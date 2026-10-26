@@ -89,11 +89,16 @@ export interface Params {
     wd: number;
     /** Weight ξ of the optimal light direction V. */
     xi: number;
-    /** Weight η of the tropism vector (negative flips it). */
+    /** Weight η of the tropism vector t(A_set) (negative flips it). */
     eta: number;
-    /** Set-point angle A_set from vertical, degrees (0 orthotropic, 90 plagiotropic). */
+    /**
+     * Set-point angle A_set from vertical, degrees: 0 orthotropic, ~90 plagiotropic, > 90
+     * pendulous. One value for every axis until R2 (M7) gives each physiological age its own.
+     */
     setPoint: number;
-    /** Angular noise σ, degrees. */
+    /** Weight ε of the noise vector u = d_prev rotated by N(0, σ²). */
+    epsilon: number;
+    /** Angular noise σ of u, degrees. */
     sigma: number;
   };
 
@@ -136,7 +141,7 @@ export const defaultParams: Params = {
     perceptionDistance: 4,
   },
   c3: { mode: "none", lambda: 0.5, alpha: 2 },
-  c4: { enabled: false, wd: 1, xi: 0.3, eta: 0.15, setPoint: 0, sigma: 8 },
+  c4: { enabled: false, wd: 1, xi: 0.3, eta: 0.15, setPoint: 0, epsilon: 0.5, sigma: 20 },
   c5: { enabled: false, T: 0.3, g: 3 },
   c6: { enabled: false, n: 2, r0: 0.08 },
 };

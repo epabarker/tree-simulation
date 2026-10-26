@@ -50,6 +50,32 @@ const SECTIONS: SectionSpec[] = [
       { key: "perceptionDistance", label: "r perception", min: 1, max: 8, step: 1 },
     ],
   },
+  {
+    section: "c3",
+    title: "C3 Allocation",
+    fields: [
+      {
+        key: "mode",
+        label: "mode",
+        options: { "Borchert–Honda": "bh", "equal (ablation)": "equal", "none (M0–M1)": "none" },
+      },
+      { key: "lambda", label: "λ apical bias", min: 0.4, max: 0.65, step: 0.005 },
+      { key: "alpha", label: "α resource", min: 0.5, max: 5, step: 0.1 },
+    ],
+  },
+  {
+    section: "c4",
+    title: "C4 Direction",
+    toggle: true,
+    fields: [
+      { key: "wd", label: "w_d previous", min: 0, max: 3, step: 0.05 },
+      { key: "xi", label: "ξ light", min: 0, max: 2, step: 0.05 },
+      { key: "eta", label: "η tropism", min: -1, max: 1, step: 0.05 },
+      { key: "setPoint", label: "A_set°", min: 0, max: 180, step: 1 },
+      { key: "epsilon", label: "ε noise", min: 0, max: 2, step: 0.05 },
+      { key: "sigma", label: "σ noise°", min: 0, max: 90, step: 1 },
+    ],
+  },
 ];
 
 export interface PlaybackState {

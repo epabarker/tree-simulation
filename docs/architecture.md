@@ -67,7 +67,7 @@ The passes need only `parent` and `slot`:
 | BASIPETAL | `gatherLight` (C3): Q_sum, n_b, Q_base | M0 |
 | CARBON | — | M8 |
 | ACROPETAL | `allocate` (C3, by `c3.mode`): `bh` splits by λ at every node; `equal` shares α·Q_base over live buds; `none` gives v = 1 to any bud with Q > 0. Every mode fills `vIn` | M0 `none`, M2 `bh`/`equal` |
-| BUD_FATE, GROW | `growBuds` → `shootSize`, `growShoot` (C1, C4 direction) | M0, M3 |
+| BUD_FATE, GROW | `growBuds` → `shootSize`, `growShoot`; each new metamer's angle comes from `shootDirection` (C4) when `c4.enabled`, using the bud's V | M0, M3 |
 | SHED, GIRTH | — | M4 |
 | MECHANICS | — | M9 |
 | COMMIT_STAGING | `commitBuds` compacts consumed buds; new rows were appended past the phase's loop bounds | M0 |

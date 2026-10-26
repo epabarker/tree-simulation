@@ -5,5 +5,7 @@
   "shadow:seed2:s40": "b6b5e932",
   "bh:seed1:s40": "aca2393b",
   "leader:seed1:s30": "dbee4861",
-  "spreading:seed1:s30": "06bc048a"
+  "spreading:seed1:s30": "06bc048a",
+  "direction:seed1:s30": "656c6289",
+  "wall:seed1:s30": "155fb2bf"
 }

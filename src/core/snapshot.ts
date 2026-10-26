@@ -9,6 +9,7 @@
  */
 
 import { type TreeMetrics, treeMetrics } from "./metrics.ts";
+import type { Wall } from "./params.ts";
 import { isLiveBud } from "./principles/c3-allocation.ts";
 import type { F32, I32, U8 } from "./soa.ts";
 import type { World } from "./world.ts";
@@ -43,6 +44,7 @@ export interface Snapshot {
   budQ: F32;
   /** Shadow per cell (row-major, row 0 at the ground), or null when C2 is off. */
   shadow: F32 | null;
+  walls: Wall[];
   metrics: TreeMetrics[];
   /** Milliseconds the worker spent on the season(s) behind this snapshot. */
   seasonMs: number;
@@ -111,6 +113,7 @@ export class SnapshotBuilder {
       budState: new Uint8Array(nb),
       budQ: new Float32Array(nb),
       shadow: null,
+      walls: world.params.c2.enabled ? world.params.world.walls : [],
       metrics: world.trees.filter((t) => t.m.length > 0).map(treeMetrics),
       seasonMs,
     };

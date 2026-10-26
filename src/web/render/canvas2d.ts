@@ -182,6 +182,11 @@ export class Canvas2DRenderer {
       ctx.restore();
     }
 
+    if (s.walls.length > 0) {
+      ctx.fillStyle = style.getPropertyValue("--wall").trim() || "rgba(90, 90, 100, 0.35)";
+      for (const wall of s.walls) ctx.fillRect(wall.x, wall.y, wall.width, wall.height);
+    }
+
     this.computeGeometry(t);
     if (view.showGhosts && this.prev && t < 1) this.drawGhosts(1 - t);
     this.drawSegments(s, view.colorMode);

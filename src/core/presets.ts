@@ -62,11 +62,33 @@ export const presets = {
       c3: { mode: "bh", lambda: 0.46 },
     },
   },
+  direction: {
+    label: "M3: shoots bend to light and tropism",
+    description: "C4 on: each new metamer turns toward light V and its set-point (§C4).",
+    patch: {
+      world: { width: 120, height: 90, walls: [] },
+      trees: [{ x: 60 }],
+      c2: { enabled: true },
+      c3: { mode: "bh", lambda: 0.5 },
+      c4: { enabled: true },
+    },
+  },
+  wall: {
+    label: "M3: lean away from a wall",
+    description: "A shaded wall left of the tree: the crown grows away from it (§7 M3).",
+    patch: {
+      world: { width: 100, height: 80, walls: [{ x: 36, y: 0, width: 8, height: 80, shade: 3 }] },
+      trees: [{ x: 50 }],
+      c2: { enabled: true },
+      c3: { mode: "bh", lambda: 0.5 },
+      c4: { enabled: true },
+    },
+  },
 } satisfies Record<string, Preset>;
 
 export type PresetName = keyof typeof presets;
 
-export const defaultPreset: PresetName = "shadow";
+export const defaultPreset: PresetName = "direction";
 
 export function presetParams(name: PresetName, seed?: number): Params {
   const params = mergeParams(defaultParams, presets[name].patch);

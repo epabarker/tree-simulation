@@ -2,17 +2,16 @@
 
 _Last updated: 2026-10-26_
 
-**Current milestone: M3** (C4 shoot direction). M0–M2 are done. The repo is public at https://github.com/epabarker/tree-simulation, and CI and the Pages deploy are green.
+**Current milestone: M4** (C5 shedding + C6 pipe girth). M0–M3 are done. The repo is public at https://github.com/epabarker/tree-simulation, and CI and the Pages deploy are green.
 
 ## Works
-- Core: SoA tables, keyed-hash RNG, C1 buds and shoots, C2 shadow triangle (default a = 0.2, b = 2, C = 1), C3 Borchert–Honda (`bh`/`equal`), the §6 season loop, metrics, golden hashes.
+- Core: SoA tables, keyed-hash RNG, C1 buds and shoots, C2 shadow triangle (default a = 0.2, b = 2, C = 1), C3 Borchert–Honda (`bh`/`equal`), C4 direction, the §6 season loop, metrics, golden hashes.
 - Page: worker (Comlink), Canvas 2D renderer with tweening and auto-fit, Tweakpane panel, Observable Plot charts. M0 has been checked visually in Firefox.
 - Headless: `npm run sim`; `uv run --project analysis python analysis/experiments/m0_growth.py` (growth ratio ≈ 2.0 per season).
 
 ## Next
-1. M3: C4 weighted direction (w_d, ξ·V, η·tropism to A_set, noise σ via `Purpose.directionNoise`), a wall preset, and tests (the wall pushes the centroid away; the tropism sign changes the spread).
-2. M4: C5 shedding (scars, compaction with remap) and C6 pipe girth with memory; the junction-exponent histogram.
-3. M5: multi-tree stands; tap to remove a tree.
+1. M4: C5 shedding (Q_b/n_b < T after g seasons; scars; compaction with index remap) and C6 pipe girth with memory; the junction-exponent histogram and a bole-height metric.
+2. M5: multi-tree stands; tap to remove a tree; per-tree Q bars.
 4. Recalibrate a, b, C with C3 on; add a leader-share metric (λ sweep follow-up).
 
 ## Open questions (for the user)

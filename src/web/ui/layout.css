@@ -3,6 +3,7 @@
   --fg: #2b2a27;
   --muted: #6d6a62;
   --ground: #8a7a5a;
+  --wall: rgba(90, 90, 100, 0.35);
   --panel-bg: transparent;
   color-scheme: light dark;
 }

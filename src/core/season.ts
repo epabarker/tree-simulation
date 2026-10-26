@@ -9,8 +9,11 @@
  */
 
 import type { LightSample } from "./light/light-model.ts";
+import { DEG } from "./params.ts";
 import { type DirectionFn, growShoot, shootSize } from "./principles/c1-buds.ts";
 import { allocate, gatherLight, isLiveBud } from "./principles/c3-allocation.ts";
+import { shootDirection } from "./principles/c4-direction.ts";
+import { normal, Purpose } from "./rng.ts";
 import { BudState, type Tree } from "./tree.ts";
 import type { World } from "./world.ts";
 
@@ -72,7 +75,14 @@ function sampleBuds(world: World, tree: Tree): void {
 /** Bud fate and growth: a bud with n ≥ 1 grows a shoot, any other live bud stays dormant. */
 function growBuds(world: World, tree: Tree, season: number): void {
   const { params } = world;
-  const direct: DirectionFn = (prev) => prev;
+  const { c4 } = params;
+  const sigma = c4.sigma * DEG;
+  const direct: DirectionFn = c4.enabled
+    ? (prev, bud, id) => {
+        const noise = sigma * normal(params.seed, Purpose.directionNoise, tree.id, id, season);
+        return shootDirection(prev, tree.b.cols.vx[bud], tree.b.cols.vy[bud], noise, c4);
+      }
+    : (prev) => prev;
   const b = tree.b.cols;
   const count = tree.b.length;
   for (let i = 0; i < count; i++) {

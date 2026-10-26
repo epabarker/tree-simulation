@@ -1,0 +1,6 @@
+{
+  // Tests, test helpers and tool configs (Node). Each src/* area has its own tsconfig.
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": { "lib": ["es2023"], "types": ["node"] },
+  "include": ["src/**/*.test.ts", "tests/**/*.ts", "vite.config.ts"]
+}

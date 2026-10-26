@@ -1,0 +1,112 @@
+/**
+ * The simulated world (spec §5 "Global state"): parameters, trees, the shared light model,
+ * the season counter and a log of interactive events, so any session can be replayed exactly.
+ */
+
+import { type LightModel, UniformLight } from "./light/light-model.ts";
+import { clone, mergeParams, type Params, type ParamsPatch } from "./params.ts";
+import { plantSeedling } from "./principles/c1-buds.ts";
+import { runSeason } from "./season.ts";
+import { Tree } from "./tree.ts";
+
+/** A change applied at the start of `season` (before that season runs). */
+export type RunEvent =
+  | { season: number; type: "params"; patch: ParamsPatch }
+  | { season: number; type: "removeTree"; tree: number };
+
+/** Everything needed to reproduce a run: initial params plus the event log. */
+export interface RunRecord {
+  params: Params;
+  events: RunEvent[];
+  seasons: number;
+}
+
+export function makeLight(params: Params): LightModel {
+  const { width, height } = params.world;
+  return new UniformLight(width, height, params.c2.C);
+}
+
+export class World {
+  readonly initialParams: Params;
+  params: Params;
+  season = 0;
+  readonly trees: Tree[];
+  light: LightModel;
+  /** Events applied so far. */
+  readonly log: RunEvent[] = [];
+  private pending: RunEvent[] = [];
+
+  constructor(params: Params) {
+    this.initialParams = clone(params);
+    this.params = clone(params);
+    this.light = makeLight(this.params);
+    this.trees = this.params.trees.map((spec, id) => {
+      const tree = new Tree(id, spec.x);
+      tree.alive = false; // planted when its season comes
+      return tree;
+    });
+    this.plantDue();
+  }
+
+  /** Queues a parameter change for the next season boundary. `trees` cannot change mid-run. */
+  setParams(patch: ParamsPatch): void {
+    const { trees: _ignored, ...rest } = patch;
+    this.pending.push({ season: this.season, type: "params", patch: rest });
+  }
+
+  /** Queues the removal of a tree at the next season boundary (deaths take effect last, §6). */
+  removeTree(tree: number): void {
+    this.pending.push({ season: this.season, type: "removeTree", tree });
+  }
+
+  /** Applies queued events, plants due seedlings and runs one season. */
+  step(): void {
+    for (const event of this.pending) this.apply({ ...event, season: this.season });
+    this.pending = [];
+    this.plantDue();
+    runSeason(this);
+    this.season += 1;
+  }
+
+  /** Runs `seasons` seasons, applying any recorded events at their seasons (CLI replay). */
+  run(seasons: number, events: readonly RunEvent[] = []): void {
+    const queue = [...events].sort((a, b) => a.season - b.season);
+    let next = 0;
+    for (let s = 0; s < seasons; s++) {
+      while (next < queue.length && (queue[next] as RunEvent).season <= this.season) {
+        this.apply(queue[next] as RunEvent);
+        next += 1;
+      }
+      this.step();
+    }
+  }
+
+  record(): RunRecord {
+    return { params: clone(this.initialParams), events: clone(this.log), seasons: this.season };
+  }
+
+  private apply(event: RunEvent): void {
+    this.log.push(event);
+    if (event.type === "params") {
+      this.params = mergeParams(this.params, event.patch);
+      this.light = makeLight(this.params);
+    } else {
+      const tree = this.trees[event.tree];
+      if (tree) tree.alive = false;
+    }
+  }
+
+  private plantDue(): void {
+    this.params.trees.forEach((spec, id) => {
+      const tree = this.trees[id] as Tree;
+      if (tree.m.length === 0 && (spec.plantSeason ?? 0) <= this.season && !this.isRemoved(id)) {
+        tree.alive = true;
+        plantSeedling(tree, this.params, this.season);
+      }
+    });
+  }
+
+  private isRemoved(id: number): boolean {
+    return this.log.some((e) => e.type === "removeTree" && e.tree === id);
+  }
+}

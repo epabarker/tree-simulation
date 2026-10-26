@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run *)",
+      "Bash(npm test*)",
+      "Bash(npx vitest *)",
+      "Bash(npx tsc *)",
+      "Bash(npx biome *)",
+      "Bash(node cli/run.ts *)",
+      "Bash(uv run *)",
+      "Bash(git status*)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "Bash(gh run list*)",
+      "Bash(gh run view*)"
+    ]
+  }
+}

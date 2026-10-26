@@ -1,0 +1,37 @@
+{
+  "name": "tree-simulation",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Self-organizing trees in a 2D world: an interactive procedural growth simulator",
+  "license": "MIT",
+  "author": "Edward Barker",
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc -p src/core && tsc -p src/worker && tsc -p src/web && tsc -p cli && tsc -p .",
+    "lint": "biome check .",
+    "format": "biome check --write .",
+    "test": "vitest run",
+    "check": "npm run lint && npm run typecheck && npm run test",
+    "sim": "node cli/run.ts",
+    "golden:update": "node tests/update-golden.ts"
+  },
+  "dependencies": {
+    "@observablehq/plot": "^0.6.17",
+    "comlink": "^4.4.2",
+    "tweakpane": "^4.0.5"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.6.3",
+    "@tweakpane/core": "^2.0.5",
+    "@types/node": "^24.19.2",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.5",
+    "vitest": "^5.0.5"
+  }
+}

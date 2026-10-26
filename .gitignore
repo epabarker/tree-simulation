@@ -1,0 +1,13 @@
+node_modules/
+dist/
+runs/
+*.log
+.DS_Store
+
+# Python analysis
+analysis/.venv/
+analysis/out/
+__pycache__/
+
+# Personal Claude Code settings (shared ones live in .claude/settings.json)
+.claude/settings.local.json

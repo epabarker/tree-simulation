@@ -1,0 +1,7 @@
+{
+  // Pure simulation core: no DOM, no Node. Using either is a type error here.
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": { "lib": ["es2023"] },
+  "include": ["./**/*.ts"],
+  "exclude": ["./**/*.test.ts"]
+}

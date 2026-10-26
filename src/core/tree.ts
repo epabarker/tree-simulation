@@ -1,0 +1,125 @@
+/**
+ * One tree's state (spec §5): a metamer table and a bud table, both structure-of-arrays.
+ *
+ * Topology without child pointers: every metamer records its `parent` and the `slot` it
+ * occupies at the parent's upper node (0 = continuation of the parent's axis, 1 = left
+ * lateral, 2 = right lateral). A bud sits at its metamer's upper node in one of the same
+ * slots. In 2D a node has at most two sides, so three slots cover every phyllotaxis in §C1.
+ * A slot holds a bud or a child metamer, never both: when a bud grows it is consumed and the
+ * new metamer takes its slot.
+ */
+
+import { ensureFloat64, ensureUint8, Table } from "./soa.ts";
+
+export const Slot = { main: 0, left: 1, right: 2 } as const;
+export type Slot = (typeof Slot)[keyof typeof Slot];
+
+/** Bud fates (spec §C1). 0 marks a consumed or removed bud awaiting compaction. */
+export const BudState = { gone: 0, active: 1, dormant: 2, terminated: 3, aborted: 4 } as const;
+export type BudState = (typeof BudState)[keyof typeof BudState];
+
+export const METAMER_SCHEMA = {
+  /** Stable id, unique within the tree, ascending in array order. Keys RNG draws and tweening. */
+  birthId: Int32Array,
+  /** Index of the parent metamer, -1 for the root. Always less than the row's own index. */
+  parent: Int32Array,
+  /** Slot at the parent's upper node (Slot). */
+  slot: Uint8Array,
+  /** birthId of the first metamer of this metamer's axis. */
+  axis: Int32Array,
+  /** Position along the axis (0 = first metamer of the axis). Drives the side sequence. */
+  axisNode: Int32Array,
+  /** Branching order (0 = trunk). */
+  order: Uint8Array,
+  baseX: Float64Array,
+  baseY: Float64Array,
+  /** Absolute direction, radians (0 = +x, π/2 = up). */
+  angle: Float64Array,
+  length: Float64Array,
+  radius: Float64Array,
+  /** Σ r^n of branches shed from this metamer's upper node (C6 scars). */
+  scarSumN: Float64Array,
+  birthSeason: Int32Array,
+  // Per-season values written by the passes and kept with the row, so they survive compaction
+  // and can be drawn (spec §5 "scratch per pass").
+  /** Light gathered by the subtree above and including this metamer: Q_sum (C3, C5). */
+  qSum: Float64Array,
+  /** Metamer count of that subtree: n_b (C5). */
+  nSum: Int32Array,
+  /** Resource arriving at the metamer's base this season (C3). */
+  vIn: Float64Array,
+} as const;
+
+export const BUD_SCHEMA = {
+  /** Stable id, unique within the tree. Keys RNG draws. */
+  birthId: Int32Array,
+  /** Index of the metamer whose upper node holds the bud. */
+  metamer: Int32Array,
+  slot: Uint8Array,
+  state: Uint8Array,
+  /** Seasons since the bud was formed. */
+  age: Int32Array,
+  /** Order of the shoot this bud would produce. */
+  order: Uint8Array,
+  /** Default growth direction, radians: the parent's direction, rotated by β for laterals. */
+  angle: Float64Array,
+  /** Light exposure Q and optimal direction V from the light model (C2). */
+  q: Float64Array,
+  vx: Float64Array,
+  vy: Float64Array,
+  /** Resource v delivered this season (C3). */
+  v: Float64Array,
+} as const;
+
+export class Tree {
+  readonly id: number;
+  readonly rootX: number;
+  alive = true;
+  /** Seasons since planting. */
+  age = 0;
+  nextMetamerId = 0;
+  nextBudId = 0;
+
+  readonly m = new Table(METAMER_SCHEMA, 256);
+  readonly b = new Table(BUD_SCHEMA, 256);
+
+  // Per-season scratch, indexed like the metamer table. Never compacted; resized on demand.
+  /** Light flowing into each node from each slot (3 per metamer). */
+  qSlot = new Float64Array(0);
+  /** Resource leaving each node through each slot (3 per metamer). */
+  vSlot = new Float64Array(0);
+  /** Pass-local scratch (C6 child Σ r^n, C5 shed marks). */
+  scratchF = new Float64Array(0);
+  scratchU = new Uint8Array(0);
+
+  /** Light and resource at the base this season (C3), for metrics. */
+  qBase = 0;
+  vBase = 0;
+  /** Metamers shed this season (C5). */
+  shedCount = 0;
+  /** Mean Q over the buds sampled this season (C2). */
+  meanBudQ = 0;
+
+  constructor(id: number, rootX: number) {
+    this.id = id;
+    this.rootX = rootX;
+  }
+
+  ensureScratch(): void {
+    const n = this.m.capacity;
+    this.qSlot = ensureFloat64(this.qSlot, 3 * n);
+    this.vSlot = ensureFloat64(this.vSlot, 3 * n);
+    this.scratchF = ensureFloat64(this.scratchF, n);
+    this.scratchU = ensureUint8(this.scratchU, Math.max(n, this.b.capacity));
+  }
+
+  tipX(i: number): number {
+    const c = this.m.cols;
+    return c.baseX[i] + c.length[i] * Math.cos(c.angle[i]);
+  }
+
+  tipY(i: number): number {
+    const c = this.m.cols;
+    return c.baseY[i] + c.length[i] * Math.sin(c.angle[i]);
+  }
+}

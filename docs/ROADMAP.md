@@ -8,7 +8,7 @@ Status key: ✅ done · 🚧 in progress · ⏳ not started.
 
 | # | Build | Visible test (§7) | Automated check | Status |
 |---|---|---|---|---|
-| M0 | Metamer graph, distichous buds, all buds grow; worker, renderer, CLI, analysis | Exponential bush (Borchert–Slade explosion) | `src/core/world.test.ts`: parent-before-child; growth ratio > 1.5; alternating sides; replay; goldens | 🚧 |
+| M0 | Metamer graph, distichous buds, all buds grow; worker, renderer, CLI, analysis | Exponential bush (Borchert–Slade explosion) | `src/core/world.test.ts`: parent-before-child; growth ratio > 1.5; alternating sides; replay; goldens | ✅ 2026-10-26 |
 | M1 | C2 shadow triangle | Density regulated; shadow heatmap and bud-light overlay | Deposit pattern a·b^(−q); growth ratio below M0's | ⏳ |
 | M2 | C3 Borchert–Honda allocation | λ 0.46 → 0.56: spreading → leader | Σ v at buds = v_base; leader dominance at 0.56 > at 0.46 (5 seeds); λ sweep note | ⏳ |
 | M3 | C4 direction | Lean away from a wall; tropism sign flips spread | Wall pushes the centroid away; tropism sign changes width | ⏳ |
@@ -25,7 +25,7 @@ Status key: ✅ done · 🚧 in progress · ⏳ not started.
 
 | ID | Principle | Spec | Switch | Code | Tests | Overlay / colour | Status |
 |---|---|---|---|---|---|---|---|
-| C1 | Metamers, buds, distichous side sequence | §C1 | always on | `principles/c1-buds.ts` | `world.test.ts` | colour: order; buds | 🚧 M0 |
+| C1 | Metamers, buds, distichous side sequence | §C1 | always on | `principles/c1-buds.ts` | `world.test.ts` | colour: order; buds | ✅ M0 |
 | C2 | Shadow triangle → Q, V | §C2 | `c2.enabled` | `light/` | — | shadow heatmap; colour: light | ⏳ M1 |
 | C3 | Basipetal ΣQ, Borchert–Honda split | §C3 | `c3.mode` (`bh`/`equal`/`none`) | `principles/c3-allocation.ts` (basipetal pass and `none` mode exist) | — | colour: resource | ⏳ M2 |
 | C4 | Weighted shoot direction | §C4 | `c4.enabled` | — | — | — | ⏳ M3 |

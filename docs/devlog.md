@@ -2,6 +2,16 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-26: M6, the Beer–Lambert sky sweep
+
+- Polish bundles (shareable links, diagnostic overlays) dropped at the user's request; the half-done groundwork was reverted.
+- `SkySweep` implements §C2.4: leaf area per cell from buds, K sky directions, optical depth swept from the sky side with linear interpolation, Q = Σ w_k e^(−k_ext T_k), V the light-weighted sky direction. Light models gained `compute()` (end of Phase 1). Three open details decided in ADR 0005: own cell does not shade its buds; rays from beyond the sides are open sky; w ∝ sin(elevation)^p · (1 + tilt·cos θ).
+- Sky is the new default model; the M1–M5 presets pin the triangle, and every existing golden is unchanged (checked against a pre-change regeneration). New presets `skyStand` (page default), `skyGrove` (phones), `skyTree`, `obliqueSun`.
+- Results ([note](experiments/2026-10-26-m6-sky-sweep.md)): edge trees lean out 7.6 cells (median), stand crown bases lift to 51 cells while open-grown trees keep branches to the ground, neighbours lean 1.6–6.7 cells into a felled tree's gap, oblique sun leans crowns 8–14 cells; no seedling stalls at k_ext 0.5. About 3 ms per season for 10 trees.
+- Surprise: a suppressed decurrent stand tree can lose almost its whole crown to C5 in one season (its tall fork is a lateral). Spec-conformant; looks like the onset of self-thinning.
+- Fixed `treesim.load_run` CSV type inference (a column can start as whole numbers).
+- The WebGL2 renderer, also slated for M6 in ADR 0001, is split out as M6b.
+
 ## 2026-10-26: Polish, natural look and page experience
 
 - **Scope.** You chose two polish bundles: natural look and page experience. Shareable links and diagnostic overlays are deferred.

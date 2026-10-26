@@ -2,28 +2,27 @@
 
 _Last updated: 2026-10-26_
 
-**The prototype (M0–M5) is complete.** The repo is public at https://github.com/epabarker/tree-simulation, and CI and Pages are green. Next is M6: sky sweep + WebGL2 renderer.
+**Current milestone: M6b** (WebGL2 renderer) or M7 (R2 physiological age). M0–M6 are done; repo public at https://github.com/epabarker/tree-simulation, CI and Pages green.
 
 ## Works
-- Core: SoA tables, keyed-hash RNG, C1 buds, C2 shadow triangle, C3 Borchert–Honda (plus the `equal` ablation), C4 direction, C5 shedding, C6 pipe girth with memory, multi-tree stands, the §6 season loop, golden hashes. 51 tests.
-- Page: natural view (bark, leaves, sky; light and dark), autoplay, eased camera, season counter, tap to fell a tree, themed Tweakpane folders C1–C6, charts, phone layout with a four-tree default.
-- Headless and analysis: `npm run sim`; `analysis/experiments/` (m0 growth, m2 λ sweep, m4 calibration).
-- Defaults: a = 0.15, b = 1.5, qMax = 6, C = 1, T = 0.1, α = 2, λ = 0.5 (all `calibrate` except α).
+- Core: C1–C6 and two light models — the Beer–Lambert sky sweep (default, ADR 0005) and the shadow triangle (pinned in the M1–M5 presets); multi-tree stands; the §6 season loop; golden hashes. 66 tests.
+- Page: natural view (bark, leaves, sky; light and dark), autoplay, eased camera, tap to fell a tree, themed Tweakpane folders C1–C6 (C2 has a model switch), charts, phone layout. Opens on `skyStand` (`skyGrove` on phones).
+- Headless and analysis: `npm run sim`; `analysis/experiments/` (m0 growth, m2 λ sweep, m4 calibration, m6 sky sweep).
+- Defaults: sky k_ext = 0.5, K = 7, cosine-weighted; T = 0.1, α = 2, λ = 0.5.
 
 ## Next
-1. Agree the next step with the user: M6 (Beer–Lambert sky sweep, WebGL2 renderer), or the deferred polish bundles (shareable links; §8 diagnostic overlays).
-2. M6 is expected to lift crown bases in stands and on isolated trees. Re-run the bole checks then.
-3. Leader-share metric; rerun the λ sweep with shedding on.
+1. Agree with the user: M6b (WebGL2 renderer, ADR 0001) or M7 (R2 physiological age, §9 species presets).
+2. Leader-share metric; rerun the λ sweep with shedding and the sky on.
+3. Sweep K / sky exponent; consider R1 (M8) to turn crown loss into mortality.
 
 ## Open questions (for the user)
 - **The Pages demo URL is unreachable.** The user site `epabarker.github.io` has the custom domain `barker.garden`, which no longer resolves in DNS (NXDOMAIN), so every project page redirects to it. Fix: remove that custom domain, restore the DNS, or give this repo its own domain.
-- Whether to add `runs/` and `dist/` to the `pcloud-sync` filters (this folder syncs to pCloud hourly).
+- Delete the ≈ 5 MB of early `runs/` and `dist/` copies on pCloud (`rclone purge pcloud:Projects/tree-simulation/runs`, `…/dist`)?
 
 ## Known issues
-- The shadow triangle can't lift crown bases: shade reaches only qMax layers below a bud (→ M6 sky sweep).
-- The seedling starvation trap (4+ buds in a cell, each v < 1) is now rare at a = 0.15, but stalls are permanent until R1/R4 exist.
+- Suppressed decurrent stand trees can lose their crown to C5 in one season (spec-conformant; mortality comes with R1).
+- Shadow-triangle presets (M1–M5) still show the seedling trap rarely and no crown lift; the sky sweep does not.
 
 ## Notes for the next session
-- Before C3 was implemented, `c3.mode: "none"` was the milestone scaffold: any bud with Q > 0 grows one metamer.
-- The world is a closed box: Q = 0 outside the grid on every side.
+- The world is a closed box for growth (Q = 0 outside); the sky sweep still lets light in from beyond the sides.
 - Visual checks: `npx vite preview`, then drive the system Firefox with puppeteer-core from a scratch folder (see auto-memory).

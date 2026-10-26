@@ -13,12 +13,15 @@ export interface Preset {
 
 /** Principles shared by every stand preset (C2–C6 on, λ = 0.5). */
 const STAND = {
-  c2: { enabled: true },
+  c2: { enabled: true, model: "triangle" },
   c3: { mode: "bh", lambda: 0.5 },
   c4: { enabled: true },
   c5: { enabled: true },
   c6: { enabled: true },
 } satisfies ParamsPatch;
+
+/** Principles of the M6 presets: as STAND, with the Beer–Lambert sky sweep as the light model. */
+const SKY = { ...STAND, c2: { enabled: true, model: "sky" } } satisfies ParamsPatch;
 
 export const presets = {
   explosion: {
@@ -37,7 +40,7 @@ export const presets = {
     patch: {
       world: { width: 100, height: 70, walls: [] },
       trees: [{ x: 50 }],
-      c2: { enabled: true },
+      c2: { enabled: true, model: "triangle" },
       c3: { mode: "none" },
     },
   },
@@ -47,7 +50,7 @@ export const presets = {
     patch: {
       world: { width: 120, height: 90, walls: [] },
       trees: [{ x: 60 }],
-      c2: { enabled: true },
+      c2: { enabled: true, model: "triangle" },
       c3: { mode: "bh", lambda: 0.5 },
     },
   },
@@ -57,7 +60,7 @@ export const presets = {
     patch: {
       world: { width: 120, height: 90, walls: [] },
       trees: [{ x: 60 }],
-      c2: { enabled: true },
+      c2: { enabled: true, model: "triangle" },
       c3: { mode: "bh", lambda: 0.56 },
     },
   },
@@ -67,7 +70,7 @@ export const presets = {
     patch: {
       world: { width: 120, height: 90, walls: [] },
       trees: [{ x: 60 }],
-      c2: { enabled: true },
+      c2: { enabled: true, model: "triangle" },
       c3: { mode: "bh", lambda: 0.46 },
     },
   },
@@ -77,7 +80,7 @@ export const presets = {
     patch: {
       world: { width: 120, height: 90, walls: [] },
       trees: [{ x: 60 }],
-      c2: { enabled: true },
+      c2: { enabled: true, model: "triangle" },
       c3: { mode: "bh", lambda: 0.5 },
       c4: { enabled: true },
     },
@@ -88,7 +91,7 @@ export const presets = {
     patch: {
       world: { width: 100, height: 80, walls: [{ x: 36, y: 0, width: 8, height: 80, shade: 3 }] },
       trees: [{ x: 50 }],
-      c2: { enabled: true },
+      c2: { enabled: true, model: "triangle" },
       c3: { mode: "bh", lambda: 0.5 },
       c4: { enabled: true },
     },
@@ -99,7 +102,7 @@ export const presets = {
     patch: {
       world: { width: 120, height: 100, walls: [] },
       trees: [{ x: 60 }],
-      c2: { enabled: true },
+      c2: { enabled: true, model: "triangle" },
       c3: { mode: "bh", lambda: 0.5 },
       c4: { enabled: true },
       c5: { enabled: true },
@@ -142,11 +145,49 @@ export const presets = {
       ...STAND,
     },
   },
+  skyStand: {
+    label: "M6: stand under a full sky",
+    description:
+      "Beer–Lambert sky sweep: edge trees lean out, crowns lift, gaps get filled (§C2, M6).",
+    patch: {
+      world: { width: 230, height: 110, walls: [] },
+      trees: [20, 41, 62, 83, 104, 125, 146, 167, 188, 209].map((x) => ({ x })),
+      ...SKY,
+    },
+  },
+  skyGrove: {
+    label: "M6: grove under a full sky",
+    description: "Four trees under the sky sweep, sized for a phone.",
+    patch: {
+      world: { width: 110, height: 100, walls: [] },
+      trees: [22, 44, 66, 88].map((x) => ({ x })),
+      ...SKY,
+    },
+  },
+  skyTree: {
+    label: "M6: one tree under a full sky",
+    description: "An open-grown tree keeps its low, side-lit branches.",
+    patch: {
+      world: { width: 120, height: 100, walls: [] },
+      trees: [{ x: 60 }],
+      ...SKY,
+    },
+  },
+  obliqueSun: {
+    label: "M6: oblique sun",
+    description: "A sky brighter to the right (tilt 0.5): the crown grows toward the sun (§C2.6).",
+    patch: {
+      world: { width: 120, height: 100, walls: [] },
+      trees: [{ x: 50 }],
+      ...SKY,
+      c2: { enabled: true, model: "sky", skyTilt: 0.5 },
+    },
+  },
 } satisfies Record<string, Preset>;
 
 export type PresetName = keyof typeof presets;
 
-export const defaultPreset: PresetName = "stand";
+export const defaultPreset: PresetName = "skyStand";
 
 export function presetParams(name: PresetName, seed?: number): Params {
   const params = mergeParams(defaultParams, presets[name].patch);

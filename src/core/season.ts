@@ -32,6 +32,7 @@ export function runSeason(world: World): void {
     for (const wall of params.world.walls) light.addWall(wall);
     for (const tree of live) depositBuds(world, tree);
   }
+  light.compute();
 
   // Phase 2: per-tree passes, reading the environment only.
   for (const tree of live) {

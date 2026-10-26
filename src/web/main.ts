@@ -31,7 +31,7 @@ const sim = Comlink.wrap<SimApi>(worker);
 const narrow = window.matchMedia("(max-width: 700px)").matches;
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 // A phone shows a four-tree grove; the ten-tree stand would be too small to read.
-const startPreset: PresetName = narrow ? "grove" : defaultPreset;
+const startPreset: PresetName = narrow ? "skyGrove" : defaultPreset;
 
 const hud = element("hud");
 const playback: PlaybackState = { playing: false, speed: 3 };

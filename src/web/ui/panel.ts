@@ -39,10 +39,19 @@ const SECTIONS: SectionSpec[] = [
   },
   {
     section: "c2",
-    title: "C2 Light (shadow)",
+    title: "C2 Light",
     toggle: true,
     fields: [
-      { key: "a", label: "a strength", min: 0.1, max: 3, step: 0.05 },
+      {
+        key: "model",
+        label: "model",
+        options: { "sky sweep (M6)": "sky", "shadow triangle": "triangle" },
+      },
+      { key: "kExt", label: "k_ext (sky)", min: 0.05, max: 3, step: 0.05 },
+      { key: "K", label: "K directions (sky)", min: 1, max: 15, step: 1 },
+      { key: "skyTilt", label: "sky tilt (sun side)", min: -1, max: 1, step: 0.05 },
+      { key: "skyExponent", label: "zenith weighting", min: 0, max: 4, step: 0.1 },
+      { key: "a", label: "a strength (triangle)", min: 0.05, max: 3, step: 0.05 },
       { key: "b", label: "b decay", min: 1.05, max: 4, step: 0.05 },
       { key: "qMax", label: "q max depth", min: 1, max: 12, step: 1 },
       { key: "C", label: "C full light", min: 0.1, max: 3, step: 0.05 },

@@ -49,9 +49,11 @@ export interface Params {
     maxMetamersPerShoot: number;
   };
 
-  /** C2 Shared light field: shadow triangle (Palubicki et al. §4.1, triangle in 2D). */
+  /** C2 Shared light field: shadow triangle (Palubicki et al. §4.1) or sky sweep (§C2.4, M6). */
   c2: {
     enabled: boolean;
+    /** 'triangle': the baseline shadow triangle. 'sky': the Beer–Lambert sky sweep (M6). */
+    model: "triangle" | "sky";
     /**
      * Shadow strength a > 0 (calibrate). Also the self-shadow a bud removes from its own Q.
      * Buds of one node share a cell and shade each other, so C must exceed a·(buds per node − 1).
@@ -67,6 +69,16 @@ export interface Params {
     perceptionAngle: number;
     /** Perception distance for V, in cells (Palubicki r = 4–6). */
     perceptionDistance: number;
+    /** Sky sweep: number of sky directions K (spec: 5–9). */
+    K: number;
+    /** Sky sweep: extinction coefficient k_ext per unit of leaf area (one bud = one unit) (calibrate). */
+    kExt: number;
+    /** Sky sweep: weights ∝ sin(elevation)^p; p = 1 is a cosine-weighted (overcast-like) sky. */
+    skyExponent: number;
+    /** Sky sweep: −1…1; positive skies are brighter to the right (an oblique sun, §C2.6). */
+    skyTilt: number;
+    /** Sky sweep: lowest sky direction above the horizon, degrees. */
+    minElevation: number;
   };
 
   /** C3 Basipetal light summation and acropetal Borchert–Honda allocation. */
@@ -133,12 +145,18 @@ export const defaultParams: Params = {
   },
   c2: {
     enabled: false,
+    model: "sky", // M6; the M1–M5 presets pin "triangle"
     a: 0.15, // calibrate (M5: 0.2 stalled 5/40 stand seedlings; 0.15 stalled none)
     b: 1.5, // calibrate (M4: 1.5 shades deeper than 2 once shedding is on)
     qMax: 6,
     C: 1, // calibrate
     perceptionAngle: 45,
     perceptionDistance: 4,
+    K: 7,
+    kExt: 0.5, // calibrate
+    skyExponent: 1,
+    skyTilt: 0,
+    minElevation: 15,
   },
   c3: { mode: "none", lambda: 0.5, alpha: 2 },
   c4: { enabled: false, wd: 1, xi: 0.3, eta: 0.15, setPoint: 0, epsilon: 0.5, sigma: 20 },

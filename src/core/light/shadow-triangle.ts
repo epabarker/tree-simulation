@@ -74,6 +74,9 @@ export class ShadowTriangle implements LightModel {
     }
   }
 
+  /** The shadow is complete once deposited. */
+  compute(): void {}
+
   sample(x: number, y: number, dir: number, out: LightSample): void {
     const I = Math.floor(x);
     const J = Math.floor(y);

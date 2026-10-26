@@ -20,6 +20,8 @@ export interface LightModel {
   deposit(x: number, y: number): void;
   /** A static shade source. */
   addWall(wall: Wall): void;
+  /** After all deposits (end of §6 Phase 1): derive the light field. */
+  compute(): void;
   /** Light Q and optimal direction V for a bud at (x, y) whose default direction is `dir` (radians). */
   sample(x: number, y: number, dir: number, out: LightSample): void;
   /** Per-cell shadow for overlays, or null when the model has no grid. */
@@ -45,6 +47,7 @@ export class UniformLight implements LightModel {
   clear(): void {}
   deposit(): void {}
   addWall(): void {}
+  compute(): void {}
 
   sample(x: number, y: number, _dir: number, out: LightSample): void {
     const inside = x >= 0 && x < this.width && y >= 0 && y < this.height;

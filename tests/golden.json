@@ -12,5 +12,8 @@
   "pruned:seed2:s40": "d33fdaeb",
   "pair:seed1:s35": "97731e6c",
   "late:seed1:s45": "76bc9491",
-  "stand:seed1:s30": "8c4f6dda"
+  "stand:seed1:s30": "8c4f6dda",
+  "skyStand:seed1:s30": "4290e06f",
+  "skyTree:seed1:s40": "bb6abad2",
+  "obliqueSun:seed1:s30": "0cddc39e"
 }

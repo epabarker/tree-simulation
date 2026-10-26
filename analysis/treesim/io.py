@@ -17,8 +17,9 @@ def load_run(path: str | Path) -> dict:
         "meta": record["meta"],
         "params": record["params"],
         "events": record["events"],
-        "metrics": pl.read_csv(path / "metrics.csv"),
-        "metamers": pl.read_csv(path / "metamers.csv"),
+        # Infer column types from the whole file: a column can start as whole numbers.
+        "metrics": pl.read_csv(path / "metrics.csv", infer_schema_length=None),
+        "metamers": pl.read_csv(path / "metamers.csv", infer_schema_length=None),
     }
 
 

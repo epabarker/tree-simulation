@@ -62,7 +62,7 @@ The passes need only `parent` and `slot`:
 
 | §6 step | Code | Milestone |
 |---|---|---|
-| Phase 1 `ENV.clear`, `deposit`, `compute_light` | `light.clear()`, `addWall`, `depositBuds` (only when C2 is on) | M1 |
+| Phase 1 `ENV.clear`, `deposit`, `compute_light` | `light.clear()`, `addWall`, `depositBuds` (only when C2 is on), `light.compute()` | M1, M6 |
 | Phase 2 sample (Q, V) | `sampleBuds` → `LightModel.sample` | M0 (uniform), M1 |
 | BASIPETAL | `gatherLight` (C3): Q_sum, n_b, Q_base | M0 |
 | CARBON | — | M8 |
@@ -84,6 +84,7 @@ Before this rule, shoots that left the grid saw unshaded sky and grew exponentia
 ## Light models (`src/core/light/`)
 
 All of them sit behind `LightModel.sample(x, y, dir) → {q, vx, vy}` (§C2.8):
+- `SkySweep` (M6, default `c2.model: "sky"`, ADR 0005): each bud adds one unit of leaf area to its cell; `compute()` (end of Phase 1) sweeps K sky directions from the sky side, accumulating optical depth T_k into every cell with linear interpolation between the two upstream cells, then stores Q = Σ w_k e^(−k_ext T_k) and the light-weighted direction per cell. A bud gets its cell's values (its own cell's foliage does not shade it); rays from beyond the world's sides are open sky; outside the box Q = 0. The shade overlay shows 1 − Q/Q_open.
 - `UniformLight`: C2 off.
 - `ShadowTriangle` (M1): deposits a·b^(−q) per bud, Q = max(C − s + a, 0), and V points at the least-shaded cell in a wedge of half-angle θ and radius r.
 - The sky sweep: M6.

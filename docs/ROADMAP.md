@@ -14,7 +14,8 @@ Status key: ✅ done · 🚧 in progress · ⏳ not started.
 | M3 | C4 direction | Lean away from a wall; tropism sign flips spread | `principles/c4-direction.test.ts`: each term of the weighted sum; the wall shifts the centroid by > 1 cell away (5 seeds); η −0.3 crowns > 1.2 × the width of η +0.3 | ✅ 2026-10-26 |
 | M4 | C5 shedding + C6 pipe girth | Clear bole; junction-exponent histogram near n | `principles/c5-c6.test.ts`: pipe sums, memory, shedding with scar and remap, grace period; radii never decrease; Δ = n everywhere without shedding; C5 sheds, shrinks crowns and doesn't lower the crown base (5 seeds). Isolated trees form only a low bole (1–6 cells); see the [calibration note](experiments/2026-10-26-m4-calibration.md) | ✅ 2026-10-26 (bole retested at M5) |
 | M5 | N trees, one grid | Crowns asymmetric away from each other; short tree suppressed | `stand.test.ts` (5 seeds each): a pair leans apart; a late tree is < 0.6 × the height, < 0.3 × the metamers and < 0.3 × the Q_base of its neighbours; after a removal the neighbour's centroid moves > 2 cells into the gap; results don't depend on tree processing order. Crown bases don't lift in stands: the shadow triangle is too shallow (→ M6) | ✅ 2026-10-26 |
-| M6 | Sky sweep (Beer–Lambert, K directions); WebGL2 renderer | Edge trees lean outward; neighbours lean into a gap | — | ⏳ |
+| M6 | Sky sweep (Beer–Lambert, K directions) | Edge trees lean outward; neighbours lean into a gap | `light/sky-sweep.test.ts` (exact Beer–Lambert, own cell, shallow rays, side light, open sides, tilt); `sky.test.ts` (5 seeds): edge trees lean out, interior crown base > 15 and > 5× open-grown, neighbours lean into a felled tree's gap, oblique sun, order independence. [Note](experiments/2026-10-26-m6-sky-sweep.md), ADR 0005 | ✅ 2026-10-26 |
+| M6b | WebGL2 renderer (ADR 0001) | Same scenes at 60 fps on a phone | — | ⏳ |
 | M7 | R2 physiological age; §9 species presets | Massart conifer, Rauh broadleaf, Aubréville tiers | — | ⏳ |
 | M8 | R1 carbon balance | Height plateau; suppressed tree dies; crown base rises | — | ⏳ |
 | M9 | R3 mechanics | Drooping limbs with upturned tips; willow; Troll straightening | — | ⏳ |
@@ -26,7 +27,7 @@ Status key: ✅ done · 🚧 in progress · ⏳ not started.
 | ID | Principle | Spec | Switch | Code | Tests | Overlay / colour | Status |
 |---|---|---|---|---|---|---|---|
 | C1 | Metamers, buds, distichous side sequence | §C1 | always on | `principles/c1-buds.ts` | `world.test.ts` | colour: order; buds | ✅ M0 |
-| C2 | Shadow triangle → Q, V | §C2 | `c2.enabled` | `light/shadow-triangle.ts` | `shadow-triangle.test.ts`, `world.test.ts` | shadow heatmap; colour: light (branches and buds) | ✅ M1 |
+| C2 | Shadow triangle or sky sweep → Q, V | §C2 | `c2.enabled`, `c2.model` (`sky` default, `triangle`) | `light/shadow-triangle.ts`, `light/sky-sweep.ts` | `shadow-triangle.test.ts`, `sky-sweep.test.ts`, `sky.test.ts` | shade heatmap; colour: light (branches and buds) | ✅ M1, M6 |
 | C3 | Basipetal ΣQ, Borchert–Honda split | §C3 | `c3.mode` (`bh`; `equal` = §8 ablation; `none` = M0–M1 scaffold) | `principles/c3-allocation.ts` | `c3-allocation.test.ts` | colour: resource v | ✅ M2 |
 | C4 | Weighted shoot direction | §C4 | `c4.enabled` | `principles/c4-direction.ts` (noise: `Purpose.directionNoise`, keyed by birthId and season) | `c4-direction.test.ts` | walls drawn | ✅ M3 |
 | C5 | Self-pruning | §C5 | `c5.enabled` | `principles/c5-shedding.ts` | `c5-c6.test.ts` | shed ghosts | ✅ M4 |
@@ -40,7 +41,9 @@ No published value exists for these. Tune each on an isolated tree (spec §2 tab
 
 | Param | Placeholder | Notes |
 |---|---|---|
-| `c2.a` shadow strength | 0.15 | [M1](experiments/2026-10-26-m1-shadow-calibration.md), [M4](experiments/2026-10-26-m4-calibration.md). M5: in 10-tree stands, 0.2 stalled 5 of 40 seedlings and 0.15 stalled none |
+| `c2.kExt` sky extinction | 0.5 | [M6](experiments/2026-10-26-m6-sky-sweep.md): ≥ 1 stalls some seedlings and thins crowns |
+| `c2.K`, `skyExponent`, `minElevation` | 7, 1, 15° | Not yet swept; K = 7 shows faint streaks in the shade overlay |
+| `c2.a` shadow strength (triangle) | 0.15 | [M1](experiments/2026-10-26-m1-shadow-calibration.md), [M4](experiments/2026-10-26-m4-calibration.md). M5: in 10-tree stands, 0.2 stalled 5 of 40 seedlings and 0.15 stalled none |
 | `c2.b` shadow decay | 1.5 | M4 calibration: deeper shade once shedding is on |
 | `c2.C` full exposure | 1 | The buds of one node share a cell, so C > a·(buds per node − 1) |
 | `c5.T` shedding threshold | 0.1 | M4 calibration; ≥ 0.2 over-prunes |

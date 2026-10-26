@@ -124,6 +124,15 @@ export const presets = {
       ...STAND,
     },
   },
+  grove: {
+    label: "M5: grove of four",
+    description: "Four trees: the stand at a size that reads well on a phone.",
+    patch: {
+      world: { width: 110, height: 100, walls: [] },
+      trees: [22, 44, 66, 88].map((x) => ({ x })),
+      ...STAND,
+    },
+  },
   stand: {
     label: "M5: stand of ten",
     description: "Ten trees: edge trees lean out, interior trees grow tall and narrow (§8).",

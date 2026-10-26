@@ -75,6 +75,7 @@ analysis/            uv project: polars + plotnine; experiments/ holds one scrip
 - Comments explain _why_, citing spec sections or papers. Code reads like the existing files: plain loops over typed arrays, with no classes beyond `Table`, `Tree` and `World`.
 - Formatting comes from Biome: 2 spaces, double quotes, width 100. TypeScript is strict with `erasableSyntaxOnly`: no enums, namespaces or constructor parameter properties. Use `as const` objects instead.
 - Tests: one unit test per local rule, plus each milestone's "visible test" from §7 as an automated check where possible.
+- Page colours are CSS tokens in `src/web/ui/layout.css` (light and dark); the canvas reads them via `src/web/render/theme.ts`. Don't hard-code colours in TypeScript.
 - Generated output (`runs/`, `dist/`, `analysis/out/`) is never committed. Small figures that support an experiment note go in `docs/experiments/figures/`.
 
 ## Session protocol

@@ -124,6 +124,12 @@ Tapping a tree on the page fells it. `Canvas2DRenderer.pickTree` finds the neare
 
 Every typed array is transferred, not copied.
 
+**Natural view (default).** Branches are coloured bark-young → bark-old by √(age/max age). Leaves are drawn as lens shapes at the tip of every metamer up to `leafAge` seasons old (default 5), alternating sides by birthId parity, coloured shade → sun by the metamer's light, with a small stable per-leaf variation. They are a view of the foliage only: in the model, buds cast the shade (§C2). Leaves unfold with their metamer, shrink away in the season they age out, and never draw shorter than 5 px so zoomed-out crowns still read as foliage. Sky and ground are screen-space gradients.
+
+**Colours** live as CSS tokens in `src/web/ui/layout.css` (light and dark, including the Tweakpane theme). The canvas reads them through `render/theme.ts` and re-reads them when the system scheme or `<html data-theme>` changes, so a host site's theme toggle carries through.
+
+**Camera.** `fit()` sets a target (centre x and scale) covering the trees, with margins for the ground and the header text; `animateCamera` eases toward it each frame (time constant 380 ms) while keeping the ground line pinned. Any pan or zoom by the user stops the following until "Fit view" or a double-tap.
+
 **Tweening.** Each frame, the renderer rebuilds positions in a single forward loop. It interpolates length, angle and radius from the `prevIndex` row; new rows grow from zero; previous rows that nothing maps to are drawn as fading ghosts (shed branches). Segments are grouped by (colour, width bucket) and each group is stroked as one path.
 
 ## CLI output (`cli/run.ts`)

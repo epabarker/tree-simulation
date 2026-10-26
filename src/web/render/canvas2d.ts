@@ -4,17 +4,22 @@
  * Each frame rebuilds positions from angles and lengths in one parent-before-child loop,
  * interpolating between the previous and current snapshots, so growth and bending animate
  * rather than jump. Segments are grouped by (colour, width) and each group is stroked as one
- * path, which keeps Canvas 2D usable into the tens of thousands of segments.
+ * path, which keeps Canvas 2D usable into the tens of thousands of segments. Leaves are drawn at
+ * young nodes only (a view of the foliage, not part of the light model, where buds cast shade).
  */
 
 import type { Snapshot } from "../../core/snapshot.ts";
 import { BudState } from "../../core/tree.ts";
 import { BUD_ACTIVE, BUD_DORMANT, CATEGORICAL, SEQUENTIAL, shadowRgb } from "./colors.ts";
+import { RAMP_STEPS, readTheme, type Theme } from "./theme.ts";
 
-export type ColorMode = "order" | "light" | "resource" | "age" | "tree";
+export type ColorMode = "natural" | "order" | "light" | "resource" | "age" | "tree";
 
 export interface ViewOptions {
   colorMode: ColorMode;
+  showLeaves: boolean;
+  /** Metamers up to this many seasons old carry a leaf. */
+  leafAge: number;
   showBuds: boolean;
   showShadow: boolean;
   showGhosts: boolean;
@@ -29,6 +34,19 @@ export interface Camera {
 
 const WIDTH_BUCKETS = 48;
 const MAX_DPR = 2;
+/** Ground sits this many CSS pixels above the bottom edge when the view is fitted. */
+const GROUND_MARGIN = 18;
+/** Room kept free above the crowns for the title and hint, CSS pixels. */
+const HEADER_MARGIN = 52;
+/** Time constant of the camera's easing toward its fitted target, ms. */
+const CAMERA_EASE_MS = 380;
+/** Leaf length and width in world units (one unit = one internode). */
+const LEAF_LENGTH = 1.1;
+const LEAF_WIDTH = 0.45;
+/** Leaves never draw shorter than this on screen, so zoomed-out crowns still read as foliage. */
+const LEAF_MIN_PX = 5;
+/** Angle between a leaf and its shoot. */
+const LEAF_SPREAD = 0.95;
 
 interface Geometry {
   baseX: Float32Array;
@@ -36,6 +54,8 @@ interface Geometry {
   tipX: Float32Array;
   tipY: Float32Array;
   radius: Float32Array;
+  /** Drawn length over final length: 0 → 1 as a new metamer grows in. */
+  grown: Float32Array;
 }
 
 function emptyGeometry(n: number): Geometry {
@@ -45,6 +65,7 @@ function emptyGeometry(n: number): Geometry {
     tipX: new Float32Array(n),
     tipY: new Float32Array(n),
     radius: new Float32Array(n),
+    grown: new Float32Array(n),
   };
 }
 
@@ -53,6 +74,11 @@ function lerpAngle(a: number, b: number, t: number): number {
   while (d > Math.PI) d -= 2 * Math.PI;
   while (d < -Math.PI) d += 2 * Math.PI;
   return a + d * t;
+}
+
+/** A small, stable per-metamer variation in {-1, 0, 1}, so neighbouring leaves differ a little. */
+function jitter(tree: number, birthId: number): number {
+  return ((Math.imul(birthId ^ (tree << 20), 0x9e3779b1) >>> 0) % 3) - 1;
 }
 
 export class Canvas2DRenderer {
@@ -69,17 +95,26 @@ export class Canvas2DRenderer {
   private keys = new Uint16Array(0);
   private order = new Int32Array(0);
   private colors: string[] = [];
+  private theme: Theme;
+  /** Where the fitted view wants the camera; the ground line stays pinned while it eases. */
+  private target: { cx: number; scale: number } | null = null;
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
     const ctx = canvas.getContext("2d");
     if (!ctx) throw new Error("Canvas 2D is not available");
     this.ctx = ctx;
+    this.theme = readTheme(canvas);
     this.resize();
   }
 
   get snapshot(): Snapshot | null {
     return this.next;
+  }
+
+  /** Re-reads the colour tokens (after a light/dark switch). */
+  refreshTheme(): void {
+    this.theme = readTheme(this.canvas);
   }
 
   /** Makes `s` the tween target; the current target becomes the tween origin. */
@@ -110,10 +145,14 @@ export class Canvas2DRenderer {
     this.dpr = Math.min(window.devicePixelRatio || 1, MAX_DPR);
     this.canvas.width = Math.max(1, Math.round(rect.width * this.dpr));
     this.canvas.height = Math.max(1, Math.round(rect.height * this.dpr));
+    if (this.target) this.pinGround();
   }
 
-  /** Fits the trees and the ground beneath them in view, with a margin. */
-  fit(): void {
+  /**
+   * Fits the trees and the ground beneath them in view. With `snap` the camera jumps there;
+   * otherwise `animateCamera` eases toward it.
+   */
+  fit(snap = false): void {
     const s = this.next;
     if (!s) return;
     this.computeGeometry(1);
@@ -131,16 +170,37 @@ export class Canvas2DRenderer {
       maxX = s.width;
     }
     const minSpan = 16;
-    const midX = (minX + maxX) / 2;
-    const spanX = Math.max(minSpan, (maxX - minX) * 1.2);
-    const spanY = Math.max(minSpan, maxY * 1.15);
+    const spanX = Math.max(minSpan, (maxX - minX) * 1.15 + 2 * LEAF_LENGTH);
+    const spanY = Math.max(minSpan, maxY * 1.12 + LEAF_LENGTH);
     const w = this.canvas.width / this.dpr;
     const h = this.canvas.height / this.dpr;
-    const margin = 16;
-    this.camera.scale = Math.min(w / spanX, (h - margin) / spanY);
-    this.camera.cx = midX;
-    // Ground (y = 0) sits `margin` pixels above the bottom edge.
-    this.camera.cy = (h / 2 - margin) / this.camera.scale;
+    const first = this.target === null;
+    const fitH = h - GROUND_MARGIN - HEADER_MARGIN;
+    this.target = { cx: (minX + maxX) / 2, scale: Math.min(w / spanX, fitH / spanY) };
+    if (snap || first) {
+      this.camera.cx = this.target.cx;
+      this.camera.scale = this.target.scale;
+      this.pinGround();
+    }
+  }
+
+  /** Eases the camera toward the fitted target. Returns true while it is still moving. */
+  animateCamera(dtMs: number): boolean {
+    const t = this.target;
+    if (!t) return false;
+    const k = 1 - Math.exp(-dtMs / CAMERA_EASE_MS);
+    const cam = this.camera;
+    cam.cx += (t.cx - cam.cx) * k;
+    cam.scale = Math.exp(Math.log(cam.scale) + (Math.log(t.scale) - Math.log(cam.scale)) * k);
+    this.pinGround();
+    const w = this.canvas.width / this.dpr;
+    return Math.abs(t.cx - cam.cx) * cam.scale > 0.3 || Math.abs(t.scale / cam.scale - 1) * w > 0.3;
+  }
+
+  /** Keeps the ground line GROUND_MARGIN pixels above the bottom edge at the current scale. */
+  private pinGround(): void {
+    const h = this.canvas.height / this.dpr;
+    this.camera.cy = (h / 2 - GROUND_MARGIN) / this.camera.scale;
   }
 
   /** The tree whose nearest branch passes within `maxPx` screen pixels of a world point, or null. */
@@ -181,13 +241,15 @@ export class Canvas2DRenderer {
   draw(t: number, view: ViewOptions): void {
     const { ctx } = this;
     const s = this.next;
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    if (!s) return;
-
     const w = this.canvas.width / this.dpr;
     const h = this.canvas.height / this.dpr;
     const { cx, cy, scale } = this.camera;
+    const groundY = h / 2 + cy * scale; // screen y of world y = 0
+
+    ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
+    this.drawSky(w, h, groundY);
+    if (!s) return;
+
     // World → CSS pixels: x' = (x − cx)·scale + w/2, y' = h/2 − (y − cy)·scale.
     ctx.setTransform(
       scale * this.dpr,
@@ -195,10 +257,9 @@ export class Canvas2DRenderer {
       0,
       -scale * this.dpr,
       (w / 2 - cx * scale) * this.dpr,
-      (h / 2 + cy * scale) * this.dpr,
+      groundY * this.dpr,
     );
 
-    const style = getComputedStyle(this.canvas);
     if (view.showShadow && this.shadowImage) {
       ctx.save();
       ctx.imageSmoothingEnabled = false;
@@ -207,20 +268,39 @@ export class Canvas2DRenderer {
       ctx.drawImage(this.shadowImage, 0, 0, s.width, s.height);
       ctx.restore();
     }
-
     if (s.walls.length > 0) {
-      ctx.fillStyle = style.getPropertyValue("--wall").trim() || "rgba(90, 90, 100, 0.35)";
+      ctx.fillStyle = this.theme.wall;
       for (const wall of s.walls) ctx.fillRect(wall.x, wall.y, wall.width, wall.height);
     }
 
     this.computeGeometry(t);
     if (view.showGhosts && this.prev && t < 1) this.drawGhosts(1 - t);
     this.drawSegments(s, view.colorMode);
+    if (view.showLeaves) this.drawLeaves(s, view.leafAge, t);
     if (view.showBuds) this.drawBuds(s, view.colorMode === "light");
 
-    // Ground last, so the stubs of shoots that turned downward stay underground.
-    ctx.fillStyle = style.getPropertyValue("--ground").trim() || "#8a7a5a";
-    ctx.fillRect(-s.width, -3 / scale - 4, s.width * 3, 3 / scale + 4);
+    // Ground last, in screen space, so stubs of shoots that turned downward stay underground.
+    ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
+    this.drawGround(w, h, groundY);
+  }
+
+  private drawSky(w: number, h: number, groundY: number): void {
+    const { ctx, theme } = this;
+    const sky = ctx.createLinearGradient(0, 0, 0, Math.max(1, groundY));
+    sky.addColorStop(0, theme.skyTop);
+    sky.addColorStop(1, theme.skyBottom);
+    ctx.fillStyle = sky;
+    ctx.fillRect(0, 0, w, h);
+  }
+
+  private drawGround(w: number, h: number, groundY: number): void {
+    if (groundY >= h) return;
+    const { ctx, theme } = this;
+    const ground = ctx.createLinearGradient(0, groundY, 0, h);
+    ground.addColorStop(0, theme.ground);
+    ground.addColorStop(1, theme.groundDeep);
+    ctx.fillStyle = ground;
+    ctx.fillRect(0, groundY, w, h - groundY);
   }
 
   /** Positions at tween time t ∈ [0, 1]: lengths, angles and radii interpolate; new rows grow from zero. */
@@ -239,10 +319,13 @@ export class Canvas2DRenderer {
         len = prev.length[pi] + (s.length[j] - prev.length[pi]) * t;
         ang = lerpAngle(prev.angle[pi], s.angle[j], t);
         r = prev.radius[pi] + (s.radius[j] - prev.radius[pi]) * t;
+        g.grown[j] = 1;
       } else {
-        len = s.length[j] * (prev ? t : 1);
+        const f = prev ? t : 1;
+        len = s.length[j] * f;
         ang = s.angle[j];
-        r = s.radius[j] * (prev ? t : 1);
+        r = s.radius[j] * f;
+        g.grown[j] = f;
       }
       const bx = p >= 0 ? g.tipX[p] : s.x0[j];
       const by = p >= 0 ? g.tipY[p] : s.y0[j];
@@ -263,13 +346,14 @@ export class Canvas2DRenderer {
     let field: Float32Array | null = null;
     if (mode === "light") field = s.light;
     else if (mode === "resource") field = s.resource;
-    else if (mode === "age") field = s.age;
+    else if (mode === "age" || mode === "natural") field = s.age;
 
     let max = 0;
     if (field) for (let j = 0; j < n; j++) if (field[j] > max) max = field[j];
-    // Light and resource are heavily skewed (a few bright tips), so colour by √(value / max).
+    // Light and resource are heavily skewed (a few bright tips), so colour by √(value / max);
+    // bark darkens quickly over the first seasons, so the same curve suits it.
     const gamma = mode === "age" ? 1 : 0.5;
-    const palette = field ? SEQUENTIAL : CATEGORICAL;
+    const palette = mode === "natural" ? this.theme.bark : field ? SEQUENTIAL : CATEGORICAL;
     this.colors = palette;
     const pxPerUnit = this.camera.scale;
     for (let j = 0; j < n; j++) {
@@ -320,6 +404,62 @@ export class Canvas2DRenderer {
     }
   }
 
+  /**
+   * One leaf at the tip of every metamer up to `leafAge` seasons old, on alternating sides,
+   * coloured from shade to sun by the light the metamer's subtree gathers. Leaves unfold as their
+   * metamer grows in and shrink away during the season in which they pass `leafAge`.
+   */
+  private drawLeaves(s: Snapshot, leafAge: number, t: number): void {
+    const { ctx } = this;
+    const g = this.geom;
+    const n = s.metamerCount;
+    let maxLight = 0;
+    for (let j = 0; j < n; j++)
+      if (s.age[j] <= leafAge + 1 && s.light[j] > maxLight) maxLight = s.light[j];
+    const palette = this.theme.leaf;
+    const leafLength = Math.max(LEAF_LENGTH, LEAF_MIN_PX / this.camera.scale);
+    const leafWidth = leafLength * (LEAF_WIDTH / LEAF_LENGTH);
+    const buckets: number[][] = Array.from({ length: RAMP_STEPS }, () => []);
+    for (let j = 0; j < n; j++) {
+      const age = s.age[j];
+      if (age > leafAge + 1) continue;
+      const u = maxLight > 0 ? Math.sqrt(s.light[j] / maxLight) : 0;
+      const c = Math.floor(u * (RAMP_STEPS - 1)) + jitter(s.tree[j], s.birthId[j]);
+      (buckets[Math.max(0, Math.min(RAMP_STEPS - 1, c))] as number[]).push(j);
+    }
+    ctx.save();
+    ctx.globalAlpha = 0.92;
+    for (let c = 0; c < RAMP_STEPS; c++) {
+      const list = buckets[c] as number[];
+      if (list.length === 0) continue;
+      ctx.fillStyle = palette[c] as string;
+      ctx.beginPath();
+      for (const j of list) {
+        const fading = s.age[j] > leafAge ? 1 - t : 1;
+        const size = g.grown[j] * fading;
+        if (size <= 0.02) continue;
+        const bx = g.tipX[j];
+        const by = g.tipY[j];
+        const side = s.birthId[j] & 1 ? 1 : -1;
+        const ang = Math.atan2(by - g.baseY[j], bx - g.baseX[j]) + side * LEAF_SPREAD;
+        const ux = Math.cos(ang);
+        const uy = Math.sin(ang);
+        const len = leafLength * size;
+        const half = (leafWidth * size) / 2;
+        const tx = bx + ux * len;
+        const ty = by + uy * len;
+        const mx = bx + ux * len * 0.5;
+        const my = by + uy * len * 0.5;
+        // A lens: two quadratic curves bulging either side of the midrib.
+        ctx.moveTo(bx, by);
+        ctx.quadraticCurveTo(mx - uy * half * 2, my + ux * half * 2, tx, ty);
+        ctx.quadraticCurveTo(mx + uy * half * 2, my - ux * half * 2, bx, by);
+      }
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+
   private drawGhosts(alpha: number): void {
     const prev = this.prev;
     if (!prev) return;
@@ -327,7 +467,7 @@ export class Canvas2DRenderer {
     const g = this.prevGeom;
     ctx.save();
     ctx.globalAlpha = 0.6 * alpha;
-    ctx.strokeStyle = "#9a8f80";
+    ctx.strokeStyle = this.theme.ghost;
     ctx.lineCap = "round";
     ctx.lineWidth = Math.max(0.8 / this.camera.scale, 0.1);
     ctx.beginPath();

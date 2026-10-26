@@ -163,7 +163,7 @@ export class Panel {
       if (ev.last) cb.onRestart(this.params);
     });
 
-    const monitors = pane.addFolder({ title: "Stats", expanded: !compact });
+    const monitors = pane.addFolder({ title: "Stats", expanded: false });
     monitors.addBinding(stats, "season", { readonly: true, format: (v: number) => v.toFixed(0) });
     monitors.addBinding(stats, "metamers", { readonly: true, format: (v: number) => v.toFixed(0) });
     monitors.addBinding(stats, "workerMs", {
@@ -192,8 +192,9 @@ export class Panel {
       }
     }
 
-    const viewFolder = pane.addFolder({ title: "View", expanded: !compact });
+    const viewFolder = pane.addFolder({ title: "View", expanded: false });
     const colorOptions: Record<string, ColorMode> = {
+      "natural (bark by age)": "natural",
       "branch order": "order",
       "light (Q per metamer)": "light",
       "resource v": "resource",
@@ -201,6 +202,13 @@ export class Panel {
       tree: "tree",
     };
     viewFolder.addBinding(view, "colorMode", { label: "colour", options: colorOptions });
+    viewFolder.addBinding(view, "showLeaves", { label: "leaves" });
+    viewFolder.addBinding(view, "leafAge", {
+      label: "leaf age (seasons)",
+      min: 1,
+      max: 8,
+      step: 1,
+    });
     viewFolder.addBinding(view, "showBuds", { label: "buds" });
     viewFolder.addBinding(view, "showShadow", { label: "shadow" });
     viewFolder.addBinding(view, "showGhosts", { label: "shed ghosts" });

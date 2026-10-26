@@ -28,18 +28,27 @@ const charts = new Charts(element("charts"));
 const worker = new Worker(new URL("../worker/sim.worker.ts", import.meta.url), { type: "module" });
 const sim = Comlink.wrap<SimApi>(worker);
 
+const narrow = window.matchMedia("(max-width: 700px)").matches;
+const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+// A phone shows a four-tree grove; the ten-tree stand would be too small to read.
+const startPreset: PresetName = narrow ? "grove" : defaultPreset;
+
+const hud = element("hud");
 const playback: PlaybackState = { playing: false, speed: 3 };
 const stats: Stats = { season: 0, metamers: 0, workerMs: 0 };
 const view: ViewOptions & { preset: PresetName } = {
-  preset: defaultPreset,
-  colorMode: "order",
-  showBuds: true,
-  showShadow: true,
+  preset: startPreset,
+  colorMode: "natural",
+  showLeaves: true,
+  leafAge: 5,
+  showBuds: false,
+  showShadow: false,
   showGhosts: true,
 };
 
 let busy = false;
 let dirty = true;
+let lastFrame = 0;
 let visible = true;
 let tweenStart = 0;
 let tweenMs = 1;
@@ -51,7 +60,9 @@ let autoFit = true;
 function accept(s: Snapshot, animate: boolean): void {
   renderer.setSnapshot(s);
   if (!animate) renderer.clearHistory();
-  if (autoFit) renderer.fit();
+  if (autoFit) renderer.fit(!animate);
+  const trees = s.metrics.length;
+  hud.textContent = `Season ${s.season} · ${trees} ${trees === 1 ? "tree" : "trees"}`;
   stats.season = s.season;
   stats.metamers = s.metamerCount;
   stats.workerMs = s.seasonMs;
@@ -83,7 +94,7 @@ async function step(): Promise<void> {
   accept(s, true);
 }
 
-const panel = new Panel(element("panel"), presetParams(defaultPreset), playback, stats, view, {
+const panel = new Panel(element("panel"), presetParams(startPreset), playback, stats, view, {
   onPlay: (playing) => {
     if (playing) lastStep = 0;
   },
@@ -139,7 +150,10 @@ attachInput(renderer, {
 
 function frame(now: number): void {
   requestAnimationFrame(frame);
+  const dt = lastFrame > 0 ? Math.min(100, now - lastFrame) : 16;
+  lastFrame = now;
   if (!visible) return;
+  if (autoFit && renderer.animateCamera(dt)) dirty = true;
   const t = Math.min(1, (now - tweenStart) / tweenMs);
   if (dirty || t < 1) {
     renderer.draw(t * t * (3 - 2 * t), view);
@@ -161,8 +175,23 @@ new IntersectionObserver((entries) => {
 document.addEventListener("visibilitychange", () => {
   visible = !document.hidden;
 });
+// Follow the system colour scheme, and a data-theme attribute on <html> if the host page sets one.
+const onTheme = (): void => {
+  renderer.refreshTheme();
+  dirty = true;
+};
+window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", onTheme);
+new MutationObserver(onTheme).observe(document.documentElement, {
+  attributes: true,
+  attributeFilter: ["data-theme"],
+});
 
 void restart(mergeParams(panel.current, {})).then(() => {
+  // Start growing straight away, unless the visitor asked for reduced motion.
+  if (!reduceMotion) {
+    playback.playing = true;
+    panel.setPlaying(true);
+  }
   requestAnimationFrame(frame);
   void charts.load();
 });

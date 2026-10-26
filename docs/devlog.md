@@ -2,6 +2,34 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-26: Polish, natural look and page experience
+
+- **Scope.** You chose two polish bundles: natural look and page experience. Shareable links and diagnostic overlays are deferred.
+- **Natural view, now the default.**
+  - Bark is coloured on a ramp by age.
+  - Lens-shaped leaves sit on metamers up to 5 seasons old, coloured by light. They are a view only; buds still cast the shade.
+  - Sky and ground are drawn as gradients.
+  - Buds and the shadow heatmap are off by default.
+  - Light and dark palettes are CSS tokens. The canvas follows both the system scheme and `<html data-theme>`.
+- **Page.**
+  - Autoplay, unless the visitor has `prefers-reduced-motion` set.
+  - An eased camera that keeps the ground pinned and leaves room for the header.
+  - A season counter.
+  - A four-tree `grove` preset as the default on phones (≤ 700 px).
+  - Tweakpane themed from the same tokens.
+- **Visual checks** in headless Firefox: desktop light and dark, a single tree close up, phone width. At stand scale leaves first read as specks, so they now have a 5 px minimum and the default leaf age went from 3 to 5.
+- **No simulation change.** Goldens are untouched.
+
+## 2026-10-26: Shoot size settled by research (ADR 0004)
+
+- **Question:** what does §C3.4's "n = ⌊v⌋ (capped), l = v/n" cap?
+- **What the sources do:**
+  - Palubicki 2009 and a C++ implementation have no cap.
+  - The LPFG SOT example caps the bud's *resource* (`min(v, MAXGROW)`), then sizes the shoot by Palubicki's rule.
+  - None caps n alone.
+- **Change.** `shootSize` now follows the SOT form: v' = min(v, cap), n = ⌊v'⌋, l = v'/n. Capped shoots now have internodes of exactly l0. Goldens regenerated (intended); all 51 tests pass unchanged.
+- **pcloud-sync filters** (dotfiles, uncommitted): `/tree-simulation/runs/**` and `/tree-simulation/dist/**` are excluded, anchored to this project. Earlier copies (about 5 MB) stay on pCloud until removed.
+
 ## 2026-10-26: M5, stands; prototype M0–M5 complete
 
 - **Stands.** New presets `pair`, `late` (a seedling at season 12 between two trees) and `stand` (10 trees, now the default). All trees deposit into one shadow grid before any tree samples it, so a test confirms results don't depend on processing order.

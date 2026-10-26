@@ -6,12 +6,12 @@ _Last updated: 2026-10-26_
 
 ## Works
 - Core: SoA tables, keyed-hash RNG, C1 buds, C2 shadow triangle, C3 Borchert–Honda (plus the `equal` ablation), C4 direction, C5 shedding, C6 pipe girth with memory, multi-tree stands, the §6 season loop, golden hashes. 51 tests.
-- Page: worker, Canvas 2D with tweening and shed ghosts, tap to fell a tree, Tweakpane folders C1–C6, charts (metamers, height, Q per tree, junction Δ), and a layout that works at phone width.
+- Page: natural view (bark, leaves, sky; light and dark), autoplay, eased camera, season counter, tap to fell a tree, themed Tweakpane folders C1–C6, charts, phone layout with a four-tree default.
 - Headless and analysis: `npm run sim`; `analysis/experiments/` (m0 growth, m2 λ sweep, m4 calibration).
 - Defaults: a = 0.15, b = 1.5, qMax = 6, C = 1, T = 0.1, α = 2, λ = 0.5 (all `calibrate` except α).
 
 ## Next
-1. Agree the next step with the user: M6 (Beer–Lambert sky sweep, the WebGL2 renderer) or polish first.
+1. Agree the next step with the user: M6 (Beer–Lambert sky sweep, WebGL2 renderer), or the deferred polish bundles (shareable links; §8 diagnostic overlays).
 2. M6 is expected to lift crown bases in stands and on isolated trees. Re-run the bole checks then.
 3. Leader-share metric; rerun the λ sweep with shedding on.
 

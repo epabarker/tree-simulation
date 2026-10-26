@@ -76,6 +76,24 @@ const SECTIONS: SectionSpec[] = [
       { key: "sigma", label: "σ noise°", min: 0, max: 90, step: 1 },
     ],
   },
+  {
+    section: "c5",
+    title: "C5 Shedding",
+    toggle: true,
+    fields: [
+      { key: "T", label: "T light per metamer", min: 0, max: 0.5, step: 0.01 },
+      { key: "g", label: "g grace (seasons)", min: 0, max: 15, step: 1 },
+    ],
+  },
+  {
+    section: "c6",
+    title: "C6 Pipe girth",
+    toggle: true,
+    fields: [
+      { key: "n", label: "n pipe exponent", min: 1.5, max: 3.5, step: 0.05 },
+      { key: "r0", label: "r0 tip radius", min: 0.02, max: 0.3, step: 0.01 },
+    ],
+  },
 ];
 
 export interface PlaybackState {

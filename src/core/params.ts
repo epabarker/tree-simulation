@@ -134,7 +134,7 @@ export const defaultParams: Params = {
   c2: {
     enabled: false,
     a: 0.2, // calibrate (M1 scan: 0.2 keeps both buds of a node lit, since C > a·(buds − 1))
-    b: 2, // calibrate
+    b: 1.5, // calibrate (M4: 1.5 shades deeper than 2 once shedding is on)
     qMax: 6,
     C: 1, // calibrate
     perceptionAngle: 45,
@@ -142,7 +142,7 @@ export const defaultParams: Params = {
   },
   c3: { mode: "none", lambda: 0.5, alpha: 2 },
   c4: { enabled: false, wd: 1, xi: 0.3, eta: 0.15, setPoint: 0, epsilon: 0.5, sigma: 20 },
-  c5: { enabled: false, T: 0.3, g: 3 },
+  c5: { enabled: false, T: 0.1, g: 3 }, // T: calibrate (M4 calibration)
   c6: { enabled: false, n: 2, r0: 0.08 },
 };
 

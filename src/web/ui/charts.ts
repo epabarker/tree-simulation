@@ -12,6 +12,8 @@ type PlotModule = typeof import("@observablehq/plot");
 export class Charts {
   private plot: PlotModule | null = null;
   private rows: MetricsRow[] = [];
+  private junctions: Float32Array = new Float32Array(0);
+  private pipeN = 2;
   private pending = false;
   private lastDraw = 0;
   private readonly container: HTMLElement;
@@ -30,8 +32,15 @@ export class Charts {
     this.schedule();
   }
 
-  push(season: number, metrics: readonly TreeMetrics[]): void {
+  push(
+    season: number,
+    metrics: readonly TreeMetrics[],
+    junctions: Float32Array,
+    pipeN: number,
+  ): void {
     for (const m of metrics) this.rows.push({ ...m, season });
+    this.junctions = junctions;
+    this.pipeN = pipeN;
     this.schedule();
   }
 
@@ -49,7 +58,8 @@ export class Charts {
   private draw(): void {
     const Plot = this.plot;
     if (!Plot) return;
-    const width = Math.max(240, Math.min(420, this.container.clientWidth / 2 - 16));
+    // Three across on a wide screen, wrapping to fewer on narrow ones.
+    const width = Math.max(240, Math.min(380, (this.container.clientWidth - 32) / 3 - 16));
     const rows = this.rows;
     const common = { width, height: 180, marginLeft: 48, style: { background: "transparent" } };
     const tree = (d: MetricsRow) => `tree ${d.tree}`;
@@ -70,6 +80,23 @@ export class Charts {
         marks: [Plot.lineY(rows, { x: "season", y: "height", stroke: tree, tip: true })],
       }),
     ];
+    if (this.junctions.length > 0) {
+      charts.push(
+        Plot.plot({
+          ...common,
+          title: "Junction exponent Δ (C6)",
+          x: { label: "Δ in r_p^Δ = Σ r_c^Δ", domain: [1, 4] },
+          y: { label: "junctions", grid: true },
+          marks: [
+            Plot.rectY(
+              Array.from(this.junctions),
+              Plot.binX({ y: "count" }, { x: (d: number) => d, interval: 0.1 }),
+            ),
+            Plot.ruleX([this.pipeN], { stroke: "currentColor", strokeDasharray: "3,3" }),
+          ],
+        }),
+      );
+    }
     this.container.replaceChildren(...charts);
   }
 }

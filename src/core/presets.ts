@@ -84,11 +84,24 @@ export const presets = {
       c4: { enabled: true },
     },
   },
+  pruned: {
+    label: "M4: shedding and pipe girth",
+    description: "C5 sheds shaded laterals; C6 thickens stems by the pipe model (§C5, §C6).",
+    patch: {
+      world: { width: 120, height: 100, walls: [] },
+      trees: [{ x: 60 }],
+      c2: { enabled: true },
+      c3: { mode: "bh", lambda: 0.5 },
+      c4: { enabled: true },
+      c5: { enabled: true },
+      c6: { enabled: true },
+    },
+  },
 } satisfies Record<string, Preset>;
 
 export type PresetName = keyof typeof presets;
 
-export const defaultPreset: PresetName = "direction";
+export const defaultPreset: PresetName = "pruned";
 
 export function presetParams(name: PresetName, seed?: number): Params {
   const params = mergeParams(defaultParams, presets[name].patch);

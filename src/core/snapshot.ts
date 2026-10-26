@@ -11,6 +11,7 @@
 import { type TreeMetrics, treeMetrics } from "./metrics.ts";
 import type { Wall } from "./params.ts";
 import { isLiveBud } from "./principles/c3-allocation.ts";
+import { junctionExponents } from "./principles/c6-girth.ts";
 import type { F32, I32, U8 } from "./soa.ts";
 import type { World } from "./world.ts";
 
@@ -45,6 +46,8 @@ export interface Snapshot {
   /** Shadow per cell (row-major, row 0 at the ground), or null when C2 is off. */
   shadow: F32 | null;
   walls: Wall[];
+  /** Leonardo exponent Δ at every junction of every live tree (C6 on), for the histogram. */
+  junctions: F32;
   metrics: TreeMetrics[];
   /** Milliseconds the worker spent on the season(s) behind this snapshot. */
   seasonMs: number;
@@ -68,6 +71,7 @@ export function transferables(s: Snapshot): ArrayBuffer[] {
     s.budMetamer,
     s.budState,
     s.budQ,
+    s.junctions,
   ];
   if (s.shadow) arrays.push(s.shadow);
   return arrays.map((a) => a.buffer);
@@ -114,6 +118,9 @@ export class SnapshotBuilder {
       budQ: new Float32Array(nb),
       shadow: null,
       walls: world.params.c2.enabled ? world.params.world.walls : [],
+      junctions: new Float32Array(
+        world.params.c6.enabled ? live.flatMap((t) => junctionExponents(t)) : [],
+      ),
       metrics: world.trees.filter((t) => t.m.length > 0).map(treeMetrics),
       seasonMs,
     };

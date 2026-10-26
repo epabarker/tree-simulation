@@ -13,6 +13,8 @@ import { DEG } from "./params.ts";
 import { type DirectionFn, growShoot, shootSize } from "./principles/c1-buds.ts";
 import { allocate, gatherLight, isLiveBud } from "./principles/c3-allocation.ts";
 import { shootDirection } from "./principles/c4-direction.ts";
+import { shedBranches } from "./principles/c5-shedding.ts";
+import { updateGirth } from "./principles/c6-girth.ts";
 import { normal, Purpose } from "./rng.ts";
 import { BudState, type Tree } from "./tree.ts";
 import type { World } from "./world.ts";
@@ -38,7 +40,10 @@ export function runSeason(world: World): void {
     sampleBuds(world, tree); // C2: Q and V at every bud
     gatherLight(tree); // C3 basipetal: Q_sum, n_b
     allocate(tree, params); // C3 acropetal: v at every bud
+    const evaluated = tree.m.length; // rows that took part in this season's passes
     growBuds(world, tree, season); // C1 bud fate, GROW (C4 direction)
+    if (params.c5.enabled) tree.shedCount = shedBranches(tree, params, season, evaluated); // C5
+    if (params.c6.enabled) updateGirth(tree, params); // C6, after shedding so scars count
     commitBuds(tree);
     tree.age += 1;
   }

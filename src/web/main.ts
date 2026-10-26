@@ -55,7 +55,7 @@ function accept(s: Snapshot, animate: boolean): void {
   stats.season = s.season;
   stats.metamers = s.metamerCount;
   stats.workerMs = s.seasonMs;
-  charts.push(s.season, s.metrics);
+  charts.push(s.season, s.metrics, s.junctions, panel.current.c6.n);
   tweenStart = performance.now();
   tweenMs = animate ? Math.min(450, (1000 / playback.speed) * 0.85) : 1;
   dirty = true;

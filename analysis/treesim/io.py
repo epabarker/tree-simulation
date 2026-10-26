@@ -35,4 +35,5 @@ def load_runs(root: str | Path, table: str = "metrics") -> pl.DataFrame:
         )
     if not frames:
         raise FileNotFoundError(f"no run.json under {root}")
-    return pl.concat(frames, how="diagonal")
+    # Columns can infer as Int64 in one run and Float64 in another; relax to the supertype.
+    return pl.concat(frames, how="diagonal_relaxed")

@@ -12,7 +12,7 @@ Status key: ✅ done · 🚧 in progress · ⏳ not started.
 | M1 | C2 shadow triangle | Density regulated; shadow heatmap and bud-light overlay | `light/shadow-triangle.test.ts`: deposit pattern, Q formula, V away from shade, opaque box. `world.test.ts`: growth ≪ M0, late ratio < 1.2, most buds dormant | ✅ 2026-10-26 |
 | M2 | C3 Borchert–Honda allocation | λ 0.46 → 0.56: spreading → leader | `principles/c3-allocation.test.ts`: split formula; v_base = α·Q_base = root inflow; slot shares sum to inflow; `equal` gives equal shares; height at 0.56 > 1.3 × at 0.46 (5 seeds). [λ sweep](experiments/2026-10-26-m2-lambda-sweep.md) | ✅ 2026-10-26 |
 | M3 | C4 direction | Lean away from a wall; tropism sign flips spread | `principles/c4-direction.test.ts`: each term of the weighted sum; the wall shifts the centroid by > 1 cell away (5 seeds); η −0.3 crowns > 1.2 × the width of η +0.3 | ✅ 2026-10-26 |
-| M4 | C5 shedding + C6 pipe girth | Clear bole; junction-exponent histogram near n | Radii never decrease; Δ = n at unscarred junctions; bole with C5 on, none off | ⏳ |
+| M4 | C5 shedding + C6 pipe girth | Clear bole; junction-exponent histogram near n | `principles/c5-c6.test.ts`: pipe sums, memory, shedding with scar and remap, grace period; radii never decrease; Δ = n everywhere without shedding; C5 sheds, shrinks crowns and doesn't lower the crown base (5 seeds). Isolated trees form only a low bole (1–6 cells); see the [calibration note](experiments/2026-10-26-m4-calibration.md) | ✅ 2026-10-26 (bole retested at M5) |
 | M5 | N trees, one grid | Crowns asymmetric away from each other; short tree suppressed | Two trees lean apart; a late tree gets less Q; removal → neighbour leans into the gap | ⏳ |
 | M6 | Sky sweep (Beer–Lambert, K directions); WebGL2 renderer | Edge trees lean outward; neighbours lean into a gap | — | ⏳ |
 | M7 | R2 physiological age; §9 species presets | Massart conifer, Rauh broadleaf, Aubréville tiers | — | ⏳ |
@@ -29,8 +29,8 @@ Status key: ✅ done · 🚧 in progress · ⏳ not started.
 | C2 | Shadow triangle → Q, V | §C2 | `c2.enabled` | `light/shadow-triangle.ts` | `shadow-triangle.test.ts`, `world.test.ts` | shadow heatmap; colour: light (branches and buds) | ✅ M1 |
 | C3 | Basipetal ΣQ, Borchert–Honda split | §C3 | `c3.mode` (`bh`; `equal` = §8 ablation; `none` = M0–M1 scaffold) | `principles/c3-allocation.ts` | `c3-allocation.test.ts` | colour: resource v | ✅ M2 |
 | C4 | Weighted shoot direction | §C4 | `c4.enabled` | `principles/c4-direction.ts` (noise: `Purpose.directionNoise`, keyed by birthId and season) | `c4-direction.test.ts` | walls drawn | ✅ M3 |
-| C5 | Self-pruning | §C5 | `c5.enabled` | — | — | shed ghosts | ⏳ M4 |
-| C6 | Pipe girth with memory | §C6 | `c6.enabled` | — | — | width | ⏳ M4 |
+| C5 | Self-pruning | §C5 | `c5.enabled` | `principles/c5-shedding.ts` | `c5-c6.test.ts` | shed ghosts | ✅ M4 |
+| C6 | Pipe girth with memory | §C6 | `c6.enabled` | `principles/c6-girth.ts` (+ `junctionExponents`) | `c5-c6.test.ts` | width; Δ histogram chart | ✅ M4 |
 | R1–R5 | Refinements | §R1–R5 | — | — | — | — | ⏳ M7–M10 |
 | O1–O4 | Optional | §O1–O4 | — | — | — | — | ⏳ M11+ |
 
@@ -40,10 +40,10 @@ No published value exists for these. Tune each on an isolated tree (spec §2 tab
 
 | Param | Placeholder | Notes |
 |---|---|---|
-| `c2.a` shadow strength | 0.2 | First pass: [M1 calibration](experiments/2026-10-26-m1-shadow-calibration.md). Revisit with C3, which turns Q into growth |
-| `c2.b` shadow decay | 2 | b > 1. First pass as above |
+| `c2.a` shadow strength | 0.2 | [M1](experiments/2026-10-26-m1-shadow-calibration.md), [M4](experiments/2026-10-26-m4-calibration.md). With α = 2, a > ~0.15 risks the seedling trap (4 buds in a cell) |
+| `c2.b` shadow decay | 1.5 | M4 calibration: deeper shade once shedding is on |
 | `c2.C` full exposure | 1 | The buds of one node share a cell, so C > a·(buds per node − 1) |
-| `c5.T` shedding threshold | 0.3 | Light per metamer; recalibrate for 2D (§C5.5) |
+| `c5.T` shedding threshold | 0.1 | M4 calibration; ≥ 0.2 over-prunes |
 | `c6.r0` tip radius | 0.08 cells | Visual only until R1/R3 |
 | `c4` weights `wd, xi, eta, epsilon, sigma` | 1, 0.3, 0.15, 0.5, 20° | Palubicki Fig. 12 is qualitative. Strong upward η (0.4) can starve a seedling whose buds bunch up |
 

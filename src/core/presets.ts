@@ -32,6 +32,36 @@ export const presets = {
       c3: { mode: "none" },
     },
   },
+  bh: {
+    label: "M2: Borchert–Honda, λ = 0.5",
+    description: "C3 on: resource flows to well-lit branches; λ biases it to the main axis (§C3).",
+    patch: {
+      world: { width: 120, height: 90, walls: [] },
+      trees: [{ x: 60 }],
+      c2: { enabled: true },
+      c3: { mode: "bh", lambda: 0.5 },
+    },
+  },
+  leader: {
+    label: "M2: dominant leader, λ = 0.56",
+    description: "Strong apical control: an excurrent tree with a clear trunk (Guerra: 0.56).",
+    patch: {
+      world: { width: 120, height: 90, walls: [] },
+      trees: [{ x: 60 }],
+      c2: { enabled: true },
+      c3: { mode: "bh", lambda: 0.56 },
+    },
+  },
+  spreading: {
+    label: "M2: spreading crown, λ = 0.46",
+    description: "Weak apical control: a decurrent, spreading crown (Guerra: 0.46).",
+    patch: {
+      world: { width: 120, height: 90, walls: [] },
+      trees: [{ x: 60 }],
+      c2: { enabled: true },
+      c3: { mode: "bh", lambda: 0.46 },
+    },
+  },
 } satisfies Record<string, Preset>;
 
 export type PresetName = keyof typeof presets;

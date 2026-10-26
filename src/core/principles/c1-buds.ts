@@ -110,13 +110,20 @@ export function plantSeedling(tree: Tree, params: Params, season: number): void 
 }
 
 /**
- * Number of metamers and internode length for a bud receiving resource v (§C3.4):
- * n = ⌊v⌋ capped, l = v/n in units of l0. Writes into `out` and returns n (0 = no growth).
+ * Number of metamers and internode length for a bud receiving resource v (§C3.4, Palubicki et
+ * al. §4.2): n = ⌊v⌋, capped at c1.maxMetamersPerShoot, and l = v / ⌊v⌋ in units of l0.
+ * The length uses the uncapped ⌊v⌋, so internodes stay within [1, 2)·l0 (the "internode ≈ one
+ * grid cell" assumption of §C1/§C2); the cap only limits how many metamers a shoot adds.
+ * Writes the length into `out` and returns n (0 = no growth).
  */
 export function shootSize(v: number, params: Params, out: { length: number }): number {
-  const n = Math.min(Math.floor(v), params.c1.maxMetamersPerShoot);
-  out.length = n > 0 ? (v / n) * params.c1.internodeLength : 0;
-  return Math.max(n, 0);
+  const whole = Math.floor(v);
+  if (whole < 1) {
+    out.length = 0;
+    return 0;
+  }
+  out.length = (v / whole) * params.c1.internodeLength;
+  return Math.min(whole, params.c1.maxMetamersPerShoot);
 }
 
 /**

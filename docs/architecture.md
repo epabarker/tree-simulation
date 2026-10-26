@@ -66,12 +66,14 @@ The passes need only `parent` and `slot`:
 | Phase 2 sample (Q, V) | `sampleBuds` → `LightModel.sample` | M0 (uniform), M1 |
 | BASIPETAL | `gatherLight` (C3): Q_sum, n_b, Q_base | M0 |
 | CARBON | — | M8 |
-| ACROPETAL | `allocate` (C3, by `c3.mode`) | M0 `none`, M2 `bh`/`equal` |
+| ACROPETAL | `allocate` (C3, by `c3.mode`): `bh` splits by λ at every node; `equal` shares α·Q_base over live buds; `none` gives v = 1 to any bud with Q > 0. Every mode fills `vIn` | M0 `none`, M2 `bh`/`equal` |
 | BUD_FATE, GROW | `growBuds` → `shootSize`, `growShoot` (C1, C4 direction) | M0, M3 |
 | SHED, GIRTH | — | M4 |
 | MECHANICS | — | M9 |
 | COMMIT_STAGING | `commitBuds` compacts consumed buds; new rows were appended past the phase's loop bounds | M0 |
 | Phase 3 abrasion, stand | — | M11 |
+
+**Shoot size (interpretation of §C3.4).** n = min(⌊v⌋, `c1.maxMetamersPerShoot`) and l = v/⌊v⌋·l0, with the length computed from the *uncapped* ⌊v⌋. Spec §C3 writes "n = ⌊v⌋ metamers (capped), length l = v/n". Using the capped n there would let a well-fed leader grow internodes tens of cells long (seen at M2: height 71 by season 20 at λ = 0.56). That would break the "internode ≈ one grid cell" assumption that the shadow grid relies on. Palubicki et al. have no cap, and their l stays in [1, 2).
 
 **Milestone scaffold.** Until C3 lands at M2, `c3.mode: "none"` gives each bud with Q > 0 exactly one metamer of length l0. With C2 off (M0) that is "all buds grow".
 

@@ -10,7 +10,7 @@ Status key: ✅ done · 🚧 in progress · ⏳ not started.
 |---|---|---|---|---|
 | M0 | Metamer graph, distichous buds, all buds grow; worker, renderer, CLI, analysis | Exponential bush (Borchert–Slade explosion) | `src/core/world.test.ts`: parent-before-child; growth ratio > 1.5; alternating sides; replay; goldens | ✅ 2026-10-26 |
 | M1 | C2 shadow triangle | Density regulated; shadow heatmap and bud-light overlay | `light/shadow-triangle.test.ts`: deposit pattern, Q formula, V away from shade, opaque box. `world.test.ts`: growth ≪ M0, late ratio < 1.2, most buds dormant | ✅ 2026-10-26 |
-| M2 | C3 Borchert–Honda allocation | λ 0.46 → 0.56: spreading → leader | Σ v at buds = v_base; leader dominance at 0.56 > at 0.46 (5 seeds); λ sweep note | ⏳ |
+| M2 | C3 Borchert–Honda allocation | λ 0.46 → 0.56: spreading → leader | `principles/c3-allocation.test.ts`: split formula; v_base = α·Q_base = root inflow; slot shares sum to inflow; `equal` gives equal shares; height at 0.56 > 1.3 × at 0.46 (5 seeds). [λ sweep](experiments/2026-10-26-m2-lambda-sweep.md) | ✅ 2026-10-26 |
 | M3 | C4 direction | Lean away from a wall; tropism sign flips spread | Wall pushes the centroid away; tropism sign changes width | ⏳ |
 | M4 | C5 shedding + C6 pipe girth | Clear bole; junction-exponent histogram near n | Radii never decrease; Δ = n at unscarred junctions; bole with C5 on, none off | ⏳ |
 | M5 | N trees, one grid | Crowns asymmetric away from each other; short tree suppressed | Two trees lean apart; a late tree gets less Q; removal → neighbour leans into the gap | ⏳ |
@@ -27,7 +27,7 @@ Status key: ✅ done · 🚧 in progress · ⏳ not started.
 |---|---|---|---|---|---|---|---|
 | C1 | Metamers, buds, distichous side sequence | §C1 | always on | `principles/c1-buds.ts` | `world.test.ts` | colour: order; buds | ✅ M0 |
 | C2 | Shadow triangle → Q, V | §C2 | `c2.enabled` | `light/shadow-triangle.ts` | `shadow-triangle.test.ts`, `world.test.ts` | shadow heatmap; colour: light (branches and buds) | ✅ M1 |
-| C3 | Basipetal ΣQ, Borchert–Honda split | §C3 | `c3.mode` (`bh`/`equal`/`none`) | `principles/c3-allocation.ts` (basipetal pass and `none` mode exist) | — | colour: resource | ⏳ M2 |
+| C3 | Basipetal ΣQ, Borchert–Honda split | §C3 | `c3.mode` (`bh`; `equal` = §8 ablation; `none` = M0–M1 scaffold) | `principles/c3-allocation.ts` | `c3-allocation.test.ts` | colour: resource v | ✅ M2 |
 | C4 | Weighted shoot direction | §C4 | `c4.enabled` | — | — | — | ⏳ M3 |
 | C5 | Self-pruning | §C5 | `c5.enabled` | — | — | shed ghosts | ⏳ M4 |
 | C6 | Pipe girth with memory | §C6 | `c6.enabled` | — | — | width | ⏳ M4 |

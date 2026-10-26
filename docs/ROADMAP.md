@@ -9,7 +9,7 @@ Status key: ✅ done · 🚧 in progress · ⏳ not started.
 | # | Build | Visible test (§7) | Automated check | Status |
 |---|---|---|---|---|
 | M0 | Metamer graph, distichous buds, all buds grow; worker, renderer, CLI, analysis | Exponential bush (Borchert–Slade explosion) | `src/core/world.test.ts`: parent-before-child; growth ratio > 1.5; alternating sides; replay; goldens | ✅ 2026-10-26 |
-| M1 | C2 shadow triangle | Density regulated; shadow heatmap and bud-light overlay | Deposit pattern a·b^(−q); growth ratio below M0's | ⏳ |
+| M1 | C2 shadow triangle | Density regulated; shadow heatmap and bud-light overlay | `light/shadow-triangle.test.ts`: deposit pattern, Q formula, V away from shade, opaque box. `world.test.ts`: growth ≪ M0, late ratio < 1.2, most buds dormant | ✅ 2026-10-26 |
 | M2 | C3 Borchert–Honda allocation | λ 0.46 → 0.56: spreading → leader | Σ v at buds = v_base; leader dominance at 0.56 > at 0.46 (5 seeds); λ sweep note | ⏳ |
 | M3 | C4 direction | Lean away from a wall; tropism sign flips spread | Wall pushes the centroid away; tropism sign changes width | ⏳ |
 | M4 | C5 shedding + C6 pipe girth | Clear bole; junction-exponent histogram near n | Radii never decrease; Δ = n at unscarred junctions; bole with C5 on, none off | ⏳ |
@@ -26,7 +26,7 @@ Status key: ✅ done · 🚧 in progress · ⏳ not started.
 | ID | Principle | Spec | Switch | Code | Tests | Overlay / colour | Status |
 |---|---|---|---|---|---|---|---|
 | C1 | Metamers, buds, distichous side sequence | §C1 | always on | `principles/c1-buds.ts` | `world.test.ts` | colour: order; buds | ✅ M0 |
-| C2 | Shadow triangle → Q, V | §C2 | `c2.enabled` | `light/` | — | shadow heatmap; colour: light | ⏳ M1 |
+| C2 | Shadow triangle → Q, V | §C2 | `c2.enabled` | `light/shadow-triangle.ts` | `shadow-triangle.test.ts`, `world.test.ts` | shadow heatmap; colour: light (branches and buds) | ✅ M1 |
 | C3 | Basipetal ΣQ, Borchert–Honda split | §C3 | `c3.mode` (`bh`/`equal`/`none`) | `principles/c3-allocation.ts` (basipetal pass and `none` mode exist) | — | colour: resource | ⏳ M2 |
 | C4 | Weighted shoot direction | §C4 | `c4.enabled` | — | — | — | ⏳ M3 |
 | C5 | Self-pruning | §C5 | `c5.enabled` | — | — | shed ghosts | ⏳ M4 |
@@ -40,9 +40,9 @@ No published value exists for these. Tune each on an isolated tree (spec §2 tab
 
 | Param | Placeholder | Notes |
 |---|---|---|
-| `c2.a` shadow strength | 1 | Palubicki gives only a > 0. In 2D, lower a or raise b (§2) |
-| `c2.b` shadow decay | 2 | b > 1 |
-| `c2.C` full exposure | 1 | |
+| `c2.a` shadow strength | 0.2 | First pass: [M1 calibration](experiments/2026-10-26-m1-shadow-calibration.md). Revisit with C3, which turns Q into growth |
+| `c2.b` shadow decay | 2 | b > 1. First pass as above |
+| `c2.C` full exposure | 1 | The buds of one node share a cell, so C > a·(buds per node − 1) |
 | `c5.T` shedding threshold | 0.3 | Light per metamer; recalibrate for 2D (§C5.5) |
 | `c6.r0` tip radius | 0.08 cells | Visual only until R1/R3 |
 | `c4` weights `wd, xi, eta, sigma` | 1, 0.3, 0.15, 8° | Palubicki Fig. 12 is qualitative |

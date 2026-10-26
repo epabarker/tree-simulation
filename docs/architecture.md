@@ -75,13 +75,15 @@ The passes need only `parent` and `slot`:
 
 **Milestone scaffold.** Until C3 lands at M2, `c3.mode: "none"` gives each bud with Q > 0 exactly one metamer of length l0. With C2 off (M0) that is "all buds grow".
 
-**Ground.** The ground (y < 0) is opaque in every light model: a bud below it gets Q = 0 and never grows. A shoot that turns downward can push one metamer below ground, which then stops. The renderer draws the ground over such stubs.
+**The world is a closed box.** In every light model, everything outside the W×H grid is opaque: below the ground, beyond the sides and above the top. A bud there gets Q = 0 and never grows, and V never points out of the box. A shoot can overshoot the edge by one metamer, which then stops. The renderer draws the ground over stubs that pushed below it.
+
+Before this rule, shoots that left the grid saw unshaded sky and grew exponentially (found at M1). Make the world large enough for the trees it holds.
 
 ## Light models (`src/core/light/`)
 
 All of them sit behind `LightModel.sample(x, y, dir) → {q, vx, vy}` (§C2.8):
 - `UniformLight`: C2 off.
-- The shadow triangle: M1.
+- `ShadowTriangle` (M1): deposits a·b^(−q) per bud, Q = max(C − s + a, 0), and V points at the least-shaded cell in a wedge of half-angle θ and radius r.
 - The sky sweep: M6.
 
 `World.makeLight(params)` picks one. It is rebuilt whenever params change.

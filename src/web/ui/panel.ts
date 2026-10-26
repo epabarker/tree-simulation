@@ -37,6 +37,19 @@ const SECTIONS: SectionSpec[] = [
       { key: "maxMetamersPerShoot", label: "shoot cap", min: 1, max: 8, step: 1 },
     ],
   },
+  {
+    section: "c2",
+    title: "C2 Light (shadow)",
+    toggle: true,
+    fields: [
+      { key: "a", label: "a strength", min: 0.1, max: 3, step: 0.05 },
+      { key: "b", label: "b decay", min: 1.05, max: 4, step: 0.05 },
+      { key: "qMax", label: "q max depth", min: 1, max: 12, step: 1 },
+      { key: "C", label: "C full light", min: 0.1, max: 3, step: 0.05 },
+      { key: "perceptionAngle", label: "θ wedge half-angle°", min: 10, max: 90, step: 1 },
+      { key: "perceptionDistance", label: "r perception", min: 1, max: 8, step: 1 },
+    ],
+  },
 ];
 
 export interface PlaybackState {

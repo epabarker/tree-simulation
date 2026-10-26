@@ -52,7 +52,10 @@ export interface Params {
   /** C2 Shared light field: shadow triangle (Palubicki et al. §4.1, triangle in 2D). */
   c2: {
     enabled: boolean;
-    /** Shadow strength a > 0 (calibrate). Also the self-shadow a bud removes from its own Q. */
+    /**
+     * Shadow strength a > 0 (calibrate). Also the self-shadow a bud removes from its own Q.
+     * Buds of one node share a cell and shade each other, so C must exceed a·(buds per node − 1).
+     */
     a: number;
     /** Shadow decay b > 1 per layer below the bud (calibrate). */
     b: number;
@@ -125,7 +128,7 @@ export const defaultParams: Params = {
   },
   c2: {
     enabled: false,
-    a: 1, // calibrate
+    a: 0.2, // calibrate (M1 scan: 0.2 keeps both buds of a node lit, since C > a·(buds − 1))
     b: 2, // calibrate
     qMax: 6,
     C: 1, // calibrate

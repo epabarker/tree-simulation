@@ -17,6 +17,8 @@ export interface GoldenCase {
 export const GOLDEN_CASES: GoldenCase[] = [
   { preset: "explosion", seed: 1, seasons: 10 },
   { preset: "explosion", seed: 2, seasons: 10 },
+  { preset: "shadow", seed: 1, seasons: 40 },
+  { preset: "shadow", seed: 2, seasons: 40 },
 ];
 
 export function caseKey(c: GoldenCase): string {

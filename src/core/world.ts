@@ -4,6 +4,7 @@
  */
 
 import { type LightModel, UniformLight } from "./light/light-model.ts";
+import { ShadowTriangle } from "./light/shadow-triangle.ts";
 import { clone, mergeParams, type Params, type ParamsPatch } from "./params.ts";
 import { plantSeedling } from "./principles/c1-buds.ts";
 import { runSeason } from "./season.ts";
@@ -23,6 +24,7 @@ export interface RunRecord {
 
 export function makeLight(params: Params): LightModel {
   const { width, height } = params.world;
+  if (params.c2.enabled) return new ShadowTriangle(width, height, params.c2);
   return new UniformLight(width, height, params.c2.C);
 }
 

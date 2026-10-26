@@ -185,7 +185,7 @@ export class Canvas2DRenderer {
     this.computeGeometry(t);
     if (view.showGhosts && this.prev && t < 1) this.drawGhosts(1 - t);
     this.drawSegments(s, view.colorMode);
-    if (view.showBuds) this.drawBuds(s);
+    if (view.showBuds) this.drawBuds(s, view.colorMode === "light");
 
     // Ground last, so the stubs of shoots that turned downward stay underground.
     ctx.fillStyle = style.getPropertyValue("--ground").trim() || "#8a7a5a";
@@ -236,15 +236,19 @@ export class Canvas2DRenderer {
 
     let max = 0;
     if (field) for (let j = 0; j < n; j++) if (field[j] > max) max = field[j];
+    // Light and resource are heavily skewed (a few bright tips), so colour by √(value / max).
+    const gamma = mode === "age" ? 1 : 0.5;
     const palette = field ? SEQUENTIAL : CATEGORICAL;
     this.colors = palette;
     const pxPerUnit = this.camera.scale;
     for (let j = 0; j < n; j++) {
       let c: number;
-      if (field)
-        c =
-          max > 0 ? Math.min(palette.length - 1, Math.floor((field[j] / max) * palette.length)) : 0;
-      else c = (mode === "tree" ? s.tree[j] + 1 : s.order[j]) % palette.length;
+      if (field) {
+        const u = max > 0 ? (field[j] / max) ** gamma : 0;
+        c = Math.min(palette.length - 1, Math.floor(u * palette.length));
+      } else {
+        c = (mode === "tree" ? s.tree[j] + 1 : s.order[j]) % palette.length;
+      }
       const widthPx = Math.max(0.6, 2 * this.geom.radius[j] * pxPerUnit);
       const wb = Math.min(WIDTH_BUCKETS - 1, Math.max(0, Math.round(Math.log2(widthPx / 0.6) * 4)));
       this.keys[j] = c * WIDTH_BUCKETS + wb;
@@ -305,11 +309,29 @@ export class Canvas2DRenderer {
     ctx.restore();
   }
 
-  private drawBuds(s: Snapshot): void {
+  /** Buds coloured by state, or by their light Q (√ of Q over the brightest bud's) when `byLight`. */
+  private drawBuds(s: Snapshot, byLight: boolean): void {
     const { ctx } = this;
     const g = this.geom;
-    const size = Math.max(2.2 / this.camera.scale, 0.18);
+    const size = Math.max(2.6 / this.camera.scale, 0.22);
     const half = size / 2;
+    if (byLight) {
+      let max = 0;
+      for (let i = 0; i < s.budCount; i++) max = Math.max(max, s.budQ[i]);
+      const n = SEQUENTIAL.length;
+      for (let c = 0; c < n; c++) {
+        ctx.fillStyle = SEQUENTIAL[c] as string;
+        ctx.beginPath();
+        for (let i = 0; i < s.budCount; i++) {
+          const k = max > 0 ? Math.min(n - 1, Math.floor(Math.sqrt(s.budQ[i] / max) * n)) : 0;
+          if (k !== c) continue;
+          const m = s.budMetamer[i];
+          ctx.rect(g.tipX[m] - half, g.tipY[m] - half, size, size);
+        }
+        ctx.fill();
+      }
+      return;
+    }
     for (const [state, color] of [
       [BudState.active, BUD_ACTIVE],
       [BudState.dormant, BUD_DORMANT],

@@ -98,3 +98,29 @@ describe("M0: metamer graph, distichous buds, all buds grow", () => {
     expect(m.height).toBeCloseTo(6, 9); // one metamer per season on the leader, plus the seedling
   });
 });
+
+describe("M1: the shadow triangle regulates density", () => {
+  it("grows far less than unchecked growth, and stops being exponential", () => {
+    const seasons = 14;
+    const free = new World(presetParams("explosion"));
+    free.run(seasons);
+    const shaded = new World(presetParams("shadow"));
+    const counts: number[] = [];
+    for (let s = 0; s < 30; s++) {
+      shaded.step();
+      counts.push((shaded.trees[0] as Tree).m.length);
+    }
+    const at = (season: number) => counts[season - 1] as number;
+    expect(at(seasons)).toBeLessThan((free.trees[0] as Tree).m.length / 10);
+    // Late growth ratio well below M0's ≈ 2 per season.
+    expect(at(30) / at(29)).toBeLessThan(1.2);
+    expect(at(30)).toBeGreaterThan(at(15));
+  });
+
+  it("leaves most interior buds dormant", () => {
+    const world = new World(presetParams("shadow"));
+    world.run(25);
+    const m = treeMetrics(world.trees[0] as Tree);
+    expect(m.dormantBuds / m.buds).toBeGreaterThan(0.5);
+  });
+});

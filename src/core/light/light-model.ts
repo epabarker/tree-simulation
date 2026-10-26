@@ -27,8 +27,9 @@ export interface LightModel {
 }
 
 /**
- * C2 switched off: every bud above ground is fully exposed (Q = C) and V points straight up.
- * The ground is opaque in every light model: a bud below it gets Q = 0 and cannot grow.
+ * C2 switched off: every bud inside the world is fully exposed (Q = C) and V points straight up.
+ * In every light model the world is a closed box: outside it (below the ground, beyond the
+ * sides, above the top) Q = 0, so nothing grows out of the world.
  */
 export class UniformLight implements LightModel {
   readonly width: number;
@@ -45,8 +46,9 @@ export class UniformLight implements LightModel {
   deposit(): void {}
   addWall(): void {}
 
-  sample(_x: number, y: number, _dir: number, out: LightSample): void {
-    out.q = y < 0 ? 0 : this.q;
+  sample(x: number, y: number, _dir: number, out: LightSample): void {
+    const inside = x >= 0 && x < this.width && y >= 0 && y < this.height;
+    out.q = inside ? this.q : 0;
     out.vx = 0;
     out.vy = 1;
   }

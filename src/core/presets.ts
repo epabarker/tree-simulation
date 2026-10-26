@@ -22,11 +22,21 @@ export const presets = {
       c3: { mode: "none" },
     },
   },
+  shadow: {
+    label: "M1: shadow regulates density",
+    description: "C2 on: buds in another bud's shadow triangle stop growing (spec §7 M1).",
+    patch: {
+      world: { width: 100, height: 70, walls: [] },
+      trees: [{ x: 50 }],
+      c2: { enabled: true },
+      c3: { mode: "none" },
+    },
+  },
 } satisfies Record<string, Preset>;
 
 export type PresetName = keyof typeof presets;
 
-export const defaultPreset: PresetName = "explosion";
+export const defaultPreset: PresetName = "shadow";
 
 export function presetParams(name: PresetName, seed?: number): Params {
   const params = mergeParams(defaultParams, presets[name].patch);

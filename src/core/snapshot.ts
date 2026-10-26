@@ -121,7 +121,7 @@ export class SnapshotBuilder {
       junctions: new Float32Array(
         world.params.c6.enabled ? live.flatMap((t) => junctionExponents(t)) : [],
       ),
-      metrics: world.trees.filter((t) => t.m.length > 0).map(treeMetrics),
+      metrics: live.map(treeMetrics),
       seasonMs,
     };
 

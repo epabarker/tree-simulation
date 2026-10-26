@@ -143,6 +143,32 @@ export class Canvas2DRenderer {
     this.camera.cy = (h / 2 - margin) / this.camera.scale;
   }
 
+  /** The tree whose nearest branch passes within `maxPx` screen pixels of a world point, or null. */
+  pickTree(wx: number, wy: number, maxPx = 14): number | null {
+    const s = this.next;
+    if (!s) return null;
+    const g = this.geom;
+    let best = (maxPx / this.camera.scale) ** 2;
+    let tree: number | null = null;
+    for (let j = 0; j < s.metamerCount; j++) {
+      const ax = g.baseX[j];
+      const ay = g.baseY[j];
+      const dx = g.tipX[j] - ax;
+      const dy = g.tipY[j] - ay;
+      const len2 = dx * dx + dy * dy;
+      const u = len2 > 0 ? Math.max(0, Math.min(1, ((wx - ax) * dx + (wy - ay) * dy) / len2)) : 0;
+      const ex = ax + u * dx - wx;
+      const ey = ay + u * dy - wy;
+      const r = g.radius[j];
+      const d2 = Math.max(0, Math.hypot(ex, ey) - r) ** 2;
+      if (d2 < best) {
+        best = d2;
+        tree = s.tree[j];
+      }
+    }
+    return tree;
+  }
+
   screenToWorld(px: number, py: number): [number, number] {
     const w = this.canvas.width / this.dpr;
     const h = this.canvas.height / this.dpr;

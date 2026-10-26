@@ -13,7 +13,7 @@ Status key: ✅ done · 🚧 in progress · ⏳ not started.
 | M2 | C3 Borchert–Honda allocation | λ 0.46 → 0.56: spreading → leader | `principles/c3-allocation.test.ts`: split formula; v_base = α·Q_base = root inflow; slot shares sum to inflow; `equal` gives equal shares; height at 0.56 > 1.3 × at 0.46 (5 seeds). [λ sweep](experiments/2026-10-26-m2-lambda-sweep.md) | ✅ 2026-10-26 |
 | M3 | C4 direction | Lean away from a wall; tropism sign flips spread | `principles/c4-direction.test.ts`: each term of the weighted sum; the wall shifts the centroid by > 1 cell away (5 seeds); η −0.3 crowns > 1.2 × the width of η +0.3 | ✅ 2026-10-26 |
 | M4 | C5 shedding + C6 pipe girth | Clear bole; junction-exponent histogram near n | `principles/c5-c6.test.ts`: pipe sums, memory, shedding with scar and remap, grace period; radii never decrease; Δ = n everywhere without shedding; C5 sheds, shrinks crowns and doesn't lower the crown base (5 seeds). Isolated trees form only a low bole (1–6 cells); see the [calibration note](experiments/2026-10-26-m4-calibration.md) | ✅ 2026-10-26 (bole retested at M5) |
-| M5 | N trees, one grid | Crowns asymmetric away from each other; short tree suppressed | Two trees lean apart; a late tree gets less Q; removal → neighbour leans into the gap | ⏳ |
+| M5 | N trees, one grid | Crowns asymmetric away from each other; short tree suppressed | `stand.test.ts` (5 seeds each): a pair leans apart; a late tree is < 0.6 × the height, < 0.3 × the metamers and < 0.3 × the Q_base of its neighbours; after a removal the neighbour's centroid moves > 2 cells into the gap; results don't depend on tree processing order. Crown bases don't lift in stands: the shadow triangle is too shallow (→ M6) | ✅ 2026-10-26 |
 | M6 | Sky sweep (Beer–Lambert, K directions); WebGL2 renderer | Edge trees lean outward; neighbours lean into a gap | — | ⏳ |
 | M7 | R2 physiological age; §9 species presets | Massart conifer, Rauh broadleaf, Aubréville tiers | — | ⏳ |
 | M8 | R1 carbon balance | Height plateau; suppressed tree dies; crown base rises | — | ⏳ |
@@ -40,7 +40,7 @@ No published value exists for these. Tune each on an isolated tree (spec §2 tab
 
 | Param | Placeholder | Notes |
 |---|---|---|
-| `c2.a` shadow strength | 0.2 | [M1](experiments/2026-10-26-m1-shadow-calibration.md), [M4](experiments/2026-10-26-m4-calibration.md). With α = 2, a > ~0.15 risks the seedling trap (4 buds in a cell) |
+| `c2.a` shadow strength | 0.15 | [M1](experiments/2026-10-26-m1-shadow-calibration.md), [M4](experiments/2026-10-26-m4-calibration.md). M5: in 10-tree stands, 0.2 stalled 5 of 40 seedlings and 0.15 stalled none |
 | `c2.b` shadow decay | 1.5 | M4 calibration: deeper shade once shedding is on |
 | `c2.C` full exposure | 1 | The buds of one node share a cell, so C > a·(buds per node − 1) |
 | `c5.T` shedding threshold | 0.1 | M4 calibration; ≥ 0.2 over-prunes |

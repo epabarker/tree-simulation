@@ -39,3 +39,6 @@ uv run --project analysis python analysis/experiments/m4_calibration.py   # writ
 ## Decisions
 - **New defaults:** a = 0.2, b = 1.5 (was 2), qMax = 6, T = 0.1 (was 0.3), C = 1. All still marked `calibrate`.
 - The M4 visible test is satisfied in the §8 ablation sense: C5 off gives a cluttered interior and no bole. The bole itself is retested in stands at M5.
+
+## Update at M5
+In 10-tree stands (4 seeds, 40 trees), a = 0.2 left 5 seedlings stalled and a = 0.15 left none (median tree 786 metamers). The default is now **a = 0.15**, following spec §2's advice to lower a in 2D.

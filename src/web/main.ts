@@ -123,7 +123,13 @@ attachInput(renderer, {
     autoFit = false;
     dirty = true;
   },
-  onTap: () => {},
+  // Direct manipulation: tap a tree to fell it; neighbours lean into the gap (§8, M5).
+  onTap: (wx, wy) => {
+    const tree = renderer.pickTree(wx, wy);
+    if (tree === null) return;
+    void sim.removeTree(tree);
+    if (!playback.playing) void step();
+  },
   onRefit: () => {
     autoFit = true;
     renderer.fit();

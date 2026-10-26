@@ -99,6 +99,10 @@ All of them sit behind `LightModel.sample(x, y, dir) → {q, vx, vy}` (§C2.8):
 | C1 side sequence | (tree id, axis id, 0) |
 | C4 direction noise | (tree id, new metamer's birthId, season) |
 
+## Direct manipulation
+
+Tapping a tree on the page fells it. `Canvas2DRenderer.pickTree` finds the nearest drawn segment within 14 px, and the page calls `removeTree(id)`. That is an event at the next season boundary: the tree stops depositing shade, so the next season's light reaches its neighbours. Its branches fade out as ghosts. Snapshots and charts show only live trees; the CLI's metrics.csv keeps rows for dead trees, with `alive = 0`.
+
 ## Events and replay
 
 `World.setParams` and `World.removeTree` queue events that apply at the next season boundary. Applied events are logged, and `World.record()` returns `{params, events, seasons}`. The page's **Export run** downloads this record; `npm run sim -- --replay file.json` reproduces the run exactly on V8. Changing `trees` mid-run is ignored; a new tree layout needs a new run.

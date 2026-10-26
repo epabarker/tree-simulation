@@ -81,6 +81,16 @@ body {
   pointer-events: none;
 }
 
+.hint {
+  position: absolute;
+  top: 32px;
+  left: 16px;
+  margin: 0;
+  font-size: 12px;
+  color: var(--muted);
+  pointer-events: none;
+}
+
 .panel {
   grid-area: panel;
   overflow-y: auto;

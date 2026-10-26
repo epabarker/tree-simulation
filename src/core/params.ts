@@ -133,7 +133,7 @@ export const defaultParams: Params = {
   },
   c2: {
     enabled: false,
-    a: 0.2, // calibrate (M1 scan: 0.2 keeps both buds of a node lit, since C > a·(buds − 1))
+    a: 0.15, // calibrate (M5: 0.2 stalled 5/40 stand seedlings; 0.15 stalled none)
     b: 1.5, // calibrate (M4: 1.5 shades deeper than 2 once shedding is on)
     qMax: 6,
     C: 1, // calibrate

@@ -11,6 +11,15 @@ export interface Preset {
   patch: ParamsPatch;
 }
 
+/** Principles shared by every stand preset (C2–C6 on, λ = 0.5). */
+const STAND = {
+  c2: { enabled: true },
+  c3: { mode: "bh", lambda: 0.5 },
+  c4: { enabled: true },
+  c5: { enabled: true },
+  c6: { enabled: true },
+} satisfies ParamsPatch;
+
 export const presets = {
   explosion: {
     label: "M0: unchecked growth",
@@ -97,11 +106,38 @@ export const presets = {
       c6: { enabled: true },
     },
   },
+  pair: {
+    label: "M5: two trees",
+    description: "Two trees share one light grid: crowns grow away from each other (§7 M5).",
+    patch: {
+      world: { width: 120, height: 100, walls: [] },
+      trees: [{ x: 48 }, { x: 72 }],
+      ...STAND,
+    },
+  },
+  late: {
+    label: "M5: a late tree is suppressed",
+    description: "A seedling planted at season 12 between two older trees stays small (§7 M5).",
+    patch: {
+      world: { width: 140, height: 100, walls: [] },
+      trees: [{ x: 45 }, { x: 70, plantSeason: 12 }, { x: 95 }],
+      ...STAND,
+    },
+  },
+  stand: {
+    label: "M5: stand of ten",
+    description: "Ten trees: edge trees lean out, interior trees grow tall and narrow (§8).",
+    patch: {
+      world: { width: 230, height: 110, walls: [] },
+      trees: [20, 41, 62, 83, 104, 125, 146, 167, 188, 209].map((x) => ({ x })),
+      ...STAND,
+    },
+  },
 } satisfies Record<string, Preset>;
 
 export type PresetName = keyof typeof presets;
 
-export const defaultPreset: PresetName = "pruned";
+export const defaultPreset: PresetName = "stand";
 
 export function presetParams(name: PresetName, seed?: number): Params {
   const params = mergeParams(defaultParams, presets[name].patch);

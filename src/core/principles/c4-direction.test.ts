@@ -82,6 +82,9 @@ describe("M3: shoot direction shapes the crown", () => {
       SEEDS.map((s) =>
         finalMetric(mergeParams(presetParams("direction", s), { c4: { eta } }), 25, crownWidth),
       );
-    expect(mean(width(-0.3))).toBeGreaterThan(mean(width(0.3)) * 1.2);
+    const up = width(0.5);
+    const down = width(-0.5);
+    for (const [i, d] of down.entries()) expect(d).toBeGreaterThan(up[i] as number);
+    expect(mean(down)).toBeGreaterThan(mean(up) * 1.2);
   });
 });

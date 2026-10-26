@@ -70,16 +70,32 @@ export class Charts {
         y: { type: "log", label: "metamers", grid: true },
         x: { label: "season" },
         color: { legend: false },
-        marks: [Plot.lineY(rows, { x: "season", y: "metamers", stroke: tree, tip: true })],
+        marks: [Plot.lineY(rows, { x: "season", y: "metamers", stroke: tree, z: tree, tip: true })],
       }),
       Plot.plot({
         ...common,
         title: "Height",
         y: { label: "height (cells)", grid: true },
         x: { label: "season" },
-        marks: [Plot.lineY(rows, { x: "season", y: "height", stroke: tree, tip: true })],
+        marks: [Plot.lineY(rows, { x: "season", y: "height", stroke: tree, z: tree, tip: true })],
       }),
     ];
+    const lastSeason = rows.length > 0 ? (rows[rows.length - 1] as MetricsRow).season : 0;
+    const latest = rows.filter((d) => d.season === lastSeason && d.alive);
+    if (latest.length > 1) {
+      charts.push(
+        Plot.plot({
+          ...common,
+          title: "Light captured per tree (Q_base)",
+          x: { label: "tree" },
+          y: { label: "Q_base", grid: true },
+          marks: [
+            Plot.barY(latest, { x: "tree", y: "qBase", fill: tree, tip: true }),
+            Plot.ruleY([0]),
+          ],
+        }),
+      );
+    }
     if (this.junctions.length > 0) {
       charts.push(
         Plot.plot({

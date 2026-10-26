@@ -17,7 +17,6 @@ _Last updated: 2026-10-26_
 
 ## Open questions (for the user)
 - **The Pages demo URL is unreachable.** The user site `epabarker.github.io` has the custom domain `barker.garden`, which no longer resolves in DNS (NXDOMAIN), so every project page redirects to it. Fix: remove that custom domain, restore the DNS, or give this repo its own domain.
-- Confirm the shoot-length reading of §C3.4: l = v/⌊v⌋ with uncapped ⌊v⌋ (architecture.md, "Shoot size").
 - Whether to add `runs/` and `dist/` to the `pcloud-sync` filters (this folder syncs to pCloud hourly).
 
 ## Known issues

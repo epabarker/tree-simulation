@@ -73,7 +73,7 @@ The passes need only `parent` and `slot`:
 | COMMIT_STAGING | `commitBuds` compacts consumed buds; new rows were appended past the phase's loop bounds | M0 |
 | Phase 3 abrasion, stand | — | M11 |
 
-**Shoot size (interpretation of §C3.4).** n = min(⌊v⌋, `c1.maxMetamersPerShoot`) and l = v/⌊v⌋·l0, with the length computed from the *uncapped* ⌊v⌋. Spec §C3 writes "n = ⌊v⌋ metamers (capped), length l = v/n". Using the capped n there would let a well-fed leader grow internodes tens of cells long (seen at M2: height 71 by season 20 at λ = 0.56). That would break the "internode ≈ one grid cell" assumption that the shadow grid relies on. Palubicki et al. have no cap, and their l stays in [1, 2).
+**Shoot size (ADR 0004).** v' = min(v, `c1.maxMetamersPerShoot`), n = ⌊v'⌋, l = v'/n · l0: the resource is capped, then Palubicki's rule applies unchanged, as in the LPFG SOT model. Internodes stay within [1, 2)·l0.
 
 **Milestone scaffold.** Until C3 lands at M2, `c3.mode: "none"` gives each bud with Q > 0 exactly one metamer of length l0. With C2 off (M0) that is "all buds grow".
 

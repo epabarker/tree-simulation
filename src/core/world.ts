@@ -45,6 +45,8 @@ export class World {
   storm = false;
   /** O2: which tree's foliage holds each cell this season (W × H, −1 none, −2 several). */
   owner: Int32Array;
+  /** The owner grid was filled this season (O2 abrasion, or R5's neighbour signal). */
+  ownersTagged = false;
   light: LightModel;
   /** Events applied so far. */
   readonly log: RunEvent[] = [];

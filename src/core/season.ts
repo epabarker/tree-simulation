@@ -22,7 +22,7 @@ import { carbonBalance, starvedToDeath } from "./principles/r1-carbon.ts";
 import { directionParams } from "./principles/r2-physiological-age.ts";
 import { updateMechanics } from "./principles/r3-mechanics.ts";
 import { aborts, growthThreshold, lightReleases, releasedShift } from "./principles/r4-dormancy.ts";
-import { elongation, setPointScale, shadeOf } from "./principles/r5-shade.ts";
+import { elongation, neighbourShare, setPointScale, shadeOf } from "./principles/r5-shade.ts";
 import { depositArea, restingState } from "./principles/r6-short-shoots.ts";
 import { normal, Purpose, uniform } from "./rng.ts";
 import { BudState, type Tree } from "./tree.ts";
@@ -70,7 +70,14 @@ export function runSeason(world: World, mark: PhaseMark = noMark): void {
   }
   light.clear();
   const abrasion = params.o2.enabled;
-  if (abrasion) world.owner.fill(EMPTY);
+  // The owner grid serves O2 and R5's neighbour signal (M19), for the world or any species.
+  const neighbours = (r5: { signal?: string }) => r5.signal === "neighbours";
+  const owners =
+    abrasion ||
+    neighbours(params.r5) ||
+    Object.values(params.species ?? {}).some((sp) => sp.r5 !== undefined && neighbours(sp.r5));
+  world.ownersTagged = owners;
+  if (owners) world.owner.fill(EMPTY);
   if (params.c2.enabled) {
     for (const wall of params.world.walls) light.addWall(wall);
     for (const tree of live) depositBuds(world, tree);
@@ -146,17 +153,28 @@ function depositBuds(world: World, tree: Tree): void {
     if (area === 0) continue;
     const m = b.metamer[i];
     world.light.deposit(tree.tipX(m), tree.tipY(m), area);
-    if (world.params.o2.enabled) tagFoliage(world, tree, tree.tipX(m), tree.tipY(m)); // O2 owners
+    if (world.ownersTagged) tagFoliage(world, tree, tree.tipX(m), tree.tipY(m)); // O2, R5 owners
   }
 }
 
-/** R5: shade s = 1 − Q/C at every metamer's upper node, from the start-of-season field. */
+/**
+ * R5: shade s = 1 − Q/C at every metamer's upper node, from the start-of-season field; with the
+ * neighbour signal (M19), scaled by the share of the foliage above that other trees own.
+ */
 function sampleNodes(world: World, tree: Tree): void {
   const C = world.params.c2.C;
   const c = tree.m.cols;
+  const byNeighbours = world.paramsOf(tree).r5.signal === "neighbours";
+  const { width: W, height: H, sides } = world.params.world;
   for (let i = 0; i < tree.m.length; i++) {
-    world.light.sample(tree.tipX(i), tree.tipY(i), c.angle[i], sample);
-    tree.nodeShade[i] = shadeOf(sample.q, C);
+    const x = tree.tipX(i);
+    const y = tree.tipY(i);
+    world.light.sample(x, y, c.angle[i], sample);
+    let s = shadeOf(sample.q, C);
+    if (byNeighbours && s > 0) {
+      s *= neighbourShare(world.owner, W, H, sides === "periodic", x, y, tree.id);
+    }
+    tree.nodeShade[i] = s;
   }
 }
 
@@ -217,7 +235,12 @@ export function growBuds(world: World, tree: Tree, season: number): void {
   const count = tree.b.length;
   for (let i = 0; i < count; i++) {
     if (!isLiveBud(b.state[i])) continue;
-    const shade = r5.enabled ? shadeOf(b.q[i], C) : 0;
+    // A bud senses the shade at its node: by light, or by neighbours (sampleNodes, M19).
+    const shade = !r5.enabled
+      ? 0
+      : r5.signal === "neighbours"
+        ? (tree.nodeShade[b.metamer[i] as number] as number)
+        : shadeOf(b.q[i], C);
     const state = b.state[i];
     const threshold = growthThreshold(state, b.age[i], shade, params);
     let n = b.v[i] >= threshold ? shootSize(b.v[i], params, shoot) : 0;

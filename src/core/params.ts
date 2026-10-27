@@ -319,6 +319,13 @@ export interface Params {
     dB: number;
     /** δ_A: A_set·(1 − δ_A·s): shade makes shoots more upright (Roychoudhry et al. 2017) (calibrate). */
     dA: number;
+    /**
+     * What the shade signal s reads (M19). "light" (default): 1 − Q/C, own foliage included, so a
+     * lone tree avoids its own shade and grows tall. "neighbours": that shade scaled by the share
+     * of the foliage above the node that belongs to other trees (O2's owner grid), standing in for
+     * the low R:FR of neighbours' light, so a lone tree grows squat (MacFarlane et al. 2017).
+     */
+    signal?: "light" | "neighbours";
   };
 
   /**

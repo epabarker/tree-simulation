@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { hashWorld } from "./hash.ts";
+import { treeMetrics } from "./metrics.ts";
 import { mergeParams, type Params } from "./params.ts";
 import { presetParams } from "./presets.ts";
 import type { Tree } from "./tree.ts";
@@ -83,5 +84,24 @@ describe("species per tree (ADR 0016)", () => {
     world.step();
     const sown = world.trees.find((t) => t.sown) as Tree;
     expect(sown.species).toBe("b");
+  });
+});
+
+describe("R5's neighbour signal (M19)", () => {
+  it("lets a lone tree grow squat, while a stand still grows slender (3 seeds)", () => {
+    const slender = (preset: "skyTree" | "skyStand", signal: "light" | "neighbours") => {
+      const hd: number[] = [];
+      for (let seed = 1; seed <= 3; seed++) {
+        const base = presetParams(preset, seed);
+        const world = new World(mergeParams(base, { r5: { ...base.r5, signal } }));
+        world.run(60);
+        const ms = world.trees.filter((t) => t.alive).map((t) => treeMetrics(t, world));
+        for (const m of preset === "skyStand" ? ms.slice(2, -2) : ms) hd.push(m.slenderness);
+      }
+      return hd.reduce((a, b) => a + b, 0) / hd.length;
+    };
+    const lone = slender("skyTree", "neighbours");
+    expect(lone).toBeLessThan(0.9 * slender("skyTree", "light"));
+    expect(slender("skyStand", "neighbours")).toBeGreaterThan(1.3 * lone);
   });
 });

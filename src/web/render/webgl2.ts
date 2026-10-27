@@ -233,8 +233,11 @@ interface Batch {
   program: ProgramInfo;
   buffers: BufferInfo;
   vao: VertexArrayInfo;
-  /** Attribute name → CPU array (grown on demand) and components per instance. */
-  streams: Map<string, { data: Floats | Bytes; size: number }>;
+  /**
+   * Attribute name → CPU array (grown on demand), components per instance, and how many elements
+   * the GPU buffer holds: it grows to the CPU array's capacity, so a frame only overwrites it.
+   */
+  streams: Map<string, { data: Floats | Bytes; size: number; gpuLength: number }>;
   /** Instances uploaded last time. */
   count: number;
 }
@@ -264,6 +267,7 @@ export class WebGL2Renderer implements Renderer {
   private shadeTexture: WebGLTexture | null = null;
   private shadeSize: [number, number] = [0, 0];
   private hasShade = false;
+  private shadeFor: Snapshot | null = null;
   private paletteCache = new Map<string, Bytes>();
   /** What the uploaded instance data was built from; if nothing differs it can be re-used. */
   private uploaded: { next: Snapshot | null; prev: Snapshot | null; key: string } = {
@@ -273,7 +277,7 @@ export class WebGL2Renderer implements Renderer {
   };
 
   private readonly transparent: boolean;
-  private readonly maxDpr: number;
+  private maxDpr: number;
 
   constructor(canvas: HTMLCanvasElement, options: RendererOptions = {}) {
     this.canvas = canvas;
@@ -317,7 +321,7 @@ export class WebGL2Renderer implements Renderer {
     const streams: Batch["streams"] = new Map();
     for (const [name, { size, bytes }] of Object.entries(attribs)) {
       const data = bytes ? new Uint8Array(64 * size) : new Float32Array(64 * size);
-      streams.set(name, { data, size });
+      streams.set(name, { data, size, gpuLength: data.length });
       arrays[name] = {
         numComponents: size,
         data,
@@ -369,8 +373,7 @@ export class WebGL2Renderer implements Renderer {
     this.shadeTexture = null;
     this.shadeSize = [0, 0];
     this.uploaded = { next: null, prev: null, key: "" };
-    const snapshot = this.scene.next;
-    if (snapshot) this.uploadShade(snapshot);
+    this.shadeFor = null;
   }
 
   refreshTheme(): void {
@@ -381,10 +384,13 @@ export class WebGL2Renderer implements Renderer {
 
   setSnapshot(s: Snapshot): void {
     this.scene.setSnapshot(s);
-    if (!this.lost) this.uploadShade(s);
+    this.shadeFor = null;
   }
 
+  /** Uploads the shade overlay of `s`, at most once per snapshot and only while it is shown. */
   private uploadShade(s: Snapshot): void {
+    if (this.shadeFor === s) return;
+    this.shadeFor = s;
     this.hasShade = !!s.shadow;
     if (!s.shadow) return;
     const gl = this.gl;
@@ -402,6 +408,11 @@ export class WebGL2Renderer implements Renderer {
     } else {
       setTextureFromArray(gl, this.shadeTexture, pixels, options);
     }
+  }
+
+  setMaxDpr(dpr: number): void {
+    this.maxDpr = dpr;
+    this.resize();
   }
 
   resize(): void {
@@ -443,13 +454,24 @@ export class WebGL2Renderer implements Renderer {
     return s.data as T;
   }
 
-  /** Uploads the first `count` instances of every stream of `batch`. */
+  /**
+   * Uploads the first `count` instances of every stream of `batch`. A buffer is reallocated only
+   * when the instances outgrow it (to the CPU array's doubled capacity); otherwise the frame's
+   * data overwrites its start with bufferSubData (M15: a tween frame used to reallocate them all).
+   */
   private upload(batch: Batch, count: number): void {
     batch.count = count;
     if (count <= 0) return;
-    for (const [name, { data, size }] of batch.streams) {
+    for (const [name, stream] of batch.streams) {
       const attrib = batch.buffers.attribs?.[name];
-      if (attrib) setAttribInfoBufferFromArray(this.gl, attrib, data.subarray(0, count * size));
+      if (!attrib) continue;
+      const used = count * stream.size;
+      if (stream.gpuLength < used) {
+        setAttribInfoBufferFromArray(this.gl, attrib, stream.data);
+        stream.gpuLength = stream.data.length;
+      } else {
+        setAttribInfoBufferFromArray(this.gl, attrib, stream.data.subarray(0, used), 0);
+      }
     }
   }
 
@@ -516,6 +538,7 @@ export class WebGL2Renderer implements Renderer {
       u_leaf: [scene.leafStyle.length, scene.leafStyle.aspect, LEAF_MIN_PX],
       u_point: [BUD_SIDE_PX, BUD_MIN_SIDE],
     };
+    if (view.showShadow) this.uploadShade(s);
     if (view.showShadow && this.hasShade && this.shadeTexture) {
       this.drawBatch(this.image, 1, {
         ...uniforms,
@@ -529,7 +552,7 @@ export class WebGL2Renderer implements Renderer {
     for (const offset of scene.wrapOffsets()) {
       const shifted = { ...uniforms, u_view: [cx - offset, ...uniforms.u_view.slice(1)] };
       this.drawBatch(this.ghostBatch, this.ghostBatch.count, shifted);
-      this.drawBatch(this.leafBackBatch, this.leafBackBatch.count, shifted);
+      if (!view.lite) this.drawBatch(this.leafBackBatch, this.leafBackBatch.count, shifted);
       this.drawBatch(this.segments, this.segments.count, shifted);
       this.drawBatch(this.leafBatch, this.leafBatch.count, shifted);
       this.drawBatch(this.budBatch, this.budBatch.count, shifted);

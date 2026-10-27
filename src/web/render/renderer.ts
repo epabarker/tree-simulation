@@ -18,6 +18,8 @@ export interface Renderer {
   draw(t: number, view: ViewOptions): void;
   /** Re-reads the colour tokens (after a light/dark switch). */
   refreshTheme(): void;
+  /** Caps device pixels per CSS pixel (adaptive quality, M15) and resizes to match. */
+  setMaxDpr(dpr: number): void;
 }
 
 /** Device pixels per CSS pixel, capped: beyond 2 the extra pixels cost more than they show. */

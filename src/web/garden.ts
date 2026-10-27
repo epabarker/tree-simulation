@@ -21,7 +21,8 @@ import type { SimApi } from "../worker/api.ts";
 import { createRenderer } from "./render/create.ts";
 import { attachInput } from "./render/input.ts";
 import { LEAF_STYLES } from "./render/leaf-styles.ts";
-import type { Renderer } from "./render/renderer.ts";
+import { governor, judge, type QualityLevel, qualityLevels } from "./render/quality.ts";
+import { MAX_DPR, type Renderer } from "./render/renderer.ts";
 import sceneTokens from "./render/scene.css?inline";
 import type { Scene, ViewOptions } from "./render/scene.ts";
 
@@ -40,6 +41,28 @@ export interface Stats {
   /** Frames per second while animating, and CPU milliseconds per draw. */
   fps: number;
   drawMs: number;
+  /** The adaptive quality level in use: device pixel ratio, and "lite" without back leaves. */
+  quality: string;
+}
+
+/** What `bench` measures over a run (M15): milliseconds unless named otherwise. */
+export interface BenchResult {
+  renderer: string;
+  dpr: number;
+  seasons: number;
+  metamers: number;
+  /** Animated frames sampled. */
+  frames: number;
+  /** CPU time of a draw call, and the interval between animated frames. */
+  drawP50: number;
+  drawP95: number;
+  frameP50: number;
+  frameP95: number;
+  /** Animated frames that took longer than 33 ms (missed two vsyncs at 60 Hz). */
+  longFrames: number;
+  /** Worker time per season, simulation plus snapshot. */
+  workerMean: number;
+  workerMax: number;
 }
 
 /** Seasons per second: `intro` until the world reaches `introSeasons`, then `ambient`. */
@@ -75,6 +98,8 @@ export interface GardenOptions {
   speed?: number;
   /** Longest tween between two seasons, ms: short in the lab, long for slow ambient growth. */
   maxTweenMs?: number;
+  /** Lower the resolution, then the leaf detail, when frames run slow (default on; off in bench). */
+  adaptive?: boolean;
   autoplay?: boolean;
   /**
    * With prefers-reduced-motion: "still" (default) shows the forest after the intro without
@@ -85,6 +110,8 @@ export interface GardenOptions {
   snapshot?: SnapshotOptions;
   /** Called with every snapshot; `fresh` marks the first one of a new run. */
   onSnapshot?(s: Snapshot, fresh: boolean): void;
+  /** Bench mode (`?bench`): play to `seasons`, sampling every animated frame, then report. */
+  bench?: { seasons: number; onDone(result: BenchResult): void };
 }
 
 export interface Garden {
@@ -188,6 +215,23 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
     renderer: renderer.kind === "webgl2" ? "WebGL2" : "Canvas 2D",
     fps: 0,
     drawMs: 0,
+    quality: "",
+  };
+
+  // Adaptive quality (render/quality.ts): fewer pixels, then fewer leaves, when frames run slow.
+  const adaptive = (options.adaptive ?? true) && !options.bench;
+  const quality = governor(qualityLevels(window.devicePixelRatio, options.maxDpr ?? MAX_DPR));
+  const describeQuality = (level: QualityLevel): string =>
+    `dpr ${level.dpr}${level.lite ? ", lite" : ""}`;
+  stats.quality = describeQuality(quality.levels[0] as QualityLevel);
+  const judgeFrame = (dt: number, now: number): void => {
+    const next = judge(quality, dt, now);
+    if (next === null) return;
+    const level = quality.levels[next] as QualityLevel;
+    view.lite = level.lite;
+    renderer.setMaxDpr(level.dpr);
+    stats.quality = describeQuality(level);
+    dirty = true;
   };
 
   const worker = new Worker(new URL("../worker/sim.worker.ts", import.meta.url), {
@@ -196,7 +240,9 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
   const sim = Comlink.wrap<SimApi>(worker);
   void sim.setSnapshotOptions(options.snapshot ?? { junctions: false, field: false });
 
-  let busy = false;
+  /** A season is being computed; a computed season is waiting for its turn (pipelining, M15). */
+  let inFlight = false;
+  let ahead: Snapshot | null = null;
   let dirty = true;
   let lastFrame = 0;
   let drewLastFrame = false;
@@ -208,6 +254,7 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
   let season = 0;
   let frameId = 0;
   let destroyed = false;
+  const samples = { draw: [] as number[], frame: [] as number[], worker: [] as number[] };
   /** Keep refitting the view as the trees grow, until the user pans or zooms. */
   let autoFit = true;
 
@@ -222,6 +269,7 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
     stats.season = s.season;
     stats.metamers = s.metamerCount;
     stats.workerMs = s.seasonMs + s.snapshotMs;
+    if (options.bench && !fresh) samples.worker.push(stats.workerMs);
     options.onSnapshot?.(s, fresh);
     tweenStart = performance.now();
     tweenMs = animate ? Math.min(maxTweenMs, (1000 / speed()) * 0.85) : 1;
@@ -231,32 +279,60 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
   async function restart(next: Params): Promise<void> {
     generation += 1;
     const mine = generation;
-    busy = true;
+    inFlight = true;
+    ahead = null;
     const s = await sim.init(next);
-    busy = false;
     if (mine !== generation || destroyed) return;
+    inFlight = false;
     autoFit = true;
     accept(s, false, true);
+    if (playback.playing) request();
   }
 
-  async function step(): Promise<void> {
-    if (busy || destroyed) return;
-    busy = true;
-    const mine = generation;
-    const s = await sim.step(1);
-    busy = false;
-    if (mine !== generation || destroyed) return;
+  /** Shows a computed season, and while playing asks for the next one straight away. */
+  function show(s: Snapshot): void {
     accept(s, !(reduceMotion && reducedMode === "still"), false);
+    if (playback.playing) request();
+  }
+
+  /**
+   * Asks the worker for the next season unless one is being computed or is waiting. While
+   * playing, the worker thus computes season s + 1 while the page tweens to s, and the result
+   * waits in `ahead` for its turn; when paused it is shown at once. Events (a felled tree, a
+   * param change) apply at the next season the worker has not yet computed: while playing that
+   * is one season later than without pipelining.
+   */
+  function request(): void {
+    if (inFlight || ahead || destroyed) return;
+    inFlight = true;
+    const mine = generation;
+    void sim.step(1).then((s) => {
+      if (mine !== generation || destroyed) return;
+      inFlight = false;
+      if (playback.playing) ahead = s;
+      else show(s);
+    });
+  }
+
+  /** One season: the waiting one if there is one, else the next from the worker. */
+  async function step(): Promise<void> {
+    if (ahead) {
+      const s = ahead;
+      ahead = null;
+      show(s);
+    } else {
+      request();
+    }
   }
 
   /** Reduced motion, "still": the forest as it stands after the intro, without animation. */
   async function growStill(): Promise<void> {
     if (!pace) return;
     const mine = generation;
-    busy = true;
+    inFlight = true;
     const s = await sim.step(pace.introSeasons);
-    busy = false;
     if (mine !== generation || destroyed) return;
+    inFlight = false;
     accept(s, false, false);
   }
 
@@ -300,18 +376,59 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
     if (dirty || t < 1) {
       const t0 = performance.now();
       renderer.draw(t * t * (3 - 2 * t), view);
+      const ms = performance.now() - t0;
       // Smoothed CPU cost of a draw, and frame rate while drawing every frame.
-      stats.drawMs += (performance.now() - t0 - stats.drawMs) * 0.1;
+      stats.drawMs += (ms - stats.drawMs) * 0.1;
       if (drewLastFrame) stats.fps += (1000 / dt - stats.fps) * 0.1;
+      if (adaptive && drewLastFrame && t < 1) judgeFrame(dt, now);
+      if (options.bench && playback.playing && t < 1) {
+        samples.draw.push(ms);
+        if (drewLastFrame) samples.frame.push(dt);
+      }
       drewLastFrame = true;
       dirty = t < 1;
     } else {
       drewLastFrame = false;
     }
-    if (playback.playing && !busy && t >= 1 && now - lastStep >= 1000 / speed()) {
-      lastStep = now;
-      void step();
+    if (options.bench && playback.playing && t >= 1 && season >= options.bench.seasons) {
+      playback.playing = false;
+      options.bench.onDone(benchResult());
     }
+    if (playback.playing && t >= 1 && now - lastStep >= 1000 / speed()) {
+      if (ahead) {
+        const s = ahead;
+        ahead = null;
+        lastStep = now;
+        show(s);
+      } else {
+        request();
+      }
+    }
+  }
+
+  function benchResult(): BenchResult {
+    const q = (xs: number[], p: number): number => {
+      const sorted = [...xs].sort((a, b) => a - b);
+      return sorted.length
+        ? (sorted[Math.min(sorted.length - 1, Math.floor(p * sorted.length))] as number)
+        : 0;
+    };
+    const round = (x: number): number => Math.round(x * 100) / 100;
+    const w = samples.worker;
+    return {
+      renderer: stats.renderer,
+      dpr: scene.dpr,
+      seasons: season,
+      metamers: stats.metamers,
+      frames: samples.draw.length,
+      drawP50: round(q(samples.draw, 0.5)),
+      drawP95: round(q(samples.draw, 0.95)),
+      frameP50: round(q(samples.frame, 0.5)),
+      frameP95: round(q(samples.frame, 0.95)),
+      longFrames: samples.frame.filter((dt) => dt > 33).length,
+      workerMean: round(w.reduce((a, b) => a + b, 0) / Math.max(1, w.length)),
+      workerMax: round(Math.max(0, ...w)),
+    };
   }
 
   const resizer = new ResizeObserver(() => {
@@ -364,7 +481,15 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
     step,
     setPlaying(playing) {
       playback.playing = playing;
-      if (playing) lastStep = 0;
+      if (playing) {
+        lastStep = 0;
+        request();
+      } else if (ahead) {
+        // Pausing shows the season already computed, so later taps and steps act at once.
+        const s = ahead;
+        ahead = null;
+        show(s);
+      }
     },
     setParams(patch) {
       void sim.setParams(patch);

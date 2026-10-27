@@ -59,8 +59,21 @@
     <script type="module">
       import { mountGarden } from "/src/web/garden.ts";
 
+      // `?bench[&seasons=60]` plays the intro and reports frame costs here (M15).
+      const query = new URLSearchParams(location.search);
+      const note = document.querySelector(".overlay p");
+      const bench = query.has("bench")
+        ? {
+            seasons: Number(query.get("seasons") ?? 60),
+            onDone: (result) => {
+              window.bench = result;
+              console.log("bench", JSON.stringify(result));
+              note.textContent = `bench: draw p95 ${result.drawP95} ms, frame p95 ${result.frameP95} ms, worker ${result.workerMean} ms (${result.metamers} metamers, ${result.renderer}, dpr ${result.dpr})`;
+            },
+          }
+        : undefined;
       // Exposed for poking at from the console (and headless checks); a host page needn't.
-      window.garden = mountGarden(document.getElementById("garden"), { headroom: 140 });
+      window.garden = mountGarden(document.getElementById("garden"), { headroom: 140, bench });
     </script>
   </body>
 </html>

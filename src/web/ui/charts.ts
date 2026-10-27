@@ -1,6 +1,7 @@
 /**
  * Small on-page charts (Observable Plot), loaded after the first frame so they never delay it.
- * The page keeps one metrics row per tree per season; charts redraw at most a few times a second.
+ * The page keeps one metrics row per tree per season for the last 300 seasons; charts redraw at
+ * most a few times a second.
  */
 
 import type { TreeMetrics } from "../../core/metrics.ts";
@@ -8,6 +9,9 @@ import type { TreeMetrics } from "../../core/metrics.ts";
 export type MetricsRow = TreeMetrics & { season: number };
 
 type PlotModule = typeof import("@observablehq/plot");
+
+/** Seasons of history the charts keep and draw. */
+const KEEP_SEASONS = 300;
 
 export class Charts {
   private plot: PlotModule | null = null;
@@ -39,6 +43,12 @@ export class Charts {
     pipeN: number,
   ): void {
     for (const m of metrics) this.rows.push({ ...m, season });
+    // Keep the last KEEP_SEASONS seasons, trimming in batches: a forest can run for hours.
+    const first = this.rows[0];
+    if (first && first.season < season - KEEP_SEASONS - 50) {
+      const from = this.rows.findIndex((r) => r.season > season - KEEP_SEASONS);
+      this.rows.splice(0, from < 0 ? this.rows.length : from);
+    }
     this.junctions = junctions;
     this.pipeN = pipeN;
     this.schedule();

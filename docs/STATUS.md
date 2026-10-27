@@ -2,7 +2,7 @@
 
 _Last updated: 2026-10-27_
 
-**Current milestone: M17** (seasons), built on `claude/m17-seasons` (with the M16 close-out; not pushed) and previewed with the site at https://m17-seasons-edbarker-dev.edbarker.workers.dev (garden 0.6.0, a local build). edbarker.dev runs garden-v0.5.0 (wind, storms, falling wood).
+**Current milestone: M18** (light rework, bigger worlds). M17 is live on edbarker.dev (garden-v0.6.0, PR #12): seasons on the plates with brisk, gentle and slow paces, after M16's wind, storms and falling wood. The site is the Field guide.
 
 ## Works
 - **Core:** C1–C6, R1–R6, O2 and O4 (ADRs 0005–0013); the sky sweep with open or periodic sides; golden hashes. `World.discardDead` for long page runs.
@@ -16,9 +16,8 @@ _Last updated: 2026-10-27_
 - **Lab:** WebGL2 with pseudo-depth, Tweakpane, charts, tap to fell, phone layout. **Headless:** `npm run sim`, `npm run bench` (rings 3.8 ms a season), `analysis/experiments/` m0–m11.
 
 ## Next
-1. **Ship M17, on the user's go-ahead:** PR, release garden-v0.6.0, sync edbarker-dev, merge `m17-seasons`.
-2. **M18:** the row-marched light sweep (changes goldens) and bigger, viewport-shaped worlds. Then **M19–M20**: species per tree (ADR 0016), calibrated species, the succession forest, an open-grown specimen for Plate II.
-3. **The user:** the site's `TODO(Ed)` items.
+1. **M18:** the row-marched light sweep (changes goldens) and bigger, viewport-shaped worlds. Then **M19–M20**: species per tree (ADR 0016), calibrated species, the succession forest, an open-grown specimen for Plate II.
+2. **The user:** the site's `TODO(Ed)` items.
 
 ## Open questions (ask when the milestone comes up)
 - The design direction (D2). ADR 0016, species per tree (M19). Amendments to ADR 0011 and §O2 (M16), and to ADR 0005 (M18). Art direction (M21).

@@ -2,7 +2,7 @@
 
 _Last updated: 2026-10-27_
 
-**Current milestone: M14** (garden embed and a first home page). M0–M13 are done. M12 was the [review](reviews/2026-10-27-m12-review.md); it triaged the work after the build order into M13–M21 (ROADMAP), in three tracks: A performance, B realism, C the edbarker.dev home page. M12 and M13 sit on branch `claude/m13-bench`, not yet pushed. Repo: https://github.com/epabarker/tree-simulation.
+**Current milestone: M14** (garden embed and a first home page). M0–M13 are done. M12 was the [review](reviews/2026-10-27-m12-review.md); it triaged the work after the build order into M13–M21 (ROADMAP), in three tracks: A performance, B realism, C the edbarker.dev home page. M12 and M13 are in PR epabarker/tree-simulation#6 (branch `claude/m13-bench`). Repo: https://github.com/epabarker/tree-simulation.
 
 ## Works
 - **Core:** C1–C6, R1–R6, O2 and O4 (ADRs 0005–0013); the sky sweep with open or periodic sides; the §6 season loop; golden hashes.
@@ -12,7 +12,7 @@ _Last updated: 2026-10-27_
 - **Results:** stand H/D 72; limbs droop 22°; neighbours sprout from their boles after a felling; self-thinning slope ≈ −3; the forest keeps a 7–8-tree canopy.
 
 ## Next (ROADMAP "After the build order")
-1. Push `claude/m13-bench` and open a PR, when the user asks.
+1. Merge PR #6 once CI is green (on the user's request).
 2. **M14:** `mountGarden` split out of `src/web/main.ts`, plus the garden build and release (ADR 0014). Then a full-bleed home page in `epabarker/edbarker-dev` (not cloned yet; clone it to `~/Documents/Projects/edbarker-dev`).
 3. **M15:** renderer and phone performance, then M16 motion and M17 seasons.
 4. **M18–M21:** light rework, then species per tree, the succession forest, and launch.

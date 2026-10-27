@@ -242,7 +242,7 @@ Low R:FR also suppresses bud outgrowth, through ABA in the bud (Schneider et al.
 1. **Statement.** Exposed, slender branches sway; tips meeting another tree's foliage are damaged; wind load adds girth.
 2. **Biology.** Crown shyness was quantified with a 3-D surface-complementarity metric on 14 laser-scanned trees and correlated with slenderness (R² = 0.484) (van der Zee et al. 2021);\[35\] mechanism debated.
 3. **Evidence.** Supported but debated.
-4. **Local rule.** Sway A_i ∝ exposure·h/r; if another tree's foliage lies within A_i, kill tip with p_abr **[RNG]**; girth bonus ∝ exposure.
+4. **Local rule.** Sway A_i ∝ exposure·h/r; if another tree's foliage lies within A_i, kill tip with p_abr **[RNG]**; girth bonus ∝ exposure. As built (ADR 0013), the bud's light Q stands for exposure and the girth bonus is left to R3's stress wood; light competition alone already keeps crowns apart.
 5. **2D translation.** In-plane sway makes crown gaps visible channels.
 6. **Parameters.** p_abr, sway coefficient, wind-event rate **[RNG]**.
 7. **Feedback.** Negative feedback between neighbours.
@@ -271,7 +271,7 @@ Low R:FR also suppresses bud outgrowth, through ABA in the bud (Schneider et al.
 2. **Biology/models.** JABOWA (Botkin et al. 1972) and SORTIE (Pacala et al. 1993, 1996) build forest dynamics from individual growth, light competition, recruitment and mortality.\[36\]\[37\] Self-thinning: w ∝ ρ^(−3/2) (Yoda et al. 1963), qualified by Westoby (1984).\[38\]\[39\] Asymmetric light competition raises size inequality with density (Weiner 1990; Weiner et al. 2001).\[40\]\[41\]\[42\] In individual-based models the slope ranges from −0.9 to −1.8 (Mrad et al. 2020) and depends mainly on the mode of competition (Ma et al. 2019); models should be judged on several patterns at once, not the line alone (Reynolds & Ford 2005). A minimal cellular crown model already reproduces self-thinning, gap filling and crown asymmetry (Loehle 2025).
 3. **Evidence.** Individual-based modelling well established; −3/2 exponent debated.\[43\]
 4. **Local rule.** Seeds = ⌊f_rep·N⁺/c_seed⌋; position ~ parent + Laplace(0,d) **[RNG]**; establish if ground Q > Q_est with p_est **[RNG]**; p_die = m₀ + starvation + breakage **[RNG]**.
-5. **2D translation.** Ground is a line; density per metre.
+5. **2D translation.** Ground is a line; density per metre. Stand experiments run on a ring (periodic world sides), so no tree has an open edge (ADR 0013). Establishment also needs no live trunk within one cell.
 6. **Parameters.** f_rep, c_seed, maturity, d, Q_est, p_est, m₀.
 7. **Feedback.** Population-scale loop E.
 8. **Module boundary.** Separate; needs R1.

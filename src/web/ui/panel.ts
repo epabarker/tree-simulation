@@ -22,7 +22,21 @@ interface FieldSpec {
 }
 
 interface SectionSpec {
-  section: "c1" | "c2" | "c3" | "c4" | "c5" | "c6" | "r1" | "r2" | "r3" | "r4" | "r5" | "r6";
+  section:
+    | "c1"
+    | "c2"
+    | "c3"
+    | "c4"
+    | "c5"
+    | "c6"
+    | "r1"
+    | "r2"
+    | "r3"
+    | "r4"
+    | "r5"
+    | "r6"
+    | "o2"
+    | "o4";
   title: string;
   /** Adds an on/off checkbox bound to the section's `enabled` flag. */
   toggle?: boolean;
@@ -189,6 +203,29 @@ const SECTIONS: SectionSpec[] = [
     fields: [
       { key: "qMin", label: "Q_ss light threshold", min: 0, max: 1, step: 0.01 },
       { key: "leafArea", label: "a_ss leaf area", min: 0, max: 4, step: 0.05 },
+    ],
+  },
+  {
+    section: "o2",
+    title: "O2 Abrasion",
+    toggle: true,
+    fields: [
+      { key: "sway", label: "k_sway", min: 0, max: 0.005, step: 0.0001 },
+      { key: "maxSway", label: "max sway (cells)", min: 0, max: 8, step: 0.5 },
+      { key: "pAbr", label: "p_abr", min: 0, max: 1, step: 0.05 },
+    ],
+  },
+  {
+    // Seeds come from R1's reproductive sink: set R1's f_rep and maturity height too.
+    section: "o4",
+    title: "O4 Stand dynamics",
+    toggle: true,
+    fields: [
+      { key: "cSeed", label: "c_seed per seed", min: 0.5, max: 50, step: 0.5 },
+      { key: "d", label: "d dispersal (cells)", min: 1, max: 100, step: 1 },
+      { key: "qEst", label: "Q_est ground light", min: 0, max: 1, step: 0.01 },
+      { key: "pEst", label: "p_est", min: 0, max: 1, step: 0.05 },
+      { key: "m0", label: "m₀ background death", min: 0, max: 0.05, step: 0.001 },
     ],
   },
 ];

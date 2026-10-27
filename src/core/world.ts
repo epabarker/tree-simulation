@@ -25,7 +25,9 @@ export interface RunRecord {
 
 export function makeLight(params: Params): LightModel {
   const { width, height } = params.world;
-  if (params.c2.enabled && params.c2.model === "sky") return new SkySweep(width, height, params.c2);
+  if (params.c2.enabled && params.c2.model === "sky") {
+    return new SkySweep(width, height, params.c2, params.world.sides === "periodic");
+  }
   if (params.c2.enabled) return new ShadowTriangle(width, height, params.c2);
   return new UniformLight(width, height, params.c2.C);
 }
@@ -34,7 +36,12 @@ export class World {
   readonly initialParams: Params;
   params: Params;
   season = 0;
+  /** Planted trees in params order, then O4 recruits appended in order of establishment. */
   readonly trees: Tree[];
+  /** Seedlings established at the end of the last season (O4). */
+  recruits = 0;
+  /** O2: which tree's foliage holds each cell this season (W × H, −1 none, −2 several). */
+  owner: Int32Array;
   light: LightModel;
   /** Events applied so far. */
   readonly log: RunEvent[] = [];
@@ -44,6 +51,7 @@ export class World {
     this.initialParams = clone(params);
     this.params = clone(params);
     this.light = makeLight(this.params);
+    this.owner = new Int32Array(this.params.world.width * this.params.world.height);
     this.trees = this.params.trees.map((spec, id) => {
       const tree = new Tree(id, spec.x);
       tree.alive = false; // planted when its season comes

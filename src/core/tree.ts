@@ -135,6 +135,11 @@ export class Tree {
   reserve = 0;
   starved = 0;
   reproduction = 0;
+  /** O4: reproductive carbon not yet turned into seeds, and seeds made this season. */
+  seedPool = 0;
+  seeds = 0;
+  /** O2: buds lost to abrasion this season. */
+  abraded = 0;
   /** Per metamer (scratch, by this season's row index): P_b and M_b of the subtree (R1 shedding). */
   pSum = new Float64Array(0);
   mSum = new Float64Array(0);

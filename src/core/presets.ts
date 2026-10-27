@@ -193,6 +193,19 @@ const TROLL = {
   },
 } satisfies ParamsPatch;
 
+/**
+ * M11 (ADR 0013): a forest without edges. Periodic sides wrap light and growth around, so the
+ * stand continues for ever on both sides; O4 adds seeds from R1's reproductive sink (f_rep 0.1
+ * above 40 cells), establishment in lit ground and background mortality.
+ */
+const FOREST = {
+  ...SKY,
+  r1: { enabled: true, fRep: 0.1, maturity: 40 },
+  o4: { enabled: true },
+} satisfies ParamsPatch;
+
+const RING: Params["world"] = { width: 210, height: 130, walls: [], sides: "periodic" };
+
 const STAND_X = [20, 41, 62, 83, 104, 125, 146, 167, 188, 209].map((x) => ({ x }));
 
 export const presets = {
@@ -408,6 +421,26 @@ export const presets = {
     description:
       "Aubréville's model, as in Terminalia catappa: a pagoda of flat tiers of forking branch modules (§9).",
     patch: { world: { width: 140, height: 160, walls: [] }, trees: [{ x: 70 }], ...TROPICAL },
+  },
+  forest: {
+    label: "M11: a forest without edges",
+    description:
+      "Periodic sides and stand dynamics: seeds land, seedlings wait in the shade, and gaps refill when canopy trees die (O4).",
+    patch: {
+      world: RING,
+      trees: [10, 31, 52, 73, 94, 115, 136, 157, 178, 199].map((x) => ({ x })),
+      ...FOREST,
+    },
+  },
+  thinning: {
+    label: "M11: self-thinning",
+    description:
+      "Sixty seedlings 3.5 cells apart on an edgeless ring: the suppressed starve and the stand thins itself (§10).",
+    patch: {
+      world: RING,
+      trees: Array.from({ length: 60 }, (_, k) => ({ x: 1.75 + 3.5 * k })),
+      ...SKY,
+    },
   },
   weeping: {
     leaf: "small",

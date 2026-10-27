@@ -125,3 +125,59 @@ describe("C2 sky sweep (§C2.4, M6)", () => {
     expect(Array.from(fixed.dirX)).toEqual(before);
   });
 });
+
+describe("C2 sky sweep with periodic sides (M11, ADR 0013)", () => {
+  const ring = (width: number, height: number) => new SkySweep(width, height, base, true);
+
+  it("is translation invariant: shifting the foliage shifts the field, across the seam too", () => {
+    const W = 30;
+    const H = 40;
+    const a = ring(W, H);
+    const b = ring(W, H);
+    const blob = [
+      [3, 20],
+      [4, 20],
+      [4, 21],
+      [5, 25],
+    ];
+    const shift = 27; // pushes part of the blob across the right edge
+    for (const [x, y] of blob) {
+      a.deposit((x as number) + 0.5, (y as number) + 0.5, 2);
+      b.deposit((x as number) + shift + 0.5, (y as number) + 0.5, 2);
+    }
+    a.compute();
+    b.compute();
+    for (let col = 0; col < W; col++) {
+      for (const row of [0, 10, 19, 30]) {
+        const q = a.q[row * W + col] as number;
+        expect(b.q[row * W + ((col + shift) % W)]).toBeCloseTo(q, 9);
+      }
+    }
+  });
+
+  it("lets no side light under a full-width layer: every column gets the same light", () => {
+    const W = 20;
+    const H = 60;
+    const g = ring(W, H);
+    const open = sky(W, H);
+    for (const field of [g, open]) {
+      for (let col = 0; col < W; col++) field.deposit(col + 0.5, 30.5, 1);
+      field.compute();
+    }
+    const qs = Array.from({ length: W }, (_, col) => g.q[5 * W + col] as number);
+    for (const q of qs) expect(q).toBeCloseTo(qs[0] as number, 9);
+    expect(qs[0]).toBeLessThan(0.75); // the layer shades every ray
+    // With open sides, low rays from beyond the edge reach the floor at the edge columns.
+    expect(open.q[5 * W]).toBeGreaterThan((qs[0] as number) + 0.05);
+  });
+
+  it("wraps samples and deposits beyond the sides", () => {
+    const g = ring(10, 10);
+    g.deposit(12.5, 5.5, 3); // lands in column 2
+    g.compute();
+    expect(g.lad[5 * 10 + 2]).toBe(3);
+    g.sample(-7.5, 2.5, UP, out); // column 2
+    expect(out.q).toBeCloseTo(g.q[2 * 10 + 2] as number, 12);
+    expect(out.q).toBeGreaterThan(0);
+  });
+});

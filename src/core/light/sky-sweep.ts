@@ -13,6 +13,9 @@
  *    ("a bud does not cast a shadow on itself"); shade comes from foliage along the rays.
  *  - Rays arriving from beyond the sides of the world are unobstructed (open sky), which is what
  *    gives edge trees their side light. Growth is still confined to the box: outside it Q = 0.
+ *  - With periodic sides (M11, ADR 0013) the world is a ring: x wraps for deposits, samples and
+ *    rays, so a stand has no edge. Shallow rays, which can cross the width more than once before
+ *    reaching the top, are swept around the ring until every ray has climbed out of the grid.
  *
  * Params: c2.K, c2.kExt (k_ext), c2.skyExponent (p), c2.skyTilt, c2.minElevation, c2.C,
  * c2.rotate.
@@ -42,8 +45,11 @@ export class SkySweep implements LightModel {
   private readonly c2: Params["c2"];
   private readonly depth: Float64Array<ArrayBuffer>;
   private shade: Float64Array<ArrayBuffer> | null = null;
+  /** Periodic sides: x wraps around (M11). */
+  readonly periodic: boolean;
 
-  constructor(width: number, height: number, c2: Params["c2"]) {
+  constructor(width: number, height: number, c2: Params["c2"], periodic = false) {
+    this.periodic = periodic;
     this.width = width;
     this.height = height;
     const n = width * height;
@@ -91,8 +97,14 @@ export class SkySweep implements LightModel {
     this.shade = null;
   }
 
-  deposit(x: number, y: number, area = 1): void {
+  /** Column of x: wrapped around the ring with periodic sides. */
+  private column(x: number): number {
     const I = Math.floor(x);
+    return this.periodic ? ((I % this.width) + this.width) % this.width : I;
+  }
+
+  deposit(x: number, y: number, area = 1): void {
+    const I = this.column(x);
     const J = Math.floor(y);
     if (I < 0 || I >= this.width || J < 0 || J >= this.height) return;
     this.lad[J * this.width + I] += area;
@@ -143,12 +155,15 @@ export class SkySweep implements LightModel {
    * interpolated linearly. Upstream points outside the grid are open sky (T = 0).
    */
   private sweep(dx: number, dy: number): void {
-    const { width: W, height: H, lad, depth } = this;
+    const { width: W, height: H, lad, depth, periodic } = this;
+    const wrap = (col: number) => (periodic ? ((col % W) + W) % W : col);
     // Optical depth on leaving cell (col, row) along the ray: entry depth plus its own foliage.
-    const exitDepth = (col: number, row: number, step: number): number =>
-      col < 0 || col >= W || row < 0 || row >= H
+    const exitDepth = (c: number, row: number, step: number): number => {
+      const col = wrap(c);
+      return col < 0 || col >= W || row < 0 || row >= H
         ? 0
         : depth[row * W + col] + lad[row * W + col] * step;
+    };
 
     if (Math.abs(dx) <= dy) {
       const step = 1 / dy; // path length per row
@@ -170,9 +185,14 @@ export class SkySweep implements LightModel {
       const step = 1 / Math.abs(dx); // path length per column
       const rise = dy / Math.abs(dx); // rows moved per column toward the sky
       const toward = dx > 0 ? 1 : -1;
-      for (let n = 0; n < W; n++) {
-        const col = toward > 0 ? W - 1 - n : n;
-        const up = col + toward;
+      // Periodic: a ray climbs H rows over H/rise columns, so sweep the ring until every path has
+      // climbed out, starting from open sky; every later lap overwrites with the full path. The
+      // linear interpolation diffuses a ray (some of its weight climbs slower), so allow 3 H/rise.
+      const laps = periodic ? Math.ceil((3 * H) / rise / W) + 1 : 1;
+      if (periodic) depth.fill(0);
+      for (let n = 0; n < laps * W; n++) {
+        const col = toward > 0 ? W - 1 - (n % W) : n % W;
+        const up = wrap(col + toward);
         for (let row = 0; row < H; row++) {
           if (up < 0 || up >= W) {
             depth[row * W + col] = 0;
@@ -189,7 +209,7 @@ export class SkySweep implements LightModel {
   }
 
   sample(x: number, y: number, dir: number, out: LightSample): void {
-    const I = Math.floor(x);
+    const I = this.column(x);
     const J = Math.floor(y);
     const { width: W, height: H } = this;
     if (I < 0 || I >= W || J < 0 || J >= H) {

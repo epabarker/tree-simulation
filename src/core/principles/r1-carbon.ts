@@ -100,6 +100,7 @@ export function carbonBalance(tree: Tree, params: Params): void {
     const toSeeds = r1.fRep > 0 && height >= r1.maturity ? r1.fRep * N : 0;
     tree.reserve = Math.min(tree.reserve + toReserve, cap);
     tree.reproduction += toSeeds;
+    tree.seedPool += toSeeds; // O4 turns it into seeds
     tree.vBase = N - toReserve - toSeeds;
     tree.starved = 0;
   } else {

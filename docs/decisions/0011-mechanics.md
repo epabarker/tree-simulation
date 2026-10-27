@@ -29,3 +29,12 @@
 - Slender, excurrent trees with low E can buckle (the trunk bends further under its own crown each season). The weeping preset uses E = 2·10⁶, thicker tips (r0 0.03) and faster reaction wood (c 0.3).
 - Δ falls below 2 where a parent axis gets stress wood and its laterals do not (visible in the Troll preset's histogram).
 - Revisit if wind loads (O2) arrive, since they dominate real stem design, or if breakage is needed for gap dynamics before M10.
+
+## Addendum (M16, 2026-10-27): ground contact and storms
+- **Ground contact** (user's choice: "rest on the ground"). `r3.ground: true` means a limb whose tip would end below the ground is turned in R3's position pass to rest on it, with its subtree, still alive. It is opt-in: the M9–M10 presets keep the calibration their tests and notes measured. The `forest` preset, the home page's, turns it on.
+- **Storms make breakage fire** (user's choice: "rare random storms"; §O2's wind events). `o2.stormP` is the chance a season is a storm, one draw per season under the registered `Purpose.wind`.
+  - In a storm a limb's stress counts (1 + `stormLoad`·h/H) times toward σ_break, h being its height and H the tree's.
+  - A tree is thrown with chance 0.06·`stormLoad`·(H/100)².
+  - Calm seasons break nothing: stress wood holds σ ≤ σ_target < σ_break.
+  - `forest` sets σ_break 4500, `stormP` 0.05 and `stormLoad` 1.5 ([M16 note](../experiments/2026-10-27-m16-storms.md)).
+- **The page shows storms:** snapshots carry `storm`, which turns the page's wind into a gale (page only; the simulation never sees the page's wind or the pointer).

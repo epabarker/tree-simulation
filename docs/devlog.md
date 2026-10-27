@@ -2,6 +2,24 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-27: D3, building the Field guide
+
+- **Direction:** the user chose the Field guide and agreed ten changes (brief: edbarker-dev `docs/design-brief.md`). One condition: the CV must stay at least as clear for a recruiter as a plain CV.
+- **Garden** (`claude/d3-garden`):
+  - **Ink plate:** `--ground-hatch: 1` draws the ground as an ink line with hatching (both renderers).
+  - **Specimen plates:** focus `"specimen"` frames one tree (Scene frame `"tree"`) and draws it alone (`Scene.solo`), with its shed branches only; `setFocus` eases between forest and specimen.
+  - **Labels:** `anchors()` gives each tree's crown top for labels.
+  - **Sown trees:** visitor-sown trees carry `sown`.
+- **Site** (`d3-field-guide`):
+  - **Look:** ink tokens; night pages with a moon; EB Garamond (three self-hosted cuts, ≈ 74 kB).
+  - **Plates:** Home shows the forest (Plate I), the CV a specimen (Plate II).
+  - **Plate furniture:** labels on the tallest and sown trees; specimen cards with the planting year; the card as a strip on phones; a session tally of seeds.
+  - **Writing:** margin notes, and CV roles as entries with dates in the margin.
+- **Surprises:**
+  - A wide, short plate framed on one tree's height still showed the whole forest. A botanical plate draws one specimen alone, hence `solo`.
+  - Astro ate the space before an inline `<span>`, again.
+  - The paper's white highlight turned into grey haze at night, so it became a token.
+
 ## 2026-10-27: D1 and D2, designing the site around the forest
 
 - **A new phase** (user): the site was getting too little design attention, and the simulation should be its core style. Design phase D1–D3 comes before M16; M21's art direction moves into it.

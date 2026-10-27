@@ -2,7 +2,7 @@
 
 _Last updated: 2026-10-27_
 
-**Current phase: D2** (design exploration, before M16). D1 shipped as garden-v0.3.0. The D2 foundation (obstacles, ADR 0015; planting; the garden's page hooks) is on branch `claude/d2-obstacles` (not pushed). Two site prototypes are on preview: https://d2-clearings-edbarker-dev.edbarker.workers.dev and https://d2-field-guide-edbarker-dev.edbarker.workers.dev (garden 0.4.0, a local build). M0–M14 are done: M14 was merged in PR #7 and released as [garden-v0.1.0](https://github.com/epabarker/tree-simulation/releases/tag/garden-v0.1.0). **edbarker.dev is live** with the garden behind the home page, a CV page and the lab at `/lab/` (epabarker/edbarker-dev `main`, 2026-10-27; content from the user's website brief, with `TODO(Ed)` comments for unconfirmed items). Tracks from the [M12 review](reviews/2026-10-27-m12-review.md): A performance, B realism, C the home page (ROADMAP M13–M21).
+**Current phase: D3** (build the Field guide; before M16). The user chose the Field guide from D2; the brief is in edbarker-dev `docs/design-brief.md` (ten agreed changes). Simulation work is on `claude/d3-garden` (stacked on `claude/d2-obstacles`, neither pushed); the site is on edbarker-dev `d3-field-guide`, previewed at https://d3-field-guide-edbarker-dev.edbarker.workers.dev (garden 0.4.0, a local build).
 
 ## Works
 - **Core:** C1–C6, R1–R6, O2 and O4 (ADRs 0005–0013); the sky sweep with open or periodic sides; golden hashes. `World.discardDead` for long page runs.
@@ -16,9 +16,9 @@ _Last updated: 2026-10-27_
 - **Lab:** WebGL2 with pseudo-depth, Tweakpane, charts, tap to fell, phone layout. **Headless:** `npm run sim`, `npm run bench` (rings 3.8 ms a season), `analysis/experiments/` m0–m11.
 
 ## Next
-1. **The user** picks a direction (or a blend) from the two previews; write it up as a design brief.
-2. **D3:** release garden-v0.4.0 (PR for `claude/d2-obstacles`), build the chosen direction across the site, merge to edbarker-dev `main`.
-3. **M16** motion, **M17** seasons, then **M18–M20**.
+1. **The user** reviews the D3 preview on a phone, in light and dark mode.
+2. **Ship, on the user's go-ahead:** PR and merge `claude/d3-garden` (which contains D2's obstacles), release garden-v0.4.0, re-sync the site from it, merge `d3-field-guide` to edbarker-dev `main`.
+3. **M16** motion (wind would suit the plate), **M17** seasons (autumn plates), then **M18–M20** (species plates).
 4. **The user:** the site's `TODO(Ed)` items in `src/data/cv.ts`.
 
 ## Open questions (ask when the milestone comes up)

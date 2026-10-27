@@ -1,6 +1,7 @@
 /**
  * The simulation runs here, off the main thread. The page drives it through Comlink and asks
- * for one season at a time (pull model), so work never queues up behind the animation.
+ * for one season at a time (pull model), so work never queues up behind the animation. Dead
+ * trees are discarded as they die (World.discardDead), so the world's hash here is not the CLI's.
  */
 
 import * as Comlink from "comlink";
@@ -34,7 +35,11 @@ const api: SimApi = {
   },
   step(seasons: number) {
     const t0 = performance.now();
-    for (let i = 0; i < seasons; i++) world.step();
+    for (let i = 0; i < seasons; i++) {
+      world.step();
+      // A page can run for hours; the dead trees a forest piles up are never drawn again.
+      world.discardDead();
+    }
     return snapshot((performance.now() - t0) / Math.max(1, seasons));
   },
   setSnapshotOptions(next: SnapshotOptions) {

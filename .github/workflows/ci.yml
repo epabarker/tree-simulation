@@ -21,5 +21,7 @@ jobs:
       - name: Lint, typecheck, tests (incl. golden hashes)
         run: npm run check
       - run: npm run build
+      - name: Garden build, within its size budget (ADR 0014)
+        run: npm run build:garden
       - name: Headless smoke run
         run: npm run sim -- --seasons 10 --out runs/ci

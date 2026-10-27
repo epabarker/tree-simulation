@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Garden · Self-Organizing Trees</title>
+    <meta
+      name="description"
+      content="The home-page view of the simulation: a forest that grows, thins and renews itself."
+    />
+    <style>
+      /* A stand-in for a host page (ADR 0014): the garden fills the window, text sits over the sky. */
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        background: var(--sky-bottom);
+        color: #2b2a27;
+        font: 16px / 1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+      }
+      @media (prefers-color-scheme: dark) {
+        body {
+          color: #e6e3dc;
+        }
+      }
+      #garden {
+        position: fixed;
+        inset: 0;
+      }
+      .overlay {
+        position: relative;
+        max-width: 34rem;
+        padding: 24px;
+        pointer-events: none;
+      }
+      .overlay h1 {
+        margin: 0 0 4px;
+        font-size: 24px;
+      }
+      .overlay p {
+        margin: 0;
+        opacity: 0.8;
+      }
+      .overlay a {
+        color: inherit;
+        pointer-events: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="garden"></div>
+    <main class="overlay">
+      <h1>A forest from simple rules</h1>
+      <p>
+        Buds compete for light; the best-lit branches get the most to grow with; shaded ones are
+        shed. Tap a tree to fell it. <a href="./">Open the lab</a>.
+      </p>
+    </main>
+    <script type="module">
+      import { mountGarden } from "/src/web/garden.ts";
+
+      // Exposed for poking at from the console (and headless checks); a host page needn't.
+      window.garden = mountGarden(document.getElementById("garden"), { headroom: 140 });
+    </script>
+  </body>
+</html>

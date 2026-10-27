@@ -1,6 +1,7 @@
 /**
  * Colours of the natural view, read from CSS custom properties on the canvas so light and dark
- * modes live in one place (layout.css). Re-read whenever the colour scheme changes.
+ * modes live in one place (scene.css, which a host page may override). Re-read whenever the
+ * colour scheme changes.
  */
 
 import { LEAF_PALETTES, type LeafPalette } from "./leaf-styles.ts";
@@ -38,9 +39,29 @@ export function ramp(from: string, to: string, steps = RAMP_STEPS): string[] {
   });
 }
 
+let probe: CanvasRenderingContext2D | null = null;
+
+/**
+ * A token's value as "#rrggbb", or as given if it is already hex or rgb()/rgba(). A custom
+ * property's computed value is its raw text, so a host page may hand over oklch(), a named colour
+ * or anything else CSS knows; the browser converts it by painting one pixel.
+ */
+export function toHexColor(css: string): string {
+  if (/^#[0-9a-f]{3}([0-9a-f]{3})?$/i.test(css) || /^rgba?\(/i.test(css)) return css;
+  probe ??= document.createElement("canvas").getContext("2d", { willReadFrequently: true });
+  if (!probe) return css;
+  probe.clearRect(0, 0, 1, 1);
+  probe.fillStyle = "#000";
+  probe.fillStyle = css;
+  probe.fillRect(0, 0, 1, 1);
+  const [r, g, b] = probe.getImageData(0, 0, 1, 1).data;
+  return `#${[r, g, b].map((c) => (c as number).toString(16).padStart(2, "0")).join("")}`;
+}
+
 export function readTheme(el: Element): Theme {
   const style = getComputedStyle(el);
-  const v = (name: string, fallback: string) => style.getPropertyValue(name).trim() || fallback;
+  const v = (name: string, fallback: string) =>
+    toHexColor(style.getPropertyValue(name).trim() || fallback);
   return {
     skyTop: v("--sky-top", "#cfe2ee"),
     skyBottom: v("--sky-bottom", "#f4efe2"),

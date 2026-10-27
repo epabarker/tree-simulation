@@ -2,6 +2,49 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-27: M14, the garden and a home page
+
+- **Merged** PR #6 (M12, M13) at the user's request.
+- **`mountGarden(host, options)`** (`src/web/garden.ts`, ADR 0014) owns the worker, renderer, pull loop, input and observers. The lab (`main.ts`) is now a garden with the panel, charts and HUD around it.
+- **Home-page defaults:**
+  - the `forest` preset on a ring shaped to the host, from 90 cells on a phone to 320, with a new seed per visit;
+  - a 40-season intro at 4 seasons/s, then 0.5 seasons/s with long tweens;
+  - tap to fell, with no pan, zoom or scroll capture;
+  - lean snapshots;
+  - with reduced motion, the forest after the intro, held still.
+- **Scene and renderers:**
+  - a "world" frame;
+  - `headroom` for text above the crowns;
+  - on a ring, crowns drawn across the seam at both edges (fixes that known issue for this view), with picking wrapped to match;
+  - `transparent` and `maxDpr` options.
+- **Input:** a tap-only mode. In the lab a tap now waits out the double-tap window, so a double-tap no longer fells a tree.
+- **Colours:**
+  - The scene's tokens moved to `render/scene.css`, inside a cascade layer the garden injects first, so a host page overrides them.
+  - `theme.ts` converts any CSS colour to hex; an `oklch()` token used to draw as black.
+- **Memory:** a forest left running piles up dead trees, about 20 MB of tables per 1000 seasons with a flat 5 ms a season. `World.discardDead` frees them, and the worker calls it each season. A test shows live trees stay bit-identical and dead planted trees are never replanted (its mutant fails the test).
+- **Shipping:**
+  - `npm run build:garden` produces 42.7 kB gzipped, under a 60 kB gate that CI runs.
+  - `.github/workflows/release.yml` runs on `garden-v*` tags.
+  - `garden.html` demos the home-page view in this repo.
+- **Site** (epabarker/edbarker-dev, branch `garden-home`, not pushed):
+  - `scripts/sync-garden.mjs` vendors a release into `public/garden/<version>/` and `public/lab/`.
+  - `Garden.astro` loads it after first paint and keeps the crowns below the text as it reflows.
+  - `BaseLayout` gains a `bleed` prop; the page and the garden share one sky gradient.
+  - `_headers` adds immutable caching; AGENTS.md now says Astro 7.
+- **Surprises:**
+  - The review's claim that `theme.ts` reads from `:root` was wrong; it reads from the canvas.
+  - Astro bundles an inline `<script>` with Vite's preload helper and leaves `__VITE_PRELOAD__` undefined, so the loader is an `is:inline` module.
+  - Astro's HTML compression drops a line break next to an inline tag, which glued "lab" and "or" together; the fix is to break lines inside tags instead.
+  - The vendored release is ≈ 0.8 MB unpacked (the lab's Plot chunk), not ≈ 0.2 MB; ADR 0014 is corrected.
+- **Seen** in headless Firefox:
+  - the lab, unchanged;
+  - `garden.html` and the site at 1440 × 900 and 390 × 844, with no console errors, 60 fps and draws of 1–2 ms;
+  - the intro at 2.75 seasons/s, then 0.5;
+  - a tap fells the largest tree;
+  - reduced motion holds at season 40;
+  - opening the explainer moves the crowns down.
+- **Goldens:** unchanged (163 tests).
+
 ## 2026-10-27: M13, a benchmark and golden-safe speed-ups
 
 - **Benchmark** (`npm run bench`, `cli/bench.ts`):

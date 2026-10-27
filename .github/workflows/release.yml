@@ -1,0 +1,41 @@
+# A garden release (ADR 0014): pushing a tag garden-vX.Y.Z builds the garden and the lab and
+# attaches garden-X.Y.Z.tgz (garden/ and lab/, without source maps) to a GitHub Release. The site
+# (epabarker/edbarker-dev) vendors a pinned version with its scripts/sync-garden.mjs.
+name: Garden release
+
+on:
+  push:
+    tags: ["garden-v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .node-version
+          cache: npm
+      - run: npm ci
+      - run: npm run check
+      - run: npm run build
+      - run: npm run build:garden
+      - name: Package garden/ and lab/
+        run: |
+          version="${GITHUB_REF_NAME#garden-v}"
+          mkdir -p release
+          cp -r dist-garden release/garden
+          cp -r dist release/lab
+          find release -name '*.map' -delete
+          tar -czf "garden-${version}.tgz" -C release garden lab
+          echo "VERSION=${version}" >> "$GITHUB_ENV"
+      - name: Create the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" "garden-${VERSION}.tgz" \
+            --title "Garden ${VERSION}" \
+            --notes "garden/ for a host page to import (garden.js and its worker); lab/ is the full lab. See ADR 0014."

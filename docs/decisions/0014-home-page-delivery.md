@@ -30,6 +30,13 @@
   - A working lab URL no longer depends on the parked custom-domain problem.
 - **Harder:**
   - Each change reaches the site in two steps: tag here, then sync there.
-  - The vendored files make the site repo larger, by roughly 0.2 MB per version kept.
+  - The vendored files make the site repo larger. Measured at M14: `garden/` is 128 kB and `lab/` is 684 kB (mostly Observable Plot), about 250 kB compressed per release. The sync script keeps only the current garden version.
 - **SharedArrayBuffer.** Cloudflare can send COOP/COEP headers (`_headers`), so it becomes technically possible on edbarker.dev. The AGENTS invariant stands until a separate ADR reverses it. That happens only if M18's benchmark calls for several workers.
 - **Revisit** if the site moves off a static host, or if a second consumer of the garden appears. An npm package would then pay off.
+
+## Addendum (M14, 2026-10-27)
+- **Built as decided:** `mountGarden` and the garden build (42.7 kB gzipped), the release workflow, and the site's `sync-garden.mjs`, `Garden.astro` and full-bleed home page.
+- **Colour tokens:** a host overrides the scene's tokens (in a cascade layer the garden injects first) in any CSS colour format.
+- **The loader script:** the site loads the garden with an inline module, because Astro bundling wraps a run-time `import()` in a preload helper that breaks once the script is inlined.
+- **Memory:** page worlds discard dead trees (`World.discardDead`) to keep long runs bounded.
+

@@ -2,7 +2,7 @@
 
 An interactive simulator in which tree form emerges from simple local rules. Buds compete for light in a shared 2D grid, resources flow to the best-lit branches (Borchert–Honda), shaded branches are shed, and stems thicken by the pipe model. Several trees share one light field, so they compete, lean away from each other and suppress the small. It follows Palubicki et al. (2009), translated to a genuinely planar world.
 
-**Live demo:** <https://epabarker.github.io/tree-simulation/>
+**Live demo:** <https://epabarker.github.io/tree-simulation/> (the lab), and `garden.html` there for the view a home page embeds. The garden is the home page of edbarker.dev ([ADR 0014](docs/decisions/0014-home-page-delivery.md)).
 
 The design is specified principle by principle in [`docs/spec.md`](docs/spec.md). Progress against its build order is in [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
@@ -14,7 +14,8 @@ You need Node 24 and npm. The analysis also needs [uv](https://docs.astral.sh/uv
 npm install
 npm run dev        # http://localhost:5173 (add -- --host to open it on a phone over the LAN)
 npm run check      # lint, typecheck, tests
-npm run build      # static site in dist/
+npm run build      # static site in dist/ (the lab and garden.html)
+npm run build:garden   # garden.js and its worker in dist-garden/, for a host page (size-gated)
 ```
 
 ### Headless runs and analysis

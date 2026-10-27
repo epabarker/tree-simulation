@@ -28,7 +28,9 @@ npm run dev                # page with hot reload (add -- --host to test on a ph
 npm run check              # lint + typecheck + tests: run before saying anything is done
 npm run test               # tests only
 npm run format             # Biome auto-fix
-npm run build              # static site in dist/
+npm run build              # static site in dist/ (the lab, and garden.html)
+npm run build:garden       # garden.js + worker in dist-garden/ for a host page, size-gated (ADR 0014)
+npm run bench              # per-phase timings and final hashes; --compare runs/bench/<sha>.json
 npm run sim -- --preset explosion --seasons 12 --out runs/x   # headless run → CSV
 npm run golden:update      # regenerate golden hashes (intended behaviour changes only)
 uv run --project analysis python analysis/experiments/m0_growth.py runs/x
@@ -51,7 +53,8 @@ src/core/            simulation: pure TypeScript, no DOM, no Node (its tsconfig 
   principles/        one file per principle: c1-buds.ts, c3-allocation.ts, …
   metrics.ts snapshot.ts hash.ts
 src/worker/          Web Worker (Comlink) running the core; api.ts is the shared interface
-src/web/             page: main.ts, render/ (Canvas 2D, input), ui/ (Tweakpane panel, charts, CSS)
+src/web/             page: garden.ts (mountGarden, the living view any page embeds), main.ts (the lab),
+                     render/ (WebGL2, Canvas 2D, scene, input, scene.css tokens), ui/ (Tweakpane, charts, CSS)
 cli/run.ts           headless runner → runs/<id>/{run.json,metrics.csv,metamers.csv,hash.txt}
 tests/               golden-hash tests; unit tests sit next to code as src/core/**/*.test.ts
 analysis/            uv project: polars + plotnine; experiments/ holds one script per milestone
@@ -76,7 +79,7 @@ analysis/            uv project: polars + plotnine; experiments/ holds one scrip
 - Comments explain _why_, citing spec sections or papers. Code reads like the existing files: plain loops over typed arrays, with no classes beyond `Table`, `Tree` and `World`.
 - Formatting comes from Biome: 2 spaces, double quotes, width 100. TypeScript is strict with `erasableSyntaxOnly`: no enums, namespaces or constructor parameter properties. Use `as const` objects instead.
 - Tests: one unit test per local rule, plus each milestone's "visible test" from §7 as an automated check where possible.
-- Page colours are CSS tokens in `src/web/ui/layout.css` (light and dark); the canvas reads them via `src/web/render/theme.ts`. Don't hard-code colours in TypeScript.
+- Scene colours are CSS tokens in `src/web/render/scene.css` (light and dark, in a layer a host page can override); the lab's own are in `src/web/ui/layout.css`. The canvas reads them via `src/web/render/theme.ts`. Don't hard-code colours in TypeScript.
 - Generated output (`runs/`, `dist/`, `analysis/out/`) is never committed. Small figures that support an experiment note go in `docs/experiments/figures/`.
 
 ## Session protocol

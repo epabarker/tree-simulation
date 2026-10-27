@@ -5,17 +5,43 @@ How the code realises the spec. For *why* a choice was made, see `docs/decisions
 ## Layers
 
 ```
-            ┌───────────── page (main thread) ─────────────┐
- Tweakpane ─┤ main.ts ── Renderer (WebGL2 | Canvas 2D) ─ input│
- Plot ──────┤    │ Comlink (async calls, transferred buffers)│
-            └────┼──────────────────────────────────────────┘
-                 ▼
+            ┌──────────────── page (main thread) ─────────────────┐
+ Tweakpane ─┤ main.ts (lab) ─┐                                     │
+ Plot ──────┤                ├─ garden.ts ── Renderer (WebGL2 |    │
+ host page ─┤ mountGarden() ─┘      │        Canvas 2D) ── input   │
+            │                       │ Comlink (calls, transferred buffers)
+            └───────────────────────┼─────────────────────────────┘
+                                    ▼
             sim.worker.ts ── World (src/core) ── SnapshotBuilder
                                    ▲
             cli/run.ts ────────────┘  (same core under Node → CSV for Python/R)
 ```
 
 `src/core` is pure TypeScript. It compiles against `lib: es2023` only, so a DOM or Node API used there is a type error. The worker, the page, the CLI and the tests are thin hosts around it.
+
+## The garden and the lab (M14, ADR 0014)
+
+`mountGarden(host, options)` (`src/web/garden.ts`) is the whole living view: worker, renderer, pull loop, input, and the resize, visibility and theme observers. It returns a `Garden` with `view`, `playback`, `stats`, `ready`, `restart`, `step`, `setPlaying`, `setParams`, `record`, `fit`, `redraw` and `destroy`. Two hosts use it:
+- **The lab** (`main.ts`, `index.html`): a garden with `interaction: "full"`, `frame: "trees"`, a fixed speed, full snapshots, and the panel, charts and HUD around it.
+- **A home page** (`garden.html` here; edbarker.dev in production): the defaults.
+  - **World:** `forestParams` puts the `forest` preset on a ring whose width follows the host's aspect (90–320 cells, a tree every ≈ 21 cells), with a random seed per visit.
+  - **Pace:** a 40-season intro at 4 seasons/s, then 0.5 seasons/s, with tweens up to 2.5 s.
+  - **Interaction:** tap to fell only. There is no pan, zoom or scroll capture (`touch-action: manipulation`).
+  - **Snapshots:** lean (no junctions, no field).
+  - **Reduced motion:** the forest as it stands after the intro, still.
+
+`Scene.frame = "world"` fits the world's width and eases out only once crowns pass half the world's height. `Scene.headroom` keeps crowns below the host's text. On a ring, both renderers draw the trees at offsets −W, 0 and +W (`Scene.wrapOffsets`), so crowns that grew across the seam show at both edges, and picking wraps the same way.
+
+**Building and shipping it:**
+- `npm run build:garden` (`vite.garden.config.ts`) writes `dist-garden/garden.js` and its worker, resolved relative to `garden.js`.
+- `cli/garden-size.ts` fails the build above 60 kB gzipped (M14: 42.7 kB).
+- A `garden-vX.Y.Z` tag makes `.github/workflows/release.yml` attach `garden-X.Y.Z.tgz` (`garden/` and the lab as `lab/`, without source maps; ≈ 250 kB) to a GitHub Release. The site vendors it with its `scripts/sync-garden.mjs`.
+
+**Colour tokens for hosts:**
+- The scene's tokens live in `render/scene.css` inside `@layer tree-garden`. The garden injects that sheet first in `<head>`, so the layer comes first and any host declaration of a token wins.
+- `theme.ts` converts any CSS colour a host gives (oklch(), names) to hex by painting one pixel. A custom property's computed value is its raw text, and the WebGL parser only reads hex and rgb().
+
+**Long runs:** the worker calls `World.discardDead()` after each season. It frees dead trees' tables (a forest piles up ≈ 20 MB per 1000 seasons otherwise) without changing any live tree (`world.test.ts`). Page worlds therefore do not hash like CLI worlds.
 
 ## Data model (spec §5)
 
@@ -148,9 +174,9 @@ Every typed array is transferred, not copied.
 
 **Pseudo-depth (M6c, ADR 0008, page only).** With the `depth` view option on (natural default), `Scene.computeGeometry` maps each metamer's simulated direction through a 2×2 projection: identity on the trunk; each first-order limb's subtree squeezed perpendicular to the trunk by 0.55 + 0.45·|sin φ|, φ hashed from the limb's birthId (spec §C1.4's projected spiral, applied once per limb). `Scene.leaves` then emits `CLUSTER_LEAVES` (3) leaves per leafy metamer spaced around the shoot, each foreshortened by its out-of-plane angle, with depth mixing the axis depth and the leaf's; leaves behind the plane come first (`Leaves.back`), darkened, and both renderers draw them before the branches, the rest after (WebGL2 uses a second leaf batch). With `depth` off (the x-ray view) the page draws exactly the simulated geometry. Picking uses the drawn geometry.
 
-**Colours** live as CSS tokens in `src/web/ui/layout.css` (light and dark, including the Tweakpane theme). The canvas reads them through `render/theme.ts` and re-reads them when the system scheme or `<html data-theme>` changes, so a host site's theme toggle carries through.
+**Colours** live as CSS tokens: the scene's in `src/web/render/scene.css` (light and dark, in a cascade layer a host can override), the lab's own (including the Tweakpane theme) in `src/web/ui/layout.css`. The canvas reads them through `render/theme.ts` and re-reads them when the system scheme or `<html data-theme>` changes, so a host site's theme toggle carries through.
 
-**Camera.** `fit()` sets a target (centre x and scale) covering the trees, with margins for the ground and the header text; `animateCamera` eases toward it each frame (time constant 380 ms) while keeping the ground line pinned. Any pan or zoom by the user stops the following until "Fit view" or a double-tap.
+**Camera.** `fit()` sets a target (centre x and scale) covering the trees (`frame: "trees"`) or the world's width (`frame: "world"`), with margins for the ground and `headroom` for text above; `animateCamera` eases toward it each frame (time constant 380 ms) while keeping the ground line pinned. Any pan or zoom by the user stops the following until "Fit view" or a double-tap. In the lab a single tap waits out the double-tap window (320 ms) before it fells a tree.
 
 **Tweening.** `render/scene.ts` (`Scene`) holds everything both renderers share: each frame it rebuilds positions in a single forward loop, interpolating length, angle and radius from the `prevIndex` row; new rows grow from zero; previous rows that nothing maps to are fading ghosts (shed branches). It also tapers each segment toward its thickest child (`tipRadius`), chooses palette indices per colour mode, lays out leaves (camera-independent: base point, direction, size 0…1), fits and eases the camera, and picks trees.
 

@@ -22,3 +22,10 @@ export interface Renderer {
 
 /** Device pixels per CSS pixel, capped: beyond 2 the extra pixels cost more than they show. */
 export const MAX_DPR = 2;
+
+export interface RendererOptions {
+  /** Leave the sky out and keep the canvas transparent, so the host page shows through. */
+  transparent?: boolean;
+  /** Cap on device pixels per CSS pixel (default MAX_DPR). */
+  maxDpr?: number;
+}

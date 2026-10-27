@@ -86,6 +86,16 @@ export class Table<S extends Schema> {
   clear(): void {
     this.length = 0;
   }
+
+  /** Empties the table and gives its memory back: every column is reallocated at `capacity`. */
+  reset(capacity = 1): void {
+    const cols = this.cols as Record<string, AnyColumn>;
+    for (const name of Object.keys(this.schema)) cols[name] = new this.schema[name](capacity);
+    this.list = Object.values(cols);
+    this.map = new Int32Array(0);
+    this.capacity = Math.max(1, capacity);
+    this.length = 0;
+  }
 }
 
 // Typed arrays over plain (non-shared) buffers, as created by `new Float64Array(n)`.

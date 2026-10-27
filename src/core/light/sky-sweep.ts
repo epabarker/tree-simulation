@@ -19,7 +19,10 @@
  *
  * Params: c2.K, c2.kExt (k_ext), c2.skyExponent (p), c2.skyTilt, c2.minElevation, c2.C,
  * c2.rotate.
- * Cost: O(K · W · H) per season, independent of the number of trees (§C2.11).
+ * Cost: O(K · W · H) per season, independent of the number of trees (§C2.11). Two shortcuts
+ * leave every value bit-identical (M13): rows above the highest leafy row see open sky in every
+ * direction (their optical depth is exactly 0), so only the rows below are swept; and a periodic
+ * shallow sweep stops as soon as a lap around the ring changes nothing.
  */
 
 import { DEG, type Params, type Wall } from "../params.ts";
@@ -44,7 +47,10 @@ export class SkySweep implements LightModel {
   private readonly kExt: number;
   private readonly c2: Params["c2"];
   private readonly depth: Float64Array<ArrayBuffer>;
+  /** Rows 0 … top − 1 hold all of this season's leaf area; rows from `top` up are empty. */
+  private top = 0;
   private shade: Float64Array<ArrayBuffer> | null = null;
+  private shadeFresh = false;
   /** Periodic sides: x wraps around (M11). */
   readonly periodic: boolean;
 
@@ -93,8 +99,9 @@ export class SkySweep implements LightModel {
   }
 
   clear(): void {
-    this.lad.fill(0);
-    this.shade = null;
+    this.lad.fill(0, 0, this.top * this.width);
+    this.top = 0;
+    this.shadeFresh = false;
   }
 
   /** Column of x: wrapped around the ring with periodic sides. */
@@ -108,6 +115,7 @@ export class SkySweep implements LightModel {
     const J = Math.floor(y);
     if (I < 0 || I >= this.width || J < 0 || J >= this.height) return;
     this.lad[J * this.width + I] += area;
+    if (J >= this.top) this.top = J + 1;
   }
 
   addWall(wall: Wall): void {
@@ -119,6 +127,7 @@ export class SkySweep implements LightModel {
     for (let row = y0; row < y1; row++) {
       for (let col = x0; col < x1; col++) lad[row * W + col] += wall.shade;
     }
+    if (x1 > x0 && y1 > this.top) this.top = y1;
   }
 
   /**
@@ -129,56 +138,78 @@ export class SkySweep implements LightModel {
    */
   compute(season = 0): void {
     if (this.c2.rotate) this.setDirections((0.5 + season * GOLDEN) % 1);
-    this.q.fill(0);
-    this.vx.fill(0);
-    this.vy.fill(0);
+    const { width: W, height: H, depth, q, vx, vy, kExt } = this;
+    const top = this.top;
+    const n = top * W;
+    // Row `top` is read as the empty row above the foliage: clear what an earlier season left.
+    if (top < H) depth.fill(0, n, n + W);
+    q.fill(0, 0, n);
+    vx.fill(0, 0, n);
+    vy.fill(0, 0, n);
+    // Open sky, summed in the same order as a cell's own sum, so both give the same bits.
+    let qOpen = 0;
+    let vxOpen = 0;
+    let vyOpen = 0;
     for (let k = 0; k < this.weight.length; k++) {
-      this.sweep(this.dirX[k], this.dirY[k]);
       const w = this.weight[k];
       const dx = this.dirX[k];
       const dy = this.dirY[k];
-      const { depth, q, vx, vy } = this;
-      for (let c = 0; c < depth.length; c++) {
-        const light = w * Math.exp(-this.kExt * depth[c]);
+      this.sweep(dx, dy);
+      for (let c = 0; c < n; c++) {
+        const d = depth[c];
+        const light = d === 0 ? w : w * Math.exp(-kExt * d); // exp(−0) = 1 exactly
         q[c] += light;
         vx[c] += light * dx;
         vy[c] += light * dy;
       }
+      qOpen += w;
+      vxOpen += w * dx;
+      vyOpen += w * dy;
     }
-    this.shade = null;
+    q.fill(qOpen, n);
+    vx.fill(vxOpen, n);
+    vy.fill(vyOpen, n);
+    this.shadeFresh = false;
   }
 
   /**
    * Fills `depth` with the optical depth T along direction (dx, dy) (toward the sky, dy > 0)
    * from the sky down to the entry into each cell. Steep rays step one row up per cell, shallow
    * rays one column toward the sky side; the upstream point falls between two cells and is
-   * interpolated linearly. Upstream points outside the grid are open sky (T = 0).
+   * interpolated linearly. Upstream points outside the grid are open sky (T = 0). Only rows
+   * below `top` are written; row `top` (if inside the grid) must hold zeros.
    */
   private sweep(dx: number, dy: number): void {
-    const { width: W, height: H, lad, depth, periodic } = this;
-    const wrap = (col: number) => (periodic ? ((col % W) + W) % W : col);
-    // Optical depth on leaving cell (col, row) along the ray: entry depth plus its own foliage.
-    const exitDepth = (c: number, row: number, step: number): number => {
-      const col = wrap(c);
-      return col < 0 || col >= W || row < 0 || row >= H
-        ? 0
-        : depth[row * W + col] + lad[row * W + col] * step;
-    };
+    const { width: W, height: H, lad, depth, periodic, top } = this;
+    // The optical depth on leaving a cell along the ray is its entry depth plus its own foliage,
+    // depth[i] + lad[i]·step; upstream cells outside the grid are open sky (0). Columns are
+    // wrapped by one width at most, which is all a single step can cross.
 
     if (Math.abs(dx) <= dy) {
       const step = 1 / dy; // path length per row
-      const shift = dx / dy; // columns moved per row up
-      for (let row = H - 1; row >= 0; row--) {
+      const shift = dx / dy; // columns moved per row up, |shift| ≤ 1
+      for (let row = top - 1; row >= 0; row--) {
+        const base = row * W;
+        if (row === H - 1) {
+          depth.fill(0, base, base + W);
+          continue;
+        }
+        const above = base + W;
         for (let col = 0; col < W; col++) {
-          if (row === H - 1) {
-            depth[row * W + col] = 0;
-            continue;
-          }
           const u = col + shift;
           const c0 = Math.floor(u);
           const f = u - c0;
-          depth[row * W + col] =
-            exitDepth(c0, row + 1, step) * (1 - f) + exitDepth(c0 + 1, row + 1, step) * f;
+          let i0 = c0;
+          let i1 = c0 + 1;
+          if (periodic) {
+            if (i0 < 0) i0 += W;
+            else if (i0 >= W) i0 -= W;
+            if (i1 >= W) i1 -= W;
+            else if (i1 < 0) i1 += W;
+          }
+          const e0 = i0 >= 0 && i0 < W ? depth[above + i0] + lad[above + i0] * step : 0;
+          const e1 = i1 >= 0 && i1 < W ? depth[above + i1] + lad[above + i1] * step : 0;
+          depth[base + col] = e0 * (1 - f) + e1 * f;
         }
       }
     } else {
@@ -188,21 +219,38 @@ export class SkySweep implements LightModel {
       // Periodic: a ray climbs H rows over H/rise columns, so sweep the ring until every path has
       // climbed out, starting from open sky; every later lap overwrites with the full path. The
       // linear interpolation diffuses a ray (some of its weight climbs slower), so allow 3 H/rise.
+      // A lap is a fixed map of the whole field, so once one changes nothing, none will: stop.
       const laps = periodic ? Math.ceil((3 * H) / rise / W) + 1 : 1;
-      if (periodic) depth.fill(0);
+      if (periodic) depth.fill(0, 0, top * W);
+      let changed = false;
       for (let n = 0; n < laps * W; n++) {
         const col = toward > 0 ? W - 1 - (n % W) : n % W;
-        const up = wrap(col + toward);
-        for (let row = 0; row < H; row++) {
-          if (up < 0 || up >= W) {
-            depth[row * W + col] = 0;
-            continue;
+        let up = col + toward;
+        if (periodic) {
+          if (up < 0) up += W;
+          else if (up >= W) up -= W;
+        }
+        if (up < 0 || up >= W) {
+          for (let row = 0; row < top; row++) depth[row * W + col] = 0;
+        } else {
+          for (let row = 0; row < top; row++) {
+            const v = row + rise;
+            const r0 = Math.floor(v);
+            const f = v - r0;
+            const i0 = r0 * W + up;
+            const e0 = r0 < H ? depth[i0] + lad[i0] * step : 0;
+            const e1 = r0 + 1 < H ? depth[i0 + W] + lad[i0 + W] * step : 0;
+            const d = e0 * (1 - f) + e1 * f;
+            const i = row * W + col;
+            if (d !== depth[i]) {
+              depth[i] = d;
+              changed = true;
+            }
           }
-          const v = row + rise;
-          const r0 = Math.floor(v);
-          const f = v - r0;
-          depth[row * W + col] =
-            exitDepth(up, r0, step) * (1 - f) + exitDepth(up, r0 + 1, step) * f;
+        }
+        if (n % W === W - 1) {
+          if (!changed) break;
+          changed = false;
         }
       }
     }
@@ -232,12 +280,13 @@ export class SkySweep implements LightModel {
 
   /** Shade per cell for the overlay: 1 − Q/Q_max, where Q_max is the open-sky light. */
   field(): Float64Array<ArrayBuffer> {
-    if (!this.shade) {
+    if (!this.shade) this.shade = new Float64Array(this.q.length);
+    if (!this.shadeFresh) {
       let full = 0;
       for (let k = 0; k < this.weight.length; k++) full += this.weight[k];
-      const shade = new Float64Array(this.q.length);
+      const shade = this.shade;
       for (let c = 0; c < shade.length; c++) shade[c] = full > 0 ? 1 - this.q[c] / full : 0;
-      this.shade = shade;
+      this.shadeFresh = true;
     }
     return this.shade;
   }

@@ -5,15 +5,24 @@
 
 import * as Comlink from "comlink";
 import { defaultParams, type Params, type ParamsPatch } from "../core/params.ts";
-import { type Snapshot, SnapshotBuilder, transferables } from "../core/snapshot.ts";
+import {
+  FULL_SNAPSHOT,
+  type Snapshot,
+  SnapshotBuilder,
+  type SnapshotOptions,
+  transferables,
+} from "../core/snapshot.ts";
 import { World } from "../core/world.ts";
 import type { SimApi } from "./api.ts";
 
 let world = new World(defaultParams);
 const builder = new SnapshotBuilder();
+let options: SnapshotOptions = FULL_SNAPSHOT;
 
 function snapshot(ms: number): Snapshot {
-  const s = builder.build(world, ms);
+  const t0 = performance.now();
+  const s = builder.build(world, ms, options);
+  s.snapshotMs = performance.now() - t0;
   return Comlink.transfer(s, transferables(s));
 }
 
@@ -27,6 +36,9 @@ const api: SimApi = {
     const t0 = performance.now();
     for (let i = 0; i < seasons; i++) world.step();
     return snapshot((performance.now() - t0) / Math.max(1, seasons));
+  },
+  setSnapshotOptions(next: SnapshotOptions) {
+    options = next;
   },
   setParams(patch: ParamsPatch) {
     world.setParams(patch);

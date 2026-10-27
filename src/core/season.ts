@@ -52,7 +52,8 @@ const noMark: PhaseMark = () => {};
 
 export function runSeason(world: World, mark: PhaseMark = noMark): void {
   const { params, light, season } = world;
-  const live = world.trees.filter((t) => t.alive);
+  const live: Tree[] = [];
+  for (const tree of world.trees) if (tree.alive) live.push(tree);
   const carbonShedding = params.r1.enabled && params.r1.shed === "carbon";
 
   // Phase 1: environment from the start-of-season snapshot (C2).

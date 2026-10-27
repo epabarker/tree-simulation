@@ -88,7 +88,7 @@ function accept(s: Snapshot, animate: boolean): void {
   hud.textContent = `Season ${s.season} · ${trees} ${trees === 1 ? "tree" : "trees"}`;
   stats.season = s.season;
   stats.metamers = s.metamerCount;
-  stats.workerMs = s.seasonMs;
+  stats.workerMs = s.seasonMs + s.snapshotMs;
   charts.push(s.season, s.metrics, s.junctions, panel.current.c6.n);
   tweenStart = performance.now();
   tweenMs = animate ? Math.min(450, (1000 / playback.speed) * 0.85) : 1;

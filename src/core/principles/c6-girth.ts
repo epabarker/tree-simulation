@@ -43,37 +43,56 @@ export function updateGirth(tree: Tree, params: Params): void {
 /**
  * Leonardo exponent Δ at every junction with two or more child metamers: the Δ solving
  * r_parent^Δ = Σ r_child^Δ (§10 validation target: 1.8–2.3). Junctions where a child is as thick
- * as its parent have no solution and are skipped.
+ * as its parent have no solution and are skipped, as are roots outside [0.5, 8]. Appends to `out`.
+ *
+ * f(Δ) = Σ x_i^Δ − 1, with x_i = r_child/r_parent in (0, 1), falls and is convex in Δ, so Newton's
+ * method started left of the root climbs to it without overshooting: a few exps per junction
+ * where bisection needed 60 rounds of pow (M13; this runs for every snapshot the lab charts).
  */
-export function junctionExponents(tree: Tree): number[] {
+export function junctionExponents(tree: Tree, out: number[] = []): number[] {
   const nm = tree.m.length;
   const { parent, radius } = tree.m.cols;
-  const children: number[][] = [];
-  for (let i = 1; i < nm; i++) {
+  // Children of p, chained first[p] → next[child] → …, so no list is allocated per node.
+  const first = new Int32Array(nm).fill(-1);
+  const next = new Int32Array(nm);
+  for (let i = nm - 1; i >= 1; i--) {
     const p = parent[i];
     if (p < 0) continue;
-    const list = children[p] ?? [];
-    list.push(i);
-    children[p] = list;
+    next[i] = first[p];
+    first[p] = i;
   }
-  const out: number[] = [];
+  const logs: number[] = [];
   for (let p = 0; p < nm; p++) {
-    const kids = children[p];
-    if (!kids || kids.length < 2) continue;
+    if (first[p] < 0 || next[first[p]] < 0) continue; // fewer than two children
     const rp = radius[p];
-    const ratios = kids.map((k) => radius[k] / rp);
-    if (ratios.some((x) => x >= 1 || x <= 0)) continue;
-    // f(Δ) = Σ ratio^Δ − 1 falls monotonically in Δ; bisect on [0.5, 8].
-    let lo = 0.5;
-    let hi = 8;
-    const f = (d: number) => ratios.reduce((s, x) => s + x ** d, 0) - 1;
-    if (f(lo) < 0 || f(hi) > 0) continue;
-    for (let it = 0; it < 60; it++) {
-      const mid = (lo + hi) / 2;
-      if (f(mid) > 0) lo = mid;
-      else hi = mid;
+    logs.length = 0;
+    let solvable = true;
+    for (let k = first[p]; k >= 0; k = next[k]) {
+      const x = radius[k] / rp;
+      if (x >= 1 || x <= 0) solvable = false;
+      logs.push(Math.log(x));
     }
-    out.push((lo + hi) / 2);
+    if (!solvable) continue;
+    const f = (d: number): number => {
+      let sum = -1;
+      for (const l of logs) sum += Math.exp(d * l);
+      return sum;
+    };
+    if (f(0.5) < 0 || f(8) > 0) continue;
+    let d = 0.5;
+    for (let it = 0; it < 100; it++) {
+      let fd = -1;
+      let slope = 0;
+      for (const l of logs) {
+        const e = Math.exp(d * l);
+        fd += e;
+        slope += e * l;
+      }
+      const step = fd / slope;
+      if (!(step < 0) || step > -1e-13) break; // converged (f ≈ 0) or no progress left
+      d -= step;
+    }
+    out.push(d);
   }
   return out;
 }

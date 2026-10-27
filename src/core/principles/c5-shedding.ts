@@ -20,7 +20,7 @@
  */
 
 import type { Params } from "../params.ts";
-import { ensureUint8 } from "../soa.ts";
+import { ensureFloat64, ensureUint8 } from "../soa.ts";
 import { BudState, Slot, type Tree } from "../tree.ts";
 import { addBud, budAngle } from "./c1-buds.ts";
 import { isLiveBud } from "./c3-allocation.ts";
@@ -31,13 +31,16 @@ import { isLiveBud } from "./c3-allocation.ts";
  */
 export function crownTopLight(tree: Tree, quantile: number): number {
   const b = tree.b.cols;
-  const qs: number[] = [];
-  for (let i = 0; i < tree.b.length; i++) if (isLiveBud(b.state[i])) qs.push(b.q[i]);
-  if (qs.length === 0) return 0;
-  qs.sort((x, y) => x - y);
-  const rank = Math.min(qs.length - 1, Math.max(0, Math.ceil(quantile * qs.length) - 1));
+  topScratch = ensureFloat64(topScratch, tree.b.length);
+  let count = 0;
+  for (let i = 0; i < tree.b.length; i++) if (isLiveBud(b.state[i])) topScratch[count++] = b.q[i];
+  if (count === 0) return 0;
+  const qs = topScratch.subarray(0, count).sort(); // typed arrays sort numerically
+  const rank = Math.min(count - 1, Math.max(0, Math.ceil(quantile * count) - 1));
   return qs[rank] as number;
 }
+
+let topScratch = new Float64Array(256);
 
 /**
  * Sheds qualifying laterals among the first `evaluated` metamers. Returns the number of

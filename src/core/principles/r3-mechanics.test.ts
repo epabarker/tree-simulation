@@ -128,6 +128,27 @@ describe("R3 mechanics (§R3, ADR 0011)", () => {
     expect(junctionExponents(tree)[0]).toBeGreaterThan(2.1);
   });
 
+  it("breaks an overstressed limb off with its subtree, leaving a scar and a banked bud (R4)", () => {
+    const p = mergeParams(params({ E: 1e12, sigmaBreak: 1e4, leafMass: 1 }), {
+      r4: { enabled: true },
+    });
+    const tree = new Tree(0, 10);
+    const trunk = addMetamer(tree, -1, Slot.main, Math.PI / 2, 1, 0.1, 0);
+    const side = addMetamer(tree, trunk, Slot.right, 0, 3, 0.05, 0); // σ ≈ 3·10⁴ at its base
+    const tip = addMetamer(tree, side, Slot.main, 0, 1, 0.05, 0);
+    addBud(tree, tip, Slot.main, 0, 1);
+    tree.ensureScratch();
+    tree.prevRadius.set(tree.m.cols.radius.subarray(0, 3));
+    updateMechanics(tree, p);
+    expect(tree.broken).toBe(2);
+    expect(tree.m.length).toBe(1);
+    expect(tree.m.cols.scarSumN[0]).toBeCloseTo(0.05 ** 2, 12);
+    const b = tree.b.cols;
+    expect(b.state[0]).toBe(BudState.gone);
+    expect(b.state[1]).toBe(BudState.dormant); // the bud bank
+    expect(b.slot[1]).toBe(Slot.right);
+  });
+
   it("wraps angles into (−π, π]", () => {
     expect(wrapAngle(3 * Math.PI)).toBeCloseTo(Math.PI, 12);
     expect(wrapAngle(-Math.PI / 2 - 2 * Math.PI)).toBeCloseTo(-Math.PI / 2, 12);

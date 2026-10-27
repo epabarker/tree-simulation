@@ -17,17 +17,19 @@
  *   same axis (proprioception). It is clamped to ±c·Δr/r: no new girth, no correction.
  * Every metamer's turn is computed from the start-of-pass geometry (all elements sense at once, so
  * gravitropism alone overshoots as in Bastien et al. 2013), then turns accumulate acropetally:
- * each rotates its whole subtree about its base. Buds turn with their metamer. Breakage (§R3.4
- * optional) waits for R4 release (ADR 0011).
+ * each rotates its whole subtree about its base. Buds turn with their metamer.
+ * - **Breakage** (§R3.4 optional, M10): a metamer whose stress exceeds σ_break breaks off with its
+ *   subtree, leaving a scar; R4 can then release dormant buds below the break.
  *
  * Params: r3.enabled, r3.rho (ρ_w), r3.leafMass, r3.E, r3.phi (φ), r3.posture, r3.betaG (β_g),
- * r3.gamma (γ), r3.c, r3.sigmaTarget (σ_target), r3.girthGain; posture set-points from r2.levels
+ * r3.gamma (γ), r3.c, r3.sigmaTarget (σ_target), r3.girthGain, r3.sigmaBreak (σ_break); posture set-points from r2.levels
  * (`postureSetPoint`, else `setPoint`) or c4.setPoint; r6 leaf areas.
  */
 
 import { DEG, type Params } from "../params.ts";
 import { Slot, type Tree } from "../tree.ts";
 import { isLiveBud } from "./c3-allocation.ts";
+import { removeBranches } from "./c5-shedding.ts";
 import { paLevel } from "./r2-physiological-age.ts";
 import { depositArea } from "./r6-short-shoots.ts";
 
@@ -94,6 +96,8 @@ export function updateMechanics(tree: Tree, params: Params): void {
   // come later in the table, so their loads are in W and S by the time their parent is reached).
   const turn = tree.scratchF;
   const sigmaT = r3.sigmaTarget;
+  const breaks = tree.scratchU; // sized by ensureScratch to the metamer capacity
+  let anyBreak = false;
   for (let i = nm - 1; i >= 0; i--) {
     const r = c.radius[i];
     const l = c.length[i];
@@ -119,6 +123,8 @@ export function updateMechanics(tree: Tree, params: Params): void {
       sigma = (4 * Math.abs(M)) / (Math.PI * rNew * rNew * rNew);
     }
     stress[i] = sigmaT > 0 ? sigma / sigmaT : 0;
+    breaks[i] = r3.sigmaBreak > 0 && p >= 0 && sigma > r3.sigmaBreak ? 1 : 0;
+    if (breaks[i]) anyBreak = true;
 
     // Sag: a load to the right of the base (M > 0) turns the metamer clockwise.
     const load = r3.sag === "increment" ? M - c.moment[i] : M;
@@ -131,7 +137,8 @@ export function updateMechanics(tree: Tree, params: Params): void {
       const kink = p >= 0 && c.slot[i] === Slot.main ? wrapAngle(a - c.angle[p]) : 0;
       const prev = prevRadius[i] > 0 ? prevRadius[i] : rNew;
       const dr = (rNew - prev) / rNew;
-      post = postureTurn(a, postureSetPoint(c.order[i], params), kink, dr, r3);
+      const setPoint = postureSetPoint(c.order[i] - c.paShift[i], params);
+      post = postureTurn(a, setPoint, kink, dr, r3);
     }
     turn[i] = sag + post;
   }
@@ -149,4 +156,7 @@ export function updateMechanics(tree: Tree, params: Params): void {
   for (let j = 0; j < tree.b.length; j++) {
     if (isLiveBud(b.state[j])) b.angle[j] += turn[b.metamer[j]];
   }
+
+  // Breakage: an overstressed metamer goes with everything above it, leaving a scar.
+  if (anyBreak) tree.broken = removeBranches(tree, breaks, params, [stress]);
 }

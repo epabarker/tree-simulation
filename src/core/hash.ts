@@ -28,7 +28,7 @@ function fnvInt(h: number, value: number): number {
  * Columns added after a principle that is off by default: hashed only when some row is non-zero,
  * so switching that principle off reproduces the hashes from before the column existed.
  */
-const LATE_COLUMNS = new Set(["stressWood", "moment"]);
+const LATE_COLUMNS = new Set(["stressWood", "moment", "paShift"]);
 
 /** Hashes the first `length` rows of every column. (All typed arrays share the members used.) */
 function hashTable(h: number, table: { length: number; cols: object }): number {

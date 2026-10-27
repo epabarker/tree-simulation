@@ -68,6 +68,11 @@ export const METAMER_SCHEMA = {
    * M − M_prev sets this season's sag (Alméras & Fournier 2009). Hashed only when non-zero.
    */
   moment: Float64Array,
+  /**
+   * Reiteration (R4): how many levels younger this axis's physiological age is than its order says;
+   * pa = min(order − paShift, levels − 1). Inherited by the whole subtree. Hashed only when non-zero.
+   */
+  paShift: Uint8Array,
 } as const;
 
 export const BUD_SCHEMA = {
@@ -144,6 +149,14 @@ export class Tree {
   loadS = new Float64Array(0);
   /** Bending stress at each metamer's base over σ_target (for the stress colour). */
   stress = new Float64Array(0);
+  /** R5: shade s = 1 − Q/C at each metamer's upper node, from this season's light field. */
+  nodeShade = new Float64Array(0);
+  /** This season's counts: dormant buds released (R4), dormant buds aborted (R4), breaks (R3). */
+  released = 0;
+  /** Of those, released from trunk wood at least 10 seasons old (epicormic shoots). */
+  epicormic = 0;
+  aborted = 0;
+  broken = 0;
 
   constructor(id: number, rootX: number) {
     this.id = id;
@@ -163,6 +176,7 @@ export class Tree {
     this.loadW = ensureFloat64(this.loadW, n);
     this.loadS = ensureFloat64(this.loadS, n);
     this.stress = ensureFloat64(this.stress, n);
+    this.nodeShade = ensureFloat64(this.nodeShade, n);
   }
 
   tipX(i: number): number {

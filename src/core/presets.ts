@@ -34,7 +34,8 @@ const STAND = {
  * prune as at T = 0.1 while overtopped trees keep deeper crowns) and short shoots (ADR 0006:
  * Q_ss = 0.1, a_ss = 2, about half the leaf area on short shoots). Calibrated in
  * docs/experiments/2026-10-27-m6d-shedding-short-shoots.md. From M8 they also carry R1's carbon
- * balance (ADR 0010), with α = 3 so that net production keeps young trees as vigorous as before.
+ * balance (ADR 0010), with α = 3 so that net production keeps young trees as vigorous as before,
+ * and from M9 R3's mechanics (ADR 0011): limbs sag under their load and reaction wood rights them.
  */
 const SKY = {
   ...STAND,
@@ -42,14 +43,19 @@ const SKY = {
   c3: { mode: "bh", lambda: 0.5, alpha: 3 },
   c5: { enabled: true, T: 0.03, Trel: 0.12 },
   r1: { enabled: true },
+  r3: { enabled: true },
   r6: { enabled: true, qMin: 0.1, leafArea: 2 },
 } satisfies ParamsPatch;
 
 /**
- * The sky presets before R1 (M6–M7): resource α·Q_base with no costs. Tests of those milestones
- * pin it, so their evidence still holds with R1 on in the presets.
+ * The sky presets before R1 (M6–M7): resource α·Q_base with no costs, and no mechanics. Tests of
+ * those milestones pin it, so their evidence still holds with R1 and R3 on in the presets.
  */
-export const PRE_R1 = { c3: { alpha: 2 }, r1: { enabled: false } } satisfies ParamsPatch;
+export const PRE_R1 = {
+  c3: { alpha: 2 },
+  r1: { enabled: false },
+  r3: { enabled: false },
+} satisfies ParamsPatch;
 
 /**
  * The species keep the M7 resource scale and no carbon balance: under R1 their strong leaders
@@ -59,6 +65,7 @@ export const PRE_R1 = { c3: { alpha: 2 }, r1: { enabled: false } } satisfies Par
 const SPECIES_PRE_R1 = {
   c3: { mode: "bh", lambda: 0.5, alpha: 2 },
   r1: { enabled: false },
+  r3: { enabled: false },
 } satisfies ParamsPatch;
 
 /** One R2 table row (ADR 0009); unspecified fields take baseline values. */
@@ -129,6 +136,49 @@ const TROPICAL = {
       level({ lambda: 0.6, setPoint: 0, eta: 0.5, generator: "whorled", tierEvery: 7 }),
       // plagiotropic sympodial modules: each season's shoot ends and two relays fork on.
       level({ lambda: 0.5, setPoint: 88, eta: 2, branchAngle: 20, generator: "whorled", pTerm: 1 }),
+    ],
+  },
+} satisfies ParamsPatch;
+
+/**
+ * M9 R3 demonstrations (§9, ADR 0011), not yet calibrated species (ADR 0009 keeps willow and beech
+ * for later). Both keep the sky presets' R1 and R3 and strengthen posture control.
+ *
+ * Weeping (willow-like, §9): an upright scaffold with hanging curtains. The trunk's posture holds it
+ * vertical; limbs grow out at 50° but their reaction wood bends them toward 140°, and twigs grow and
+ * set toward 150–175°, so limbs arch over and twigs hang (pendulous axes; the peach WEEP gene,
+ * Hollender et al. 2018). A stiffer wood and thicker tips keep the slender trunk from buckling.
+ */
+const WEEPING = {
+  ...SKY,
+  c6: { enabled: true, r0: 0.03 },
+  r3: { enabled: true, E: 2e6, c: 0.3, betaG: 0.2 },
+  r2: {
+    enabled: true,
+    aC: 10,
+    dLambda: 0.05,
+    ramp: 15,
+    levels: [
+      level({ lambda: 0.53, setPoint: 0, eta: 0.4 }),
+      level({ lambda: 0.5, setPoint: 50, eta: 0.3, branchAngle: 40, postureSetPoint: 140 }),
+      level({ lambda: 0.5, setPoint: 150, eta: 1, branchAngle: 45, postureSetPoint: 175 }),
+    ],
+  },
+} satisfies ParamsPatch;
+
+/**
+ * Troll's model (beech-like, §9: "Fagus type"): every axis grows plagiotropic, the trunk's leader
+ * too (A_set 70°), and the trunk straightens secondarily because its posture set-point is vertical.
+ * Without R3 the same tree sprawls (spec §9: "impossible without R3").
+ */
+const TROLL = {
+  ...SKY,
+  r3: { enabled: true, c: 0.15, betaG: 0.2 },
+  r2: {
+    enabled: true,
+    levels: [
+      level({ lambda: 0.52, setPoint: 70, eta: 0.5, postureSetPoint: 0 }),
+      level({ lambda: 0.5, setPoint: 80, eta: 0.6, branchAngle: 45 }),
     ],
   },
 } satisfies ParamsPatch;
@@ -348,6 +398,19 @@ export const presets = {
     description:
       "Aubréville's model, as in Terminalia catappa: a pagoda of flat tiers of forking branch modules (§9).",
     patch: { world: { width: 140, height: 160, walls: [] }, trees: [{ x: 70 }], ...TROPICAL },
+  },
+  weeping: {
+    leaf: "small",
+    label: "M9: weeping form (willow-like)",
+    description:
+      "R3 mechanics: limbs arch over and twigs hang in curtains, because their reaction wood sets them toward pendulous angles (§9).",
+    patch: { world: { width: 120, height: 120, walls: [] }, trees: [{ x: 60 }], ...WEEPING },
+  },
+  troll: {
+    label: "M9: Troll straightening (beech-like)",
+    description:
+      "Troll's model, as in Fagus: the leader grows out sideways and the trunk rights itself behind it with reaction wood (§9).",
+    patch: { world: { width: 120, height: 140, walls: [] }, trees: [{ x: 60 }], ...TROLL },
   },
 } satisfies Record<string, Preset>;
 

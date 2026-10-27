@@ -2,6 +2,35 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-27: M9, mechanics
+
+- **Merged** the M8 PR (epabarker/tree-simulation#2) at the user's request; M9 starts from it.
+- **R3** (`principles/r3-mechanics.ts`, ADR 0011). After C6 girth:
+  - a basipetal pass gives each metamer's weight W, first moment S and base moment M = S − W·x_base (wood at its midpoint, leaves at its tip);
+  - stress-driven girth adds local wood where σ = 4|M|/(πr³) > σ_target, never past it (`stressWood`, out of C6's pipe sums);
+  - sag −φ·(M − M_prev)/(E·πr⁴/4)·l, from last season's stored `moment`;
+  - posture −β_g·sin(A − A_set) − γ·kink, clamped to ±c·Δr/r;
+  - all turns come from the start-of-pass geometry and accumulate acropetally; buds turn with their metamer.
+  - `PaLevel.postureSetPoint` lets an axis set to a different angle than it grows at.
+  - Page: an R3 folder and a "stress σ/σ_target" colour; snapshots carry `stress`; metamers.csv carries `stressWood`.
+- **Decision (user):** sag comes from the load *increment* (Fournier's growth rings; Alméras & Fournier 2009), not from the whole load each season as §R3.4 first said. The spec's creep stays as `r3.sag: "creep"`. Spec §R3.4 amended.
+- **Presets:** the sky presets enable R3. New `weeping` (willow-like) and `troll` (beech-like) demonstrations. The species presets stay pre-R3 with pre-R1.
+- **Results** ([note](experiments/2026-10-27-m9-mechanics.md), 5 seeds):
+  - Open-grown limbs droop 22° with tips up 15°, and the crown widens 63 → 80.
+  - Without posture, trunks tilt 34°.
+  - `weeping`: 59% of young twigs hang, against 25% without R3.
+  - `troll`: the trunk grows at 70° yet stands within 1° of vertical; without posture it sprawls at 95°.
+  - Δ 2.08 at reinforced junctions, 2.00 elsewhere.
+  - In the stand, R3 straightens trunks (5° → 1.4°) and raises H/D 58 → 65. Cost is within noise (≈ 7 ms a season).
+- **Surprises.**
+  - Creep collapses trees: limbs keep sinking after R1's plateau, and open trees lie on the ground by season 100.
+  - With posture set to vertical for every axis and fast reaction wood (c 1), crowns closed up like brooms. c is the knob that sets droop.
+  - Low E for a whole tree buckles slender trunks, because each season's lean raises the next season's moment. The weeping preset needs E 2·10⁶, r0 0.03 and c 0.3, with pendulous *posture* set-points rather than floppy wood.
+  - Twigs that grow straight down sit in their own crown's shade and are shed; arching scaffolds with hanging ends survive.
+- **Tests:** `r3-mechanics.test.ts` (7) and `mechanics.test.ts` (5).
+- **Goldens:** `skyStand`, `skyTree`, `obliqueSun`, `skyLate` and `overcast` changed (R3 on). `weeping` and `troll` added. With R3 off, all five reproduce their M8 hashes exactly; the new columns are hashed only when non-zero.
+- **Seen** on the page in headless Chromium (WebGL2): weeping curtains, the Troll staircase trunk, arching limbs in stress colour. No console errors.
+
 ## 2026-10-27: M8, carbon balance
 
 - **R1** (`principles/r1-carbon.ts`, ADR 0010). After the basipetal light pass:

@@ -179,6 +179,48 @@ export interface Params {
   };
 
   /**
+   * R3 Mechanics (spec §R3, ADR 0011): each season branches bend under the weight they carry,
+   * with girth-set stiffness, and reaction wood bends them back toward their set-point at a rate
+   * limited by new girth. Off = baseline: geometry is fixed once grown.
+   *
+   * Units: weights are in units of a cell³ of wood (ρ_w = 1 by default), moments in weight·cells,
+   * so E and σ are in weight per cell² (physically ρ_w·g·0.25 m ≈ 2.5 kPa per unit: wood's
+   * E ≈ 10 GPa is ≈ 4·10⁶).
+   */
+  r3: {
+    enabled: boolean;
+    /** ρ_w: wood weight per cell³ (sets the unit; change it only to compare densities). */
+    rho: number;
+    /** Leaf weight per unit of leaf area (a bud's leaf area as the light model sees it) (calibrate). */
+    leafMass: number;
+    /** E: Young's modulus (calibrate; wood ≈ 4·10⁶ in these units). */
+    E: number;
+    /**
+     * 'increment': the elastic curvature of this season's load increment, ΔM/(E·πr⁴/4), sets
+     * (Fournier's growth-ring model; Alméras & Fournier 2009). 'creep': the whole κ_e = M/(E·πr⁴/4)
+     * sets again each season (spec §R3.4 as first written).
+     */
+    sag: "increment" | "creep";
+    /** φ: share of the elastic curvature κ_e = M/(E·πr⁴/4) that becomes permanent each season. */
+    phi: number;
+    /**
+     * Posture control on (reaction wood). Off = the §8 ablation "R3 posture only": sag with no
+     * correction, so limbs droop progressively.
+     */
+    posture: boolean;
+    /** β_g: gravitropic gain, rotation per metamer per season at 90° from the set-point (Bastien et al. 2013's β). */
+    betaG: number;
+    /** γ: proprioceptive gain on the axis's local curvature (Bastien et al. 2013's γ). */
+    gamma: number;
+    /** c: a metamer's posture rotation per season is at most c·Δr/r, its relative girth growth. */
+    c: number;
+    /** σ_target: bending stress above which stress-driven girth adds wood (calibrate). */
+    sigmaTarget: number;
+    /** Stress-driven girth gain: Δr = gain·r·(σ/σ_target − 1), never past σ = σ_target; 0 = off. */
+    girthGain: number;
+  };
+
+  /**
    * R2 Physiological age (spec §R2, ADR 0009). pa = min(branching order, levels − 1); each level
    * overrides λ, A_set, η and β for its axes and sets their lateral generator and p_term.
    * Off = baseline: one level taken from c1, c3 and c4.
@@ -219,6 +261,11 @@ export interface PaLevel {
   tierEvery: number;
   /** Probability that the terminal bud ends when a shoot of this pa ends: sympodial growth. */
   pTerm: number;
+  /**
+   * R3 posture set-point from vertical, degrees, when it differs from the growth set-point
+   * (Troll's model: shoots grow plagiotropic, the trunk straightens to 0 later; ADR 0011).
+   */
+  postureSetPoint?: number;
 }
 
 export const defaultParams: Params = {
@@ -267,6 +314,23 @@ export const defaultParams: Params = {
     shed: "carbon",
   },
   r2: { enabled: false, levels: [], aC: 0, dLambda: 0, ramp: 1 },
+  // M9 calibration (docs/experiments/2026-10-27-m9-mechanics.md).
+  r3: {
+    enabled: false,
+    rho: 1,
+    leafMass: 0.002, // calibrate: a shoot's leaves weigh about as much as its first-year wood
+    // Wood's E ≈ 4·10⁶ here, but a 2D limb carries less foliage than the 3D limb it stands for,
+    // so the effective stiffness is lower (M9 note).
+    E: 1e6, // calibrate
+    sag: "increment",
+    phi: 1, // calibrate
+    posture: true,
+    betaG: 0.1, // calibrate
+    gamma: 0.2, // calibrate
+    c: 0.05, // calibrate
+    sigmaTarget: 3000, // calibrate: ≈ 7.5 MPa
+    girthGain: 0.3, // calibrate
+  },
   r6: { enabled: false, qMin: 0.2, leafArea: 1 }, // calibrate (M6d)
 };
 

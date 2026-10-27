@@ -82,7 +82,7 @@ snapshotSeasons.add(seasons);
 
 const metricsLines = [["season", ...METRIC_COLUMNS].join(",")];
 const metamerLines = [
-  "season,tree,birthId,parentBirthId,order,axis,x0,y0,x1,y1,length,angle,radius,qSum,nSum,vIn,birthSeason",
+  "season,tree,birthId,parentBirthId,order,axis,x0,y0,x1,y1,length,angle,radius,qSum,nSum,vIn,birthSeason,stressWood",
 ];
 
 const lightLines = ["season,col,row,shade"];
@@ -137,6 +137,7 @@ for (let s = 0; s < seasons; s++) {
             c.nSum[i],
             c.vIn[i],
             c.birthSeason[i],
+            c.stressWood[i],
           ]
             .map(num)
             .join(","),

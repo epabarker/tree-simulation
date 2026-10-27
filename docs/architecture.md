@@ -32,6 +32,8 @@ Each `Tree` owns two structure-of-arrays tables (`soa.ts` `Table`), one typed ar
 | `scarSumN` | Σ r^n of branches shed at this node (C6 memory) |
 | `birthSeason` | |
 | `qSum`, `nSum`, `vIn` | Per-season pass results (Q_sum, n_b, resource in). Stored with the row so they survive compaction and can be drawn |
+| `stressWood` | Radius added by R3's stress-driven girth. It is local, so C6 sums and remembers only the pipe radius `radius − stressWood` (ADR 0011) |
+| `moment` | Bending moment at the base after last season's R3 pass; this season's sag comes from M − `moment` (ADR 0011) |
 
 **Buds** (`BUD_SCHEMA`)
 
@@ -56,6 +58,8 @@ The passes need only `parent` and `slot`:
 
 **Ordering invariants.** Rows are appended, so parents always come before children. `Table.compact(keep)` removes rows, keeps the order of the rest, and returns old → new indices; every stored index (`parent`, `bud.metamer`) must be remapped through it. Because tables are append-only and compaction keeps order, `birthId` ascends in array order, which lets snapshots match rows across seasons with a two-pointer merge.
 
+**Late columns.** `hash.ts` skips `stressWood` and `moment` while every row is zero, so runs with R3 off hash exactly as before those columns existed.
+
 **Reallocation.** `Table.add()` may reallocate every column. Read `t.cols.x[i]` through the `cols` object after an add; never hold on to an old array.
 
 ## Season loop (spec §6 → `season.ts`)
@@ -70,8 +74,8 @@ The passes need only `parent` and `slot`:
 | BUD_FATE, GROW | `growBuds` → `shootSize`, `growShoot`; each new metamer's angle comes from `shootDirection` (C4) when `c4.enabled`, using the bud's V | M0, M3 |
 | R2 (M7, ADR 0009) | No pass of its own: pa = min(order, levels − 1) is looked up where each rule reads its params. `allocate` reads λ per node (`lambdaAt`, with the ontogeny decline); `growBuds` reads A_set and η per bud (`directionParams`); `growShoot` places lateral buds by the axis's generator (`lateralCount`; whorls on the shoot's last metamer) and forms the terminal bud `terminated` with p_term (`terminates`, `Purpose.sympodialTermination`) | M7 |
 | BUD_FATE (R6, M6d) | In `growBuds`: a live bud with n = 0 becomes `shortShoot` if Q ≥ `r6.qMin`, else `dormant`. With R6 on, `depositBuds` deposits leaf area by state (active 1, short shoot `r6.leafArea`, dormant 0) and `gatherLight` weights Q by it | M6d |
-| SHED, GIRTH | `shedBranches` (C5; threshold max(T, T_rel·Q_top), Q_top from `crownTopLight` after sampling, ADR 0007): marks dim laterals' subtrees on this season's Q_sum/n_b, records scars, compacts metamers and buds, remaps `parent` and `bud.metamer`. With `r1.shed: "carbon"` (R1 on) the test is P_b < M_b or light per metamer < T_rel·Q_top. Then `updateGirth` (C6): basipetal pipe sums with memory | M4, M8 |
-| MECHANICS | — | M9 |
+| SHED, GIRTH | `shedBranches` (C5; threshold max(T, T_rel·Q_top), Q_top from `crownTopLight` after sampling, ADR 0007): marks dim laterals' subtrees on this season's Q_sum/n_b, records scars, compacts metamers and buds, remaps `parent` and `bud.metamer`. With `r1.shed: "carbon"` (R1 on) the test is P_b < M_b or light per metamer < T_rel·Q_top. Then `updateGirth` (C6): basipetal pipe sums with memory, over the pipe radius r − stressWood | M4, M8 |
+| MECHANICS (R3, ADR 0011) | When `r3.enabled`, `tree.prevRadius` takes the radius before `updateGirth`. After it, `updateMechanics` runs a basipetal pass for weight W, first moment S and M = S − W·x_base, with leaf weight from `depositArea`. It adds local stress wood where σ = 4·abs(M)/(πr³) > σ_target, and sets each metamer's turn: sag −φ·(M − `moment`)/(E·πr⁴/4)·l (`r3.sag: "creep"` uses the whole M), capped at `MAX_SAG`, plus posture −β_g·sin(A − A_set) − γ·kink, clamped to ±c·Δr/r. A_set comes from `postureSetPoint`: the R2 row's `postureSetPoint`, else its growth set-point, else `c4.setPoint`. All turns come from the start-of-pass geometry. An acropetal pass then accumulates them, rotates the metamers, rebuilds base positions and turns the buds. `tree.stress` keeps σ/σ_target for the page | M9 |
 | COMMIT_STAGING | `commitBuds` compacts consumed buds; new rows were appended past the phase's loop bounds | M0 |
 | Phase 3 abrasion, stand | — | M11 |
 
@@ -121,7 +125,7 @@ Tapping a tree on the page fells it. `Scene.pickTree` finds the nearest drawn se
 
 **Snapshot** (`snapshot.ts`). Flat arrays over all live trees, concatenated in tree-id order:
 
-- **Metamers:** `parent` (row in the snapshot), `x0`, `y0`, `angle`, `length`, `radius`, `tree`, `birthId`, `order`, `light` (Q_sum/n_b), `resource` (vIn), `age`, `prevIndex`.
+- **Metamers:** `parent` (row in the snapshot), `x0`, `y0`, `angle`, `length`, `radius`, `tree`, `birthId`, `order`, `light` (Q_sum/n_b), `resource` (vIn), `age`, `stress` (σ/σ_target, R3), `prevIndex`.
 - **Buds:** `budMetamer`, `budState`, `budQ`.
 - **Other:** `shadow` (W×H, or null), `metrics`, `seasonMs`.
 
@@ -155,7 +159,7 @@ Measured in headless Firefox (desktop GPU; phones are slower): a 10-tree stand o
 |---|---|
 | `run.json` | `meta` (preset, seasons, git commit, hash, ms), `params`, `events`, `seasons` |
 | `metrics.csv` | One row per tree per season after the season ran. Columns: `season` + `METRIC_COLUMNS` (`metrics.ts`) |
-| `metamers.csv` | Every metamer at each `--snapshots` season and at the final season. Columns: `season,tree,birthId,parentBirthId,order,axis,x0,y0,x1,y1,length,angle,radius,qSum,nSum,vIn,birthSeason` |
+| `metamers.csv` | Every metamer at each `--snapshots` season and at the final season. Columns: `season,tree,birthId,parentBirthId,order,axis,x0,y0,x1,y1,length,angle,radius,qSum,nSum,vIn,birthSeason,stressWood` |
 | `hash.txt` | State hash (same function as the golden tests) |
 | `light.csv` | With `--light` only: the light model's per-cell shade (1 − Q/C for the sky sweep) at the same seasons as `metamers.csv`, i.e. the start-of-season field those seasons' buds saw. Columns: `season,col,row,shade`, row 0 at the ground |
 

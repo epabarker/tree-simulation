@@ -5,7 +5,7 @@ import { BudState, Slot, type Tree } from "../tree.ts";
 import { World } from "../world.ts";
 import { directionParams, lambdaAt, lateralCount, terminates } from "./r2-physiological-age.ts";
 
-/** These checks are the M7 evidence, so they run the presets as they were before R1 (M8). */
+/** These checks are the M7 evidence, so they run the presets as they were before R1 and R3. */
 const presetParams = (name: PresetName, seed?: number) =>
   mergeParams(currentPreset(name, seed), PRE_R1);
 

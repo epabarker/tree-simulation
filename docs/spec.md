@@ -169,7 +169,7 @@ I found no study testing a vertical-plane tree model against 3D. Forestry reduce
 1. **Statement.** Each season branches bend under carried weight with girth-set stiffness, and reaction wood counter-bends toward the set-point at a rate limited by new girth; next season sees the new geometry.
 2. **Biology.** Plants adjust skeletal growth to loads and control posture with motors (differential growth, reaction wood) (Moulia et al. 2006).\[23\] Stability requires gravitropic correction to outpace weight-driven bending (Alméras & Fournier 2009).\[24\]\[25\] Palubicki et al. "ignored changes in branch position and orientation over time," noting they matter for Champagnat and Troll models.\[2\] Graphics follow-ups: Pirk et al. (2014), Li et al. (2025).\[26\]\[27\]
 3. **Evidence.** Phenomena well established; the incremental rule is a modelling simplification.
-4. **Local rule.** Basipetal: W_i = w_i + ΣW_c, S_i = w_i x_i + ΣS_c, moment M_i = S_i − W_i·x_base,i (exact, local). κ_e = M/(E·πr⁴/4). Permanent set θ += φ·κ_e·l. Posture Δθ = clamp(−β_g sin(A − A_set) − γκ, ±c·Δr/r). Optional: break if 4|M|/(πr³) > σ_break; stress-driven girth Δr ∝ max(0, σ/σ_target − 1). Recompute positions acropetally.
+4. **Local rule.** Basipetal: W_i = w_i + ΣW_c, S_i = w_i x_i + ΣS_c, moment M_i = S_i − W_i·x_base,i (exact, local). κ_e = M/(E·πr⁴/4). Permanent set θ += φ·Δκ_e·l, where Δκ_e = (M − M_prev)/(E·πr⁴/4) is the elastic curvature of this season's load increment, locked in by the new growth ring (Fournier's model; Alméras & Fournier 2009). The creep form θ += φ·κ_e·l, on the whole load, remains a switch; it keeps lowering limbs after growth stops (ADR 0011). Posture Δθ = clamp(−β_g sin(A − A_set) − γκ, ±c·Δr/r), with a posture set-point per physiological age that may differ from the growth set-point (Troll). Optional: break if 4|M|/(πr³) > σ_break; stress-driven girth Δr ∝ max(0, σ/σ_target − 1), local to the stressed metamer (not passed on in the pipe sums, so Δ > n there). Recompute positions acropetally.
 5. **2D translation.** Scalar moments, no torsion.
 6. **Parameters.** ρ_w, E, leaf mass, φ, β_g/γ (analogous to Bastien's B), c, σ_break, σ_target.
 7. **Feedback.** Closes loop D.
@@ -386,7 +386,7 @@ Ordering: (1) every tree reads the same snapshot, so iteration order cannot bias
 | Constant λ (no apical-control decline) | Stays conical, no mature decurrent form | Palubicki Figs. 10–11 |
 | R1 | No plateau, no suppression death, no self-thinning | Koch et al. 2004 (hypothesis) |
 | R3 | Straight old limbs, no weeping or Troll forms | Moulia et al. 2006 |
-| R3 posture only | Progressive droop, possible collapse | Alméras & Fournier 2009 |
+| R3 posture only (sag without posture) | Progressive droop, possible collapse | Alméras & Fournier 2009 |
 | R4 | Gaps refill slowly | Reiteration (Barthélémy & Caraglio 2007) |
 | R6 | Foliage only at shoot tips; thin shell, bare older limbs | Millan et al. 2022 |
 | C5 T_rel = 0 | Suppressed and dominant trees prune at the same local light | Sprugel 2002; Kothari et al. 2025 |

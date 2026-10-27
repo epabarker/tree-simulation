@@ -6,7 +6,7 @@ How the code realises the spec. For *why* a choice was made, see `docs/decisions
 
 ```
             ┌───────────── page (main thread) ─────────────┐
- Tweakpane ─┤ main.ts ── Canvas2DRenderer ── input.ts       │
+ Tweakpane ─┤ main.ts ── Renderer (WebGL2 | Canvas 2D) ─ input│
  Plot ──────┤    │ Comlink (async calls, transferred buffers)│
             └────┼──────────────────────────────────────────┘
                  ▼
@@ -102,7 +102,7 @@ All of them sit behind `LightModel.sample(x, y, dir) → {q, vx, vy}` (§C2.8):
 
 ## Direct manipulation
 
-Tapping a tree on the page fells it. `Canvas2DRenderer.pickTree` finds the nearest drawn segment within 14 px, and the page calls `removeTree(id)`. That is an event at the next season boundary: the tree stops depositing shade, so the next season's light reaches its neighbours. Its branches fade out as ghosts. Snapshots and charts show only live trees; the CLI's metrics.csv keeps rows for dead trees, with `alive = 0`.
+Tapping a tree on the page fells it. `Scene.pickTree` finds the nearest drawn segment within 14 px, and the page calls `removeTree(id)`. That is an event at the next season boundary: the tree stops depositing shade, so the next season's light reaches its neighbours. Its branches fade out as ghosts. Snapshots and charts show only live trees; the CLI's metrics.csv keeps rows for dead trees, with `alive = 0`.
 
 ## Events and replay
 
@@ -131,7 +131,13 @@ Every typed array is transferred, not copied.
 
 **Camera.** `fit()` sets a target (centre x and scale) covering the trees, with margins for the ground and the header text; `animateCamera` eases toward it each frame (time constant 380 ms) while keeping the ground line pinned. Any pan or zoom by the user stops the following until "Fit view" or a double-tap.
 
-**Tweening.** Each frame, the renderer rebuilds positions in a single forward loop. It interpolates length, angle and radius from the `prevIndex` row; new rows grow from zero; previous rows that nothing maps to are drawn as fading ghosts (shed branches). Segments are grouped by (colour, width bucket) and each group is stroked as one path.
+**Tweening.** `render/scene.ts` (`Scene`) holds everything both renderers share: each frame it rebuilds positions in a single forward loop, interpolating length, angle and radius from the `prevIndex` row; new rows grow from zero; previous rows that nothing maps to are fading ghosts (shed branches). It also tapers each segment toward its thickest child (`tipRadius`), chooses palette indices per colour mode, lays out leaves (camera-independent: base point, direction, size 0…1), fits and eases the camera, and picks trees.
+
+**Renderers** (`render/create.ts` picks one; `?renderer=canvas` forces the fallback):
+- `WebGL2Renderer` (default, M6b, ADR 0001; twgl.js): one instanced quad per metamer shaded in the fragment shader as an uneven capsule (signed distance, antialiased by `0.5 − d/px`; stems under half a pixel draw at half a pixel with alpha scaled by their true coverage), one quad per leaf shaded as a vesica, instanced squares for buds and rectangles for walls, the shade overlay as an RGBA texture, sky and ground as full-screen gradients; premultiplied alpha. Instance data never depends on the camera (zoom-dependent minimum sizes are applied in the shaders), so frames where only the camera moves skip the rebuild and only change uniforms. Handles context loss by recreating its resources.
+- `Canvas2DRenderer` (fallback): segments grouped by (colour, width bucket), each group stroked as one path.
+
+Measured in headless Firefox (desktop GPU; phones are slower): a 10-tree stand of about 4k metamers draws in 2.3 ms of CPU per frame during growth playback with WebGL2 against 19 ms with Canvas 2D; 28k metamers in 5.8 ms; panning a paused 55k-metamer scene costs 0.35 ms.
 
 ## CLI output (`cli/run.ts`)
 

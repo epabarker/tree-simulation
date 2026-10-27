@@ -1,6 +1,7 @@
 {
-  // Tests, test helpers and tool configs (Node). Each src/* area has its own tsconfig.
+  // Tests, test helpers and tool configs (Node). Each src/* area has its own tsconfig; the DOM lib
+  // here only lets page-side tests (src/web/**/*.test.ts) type-check. src/core stays DOM-free.
   "extends": "./tsconfig.base.json",
-  "compilerOptions": { "lib": ["es2023"], "types": ["node"] },
+  "compilerOptions": { "lib": ["es2023", "dom"], "types": ["node"] },
   "include": ["src/**/*.test.ts", "tests/**/*.ts", "vite.config.ts"]
 }

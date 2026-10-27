@@ -46,3 +46,45 @@ export function shadowRgb(t: number): [number, number, number] {
   const b = Math.round(120 * (1 - u) + 120 * u);
   return [r, g, b];
 }
+
+/**
+ * The shade overlay as RGBA pixels, row 0 at the ground (as the field is stored). Transparent
+ * where there is no shade; otherwise the shadowRgb ramp scaled to the darkest cell.
+ */
+export function shadeImage(
+  field: Float32Array,
+  width: number,
+  height: number,
+): Uint8ClampedArray<ArrayBuffer> {
+  const img = new Uint8ClampedArray(width * height * 4);
+  let max = 0;
+  for (let i = 0; i < field.length; i++) if (field[i] > max) max = field[i];
+  if (max <= 0) return img;
+  for (let i = 0; i < width * height; i++) {
+    const v = field[i];
+    if (v <= 0) continue;
+    const [r, g, b] = shadowRgb(v / max);
+    img[i * 4] = r;
+    img[i * 4 + 1] = g;
+    img[i * 4 + 2] = b;
+    img[i * 4 + 3] = Math.round(60 + 180 * Math.min(1, v / max));
+  }
+  return img;
+}
+
+/** "#rrggbb", "#rgb", "rgb(r, g, b)" or "rgba(r, g, b, a)" as bytes [r, g, b, a]. */
+export function parseColor(css: string): [number, number, number, number] {
+  const c = css.trim();
+  if (c.startsWith("#")) {
+    const h = c.length === 4 ? [...c.slice(1)].map((x) => x + x).join("") : c.slice(1, 7);
+    const n = Number.parseInt(h, 16);
+    return [(n >> 16) & 255, (n >> 8) & 255, n & 255, 255];
+  }
+  const m = c.match(/rgba?\(([^)]+)\)/);
+  if (m) {
+    const parts = (m[1] as string).split(",").map((x) => Number.parseFloat(x));
+    const a = parts.length > 3 ? Math.round((parts[3] as number) * 255) : 255;
+    return [parts[0] ?? 0, parts[1] ?? 0, parts[2] ?? 0, a];
+  }
+  return [0, 0, 0, 255];
+}

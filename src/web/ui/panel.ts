@@ -7,7 +7,7 @@
 import { Pane } from "tweakpane";
 import type { Params, ParamsPatch } from "../../core/params.ts";
 import { type PresetName, presets } from "../../core/presets.ts";
-import type { ColorMode, ViewOptions } from "../render/canvas2d.ts";
+import type { ColorMode, ViewOptions } from "../render/scene.ts";
 
 interface FieldSpec {
   key: string;
@@ -114,6 +114,10 @@ export interface Stats {
   season: number;
   metamers: number;
   workerMs: number;
+  renderer: string;
+  /** Frames per second while animating, and CPU milliseconds per draw. */
+  fps: number;
+  drawMs: number;
 }
 
 export interface PanelCallbacks {
@@ -179,6 +183,13 @@ export class Panel {
       label: "worker ms/season",
       readonly: true,
       format: (v: number) => v.toFixed(1),
+    });
+    monitors.addBinding(stats, "renderer", { readonly: true });
+    monitors.addBinding(stats, "fps", { readonly: true, format: (v: number) => v.toFixed(0) });
+    monitors.addBinding(stats, "drawMs", {
+      label: "draw ms (CPU)",
+      readonly: true,
+      format: (v: number) => v.toFixed(2),
     });
 
     for (const spec of SECTIONS) {

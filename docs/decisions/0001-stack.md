@@ -64,3 +64,6 @@ The user knows Python and R best, and is willing to learn a language that is use
   - in-process `import` from Python (PyO3) or R (extendr) is wanted.
 - **WebGPU:** only for very large stands or GPU-side kinematics. The tree passes are sequential traversals, the light sweep is too small to beat dispatch and readback, and WebGL2 works on effectively every device.
 - **WebGL2 renderer:** at M6, or earlier if Canvas 2D frame times on a phone exceed about 16 ms at the M5 stand size.
+
+## Update 2026-10-27 (M6b)
+The WebGL2 renderer is in, as planned (twgl.js 7; instanced SDF capsules and leaves; the light field as a texture), with Canvas 2D kept as the automatic fallback. First paint grew from about 39 kB to 60 kB gzipped (twgl.js does not tree-shake fully), still inside the 100 kB budget. Desktop measurements are in `docs/architecture.md`; a real-phone measurement is still to do.

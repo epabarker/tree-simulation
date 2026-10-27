@@ -10,8 +10,9 @@ import { mergeParams, type Params } from "../core/params.ts";
 import { defaultPreset, type PresetName, presetParams } from "../core/presets.ts";
 import type { Snapshot } from "../core/snapshot.ts";
 import type { SimApi } from "../worker/api.ts";
-import { Canvas2DRenderer, type ViewOptions } from "./render/canvas2d.ts";
+import { createRenderer } from "./render/create.ts";
 import { attachInput } from "./render/input.ts";
+import type { ViewOptions } from "./render/scene.ts";
 import { Charts } from "./ui/charts.ts";
 import { Panel, type PlaybackState, type Stats } from "./ui/panel.ts";
 import "./ui/layout.css";
@@ -22,8 +23,13 @@ function element<T extends HTMLElement>(id: string): T {
   return el as T;
 }
 
-const canvas = element<HTMLCanvasElement>("view");
-const renderer = new Canvas2DRenderer(canvas);
+// WebGL2 by default; `?renderer=canvas` forces the Canvas 2D fallback (for comparison).
+const forceCanvas = new URLSearchParams(location.search).get("renderer") === "canvas";
+const renderer = createRenderer(
+  element<HTMLCanvasElement>("view"),
+  forceCanvas ? "canvas2d" : "auto",
+);
+const { scene, canvas } = renderer;
 const charts = new Charts(element("charts"));
 const worker = new Worker(new URL("../worker/sim.worker.ts", import.meta.url), { type: "module" });
 const sim = Comlink.wrap<SimApi>(worker);
@@ -35,7 +41,14 @@ const startPreset: PresetName = narrow ? "skyGrove" : defaultPreset;
 
 const hud = element("hud");
 const playback: PlaybackState = { playing: false, speed: 3 };
-const stats: Stats = { season: 0, metamers: 0, workerMs: 0 };
+const stats: Stats = {
+  season: 0,
+  metamers: 0,
+  workerMs: 0,
+  renderer: renderer.kind === "webgl2" ? "WebGL2" : "Canvas 2D",
+  fps: 0,
+  drawMs: 0,
+};
 const view: ViewOptions & { preset: PresetName } = {
   preset: startPreset,
   colorMode: "natural",
@@ -49,6 +62,7 @@ const view: ViewOptions & { preset: PresetName } = {
 let busy = false;
 let dirty = true;
 let lastFrame = 0;
+let drewLastFrame = false;
 let visible = true;
 let tweenStart = 0;
 let tweenMs = 1;
@@ -59,8 +73,8 @@ let autoFit = true;
 
 function accept(s: Snapshot, animate: boolean): void {
   renderer.setSnapshot(s);
-  if (!animate) renderer.clearHistory();
-  if (autoFit) renderer.fit(!animate);
+  if (!animate) scene.clearHistory();
+  if (autoFit) scene.fit(!animate);
   const trees = s.metrics.length;
   hud.textContent = `Season ${s.season} · ${trees} ${trees === 1 ? "tree" : "trees"}`;
   stats.season = s.season;
@@ -113,7 +127,7 @@ const panel = new Panel(element("panel"), presetParams(startPreset), playback, s
   },
   onFit: () => {
     autoFit = true;
-    renderer.fit();
+    scene.fit();
     dirty = true;
   },
   onExport: () => void exportRun(),
@@ -129,35 +143,45 @@ async function exportRun(): Promise<void> {
   URL.revokeObjectURL(a.href);
 }
 
-attachInput(renderer, {
-  onChange: () => {
-    autoFit = false;
-    dirty = true;
+attachInput(
+  { canvas, camera: scene.camera, screenToWorld: (x, y) => scene.screenToWorld(x, y) },
+  {
+    onChange: () => {
+      autoFit = false;
+      dirty = true;
+    },
+    // Direct manipulation: tap a tree to fell it; neighbours lean into the gap (§8, M5).
+    onTap: (wx, wy) => {
+      const tree = scene.pickTree(wx, wy);
+      if (tree === null) return;
+      void sim.removeTree(tree);
+      if (!playback.playing) void step();
+    },
+    onRefit: () => {
+      autoFit = true;
+      scene.fit();
+      dirty = true;
+    },
   },
-  // Direct manipulation: tap a tree to fell it; neighbours lean into the gap (§8, M5).
-  onTap: (wx, wy) => {
-    const tree = renderer.pickTree(wx, wy);
-    if (tree === null) return;
-    void sim.removeTree(tree);
-    if (!playback.playing) void step();
-  },
-  onRefit: () => {
-    autoFit = true;
-    renderer.fit();
-    dirty = true;
-  },
-});
+);
 
 function frame(now: number): void {
   requestAnimationFrame(frame);
   const dt = lastFrame > 0 ? Math.min(100, now - lastFrame) : 16;
   lastFrame = now;
   if (!visible) return;
-  if (autoFit && renderer.animateCamera(dt)) dirty = true;
+  if (autoFit && scene.animateCamera(dt)) dirty = true;
   const t = Math.min(1, (now - tweenStart) / tweenMs);
   if (dirty || t < 1) {
+    const t0 = performance.now();
     renderer.draw(t * t * (3 - 2 * t), view);
+    // Smoothed CPU cost of a draw, and frame rate while drawing every frame.
+    stats.drawMs += (performance.now() - t0 - stats.drawMs) * 0.1;
+    if (drewLastFrame) stats.fps += (1000 / dt - stats.fps) * 0.1;
+    drewLastFrame = true;
     dirty = t < 1;
+  } else {
+    drewLastFrame = false;
   }
   if (playback.playing && !busy && t >= 1 && now - lastStep >= 1000 / playback.speed) {
     lastStep = now;

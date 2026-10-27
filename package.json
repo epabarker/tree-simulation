@@ -24,7 +24,8 @@
   "dependencies": {
     "@observablehq/plot": "^0.6.17",
     "comlink": "^4.4.2",
-    "tweakpane": "^4.0.5"
+    "tweakpane": "^4.0.5",
+    "twgl.js": "^7.0.0"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.6.3",

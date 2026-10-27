@@ -3,7 +3,7 @@
  * tap to pick a world point. Pointer Events cover mouse, pen and touch alike.
  */
 
-import type { Canvas2DRenderer } from "./canvas2d.ts";
+import type { Camera } from "./scene.ts";
 
 export interface InputCallbacks {
   onChange(): void;
@@ -15,7 +15,7 @@ const TAP_SLOP_PX = 6;
 const TAP_MS = 300;
 const DOUBLE_TAP_MS = 320;
 
-export function attachInput(renderer: Renderer, cb: InputCallbacks): void {
+export function attachInput(renderer: InputTarget, cb: InputCallbacks): void {
   const canvas = renderer.canvas;
   const pointers = new Map<number, { x: number; y: number }>();
   let down: { x: number; y: number; time: number; moved: boolean } | null = null;
@@ -102,4 +102,9 @@ export function attachInput(renderer: Renderer, cb: InputCallbacks): void {
   );
 }
 
-type Renderer = Pick<Canvas2DRenderer, "canvas" | "camera" | "screenToWorld">;
+/** What input needs from the view: the element, the camera it moves, and a coordinate mapping. */
+export interface InputTarget {
+  canvas: HTMLCanvasElement;
+  camera: Camera;
+  screenToWorld(px: number, py: number): [number, number];
+}

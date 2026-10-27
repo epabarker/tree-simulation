@@ -2,6 +2,24 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-27: M6b, the WebGL2 renderer
+
+- **Shared scene.** Split `render/scene.ts` (`Scene`) out of the Canvas 2D renderer. It holds the tween, camera, fitting, picking, colour indices and leaf layout, shared by both renderers behind a small `Renderer` interface. `create.ts` picks WebGL2 and falls back to Canvas 2D on a fresh canvas; `?renderer=canvas` forces the fallback.
+- **`WebGL2Renderer`** (twgl.js 7, whose API matches what ADR 0001 assumed):
+  - instanced uneven-capsule branches, shaded with signed-distance antialiasing;
+  - vesica leaves; instanced buds and walls;
+  - a shade texture and gradient backdrops, with premultiplied blending;
+  - context-loss recovery.
+- **Taper.** Branches now taper toward their thickest child. Tapering toward the continuation left knobs where a thicker lateral leaves a limb, which is common in decurrent crowns.
+- **Performance** (headless Firefox, desktop):
+  - First pass: 2.3 ms against Canvas 2D's 17 ms per draw on a stand; the 55k-metamer explosion ran at 26 fps.
+  - Second pass removed per-leaf and per-bud allocations and made instance data camera-independent: zoom minimums moved into the shaders, and ghosts, walls and buds got their own buffers, so camera-only frames reuse uploads. Panning a paused 55k scene now costs 0.35 ms at 60 fps.
+  - During playback: stand of about 4k metamers 2.3 ms against 19 ms; 28k metamers 5.8 ms.
+- **Stats** gained renderer, fps and draw-ms monitors.
+- **Tests.** New `web/render/scene.test.ts`. The root tsconfig gained the DOM lib for page-side tests (src/core keeps its DOM-free tsconfig).
+- **Bundle.** First paint grew from 39 kB to 60 kB gzipped (twgl.js).
+- **Open.** Not yet measured on a real phone.
+
 ## 2026-10-26: M6, the Beer–Lambert sky sweep
 
 - Polish bundles (shareable links, diagnostic overlays) dropped at the user's request; the half-done groundwork was reverted.

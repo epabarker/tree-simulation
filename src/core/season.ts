@@ -24,7 +24,7 @@ import { updateMechanics } from "./principles/r3-mechanics.ts";
 import { aborts, growthThreshold, lightReleases, releasedShift } from "./principles/r4-dormancy.ts";
 import { elongation, setPointScale, shadeOf } from "./principles/r5-shade.ts";
 import { depositArea, restingState } from "./principles/r6-short-shoots.ts";
-import { normal, Purpose } from "./rng.ts";
+import { normal, Purpose, uniform } from "./rng.ts";
 import { BudState, type Tree } from "./tree.ts";
 import type { World } from "./world.ts";
 
@@ -56,6 +56,10 @@ export function runSeason(world: World, mark: PhaseMark = noMark): void {
   const live: Tree[] = [];
   for (const tree of world.trees) if (tree.alive) live.push(tree);
   const carbonShedding = params.r1.enabled && params.r1.shed === "carbon";
+  // A storm season (M16, §O2 wind events): one draw per season, keyed so it replays.
+  const stormP = params.o2.stormP ?? 0;
+  const storm = stormP > 0 && uniform(params.seed, Purpose.wind, 0, 0, season) < stormP;
+  world.storm = storm;
 
   // Phase 1: environment from the start-of-season snapshot (C2). Obstacles first (ADR 0015): a
   // branch the page's layout now covers is shed before it deposits foliage or shade.
@@ -106,7 +110,7 @@ export function runSeason(world: World, mark: PhaseMark = noMark): void {
     }
     if (params.c6.enabled) updateGirth(tree, params); // C6, after shedding so scars count
     mark("girth");
-    if (params.r3.enabled) updateMechanics(tree, params); // R3 MECHANICS: girth first (§6 rule 2)
+    if (params.r3.enabled) updateMechanics(tree, params, storm, season); // R3 MECHANICS: girth first (§6 rule 2)
     // Obstacles again (ADR 0015): a limb that sagged into one this season is shed now, so no season
     // ends with wood inside the page's content.
     if (params.world.obstacles?.length) {

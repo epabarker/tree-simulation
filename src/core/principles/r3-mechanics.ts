@@ -19,7 +19,12 @@
  * gravitropism alone overshoots as in Bastien et al. 2013), then turns accumulate acropetally:
  * each rotates its whole subtree about its base. Buds turn with their metamer.
  * - **Breakage** (§R3.4 optional, M10): a metamer whose stress exceeds σ_break breaks off with its
- *   subtree, leaving a scar; R4 can then release dormant buds below the break.
+ *   subtree, leaving a scar; R4 can then release dormant buds below the break. In a storm (M16, O2
+ *   `stormP`) stress counts (1 + stormLoad · h/H) times, h the metamer's height and H the tree's,
+ *   and a tree may be thrown, with chance 0.06 · stormLoad · (H/100)² (a draw keyed by tree and
+ *   season).
+ * - **Ground contact** (M16, `r3.ground`, opt-in): a limb whose tip would end below the ground is turned to
+ *   rest on it, with its subtree; it lies there, alive, instead of sinking.
  *
  * Params: r3.enabled, r3.rho (ρ_w), r3.leafMass, r3.E, r3.phi (φ), r3.posture, r3.betaG (β_g),
  * r3.gamma (γ), r3.c, r3.sigmaTarget (σ_target), r3.girthGain, r3.sigmaBreak (σ_break); posture set-points from r2.levels
@@ -27,11 +32,15 @@
  */
 
 import { DEG, type Params } from "../params.ts";
+import { Purpose, uniform } from "../rng.ts";
 import { Slot, type Tree } from "../tree.ts";
 import { isLiveBud } from "./c3-allocation.ts";
 import { removeBranches } from "./c5-shedding.ts";
 import { paLevel } from "./r2-physiological-age.ts";
 import { depositArea } from "./r6-short-shoots.ts";
+
+/** Windthrow: a storm's chance of throwing a 25 m tree, per unit of storm load (M16; calibrate). */
+const THROW = 0.06;
 
 /** Largest sag a metamer takes in one season, radians: keeps a light, thin tip from flipping over. */
 export const MAX_SAG = 0.2;
@@ -74,8 +83,13 @@ export function postureTurn(
  * The MECHANICS step of §6, after C6 girth. Expects `tree.prevRadius` to hold each metamer's
  * radius from before this season's girth pass.
  */
-export function updateMechanics(tree: Tree, params: Params): void {
+export function updateMechanics(tree: Tree, params: Params, storm = false, season = 0): void {
   const { r3 } = params;
+  const stormLoad = storm ? (params.o2.stormLoad ?? 0) : 0;
+  let height = 0;
+  if (stormLoad > 0)
+    for (let i = 0; i < tree.m.length; i++) height = Math.max(height, tree.tipY(i));
+  let thrown = false;
   const nm = tree.m.length;
   const c = tree.m.cols;
   const { loadW: W, loadS: S, stress, prevRadius } = tree;
@@ -123,8 +137,20 @@ export function updateMechanics(tree: Tree, params: Params): void {
       sigma = (4 * Math.abs(M)) / (Math.PI * rNew * rNew * rNew);
     }
     stress[i] = sigmaT > 0 ? sigma / sigmaT : 0;
-    breaks[i] = r3.sigmaBreak > 0 && p >= 0 && sigma > r3.sigmaBreak ? 1 : 0;
+    // A storm loads exposed, high limbs most (wind drag grows with height above the ground).
+    const loaded =
+      stormLoad > 0
+        ? sigma * (1 + (stormLoad * Math.max(0, c.baseY[i])) / Math.max(1, height))
+        : sigma;
+    breaks[i] = r3.sigmaBreak > 0 && p >= 0 && loaded > r3.sigmaBreak ? 1 : 0;
     if (breaks[i]) anyBreak = true;
+    // Windthrow: the wind's moment on a crown grows with about the square of its height, so a
+    // storm throws a tree with chance THROW·stormLoad·(H/100)² (100 cells ≈ 25 m). A draw keyed
+    // by tree and season, so the run replays.
+    if (p < 0 && stormLoad > 0 && r3.sigmaBreak > 0) {
+      const chance = THROW * stormLoad * Math.min(1, height / 100) ** 2;
+      if (uniform(params.seed, Purpose.wind, tree.id, 1, season) < chance) thrown = true;
+    }
 
     // Sag: a load to the right of the base (M > 0) turns the metamer clockwise.
     const load = r3.sag === "increment" ? M - c.moment[i] : M;
@@ -152,11 +178,26 @@ export function updateMechanics(tree: Tree, params: Params): void {
       c.baseY[i] = tree.tipY(p);
     }
     c.angle[i] += turn[i];
+    // Ground contact: a limb that would end below the ground rests on it, its subtree with it.
+    if (r3.ground === true && tree.tipY(i) < 0) {
+      const a = c.angle[i];
+      const y = c.baseY[i];
+      const l = c.length[i];
+      const drop = y > 0 ? Math.asin(Math.min(1, y / l)) : 0;
+      const rest = Math.cos(a) >= 0 ? -drop : Math.PI + drop;
+      turn[i] += rest - a;
+      c.angle[i] = rest;
+    }
   }
   for (let j = 0; j < tree.b.length; j++) {
     if (isLiveBud(b.state[j])) b.angle[j] += turn[b.metamer[j]];
   }
 
   // Breakage: an overstressed metamer goes with everything above it, leaving a scar.
+  if (thrown) {
+    tree.alive = false;
+    tree.broken = nm;
+    return;
+  }
   if (anyBreak) tree.broken = removeBranches(tree, breaks, params, [stress]);
 }

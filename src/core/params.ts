@@ -243,6 +243,12 @@ export interface Params {
      * leaving a scar (§R3.4 optional; its dormant buds below can then be released, R4). 0 = off.
      */
     sigmaBreak: number;
+    /**
+     * Ground contact (M16, ADR 0011 addendum): a limb that sags down to the ground rests on it
+     * instead of sinking below. Off by default, so the M9 presets keep their calibration; the
+     * `forest` preset (the home page's) turns it on.
+     */
+    ground?: boolean;
   };
 
   /**
@@ -320,6 +326,14 @@ export interface Params {
     maxSway: number;
     /** p_abr: probability a touching bud dies in a season (calibrate). */
     pAbr: number;
+    /**
+     * Storms (M16, §O2 wind events): the chance a season is a storm (0 = never). In a storm every
+     * limb's stress counts (1 + stormLoad · h/H) times toward breakage (R3 σ_break), h its height and
+     * H the tree's, so exposed upper limbs snap; a trunk overloaded at its base throws the tree.
+     * Independent of `enabled` (abrasion). Needs R3 with σ_break > 0 to break anything.
+     */
+    stormP?: number;
+    stormLoad?: number;
   };
 
   /**
@@ -454,7 +468,7 @@ export const defaultParams: Params = {
   r5: { enabled: false, eS: 0.1, dLambda: 0.02, dB: 1, dA: 0.5 },
   r6: { enabled: false, qMin: 0.2, leafArea: 1 }, // calibrate (M6d)
   // M11 calibration (docs/experiments/2026-10-27-m11-stand-dynamics.md).
-  o2: { enabled: false, sway: 0.0005, maxSway: 3, pAbr: 0.5 },
+  o2: { enabled: false, sway: 0.0005, maxSway: 3, pAbr: 0.5, stormP: 0, stormLoad: 1.5 },
   o4: { enabled: false, cSeed: 5, d: 20, qEst: 0.1, pEst: 0.3, m0: 0.002, maxTrees: 300 },
 };
 

@@ -694,13 +694,22 @@ export class WebGL2Renderer implements Renderer {
 
   private buildLeaves(leafAge: number, t: number): void {
     const leaves = this.scene.leaves(leafAge, t);
-    const palette = this.paletteBytes(this.theme.leaf[this.scene.leafStyle.palette], 0.92);
-    this.fillLeaves(this.leafBackBatch, leaves, 0, leaves.back, palette);
-    this.fillLeaves(this.leafBatch, leaves, leaves.back, leaves.count, palette);
+    const style = this.scene.leafStyle.palette;
+    const palette = this.paletteBytes(this.theme.leaf[style], 0.92);
+    const autumn = this.paletteBytes(this.theme.autumn[style], 0.92);
+    this.fillLeaves(this.leafBackBatch, leaves, 0, leaves.back, palette, autumn);
+    this.fillLeaves(this.leafBatch, leaves, leaves.back, leaves.count, palette, autumn);
   }
 
   /** Uploads leaves [from, to) of the frame's leaf list into `batch`. */
-  private fillLeaves(batch: Batch, leaves: Leaves, from: number, to: number, palette: Bytes): void {
+  private fillLeaves(
+    batch: Batch,
+    leaves: Leaves,
+    from: number,
+    to: number,
+    palette: Bytes,
+    autumn: Bytes,
+  ): void {
     const n = to - from;
     const pos = this.stream<Floats>(batch, "a_pos", n);
     const dir = this.stream<Floats>(batch, "a_dir", n);
@@ -714,10 +723,13 @@ export class WebGL2Renderer implements Renderer {
       dir[2 * i + 1] = leaves.uy[k];
       grow[i] = leaves.size[k];
       const c = leaves.color[k] * 4;
-      color[4 * i] = palette[c] as number;
-      color[4 * i + 1] = palette[c + 1] as number;
-      color[4 * i + 2] = palette[c + 2] as number;
-      color[4 * i + 3] = palette[c + 3] as number;
+      // Green to autumn colour as the leaf turns (M17).
+      const u = leaves.turn[k] as number;
+      for (let q = 0; q < 4; q++) {
+        const green = palette[c + q] as number;
+        color[4 * i + q] =
+          u > 0 ? Math.round(green + ((autumn[c + q] as number) - green) * u) : green;
+      }
     }
     this.upload(batch, n);
   }

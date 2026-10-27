@@ -23,6 +23,13 @@
     --tropical-leaf-sun: #6fb04a;
     --ghost: #9a8f80;
     --wall: rgba(90, 90, 100, 0.35);
+    /* Autumn (M17): what each foliage turns to before it falls. */
+    --leaf-autumn-shade: #8a3b16;
+    --leaf-autumn-sun: #e3a43a;
+    --birch-leaf-autumn-shade: #9a6b17;
+    --birch-leaf-autumn-sun: #f1d14f;
+    --tropical-leaf-autumn-shade: #7a1e14;
+    --tropical-leaf-autumn-sun: #d8572e;
   }
 
   @media (prefers-color-scheme: dark) {

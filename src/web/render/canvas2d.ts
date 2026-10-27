@@ -217,14 +217,18 @@ export class Canvas2DRenderer implements Renderer {
     const { ctx } = this;
     const style = this.scene.leafStyle;
     const palette = this.theme.leaf[style.palette];
+    const autumn = this.theme.autumn[style.palette];
     const full = leafLength(this.scene.camera.scale, style.length);
     ctx.save();
     ctx.globalAlpha = 0.92;
-    for (let c = 0; c < RAMP_STEPS; c++) {
-      ctx.fillStyle = palette[c] as string;
+    // Leaves drawn in two passes per colour: green, then those past halfway to autumn (M17).
+    for (let pass = 0; pass < 2 * RAMP_STEPS; pass++) {
+      const c = pass % RAMP_STEPS;
+      const turned = pass >= RAMP_STEPS;
+      ctx.fillStyle = (turned ? autumn : palette)[c] as string;
       ctx.beginPath();
       for (let k = from; k < to; k++) {
-        if (leaves.color[k] !== c) continue;
+        if (leaves.color[k] !== c || (leaves.turn[k] as number) > 0.5 !== turned) continue;
         const bx = leaves.x[k];
         const by = leaves.y[k];
         const ux = leaves.ux[k];

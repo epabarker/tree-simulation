@@ -133,6 +133,7 @@ export class World {
       if (x < 0 || x >= W) return;
       if (this.trees.some((t) => t.alive && Math.abs(t.rootX - x) < 1)) return;
       const tree = new Tree(this.trees.length, x);
+      tree.sown = true;
       plantSeedling(tree, this.params, this.season);
       this.trees.push(tree);
     } else {

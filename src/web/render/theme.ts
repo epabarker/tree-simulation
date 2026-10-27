@@ -13,6 +13,8 @@ export interface Theme {
   groundDeep: string;
   wall: string;
   ghost: string;
+  /** `--ground-hatch: 1` draws the ground as ink hatching (an engraved plate) instead of a fill. */
+  groundHatch: boolean;
   /** Young twig → old bark. */
   bark: string[];
   /** Deep shade → full sun, one ramp per leaf palette (leaf-styles.ts). */
@@ -69,6 +71,7 @@ export function readTheme(el: Element): Theme {
     groundDeep: v("--ground-deep", "#6c5e45"),
     wall: v("--wall", "rgba(90, 90, 100, 0.35)"),
     ghost: v("--ghost", "#9a8f80"),
+    groundHatch: style.getPropertyValue("--ground-hatch").trim() === "1",
     bark: ramp(v("--bark-young", "#8c7b4f"), v("--bark-old", "#4c3d31")),
     leaf: leafRamps(v),
   };

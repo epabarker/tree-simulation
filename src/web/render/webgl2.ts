@@ -207,6 +207,8 @@ uniform float u_ground; // device pixels from the bottom edge
 uniform int u_mode;     // 0 = sky, 1 = ground
 uniform vec3 u_top;
 uniform vec3 u_bottom;
+uniform float u_hatch;  // ground drawn as ink hatching, lines this many device pixels apart (0: filled)
+uniform float u_line;   // ink line width, device pixels
 out vec4 outColor;
 void main() {
   float y = gl_FragCoord.y;
@@ -215,6 +217,17 @@ void main() {
     outColor = vec4(mix(u_top, u_bottom, t), 1.0);
   } else {
     if (y > u_ground) discard;
+    if (u_hatch > 0.0) {
+      // An ink line along the ground, and diagonal hatching below it fading downward.
+      float edge = 1.0 - smoothstep(u_line, u_line + 1.0, u_ground - y);
+      float d = mod(gl_FragCoord.x + y, u_hatch);
+      float hatch = (1.0 - smoothstep(u_line * 0.6, u_line * 0.6 + 1.0, d)) * 0.55;
+      hatch *= clamp(y / max(1.0, u_ground), 0.25, 1.0);
+      float a = max(edge, hatch);
+      if (a <= 0.0) discard;
+      outColor = vec4(u_top * a, a);
+      return;
+    }
     float t = clamp((u_ground - y) / max(1.0, u_ground), 0.0, 1.0);
     outColor = vec4(mix(u_top, u_bottom, t), 1.0);
   }
@@ -573,6 +586,8 @@ export class WebGL2Renderer implements Renderer {
       u_mode: mode,
       u_top: rgb(top),
       u_bottom: rgb(bottom),
+      u_hatch: mode === 1 && this.theme.groundHatch ? 5 * this.scene.dpr : 0,
+      u_line: Math.max(1, this.scene.dpr),
     });
     gl.drawArrays(gl.TRIANGLES, 0, 3);
   }

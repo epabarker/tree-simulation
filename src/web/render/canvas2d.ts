@@ -142,6 +142,25 @@ export class Canvas2DRenderer implements Renderer {
   private drawGround(w: number, h: number, groundY: number): void {
     if (groundY >= h) return;
     const { ctx, theme } = this;
+    if (theme.groundHatch) {
+      // An ink line along the ground and diagonal hatching below it (an engraved plate).
+      ctx.save();
+      ctx.strokeStyle = theme.ground;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(0, groundY + 0.5);
+      ctx.lineTo(w, groundY + 0.5);
+      ctx.stroke();
+      ctx.globalAlpha = 0.55;
+      ctx.beginPath();
+      for (let x = -(h - groundY); x < w; x += 5) {
+        ctx.moveTo(x, h);
+        ctx.lineTo(x + (h - groundY), groundY);
+      }
+      ctx.stroke();
+      ctx.restore();
+      return;
+    }
     const ground = ctx.createLinearGradient(0, groundY, 0, h);
     ground.addColorStop(0, theme.ground);
     ground.addColorStop(1, theme.groundDeep);

@@ -166,7 +166,9 @@ export class Scene {
    * world's whole width, easing out only once crowns outgrow half its height (the home page); on
    * a ring the crowns are then drawn across the seam as well.
    */
-  frame: "trees" | "world" = "trees";
+  frame: "trees" | "world" | "tree" = "trees";
+  /** The tree the "tree" frame fits: one specimen and the ground beneath it (D3). */
+  focusTree = -1;
   /** CSS pixels kept free above the crowns when fitting. */
   headroom = HEADER_MARGIN;
   /**
@@ -264,7 +266,9 @@ export class Scene {
     let minX = Number.POSITIVE_INFINITY;
     let maxX = Number.NEGATIVE_INFINITY;
     let maxY = 0;
+    const only = this.frame === "tree" ? this.focusTree : -1;
     for (let j = 0; j < s.metamerCount; j++) {
+      if (only >= 0 && s.tree[j] !== only) continue;
       minX = Math.min(minX, g.baseX[j], g.tipX[j]);
       maxX = Math.max(maxX, g.baseX[j], g.tipX[j]);
       maxY = Math.max(maxY, g.baseY[j], g.tipY[j]);
@@ -319,6 +323,47 @@ export class Scene {
   wrapOffsets(): number[] {
     const s = this.next;
     return s?.periodic && this.frame === "world" ? [-s.width, 0, s.width] : [0];
+  }
+
+  /** Canvas pixels of a world point (the inverse of `screenToWorld`). */
+  worldToScreen(x: number, y: number): [number, number] {
+    return [
+      (x - this.camera.cx) * this.camera.scale + this.width / 2,
+      this.height / 2 - (y - this.camera.cy) * this.camera.scale,
+    ];
+  }
+
+  /**
+   * Each live tree's crown top and trunk base in canvas pixels, at the last drawn frame, for a
+   * host to pin labels to (D3). On a ring the copy nearest the middle of the view is used.
+   */
+  anchors(): { tree: number; x: number; y: number; baseX: number; baseY: number }[] {
+    const s = this.next;
+    if (!s) return [];
+    const g = this.geom;
+    const top = new Map<number, number>();
+    const root = new Map<number, number>();
+    for (let j = 0; j < s.metamerCount; j++) {
+      const t = s.tree[j] as number;
+      if (s.parent[j] < 0) root.set(t, j);
+      const k = top.get(t);
+      if (k === undefined || g.tipY[j] > g.tipY[k]) top.set(t, j);
+    }
+    const offsets = this.wrapOffsets();
+    const out: { tree: number; x: number; y: number; baseX: number; baseY: number }[] = [];
+    for (const [tree, j] of top) {
+      const r = root.get(tree) ?? j;
+      let best = offsets[0] as number;
+      for (const o of offsets) {
+        const [sx] = this.worldToScreen(g.baseX[r] + o, 0);
+        const [bx] = this.worldToScreen(g.baseX[r] + best, 0);
+        if (Math.abs(sx - this.width / 2) < Math.abs(bx - this.width / 2)) best = o;
+      }
+      const [x, y] = this.worldToScreen(g.tipX[j] + best, g.tipY[j]);
+      const [baseX, baseY] = this.worldToScreen(g.baseX[r] + best, g.baseY[r]);
+      out.push({ tree, x, y, baseX, baseY });
+    }
+    return out;
   }
 
   screenToWorld(px: number, py: number): [number, number] {

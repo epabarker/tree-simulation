@@ -56,6 +56,8 @@ export interface TreeMetrics {
   /** O2: buds lost to abrasion; O4: seeds made this season. */
   abraded: number;
   seeds: number;
+  /** Sown by a visitor on the page (World.plantTree, D3). */
+  sown: boolean;
   released: number;
   /** Of those, released from trunk wood at least 10 seasons old: epicormic shoots. */
   epicormic: number;
@@ -172,6 +174,7 @@ export function treeMetrics(tree: Tree, world?: World): TreeMetrics {
     starved: tree.starved,
     abraded: tree.abraded,
     seeds: tree.seeds,
+    sown: tree.sown,
     released: tree.released,
     epicormic: tree.epicormic,
     aborted: tree.aborted,

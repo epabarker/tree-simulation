@@ -90,6 +90,11 @@ export interface GardenOptions {
   interaction?: "none" | "fell" | "full";
   /** What the camera fits (Scene.frame). Default "world". */
   frame?: "trees" | "world";
+  /**
+   * "forest" (default): the frame above. "specimen": one tree, the tallest when chosen, kept
+   * while it lives (a page's plate, D3). Change it later with `setFocus`; the camera eases.
+   */
+  focus?: "forest" | "specimen";
   /** CSS pixels kept free above the crowns, e.g. for text over the sky. Default 0. */
   headroom?: number;
   /** Leave the sky out so the page shows through. */
@@ -155,6 +160,12 @@ export interface Garden {
   refreshObstacles(): void;
   /** The run's seed: shown as "forest #seed", and passed back as `seed` to regrow the same forest. */
   readonly seed: number;
+  /** Frames the whole forest, or one specimen (see `focus`); the camera eases to it. */
+  setFocus(focus: "forest" | "specimen"): void;
+  /** The tree a "specimen" focus frames, or -1. */
+  readonly focusTree: number;
+  /** Each live tree's crown top and trunk base in canvas pixels, for labels (Scene.anchors). */
+  anchors(): { tree: number; x: number; y: number; baseX: number; baseY: number }[];
   /** The latest metrics of a live tree, or undefined. */
   metrics(tree: number): TreeMetrics | undefined;
   /** Stops the worker, the frame loop and every listener; removes a canvas the garden made. */
@@ -217,7 +228,8 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
     maxDpr: options.maxDpr,
   });
   const { scene } = renderer;
-  scene.frame = options.frame ?? "world";
+  let focus = options.focus ?? "forest";
+  scene.frame = focus === "specimen" ? "tree" : (options.frame ?? "world");
   if (options.headroom !== undefined) scene.headroom = options.headroom;
   const rect = renderer.canvas.getBoundingClientRect();
   const params =
@@ -311,6 +323,7 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
 
   function accept(s: Snapshot, animate: boolean, fresh: boolean): void {
     renderer.setSnapshot(s);
+    if (focus === "specimen") chooseSpecimen(s);
     if (!animate) scene.clearHistory();
     if (autoFit) scene.fit(!animate);
     season = s.season;
@@ -523,6 +536,23 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
     };
   }
 
+  /** Keeps the framed specimen while it lives; otherwise frames the tallest tree. */
+  function chooseSpecimen(s: Snapshot): void {
+    if (s.metrics.some((m) => m.tree === scene.focusTree)) return;
+    let best = s.metrics[0];
+    for (const m of s.metrics) if (best && m.height > best.height) best = m;
+    scene.focusTree = best ? best.tree : -1;
+  }
+
+  function setFocus(next: "forest" | "specimen"): void {
+    focus = next;
+    scene.frame = next === "specimen" ? "tree" : (options.frame ?? "world");
+    if (next === "specimen" && scene.next) chooseSpecimen(scene.next);
+    autoFit = true;
+    scene.fit();
+    dirty = true;
+  }
+
   function fell(tree: number): void {
     void sim.removeTree(tree);
     if (!playback.playing) void step();
@@ -611,6 +641,11 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
       dirty = true;
     },
     seed: params.seed,
+    setFocus,
+    get focusTree() {
+      return scene.focusTree;
+    },
+    anchors: () => scene.anchors(),
     fell,
     plant,
     refreshObstacles: measureObstacles,

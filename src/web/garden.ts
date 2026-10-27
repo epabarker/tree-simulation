@@ -91,7 +91,8 @@ export interface GardenOptions {
   /** What the camera fits (Scene.frame). Default "world". */
   frame?: "trees" | "world";
   /**
-   * "forest" (default): the frame above. "specimen": one tree alone, the tallest when chosen, kept
+   * "forest" (default): the frame above. "specimen": one tree alone, the broadest crown among the
+   * taller trees when chosen, kept
    * while it lives, as a botanical plate draws one specimen (D3). Change it later with
    * `setFocus`; the camera eases.
    */
@@ -540,8 +541,14 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
   /** Keeps the framed specimen while it lives; otherwise frames the tallest tree. */
   function chooseSpecimen(s: Snapshot): void {
     if (!s.metrics.some((m) => m.tree === scene.focusTree)) {
-      let best = s.metrics[0];
-      for (const m of s.metrics) if (best && m.height > best.height) best = m;
+      // The broadest crown among the taller trees: the nearest a forest has to an open-grown
+      // specimen, which reads better on a plate than the tallest, slenderest tree.
+      const tallest = Math.max(0, ...s.metrics.map((m) => m.height));
+      let best: (typeof s.metrics)[number] | undefined;
+      for (const m of s.metrics) {
+        if (m.height < 0.5 * tallest) continue;
+        if (!best || m.crownWidth > best.crownWidth) best = m;
+      }
       scene.focusTree = best ? best.tree : -1;
     }
     scene.solo = scene.focusTree;

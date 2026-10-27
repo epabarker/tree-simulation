@@ -30,9 +30,30 @@ import type { World } from "./world.ts";
 const sample: LightSample = { q: 0, vx: 0, vy: 0 };
 const shoot = { length: 0 };
 
-export function runSeason(world: World): void {
+/** Phases reported to a `PhaseMark` timer, in the order they end within a season. */
+export const PHASES = [
+  "light",
+  "sample",
+  "allocate",
+  "grow",
+  "shed",
+  "girth",
+  "mechanics",
+  "commit",
+  "deaths",
+] as const;
+export type Phase = (typeof PHASES)[number];
+/**
+ * Called as each phase ends (per tree in Phase 2), for `npm run bench`. The core never reads a
+ * clock itself (it imports no DOM or Node API), so the caller times the gaps between calls.
+ */
+export type PhaseMark = (phase: Phase) => void;
+const noMark: PhaseMark = () => {};
+
+export function runSeason(world: World, mark: PhaseMark = noMark): void {
   const { params, light, season } = world;
-  const live = world.trees.filter((t) => t.alive);
+  const live: Tree[] = [];
+  for (const tree of world.trees) if (tree.alive) live.push(tree);
   const carbonShedding = params.r1.enabled && params.r1.shed === "carbon";
 
   // Phase 1: environment from the start-of-season snapshot (C2).
@@ -44,6 +65,7 @@ export function runSeason(world: World): void {
     for (const tree of live) depositBuds(world, tree);
   }
   light.compute(season);
+  mark("light");
 
   // Phase 2: per-tree passes, reading the environment only.
   for (const tree of live) {
@@ -58,22 +80,29 @@ export function runSeason(world: World): void {
     if ((params.c5.enabled || carbonShedding) && params.c5.Trel > 0) {
       tree.qTop = crownTopLight(tree, params.c5.topQuantile); // C5 relative threshold
     }
+    mark("sample");
     gatherLight(tree, params.r6); // C3 basipetal: Q_sum, n_b (short shoots by leaf area, R6)
     if (params.r1.enabled) carbonBalance(tree, params); // R1 CARBON: v_base = net production
     allocate(tree, params); // C3 acropetal: v at every bud
+    mark("allocate");
     const evaluated = tree.m.length; // rows that took part in this season's passes
     growBuds(world, tree, season); // C1 bud fate, GROW (C4 direction)
+    mark("grow");
     if (params.c5.enabled || carbonShedding) {
       tree.shedCount = shedBranches(tree, params, season, evaluated); // C5, or R1 by carbon
     }
+    mark("shed");
     if (params.r3.enabled) {
       tree.ensureScratch(); // growth may have outgrown the scratch arrays
       tree.prevRadius.set(tree.m.cols.radius.subarray(0, tree.m.length)); // R3: Δr/r for posture
     }
     if (params.c6.enabled) updateGirth(tree, params); // C6, after shedding so scars count
+    mark("girth");
     if (params.r3.enabled) updateMechanics(tree, params); // R3 MECHANICS: girth first (§6 rule 2)
+    mark("mechanics");
     commitBuds(tree);
     tree.age += 1;
+    mark("commit");
   }
 
   // Phase 3: deaths last (§6), so a dead tree's shade is gone next season; then O4 recruitment.
@@ -85,6 +114,7 @@ export function runSeason(world: World): void {
   for (const tree of live) if (starvedToDeath(tree, params.r1)) tree.alive = false;
   for (const tree of live) tree.seeds = 0;
   if (params.o4.enabled) world.recruits = standDynamics(world); // O4: background deaths, seeds
+  mark("deaths");
 }
 
 function depositBuds(world: World, tree: Tree): void {

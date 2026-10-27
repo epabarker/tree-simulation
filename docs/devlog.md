@@ -2,6 +2,51 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-27: M13, a benchmark and golden-safe speed-ups
+
+- **Benchmark** (`npm run bench`, `cli/bench.ts`):
+  - It runs six cases as the worker does (a season, then a snapshot) for 100 seasons, best of 3.
+  - It reports ms by phase and stores each case's final hash, so `--compare` shows whether a change kept behaviour bit-identical.
+  - `runSeason` takes an optional `PhaseMark`. `--snapshot lean` measures snapshots as the home page will ask for them.
+- **Speed-ups**, all bit-identical:
+  - The sky sweep stops at the highest leafy row, skips `exp` at zero depth, stops periodic laps at their fixed point, and wraps columns without modulo.
+  - Junction exponents use Newton's method instead of 60-step bisection.
+  - Snapshot options (`setSnapshotOptions`), and `snapshotMs` counted in the HUD.
+  - Tables cache their column list and reuse their compaction map; `crownTopLight` sorts a typed scratch array.
+- **Results** ([note](experiments/2026-10-27-m13-perf.md)):
+  - Rings: 12.4 → 3.8 ms a season (light 10.2 → 2.7).
+  - Double-width ring: 19.0 → 7.2 ms. Conifer stand: 8.5 → 5.2 ms.
+  - A lean snapshot costs 0.1–0.3 ms.
+- **Surprises:**
+  - The quoted 25–40 ms for the rings included metrics and CSV; the season itself took 12.4 ms.
+  - The 15° periodic sweep reaches an exact fixed point after 5 of its 8 laps.
+  - Several hot spots predicted from reading the code (`isRemoved`, O4's seed check, `tipX`) did not show in the profile, so they were left alone.
+  - A stale-row mutant in the new sweep failed only 1 of 26 goldens. A unit test now covers it.
+- **Tests:** a reused sweep forgets a taller season (open and periodic); Newton recovers known Δ with two and three children. 162 tests.
+- **Goldens:** unchanged.
+- **Seen** in headless Firefox: `skyStand` autoplays to season 41 with charts, the Δ histogram peaks at 2, and the console shows no errors.
+
+## 2026-10-27: M12, the review and a plan beyond the build order
+
+- **Scope.**
+  - The user took this planning session as M12, aimed at three goals: performance, realism and a home page for edbarker.dev.
+  - Three read-only surveys covered:
+    - the hot paths (season loop, light, worker, renderer);
+    - realism (spec, ADRs, experiments, known issues);
+    - the page and its deployment.
+  - The line-by-line audit of correctness and test strength that the old M12 row asked for is folded into M13 and M19. [Review](reviews/2026-10-27-m12-review.md).
+- **Decisions (user):**
+  - The simulation *is* the home page.
+  - The site is the private Astro repo `epabarker/edbarker-dev` on Cloudflare, and it receives the garden as a versioned GitHub Release that it vendors (ADR 0014).
+  - Realism means botanical form, motion and physics, and seasons, all still in 2D.
+  - The home world is a mixed forest with succession, which needs species per tree (ADR 0015, at M19).
+- **Roadmap:** M13–M21 added. "Later" items folded in: species onto R1–R5, oak, willow, beech, ground contact, far-red, embedding.
+- **Surprises** from reading the hot paths:
+  - Periodic sides cost ≈ 27 grid sweeps a season, not 7.
+  - `junctionExponents` runs 60 bisection steps per junction for every snapshot, even with the charts closed.
+  - The worker sits idle while the page tweens.
+- No code changed, so the goldens are unchanged.
+
 ## 2026-10-27: M11, a forest without edges
 
 - **Merged** the M10 PR (epabarker/tree-simulation#4) at the user's request.

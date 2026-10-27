@@ -171,6 +171,25 @@ describe("C2 sky sweep with periodic sides (M11, ADR 0013)", () => {
     expect(open.q[5 * W]).toBeGreaterThan((qs[0] as number) + 0.05);
   });
 
+  it("forgets a taller season: the field depends only on this season's foliage (M13 row bound)", () => {
+    for (const periodic of [false, true]) {
+      const reused = new SkySweep(24, 40, base, periodic);
+      const fresh = new SkySweep(24, 40, base, periodic);
+      // Season 1: foliage up to row 35, so the sweep writes depth that high.
+      for (let row = 10; row < 36; row++) reused.deposit(12.5, row + 0.5, 2);
+      reused.compute(0);
+      // Season 2: only low foliage. The stale depth above must not leak into the field.
+      reused.clear();
+      for (const f of [reused, fresh]) {
+        for (let col = 8; col < 16; col++) f.deposit(col + 0.5, 6.5, 2);
+        f.compute(1);
+      }
+      expect(Array.from(reused.q)).toEqual(Array.from(fresh.q));
+      expect(Array.from(reused.vx)).toEqual(Array.from(fresh.vx));
+      expect(Array.from(reused.field())).toEqual(Array.from(fresh.field()));
+    }
+  });
+
   it("wraps samples and deposits beyond the sides", () => {
     const g = ring(10, 10);
     g.deposit(12.5, 5.5, 3); // lands in column 2

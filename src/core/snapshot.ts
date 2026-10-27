@@ -45,15 +45,28 @@ export interface Snapshot {
   budMetamer: I32;
   budState: U8;
   budQ: F32;
-  /** Shadow per cell (row-major, row 0 at the ground), or null when C2 is off. */
+  /** Shadow per cell (row-major, row 0 at the ground), or null when C2 is off or not asked for. */
   shadow: F32 | null;
   walls: Wall[];
-  /** Leonardo exponent Δ at every junction of every live tree (C6 on), for the histogram. */
+  /** Leonardo exponent Δ at every junction of every live tree (C6 on and asked for), for the histogram. */
   junctions: F32;
   metrics: TreeMetrics[];
   /** Milliseconds the worker spent on the season(s) behind this snapshot. */
   seasonMs: number;
+  /** Milliseconds the worker spent building this snapshot (set by the worker; 0 here). */
+  snapshotMs: number;
 }
+
+/**
+ * Optional parts of a snapshot, both for the lab: the junction exponents (Δ histogram chart) and
+ * the light field (shade overlay). The home page asks for neither.
+ */
+export interface SnapshotOptions {
+  junctions: boolean;
+  field: boolean;
+}
+
+export const FULL_SNAPSHOT: SnapshotOptions = { junctions: true, field: true };
 
 export function transferables(s: Snapshot): ArrayBuffer[] {
   const arrays = [
@@ -89,8 +102,12 @@ export class SnapshotBuilder {
     this.prevBirth = new Int32Array(0);
   }
 
-  build(world: World, seasonMs: number): Snapshot {
+  build(world: World, seasonMs: number, options: SnapshotOptions = FULL_SNAPSHOT): Snapshot {
     const live = world.trees.filter((t) => t.alive);
+    const junctions: number[] = [];
+    if (options.junctions && world.params.c6.enabled) {
+      for (const t of live) junctionExponents(t, junctions);
+    }
     let nm = 0;
     let nb = 0;
     for (const t of live) {
@@ -122,11 +139,10 @@ export class SnapshotBuilder {
       budQ: new Float32Array(nb),
       shadow: null,
       walls: world.params.c2.enabled ? world.params.world.walls : [],
-      junctions: new Float32Array(
-        world.params.c6.enabled ? live.flatMap((t) => junctionExponents(t)) : [],
-      ),
+      junctions: new Float32Array(junctions),
       metrics: live.map((t) => treeMetrics(t, world)),
       seasonMs,
+      snapshotMs: 0,
     };
 
     let offset = 0;
@@ -162,8 +178,8 @@ export class SnapshotBuilder {
     }
     s.budCount = k;
 
-    const field = world.light.field();
-    if (field) s.shadow = Float32Array.from(field);
+    const field = options.field ? world.light.field() : null;
+    if (field) s.shadow = new Float32Array(field);
 
     this.linkPrevious(s);
     return s;

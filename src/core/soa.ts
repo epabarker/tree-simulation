@@ -24,6 +24,9 @@ export class Table<S extends Schema> {
   capacity: number;
   readonly cols: Columns<S>;
   private readonly schema: S;
+  /** The columns as a list, rebuilt whenever `grow` replaces them (`add` runs per new row). */
+  private list: AnyColumn[];
+  private map: I32 = new Int32Array(0);
 
   constructor(schema: S, capacity = 64) {
     this.schema = schema;
@@ -34,13 +37,14 @@ export class Table<S extends Schema> {
       cols[name] = new Ctor(this.capacity);
     }
     this.cols = cols as Columns<S>;
+    this.list = Object.values(cols);
   }
 
   /** Appends a zeroed row and returns its index. Re-read `cols` columns after calling: they may be reallocated. */
   add(): number {
     if (this.length === this.capacity) this.grow(this.capacity * 2);
     const i = this.length++;
-    for (const col of Object.values(this.cols) as AnyColumn[]) col[i] = 0;
+    for (const col of this.list) col[i] = 0;
     return i;
   }
 
@@ -53,20 +57,23 @@ export class Table<S extends Schema> {
       next.set(cols[name] as never);
       cols[name] = next;
     }
+    this.list = Object.values(cols);
     this.capacity = capacity;
   }
 
   /**
    * Removes rows whose `keep` flag is 0, keeping the order of the others.
-   * Returns old index → new index (-1 for removed rows), for remapping references.
+   * Returns old index → new index (-1 for removed rows), for remapping references. The map is
+   * scratch: it is overwritten by the next `compact` of this table.
    */
   compact(keep: Uint8Array): I32 {
     const n = this.length;
-    const oldToNew = new Int32Array(n);
+    if (this.map.length < n) this.map = new Int32Array(Math.max(n, 2 * this.map.length));
+    const oldToNew = this.map.subarray(0, n);
     let j = 0;
     for (let i = 0; i < n; i++) oldToNew[i] = keep[i] ? j++ : -1;
     if (j === n) return oldToNew;
-    for (const col of Object.values(this.cols) as AnyColumn[]) {
+    for (const col of this.list) {
       for (let i = 0; i < n; i++) {
         const t = oldToNew[i];
         if (t >= 0) col[t] = col[i];

@@ -4,7 +4,7 @@
  */
 
 import type { Params, ParamsPatch } from "../core/params.ts";
-import type { Snapshot } from "../core/snapshot.ts";
+import type { Snapshot, SnapshotOptions } from "../core/snapshot.ts";
 import type { RunRecord } from "../core/world.ts";
 
 export interface SimApi {
@@ -12,6 +12,8 @@ export interface SimApi {
   init(params: Params): Snapshot;
   /** Runs `seasons` seasons and returns the snapshot after the last one. */
   step(seasons: number): Snapshot;
+  /** Which optional parts later snapshots carry (default: all, as the lab needs). */
+  setSnapshotOptions(options: SnapshotOptions): void;
   /** Queues a parameter change for the next season boundary. */
   setParams(patch: ParamsPatch): void;
   /** Queues the removal of a tree for the next season boundary. */

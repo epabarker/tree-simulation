@@ -19,7 +19,8 @@
     "test": "vitest run",
     "check": "npm run lint && npm run typecheck && npm run test",
     "sim": "node cli/run.ts",
-    "golden:update": "node tests/update-golden.ts"
+    "golden:update": "node tests/update-golden.ts",
+    "bench": "node cli/bench.ts"
   },
   "dependencies": {
     "@observablehq/plot": "^0.6.17",

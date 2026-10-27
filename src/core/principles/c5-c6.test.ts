@@ -40,6 +40,24 @@ describe("C6 pipe girth with memory (§C6)", () => {
     expect(junctionExponents(t)).toEqual([expect.closeTo(params.c6.n, 6)]);
   });
 
+  it("solves the Leonardo exponent at junctions with two and three children", () => {
+    // Children with radii x_i (parent radius 1) chosen so that Σ x_i^Δ = 1 at a known Δ.
+    for (const [delta, xs] of [
+      [2.5, [0.6]],
+      [1.8, [0.5, 0.3]],
+      [3.2, [0.7]],
+    ] as const) {
+      const rest = 1 - xs.reduce((sum, x) => sum + x ** delta, 0);
+      const t = new Tree(0, 10);
+      const root = addMetamer(t, -1, Slot.main, UP, 1, 1, 0);
+      const radii = [...xs, rest ** (1 / delta)];
+      radii.forEach((r, k) => {
+        addMetamer(t, root, [Slot.main, Slot.left, Slot.right][k] as Slot, UP, 1, r, 0);
+      });
+      expect(junctionExponents(t)).toEqual([expect.closeTo(delta, 10)]);
+    }
+  });
+
   it("never decreases a radius (memory)", () => {
     const t = smallTree();
     t.m.cols.radius[0] = 1;

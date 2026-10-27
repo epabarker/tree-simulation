@@ -8,7 +8,7 @@ import { ShadowTriangle } from "./light/shadow-triangle.ts";
 import { SkySweep } from "./light/sky-sweep.ts";
 import { clone, mergeParams, type Params, type ParamsPatch } from "./params.ts";
 import { plantSeedling } from "./principles/c1-buds.ts";
-import { runSeason } from "./season.ts";
+import { type PhaseMark, runSeason } from "./season.ts";
 import { Tree } from "./tree.ts";
 
 /** A change applied at the start of `season` (before that season runs). */
@@ -71,12 +71,12 @@ export class World {
     this.pending.push({ season: this.season, type: "removeTree", tree });
   }
 
-  /** Applies queued events, plants due seedlings and runs one season. */
-  step(): void {
+  /** Applies queued events, plants due seedlings and runs one season (`mark`: phase timer). */
+  step(mark?: PhaseMark): void {
     for (const event of this.pending) this.apply({ ...event, season: this.season });
     this.pending = [];
     this.plantDue();
-    runSeason(this);
+    runSeason(this, mark);
     this.season += 1;
   }
 

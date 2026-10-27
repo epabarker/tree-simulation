@@ -2,7 +2,7 @@
 
 _Last updated: 2026-10-27_
 
-**Current milestone: M15** (renderer and phone performance): the code is done on branch `claude/m15-render` (not pushed); a real-phone measurement remains. M0–M14 are done: M14 was merged in PR #7 and released as [garden-v0.1.0](https://github.com/epabarker/tree-simulation/releases/tag/garden-v0.1.0). **edbarker.dev is live** with the garden behind the home page, a CV page and the lab at `/lab/` (epabarker/edbarker-dev `main`, 2026-10-27; content from the user's website brief, with `TODO(Ed)` comments for unconfirmed items). Tracks from the [M12 review](reviews/2026-10-27-m12-review.md): A performance, B realism, C the home page (ROADMAP M13–M21).
+**Current milestone: M16** (motion: wind sway, falling branches, toppling trees). M15 is merged (PR #8), released as garden-v0.2.0 and live on edbarker.dev; on the user's phone a 10k-metamer stand runs at 60 fps (frame p95 16.8 ms). M0–M14 are done: M14 was merged in PR #7 and released as [garden-v0.1.0](https://github.com/epabarker/tree-simulation/releases/tag/garden-v0.1.0). **edbarker.dev is live** with the garden behind the home page, a CV page and the lab at `/lab/` (epabarker/edbarker-dev `main`, 2026-10-27; content from the user's website brief, with `TODO(Ed)` comments for unconfirmed items). Tracks from the [M12 review](reviews/2026-10-27-m12-review.md): A performance, B realism, C the home page (ROADMAP M13–M21).
 
 ## Works
 - **Core:** C1–C6, R1–R6, O2 and O4 (ADRs 0005–0013); the sky sweep with open or periodic sides; golden hashes. `World.discardDead` for long page runs.
@@ -17,11 +17,7 @@ _Last updated: 2026-10-27_
 
 ## Next
 1. **The user:** look at edbarker.dev on a real phone (the intro fills much of a phone screen; M21 art direction), and settle the site's `TODO(Ed)` items in `src/data/cv.ts`.
-2. **M15 close-out, on the user's go-ahead:**
-   - Push `claude/m15-render`, open a PR and merge.
-   - Release `garden-v0.2.0`, then sync it into edbarker-dev.
-   - The user opens `edbarker.dev/lab/?bench&preset=coniferStand&seasons=80` on a phone; record frame p95 and the quality level in the [M15 note](experiments/2026-10-27-m15-render.md).
-3. **M16** motion: wind sway, falling branches, toppling trees (which also cover the season of latency pipelining adds to a tap). Then **M17** seasons and **M18–M21**.
+2. **M16** motion: wind sway, falling branches, toppling trees (which also cover the season of latency pipelining adds to a tap). Then **M17** seasons and **M18–M21**.
 
 ## Open questions (ask when the milestone comes up)
 - ADR 0015, species per tree (M19). Amendments to ADR 0011 and §O2 (M16), and to ADR 0005 (M18). Art direction (M21).

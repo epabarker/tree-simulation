@@ -24,8 +24,8 @@ How the code realises the spec. For *why* a choice was made, see `docs/decisions
 `mountGarden(host, options)` (`src/web/garden.ts`) is the whole living view: worker, renderer, pull loop, input, and the resize, visibility and theme observers. It returns a `Garden` with `view`, `playback`, `stats`, `ready`, `restart`, `step`, `setPlaying`, `setParams`, `record`, `fit`, `redraw` and `destroy`. Two hosts use it:
 - **The lab** (`main.ts`, `index.html`): a garden with `interaction: "full"`, `frame: "trees"`, a fixed speed, full snapshots, and the panel, charts and HUD around it.
 - **A home page** (`garden.html` here; edbarker.dev in production): the defaults.
-  - **World:** `forestParams` puts the `forest` preset on a ring whose width follows the host's aspect (90–320 cells, a tree every ≈ 21 cells), with a random seed per visit.
-  - **Pace:** a 40-season intro at 4 seasons/s, then 0.5 seasons/s, with tweens up to 2.5 s.
+  - **World:** `forestParams` puts the `forest` preset on a ring whose width follows the host's aspect (54–320 cells, a tree every ≈ 21 cells; a portrait phone gets two or three large trees), with a random seed per visit.
+  - **Pace:** a 40-season intro at 4 seasons/s that slows geometrically to 0.5 seasons/s over its last 12 seasons. While playing, each season's tween is linear and fills its whole interval, so growth never stops between seasons (D1); a single step eases.
   - **Interaction:** tap to fell only. There is no pan, zoom or scroll capture (`touch-action: manipulation`).
   - **Snapshots:** lean (no junctions, no field).
   - **Reduced motion:** the forest as it stands after the intro, still.

@@ -26,6 +26,9 @@ Newest first. One entry per session or milestone: what changed, why, surprises, 
   - A real phone measurement, which needs a garden release.
   - The GPU-side tween, which isn't needed unless the phone says otherwise.
 - **Goldens:** unchanged (168 tests).
+- **Closed** (user's go-ahead):
+  - PR #8 merged; `garden-v0.2.0` released, synced into edbarker-dev and live.
+  - On the user's phone the 10k-metamer `coniferStand` bench ran at frame p95 16.8 ms (60 fps), with the worker at 18.15 ms a season.
 
 ## 2026-10-27: M14, the garden and a home page
 

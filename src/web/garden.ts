@@ -137,6 +137,8 @@ export interface Garden {
 }
 
 const DEFAULT_PACE: Pace = { intro: 4, introSeasons: 40, ambient: 0.5 };
+/** The intro slows to the ambient pace over its last this many seasons. */
+const SLOWDOWN = 12;
 /** Rows of sky above the forest's ground in its preset (130): the ring's width follows the host. */
 const WORLD_HEIGHT = 130;
 
@@ -146,7 +148,8 @@ const WORLD_HEIGHT = 130;
  */
 export function forestParams(width = 210, seed?: number): Params {
   const base = presetParams("forest", seed);
-  const W = Math.round(Math.min(320, Math.max(90, width)));
+  // A phone in portrait gets a narrow ring of two or three trees, drawn large (D1).
+  const W = Math.round(Math.min(320, Math.max(54, width)));
   const n = Math.max(2, Math.round(W / 21));
   const trees = Array.from({ length: n }, (_, k) => ({ x: ((k + 0.5) * W) / n }));
   return mergeParams(base, { world: { ...base.world, width: W }, trees });
@@ -249,6 +252,8 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
   let onScreen = true;
   let tweenStart = 0;
   let tweenMs = 1;
+  /** The current tween is one of a playing run: linear in time rather than eased. */
+  let continuous = false;
   let lastStep = 0;
   let generation = 0;
   let season = 0;
@@ -258,8 +263,18 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
   /** Keep refitting the view as the trees grow, until the user pans or zooms. */
   let autoFit = true;
 
-  const speed = (): number =>
-    pace ? (season < pace.introSeasons ? pace.intro : pace.ambient) : playback.speed;
+  /**
+   * Seasons per second. With a pace, the intro runs at `intro` and then slows geometrically to
+   * `ambient` over its last SLOWDOWN seasons, so the forest settles rather than stops short (D1).
+   */
+  const speed = (): number => {
+    if (!pace) return playback.speed;
+    const from = pace.introSeasons - SLOWDOWN;
+    if (season < from) return pace.intro;
+    if (season >= pace.introSeasons) return pace.ambient;
+    const f = (season - from) / SLOWDOWN;
+    return pace.intro * (pace.ambient / pace.intro) ** f;
+  };
 
   function accept(s: Snapshot, animate: boolean, fresh: boolean): void {
     renderer.setSnapshot(s);
@@ -272,7 +287,11 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
     if (options.bench && !fresh) samples.worker.push(stats.workerMs);
     options.onSnapshot?.(s, fresh);
     tweenStart = performance.now();
-    tweenMs = animate ? Math.min(maxTweenMs, (1000 / speed()) * 0.85) : 1;
+    // While playing, each season's tween fills its whole interval and runs at constant speed, so
+    // one season hands straight on to the next and growth never stops (D1); a single step eases.
+    continuous = animate && playback.playing;
+    const interval = 1000 / speed();
+    tweenMs = animate ? Math.min(maxTweenMs, continuous ? interval : interval * 0.85) : 1;
     dirty = true;
   }
 
@@ -375,7 +394,7 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
     const t = Math.min(1, (now - tweenStart) / tweenMs);
     if (dirty || t < 1) {
       const t0 = performance.now();
-      renderer.draw(t * t * (3 - 2 * t), view);
+      renderer.draw(continuous ? t : t * t * (3 - 2 * t), view);
       const ms = performance.now() - t0;
       // Smoothed CPU cost of a draw, and frame rate while drawing every frame.
       stats.drawMs += (ms - stats.drawMs) * 0.1;

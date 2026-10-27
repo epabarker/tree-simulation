@@ -22,7 +22,7 @@ interface FieldSpec {
 }
 
 interface SectionSpec {
-  section: "c1" | "c2" | "c3" | "c4" | "c5" | "c6" | "r2" | "r6";
+  section: "c1" | "c2" | "c3" | "c4" | "c5" | "c6" | "r1" | "r2" | "r6";
   title: string;
   /** Adds an on/off checkbox bound to the section's `enabled` flag. */
   toggle?: boolean;
@@ -105,6 +105,24 @@ const SECTIONS: SectionSpec[] = [
     fields: [
       { key: "n", label: "n pipe exponent", min: 1.5, max: 3.5, step: 0.05 },
       { key: "r0", label: "r0 tip radius", min: 0.005, max: 0.3, step: 0.005 },
+    ],
+  },
+  {
+    section: "r1",
+    title: "R1 Carbon balance",
+    toggle: true,
+    fields: [
+      { key: "mw", label: "m_w sapwood cost", min: 0, max: 5, step: 0.05 },
+      { key: "mf", label: "m_f foliage cost", min: 0, max: 0.4, step: 0.005 },
+      { key: "Lh", label: "L_h path length (0 = off)", min: 0, max: 200, step: 5 },
+      { key: "fRep", label: "f_rep reproduction", min: 0, max: 0.9, step: 0.05 },
+      { key: "maturity", label: "maturity height", min: 0, max: 150, step: 5 },
+      { key: "kStarve", label: "k_starve seasons", min: 1, max: 10, step: 1 },
+      {
+        key: "shed",
+        label: "branch shedding",
+        options: { "carbon or relative (R1)": "carbon", "C5 light rule": "c5" },
+      },
     ],
   },
   {

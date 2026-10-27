@@ -41,6 +41,13 @@ export interface TreeMetrics {
    * stand's floor gets ≈ 2–10%, §10). NaN without a world.
    */
   groundLight: number;
+  /** R1 (ADR 0010): production P, sapwood maintenance M, reserve, lifetime reproduction, and
+   * seasons in a row with an empty reserve. Zero with R1 off. */
+  production: number;
+  maintenance: number;
+  reserve: number;
+  reproduction: number;
+  starved: number;
 }
 
 export const METRIC_COLUMNS: readonly (keyof TreeMetrics)[] = [
@@ -62,6 +69,11 @@ export const METRIC_COLUMNS: readonly (keyof TreeMetrics)[] = [
   "slenderness",
   "shed",
   "groundLight",
+  "production",
+  "maintenance",
+  "reserve",
+  "reproduction",
+  "starved",
 ];
 
 const ground: LightSample = { q: 0, vx: 0, vy: 0 };
@@ -128,5 +140,10 @@ export function treeMetrics(tree: Tree, world?: World): TreeMetrics {
     slenderness: nm > 0 && c.radius[0] > 0 ? height / (2 * c.radius[0]) : 0,
     shed: tree.shedCount,
     groundLight: world && nm > 0 ? groundLight(world, minX, maxX) : Number.NaN,
+    production: tree.production,
+    maintenance: tree.maintenance,
+    reserve: tree.reserve,
+    reproduction: tree.reproduction,
+    starved: tree.starved,
   };
 }

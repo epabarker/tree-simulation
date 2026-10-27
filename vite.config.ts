@@ -8,5 +8,7 @@ export default defineConfig({
   test: {
     include: ["src/**/*.test.ts", "tests/**/*.test.ts"],
     environment: "node",
+    // Visible-test checks grow several 5-seed stands inside one test; 5 s is too tight under load.
+    testTimeout: 30_000,
   },
 });

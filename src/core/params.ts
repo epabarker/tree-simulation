@@ -150,6 +150,35 @@ export interface Params {
   };
 
   /**
+   * R1 Carbon balance with the cost of size (spec §R1, ADR 0010). Off = baseline: v_base = α·Q_base.
+   * On: production P = α·Σ w·Q·exp(−L_path/L_h) minus sapwood maintenance M = m_w·Σ π r_live² l;
+   * a reserve buffers deficits and a tree whose reserve stays empty for k_starve seasons dies.
+   */
+  r1: {
+    enabled: boolean;
+    /** m_w: maintenance per unit of sapwood volume per season (calibrate). */
+    mw: number;
+    /** m_f: foliage maintenance per unit of leaf area per season; Q_c = m_f/α is the compensation light. */
+    mf: number;
+    /** L_h: hydraulic path-length scale in cells; 0 switches the path-length cause off. */
+    Lh: number;
+    /** s_r: share of a surplus put into the reserve. */
+    sr: number;
+    /** f_rep: share of a surplus going to reproduction once the tree is mature; 0 = off. */
+    fRep: number;
+    /** Maturity: the height (cells) from which the reproductive sink runs (size, never age). */
+    maturity: number;
+    /** k_starve: seasons with an empty reserve before the tree dies. */
+    kStarve: number;
+    /** The seed's reserve, in resource units. */
+    reserve0: number;
+    /** The reserve holds at most this many seasons of maintenance (stores are kept, not hoarded). */
+    store: number;
+    /** Branch shedding: 'c5' keeps C5's light rule; 'carbon' sheds branches whose P_b < M_b. */
+    shed: "c5" | "carbon";
+  };
+
+  /**
    * R2 Physiological age (spec §R2, ADR 0009). pa = min(branching order, levels − 1); each level
    * overrides λ, A_set, η and β for its axes and sets their lateral generator and p_term.
    * Off = baseline: one level taken from c1, c3 and c4.
@@ -222,6 +251,21 @@ export const defaultParams: Params = {
   c4: { enabled: false, wd: 1, xi: 0.3, eta: 0.15, setPoint: 0, epsilon: 0.5, sigma: 20 },
   c5: { enabled: false, T: 0.1, g: 3, Trel: 0, topQuantile: 0.9 }, // T, Trel: calibrate
   c6: { enabled: false, n: 2, r0: 0.02 },
+  // M8 calibration (docs/experiments/2026-10-27-m8-carbon.md). With R1 on, the sky presets
+  // also raise c3.alpha to 3, since costs and the L_h discount take ≈ 40% of the resource.
+  r1: {
+    enabled: false,
+    mw: 1, // stem maintenance ≈ 5–13% of production (Ryan et al. 1995)
+    mf: 0.06, // Q_c = m_f/α ≈ 0.02–0.03 of open sky
+    Lh: 60, // the plateau cause: stand trees level off at ≈ 78 cells
+    sr: 0.1,
+    fRep: 0, // the alternative plateau cause, off
+    maturity: 70,
+    kStarve: 3,
+    reserve0: 2,
+    store: 2,
+    shed: "carbon",
+  },
   r2: { enabled: false, levels: [], aC: 0, dLambda: 0, ramp: 1 },
   r6: { enabled: false, qMin: 0.2, leafArea: 1 }, // calibrate (M6d)
 };

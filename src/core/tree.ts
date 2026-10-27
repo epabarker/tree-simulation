@@ -111,6 +111,20 @@ export class Tree {
   /** The `c5.topQuantile` quantile of live-bud Q this season: light at the crown top (C5, ADR 0007). */
   qTop = 0;
 
+  // R1 carbon balance (ADR 0010): this season's totals, and state carried between seasons.
+  /** Production P and sapwood maintenance M this season. */
+  production = 0;
+  maintenance = 0;
+  /** Carbon reserve; seasons in a row it has been empty; reproduction summed over the tree's life. */
+  reserve = 0;
+  starved = 0;
+  reproduction = 0;
+  /** Per metamer (scratch, by this season's row index): P_b and M_b of the subtree (R1 shedding). */
+  pSum = new Float64Array(0);
+  mSum = new Float64Array(0);
+  /** Path length from the base to each metamer's tip (R1, L_path). */
+  pathLen = new Float64Array(0);
+
   constructor(id: number, rootX: number) {
     this.id = id;
     this.rootX = rootX;
@@ -122,6 +136,9 @@ export class Tree {
     this.vSlot = ensureFloat64(this.vSlot, 3 * n);
     this.scratchF = ensureFloat64(this.scratchF, n);
     this.scratchU = ensureUint8(this.scratchU, Math.max(n, this.b.capacity));
+    this.pSum = ensureFloat64(this.pSum, n);
+    this.mSum = ensureFloat64(this.mSum, n);
+    this.pathLen = ensureFloat64(this.pathLen, n);
   }
 
   tipX(i: number): number {

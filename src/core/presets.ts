@@ -33,13 +33,32 @@ const STAND = {
  * relative shedding (ADR 0007: a shade-tolerance floor T = 0.03 and T_rel = 0.12, so canopy trees
  * prune as at T = 0.1 while overtopped trees keep deeper crowns) and short shoots (ADR 0006:
  * Q_ss = 0.1, a_ss = 2, about half the leaf area on short shoots). Calibrated in
- * docs/experiments/2026-10-27-m6d-shedding-short-shoots.md.
+ * docs/experiments/2026-10-27-m6d-shedding-short-shoots.md. From M8 they also carry R1's carbon
+ * balance (ADR 0010), with α = 3 so that net production keeps young trees as vigorous as before.
  */
 const SKY = {
   ...STAND,
   c2: { enabled: true, model: "sky" },
+  c3: { mode: "bh", lambda: 0.5, alpha: 3 },
   c5: { enabled: true, T: 0.03, Trel: 0.12 },
+  r1: { enabled: true },
   r6: { enabled: true, qMin: 0.1, leafArea: 2 },
+} satisfies ParamsPatch;
+
+/**
+ * The sky presets before R1 (M6–M7): resource α·Q_base with no costs. Tests of those milestones
+ * pin it, so their evidence still holds with R1 on in the presets.
+ */
+export const PRE_R1 = { c3: { alpha: 2 }, r1: { enabled: false } } satisfies ParamsPatch;
+
+/**
+ * The species keep the M7 resource scale and no carbon balance: under R1 their strong leaders
+ * still reach the world's top or grow far too slender (M8 note), so they need their own R1
+ * calibration (ROADMAP follow-up).
+ */
+const SPECIES_PRE_R1 = {
+  c3: { mode: "bh", lambda: 0.5, alpha: 2 },
+  r1: { enabled: false },
 } satisfies ParamsPatch;
 
 /** One R2 table row (ADR 0009); unspecified fields take baseline values. */
@@ -61,6 +80,7 @@ const level = (row: Partial<PaLevel>): PaLevel => ({
  */
 const CONIFER = {
   ...SKY,
+  ...SPECIES_PRE_R1,
   c2: { enabled: true, model: "sky", kExt: 0.6 },
   c5: { enabled: true, T: 0.02, Trel: 0.12 },
   // Whorls carry few tips, so the pipe model gives a thin trunk; a thicker tip radius brings
@@ -80,6 +100,7 @@ const CONIFER = {
 
 const BIRCH = {
   ...SKY,
+  ...SPECIES_PRE_R1,
   c2: { enabled: true, model: "sky", kExt: 0.35 },
   c5: { enabled: true, T: 0.08, Trel: 0.2 },
   r2: {
@@ -99,6 +120,7 @@ const BIRCH = {
 
 const TROPICAL = {
   ...SKY,
+  ...SPECIES_PRE_R1,
   c2: { enabled: true, model: "sky", kExt: 0.6 },
   r2: {
     enabled: true,

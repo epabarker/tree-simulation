@@ -2,19 +2,19 @@
 
 _Last updated: 2026-10-27_
 
-**Current milestone: M8** (R1 carbon balance), to confirm with the user. M0–M7 and per-species leaf styles are done; they sit on PR epabarker/tree-simulation#1 (branch `claude/busy-euler-qvbifp`). Repo: https://github.com/epabarker/tree-simulation.
+**Current milestone: M9** (R3 mechanics). M0–M8 are done; M8 is on branch `claude/busy-euler-qvbifp` (a new PR after epabarker/tree-simulation#1 merged). Repo: https://github.com/epabarker/tree-simulation.
 
 ## Works
-- Core: C1–C6, R2 (physiological age, ADR 0009), R6 and two light models — the Beer–Lambert sky sweep (default, ADR 0005; optional `c2.rotate`) and the shadow triangle (pinned in the M1–M5 presets); multi-tree stands; the §6 season loop; golden hashes.
+- Core: C1–C6, R1 (carbon balance, ADR 0010), R2 (physiological age, ADR 0009), R6 and two light models — the Beer–Lambert sky sweep (default, ADR 0005; optional `c2.rotate`) and the shadow triangle (pinned in the M1–M5 presets); multi-tree stands; the §6 season loop; golden hashes.
 - Species presets (M7): `conifer`/`coniferStand` (fir-like, Massart), `birch`/`birchStand` (pioneer), `tropical` (Terminalia-like, Aubréville); 160-cell worlds.
 - Page: per-species leaf styles (needle, small, large; View → leaf style); WebGL2 renderer (Canvas 2D fallback, `?renderer=canvas`), natural view with pseudo-depth (ADR 0008; View → depth off = x-ray), autoplay, eased camera, tap to fell a tree, themed Tweakpane, charts, phone layout. Opens on `skyStand` (`skyGrove` on phones).
-- Headless and analysis: `npm run sim` (`--light` writes the light field); `analysis/experiments/` (m0, m2, m4, m6, m6d, m6e, m7).
-- Calibrated (sky presets): k_ext 0.5, K 7, p 1 (`overcast` preset p 1.5); T 0.03, T_rel 0.12; Q_ss 0.1, a_ss 2; r0 0.02. Floor light under a closed stand 3.5–6% (target 2–10%); interior H/D ≈ 67.
+- Headless and analysis: `npm run sim` (`--light` writes the light field); `analysis/experiments/` (m0, m2, m4, m6, m6d, m6e, m7, m8).
+- Calibrated (sky presets): k_ext 0.5, K 7, p 1 (`overcast` p 1.5); T 0.03, T_rel 0.12; Q_ss 0.1, a_ss 2; r0 0.02; R1 m_w 1, m_f 0.06, L_h 60 with α 3. Stand levels off ≈ 78 cells; floor light 3.5–6%; interior H/D ≈ 56 (M6 pre-R1: 67). Species presets are pre-R1.
 
 ## Next
-1. Merge PR #1 once CI is green (M6e, M7, leaf styles).
-2. **M8**: R1 carbon balance, two switchable plateau causes (path length L_h; reproductive sink after a size threshold); suppressed trees die; also stops trees hitting the world's top.
-3. M9–M11, then **M12: independent review by a fresh agent** (user), triaged with the user before any post-build-order direction.
+1. Open and merge the M8 PR once CI is green.
+2. **M9**: R3 mechanics (sag, posture control, stress-driven girth): drooping limbs with upturned tips, willow, Troll straightening.
+3. R1 for the species presets (m_f as shade tolerance, L_h per species); then M10–M11, then **M12: independent review by a fresh agent** (user), triaged with the user before any post-build-order direction.
 4. Look at the depth view and measure the WebGL2 renderer on a real phone (Stats → fps, draw ms).
 5. Before M11: world sides that act like a continuing forest. After the main milestones: revisit oak, willow, beech (ADR 0009).
 
@@ -23,10 +23,10 @@ _Last updated: 2026-10-27_
 - Delete the ≈ 5 MB of early `runs/` and `dist/` copies on pCloud (`rclone purge pcloud:Projects/tree-simulation/runs`, `…/dist`)?
 
 ## Known issues
-- Suppressed decurrent stand trees can lose their crown to C5 in one season (spec-conformant; mortality comes with R1).
+- R1's plateau freezes the stand (nothing changes once every bud's share is below one metamer); turnover comes with R4 (M10) and recruitment with O4 (M11). No self-thinning yet in the even ten-tree stand.
 - Shadow-triangle presets (M1–M5) still show the seedling trap rarely and no crown lift; the sky sweep does not.
 - With R6 on, short shoots weaken gap filling a little; the deep inner crown stays bare.
-- On autoplay, trees reach the world's top (`skyStand` by season ≈ 55; species ≈ 3 cells a season, 160 cells by ≈ 50) and the canopy flattens against it.
+- On autoplay the species presets (pre-R1) still reach their 160-cell top by season ≈ 50.
 - Open world sides light every stand from its edges: floor light 20% under edge trees, 8% one tree in; closing the sides slows the whole stand (M6e).
 - K = 7 puts the stand crown base ≈ 7 cells lower than K = 31; use K = 11 if a milestone depends on crown base.
 

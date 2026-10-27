@@ -20,12 +20,13 @@ export class Canvas2DRenderer implements Renderer {
   readonly scene = new Scene();
   private readonly ctx: CanvasRenderingContext2D;
   private shadowImage: HTMLCanvasElement | null = null;
+  private shadowFor: Snapshot | null = null;
   private keys = new Uint16Array(0);
   private order = new Int32Array(0);
   private theme: Theme;
 
   private readonly transparent: boolean;
-  private readonly maxDpr: number;
+  private maxDpr: number;
 
   constructor(canvas: HTMLCanvasElement, options: RendererOptions = {}) {
     this.canvas = canvas;
@@ -44,7 +45,12 @@ export class Canvas2DRenderer implements Renderer {
 
   setSnapshot(s: Snapshot): void {
     this.scene.setSnapshot(s);
-    this.shadowImage = s.shadow ? this.buildShadowImage(s) : null;
+    this.shadowFor = null;
+  }
+
+  setMaxDpr(dpr: number): void {
+    this.maxDpr = dpr;
+    this.resize();
   }
 
   resize(): void {
@@ -79,6 +85,11 @@ export class Canvas2DRenderer implements Renderer {
       );
     world(0);
 
+    if (view.showShadow && this.shadowFor !== s) {
+      // Built once per snapshot, and only while the overlay is shown.
+      this.shadowImage = s.shadow ? this.buildShadowImage(s) : null;
+      this.shadowFor = s;
+    }
     if (view.showShadow && this.shadowImage) {
       ctx.save();
       ctx.imageSmoothingEnabled = false;
@@ -101,7 +112,7 @@ export class Canvas2DRenderer implements Renderer {
       world(offset);
       if (view.showGhosts && scene.prev && t < 1) this.drawGhosts(1 - t);
       // Back-layer leaves (pseudo-depth, ADR 0008) go behind the wood, the rest in front.
-      if (leaves) this.drawLeaves(leaves, 0, leaves.back);
+      if (leaves && !view.lite) this.drawLeaves(leaves, 0, leaves.back);
       this.drawSegments(s, view.colorMode);
       if (leaves) this.drawLeaves(leaves, leaves.back, leaves.count);
       if (view.showBuds) this.drawBuds(s, view.colorMode === "light");

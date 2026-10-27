@@ -39,4 +39,5 @@
 - **Colour tokens:** a host overrides the scene's tokens (in a cascade layer the garden injects first) in any CSS colour format.
 - **The loader script:** the site loads the garden with an inline module, because Astro bundling wraps a run-time `import()` in a preload helper that breaks once the script is inlined.
 - **Memory:** page worlds discard dead trees (`World.discardDead`) to keep long runs bounded.
+- **Deployment:** the site deploys through Cloudflare Workers Builds. A push to `main` goes to production; any other branch gets a preview URL (`<branch>-edbarker-dev.edbarker.workers.dev`). `garden-v0.1.0` is the first release, and the site's re-sync from it was byte-identical to the locally built copy.
 

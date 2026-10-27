@@ -3,7 +3,13 @@
  * the worker, the renderer and playback; this file only wires the controls to it.
  */
 
-import { defaultPreset, type PresetName, presetParams, presets } from "../core/presets.ts";
+import {
+  defaultPreset,
+  isPresetName,
+  type PresetName,
+  presetParams,
+  presets,
+} from "../core/presets.ts";
 import { FULL_SNAPSHOT } from "../core/snapshot.ts";
 import { mountGarden } from "./garden.ts";
 import { isLeafStyleName, LEAF_STYLES, type LeafStyleName } from "./render/leaf-styles.ts";
@@ -18,9 +24,13 @@ function element<T extends HTMLElement>(id: string): T {
   return el as T;
 }
 
+const query = new URLSearchParams(location.search);
 const narrow = window.matchMedia("(max-width: 700px)").matches;
 // A phone shows a four-tree grove; the ten-tree stand would be too small to read.
-const startPreset: PresetName = narrow ? "skyGrove" : defaultPreset;
+// `?preset=name` picks another (and `?bench` measures it, M15).
+const asked = query.get("preset");
+const startPreset: PresetName =
+  asked !== null && isPresetName(asked) ? asked : narrow ? "skyGrove" : defaultPreset;
 
 /** The foliage style a preset asks for (broadleaf unless it names one). */
 function leafStyleOf(name: PresetName): LeafStyleName {
@@ -48,7 +58,7 @@ const garden = mountGarden(element("stage"), {
   canvas: element<HTMLCanvasElement>("view"),
   label: "Tree growth simulation",
   // WebGL2 by default; `?renderer=canvas` forces the Canvas 2D fallback (for comparison).
-  renderer: new URLSearchParams(location.search).get("renderer") === "canvas" ? "canvas2d" : "auto",
+  renderer: query.get("renderer") === "canvas" ? "canvas2d" : "auto",
   interaction: "full",
   frame: "trees",
   headroom: 52, // the title and hint
@@ -57,6 +67,18 @@ const garden = mountGarden(element("stage"), {
   maxTweenMs: 450,
   reducedMotion: "pause",
   snapshot: FULL_SNAPSHOT,
+  // `?bench[&preset=forest][&seasons=60]`: play at the panel's speed, then report frame costs.
+  bench: query.has("bench")
+    ? {
+        seasons: Number(query.get("seasons") ?? 60),
+        onDone: (result) => {
+          (window as unknown as { bench: unknown }).bench = result;
+          console.log("bench", JSON.stringify(result));
+          hud.textContent = `bench: draw p95 ${result.drawP95} ms · frame p95 ${result.frameP95} ms · worker ${result.workerMean} ms`;
+          panel.setPlaying(false);
+        },
+      }
+    : undefined,
   onSnapshot: (s, fresh) => {
     if (fresh) charts.reset();
     const trees = s.metrics.length;
@@ -99,6 +121,9 @@ async function exportRun(): Promise<void> {
   a.click();
   URL.revokeObjectURL(a.href);
 }
+
+// Exposed for poking at from the console (and headless checks).
+(window as unknown as { garden: typeof garden }).garden = garden;
 
 void garden.ready.then(() => {
   panel.setPlaying(garden.playback.playing);

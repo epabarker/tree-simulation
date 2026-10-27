@@ -2,6 +2,31 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-27: M15, a cheaper frame
+
+- **Shipped first** (user's go-ahead): PR #7 merged and `garden-v0.1.0` released; the site's `garden-home` previewed and then merged.
+  - edbarker.dev is live with the garden home page, a CV page and `/lab/`.
+  - The text comes from the user's website brief, with `TODO(Ed)` comments where the brief said to confirm something.
+- **Measured first:**
+  - The page's `?bench` mode samples every animated frame. Firefox rounds `performance.now()` to a millisecond, so `node src/web/render/scene.bench.ts` times the Scene's per-frame work in Node instead.
+  - Leaves were 1.78 ms of a 10k-metamer stand's 2.45 ms a frame (`atan2`, `cos`, `sin`, a hash and `hypot` per leaf), and the per-limb projections a further 0.31 ms. Both depend only on the snapshot.
+- **Scene:**
+  - The projections, colour indices and leaf layout are now computed once per snapshot. A leaf's direction is stored as a fixed rotation of its shoot's direction, and a frame only applies it.
+  - Geometry arrays are pooled.
+  - CPU per frame: forest 0.39 → 0.07 ms, the 10k stand 2.45 → 0.52 ms.
+  - The old and new Scene agree to 6·10⁻⁸ in 96 checks across presets, views and tween times.
+- **WebGL2:** buffers grow by capacity and frames use `bufferSubData`. The shade overlay is built only while shown.
+- **Pipelining:** the worker computes season s+1 while the page tweens s. Pausing shows the waiting season, so taps while paused still fell at once (checked headless).
+- **Adaptive quality** (`render/quality.ts`, 5 tests): the pixel ratio drops 2 → 1.5 → 1, then the back leaves go; ten good windows step back up. The lab's Stats shows the level.
+- **Also:** the lab takes `?preset=` and exposes `window.garden`; its charts keep 300 seasons.
+- **Surprises:**
+  - Vitest 5 has no `bench` export, so the Scene benchmark is a plain Node script.
+  - The intro's "2.75 seasons/s" reported at M14 was my measurement's fault: its window ran past season 40 into the ambient pace. Measured season by season, the intro runs every 250–267 ms.
+- **Not done:**
+  - A real phone measurement, which needs a garden release.
+  - The GPU-side tween, which isn't needed unless the phone says otherwise.
+- **Goldens:** unchanged (168 tests).
+
 ## 2026-10-27: M14, the garden and a home page
 
 - **Merged** PR #6 (M12, M13) at the user's request.
@@ -44,6 +69,10 @@ Newest first. One entry per session or milestone: what changed, why, surprises, 
   - reduced motion holds at season 40;
   - opening the explainer moves the crowns down.
 - **Goldens:** unchanged (163 tests).
+- **Shipped** (user's go-ahead):
+  - PR #7 merged, and `garden-v0.1.0` released (252 kB tarball). The site's re-sync from the Release was byte-identical to the local build.
+  - `garden-home` pushed. Cloudflare Workers Builds built a preview (https://garden-home-edbarker-dev.edbarker.workers.dev) where the home page and `/lab/` run without errors and versioned files are served immutable.
+  - Production edbarker.dev is unchanged until the branch merges.
 
 ## 2026-10-27: M13, a benchmark and golden-safe speed-ups
 

@@ -296,6 +296,7 @@ export class Panel {
       format: (v: number) => v.toFixed(1),
     });
     monitors.addBinding(stats, "renderer", { readonly: true });
+    monitors.addBinding(stats, "quality", { label: "quality", readonly: true });
     monitors.addBinding(stats, "fps", { readonly: true, format: (v: number) => v.toFixed(0) });
     monitors.addBinding(stats, "drawMs", {
       label: "draw ms (CPU)",

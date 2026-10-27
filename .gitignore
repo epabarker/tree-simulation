@@ -1,6 +1,7 @@
 node_modules/
 dist/
 runs/
+graphify-out/
 *.log
 .DS_Store
 

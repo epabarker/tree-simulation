@@ -2,6 +2,24 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-27: M7, physiological age and three species
+
+- **Species** chosen by the user (ADR 0009): a fir-like conifer (Massart), a birch-like pioneer (in place of §7's Rauh broadleaf) and a *Terminalia*-like tropical tree (Aubréville). Names are generic with a real example. The oak-like, willow and beech presets wait for R3 (ROADMAP "Later").
+- **R2** (`r2-physiological-age.ts`, ADR 0009):
+  - pa = min(order, levels − 1);
+  - per-pa λ, A_set, η, β, generator (distichous, opposite, whorled with an optional `tierEvery`, none) and p_term;
+  - ontogeny: λ falls by Δλ over `ramp` seasons from age a_c.
+  - It hooks into C1 (`formAxillaryBuds`, `formTerminalBud`), C3 (λ per node) and C4 (`directionParams`). Acrotony is deferred. R2 off: every existing golden unchanged.
+- **Presets:** `conifer`, `coniferStand`, `birch`, `birchStand`, `tropical`, with 160-cell-tall worlds (the species' leaders reach a 110-cell ceiling by season 40). Species light knobs: k_ext 0.6/0.35/0.6, T 0.02/0.08/0.03, conifer r0 0.035. Page: an R2 folder (enable, a_c, Δλ, ramp).
+- **Results** ([note](experiments/2026-10-27-m7-species.md)): conifer tiers at 77° from vertical, cone 1.6× wider below than above, stand H/D 78 with bole 64% of height; birch branches 25°, its λ decline broadens the crown from 0.54 to 0.80 of its height, its stand crowns lift to 80%; tropical pagoda tiers at 69°, widest at the base.
+- **Surprises.**
+  - Plagiotropic tiers need η ≈ 2: at η 0.4 the light term ξ·V tilts the branches 45° upward.
+  - Whorls carry few tips, so the pipe model makes conifer trunks thin (stand H/D 136 at r0 0.02).
+  - Sympodial relays at β 75° zigzag; β 20° with a strong η keeps the tiers flat.
+  - The seedling's first node is a tier node whose continuation shares its season, so the whorl test exempts it.
+- **Tests:** `r2-physiological-age.test.ts` (6) and `species.test.ts` (5). **Goldens:** `conifer`, `birch` and `tropical` added; no existing hash changed.
+- Checked on the page (headless Chromium, WebGL2): tiers and the pagoda read well. Every species uses the same broad leaves, so the conifer looks like a tiered broadleaf; needles are a follow-up.
+
 ## 2026-10-27: M6e, light calibration
 
 - **Session setup.** This is a cloud session: Node 24 installed with nvm (`/opt/nvm`; the image's default is Node 22), then `npm ci`. The user parked the two open questions (Pages domain, pCloud copies).

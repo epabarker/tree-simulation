@@ -15,6 +15,7 @@ import { allocate, gatherLight, isLiveBud } from "./principles/c3-allocation.ts"
 import { shootDirection } from "./principles/c4-direction.ts";
 import { crownTopLight, shedBranches } from "./principles/c5-shedding.ts";
 import { updateGirth } from "./principles/c6-girth.ts";
+import { directionParams } from "./principles/r2-physiological-age.ts";
 import { depositArea, restingState } from "./principles/r6-short-shoots.ts";
 import { normal, Purpose } from "./rng.ts";
 import { BudState, type Tree } from "./tree.ts";
@@ -93,10 +94,12 @@ function growBuds(world: World, tree: Tree, season: number): void {
   const { params } = world;
   const { c4 } = params;
   const sigma = c4.sigma * DEG;
+  const c4Of = directionParams(params); // R2: A_set and η by the shoot's pa
   const direct: DirectionFn = c4.enabled
     ? (prev, bud, id) => {
         const noise = sigma * normal(params.seed, Purpose.directionNoise, tree.id, id, season);
-        return shootDirection(prev, tree.b.cols.vx[bud], tree.b.cols.vy[bud], noise, c4);
+        const bc = tree.b.cols;
+        return shootDirection(prev, bc.vx[bud], bc.vy[bud], noise, c4Of(bc.order[bud]));
       }
     : (prev) => prev;
   const b = tree.b.cols;

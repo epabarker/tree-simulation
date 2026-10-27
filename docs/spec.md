@@ -365,7 +365,7 @@ Ordering: (1) every tree reads the same snapshot, so iteration order cannot bias
 | M6c | Pseudo-depth view (page only); r0 calibrated | Crowns read as full discs; x-ray view shows the shell; realistic H/D |
 | M6d | Relative C5; R6 | Suppressed trees keep deeper crowns; leafy older limbs |
 | M6e | Light calibration (k_ext, K) | Ground light under a closed stand 2–10% of open sky |
-| M7 | R2 | Massart conifer, Rauh broadleaf, Aubréville tiers from tables |
+| M7 | R2 | Massart conifer, birch-like pioneer, Aubréville tiers from tables (ADR 0009) |
 | M8 | R1 | Height plateau; suppressed tree dies; crown base rises |
 | M9 | R3 | Drooping limbs with upturned tips; willow; Troll straightening |
 | M10 | R4 + R5 | Epicormic flush after neighbour removal; slender stand trees |

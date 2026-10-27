@@ -7,11 +7,12 @@
  * the main slot and the lateral slots (§C3.4); a slot holding a bud delivers its share to the
  * bud, a slot holding a metamer passes it on.
  *
- * Params: c3.mode, c3.lambda (λ), c3.alpha (α).
+ * Params: c3.mode, c3.lambda (λ), c3.alpha (α); with R2, λ by pa and tree age.
  */
 
 import type { Params } from "../params.ts";
 import { BudState, type Tree } from "../tree.ts";
+import { lambdaAt } from "./r2-physiological-age.ts";
 import { lightWeight } from "./r6-short-shoots.ts";
 
 /** True for buds that still take part in growth (not consumed, aborted or terminated). */
@@ -63,7 +64,7 @@ export function bhMainShare(v: number, qMain: number, qLateral: number, lambda: 
 export function allocate(tree: Tree, params: Params): void {
   const b = tree.b.cols;
   const nb = tree.b.length;
-  const { alpha, lambda } = params.c3;
+  const { alpha } = params.c3;
   switch (params.c3.mode) {
     case "none": {
       // Milestone scaffold (M0–M1): every bud that sees any light grows one metamer.
@@ -86,7 +87,7 @@ export function allocate(tree: Tree, params: Params): void {
     case "bh": {
       const nm = tree.m.length;
       const { qSlot, vSlot } = tree;
-      const { parent, slot, vIn } = tree.m.cols;
+      const { parent, slot, vIn, order } = tree.m.cols;
       tree.vBase = nm > 0 ? alpha * tree.qBase : 0;
       for (let i = 0; i < nm; i++) {
         const p = parent[i];
@@ -96,6 +97,7 @@ export function allocate(tree: Tree, params: Params): void {
         const qLeft = qSlot[3 * i + 1];
         const qRight = qSlot[3 * i + 2];
         const qLat = qLeft + qRight;
+        const lambda = lambdaAt(order[i], tree.age, params); // c3.lambda, or by pa and age (R2)
         const vMain = bhMainShare(v, qMain, qLat, lambda);
         const vLat = qMain + qLat > 0 ? v - vMain : 0;
         vSlot[3 * i] = vMain;

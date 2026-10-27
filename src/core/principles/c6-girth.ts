@@ -6,6 +6,10 @@
  * the thin-slab convention (§2), so n ≈ 2 conserves cross-sectional area and Leonardo-type
  * exponents stay comparable with 3D data (Eloy 2011: 1.8–2.3).
  *
+ * R3's stress-driven girth (ADR 0011) adds local wood, `stressWood`, on top: the pipe radius
+ * r − stressWood is what enters the parent's sum and what memory keeps, so reinforced junctions
+ * get Leonardo exponents above n (Minamino & Tateno 2014).
+ *
  * Params: c6.n, c6.r0.
  */
 
@@ -23,14 +27,14 @@ export function updateGirth(tree: Tree, params: Params): void {
   const hasChild = tree.scratchU;
   childSum.fill(0, 0, nm);
   hasChild.fill(0, 0, nm);
-  const { parent, radius, scarSumN } = tree.m.cols;
+  const { parent, radius, scarSumN, stressWood } = tree.m.cols;
   for (let i = nm - 1; i >= 0; i--) {
     const base = hasChild[i] ? childSum[i] : tipN;
-    const r = (base + scarSumN[i]) ** (1 / n);
+    const r = (base + scarSumN[i]) ** (1 / n) + stressWood[i];
     if (r > radius[i]) radius[i] = r;
     const p = parent[i];
     if (p >= 0) {
-      childSum[p] += radius[i] ** n;
+      childSum[p] += (radius[i] - stressWood[i]) ** n;
       hasChild[p] = 1;
     }
   }

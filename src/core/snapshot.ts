@@ -37,6 +37,8 @@ export interface Snapshot {
   resource: F32;
   /** Seasons since the metamer formed (colour by age). */
   age: F32;
+  /** Bending stress at the base over σ_target (R3; 0 when R3 is off). */
+  stress: F32;
   prevIndex: I32;
   budCount: number;
   /** Row of the metamer whose upper node holds the bud. */
@@ -67,6 +69,7 @@ export function transferables(s: Snapshot): ArrayBuffer[] {
     s.light,
     s.resource,
     s.age,
+    s.stress,
     s.prevIndex,
     s.budMetamer,
     s.budState,
@@ -111,6 +114,7 @@ export class SnapshotBuilder {
       light: new Float32Array(nm),
       resource: new Float32Array(nm),
       age: new Float32Array(nm),
+      stress: new Float32Array(nm),
       prevIndex: new Int32Array(nm),
       budCount: 0,
       budMetamer: new Int32Array(nb),
@@ -127,6 +131,7 @@ export class SnapshotBuilder {
 
     let offset = 0;
     let k = 0;
+    const mechanics = world.params.r3.enabled;
     for (const t of live) {
       const c = t.m.cols;
       for (let i = 0; i < t.m.length; i++) {
@@ -143,6 +148,7 @@ export class SnapshotBuilder {
         s.light[j] = c.nSum[i] > 0 ? c.qSum[i] / c.nSum[i] : 0;
         s.resource[j] = c.vIn[i];
         s.age[j] = world.season - c.birthSeason[i];
+        s.stress[j] = mechanics && i < t.stress.length ? t.stress[i] : 0;
       }
       const b = t.b.cols;
       for (let i = 0; i < t.b.length; i++) {

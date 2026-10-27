@@ -13,12 +13,14 @@
   "pair:seed1:s35": "d5c358ad",
   "late:seed1:s45": "5f9791d5",
   "stand:seed1:s30": "3ffbf68b",
-  "skyStand:seed1:s30": "f4e0009a",
-  "skyTree:seed1:s40": "75b4cd3f",
-  "obliqueSun:seed1:s30": "cc10be2f",
-  "skyLate:seed1:s40": "b123a67a",
-  "overcast:seed1:s30": "40923826",
+  "skyStand:seed1:s30": "5cedfde9",
+  "skyTree:seed1:s40": "541ec519",
+  "obliqueSun:seed1:s30": "3c4bac70",
+  "skyLate:seed1:s40": "7f904788",
+  "overcast:seed1:s30": "1c25b703",
   "conifer:seed1:s30": "00a241ff",
   "birch:seed1:s30": "698f2a93",
-  "tropical:seed1:s30": "82a6ee62"
+  "tropical:seed1:s30": "82a6ee62",
+  "weeping:seed1:s40": "1c3d40e3",
+  "troll:seed1:s40": "e85ccb45"
 }

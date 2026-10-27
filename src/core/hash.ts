@@ -24,10 +24,17 @@ function fnvInt(h: number, value: number): number {
   return h >>> 0;
 }
 
+/**
+ * Columns added after a principle that is off by default: hashed only when some row is non-zero,
+ * so switching that principle off reproduces the hashes from before the column existed.
+ */
+const LATE_COLUMNS = new Set(["stressWood", "moment"]);
+
 /** Hashes the first `length` rows of every column. (All typed arrays share the members used.) */
 function hashTable(h: number, table: { length: number; cols: object }): number {
   h = fnvInt(h, table.length);
-  for (const col of Object.values(table.cols) as Float64Array[]) {
+  for (const [name, col] of Object.entries(table.cols) as [string, Float64Array][]) {
+    if (LATE_COLUMNS.has(name) && !col.subarray(0, table.length).some((x) => x !== 0)) continue;
     h = fnvBytes(
       h,
       new Uint8Array(col.buffer, col.byteOffset, table.length * col.BYTES_PER_ELEMENT),

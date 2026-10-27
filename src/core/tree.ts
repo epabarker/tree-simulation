@@ -57,6 +57,17 @@ export const METAMER_SCHEMA = {
   nSum: Int32Array,
   /** Resource arriving at the metamer's base this season (C3). */
   vIn: Float64Array,
+  /**
+   * Radius added by stress-driven girth (R3, ADR 0011): local reinforcement that does not carry on
+   * into the parent's pipe sum, so the pipe radius is `radius − stressWood`. Hashed only when
+   * non-zero (hash.ts), so runs without R3 keep their golden hashes.
+   */
+  stressWood: Float64Array,
+  /**
+   * Bending moment at the base after last season's mechanics pass (R3): the load increment
+   * M − M_prev sets this season's sag (Alméras & Fournier 2009). Hashed only when non-zero.
+   */
+  moment: Float64Array,
 } as const;
 
 export const BUD_SCHEMA = {
@@ -125,6 +136,15 @@ export class Tree {
   /** Path length from the base to each metamer's tip (R1, L_path). */
   pathLen = new Float64Array(0);
 
+  // R3 mechanics (ADR 0011), per metamer by this season's row index.
+  /** Radius before this season's girth pass: Δr/r limits posture control. */
+  prevRadius = new Float64Array(0);
+  /** Weight W carried by each metamer's base and its first moment S (Σ weight·x). */
+  loadW = new Float64Array(0);
+  loadS = new Float64Array(0);
+  /** Bending stress at each metamer's base over σ_target (for the stress colour). */
+  stress = new Float64Array(0);
+
   constructor(id: number, rootX: number) {
     this.id = id;
     this.rootX = rootX;
@@ -139,6 +159,10 @@ export class Tree {
     this.pSum = ensureFloat64(this.pSum, n);
     this.mSum = ensureFloat64(this.mSum, n);
     this.pathLen = ensureFloat64(this.pathLen, n);
+    this.prevRadius = ensureFloat64(this.prevRadius, n);
+    this.loadW = ensureFloat64(this.loadW, n);
+    this.loadS = ensureFloat64(this.loadS, n);
+    this.stress = ensureFloat64(this.stress, n);
   }
 
   tipX(i: number): number {

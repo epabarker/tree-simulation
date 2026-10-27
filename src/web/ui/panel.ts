@@ -22,7 +22,7 @@ interface FieldSpec {
 }
 
 interface SectionSpec {
-  section: "c1" | "c2" | "c3" | "c4" | "c5" | "c6" | "r1" | "r2" | "r6";
+  section: "c1" | "c2" | "c3" | "c4" | "c5" | "c6" | "r1" | "r2" | "r3" | "r6";
   title: string;
   /** Adds an on/off checkbox bound to the section's `enabled` flag. */
   toggle?: boolean;
@@ -134,6 +134,28 @@ const SECTIONS: SectionSpec[] = [
       { key: "aC", label: "a_c λ decline from age", min: 0, max: 100, step: 1 },
       { key: "dLambda", label: "Δλ decline", min: 0, max: 0.15, step: 0.005 },
       { key: "ramp", label: "decline over (seasons)", min: 1, max: 60, step: 1 },
+    ],
+  },
+  {
+    // Posture set-points per pa come from the presets' R2 table (ADR 0011).
+    section: "r3",
+    title: "R3 Mechanics",
+    toggle: true,
+    fields: [
+      { key: "E", label: "E stiffness", min: 1e5, max: 1e7, step: 1e5 },
+      { key: "phi", label: "φ sag set", min: 0, max: 2, step: 0.05 },
+      {
+        key: "sag",
+        label: "sag",
+        options: { "load increment": "increment", "creep (whole load)": "creep" },
+      },
+      { key: "leafMass", label: "leaf mass", min: 0, max: 0.02, step: 0.0005 },
+      { key: "posture", label: "posture control" },
+      { key: "betaG", label: "β_g gravitropism", min: 0, max: 1, step: 0.01 },
+      { key: "gamma", label: "γ proprioception", min: 0, max: 1, step: 0.01 },
+      { key: "c", label: "c reaction-wood rate", min: 0, max: 1, step: 0.01 },
+      { key: "sigmaTarget", label: "σ_target stress", min: 500, max: 20000, step: 100 },
+      { key: "girthGain", label: "stress girth gain", min: 0, max: 1, step: 0.05 },
     ],
   },
   {
@@ -265,6 +287,7 @@ export class Panel {
       "resource v": "resource",
       age: "age",
       tree: "tree",
+      "stress σ/σ_target (R3)": "stress",
     };
     viewFolder.addBinding(view, "colorMode", { label: "colour", options: colorOptions });
     viewFolder.addBinding(view, "showLeaves", { label: "leaves" });

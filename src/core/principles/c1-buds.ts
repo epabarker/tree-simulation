@@ -55,6 +55,8 @@ export function addMetamer(
   c.length[i] = length;
   c.radius[i] = radius;
   c.scarSumN[i] = 0;
+  c.stressWood[i] = 0;
+  c.moment[i] = 0;
   c.birthSeason[i] = season;
   return i;
 }

@@ -5,7 +5,7 @@ import { presetParams as currentPreset, PRE_R1, type PresetName } from "./preset
 import type { Tree } from "./tree.ts";
 import { World } from "./world.ts";
 
-/** These checks are the M6–M7 evidence, so they run the presets as they were before R1 (M8). */
+/** These checks are the M6–M7 evidence, so they run the presets as they were before R1 and R3. */
 const presetParams = (name: PresetName, seed?: number) =>
   mergeParams(currentPreset(name, seed), PRE_R1);
 

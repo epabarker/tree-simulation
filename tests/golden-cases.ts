@@ -37,6 +37,8 @@ export const GOLDEN_CASES: GoldenCase[] = [
   { preset: "conifer", seed: 1, seasons: 30 },
   { preset: "birch", seed: 1, seasons: 30 },
   { preset: "tropical", seed: 1, seasons: 30 },
+  { preset: "weeping", seed: 1, seasons: 40 },
+  { preset: "troll", seed: 1, seasons: 40 },
 ];
 
 export function caseKey(c: GoldenCase): string {

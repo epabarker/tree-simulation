@@ -17,6 +17,7 @@ import { crownTopLight, shedBranches } from "./principles/c5-shedding.ts";
 import { updateGirth } from "./principles/c6-girth.ts";
 import { carbonBalance, starvedToDeath } from "./principles/r1-carbon.ts";
 import { directionParams } from "./principles/r2-physiological-age.ts";
+import { updateMechanics } from "./principles/r3-mechanics.ts";
 import { depositArea, restingState } from "./principles/r6-short-shoots.ts";
 import { normal, Purpose } from "./rng.ts";
 import { BudState, type Tree } from "./tree.ts";
@@ -54,7 +55,12 @@ export function runSeason(world: World): void {
     if (params.c5.enabled || carbonShedding) {
       tree.shedCount = shedBranches(tree, params, season, evaluated); // C5, or R1 by carbon
     }
+    if (params.r3.enabled) {
+      tree.ensureScratch(); // growth may have outgrown the scratch arrays
+      tree.prevRadius.set(tree.m.cols.radius.subarray(0, tree.m.length)); // R3: Δr/r for posture
+    }
     if (params.c6.enabled) updateGirth(tree, params); // C6, after shedding so scars count
+    if (params.r3.enabled) updateMechanics(tree, params); // R3 MECHANICS: girth first (§6 rule 2)
     commitBuds(tree);
     tree.age += 1;
   }

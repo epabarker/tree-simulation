@@ -22,7 +22,7 @@ import { CATEGORICAL, SEQUENTIAL } from "./colors.ts";
 import { LEAF_STYLES, type LeafStyle, type LeafStyleName } from "./leaf-styles.ts";
 import { RAMP_STEPS, type Theme } from "./theme.ts";
 
-export type ColorMode = "natural" | "order" | "light" | "resource" | "age" | "tree";
+export type ColorMode = "natural" | "order" | "light" | "resource" | "age" | "tree" | "stress";
 
 export interface ViewOptions {
   colorMode: ColorMode;
@@ -403,7 +403,9 @@ export class Scene {
   /** The palette a colour mode draws with. */
   palette(mode: ColorMode, theme: Theme): string[] {
     if (mode === "natural") return theme.bark;
-    if (mode === "light" || mode === "resource" || mode === "age") return SEQUENTIAL;
+    if (mode === "light" || mode === "resource" || mode === "age" || mode === "stress") {
+      return SEQUENTIAL;
+    }
     return CATEGORICAL;
   }
 
@@ -417,7 +419,12 @@ export class Scene {
     if (mode === "light") field = s.light;
     else if (mode === "resource") field = s.resource;
     else if (mode === "age" || mode === "natural") field = s.age;
-    if (field) {
+    if (mode === "stress") {
+      // Bending stress over σ_target (R3) on a fixed scale: the top colour means "at target".
+      for (let j = 0; j < n; j++) {
+        this.colors[j] = Math.min(steps - 1, Math.floor(Math.min(1, s.stress[j]) * steps));
+      }
+    } else if (field) {
       let max = 0;
       for (let j = 0; j < n; j++) if (field[j] > max) max = field[j];
       // Light and resource are heavily skewed (a few bright tips), so colour by √(value / max);

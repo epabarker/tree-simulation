@@ -100,6 +100,8 @@ export class Tree {
   readonly id: number;
   readonly rootX: number;
   alive = true;
+  /** A dead tree whose tables were freed (World.discardDead); it is never replanted. */
+  discarded = false;
   /** Seasons since planting. */
   age = 0;
   nextMetamerId = 0;
@@ -182,6 +184,17 @@ export class Tree {
     this.loadS = ensureFloat64(this.loadS, n);
     this.stress = ensureFloat64(this.stress, n);
     this.nodeShade = ensureFloat64(this.nodeShade, n);
+  }
+
+  /** Frees the tables and scratch of a dead tree. Nothing in a season reads a dead tree's rows. */
+  discard(): void {
+    this.m.reset();
+    this.b.reset();
+    this.qSlot = this.vSlot = this.scratchF = new Float64Array(0);
+    this.pSum = this.mSum = this.pathLen = new Float64Array(0);
+    this.prevRadius = this.loadW = this.loadS = this.stress = this.nodeShade = new Float64Array(0);
+    this.scratchU = new Uint8Array(0);
+    this.discarded = true;
   }
 
   tipX(i: number): number {

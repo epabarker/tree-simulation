@@ -93,6 +93,22 @@ export class World {
     }
   }
 
+  /**
+   * Frees the tables of trees that have died, for a page that runs for hours (a forest with
+   * recruitment piles up dead trees). No phase of a season reads a dead tree's rows, so live trees
+   * grow exactly as before, but `hashWorld` fingerprints dead trees too: the CLI and tests never
+   * call this. Returns how many trees were discarded.
+   */
+  discardDead(): number {
+    let n = 0;
+    for (const tree of this.trees) {
+      if (tree.alive || tree.discarded || tree.m.length === 0) continue;
+      tree.discard();
+      n += 1;
+    }
+    return n;
+  }
+
   record(): RunRecord {
     return { params: clone(this.initialParams), events: clone(this.log), seasons: this.season };
   }
@@ -111,7 +127,8 @@ export class World {
   private plantDue(): void {
     this.params.trees.forEach((spec, id) => {
       const tree = this.trees[id] as Tree;
-      if (tree.m.length === 0 && (spec.plantSeason ?? 0) <= this.season && !this.isRemoved(id)) {
+      const unplanted = tree.m.length === 0 && !tree.discarded;
+      if (unplanted && (spec.plantSeason ?? 0) <= this.season && !this.isRemoved(id)) {
         tree.alive = true;
         plantSeedling(tree, this.params, this.season);
       }

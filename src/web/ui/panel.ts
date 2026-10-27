@@ -7,6 +7,7 @@
 import { Pane } from "tweakpane";
 import type { Params, ParamsPatch } from "../../core/params.ts";
 import { type PresetName, presets } from "../../core/presets.ts";
+import type { PlaybackState, Stats } from "../garden.ts";
 import type { LeafStyleName } from "../render/leaf-styles.ts";
 import type { ColorMode, ViewOptions } from "../render/scene.ts";
 
@@ -229,21 +230,6 @@ const SECTIONS: SectionSpec[] = [
     ],
   },
 ];
-
-export interface PlaybackState {
-  playing: boolean;
-  speed: number;
-}
-
-export interface Stats {
-  season: number;
-  metamers: number;
-  workerMs: number;
-  renderer: string;
-  /** Frames per second while animating, and CPU milliseconds per draw. */
-  fps: number;
-  drawMs: number;
-}
 
 export interface PanelCallbacks {
   onPlay(playing: boolean): void;

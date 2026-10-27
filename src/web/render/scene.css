@@ -1,0 +1,67 @@
+/*
+ * Scene colour tokens, read by render/theme.ts from the canvas (light and dark).
+ *
+ * The garden injects this sheet first in <head> (garden.ts), so its layer comes first and has the
+ * lowest priority: any declaration of these tokens by a host page, layered or not, wins.
+ */
+@layer tree-garden {
+  :root {
+    --sky-top: #cfe2ee;
+    --sky-bottom: #f4efe2;
+    --ground: #8f7d58;
+    --ground-deep: #6e5f44;
+    --bark-young: #8c7b4f;
+    --bark-old: #4c3d31;
+    --leaf-shade: #35502a;
+    --leaf-sun: #a3cf5b;
+    /* Species foliage (render/leaf-styles.ts): fir needles, birch, Terminalia. */
+    --needle-shade: #1f3b2c;
+    --needle-sun: #5d8a5a;
+    --birch-leaf-shade: #4a6a2a;
+    --birch-leaf-sun: #c3dc6a;
+    --tropical-leaf-shade: #1d4a26;
+    --tropical-leaf-sun: #6fb04a;
+    --ghost: #9a8f80;
+    --wall: rgba(90, 90, 100, 0.35);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --sky-top: #0e1621;
+      --sky-bottom: #1f2731;
+      --ground: #4b4232;
+      --ground-deep: #2f2a21;
+      --bark-young: #b09c6c;
+      --bark-old: #7a6552;
+      --leaf-shade: #2d4824;
+      --leaf-sun: #8fbf4f;
+      --needle-shade: #1a3326;
+      --needle-sun: #507a4f;
+      --birch-leaf-shade: #3f5c25;
+      --birch-leaf-sun: #a9c45a;
+      --tropical-leaf-shade: #18401f;
+      --tropical-leaf-sun: #5f9a3f;
+      --ghost: #6f6a62;
+      --wall: rgba(160, 160, 175, 0.25);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --sky-top: #0e1621;
+    --sky-bottom: #1f2731;
+    --ground: #4b4232;
+    --ground-deep: #2f2a21;
+    --bark-young: #b09c6c;
+    --bark-old: #7a6552;
+    --leaf-shade: #2d4824;
+    --leaf-sun: #8fbf4f;
+    --needle-shade: #1a3326;
+    --needle-sun: #507a4f;
+    --birch-leaf-shade: #3f5c25;
+    --birch-leaf-sun: #a9c45a;
+    --tropical-leaf-shade: #18401f;
+    --tropical-leaf-sun: #5f9a3f;
+    --ghost: #6f6a62;
+    --wall: rgba(160, 160, 175, 0.25);
+  }
+}

@@ -76,7 +76,7 @@ export interface Leaves {
 
 /** Ground sits this many CSS pixels above the bottom edge when the view is fitted. */
 const GROUND_MARGIN = 18;
-/** Room kept free above the crowns for the title and hint, CSS pixels. */
+/** Room kept free above the crowns for the lab's title and hint, CSS pixels. */
 const HEADER_MARGIN = 52;
 /** Time constant of the camera's easing toward its fitted target, ms. */
 const CAMERA_EASE_MS = 380;
@@ -153,6 +153,14 @@ export class Scene {
   /** Foliage style; renderers copy `LEAF_STYLES[ViewOptions.leafStyle]` here. */
   leafStyle: LeafStyle = LEAF_STYLES.broadleaf;
   /**
+   * What `fit` frames. "trees": the trees and the ground beneath them (the lab). "world": the
+   * world's whole width, easing out only once crowns outgrow half its height (the home page); on
+   * a ring the crowns are then drawn across the seam as well.
+   */
+  frame: "trees" | "world" = "trees";
+  /** CSS pixels kept free above the crowns when fitting. */
+  headroom = HEADER_MARGIN;
+  /**
    * Per metamer, the 2×2 map from simulated to drawn direction (row-major a b / c d) and the
    * depth of its axis in [−1, 1]. Identity and 0 everywhere when `depth` is off.
    */
@@ -228,11 +236,17 @@ export class Scene {
       maxX = s.width;
     }
     const minSpan = 16;
-    const spanX = Math.max(minSpan, (maxX - minX) * 1.15 + 2 * LEAF_LENGTH);
-    const spanY = Math.max(minSpan, maxY * 1.12 + LEAF_LENGTH);
-    const fitH = this.height - GROUND_MARGIN - HEADER_MARGIN;
+    let cx = (minX + maxX) / 2;
+    let spanX = Math.max(minSpan, (maxX - minX) * 1.15 + 2 * LEAF_LENGTH);
+    let spanY = Math.max(minSpan, maxY * 1.12 + LEAF_LENGTH);
+    if (this.frame === "world") {
+      cx = s.width / 2;
+      spanX = s.width;
+      spanY = Math.max(0.5 * s.height, maxY * 1.05 + LEAF_LENGTH);
+    }
+    const fitH = Math.max(1, this.height - GROUND_MARGIN - this.headroom);
     const first = this.target === null;
-    this.target = { cx: (minX + maxX) / 2, scale: Math.min(this.width / spanX, fitH / spanY) };
+    this.target = { cx, scale: Math.min(this.width / spanX, fitH / spanY) };
     if (snap || first) {
       this.camera.cx = this.target.cx;
       this.camera.scale = this.target.scale;
@@ -260,6 +274,15 @@ export class Scene {
     this.camera.cy = (this.height / 2 - GROUND_MARGIN) / this.camera.scale;
   }
 
+  /**
+   * World-x offsets at which to draw the trees: on a ring in the "world" frame, one copy either
+   * side as well, so crowns that grew across the seam show at both edges.
+   */
+  wrapOffsets(): number[] {
+    const s = this.next;
+    return s?.periodic && this.frame === "world" ? [-s.width, 0, s.width] : [0];
+  }
+
   screenToWorld(px: number, py: number): [number, number] {
     return [
       (px - this.width / 2) / this.camera.scale + this.camera.cx,
@@ -268,25 +291,28 @@ export class Scene {
   }
 
   /** The tree whose nearest branch passes within `maxPx` screen pixels of a world point, or null. */
-  pickTree(wx: number, wy: number, maxPx = 14): number | null {
+  pickTree(x: number, wy: number, maxPx = 14): number | null {
     const s = this.next;
     if (!s) return null;
     const g = this.geom;
     let best = (maxPx / this.camera.scale) ** 2;
     let tree: number | null = null;
-    for (let j = 0; j < s.metamerCount; j++) {
-      const ax = g.baseX[j];
-      const ay = g.baseY[j];
-      const dx = g.tipX[j] - ax;
-      const dy = g.tipY[j] - ay;
-      const len2 = dx * dx + dy * dy;
-      const u = len2 > 0 ? Math.max(0, Math.min(1, ((wx - ax) * dx + (wy - ay) * dy) / len2)) : 0;
-      const ex = ax + u * dx - wx;
-      const ey = ay + u * dy - wy;
-      const d2 = Math.max(0, Math.hypot(ex, ey) - g.radius[j]) ** 2;
-      if (d2 < best) {
-        best = d2;
-        tree = s.tree[j];
+    for (const offset of this.wrapOffsets()) {
+      const wx = x - offset;
+      for (let j = 0; j < s.metamerCount; j++) {
+        const ax = g.baseX[j];
+        const ay = g.baseY[j];
+        const dx = g.tipX[j] - ax;
+        const dy = g.tipY[j] - ay;
+        const len2 = dx * dx + dy * dy;
+        const u = len2 > 0 ? Math.max(0, Math.min(1, ((wx - ax) * dx + (wy - ay) * dy) / len2)) : 0;
+        const ex = ax + u * dx - wx;
+        const ey = ay + u * dy - wy;
+        const d2 = Math.max(0, Math.hypot(ex, ey) - g.radius[j]) ** 2;
+        if (d2 < best) {
+          best = d2;
+          tree = s.tree[j];
+        }
       }
     }
     return tree;

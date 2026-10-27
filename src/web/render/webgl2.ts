@@ -30,7 +30,7 @@ import type { Snapshot } from "../../core/snapshot.ts";
 import { BudState } from "../../core/tree.ts";
 import { BUD_ACTIVE, BUD_DORMANT, parseColor, SEQUENTIAL, shadeImage } from "./colors.ts";
 import { LEAF_STYLES } from "./leaf-styles.ts";
-import { MAX_DPR, type Renderer } from "./renderer.ts";
+import { MAX_DPR, type Renderer, type RendererOptions } from "./renderer.ts";
 import { LEAF_MIN_PX, type Leaves, Scene, type ViewOptions } from "./scene.ts";
 import { readTheme, type Theme } from "./theme.ts";
 
@@ -272,9 +272,19 @@ export class WebGL2Renderer implements Renderer {
     key: "",
   };
 
-  constructor(canvas: HTMLCanvasElement) {
+  private readonly transparent: boolean;
+  private readonly maxDpr: number;
+
+  constructor(canvas: HTMLCanvasElement, options: RendererOptions = {}) {
     this.canvas = canvas;
-    const gl = canvas.getContext("webgl2", { alpha: false, antialias: false, depth: false });
+    this.transparent = options.transparent ?? false;
+    this.maxDpr = options.maxDpr ?? MAX_DPR;
+    // Colours are premultiplied throughout (blend ONE, ONE_MINUS_SRC_ALPHA), as a page expects.
+    const gl = canvas.getContext("webgl2", {
+      alpha: this.transparent,
+      antialias: false,
+      depth: false,
+    });
     if (!gl) throw new Error("WebGL2 is not available");
     this.gl = gl;
     this.theme = readTheme(canvas);
@@ -396,7 +406,7 @@ export class WebGL2Renderer implements Renderer {
 
   resize(): void {
     const rect = this.canvas.getBoundingClientRect();
-    const dpr = Math.min(window.devicePixelRatio || 1, MAX_DPR);
+    const dpr = Math.min(window.devicePixelRatio || 1, this.maxDpr);
     this.canvas.width = Math.max(1, Math.round(rect.width * dpr));
     this.canvas.height = Math.max(1, Math.round(rect.height * dpr));
     this.scene.setSize(rect.width, rect.height, dpr);
@@ -464,7 +474,12 @@ export class WebGL2Renderer implements Renderer {
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
     const groundFromBottom = (h - groundY) * dpr;
-    this.drawBackdrop(0, theme.skyTop, theme.skyBottom, groundFromBottom);
+    if (this.transparent) {
+      gl.clearColor(0, 0, 0, 0);
+      gl.clear(gl.COLOR_BUFFER_BIT);
+    } else {
+      this.drawBackdrop(0, theme.skyTop, theme.skyBottom, groundFromBottom);
+    }
     if (!s) return;
 
     // Rebuild instance data only when the scene changed; a camera move only changes uniforms.
@@ -510,11 +525,15 @@ export class WebGL2Renderer implements Renderer {
       });
     }
     this.drawBatch(this.wallBatch, this.wallBatch.count, uniforms);
-    this.drawBatch(this.ghostBatch, this.ghostBatch.count, uniforms);
-    this.drawBatch(this.leafBackBatch, this.leafBackBatch.count, uniforms);
-    this.drawBatch(this.segments, this.segments.count, uniforms);
-    this.drawBatch(this.leafBatch, this.leafBatch.count, uniforms);
-    this.drawBatch(this.budBatch, this.budBatch.count, uniforms);
+    // On a ring seen whole, each batch is drawn once per copy of the world (Scene.wrapOffsets).
+    for (const offset of scene.wrapOffsets()) {
+      const shifted = { ...uniforms, u_view: [cx - offset, ...uniforms.u_view.slice(1)] };
+      this.drawBatch(this.ghostBatch, this.ghostBatch.count, shifted);
+      this.drawBatch(this.leafBackBatch, this.leafBackBatch.count, shifted);
+      this.drawBatch(this.segments, this.segments.count, shifted);
+      this.drawBatch(this.leafBatch, this.leafBatch.count, shifted);
+      this.drawBatch(this.budBatch, this.budBatch.count, shifted);
+    }
 
     // Ground last, so stubs of shoots that turned downward stay underground.
     this.drawBackdrop(1, theme.ground, theme.groundDeep, groundFromBottom);

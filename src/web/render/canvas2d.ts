@@ -8,7 +8,7 @@ import type { Snapshot } from "../../core/snapshot.ts";
 import { BudState } from "../../core/tree.ts";
 import { BUD_ACTIVE, BUD_DORMANT, SEQUENTIAL, shadeImage } from "./colors.ts";
 import { LEAF_STYLES } from "./leaf-styles.ts";
-import { MAX_DPR, type Renderer } from "./renderer.ts";
+import { MAX_DPR, type Renderer, type RendererOptions } from "./renderer.ts";
 import { type ColorMode, type Leaves, leafLength, Scene, type ViewOptions } from "./scene.ts";
 import { RAMP_STEPS, readTheme, type Theme } from "./theme.ts";
 
@@ -24,8 +24,13 @@ export class Canvas2DRenderer implements Renderer {
   private order = new Int32Array(0);
   private theme: Theme;
 
-  constructor(canvas: HTMLCanvasElement) {
+  private readonly transparent: boolean;
+  private readonly maxDpr: number;
+
+  constructor(canvas: HTMLCanvasElement, options: RendererOptions = {}) {
     this.canvas = canvas;
+    this.transparent = options.transparent ?? false;
+    this.maxDpr = options.maxDpr ?? MAX_DPR;
     const ctx = canvas.getContext("2d");
     if (!ctx) throw new Error("Canvas 2D is not available");
     this.ctx = ctx;
@@ -44,7 +49,7 @@ export class Canvas2DRenderer implements Renderer {
 
   resize(): void {
     const rect = this.canvas.getBoundingClientRect();
-    const dpr = Math.min(window.devicePixelRatio || 1, MAX_DPR);
+    const dpr = Math.min(window.devicePixelRatio || 1, this.maxDpr);
     this.canvas.width = Math.max(1, Math.round(rect.width * dpr));
     this.canvas.height = Math.max(1, Math.round(rect.height * dpr));
     this.scene.setSize(rect.width, rect.height, dpr);
@@ -58,11 +63,21 @@ export class Canvas2DRenderer implements Renderer {
     const groundY = scene.groundY();
 
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    this.drawSky(w, h, groundY);
+    if (this.transparent) ctx.clearRect(0, 0, w, h);
+    else this.drawSky(w, h, groundY);
     if (!s) return;
 
     // World → CSS pixels: x' = (x − cx)·scale + w/2, y' = groundY − y·scale.
-    ctx.setTransform(scale * dpr, 0, 0, -scale * dpr, (w / 2 - cx * scale) * dpr, groundY * dpr);
+    const world = (offset: number): void =>
+      ctx.setTransform(
+        scale * dpr,
+        0,
+        0,
+        -scale * dpr,
+        (w / 2 - (cx - offset) * scale) * dpr,
+        groundY * dpr,
+      );
+    world(0);
 
     if (view.showShadow && this.shadowImage) {
       ctx.save();
@@ -80,13 +95,17 @@ export class Canvas2DRenderer implements Renderer {
     scene.depth = view.depth;
     scene.leafStyle = LEAF_STYLES[view.leafStyle];
     scene.computeGeometry(t);
-    if (view.showGhosts && scene.prev && t < 1) this.drawGhosts(1 - t);
-    // Back-layer leaves (pseudo-depth, ADR 0008) go behind the wood, the rest in front.
     const leaves = view.showLeaves ? scene.leaves(view.leafAge, t) : null;
-    if (leaves) this.drawLeaves(leaves, 0, leaves.back);
-    this.drawSegments(s, view.colorMode);
-    if (leaves) this.drawLeaves(leaves, leaves.back, leaves.count);
-    if (view.showBuds) this.drawBuds(s, view.colorMode === "light");
+    // On a ring seen whole, the trees are drawn once per copy of the world (Scene.wrapOffsets).
+    for (const offset of scene.wrapOffsets()) {
+      world(offset);
+      if (view.showGhosts && scene.prev && t < 1) this.drawGhosts(1 - t);
+      // Back-layer leaves (pseudo-depth, ADR 0008) go behind the wood, the rest in front.
+      if (leaves) this.drawLeaves(leaves, 0, leaves.back);
+      this.drawSegments(s, view.colorMode);
+      if (leaves) this.drawLeaves(leaves, leaves.back, leaves.count);
+      if (view.showBuds) this.drawBuds(s, view.colorMode === "light");
+    }
 
     // Ground last, in screen space, so stubs of shoots that turned downward stay underground.
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);

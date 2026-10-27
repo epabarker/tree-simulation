@@ -527,6 +527,7 @@ export class WebGL2Renderer implements Renderer {
       view.leafStyle,
       view.showBuds,
       view.showObstacles,
+      scene.solo,
       ghosts,
       this.themeVersion,
     ].join();
@@ -614,7 +615,9 @@ export class WebGL2Renderer implements Renderer {
       color[4 * j] = palette[c] as number;
       color[4 * j + 1] = palette[c + 1] as number;
       color[4 * j + 2] = palette[c + 2] as number;
-      color[4 * j + 3] = palette[c + 3] as number;
+      // A solo plate draws one specimen: the other trees' wood is fully transparent.
+      color[4 * j + 3] =
+        scene.solo >= 0 && s.tree[j] !== scene.solo ? 0 : (palette[c + 3] as number);
     }
     this.upload(batch, n);
   }

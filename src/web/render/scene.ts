@@ -169,6 +169,8 @@ export class Scene {
   frame: "trees" | "world" | "tree" = "trees";
   /** The tree the "tree" frame fits: one specimen and the ground beneath it (D3). */
   focusTree = -1;
+  /** Draw only this tree, as a botanical plate draws one specimen (-1: every tree). */
+  solo = -1;
   /** CSS pixels kept free above the crowns when fitting. */
   headroom = HEADER_MARGIN;
   /**
@@ -383,6 +385,7 @@ export class Scene {
     for (const offset of this.wrapOffsets()) {
       const wx = x - offset;
       for (let j = 0; j < s.metamerCount; j++) {
+        if (this.solo >= 0 && s.tree[j] !== this.solo) continue; // only the drawn specimen
         const ax = g.baseX[j];
         const ay = g.baseY[j];
         const dx = g.tipX[j] - ax;
@@ -594,6 +597,7 @@ export class Scene {
     for (let i = 0; i < L.count; i++) {
       if (i === L.back) out.back = k;
       const j = L.metamer[i];
+      if (this.solo >= 0 && s.tree[j] !== this.solo) continue;
       let size = ROSETTE_SIZE;
       if (!L.rosette[i]) {
         size = g.grown[j] * (s.age[j] > leafAge ? 1 - t : 1);

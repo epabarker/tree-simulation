@@ -91,8 +91,9 @@ export interface GardenOptions {
   /** What the camera fits (Scene.frame). Default "world". */
   frame?: "trees" | "world";
   /**
-   * "forest" (default): the frame above. "specimen": one tree, the tallest when chosen, kept
-   * while it lives (a page's plate, D3). Change it later with `setFocus`; the camera eases.
+   * "forest" (default): the frame above. "specimen": one tree alone, the tallest when chosen, kept
+   * while it lives, as a botanical plate draws one specimen (D3). Change it later with
+   * `setFocus`; the camera eases.
    */
   focus?: "forest" | "specimen";
   /** CSS pixels kept free above the crowns, e.g. for text over the sky. Default 0. */
@@ -538,15 +539,18 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
 
   /** Keeps the framed specimen while it lives; otherwise frames the tallest tree. */
   function chooseSpecimen(s: Snapshot): void {
-    if (s.metrics.some((m) => m.tree === scene.focusTree)) return;
-    let best = s.metrics[0];
-    for (const m of s.metrics) if (best && m.height > best.height) best = m;
-    scene.focusTree = best ? best.tree : -1;
+    if (!s.metrics.some((m) => m.tree === scene.focusTree)) {
+      let best = s.metrics[0];
+      for (const m of s.metrics) if (best && m.height > best.height) best = m;
+      scene.focusTree = best ? best.tree : -1;
+    }
+    scene.solo = scene.focusTree;
   }
 
   function setFocus(next: "forest" | "specimen"): void {
     focus = next;
     scene.frame = next === "specimen" ? "tree" : (options.frame ?? "world");
+    scene.solo = -1;
     if (next === "specimen" && scene.next) chooseSpecimen(scene.next);
     autoFit = true;
     scene.fit();

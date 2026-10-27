@@ -2,7 +2,7 @@
 
 _Last updated: 2026-10-27_
 
-**Current milestone: M16** (motion), built on `claude/m16-motion` (with `claude/d3-close` docs; not pushed): wind on the plates (breeze, storm gales, the pointer as wind), falling and toppling wood, limbs resting on the ground, storms that break limbs and throw trees. edbarker.dev is the Field guide (garden-v0.4.0).
+**Current milestone: M17** (seasons). M16 is live on edbarker.dev (garden-v0.5.0, PR #11): wind on the plates (breeze, storm gales, the pointer as wind), falling and toppling wood, limbs resting on the ground, storms that break limbs and throw trees. The site is the Field guide.
 
 ## Works
 - **Core:** C1–C6, R1–R6, O2 and O4 (ADRs 0005–0013); the sky sweep with open or periodic sides; golden hashes. `World.discardDead` for long page runs.
@@ -16,9 +16,8 @@ _Last updated: 2026-10-27_
 - **Lab:** WebGL2 with pseudo-depth, Tweakpane, charts, tap to fell, phone layout. **Headless:** `npm run sim`, `npm run bench` (rings 3.8 ms a season), `analysis/experiments/` m0–m11.
 
 ## Next
-1. **Ship M16, on the user's go-ahead:** PR, release garden-v0.5.0, sync edbarker-dev, merge (wind needs no site change).
-2. **M17** seasons (autumn plates, falling leaves), then **M18–M20** (species plates, an open-grown specimen for Plate II).
-3. **The user:** a look on a phone (light, dark, the pointer wind); the site's `TODO(Ed)` items.
+1. **M17** seasons (autumn plates, falling leaves), then **M18–M20** (species plates, an open-grown specimen for Plate II).
+2. **The user:** a look on a phone (light, dark, the pointer wind); the site's `TODO(Ed)` items.
 
 ## Open questions (ask when the milestone comes up)
 - The design direction (D2). ADR 0016, species per tree (M19). Amendments to ADR 0011 and §O2 (M16), and to ADR 0005 (M18). Art direction (M21).

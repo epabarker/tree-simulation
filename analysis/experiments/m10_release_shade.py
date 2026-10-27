@@ -15,8 +15,16 @@ import subprocess
 from concurrent.futures import ThreadPoolExecutor
 
 import polars as pl
-from plotnine import aes, facet_wrap, geom_line, ggplot, labs, stat_summary, theme_minimal
-from treesim import REPO, Run, load_runs, run_many, run_one
+from plotnine import (
+    aes,
+    facet_wrap,
+    geom_line,
+    ggplot,
+    labs,
+    stat_summary,
+    theme_minimal,
+)
+from treesim import REPO, Run, load_runs, run_many
 
 EXPERIMENT = "runs/m10-release-shade"
 FIGURE = REPO / "docs" / "experiments" / "figures" / "2026-10-27-m10-flush.png"

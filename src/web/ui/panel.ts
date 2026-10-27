@@ -7,6 +7,7 @@
 import { Pane } from "tweakpane";
 import type { Params, ParamsPatch } from "../../core/params.ts";
 import { type PresetName, presets } from "../../core/presets.ts";
+import type { LeafStyleName } from "../render/leaf-styles.ts";
 import type { ColorMode, ViewOptions } from "../render/scene.ts";
 
 interface FieldSpec {
@@ -21,7 +22,7 @@ interface FieldSpec {
 }
 
 interface SectionSpec {
-  section: "c1" | "c2" | "c3" | "c4" | "c5" | "c6" | "r6";
+  section: "c1" | "c2" | "c3" | "c4" | "c5" | "c6" | "r2" | "r6";
   title: string;
   /** Adds an on/off checkbox bound to the section's `enabled` flag. */
   toggle?: boolean;
@@ -48,7 +49,8 @@ const SECTIONS: SectionSpec[] = [
         options: { "sky sweep (M6)": "sky", "shadow triangle": "triangle" },
       },
       { key: "kExt", label: "k_ext (sky)", min: 0.05, max: 3, step: 0.05 },
-      { key: "K", label: "K directions (sky)", min: 1, max: 15, step: 1 },
+      { key: "K", label: "K directions (sky)", min: 1, max: 31, step: 1 },
+      { key: "rotate", label: "rotate directions (sky)" },
       { key: "skyTilt", label: "sky tilt (sun side)", min: -1, max: 1, step: 0.05 },
       { key: "skyExponent", label: "zenith weighting", min: 0, max: 4, step: 0.1 },
       { key: "a", label: "a strength (triangle)", min: 0.05, max: 3, step: 0.05 },
@@ -103,6 +105,17 @@ const SECTIONS: SectionSpec[] = [
     fields: [
       { key: "n", label: "n pipe exponent", min: 1.5, max: 3.5, step: 0.05 },
       { key: "r0", label: "r0 tip radius", min: 0.005, max: 0.3, step: 0.005 },
+    ],
+  },
+  {
+    // The pa table itself comes from the species presets (ADR 0009); these are its ontogeny knobs.
+    section: "r2",
+    title: "R2 Physiological age",
+    toggle: true,
+    fields: [
+      { key: "aC", label: "a_c λ decline from age", min: 0, max: 100, step: 1 },
+      { key: "dLambda", label: "Δλ decline", min: 0, max: 0.15, step: 0.005 },
+      { key: "ramp", label: "decline over (seasons)", min: 1, max: 60, step: 1 },
     ],
   },
   {
@@ -212,9 +225,12 @@ export class Panel {
         });
       }
       for (const f of spec.fields) {
+        // A field without options or a range is a checkbox (a boolean param).
         const options = f.options
           ? { options: f.options }
-          : { min: f.min, max: f.max, step: f.step };
+          : f.min !== undefined
+            ? { min: f.min, max: f.max, step: f.step }
+            : {};
         folder.addBinding(target, f.key, { label: f.label, ...options }).on("change", (ev) => {
           if (!ev.last) return;
           if (f.restart) cb.onRestart(this.params);
@@ -235,10 +251,17 @@ export class Panel {
     viewFolder.addBinding(view, "colorMode", { label: "colour", options: colorOptions });
     viewFolder.addBinding(view, "showLeaves", { label: "leaves" });
     viewFolder.addBinding(view, "depth", { label: "depth (off = x-ray)" });
+    const leafOptions: Record<string, LeafStyleName> = {
+      broadleaf: "broadleaf",
+      "needles (conifer)": "needle",
+      "small (birch)": "small",
+      "large (tropical)": "large",
+    };
+    viewFolder.addBinding(view, "leafStyle", { label: "leaf style", options: leafOptions });
     viewFolder.addBinding(view, "leafAge", {
       label: "leaf age (seasons)",
       min: 1,
-      max: 8,
+      max: 12,
       step: 1,
     });
     viewFolder.addBinding(view, "showBuds", { label: "buds" });

@@ -1,14 +1,22 @@
 /**
  * Named starting points, shared by the page and the CLI. Each is a patch over defaultParams,
- * so it is type-checked against Params. Species presets (§9) arrive with R2 at M7.
+ * so it is type-checked against Params. Species presets (§9) use R2 (M7, ADR 0009).
  */
 
-import { defaultParams, mergeParams, type Params, type ParamsPatch } from "./params.ts";
+import {
+  defaultParams,
+  mergeParams,
+  type PaLevel,
+  type Params,
+  type ParamsPatch,
+} from "./params.ts";
 
 export interface Preset {
   label: string;
   description: string;
   patch: ParamsPatch;
+  /** Page only: how the page draws this preset's foliage (src/web/render/leaf-styles.ts). */
+  leaf?: string;
 }
 
 /** Principles shared by every stand preset (C2–C6 on, λ = 0.5). */
@@ -33,6 +41,77 @@ const SKY = {
   c5: { enabled: true, T: 0.03, Trel: 0.12 },
   r6: { enabled: true, qMin: 0.1, leafArea: 2 },
 } satisfies ParamsPatch;
+
+/** One R2 table row (ADR 0009); unspecified fields take baseline values. */
+const level = (row: Partial<PaLevel>): PaLevel => ({
+  lambda: 0.5,
+  setPoint: 0,
+  eta: 0.15,
+  branchAngle: 45,
+  generator: "distichous",
+  tierEvery: 0,
+  pTerm: 0,
+  ...row,
+});
+
+/**
+ * M7 species (§9, ADR 0009): generic types named after a real example, with qualitative values.
+ * Light knobs follow the ROADMAP anchors: k_ext higher for plagiotropic crowns (Kitajima et al.
+ * 2004), the shedding floor T low for shade-tolerant and high for light-demanding species.
+ */
+const CONIFER = {
+  ...SKY,
+  c2: { enabled: true, model: "sky", kExt: 0.6 },
+  c5: { enabled: true, T: 0.02, Trel: 0.12 },
+  // Whorls carry few tips, so the pipe model gives a thin trunk; a thicker tip radius brings
+  // stand H/D to ≈ 78 (stand-grown conifers 60–80, Watt et al. 2023; M7 note).
+  c6: { enabled: true, r0: 0.035 },
+  r2: {
+    enabled: true,
+    levels: [
+      // Massart: monopodial orthotropic trunk with a whorl at the start of each growth unit,
+      level({ lambda: 0.58, setPoint: 0, eta: 0.4, generator: "whorled" }),
+      // plagiotropic branches and branchlets in the plane of the tier.
+      level({ lambda: 0.52, setPoint: 85, eta: 2, branchAngle: 80 }),
+      level({ lambda: 0.5, setPoint: 90, eta: 0.5, branchAngle: 45 }),
+    ],
+  },
+} satisfies ParamsPatch;
+
+const BIRCH = {
+  ...SKY,
+  c2: { enabled: true, model: "sky", kExt: 0.35 },
+  c5: { enabled: true, T: 0.08, Trel: 0.2 },
+  r2: {
+    enabled: true,
+    // Excurrent when young; apical control fades from age 15 (λ −0.06 over 20 seasons).
+    aC: 15,
+    dLambda: 0.06,
+    ramp: 20,
+    levels: [
+      level({ lambda: 0.56, setPoint: 0, eta: 0.3 }),
+      // Fine, steep laterals; the finest twigs hang (A_set > 90°).
+      level({ lambda: 0.53, setPoint: 40, eta: 0.2, branchAngle: 35 }),
+      level({ lambda: 0.5, setPoint: 120, eta: 0.25, branchAngle: 40 }),
+    ],
+  },
+} satisfies ParamsPatch;
+
+const TROPICAL = {
+  ...SKY,
+  c2: { enabled: true, model: "sky", kExt: 0.6 },
+  r2: {
+    enabled: true,
+    levels: [
+      // Aubréville: orthotropic trunk with a tier every 7 nodes,
+      level({ lambda: 0.6, setPoint: 0, eta: 0.5, generator: "whorled", tierEvery: 7 }),
+      // plagiotropic sympodial modules: each season's shoot ends and two relays fork on.
+      level({ lambda: 0.5, setPoint: 88, eta: 2, branchAngle: 20, generator: "whorled", pTerm: 1 }),
+    ],
+  },
+} satisfies ParamsPatch;
+
+const STAND_X = [20, 41, 62, 83, 104, 125, 146, 167, 188, 209].map((x) => ({ x }));
 
 export const presets = {
   explosion: {
@@ -194,6 +273,17 @@ export const presets = {
       ...SKY,
     },
   },
+  overcast: {
+    label: "M6e: stand under an overcast sky",
+    description:
+      "The stand under a standard overcast sky (zenith three times as bright as the horizon, p = 1.5).",
+    patch: {
+      world: { width: 230, height: 110, walls: [] },
+      trees: [20, 41, 62, 83, 104, 125, 146, 167, 188, 209].map((x) => ({ x })),
+      ...SKY,
+      c2: { enabled: true, model: "sky", skyExponent: 1.5 },
+    },
+  },
   obliqueSun: {
     label: "M6: oblique sun",
     description: "A sky brighter to the right (tilt 0.5): the crown grows toward the sun (§C2.6).",
@@ -203,6 +293,39 @@ export const presets = {
       ...SKY,
       c2: { enabled: true, model: "sky", skyTilt: 0.5 },
     },
+  },
+  conifer: {
+    leaf: "needle",
+    label: "M7: conifer (fir-like)",
+    description:
+      "Massart's model, as in Abies: a straight trunk with a tier of flat branches each season (§9).",
+    patch: { world: { width: 120, height: 160, walls: [] }, trees: [{ x: 60 }], ...CONIFER },
+  },
+  coniferStand: {
+    leaf: "needle",
+    label: "M7: conifer stand",
+    description: "Ten fir-like trees: narrow spires with clear boles (§9).",
+    patch: { world: { width: 230, height: 160, walls: [] }, trees: STAND_X, ...CONIFER },
+  },
+  birch: {
+    leaf: "small",
+    label: "M7: pioneer (birch-like)",
+    description:
+      "Light-demanding and slender, like Betula: a leader when young, fine steep branches, hanging twigs (§9).",
+    patch: { world: { width: 120, height: 160, walls: [] }, trees: [{ x: 60 }], ...BIRCH },
+  },
+  birchStand: {
+    leaf: "small",
+    label: "M7: pioneer stand",
+    description: "Ten birch-like trees: open, slender crowns that lift fast (§9).",
+    patch: { world: { width: 230, height: 160, walls: [] }, trees: STAND_X, ...BIRCH },
+  },
+  tropical: {
+    leaf: "large",
+    label: "M7: tiered tropical tree (Terminalia-like)",
+    description:
+      "Aubréville's model, as in Terminalia catappa: a pagoda of flat tiers of forking branch modules (§9).",
+    patch: { world: { width: 140, height: 160, walls: [] }, trees: [{ x: 70 }], ...TROPICAL },
   },
 } satisfies Record<string, Preset>;
 

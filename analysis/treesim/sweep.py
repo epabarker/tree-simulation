@@ -22,6 +22,7 @@ class Run:
     seasons: int = 30
     patch: dict = field(default_factory=dict)
     snapshots: list[int] = field(default_factory=list)
+    light: bool = False  # also write light.csv (per-cell shade) at the snapshot seasons
 
 
 def run_one(run: Run) -> Path:
@@ -36,6 +37,8 @@ def run_one(run: Run) -> Path:
     ]
     if run.snapshots:
         cmd += ["--snapshots", ",".join(str(s) for s in run.snapshots)]
+    if run.light:
+        cmd.append("--light")
     subprocess.run(cmd, input=json.dumps(run.patch), text=True, cwd=REPO, check=True)
     return REPO / run.out
 

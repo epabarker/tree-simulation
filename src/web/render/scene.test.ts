@@ -1,8 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { presetParams } from "../../core/presets.ts";
+import { presetParams, presets } from "../../core/presets.ts";
 import { SnapshotBuilder } from "../../core/snapshot.ts";
 import { BudState, type Tree } from "../../core/tree.ts";
 import { World } from "../../core/world.ts";
+import { isLeafStyleName, LEAF_STYLES } from "./leaf-styles.ts";
 import { CLUSTER_LEAVES, Scene } from "./scene.ts";
 
 /** Young metamers (leafy shoots) and short shoots on older wood (rosettes) in a snapshot. */
@@ -139,5 +140,28 @@ describe("Scene pseudo-depth view (ADR 0008)", () => {
     const b = scene.leaves(3, 1);
     expect(b.back).toBe(first.back);
     expect(Array.from(b.x.subarray(0, b.count))).toEqual(first.x);
+  });
+});
+
+describe("Leaf styles (page only, per species)", () => {
+  const { scene } = sceneAfter(20);
+
+  it("draws a needle spray of the style's cluster size, on both sides in the x-ray view", () => {
+    scene.leafStyle = LEAF_STYLES.needle;
+    const { young, rosettes } = leafSites(scene, 3);
+    scene.depth = true;
+    scene.computeGeometry(1);
+    expect(scene.leaves(3, 1).count).toBe(LEAF_STYLES.needle.cluster * (young + rosettes));
+    scene.depth = false;
+    scene.computeGeometry(1);
+    expect(scene.leaves(3, 1).count).toBe(2 * young + 2 * rosettes);
+    scene.leafStyle = LEAF_STYLES.broadleaf;
+  });
+
+  it("names a known style for every preset that asks for one", () => {
+    for (const preset of Object.values(presets) as { leaf?: string }[]) {
+      if (preset.leaf !== undefined) expect(isLeafStyleName(preset.leaf)).toBe(true);
+    }
+    expect((presets.conifer as { leaf?: string }).leaf).toBe("needle");
   });
 });

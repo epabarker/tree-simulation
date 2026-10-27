@@ -98,4 +98,30 @@ describe("C2 sky sweep (§C2.4, M6)", () => {
     expect(out.q).toBeCloseTo(1, 12); // weights still sum to C
     expect(out.vx).toBeGreaterThan(0.1);
   });
+
+  it("moves the sky directions each season with c2.rotate, keeping Σw = C (M6e)", () => {
+    const g = sky(12, 10, { rotate: true });
+    const lo = (base.minElevation * Math.PI) / 180;
+    const angles: number[][] = [];
+    for (const season of [0, 1, 2, 7]) {
+      g.clear();
+      g.compute(season);
+      g.sample(6.5, 4.5, UP, out);
+      expect(out.q).toBeCloseTo(1, 12); // empty sky: full light at every rotation
+      const theta = Array.from(g.dirX, (dx, k) => Math.atan2(g.dirY[k] as number, dx));
+      for (const t of theta) {
+        expect(t).toBeGreaterThanOrEqual(lo - 1e-12);
+        expect(t).toBeLessThanOrEqual(Math.PI - lo + 1e-12);
+      }
+      angles.push(theta);
+    }
+    expect(angles[1]).not.toEqual(angles[0]);
+    expect(angles[3]).not.toEqual(angles[2]);
+    // Without rotate the M6 grid stays put whatever the season.
+    const fixed = sky(12, 10);
+    fixed.compute(0);
+    const before = Array.from(fixed.dirX);
+    fixed.compute(5);
+    expect(Array.from(fixed.dirX)).toEqual(before);
+  });
 });

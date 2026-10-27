@@ -5,7 +5,8 @@
  * axillary buds get a side from the distichous sequence s_k = s0·(−1)^k [RNG: sideSequence,
  * keyed by axis], so successive nodes of an axis alternate left and right.
  *
- * Params: c1.branchAngle (β), c1.internodeLength (l0), c1.maxMetamersPerShoot, c6.r0.
+ * Params: c1.branchAngle (β), c1.internodeLength (l0), c1.maxMetamersPerShoot, c6.r0; with R2
+ * the r2.levels generator, β and p_term (r2-physiological-age.ts).
  *
  * Column arrays are re-read after every `add()`, which may reallocate them.
  */
@@ -13,6 +14,7 @@
 import { DEG, type Params } from "../params.ts";
 import { Purpose, sign } from "../rng.ts";
 import { BudState, Slot, type Tree } from "../tree.ts";
+import { branchAngleOf, lateralCount, terminates } from "./r2-physiological-age.ts";
 
 /** Appends a metamer at `slot` of `parent`'s upper node (parent -1 = root). Returns its index. */
 export function addMetamer(
@@ -73,25 +75,40 @@ export function addBud(tree: Tree, m: number, slot: Slot, angle: number, order: 
 
 /**
  * Forms the axillary bud(s) of metamer `m` from the side sequence (§C1.4). Distichous: one bud
- * per node, side s_k = s0·(−1)^k where k is the node's position on its axis.
+ * per node, side s_k = s0·(−1)^k where k is the node's position on its axis. With R2 the axis's
+ * generator may place a bud on both sides (opposite, whorled tiers) or none (ADR 0009);
+ * `lastOfShoot` marks the last metamer of this season's shoot, where whorled tiers form.
  * Side −1 is the left slot (direction rotated by +β), side +1 the right slot (−β).
  */
-export function formAxillaryBuds(tree: Tree, m: number, params: Params): void {
+export function formAxillaryBuds(tree: Tree, m: number, params: Params, lastOfShoot = true): void {
   const c = tree.m.cols;
   const k = c.axisNode[m];
+  const count = lateralCount(c.order[m], k, lastOfShoot, params.r2);
+  if (count === 0) return;
+  const order = c.order[m] + 1;
+  const beta = branchAngleOf(order, params) * DEG;
+  const angle = c.angle[m];
+  if (count === 2) {
+    addBud(tree, m, Slot.left, angle + beta, order);
+    addBud(tree, m, Slot.right, angle - beta, order);
+    return;
+  }
   const s0 = sign(params.seed, Purpose.sideSequence, tree.id, c.axis[m], 0);
   const side = k % 2 === 0 ? s0 : -s0;
-  const beta = params.c1.branchAngle * DEG;
-  const angle = c.angle[m];
-  const order = c.order[m] + 1;
   if (side < 0) addBud(tree, m, Slot.left, angle + beta, order);
   else addBud(tree, m, Slot.right, angle - beta, order);
 }
 
-/** Forms the terminal bud of metamer `m`, continuing its axis in the same direction. */
-export function formTerminalBud(tree: Tree, m: number): void {
+/**
+ * Forms the terminal bud of metamer `m`, continuing its axis in the same direction. With R2 it
+ * ends (terminated, sympodial growth) with probability p_term of the axis's pa.
+ */
+export function formTerminalBud(tree: Tree, m: number, params: Params, season: number): void {
   const c = tree.m.cols;
-  addBud(tree, m, Slot.main, c.angle[m], c.order[m]);
+  const i = addBud(tree, m, Slot.main, c.angle[m], c.order[m]);
+  if (terminates(c.order[m], tree.id, c.birthId[m], season, params)) {
+    tree.b.cols.state[i] = BudState.terminated;
+  }
 }
 
 /** Plants a seedling: one vertical metamer with its terminal and axillary buds. */
@@ -105,7 +122,7 @@ export function plantSeedling(tree: Tree, params: Params, season: number): void 
     params.c6.r0,
     season,
   );
-  formTerminalBud(tree, m);
+  formTerminalBud(tree, m, params, season);
   formAxillaryBuds(tree, m, params);
 }
 
@@ -154,8 +171,8 @@ export function growShoot(
   for (let j = 0; j < n; j++) {
     angle = direct(angle, bud, tree.nextMetamerId);
     const m = addMetamer(tree, parent, slot, angle, length, params.c6.r0, season);
-    formAxillaryBuds(tree, m, params);
-    if (j === n - 1) formTerminalBud(tree, m);
+    formAxillaryBuds(tree, m, params, j === n - 1);
+    if (j === n - 1) formTerminalBud(tree, m, params, season);
     parent = m;
     slot = Slot.main;
   }

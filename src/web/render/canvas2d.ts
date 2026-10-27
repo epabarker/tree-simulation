@@ -7,15 +7,9 @@
 import type { Snapshot } from "../../core/snapshot.ts";
 import { BudState } from "../../core/tree.ts";
 import { BUD_ACTIVE, BUD_DORMANT, SEQUENTIAL, shadeImage } from "./colors.ts";
+import { LEAF_STYLES } from "./leaf-styles.ts";
 import { MAX_DPR, type Renderer } from "./renderer.ts";
-import {
-  type ColorMode,
-  LEAF_ASPECT,
-  type Leaves,
-  leafLength,
-  Scene,
-  type ViewOptions,
-} from "./scene.ts";
+import { type ColorMode, type Leaves, leafLength, Scene, type ViewOptions } from "./scene.ts";
 import { RAMP_STEPS, readTheme, type Theme } from "./theme.ts";
 
 const WIDTH_BUCKETS = 48;
@@ -84,6 +78,7 @@ export class Canvas2DRenderer implements Renderer {
     }
 
     scene.depth = view.depth;
+    scene.leafStyle = LEAF_STYLES[view.leafStyle];
     scene.computeGeometry(t);
     if (view.showGhosts && scene.prev && t < 1) this.drawGhosts(1 - t);
     // Back-layer leaves (pseudo-depth, ADR 0008) go behind the wood, the rest in front.
@@ -162,8 +157,9 @@ export class Canvas2DRenderer implements Renderer {
 
   private drawLeaves(leaves: Leaves, from: number, to: number): void {
     const { ctx } = this;
-    const palette = this.theme.leaf;
-    const full = leafLength(this.scene.camera.scale);
+    const style = this.scene.leafStyle;
+    const palette = this.theme.leaf[style.palette];
+    const full = leafLength(this.scene.camera.scale, style.length);
     ctx.save();
     ctx.globalAlpha = 0.92;
     for (let c = 0; c < RAMP_STEPS; c++) {
@@ -176,7 +172,7 @@ export class Canvas2DRenderer implements Renderer {
         const ux = leaves.ux[k];
         const uy = leaves.uy[k];
         const len = full * leaves.size[k];
-        const bulge = len * LEAF_ASPECT; // control points at twice the half-width
+        const bulge = len * style.aspect; // control points at twice the half-width
         const tx = bx + ux * len;
         const ty = by + uy * len;
         const mx = bx + ux * len * 0.5;

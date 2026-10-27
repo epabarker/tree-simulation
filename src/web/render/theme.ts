@@ -3,6 +3,8 @@
  * modes live in one place (layout.css). Re-read whenever the colour scheme changes.
  */
 
+import { LEAF_PALETTES, type LeafPalette } from "./leaf-styles.ts";
+
 export interface Theme {
   skyTop: string;
   skyBottom: string;
@@ -12,8 +14,8 @@ export interface Theme {
   ghost: string;
   /** Young twig → old bark. */
   bark: string[];
-  /** Deep shade → full sun. */
-  leaf: string[];
+  /** Deep shade → full sun, one ramp per leaf palette (leaf-styles.ts). */
+  leaf: Record<LeafPalette, string[]>;
 }
 
 export const RAMP_STEPS = 12;
@@ -47,6 +49,23 @@ export function readTheme(el: Element): Theme {
     wall: v("--wall", "rgba(90, 90, 100, 0.35)"),
     ghost: v("--ghost", "#9a8f80"),
     bark: ramp(v("--bark-young", "#8c7b4f"), v("--bark-old", "#4c3d31")),
-    leaf: ramp(v("--leaf-shade", "#35502a"), v("--leaf-sun", "#a3cf5b")),
+    leaf: leafRamps(v),
   };
+}
+
+/** Fallbacks for each palette's tokens (`--leaf-shade`/`--leaf-sun`, `--needle-…`, …). */
+const LEAF_FALLBACK: Record<LeafPalette, [string, string, string]> = {
+  broadleaf: ["--leaf", "#35502a", "#a3cf5b"],
+  needle: ["--needle", "#1f3b2c", "#5d8a5a"],
+  birch: ["--birch-leaf", "#4a6a2a", "#c3dc6a"],
+  tropical: ["--tropical-leaf", "#1d4a26", "#6fb04a"],
+};
+
+function leafRamps(v: (name: string, fallback: string) => string): Record<LeafPalette, string[]> {
+  const out = {} as Record<LeafPalette, string[]>;
+  for (const p of LEAF_PALETTES) {
+    const [token, shade, sun] = LEAF_FALLBACK[p];
+    out[p] = ramp(v(`${token}-shade`, shade), v(`${token}-sun`, sun));
+  }
+  return out;
 }

@@ -2,6 +2,52 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-27: Per-species leaf styles; M12 review milestone
+
+- **Leaf styles** (user's choice over going straight to M8), page only (`render/leaf-styles.ts`):
+  - broadleaf (the M6c lens);
+  - needle: thin dark blue-green needles, 6 per spray, kept 8 seasons;
+  - small: birch-like, light, broad;
+  - large: Terminalia-like, glossy, crowded at shoot tips.
+  - Species presets name theirs in `Preset.leaf`; picking a preset sets View → leaf style and leaf age, and both can be overridden. Both renderers read `Scene.leafStyle`; the WebGL2 leaf uniform and palette come from it. New colour tokens in light and dark.
+- **Seen** in headless Chromium (WebGL2 light and dark, Canvas 2D): the fir reads as a conifer, the birch as small-leaved and open, the Terminalia as tiers of big leaves at branch ends. No console errors.
+- **Tests:** `scene.test.ts` checks the needle spray counts in both views and that every preset's `leaf` names a known style.
+- **M12** (user): after M11, an independent review of the whole project by a fresh agent, triaged with the user before any post-build-order work (ROADMAP, spec §7).
+- No simulation or golden changes.
+
+## 2026-10-27: M7, physiological age and three species
+
+- **Species** chosen by the user (ADR 0009): a fir-like conifer (Massart), a birch-like pioneer (in place of §7's Rauh broadleaf) and a *Terminalia*-like tropical tree (Aubréville). Names are generic with a real example. The oak-like, willow and beech presets wait for R3 (ROADMAP "Later").
+- **R2** (`r2-physiological-age.ts`, ADR 0009):
+  - pa = min(order, levels − 1);
+  - per-pa λ, A_set, η, β, generator (distichous, opposite, whorled with an optional `tierEvery`, none) and p_term;
+  - ontogeny: λ falls by Δλ over `ramp` seasons from age a_c.
+  - It hooks into C1 (`formAxillaryBuds`, `formTerminalBud`), C3 (λ per node) and C4 (`directionParams`). Acrotony is deferred. R2 off: every existing golden unchanged.
+- **Presets:** `conifer`, `coniferStand`, `birch`, `birchStand`, `tropical`, with 160-cell-tall worlds (the species' leaders reach a 110-cell ceiling by season 40). Species light knobs: k_ext 0.6/0.35/0.6, T 0.02/0.08/0.03, conifer r0 0.035. Page: an R2 folder (enable, a_c, Δλ, ramp).
+- **Results** ([note](experiments/2026-10-27-m7-species.md)): conifer tiers at 77° from vertical, cone 1.6× wider below than above, stand H/D 78 with bole 64% of height; birch branches 25°, its λ decline broadens the crown from 0.54 to 0.80 of its height, its stand crowns lift to 80%; tropical pagoda tiers at 69°, widest at the base.
+- **Surprises.**
+  - Plagiotropic tiers need η ≈ 2: at η 0.4 the light term ξ·V tilts the branches 45° upward.
+  - Whorls carry few tips, so the pipe model makes conifer trunks thin (stand H/D 136 at r0 0.02).
+  - Sympodial relays at β 75° zigzag; β 20° with a strong η keeps the tiers flat.
+  - The seedling's first node is a tier node whose continuation shares its season, so the whorl test exempts it.
+- **Tests:** `r2-physiological-age.test.ts` (6) and `species.test.ts` (5). **Goldens:** `conifer`, `birch` and `tropical` added; no existing hash changed.
+- Checked on the page (headless Chromium, WebGL2): tiers and the pagoda read well. Every species uses the same broad leaves, so the conifer looks like a tiered broadleaf; needles are a follow-up.
+
+## 2026-10-27: M6e, light calibration
+
+- **Session setup.** This is a cloud session: Node 24 installed with nvm (`/opt/nvm`; the image's default is Node 22), then `npm ci`. The user parked the two open questions (Pages domain, pCloud copies).
+- **`groundLight` metric** (`metrics.ts`, `metrics.csv`): mean Q/C in the bottom row of cells across a tree's crown, from the start-of-season field. `treeMetrics(tree, world?)` takes the world for it; without one it is NaN.
+- **`c2.rotate`** (off by default): the K directions sit one per equal stratum at (k + f)/K of the sky, and f advances by φ − 1 each season. `LightModel.compute` now takes the season. Page: a "rotate directions" checkbox in C2; the K slider goes up to 31; the panel accepts boolean fields.
+- **`overcast` preset** (stand, p = 1.5). CLI `--light` writes `light.csv` (per-cell shade at the snapshot seasons).
+- **Calibration** ([note](experiments/2026-10-27-m6e-light-calibration.md)). Defaults kept: k_ext 0.5, K 7, rotate off.
+  - Floor light under interior crowns is 5.8% (3.5–3.8% under the central trees).
+  - Surprise: floor light is nearly independent of k_ext (5.8–8% from 0.25 to 1), because crowns carry less leaf area when k_ext is larger. So k_ext is a leaf-area knob, not a floor-light knob.
+  - Second surprise: much of the light reaching a stand's floor, and the stand's growth, comes through the world's open sides. Closing them with walls gives 1% floor light and trees 22% shorter at season 50. The ROADMAP M11 row now asks for a forest-like boundary first.
+  - K = 7 matches K = 31 on every pattern except crown base, which is about 7 cells lower (≈ 2 SE). Rotation hides the zenith streaks in the field but changes no pattern.
+- **Tests.** `sky-sweep.test.ts` gained a rotate test. `sky.test.ts` gained the M6e block: the ground-light metric, the 2–10% floor target, and K 7 vs 15 convergence.
+- **Goldens:** `overcast:seed1:s30` added. No existing hash changed (rotate off reproduces the M6 grid exactly).
+- Checked on the page in headless Chromium: the rotate checkbox toggles live, the overcast preset loads, no console errors.
+
 ## 2026-10-27: M6d, relative shedding and short shoots
 
 - **C5 relative threshold** (ADR 0007): `c5.Trel`, `c5.topQuantile`; Q_top computed per tree after sampling (`crownTopLight`).

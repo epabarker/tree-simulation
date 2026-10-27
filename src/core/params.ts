@@ -79,6 +79,11 @@ export interface Params {
     skyTilt: number;
     /** Sky sweep: lowest sky direction above the horizon, degrees. */
     minElevation: number;
+    /**
+     * Sky sweep: move the K directions by a golden-ratio step each season (stratified, one per
+     * equal slice of the sky) so the streaks of a small K average out (M6e). Off: the fixed M6 grid.
+     */
+    rotate: boolean;
   };
 
   /** C3 Basipetal light summation and acropetal Borchert–Honda allocation. */
@@ -144,6 +149,21 @@ export interface Params {
     r0: number;
   };
 
+  /**
+   * R2 Physiological age (spec §R2, ADR 0009). pa = min(branching order, levels − 1); each level
+   * overrides λ, A_set, η and β for its axes and sets their lateral generator and p_term.
+   * Off = baseline: one level taken from c1, c3 and c4.
+   */
+  r2: {
+    enabled: boolean;
+    /** The pa table, 2–4 rows: row 0 is the trunk. */
+    levels: PaLevel[];
+    /** Ontogeny: from tree age a_c (seasons), every λ falls linearly by Δλ over `ramp` seasons. */
+    aC: number;
+    dLambda: number;
+    ramp: number;
+  };
+
   /** R6 Short shoots (spec §R6, ADR 0006). Off = baseline: every live bud is one unit of leaf area. */
   r6: {
     enabled: boolean;
@@ -152,6 +172,24 @@ export interface Params {
     /** a_ss: leaf area of a short shoot, in units of a long shoot's (calibrate). */
     leafArea: number;
   };
+}
+
+/** One row of the R2 table (§R2.6): what an axis of this physiological age does. */
+export interface PaLevel {
+  /** Apical bias λ at the nodes of this axis (C3). */
+  lambda: number;
+  /** Set-point angle A_set from vertical, degrees (C4): 0 orthotropic, ≈ 90 plagiotropic. */
+  setPoint: number;
+  /** Tropism weight η toward A_set (C4). */
+  eta: number;
+  /** Branch angle β of a lateral of this pa from its parent axis, degrees (C1). */
+  branchAngle: number;
+  /** Where this axis forms lateral buds (§C1.4; ADR 0009). */
+  generator: "distichous" | "opposite" | "whorled" | "none";
+  /** Whorled only: 0 = a tier at the start of each growth unit; k > 0 = at every k-th node. */
+  tierEvery: number;
+  /** Probability that the terminal bud ends when a shoot of this pa ends: sympodial growth. */
+  pTerm: number;
 }
 
 export const defaultParams: Params = {
@@ -178,11 +216,13 @@ export const defaultParams: Params = {
     skyExponent: 1,
     skyTilt: 0,
     minElevation: 15,
+    rotate: false,
   },
   c3: { mode: "none", lambda: 0.5, alpha: 2 },
   c4: { enabled: false, wd: 1, xi: 0.3, eta: 0.15, setPoint: 0, epsilon: 0.5, sigma: 20 },
   c5: { enabled: false, T: 0.1, g: 3, Trel: 0, topQuantile: 0.9 }, // T, Trel: calibrate
   c6: { enabled: false, n: 2, r0: 0.02 },
+  r2: { enabled: false, levels: [], aC: 0, dLambda: 0, ramp: 1 },
   r6: { enabled: false, qMin: 0.2, leafArea: 1 }, // calibrate (M6d)
 };
 

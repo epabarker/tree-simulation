@@ -7,7 +7,8 @@
  *   echo '{"c3":{"lambda":0.56}}' | npm run sim -- --params - --out runs/y
  *
  * Writes to --out: run.json (resolved params, events, metadata), metrics.csv (one row per tree
- * per season), metamers.csv (geometry at --snapshots seasons and the last), hash.txt.
+ * per season), metamers.csv (geometry at --snapshots seasons and the last), hash.txt, and with
+ * --light light.csv (the light model's per-cell shade 1 − Q/C at the same seasons; M6e).
  */
 
 import { execFileSync } from "node:child_process";
@@ -30,6 +31,7 @@ const { values } = parseArgs({
     snapshots: { type: "string", default: "" },
     out: { type: "string" },
     quiet: { type: "boolean", default: false },
+    light: { type: "boolean", default: false },
   },
 });
 
@@ -83,6 +85,8 @@ const metamerLines = [
   "season,tree,birthId,parentBirthId,order,axis,x0,y0,x1,y1,length,angle,radius,qSum,nSum,vIn,birthSeason",
 ];
 
+const lightLines = ["season,col,row,shade"];
+
 const world = new World(params);
 const queue = [...events].sort((a, b) => a.season - b.season);
 const t0 = performance.now();
@@ -93,12 +97,20 @@ for (let s = 0; s < seasons; s++) {
   );
   for (const tree of world.trees) {
     if (tree.m.length === 0) continue;
-    const m = treeMetrics(tree);
+    const m = treeMetrics(tree, world);
     metricsLines.push(
       [world.season, ...METRIC_COLUMNS.map((k) => m[k])]
         .map((v) => (typeof v === "boolean" ? (v ? 1 : 0) : num(v as number)))
         .join(","),
     );
+  }
+  const field = values.light && snapshotSeasons.has(world.season) ? world.light.field() : null;
+  if (field) {
+    // The field of the season just run, i.e. the start-of-season light its buds saw.
+    const W = world.light.width;
+    for (let c = 0; c < field.length; c++) {
+      lightLines.push(`${world.season},${c % W},${Math.floor(c / W)},${num(field[c] as number)}`);
+    }
   }
   if (snapshotSeasons.has(world.season)) {
     for (const tree of world.trees) {
@@ -150,6 +162,7 @@ writeFileSync(join(out, "run.json"), `${JSON.stringify(run, null, 2)}\n`);
 writeFileSync(join(out, "metrics.csv"), `${metricsLines.join("\n")}\n`);
 writeFileSync(join(out, "metamers.csv"), `${metamerLines.join("\n")}\n`);
 writeFileSync(join(out, "hash.txt"), `${hash}\n`);
+if (values.light) writeFileSync(join(out, "light.csv"), `${lightLines.join("\n")}\n`);
 if (!values.quiet) {
   console.log(`${out}: ${seasons} seasons in ${ms.toFixed(0)} ms, hash ${hash}`);
 }

@@ -68,6 +68,7 @@ The passes need only `parent` and `slot`:
 | CARBON | — | M8 |
 | ACROPETAL | `allocate` (C3, by `c3.mode`): `bh` splits by λ at every node; `equal` shares α·Q_base over live buds; `none` gives v = 1 to any bud with Q > 0. Every mode fills `vIn` | M0 `none`, M2 `bh`/`equal` |
 | BUD_FATE, GROW | `growBuds` → `shootSize`, `growShoot`; each new metamer's angle comes from `shootDirection` (C4) when `c4.enabled`, using the bud's V | M0, M3 |
+| R2 (M7, ADR 0009) | No pass of its own: pa = min(order, levels − 1) is looked up where each rule reads its params. `allocate` reads λ per node (`lambdaAt`, with the ontogeny decline); `growBuds` reads A_set and η per bud (`directionParams`); `growShoot` places lateral buds by the axis's generator (`lateralCount`; whorls on the shoot's last metamer) and forms the terminal bud `terminated` with p_term (`terminates`, `Purpose.sympodialTermination`) | M7 |
 | BUD_FATE (R6, M6d) | In `growBuds`: a live bud with n = 0 becomes `shortShoot` if Q ≥ `r6.qMin`, else `dormant`. With R6 on, `depositBuds` deposits leaf area by state (active 1, short shoot `r6.leafArea`, dormant 0) and `gatherLight` weights Q by it | M6d |
 | SHED, GIRTH | `shedBranches` (C5; threshold max(T, T_rel·Q_top), Q_top from `crownTopLight` after sampling, ADR 0007): marks dim laterals' subtrees on this season's Q_sum/n_b, records scars, compacts metamers and buds, remaps `parent` and `bud.metamer`. Then `updateGirth` (C6): basipetal pipe sums with memory | M4 |
 | MECHANICS | — | M9 |
@@ -85,7 +86,7 @@ Before this rule, shoots that left the grid saw unshaded sky and grew exponentia
 ## Light models (`src/core/light/`)
 
 All of them sit behind `LightModel.sample(x, y, dir) → {q, vx, vy}` (§C2.8):
-- `SkySweep` (M6, default `c2.model: "sky"`, ADR 0005): each bud adds one unit of leaf area to its cell; `compute()` (end of Phase 1) sweeps K sky directions from the sky side, accumulating optical depth T_k into every cell with linear interpolation between the two upstream cells, then stores Q = Σ w_k e^(−k_ext T_k) and the light-weighted direction per cell. A bud gets its cell's values (its own cell's foliage does not shade it); rays from beyond the world's sides are open sky; outside the box Q = 0. The shade overlay shows 1 − Q/Q_open.
+- `SkySweep` (M6, default `c2.model: "sky"`, ADR 0005): each bud adds one unit of leaf area to its cell; `compute()` (end of Phase 1) sweeps K sky directions from the sky side, accumulating optical depth T_k into every cell with linear interpolation between the two upstream cells, then stores Q = Σ w_k e^(−k_ext T_k) and the light-weighted direction per cell. A bud gets its cell's values (its own cell's foliage does not shade it); rays from beyond the world's sides are open sky; outside the box Q = 0. The shade overlay shows 1 − Q/Q_open. `compute(season)` takes the season so that `c2.rotate` (M6e, off by default) can move the K directions each season: they then sit at (k + f)/K of the sky's span with f = frac(0.5 + season·(φ − 1)), one per equal stratum, and the weights are renormalised to Σw = C.
 - `UniformLight`: C2 off.
 - `ShadowTriangle` (M1): deposits a·b^(−q) per bud, Q = max(C − s + a, 0), and V points at the least-shaded cell in a wedge of half-angle θ and radius r.
 - The sky sweep: M6.
@@ -128,6 +129,8 @@ Every typed array is transferred, not copied.
 
 **Natural view (default).** Branches are coloured bark-young → bark-old by √(age/max age). Leaves are drawn as lens shapes at the tip of every metamer up to `leafAge` seasons old (default 5), alternating sides by birthId parity, coloured shade → sun by the metamer's light, with a small stable per-leaf variation. They are a view of the foliage only: in the model, buds cast the shade (§C2). Leaves unfold with their metamer, shrink away in the season they age out, and never draw shorter than 5 px so zoomed-out crowns still read as foliage. Sky and ground are screen-space gradients.
 
+**Leaf styles** (`render/leaf-styles.ts`, page only). A species preset names a style in `Preset.leaf` (core/presets.ts); the page copies it into `ViewOptions.leafStyle`, and the renderers into `Scene.leafStyle`. A style sets leaf length and aspect (a needle is a thin lens), spread, leaves per cluster (depth view) and per side (x-ray), the colour ramp (`--needle-*`, `--birch-leaf-*`, `--tropical-leaf-*` tokens in layout.css) and the default leaf age. View → leaf style overrides it. The model's leaf area does not depend on it.
+
 **Drawn vs simulated foliage.** Today the model holds one unit of leaf area per live bud (active or dormant), while the page draws leaves on young metamers. With R6 on (M6d) the model's leaf area follows shoot type, and the page draws a rosette at each short shoot, so the two agree.
 
 **Pseudo-depth (M6c, ADR 0008, page only).** With the `depth` view option on (natural default), `Scene.computeGeometry` maps each metamer's simulated direction through a 2×2 projection: identity on the trunk; each first-order limb's subtree squeezed perpendicular to the trunk by 0.55 + 0.45·|sin φ|, φ hashed from the limb's birthId (spec §C1.4's projected spiral, applied once per limb). `Scene.leaves` then emits `CLUSTER_LEAVES` (3) leaves per leafy metamer spaced around the shoot, each foreshortened by its out-of-plane angle, with depth mixing the axis depth and the leaf's; leaves behind the plane come first (`Leaves.back`), darkened, and both renderers draw them before the branches, the rest after (WebGL2 uses a second leaf batch). With `depth` off (the x-ray view) the page draws exactly the simulated geometry. Picking uses the drawn geometry.
@@ -154,5 +157,6 @@ Measured in headless Firefox (desktop GPU; phones are slower): a 10-tree stand o
 | `metrics.csv` | One row per tree per season after the season ran. Columns: `season` + `METRIC_COLUMNS` (`metrics.ts`) |
 | `metamers.csv` | Every metamer at each `--snapshots` season and at the final season. Columns: `season,tree,birthId,parentBirthId,order,axis,x0,y0,x1,y1,length,angle,radius,qSum,nSum,vIn,birthSeason` |
 | `hash.txt` | State hash (same function as the golden tests) |
+| `light.csv` | With `--light` only: the light model's per-cell shade (1 − Q/C for the sky sweep) at the same seasons as `metamers.csv`, i.e. the start-of-season field those seasons' buds saw. Columns: `season,col,row,shade`, row 0 at the ground |
 
 The analysis reads these with `analysis/treesim_io.py`.

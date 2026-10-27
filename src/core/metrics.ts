@@ -3,8 +3,10 @@
  * One row per tree per season in the CLI's metrics.csv.
  */
 
+import type { LightSample } from "./light/light-model.ts";
 import { isLiveBud } from "./principles/c3-allocation.ts";
 import { BudState, type Tree } from "./tree.ts";
+import type { World } from "./world.ts";
 
 export interface TreeMetrics {
   tree: number;
@@ -33,6 +35,12 @@ export interface TreeMetrics {
   slenderness: number;
   /** Metamers shed this season (C5). */
   shed: number;
+  /**
+   * Mean light on the ground under the crown, as a fraction of open sky (Q/C in the bottom row
+   * of cells across the crown's width), from this season's start-of-season field (M6e; a closed
+   * stand's floor gets ≈ 2–10%, §10). NaN without a world.
+   */
+  groundLight: number;
 }
 
 export const METRIC_COLUMNS: readonly (keyof TreeMetrics)[] = [
@@ -53,9 +61,27 @@ export const METRIC_COLUMNS: readonly (keyof TreeMetrics)[] = [
   "trunkRadius",
   "slenderness",
   "shed",
+  "groundLight",
 ];
 
-export function treeMetrics(tree: Tree): TreeMetrics {
+const ground: LightSample = { q: 0, vx: 0, vy: 0 };
+
+/** Mean Q/C over the bottom row of cells whose columns lie in [x0, x1] (clipped to the world). */
+export function groundLight(world: World, x0: number, x1: number): number {
+  const { light } = world;
+  const C = world.params.c2.C;
+  const lo = Math.max(0, Math.floor(x0));
+  const hi = Math.min(light.width - 1, Math.floor(x1));
+  if (hi < lo || C <= 0) return Number.NaN;
+  let sum = 0;
+  for (let col = lo; col <= hi; col++) {
+    light.sample(col + 0.5, 0.5, Math.PI / 2, ground);
+    sum += ground.q;
+  }
+  return sum / ((hi - lo + 1) * C);
+}
+
+export function treeMetrics(tree: Tree, world?: World): TreeMetrics {
   const nm = tree.m.length;
   const c = tree.m.cols;
   let height = 0;
@@ -101,5 +127,6 @@ export function treeMetrics(tree: Tree): TreeMetrics {
     trunkRadius: nm > 0 ? c.radius[0] : 0,
     slenderness: nm > 0 && c.radius[0] > 0 ? height / (2 * c.radius[0]) : 0,
     shed: tree.shedCount,
+    groundLight: world && nm > 0 ? groundLight(world, minX, maxX) : Number.NaN,
   };
 }

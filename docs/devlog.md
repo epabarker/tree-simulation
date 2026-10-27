@@ -2,6 +2,27 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-27: D1 and D2, designing the site around the forest
+
+- **A new phase** (user): the site was getting too little design attention, and the simulation should be its core style. Design phase D1–D3 comes before M16; M21's art direction moves into it.
+  - User choices: playful and exploratory; the forest on every page; page elements as obstacles that are solid with no shade.
+- **D1, shipped as garden-v0.3.0 (PR #9):**
+  - While playing, each season's tween is linear and fills its whole interval, so growth flows instead of easing to a stop four times a second.
+  - The intro slows geometrically into the ambient pace.
+  - A portrait phone gets a ring of two or three large trees.
+  - On the site, the bio folds behind "About me" on phones.
+- **D2 foundation** (`claude/d2-obstacles`):
+  - Obstacles (ADR 0015): shoots stop before entering one, and branches inside are shed at the start of a season and again after R3 mechanics (a sagging limb could otherwise sit inside for a season). Off by default, so the goldens are unchanged; the `clearing` preset and its golden were added.
+  - `World.plantTree` is a replayable event.
+  - The garden turns `[data-garden-obstacle]` elements into obstacles through the camera, and gains `onTreeTap`, `onEmptyTap`, `fell`, `plant` and `seed`.
+  - Species per tree moves to ADR 0016.
+- **Surprises:**
+  - A tree beneath a wide obstacle can't reach round it, so it flattens into a mat under it. Content low in the forest reads as a shelf the forest holds up, so placement is a design lever.
+  - A one-line `sed` for the ADR renumbering also caught the obstacle code. It was caught and fixed.
+- **Site prototypes**, both with the forest persisting across pages through Astro's client router (`transition:persist`):
+  - **Clearings:** paper cards the forest grows around; navigating prunes and regrows it.
+  - **Field guide:** a notebook with the forest as a plate, specimen cards on tap, sowing on the ground, and Regrow and Share.
+
 ## 2026-10-27: M15, a cheaper frame
 
 - **Shipped first** (user's go-ahead): PR #7 merged and `garden-v0.1.0` released; the site's `garden-home` previewed and then merged.

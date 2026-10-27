@@ -14,6 +14,7 @@
 import { DEG, type Params } from "../params.ts";
 import { Purpose, sign } from "../rng.ts";
 import { BudState, Slot, type Tree } from "../tree.ts";
+import { insideObstacle } from "./obstacles.ts";
 import { branchAngleOf, lateralCount, terminates } from "./r2-physiological-age.ts";
 
 /** Appends a metamer at `slot` of `parent`'s upper node (parent -1 = root). Returns its index. */
@@ -184,9 +185,25 @@ export function growShoot(
   let parent = b.metamer[bud];
   let slot = b.slot[bud] as Slot;
   let angle = b.angle[bud];
+  const state = b.state[bud];
   b.state[bud] = BudState.gone;
   for (let j = 0; j < n; j++) {
     angle = direct(angle, bud, tree.nextMetamerId);
+    // Obstacles (ADR 0015): the shoot stops before a metamer that would end inside one. Unblocked,
+    // nothing changes (the check reads no RNG and adds no rows).
+    const blocked =
+      params.world.obstacles !== undefined &&
+      insideObstacle(
+        params,
+        tree.tipX(parent) + length * Math.cos(angle),
+        tree.tipY(parent) + length * Math.sin(angle),
+      );
+    if (blocked) {
+      if (j === 0)
+        b.state[bud] = state; // nothing grew: the bud rests and tries again
+      else formTerminalBud(tree, parent, params, season);
+      return;
+    }
     const m = addMetamer(tree, parent, slot, angle, length, params.c6.r0, season);
     if (j === 0 && paShift >= 0) tree.m.cols.paShift[m] = paShift;
     formAxillaryBuds(tree, m, params, j === n - 1);

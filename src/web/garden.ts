@@ -13,7 +13,8 @@
  */
 
 import * as Comlink from "comlink";
-import { mergeParams, type Params, type ParamsPatch } from "../core/params.ts";
+import type { TreeMetrics } from "../core/metrics.ts";
+import { mergeParams, type Obstacle, type Params, type ParamsPatch } from "../core/params.ts";
 import { presetParams } from "../core/presets.ts";
 import type { Snapshot, SnapshotOptions } from "../core/snapshot.ts";
 import type { RunRecord } from "../core/world.ts";
@@ -75,6 +76,8 @@ export interface Pace {
 export interface GardenOptions {
   /** The run. Default: the `forest` preset on a ring shaped to the host (`forestParams`). */
   params?: Params;
+  /** Seed of the default run (ignored with `params`). Default: a new one per visit. */
+  seed?: number;
   /** View settings; an object passed here is used (and filled in) by reference. */
   view?: Partial<ViewOptions>;
   /** WebGL2 with a Canvas 2D fallback, or Canvas 2D only. */
@@ -87,6 +90,13 @@ export interface GardenOptions {
   interaction?: "none" | "fell" | "full";
   /** What the camera fits (Scene.frame). Default "world". */
   frame?: "trees" | "world";
+  /**
+   * "forest" (default): the frame above. "specimen": one tree alone, the broadest crown among the
+   * taller trees when chosen, kept
+   * while it lives, as a botanical plate draws one specimen (D3). Change it later with
+   * `setFocus`; the camera eases.
+   */
+  focus?: "forest" | "specimen";
   /** CSS pixels kept free above the crowns, e.g. for text over the sky. Default 0. */
   headroom?: number;
   /** Leave the sky out so the page shows through. */
@@ -110,6 +120,18 @@ export interface GardenOptions {
   snapshot?: SnapshotOptions;
   /** Called with every snapshot; `fresh` marks the first one of a new run. */
   onSnapshot?(s: Snapshot, fresh: boolean): void;
+  /**
+   * Page elements the forest grows around (ADR 0015): a CSS selector, default
+   * "[data-garden-obstacle]"; null for none. Their screen rectangles, padded by `obstacleMargin`
+   * CSS pixels (default 12), become obstacles in world cells, re-measured at every season and on
+   * resize and sent only when they change.
+   */
+  obstacles?: string | null;
+  obstacleMargin?: number;
+  /** A tree was tapped (canvas pixels `at`): return true to handle it instead of felling it. */
+  onTreeTap?(tree: number, metrics: TreeMetrics | undefined, at: { x: number; y: number }): boolean;
+  /** A tap that hit no tree, at world x (wrapped onto the world on a ring). */
+  onEmptyTap?(x: number, at: { x: number; y: number }): void;
   /** Bench mode (`?bench`): play to `seasons`, sampling every animated frame, then report. */
   bench?: { seasons: number; onDone(result: BenchResult): void };
 }
@@ -132,6 +154,22 @@ export interface Garden {
   fit(): void;
   /** Redraws on the next frame (after a view change). */
   redraw(): void;
+  /** Fells a tree at the next season the worker has not computed. */
+  fell(tree: number): void;
+  /** Sows a seedling at world x at the next season the worker has not computed. */
+  plant(x: number): void;
+  /** Re-measures the obstacle elements now (after a layout change the garden can't see). */
+  refreshObstacles(): void;
+  /** The run's seed: shown as "forest #seed", and passed back as `seed` to regrow the same forest. */
+  readonly seed: number;
+  /** Frames the whole forest, or one specimen (see `focus`); the camera eases to it. */
+  setFocus(focus: "forest" | "specimen"): void;
+  /** The tree a "specimen" focus frames, or -1. */
+  readonly focusTree: number;
+  /** Each live tree's crown top and trunk base in canvas pixels, for labels (Scene.anchors). */
+  anchors(): { tree: number; x: number; y: number; baseX: number; baseY: number }[];
+  /** The latest metrics of a live tree, or undefined. */
+  metrics(tree: number): TreeMetrics | undefined;
   /** Stops the worker, the frame loop and every listener; removes a canvas the garden made. */
   destroy(): void;
 }
@@ -192,12 +230,16 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
     maxDpr: options.maxDpr,
   });
   const { scene } = renderer;
-  scene.frame = options.frame ?? "world";
+  let focus = options.focus ?? "forest";
+  scene.frame = focus === "specimen" ? "tree" : (options.frame ?? "world");
   if (options.headroom !== undefined) scene.headroom = options.headroom;
   const rect = renderer.canvas.getBoundingClientRect();
   const params =
     options.params ??
-    forestParams((WORLD_HEIGHT * rect.width) / Math.max(1, rect.height), randomSeed());
+    forestParams(
+      (WORLD_HEIGHT * rect.width) / Math.max(1, rect.height),
+      options.seed ?? randomSeed(),
+    );
 
   const view = Object.assign(options.view ?? {}, {
     colorMode: "natural",
@@ -245,6 +287,11 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
 
   /** A season is being computed; a computed season is waiting for its turn (pipelining, M15). */
   let inFlight = false;
+  /** The run's params (for obstacle events) and the obstacles last sent, as JSON. */
+  let current = params;
+  let sentObstacles = JSON.stringify(params.world.obstacles ?? []);
+  const obstacleSelector =
+    options.obstacles === undefined ? "[data-garden-obstacle]" : options.obstacles;
   let ahead: Snapshot | null = null;
   let dirty = true;
   let lastFrame = 0;
@@ -278,6 +325,7 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
 
   function accept(s: Snapshot, animate: boolean, fresh: boolean): void {
     renderer.setSnapshot(s);
+    if (focus === "specimen") chooseSpecimen(s);
     if (!animate) scene.clearHistory();
     if (autoFit) scene.fit(!animate);
     season = s.season;
@@ -300,18 +348,49 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
     const mine = generation;
     inFlight = true;
     ahead = null;
+    current = next;
+    sentObstacles = JSON.stringify(next.world.obstacles ?? []);
     const s = await sim.init(next);
     if (mine !== generation || destroyed) return;
     inFlight = false;
     autoFit = true;
     accept(s, false, true);
+    measureObstacles();
     if (playback.playing) request();
   }
 
   /** Shows a computed season, and while playing asks for the next one straight away. */
   function show(s: Snapshot): void {
     accept(s, !(reduceMotion && reducedMode === "still"), false);
+    measureObstacles();
     if (playback.playing) request();
+  }
+
+  /**
+   * Obstacles from the page (ADR 0015): each matching element's screen rectangle, padded, mapped
+   * through the camera into world cells (rounded to half a cell, so a camera still easing doesn't
+   * resend them every season). Sent as a params event, which applies at the next season the worker
+   * has not computed; on a ring, x beyond the world wraps in the core.
+   */
+  function measureObstacles(): void {
+    if (obstacleSelector === null || !scene.next) return;
+    const canvas = renderer.canvas.getBoundingClientRect();
+    const pad = options.obstacleMargin ?? 12;
+    const half = (v: number): number => Math.round(v * 2) / 2;
+    const found: Obstacle[] = [];
+    for (const el of document.querySelectorAll(obstacleSelector)) {
+      const r = el.getBoundingClientRect();
+      if (r.width === 0 || r.height === 0) continue;
+      const [x0, y0] = scene.screenToWorld(r.left - canvas.left - pad, r.bottom - canvas.top + pad);
+      const [x1, y1] = scene.screenToWorld(r.right - canvas.left + pad, r.top - canvas.top - pad);
+      const y = Math.max(0, y0);
+      if (y1 <= y) continue; // entirely below the ground
+      found.push({ x: half(x0), y: half(y), width: half(x1 - x0), height: half(y1 - y) });
+    }
+    const key = JSON.stringify(found);
+    if (key === sentObstacles) return;
+    sentObstacles = key;
+    void sim.setParams({ world: { ...current.world, obstacles: found } });
   }
 
   /**
@@ -370,11 +449,20 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
               dirty = true;
             },
             // Direct manipulation: tap a tree to fell it; neighbours lean into the gap (§8, M5).
-            onTap: (wx, wy) => {
+            // A host may take the tap instead (a tree's card), or use taps that miss (sowing).
+            onTap: (wx, wy, sx, sy) => {
               const tree = scene.pickTree(wx, wy);
-              if (tree === null) return;
-              void sim.removeTree(tree);
-              if (!playback.playing) void step();
+              const at = { x: sx, y: sy };
+              if (tree === null) {
+                const W = current.world.width;
+                options.onEmptyTap?.(
+                  current.world.sides === "periodic" ? ((wx % W) + W) % W : wx,
+                  at,
+                );
+                return;
+              }
+              if (options.onTreeTap?.(tree, metricsOf(tree), at)) return;
+              fell(tree);
             },
             onRefit: () => {
               autoFit = true;
@@ -450,9 +538,50 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
     };
   }
 
+  /** Keeps the framed specimen while it lives; otherwise frames the tallest tree. */
+  function chooseSpecimen(s: Snapshot): void {
+    if (!s.metrics.some((m) => m.tree === scene.focusTree)) {
+      // The broadest crown among the taller trees: the nearest a forest has to an open-grown
+      // specimen, which reads better on a plate than the tallest, slenderest tree.
+      const tallest = Math.max(0, ...s.metrics.map((m) => m.height));
+      let best: (typeof s.metrics)[number] | undefined;
+      for (const m of s.metrics) {
+        if (m.height < 0.5 * tallest) continue;
+        if (!best || m.crownWidth > best.crownWidth) best = m;
+      }
+      scene.focusTree = best ? best.tree : -1;
+    }
+    scene.solo = scene.focusTree;
+  }
+
+  function setFocus(next: "forest" | "specimen"): void {
+    focus = next;
+    scene.frame = next === "specimen" ? "tree" : (options.frame ?? "world");
+    scene.solo = -1;
+    if (next === "specimen" && scene.next) chooseSpecimen(scene.next);
+    autoFit = true;
+    scene.fit();
+    dirty = true;
+  }
+
+  function fell(tree: number): void {
+    void sim.removeTree(tree);
+    if (!playback.playing) void step();
+  }
+
+  function plant(x: number): void {
+    void sim.plantTree(x);
+    if (!playback.playing) void step();
+  }
+
+  function metricsOf(tree: number): TreeMetrics | undefined {
+    return scene.next?.metrics.find((m) => m.tree === tree);
+  }
+
   const resizer = new ResizeObserver(() => {
     renderer.resize();
     if (autoFit) scene.fit(true);
+    measureObstacles();
     dirty = true;
   });
   resizer.observe(renderer.canvas);
@@ -522,6 +651,16 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
     redraw() {
       dirty = true;
     },
+    seed: params.seed,
+    setFocus,
+    get focusTree() {
+      return scene.focusTree;
+    },
+    anchors: () => scene.anchors(),
+    fell,
+    plant,
+    refreshObstacles: measureObstacles,
+    metrics: metricsOf,
     destroy() {
       destroyed = true;
       cancelAnimationFrame(frameId);

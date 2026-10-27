@@ -51,6 +51,9 @@ const api: SimApi = {
   removeTree(tree: number) {
     world.removeTree(tree);
   },
+  plantTree(x: number) {
+    world.plantTree(x);
+  },
   record() {
     return world.record();
   },

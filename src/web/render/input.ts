@@ -11,7 +11,8 @@ import type { Camera } from "./scene.ts";
 
 export interface InputCallbacks {
   onChange(): void;
-  onTap(worldX: number, worldY: number): void;
+  /** A tap at world (x, y), which is at canvas pixels (sx, sy). */
+  onTap(worldX: number, worldY: number, sx: number, sy: number): void;
   onRefit(): void;
 }
 
@@ -91,15 +92,16 @@ export function attachInput(
       const now = performance.now();
       if (!down.moved && now - down.time < TAP_MS) {
         const [wx, wy] = renderer.screenToWorld(down.x, down.y);
+        const { x: sx, y: sy } = down;
         if (!panZoom) {
-          cb.onTap(wx, wy);
+          cb.onTap(wx, wy, sx, sy);
         } else if (now - lastTap < DOUBLE_TAP_MS) {
           lastTap = 0;
           window.clearTimeout(pendingTap);
           cb.onRefit();
         } else {
           lastTap = now;
-          pendingTap = window.setTimeout(() => cb.onTap(wx, wy), DOUBLE_TAP_MS);
+          pendingTap = window.setTimeout(() => cb.onTap(wx, wy, sx, sy), DOUBLE_TAP_MS);
         }
       }
       down = null;

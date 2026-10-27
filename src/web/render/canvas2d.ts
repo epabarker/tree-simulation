@@ -102,6 +102,13 @@ export class Canvas2DRenderer implements Renderer {
       ctx.fillStyle = this.theme.wall;
       for (const wall of s.walls) ctx.fillRect(wall.x, wall.y, wall.width, wall.height);
     }
+    if (view.showObstacles && s.obstacles.length > 0) {
+      ctx.save();
+      ctx.globalAlpha = 0.45;
+      ctx.fillStyle = this.theme.wall;
+      for (const o of s.obstacles) ctx.fillRect(o.x, o.y, o.width, o.height);
+      ctx.restore();
+    }
 
     scene.depth = view.depth;
     scene.leafStyle = LEAF_STYLES[view.leafStyle];
@@ -135,6 +142,25 @@ export class Canvas2DRenderer implements Renderer {
   private drawGround(w: number, h: number, groundY: number): void {
     if (groundY >= h) return;
     const { ctx, theme } = this;
+    if (theme.groundHatch) {
+      // An ink line along the ground and diagonal hatching below it (an engraved plate).
+      ctx.save();
+      ctx.strokeStyle = theme.ground;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(0, groundY + 0.5);
+      ctx.lineTo(w, groundY + 0.5);
+      ctx.stroke();
+      ctx.globalAlpha = 0.55;
+      ctx.beginPath();
+      for (let x = -(h - groundY); x < w; x += 5) {
+        ctx.moveTo(x, h);
+        ctx.lineTo(x + (h - groundY), groundY);
+      }
+      ctx.stroke();
+      ctx.restore();
+      return;
+    }
     const ground = ctx.createLinearGradient(0, groundY, 0, h);
     ground.addColorStop(0, theme.ground);
     ground.addColorStop(1, theme.groundDeep);
@@ -178,6 +204,7 @@ export class Canvas2DRenderer implements Renderer {
       ctx.beginPath();
       for (let i = a; i < b; i++) {
         const j = this.order[i];
+        if (scene.solo >= 0 && s.tree[j] !== scene.solo) continue; // a solo plate: one specimen
         ctx.moveTo(g.baseX[j], g.baseY[j]);
         ctx.lineTo(g.tipX[j], g.tipY[j]);
       }
@@ -230,6 +257,7 @@ export class Canvas2DRenderer implements Renderer {
     ctx.beginPath();
     for (let j = 0; j < prev.metamerCount; j++) {
       if (!scene.ghosts[j]) continue;
+      if (scene.solo >= 0 && prev.tree[j] !== scene.solo) continue; // a solo plate: one specimen
       ctx.moveTo(g.baseX[j], g.baseY[j]);
       ctx.lineTo(g.tipX[j], g.tipY[j]);
     }

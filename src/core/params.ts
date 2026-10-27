@@ -19,6 +19,14 @@ export interface Wall {
   shade: number;
 }
 
+/** A solid region with no shade (ADR 0015): nothing grows into it. Cells, like a wall. */
+export interface Obstacle {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
 export interface TreeSpec {
   /** Root position along the ground, in cells. */
   x: number;
@@ -34,6 +42,12 @@ export interface Params {
     height: number;
     /** Static shade sources (M3 "lean away from a wall"). */
     walls: Wall[];
+    /**
+     * Solid regions with no shade (ADR 0015): shoots don't grow into them, and branches found
+     * inside are shed at the start of a season. A host page marks its content as obstacles so the
+     * forest grows around it. Optional: none.
+     */
+    obstacles?: Obstacle[];
     /**
      * World sides for the sky sweep: 'open' lets open sky in from beyond them (ADR 0005), so a
      * stand is an island lit from its edges (M6e); 'periodic' wraps light, foliage and growth

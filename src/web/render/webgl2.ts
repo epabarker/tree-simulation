@@ -207,6 +207,8 @@ uniform float u_ground; // device pixels from the bottom edge
 uniform int u_mode;     // 0 = sky, 1 = ground
 uniform vec3 u_top;
 uniform vec3 u_bottom;
+uniform float u_hatch;  // ground drawn as ink hatching, lines this many device pixels apart (0: filled)
+uniform float u_line;   // ink line width, device pixels
 out vec4 outColor;
 void main() {
   float y = gl_FragCoord.y;
@@ -215,6 +217,17 @@ void main() {
     outColor = vec4(mix(u_top, u_bottom, t), 1.0);
   } else {
     if (y > u_ground) discard;
+    if (u_hatch > 0.0) {
+      // An ink line along the ground, and diagonal hatching below it fading downward.
+      float edge = 1.0 - smoothstep(u_line, u_line + 1.0, u_ground - y);
+      float d = mod(gl_FragCoord.x + y, u_hatch);
+      float hatch = (1.0 - smoothstep(u_line * 0.6, u_line * 0.6 + 1.0, d)) * 0.55;
+      hatch *= clamp(y / max(1.0, u_ground), 0.25, 1.0);
+      float a = max(edge, hatch);
+      if (a <= 0.0) discard;
+      outColor = vec4(u_top * a, a);
+      return;
+    }
     float t = clamp((u_ground - y) / max(1.0, u_ground), 0.0, 1.0);
     outColor = vec4(mix(u_top, u_bottom, t), 1.0);
   }
@@ -513,6 +526,8 @@ export class WebGL2Renderer implements Renderer {
       view.depth,
       view.leafStyle,
       view.showBuds,
+      view.showObstacles,
+      scene.solo,
       ghosts,
       this.themeVersion,
     ].join();
@@ -528,7 +543,7 @@ export class WebGL2Renderer implements Renderer {
       else this.leafBatch.count = this.leafBackBatch.count = 0;
       if (view.showBuds) this.buildBuds(s, view.colorMode === "light");
       else this.budBatch.count = 0;
-      this.buildWalls(s);
+      this.buildWalls(s, view);
       this.uploaded = { next: s, prev: scene.prev, key };
     }
 
@@ -572,6 +587,8 @@ export class WebGL2Renderer implements Renderer {
       u_mode: mode,
       u_top: rgb(top),
       u_bottom: rgb(bottom),
+      u_hatch: mode === 1 && this.theme.groundHatch ? 5 * this.scene.dpr : 0,
+      u_line: Math.max(1, this.scene.dpr),
     });
     gl.drawArrays(gl.TRIANGLES, 0, 3);
   }
@@ -598,7 +615,9 @@ export class WebGL2Renderer implements Renderer {
       color[4 * j] = palette[c] as number;
       color[4 * j + 1] = palette[c + 1] as number;
       color[4 * j + 2] = palette[c + 2] as number;
-      color[4 * j + 3] = palette[c + 3] as number;
+      // A solo plate draws one specimen: the other trees' wood is fully transparent.
+      color[4 * j + 3] =
+        scene.solo >= 0 && s.tree[j] !== scene.solo ? 0 : (palette[c + 3] as number);
     }
     this.upload(batch, n);
   }
@@ -612,7 +631,10 @@ export class WebGL2Renderer implements Renderer {
       return;
     }
     let count = 0;
-    for (let j = 0; j < prev.metamerCount; j++) if (scene.ghosts[j]) count++;
+    // A solo plate (one specimen) shows only that tree's falling branches.
+    const shown = (j: number): boolean =>
+      scene.ghosts[j] === 1 && (scene.solo < 0 || prev.tree[j] === scene.solo);
+    for (let j = 0; j < prev.metamerCount; j++) if (shown(j)) count++;
     const a = this.stream<Floats>(batch, "a_a", count);
     const b = this.stream<Floats>(batch, "a_b", count);
     const r = this.stream<Floats>(batch, "a_r", count);
@@ -622,7 +644,7 @@ export class WebGL2Renderer implements Renderer {
     const g = scene.prevGeom;
     let k = 0;
     for (let j = 0; j < prev.metamerCount; j++) {
-      if (!scene.ghosts[j]) continue;
+      if (!shown(j)) continue;
       a[2 * k] = g.baseX[j];
       a[2 * k + 1] = g.baseY[j];
       b[2 * k] = g.tipX[j];
@@ -701,13 +723,18 @@ export class WebGL2Renderer implements Renderer {
     this.upload(batch, n);
   }
 
-  private buildWalls(s: Snapshot): void {
-    const n = s.walls.length;
+  /** Walls in the wall colour, and with `showObstacles` (the lab) the obstacles as fainter boxes. */
+  private buildWalls(s: Snapshot, view: ViewOptions): void {
+    const rects = [
+      ...s.walls.map((w) => ({ ...w, alpha: 1 })),
+      ...(view.showObstacles ? s.obstacles.map((o) => ({ ...o, alpha: 0.45 })) : []),
+    ];
+    const n = rects.length;
     const batch = this.wallBatch;
     const rect = this.stream<Floats>(batch, "a_rect", n);
     const color = this.stream<Bytes>(batch, "a_color", n);
     const [cr, cg, cb, ca] = parseColor(this.theme.wall);
-    s.walls.forEach((wall, k) => {
+    rects.forEach((wall, k) => {
       rect[4 * k] = wall.x;
       rect[4 * k + 1] = wall.y;
       rect[4 * k + 2] = wall.width;
@@ -715,7 +742,7 @@ export class WebGL2Renderer implements Renderer {
       color[4 * k] = cr;
       color[4 * k + 1] = cg;
       color[4 * k + 2] = cb;
-      color[4 * k + 3] = ca;
+      color[4 * k + 3] = Math.round(ca * wall.alpha);
     });
     this.upload(batch, n);
   }

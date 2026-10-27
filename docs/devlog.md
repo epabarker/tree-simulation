@@ -2,6 +2,45 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-27: D3, building the Field guide
+
+- **Direction:** the user chose the Field guide and agreed ten changes (brief: edbarker-dev `docs/design-brief.md`). One condition: the CV must stay at least as clear for a recruiter as a plain CV.
+- **Garden** (`claude/d3-garden`):
+  - **Ink plate:** `--ground-hatch: 1` draws the ground as an ink line with hatching (both renderers).
+  - **Specimen plates:** focus `"specimen"` frames one tree (Scene frame `"tree"`) and draws it alone (`Scene.solo`), with its shed branches only; `setFocus` eases between forest and specimen.
+  - **Labels:** `anchors()` gives each tree's crown top for labels.
+  - **Sown trees:** visitor-sown trees carry `sown`.
+- **Site** (`d3-field-guide`):
+  - **Look:** ink tokens; night pages with a moon; EB Garamond (three self-hosted cuts, ≈ 74 kB).
+  - **Plates:** Home shows the forest (Plate I), the CV a specimen (Plate II).
+  - **Plate furniture:** labels on the tallest and sown trees; specimen cards with the planting year; the card as a strip on phones; a session tally of seeds.
+  - **Writing:** margin notes, and CV roles as entries with dates in the margin.
+- **Surprises:**
+  - A wide, short plate framed on one tree's height still showed the whole forest. A botanical plate draws one specimen alone, hence `solo`.
+  - Astro ate the space before an inline `<span>`, again.
+  - The paper's white highlight turned into grey haze at night, so it became a token.
+
+## 2026-10-27: D1 and D2, designing the site around the forest
+
+- **A new phase** (user): the site was getting too little design attention, and the simulation should be its core style. Design phase D1–D3 comes before M16; M21's art direction moves into it.
+  - User choices: playful and exploratory; the forest on every page; page elements as obstacles that are solid with no shade.
+- **D1, shipped as garden-v0.3.0 (PR #9):**
+  - While playing, each season's tween is linear and fills its whole interval, so growth flows instead of easing to a stop four times a second.
+  - The intro slows geometrically into the ambient pace.
+  - A portrait phone gets a ring of two or three large trees.
+  - On the site, the bio folds behind "About me" on phones.
+- **D2 foundation** (`claude/d2-obstacles`):
+  - Obstacles (ADR 0015): shoots stop before entering one, and branches inside are shed at the start of a season and again after R3 mechanics (a sagging limb could otherwise sit inside for a season). Off by default, so the goldens are unchanged; the `clearing` preset and its golden were added.
+  - `World.plantTree` is a replayable event.
+  - The garden turns `[data-garden-obstacle]` elements into obstacles through the camera, and gains `onTreeTap`, `onEmptyTap`, `fell`, `plant` and `seed`.
+  - Species per tree moves to ADR 0016.
+- **Surprises:**
+  - A tree beneath a wide obstacle can't reach round it, so it flattens into a mat under it. Content low in the forest reads as a shelf the forest holds up, so placement is a design lever.
+  - A one-line `sed` for the ADR renumbering also caught the obstacle code. It was caught and fixed.
+- **Site prototypes**, both with the forest persisting across pages through Astro's client router (`transition:persist`):
+  - **Clearings:** paper cards the forest grows around; navigating prunes and regrows it.
+  - **Field guide:** a notebook with the forest as a plate, specimen cards on tap, sowing on the ground, and Regrow and Share.
+
 ## 2026-10-27: M15, a cheaper frame
 
 - **Shipped first** (user's go-ahead): PR #7 merged and `garden-v0.1.0` released; the site's `garden-home` previewed and then merged.
@@ -114,7 +153,7 @@ Newest first. One entry per session or milestone: what changed, why, surprises, 
   - The simulation *is* the home page.
   - The site is the private Astro repo `epabarker/edbarker-dev` on Cloudflare, and it receives the garden as a versioned GitHub Release that it vendors (ADR 0014).
   - Realism means botanical form, motion and physics, and seasons, all still in 2D.
-  - The home world is a mixed forest with succession, which needs species per tree (ADR 0015, at M19).
+  - The home world is a mixed forest with succession, which needs species per tree (ADR 0016, at M19).
 - **Roadmap:** M13–M21 added. "Later" items folded in: species onto R1–R5, oak, willow, beech, ground contact, far-red, embedding.
 - **Surprises** from reading the hot paths:
   - Periodic sides cost ≈ 27 grid sweeps a season, not 7.

@@ -432,6 +432,16 @@ export const presets = {
       ...FOREST,
     },
   },
+  clearing: {
+    label: "D2: a clearing (obstacles)",
+    description:
+      "The forest grows around a solid region that casts no shade, as it grows around a page's text (ADR 0015).",
+    patch: {
+      world: { ...RING, obstacles: [{ x: 70, y: 32, width: 70, height: 22 }] },
+      trees: [10, 31, 52, 73, 94, 115, 136, 157, 178, 199].map((x) => ({ x })),
+      ...FOREST,
+    },
+  },
   thinning: {
     label: "M11: self-thinning",
     description:

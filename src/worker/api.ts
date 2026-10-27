@@ -18,6 +18,8 @@ export interface SimApi {
   setParams(patch: ParamsPatch): void;
   /** Queues the removal of a tree for the next season boundary. */
   removeTree(tree: number): void;
+  /** Queues a seedling at world x for the next season boundary. */
+  plantTree(x: number): void;
   /** Initial params plus every applied event: replay it with `npm run sim -- --replay`. */
   record(): RunRecord;
 }

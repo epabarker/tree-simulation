@@ -102,6 +102,8 @@ export class Tree {
   alive = true;
   /** A dead tree whose tables were freed (World.discardDead); it is never replanted. */
   discarded = false;
+  /** Sown by a visitor (World.plantTree), not planted by the params or recruited by O4. */
+  sown = false;
   /** Seasons since planting. */
   age = 0;
   nextMetamerId = 0;

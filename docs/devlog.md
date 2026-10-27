@@ -2,6 +2,20 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-27: M17, seasons
+
+- **User:** slower years with four seasons, and a few pace options.
+- **Page only** (no simulation or golden changes):
+  - Once a year lasts at least 3 s, a visual year τ runs over it.
+  - Growth unfolds over spring (the first 30%), then summer, autumn and winter.
+  - Deciduous leaf styles flush, turn and fall; shaded leaves turn first, through autumn colour ramps. A third of the leaves drift down on the wind and lie as litter until the year turns. Needles stay.
+  - `yearSeconds` (default 16), `setYearSeconds` and `seasonName`.
+- **Site:** "Seasons: brisk · gentle · slow" (8, 16 and 32 s), remembered in local storage; the caption names the season; autumn inks for day and night.
+- **Surprises:**
+  - Leaves falling at a fixed speed in seconds were still in the air at Brisk when the new year cleared them, and would fall in a blink at Slow. They now fall in year-time: a canopy's height in a tenth of a year.
+  - A leaf crossing its fall time still has full size in that frame, so the drop check must come before the size skip.
+- **Tests:** 183 pass.
+
 ## 2026-10-27: M16, motion
 
 - **User choices:**

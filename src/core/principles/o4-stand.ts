@@ -26,7 +26,7 @@ const ground: LightSample = { q: 0, vx: 0, vy: 0 };
 /** True when background mortality kills `tree` this season. */
 export function diesOfBackground(world: World, tree: Tree): boolean {
   const { params, season } = world;
-  return uniform(params.seed, Purpose.mortality, tree.id, 0, season) < params.o4.m0;
+  return uniform(params.seed, Purpose.mortality, tree.id, 0, season) < world.paramsOf(tree).o4.m0;
 }
 
 /** Laplace(0, d) from a uniform u in [0, 1). */
@@ -52,21 +52,25 @@ export function standDynamics(world: World): number {
   let live = parents.length;
   let recruits = 0;
   for (const parent of parents) {
-    const n = Math.floor(parent.seedPool / o4.cSeed);
-    parent.seedPool -= n * o4.cSeed;
+    // Seeds, dispersal and establishment follow the parent's species (ADR 0016).
+    const own = world.paramsOf(parent);
+    const { cSeed, d, qEst, pEst } = own.o4;
+    const n = Math.floor(parent.seedPool / cSeed);
+    parent.seedPool -= n * cSeed;
     parent.seeds = n;
     for (let k = 0; k < n; k++) {
       const u = uniform(params.seed, Purpose.dispersal, parent.id, k, season);
-      let x = parent.rootX + laplace(u, o4.d);
+      let x = parent.rootX + laplace(u, d);
       if (periodic) x = ((x % W) + W) % W;
       else if (x < 0 || x >= W) continue;
       if (live >= o4.maxTrees) return recruits;
       light.sample(x, 0.5, Math.PI / 2, ground);
-      if (C <= 0 || ground.q / C < o4.qEst) continue;
-      if (uniform(params.seed, Purpose.establishment, parent.id, k, season) >= o4.pEst) continue;
+      if (C <= 0 || ground.q / C < qEst) continue;
+      if (uniform(params.seed, Purpose.establishment, parent.id, k, season) >= pEst) continue;
       if (world.trees.some((t) => t.alive && Math.abs(t.rootX - x) < 1)) continue;
       const seedling = new Tree(world.trees.length, x);
-      plantSeedling(seedling, params, season + 1);
+      seedling.species = parent.species;
+      plantSeedling(seedling, own, season + 1);
       world.trees.push(seedling);
       live += 1;
       recruits += 1;

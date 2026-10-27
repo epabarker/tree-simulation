@@ -30,6 +30,8 @@ export interface Obstacle {
 export interface TreeSpec {
   /** Root position along the ground, in cells. */
   x: number;
+  /** Its species, a key of `Params.species` (ADR 0016). Omitted: the world's own params. */
+  species?: string;
   /** Season in which the seedling appears (default 0). */
   plantSeason?: number;
 }
@@ -56,6 +58,11 @@ export interface Params {
     sides?: "open" | "periodic";
   };
   trees: TreeSpec[];
+  /**
+   * Species (ADR 0016): named overrides of the per-tree groups, so one world can hold several.
+   * A tree of a species grows by the world's params with its species' patch on top.
+   */
+  species?: Record<string, SpeciesPatch>;
 
   /** C1 Metamer structure, bud fate and 2D side sequence (always on). */
   c1: {
@@ -479,6 +486,18 @@ export type ParamsPatch = {
     : Params[K] extends object
       ? Partial<Params[K]>
       : Params[K];
+};
+
+/**
+ * A species (ADR 0016): overrides of the groups that differ between trees (not the world, the
+ * light model, the seed or the tree list), plus labels for the page: a common name, a Latin name
+ * and the leaf style it is drawn with. O4's per-tree quantities (c_seed, d, Q_est, p_est, m₀) come
+ * from the parent's (or the tree's) species; its cap on live trees stays the world's.
+ */
+export type SpeciesPatch = Omit<ParamsPatch, "seed" | "world" | "trees" | "species" | "c2"> & {
+  common?: string;
+  latin?: string;
+  leaf?: string;
 };
 
 /** Returns a new Params with `patch` applied on top of `base` (sections merge, arrays replace). */

@@ -55,7 +55,6 @@ export function runSeason(world: World, mark: PhaseMark = noMark): void {
   const { params, light, season } = world;
   const live: Tree[] = [];
   for (const tree of world.trees) if (tree.alive) live.push(tree);
-  const carbonShedding = params.r1.enabled && params.r1.shed === "carbon";
   // A storm season (M16, §O2 wind events): one draw per season, keyed so it replays.
   const stormP = params.o2.stormP ?? 0;
   const storm = stormP > 0 && uniform(params.seed, Purpose.wind, 0, 0, season) < stormP;
@@ -65,7 +64,7 @@ export function runSeason(world: World, mark: PhaseMark = noMark): void {
   // branch the page's layout now covers is shed before it deposits foliage or shade.
   if (params.world.obstacles?.length) {
     for (const tree of live) {
-      tree.shedCount = clearObstacles(tree, params);
+      tree.shedCount = clearObstacles(tree, world.paramsOf(tree));
     }
     for (let i = live.length - 1; i >= 0; i--) if (!(live[i] as Tree).alive) live.splice(i, 1);
   }
@@ -79,8 +78,11 @@ export function runSeason(world: World, mark: PhaseMark = noMark): void {
   light.compute(season);
   mark("light");
 
-  // Phase 2: per-tree passes, reading the environment only.
+  // Phase 2: per-tree passes, reading the environment only. Each tree grows by its own species'
+  // params (ADR 0016); without species that is the world's params object itself.
   for (const tree of live) {
+    const params = world.paramsOf(tree);
+    const carbonShedding = params.r1.enabled && params.r1.shed === "carbon";
     tree.ensureScratch();
     tree.shedCount = 0;
     tree.released = 0;
@@ -126,9 +128,10 @@ export function runSeason(world: World, mark: PhaseMark = noMark): void {
   const { width: W, height: H } = params.world;
   const periodic = params.world.sides === "periodic";
   for (const tree of live) {
-    tree.abraded = abrasion ? abrade(tree, world.owner, W, H, periodic, params, season) : 0; // O2
+    const own = world.paramsOf(tree);
+    tree.abraded = abrasion ? abrade(tree, world.owner, W, H, periodic, own, season) : 0; // O2
   }
-  for (const tree of live) if (starvedToDeath(tree, params.r1)) tree.alive = false;
+  for (const tree of live) if (starvedToDeath(tree, world.paramsOf(tree).r1)) tree.alive = false;
   for (const tree of live) tree.seeds = 0;
   if (params.o4.enabled) world.recruits = standDynamics(world); // O4: background deaths, seeds
   mark("deaths");
@@ -136,7 +139,7 @@ export function runSeason(world: World, mark: PhaseMark = noMark): void {
 
 function depositBuds(world: World, tree: Tree): void {
   const b = tree.b.cols;
-  const { r6 } = world.params;
+  const { r6 } = world.paramsOf(tree); // its species' leaf areas (ADR 0016)
   for (let i = 0; i < tree.b.length; i++) {
     if (!isLiveBud(b.state[i])) continue;
     const area = depositArea(b.state[i], r6); // R6: leaf area by shoot type
@@ -193,7 +196,7 @@ function sampleBuds(world: World, tree: Tree): void {
  * shoot more upright.
  */
 export function growBuds(world: World, tree: Tree, season: number): void {
-  const { params } = world;
+  const params = world.paramsOf(tree);
   const { c4, r4, r5 } = params;
   const C = params.c2.C;
   const sigma = c4.sigma * DEG;

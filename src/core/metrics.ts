@@ -58,6 +58,8 @@ export interface TreeMetrics {
   seeds: number;
   /** Sown by a visitor on the page (World.plantTree, D3). */
   sown: boolean;
+  /** Its species (ADR 0016), "" for the world's own params. */
+  species: string;
   released: number;
   /** Of those, released from trunk wood at least 10 seasons old: epicormic shoots. */
   epicormic: number;
@@ -175,6 +177,7 @@ export function treeMetrics(tree: Tree, world?: World): TreeMetrics {
     abraded: tree.abraded,
     seeds: tree.seeds,
     sown: tree.sown,
+    species: tree.species,
     released: tree.released,
     epicormic: tree.epicormic,
     aborted: tree.aborted,

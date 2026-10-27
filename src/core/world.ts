@@ -15,7 +15,7 @@ import { Tree } from "./tree.ts";
 export type RunEvent =
   | { season: number; type: "params"; patch: ParamsPatch }
   | { season: number; type: "removeTree"; tree: number }
-  | { season: number; type: "plantTree"; x: number };
+  | { season: number; type: "plantTree"; x: number; species?: string };
 
 /** Everything needed to reproduce a run: initial params plus the event log. */
 export interface RunRecord {
@@ -49,6 +49,7 @@ export class World {
   /** Events applied so far. */
   readonly log: RunEvent[] = [];
   private pending: RunEvent[] = [];
+  private speciesParams = new Map<string, Params>();
 
   constructor(params: Params) {
     this.initialParams = clone(params);
@@ -57,6 +58,7 @@ export class World {
     this.owner = new Int32Array(this.params.world.width * this.params.world.height);
     this.trees = this.params.trees.map((spec, id) => {
       const tree = new Tree(id, spec.x);
+      tree.species = spec.species ?? "";
       tree.alive = false; // planted when its season comes
       return tree;
     });
@@ -78,8 +80,34 @@ export class World {
    * Queues a seedling at x for the next season boundary (a visitor sowing, D2). It is appended
    * to `trees` like an O4 recruit, unless a live trunk stands within a cell of x.
    */
-  plantTree(x: number): void {
-    this.pending.push({ season: this.season, type: "plantTree", x });
+  plantTree(x: number, species?: string): void {
+    this.pending.push({
+      season: this.season,
+      type: "plantTree",
+      x,
+      ...(species ? { species } : {}),
+    });
+  }
+
+  /**
+   * The params a tree grows by (ADR 0016): the world's, with its species' patch on top, built
+   * once per species and dropped when params change. A tree without a species gets the world's
+   * params object itself, so single-species worlds are exactly as before.
+   */
+  paramsOf(tree: Tree): Params {
+    if (!tree.species) return this.params;
+    let p = this.speciesParams.get(tree.species);
+    if (!p) {
+      const patch = this.params.species?.[tree.species];
+      if (patch) {
+        const { common: _c, latin: _l, leaf: _f, ...groups } = patch;
+        p = mergeParams(this.params, groups);
+      } else {
+        p = this.params;
+      }
+      this.speciesParams.set(tree.species, p);
+    }
+    return p;
   }
 
   /** Applies queued events, plants due seedlings and runs one season (`mark`: phase timer). */
@@ -128,6 +156,7 @@ export class World {
     this.log.push(event);
     if (event.type === "params") {
       this.params = mergeParams(this.params, event.patch);
+      this.speciesParams.clear();
       this.light = makeLight(this.params);
     } else if (event.type === "plantTree") {
       const { width: W, sides } = this.params.world;
@@ -136,7 +165,14 @@ export class World {
       if (this.trees.some((t) => t.alive && Math.abs(t.rootX - x) < 1)) return;
       const tree = new Tree(this.trees.length, x);
       tree.sown = true;
-      plantSeedling(tree, this.params, this.season);
+      // A visitor's seed is of the species asked for, else of the nearest live tree.
+      let nearest: Tree | undefined;
+      for (const t of this.trees) {
+        if (t.alive && (!nearest || Math.abs(t.rootX - x) < Math.abs(nearest.rootX - x)))
+          nearest = t;
+      }
+      tree.species = event.species ?? nearest?.species ?? "";
+      plantSeedling(tree, this.paramsOf(tree), this.season);
       this.trees.push(tree);
     } else {
       const tree = this.trees[event.tree];
@@ -150,7 +186,7 @@ export class World {
       const unplanted = tree.m.length === 0 && !tree.discarded;
       if (unplanted && (spec.plantSeason ?? 0) <= this.season && !this.isRemoved(id)) {
         tree.alive = true;
-        plantSeedling(tree, this.params, this.season);
+        plantSeedling(tree, this.paramsOf(tree), this.season);
       }
     });
   }

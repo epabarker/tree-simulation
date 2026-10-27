@@ -2,7 +2,7 @@
 
 _Last updated: 2026-10-27_
 
-**Current milestone: M14** (garden embed and a first home page). The code is done on branch `claude/m14-garden` (not pushed), and the site's on `garden-home` in `~/Documents/Projects/edbarker-dev` (not pushed). M0–M13 are merged (PR #6). Tracks after the build order, from the [M12 review](reviews/2026-10-27-m12-review.md): A performance, B realism, C the edbarker.dev home page (ROADMAP M13–M21). Repo: https://github.com/epabarker/tree-simulation.
+**Current milestone: M15** (renderer and phone performance). M0–M14 are done: M14 was merged in PR #7 and released as [garden-v0.1.0](https://github.com/epabarker/tree-simulation/releases/tag/garden-v0.1.0). **edbarker.dev is live** with the garden behind the home page, a CV page and the lab at `/lab/` (epabarker/edbarker-dev `main`, 2026-10-27; content from the user's website brief, with `TODO(Ed)` comments for unconfirmed items). Tracks from the [M12 review](reviews/2026-10-27-m12-review.md): A performance, B realism, C the home page (ROADMAP M13–M21).
 
 ## Works
 - **Core:** C1–C6, R1–R6, O2 and O4 (ADRs 0005–0013); the sky sweep with open or periodic sides; golden hashes. `World.discardDead` for long page runs.
@@ -15,17 +15,11 @@ _Last updated: 2026-10-27_
 - **Lab:** WebGL2 with pseudo-depth, Tweakpane, charts, tap to fell, phone layout. **Headless:** `npm run sim`, `npm run bench` (rings 3.8 ms a season), `analysis/experiments/` m0–m11.
 
 ## Next
-1. **M14 close-out, each on the user's go-ahead:**
-   - Push `claude/m14-garden` and open a PR. Merge once CI is green.
-   - Tag `garden-v0.1.0` on main, which publishes a Release.
-   - In edbarker-dev: `node scripts/sync-garden.mjs 0.1.0`; the diff should be empty, since the vendored copy is a local build of the same code.
-   - Push `garden-home` (it may deploy to Cloudflare).
-   - Look at the home page on a real phone.
+1. **The user:** look at edbarker.dev on a real phone (the intro fills much of a phone screen; M21 art direction), and settle the site's `TODO(Ed)` items in `src/data/cv.ts`.
 2. **M15:** renderer and phone performance: persistent GPU buffers, worker pipelining, adaptive quality, `?bench` page mode.
 3. **M16** motion, **M17** seasons, then **M18–M21**.
 
 ## Open questions (ask when the milestone comes up)
-- How the site deploys: Cloudflare Workers Builds on push, or `wrangler deploy` by hand?
 - ADR 0015, species per tree (M19). Amendments to ADR 0011 and §O2 (M16), and to ADR 0005 (M18). Art direction (M21).
 
 ## Parked (user, 2026-10-27; raise again only when asked)
@@ -35,6 +29,7 @@ _Last updated: 2026-10-27_
 - R5 reads self-shade; breakage never fires; sagging limbs can sink below the ground; in the lab, ring crowns cross the seam beyond the edge (the garden wraps them). Bimodality is marginal; K = 7 puts the crown base ≈ 7 cells low.
 
 ## Notes for the next session
+- **Site deploys:** Cloudflare Workers Builds. A push to `main` goes to production; another branch gets a preview URL, `<branch>-edbarker-dev.edbarker.workers.dev`. A new garden means tag `garden-vX.Y.Z` here, then `node scripts/sync-garden.mjs X.Y.Z` there.
 - **Golden-safe means bit-identical.** Check with goldens and `npm run bench -- --compare runs/bench/<sha>.json`.
 - **Site loader:** it must stay `is:inline`, because bundling breaks the run-time `import()`. In `.astro` text, break lines inside tags, never next to them (HTML compression eats the space).
 - **Headless checks:** puppeteer-core with system Firefox. Reduced motion needs `extraPrefsFirefox: {"ui.prefersReducedMotion": 1}`, since CDP emulation is unsupported. `garden.html` exposes `window.garden`.

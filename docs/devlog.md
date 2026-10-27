@@ -44,6 +44,10 @@ Newest first. One entry per session or milestone: what changed, why, surprises, 
   - reduced motion holds at season 40;
   - opening the explainer moves the crowns down.
 - **Goldens:** unchanged (163 tests).
+- **Shipped** (user's go-ahead):
+  - PR #7 merged, and `garden-v0.1.0` released (252 kB tarball). The site's re-sync from the Release was byte-identical to the local build.
+  - `garden-home` pushed. Cloudflare Workers Builds built a preview (https://garden-home-edbarker-dev.edbarker.workers.dev) where the home page and `/lab/` run without errors and versioned files are served immutable.
+  - Production edbarker.dev is unchanged until the branch merges.
 
 ## 2026-10-27: M13, a benchmark and golden-safe speed-ups
 

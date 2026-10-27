@@ -4,6 +4,9 @@ Newest first. One entry per session or milestone: what changed, why, surprises, 
 
 ## 2026-10-27: D3, building the Field guide
 
+- **Shipped** (user's go-ahead): PR #10 merged, `garden-v0.4.0` released, the site re-synced from it, and `d3-field-guide` merged. edbarker.dev is the Field guide.
+- **Plate II** now frames the broadest crown among the taller trees, at the user's request. In a closed forest that is still slender; an open-grown specimen waits for species.
+
 - **Direction:** the user chose the Field guide and agreed ten changes (brief: edbarker-dev `docs/design-brief.md`). One condition: the CV must stay at least as clear for a recruiter as a plain CV.
 - **Garden** (`claude/d3-garden`):
   - **Ink plate:** `--ground-hatch: 1` draws the ground as an ink line with hatching (both renderers).

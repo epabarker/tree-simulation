@@ -2,7 +2,7 @@
 
 _Last updated: 2026-10-27_
 
-**Current phase: D3** (build the Field guide; before M16). The user chose the Field guide from D2; the brief is in edbarker-dev `docs/design-brief.md` (ten agreed changes). Simulation work is on `claude/d3-garden` (stacked on `claude/d2-obstacles`, neither pushed); the site is on edbarker-dev `d3-field-guide`, previewed at https://d3-field-guide-edbarker-dev.edbarker.workers.dev (garden 0.4.0, a local build).
+**Current milestone: M16** (motion). The design phase is done: **edbarker.dev is the Field guide** (garden-v0.4.0, PR #10; brief in edbarker-dev `docs/design-brief.md`). Plate II's specimen is the broadest crown in the forest, still slender: a truly open-grown specimen waits for species (M19–M20).
 
 ## Works
 - **Core:** C1–C6, R1–R6, O2 and O4 (ADRs 0005–0013); the sky sweep with open or periodic sides; golden hashes. `World.discardDead` for long page runs.
@@ -16,10 +16,9 @@ _Last updated: 2026-10-27_
 - **Lab:** WebGL2 with pseudo-depth, Tweakpane, charts, tap to fell, phone layout. **Headless:** `npm run sim`, `npm run bench` (rings 3.8 ms a season), `analysis/experiments/` m0–m11.
 
 ## Next
-1. **The user** reviews the D3 preview on a phone, in light and dark mode.
-2. **Ship, on the user's go-ahead:** PR and merge `claude/d3-garden` (which contains D2's obstacles), release garden-v0.4.0, re-sync the site from it, merge `d3-field-guide` to edbarker-dev `main`.
-3. **M16** motion (wind would suit the plate), **M17** seasons (autumn plates), then **M18–M20** (species plates).
-4. **The user:** the site's `TODO(Ed)` items in `src/data/cv.ts`.
+1. **M16** motion: wind on the plates, falling branches, toppling trees; ground contact and storms (ask the user first: they amend ADR 0011 and §O2).
+2. **M17** seasons (autumn plates), then **M18–M20** (species plates, an open-grown specimen for Plate II).
+3. **The user:** a look on a phone in light and dark; the site's `TODO(Ed)` items in `src/data/cv.ts`.
 
 ## Open questions (ask when the milestone comes up)
 - The design direction (D2). ADR 0016, species per tree (M19). Amendments to ADR 0011 and §O2 (M16), and to ADR 0005 (M18). Art direction (M21).

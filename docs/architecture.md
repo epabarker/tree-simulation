@@ -99,7 +99,7 @@ All of them sit behind `LightModel.sample(x, y, dir) → {q, vx, vy}` (§C2.8):
 
 `World.makeLight(params)` picks one. It is rebuilt whenever params change.
 
-**Periodic sides (M11, ADR 0013).** With `world.sides: "periodic"` the sky sweep wraps x for deposits, samples and rays. Shallow rays are swept ⌈3H/(rise·W)⌉ + 1 times around the ring from open sky, so the field is translation invariant; light costs ≈ 2.5× an open world. Growth wraps too, and the page draws crowns where they grew.
+**Periodic sides (M11, ADR 0013).** With `world.sides: "periodic"` the sky sweep wraps x for deposits, samples and rays. Shallow rays are swept up to ⌈3H/(rise·W)⌉ + 1 times around the ring from open sky, so the field is translation invariant. Since M13 the sweep stops at the first lap that changes nothing (a lap is a fixed map of the field, so the result is bit-identical), and every sweep stops at the highest leafy row. On `forest` light now costs 2.7 ms a season, against 10.2 before ([M13 note](experiments/2026-10-27-m13-perf.md)). Growth wraps too, and the page draws crowns where they grew.
 
 ## Randomness (ADR 0002)
 
@@ -129,13 +129,14 @@ Tapping a tree on the page fells it. `Scene.pickTree` finds the nearest drawn se
 | `init(params)` | New World; returns the season-0 snapshot |
 | `step(n)` | Runs n seasons; returns a snapshot. The page asks for one season at a time, after the previous tween ends (pull model, no queueing) |
 | `setParams(patch)`, `removeTree(id)` | Queue events |
+| `setSnapshotOptions({junctions, field})` | Which optional parts later snapshots carry: the Δ histogram's junction exponents and the shade field. Both default to on (the lab); the home page turns both off (M13) |
 | `record()` | Returns the run record |
 
 **Snapshot** (`snapshot.ts`). Flat arrays over all live trees, concatenated in tree-id order:
 
 - **Metamers:** `parent` (row in the snapshot), `x0`, `y0`, `angle`, `length`, `radius`, `tree`, `birthId`, `order`, `light` (Q_sum/n_b), `resource` (vIn), `age`, `stress` (σ/σ_target, R3), `prevIndex`.
 - **Buds:** `budMetamer`, `budState`, `budQ`.
-- **Other:** `shadow` (W×H, or null), `metrics`, `seasonMs`.
+- **Other:** `shadow` (W×H, or null), `junctions`, `metrics`, `seasonMs`, `snapshotMs` (the worker's time to build the snapshot; the HUD's worker time is the sum).
 
 Every typed array is transferred, not copied.
 

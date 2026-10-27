@@ -6,6 +6,7 @@
  *   npm run bench                                   all cases, 100 seasons, best of 3
  *   npm run bench -- --case forest --seasons 50     one case
  *   npm run bench -- --compare runs/bench/abc1234.json
+ *   npm run bench -- --snapshot lean                 snapshots as the home page asks for them
  *
  * Writes runs/bench/<commit>[-dirty].json unless --out names another file.
  */
@@ -18,7 +19,7 @@ import { hashWorld } from "../src/core/hash.ts";
 import { mergeParams, type Params } from "../src/core/params.ts";
 import { presetParams } from "../src/core/presets.ts";
 import { PHASES, type Phase } from "../src/core/season.ts";
-import { SnapshotBuilder } from "../src/core/snapshot.ts";
+import { FULL_SNAPSHOT, SnapshotBuilder, type SnapshotOptions } from "../src/core/snapshot.ts";
 import { World } from "../src/core/world.ts";
 
 const { values } = parseArgs({
@@ -27,6 +28,7 @@ const { values } = parseArgs({
     seasons: { type: "string", default: "100" },
     repeat: { type: "string", default: "3" },
     compare: { type: "string" },
+    snapshot: { type: "string", default: "full" },
     out: { type: "string" },
   },
 });
@@ -71,6 +73,7 @@ interface BenchFile {
   date: string;
   node: string;
   repeat: number;
+  snapshot: string;
   cases: Record<string, CaseResult>;
 }
 
@@ -89,6 +92,14 @@ function quantile(sorted: number[], q: number): number {
   return sorted[Math.min(sorted.length - 1, Math.floor(q * sorted.length))] as number;
 }
 
+/** `full`: what the lab asks for (Δ histogram, shade overlay); `lean`: the home page. */
+const SNAPSHOTS: Record<string, SnapshotOptions> = {
+  full: FULL_SNAPSHOT,
+  lean: { junctions: false, field: false },
+};
+const snapshotOptions = SNAPSHOTS[values.snapshot];
+if (!snapshotOptions) throw new Error(`--snapshot must be full or lean`);
+
 function runOnce(params: Params, seasons: number): CaseResult {
   const world = new World(params);
   const builder = new SnapshotBuilder();
@@ -105,7 +116,7 @@ function runOnce(params: Params, seasons: number): CaseResult {
     last = t0;
     world.step(mark);
     const t1 = performance.now();
-    builder.build(world, t1 - t0);
+    builder.build(world, t1 - t0, snapshotOptions);
     const t2 = performance.now();
     totals.snapshot += t2 - t1;
     perSeason.push(t2 - t0);
@@ -166,13 +177,16 @@ const file: BenchFile = {
   date: new Date().toISOString(),
   node: process.version,
   repeat,
+  snapshot: values.snapshot,
   cases: results,
 };
 const out = values.out ?? join("runs", "bench", `${commit}.json`);
 mkdirSync(dirname(out), { recursive: true });
 writeFileSync(out, `${JSON.stringify(file, null, 2)}\n`);
 
-console.log(`\n${commit}, ${seasons} seasons, best of ${repeat} (ms per season)\n`);
+console.log(
+  `\n${commit}, ${seasons} seasons, best of ${repeat}, ${values.snapshot} snapshots (ms per season)\n`,
+);
 printTable([
   ["case", "grid", "trees", "metamers", "mean", "p50", "p95", "last 20", "hash"],
   ...names.map((n) => {

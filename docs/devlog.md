@@ -2,6 +2,15 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-27: M6c, the pseudo-depth view and r0 = 0.02
+
+- **r0 = 0.02** (was 0.08). Radius scales linearly with r0 under the pipe rule, and the new value gives interior `skyStand` trees H/D 62–72, edge trees 54–57 and open-grown `skyTree` 41–43 (5 seeds, season 45), against 60–80 for real stand-grown trees. **Goldens regenerated:** every case's hash changed because radius enters the state hash; growth itself does not read r0 until R1/R3.
+- **Slenderness metric** `slenderness = height / (2·trunkRadius)` in `metrics.ts` and `metrics.csv`; `sky.test.ts` checks interior trees are 50–90 and open-grown trees below 0.8× the stand median.
+- **Pseudo-depth natural view** (ADR 0008), page only. Each first-order limb is turned out of the plane about the trunk by a hashed azimuth; each leafy metamer draws three leaves around its shoot; leaves behind the plane are darkened and drawn behind the wood (WebGL2 has a second leaf batch; Canvas 2D draws two passes). View → "depth (off = x-ray)" restores the simulated geometry. [Figure](experiments/figures/2026-10-27-m6c-depth-view.png).
+- **Surprises.** Applying the projected-spiral squeeze at every branching order compounded (0.64⁵ by order 5) and collapsed crowns onto their trunks; it is now applied once per first-order limb, which is also the exact projection of a limb rotated about a vertical trunk. Fully random azimuths then narrowed crowns by about a third and split the stand's closed canopy into lollipops, so the squeeze is softened to 0.55 + 0.45·|sin φ|. The inner crown is still bare, as the model says; R6 addresses it.
+- Picking uses the drawn geometry (a tap hits what you see), not the simulated one as first planned.
+- Seen in headless Firefox (WebGL2 and Canvas 2D); not yet on a phone.
+
 ## 2026-10-27: Literature review and the M6c–M6e plan
 
 - **Review** ([note](research/2026-10-27-literature-review.md)), using Consensus, alphaXiv and web search. The core holds. Gaps: shedding should be relative to the tree's best light (correlative inhibition), and short shoots carry most leaf area in many species. The 2D "x-ray" look is the correct cross-section of a hollow crown shell; real trees look full because the shell is seen in projection.

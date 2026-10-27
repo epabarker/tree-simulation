@@ -3,7 +3,7 @@ import { presetParams } from "../../core/presets.ts";
 import { SnapshotBuilder } from "../../core/snapshot.ts";
 import type { Tree } from "../../core/tree.ts";
 import { World } from "../../core/world.ts";
-import { Scene } from "./scene.ts";
+import { CLUSTER_LEAVES, Scene } from "./scene.ts";
 
 function sceneAfter(seasons: number): { scene: Scene; world: World } {
   const world = new World(presetParams("skyTree", 3));
@@ -77,5 +77,57 @@ describe("Scene (shared by the WebGL2 and Canvas 2D renderers)", () => {
       expect(leaves.size[k]).toBeGreaterThan(0);
       expect(leaves.size[k]).toBeLessThanOrEqual(1);
     }
+  });
+
+  it("x-ray view (depth off) draws the simulated geometry and one front leaf per young metamer", () => {
+    scene.depth = false;
+    scene.computeGeometry(1);
+    expect(scene.leaves(3, 1).back).toBe(0);
+  });
+});
+
+describe("Scene pseudo-depth view (ADR 0008)", () => {
+  const { scene, world } = sceneAfter(20);
+  const tree = world.trees[0] as Tree;
+  const s = scene.next;
+  if (!s) throw new Error("no snapshot");
+  scene.depth = true;
+  scene.computeGeometry(1);
+
+  it("keeps the trunk where the core puts it and shortens laterals' spread, never lengthening", () => {
+    const g = scene.geom;
+    let squeezed = 0;
+    for (let j = 0; j < s.metamerCount; j++) {
+      const drawn = Math.hypot(g.tipX[j] - g.baseX[j], g.tipY[j] - g.baseY[j]);
+      expect(drawn).toBeLessThanOrEqual(s.length[j] + 1e-4);
+      if (drawn < s.length[j] - 1e-3) squeezed += 1;
+      if (s.order[j] === 0) {
+        expect(g.tipX[j]).toBeCloseTo(tree.tipX(j), 3);
+        expect(g.tipY[j]).toBeCloseTo(tree.tipY(j), 3);
+      }
+    }
+    expect(squeezed).toBeGreaterThan(0);
+  });
+
+  it("gives each young metamer a cluster split into back and front layers", () => {
+    const leaves = scene.leaves(3, 1);
+    let young = 0;
+    for (let j = 0; j < s.metamerCount; j++) if (s.age[j] <= 3) young += 1;
+    expect(leaves.count).toBe(CLUSTER_LEAVES * young);
+    expect(leaves.back).toBeGreaterThan(0.2 * leaves.count);
+    expect(leaves.back).toBeLessThan(0.8 * leaves.count);
+    for (let k = 0; k < leaves.count; k++) {
+      expect(leaves.size[k]).toBeGreaterThan(0);
+      expect(leaves.size[k]).toBeLessThanOrEqual(1);
+    }
+  });
+
+  it("is stable from frame to frame (depth is hashed from stable ids)", () => {
+    const a = scene.leaves(3, 1);
+    const first = { back: a.back, x: Array.from(a.x.subarray(0, a.count)) };
+    scene.computeGeometry(1);
+    const b = scene.leaves(3, 1);
+    expect(b.back).toBe(first.back);
+    expect(Array.from(b.x.subarray(0, b.count))).toEqual(first.x);
   });
 });

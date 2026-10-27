@@ -30,7 +30,14 @@ import type { Snapshot } from "../../core/snapshot.ts";
 import { BudState } from "../../core/tree.ts";
 import { BUD_ACTIVE, BUD_DORMANT, parseColor, SEQUENTIAL, shadeImage } from "./colors.ts";
 import { MAX_DPR, type Renderer } from "./renderer.ts";
-import { LEAF_ASPECT, LEAF_LENGTH, LEAF_MIN_PX, Scene, type ViewOptions } from "./scene.ts";
+import {
+  LEAF_ASPECT,
+  LEAF_LENGTH,
+  LEAF_MIN_PX,
+  type Leaves,
+  Scene,
+  type ViewOptions,
+} from "./scene.ts";
 import { readTheme, type Theme } from "./theme.ts";
 
 // World → clip space: x_clip = (x − cx)·sx, y_clip = groundClip + y·sy, with u_view = (cx, sx, groundClip, sy).
@@ -254,6 +261,8 @@ export class WebGL2Renderer implements Renderer {
   private segments!: Batch;
   private ghostBatch!: Batch;
   private leafBatch!: Batch;
+  /** Back-layer leaves of the pseudo-depth view, drawn before the branches (ADR 0008). */
+  private leafBackBatch!: Batch;
   private budBatch!: Batch;
   private wallBatch!: Batch;
   private image!: Batch;
@@ -334,12 +343,15 @@ export class WebGL2Renderer implements Renderer {
     };
     this.segments = this.batch(segment, segmentAttribs);
     this.ghostBatch = this.batch(segment, segmentAttribs);
-    this.leafBatch = this.batch(this.program(LEAF_VS, LEAF_FS), {
+    const leafProgram = this.program(LEAF_VS, LEAF_FS);
+    const leafAttribs = {
       a_pos: { size: 2 },
       a_dir: { size: 2 },
       a_grow: { size: 1 },
       a_color: { size: 4, bytes: true },
-    });
+    };
+    this.leafBatch = this.batch(leafProgram, leafAttribs);
+    this.leafBackBatch = this.batch(leafProgram, leafAttribs);
     this.budBatch = this.batch(this.program(POINT_VS, FLAT_FS), {
       a_center: { size: 2 },
       a_color: { size: 4, bytes: true },
@@ -467,18 +479,20 @@ export class WebGL2Renderer implements Renderer {
       t,
       view.colorMode,
       view.showLeaves ? view.leafAge : -1,
+      view.depth,
       view.showBuds,
       ghosts,
       this.themeVersion,
     ].join();
     const u = this.uploaded;
     if (u.next !== s || u.prev !== scene.prev || u.key !== key) {
+      scene.depth = view.depth;
       scene.computeGeometry(t);
       this.buildSegments(s, view);
       if (ghosts) this.buildGhosts(1 - t);
       else this.ghostBatch.count = 0;
       if (view.showLeaves) this.buildLeaves(view.leafAge, t);
-      else this.leafBatch.count = 0;
+      else this.leafBatch.count = this.leafBackBatch.count = 0;
       if (view.showBuds) this.buildBuds(s, view.colorMode === "light");
       else this.budBatch.count = 0;
       this.buildWalls(s);
@@ -501,6 +515,7 @@ export class WebGL2Renderer implements Renderer {
     }
     this.drawBatch(this.wallBatch, this.wallBatch.count, uniforms);
     this.drawBatch(this.ghostBatch, this.ghostBatch.count, uniforms);
+    this.drawBatch(this.leafBackBatch, this.leafBackBatch.count, uniforms);
     this.drawBatch(this.segments, this.segments.count, uniforms);
     this.drawBatch(this.leafBatch, this.leafBatch.count, uniforms);
     this.drawBatch(this.budBatch, this.budBatch.count, uniforms);
@@ -587,24 +602,30 @@ export class WebGL2Renderer implements Renderer {
 
   private buildLeaves(leafAge: number, t: number): void {
     const leaves = this.scene.leaves(leafAge, t);
-    const n = leaves.count;
-    const batch = this.leafBatch;
     const palette = this.paletteBytes(this.theme.leaf, 0.92);
+    this.fillLeaves(this.leafBackBatch, leaves, 0, leaves.back, palette);
+    this.fillLeaves(this.leafBatch, leaves, leaves.back, leaves.count, palette);
+  }
+
+  /** Uploads leaves [from, to) of the frame's leaf list into `batch`. */
+  private fillLeaves(batch: Batch, leaves: Leaves, from: number, to: number, palette: Bytes): void {
+    const n = to - from;
     const pos = this.stream<Floats>(batch, "a_pos", n);
     const dir = this.stream<Floats>(batch, "a_dir", n);
     const grow = this.stream<Floats>(batch, "a_grow", n);
     const color = this.stream<Bytes>(batch, "a_color", n);
-    for (let k = 0; k < n; k++) {
-      pos[2 * k] = leaves.x[k];
-      pos[2 * k + 1] = leaves.y[k];
-      dir[2 * k] = leaves.ux[k];
-      dir[2 * k + 1] = leaves.uy[k];
-      grow[k] = leaves.size[k];
+    for (let i = 0; i < n; i++) {
+      const k = from + i;
+      pos[2 * i] = leaves.x[k];
+      pos[2 * i + 1] = leaves.y[k];
+      dir[2 * i] = leaves.ux[k];
+      dir[2 * i + 1] = leaves.uy[k];
+      grow[i] = leaves.size[k];
       const c = leaves.color[k] * 4;
-      color[4 * k] = palette[c] as number;
-      color[4 * k + 1] = palette[c + 1] as number;
-      color[4 * k + 2] = palette[c + 2] as number;
-      color[4 * k + 3] = palette[c + 3] as number;
+      color[4 * i] = palette[c] as number;
+      color[4 * i + 1] = palette[c + 1] as number;
+      color[4 * i + 2] = palette[c + 2] as number;
+      color[4 * i + 3] = palette[c + 3] as number;
     }
     this.upload(batch, n);
   }

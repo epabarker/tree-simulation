@@ -100,7 +100,7 @@ const SECTIONS: SectionSpec[] = [
     toggle: true,
     fields: [
       { key: "n", label: "n pipe exponent", min: 1.5, max: 3.5, step: 0.05 },
-      { key: "r0", label: "r0 tip radius", min: 0.02, max: 0.3, step: 0.01 },
+      { key: "r0", label: "r0 tip radius", min: 0.005, max: 0.3, step: 0.005 },
     ],
   },
 ];
@@ -223,6 +223,7 @@ export class Panel {
     };
     viewFolder.addBinding(view, "colorMode", { label: "colour", options: colorOptions });
     viewFolder.addBinding(view, "showLeaves", { label: "leaves" });
+    viewFolder.addBinding(view, "depth", { label: "depth (off = x-ray)" });
     viewFolder.addBinding(view, "leafAge", {
       label: "leaf age (seasons)",
       min: 1,

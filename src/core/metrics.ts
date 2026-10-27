@@ -27,6 +27,8 @@ export interface TreeMetrics {
   /** Mean Q over the buds sampled this season. */
   meanBudQ: number;
   trunkRadius: number;
+  /** Height over trunk base diameter (slenderness, §10; stand-grown trees ≈ 60–80). */
+  slenderness: number;
   /** Metamers shed this season (C5). */
   shed: number;
 }
@@ -46,6 +48,7 @@ export const METRIC_COLUMNS: readonly (keyof TreeMetrics)[] = [
   "vBase",
   "meanBudQ",
   "trunkRadius",
+  "slenderness",
   "shed",
 ];
 
@@ -90,6 +93,7 @@ export function treeMetrics(tree: Tree): TreeMetrics {
     vBase: tree.vBase,
     meanBudQ: tree.meanBudQ,
     trunkRadius: nm > 0 ? c.radius[0] : 0,
+    slenderness: nm > 0 && c.radius[0] > 0 ? height / (2 * c.radius[0]) : 0,
     shed: tree.shedCount,
   };
 }

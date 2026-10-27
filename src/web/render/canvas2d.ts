@@ -8,7 +8,14 @@ import type { Snapshot } from "../../core/snapshot.ts";
 import { BudState } from "../../core/tree.ts";
 import { BUD_ACTIVE, BUD_DORMANT, SEQUENTIAL, shadeImage } from "./colors.ts";
 import { MAX_DPR, type Renderer } from "./renderer.ts";
-import { type ColorMode, LEAF_ASPECT, leafLength, Scene, type ViewOptions } from "./scene.ts";
+import {
+  type ColorMode,
+  LEAF_ASPECT,
+  type Leaves,
+  leafLength,
+  Scene,
+  type ViewOptions,
+} from "./scene.ts";
 import { RAMP_STEPS, readTheme, type Theme } from "./theme.ts";
 
 const WIDTH_BUCKETS = 48;
@@ -76,10 +83,14 @@ export class Canvas2DRenderer implements Renderer {
       for (const wall of s.walls) ctx.fillRect(wall.x, wall.y, wall.width, wall.height);
     }
 
+    scene.depth = view.depth;
     scene.computeGeometry(t);
     if (view.showGhosts && scene.prev && t < 1) this.drawGhosts(1 - t);
+    // Back-layer leaves (pseudo-depth, ADR 0008) go behind the wood, the rest in front.
+    const leaves = view.showLeaves ? scene.leaves(view.leafAge, t) : null;
+    if (leaves) this.drawLeaves(leaves, 0, leaves.back);
     this.drawSegments(s, view.colorMode);
-    if (view.showLeaves) this.drawLeaves(view.leafAge, t);
+    if (leaves) this.drawLeaves(leaves, leaves.back, leaves.count);
     if (view.showBuds) this.drawBuds(s, view.colorMode === "light");
 
     // Ground last, in screen space, so stubs of shoots that turned downward stay underground.
@@ -149,9 +160,8 @@ export class Canvas2DRenderer implements Renderer {
     }
   }
 
-  private drawLeaves(leafAge: number, t: number): void {
+  private drawLeaves(leaves: Leaves, from: number, to: number): void {
     const { ctx } = this;
-    const leaves = this.scene.leaves(leafAge, t);
     const palette = this.theme.leaf;
     const full = leafLength(this.scene.camera.scale);
     ctx.save();
@@ -159,7 +169,7 @@ export class Canvas2DRenderer implements Renderer {
     for (let c = 0; c < RAMP_STEPS; c++) {
       ctx.fillStyle = palette[c] as string;
       ctx.beginPath();
-      for (let k = 0; k < leaves.count; k++) {
+      for (let k = from; k < to; k++) {
         if (leaves.color[k] !== c) continue;
         const bx = leaves.x[k];
         const by = leaves.y[k];

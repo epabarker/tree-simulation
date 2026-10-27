@@ -53,6 +53,7 @@ const view: ViewOptions & { preset: PresetName } = {
   preset: startPreset,
   colorMode: "natural",
   showLeaves: true,
+  depth: true,
   leafAge: 5,
   showBuds: false,
   showShadow: false,

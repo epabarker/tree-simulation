@@ -128,7 +128,11 @@ export interface Params {
     enabled: boolean;
     /** Pipe exponent n (Palubicki: 2–3; empirical 1.8–2.3). */
     n: number;
-    /** Tip radius r0 in cells (calibrate). */
+    /**
+     * Tip radius r0 in cells. 0.02 gives stand-grown height/diameter ≈ 56–75 and open-grown ≈ 41,
+     * matching real slenderness (stand-grown 60–80, Watt et al. 2023); radius scales linearly with
+     * r0 under the pipe rule (literature review 2026-10-27 §4, M6c).
+     */
     r0: number;
   };
 }
@@ -161,7 +165,7 @@ export const defaultParams: Params = {
   c3: { mode: "none", lambda: 0.5, alpha: 2 },
   c4: { enabled: false, wd: 1, xi: 0.3, eta: 0.15, setPoint: 0, epsilon: 0.5, sigma: 20 },
   c5: { enabled: false, T: 0.1, g: 3 }, // T: calibrate (M4 calibration)
-  c6: { enabled: false, n: 2, r0: 0.08 },
+  c6: { enabled: false, n: 2, r0: 0.02 },
 };
 
 /** A partial set of overrides, merged one level deep into each section. */

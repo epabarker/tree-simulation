@@ -7,6 +7,13 @@
  * interpolating between the previous and current snapshots, so growth and bending animate rather
  * than jump. Leaves are drawn at young nodes only: a view of the foliage, not part of the light
  * model, where buds cast the shade.
+ *
+ * Pseudo-depth (ADR 0008, page only): with `depth` on, the planar tree is drawn as if it were a
+ * 3D crown seen from the side. Each first-order limb gets a stable azimuth φ about the trunk and
+ * is foreshortened by the projected-spiral rule of spec §C1.4 (its spread from the trunk shrinks
+ * by |sin φ|), and each leafy metamer draws a small cluster of leaves around its shoot, split into a
+ * back layer (drawn behind the wood, darker: the far side of the crown's shell) and a front layer.
+ * With `depth` off (the x-ray view) the page draws exactly the simulated geometry.
  */
 
 import type { Snapshot } from "../../core/snapshot.ts";
@@ -18,6 +25,8 @@ export type ColorMode = "natural" | "order" | "light" | "resource" | "age" | "tr
 export interface ViewOptions {
   colorMode: ColorMode;
   showLeaves: boolean;
+  /** Pseudo-depth: foreshortened laterals and two-layer leaf clusters (off = x-ray view). */
+  depth: boolean;
   /** Metamers up to this many seasons old carry a leaf. */
   leafAge: number;
   showBuds: boolean;
@@ -47,10 +56,12 @@ export interface Geometry {
 /**
  * Leaves to draw this frame: base point, unit direction, size (0 → 1 as a leaf unfolds or falls)
  * and palette index. The drawn length is `leafLength(scale) · size`; the zoom-dependent minimum
- * is applied at draw time, so these arrays do not change when only the camera moves.
+ * is applied at draw time, so these arrays do not change when only the camera moves. The first
+ * `back` leaves are the back layer, drawn before the branches; the rest are drawn after them.
  */
 export interface Leaves {
   count: number;
+  back: number;
   x: Float32Array;
   y: Float32Array;
   ux: Float32Array;
@@ -77,6 +88,16 @@ export function leafLength(scale: number): number {
 }
 /** Angle between a leaf and its shoot. */
 const LEAF_SPREAD = 0.95;
+/** Leaves per cluster in the pseudo-depth view, spaced evenly around the shoot. */
+export const CLUSTER_LEAVES = 3;
+/**
+ * Least foreshortening of a limb's spread. A fully random azimuth (squeeze |sin φ|) narrows crowns
+ * by a third and breaks a stand's closed canopy into separate crowns, which misreads a stand whose
+ * crowns touch, so the squeeze runs from MIN_SPREAD (limb facing the viewer) to 1 (in the plane).
+ */
+const MIN_SPREAD = 0.55;
+/** Fraction of the light ramp kept by back-layer leaves (the shaded far side of the crown). */
+const BACK_SHADE = 0.55;
 
 function emptyGeometry(n: number): Geometry {
   return {
@@ -102,6 +123,15 @@ function jitter(tree: number, birthId: number): number {
   return ((Math.imul(birthId ^ (tree << 20), 0x9e3779b1) >>> 0) % 3) - 1;
 }
 
+/** A stable value in [0, 1) per (tree, birthId, salt): the page's pseudo-depth, never the model's. */
+function hash01(tree: number, birthId: number, salt: number): number {
+  let h = Math.imul(birthId ^ (tree << 20) ^ (salt << 27), 0x9e3779b1);
+  h ^= h >>> 15;
+  h = Math.imul(h, 0x85ebca6b);
+  h ^= h >>> 13;
+  return (h >>> 0) / 4294967296;
+}
+
 export class Scene {
   readonly camera: Camera = { cx: 0, cy: 0, scale: 1 };
   prev: Snapshot | null = null;
@@ -114,9 +144,18 @@ export class Scene {
   width = 1;
   height = 1;
   dpr = 1;
+  /** Pseudo-depth on (natural view) or off (x-ray); renderers copy `ViewOptions.depth` here. */
+  depth = false;
+  /**
+   * Per metamer, the 2×2 map from simulated to drawn direction (row-major a b / c d) and the
+   * depth of its axis in [−1, 1]. Identity and 0 everywhere when `depth` is off.
+   */
+  private proj = new Float32Array(0);
+  private axisZ = new Float32Array(0);
   private colors = new Uint16Array(0);
   private leafList: Leaves = {
     count: 0,
+    back: 0,
     x: new Float32Array(0),
     y: new Float32Array(0),
     ux: new Float32Array(0),
@@ -253,6 +292,11 @@ export class Scene {
     if (!s) return;
     const g = this.geom;
     const prev = this.prev;
+    if (this.proj.length < 4 * s.metamerCount) {
+      this.proj = new Float32Array(8 * s.metamerCount);
+      this.axisZ = new Float32Array(2 * s.metamerCount);
+    }
+    const proj = this.proj;
     for (let j = 0; j < s.metamerCount; j++) {
       const p = s.parent[j];
       const pi = prev ? s.prevIndex[j] : -1;
@@ -275,8 +319,17 @@ export class Scene {
       const by = p >= 0 ? g.tipY[p] : s.y0[j];
       g.baseX[j] = bx;
       g.baseY[j] = by;
-      g.tipX[j] = bx + len * Math.cos(ang);
-      g.tipY[j] = by + len * Math.sin(ang);
+      let dx = len * Math.cos(ang);
+      let dy = len * Math.sin(ang);
+      if (this.depth) {
+        this.project(s, j, p);
+        const k = 4 * j;
+        const ex = proj[k] * dx + proj[k + 1] * dy;
+        dy = proj[k + 2] * dx + proj[k + 3] * dy;
+        dx = ex;
+      }
+      g.tipX[j] = bx + dx;
+      g.tipY[j] = by + dy;
       g.radius[j] = r;
     }
     // Taper each metamer toward its thickest child, so the stem flows into whichever branch
@@ -290,6 +343,55 @@ export class Scene {
     for (let j = 0; j < n; j++) {
       g.tipRadius[j] = g.tipRadius[j] > 0 ? Math.min(g.radius[j], g.tipRadius[j]) : g.radius[j];
     }
+  }
+
+  /**
+   * Sets metamer j's projection. Each first-order limb, with its whole subtree, is turned out of
+   * the plane about the trunk by a stable azimuth φ: seen from the side, the component of its
+   * geometry perpendicular to the trunk shrinks to MIN_SPREAD + (1 − MIN_SPREAD)·|sin φ| (spec §C1.4
+   * β_eff = atan(tan β·|sin φ|)) and its depth is cos φ. Everything else inherits its parent's
+   * projection, so the squeeze is applied once per limb, never compounded; higher-order axes only
+   * get their own depth (half their parent's, half their own azimuth) for the leaf layers.
+   */
+  private project(s: Snapshot, j: number, p: number): void {
+    const proj = this.proj;
+    const k = 4 * j;
+    if (p >= 0 && s.order[j] > s.order[p] && s.order[p] > 0) {
+      proj.copyWithin(k, 4 * p, 4 * p + 4);
+      const own = Math.cos(2 * Math.PI * hash01(s.tree[j], s.birthId[j], 1));
+      this.axisZ[j] = 0.5 * this.axisZ[p] + 0.5 * own;
+      return;
+    }
+    if (p < 0 || s.order[j] === s.order[p]) {
+      if (p < 0) {
+        proj[k] = 1;
+        proj[k + 1] = 0;
+        proj[k + 2] = 0;
+        proj[k + 3] = 1;
+        this.axisZ[j] = 0;
+      } else {
+        proj.copyWithin(k, 4 * p, 4 * p + 4);
+        this.axisZ[j] = this.axisZ[p];
+      }
+      return;
+    }
+    const phi = 2 * Math.PI * hash01(s.tree[j], s.birthId[j], 1);
+    const squeeze = MIN_SPREAD + (1 - MIN_SPREAD) * Math.abs(Math.sin(phi));
+    // Unit parent direction u; S = u uᵀ + squeeze · (I − u uᵀ).
+    const pa = s.angle[p];
+    const ux = Math.cos(pa);
+    const uy = Math.sin(pa);
+    const f = 1 - squeeze;
+    const s00 = 1 - f * uy * uy;
+    const s01 = f * ux * uy;
+    const s11 = 1 - f * ux * ux;
+    const q = 4 * p;
+    const [a, b, c, d] = [proj[q], proj[q + 1], proj[q + 2], proj[q + 3]];
+    proj[k] = a * s00 + b * s01;
+    proj[k + 1] = a * s01 + b * s11;
+    proj[k + 2] = c * s00 + d * s01;
+    proj[k + 3] = c * s01 + d * s11;
+    this.axisZ[j] = Math.cos(phi);
   }
 
   /** The palette a colour mode draws with. */
@@ -328,18 +430,23 @@ export class Scene {
   }
 
   /**
-   * One leaf at the tip of every metamer up to `leafAge` seasons old, on alternating sides,
-   * coloured from shade to sun (RAMP_STEPS indices) by the light its subtree gathers. Leaves unfold
-   * as their metamer grows in and shrink away during the season in which they pass `leafAge`.
+   * Leaves at the tip of every metamer up to `leafAge` seasons old, coloured from shade to sun
+   * (RAMP_STEPS indices) by the light its subtree gathers. Leaves unfold as their metamer grows in
+   * and shrink away during the season in which they pass `leafAge`. In the x-ray view each such
+   * metamer carries one leaf on alternating sides; with `depth` on it carries CLUSTER_LEAVES leaves
+   * spaced around the shoot, each foreshortened by its out-of-plane angle, and those whose depth
+   * falls behind the plane go first, darkened, as the back layer.
    */
   leaves(leafAge: number, t: number): Leaves {
     const s = this.next;
     const out = this.leafList;
     out.count = 0;
+    out.back = 0;
     if (!s) return out;
     const n = s.metamerCount;
-    if (out.x.length < n) {
-      const cap = n * 2;
+    const per = this.depth ? CLUSTER_LEAVES : 1;
+    if (out.x.length < n * per) {
+      const cap = n * per * 2;
       out.x = new Float32Array(cap);
       out.y = new Float32Array(cap);
       out.ux = new Float32Array(cap);
@@ -353,23 +460,61 @@ export class Scene {
       if (s.age[j] <= leafAge + 1 && s.light[j] > maxLight) maxLight = s.light[j];
     }
     let k = 0;
-    for (let j = 0; j < n; j++) {
-      if (s.age[j] > leafAge + 1) continue;
-      const size = g.grown[j] * (s.age[j] > leafAge ? 1 - t : 1);
-      if (size <= 0.02) continue;
-      const side = s.birthId[j] & 1 ? 1 : -1;
-      const ang = Math.atan2(g.tipY[j] - g.baseY[j], g.tipX[j] - g.baseX[j]) + side * LEAF_SPREAD;
-      const u = maxLight > 0 ? Math.sqrt(s.light[j] / maxLight) : 0;
-      const c = Math.floor(u * (RAMP_STEPS - 1)) + jitter(s.tree[j], s.birthId[j]);
-      out.x[k] = g.tipX[j];
-      out.y[k] = g.tipY[j];
-      out.ux[k] = Math.cos(ang);
-      out.uy[k] = Math.sin(ang);
-      out.size[k] = size;
-      out.color[k] = Math.max(0, Math.min(RAMP_STEPS - 1, c));
-      k++;
+    // Pass 0 emits the back layer, pass 1 the front (the x-ray view has only a front layer).
+    for (let pass = this.depth ? 0 : 1; pass < 2; pass++) {
+      for (let j = 0; j < n; j++) {
+        if (s.age[j] > leafAge + 1) continue;
+        const size = g.grown[j] * (s.age[j] > leafAge ? 1 - t : 1);
+        if (size <= 0.02) continue;
+        const u = maxLight > 0 ? Math.sqrt(s.light[j] / maxLight) : 0;
+        const c = Math.floor(u * (RAMP_STEPS - 1)) + jitter(s.tree[j], s.birthId[j]);
+        const shoot = Math.atan2(g.tipY[j] - g.baseY[j], g.tipX[j] - g.baseX[j]);
+        if (!this.depth) {
+          const side = s.birthId[j] & 1 ? 1 : -1;
+          const ang = shoot + side * LEAF_SPREAD;
+          k = this.pushLeaf(k, g.tipX[j], g.tipY[j], Math.cos(ang), Math.sin(ang), size, c);
+          continue;
+        }
+        const dx = Math.cos(shoot);
+        const dy = Math.sin(shoot);
+        const along = Math.cos(LEAF_SPREAD);
+        const across = Math.sin(LEAF_SPREAD);
+        const turn = hash01(s.tree[j], s.birthId[j], 2);
+        for (let i = 0; i < CLUSTER_LEAVES; i++) {
+          const psi = 2 * Math.PI * (turn + i / CLUSTER_LEAVES);
+          const z = 0.6 * this.axisZ[j] + 0.4 * Math.sin(psi);
+          if ((z < 0 ? 0 : 1) !== pass) continue;
+          // Leaf direction in 3D is along·d + across·(n cos ψ + z-axis sin ψ); drawn in-plane part.
+          const w = across * Math.cos(psi);
+          const lx = along * dx - w * dy;
+          const ly = along * dy + w * dx;
+          const len = Math.hypot(lx, ly);
+          const shade = pass === 0 ? Math.floor(c * BACK_SHADE) : c;
+          k = this.pushLeaf(k, g.tipX[j], g.tipY[j], lx / len, ly / len, size * len, shade);
+        }
+      }
+      if (pass === 0) out.back = k;
     }
     out.count = k;
     return out;
+  }
+
+  private pushLeaf(
+    k: number,
+    x: number,
+    y: number,
+    ux: number,
+    uy: number,
+    size: number,
+    color: number,
+  ): number {
+    const out = this.leafList;
+    out.x[k] = x;
+    out.y[k] = y;
+    out.ux[k] = ux;
+    out.uy[k] = uy;
+    out.size[k] = size;
+    out.color[k] = Math.max(0, Math.min(RAMP_STEPS - 1, color));
+    return k + 1;
   }
 }

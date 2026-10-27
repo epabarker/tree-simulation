@@ -32,6 +32,16 @@ describe("M6: the Beer–Lambert sky sweep (§C2, §7 M6)", () => {
     expect(median(interior)).toBeGreaterThan(5 * median(open));
   });
 
+  it("grows stand trees with realistic slenderness, open-grown trees squatter (§10, M6c)", () => {
+    const interior = stands.flatMap((trees) => trees.slice(1, -1).map((m) => m.slenderness));
+    for (const hd of interior) {
+      expect(hd).toBeGreaterThan(50);
+      expect(hd).toBeLessThan(90);
+    }
+    const open = SEEDS.map((seed) => (grown("skyTree", seed, 45)[0] as TreeMetrics).slenderness);
+    expect(median(open)).toBeLessThan(0.8 * median(interior));
+  });
+
   it("lets neighbours lean into the gap left by a felled tree (5 seeds)", () => {
     for (const seed of SEEDS) {
       const felled = new World(presetParams("skyStand", seed));

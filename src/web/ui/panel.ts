@@ -22,7 +22,7 @@ interface FieldSpec {
 }
 
 interface SectionSpec {
-  section: "c1" | "c2" | "c3" | "c4" | "c5" | "c6" | "r1" | "r2" | "r3" | "r6";
+  section: "c1" | "c2" | "c3" | "c4" | "c5" | "c6" | "r1" | "r2" | "r3" | "r4" | "r5" | "r6";
   title: string;
   /** Adds an on/off checkbox bound to the section's `enabled` flag. */
   toggle?: boolean;
@@ -156,6 +156,30 @@ const SECTIONS: SectionSpec[] = [
       { key: "c", label: "c reaction-wood rate", min: 0, max: 1, step: 0.01 },
       { key: "sigmaTarget", label: "σ_target stress", min: 500, max: 20000, step: 100 },
       { key: "girthGain", label: "stress girth gain", min: 0, max: 1, step: 0.05 },
+      { key: "sigmaBreak", label: "σ_break (0 = off)", min: 0, max: 30000, step: 500 },
+    ],
+  },
+  {
+    section: "r4",
+    title: "R4 Dormancy & release",
+    toggle: true,
+    fields: [
+      { key: "vBreak", label: "v_break release", min: 1, max: 6, step: 0.1 },
+      { key: "vCont", label: "v_cont continue", min: 0.5, max: 3, step: 0.1 },
+      { key: "delta", label: "δ per dormant season", min: 0, max: 0.2, step: 0.005 },
+      { key: "lDorm", label: "L_dorm lifespan", min: 1, max: 100, step: 1 },
+      { key: "juvenile", label: "reiteration (pa levels)", min: 0, max: 3, step: 1 },
+    ],
+  },
+  {
+    section: "r5",
+    title: "R5 Shade avoidance",
+    toggle: true,
+    fields: [
+      { key: "eS", label: "e_s elongation", min: 0, max: 2, step: 0.05 },
+      { key: "dLambda", label: "δλ leader bias", min: 0, max: 0.15, step: 0.005 },
+      { key: "dB", label: "δ_b fewer breaks", min: 0, max: 4, step: 0.1 },
+      { key: "dA", label: "δ_A upright", min: 0, max: 1, step: 0.05 },
     ],
   },
   {

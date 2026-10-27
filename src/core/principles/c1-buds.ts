@@ -57,6 +57,7 @@ export function addMetamer(
   c.scarSumN[i] = 0;
   c.stressWood[i] = 0;
   c.moment[i] = 0;
+  c.paShift[i] = parent < 0 ? 0 : c.paShift[parent];
   c.birthSeason[i] = season;
   return i;
 }
@@ -85,10 +86,11 @@ export function addBud(tree: Tree, m: number, slot: Slot, angle: number, order: 
 export function formAxillaryBuds(tree: Tree, m: number, params: Params, lastOfShoot = true): void {
   const c = tree.m.cols;
   const k = c.axisNode[m];
-  const count = lateralCount(c.order[m], k, lastOfShoot, params.r2);
+  const pa = c.order[m] - c.paShift[m]; // R4 reiteration shifts the physiological age
+  const count = lateralCount(pa, k, lastOfShoot, params.r2);
   if (count === 0) return;
   const order = c.order[m] + 1;
-  const beta = branchAngleOf(order, params) * DEG;
+  const beta = branchAngleOf(pa + 1, params) * DEG;
   const angle = c.angle[m];
   if (count === 2) {
     addBud(tree, m, Slot.left, angle + beta, order);
@@ -102,13 +104,24 @@ export function formAxillaryBuds(tree: Tree, m: number, params: Params, lastOfSh
 }
 
 /**
+ * Default growth direction of a bud at `slot` of metamer `m`'s upper node: the metamer's direction
+ * for the main slot, rotated by +β (left) or −β (right) for laterals (β of the lateral's pa).
+ */
+export function budAngle(tree: Tree, m: number, slot: Slot, params: Params): number {
+  const c = tree.m.cols;
+  if (slot === Slot.main) return c.angle[m];
+  const beta = branchAngleOf(c.order[m] - c.paShift[m] + 1, params) * DEG;
+  return slot === Slot.left ? c.angle[m] + beta : c.angle[m] - beta;
+}
+
+/**
  * Forms the terminal bud of metamer `m`, continuing its axis in the same direction. With R2 it
  * ends (terminated, sympodial growth) with probability p_term of the axis's pa.
  */
 export function formTerminalBud(tree: Tree, m: number, params: Params, season: number): void {
   const c = tree.m.cols;
   const i = addBud(tree, m, Slot.main, c.angle[m], c.order[m]);
-  if (terminates(c.order[m], tree.id, c.birthId[m], season, params)) {
+  if (terminates(c.order[m] - c.paShift[m], tree.id, c.birthId[m], season, params)) {
     tree.b.cols.state[i] = BudState.terminated;
   }
 }
@@ -154,7 +167,8 @@ export type DirectionFn = (prev: number, bud: number, metamerBirthId: number) =>
 
 /**
  * Grows a shoot of `n` metamers of length `length` from `bud` (§C1, §C3.4). The bud is consumed;
- * each new metamer forms its axillary bud(s), and the last one forms the terminal bud.
+ * each new metamer forms its axillary bud(s), and the last one forms the terminal bud. `paShift`,
+ * when given, sets the shoot's reiteration shift (R4); otherwise it inherits its parent's.
  */
 export function growShoot(
   tree: Tree,
@@ -164,6 +178,7 @@ export function growShoot(
   params: Params,
   season: number,
   direct: DirectionFn,
+  paShift = -1,
 ): void {
   const b = tree.b.cols;
   let parent = b.metamer[bud];
@@ -173,6 +188,7 @@ export function growShoot(
   for (let j = 0; j < n; j++) {
     angle = direct(angle, bud, tree.nextMetamerId);
     const m = addMetamer(tree, parent, slot, angle, length, params.c6.r0, season);
+    if (j === 0 && paShift >= 0) tree.m.cols.paShift[m] = paShift;
     formAxillaryBuds(tree, m, params, j === n - 1);
     if (j === n - 1) formTerminalBud(tree, m, params, season);
     parent = m;

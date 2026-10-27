@@ -22,6 +22,7 @@
 import type { Params } from "../params.ts";
 import { ensureUint8 } from "../soa.ts";
 import { BudState, Slot, type Tree } from "../tree.ts";
+import { addBud, budAngle } from "./c1-buds.ts";
 import { isLiveBud } from "./c3-allocation.ts";
 
 /**
@@ -53,7 +54,6 @@ export function shedBranches(
   const { g } = params.c5;
   const T = Math.max(params.c5.T, params.c5.Trel * tree.qTop);
   const carbon = params.r1.enabled && params.r1.shed === "carbon";
-  const n = params.c6.n;
   tree.scratchU = ensureUint8(tree.scratchU, Math.max(nm, tree.b.length));
   const dead = tree.scratchU;
   dead.fill(0, 0, nm);
@@ -74,7 +74,27 @@ export function shedBranches(
     }
   }
   if (!any) return 0;
+  return removeBranches(tree, dead, params);
+}
 
+/**
+ * Removes every metamer marked in `dead` (by this season's row index) with its whole subtree and
+ * buds, recording each removed branch's base radius as a scar at the node it hung from. Compacts
+ * the metamer table in order and remaps stored indices. Shared by C5/R1 shedding and R3 breakage.
+ * Per-row scratch arrays in `carry` are compacted alongside. With R4's bud bank, each removed
+ * branch leaves a dormant bud in its slot. Returns the number of metamers removed.
+ */
+export function removeBranches(
+  tree: Tree,
+  dead: Uint8Array,
+  params: Params,
+  carry: Float64Array[] = [],
+): number {
+  const nm = tree.m.length;
+  const c = tree.m.cols;
+  const { n } = params.c6;
+  const bank = params.r4.enabled && params.r4.bank;
+  const roots: number[] = [];
   // Forward pass: a metamer dies with its parent (parents come first). Scars go to the node
   // the shed branch hung from; nested shed roots inside a shed branch leave no scar.
   let removed = 0;
@@ -84,6 +104,7 @@ export function shedBranches(
       dead[i] = 1;
     } else if (dead[i] && p >= 0) {
       c.scarSumN[p] += c.radius[i] ** n;
+      if (bank) roots.push(i);
     }
     if (dead[i]) removed += 1;
   }
@@ -94,6 +115,7 @@ export function shedBranches(
     if (dead[b.metamer[j]]) b.state[j] = BudState.gone;
   }
 
+  const bankRows = roots.map((i) => ({ parent: c.parent[i], slot: c.slot[i], order: c.order[i] }));
   const keep = new Uint8Array(nm);
   for (let i = 0; i < nm; i++) keep[i] = dead[i] ? 0 : 1;
   const oldToNew = tree.m.compact(keep);
@@ -104,6 +126,22 @@ export function shedBranches(
   }
   for (let j = 0; j < tree.b.length; j++) {
     if (b.state[j] !== BudState.gone) b.metamer[j] = oldToNew[b.metamer[j]];
+  }
+  for (const arr of carry) {
+    for (let i = 0; i < nm; i++) if (keep[i]) arr[oldToNew[i] as number] = arr[i] as number;
+  }
+  // R4 bud bank: a dormant bud in each vacated slot (the table rows are remapped first). The
+  // compaction kept the removed roots' column values only in `bankRows`, read before it.
+  for (const root of bankRows) {
+    const m = oldToNew[root.parent] as number;
+    const i = addBud(
+      tree,
+      m,
+      root.slot as Slot,
+      budAngle(tree, m, root.slot as Slot, params),
+      root.order,
+    );
+    tree.b.cols.state[i] = BudState.dormant;
   }
   return removed;
 }

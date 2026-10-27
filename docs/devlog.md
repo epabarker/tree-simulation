@@ -2,6 +2,36 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-27: M10, dormancy, release and shade avoidance
+
+- **Merged** the M9 PR (epabarker/tree-simulation#3) at the user's request.
+- **R4** (`principles/r4-dormancy.ts`, ADR 0012):
+  - hysteresis: active buds and short shoots continue at v_cont; dormant buds need v_break·(1 + δ·age)·(1 + δ_b·s);
+  - dormant buds abort after L_dorm seasons;
+  - reiteration: a released bud's shoot takes a younger pa, stored as a metamer column `paShift`, and every R2 lookup now reads order − paShift.
+- **Decision (user):** as specified, R4 released no dormant bud at all. Bare boles carried 0–2 buds, and BH gives a lone bole bud v ≤ 0.4 even after a neighbour falls. Two additions, recorded in the spec and ADR 0012:
+  - a **bud bank**: a shed or broken branch leaves a dormant bud in its slot (`removeBranches`, `budAngle`);
+  - a **light trigger**: Q ≥ Q_rel·(1 + δ·age) releases a dormant bud, whose first metamer is paid from the R1 reserve.
+- **R5** (`principles/r5-shade.ts`): with s = 1 − Q/C,
+  - internodes l0·(1 + e_s·s);
+  - λ + δλ·s at shaded nodes (node shade sampled per metamer, `sampleNodes`);
+  - v_break·(1 + δ_b·s) on R4's sugar route;
+  - A_set·(1 − δ_A·s).
+- **R3 breakage** (σ_break, deferred from M9) is built through `removeBranches`, but stays off: no break happens because stress wood holds σ at or below σ_target.
+- **Metrics:** `released`, `epicormic` (from trunk wood ≥ 10 seasons old), `aborted`, `broken`. **Page:** R4 and R5 folders, σ_break in R3.
+- **Results** ([note](experiments/2026-10-27-m10-release-shade.md), 5 seeds):
+  - Felling a tree at season 50 leaves its neighbours with 64 trunk shoots by season 56, against 22 in the kept stand. R4 alone gives 60 against 1.
+  - With no bank, or the sugar route only, there are none.
+  - Stand H/D rises from 61 to 72 (open-grown 41 → 47), almost all from δλ. The stand still levels off (≈ 83 cells), no tree dies, and edge trees lean out as before.
+- **Surprises.**
+  - Elongation barely changes slenderness.
+  - Measured as all dormant releases, the flush is invisible (≈ 3 a tree each season inside crowns); only releases on old trunk wood show it.
+  - With δ_b also scaling the light trigger, shade cancelled the flush: the trigger already reads the light, so δ_b now scales only the sugar route.
+  - R5 lifts the open tree to `skyTree`'s 100-cell ceiling by season 100.
+- **Tests:** `r4-r5.test.ts` (8), a breakage test in `r3-mechanics.test.ts`, `release.test.ts` (2). `mechanics.test.ts` now pins `PRE_R4`.
+- **Goldens:** the five sky goldens and `weeping` and `troll` changed (R4, R5 on). With both off, all seven reproduce their M9 hashes exactly.
+- **Seen** on the page in headless Chromium (WebGL2): the R4 and R5 folders, tapping fells a tree and opens the gap. No console errors.
+
 ## 2026-10-27: M9, mechanics
 
 - **Merged** the M8 PR (epabarker/tree-simulation#2) at the user's request; M9 starts from it.

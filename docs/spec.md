@@ -183,9 +183,9 @@ I found no study testing a vertical-plane tree model against 3D. Forestry reduce
 1. **Statement.** Dormant buds have a finite lifespan and break if delivered resource exceeds a higher release threshold; active shoots continue at a lower one (hysteresis).
 2. **Biology.** Reiteration is a core architectural concept (Barthélémy & Caraglio 2007).\[18\] Bud release in pea is driven by sugar supply (Mason et al. 2014).\[28\]\[29\] Auxin-canalization modelling predicts activation is "hysteretic, such that beyond a threshold it is difficult to reverse" (Prusinkiewicz et al. 2009, as summarized by Nahas et al. 2024).\[30\]
 3. **Evidence.** Phenomenon well established; rule a modelling hypothesis.
-4. **Local rule.** age++; abort if age > L_dorm; break if v ≥ v_break(1 + δ·age); continue if v ≥ v_cont < v_break; released buds get juvenile pa. Optional stochastic break **[RNG]**.
+4. **Local rule.** age++; abort if age > L_dorm; break if v ≥ v_break(1 + δ·age), or by a light trigger, Q ≥ Q_rel(1 + δ·age), whose first metamer is paid from the reserve (R1); continue if v ≥ v_cont < v_break; released buds get juvenile pa (stored as a per-axis shift, inherited by the subtree). A shed or broken branch leaves a dormant bud in its slot, a bud bank on old wood. Without the bank and the light trigger, BH gives a lone bud on a bole too little resource to break, and no epicormic shoots form (ADR 0012). Optional stochastic break **[RNG]**.
 5. **2D translation.** Direct.
-6. **Parameters.** L_dorm, v_break, v_cont, δ.
+6. **Parameters.** L_dorm, v_break, v_cont, δ, Q_rel, juvenile Δpa; bud bank on/off.
 7. **Feedback.** Reverses loop E: neighbour death → buds break.
 8. **Module boundary.** Switchable.
 9. **Multi-tree.** Essential for gap dynamics.
@@ -198,7 +198,7 @@ I found no study testing a vertical-plane tree model against 3D. Forestry reduce
 2. **Biology.** Shade avoidance is well established: a "decrease in the ratio of red to far‐red wavelengths (low R : FR) … is detected by the phytochrome family of plant photoreceptors" (Franklin 2008, New Phytologist). Crowns are highly plastic: the perfect-plasticity approximation reproduced species- and size-dependent crown radius, depth and canopy status (Purves et al. 2007, 2008).\[31\]\[32\]
 Low R:FR also suppresses bud outgrowth, through ABA in the bud (Schneider et al. 2019), and makes branches more upright (Roychoudhry et al. 2017). Forest-grown trees converge on spindly stems with slender, sparse branches; open-grown trees on squat stems with large crowns (MacFarlane et al. 2017).
 3. **Evidence.** Phenomenon well established; mapping a hypothesis.
-4. **Local rule.** With s = 1 − Q/C (or the far-red field F): elongation l = l₀(1 + e_s·s); leader bias λ_eff = λ + δλ·s; fewer bud breaks, v_break,eff = v_break(1 + δ_b·s) (R4); a more upright set-point, A_set,eff = A_set(1 − δ_A·s) (C4). Optional far-red field F = local horizontal foliage sum.
+4. **Local rule.** With s = 1 − Q/C (or the far-red field F): elongation l = l₀(1 + e_s·s); leader bias λ_eff = λ + δλ·s; fewer bud breaks, v_break,eff = v_break(1 + δ_b·s) (R4's sugar route; the light trigger already reads the light); a more upright set-point, A_set,eff = A_set(1 − δ_A·s) (C4). Optional far-red field F = local horizontal foliage sum.
 5. **2D translation.** F is a 1D neighbourhood sum.
 6. **Parameters.** e_s, δλ, δ_b, δ_A, r_F.
 7. **Feedback.** Strengthens the height race; slender stems interact with R3, O2.

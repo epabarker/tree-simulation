@@ -7,13 +7,14 @@
  * the main slot and the lateral slots (§C3.4); a slot holding a bud delivers its share to the
  * bud, a slot holding a metamer passes it on.
  *
- * Params: c3.mode, c3.lambda (λ), c3.alpha (α); with R2, λ by pa and tree age; with R1,
- * v_base is the tree's net production (r1-carbon.ts).
+ * Params: c3.mode, c3.lambda (λ), c3.alpha (α); with R2, λ by pa and tree age; with R5, λ rises
+ * at shaded nodes; with R1, v_base is the tree's net production (r1-carbon.ts).
  */
 
 import type { Params } from "../params.ts";
 import { BudState, type Tree } from "../tree.ts";
 import { lambdaAt } from "./r2-physiological-age.ts";
+import { shadedLambda } from "./r5-shade.ts";
 import { lightWeight } from "./r6-short-shoots.ts";
 
 /** True for buds that still take part in growth (not consumed, aborted or terminated). */
@@ -88,7 +89,7 @@ export function allocate(tree: Tree, params: Params): void {
     case "bh": {
       const nm = tree.m.length;
       const { qSlot, vSlot } = tree;
-      const { parent, slot, vIn, order } = tree.m.cols;
+      const { parent, slot, vIn, order, paShift } = tree.m.cols;
       if (!params.r1.enabled) tree.vBase = nm > 0 ? alpha * tree.qBase : 0; // else R1's net
       for (let i = 0; i < nm; i++) {
         const p = parent[i];
@@ -98,7 +99,12 @@ export function allocate(tree: Tree, params: Params): void {
         const qLeft = qSlot[3 * i + 1];
         const qRight = qSlot[3 * i + 2];
         const qLat = qLeft + qRight;
-        const lambda = lambdaAt(order[i], tree.age, params); // c3.lambda, or by pa and age (R2)
+        // c3.lambda, or by pa and age (R2); shaded nodes favour the main axis (R5).
+        const lambda = shadedLambda(
+          lambdaAt(order[i] - paShift[i], tree.age, params),
+          tree.nodeShade[i] ?? 0,
+          params.r5,
+        );
         const vMain = bhMainShare(v, qMain, qLat, lambda);
         const vLat = qMain + qLat > 0 ? v - vMain : 0;
         vSlot[3 * i] = vMain;

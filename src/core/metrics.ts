@@ -48,6 +48,12 @@ export interface TreeMetrics {
   reserve: number;
   reproduction: number;
   starved: number;
+  /** This season: dormant buds that grew a shoot, dormant buds aborted (R4), metamers lost to breakage (R3). */
+  released: number;
+  /** Of those, released from trunk wood at least 10 seasons old: epicormic shoots. */
+  epicormic: number;
+  aborted: number;
+  broken: number;
 }
 
 export const METRIC_COLUMNS: readonly (keyof TreeMetrics)[] = [
@@ -74,6 +80,10 @@ export const METRIC_COLUMNS: readonly (keyof TreeMetrics)[] = [
   "reserve",
   "reproduction",
   "starved",
+  "released",
+  "epicormic",
+  "aborted",
+  "broken",
 ];
 
 const ground: LightSample = { q: 0, vx: 0, vy: 0 };
@@ -145,5 +155,9 @@ export function treeMetrics(tree: Tree, world?: World): TreeMetrics {
     reserve: tree.reserve,
     reproduction: tree.reproduction,
     starved: tree.starved,
+    released: tree.released,
+    epicormic: tree.epicormic,
+    aborted: tree.aborted,
+    broken: tree.broken,
   };
 }

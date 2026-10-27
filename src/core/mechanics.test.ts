@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { mergeParams, type ParamsPatch } from "./params.ts";
-import { type PresetName, presetParams } from "./presets.ts";
+import { PRE_R4, type PresetName, presetParams } from "./presets.ts";
 import { isLiveBud } from "./principles/c3-allocation.ts";
 import type { Tree } from "./tree.ts";
 import { World } from "./world.ts";
@@ -17,8 +17,9 @@ const tilt = (a: number) => Math.abs((Math.atan2(Math.cos(a), Math.sin(a)) * 180
 const PRE_R3 = { r3: { enabled: false } } satisfies ParamsPatch;
 const NO_POSTURE = { r3: { posture: false } } satisfies ParamsPatch;
 
+/** These checks are the M9 evidence, so they run the presets as they were before R4 and R5. */
 function grow(preset: PresetName, seed: number, seasons: number, patch: ParamsPatch = {}): Tree {
-  const world = new World(mergeParams(presetParams(preset, seed), patch));
+  const world = new World(mergeParams(mergeParams(presetParams(preset, seed), PRE_R4), patch));
   world.run(seasons);
   return world.trees[0] as Tree;
 }

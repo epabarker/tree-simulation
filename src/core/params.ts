@@ -218,6 +218,11 @@ export interface Params {
     sigmaTarget: number;
     /** Stress-driven girth gain: Δr = gain·r·(σ/σ_target − 1), never past σ = σ_target; 0 = off. */
     girthGain: number;
+    /**
+     * σ_break: a metamer whose base stress exceeds this breaks off with everything above it,
+     * leaving a scar (§R3.4 optional; its dormant buds below can then be released, R4). 0 = off.
+     */
+    sigmaBreak: number;
   };
 
   /**
@@ -233,6 +238,54 @@ export interface Params {
     aC: number;
     dLambda: number;
     ramp: number;
+  };
+
+  /**
+   * R4 Dormancy, release and reiteration (spec §R4, ADR 0012). Off = baseline: any live bud with
+   * v ≥ 1 grows, and dormant buds live for ever.
+   */
+  r4: {
+    enabled: boolean;
+    /** v_break: BH resource that releases a dormant bud (the sugar signal, spec §R4.4) (calibrate). */
+    vBreak: number;
+    /**
+     * Q_rel: light that releases a dormant bud (the light/R:FR trigger, ADR 0012); its first shoot,
+     * one metamer, is paid from the tree's reserve when R1 is on (calibrate).
+     */
+    qRel: number;
+    /** v_cont: resource an active bud needs to keep growing (sustained growth); ≤ v_break. */
+    vCont: number;
+    /** δ: v_break and Q_rel rise by this fraction per season of dormancy (older buds are harder to wake). */
+    delta: number;
+    /** L_dorm: a dormant bud older than this many seasons aborts. */
+    lDorm: number;
+    /**
+     * Reiteration: a released dormant bud's shoot takes the physiological age of an axis this many
+     * levels younger (1 = like the axis that bears it, R2 only).
+     */
+    juvenile: number;
+    /**
+     * Bud bank: a shed or broken branch leaves a dormant bud in its slot (accessory buds at the
+     * branch base, the source of epicormic shoots; ADR 0012).
+     */
+    bank: boolean;
+  };
+
+  /**
+   * R5 Shade avoidance (spec §R5, ADR 0012). With s = 1 − Q/C, a bud's or node's shade: internodes
+   * lengthen, λ favours the main axis, dormant buds break less (with R4) and shoots grow more
+   * upright. Off = baseline.
+   */
+  r5: {
+    enabled: boolean;
+    /** e_s: internode length l0·(1 + e_s·s) (calibrate). */
+    eS: number;
+    /** δλ: λ + δλ·s at a shaded node (calibrate). */
+    dLambda: number;
+    /** δ_b: v_break·(1 + δ_b·s), the sugar route of R4: low R:FR suppresses bud outgrowth (Schneider et al. 2019) (calibrate). */
+    dB: number;
+    /** δ_A: A_set·(1 − δ_A·s): shade makes shoots more upright (Roychoudhry et al. 2017) (calibrate). */
+    dA: number;
   };
 
   /** R6 Short shoots (spec §R6, ADR 0006). Off = baseline: every live bud is one unit of leaf area. */
@@ -330,7 +383,20 @@ export const defaultParams: Params = {
     c: 0.05, // calibrate
     sigmaTarget: 3000, // calibrate: ≈ 7.5 MPa
     girthGain: 0.3, // calibrate
+    sigmaBreak: 0, // off (M10 note)
   },
+  // M10 calibration (docs/experiments/2026-10-27-m10-release-shade.md).
+  r4: {
+    enabled: false,
+    vBreak: 2,
+    qRel: 0.1,
+    vCont: 1,
+    delta: 0.02,
+    lDorm: 40,
+    juvenile: 1,
+    bank: true,
+  },
+  r5: { enabled: false, eS: 0.1, dLambda: 0.02, dB: 1, dA: 0.5 },
   r6: { enabled: false, qMin: 0.2, leafArea: 1 }, // calibrate (M6d)
 };
 

@@ -32,6 +32,7 @@ export const GOLDEN_CASES: GoldenCase[] = [
   { preset: "skyStand", seed: 1, seasons: 30 },
   { preset: "skyTree", seed: 1, seasons: 40 },
   { preset: "obliqueSun", seed: 1, seasons: 30 },
+  { preset: "skyLate", seed: 1, seasons: 40 },
 ];
 
 export function caseKey(c: GoldenCase): string {

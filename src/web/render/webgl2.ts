@@ -653,7 +653,7 @@ export class WebGL2Renderer implements Renderer {
         c = 4 * (max > 0 ? Math.min(steps - 1, Math.floor(Math.sqrt(s.budQ[i] / max) * steps)) : 0);
       } else {
         src = states;
-        c = s.budState[i] === BudState.active ? 0 : 4;
+        c = s.budState[i] === BudState.dormant ? 4 : 0; // short shoots are leafy, like active buds
       }
       color[4 * i] = src[c] as number;
       color[4 * i + 1] = src[c + 1] as number;

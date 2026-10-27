@@ -2,7 +2,10 @@
  * C5. Self-pruning (spec §C5; Palubicki et al. §4.4 after Takenaka 1994).
  *
  * A lateral branch (the subtree rooted at the first metamer of a lateral axis) whose light per
- * metamer Q_b / n_b is below T, once it is at least g seasons old, is a liability and is shed.
+ * metamer Q_b / n_b is below T_eff = max(T, T_rel·Q_top), once it is at least g seasons old, is a
+ * liability and is shed. Q_top is the tree's own crown-top light (the `topQuantile` quantile of
+ * its live-bud Q this season), so a branch is judged against the rest of its tree: correlative
+ * inhibition (Sprugel 2002; Kothari et al. 2025; ADR 0007). T_rel = 0 is the baseline rule.
  * Its whole subtree and its buds are removed, and its base radius is recorded as a scar at the
  * parent's node (r_scar^n), so pipe-model girth below it never shrinks (C6).
  *
@@ -10,12 +13,27 @@
  * only rows that existed during that pass can be shed roots, and shoots grown this season on a
  * shed branch go with it. Removal compacts both tables in order and remaps stored indices.
  *
- * Params: c5.T, c5.g; c6.n and c6.r0 for the scar.
+ * Params: c5.T, c5.g, c5.Trel, c5.topQuantile; c6.n and c6.r0 for the scar.
  */
 
 import type { Params } from "../params.ts";
 import { ensureUint8 } from "../soa.ts";
 import { BudState, Slot, type Tree } from "../tree.ts";
+import { isLiveBud } from "./c3-allocation.ts";
+
+/**
+ * The `quantile` quantile of the tree's live-bud Q this season (nearest rank), stored as
+ * tree.qTop. Call after the buds are sampled.
+ */
+export function crownTopLight(tree: Tree, quantile: number): number {
+  const b = tree.b.cols;
+  const qs: number[] = [];
+  for (let i = 0; i < tree.b.length; i++) if (isLiveBud(b.state[i])) qs.push(b.q[i]);
+  if (qs.length === 0) return 0;
+  qs.sort((x, y) => x - y);
+  const rank = Math.min(qs.length - 1, Math.max(0, Math.ceil(quantile * qs.length) - 1));
+  return qs[rank] as number;
+}
 
 /**
  * Sheds qualifying laterals among the first `evaluated` metamers. Returns the number of
@@ -29,7 +47,8 @@ export function shedBranches(
 ): number {
   const nm = tree.m.length;
   const c = tree.m.cols;
-  const { T, g } = params.c5;
+  const { g } = params.c5;
+  const T = Math.max(params.c5.T, params.c5.Trel * tree.qTop);
   const n = params.c6.n;
   tree.scratchU = ensureUint8(tree.scratchU, Math.max(nm, tree.b.length));
   const dead = tree.scratchU;

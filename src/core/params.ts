@@ -121,6 +121,14 @@ export interface Params {
     T: number;
     /** Grace period g in seasons before a lateral can be shed. */
     g: number;
+    /**
+     * Relative threshold (ADR 0007): shed when Q_b/n_b < max(T, Trel·Q_top), Q_top the tree's
+     * `topQuantile` bud light this season (correlative inhibition; Sprugel 2002, Kothari et al.
+     * 2025). 0 is the baseline rule (calibrate).
+     */
+    Trel: number;
+    /** Quantile of the tree's live-bud Q that stands for the light at its crown top. */
+    topQuantile: number;
   };
 
   /** C6 Pipe-model girth with memory. */
@@ -134,6 +142,15 @@ export interface Params {
      * r0 under the pipe rule (literature review 2026-10-27 §4, M6c).
      */
     r0: number;
+  };
+
+  /** R6 Short shoots (spec §R6, ADR 0006). Off = baseline: every live bud is one unit of leaf area. */
+  r6: {
+    enabled: boolean;
+    /** Q_ss: a bud too weak to extend becomes a leafy short shoot if its Q is at least this (calibrate). */
+    qMin: number;
+    /** a_ss: leaf area of a short shoot, in units of a long shoot's (calibrate). */
+    leafArea: number;
   };
 }
 
@@ -164,8 +181,9 @@ export const defaultParams: Params = {
   },
   c3: { mode: "none", lambda: 0.5, alpha: 2 },
   c4: { enabled: false, wd: 1, xi: 0.3, eta: 0.15, setPoint: 0, epsilon: 0.5, sigma: 20 },
-  c5: { enabled: false, T: 0.1, g: 3 }, // T: calibrate (M4 calibration)
+  c5: { enabled: false, T: 0.1, g: 3, Trel: 0, topQuantile: 0.9 }, // T, Trel: calibrate
   c6: { enabled: false, n: 2, r0: 0.02 },
+  r6: { enabled: false, qMin: 0.2, leafArea: 1 }, // calibrate (M6d)
 };
 
 /** A partial set of overrides, merged one level deep into each section. */

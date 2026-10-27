@@ -4,7 +4,7 @@ import { presetParams } from "../presets.ts";
 import { BudState, Slot, Tree } from "../tree.ts";
 import { World } from "../world.ts";
 import { addBud, addMetamer } from "./c1-buds.ts";
-import { shedBranches } from "./c5-shedding.ts";
+import { crownTopLight, shedBranches } from "./c5-shedding.ts";
 import { junctionExponents, updateGirth } from "./c6-girth.ts";
 
 const params = mergeParams(defaultParams, {
@@ -73,6 +73,37 @@ describe("C5 self-pruning (§C5)", () => {
     const before = t.m.cols.radius[0];
     updateGirth(t, params);
     expect(t.m.cols.radius[0]).toBeCloseTo(before, 12);
+  });
+
+  it("judges a branch against its own tree's crown top (relative threshold, ADR 0007)", () => {
+    // Lateral light per metamer 0.15 is above T = 0.1, so the baseline rule keeps it.
+    const relative = mergeParams(params, { c5: { Trel: 0.3 } });
+    const dimLateral = (qTop: number) => {
+      const t = smallTree();
+      const c = t.m.cols;
+      c.qSum[2] = 0.3;
+      c.nSum[2] = 2;
+      t.qTop = qTop;
+      return shedBranches(t, relative, 5, t.m.length);
+    };
+    expect(dimLateral(1)).toBe(2); // bright top: T_eff = 0.3 > 0.15, shed
+    expect(dimLateral(0.4)).toBe(0); // dim top: T_eff = max(0.1, 0.12) < 0.15, kept
+    const t = smallTree();
+    t.m.cols.qSum[2] = 0.3;
+    t.m.cols.nSum[2] = 2;
+    t.qTop = 1;
+    expect(shedBranches(t, params, 5, t.m.length)).toBe(0); // Trel = 0: baseline ignores qTop
+  });
+
+  it("takes the crown-top light as a quantile of live-bud Q", () => {
+    const t = new Tree(0, 10);
+    const root = addMetamer(t, -1, Slot.main, UP, 1, params.c6.r0, 0);
+    for (let i = 0; i < 10; i++) addBud(t, root, Slot.main, UP, 0);
+    const b = t.b.cols;
+    for (let i = 0; i < 10; i++) b.q[i] = (i + 1) / 10;
+    b.state[9] = BudState.gone; // consumed buds do not count
+    expect(crownTopLight(t, 0.9)).toBeCloseTo(0.9, 12);
+    expect(crownTopLight(t, 0.5)).toBeCloseTo(0.5, 12);
   });
 
   it("respects the grace period g", () => {

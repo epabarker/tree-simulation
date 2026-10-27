@@ -72,11 +72,11 @@ export class SkySweep implements LightModel {
     this.shade = null;
   }
 
-  deposit(x: number, y: number): void {
+  deposit(x: number, y: number, area = 1): void {
     const I = Math.floor(x);
     const J = Math.floor(y);
     if (I < 0 || I >= this.width || J < 0 || J >= this.height) return;
-    this.lad[J * this.width + I] += 1;
+    this.lad[J * this.width + I] += area;
   }
 
   addWall(wall: Wall): void {

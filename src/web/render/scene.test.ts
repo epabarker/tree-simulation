@@ -1,9 +1,22 @@
 import { describe, expect, it } from "vitest";
 import { presetParams } from "../../core/presets.ts";
 import { SnapshotBuilder } from "../../core/snapshot.ts";
-import type { Tree } from "../../core/tree.ts";
+import { BudState, type Tree } from "../../core/tree.ts";
 import { World } from "../../core/world.ts";
 import { CLUSTER_LEAVES, Scene } from "./scene.ts";
+
+/** Young metamers (leafy shoots) and short shoots on older wood (rosettes) in a snapshot. */
+function leafSites(scene: Scene, leafAge: number): { young: number; rosettes: number } {
+  const s = scene.next;
+  if (!s) throw new Error("no snapshot");
+  let young = 0;
+  for (let j = 0; j < s.metamerCount; j++) if (s.age[j] <= leafAge) young += 1;
+  let rosettes = 0;
+  for (let i = 0; i < s.budCount; i++)
+    if (s.budState[i] === BudState.shortShoot && s.age[s.budMetamer[i] as number] > leafAge + 1)
+      rosettes += 1;
+  return { young, rosettes };
+}
 
 function sceneAfter(seasons: number): { scene: Scene; world: World } {
   const world = new World(presetParams("skyTree", 3));
@@ -65,14 +78,12 @@ describe("Scene (shared by the WebGL2 and Canvas 2D renderers)", () => {
     expect(scene.pickTree(-500, 500)).toBeNull();
   });
 
-  it("puts leaves only on young metamers, sized 0…1", () => {
+  it("puts leaves on young metamers and rosettes on short shoots of older wood, sized 0…1", () => {
     scene.computeGeometry(1);
     const leaves = scene.leaves(3, 1);
-    const s = scene.next;
-    if (!s) throw new Error("no snapshot");
-    let young = 0;
-    for (let j = 0; j < s.metamerCount; j++) if (s.age[j] <= 3) young += 1;
-    expect(leaves.count).toBe(young);
+    const { young, rosettes } = leafSites(scene, 3);
+    expect(rosettes).toBeGreaterThan(0); // skyTree has R6 on (M6d)
+    expect(leaves.count).toBe(young + 2 * rosettes);
     for (let k = 0; k < leaves.count; k++) {
       expect(leaves.size[k]).toBeGreaterThan(0);
       expect(leaves.size[k]).toBeLessThanOrEqual(1);
@@ -109,11 +120,10 @@ describe("Scene pseudo-depth view (ADR 0008)", () => {
     expect(squeezed).toBeGreaterThan(0);
   });
 
-  it("gives each young metamer a cluster split into back and front layers", () => {
+  it("gives each young metamer and rosette a cluster split into back and front layers", () => {
     const leaves = scene.leaves(3, 1);
-    let young = 0;
-    for (let j = 0; j < s.metamerCount; j++) if (s.age[j] <= 3) young += 1;
-    expect(leaves.count).toBe(CLUSTER_LEAVES * young);
+    const { young, rosettes } = leafSites(scene, 3);
+    expect(leaves.count).toBe(CLUSTER_LEAVES * (young + rosettes));
     expect(leaves.back).toBeGreaterThan(0.2 * leaves.count);
     expect(leaves.back).toBeLessThan(0.8 * leaves.count);
     for (let k = 0; k < leaves.count; k++) {

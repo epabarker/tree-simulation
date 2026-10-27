@@ -17,6 +17,7 @@
  */
 
 import type { Snapshot } from "../../core/snapshot.ts";
+import { BudState } from "../../core/tree.ts";
 import { CATEGORICAL, SEQUENTIAL } from "./colors.ts";
 import { RAMP_STEPS, type Theme } from "./theme.ts";
 
@@ -98,6 +99,8 @@ export const CLUSTER_LEAVES = 3;
 const MIN_SPREAD = 0.55;
 /** Fraction of the light ramp kept by back-layer leaves (the shaded far side of the crown). */
 const BACK_SHADE = 0.55;
+/** Size of a short-shoot rosette's leaves relative to a long shoot's (R6). */
+const ROSETTE_SIZE = 0.8;
 
 function emptyGeometry(n: number): Geometry {
   return {
@@ -432,10 +435,12 @@ export class Scene {
   /**
    * Leaves at the tip of every metamer up to `leafAge` seasons old, coloured from shade to sun
    * (RAMP_STEPS indices) by the light its subtree gathers. Leaves unfold as their metamer grows in
-   * and shrink away during the season in which they pass `leafAge`. In the x-ray view each such
-   * metamer carries one leaf on alternating sides; with `depth` on it carries CLUSTER_LEAVES leaves
-   * spaced around the shoot, each foreshortened by its out-of-plane angle, and those whose depth
-   * falls behind the plane go first, darkened, as the back layer.
+   * and shrink away during the season in which they pass `leafAge`. Short shoots (R6) on older wood
+   * carry a rosette, coloured by their own light, so drawn foliage matches simulated foliage. In
+   * the x-ray view a young metamer carries one leaf on alternating sides and a rosette two; with
+   * `depth` on each carries CLUSTER_LEAVES leaves spaced around the shoot, each foreshortened by
+   * its out-of-plane angle, and those whose depth falls behind the plane go first, darkened, as
+   * the back layer.
    */
   leaves(leafAge: number, t: number): Leaves {
     const s = this.next;
@@ -444,9 +449,9 @@ export class Scene {
     out.back = 0;
     if (!s) return out;
     const n = s.metamerCount;
-    const per = this.depth ? CLUSTER_LEAVES : 1;
-    if (out.x.length < n * per) {
-      const cap = n * per * 2;
+    const per = this.depth ? CLUSTER_LEAVES : 2;
+    if (out.x.length < (n + s.budCount) * per) {
+      const cap = (n + s.budCount) * per * 2;
       out.x = new Float32Array(cap);
       out.y = new Float32Array(cap);
       out.ux = new Float32Array(cap);
@@ -459,6 +464,9 @@ export class Scene {
     for (let j = 0; j < n; j++) {
       if (s.age[j] <= leafAge + 1 && s.light[j] > maxLight) maxLight = s.light[j];
     }
+    const shade = (light: number, tree: number, id: number) =>
+      Math.floor((maxLight > 0 ? Math.sqrt(Math.min(1, light / maxLight)) : 0) * (RAMP_STEPS - 1)) +
+      jitter(tree, id);
     let k = 0;
     // Pass 0 emits the back layer, pass 1 the front (the x-ray view has only a front layer).
     for (let pass = this.depth ? 0 : 1; pass < 2; pass++) {
@@ -466,37 +474,64 @@ export class Scene {
         if (s.age[j] > leafAge + 1) continue;
         const size = g.grown[j] * (s.age[j] > leafAge ? 1 - t : 1);
         if (size <= 0.02) continue;
-        const u = maxLight > 0 ? Math.sqrt(s.light[j] / maxLight) : 0;
-        const c = Math.floor(u * (RAMP_STEPS - 1)) + jitter(s.tree[j], s.birthId[j]);
-        const shoot = Math.atan2(g.tipY[j] - g.baseY[j], g.tipX[j] - g.baseX[j]);
+        const c = shade(s.light[j], s.tree[j], s.birthId[j]);
         if (!this.depth) {
           const side = s.birthId[j] & 1 ? 1 : -1;
-          const ang = shoot + side * LEAF_SPREAD;
-          k = this.pushLeaf(k, g.tipX[j], g.tipY[j], Math.cos(ang), Math.sin(ang), size, c);
-          continue;
+          k = this.leafAt(k, j, side, size, c);
+        } else {
+          k = this.cluster(k, j, s.birthId[j], pass, size, c);
         }
-        const dx = Math.cos(shoot);
-        const dy = Math.sin(shoot);
-        const along = Math.cos(LEAF_SPREAD);
-        const across = Math.sin(LEAF_SPREAD);
-        const turn = hash01(s.tree[j], s.birthId[j], 2);
-        for (let i = 0; i < CLUSTER_LEAVES; i++) {
-          const psi = 2 * Math.PI * (turn + i / CLUSTER_LEAVES);
-          const z = 0.6 * this.axisZ[j] + 0.4 * Math.sin(psi);
-          if ((z < 0 ? 0 : 1) !== pass) continue;
-          // Leaf direction in 3D is along·d + across·(n cos ψ + z-axis sin ψ); drawn in-plane part.
-          const w = across * Math.cos(psi);
-          const lx = along * dx - w * dy;
-          const ly = along * dy + w * dx;
-          const len = Math.hypot(lx, ly);
-          const shade = pass === 0 ? Math.floor(c * BACK_SHADE) : c;
-          k = this.pushLeaf(k, g.tipX[j], g.tipY[j], lx / len, ly / len, size * len, shade);
+      }
+      // Short-shoot rosettes on wood older than the leafy shoots (R6).
+      for (let i = 0; i < s.budCount; i++) {
+        if (s.budState[i] !== BudState.shortShoot) continue;
+        const j = s.budMetamer[i];
+        if (s.age[j] <= leafAge + 1) continue;
+        const id = s.birthId[j] ^ 0x5bd1;
+        const c = shade(s.budQ[i], s.tree[j], id);
+        if (!this.depth) {
+          k = this.leafAt(k, j, 1, ROSETTE_SIZE, c);
+          k = this.leafAt(k, j, -1, ROSETTE_SIZE, c);
+        } else {
+          k = this.cluster(k, j, id, pass, ROSETTE_SIZE, c);
         }
       }
       if (pass === 0) out.back = k;
     }
     out.count = k;
     return out;
+  }
+
+  /** One x-ray leaf at metamer j's tip, on `side` (±1) of its shoot. */
+  private leafAt(k: number, j: number, side: number, size: number, c: number): number {
+    const g = this.geom;
+    const ang = Math.atan2(g.tipY[j] - g.baseY[j], g.tipX[j] - g.baseX[j]) + side * LEAF_SPREAD;
+    return this.pushLeaf(k, g.tipX[j], g.tipY[j], Math.cos(ang), Math.sin(ang), size, c);
+  }
+
+  /** The leaves of a pseudo-depth cluster at metamer j's tip that belong to layer `pass`. */
+  private cluster(k: number, j: number, id: number, pass: number, size: number, c: number): number {
+    const s = this.next as Snapshot;
+    const g = this.geom;
+    const shoot = Math.atan2(g.tipY[j] - g.baseY[j], g.tipX[j] - g.baseX[j]);
+    const dx = Math.cos(shoot);
+    const dy = Math.sin(shoot);
+    const along = Math.cos(LEAF_SPREAD);
+    const across = Math.sin(LEAF_SPREAD);
+    const turn = hash01(s.tree[j], id, 2);
+    for (let i = 0; i < CLUSTER_LEAVES; i++) {
+      const psi = 2 * Math.PI * (turn + i / CLUSTER_LEAVES);
+      const z = 0.6 * this.axisZ[j] + 0.4 * Math.sin(psi);
+      if ((z < 0 ? 0 : 1) !== pass) continue;
+      // Leaf direction in 3D is along·d + across·(n cos ψ + z-axis sin ψ); drawn in-plane part.
+      const w = across * Math.cos(psi);
+      const lx = along * dx - w * dy;
+      const ly = along * dy + w * dx;
+      const len = Math.hypot(lx, ly);
+      const color = pass === 0 ? Math.floor(c * BACK_SHADE) : c;
+      k = this.pushLeaf(k, g.tipX[j], g.tipY[j], lx / len, ly / len, size * len, color);
+    }
+    return k;
   }
 
   private pushLeaf(

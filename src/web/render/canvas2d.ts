@@ -236,6 +236,7 @@ export class Canvas2DRenderer implements Renderer {
     }
     for (const [state, color] of [
       [BudState.active, BUD_ACTIVE],
+      [BudState.shortShoot, BUD_ACTIVE],
       [BudState.dormant, BUD_DORMANT],
     ] as const) {
       ctx.fillStyle = color;

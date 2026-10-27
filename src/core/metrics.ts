@@ -13,6 +13,8 @@ export interface TreeMetrics {
   metamers: number;
   buds: number;
   dormantBuds: number;
+  /** Live buds resting as leafy short shoots (R6). */
+  shortShoots: number;
   /** Highest tip above the ground. */
   height: number;
   /** Horizontal extent of all tips. */
@@ -40,6 +42,7 @@ export const METRIC_COLUMNS: readonly (keyof TreeMetrics)[] = [
   "metamers",
   "buds",
   "dormantBuds",
+  "shortShoots",
   "height",
   "crownWidth",
   "centroidOffset",
@@ -72,11 +75,13 @@ export function treeMetrics(tree: Tree): TreeMetrics {
   }
   let buds = 0;
   let dormant = 0;
+  let shortShoots = 0;
   const b = tree.b.cols;
   for (let i = 0; i < tree.b.length; i++) {
     if (!isLiveBud(b.state[i])) continue;
     buds += 1;
     if (b.state[i] === BudState.dormant) dormant += 1;
+    else if (b.state[i] === BudState.shortShoot) shortShoots += 1;
   }
   return {
     tree: tree.id,
@@ -85,6 +90,7 @@ export function treeMetrics(tree: Tree): TreeMetrics {
     metamers: nm,
     buds,
     dormantBuds: dormant,
+    shortShoots,
     height,
     crownWidth: nm > 0 ? maxX - minX : 0,
     centroidOffset: nm > 0 ? sumX / nm - tree.rootX : 0,

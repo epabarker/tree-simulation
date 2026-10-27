@@ -20,8 +20,19 @@ const STAND = {
   c6: { enabled: true },
 } satisfies ParamsPatch;
 
-/** Principles of the M6 presets: as STAND, with the Beer–Lambert sky sweep as the light model. */
-const SKY = { ...STAND, c2: { enabled: true, model: "sky" } } satisfies ParamsPatch;
+/**
+ * Principles of the M6 presets: as STAND, with the Beer–Lambert sky sweep as the light model,
+ * relative shedding (ADR 0007: a shade-tolerance floor T = 0.03 and T_rel = 0.12, so canopy trees
+ * prune as at T = 0.1 while overtopped trees keep deeper crowns) and short shoots (ADR 0006:
+ * Q_ss = 0.1, a_ss = 2, about half the leaf area on short shoots). Calibrated in
+ * docs/experiments/2026-10-27-m6d-shedding-short-shoots.md.
+ */
+const SKY = {
+  ...STAND,
+  c2: { enabled: true, model: "sky" },
+  c5: { enabled: true, T: 0.03, Trel: 0.12 },
+  r6: { enabled: true, qMin: 0.1, leafArea: 2 },
+} satisfies ParamsPatch;
 
 export const presets = {
   explosion: {
@@ -143,6 +154,16 @@ export const presets = {
       world: { width: 230, height: 110, walls: [] },
       trees: [20, 41, 62, 83, 104, 125, 146, 167, 188, 209].map((x) => ({ x })),
       ...STAND,
+    },
+  },
+  skyLate: {
+    label: "M6d: an overtopped tree keeps its crown",
+    description:
+      "The M5 late tree under the sky sweep: relative shedding lets it keep a deeper crown (ADR 0007).",
+    patch: {
+      world: { width: 140, height: 100, walls: [] },
+      trees: [{ x: 45 }, { x: 70, plantSeason: 12 }, { x: 95 }],
+      ...SKY,
     },
   },
   skyStand: {

@@ -21,7 +21,7 @@ interface FieldSpec {
 }
 
 interface SectionSpec {
-  section: "c1" | "c2" | "c3" | "c4" | "c5" | "c6";
+  section: "c1" | "c2" | "c3" | "c4" | "c5" | "c6" | "r6";
   title: string;
   /** Adds an on/off checkbox bound to the section's `enabled` flag. */
   toggle?: boolean;
@@ -92,6 +92,8 @@ const SECTIONS: SectionSpec[] = [
     fields: [
       { key: "T", label: "T light per metamer", min: 0, max: 0.5, step: 0.01 },
       { key: "g", label: "g grace (seasons)", min: 0, max: 15, step: 1 },
+      { key: "Trel", label: "T_rel × crown-top light", min: 0, max: 1, step: 0.01 },
+      { key: "topQuantile", label: "crown-top quantile", min: 0.5, max: 1, step: 0.01 },
     ],
   },
   {
@@ -101,6 +103,15 @@ const SECTIONS: SectionSpec[] = [
     fields: [
       { key: "n", label: "n pipe exponent", min: 1.5, max: 3.5, step: 0.05 },
       { key: "r0", label: "r0 tip radius", min: 0.005, max: 0.3, step: 0.005 },
+    ],
+  },
+  {
+    section: "r6",
+    title: "R6 Short shoots",
+    toggle: true,
+    fields: [
+      { key: "qMin", label: "Q_ss light threshold", min: 0, max: 1, step: 0.01 },
+      { key: "leafArea", label: "a_ss leaf area", min: 0, max: 4, step: 0.05 },
     ],
   },
 ];

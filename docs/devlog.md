@@ -2,6 +2,14 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-27: M6d, relative shedding and short shoots
+
+- **C5 relative threshold** (ADR 0007): `c5.Trel`, `c5.topQuantile`; Q_top computed per tree after sampling (`crownTopLight`).
+- **R6 short shoots** (ADR 0006): `BudState.shortShoot` (5, appended); `r6-short-shoots.ts`; deposits by shoot type (`LightModel.deposit` gained an `area`); short shoots' Q weighted by a_ss in `gatherLight`. Page: rosettes on older wood, panel sections, `shortShoots` metric.
+- **Calibration** ([note](experiments/2026-10-27-m6d-shedding-short-shoots.md)). Surprise: max(T, T_rel·Q_top) only raises thresholds in an even-aged stand (Q_top ≈ 1 everywhere); it needs a low floor. Chosen for sky presets: T 0.03, T_rel 0.12, Q_ss 0.1, a_ss 2. Overtopped late tree: 51 vs 11 metamers, crown 8.4 vs 2.2 deep, 5/5 survive.
+- **Tests.** The M6 gap test is pinned to the M6 configuration; a new M6d check requires every neighbour to lean into the gap with median shift > 2 (the strict M6 threshold failed one seed at +0.8). New `skyLate` preset and golden.
+- **Goldens:** `skyStand`, `skyTree`, `obliqueSun` changed (sky presets now enable relative C5 and R6); `skyLate` added; triangle presets unchanged.
+
 ## 2026-10-27: M6c, the pseudo-depth view and r0 = 0.02
 
 - **r0 = 0.02** (was 0.08). Radius scales linearly with r0 under the pipe rule, and the new value gives interior `skyStand` trees H/D 62–72, edge trees 54–57 and open-grown `skyTree` 41–43 (5 seeds, season 45), against 60–80 for real stand-grown trees. **Goldens regenerated:** every case's hash changed because radius enters the state hash; growth itself does not read r0 until R1/R3.

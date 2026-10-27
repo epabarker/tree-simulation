@@ -15,7 +15,16 @@ export const Slot = { main: 0, left: 1, right: 2 } as const;
 export type Slot = (typeof Slot)[keyof typeof Slot];
 
 /** Bud fates (spec §C1). 0 marks a consumed or removed bud awaiting compaction. */
-export const BudState = { gone: 0, active: 1, dormant: 2, terminated: 3, aborted: 4 } as const;
+/** Values are stored in tables and snapshots: append new states, never renumber. */
+export const BudState = {
+  gone: 0,
+  active: 1,
+  dormant: 2,
+  terminated: 3,
+  aborted: 4,
+  /** A leafy short shoot (R6): no extension this season, but leaves. */
+  shortShoot: 5,
+} as const;
 export type BudState = (typeof BudState)[keyof typeof BudState];
 
 export const METAMER_SCHEMA = {
@@ -99,6 +108,8 @@ export class Tree {
   shedCount = 0;
   /** Mean Q over the buds sampled this season (C2). */
   meanBudQ = 0;
+  /** The `c5.topQuantile` quantile of live-bud Q this season: light at the crown top (C5, ADR 0007). */
+  qTop = 0;
 
   constructor(id: number, rootX: number) {
     this.id = id;

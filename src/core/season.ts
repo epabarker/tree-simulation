@@ -13,8 +13,9 @@ import { DEG } from "./params.ts";
 import { type DirectionFn, growShoot, shootSize } from "./principles/c1-buds.ts";
 import { allocate, gatherLight, isLiveBud } from "./principles/c3-allocation.ts";
 import { shootDirection } from "./principles/c4-direction.ts";
-import { shedBranches } from "./principles/c5-shedding.ts";
+import { crownTopLight, shedBranches } from "./principles/c5-shedding.ts";
 import { updateGirth } from "./principles/c6-girth.ts";
+import { depositArea, restingState } from "./principles/r6-short-shoots.ts";
 import { normal, Purpose } from "./rng.ts";
 import { BudState, type Tree } from "./tree.ts";
 import type { World } from "./world.ts";
@@ -39,7 +40,10 @@ export function runSeason(world: World): void {
     tree.ensureScratch();
     tree.shedCount = 0;
     sampleBuds(world, tree); // C2: Q and V at every bud
-    gatherLight(tree); // C3 basipetal: Q_sum, n_b
+    if (params.c5.enabled && params.c5.Trel > 0) {
+      tree.qTop = crownTopLight(tree, params.c5.topQuantile); // C5 relative threshold
+    }
+    gatherLight(tree, params.r6); // C3 basipetal: Q_sum, n_b (short shoots by leaf area, R6)
     allocate(tree, params); // C3 acropetal: v at every bud
     const evaluated = tree.m.length; // rows that took part in this season's passes
     growBuds(world, tree, season); // C1 bud fate, GROW (C4 direction)
@@ -54,10 +58,13 @@ export function runSeason(world: World): void {
 
 function depositBuds(world: World, tree: Tree): void {
   const b = tree.b.cols;
+  const { r6 } = world.params;
   for (let i = 0; i < tree.b.length; i++) {
     if (!isLiveBud(b.state[i])) continue;
+    const area = depositArea(b.state[i], r6); // R6: leaf area by shoot type
+    if (area === 0) continue;
     const m = b.metamer[i];
-    world.light.deposit(tree.tipX(m), tree.tipY(m));
+    world.light.deposit(tree.tipX(m), tree.tipY(m), area);
   }
 }
 
@@ -78,7 +85,10 @@ function sampleBuds(world: World, tree: Tree): void {
   tree.meanBudQ = count > 0 ? sum / count : 0;
 }
 
-/** Bud fate and growth: a bud with n ≥ 1 grows a shoot, any other live bud stays dormant. */
+/**
+ * Bud fate and growth: a bud with n ≥ 1 grows a shoot; any other live bud rests, as a leafy short
+ * shoot if R6 is on and it is lit enough, else as a dormant bud.
+ */
 function growBuds(world: World, tree: Tree, season: number): void {
   const { params } = world;
   const { c4 } = params;
@@ -97,7 +107,7 @@ function growBuds(world: World, tree: Tree, season: number): void {
     if (n > 0) {
       growShoot(tree, i, n, shoot.length, params, season, direct);
     } else {
-      b.state[i] = BudState.dormant;
+      b.state[i] = restingState(b.q[i], params.r6);
       b.age[i] += 1;
     }
   }

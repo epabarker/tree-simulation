@@ -16,8 +16,8 @@ export interface LightModel {
   readonly height: number;
   /** Phase 1 of §6: start a new season's field. */
   clear(): void;
-  /** A bud (or leaf) at (x, y) adds its shadow or leaf area. */
-  deposit(x: number, y: number): void;
+  /** A bud (or leaf) at (x, y) adds its shadow or leaf area, scaled by `area` (R6; default 1). */
+  deposit(x: number, y: number, area?: number): void;
   /** A static shade source. */
   addWall(wall: Wall): void;
   /** After all deposits (end of §6 Phase 1): derive the light field. */

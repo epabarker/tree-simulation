@@ -12,17 +12,19 @@
 
 import type { Params } from "../params.ts";
 import { BudState, type Tree } from "../tree.ts";
+import { lightWeight } from "./r6-short-shoots.ts";
 
 /** True for buds that still take part in growth (not consumed, aborted or terminated). */
 export function isLiveBud(state: number): boolean {
-  return state === BudState.active || state === BudState.dormant;
+  return state === BudState.active || state === BudState.dormant || state === BudState.shortShoot;
 }
 
 /**
  * Basipetal pass: fills qSlot (light entering each node per slot), qSum (Q_sum of each
- * metamer's subtree, including buds) and nSum (metamer count n_b of each subtree).
+ * metamer's subtree, including buds) and nSum (metamer count n_b of each subtree). With R6 on,
+ * a short shoot's Q counts a_ss times (its leaf area).
  */
-export function gatherLight(tree: Tree): void {
+export function gatherLight(tree: Tree, r6?: Params["r6"]): void {
   const nm = tree.m.length;
   const nb = tree.b.length;
   const { qSlot } = tree;
@@ -30,7 +32,8 @@ export function gatherLight(tree: Tree): void {
   const b = tree.b.cols;
   for (let i = 0; i < nb; i++) {
     if (!isLiveBud(b.state[i])) continue;
-    qSlot[3 * b.metamer[i] + b.slot[i]] += b.q[i];
+    const w = r6 ? lightWeight(b.state[i], r6) : 1;
+    qSlot[3 * b.metamer[i] + b.slot[i]] += w * b.q[i];
   }
   const { parent, slot, qSum, nSum } = tree.m.cols;
   nSum.fill(0, 0, nm);

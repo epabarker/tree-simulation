@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { type TreeMetrics, treeMetrics } from "./metrics.ts";
-import { mergeParams } from "./params.ts";
+import { mergeParams, type ParamsPatch } from "./params.ts";
 import { type PresetName, presetParams } from "./presets.ts";
 import type { Tree } from "./tree.ts";
 import { World } from "./world.ts";
@@ -42,18 +42,35 @@ describe("M6: the Beer–Lambert sky sweep (§C2, §7 M6)", () => {
     expect(median(open)).toBeLessThan(0.8 * median(interior));
   });
 
-  it("lets neighbours lean into the gap left by a felled tree (5 seeds)", () => {
-    for (const seed of SEEDS) {
-      const felled = new World(presetParams("skyStand", seed));
+  /** Neighbour shifts (left toward +x, right toward −x) after felling tree 5 at season 25. */
+  const gapShifts = (patch: ParamsPatch) =>
+    SEEDS.map((seed) => {
+      const params = mergeParams(presetParams("skyStand", seed), patch);
+      const felled = new World(params);
       felled.run(25);
       felled.removeTree(5);
       felled.run(25);
-      const kept = new World(presetParams("skyStand", seed));
+      const kept = new World(params);
       kept.run(50);
       const offset = (w: World, id: number) => treeMetrics(w.trees[id] as Tree).centroidOffset;
-      expect(offset(felled, 4)).toBeGreaterThan(offset(kept, 4) + 1.5); // left neighbour leans right
-      expect(offset(felled, 6)).toBeLessThan(offset(kept, 6) - 1); // right neighbour leans left
+      return {
+        left: offset(felled, 4) - offset(kept, 4),
+        right: offset(kept, 6) - offset(felled, 6),
+      };
+    });
+
+  it("lets neighbours lean into the gap left by a felled tree (5 seeds, M6 configuration)", () => {
+    // The M6 light model alone: baseline shedding, no short shoots.
+    for (const { left, right } of gapShifts({ c5: { T: 0.1, Trel: 0 }, r6: { enabled: false } })) {
+      expect(left).toBeGreaterThan(1.5); // left neighbour leans right
+      expect(right).toBeGreaterThan(1); // right neighbour leans left
     }
+  });
+
+  it("still fills gaps with relative shedding and short shoots on (5 seeds, M6d)", () => {
+    const shifts = gapShifts({}).flatMap(({ left, right }) => [left, right]);
+    for (const shift of shifts) expect(shift).toBeGreaterThan(0.5);
+    expect(median(shifts)).toBeGreaterThan(2);
   });
 
   it("grows crowns toward an oblique sun (§C2.6)", () => {
@@ -81,5 +98,46 @@ describe("M6: the Beer–Lambert sky sweep (§C2, §7 M6)", () => {
       const b = treeMetrics(reversed.trees.find((t) => t.id === id) as Tree);
       expect(b).toEqual(a);
     }
+  });
+});
+
+describe("M6d: relative shedding and short shoots (§C5, §R6; ADRs 0006, 0007)", () => {
+  const baseline = { c5: { T: 0.1, Trel: 0 } } satisfies ParamsPatch;
+  const lateTree = (patch: ParamsPatch) =>
+    SEEDS.map((seed) => {
+      const world = new World(mergeParams(presetParams("skyLate", seed), patch));
+      world.run(50);
+      return treeMetrics(world.trees[1] as Tree);
+    });
+
+  it("lets an overtopped tree keep a deeper crown than the absolute rule does (Sprugel 2002)", () => {
+    const relative = lateTree({});
+    const absolute = lateTree(baseline);
+    for (const m of relative) expect(m.metamers).toBeGreaterThan(10); // all five survive
+    const depth = (ms: TreeMetrics[]) => median(ms.map((m) => m.height - m.boleHeight));
+    expect(median(relative.map((m) => m.metamers))).toBeGreaterThan(
+      2 * median(absolute.map((m) => m.metamers)),
+    );
+    expect(depth(relative)).toBeGreaterThan(2 * depth(absolute));
+  });
+
+  it("puts a large share of a stand's leaf area on short shoots (Millan et al. 2022)", () => {
+    const leafArea = (r6: boolean) =>
+      SEEDS.flatMap((seed) => {
+        const params = mergeParams(presetParams("skyStand", seed), { r6: { enabled: r6 } });
+        const world = new World(params);
+        world.run(45);
+        return world.trees.slice(1, -1).map((tree) => {
+          const m = treeMetrics(tree);
+          const active = m.buds - m.dormantBuds - m.shortShoots;
+          const short = params.r6.leafArea * m.shortShoots;
+          return { total: r6 ? active + short : m.buds, share: short / (active + short) };
+        });
+      });
+    const on = leafArea(true);
+    expect(median(on.map((t) => t.share))).toBeGreaterThan(0.4);
+    expect(median(on.map((t) => t.total))).toBeGreaterThan(
+      median(leafArea(false).map((t) => t.total)),
+    );
   });
 });

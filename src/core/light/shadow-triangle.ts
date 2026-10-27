@@ -47,7 +47,7 @@ export class ShadowTriangle implements LightModel {
     this.s.fill(0);
   }
 
-  deposit(x: number, y: number): void {
+  deposit(x: number, y: number, area = 1): void {
     const I = Math.floor(x);
     const J = Math.floor(y);
     const { width: W, height: H, s, weights } = this;
@@ -55,7 +55,7 @@ export class ShadowTriangle implements LightModel {
       const row = J - q;
       if (row < 0) break;
       if (row >= H) continue;
-      const w = weights[q];
+      const w = weights[q] * area;
       const lo = Math.max(0, I - q);
       const hi = Math.min(W - 1, I + q);
       const base = row * W;

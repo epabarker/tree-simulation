@@ -117,7 +117,8 @@ export class Canvas2DRenderer implements Renderer {
     // On a ring seen whole, the trees are drawn once per copy of the world (Scene.wrapOffsets).
     for (const offset of scene.wrapOffsets()) {
       world(offset);
-      if (view.showGhosts && scene.prev && t < 1) this.drawGhosts(1 - t);
+      if (view.showGhosts && scene.physics) this.drawDebris();
+      else if (view.showGhosts && scene.prev && t < 1) this.drawGhosts(1 - t);
       // Back-layer leaves (pseudo-depth, ADR 0008) go behind the wood, the rest in front.
       if (leaves && !view.lite) this.drawLeaves(leaves, 0, leaves.back);
       this.drawSegments(s, view.colorMode);
@@ -240,6 +241,24 @@ export class Canvas2DRenderer implements Renderer {
         ctx.quadraticCurveTo(mx + uy * bulge, my - ux * bulge, bx, by);
       }
       ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  /** Falling and fallen wood (M16), in the ghost colour, fading on the ground. */
+  private drawDebris(): void {
+    const { ctx, scene } = this;
+    const d = scene.debris();
+    ctx.save();
+    ctx.strokeStyle = this.theme.ghost;
+    ctx.lineCap = "round";
+    for (let k = 0; k < d.count; k++) {
+      ctx.globalAlpha = 0.85 * (d.alpha[k] as number);
+      ctx.lineWidth = Math.max(2 * (d.r[k] as number), 0.8 / scene.camera.scale);
+      ctx.beginPath();
+      ctx.moveTo(d.ax[k] as number, d.ay[k] as number);
+      ctx.lineTo(d.bx[k] as number, d.by[k] as number);
+      ctx.stroke();
     }
     ctx.restore();
   }

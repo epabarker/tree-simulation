@@ -21,6 +21,8 @@ export interface Snapshot {
   height: number;
   /** The world's sides wrap (a ring, M11): a view of the whole world can draw crowns across the seam. */
   periodic: boolean;
+  /** The season just run was a storm (M16): the page shows a gale. */
+  storm: boolean;
   metamerCount: number;
   /** Row of the parent metamer in this snapshot, -1 for a root. */
   parent: I32;
@@ -123,6 +125,7 @@ export class SnapshotBuilder {
       width: world.params.world.width,
       height: world.params.world.height,
       periodic: world.params.world.sides === "periodic",
+      storm: world.storm,
       metamerCount: nm,
       parent: new Int32Array(nm),
       x0: new Float32Array(nm),

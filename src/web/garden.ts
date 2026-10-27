@@ -26,6 +26,7 @@ import { governor, judge, type QualityLevel, qualityLevels } from "./render/qual
 import { MAX_DPR, type Renderer } from "./render/renderer.ts";
 import sceneTokens from "./render/scene.css?inline";
 import type { Scene, ViewOptions } from "./render/scene.ts";
+import { addPuff, advanceWind, CALM, createWind, GALE } from "./render/wind.ts";
 
 export interface PlaybackState {
   playing: boolean;
@@ -110,6 +111,13 @@ export interface GardenOptions {
   maxTweenMs?: number;
   /** Lower the resolution, then the leaf detail, when frames run slow (default on; off in bench). */
   adaptive?: boolean;
+  /**
+   * Motion (M16), both on by default and off with reduced motion: `wind` sways the trees (a
+   * breeze, a gale in storm seasons, and the pointer pushing them as it moves over the forest);
+   * `physics` lets shed and felled wood fall instead of fading.
+   */
+  wind?: boolean;
+  physics?: boolean;
   autoplay?: boolean;
   /**
    * With prefers-reduced-motion: "still" (default) shows the forest after the intro without
@@ -231,6 +239,10 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
   });
   const { scene } = renderer;
   let focus = options.focus ?? "forest";
+  // Motion (M16): off with reduced motion.
+  const wind = (options.wind ?? true) && !reduceMotion ? createWind() : null;
+  scene.wind = wind;
+  scene.physics = (options.physics ?? true) && !reduceMotion;
   scene.frame = focus === "specimen" ? "tree" : (options.frame ?? "world");
   if (options.headroom !== undefined) scene.headroom = options.headroom;
   const rect = renderer.canvas.getBoundingClientRect();
@@ -326,6 +338,7 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
   function accept(s: Snapshot, animate: boolean, fresh: boolean): void {
     renderer.setSnapshot(s);
     if (focus === "specimen") chooseSpecimen(s);
+    if (wind) wind.target = s.storm ? GALE : CALM;
     if (!animate) scene.clearHistory();
     if (autoFit) scene.fit(!animate);
     season = s.season;
@@ -478,6 +491,9 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
     const dt = lastFrame > 0 ? Math.min(100, now - lastFrame) : 16;
     lastFrame = now;
     if (!onScreen) return;
+    scene.time = now / 1000;
+    if (wind) advanceWind(wind, scene.time);
+    if (scene.animating()) dirty = true;
     if (autoFit && scene.animateCamera(dt)) dirty = true;
     const t = Math.min(1, (now - tweenStart) / tweenMs);
     if (dirty || t < 1) {
@@ -563,6 +579,29 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
     scene.fit();
     dirty = true;
   }
+
+  // Pointer wind (M16): moving across the forest pushes the trees near the pointer its way.
+  let lastPointer: { x: number; y: number; t: number } | null = null;
+  const onPointerMove = (e: PointerEvent): void => {
+    if (!wind || !scene.next) return;
+    const box = renderer.canvas.getBoundingClientRect();
+    const x = e.clientX - box.left;
+    const y = e.clientY - box.top;
+    const t = performance.now() / 1000;
+    if (lastPointer && t > lastPointer.t) {
+      const speed = (x - lastPointer.x) / scene.camera.scale / (t - lastPointer.t); // cells/s
+      if (Math.abs(speed) > 4) {
+        const [wx, wy] = scene.screenToWorld(x, y);
+        addPuff(wind, wx, wy, speed / 40, t);
+      }
+    }
+    lastPointer = { x, y, t };
+  };
+  const onPointerLeave = (): void => {
+    lastPointer = null;
+  };
+  renderer.canvas.addEventListener("pointermove", onPointerMove);
+  renderer.canvas.addEventListener("pointerleave", onPointerLeave);
 
   function fell(tree: number): void {
     void sim.removeTree(tree);
@@ -671,6 +710,8 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
       document.removeEventListener("visibilitychange", onVisibility);
       scheme.removeEventListener("change", onTheme);
       worker.terminate();
+      renderer.canvas.removeEventListener("pointermove", onPointerMove);
+      renderer.canvas.removeEventListener("pointerleave", onPointerLeave);
       if (ownCanvas) renderer.canvas.remove();
     },
   };

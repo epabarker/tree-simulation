@@ -41,6 +41,8 @@ export class World {
   readonly trees: Tree[];
   /** Seedlings established at the end of the last season (O4). */
   recruits = 0;
+  /** The last season was a storm (M16, O2 `stormP`). */
+  storm = false;
   /** O2: which tree's foliage holds each cell this season (W × H, −1 none, −2 several). */
   owner: Int32Array;
   light: LightModel;

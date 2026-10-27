@@ -518,7 +518,8 @@ export class WebGL2Renderer implements Renderer {
     if (!s) return;
 
     // Rebuild instance data only when the scene changed; a camera move only changes uniforms.
-    const ghosts = view.showGhosts && scene.prev !== null && t < 1;
+    // Falling wood (M16) is drawn while any is left; without physics, ghosts fade during a tween.
+    const ghosts = view.showGhosts && (scene.physics || (scene.prev !== null && t < 1));
     const key = [
       t,
       view.colorMode,
@@ -528,6 +529,7 @@ export class WebGL2Renderer implements Renderer {
       view.showBuds,
       view.showObstacles,
       scene.solo,
+      scene.animating() ? scene.time : 0, // wind and falling wood move every frame
       ghosts,
       this.themeVersion,
     ].join();
@@ -624,6 +626,10 @@ export class WebGL2Renderer implements Renderer {
 
   private buildGhosts(alpha: number): void {
     const { scene } = this;
+    if (scene.physics) {
+      this.buildDebris();
+      return;
+    }
     const prev = scene.prev;
     const batch = this.ghostBatch;
     if (!prev) {
@@ -658,6 +664,32 @@ export class WebGL2Renderer implements Renderer {
       k++;
     }
     this.upload(batch, count);
+  }
+
+  /** Falling and fallen wood (M16): in the ghost colour, at its true radius, fading on the ground. */
+  private buildDebris(): void {
+    const d = this.scene.debris();
+    const batch = this.ghostBatch;
+    const n = d.count;
+    const a = this.stream<Floats>(batch, "a_a", n);
+    const b = this.stream<Floats>(batch, "a_b", n);
+    const r = this.stream<Floats>(batch, "a_r", n);
+    const color = this.stream<Bytes>(batch, "a_color", n);
+    const [cr, cg, cb] = parseColor(this.theme.ghost);
+    for (let k = 0; k < n; k++) {
+      a[2 * k] = d.ax[k] as number;
+      a[2 * k + 1] = d.ay[k] as number;
+      b[2 * k] = d.bx[k] as number;
+      b[2 * k + 1] = d.by[k] as number;
+      r[2 * k] = d.r[k] as number;
+      r[2 * k + 1] = d.r[k] as number;
+      // Straight colour: the fragment shader premultiplies by coverage × this alpha.
+      color[4 * k] = cr;
+      color[4 * k + 1] = cg;
+      color[4 * k + 2] = cb;
+      color[4 * k + 3] = Math.round(255 * 0.85 * (d.alpha[k] as number));
+    }
+    this.upload(batch, n);
   }
 
   private buildLeaves(leafAge: number, t: number): void {

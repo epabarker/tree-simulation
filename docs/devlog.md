@@ -2,7 +2,28 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-27: M16, motion
+
+- **User choices:**
+  - Sagging limbs rest on the ground.
+  - Storms are rare and random; the pointer's wind stays visual.
+  - The cursor acts as wind (the user's idea).
+- **Core:**
+  - `r3.ground` makes a limb rest on the ground instead of sinking. It is opt-in, because turning it on everywhere failed 9 tests where M9's calibrations assume the old behaviour (willow twigs hanging, hand-built limbs at ground level). It is on in `forest`.
+  - Storms: `o2.stormP`, `stormLoad`, under `Purpose.wind`, with snapshots carrying `storm`.
+  - Windthrow at first used the trunk base's stress and almost never fired, because pipe-model bases are thick. It now uses the wind's moment, which goes with height², at a chance of 0.06·load·(H/100)².
+  - [Calibration](experiments/2026-10-27-m16-storms.md): σ_break 4500 and load 1.5 take about 137 metamers per storm and throw a tree every two or three storms. Calm seasons break nothing.
+- **Page:**
+  - Wind: a travelling breeze, a gale in storms, and pointer puffs (`wind.ts`, tested).
+  - Hierarchical sway from compliance gain/(r/r_tip)², and leaf flutter.
+  - Falling bodies built from the wood that disappears between snapshots: whole trees topple about their base, branches fall and land, then fade. On by default, off with reduced motion.
+  - Sampling the wind per metamer roughly tripled a frame's cost. An 8-cell grid sampled once a frame brings it back to forest 0.20 ms and 10k stand 0.93 ms.
+- **Tests:** 179 pass. Goldens `forest` and `clearing` changed (storms and ground contact are on in those presets); no other hash changed.
+
 ## 2026-10-27: D3, building the Field guide
+
+- **Shipped** (user's go-ahead): PR #10 merged, `garden-v0.4.0` released, the site re-synced from it, and `d3-field-guide` merged. edbarker.dev is the Field guide.
+- **Plate II** now frames the broadest crown among the taller trees, at the user's request. In a closed forest that is still slender; an open-grown specimen waits for species.
 
 - **Direction:** the user chose the Field guide and agreed ten changes (brief: edbarker-dev `docs/design-brief.md`). One condition: the CV must stay at least as clear for a recruiter as a plain CV.
 - **Garden** (`claude/d3-garden`):

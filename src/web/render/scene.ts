@@ -21,6 +21,46 @@ import { BudState } from "../../core/tree.ts";
 import { CATEGORICAL, SEQUENTIAL } from "./colors.ts";
 import { LEAF_STYLES, type LeafStyle, type LeafStyleName } from "./leaf-styles.ts";
 import { RAMP_STEPS, type Theme } from "./theme.ts";
+import { type Wind, windAt } from "./wind.ts";
+
+/** Sway per unit of wind of a metamer as thin as the snapshot's tips, radians (M16). */
+const SWAY_GAIN = 0.07;
+/** Debris (M16): gravity (cells/s²), a toppling tree's fall time (s), the fade on the ground (s). */
+const GRAVITY = 40;
+const TOPPLE_S = 1.6;
+const FADE_S = 1.6;
+const MAX_DEBRIS = 6000;
+/** Spacing of the grid the wind is sampled on each frame, cells. */
+const WIND_CELL = 8;
+
+/** A falling piece of wood: segments relative to a pivot, rotating and dropping (M16). */
+interface Body {
+  /** Segment ends and radius, relative to the pivot: x0, y0, x1, y1, r per segment. */
+  segs: Float32Array;
+  pivotX: number;
+  pivotY: number;
+  /** A whole tree topples about its base; a branch falls freely. */
+  topple: boolean;
+  /** Which way it turns (±1) and how fast a falling branch spins (rad/s). */
+  dir: number;
+  spin: number;
+  born: number;
+  /** Once on the ground: when, and the drop and turn it came to rest at. */
+  landed: number;
+  restY: number;
+  restAngle: number;
+}
+
+/** Segments of the debris at one moment, for the renderers. */
+export interface Debris {
+  count: number;
+  ax: Float32Array;
+  ay: Float32Array;
+  bx: Float32Array;
+  by: Float32Array;
+  r: Float32Array;
+  alpha: Float32Array;
+}
 
 export type ColorMode = "natural" | "order" | "light" | "resource" | "age" | "tree" | "stress";
 
@@ -171,6 +211,27 @@ export class Scene {
   focusTree = -1;
   /** Draw only this tree, as a botanical plate draws one specimen (-1: every tree). */
   solo = -1;
+  /** Wind (M16): set by the garden; null keeps the trees still. `time` is its clock, seconds. */
+  wind: Wind | null = null;
+  time = 0;
+  /** Shed and felled wood falls (M16); off, it fades where it was (the ghosts). */
+  physics = false;
+  /** Compliance per metamer (once per snapshot) and the sway accumulated down each path. */
+  private swayC = new Float32Array(0);
+  private swayFor: Snapshot | null = null;
+  private swayAcc = new Float32Array(0);
+  /** The wind sampled once a frame on a coarse grid, and read bilinearly per metamer. */
+  private windGrid = { values: new Float32Array(0), x0: 0, nx: 0, ny: 0, time: Number.NaN };
+  private bodies: Body[] = [];
+  private debrisOut: Debris = {
+    count: 0,
+    ax: new Float32Array(0),
+    ay: new Float32Array(0),
+    bx: new Float32Array(0),
+    by: new Float32Array(0),
+    r: new Float32Array(0),
+    alpha: new Float32Array(0),
+  };
   /** CSS pixels kept free above the crowns when fitting. */
   headroom = HEADER_MARGIN;
   /**
@@ -236,6 +297,146 @@ export class Scene {
       const p = s.prevIndex[j];
       if (p >= 0) this.ghosts[p] = 0;
     }
+    if (this.physics && this.prev) this.dropDebris(this.prev, m);
+  }
+
+  /** True while something moves without a tween: wind, or wood still falling. */
+  animating(): boolean {
+    return this.wind !== null || this.bodies.length > 0;
+  }
+
+  /**
+   * Turns the wood that vanished between two snapshots into falling bodies: each connected piece
+   * of ghost rows is one body. A piece with a trunk base topples about it; any other falls.
+   */
+  private dropDebris(prev: Snapshot, m: number): void {
+    const g = this.prevGeom;
+    const group = new Int32Array(m).fill(-1);
+    const members: number[][] = [];
+    for (let j = 0; j < m; j++) {
+      if (!this.ghosts[j]) continue;
+      const p = prev.parent[j] as number;
+      if (p >= 0 && group[p] >= 0) {
+        group[j] = group[p] as number;
+        (members[group[j] as number] as number[]).push(j);
+      } else {
+        group[j] = members.length;
+        members.push([j]);
+      }
+    }
+    let total = this.bodies.reduce((n, b) => n + b.segs.length / 5, 0);
+    for (const rows of members) {
+      const first = rows[0] as number;
+      const topple = (prev.parent[first] as number) < 0;
+      let px = g.baseX[first] as number;
+      let py = g.baseY[first] as number;
+      if (!topple) {
+        px = 0;
+        py = 0;
+        for (const j of rows) {
+          px += 0.5 * ((g.baseX[j] as number) + (g.tipX[j] as number));
+          py += 0.5 * ((g.baseY[j] as number) + (g.tipY[j] as number));
+        }
+        px /= rows.length;
+        py /= rows.length;
+      }
+      const segs = new Float32Array(5 * rows.length);
+      let lean = 0;
+      rows.forEach((j, k) => {
+        segs[5 * k] = (g.baseX[j] as number) - px;
+        segs[5 * k + 1] = (g.baseY[j] as number) - py;
+        segs[5 * k + 2] = (g.tipX[j] as number) - px;
+        segs[5 * k + 3] = (g.tipY[j] as number) - py;
+        segs[5 * k + 4] = g.radius[j] as number;
+        lean += segs[5 * k + 2] as number;
+      });
+      const h = hash01(prev.tree[first] as number, prev.birthId[first] as number, 3);
+      const dir = Math.abs(lean) > 1e-3 ? -Math.sign(lean) : h < 0.5 ? 1 : -1;
+      this.bodies.push({
+        segs,
+        pivotX: px,
+        pivotY: py,
+        topple,
+        dir,
+        spin: (h - 0.5) * 2.4,
+        born: this.time,
+        landed: -1,
+        restY: 0,
+        restAngle: 0,
+      });
+      total += rows.length;
+    }
+    // Keep the debris bounded: the oldest pieces go first.
+    while (total > MAX_DEBRIS && this.bodies.length > 0) {
+      total -= (this.bodies.shift() as Body).segs.length / 5;
+    }
+  }
+
+  /** The debris at `time`: positions, radii and opacity of every falling segment. */
+  debris(): Debris {
+    const out = this.debrisOut;
+    const t = this.time;
+    this.bodies = this.bodies.filter((b) => b.landed < 0 || t - b.landed < FADE_S);
+    const n = this.bodies.reduce((k, b) => k + b.segs.length / 5, 0);
+    if (out.ax.length < n) {
+      const cap = 2 * n;
+      out.ax = new Float32Array(cap);
+      out.ay = new Float32Array(cap);
+      out.bx = new Float32Array(cap);
+      out.by = new Float32Array(cap);
+      out.r = new Float32Array(cap);
+      out.alpha = new Float32Array(cap);
+    }
+    let k = 0;
+    for (const b of this.bodies) {
+      const age = t - b.born;
+      let angle: number;
+      let drop: number;
+      if (b.landed >= 0) {
+        angle = b.restAngle;
+        drop = b.restY;
+      } else if (b.topple) {
+        // A felled tree tips slowly, then fast: θ grows with the square of time until it lies down.
+        const u = Math.min(1, age / TOPPLE_S);
+        angle = (b.dir * Math.PI * u * u) / 2;
+        drop = 0;
+        if (u >= 1) b.landed = t;
+      } else {
+        angle = b.spin * age;
+        drop = 0.5 * GRAVITY * age * age;
+      }
+      const cos = Math.cos(angle);
+      const sin = Math.sin(angle);
+      let low = Number.POSITIVE_INFINITY;
+      const start = k;
+      for (let i = 0; i < b.segs.length; i += 5) {
+        const x0 = b.segs[i] as number;
+        const y0 = b.segs[i + 1] as number;
+        const x1 = b.segs[i + 2] as number;
+        const y1 = b.segs[i + 3] as number;
+        out.ax[k] = b.pivotX + x0 * cos - y0 * sin;
+        out.ay[k] = b.pivotY - drop + x0 * sin + y0 * cos;
+        out.bx[k] = b.pivotX + x1 * cos - y1 * sin;
+        out.by[k] = b.pivotY - drop + x1 * sin + y1 * cos;
+        out.r[k] = b.segs[i + 4] as number;
+        low = Math.min(low, out.ay[k] as number, out.by[k] as number);
+        k++;
+      }
+      // A falling branch lands when its lowest point reaches the ground: lift it onto it and stop.
+      if (!b.topple && b.landed < 0 && low <= 0) {
+        b.landed = t;
+        b.restAngle = angle;
+        b.restY = drop + low;
+        for (let i = start; i < k; i++) {
+          out.ay[i] = (out.ay[i] as number) - low;
+          out.by[i] = (out.by[i] as number) - low;
+        }
+      }
+      const alpha = b.landed >= 0 ? Math.max(0, 1 - (t - b.landed) / FADE_S) : 1;
+      out.alpha.fill(alpha, start, k);
+    }
+    out.count = k;
+    return out;
   }
 
   /** Drops the tween origin, so the next draw shows the current snapshot without animation. */
@@ -412,6 +613,13 @@ export class Scene {
     const prev = this.prev;
     if (this.depth) this.projectAll(s);
     const proj = this.proj;
+    const wind = this.wind;
+    if (wind) {
+      this.compliance(s);
+      this.sampleWind(s);
+    }
+    const swayC = this.swayC;
+    const swayAcc = this.swayAcc;
     for (let j = 0; j < s.metamerCount; j++) {
       const p = s.parent[j];
       const pi = prev ? s.prevIndex[j] : -1;
@@ -434,6 +642,14 @@ export class Scene {
       const by = p >= 0 ? g.tipY[p] : s.y0[j];
       g.baseX[j] = bx;
       g.baseY[j] = by;
+      if (wind) {
+        // Sway (M16): each metamer bends with the wind where it stands, and carries its parent's
+        // bend, so a crown moves as a whole while its twigs move most. Wind toward +x turns clockwise.
+        const a =
+          (p >= 0 ? (swayAcc[p] as number) : 0) + (swayC[j] as number) * this.windHere(bx, by);
+        swayAcc[j] = a;
+        ang -= a;
+      }
       let dx = len * Math.cos(ang);
       let dy = len * Math.sin(ang);
       if (this.depth) {
@@ -457,6 +673,66 @@ export class Scene {
     for (let j = 0; j < n; j++) {
       g.tipRadius[j] = g.tipRadius[j] > 0 ? Math.min(g.radius[j], g.tipRadius[j]) : g.radius[j];
     }
+  }
+
+  /**
+   * Samples the wind every WIND_CELL cells over the world (and half a width beyond each side, where
+   * crowns can grow on a ring) at this frame's time. The wind varies over tens of cells, so this
+   * costs a few thousand evaluations a frame instead of one per metamer.
+   */
+  private sampleWind(s: Snapshot): void {
+    const grid = this.windGrid;
+    const wind = this.wind;
+    if (!wind || grid.time === this.time) return;
+    const x0 = -0.5 * s.width;
+    const nx = Math.ceil((2 * s.width) / WIND_CELL) + 2;
+    const ny = Math.ceil(s.height / WIND_CELL) + 2;
+    if (grid.values.length < nx * ny) grid.values = new Float32Array(nx * ny);
+    for (let iy = 0; iy < ny; iy++) {
+      for (let ix = 0; ix < nx; ix++) {
+        grid.values[iy * nx + ix] = windAt(wind, x0 + ix * WIND_CELL, iy * WIND_CELL, this.time);
+      }
+    }
+    grid.x0 = x0;
+    grid.nx = nx;
+    grid.ny = ny;
+    grid.time = this.time;
+  }
+
+  /** The sampled wind at (x, y), bilinear between grid points (clamped at the grid's edge). */
+  private windHere(x: number, y: number): number {
+    const { values, x0, nx, ny } = this.windGrid;
+    const fx = Math.min(nx - 1.001, Math.max(0, (x - x0) / WIND_CELL));
+    const fy = Math.min(ny - 1.001, Math.max(0, y / WIND_CELL));
+    const ix = Math.floor(fx);
+    const iy = Math.floor(fy);
+    const u = fx - ix;
+    const v = fy - iy;
+    const k = iy * nx + ix;
+    const top = (values[k] as number) * (1 - u) + (values[k + 1] as number) * u;
+    const bottom = (values[k + nx] as number) * (1 - u) + (values[k + nx + 1] as number) * u;
+    return top * (1 - v) + bottom * v;
+  }
+
+  /**
+   * How readily each metamer sways, once per snapshot: SWAY_GAIN/(r/r_tip)², so a twig bends and
+   * a trunk, whose pipe-model radius sums every tip above it, hardly moves.
+   */
+  private compliance(s: Snapshot): void {
+    if (this.swayFor === s) return;
+    const n = s.metamerCount;
+    if (this.swayC.length < n) {
+      this.swayC = new Float32Array(2 * n);
+      this.swayAcc = new Float32Array(2 * n);
+    }
+    let rTip = Number.POSITIVE_INFINITY;
+    for (let j = 0; j < n; j++)
+      if ((s.radius[j] as number) > 0) rTip = Math.min(rTip, s.radius[j] as number);
+    for (let j = 0; j < n; j++) {
+      const ratio = Math.max(1, (s.radius[j] as number) / rTip);
+      this.swayC[j] = SWAY_GAIN / (ratio * ratio);
+    }
+    this.swayFor = s;
   }
 
   /** Every metamer's projection for snapshot `s`, once per snapshot (parents come first). */
@@ -613,8 +889,18 @@ export class Scene {
         dx = 1; // atan2(0, 0) = 0: a shoot of no length points along +x
         dy = 0;
       }
-      const a = L.a[i];
-      const b = L.b[i];
+      let a = L.a[i] as number;
+      let b = L.b[i] as number;
+      if (this.wind) {
+        // Flutter (M16): each leaf twists a little, more on a shoot the wind is bending hard.
+        const f =
+          0.18 *
+          Math.min(1.5, 0.35 + 5 * Math.abs(this.swayAcc[j] as number)) *
+          Math.sin(5.3 * this.time + 2.1 * i);
+        const na = a - b * f;
+        b += a * f;
+        a = na;
+      }
       out.x[k] = g.tipX[j];
       out.y[k] = g.tipY[j];
       out.ux[k] = a * dx - b * dy;

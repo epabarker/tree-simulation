@@ -201,6 +201,9 @@ const TROLL = {
 const FOREST = {
   ...SKY,
   r1: { enabled: true, fRep: 0.1, maturity: 40 },
+  // M16: limbs rest on the ground; storms in 5% of seasons break exposed limbs and throw tall trees.
+  r3: { ...SKY.r3, ground: true, sigmaBreak: 4500 },
+  o2: { stormP: 0.05, stormLoad: 1.5 },
   o4: { enabled: true },
 } satisfies ParamsPatch;
 

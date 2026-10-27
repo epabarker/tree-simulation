@@ -95,7 +95,7 @@ I found no study testing a vertical-plane tree model against 3D. Forestry reduce
 
 #### C4. Shoot direction as a weighted sum
 1. **Statement.** New metamer direction = normalized weighted sum of previous direction, light direction V, a tropism vector and noise.
-2. **Biology.** Photo- and gravitropism are well established. Bastien et al. (2013) showed across 11 taxa that the sine law is insufficient and curvature sensing (proprioception) is required; a dimensionless "bending number" B sets final shape and timing.\[7\]\[8\]\[9\]
+2. **Biology.** Photo- and gravitropism are well established. Bastien et al. (2013) showed across 11 taxa that the sine law is insufficient and curvature sensing (proprioception) is required; a dimensionless "bending number" B sets final shape and timing.\[7\]\[8\]\[9\] The set-point has a mechanism: lateral branches hold a gravitropic set-point angle (GSA) through an auxin-dependent "anti-gravitropic offset" balanced against gravitropism (Roychoudhry et al. 2013), and shade (low R:FR) shifts branches toward the vertical (Roychoudhry et al. 2017; review Yun et al. 2025).
 3. **Evidence.** Tropisms well established; the vector sum is a graphics convenience.
 4. **Local rule.** d = normalize(w_d·d_prev + ξ·V + η·t(A_set) + ε·u), u = d_prev rotated by N(0,σ²) **[RNG]**; t(A_set) points at the axis's set-point angle (0° orthotropic, ~90° plagiotropic, >90° pendulous).
 5. **2D translation.** Direct and simpler (angles); raise σ slightly.
@@ -109,11 +109,11 @@ I found no study testing a vertical-plane tree model against 3D. Forestry reduce
 
 #### C5. Self-pruning
 1. **Statement.** A lateral whose light per metamer stays below a threshold after a grace period is shed.
-2. **Biology.** Palubicki et al. adopt Takenaka's (1994) rule: a branch below threshold "is considered a liability for the tree and is shed."\[2\] Takenaka's model reproduced position-dependent crown shapes "in a similar way as observed in real forests."\[6\]
-3. **Evidence.** Self-pruning well established; the carbon-liability criterion is supported but debated.
-4. **Local rule.** If age ≥ g and Q_b/n_b < T → remove subtree, record scar. Optional stochastic p_shed **[RNG]**. With R1: shed if production < maintenance for k seasons.
+2. **Biology.** Palubicki et al. adopt Takenaka's (1994) rule: a branch below threshold "is considered a liability for the tree and is shed."\[2\] Takenaka's model reproduced position-dependent crown shapes "in a similar way as observed in real forests."\[6\] Branch autonomy is only partial. Branches on suppressed trees survive at irradiances where branches on dominant trees die (Sprugel 2002); a singly shaded birch branch dies where a branch on a wholly shaded tree survives (Henriksson 2001); and the light at the crown base, the self-pruning threshold, is lower in shade-tolerant species and rises with the light at the crown top (Kothari et al. 2025). This is *correlative inhibition*: a branch is judged against the rest of its tree.
+3. **Evidence.** Self-pruning well established; the carbon-liability criterion is supported but debated; correlative inhibition supported (counterpoint: Zahnd et al. 2026 find high carbon autonomy in shaded branches of open-canopy trees).
+4. **Local rule.** If age ≥ g and Q_b/n_b < T_eff → remove subtree, record scar, where T_eff = max(T, T_rel·Q_top) and Q_top is the q-quantile (default 0.9) of the tree's live-bud Q this season. T_rel = 0 is the baseline rule (ADR 0007). Optional stochastic p_shed **[RNG]**. With R1: shed if production < maintenance for k seasons.
 5. **2D translation.** Direct; recalibrate T.
-6. **Parameters.** T, g, k.
+6. **Parameters.** T (≈ 0.1 light-demanding, 0.02–0.05 shade-tolerant, from sapling survival thresholds of 10–15% and 1–2% of full light), T_rel, quantile, g, k.
 7. **Feedback.** Closes loop A; amplifies asymmetric competition.
 8. **Module boundary.** Switchable.
 9. **Multi-tree.** Neighbour shade lifts the crown base.
@@ -123,7 +123,7 @@ I found no study testing a vertical-plane tree model against 3D. Forestry reduce
 
 #### C6. Pipe-model girth with memory
 1. **Statement.** r_parent^n = Σ r_child^n + Σ r_scar^n from tips (r₀) to root; radius never decreases.
-2. **Biology.** The pipe model (Shinozaki et al. 1964) links stem area to supported leaves.\[10\] Measured Leonardo exponents lie in 1.8 < Δ < 2.3 (Eloy 2011). Explanations compete: hydraulic pipes, elastic similarity (McMahon & Kronauer 1976), wind-stress resistance (Eloy 2011).\[11\] A review finds "most of its properties are not valid as a general rule," yet it remains a useful "first approximation" (Lehnebach et al. 2018).\[12\]\[13\]
+2. **Biology.** The pipe model (Shinozaki et al. 1964) links stem area to supported leaves.\[10\] Measured Leonardo exponents lie in 1.8 < Δ < 2.3 (Eloy 2011). Explanations compete: hydraulic pipes, elastic similarity (McMahon & Kronauer 1976), wind-stress resistance (Eloy 2011).\[11\] A review finds "most of its properties are not valid as a general rule," yet it remains a useful "first approximation" (Lehnebach et al. 2018).\[12\]\[13\] Laser scans of 18,657 branching nodes on 603 trees are area-preserving (Δ ≈ 2) rather than WBE-like (Yang et al. 2024); deviations grow with heavy, wide-angled laterals, as stress models predict (Minamino & Tateno 2014).
 3. **Evidence.** Supported but debated.
 4. **Local rule.** r_i = (Σ r_c^n + Σ r_s^n)^(1/n); r_i ← max(r_i, r_prev).
 5. **2D translation.** Use circular cross-sections; drawn width = 2r.
@@ -140,10 +140,10 @@ I found no study testing a vertical-plane tree model against 3D. Forestry reduce
 #### R1. Carbon balance with the cost of size
 1. **Statement.** Distributed resource = production minus wood maintenance, with each bud's contribution discounted by hydraulic path length; sustained deficit kills branches, then trees.
 2. **Biology.** Living sapwood respires. Koch et al. (2004), studying redwoods up to 112.7 m, concluded that "increasing leaf water stress due to gravity and path length resistance may ultimately limit leaf expansion and photosynthesis for further height growth."\[14\] LIGNUM couples structural units with a pipe-model carbon balance (Perttunen et al. 1996); GreenLab uses source–sink dynamics (Yan et al. 2004).\[15\]\[16\]
-3. **Evidence.** Maintenance respiration well established; hydraulic height limitation supported but debated (Ryan & Yoder 1997; Koch & Sillett 2009).\[17\]
-4. **Local rule.** P = α·Σ Q_i·exp(−L_path,i/L_h) (L_path accumulated acropetally); M = m_w·Σ πr²l (sapwood); N = P − M. N > 0: v_base = (1−s_r)N, reserve += s_r N. N ≤ 0: draw reserve; empty for k_starve seasons → death (O4). Per-branch P_b < M_b → shed (replaces C5 threshold).
+3. **Evidence.** Maintenance respiration well established; hydraulic height limitation supported but debated (Ryan & Yoder 1997; Koch & Sillett 2009).\[17\] Ryan et al. (2006) found hydraulic limitation "common, but not universal" and not sufficient to explain the decline in wood production. The decline is caused by size, not age (Mencuccini et al. 2005), and reverses after thinning (Martínez-Vilalta et al. 2006). Allocation to reproduction is a competing explanation of the plateau (Becker et al. 2000).
+4. **Local rule.** P = α·Σ Q_i·exp(−L_path,i/L_h) (L_path accumulated acropetally); M = m_w·Σ πr²l (sapwood); N = P − M. N > 0: v_base = (1−s_r−f_rep)N, reserve += s_r N, and once the tree passes a *size* threshold (height or Q_base, never age) a reproductive sink takes f_rep·N (feeds O4 seeds). The two plateau causes, path length (L_h) and reproduction (f_rep), are separately switchable. N ≤ 0: draw reserve; empty for k_starve seasons → death (O4). Per-branch P_b < M_b → shed (replaces C5 threshold).
 5. **2D translation.** Circular volumes; lower m_w, since 2D trees carry fewer leaves per wood.
-6. **Parameters.** m_w, L_h (sets max height), s_r, k_starve; no species values, calibrate on an isolated tree.
+6. **Parameters.** m_w, L_h (sets max height), s_r, f_rep, maturity size, k_starve; no species values, calibrate on an isolated tree.
 7. **Feedback.** Closes loop C; makes C6 causal.
 8. **Module boundary.** Switchable (off = baseline).
 9. **Multi-tree.** Turns shade into suppression mortality and later self-thinning.
@@ -196,16 +196,31 @@ I found no study testing a vertical-plane tree model against 3D. Forestry reduce
 #### R5. Shade-avoidance elongation
 1. **Statement.** Shoots in low light elongate, branch less and favour the leader.
 2. **Biology.** Shade avoidance is well established: a "decrease in the ratio of red to far‐red wavelengths (low R : FR) … is detected by the phytochrome family of plant photoreceptors" (Franklin 2008, New Phytologist). Crowns are highly plastic: the perfect-plasticity approximation reproduced species- and size-dependent crown radius, depth and canopy status (Purves et al. 2007, 2008).\[31\]\[32\]
+Low R:FR also suppresses bud outgrowth, through ABA in the bud (Schneider et al. 2019), and makes branches more upright (Roychoudhry et al. 2017). Forest-grown trees converge on spindly stems with slender, sparse branches; open-grown trees on squat stems with large crowns (MacFarlane et al. 2017).
 3. **Evidence.** Phenomenon well established; mapping a hypothesis.
-4. **Local rule.** l = l₀(1 + e_s(1 − Q/C)); λ_eff = λ + δλ(1 − Q/C); optional far-red field F = local horizontal foliage sum.
+4. **Local rule.** With s = 1 − Q/C (or the far-red field F): elongation l = l₀(1 + e_s·s); leader bias λ_eff = λ + δλ·s; fewer bud breaks, v_break,eff = v_break(1 + δ_b·s) (R4); a more upright set-point, A_set,eff = A_set(1 − δ_A·s) (C4). Optional far-red field F = local horizontal foliage sum.
 5. **2D translation.** F is a 1D neighbourhood sum.
-6. **Parameters.** e_s, δλ, r_F.
+6. **Parameters.** e_s, δλ, δ_b, δ_A, r_F.
 7. **Feedback.** Strengthens the height race; slender stems interact with R3, O2.
 8. **Module boundary.** Switchable.
 9. **Multi-tree.** Stand trees taller and slenderer than open-grown.
 10. **Emergent signature.** Higher height/diameter in dense stands.
 11. **Cost.** O(1).
 12. **Baseline.** New.
+
+#### R6. Short shoots (long/short shoot dimorphism)
+1. **Statement.** A bud too weak to extend but lit enough becomes a short shoot: it adds leaves each season without adding wood, so foliage persists along older branches and inside the crown.
+2. **Biology.** Long shoots extend the crown; short shoots (spurs) display leaves. Across 30 woody species, leaves on short shoots made up most of the leaf area where short shoots exist, at 36% less biomass per leaf area, which lets trees keep foliage in self-shaded parts of the crown (Millan et al. 2022). The split is well documented in temperate trees (Yagi 2000; Jarčuška et al. 2012 for *Fagus*), and in *Populus* new leaf area and extension growth are largely uncoupled because short shoots carry many new leaves (Kull et al. 2002).
+3. **Evidence.** Shoot dimorphism well established; the threshold rule is a modelling hypothesis.
+4. **Local rule.** At bud fate, a live bud with n = 0 becomes a short shoot if Q ≥ Q_ss, else a leafless dormant bud. A short shoot that receives v ≥ 1 grows a long shoot (the long/short switch). With R6 on, foliage follows shoot type: active buds deposit one unit of leaf area, short shoots deposit a_ss, leafless dormant buds none; in the basipetal sum each bud's Q is weighted by its leaf area, while a dormant bud keeps its Q as an allocation signal (a simplification until R1 separates production from signal). Short shoots are shed with their branch (C5) (ADR 0006).
+5. **2D translation.** Direct. It also aligns the drawn foliage with the simulated foliage: leaves are drawn where the model holds leaf area.
+6. **Parameters.** Q_ss, a_ss; calibrate (target: short-shoot leaf share > 50% in species with spurs).
+7. **Feedback.** Thickens the foliage shell from inside (loop A); raises production without wood cost (loop C, with R1).
+8. **Module boundary.** Switchable (off = baseline: every live bud is one unit of leaf area).
+9. **Multi-tree.** Shaded interiors lose short shoots first, so neighbour shade still lifts the crown base.
+10. **Emergent signature.** Leafy older limbs; fuller crowns at the same metamer count.
+11. **Cost.** O(buds).
+12. **Baseline.** New (added after the 2026-10-27 literature review).
 
 ### Tier 3: Optional enrichments
 
@@ -253,7 +268,7 @@ I found no study testing a vertical-plane tree model against 3D. Forestry reduce
 
 #### O4. Stand dynamics (extension)
 1. **Statement.** Surplus carbon produces seeds that disperse and establish where ground light suffices; trees die of starvation, breakage or background risk; self-thinning emerges.
-2. **Biology/models.** JABOWA (Botkin et al. 1972) and SORTIE (Pacala et al. 1993, 1996) build forest dynamics from individual growth, light competition, recruitment and mortality.\[36\]\[37\] Self-thinning: w ∝ ρ^(−3/2) (Yoda et al. 1963), qualified by Westoby (1984).\[38\]\[39\] Asymmetric light competition raises size inequality with density (Weiner 1990; Weiner et al. 2001).\[40\]\[41\]\[42\]
+2. **Biology/models.** JABOWA (Botkin et al. 1972) and SORTIE (Pacala et al. 1993, 1996) build forest dynamics from individual growth, light competition, recruitment and mortality.\[36\]\[37\] Self-thinning: w ∝ ρ^(−3/2) (Yoda et al. 1963), qualified by Westoby (1984).\[38\]\[39\] Asymmetric light competition raises size inequality with density (Weiner 1990; Weiner et al. 2001).\[40\]\[41\]\[42\] In individual-based models the slope ranges from −0.9 to −1.8 (Mrad et al. 2020) and depends mainly on the mode of competition (Ma et al. 2019); models should be judged on several patterns at once, not the line alone (Reynolds & Ford 2005). A minimal cellular crown model already reproduces self-thinning, gap filling and crown asymmetry (Loehle 2025).
 3. **Evidence.** Individual-based modelling well established; −3/2 exponent debated.\[43\]
 4. **Local rule.** Seeds = ⌊f_rep·N⁺/c_seed⌋; position ~ parent + Laplace(0,d) **[RNG]**; establish if ground Q > Q_est with p_est **[RNG]**; p_die = m₀ + starvation + breakage **[RNG]**.
 5. **2D translation.** Ground is a line; density per metre.
@@ -275,13 +290,14 @@ I found no study testing a vertical-plane tree model against 3D. Forestry reduce
 | C2 | Light field | Shadow triangle or sky sweep → Q, V | a, b, q_max; K, k_ext | Triangle; cheap sky | C1 | Core |
 | C3 | BH allocation | ΣQ down; split λQ_m:(1−λ)Q_l up; n = ⌊v⌋ | λ, α, cap | Unchanged | C1, C2 | Core |
 | C4 | Direction | Weighted sum d, V, tropism, noise | ξ, η, A_set, σ | One angle | C2 | Core |
-| C5 | Shedding | Q/n < T after g | T, g | Recalibrate T | C3 | Core |
+| C5 | Shedding | Q/n < max(T, T_rel·Q_top) after g | T, T_rel, g | Recalibrate T | C3 | Core |
 | C6 | Pipe girth | r^n = Σr_c^n + scars, monotone | n, r₀ | Round section | C1 | Core |
-| R1 | Carbon balance | P·e^(−L/L_h) − m_w·V; reserve; starvation | m_w, L_h | Lower m_w | C3, C6 | Refinement |
+| R1 | Carbon balance | P·e^(−L/L_h) − m_w·V; reserve; reproductive sink; starvation | m_w, L_h, f_rep | Lower m_w | C3, C6 | Refinement |
 | R2 | Physiological age | Table by pa; p_term; acrotony; λ(age) | pa table, κ, a_c | Ortho/plagio | C1, C3, C4 | Refinement |
 | R3 | Mechanics | M = S − W·x; κ = M/EI; posture ≤ c·Δr/r | E, φ, β_g/γ, c | Scalar moments | C6 | Refinement |
 | R4 | Dormancy/release | Hysteretic thresholds; lifespan | v_break, v_cont, L_dorm | Unchanged | C3, R2 | Refinement |
-| R5 | Shade avoidance | l, λ rise as Q falls | e_s, δλ | 1D far-red | C2, C3 | Refinement |
+| R5 | Shade avoidance | l, λ, v_break rise and A_set falls as Q falls | e_s, δλ, δ_b, δ_A | 1D far-red | C2, C3, C4, R4 | Refinement |
+| R6 | Short shoots | n = 0 and Q ≥ Q_ss → leafy short shoot; foliage by shoot type | Q_ss, a_ss | Unchanged | C1, C2, C3 | Refinement |
 | O1 | Auxin switch | Claim stem transport capacity | F_max, k | Unchanged | C1 | Optional |
 | O2 | Wind & shyness | Abrade other-tree tips | p_abr | In-plane sway | C2, C6, R3 | Optional |
 | O3 | Space colonization | Markers in wedge | radii, θ | 2D markers | C1 | Optional |
@@ -309,7 +325,7 @@ Parents-before-children order makes the basipetal pass a reverse loop and the ac
 SEASON(t):
   # Phase 1: environment from start-of-season snapshot (order-independent)
   ENV.clear()
-  for tree in live_trees: for leaf in tree.foliage(): ENV.deposit(leaf)   # C2
+  for tree in live_trees: for leaf in tree.foliage(): ENV.deposit(leaf)   # C2 (leaf area by shoot type, R6)
   ENV.compute_light(); ENV.compute_far_red()                             # C2, R5
 
   # Phase 2: per-tree passes (read ENV only; parallelizable)
@@ -318,7 +334,7 @@ SEASON(t):
       BASIPETAL: Q_sum, n (C3,C5); W, S, M (R3); P_b, M_b (R1)
       CARBON: net = production(L_path) - maintenance; reserve; starvation flag (R1)
       ACROPETAL: L_path; BH split with lambda(pa, age, Q); acrotony (C3,R2,R5)
-      BUD_FATE: break/continue/dormant/terminate/abort (C1,R2,R4)     [RNG]
+      BUD_FATE: break/continue/short shoot/dormant/terminate/abort (C1,R2,R4,R6) [RNG]
       GROW: n=floor(v), length, direction (C1,C4,R5) -> STAGING       [RNG]
       SHED (C5 or R1); GIRTH (C6, + R3/O2 bonus, monotone)
       MECHANICS: sag + posture limited by dr/r; breakage -> R4 (R3)
@@ -346,6 +362,9 @@ Ordering: (1) every tree reads the same snapshot, so iteration order cannot bias
 | M4 | C5 + C6 | Clear bole; junction-exponent histogram near n |
 | M5 | N trees, one grid | Crowns asymmetric away from each other; short tree suppressed |
 | M6 | Sky sweep | Edge trees lean outward; neighbours lean into a gap |
+| M6c | Pseudo-depth view (page only); r0 calibrated | Crowns read as full discs; x-ray view shows the shell; realistic H/D |
+| M6d | Relative C5; R6 | Suppressed trees keep deeper crowns; leafy older limbs |
+| M6e | Light calibration (k_ext, K) | Ground light under a closed stand 2–10% of open sky |
 | M7 | R2 | Massart conifer, Rauh broadleaf, Aubréville tiers from tables |
 | M8 | R1 | Height plateau; suppressed tree dies; crown base rises |
 | M9 | R3 | Drooping limbs with upturned tips; willow; Troll straightening |
@@ -368,6 +387,8 @@ Ordering: (1) every tree reads the same snapshot, so iteration order cannot bias
 | R3 | Straight old limbs, no weeping or Troll forms | Moulia et al. 2006 |
 | R3 posture only | Progressive droop, possible collapse | Alméras & Fournier 2009 |
 | R4 | Gaps refill slowly | Reiteration (Barthélémy & Caraglio 2007) |
+| R6 | Foliage only at shoot tips; thin shell, bare older limbs | Millan et al. 2022 |
+| C5 T_rel = 0 | Suppressed and dominant trees prune at the same local light | Sprugel 2002; Kothari et al. 2025 |
 | Shared pooled light instead of directional shade | Size inequality drops, no bimodality | Weiner 1990; Schwinning & Weiner 1998 |
 
 **Sweeps:** λ ∈ [0.44, 0.58] (look for a threshold-like shift in trunk dominance); n ∈ [1.8, 3]; shadow b and q_max (4–8); shedding T × spacing (crown-base height); L_h (asymptotic height); E × posture gain (stiff → weeping phase diagram); sky weighting (lean toward light).
@@ -407,7 +428,11 @@ Monopodial vs sympodial (R2's p_term) is the most important *choice*; λ is the 
 | Neighbour response | Crown centroid offset vs neighbour distance | Displacement toward gaps | Purves et al. 2007, 2008; Takenaka 1994 |
 | Crown shyness | Gap width vs slenderness | Positive association | van der Zee et al. 2021 |
 | Size inequality | CV/Gini vs density over time | Rises with density; possible bimodality | Weiner 1990; Weiner et al. 2001 |
-| Self-thinning | log mean mass vs log density | 3D: −3/2 (debated). My untested 2D derivation: w ∝ ρ^(−2) if mass ∝ L² and ground occupancy ∝ L; w ∝ ρ^(−3) if 3D-cylinder mass ∝ L³ is kept | Yoda et al. 1963; Westoby 1984 |
+| Self-thinning | log mean mass vs log density, together with size CV and bimodality | 3D: −3/2 (debated); simulations −0.9 to −1.8 by competition mode. Untested 2D hypotheses: w ∝ ρ^(−2) if mass ∝ L² and ground occupancy ∝ L; w ∝ ρ^(−3) if 3D-cylinder mass ∝ L³ is kept. Expect size asymmetry to matter more than dimension | Yoda et al. 1963; Westoby 1984; Mrad et al. 2020; Ma et al. 2019; Reynolds & Ford 2005 |
+| Slenderness | Height / stem diameter | Stand-grown ≈ 60–80 (risky > 80, slender > 100); open-grown markedly lower | Watt et al. 2023; Stăncioiu et al. 2021; MacFarlane et al. 2017 |
+| Light extinction | Ground light under a closed stand; crown extinction | Understorey a few % of open sky; crown K 0.35 (orthotropic) to 0.53–0.80 (plagiotropic), crown LAI 2–8 | Kitajima et al. 2004 |
+| Self-pruning | Light at crown base vs light at crown top | Lower in shade-tolerant species; rises with crown-top light | Kothari et al. 2025 |
+| Short shoots | Leaf-area share on short shoots | > 50% in species with spurs | Millan et al. 2022 |
 
 ---
 
@@ -420,7 +445,7 @@ Monopodial vs sympodial (R2's p_term) is the most important *choice*; λ is the 
 5. **Hydraulic height limitation is debated** (Koch & Sillett 2009); L_h is phenomenological.\[17\]
 6. **Crown-shyness mechanism is unresolved**; abrasion is convenient, not proven.
 7. **Self-thinning universality** has been debated since Westoby (1984); the 2D analogue is untested.\[43\]
-8. **2D validity is unstudied.** Honda's (1971) models are 3D; planar precedents (Ulam's 2D automata, Fisher & Honda's *Terminalia* tiers, Borchert & Honda's bifurcating systems) are abstract or specific to tiered architectures.\[2\]
+8. **2D validity is unstudied.** Honda's (1971) models are 3D; planar precedents (Ulam's 2D automata, Fisher & Honda's *Terminalia* tiers, Borchert & Honda's bifurcating systems) are abstract or specific to tiered architectures.\[2\] A 2026 search found no test of a vertical-plane tree model against 3D. The closest precedents are Jirasek et al.'s (2000) planar branch bending, Loehle's (2025) cellular crown model and Korzukhin et al.'s (1995) vertical-screen crowns. Drawing, not simulation, decides how full a 2D crown looks: the page projects the simulated shell as a pseudo-3D crown (ADR 0008).
 9. **Light-model choice matters**; Nauber et al. (2025) compare light-distribution models for tree growth simulation.\[55\]
 10. **Branch autonomy is partial** in real trees.
 11. **Scope items:** of limited use here are JABOWA (no geometry; borrow mortality logic), Pirk et al. 2012 (adapts an existing skeleton rather than growing one)\[56\] and Stava et al. 2014 (useful later for fitting parameters).\[57\] Contested: WBE, Leonardo explanations, auxin-only apical dominance. Still central: Palubicki et al. 2009, Barthélémy & Caraglio 2007, Hallé–Oldeman (descriptive), pipe model (approximate), Bastien's AC model, Takenaka 1994. Notable post-2015 work: Makowski et al. 2019; Pałubicki et al. 2022 (Ecoclimates); Li et al. 2025 (strand-based breakage and reaction wood); Pirk et al. 2017 (combustion); Hädrich et al. 2021 (wildfire);\[58\]\[59\] Li et al.'s Interactive Invigoration (ACM TOG 43(4), Article 146, 2024), which builds branches from strands, "fixed-size volumetric pipes that define the branching structure"; DeepTree (Zhou et al., arXiv 2305.05153).
@@ -429,6 +454,7 @@ Monopodial vs sympodial (R2's p_term) is the most important *choice*; λ is the 
 
 ## 12. References
 
+- _Added after the 2026-10-27 literature review (`docs/research/2026-10-27-literature-review.md` has links):_ Becker, Meinzer & Wullschleger 2000 (*Funct. Ecol.*); Beveridge et al. 2023 (*J. Exp. Bot.*); Cao et al. 2023 (*Plant Physiol.*); Costes et al. 2008 (MAppleT, *Funct. Plant Biol.*); Henriksson 2001 (*Oecologia*); Jarčuška et al. 2012 (*J. Plant Ecol.*); Jirasek, Prusinkiewicz & Moulia 2000; Kitajima, Mulkey & Wright 2004 (*Ann. Bot.*); Kobe et al. 1995 (*Ecol. Appl.*); Korzukhin & Ter-Mikaelian 1995 (*Ecol. Model.*); Kothari et al. 2025 (*Funct. Ecol.*); Kull et al. 2002 (*Tree Physiol.*); Loehle 2025 (*Ecol. Model.*); Ma et al. 2019 (*Ecol. Model.*); MacFarlane & Kane 2017 (*Funct. Ecol.*); Martínez-Vilalta et al. 2006 (*Oecologia*); Mencuccini et al. 2005 (*Ecol. Lett.*); Millan et al. 2022 (*New Phytol.*); Minamino & Tateno 2014 (*PLoS ONE*); Mrad et al. 2020; Petritan et al. 2007 (*Forestry*); Reynolds & Ford 2005 (*J. Ecol.*); Roychoudhry et al. 2013 (*Curr. Biol.*), 2017 (*Sci. Rep.*); Ryan, Phillips & Bond 2006 (*Plant Cell Environ.*); Schneider et al. 2019 (*Front. Plant Sci.*); Sprugel 2002 (*Tree Physiol.*); Stăncioiu et al. 2021 (*Forests*); Taylor-Hell 2005 (SIBGRAPI); Watt et al. 2023 (*Front. For. Glob. Change*); Yagi 2000 (*J. Plant Res.*); Yang et al. 2024 (Treegraph, *Remote Sens. Ecol. Conserv.*); Yun et al. 2025 (*Plant Commun.*); Zahnd et al. 2026 (*Plant Cell Environ.*).
 - Alméras, T. & Fournier, M. (2009). *J. Theor. Biol.* 256(3): 370–381. doi:10.1016/j.jtbi.2008.10.011
 - Barczi, J.-F. et al. (2008). AmapSim. *Annals of Botany* 101(8): 1125–1138.
 - Barthélémy, D. & Caraglio, Y. (2007). Plant architecture. *Annals of Botany* 99(3): 375–407. doi:10.1093/aob/mcl260

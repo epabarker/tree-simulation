@@ -16,11 +16,27 @@ Status key: ✅ done · 🚧 in progress · ⏳ not started.
 | M5 | N trees, one grid | Crowns asymmetric away from each other; short tree suppressed | `stand.test.ts` (5 seeds each): a pair leans apart; a late tree is < 0.6 × the height, < 0.3 × the metamers and < 0.3 × the Q_base of its neighbours; after a removal the neighbour's centroid moves > 2 cells into the gap; results don't depend on tree processing order. Crown bases don't lift in stands: the shadow triangle is too shallow (→ M6) | ✅ 2026-10-26 |
 | M6 | Sky sweep (Beer–Lambert, K directions) | Edge trees lean outward; neighbours lean into a gap | `light/sky-sweep.test.ts` (exact Beer–Lambert, own cell, shallow rays, side light, open sides, tilt); `sky.test.ts` (5 seeds): edge trees lean out, interior crown base > 15 and > 5× open-grown, neighbours lean into a felled tree's gap, oblique sun, order independence. [Note](experiments/2026-10-26-m6-sky-sweep.md), ADR 0005 | ✅ 2026-10-26 |
 | M6b | WebGL2 renderer (ADR 0001) | Same scenes at 60 fps on a phone | `web/render/scene.test.ts` (shared scene: positions match the core, taper, grow-in, picking, leaves). Measured (desktop, headless Firefox): stand 2.3 ms vs 19 ms CPU per frame (Canvas 2D), 28k metamers 5.8 ms at 60 fps. Phone not yet measured on a device | ✅ 2026-10-27 |
-| M7 | R2 physiological age; §9 species presets | Massart conifer, Rauh broadleaf, Aubréville tiers | — | ⏳ |
-| M8 | R1 carbon balance | Height plateau; suppressed tree dies; crown base rises | — | ⏳ |
-| M9 | R3 mechanics | Drooping limbs with upturned tips; willow; Troll straightening | — | ⏳ |
-| M10 | R4 dormancy/release + R5 shade avoidance | Epicormic flush after neighbour removal; slender stand trees | — | ⏳ |
-| M11 | O4 stand dynamics, then O2 | Log–log thinning line; crown gaps | — | ⏳ |
+| M6c | Pseudo-depth natural view (ADR 0008, page only); r0 = 0.02; slenderness metric | Crowns read as full discs; `depth` off shows the x-ray shell; realistic H/D | `scene.test.ts`: cluster count, back/front split, stable depth across frames, x-ray view unchanged. `metrics`: interior `skyStand` H/D in 50–90, open-grown below the stand median (5 seeds). Goldens regenerated for r0 | ⏳ |
+| M6d | C5 relative threshold (ADR 0007); R6 short shoots (ADR 0006) | Suppressed trees keep deeper crowns; leafy older limbs | C5 unit test (same branch light shed under a bright top, kept under a dim one); suppressed vs dominant crown depth (5 seeds). R6 unit test of bud fate; R6 off leaves goldens unchanged; `shortShoots` preset + golden; short-shoot leaf share > 50% and deeper mean leaf depth. Experiment note sweeping T_rel × Q_ss × a_ss | ⏳ |
+| M6e | Light calibration: `groundLight` metric, k_ext, K, optional `c2.rotate`, overcast preset | Ground light under a closed stand 2–10% of open sky; no K streaks | Ground-light target met at the chosen k_ext; K convergence on bole, width, stalls. Experiment note | ⏳ |
+| M7 | R2 physiological age; §9 species presets | Massart conifer, Rauh broadleaf, Aubréville tiers | — Also: A_set per order and light; species knobs k_ext, T, T_rel; c4 weights fitted on patterns (branch angle, width/height, lean) | ⏳ |
+| M8 | R1 carbon balance, two switchable plateau causes (L_h; reproductive sink after a size threshold) | Height plateau; suppressed tree dies; crown base rises | — | ⏳ |
+| M9 | R3 mechanics | Drooping limbs with upturned tips; willow; Troll straightening | — Expect Δ > 2 at heavy, wide junctions | ⏳ |
+| M10 | R4 dormancy/release + R5 shade avoidance (elongation, fewer bud breaks, upright A_set) | Epicormic flush after neighbour removal; slender stand trees | — | ⏳ |
+| M11 | O4 stand dynamics, then O2 | Log–log thinning line; crown gaps | — Validate slope, size CV and bimodality together | ⏳ |
+
+### Reading before each milestone
+From the [2026-10-27 literature review](research/2026-10-27-literature-review.md) §5.
+
+| Milestone | Read |
+|---|---|
+| M6c | Kitajima et al. 2004 (crown light extinction) |
+| M6d | Kothari et al. 2025; Sprugel 2002; Millan et al. 2022 |
+| M7 | Yun et al. 2025 (branch angles); Roychoudhry et al. 2013 (GSA) |
+| M8 | Ryan et al. 2006; Mencuccini et al. 2005; Becker et al. 2000; Nauber & Mäder 2024 |
+| M9 | Jirasek et al. 2000; Taylor-Hell 2005; Costes et al. 2008; Minamino & Tateno 2014 |
+| M10 | Cao et al. 2023; Beveridge et al. 2023; Schneider et al. 2019; MacFarlane et al. 2017 |
+| M11 | Loehle 2025; Reynolds & Ford 2005; Mrad et al. 2020; Ma et al. 2019; arXiv 2608.28692 |
 
 ## Principles: from spec to code
 
@@ -30,30 +46,34 @@ Status key: ✅ done · 🚧 in progress · ⏳ not started.
 | C2 | Shadow triangle or sky sweep → Q, V | §C2 | `c2.enabled`, `c2.model` (`sky` default, `triangle`) | `light/shadow-triangle.ts`, `light/sky-sweep.ts` | `shadow-triangle.test.ts`, `sky-sweep.test.ts`, `sky.test.ts` | shade heatmap; colour: light (branches and buds) | ✅ M1, M6 |
 | C3 | Basipetal ΣQ, Borchert–Honda split | §C3 | `c3.mode` (`bh`; `equal` = §8 ablation; `none` = M0–M1 scaffold) | `principles/c3-allocation.ts` | `c3-allocation.test.ts` | colour: resource v | ✅ M2 |
 | C4 | Weighted shoot direction | §C4 | `c4.enabled` | `principles/c4-direction.ts` (noise: `Purpose.directionNoise`, keyed by birthId and season) | `c4-direction.test.ts` | walls drawn | ✅ M3 |
-| C5 | Self-pruning | §C5 | `c5.enabled` | `principles/c5-shedding.ts` | `c5-c6.test.ts` | shed ghosts | ✅ M4 |
+| C5 | Self-pruning (relative threshold, ADR 0007) | §C5 | `c5.enabled`; `c5.Trel` = 0 is the baseline | `principles/c5-shedding.ts` | `c5-c6.test.ts` | shed ghosts | ✅ M4; T_rel ⏳ M6d |
 | C6 | Pipe girth with memory | §C6 | `c6.enabled` | `principles/c6-girth.ts` (+ `junctionExponents`) | `c5-c6.test.ts` | width; Δ histogram chart | ✅ M4 |
+| R6 | Short shoots (ADR 0006) | §R6 | `r6.enabled` | `principles/r6-short-shoots.ts` | — | short-shoot rosettes; buds by state | ⏳ M6d |
 | R1–R5 | Refinements | §R1–R5 | — | — | — | — | ⏳ M7–M10 |
 | O1–O4 | Optional | §O1–O4 | — | — | — | — | ⏳ M11+ |
 
 ## Parameters awaiting calibration
 
-No published value exists for these. Tune each on an isolated tree (spec §2 table) and record the result in an experiment note.
+No published value exists for these. Calibrate on *patterns*: several weak targets at once (H/D, crown base, crown width, ground light, bud-break fraction, Δ), not one strong one (Reynolds & Ford 2005). Record each result in an experiment note. Anchors and derivations are in the [literature review](research/2026-10-27-literature-review.md) §4. Physical scale: trees grow ≈ 2 cells a season, so a cell is ≈ 0.2–0.3 m.
 
-| Param | Placeholder | Notes |
-|---|---|---|
-| `c2.kExt` sky extinction | 0.5 | [M6](experiments/2026-10-26-m6-sky-sweep.md): ≥ 1 stalls some seedlings and thins crowns |
-| `c2.K`, `skyExponent`, `minElevation` | 7, 1, 15° | Not yet swept; K = 7 shows faint streaks in the shade overlay |
-| `c2.a` shadow strength (triangle) | 0.15 | [M1](experiments/2026-10-26-m1-shadow-calibration.md), [M4](experiments/2026-10-26-m4-calibration.md). M5: in 10-tree stands, 0.2 stalled 5 of 40 seedlings and 0.15 stalled none |
-| `c2.b` shadow decay | 1.5 | M4 calibration: deeper shade once shedding is on |
-| `c2.C` full exposure | 1 | The buds of one node share a cell, so C > a·(buds per node − 1) |
-| `c5.T` shedding threshold | 0.1 | M4 calibration; ≥ 0.2 over-prunes |
-| `c6.r0` tip radius | 0.08 cells | Visual only until R1/R3 |
-| `c4` weights `wd, xi, eta, epsilon, sigma` | 1, 0.3, 0.15, 0.5, 20° | Palubicki Fig. 12 is qualitative. Strong upward η (0.4) can starve a seedling whose buds bunch up |
+| Param | Value | Anchor / target | Status |
+|---|---|---|---|
+| `c2.skyExponent` | 1 | Exactly a uniform 3D sky projected onto the plane; standard overcast sky ≈ 1.5 | Settled; overcast preset in M6e |
+| `c2.minElevation` | 15° | Uniform sky puts 3.4% of its weight below 15° per side | Settled |
+| `c2.K` | 7 | Sampling only; streaks at K = 7 | M6e: convergence K ∈ {7, 11, 15, 31}, or `c2.rotate` |
+| `c2.kExt` sky extinction | 0.5 | Target: ground light under a closed stand 2–10% of open sky. Species ratio ≈ 1.5–2× plagiotropic over orthotropic (Kitajima et al. 2004). [M6](experiments/2026-10-26-m6-sky-sweep.md): ≥ 1 stalls some seedlings | M6e |
+| `c5.T` shedding threshold | 0.1 | Light-demanding ≈ 0.1, shade-tolerant 0.02–0.05 (sapling survival at 10–15% vs 1–2% of full light). M4: ≥ 0.2 over-prunes | Species values at M7 |
+| `c5.Trel`, `c5.topQuantile` | 0, 0.9 | Crown-base light rises with crown-top light (Kothari et al. 2025) | M6d |
+| `r6.qMin`, `r6.leafArea` | — | Short-shoot leaf share > 50% (Millan et al. 2022) | M6d |
+| `c6.r0` tip radius | 0.08 → 0.02 cells | H/D stand-grown 60–80 (Watt et al. 2023). Measured at 0.08: stand 14–19, open 10; radius ∝ r0, so 0.02 → ≈ 56–75 and 41 | M6c |
+| `c4` weights `wd, xi, eta, epsilon, sigma` | 1, 0.3, 0.15, 0.5, 20° | Qualitative only (Palubicki Fig. 12). Strong upward η (0.4) can starve a seedling whose buds bunch up | M7, on patterns |
+| `c2.a`, `b`, `C` (triangle) | 0.15, 1.5, 1 | [M1](experiments/2026-10-26-m1-shadow-calibration.md), [M4](experiments/2026-10-26-m4-calibration.md); legacy model pinned to M1–M5 presets | Frozen |
 
 ## Later (out of prototype scope)
 
 - Arrow output from the CLI.
 - An R analysis environment (`sudo dnf install R`, then the `arrow` or `readr` package).
 - Rust/WASM core and WebGPU: only when the ADR 0001 triggers fire.
+- Depth beyond ADR 0008, held: parallel transects drawn behind each other (forest depth), or a thick 3D slab (W × D × H, about 50× the light cost; reverses spec §2). Revisit if trees must be seen from an angle.
 - Shareable URLs that hold the seed, preset and param edits.
 - Embedding in the personal website.

@@ -2,6 +2,15 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-27: Literature review and the M6c–M6e plan
+
+- **Review** ([note](research/2026-10-27-literature-review.md)), using Consensus, alphaXiv and web search. The core holds. Gaps: shedding should be relative to the tree's best light (correlative inhibition), and short shoots carry most leaf area in many species. The 2D "x-ray" look is the correct cross-section of a hollow crown shell; real trees look full because the shell is seen in projection.
+- **Decisions** (user): R6 short shoots (ADR 0006), relative C5 with `c5.Trel` defaulting to the baseline (ADR 0007), a page-only pseudo-depth natural view (ADR 0008), and r0 = 0.02.
+- **Spec amended:** C4 (GSA mechanism), C5 (T_eff), C6 (laser-scan evidence), R1 (two switchable plateau causes, keyed on size), R5 (fewer bud breaks and upright A_set in shade), new R6, O4/§10 (self-thinning slopes are hypotheses; slenderness, extinction, self-pruning and short-shoot targets), §11.8, references.
+- **Plan:** M6c (view + r0), M6d (C5 + R6), M6e (light calibration) before M7. ROADMAP calibration table now carries literature anchors and targets; the triangle's a, b, C are frozen.
+- **Measured** while reviewing: at r0 = 0.08, `skyStand` trees have H/D 14–19 and `skyTree` 10, against 60–80 in real stands. Trees grow ≈ 2 cells a season, so a cell is ≈ 0.2–0.3 m.
+- No code or golden changes.
+
 ## 2026-10-27: M6b, the WebGL2 renderer
 
 - **Shared scene.** Split `render/scene.ts` (`Scene`) out of the Canvas 2D renderer. It holds the tween, camera, fitting, picking, colour indices and leaf layout, shared by both renderers behind a small `Renderer` interface. `create.ts` picks WebGL2 and falls back to Canvas 2D on a fresh canvas; `?renderer=canvas` forces the fallback.

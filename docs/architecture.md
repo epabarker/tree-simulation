@@ -39,7 +39,7 @@ Each `Tree` owns two structure-of-arrays tables (`soa.ts` `Table`), one typed ar
 |---|---|
 | `birthId` | Stable id |
 | `metamer`, `slot` | Where the bud sits |
-| `state` | Active, dormant, terminated or aborted; `gone` = consumed, awaiting compaction |
+| `state` | Active, dormant, terminated or aborted; `gone` = consumed, awaiting compaction. M6d appends `shortShoot` (R6, ADR 0006) |
 | `age` | |
 | `order` | Order of the shoot the bud would produce |
 | `angle` | Default growth direction |
@@ -68,7 +68,8 @@ The passes need only `parent` and `slot`:
 | CARBON | — | M8 |
 | ACROPETAL | `allocate` (C3, by `c3.mode`): `bh` splits by λ at every node; `equal` shares α·Q_base over live buds; `none` gives v = 1 to any bud with Q > 0. Every mode fills `vIn` | M0 `none`, M2 `bh`/`equal` |
 | BUD_FATE, GROW | `growBuds` → `shootSize`, `growShoot`; each new metamer's angle comes from `shootDirection` (C4) when `c4.enabled`, using the bud's V | M0, M3 |
-| SHED, GIRTH | `shedBranches` (C5): marks dim laterals' subtrees on this season's Q_sum/n_b, records scars, compacts metamers and buds, remaps `parent` and `bud.metamer`. Then `updateGirth` (C6): basipetal pipe sums with memory | M4 |
+| BUD_FATE (R6, planned M6d) | In `growBuds`: a live bud with n = 0 becomes `shortShoot` if Q ≥ `r6.qMin`, else `dormant`. With R6 on, `depositBuds` deposits leaf area by state (active 1, short shoot `r6.leafArea`, dormant 0) and `gatherLight` weights Q by it | M6d |
+| SHED, GIRTH | `shedBranches` (C5; planned M6d: threshold max(T, T_rel·Q_top), ADR 0007): marks dim laterals' subtrees on this season's Q_sum/n_b, records scars, compacts metamers and buds, remaps `parent` and `bud.metamer`. Then `updateGirth` (C6): basipetal pipe sums with memory | M4 |
 | MECHANICS | — | M9 |
 | COMMIT_STAGING | `commitBuds` compacts consumed buds; new rows were appended past the phase's loop bounds | M0 |
 | Phase 3 abrasion, stand | — | M11 |
@@ -126,6 +127,10 @@ Tapping a tree on the page fells it. `Scene.pickTree` finds the nearest drawn se
 Every typed array is transferred, not copied.
 
 **Natural view (default).** Branches are coloured bark-young → bark-old by √(age/max age). Leaves are drawn as lens shapes at the tip of every metamer up to `leafAge` seasons old (default 5), alternating sides by birthId parity, coloured shade → sun by the metamer's light, with a small stable per-leaf variation. They are a view of the foliage only: in the model, buds cast the shade (§C2). Leaves unfold with their metamer, shrink away in the season they age out, and never draw shorter than 5 px so zoomed-out crowns still read as foliage. Sky and ground are screen-space gradients.
+
+**Drawn vs simulated foliage.** Today the model holds one unit of leaf area per live bud (active or dormant), while the page draws leaves on young metamers. With R6 on (M6d) the model's leaf area follows shoot type, and the page draws a rosette at each short shoot, so the two agree.
+
+**Pseudo-depth (M6c, ADR 0008, page only).** With the `depth` view option on (natural default), each leafy metamer draws a small cluster with a pseudo-depth hashed from (tree, birthId): back leaves before the branches, darker; front leaves after. Laterals are foreshortened by β_eff = atan(tan β·|sin φ|) with φ from the same hash. With `depth` off (the x-ray view) the page draws exactly the simulated geometry; picking always uses true geometry.
 
 **Colours** live as CSS tokens in `src/web/ui/layout.css` (light and dark, including the Tweakpane theme). The canvas reads them through `render/theme.ts` and re-reads them when the system scheme or `<html data-theme>` changes, so a host site's theme toggle carries through.
 

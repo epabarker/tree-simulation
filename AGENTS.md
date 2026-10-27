@@ -10,13 +10,14 @@ An interactive 2D tree-growth simulator for a personal website. The trees self-o
 
 | Need | Read |
 |---|---|
-| The design: principles C1–C6, R1–R5, O1–O4, the season loop, the build order | `docs/spec.md`. Cite sections as §N. It is long (≈25k tokens): read only the section you need |
+| The design: principles C1–C6, R1–R6, O1–O4, the season loop, the build order | `docs/spec.md`. Cite sections as §N. It is long (≈25k tokens): read only the section you need |
 | Where we are and what's next | `docs/STATUS.md` (loaded every session) |
 | Milestones M0–M11, and a table tracing each principle to its code | `docs/ROADMAP.md` |
 | Why things are the way they are | `docs/decisions/` (ADRs) |
 | Data layout, season-loop mapping, worker protocol, file formats | `docs/architecture.md` |
 | History of changes and surprises | `docs/devlog.md` (newest first) |
 | Experiment write-ups | `docs/experiments/` |
+| Literature reviews (evidence, gaps, calibration anchors) | `docs/research/` |
 
 **Ask before diverging.** If a change would contradict `docs/spec.md` or an ADR, stop and ask the user. Once they agree, record the decision as a new ADR.
 

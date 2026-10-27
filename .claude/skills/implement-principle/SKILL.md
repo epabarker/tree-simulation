@@ -1,6 +1,6 @@
 ---
 name: implement-principle
-description: Checklist for adding or changing a simulation principle (C1–C6, R1–R5, O1–O4) of the tree simulation so that it matches docs/spec.md, stays switchable for ablations, is deterministic and tested, and is visible on the page. Use whenever new growth behaviour is implemented.
+description: Checklist for adding or changing a simulation principle (C1–C6, R1–R6, O1–O4) of the tree simulation so that it matches docs/spec.md, stays switchable for ablations, is deterministic and tested, and is visible on the page. Use whenever new growth behaviour is implemented.
 ---
 
 # Implement a principle

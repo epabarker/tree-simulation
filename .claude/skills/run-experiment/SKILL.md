@@ -11,6 +11,7 @@ description: Run a parameter sweep, ablation or validation analysis for the tree
    - Use at least 5 seeds per condition; trees are chaotic, so never conclude from one seed.
    - Choose the number of seasons and the snapshot seasons.
    - Keep the total cost small: check one run's time from `run.json` `meta.ms` first.
+   - For calibration, judge on several patterns at once (e.g. H/D, crown base, crown width, ground light, stalled seedlings, Δ), not one target (pattern-oriented modelling, Reynolds & Ford 2005). Take targets from the ROADMAP calibration table.
 3. **Run.**
    - Put the conditions in a script under `analysis/experiments/`. It should build a list of `Run(...)` objects and call `run_many(...)` from `analysis/sweep.py`, which runs `node cli/run.ts` in parallel and writes `runs/<experiment>/<condition>-seed<k>/`.
    - `runs/` is not committed. The script must recreate it exactly.

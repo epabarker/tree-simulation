@@ -15,6 +15,7 @@ import { allocate, gatherLight, isLiveBud } from "./principles/c3-allocation.ts"
 import { shootDirection } from "./principles/c4-direction.ts";
 import { crownTopLight, shedBranches } from "./principles/c5-shedding.ts";
 import { updateGirth } from "./principles/c6-girth.ts";
+import { carbonBalance, starvedToDeath } from "./principles/r1-carbon.ts";
 import { directionParams } from "./principles/r2-physiological-age.ts";
 import { depositArea, restingState } from "./principles/r6-short-shoots.ts";
 import { normal, Purpose } from "./rng.ts";
@@ -27,6 +28,7 @@ const shoot = { length: 0 };
 export function runSeason(world: World): void {
   const { params, light, season } = world;
   const live = world.trees.filter((t) => t.alive);
+  const carbonShedding = params.r1.enabled && params.r1.shed === "carbon";
 
   // Phase 1: environment from the start-of-season snapshot (C2).
   light.clear();
@@ -41,20 +43,24 @@ export function runSeason(world: World): void {
     tree.ensureScratch();
     tree.shedCount = 0;
     sampleBuds(world, tree); // C2: Q and V at every bud
-    if (params.c5.enabled && params.c5.Trel > 0) {
+    if ((params.c5.enabled || carbonShedding) && params.c5.Trel > 0) {
       tree.qTop = crownTopLight(tree, params.c5.topQuantile); // C5 relative threshold
     }
     gatherLight(tree, params.r6); // C3 basipetal: Q_sum, n_b (short shoots by leaf area, R6)
+    if (params.r1.enabled) carbonBalance(tree, params); // R1 CARBON: v_base = net production
     allocate(tree, params); // C3 acropetal: v at every bud
     const evaluated = tree.m.length; // rows that took part in this season's passes
     growBuds(world, tree, season); // C1 bud fate, GROW (C4 direction)
-    if (params.c5.enabled) tree.shedCount = shedBranches(tree, params, season, evaluated); // C5
+    if (params.c5.enabled || carbonShedding) {
+      tree.shedCount = shedBranches(tree, params, season, evaluated); // C5, or R1 by carbon
+    }
     if (params.c6.enabled) updateGirth(tree, params); // C6, after shedding so scars count
     commitBuds(tree);
     tree.age += 1;
   }
 
-  // Phase 3: multi-tree and population processes (O2, O4) arrive in later milestones.
+  // Phase 3: deaths last (§6), so a dead tree's shade is gone next season. O2 and O4 come later.
+  for (const tree of live) if (starvedToDeath(tree, params.r1)) tree.alive = false;
 }
 
 function depositBuds(world: World, tree: Tree): void {

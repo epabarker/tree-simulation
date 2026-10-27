@@ -7,7 +7,8 @@
  * the main slot and the lateral slots (§C3.4); a slot holding a bud delivers its share to the
  * bud, a slot holding a metamer passes it on.
  *
- * Params: c3.mode, c3.lambda (λ), c3.alpha (α); with R2, λ by pa and tree age.
+ * Params: c3.mode, c3.lambda (λ), c3.alpha (α); with R2, λ by pa and tree age; with R1,
+ * v_base is the tree's net production (r1-carbon.ts).
  */
 
 import type { Params } from "../params.ts";
@@ -78,7 +79,7 @@ export function allocate(tree: Tree, params: Params): void {
       // regardless of where the light was gathered.
       let live = 0;
       for (let i = 0; i < nb; i++) if (isLiveBud(b.state[i])) live += 1;
-      tree.vBase = alpha * tree.qBase;
+      if (!params.r1.enabled) tree.vBase = alpha * tree.qBase; // else net production (R1)
       const share = live > 0 ? tree.vBase / live : 0;
       for (let i = 0; i < nb; i++) b.v[i] = isLiveBud(b.state[i]) ? share : 0;
       sumResourceBasipetally(tree);
@@ -88,7 +89,7 @@ export function allocate(tree: Tree, params: Params): void {
       const nm = tree.m.length;
       const { qSlot, vSlot } = tree;
       const { parent, slot, vIn, order } = tree.m.cols;
-      tree.vBase = nm > 0 ? alpha * tree.qBase : 0;
+      if (!params.r1.enabled) tree.vBase = nm > 0 ? alpha * tree.qBase : 0; // else R1's net
       for (let i = 0; i < nm; i++) {
         const p = parent[i];
         const v = p < 0 ? tree.vBase : vSlot[3 * p + slot[i]];

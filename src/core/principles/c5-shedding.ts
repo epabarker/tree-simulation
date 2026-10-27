@@ -13,7 +13,10 @@
  * only rows that existed during that pass can be shed roots, and shoots grown this season on a
  * shed branch go with it. Removal compacts both tables in order and remaps stored indices.
  *
- * Params: c5.T, c5.g, c5.Trel, c5.topQuantile; c6.n and c6.r0 for the scar.
+ * With R1 in `carbon` shedding mode (spec §R1.4) the test is instead P_b < M_b: the branch's
+ * production does not cover its sapwood maintenance (r1-carbon.ts); the grace period still holds.
+ *
+ * Params: c5.T, c5.g, c5.Trel, c5.topQuantile; c6.n and c6.r0 for the scar; r1.shed.
  */
 
 import type { Params } from "../params.ts";
@@ -49,6 +52,7 @@ export function shedBranches(
   const c = tree.m.cols;
   const { g } = params.c5;
   const T = Math.max(params.c5.T, params.c5.Trel * tree.qTop);
+  const carbon = params.r1.enabled && params.r1.shed === "carbon";
   const n = params.c6.n;
   tree.scratchU = ensureUint8(tree.scratchU, Math.max(nm, tree.b.length));
   const dead = tree.scratchU;
@@ -58,7 +62,13 @@ export function shedBranches(
   for (let i = 0; i < evaluated; i++) {
     if (c.slot[i] === Slot.main || c.parent[i] < 0) continue;
     if (season - c.birthSeason[i] < g) continue;
-    if (c.nSum[i] > 0 && c.qSum[i] / c.nSum[i] < T) {
+    const lightPerMetamer = c.nSum[i] > 0 ? c.qSum[i] / c.nSum[i] : 0;
+    const shed = carbon
+      ? // R1: the branch cannot pay for its foliage and sapwood (autonomy), or it is dim
+        // relative to the tree's own crown top (correlative inhibition, ADR 0007).
+        tree.pSum[i] < tree.mSum[i] || lightPerMetamer < params.c5.Trel * tree.qTop
+      : c.nSum[i] > 0 && lightPerMetamer < T;
+    if (shed) {
       dead[i] = 1;
       any = true;
     }

@@ -2,6 +2,33 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-27: M8, carbon balance
+
+- **R1** (`principles/r1-carbon.ts`, ADR 0010). After the basipetal light pass:
+  - production P = α·Σ a·Q·exp(−L_path/L_h) over live buds' leaf area;
+  - maintenance M = m_w·Σ π r_live²·l over live-pipe sapwood, plus m_f·Σ a over foliage;
+  - the net is split into reserve (capped at 2 seasons of M), reproduction (above a maturity height, off by default) and v_base;
+  - deficits drain the reserve, and a tree empty for k_starve seasons dies in Phase 3.
+  - `r1.shed: "carbon"` sheds a lateral that can't pay for itself, or that is below T_rel·Q_top.
+  - New metrics: production, maintenance, reserve, reproduction, starved. Page: an R1 folder.
+- **Research settled the open choices** at the user's request (ADR 0010):
+  - Stem respiration follows sapwood and is 5–13% of assimilation.
+  - Rising wood respiration does not cause the growth plateau, so the plateau comes from L_h (or reproduction).
+  - Shade death comes from foliage costs against light (compensation point).
+  - Branch death follows the branch's own carbon budget, modified by correlative inhibition.
+- **Calibration** ([note](experiments/2026-10-27-m8-carbon.md)): m_w 1, m_f 0.06, L_h 60, α 3 (with R1). The stand levels off at ≈ 78 cells (it used to hit the 110 top), a seedling under the closed canopy dies within 5 seasons, crown bases rise 25 → 31, and M/P is 19%.
+- **Surprises.**
+  - Charging live sapwood alone let shaded trees shrink rather than starve. Charging the whole stem killed half a stand, but only at a ~100% wood cost.
+  - Leafless dormant buds first counted as producers.
+  - The seed reserve outlived any deficit.
+  - At α 2 the lowered resource erased apical dominance and trees forked low.
+  - Carrying unused bud resource over to the next season (tried, reverted) did not unfreeze the plateau.
+  - The species presets don't plateau under R1, so they stay pre-R1 (follow-up).
+- **Presets:** the sky presets enable R1 with α 3. The species presets pin the pre-R1 settings (`SPECIES_PRE_R1`), and M6–M7 tests pin `PRE_R1`.
+- **Goldens:** `skyStand`, `skyTree`, `obliqueSun`, `skyLate` and `overcast` changed (R1 on). Species and triangle goldens are unchanged, and R1 off reproduces the old hashes exactly.
+- **Tests:** `r1-carbon.test.ts` (6) and `carbon.test.ts` (6). Vitest's per-test timeout is raised to 30 s, because a 10-stand M7 check took 5.4 s under load.
+- **Seen** on the page (headless Chromium, WebGL2): the stand levels off well below the top by season 80, with no console errors. Crowns look sparser than before.
+
 ## 2026-10-27: Per-species leaf styles; M12 review milestone
 
 - **Leaf styles** (user's choice over going straight to M8), page only (`render/leaf-styles.ts`):

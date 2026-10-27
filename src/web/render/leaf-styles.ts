@@ -22,6 +22,11 @@ export interface LeafStyle {
   palette: LeafPalette;
   /** Seasons a metamer keeps its foliage; the page's default for View → leaf age. */
   leafAge: number;
+  /**
+   * Drops its leaves each autumn (M17): with seasons on, they flush in spring, turn and fall in
+   * autumn, and the crown stands bare in winter. Evergreen foliage stays.
+   */
+  deciduous: boolean;
 }
 
 export const LEAF_STYLES = {
@@ -34,6 +39,7 @@ export const LEAF_STYLES = {
     xray: 1,
     palette: "broadleaf",
     leafAge: 5,
+    deciduous: true,
   },
   /** Fir-like sprays: many thin, dark needles set wide on both sides, kept for years (Abies ≈ 8–10). */
   needle: {
@@ -44,6 +50,7 @@ export const LEAF_STYLES = {
     xray: 2,
     palette: "needle",
     leafAge: 8,
+    deciduous: false,
   },
   /** Birch-like: small, broad, light leaves. */
   small: {
@@ -54,6 +61,7 @@ export const LEAF_STYLES = {
     xray: 1,
     palette: "birch",
     leafAge: 4,
+    deciduous: true,
   },
   /** Terminalia-like: large, glossy leaves crowded at the shoot tips. */
   large: {
@@ -64,6 +72,7 @@ export const LEAF_STYLES = {
     xray: 2,
     palette: "tropical",
     leafAge: 3,
+    deciduous: true, // Terminalia catappa reddens and drops its leaves
   },
 } as const satisfies Record<string, LeafStyle>;
 

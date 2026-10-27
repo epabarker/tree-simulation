@@ -19,6 +19,8 @@ export interface Theme {
   bark: string[];
   /** Deep shade → full sun, one ramp per leaf palette (leaf-styles.ts). */
   leaf: Record<LeafPalette, string[]>;
+  /** The same in autumn colour (M17): shaded leaves turn darker, sunlit ones brighter. */
+  autumn: Record<LeafPalette, string[]>;
 }
 
 export const RAMP_STEPS = 12;
@@ -74,6 +76,7 @@ export function readTheme(el: Element): Theme {
     groundHatch: style.getPropertyValue("--ground-hatch").trim() === "1",
     bark: ramp(v("--bark-young", "#8c7b4f"), v("--bark-old", "#4c3d31")),
     leaf: leafRamps(v),
+    autumn: autumnRamps(v),
   };
 }
 
@@ -84,6 +87,23 @@ const LEAF_FALLBACK: Record<LeafPalette, [string, string, string]> = {
   birch: ["--birch-leaf", "#4a6a2a", "#c3dc6a"],
   tropical: ["--tropical-leaf", "#1d4a26", "#6fb04a"],
 };
+
+/** Autumn fallbacks per palette (`--leaf-autumn-shade`/`-sun`, …); needles barely change. */
+const AUTUMN_FALLBACK: Record<LeafPalette, [string, string, string]> = {
+  broadleaf: ["--leaf-autumn", "#8a3b16", "#e3a43a"],
+  needle: ["--needle-autumn", "#1c3527", "#4f7a4c"],
+  birch: ["--birch-leaf-autumn", "#9a6b17", "#f1d14f"],
+  tropical: ["--tropical-leaf-autumn", "#7a1e14", "#d8572e"],
+};
+
+function autumnRamps(v: (name: string, fallback: string) => string): Record<LeafPalette, string[]> {
+  const out = {} as Record<LeafPalette, string[]>;
+  for (const p of LEAF_PALETTES) {
+    const [token, shade, sun] = AUTUMN_FALLBACK[p];
+    out[p] = ramp(v(`${token}-shade`, shade), v(`${token}-sun`, sun));
+  }
+  return out;
+}
 
 function leafRamps(v: (name: string, fallback: string) => string): Record<LeafPalette, string[]> {
   const out = {} as Record<LeafPalette, string[]>;

@@ -32,6 +32,18 @@ const FADE_S = 1.6;
 const MAX_DEBRIS = 6000;
 /** Spacing of the grid the wind is sampled on each frame, cells. */
 const WIND_CELL = 8;
+/**
+ * Seasons (M17): at most this many falling or fallen leaves. They fall in year-time, about 60
+ * cells (a canopy's height) in a tenth of a year, so they land before winter at any pace.
+ */
+const FALLEN_MAX = 1500;
+const LEAF_FALL_PER_YEAR = 600;
+
+/** Smooth step from 0 at `a` to 1 at `b`. */
+function smooth(a: number, b: number, x: number): number {
+  const u = Math.min(1, Math.max(0, (x - a) / (b - a)));
+  return u * u * (3 - 2 * u);
+}
 
 /** A falling piece of wood: segments relative to a pivot, rotating and dropping (M16). */
 interface Body {
@@ -116,6 +128,8 @@ export interface Leaves {
   uy: Float32Array;
   size: Float32Array;
   color: Uint8Array;
+  /** How far each leaf has turned to autumn colour, 0 → 1 (M17). */
+  turn: Float32Array;
 }
 
 /** Ground sits this many CSS pixels above the bottom edge when the view is fitted. */
@@ -216,6 +230,27 @@ export class Scene {
   time = 0;
   /** Shed and felled wood falls (M16); off, it fades where it was (the ghosts). */
   physics = false;
+  /**
+   * Seasons (M17): show the visual year τ ∈ [0, 1), set by the garden. Spring 0–0.25 (deciduous
+   * leaves flush), summer to ≈ 0.52, autumn to ≈ 0.85 (they turn, shaded ones first, and fall),
+   * winter after (bare). Evergreen foliage stays. Off: always summer.
+   */
+  seasons = false;
+  tau = 0.35;
+  private lastTau = 0.35;
+  private lastTime = 0;
+  /** Leaves falling and lying on the ground (M17), drawn after the crowns. */
+  private fallen = {
+    count: 0,
+    x: new Float32Array(FALLEN_MAX),
+    y: new Float32Array(FALLEN_MAX),
+    ux: new Float32Array(FALLEN_MAX),
+    uy: new Float32Array(FALLEN_MAX),
+    size: new Float32Array(FALLEN_MAX),
+    color: new Uint8Array(FALLEN_MAX),
+    phase: new Float32Array(FALLEN_MAX),
+    landed: new Uint8Array(FALLEN_MAX),
+  };
   /** Compliance per metamer (once per snapshot) and the sway accumulated down each path. */
   private swayC = new Float32Array(0);
   private swayFor: Snapshot | null = null;
@@ -273,6 +308,7 @@ export class Scene {
     uy: new Float32Array(0),
     size: new Float32Array(0),
     color: new Uint8Array(0),
+    turn: new Float32Array(0),
   };
   /** Where the fitted view wants the camera; the ground line stays pinned while it eases. */
   private target: { cx: number; scale: number } | null = null;
@@ -302,7 +338,7 @@ export class Scene {
 
   /** True while something moves without a tween: wind, or wood still falling. */
   animating(): boolean {
-    return this.wind !== null || this.bodies.length > 0;
+    return this.wind !== null || this.bodies.length > 0 || this.seasons;
   }
 
   /**
@@ -859,15 +895,19 @@ export class Scene {
     out.back = 0;
     if (!s) return out;
     const L = this.layoutLeaves(s, leafAge);
-    if (out.x.length < L.count) {
-      const cap = L.count * 2;
+    if (out.x.length < L.count + FALLEN_MAX) {
+      const cap = (L.count + FALLEN_MAX) * 2;
       out.x = new Float32Array(cap);
       out.y = new Float32Array(cap);
       out.ux = new Float32Array(cap);
       out.uy = new Float32Array(cap);
       out.size = new Float32Array(cap);
       out.color = new Uint8Array(cap);
+      out.turn = new Float32Array(cap);
     }
+    const tau = this.tau;
+    const phenology = this.seasons && this.leafStyle.deciduous;
+    if (this.seasons && tau < this.lastTau) this.fallen.count = 0; // a new year: last year's litter is gone
     const g = this.geom;
     let k = 0;
     for (let i = 0; i < L.count; i++) {
@@ -875,10 +915,24 @@ export class Scene {
       const j = L.metamer[i];
       if (this.solo >= 0 && s.tree[j] !== this.solo) continue;
       let size = ROSETTE_SIZE;
-      if (!L.rosette[i]) {
-        size = g.grown[j] * (s.age[j] > leafAge ? 1 - t : 1);
-        if (size <= 0.02) continue;
+      if (!L.rosette[i]) size = g.grown[j] * (s.age[j] > leafAge ? 1 - t : 1);
+      let turn = 0;
+      let fallAt = 2;
+      let h = 0;
+      if (phenology) {
+        // Each leaf's own year: it flushes early in spring; it turns in autumn, shaded leaves
+        // first; it falls soon after. h spreads the leaves of a crown over a few weeks.
+        h = ((Math.imul(i + 1, 0x9e3779b1) >>> 0) % 1000) / 1000;
+        const light = (L.color[i] as number) / (RAMP_STEPS - 1);
+        const flushAt = 0.01 + 0.1 * h;
+        const turnAt = 0.52 + 0.1 * light + 0.04 * h;
+        fallAt = turnAt + 0.06 + 0.06 * h; // by 0.78: every leaf is down before winter (0.85)
+        turn = smooth(turnAt, turnAt + 0.08, tau);
+        size *= smooth(flushAt, flushAt + 0.12, tau) * (1 - smooth(fallAt, fallAt + 0.015, tau));
       }
+      // A third of the leaves are seen to come loose and drift down; the rest just shrink away.
+      if (this.lastTau < fallAt && fallAt <= tau && h < 0.35) this.dropLeaf(i, j, L);
+      if (size <= 0.02) continue;
       let dx = g.tipX[j] - g.baseX[j];
       let dy = g.tipY[j] - g.baseY[j];
       const len = Math.sqrt(dx * dx + dy * dy);
@@ -907,11 +961,72 @@ export class Scene {
       out.uy[k] = a * dy + b * dx;
       out.size[k] = size * L.scale[i];
       out.color[k] = L.color[i];
+      out.turn[k] = turn;
       k++;
     }
     if (L.back >= L.count) out.back = k;
+    if (this.seasons) k = this.driftLeaves(out, k);
+    this.lastTau = tau;
     out.count = k;
     return out;
+  }
+
+  /** Leaves falling or lying on the ground, drawn after the crowns' own leaves. */
+  get fallenLeaves(): number {
+    return this.fallen.count;
+  }
+
+  /** A turned leaf comes loose: it joins the falling leaves at its place on the shoot. */
+  private dropLeaf(i: number, j: number, L: Scene["layout"]): void {
+    const f = this.fallen;
+    if (f.count >= FALLEN_MAX) return;
+    const g = this.geom;
+    const k = f.count++;
+    f.x[k] = g.tipX[j] as number;
+    f.y[k] = g.tipY[j] as number;
+    f.ux[k] = L.a[i] as number;
+    f.uy[k] = L.b[i] as number;
+    f.size[k] = (L.scale[i] as number) * 0.9;
+    f.color[k] = L.color[i] as number;
+    f.phase[k] = (i * 0.618) % (2 * Math.PI);
+    f.landed[k] = 0;
+  }
+
+  /**
+   * Falling leaves drift down, carried by the wind and see-sawing as they go, and lie on the
+   * ground as litter until it shrinks away at the end of winter. Appends them to `out` from k.
+   */
+  private driftLeaves(out: Leaves, k: number): number {
+    const f = this.fallen;
+    const dt = Math.min(0.1, Math.max(0, this.time - this.lastTime));
+    this.lastTime = this.time;
+    const dTau = Math.max(0, this.tau - this.lastTau);
+    const fade = 1 - smooth(0.9, 0.99, this.tau);
+    for (let i = 0; i < f.count; i++) {
+      if (!f.landed[i]) {
+        const phase = (f.phase[i] as number) + 2.2 * this.time;
+        const push = this.wind ? this.windHere(f.x[i] as number, f.y[i] as number) : 0;
+        f.x[i] = (f.x[i] as number) + (4 * push + 1.2 * Math.sin(phase)) * dt;
+        f.y[i] = (f.y[i] as number) - LEAF_FALL_PER_YEAR * (0.7 + 0.3 * Math.cos(phase)) * dTau;
+        const swing = 0.9 * Math.sin(phase);
+        f.ux[i] = Math.cos(swing);
+        f.uy[i] = Math.sin(swing);
+        if ((f.y[i] as number) <= 0.15) {
+          f.y[i] = 0.15;
+          f.landed[i] = 1;
+          f.uy[i] = 0.15 * Math.sign(f.uy[i] as number);
+        }
+      }
+      out.x[k] = f.x[i] as number;
+      out.y[k] = f.y[i] as number;
+      out.ux[k] = f.ux[i] as number;
+      out.uy[k] = f.uy[i] as number;
+      out.size[k] = (f.size[i] as number) * fade;
+      out.color[k] = f.color[i] as number;
+      out.turn[k] = 1;
+      k++;
+    }
+    return k;
   }
 
   /** The leaf layout of snapshot `s` (see `layout`), rebuilt only when what it depends on changes. */

@@ -109,6 +109,12 @@ export interface GardenOptions {
   speed?: number;
   /** Longest tween between two seasons, ms: short in the lab, long for slow ambient growth. */
   maxTweenMs?: number;
+  /**
+   * Seasons (M17): seconds a year lasts once the opening has grown the forest, shown as spring
+   * (new growth unfolds), summer, autumn (leaves turn and fall) and winter (bare). It sets the
+   * ambient pace; 0 keeps the old one without seasons. Default 16. Needs a pace (not the lab's).
+   */
+  yearSeconds?: number;
   /** Lower the resolution, then the leaf detail, when frames run slow (default on; off in bench). */
   adaptive?: boolean;
   /**
@@ -178,6 +184,10 @@ export interface Garden {
   anchors(): { tree: number; x: number; y: number; baseX: number; baseY: number }[];
   /** The latest metrics of a live tree, or undefined. */
   metrics(tree: number): TreeMetrics | undefined;
+  /** Seconds a year lasts from the next year on (see `yearSeconds`). */
+  setYearSeconds(seconds: number): void;
+  /** The season showing, or null when seasons are not (the opening, the lab, reduced motion). */
+  readonly seasonName: "spring" | "summer" | "autumn" | "winter" | null;
   /** Stops the worker, the frame loop and every listener; removes a canvas the garden made. */
   destroy(): void;
 }
@@ -185,6 +195,9 @@ export interface Garden {
 const DEFAULT_PACE: Pace = { intro: 4, introSeasons: 40, ambient: 0.5 };
 /** The intro slows to the ambient pace over its last this many seasons. */
 const SLOWDOWN = 12;
+/** Seasons (M17) show once a year lasts at least this long; spring is this share of a year. */
+const SEASONS_FROM_MS = 3000;
+const SPRING = 0.3;
 /** Rows of sky above the forest's ground in its preset (130): the ring's width follows the host. */
 const WORLD_HEIGHT = 130;
 
@@ -313,6 +326,10 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
   let tweenMs = 1;
   /** The current tween is one of a playing run: linear in time rather than eased. */
   let continuous = false;
+  /** Seasons (M17): seconds a year lasts, and when this year began and how long it lasts. */
+  let yearSeconds = options.yearSeconds ?? 16;
+  let yearStart = 0;
+  let yearMs = 1;
   let lastStep = 0;
   let generation = 0;
   let season = 0;
@@ -328,11 +345,12 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
    */
   const speed = (): number => {
     if (!pace) return playback.speed;
+    const ambient = yearSeconds > 0 ? 1 / yearSeconds : pace.ambient;
     const from = pace.introSeasons - SLOWDOWN;
     if (season < from) return pace.intro;
-    if (season >= pace.introSeasons) return pace.ambient;
+    if (season >= pace.introSeasons) return ambient;
     const f = (season - from) / SLOWDOWN;
-    return pace.intro * (pace.ambient / pace.intro) ** f;
+    return pace.intro * (ambient / pace.intro) ** f;
   };
 
   function accept(s: Snapshot, animate: boolean, fresh: boolean): void {
@@ -350,9 +368,20 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
     tweenStart = performance.now();
     // While playing, each season's tween fills its whole interval and runs at constant speed, so
     // one season hands straight on to the next and growth never stops (D1); a single step eases.
-    continuous = animate && playback.playing;
     const interval = 1000 / speed();
-    tweenMs = animate ? Math.min(maxTweenMs, continuous ? interval : interval * 0.85) : 1;
+    // Seasons (M17), once a year lasts long enough to watch: growth unfolds over spring, the first
+    // 30% of the year, and the rest of the year turns through summer, autumn and winter.
+    const seasonal =
+      animate && !!pace && yearSeconds > 0 && !reduceMotion && interval >= SEASONS_FROM_MS;
+    scene.seasons = seasonal;
+    yearStart = performance.now();
+    yearMs = interval;
+    continuous = animate && playback.playing && !seasonal;
+    tweenMs = !animate
+      ? 1
+      : seasonal
+        ? SPRING * interval
+        : Math.min(maxTweenMs, continuous ? interval : interval * 0.85);
     dirty = true;
   }
 
@@ -492,6 +521,7 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
     lastFrame = now;
     if (!onScreen) return;
     scene.time = now / 1000;
+    if (scene.seasons && playback.playing) scene.tau = Math.min(0.999, (now - yearStart) / yearMs);
     if (wind) advanceWind(wind, scene.time);
     if (scene.animating()) dirty = true;
     if (autoFit && scene.animateCamera(dt)) dirty = true;
@@ -691,6 +721,14 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
       dirty = true;
     },
     seed: params.seed,
+    setYearSeconds(seconds) {
+      yearSeconds = Math.max(0, seconds);
+    },
+    get seasonName() {
+      if (!scene.seasons) return null;
+      const tau = scene.tau;
+      return tau < 0.25 ? "spring" : tau < 0.52 ? "summer" : tau < 0.85 ? "autumn" : "winter";
+    },
     setFocus,
     get focusTree() {
       return scene.focusTree;

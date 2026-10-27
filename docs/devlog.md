@@ -2,6 +2,26 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-27: M19–M20 step 3, calibrated species
+
+- **User:** birch → beech and oak in the home forest; conifer a lab species; Plate II an open-grown oak; field-guide names; "as close to a botanical simulation as possible" (the species-calibrated route).
+- **Core** (golden-safe: no golden changed):
+  - `src/core/flora.ts`: `FLORA`, calibrated patches for silver birch, pedunculate oak, beech and silver fir, with common and Latin names and leaf styles.
+  - Presets: `oakOpen` (Plate II), `birchWood`, `oakWood`, `beechWood`, `firWood` and `succession`, on a `WOODLAND` base: the forest's principles, R5's neighbour signal and storms at 0.08/2.
+  - `metrics.csv` gains a `species` column.
+- **Calibration** ([note](experiments/2026-10-27-m19-species.md)):
+  - Shade survival is fir 1%, beech 2%, oak 5% and birch 11%, matching the Niinemets & Valladares scores.
+  - Floors darken from birch (15–20%) to oak (5%) to beech (3%).
+  - Stands have H/D 70–80. Open oak is broad (W/H 1.4) and squat.
+  - Birch → beech succession emerges in all 5 seeds; oak dwindles under beech.
+- **Surprises:**
+  - **The survival threshold is Q_ss.** A seedling whose one bud rests below `r6.qMin` holds no leaves and starves, while `r1.mf` barely moved survival.
+  - **Epicormic shoots in birch stands.** Light under birch woke epicormic shoots all down the trunks, so crowns never lifted. Birch needs a high release light (`r4.qRel` 0.3).
+  - **Drooping oak.** The first open oak drooped like a willow; stiffer wood and posture control fixed it.
+  - **Lone oaks were windthrown.** Windthrow scales with height only, so `oakOpen` has no storms or recruits.
+  - **I misquoted birch's score.** From memory I had birch's shade score as 1.85, which is its drought score; the table says 2.03.
+- **Tests:** `flora.test.ts` covers the shade-house order, stand floors and slenderness, the open oak's form, and succession. 192 pass.
+
 ## 2026-10-27: M17, seasons
 
 - **User:** slower years with four seasons, and a few pace options.

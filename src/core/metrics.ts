@@ -77,6 +77,7 @@ export interface TreeMetrics {
 export const METRIC_COLUMNS: readonly (keyof TreeMetrics)[] = [
   "tree",
   "alive",
+  "species",
   "rootX",
   "age",
   "metamers",

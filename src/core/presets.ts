@@ -3,13 +3,8 @@
  * so it is type-checked against Params. Species presets (§9) use R2 (M7, ADR 0009).
  */
 
-import {
-  defaultParams,
-  mergeParams,
-  type PaLevel,
-  type Params,
-  type ParamsPatch,
-} from "./params.ts";
+import { FLORA, type FloraName, level } from "./flora.ts";
+import { defaultParams, mergeParams, type Params, type ParamsPatch } from "./params.ts";
 
 export interface Preset {
   label: string;
@@ -77,18 +72,6 @@ const SPECIES_PRE_R1 = {
   r4: { enabled: false },
   r5: { enabled: false },
 } satisfies ParamsPatch;
-
-/** One R2 table row (ADR 0009); unspecified fields take baseline values. */
-const level = (row: Partial<PaLevel>): PaLevel => ({
-  lambda: 0.5,
-  setPoint: 0,
-  eta: 0.15,
-  branchAngle: 45,
-  generator: "distichous",
-  tierEvery: 0,
-  pTerm: 0,
-  ...row,
-});
 
 /**
  * M7 species (§9, ADR 0009): generic types named after a real example, with qualitative values.
@@ -206,6 +189,22 @@ const FOREST = {
   o2: { stormP: 0.05, stormLoad: 1.5 },
   o4: { enabled: true },
 } satisfies ParamsPatch;
+
+/**
+ * M19: the woodland the calibrated species (flora.ts) grow in, the forest's principles with R5
+ * sensing its neighbours' shade rather than its own, so lone trees grow squat and stands slender.
+ * Storms come a little more often and harder than in `forest`, so gaps keep reopening for birch
+ * and oak (the succession note).
+ */
+const WOODLAND = {
+  ...FOREST,
+  r5: { enabled: true, signal: "neighbours" },
+  o2: { stormP: 0.08, stormLoad: 2 },
+  species: FLORA,
+} satisfies ParamsPatch;
+
+/** A world of one calibrated species: `x` positions, all of `name`. */
+const flora = (name: FloraName, xs: number[]) => xs.map((x) => ({ x, species: name }));
 
 const RING: Params["world"] = { width: 210, height: 130, walls: [], sides: "periodic" };
 
@@ -443,6 +442,84 @@ export const presets = {
       world: { ...RING, obstacles: [{ x: 70, y: 32, width: 70, height: 22 }] },
       trees: [10, 31, 52, 73, 94, 115, 136, 157, 178, 199].map((x) => ({ x })),
       ...FOREST,
+    },
+  },
+  oakOpen: {
+    label: "M19: an oak grown in the open",
+    description:
+      "Quercus robur alone in a field: wide-angled limbs, a broad decurrent crown and a squat trunk (Plate II).",
+    // A specimen: no seedlings around it, and no storms, which throw tall trees by height alone.
+    patch: {
+      world: { width: 160, height: 120, walls: [] },
+      trees: flora("oak", [80]),
+      ...WOODLAND,
+      o2: { stormP: 0 },
+      o4: { enabled: false },
+    },
+  },
+  birchWood: {
+    leaf: "small",
+    label: "M19: a birch wood",
+    description:
+      "Betula pendula: quick to grow, light-demanding, clean boles under a light canopy.",
+    patch: {
+      world: { width: 230, height: 130, walls: [] },
+      trees: flora(
+        "birch",
+        STAND_X.map((t) => t.x),
+      ),
+      ...WOODLAND,
+    },
+  },
+  oakWood: {
+    label: "M19: an oak wood",
+    description: "Quercus robur in a stand: tall and slender, with crowns lifted to the light.",
+    patch: {
+      world: { width: 230, height: 130, walls: [] },
+      trees: flora(
+        "oak",
+        STAND_X.map((t) => t.x),
+      ),
+      ...WOODLAND,
+    },
+  },
+  beechWood: {
+    label: "M19: a beech wood",
+    description:
+      "Fagus sylvatica: deep, dense crowns over a dark floor, a few per cent of the sky.",
+    patch: {
+      world: { width: 230, height: 130, walls: [] },
+      trees: flora(
+        "beech",
+        STAND_X.map((t) => t.x),
+      ),
+      ...WOODLAND,
+    },
+  },
+  firWood: {
+    leaf: "needle",
+    label: "M19: a silver fir wood",
+    description: "Abies alba: tiered spires that keep their shaded branches (a lab species).",
+    patch: {
+      world: { width: 230, height: 160, walls: [] },
+      trees: flora(
+        "fir",
+        STAND_X.map((t) => t.x),
+      ),
+      ...WOODLAND,
+    },
+  },
+  succession: {
+    label: "M19: succession, birch to beech",
+    description:
+      "Birch pioneers with a few oak and beech among them: beech grows up in their shade and takes the canopy, and storms reopen gaps for birch and oak.",
+    patch: {
+      world: RING,
+      trees: [10, 31, 52, 73, 94, 115, 136, 157, 178, 199].map((x, i) => ({
+        x,
+        species: i === 2 || i === 6 ? "oak" : i === 4 || i === 8 ? "beech" : "birch",
+      })),
+      ...WOODLAND,
     },
   },
   thinning: {

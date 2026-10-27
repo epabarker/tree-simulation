@@ -1,11 +1,12 @@
 # Status
 
-_Last updated: 2026-10-27_
+_Last updated: 2026-10-27 (M19 step 3)_
 
-**Current milestone: M18** (light rework, bigger worlds). M17 is live on edbarker.dev (garden-v0.6.0, PR #12): seasons on the plates with brisk, gentle and slow paces, after M16's wind, storms and falling wood. The site is the Field guide.
+**Current milestone: M19–M20** (species), on branch `claude/m19-species`, not yet pushed. Steps 1–3 are done: species per tree (ADR 0016), R5's neighbour signal, and calibrated birch, oak, beech and fir ([note](experiments/2026-10-27-m19-species.md)). M17 is live on edbarker.dev (garden-v0.6.0). M18 is deferred.
 
 ## Works
 - **Core:** C1–C6, R1–R6, O2 and O4 (ADRs 0005–0013); the sky sweep with open or periodic sides; golden hashes. `World.discardDead` for long page runs.
+- **Species** (`src/core/flora.ts`): silver birch, pedunculate oak, beech and silver fir, with field-guide names. Presets `oakOpen` (Plate II), `birchWood`, `oakWood`, `beechWood`, `firWood` and `succession` (birch → beech emerges; oak dwindles).
 - **Presets:** `skyStand`, `skyGrove`, `skyTree`, `forest`, `thinning`, `weeping`, `troll`; species `conifer`, `birch` and `tropical`, still without R1, R3, R4 and R5.
 - **Garden** (`src/web/garden.ts`, ADR 0014):
   - `mountGarden(host, options)`, the living view the lab and the home page share;
@@ -16,8 +17,15 @@ _Last updated: 2026-10-27_
 - **Lab:** WebGL2 with pseudo-depth, Tweakpane, charts, tap to fell, phone layout. **Headless:** `npm run sim`, `npm run bench` (rings 3.8 ms a season), `analysis/experiments/` m0–m11.
 
 ## Next
-1. **M18:** the row-marched light sweep (changes goldens) and bigger, viewport-shaped worlds. Then **M19–M20**: species per tree (ADR 0016), calibrated species, the succession forest, an open-grown specimen for Plate II.
-2. **The user:** the site's `TODO(Ed)` items.
+1. **M19–M20 step 4, the page:**
+   - the home forest from `succession`, sized by `forestParams`;
+   - per-species leaves, autumn colours and phenology: birch flushes early, oak late, beech keeps its dead leaves;
+   - species names on the cards and labels;
+   - Plate II as `oakOpen` with a new seed per visit;
+   - check the woods' look in the garden view (storms may strip crowns).
+   Then ship in releases with previews.
+2. **Follow-ups:** windthrow by slenderness (changes `forest` goldens); acrotony for decurrent oaks; willow; then M18.
+3. **The user:** the site's `TODO(Ed)` items.
 
 ## Open questions (ask when the milestone comes up)
 - The design direction (D2). ADR 0016, species per tree (M19). Amendments to ADR 0011 and §O2 (M16), and to ADR 0005 (M18). Art direction (M21).

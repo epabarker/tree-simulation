@@ -153,7 +153,7 @@ Tapping a tree on the page fells it. `Scene.pickTree` finds the nearest drawn se
 | Call | Effect |
 |---|---|
 | `init(params)` | New World; returns the season-0 snapshot |
-| `step(n)` | Runs n seasons; returns a snapshot. The page asks for one season at a time, after the previous tween ends (pull model, no queueing) |
+| `step(n)` | Runs n seasons; returns a snapshot. The page asks for one season at a time. While playing it asks as soon as a season is shown, so the worker computes season s+1 while the page tweens to s, and the result waits for its turn (pipelining, M15). Pausing shows the waiting season; while playing, events apply one season later |
 | `setParams(patch)`, `removeTree(id)` | Queue events |
 | `setSnapshotOptions({junctions, field})` | Which optional parts later snapshots carry: the Δ histogram's junction exponents and the shade field. Both default to on (the lab); the home page turns both off (M13) |
 | `record()` | Returns the run record |
@@ -180,8 +180,22 @@ Every typed array is transferred, not copied.
 
 **Tweening.** `render/scene.ts` (`Scene`) holds everything both renderers share: each frame it rebuilds positions in a single forward loop, interpolating length, angle and radius from the `prevIndex` row; new rows grow from zero; previous rows that nothing maps to are fading ghosts (shed branches). It also tapers each segment toward its thickest child (`tipRadius`), chooses palette indices per colour mode, lays out leaves (camera-independent: base point, direction, size 0…1), fits and eases the camera, and picks trees.
 
+**Per snapshot, not per frame (M15).** These depend only on the snapshot (and view settings), so they are computed when a snapshot is first drawn:
+- the pseudo-depth projections;
+- the colour indices;
+- the leaf layout: which leaves exist; each one's metamer and layer; its direction as a fixed rotation (a, b) of its shoot's direction; its size scale and colour.
+
+A frame then interpolates positions, normalises each leafy shoot's direction, applies the rotations and sizes the leaves. Two geometries take turns as tween origin and target. `node src/web/render/scene.bench.ts` times a frame's Scene work ([M15 note](experiments/2026-10-27-m15-render.md)).
+
+**Adaptive quality** (`render/quality.ts`, M15). While the garden animates, every 60 frame intervals form a window:
+- If its 90th percentile is above 24 ms, the quality steps down one level: device pixel ratio 2 → 1.5 → 1, then `ViewOptions.lite` (no back layer of leaves).
+- Ten windows in a row under 18 ms step back up.
+- A change waits a second before frames count again.
+
+The lab's Stats shows the level. `?bench` turns it off, and also measures the page: the lab takes `?preset=` and `?seasons=`, and `garden.html` works too.
+
 **Renderers** (`render/create.ts` picks one; `?renderer=canvas` forces the fallback):
-- `WebGL2Renderer` (default, M6b, ADR 0001; twgl.js): one instanced quad per metamer shaded in the fragment shader as an uneven capsule (signed distance, antialiased by `0.5 − d/px`; stems under half a pixel draw at half a pixel with alpha scaled by their true coverage), one quad per leaf shaded as a vesica, instanced squares for buds and rectangles for walls, the shade overlay as an RGBA texture, sky and ground as full-screen gradients; premultiplied alpha. Instance data never depends on the camera (zoom-dependent minimum sizes are applied in the shaders), so frames where only the camera moves skip the rebuild and only change uniforms. Handles context loss by recreating its resources.
+- `WebGL2Renderer` (default, M6b, ADR 0001; twgl.js). Its instance buffers grow by capacity and frames overwrite them with `bufferSubData` (M15). It draws one instanced quad per metamer shaded in the fragment shader as an uneven capsule (signed distance, antialiased by `0.5 − d/px`; stems under half a pixel draw at half a pixel with alpha scaled by their true coverage), one quad per leaf shaded as a vesica, instanced squares for buds and rectangles for walls, the shade overlay as an RGBA texture, sky and ground as full-screen gradients; premultiplied alpha. Instance data never depends on the camera (zoom-dependent minimum sizes are applied in the shaders), so frames where only the camera moves skip the rebuild and only change uniforms. Handles context loss by recreating its resources.
 - `Canvas2DRenderer` (fallback): segments grouped by (colour, width bucket), each group stroked as one path.
 
 Measured in headless Firefox (desktop GPU; phones are slower): a 10-tree stand of about 4k metamers draws in 2.3 ms of CPU per frame during growth playback with WebGL2 against 19 ms with Canvas 2D; 28k metamers in 5.8 ms; panning a paused 55k-metamer scene costs 0.35 ms.

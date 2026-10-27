@@ -257,6 +257,7 @@ export class Canvas2DRenderer implements Renderer {
     ctx.beginPath();
     for (let j = 0; j < prev.metamerCount; j++) {
       if (!scene.ghosts[j]) continue;
+      if (scene.solo >= 0 && prev.tree[j] !== scene.solo) continue; // a solo plate: one specimen
       ctx.moveTo(g.baseX[j], g.baseY[j]);
       ctx.lineTo(g.tipX[j], g.tipY[j]);
     }

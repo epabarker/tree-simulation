@@ -631,7 +631,10 @@ export class WebGL2Renderer implements Renderer {
       return;
     }
     let count = 0;
-    for (let j = 0; j < prev.metamerCount; j++) if (scene.ghosts[j]) count++;
+    // A solo plate (one specimen) shows only that tree's falling branches.
+    const shown = (j: number): boolean =>
+      scene.ghosts[j] === 1 && (scene.solo < 0 || prev.tree[j] === scene.solo);
+    for (let j = 0; j < prev.metamerCount; j++) if (shown(j)) count++;
     const a = this.stream<Floats>(batch, "a_a", count);
     const b = this.stream<Floats>(batch, "a_b", count);
     const r = this.stream<Floats>(batch, "a_r", count);
@@ -641,7 +644,7 @@ export class WebGL2Renderer implements Renderer {
     const g = scene.prevGeom;
     let k = 0;
     for (let j = 0; j < prev.metamerCount; j++) {
-      if (!scene.ghosts[j]) continue;
+      if (!shown(j)) continue;
       a[2 * k] = g.baseX[j];
       a[2 * k + 1] = g.baseY[j];
       b[2 * k] = g.tipX[j];

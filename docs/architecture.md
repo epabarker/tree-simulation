@@ -85,7 +85,7 @@ Before this rule, shoots that left the grid saw unshaded sky and grew exponentia
 ## Light models (`src/core/light/`)
 
 All of them sit behind `LightModel.sample(x, y, dir) → {q, vx, vy}` (§C2.8):
-- `SkySweep` (M6, default `c2.model: "sky"`, ADR 0005): each bud adds one unit of leaf area to its cell; `compute()` (end of Phase 1) sweeps K sky directions from the sky side, accumulating optical depth T_k into every cell with linear interpolation between the two upstream cells, then stores Q = Σ w_k e^(−k_ext T_k) and the light-weighted direction per cell. A bud gets its cell's values (its own cell's foliage does not shade it); rays from beyond the world's sides are open sky; outside the box Q = 0. The shade overlay shows 1 − Q/Q_open.
+- `SkySweep` (M6, default `c2.model: "sky"`, ADR 0005): each bud adds one unit of leaf area to its cell; `compute()` (end of Phase 1) sweeps K sky directions from the sky side, accumulating optical depth T_k into every cell with linear interpolation between the two upstream cells, then stores Q = Σ w_k e^(−k_ext T_k) and the light-weighted direction per cell. A bud gets its cell's values (its own cell's foliage does not shade it); rays from beyond the world's sides are open sky; outside the box Q = 0. The shade overlay shows 1 − Q/Q_open. `compute(season)` takes the season so that `c2.rotate` (M6e, off by default) can move the K directions each season: they then sit at (k + f)/K of the sky's span with f = frac(0.5 + season·(φ − 1)), one per equal stratum, and the weights are renormalised to Σw = C.
 - `UniformLight`: C2 off.
 - `ShadowTriangle` (M1): deposits a·b^(−q) per bud, Q = max(C − s + a, 0), and V points at the least-shaded cell in a wedge of half-angle θ and radius r.
 - The sky sweep: M6.
@@ -154,5 +154,6 @@ Measured in headless Firefox (desktop GPU; phones are slower): a 10-tree stand o
 | `metrics.csv` | One row per tree per season after the season ran. Columns: `season` + `METRIC_COLUMNS` (`metrics.ts`) |
 | `metamers.csv` | Every metamer at each `--snapshots` season and at the final season. Columns: `season,tree,birthId,parentBirthId,order,axis,x0,y0,x1,y1,length,angle,radius,qSum,nSum,vIn,birthSeason` |
 | `hash.txt` | State hash (same function as the golden tests) |
+| `light.csv` | With `--light` only: the light model's per-cell shade (1 − Q/C for the sky sweep) at the same seasons as `metamers.csv`, i.e. the start-of-season field those seasons' buds saw. Columns: `season,col,row,shade`, row 0 at the ground |
 
 The analysis reads these with `analysis/treesim_io.py`.

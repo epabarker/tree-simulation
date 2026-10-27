@@ -2,6 +2,21 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-27: M6e, light calibration
+
+- **Session setup.** This is a cloud session: Node 24 installed with nvm (`/opt/nvm`; the image's default is Node 22), then `npm ci`. The user parked the two open questions (Pages domain, pCloud copies).
+- **`groundLight` metric** (`metrics.ts`, `metrics.csv`): mean Q/C in the bottom row of cells across a tree's crown, from the start-of-season field. `treeMetrics(tree, world?)` takes the world for it; without one it is NaN.
+- **`c2.rotate`** (off by default): the K directions sit one per equal stratum at (k + f)/K of the sky, and f advances by φ − 1 each season. `LightModel.compute` now takes the season. Page: a "rotate directions" checkbox in C2; the K slider goes up to 31; the panel accepts boolean fields.
+- **`overcast` preset** (stand, p = 1.5). CLI `--light` writes `light.csv` (per-cell shade at the snapshot seasons).
+- **Calibration** ([note](experiments/2026-10-27-m6e-light-calibration.md)). Defaults kept: k_ext 0.5, K 7, rotate off.
+  - Floor light under interior crowns is 5.8% (3.5–3.8% under the central trees).
+  - Surprise: floor light is nearly independent of k_ext (5.8–8% from 0.25 to 1), because crowns carry less leaf area when k_ext is larger. So k_ext is a leaf-area knob, not a floor-light knob.
+  - Second surprise: much of the light reaching a stand's floor, and the stand's growth, comes through the world's open sides. Closing them with walls gives 1% floor light and trees 22% shorter at season 50. The ROADMAP M11 row now asks for a forest-like boundary first.
+  - K = 7 matches K = 31 on every pattern except crown base, which is about 7 cells lower (≈ 2 SE). Rotation hides the zenith streaks in the field but changes no pattern.
+- **Tests.** `sky-sweep.test.ts` gained a rotate test. `sky.test.ts` gained the M6e block: the ground-light metric, the 2–10% floor target, and K 7 vs 15 convergence.
+- **Goldens:** `overcast:seed1:s30` added. No existing hash changed (rotate off reproduces the M6 grid exactly).
+- Checked on the page in headless Chromium: the rotate checkbox toggles live, the overcast preset loads, no console errors.
+
 ## 2026-10-27: M6d, relative shedding and short shoots
 
 - **C5 relative threshold** (ADR 0007): `c5.Trel`, `c5.topQuantile`; Q_top computed per tree after sampling (`crownTopLight`).

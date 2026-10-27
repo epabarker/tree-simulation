@@ -79,6 +79,11 @@ export interface Params {
     skyTilt: number;
     /** Sky sweep: lowest sky direction above the horizon, degrees. */
     minElevation: number;
+    /**
+     * Sky sweep: move the K directions by a golden-ratio step each season (stratified, one per
+     * equal slice of the sky) so the streaks of a small K average out (M6e). Off: the fixed M6 grid.
+     */
+    rotate: boolean;
   };
 
   /** C3 Basipetal light summation and acropetal Borchert–Honda allocation. */
@@ -178,6 +183,7 @@ export const defaultParams: Params = {
     skyExponent: 1,
     skyTilt: 0,
     minElevation: 15,
+    rotate: false,
   },
   c3: { mode: "none", lambda: 0.5, alpha: 2 },
   c4: { enabled: false, wd: 1, xi: 0.3, eta: 0.15, setPoint: 0, epsilon: 0.5, sigma: 20 },

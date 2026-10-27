@@ -194,6 +194,17 @@ export const presets = {
       ...SKY,
     },
   },
+  overcast: {
+    label: "M6e: stand under an overcast sky",
+    description:
+      "The stand under a standard overcast sky (zenith three times as bright as the horizon, p = 1.5).",
+    patch: {
+      world: { width: 230, height: 110, walls: [] },
+      trees: [20, 41, 62, 83, 104, 125, 146, 167, 188, 209].map((x) => ({ x })),
+      ...SKY,
+      c2: { enabled: true, model: "sky", skyExponent: 1.5 },
+    },
+  },
   obliqueSun: {
     label: "M6: oblique sun",
     description: "A sky brighter to the right (tilt 0.5): the crown grows toward the sun (§C2.6).",

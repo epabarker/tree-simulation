@@ -14,12 +14,16 @@
  *  - Rays arriving from beyond the sides of the world are unobstructed (open sky), which is what
  *    gives edge trees their side light. Growth is still confined to the box: outside it Q = 0.
  *
- * Params: c2.K, c2.kExt (k_ext), c2.skyExponent (p), c2.skyTilt, c2.minElevation, c2.C.
+ * Params: c2.K, c2.kExt (k_ext), c2.skyExponent (p), c2.skyTilt, c2.minElevation, c2.C,
+ * c2.rotate.
  * Cost: O(K · W · H) per season, independent of the number of trees (§C2.11).
  */
 
 import { DEG, type Params, type Wall } from "../params.ts";
 import type { LightModel, LightSample } from "./light-model.ts";
+
+/** φ − 1: successive multiples mod 1 spread as evenly as any sequence can (Weyl, three-gap). */
+const GOLDEN = (Math.sqrt(5) - 1) / 2;
 
 export class SkySweep implements LightModel {
   readonly width: number;
@@ -35,6 +39,7 @@ export class SkySweep implements LightModel {
   readonly dirY: Float64Array<ArrayBuffer>;
   readonly weight: Float64Array<ArrayBuffer>;
   private readonly kExt: number;
+  private readonly c2: Params["c2"];
   private readonly depth: Float64Array<ArrayBuffer>;
   private shade: Float64Array<ArrayBuffer> | null = null;
 
@@ -48,23 +53,37 @@ export class SkySweep implements LightModel {
     this.vy = new Float64Array(n);
     this.depth = new Float64Array(n);
     this.kExt = c2.kExt;
-
+    this.c2 = c2;
     const K = Math.max(1, Math.floor(c2.K));
-    const lo = Math.min(89, Math.max(1, c2.minElevation)) * DEG;
     this.dirX = new Float64Array(K);
     this.dirY = new Float64Array(K);
     this.weight = new Float64Array(K);
+    this.setDirections(null);
+  }
+
+  /**
+   * Places the K sky directions between minElevation and 180° − minElevation, from +x (sky to
+   * the right) to −x. With `offset` null they include both ends and are symmetric about the
+   * zenith (the M6 grid). With an offset f in [0, 1) they sit at (k + f)/K of the span, one per
+   * equal stratum, so a per-season f moves every direction within its stratum (c2.rotate).
+   */
+  private setDirections(offset: number | null): void {
+    const { c2, dirX, dirY, weight } = this;
+    const K = weight.length;
+    const lo = Math.min(89, Math.max(1, c2.minElevation)) * DEG;
+    const span = Math.PI - 2 * lo;
     let total = 0;
     for (let k = 0; k < K; k++) {
-      // Angles from +x (sky to the right) to −x, evenly spread and symmetric about the zenith.
-      const theta = K === 1 ? Math.PI / 2 : lo + ((Math.PI - 2 * lo) * k) / (K - 1);
-      this.dirX[k] = Math.cos(theta);
-      this.dirY[k] = Math.sin(theta);
+      let theta: number;
+      if (offset !== null) theta = lo + (span * (k + offset)) / K;
+      else theta = K === 1 ? Math.PI / 2 : lo + (span * k) / (K - 1);
+      dirX[k] = Math.cos(theta);
+      dirY[k] = Math.sin(theta);
       const w = Math.sin(theta) ** c2.skyExponent * Math.max(0, 1 + c2.skyTilt * Math.cos(theta));
-      this.weight[k] = w;
+      weight[k] = w;
       total += w;
     }
-    for (let k = 0; k < K; k++) this.weight[k] = total > 0 ? (this.weight[k] * c2.C) / total : 0;
+    for (let k = 0; k < K; k++) weight[k] = total > 0 ? (weight[k] * c2.C) / total : 0;
   }
 
   clear(): void {
@@ -90,8 +109,14 @@ export class SkySweep implements LightModel {
     }
   }
 
-  /** Phase 1 of §6, after all deposits: one sweep per sky direction, then Q and V per cell. */
-  compute(): void {
+  /**
+   * Phase 1 of §6, after all deposits: one sweep per sky direction, then Q and V per cell.
+   * With c2.rotate the directions move by a golden-ratio step each season, so the streaks a
+   * small K leaves behind dense foliage fall in a different place every season and average out
+   * over a tree's life at no extra cost (deterministic, no RNG; the M6e K convergence note).
+   */
+  compute(season = 0): void {
+    if (this.c2.rotate) this.setDirections((0.5 + season * GOLDEN) % 1);
     this.q.fill(0);
     this.vx.fill(0);
     this.vy.fill(0);

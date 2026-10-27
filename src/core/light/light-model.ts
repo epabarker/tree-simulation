@@ -20,8 +20,8 @@ export interface LightModel {
   deposit(x: number, y: number, area?: number): void;
   /** A static shade source. */
   addWall(wall: Wall): void;
-  /** After all deposits (end of §6 Phase 1): derive the light field. */
-  compute(): void;
+  /** After all deposits (end of §6 Phase 1): derive the light field for this season. */
+  compute(season: number): void;
   /** Light Q and optimal direction V for a bud at (x, y) whose default direction is `dir` (radians). */
   sample(x: number, y: number, dir: number, out: LightSample): void;
   /** Per-cell shadow for overlays, or null when the model has no grid. */

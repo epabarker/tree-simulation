@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { type TreeMetrics, treeMetrics } from "./metrics.ts";
+import { groundLight, type TreeMetrics, treeMetrics } from "./metrics.ts";
 import { mergeParams, type ParamsPatch } from "./params.ts";
 import { type PresetName, presetParams } from "./presets.ts";
 import type { Tree } from "./tree.ts";
@@ -11,7 +11,7 @@ const median = (xs: number[]) => [...xs].sort((a, b) => a - b)[Math.floor(xs.len
 function grown(preset: PresetName, seed: number, seasons: number): TreeMetrics[] {
   const world = new World(presetParams(preset, seed));
   world.run(seasons);
-  return world.trees.map(treeMetrics);
+  return world.trees.map((t) => treeMetrics(t, world));
 }
 
 // One set of 45-season stands shared by the first two tests.
@@ -139,5 +139,42 @@ describe("M6d: relative shedding and short shoots (§C5, §R6; ADRs 0006, 0007)"
     expect(median(on.map((t) => t.total))).toBeGreaterThan(
       median(leafArea(false).map((t) => t.total)),
     );
+  });
+});
+
+describe("M6e: light calibration (§C2.4, §10)", () => {
+  it("measures full light on bare ground and less under a crown", () => {
+    const world = new World(presetParams("skyTree", 1)); // one tree at x = 60
+    world.run(20);
+    expect(groundLight(world, 0, 10)).toBeGreaterThan(0.8); // only shallow rays cross the crown
+    expect(treeMetrics(world.trees[0] as Tree, world).groundLight).toBeLessThan(0.5);
+  });
+
+  it("lets 2–10% of open-sky light reach the floor under a closed stand (5 seeds)", () => {
+    // `stands` are at season 45; interior trees 2–7 sit ≥ 40 cells from the open sides.
+    for (const trees of stands) {
+      const floor = trees.slice(2, -2).map((m) => m.groundLight);
+      const mean = floor.reduce((a, b) => a + b, 0) / floor.length;
+      expect(mean).toBeGreaterThan(0.02);
+      expect(mean).toBeLessThan(0.1);
+    }
+  });
+
+  it("gives the same stand at K = 7 as at K = 15 (sampling convergence, 5 seeds)", () => {
+    const at = (K: number) =>
+      SEEDS.flatMap((seed) => {
+        const world = new World(mergeParams(presetParams("skyStand", seed), { c2: { K } }));
+        world.run(45);
+        return world.trees.slice(1, -1).map((t) => treeMetrics(t, world));
+      });
+    const coarse = stands.flatMap((trees) => trees.slice(1, -1));
+    const fine = at(15);
+    const ratio = (key: keyof TreeMetrics) =>
+      median(coarse.map((m) => m[key] as number)) / median(fine.map((m) => m[key] as number));
+    for (const key of ["crownWidth", "height", "metamers", "slenderness"] as const) {
+      expect(Math.abs(ratio(key) - 1)).toBeLessThan(0.1);
+    }
+    expect(Math.abs(ratio("boleHeight") - 1)).toBeLessThan(0.25);
+    expect(fine.filter((m) => m.metamers <= 10)).toHaveLength(0);
   });
 });

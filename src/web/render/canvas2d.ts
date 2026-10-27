@@ -102,6 +102,13 @@ export class Canvas2DRenderer implements Renderer {
       ctx.fillStyle = this.theme.wall;
       for (const wall of s.walls) ctx.fillRect(wall.x, wall.y, wall.width, wall.height);
     }
+    if (view.showObstacles && s.obstacles.length > 0) {
+      ctx.save();
+      ctx.globalAlpha = 0.45;
+      ctx.fillStyle = this.theme.wall;
+      for (const o of s.obstacles) ctx.fillRect(o.x, o.y, o.width, o.height);
+      ctx.restore();
+    }
 
     scene.depth = view.depth;
     scene.leafStyle = LEAF_STYLES[view.leafStyle];

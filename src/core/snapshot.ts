@@ -9,7 +9,7 @@
  */
 
 import { type TreeMetrics, treeMetrics } from "./metrics.ts";
-import type { Wall } from "./params.ts";
+import type { Obstacle, Wall } from "./params.ts";
 import { isLiveBud } from "./principles/c3-allocation.ts";
 import { junctionExponents } from "./principles/c6-girth.ts";
 import type { F32, I32, U8 } from "./soa.ts";
@@ -50,6 +50,8 @@ export interface Snapshot {
   /** Shadow per cell (row-major, row 0 at the ground), or null when C2 is off or not asked for. */
   shadow: F32 | null;
   walls: Wall[];
+  /** Obstacles (ADR 0015), for the lab to outline. */
+  obstacles: Obstacle[];
   /** Leonardo exponent Δ at every junction of every live tree (C6 on and asked for), for the histogram. */
   junctions: F32;
   metrics: TreeMetrics[];
@@ -142,6 +144,7 @@ export class SnapshotBuilder {
       budQ: new Float32Array(nb),
       shadow: null,
       walls: world.params.c2.enabled ? world.params.world.walls : [],
+      obstacles: world.params.world.obstacles ?? [],
       junctions: new Float32Array(junctions),
       metrics: live.map((t) => treeMetrics(t, world)),
       seasonMs,

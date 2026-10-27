@@ -114,7 +114,7 @@ Newest first. One entry per session or milestone: what changed, why, surprises, 
   - The simulation *is* the home page.
   - The site is the private Astro repo `epabarker/edbarker-dev` on Cloudflare, and it receives the garden as a versioned GitHub Release that it vendors (ADR 0014).
   - Realism means botanical form, motion and physics, and seasons, all still in 2D.
-  - The home world is a mixed forest with succession, which needs species per tree (ADR 0015, at M19).
+  - The home world is a mixed forest with succession, which needs species per tree (ADR 0016, at M19).
 - **Roadmap:** M13–M21 added. "Later" items folded in: species onto R1–R5, oak, willow, beech, ground contact, far-red, embedding.
 - **Surprises** from reading the hot paths:
   - Periodic sides cost ≈ 27 grid sweeps a season, not 7.

@@ -48,6 +48,7 @@ const view: ViewOptions & { preset: PresetName } = {
   showBuds: false,
   showShadow: false,
   showGhosts: true,
+  showObstacles: true,
 };
 
 const hud = element("hud");
@@ -60,6 +61,7 @@ const garden = mountGarden(element("stage"), {
   // WebGL2 by default; `?renderer=canvas` forces the Canvas 2D fallback (for comparison).
   renderer: query.get("renderer") === "canvas" ? "canvas2d" : "auto",
   interaction: "full",
+  obstacles: null, // the lab's own obstacles come from the preset (ADR 0015)
   frame: "trees",
   headroom: 52, // the title and hint
   pace: null,

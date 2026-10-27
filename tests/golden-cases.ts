@@ -41,6 +41,7 @@ export const GOLDEN_CASES: GoldenCase[] = [
   { preset: "troll", seed: 1, seasons: 40 },
   { preset: "forest", seed: 1, seasons: 50 },
   { preset: "thinning", seed: 1, seasons: 30 },
+  { preset: "clearing", seed: 1, seasons: 50 },
 ];
 
 export function caseKey(c: GoldenCase): string {

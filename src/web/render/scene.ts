@@ -38,6 +38,8 @@ export interface ViewOptions {
   showGhosts: boolean;
   /** Leave out the back layer of leaves: the last step of adaptive quality (M15). */
   lite?: boolean;
+  /** Outline obstacles (ADR 0015): the lab shows them; a host page's content covers them. */
+  showObstacles?: boolean;
 }
 
 export interface Camera {

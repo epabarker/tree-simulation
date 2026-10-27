@@ -14,7 +14,8 @@ import { Tree } from "./tree.ts";
 /** A change applied at the start of `season` (before that season runs). */
 export type RunEvent =
   | { season: number; type: "params"; patch: ParamsPatch }
-  | { season: number; type: "removeTree"; tree: number };
+  | { season: number; type: "removeTree"; tree: number }
+  | { season: number; type: "plantTree"; x: number };
 
 /** Everything needed to reproduce a run: initial params plus the event log. */
 export interface RunRecord {
@@ -71,6 +72,14 @@ export class World {
     this.pending.push({ season: this.season, type: "removeTree", tree });
   }
 
+  /**
+   * Queues a seedling at x for the next season boundary (a visitor sowing, D2). It is appended
+   * to `trees` like an O4 recruit, unless a live trunk stands within a cell of x.
+   */
+  plantTree(x: number): void {
+    this.pending.push({ season: this.season, type: "plantTree", x });
+  }
+
   /** Applies queued events, plants due seedlings and runs one season (`mark`: phase timer). */
   step(mark?: PhaseMark): void {
     for (const event of this.pending) this.apply({ ...event, season: this.season });
@@ -118,6 +127,14 @@ export class World {
     if (event.type === "params") {
       this.params = mergeParams(this.params, event.patch);
       this.light = makeLight(this.params);
+    } else if (event.type === "plantTree") {
+      const { width: W, sides } = this.params.world;
+      const x = sides === "periodic" ? ((event.x % W) + W) % W : event.x;
+      if (x < 0 || x >= W) return;
+      if (this.trees.some((t) => t.alive && Math.abs(t.rootX - x) < 1)) return;
+      const tree = new Tree(this.trees.length, x);
+      plantSeedling(tree, this.params, this.season);
+      this.trees.push(tree);
     } else {
       const tree = this.trees[event.tree];
       if (tree) tree.alive = false;

@@ -20,7 +20,7 @@ _Last updated: 2026-10-27_
 2. **M16** motion: wind sway, falling branches, toppling trees (which also cover the season of latency pipelining adds to a tap). Then **M17** seasons and **M18–M21**.
 
 ## Open questions (ask when the milestone comes up)
-- ADR 0015, species per tree (M19). Amendments to ADR 0011 and §O2 (M16), and to ADR 0005 (M18). Art direction (M21).
+- ADR 0016, species per tree (M19). Amendments to ADR 0011 and §O2 (M16), and to ADR 0005 (M18). Art direction (M21).
 
 ## Parked (user, 2026-10-27; raise again only when asked)
 - The Pages demo URL is unreachable (`barker.garden` NXDOMAIN; `edbarker.dev/lab` works around it). Delete the early `runs/` and `dist/` copies on pCloud?

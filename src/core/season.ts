@@ -17,6 +17,7 @@ import { crownTopLight, shedBranches } from "./principles/c5-shedding.ts";
 import { updateGirth } from "./principles/c6-girth.ts";
 import { abrade, EMPTY, tagOwner } from "./principles/o2-shyness.ts";
 import { standDynamics } from "./principles/o4-stand.ts";
+import { clearObstacles } from "./principles/obstacles.ts";
 import { carbonBalance, starvedToDeath } from "./principles/r1-carbon.ts";
 import { directionParams } from "./principles/r2-physiological-age.ts";
 import { updateMechanics } from "./principles/r3-mechanics.ts";
@@ -56,7 +57,14 @@ export function runSeason(world: World, mark: PhaseMark = noMark): void {
   for (const tree of world.trees) if (tree.alive) live.push(tree);
   const carbonShedding = params.r1.enabled && params.r1.shed === "carbon";
 
-  // Phase 1: environment from the start-of-season snapshot (C2).
+  // Phase 1: environment from the start-of-season snapshot (C2). Obstacles first (ADR 0015): a
+  // branch the page's layout now covers is shed before it deposits foliage or shade.
+  if (params.world.obstacles?.length) {
+    for (const tree of live) {
+      tree.shedCount = clearObstacles(tree, params);
+    }
+    for (let i = live.length - 1; i >= 0; i--) if (!(live[i] as Tree).alive) live.splice(i, 1);
+  }
   light.clear();
   const abrasion = params.o2.enabled;
   if (abrasion) world.owner.fill(EMPTY);
@@ -99,6 +107,11 @@ export function runSeason(world: World, mark: PhaseMark = noMark): void {
     if (params.c6.enabled) updateGirth(tree, params); // C6, after shedding so scars count
     mark("girth");
     if (params.r3.enabled) updateMechanics(tree, params); // R3 MECHANICS: girth first (§6 rule 2)
+    // Obstacles again (ADR 0015): a limb that sagged into one this season is shed now, so no season
+    // ends with wood inside the page's content.
+    if (params.world.obstacles?.length) {
+      tree.shedCount += clearObstacles(tree, params, params.r3.enabled ? [tree.stress] : []);
+    }
     mark("mechanics");
     commitBuds(tree);
     tree.age += 1;

@@ -513,6 +513,7 @@ export class WebGL2Renderer implements Renderer {
       view.depth,
       view.leafStyle,
       view.showBuds,
+      view.showObstacles,
       ghosts,
       this.themeVersion,
     ].join();
@@ -528,7 +529,7 @@ export class WebGL2Renderer implements Renderer {
       else this.leafBatch.count = this.leafBackBatch.count = 0;
       if (view.showBuds) this.buildBuds(s, view.colorMode === "light");
       else this.budBatch.count = 0;
-      this.buildWalls(s);
+      this.buildWalls(s, view);
       this.uploaded = { next: s, prev: scene.prev, key };
     }
 
@@ -701,13 +702,18 @@ export class WebGL2Renderer implements Renderer {
     this.upload(batch, n);
   }
 
-  private buildWalls(s: Snapshot): void {
-    const n = s.walls.length;
+  /** Walls in the wall colour, and with `showObstacles` (the lab) the obstacles as fainter boxes. */
+  private buildWalls(s: Snapshot, view: ViewOptions): void {
+    const rects = [
+      ...s.walls.map((w) => ({ ...w, alpha: 1 })),
+      ...(view.showObstacles ? s.obstacles.map((o) => ({ ...o, alpha: 0.45 })) : []),
+    ];
+    const n = rects.length;
     const batch = this.wallBatch;
     const rect = this.stream<Floats>(batch, "a_rect", n);
     const color = this.stream<Bytes>(batch, "a_color", n);
     const [cr, cg, cb, ca] = parseColor(this.theme.wall);
-    s.walls.forEach((wall, k) => {
+    rects.forEach((wall, k) => {
       rect[4 * k] = wall.x;
       rect[4 * k + 1] = wall.y;
       rect[4 * k + 2] = wall.width;
@@ -715,7 +721,7 @@ export class WebGL2Renderer implements Renderer {
       color[4 * k] = cr;
       color[4 * k + 1] = cg;
       color[4 * k + 2] = cb;
-      color[4 * k + 3] = ca;
+      color[4 * k + 3] = Math.round(ca * wall.alpha);
     });
     this.upload(batch, n);
   }

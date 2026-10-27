@@ -15,6 +15,8 @@ import { allocate, gatherLight, isLiveBud } from "./principles/c3-allocation.ts"
 import { shootDirection } from "./principles/c4-direction.ts";
 import { crownTopLight, shedBranches } from "./principles/c5-shedding.ts";
 import { updateGirth } from "./principles/c6-girth.ts";
+import { abrade, EMPTY, tagOwner } from "./principles/o2-shyness.ts";
+import { standDynamics } from "./principles/o4-stand.ts";
 import { carbonBalance, starvedToDeath } from "./principles/r1-carbon.ts";
 import { directionParams } from "./principles/r2-physiological-age.ts";
 import { updateMechanics } from "./principles/r3-mechanics.ts";
@@ -35,6 +37,8 @@ export function runSeason(world: World): void {
 
   // Phase 1: environment from the start-of-season snapshot (C2).
   light.clear();
+  const abrasion = params.o2.enabled;
+  if (abrasion) world.owner.fill(EMPTY);
   if (params.c2.enabled) {
     for (const wall of params.world.walls) light.addWall(wall);
     for (const tree of live) depositBuds(world, tree);
@@ -72,8 +76,15 @@ export function runSeason(world: World): void {
     tree.age += 1;
   }
 
-  // Phase 3: deaths last (§6), so a dead tree's shade is gone next season. O2 and O4 come later.
+  // Phase 3: deaths last (§6), so a dead tree's shade is gone next season; then O4 recruitment.
+  const { width: W, height: H } = params.world;
+  const periodic = params.world.sides === "periodic";
+  for (const tree of live) {
+    tree.abraded = abrasion ? abrade(tree, world.owner, W, H, periodic, params, season) : 0; // O2
+  }
   for (const tree of live) if (starvedToDeath(tree, params.r1)) tree.alive = false;
+  for (const tree of live) tree.seeds = 0;
+  if (params.o4.enabled) world.recruits = standDynamics(world); // O4: background deaths, seeds
 }
 
 function depositBuds(world: World, tree: Tree): void {
@@ -85,6 +96,7 @@ function depositBuds(world: World, tree: Tree): void {
     if (area === 0) continue;
     const m = b.metamer[i];
     world.light.deposit(tree.tipX(m), tree.tipY(m), area);
+    if (world.params.o2.enabled) tagFoliage(world, tree, tree.tipX(m), tree.tipY(m)); // O2 owners
   }
 }
 
@@ -96,6 +108,16 @@ function sampleNodes(world: World, tree: Tree): void {
     world.light.sample(tree.tipX(i), tree.tipY(i), c.angle[i], sample);
     tree.nodeShade[i] = shadeOf(sample.q, C);
   }
+}
+
+/** O2: tags the cell at (x, y) as holding foliage of `tree`. */
+function tagFoliage(world: World, tree: Tree, x: number, y: number): void {
+  const { width: W, height: H } = world.params.world;
+  let col = Math.floor(x);
+  const row = Math.floor(y);
+  if (world.params.world.sides === "periodic") col = ((col % W) + W) % W;
+  if (col < 0 || col >= W || row < 0 || row >= H) return;
+  tagOwner(world.owner, W, col, row, tree.id);
 }
 
 function sampleBuds(world: World, tree: Tree): void {

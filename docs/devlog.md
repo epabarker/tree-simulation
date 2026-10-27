@@ -2,6 +2,34 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-27: M11, a forest without edges
+
+- **Merged** the M10 PR (epabarker/tree-simulation#4) at the user's request.
+- **Periodic sides** (`world.sides: "periodic"`, ADR 0013): the sky sweep wraps deposits, samples and rays.
+  - Shallow rays are swept ⌈3H/(rise·W)⌉ + 1 laps around the ring. With only enough laps for a ray to climb out, the interpolation's diffusion left a 2·10⁻⁵ seam error; three times as many make the field translation invariant.
+  - On a 210-cell ring, edge trees lean 1.5 cells instead of 4.1, floor light falls to 3.4%, and crown base rises to 45. Light costs ≈ 2.5× (23 against 9 ms a season).
+- **O4** (`principles/o4-stand.ts`), in Phase 3:
+  - background mortality m₀;
+  - a seed pool fed by R1's reproductive sink, one seed per c_seed;
+  - Laplace dispersal;
+  - establishment where start-of-season ground light ≥ Q_est, with p_est, no trunk within a cell, and at most `maxTrees`.
+  - Recruits are appended to `world.trees`.
+- **O2** (`principles/o2-shyness.ts`): an owner grid from the light deposits; a leafy bud swaying k·Q·h/r into another tree's foliage dies with p_abr. The girth bonus is not built. Off in every preset.
+- **Metrics:** `rootX`, `woodVolume`, `abraded`, `seeds`. **Presets:** `forest` (ring, f_rep 0.1 above 40 cells, O4) and `thinning` (60 seedlings 3.5 cells apart). **Page:** O2 and O4 folders.
+- **Results** ([note](experiments/2026-10-27-m11-stand-dynamics.md)):
+  - Self-thinning emerges from R1 starvation alone: every planting density converges on 15–17 trees, and dense stands follow slope −2.8 to −3.1, §10's hypothesis for 3D cylinder mass.
+  - Peak CV rises with density (0.61 against 0.30).
+  - Bimodality is marginal (0.54–0.86 at its peak, unimodal at the end).
+  - The forest holds a 7–8-tree canopy for 300 seasons, half the planted trees die, and a felled tree's gap draws 3× the recruits.
+- **Surprises.**
+  - Crown shyness needs no abrasion here: neighbouring crowns touch in only ≈ 3% of canopy rows, so O2 has little to do.
+  - The fitted slope steepens for sparse plantings, which reach the line late while still growing.
+  - A bimodality peak of 1.70 in every run turned out to be the first seasons' near-identical seedlings; it is measured over the thinning phase only.
+  - The CLI's metrics `season` starts at 1, which an empty first table revealed.
+- **Tests:** periodic tests in `sky-sweep.test.ts` (3), `principles/o2-o4.test.ts` (8), `forest.test.ts` (3; the slow ones have 90 s timeouts).
+- **Goldens:** `forest` and `thinning` added. No existing hash changed (sides default to open; O2 and O4 are off).
+- **Seen** on the page in headless Chromium: both presets run, with recruits in the understory, the thinned stand, and growing tree counts in the charts. No console errors.
+
 ## 2026-10-27: M10, dormancy, release and shade avoidance
 
 - **Merged** the M9 PR (epabarker/tree-simulation#3) at the user's request.

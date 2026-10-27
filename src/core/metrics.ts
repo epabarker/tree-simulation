@@ -11,6 +11,8 @@ import type { World } from "./world.ts";
 export interface TreeMetrics {
   tree: number;
   alive: boolean;
+  /** Root position along the ground (O4 recruits land anywhere). */
+  rootX: number;
   age: number;
   metamers: number;
   buds: number;
@@ -31,6 +33,8 @@ export interface TreeMetrics {
   /** Mean Q over the buds sampled this season. */
   meanBudQ: number;
   trunkRadius: number;
+  /** Wood volume Σ π r² l over all metamers: the tree's mass for self-thinning (O4, §10). */
+  woodVolume: number;
   /** Height over trunk base diameter (slenderness, §10; stand-grown trees ≈ 60–80). */
   slenderness: number;
   /** Metamers shed this season (C5). */
@@ -49,6 +53,9 @@ export interface TreeMetrics {
   reproduction: number;
   starved: number;
   /** This season: dormant buds that grew a shoot, dormant buds aborted (R4), metamers lost to breakage (R3). */
+  /** O2: buds lost to abrasion; O4: seeds made this season. */
+  abraded: number;
+  seeds: number;
   released: number;
   /** Of those, released from trunk wood at least 10 seasons old: epicormic shoots. */
   epicormic: number;
@@ -59,6 +66,7 @@ export interface TreeMetrics {
 export const METRIC_COLUMNS: readonly (keyof TreeMetrics)[] = [
   "tree",
   "alive",
+  "rootX",
   "age",
   "metamers",
   "buds",
@@ -72,6 +80,7 @@ export const METRIC_COLUMNS: readonly (keyof TreeMetrics)[] = [
   "vBase",
   "meanBudQ",
   "trunkRadius",
+  "woodVolume",
   "slenderness",
   "shed",
   "groundLight",
@@ -80,6 +89,8 @@ export const METRIC_COLUMNS: readonly (keyof TreeMetrics)[] = [
   "reserve",
   "reproduction",
   "starved",
+  "abraded",
+  "seeds",
   "released",
   "epicormic",
   "aborted",
@@ -111,7 +122,9 @@ export function treeMetrics(tree: Tree, world?: World): TreeMetrics {
   let maxX = Number.NEGATIVE_INFINITY;
   let sumX = 0;
   let bole = Number.POSITIVE_INFINITY;
+  let wood = 0;
   for (let i = 0; i < nm; i++) {
+    wood += Math.PI * c.radius[i] * c.radius[i] * c.length[i];
     const x = tree.tipX(i);
     const y = tree.tipY(i);
     if (y > height) height = y;
@@ -134,6 +147,7 @@ export function treeMetrics(tree: Tree, world?: World): TreeMetrics {
   return {
     tree: tree.id,
     alive: tree.alive,
+    rootX: tree.rootX,
     age: tree.age,
     metamers: nm,
     buds,
@@ -147,6 +161,7 @@ export function treeMetrics(tree: Tree, world?: World): TreeMetrics {
     vBase: tree.vBase,
     meanBudQ: tree.meanBudQ,
     trunkRadius: nm > 0 ? c.radius[0] : 0,
+    woodVolume: wood,
     slenderness: nm > 0 && c.radius[0] > 0 ? height / (2 * c.radius[0]) : 0,
     shed: tree.shedCount,
     groundLight: world && nm > 0 ? groundLight(world, minX, maxX) : Number.NaN,
@@ -155,6 +170,8 @@ export function treeMetrics(tree: Tree, world?: World): TreeMetrics {
     reserve: tree.reserve,
     reproduction: tree.reproduction,
     starved: tree.starved,
+    abraded: tree.abraded,
+    seeds: tree.seeds,
     released: tree.released,
     epicormic: tree.epicormic,
     aborted: tree.aborted,

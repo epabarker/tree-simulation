@@ -34,6 +34,12 @@ export interface Params {
     height: number;
     /** Static shade sources (M3 "lean away from a wall"). */
     walls: Wall[];
+    /**
+     * World sides for the sky sweep: 'open' lets open sky in from beyond them (ADR 0005), so a
+     * stand is an island lit from its edges (M6e); 'periodic' wraps light, foliage and growth
+     * around, so the stand continues for ever on both sides (M11, ADR 0013). Optional: 'open'.
+     */
+    sides?: "open" | "periodic";
   };
   trees: TreeSpec[];
 
@@ -288,6 +294,41 @@ export interface Params {
     dA: number;
   };
 
+  /**
+   * O2 Wind abrasion and crown shyness (spec §O2, ADR 0013): a leafy bud that sways into another
+   * tree's foliage dies with probability p_abr. Off = baseline.
+   */
+  o2: {
+    enabled: boolean;
+    /** k_sway: sway A = k_sway·Q·h/r cells (calibrate). */
+    sway: number;
+    /** Largest sway, in cells. */
+    maxSway: number;
+    /** p_abr: probability a touching bud dies in a season (calibrate). */
+    pAbr: number;
+  };
+
+  /**
+   * O4 Stand dynamics (spec §O4, ADR 0013): background mortality, seeds from R1's reproductive
+   * sink, Laplace dispersal and establishment in ground light. Needs R1 with f_rep > 0 for seeds.
+   * Off = baseline: the planted trees only.
+   */
+  o4: {
+    enabled: boolean;
+    /** c_seed: reproductive carbon per seed (calibrate). */
+    cSeed: number;
+    /** d: Laplace dispersal scale in cells (calibrate). */
+    d: number;
+    /** Q_est: ground light, as a fraction of open sky, a seed needs to establish (calibrate). */
+    qEst: number;
+    /** p_est: probability that a seed on lit ground establishes (calibrate). */
+    pEst: number;
+    /** m₀: background mortality per tree per season (calibrate). */
+    m0: number;
+    /** Cap on live trees, so a page cannot run away. */
+    maxTrees: number;
+  };
+
   /** R6 Short shoots (spec §R6, ADR 0006). Off = baseline: every live bud is one unit of leaf area. */
   r6: {
     enabled: boolean;
@@ -398,6 +439,9 @@ export const defaultParams: Params = {
   },
   r5: { enabled: false, eS: 0.1, dLambda: 0.02, dB: 1, dA: 0.5 },
   r6: { enabled: false, qMin: 0.2, leafArea: 1 }, // calibrate (M6d)
+  // M11 calibration (docs/experiments/2026-10-27-m11-stand-dynamics.md).
+  o2: { enabled: false, sway: 0.0005, maxSway: 3, pAbr: 0.5 },
+  o4: { enabled: false, cSeed: 5, d: 20, qEst: 0.1, pEst: 0.3, m0: 0.002, maxTrees: 300 },
 };
 
 /** A partial set of overrides, merged one level deep into each section. */

@@ -29,15 +29,9 @@ import {
 import type { Snapshot } from "../../core/snapshot.ts";
 import { BudState } from "../../core/tree.ts";
 import { BUD_ACTIVE, BUD_DORMANT, parseColor, SEQUENTIAL, shadeImage } from "./colors.ts";
+import { LEAF_STYLES } from "./leaf-styles.ts";
 import { MAX_DPR, type Renderer } from "./renderer.ts";
-import {
-  LEAF_ASPECT,
-  LEAF_LENGTH,
-  LEAF_MIN_PX,
-  type Leaves,
-  Scene,
-  type ViewOptions,
-} from "./scene.ts";
+import { LEAF_MIN_PX, type Leaves, Scene, type ViewOptions } from "./scene.ts";
 import { readTheme, type Theme } from "./theme.ts";
 
 // World → clip space: x_clip = (x − cx)·sx, y_clip = groundClip + y·sy, with u_view = (cx, sx, groundClip, sy).
@@ -480,6 +474,7 @@ export class WebGL2Renderer implements Renderer {
       view.colorMode,
       view.showLeaves ? view.leafAge : -1,
       view.depth,
+      view.leafStyle,
       view.showBuds,
       ghosts,
       this.themeVersion,
@@ -487,6 +482,7 @@ export class WebGL2Renderer implements Renderer {
     const u = this.uploaded;
     if (u.next !== s || u.prev !== scene.prev || u.key !== key) {
       scene.depth = view.depth;
+      scene.leafStyle = LEAF_STYLES[view.leafStyle];
       scene.computeGeometry(t);
       this.buildSegments(s, view);
       if (ghosts) this.buildGhosts(1 - t);
@@ -502,7 +498,7 @@ export class WebGL2Renderer implements Renderer {
     const uniforms = {
       u_view: [cx, (2 * scale) / w, 1 - (2 * groundY) / h, (2 * scale) / h],
       u_px: 1 / scale,
-      u_leaf: [LEAF_LENGTH, LEAF_ASPECT, LEAF_MIN_PX],
+      u_leaf: [scene.leafStyle.length, scene.leafStyle.aspect, LEAF_MIN_PX],
       u_point: [BUD_SIDE_PX, BUD_MIN_SIDE],
     };
     if (view.showShadow && this.hasShade && this.shadeTexture) {
@@ -602,7 +598,7 @@ export class WebGL2Renderer implements Renderer {
 
   private buildLeaves(leafAge: number, t: number): void {
     const leaves = this.scene.leaves(leafAge, t);
-    const palette = this.paletteBytes(this.theme.leaf, 0.92);
+    const palette = this.paletteBytes(this.theme.leaf[this.scene.leafStyle.palette], 0.92);
     this.fillLeaves(this.leafBackBatch, leaves, 0, leaves.back, palette);
     this.fillLeaves(this.leafBatch, leaves, leaves.back, leaves.count, palette);
   }

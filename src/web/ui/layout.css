@@ -19,6 +19,13 @@
   --bark-old: #4c3d31;
   --leaf-shade: #35502a;
   --leaf-sun: #a3cf5b;
+  /* Species foliage (render/leaf-styles.ts): fir needles, birch, Terminalia. */
+  --needle-shade: #1f3b2c;
+  --needle-sun: #5d8a5a;
+  --birch-leaf-shade: #4a6a2a;
+  --birch-leaf-sun: #c3dc6a;
+  --tropical-leaf-shade: #1d4a26;
+  --tropical-leaf-sun: #6fb04a;
   --ghost: #9a8f80;
   --wall: rgba(90, 90, 100, 0.35);
   color-scheme: light dark;
@@ -42,6 +49,12 @@
     --bark-old: #7a6552;
     --leaf-shade: #2d4824;
     --leaf-sun: #8fbf4f;
+    --needle-shade: #1a3326;
+    --needle-sun: #507a4f;
+    --birch-leaf-shade: #3f5c25;
+    --birch-leaf-sun: #a9c45a;
+    --tropical-leaf-shade: #18401f;
+    --tropical-leaf-sun: #5f9a3f;
     --ghost: #6f6a62;
     --wall: rgba(160, 160, 175, 0.25);
   }
@@ -64,6 +77,12 @@
   --bark-old: #7a6552;
   --leaf-shade: #2d4824;
   --leaf-sun: #8fbf4f;
+  --needle-shade: #1a3326;
+  --needle-sun: #507a4f;
+  --birch-leaf-shade: #3f5c25;
+  --birch-leaf-sun: #a9c45a;
+  --tropical-leaf-shade: #18401f;
+  --tropical-leaf-sun: #5f9a3f;
   --ghost: #6f6a62;
   --wall: rgba(160, 160, 175, 0.25);
 }

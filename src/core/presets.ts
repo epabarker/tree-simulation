@@ -15,6 +15,8 @@ export interface Preset {
   label: string;
   description: string;
   patch: ParamsPatch;
+  /** Page only: how the page draws this preset's foliage (src/web/render/leaf-styles.ts). */
+  leaf?: string;
 }
 
 /** Principles shared by every stand preset (C2–C6 on, λ = 0.5). */
@@ -293,28 +295,33 @@ export const presets = {
     },
   },
   conifer: {
+    leaf: "needle",
     label: "M7: conifer (fir-like)",
     description:
       "Massart's model, as in Abies: a straight trunk with a tier of flat branches each season (§9).",
     patch: { world: { width: 120, height: 160, walls: [] }, trees: [{ x: 60 }], ...CONIFER },
   },
   coniferStand: {
+    leaf: "needle",
     label: "M7: conifer stand",
     description: "Ten fir-like trees: narrow spires with clear boles (§9).",
     patch: { world: { width: 230, height: 160, walls: [] }, trees: STAND_X, ...CONIFER },
   },
   birch: {
+    leaf: "small",
     label: "M7: pioneer (birch-like)",
     description:
       "Light-demanding and slender, like Betula: a leader when young, fine steep branches, hanging twigs (§9).",
     patch: { world: { width: 120, height: 160, walls: [] }, trees: [{ x: 60 }], ...BIRCH },
   },
   birchStand: {
+    leaf: "small",
     label: "M7: pioneer stand",
     description: "Ten birch-like trees: open, slender crowns that lift fast (§9).",
     patch: { world: { width: 230, height: 160, walls: [] }, trees: STAND_X, ...BIRCH },
   },
   tropical: {
+    leaf: "large",
     label: "M7: tiered tropical tree (Terminalia-like)",
     description:
       "Aubréville's model, as in Terminalia catappa: a pagoda of flat tiers of forking branch modules (§9).",

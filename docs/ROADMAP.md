@@ -24,6 +24,7 @@ Status key: ✅ done · 🚧 in progress · ⏳ not started.
 | M9 | R3 mechanics | Drooping limbs with upturned tips; willow; Troll straightening | — Expect Δ > 2 at heavy, wide junctions | ⏳ |
 | M10 | R4 dormancy/release + R5 shade avoidance (elongation, fewer bud breaks, upright A_set) | Epicormic flush after neighbour removal; slender stand trees | — | ⏳ |
 | M11 | O4 stand dynamics, then O2 | Log–log thinning line; crown gaps | — Validate slope, size CV and bimodality together. First give the world sides that act like a continuing forest (periodic, or canopy beyond the sides): open sides light every stand from its edges (M6e) | ⏳ |
+| M12 | Independent review by another agent (user, 2026-10-27) | — | A fresh agent with no session context reviews the whole project: spec and ADR conformance principle by principle, correctness of the core (invariants, determinism, staging), test strength (do the checks test the claims?), experiment validity (seeds, confounds, over-claiming), the page, and the docs. It writes a findings report in `docs/reviews/`; findings are triaged with the user and fixed or recorded before any post-build-order direction starts | ⏳ |
 
 ### Reading before each milestone
 From the [2026-10-27 literature review](research/2026-10-27-literature-review.md) §5.
@@ -79,4 +80,4 @@ No published value exists for these. Calibrate on *patterns*: several weak targe
 - Depth beyond ADR 0008, held: parallel transects drawn behind each other (forest depth), or a thick 3D slab (W × D × H, about 50× the light cost; reverses spec §2). Revisit if trees must be seen from an angle.
 - Shareable URLs that hold the seed, preset and param edits.
 - Embedding in the personal website.
-- **Revisit species (user, 2026-10-27; ADR 0009)** once their prerequisites exist, preferably after all main milestones: an oak-like spreading crown (heavy limbs, R3), a weeping willow (R3) and a Troll-model beech (R3 straightening). Also a per-species leaf style on the page (needle sprays for conifers).
+- **Revisit species (user, 2026-10-27; ADR 0009)** once their prerequisites exist, preferably after all main milestones: an oak-like spreading crown (heavy limbs, R3), a weeping willow (R3) and a Troll-model beech (R3 straightening).

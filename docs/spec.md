@@ -370,6 +370,7 @@ Ordering: (1) every tree reads the same snapshot, so iteration order cannot bias
 | M9 | R3 | Drooping limbs with upturned tips; willow; Troll straightening |
 | M10 | R4 + R5 | Epicormic flush after neighbour removal; slender stand trees |
 | M11 | O4, then O2 | Log–log thinning line; crown gaps |
+| M12 | Independent review | A fresh agent's findings report, triaged with the user |
 
 ---
 

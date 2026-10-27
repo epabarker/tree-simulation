@@ -19,6 +19,7 @@
 import type { Snapshot } from "../../core/snapshot.ts";
 import { BudState } from "../../core/tree.ts";
 import { CATEGORICAL, SEQUENTIAL } from "./colors.ts";
+import { LEAF_STYLES, type LeafStyle, type LeafStyleName } from "./leaf-styles.ts";
 import { RAMP_STEPS, type Theme } from "./theme.ts";
 
 export type ColorMode = "natural" | "order" | "light" | "resource" | "age" | "tree";
@@ -30,6 +31,8 @@ export interface ViewOptions {
   depth: boolean;
   /** Metamers up to this many seasons old carry a leaf. */
   leafAge: number;
+  /** How foliage is drawn (leaf-styles.ts); species presets pick one. */
+  leafStyle: LeafStyleName;
   showBuds: boolean;
   showShadow: boolean;
   showGhosts: boolean;
@@ -77,20 +80,18 @@ const GROUND_MARGIN = 18;
 const HEADER_MARGIN = 52;
 /** Time constant of the camera's easing toward its fitted target, ms. */
 const CAMERA_EASE_MS = 380;
-/** Leaf length in world units (one unit = one internode), and width over length. */
-export const LEAF_LENGTH = 1.1;
-export const LEAF_ASPECT = 0.41;
+/** Default (broadleaf) leaf length in world units (one unit = one internode), and width over length. */
+export const LEAF_LENGTH = LEAF_STYLES.broadleaf.length;
+export const LEAF_ASPECT = LEAF_STYLES.broadleaf.aspect;
 /** Leaves never draw shorter than this on screen, so zoomed-out crowns still read as foliage. */
 export const LEAF_MIN_PX = 5;
 
-/** Length of a full-size leaf in world units at `scale` CSS pixels per world unit. */
-export function leafLength(scale: number): number {
-  return Math.max(LEAF_LENGTH, LEAF_MIN_PX / scale);
+/** Length of a full-size leaf of `length` world units at `scale` CSS pixels per world unit. */
+export function leafLength(scale: number, length: number = LEAF_LENGTH): number {
+  return Math.max(length, LEAF_MIN_PX / scale);
 }
-/** Angle between a leaf and its shoot. */
-const LEAF_SPREAD = 0.95;
-/** Leaves per cluster in the pseudo-depth view, spaced evenly around the shoot. */
-export const CLUSTER_LEAVES = 3;
+/** Leaves per cluster in the pseudo-depth view for the default (broadleaf) style. */
+export const CLUSTER_LEAVES = LEAF_STYLES.broadleaf.cluster;
 /**
  * Least foreshortening of a limb's spread. A fully random azimuth (squeeze |sin φ|) narrows crowns
  * by a third and breaks a stand's closed canopy into separate crowns, which misreads a stand whose
@@ -149,6 +150,8 @@ export class Scene {
   dpr = 1;
   /** Pseudo-depth on (natural view) or off (x-ray); renderers copy `ViewOptions.depth` here. */
   depth = false;
+  /** Foliage style; renderers copy `LEAF_STYLES[ViewOptions.leafStyle]` here. */
+  leafStyle: LeafStyle = LEAF_STYLES.broadleaf;
   /**
    * Per metamer, the 2×2 map from simulated to drawn direction (row-major a b / c d) and the
    * depth of its axis in [−1, 1]. Identity and 0 everywhere when `depth` is off.
@@ -437,8 +440,9 @@ export class Scene {
    * (RAMP_STEPS indices) by the light its subtree gathers. Leaves unfold as their metamer grows in
    * and shrink away during the season in which they pass `leafAge`. Short shoots (R6) on older wood
    * carry a rosette, coloured by their own light, so drawn foliage matches simulated foliage. In
-   * the x-ray view a young metamer carries one leaf on alternating sides and a rosette two; with
-   * `depth` on each carries CLUSTER_LEAVES leaves spaced around the shoot, each foreshortened by
+   * the x-ray view a young metamer carries one leaf on alternating sides (two, one each side, for
+   * styles with `xray` 2) and a rosette two; with `depth` on each carries the style's `cluster`
+   * leaves spaced around the shoot, each foreshortened by
    * its out-of-plane angle, and those whose depth falls behind the plane go first, darkened, as
    * the back layer.
    */
@@ -449,7 +453,8 @@ export class Scene {
     out.back = 0;
     if (!s) return out;
     const n = s.metamerCount;
-    const per = this.depth ? CLUSTER_LEAVES : 2;
+    const style = this.leafStyle;
+    const per = this.depth ? style.cluster : 2;
     if (out.x.length < (n + s.budCount) * per) {
       const cap = (n + s.budCount) * per * 2;
       out.x = new Float32Array(cap);
@@ -478,6 +483,7 @@ export class Scene {
         if (!this.depth) {
           const side = s.birthId[j] & 1 ? 1 : -1;
           k = this.leafAt(k, j, side, size, c);
+          if (style.xray === 2) k = this.leafAt(k, j, -side, size, c);
         } else {
           k = this.cluster(k, j, s.birthId[j], pass, size, c);
         }
@@ -505,7 +511,8 @@ export class Scene {
   /** One x-ray leaf at metamer j's tip, on `side` (±1) of its shoot. */
   private leafAt(k: number, j: number, side: number, size: number, c: number): number {
     const g = this.geom;
-    const ang = Math.atan2(g.tipY[j] - g.baseY[j], g.tipX[j] - g.baseX[j]) + side * LEAF_SPREAD;
+    const spread = this.leafStyle.spread;
+    const ang = Math.atan2(g.tipY[j] - g.baseY[j], g.tipX[j] - g.baseX[j]) + side * spread;
     return this.pushLeaf(k, g.tipX[j], g.tipY[j], Math.cos(ang), Math.sin(ang), size, c);
   }
 
@@ -516,11 +523,12 @@ export class Scene {
     const shoot = Math.atan2(g.tipY[j] - g.baseY[j], g.tipX[j] - g.baseX[j]);
     const dx = Math.cos(shoot);
     const dy = Math.sin(shoot);
-    const along = Math.cos(LEAF_SPREAD);
-    const across = Math.sin(LEAF_SPREAD);
+    const { spread, cluster } = this.leafStyle;
+    const along = Math.cos(spread);
+    const across = Math.sin(spread);
     const turn = hash01(s.tree[j], id, 2);
-    for (let i = 0; i < CLUSTER_LEAVES; i++) {
-      const psi = 2 * Math.PI * (turn + i / CLUSTER_LEAVES);
+    for (let i = 0; i < cluster; i++) {
+      const psi = 2 * Math.PI * (turn + i / cluster);
       const z = 0.6 * this.axisZ[j] + 0.4 * Math.sin(psi);
       if ((z < 0 ? 0 : 1) !== pass) continue;
       // Leaf direction in 3D is along·d + across·(n cos ψ + z-axis sin ψ); drawn in-plane part.

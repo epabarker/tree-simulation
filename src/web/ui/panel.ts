@@ -7,6 +7,7 @@
 import { Pane } from "tweakpane";
 import type { Params, ParamsPatch } from "../../core/params.ts";
 import { type PresetName, presets } from "../../core/presets.ts";
+import type { LeafStyleName } from "../render/leaf-styles.ts";
 import type { ColorMode, ViewOptions } from "../render/scene.ts";
 
 interface FieldSpec {
@@ -250,10 +251,17 @@ export class Panel {
     viewFolder.addBinding(view, "colorMode", { label: "colour", options: colorOptions });
     viewFolder.addBinding(view, "showLeaves", { label: "leaves" });
     viewFolder.addBinding(view, "depth", { label: "depth (off = x-ray)" });
+    const leafOptions: Record<string, LeafStyleName> = {
+      broadleaf: "broadleaf",
+      "needles (conifer)": "needle",
+      "small (birch)": "small",
+      "large (tropical)": "large",
+    };
+    viewFolder.addBinding(view, "leafStyle", { label: "leaf style", options: leafOptions });
     viewFolder.addBinding(view, "leafAge", {
       label: "leaf age (seasons)",
       min: 1,
-      max: 8,
+      max: 12,
       step: 1,
     });
     viewFolder.addBinding(view, "showBuds", { label: "buds" });

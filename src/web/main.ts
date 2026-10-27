@@ -7,11 +7,12 @@
 
 import * as Comlink from "comlink";
 import { mergeParams, type Params } from "../core/params.ts";
-import { defaultPreset, type PresetName, presetParams } from "../core/presets.ts";
+import { defaultPreset, type PresetName, presetParams, presets } from "../core/presets.ts";
 import type { Snapshot } from "../core/snapshot.ts";
 import type { SimApi } from "../worker/api.ts";
 import { createRenderer } from "./render/create.ts";
 import { attachInput } from "./render/input.ts";
+import { isLeafStyleName, LEAF_STYLES, type LeafStyleName } from "./render/leaf-styles.ts";
 import type { ViewOptions } from "./render/scene.ts";
 import { Charts } from "./ui/charts.ts";
 import { Panel, type PlaybackState, type Stats } from "./ui/panel.ts";
@@ -39,6 +40,12 @@ const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").match
 // A phone shows a four-tree grove; the ten-tree stand would be too small to read.
 const startPreset: PresetName = narrow ? "skyGrove" : defaultPreset;
 
+/** The foliage style a preset asks for (broadleaf unless it names one). */
+function leafStyleOf(name: PresetName): LeafStyleName {
+  const leaf: string | undefined = (presets[name] as { leaf?: string }).leaf;
+  return leaf !== undefined && isLeafStyleName(leaf) ? leaf : "broadleaf";
+}
+
 const hud = element("hud");
 const playback: PlaybackState = { playing: false, speed: 3 };
 const stats: Stats = {
@@ -54,7 +61,8 @@ const view: ViewOptions & { preset: PresetName } = {
   colorMode: "natural",
   showLeaves: true,
   depth: true,
-  leafAge: 5,
+  leafAge: LEAF_STYLES[leafStyleOf(startPreset)].leafAge,
+  leafStyle: leafStyleOf(startPreset),
   showBuds: false,
   showShadow: false,
   showGhosts: true,
@@ -119,6 +127,9 @@ const panel = new Panel(element("panel"), presetParams(startPreset), playback, s
     void sim.setParams(patch);
   },
   onPreset: (name) => {
+    // A species preset brings its own foliage style and how long foliage stays on.
+    view.leafStyle = leafStyleOf(name);
+    view.leafAge = LEAF_STYLES[view.leafStyle].leafAge;
     const params = presetParams(name, panel.current.seed);
     panel.setParams(params);
     void restart(params);

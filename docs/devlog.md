@@ -2,6 +2,19 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-27: Per-species leaf styles; M12 review milestone
+
+- **Leaf styles** (user's choice over going straight to M8), page only (`render/leaf-styles.ts`):
+  - broadleaf (the M6c lens);
+  - needle: thin dark blue-green needles, 6 per spray, kept 8 seasons;
+  - small: birch-like, light, broad;
+  - large: Terminalia-like, glossy, crowded at shoot tips.
+  - Species presets name theirs in `Preset.leaf`; picking a preset sets View → leaf style and leaf age, and both can be overridden. Both renderers read `Scene.leafStyle`; the WebGL2 leaf uniform and palette come from it. New colour tokens in light and dark.
+- **Seen** in headless Chromium (WebGL2 light and dark, Canvas 2D): the fir reads as a conifer, the birch as small-leaved and open, the Terminalia as tiers of big leaves at branch ends. No console errors.
+- **Tests:** `scene.test.ts` checks the needle spray counts in both views and that every preset's `leaf` names a known style.
+- **M12** (user): after M11, an independent review of the whole project by a fresh agent, triaged with the user before any post-build-order work (ROADMAP, spec §7).
+- No simulation or golden changes.
+
 ## 2026-10-27: M7, physiological age and three species
 
 - **Species** chosen by the user (ADR 0009): a fir-like conifer (Massart), a birch-like pioneer (in place of §7's Rauh broadleaf) and a *Terminalia*-like tropical tree (Aubréville). Names are generic with a real example. The oak-like, willow and beech presets wait for R3 (ROADMAP "Later").

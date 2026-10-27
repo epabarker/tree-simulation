@@ -2,6 +2,27 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-27: M12, the review and a plan beyond the build order
+
+- **Scope.**
+  - The user took this planning session as M12, aimed at three goals: performance, realism and a home page for edbarker.dev.
+  - Three read-only surveys covered:
+    - the hot paths (season loop, light, worker, renderer);
+    - realism (spec, ADRs, experiments, known issues);
+    - the page and its deployment.
+  - The line-by-line audit of correctness and test strength that the old M12 row asked for is folded into M13 and M19. [Review](reviews/2026-10-27-m12-review.md).
+- **Decisions (user):**
+  - The simulation *is* the home page.
+  - The site is the private Astro repo `epabarker/edbarker-dev` on Cloudflare, and it receives the garden as a versioned GitHub Release that it vendors (ADR 0014).
+  - Realism means botanical form, motion and physics, and seasons, all still in 2D.
+  - The home world is a mixed forest with succession, which needs species per tree (ADR 0015, at M19).
+- **Roadmap:** M13–M21 added. "Later" items folded in: species onto R1–R5, oak, willow, beech, ground contact, far-red, embedding.
+- **Surprises** from reading the hot paths:
+  - Periodic sides cost ≈ 27 grid sweeps a season, not 7.
+  - `junctionExponents` runs 60 bisection steps per junction for every snapshot, even with the charts closed.
+  - The worker sits idle while the page tweens.
+- No code changed, so the goldens are unchanged.
+
 ## 2026-10-27: M11, a forest without edges
 
 - **Merged** the M10 PR (epabarker/tree-simulation#4) at the user's request.

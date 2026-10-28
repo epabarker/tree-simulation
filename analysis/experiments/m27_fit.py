@@ -29,12 +29,16 @@ parser.add_argument("--workers", type=int, default=os.cpu_count() or 4)
 parser.add_argument("--budget", choices=["full", "quick"], default="full")
 parser.add_argument("--generations", type=int, help="overrides the budget's")
 parser.add_argument("--seeds", type=int, help="overrides the budget's")
+parser.add_argument("--restarts", help="warm,random restarts, e.g. 2,1; overrides the budget's")
 parser.add_argument("--skip-done", action="store_true", help="skip species that already have a results file")
 parser.add_argument("--smoke", action="store_true", help="2 generations, 2 seeds, 1 restart; writes under runs/ only")
 args = parser.parse_args()
 
 species = SPECIES if args.species == "all" else [args.species]
 overrides = {k: v for k, v in {"generations": args.generations, "seeds": args.seeds}.items() if v is not None}
+if args.restarts:
+    warm, rand = (int(n) for n in args.restarts.split(","))
+    overrides.update(warm_restarts=warm, random_restarts=rand)
 if args.smoke:
     settings = FitSettings(generations=2, popsize=6, seeds=2, warm_restarts=1, random_restarts=0,
                            finalists=2, final_seeds=2, workers=args.workers)

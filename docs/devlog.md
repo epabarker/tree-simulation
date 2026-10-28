@@ -2,6 +2,18 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-28: M27 round 2
+
+- **Run in session** (the user away): `--start round1 --restarts 2,0 --generations 50 --seeds 3`, 79 minutes for all ten ([note](experiments/2026-10-28-m27-fits.md), round 2).
+- **Fits:** every measured target is within one band for every species. Losses range from 0.82 (birch) to 7.81 (beech); only described crown traits remain.
+  - Fir: 11.3 → 4.5, with the largest h_j (87).
+  - h_j orders the species sensibly: large for fir, beech and holly; small for willow, birch and pine.
+- **Hold-out:**
+  - survival 7 of 10 in band, Spearman −0.91;
+  - holly (8.5%) is still out, and rowan and pine are too tolerant;
+  - in the mixed wood, fitted beech dominates (3.3 a run) and holly, rowan and willow are gone by season 400;
+  - fitted pine is 31 m at 100 (table 29 m) but still reaches the world's top by 200.
+
 ## 2026-10-28: M27 round 1, and the juvenile phase (ADR 0022)
 
 - **Round 1** ([note](experiments/2026-10-28-m27-fits.md)): the user ran all ten fits (1 h 51 min).

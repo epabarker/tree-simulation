@@ -2,7 +2,7 @@
 
 _Last updated: 2026-10-28 (M26 done; M27 round 1 fitted, round 2 waiting on the user's run)_
 
-**M26 is done** on `claude/gallant-brown-5k4g33`. **M27 round 1** is fitted and held out ([note](experiments/2026-10-28-m27-fits.md); `fits/round1/`). After it, survival light (four species) and late growth (H100/H60) entered the fit (ADR 0020 addendum), and two model changes landed, both off by default: the hyperbolic hydraulic discount (`r1.hydraulic`, ADR 0021) and the juvenile phase (`r2.hJ`, ADR 0022). The home forest is unchanged. **Waiting on the user** to run round 2.
+**M26 is done** on `claude/gallant-brown-5k4g33`. **M27 round 1** is fitted and held out ([note](experiments/2026-10-28-m27-fits.md); `fits/round1/`). After it, survival light (four species) and late growth (H100/H60) entered the fit (ADR 0020 addendum), and two model changes landed, both off by default: the hyperbolic hydraulic discount (`r1.hydraulic`, ADR 0021) and the juvenile phase (`r2.hJ`, ADR 0022). The home forest is unchanged. **Round 2 is fitted and held out** (79 min, in session): every measured target is met; open are holly's tolerance, the understorey's collapse under fitted beech, and height after season 100. **Waiting on the user** to decide on them and on adoption (M27b).
 
 ## Works
 - **Core:** C1–C6, R1–R6, O2 and O4 (ADRs 0005–0013); the sky sweep with open or periodic sides; golden hashes. `World.discardDead` for long page runs.
@@ -18,8 +18,8 @@ _Last updated: 2026-10-28 (M26 done; M27 round 1 fitted, round 2 waiting on the 
 
 ## Next
 1. **The user:** review M26 (the loupe on a phone); say whether to open the PR and release garden-v0.13.0 (tag push is the user's).
-2. **Handoff (the user), round 2:** plugged in, with Node 24 on PATH: `uv run --project analysis python analysis/experiments/m27_fit.py --species all --skip-done --start round1 --restarts 2,0 --generations 50 --seeds 3` (warm from round 1's fits; ≈ 6–10 min a species, estimated).
-3. **Then (session):** `m27_holdout.py`, round 2 in the M27 note, and the user's decision on adoption (M27b).
+2. **The user:** review round 2 ([note](experiments/2026-10-28-m27-fits.md)): fix holly's tolerance, the understorey under beech and the tail after season 100 (a round 3), or adopt (M27b).
+3. **Faster refits:** `m27_fit.py --species all --skip-done --start <earlier round> --restarts 2,0 --generations 50 --seeds 3` (≈ 8 min a species), after moving `fits/*.json` to a round folder.
 4. **Ideas:** rooting in windthrow; the leaf–section slope against live pipe area (r_live); measured holly and rowan growth curves, and quantum-sensor light under fir and the small trees (their targets are estimates).
 
 ## Open questions (ask when the milestone comes up)

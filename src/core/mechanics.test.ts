@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { limbShapes } from "./form.ts";
 import { mergeParams, type ParamsPatch } from "./params.ts";
 import { PRE_R4, type PresetName, presetParams } from "./presets.ts";
 import { isLiveBud } from "./principles/c3-allocation.ts";
@@ -22,24 +23,6 @@ function grow(preset: PresetName, seed: number, seasons: number, patch: ParamsPa
   const world = new World(mergeParams(mergeParams(presetParams(preset, seed), PRE_R4), patch));
   world.run(seasons);
   return world.trees[0] as Tree;
-}
-
-/** Per first-order limb of ≥ 10 metamers: droop (base − lowest elevation), upturn (tip − lowest). */
-function limbShapes(tree: Tree): { droop: number; upturn: number }[] {
-  const c = tree.m.cols;
-  const axes = new Map<number, number[]>();
-  for (let i = 0; i < tree.m.length; i++) {
-    if (c.order[i] !== 1) continue;
-    const list = axes.get(c.axis[i]) ?? [];
-    list.push(elevation(c.angle[i] as number));
-    axes.set(c.axis[i], list);
-  }
-  return [...axes.values()]
-    .filter((e) => e.length >= 10)
-    .map((e) => {
-      const low = Math.min(...e);
-      return { droop: (e[0] as number) - low, upturn: (e[e.length - 1] as number) - low };
-    });
 }
 
 /** Leonardo exponent at each junction, split by whether a lateral there carries stress wood. */

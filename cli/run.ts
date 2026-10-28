@@ -8,7 +8,8 @@
  *   npm run sim -- --preset succession --checkpoint-at 60 --seasons 60 --out runs/c   (M21)
  *
  * Writes to --out: run.json (resolved params, events, metadata), metrics.csv (one row per tree
- * per season), metamers.csv (geometry at --snapshots seasons and the last), hash.txt, and with
+ * per season), metamers.csv (geometry at --snapshots seasons and the last), form.csv (crown form
+ * and allometry per live tree at the same seasons, core/form.ts; M26), hash.txt, and with
  * --light light.csv (the light model's per-cell shade 1 − Q/C at the same seasons; M6e), and with
  * --checkpoint-at N checkpoint-N.bin.gz, the world after season N (core/checkpoint.ts; M21).
  */
@@ -19,6 +20,7 @@ import { join } from "node:path";
 import { parseArgs } from "node:util";
 import { gzipSync } from "node:zlib";
 import { saveWorld } from "../src/core/checkpoint.ts";
+import { FORM_COLUMNS, formMetrics, PROFILE_BANDS } from "../src/core/form.ts";
 import { hashWorld } from "../src/core/hash.ts";
 import { METRIC_COLUMNS, treeMetrics } from "../src/core/metrics.ts";
 import { mergeParams, type Params, type ParamsPatch } from "../src/core/params.ts";
@@ -90,6 +92,9 @@ const metamerLines = [
   "season,tree,birthId,parentBirthId,order,axis,x0,y0,x1,y1,length,angle,radius,qSum,nSum,vIn,birthSeason,stressWood",
 ];
 
+const profileColumns = Array.from({ length: PROFILE_BANDS }, (_, k) => `p${k}`);
+const formLines = [["season", "tree", "species", ...FORM_COLUMNS, ...profileColumns].join(",")];
+
 const lightLines = ["season,col,row,shade"];
 
 const world = new World(params);
@@ -124,6 +129,19 @@ for (let s = 0; s < seasons; s++) {
     }
   }
   if (snapshotSeasons.has(world.season)) {
+    for (const tree of world.trees) {
+      if (!tree.alive || tree.m.length === 0) continue;
+      const f = formMetrics(tree, world.paramsOf(tree));
+      formLines.push(
+        [
+          world.season,
+          tree.id,
+          tree.species,
+          ...FORM_COLUMNS.map((k) => num(f[k])),
+          ...f.profile.map(num),
+        ].join(","),
+      );
+    }
     for (const tree of world.trees) {
       if (!tree.alive) continue;
       const c = tree.m.cols;
@@ -173,6 +191,7 @@ const run = {
 writeFileSync(join(out, "run.json"), `${JSON.stringify(run, null, 2)}\n`);
 writeFileSync(join(out, "metrics.csv"), `${metricsLines.join("\n")}\n`);
 writeFileSync(join(out, "metamers.csv"), `${metamerLines.join("\n")}\n`);
+writeFileSync(join(out, "form.csv"), `${formLines.join("\n")}\n`);
 writeFileSync(join(out, "hash.txt"), `${hash}\n`);
 if (values.light) writeFileSync(join(out, "light.csv"), `${lightLines.join("\n")}\n`);
 if (!values.quiet) {

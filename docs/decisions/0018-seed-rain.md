@@ -18,6 +18,6 @@ The user agreed (2026-10-28) to extend O4 with **seed rain**:
 - **Values:** in `flora.ts`, goat willow 1 and birch 0.2. Willow's Q_est of 0.3 means rain takes only in large gaps.
 
 ## Consequences
-- **Clearings come back:** a 60-cell clearing felled at season 300 gets 1–2 goat willows in every seed tested, against none without rain (`flora.test.ts`). The closed wood is almost unchanged: willow stays out of the canopy, and birch still fades by season 350.
+- **Clearings come back:** 60-cell clearings felled at season 300 get 9 goat willows over 6 seeds, against none without rain (`flora.test.ts`). In the closed wood, willow keeps a few small trees in storm gaps, and birch fades to under one canopy tree a run.
 - **A world now has an outside,** but only for seeds; light and wind still stop at the world's sides.
 - **Revisit** if rain should depend on the landscape around the world (a seed source's distance), or vary from year to year (mast years).

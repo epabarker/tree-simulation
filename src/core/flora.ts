@@ -18,9 +18,10 @@
  *   young; oak and beech make few heavy seeds that land close, and beech establishes in shade.
  *
  * M25 (docs/experiments/2026-10-28-m25-species.md) adds hornbeam, field maple, holly, rowan and
- * goat willow, fitted the same way, and Scots pine. Their survival lights run from willow and pine
- * (≈ 19%) through rowan (8%) and maple (5%) to hornbeam and holly (3%), in Niinemets & Valladares's
- * order; holly and hornbeam cast the deepest shade, pine and willow the lightest.
+ * goat willow, fitted the same way, and Scots pine. Niinemets & Valladares score them pine 1.67,
+ * willow 2.16, rowan 2.73, maple 3.18, holly 3.86 and hornbeam 3.97; their survival lights run
+ * from pine (19%) through willow (13%, birch's), rowan (8%) and maple (5%) to hornbeam and holly
+ * (3%). Holly and hornbeam cast the deepest shade, pine and willow the lightest.
  *
  * Labels are the field guide's: a common name, a Latin name and the leaf style the page draws.
  * Fir and pine are lab species; the home forest (`mixedWood`) mixes the other nine.
@@ -147,7 +148,8 @@ export const FLORA = {
     latin: "Carpinus betulus",
     leaf: "hornbeam",
     c5: { enabled: true, T: 0.01, Trel: 0.02 },
-    r1: { mf: 0.04, Lh: 50 },
+    // Costlier leaves than beech's: less tolerant (3.97 against 4.56), so beech outgrows it in shade.
+    r1: { mf: 0.045, Lh: 50 },
     // Troll's model, like beech (Hallé et al. 1978), with weaker apical control.
     r2: {
       enabled: true,
@@ -267,7 +269,8 @@ export const FLORA = {
       ],
     },
     r4: { qRel: 0.3 },
-    r6: { enabled: true, qMin: 0.15, leafArea: 1.5 },
+    // Survives birch's shade, no deeper: Niinemets & Valladares score it 2.16, birch 2.03.
+    r6: { enabled: true, qMin: 0.12, leafArea: 1.5 },
     // Tiny plumed seeds blow far but need bare, lit ground; a short life. Seed rain (ADR 0018)
     // brings willow back to clearings after it has died out in the wood.
     o4: { cSeed: 1.5, d: 60, qEst: 0.3, pEst: 0.3, m0: 0.012, rain: 1 },

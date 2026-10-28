@@ -20,10 +20,13 @@ Newest first. One entry per session or milestone: what changed, why, surprises, 
   - the closed wood is almost unchanged.
   - **Surprise:** birch at 0.5 kept birch in the canopy past season 350.
   - The lab's O4 folder has a slider for it.
-- **Tolerance scores:** still unverified. The appendix and the publisher's supplement are unreachable from the session; a web search found only neighbouring species.
+- **Tolerance scores:** checked against Appendix A (the user supplied it). Pine, rowan, maple and hornbeam matched.
+  - **Goat willow** scores 2.16, a shade above birch's 2.03, where the model had it below. Its Q_ss is now birch's (0.12), and it survives 13%.
+  - **Beech against hornbeam:** that let hornbeam outgrow beech in the mixed wood. Hornbeam's leaves now cost a little more than beech's (m_f 0.045), as its lower score (3.97 against 4.56) suggests, and beech leads again.
 - **Checks:**
   - The daily seeds 9, 10 and 12 still look right.
   - Garden: 55.5 kB gzip. Tests: 219 pass (a seed-rain unit test and the clearing test are new); goldens unchanged.
+  - **Six-seed totals:** the mixed-wood and clearing tests now sum over six seeds, since single seeds vary too widely (one grows no beech). The suite takes 77 s, against 51 s.
 
 ## 2026-10-28: garden-v0.11.0 live
 

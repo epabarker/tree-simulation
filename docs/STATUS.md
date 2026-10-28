@@ -2,7 +2,7 @@
 
 _Last updated: 2026-10-28 (M25)_
 
-**M25 is live** as garden-v0.11.0. Its follow-ups (field maple's lighter shade, seed rain per ADR 0018) are on `claude/gallant-brown-5k4g33`, to release as garden-v0.12.0 after the user's preview.
+**M25 is live** as garden-v0.11.0. Its follow-ups are on `claude/gallant-brown-5k4g33`, to release as garden-v0.12.0 after the user's preview: field maple's lighter shade, seed rain (ADR 0018), and tolerance scores checked against Appendix A.
 
 ## Works
 - **Core:** C1–C6, R1–R6, O2 and O4 (ADRs 0005–0013); the sky sweep with open or periodic sides; golden hashes. `World.discardDead` for long page runs.
@@ -16,9 +16,8 @@ _Last updated: 2026-10-28 (M25)_
 
 ## Next
 1. **Release garden-v0.12.0** on the user's go-ahead: merge the PR, the user pushes the tag, sync the site and merge it.
-2. **Tolerance scores:** check the new species' values against Niinemets & Valladares's appendix. esapubs.org and the publisher are blocked here, so the user must paste them or allow the domain.
-3. **The user:** an hour's soak on a phone (heat, memory); the site's `TODO(Ed)` items.
-4. **Ideas:** a magnifying loupe over the plate (true-scale leaves); rooting in windthrow.
+2. **The user:** an hour's soak on a phone (heat, memory); the site's `TODO(Ed)` items.
+3. **Ideas:** a magnifying loupe over the plate (true-scale leaves); rooting in windthrow.
 
 ## Open questions (ask when the milestone comes up)
 - None open.

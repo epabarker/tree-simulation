@@ -217,6 +217,16 @@ const SPRING = 0.3;
 /** Rows of sky above the forest's ground in its preset (130): the ring's width follows the host. */
 const WORLD_HEIGHT = 130;
 
+/**
+ * The ring's width for a host of this size: as wide as the host is wide relative to the world's
+ * height. A portrait host (a phone) gets two thirds of that, so fewer trees are drawn larger and
+ * fill the plate's height rather than its lower half (M21 art pass).
+ */
+export function plateWidth(width: number, height: number): number {
+  const aspect = width / Math.max(1, height);
+  return WORLD_HEIGHT * aspect * (aspect < 1 ? 0.65 : 1);
+}
+
 // The home forest and Plate II's oak live with the presets, so the CLI can grow them too (M21).
 export { forestParams, specimenParams } from "../core/presets.ts";
 
@@ -267,10 +277,7 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
   const rect = renderer.canvas.getBoundingClientRect();
   const params =
     options.params ??
-    forestParams(
-      (WORLD_HEIGHT * rect.width) / Math.max(1, rect.height),
-      options.seed ?? randomSeed(),
-    );
+    forestParams(plateWidth(rect.width, rect.height), options.seed ?? randomSeed());
 
   const view = Object.assign(options.view ?? {}, {
     colorMode: "natural",

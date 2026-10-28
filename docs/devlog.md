@@ -2,6 +2,29 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-28: M21 step 2, art pass and first paint on the site
+
+- **User choices:**
+  - open on a grown forest;
+  - no poster image;
+  - Lighthouse through the installed Chrome (a Flatpak, so not on PATH);
+  - art pass on phone composition, the choice of grown forests, and the night scene.
+- **Grown forests:**
+  - **Chosen by eye** from twelve seeds: 6, 9 and 10.
+  - **At 40 seasons, not 60.** At 60 the stand has self-thinned into tall poles with small crowns: true, but not handsome.
+  - **Widths** 66, 100, 160 and 220; 300 is dropped, since the site's plate never wants it.
+- **Phone:** `plateWidth` gives a portrait plate two thirds of its aspect's width: about three trees, drawn large, filling the plate's height instead of its lower half.
+- **Site** (branch `claude/m21-launch`):
+  - the garden opens on the release's grown forests (`first`, read from the manifest at build time);
+  - plate labels that would overlap, or be cut off at the edge, are dropped;
+  - species inks in the Field guide's palette: the species tokens had fallen back to the garden's bright defaults;
+  - **a moonlit night:** cool sky, silvered foliage, grey-brown bark, muted autumn.
+- **Measured** (local build):
+  - the grown forest shows 0.26 s after `load`;
+  - Lighthouse mobile 100/100/100/100, largest paint 1.4 s, layout shift 0.001;
+  - reduced motion shows the grown forest still.
+  - Production scored 99/100/96/92 (before M21); the deductions were Cloudflare's: its analytics beacon refused in headless Chrome, and its managed robots.txt `Content-Signal` line.
+
 ## 2026-10-28: M21 step 1, checkpoints and grown forests
 
 - **Core:**

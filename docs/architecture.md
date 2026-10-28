@@ -45,7 +45,8 @@ How the code realises the spec. For *why* a choice was made, see `docs/decisions
 
 **First paint (M21):**
 - **Checkpoints** (`core/checkpoint.ts`): `saveWorld` writes a whole World as bytes. The layout is a u32 header length, a JSON header (ASCII, with anything else escaped as \uXXXX, since the core has no text codec), then every tree's metamer and bud columns, padded to 8 bytes. It holds the params, season, flags, event log and queue, and each tree's scalars and tables. `loadWorld` restores it: k more seasons hash exactly as N + k from scratch (`checkpoint.test.ts`). Light, owners and per-season scratch are rebuilt by the season that reads them.
-- **Grown forests:** `cli/first-paint.ts`, run by `npm run build:garden`, grows `forestParams` at widths 100, 160, 220 and 300 for seeds 11, 23 and 37, 60 seasons each, into `dist-garden/first/` with a `manifest.json` (40–210 kB each).
+- **Grown forests:** `cli/first-paint.ts`, run by `npm run build:garden`, grows `forestParams` into `dist-garden/first/` with a `manifest.json`: widths 66, 100, 160 and 220, seeds 6, 9 and 10 (chosen by eye), 40 seasons each, 57–192 kB each and 1.4 MB in all.
+- **Plate width:** `plateWidth` sizes the ring to the host's aspect. A portrait host gets two thirds of it, so a phone shows about three trees, drawn large enough to fill the plate.
 - **Opening on one:** `mountGarden({ first: { base, widths, seeds } })` picks the width nearest its own and a seed by the day, opens on that forest at the ambient pace, and falls back to growing from seed. `?forest=seed` (option `seed`) still grows from seed. The checkpoint was grown from `forestParams(width, seed)`, so that link regrows the same forest.
 - **CLI:** `npm run sim -- --checkpoint-at N` saves the CLI's world (dead trees included) as `checkpoint-N.bin.gz`.
 

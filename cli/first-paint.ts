@@ -14,12 +14,22 @@ import { saveWorld } from "../src/core/checkpoint.ts";
 import { forestParams } from "../src/core/presets.ts";
 import { World } from "../src/core/world.ts";
 
-/** World widths a plate may want: a portrait phone, a landscape phone or tablet, two desktops. */
-const WIDTHS = [100, 160, 220, 300];
-/** One forest a day, in turn (a returning visitor sees another). */
-const SEEDS = [11, 23, 37];
-/** Old enough for a closed birch canopy with oak and beech coming up through it. */
-const SEASONS = 60;
+/**
+ * World widths a plate may want (garden.ts `plateWidth`): a portrait phone (≈ 66 cells, three
+ * trees), a square-ish or landscape phone, a tablet, and a desktop (the site's plate is at most
+ * the page's width, about 220 cells; a wider host gets the nearest).
+ */
+const WIDTHS = [66, 100, 160, 220];
+/**
+ * One forest a day, in turn (a returning visitor sees another): chosen by eye from twelve, at 220
+ * cells, for rounded crowns and a broad oak or two among the birches (M21 art pass).
+ */
+const SEEDS = [6, 9, 10];
+/**
+ * As old as the intro grows a forest (40 seasons): a young closed wood with full crowns. At 60 the
+ * stand has self-thinned into tall poles with small crowns, true to a stand but less handsome.
+ */
+const SEASONS = 40;
 /** Each checkpoint must stay within this (M21 budget), gzipped. */
 const BUDGET_KB = 300;
 

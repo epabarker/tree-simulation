@@ -1,6 +1,6 @@
 # Status
 
-_Last updated: 2026-10-28 (garden-v0.7.0 live)_
+_Last updated: 2026-10-28 (M21 art pass)_
 
 **Current milestone: M21** (first paint, art direction, launch), on branch `claude/m21-launch`. M18–M20 are live on edbarker.dev as garden-v0.7.0 (PR #13 here, PR #1 in edbarker-dev): the row-marched light, and birch, oak and beech in the home forest, with Plate II's own oak.
 
@@ -17,11 +17,10 @@ _Last updated: 2026-10-28 (garden-v0.7.0 live)_
 - **Lab:** WebGL2 with pseudo-depth, Tweakpane, charts, tap to fell, phone layout. **Headless:** `npm run sim`, `npm run bench` (rings 3.8 ms a season), `analysis/experiments/` m0–m11.
 
 ## Next
-1. **M21:**
-   - checkpoints, and a poster for first paint;
-   - art direction;
-   - accessibility;
-   - launch checks (Lighthouse, a phone soak).
+1. **M21:** steps 1–2 are done (checkpoints, grown forests on the site, the art pass). Left:
+   - previews to the user;
+   - a soak test (an hour on the user's phone);
+   - release `garden-v0.8.0`, sync the site, and merge on the user's go-ahead.
 2. **Follow-ups:** willow; rooting in windthrow; the §8 ablation tests.
 3. **The user:** the site's `TODO(Ed)` items.
 

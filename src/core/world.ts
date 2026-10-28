@@ -4,6 +4,7 @@
  */
 
 import { type LightModel, UniformLight } from "./light/light-model.ts";
+import { PooledLight } from "./light/pooled.ts";
 import { ShadowTriangle } from "./light/shadow-triangle.ts";
 import { SkySweep } from "./light/sky-sweep.ts";
 import { clone, mergeParams, type Params, type ParamsPatch } from "./params.ts";
@@ -26,6 +27,9 @@ export interface RunRecord {
 
 export function makeLight(params: Params): LightModel {
   const { width, height } = params.world;
+  if (params.c2.enabled && params.c2.model === "pooled") {
+    return new PooledLight(width, height, params.c2);
+  }
   if (params.c2.enabled && params.c2.model === "sky") {
     return new SkySweep(width, height, params.c2, params.world.sides === "periodic");
   }

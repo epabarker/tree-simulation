@@ -61,7 +61,11 @@ const SECTIONS: SectionSpec[] = [
       {
         key: "model",
         label: "model",
-        options: { "sky sweep (M6)": "sky", "shadow triangle": "triangle" },
+        options: {
+          "sky sweep (M6)": "sky",
+          "shadow triangle": "triangle",
+          "pooled (§8 ablation)": "pooled",
+        },
       },
       { key: "kExt", label: "k_ext (sky)", min: 0.05, max: 3, step: 0.05 },
       { key: "K", label: "K directions (sky)", min: 1, max: 31, step: 1 },

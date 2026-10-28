@@ -79,8 +79,11 @@ export interface Params {
   /** C2 Shared light field: shadow triangle (Palubicki et al. §4.1) or sky sweep (§C2.4, M6). */
   c2: {
     enabled: boolean;
-    /** 'triangle': the baseline shadow triangle. 'sky': the Beer–Lambert sky sweep (M6). */
-    model: "triangle" | "sky";
+    /**
+     * 'triangle': the baseline shadow triangle. 'sky': the Beer–Lambert sky sweep (M6). 'pooled':
+     * the §8 ablation, every leaf gets one homogeneous canopy's mean light (M22, light/pooled.ts).
+     */
+    model: "triangle" | "sky" | "pooled";
     /**
      * Shadow strength a > 0 (calibrate). Also the self-shadow a bud removes from its own Q.
      * Buds of one node share a cell and shade each other, so C must exceed a·(buds per node − 1).

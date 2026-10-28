@@ -2,6 +2,18 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-28: M22, the §8 ablations
+
+- **User:** a plan for all the remaining ablation tests and pooled light, plus new species. The suite may take longer.
+- **Core:** `c2.model: "pooled"` (`light/pooled.ts`). Every leaf gets one homogeneous canopy's mean light, C·(1 − e^(−kL))/(kL), so competition is size-symmetric. It is in the lab's light menu too.
+- **Tests:** `ablation.test.ts`, six ablations over 5 seeds. The suite has 209 tests and takes 17.7 s, against 13 s before; files run in parallel.
+- **Findings** ([note](experiments/2026-10-28-m22-ablations.md)):
+  - **As predicted:** C3 equal sharing (a low, broad crown that loses to its neighbour), R1 off (no plateau, no starvation, no self-thinning), R6 off (no foliage on old wood), and pooled light (size CV 0.3 → 0.03–0.11, no deaths).
+  - **ξ = 0 departs:** crowns still lean into gaps through allocation and shedding; ξ is about a fifth of the lean under an oblique sun.
+  - **R4 off departs:** the baseline lets any bud with v ≥ 1 grow, so gaps refill no slower. What R4 adds is the dormant bank and its release.
+- **Surprises:** both departures. The spec's §8 table assumed phototropism and reiteration were the only routes; the model has more.
+- **Goldens:** unchanged.
+
 ## 2026-10-28: garden-v0.8.0 live
 
 - **Releases:**

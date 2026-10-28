@@ -2,7 +2,7 @@
 
 _Last updated: 2026-10-28 (M25)_
 
-**M25 is live** as garden-v0.11.0. Its follow-ups are on `claude/gallant-brown-5k4g33`, to release as garden-v0.12.0 after the user's preview: field maple's lighter shade, seed rain (ADR 0018), and tolerance scores checked against Appendix A.
+**M25 and its follow-ups are live** as garden-v0.12.0 (PR #19; site PR #6): field maple's lighter shade, seed rain (ADR 0018), and tolerance scores checked against Appendix A. Next: the user's next milestone.
 
 ## Works
 - **Core:** C1–C6, R1–R6, O2 and O4 (ADRs 0005–0013); the sky sweep with open or periodic sides; golden hashes. `World.discardDead` for long page runs.
@@ -15,9 +15,8 @@ _Last updated: 2026-10-28 (M25)_
 - **Lab:** WebGL2 with pseudo-depth, Tweakpane, charts, tap to fell, phone layout. **Headless:** `npm run sim`, `npm run bench`, and `analysis/experiments/` m0–m25.
 
 ## Next
-1. **Release garden-v0.12.0** on the user's go-ahead: merge the PR, the user pushes the tag, sync the site and merge it.
-2. **The user:** an hour's soak on a phone (heat, memory); the site's `TODO(Ed)` items.
-3. **Ideas:** a magnifying loupe over the plate (true-scale leaves); rooting in windthrow.
+1. **The user:** an hour's soak on a phone (heat, memory); the site's `TODO(Ed)` items.
+2. **Ideas:** a magnifying loupe over the plate (true-scale leaves); rooting in windthrow.
 
 ## Open questions (ask when the milestone comes up)
 - None open.

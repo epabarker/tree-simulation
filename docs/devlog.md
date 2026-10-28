@@ -2,6 +2,14 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-28: garden-v0.12.0 live
+
+- **Release:**
+  - PR #19 merged with CI green.
+  - The session's tag push was refused again (403), so the user pushed `garden-v0.12.0`.
+  - The release was byte-identical to the site branch's local build.
+  - Site PR #6 merged to production.
+
 ## 2026-10-28: M25 follow-ups: maple's shade and seed rain
 
 - **User:** do the three M25 follow-ups, and agreed to extend O4 with seed rain.

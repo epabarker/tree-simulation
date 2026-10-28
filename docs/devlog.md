@@ -2,6 +2,15 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-28: garden-v0.11.0 live
+
+- **User:** previewed M25 and gave the go-ahead.
+- **Release:**
+  - PR #18 merged with CI green.
+  - The session's `git push` of the tag was refused (HTTP 403), so the user pushed `garden-v0.11.0` and the workflow built the release.
+  - The release was byte-identical to the site branch's local build.
+  - Site PR #5 merged to production.
+
 ## 2026-10-28: garden-v0.10.0 live; M25, six new species and the mixed wood
 
 - **Release:** `garden-v0.10.0` had already been built by the workflow when PR #17 merged. Here the site's `claude/m24-plate` was re-synced from that release (only gzip headers and source maps differed from the local build), and site PR #4 was merged to production.

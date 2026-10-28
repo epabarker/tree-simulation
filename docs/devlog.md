@@ -2,6 +2,28 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-28: M27, targets and fitting for all ten species
+
+- **User:** fit all ten species, not only the pilot. Fir and pine keep their level-1 η at about 1.5–2.
+- **Targets** for oak, fir, hornbeam, field maple, holly, rowan, goat willow and Scots pine (`analysis/fit/targets/*.toml`; [research note](research/2026-10-28-species-traits.md)):
+  - heights from yield models or field-guide mature heights, converted to age 60, and H/D from MacFarlane and Watt, at weight 1;
+  - floors, growth-curve shape and form described, at weight 0.5;
+  - survival-light bands and Niinemets & Valladares scores held out.
+  - The literature searches returned abstracts only, with no per-species transmittance numbers, so the floors are bands set by the M25 ordering.
+- **`m27_fit.py`:**
+  - `--species all` writes each species' result as it finishes;
+  - `--skip-done` resumes an interrupted run;
+  - `--budget quick` (`FitSettings.budget`) runs one warm and one random restart, 50 generations, 4 seeds.
+- **`m27_holdout.py`** checks every species with a results file:
+  - the Spearman ρ of survival light against the tolerance scores;
+  - the mixed wood with all fitted patches at once;
+  - fir and pine in `firWood` and `pineWood` (200 seasons);
+  - progress and silhouette panels for every species.
+  - **Fixed:** the "open" lab links planted `oakOpen`'s oak, not the fitted species.
+- **Smoke:** all ten species fit in 27 s and the hold-out takes 27 s, on 16 cores. Hand-tuned ρ = −0.98.
+- **Surprise:** every hand-tuned species' height at 30 over height at 60 is 0.64–1.03, above every target (pilot included). Height growth levels off too early everywhere, through R1's plateau.
+- **Handed to the user:** the fits, `m27_fit.py --species all --skip-done` (20–40 minutes per species, full budget).
+
 ## 2026-10-28: M27 machinery: fitting species to literature traits
 
 - **Targets** ([research note](research/2026-10-28-species-traits.md)): 13 traits each for birch and beech in `analysis/fit/targets/*.toml`, 17 free parameters with bounds. Heights from site-index studies (as commonly reported ranges; the searches returned abstracts only); shape and angles are descriptions turned into wide bands at half weight.

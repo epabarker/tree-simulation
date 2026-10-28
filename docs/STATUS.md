@@ -1,8 +1,8 @@
 # Status
 
-_Last updated: 2026-10-28 (M26 done; M27 waiting on the user's fits)_
+_Last updated: 2026-10-28 (M26 done; M27 targets for all ten species, waiting on the user's fits)_
 
-**M26 is done** on `claude/gallant-brown-5k4g33`: form metrics, the §10 measurements, retired presets, shareable lab links and the loupe. **M27's machinery is done** (ADR 0020): targets, `src/core/trials.ts`, `cli/fit-eval.ts`, `analysis/treesim/fit.py`, the hold-out script. **Waiting on the user** to run the two pilot fits.
+**M26 is done** on `claude/gallant-brown-5k4g33`: form metrics, the §10 measurements, retired presets, shareable lab links and the loupe. **M27's machinery and targets for all ten species are done** (ADR 0020 and its addendum): `analysis/fit/targets/*.toml`, `src/core/trials.ts`, `cli/fit-eval.ts`, `analysis/treesim/fit.py`, the fit and hold-out scripts. **Waiting on the user** to run the fits.
 
 ## Works
 - **Core:** C1–C6, R1–R6, O2 and O4 (ADRs 0005–0013); the sky sweep with open or periodic sides; golden hashes. `World.discardDead` for long page runs.
@@ -18,15 +18,15 @@ _Last updated: 2026-10-28 (M26 done; M27 waiting on the user's fits)_
 
 ## Next
 1. **The user:** review M26 (the loupe on a phone); say whether to open the PR and release garden-v0.13.0 (tag push is the user's).
-2. **Handoff (the user):** with Node 24 on PATH, run `uv run --project analysis python analysis/experiments/m27_fit.py --species birch`, then `--species beech` (≈ 20–40 min each on 12 cores). Push `docs/experiments/fits/` (four small files).
+2. **Handoff (the user):** with Node 24 on PATH, run `uv run --project analysis python analysis/experiments/m27_fit.py --species all --skip-done` (≈ 20–40 min a species on 12 cores; `--budget quick` for about a sixth of that). Push `docs/experiments/fits/` (two small files a species).
 3. **Then (session):** `m27_holdout.py` (a few minutes), the M27 note, and the user's decision on adoption (M27b).
-4. **Ideas:** rooting in windthrow; the leaf–section slope against live pipe area (r_live).
+4. **Ideas:** rooting in windthrow; the leaf–section slope against live pipe area (r_live); measured canopy transmittance and growth curves for the eight newer species' targets.
 
 ## Open questions (ask when the milestone comes up)
 - None open.
 
 ## Known issues
-- The l–d slope is ≈ 1, not 2/3 (M26). Breakage fires only under storms. R5 reads self-shade by default (the woodland uses the neighbour signal). In the lab, a ring crown's copies show beyond the world's ends on wide screens (as in the garden). Bimodality is marginal; K = 7 puts the crown base ≈ 7 cells low.
+- The l–d slope is ≈ 1, not 2/3 (M26). Height growth levels off early: H30/H60 is 0.64–1.03 for every species, above every target (M27). Breakage fires only under storms. R5 reads self-shade by default (the woodland uses the neighbour signal). In the lab, a ring crown's copies show beyond the world's ends on wide screens (as in the garden). Bimodality is marginal; K = 7 puts the crown base ≈ 7 cells low.
 
 ## Notes for the next session
 - **Node:** this container's default is 22; `npm test` now refuses it. Install 24 (`npm i node@24` in the scratchpad, then put its `bin` first on PATH). Playwright runs under the system Node (`NODE_PATH=$(npm root -g)`).

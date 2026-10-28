@@ -33,3 +33,12 @@ The user agreed the plan (2026-10-28):
 - **Unconstrained parameters show:** where the restarts disagree, or a fit sits at a bound, the parameter is under-determined or the model can't reach the target. That is a finding about the model, not something to fix by tightening bounds.
 - **Target quality matters most.** Several shape targets are descriptions, and a fit is only as good as its weakest target. Measured crown profiles (laser scans) would be worth more than more compute.
 - **Revisit** if the hold-out checks fail systematically: then a metric or a rule is wrong, not the parameters.
+
+## Addendum (2026-10-28): all ten species
+- **The user extended the fit** from the pilot (birch, beech) to all ten species, before the pilot fits ran. Targets for the other eight follow the same conventions (`docs/research/2026-10-28-species-traits.md`).
+- **A "quick" budget** (`FitSettings.budget("quick")`): one warm and one random restart, 50 generations, 4 seeds. It costs about a sixth of the full budget, for a first look at every species.
+- **The hold-out covers every fitted species:**
+  - the Spearman correlation of survival light with the tolerance scores, over all ten;
+  - the mixed wood with every fitted woodland patch at once;
+  - fir and pine in their own woods, since the mixed wood leaves them out.
+

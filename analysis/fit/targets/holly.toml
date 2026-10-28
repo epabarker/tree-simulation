@@ -1,0 +1,191 @@
+# M27 fit targets: holly (Ilex aquifolium). Read by analysis/treesim/fit.py.
+# Units: 1 cell ≈ 0.25 m, 1 season = 1 year (ROADMAP). Each trait is a trial's trait, the mean
+# over seeds; it costs ((mean − target) / band)² × weight. "measured": a number from a study;
+# "described": a field-guide description turned into a wide band, at half weight.
+# Sources: docs/research/2026-10-28-species-traits.md.
+
+species = "holly"
+
+[[trait]]
+name = "stand.height"
+target = 44
+band = 12
+weight = 1
+kind = "measured"
+source = "≈ 11 m at 60 years: mature height in the field guides (M25 note) 10–15 m; slow-growing"
+
+[[trait]]
+name = "lone.earlyShare"
+target = 0.55
+band = 0.1
+weight = 0.5
+kind = "described"
+source = "height at 30 over height at 60: slow and steady"
+
+[[trait]]
+name = "lone.spread"
+target = 0.5
+band = 0.15
+weight = 0.5
+kind = "described"
+source = "a narrow cone (field guides; M25)"
+
+[[trait]]
+name = "lone.slenderness"
+target = 48
+band = 8
+weight = 1
+kind = "measured"
+source = "open-grown trees are squat, H/D ≈ 40–55 (MacFarlane et al. 2017)"
+
+[[trait]]
+name = "stand.slenderness"
+target = 70
+band = 10
+weight = 1
+kind = "measured"
+source = "stand-grown H/D 60–80 (Watt et al. 2023)"
+
+[[trait]]
+name = "stand.crownRatio"
+target = 0.75
+band = 0.1
+weight = 0.5
+kind = "described"
+source = "keeps its shaded lower limbs: a crown most of the stem long (M25)"
+
+[[trait]]
+name = "stand.floor"
+target = 0.03
+band = 0.015
+weight = 0.5
+kind = "described"
+source = "a dark evergreen crown: deep shade (M25 expectation)"
+
+[[trait]]
+name = "lone.widestAt"
+target = 0.15
+band = 0.1
+weight = 0.5
+kind = "described"
+source = "a cone: widest near the base"
+
+[[trait]]
+name = "lone.crownFullness"
+target = 0.55
+band = 0.1
+weight = 0.5
+kind = "described"
+source = "a cone fills a little over half its box (a triangle is 0.5)"
+
+[[trait]]
+name = "lone.forkHeight"
+target = 0.9
+band = 0.1
+weight = 0.5
+kind = "described"
+source = "excurrent: one stem to the top while young"
+
+[[trait]]
+name = "lone.leaderDominance"
+target = 3
+band = 1
+weight = 0.5
+kind = "described"
+source = "strong apical control (M25)"
+
+[[trait]]
+name = "lone.branchAngle"
+target = 60
+band = 10
+weight = 0.5
+kind = "described"
+source = "wide limbs on a cone (M25)"
+
+[[trait]]
+name = "lone.limbDroop"
+target = 10
+band = 10
+weight = 0.25
+kind = "described"
+source = "lower limbs sweep down a little"
+
+# Free parameters: dotted paths into the species' patch, with bounds (literature review §4,
+# ROADMAP calibration table). log = true searches the bound's log scale.
+# A small, slow tree: L_h and α may go lower; its limbs are wide.
+[[param]]
+path = "c3.alpha"
+lo = 1.8
+hi = 4.5
+[[param]]
+path = "r2.levels.0.lambda"
+lo = 0.5
+hi = 0.6
+[[param]]
+path = "r2.levels.1.lambda"
+lo = 0.48
+hi = 0.58
+[[param]]
+path = "r2.levels.1.setPoint"
+lo = 20
+hi = 90
+[[param]]
+path = "r2.levels.1.branchAngle"
+lo = 35
+hi = 80
+[[param]]
+path = "r2.levels.1.eta"
+lo = 0.05
+hi = 1.5
+log = true
+[[param]]
+path = "r2.levels.2.setPoint"
+lo = 40
+hi = 160
+[[param]]
+path = "r2.aC"
+lo = 0
+hi = 40
+[[param]]
+path = "r2.dLambda"
+lo = 0
+hi = 0.12
+[[param]]
+path = "r2.kappa"
+lo = 0
+hi = 4
+[[param]]
+path = "c5.Trel"
+lo = 0.005
+hi = 0.6
+[[param]]
+path = "c6.r0"
+lo = 0.015
+hi = 0.05
+[[param]]
+path = "r1.Lh"
+lo = 12
+hi = 70
+[[param]]
+path = "r1.mf"
+lo = 0.02
+hi = 0.15
+[[param]]
+path = "r3.c"
+lo = 0.01
+hi = 0.3
+log = true
+[[param]]
+path = "r6.qMin"
+lo = 0.01
+hi = 0.2
+log = true
+[[param]]
+path = "r6.leafArea"
+lo = 1
+hi = 3
+
+# Held out: never in the loss, checked after the fit (analysis/experiments/m27_holdout.py).
+[holdout]
+survivalLight = [0.02, 0.05]   # lowest light all seedlings survive (Valladares et al. 2005: high mortality at 1%)
+shadeScore = 3.86   # Niinemets & Valladares 2006, Appendix A

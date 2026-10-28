@@ -1,0 +1,190 @@
+# M27 fit targets: pedunculate oak (Quercus robur). Read by analysis/treesim/fit.py.
+# Units: 1 cell ≈ 0.25 m, 1 season = 1 year (ROADMAP). Each trait is a trial's trait, the mean
+# over seeds; it costs ((mean − target) / band)² × weight. "measured": a number from a study;
+# "described": a field-guide description turned into a wide band, at half weight.
+# Sources: docs/research/2026-10-28-species-traits.md.
+
+species = "oak"
+
+[[trait]]
+name = "stand.height"
+target = 72
+band = 16
+weight = 1
+kind = "measured"
+source = "top height ≈ 16–20 m at 60 years (oak yield classes 4–8; Forestry Commission yield models), mature 25–35 m"
+
+[[trait]]
+name = "lone.earlyShare"
+target = 0.6
+band = 0.1
+weight = 0.5
+kind = "described"
+source = "height at 30 over height at 60: oak's height growth culminates later than birch's, earlier than beech's (yield-model curve shape)"
+
+[[trait]]
+name = "lone.spread"
+target = 1.3
+band = 0.3
+weight = 0.5
+kind = "described"
+source = "an open-grown oak is as broad as it is tall or broader (Plate II; M19 note)"
+
+[[trait]]
+name = "lone.slenderness"
+target = 48
+band = 8
+weight = 1
+kind = "measured"
+source = "open-grown trees are squat, H/D ≈ 40–55 (MacFarlane et al. 2017)"
+
+[[trait]]
+name = "stand.slenderness"
+target = 70
+band = 10
+weight = 1
+kind = "measured"
+source = "stand-grown H/D 60–80 (Watt et al. 2023)"
+
+[[trait]]
+name = "stand.crownRatio"
+target = 0.4
+band = 0.1
+weight = 0.5
+kind = "described"
+source = "a light-demander's crown lifts in a stand (Kothari et al. 2025; M19 note)"
+
+[[trait]]
+name = "stand.floor"
+target = 0.08
+band = 0.03
+weight = 0.5
+kind = "described"
+source = "oak canopies let through more light than beech's, less than birch's or pine's (Pérot et al. 2017; Sercu et al. 2017; M19 targets)"
+
+[[trait]]
+name = "lone.widestAt"
+target = 0.5
+band = 0.15
+weight = 0.5
+kind = "described"
+source = "a broad, rounded crown, widest about its middle"
+
+[[trait]]
+name = "lone.crownFullness"
+target = 0.72
+band = 0.1
+weight = 0.5
+kind = "described"
+source = "a rounded, full crown (an ellipse is 0.79)"
+
+[[trait]]
+name = "lone.forkHeight"
+target = 0.3
+band = 0.15
+weight = 0.5
+kind = "described"
+source = "decurrent: the trunk divides low into a few big limbs (§9; M26 note)"
+
+[[trait]]
+name = "lone.leaderDominance"
+target = 1.3
+band = 0.5
+weight = 0.5
+kind = "described"
+source = "apical control fades early: no leader thicker than its limbs"
+
+[[trait]]
+name = "lone.branchAngle"
+target = 55
+band = 10
+weight = 0.5
+kind = "described"
+source = "wide-angled, spreading limbs (§9; Plate II)"
+
+[[trait]]
+name = "lone.limbDroop"
+target = 5
+band = 10
+weight = 0.25
+kind = "described"
+source = "stiff limbs that reach out level, twisting rather than arching"
+
+# Free parameters: dotted paths into the species' patch, with bounds (literature review §4,
+# ROADMAP calibration table). log = true searches the bound's log scale.
+[[param]]
+path = "c3.alpha"
+lo = 2.5
+hi = 6
+[[param]]
+path = "r2.levels.0.lambda"
+lo = 0.5
+hi = 0.6
+[[param]]
+path = "r2.levels.1.lambda"
+lo = 0.48
+hi = 0.58
+[[param]]
+path = "r2.levels.1.setPoint"
+lo = 20
+hi = 90
+[[param]]
+path = "r2.levels.1.branchAngle"
+lo = 25
+hi = 70
+[[param]]
+path = "r2.levels.1.eta"
+lo = 0.05
+hi = 1.5
+log = true
+[[param]]
+path = "r2.levels.2.setPoint"
+lo = 40
+hi = 160
+[[param]]
+path = "r2.aC"
+lo = 0
+hi = 40
+[[param]]
+path = "r2.dLambda"
+lo = 0
+hi = 0.12
+[[param]]
+path = "r2.kappa"
+lo = 0
+hi = 4
+[[param]]
+path = "c5.Trel"
+lo = 0.005
+hi = 0.6
+[[param]]
+path = "c6.r0"
+lo = 0.015
+hi = 0.05
+[[param]]
+path = "r1.Lh"
+lo = 25
+hi = 100
+[[param]]
+path = "r1.mf"
+lo = 0.02
+hi = 0.15
+[[param]]
+path = "r3.c"
+lo = 0.01
+hi = 0.3
+log = true
+[[param]]
+path = "r6.qMin"
+lo = 0.01
+hi = 0.2
+log = true
+[[param]]
+path = "r6.leafArea"
+lo = 1
+hi = 3
+
+# Held out: never in the loss, checked after the fit (analysis/experiments/m27_holdout.py).
+[holdout]
+survivalLight = [0.05, 0.10]   # lowest light all seedlings survive (Kobe et al. 1995; Ligot et al. 2013: oak needs over 20% to grow well)
+shadeScore = 2.45   # Niinemets & Valladares 2006, Appendix A

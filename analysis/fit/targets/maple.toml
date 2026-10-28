@@ -1,0 +1,191 @@
+# M27 fit targets: field maple (Acer campestre). Read by analysis/treesim/fit.py.
+# Units: 1 cell ≈ 0.25 m, 1 season = 1 year (ROADMAP). Each trait is a trial's trait, the mean
+# over seeds; it costs ((mean − target) / band)² × weight. "measured": a number from a study;
+# "described": a field-guide description turned into a wide band, at half weight.
+# Sources: docs/research/2026-10-28-species-traits.md.
+
+species = "maple"
+
+[[trait]]
+name = "stand.height"
+target = 56
+band = 14
+weight = 1
+kind = "measured"
+source = "≈ 14 m at 60 years: mature height in the field guides (M25 note) 15–20 m; slower than beech and oak (Schmucker et al. 2023)"
+
+[[trait]]
+name = "lone.earlyShare"
+target = 0.62
+band = 0.1
+weight = 0.5
+kind = "described"
+source = "height at 30 over height at 60: a small tree that slows early"
+
+[[trait]]
+name = "lone.spread"
+target = 1
+band = 0.25
+weight = 0.5
+kind = "described"
+source = "a low, rounded crown about as wide as it is tall (field guides; M25)"
+
+[[trait]]
+name = "lone.slenderness"
+target = 48
+band = 8
+weight = 1
+kind = "measured"
+source = "open-grown trees are squat, H/D ≈ 40–55 (MacFarlane et al. 2017)"
+
+[[trait]]
+name = "stand.slenderness"
+target = 70
+band = 10
+weight = 1
+kind = "measured"
+source = "stand-grown H/D 60–80 (Watt et al. 2023)"
+
+[[trait]]
+name = "stand.crownRatio"
+target = 0.5
+band = 0.1
+weight = 0.5
+kind = "described"
+source = "mid-tolerant: a crown between birch's and beech's in depth (Kothari et al. 2025)"
+
+[[trait]]
+name = "stand.floor"
+target = 0.05
+band = 0.02
+weight = 0.5
+kind = "described"
+source = "between oak's and beech's (M25 follow-up)"
+
+[[trait]]
+name = "lone.widestAt"
+target = 0.45
+band = 0.15
+weight = 0.5
+kind = "described"
+source = "a rounded crown, widest about its middle"
+
+[[trait]]
+name = "lone.crownFullness"
+target = 0.72
+band = 0.1
+weight = 0.5
+kind = "described"
+source = "a full, rounded crown (an ellipse is 0.79)"
+
+[[trait]]
+name = "lone.forkHeight"
+target = 0.35
+band = 0.2
+weight = 0.5
+kind = "described"
+source = "rounded and forking low: decurrent (M25)"
+
+[[trait]]
+name = "lone.leaderDominance"
+target = 1.6
+band = 0.6
+weight = 0.5
+kind = "described"
+source = "weak apical control once the crown forms"
+
+[[trait]]
+name = "lone.branchAngle"
+target = 45
+band = 10
+weight = 0.5
+kind = "described"
+source = "ascending limbs on stiff wood (M25)"
+
+[[trait]]
+name = "lone.limbDroop"
+target = 10
+band = 10
+weight = 0.25
+kind = "described"
+source = "limbs that arch a little at the tips"
+
+# Free parameters: dotted paths into the species' patch, with bounds (literature review §4,
+# ROADMAP calibration table). log = true searches the bound's log scale.
+# A small tree: L_h may go lower than the big species'.
+[[param]]
+path = "c3.alpha"
+lo = 2.5
+hi = 6
+[[param]]
+path = "r2.levels.0.lambda"
+lo = 0.5
+hi = 0.6
+[[param]]
+path = "r2.levels.1.lambda"
+lo = 0.48
+hi = 0.58
+[[param]]
+path = "r2.levels.1.setPoint"
+lo = 20
+hi = 90
+[[param]]
+path = "r2.levels.1.branchAngle"
+lo = 25
+hi = 70
+[[param]]
+path = "r2.levels.1.eta"
+lo = 0.05
+hi = 1.5
+log = true
+[[param]]
+path = "r2.levels.2.setPoint"
+lo = 40
+hi = 160
+[[param]]
+path = "r2.aC"
+lo = 0
+hi = 40
+[[param]]
+path = "r2.dLambda"
+lo = 0
+hi = 0.12
+[[param]]
+path = "r2.kappa"
+lo = 0
+hi = 4
+[[param]]
+path = "c5.Trel"
+lo = 0.005
+hi = 0.6
+[[param]]
+path = "c6.r0"
+lo = 0.015
+hi = 0.05
+[[param]]
+path = "r1.Lh"
+lo = 12
+hi = 70
+[[param]]
+path = "r1.mf"
+lo = 0.02
+hi = 0.15
+[[param]]
+path = "r3.c"
+lo = 0.01
+hi = 0.3
+log = true
+[[param]]
+path = "r6.qMin"
+lo = 0.01
+hi = 0.2
+log = true
+[[param]]
+path = "r6.leafArea"
+lo = 1
+hi = 3
+
+# Held out: never in the loss, checked after the fit (analysis/experiments/m27_holdout.py).
+[holdout]
+survivalLight = [0.03, 0.08]   # lowest light all seedlings survive (between rowan and holly in score)
+shadeScore = 3.18   # Niinemets & Valladares 2006, Appendix A

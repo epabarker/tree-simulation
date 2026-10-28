@@ -218,6 +218,20 @@ class FitSettings:
     workers: int = 4
     rng_seed: int = 2026
 
+    @classmethod
+    def budget(cls, name: str, **overrides) -> FitSettings:
+        """A named budget: "full" (ADR 0020's), or "quick" (2 restarts, 50 generations, 4 seeds;
+        about a sixth of the candidates, for a first look at every species)."""
+        presets = {
+            "full": {},
+            "quick": {"generations": 50, "seeds": 4, "warm_restarts": 1, "random_restarts": 1},
+        }
+        return cls(**{**presets[name], **overrides})
+
+
+#: Every species with a targets file, the pilot species first.
+SPECIES = ["birch", "beech", "oak", "fir", "hornbeam", "maple", "holly", "rowan", "willow", "pine"]
+
 
 def fit(spec: Spec, settings: FitSettings, log=print) -> dict:
     rng = np.random.default_rng(settings.rng_seed)

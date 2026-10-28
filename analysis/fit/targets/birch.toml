@@ -187,3 +187,4 @@ hi = 3
 # Held out: never in the loss, checked after the fit (analysis/experiments/m27_holdout.py).
 [holdout]
 survivalLight = [0.10, 0.15]   # lowest light all seedlings survive (Kobe et al. 1995; Niinemets & Valladares 2006: 2.03)
+shadeScore = 2.03   # Niinemets & Valladares 2006, Appendix A

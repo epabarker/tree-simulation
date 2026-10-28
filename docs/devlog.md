@@ -22,6 +22,7 @@ Newest first. One entry per session or milestone: what changed, why, surprises, 
   - fir's H30/H60 goes to half weight;
   - `r2.hJ` is free on 2–150 (log).
   - Smoke fit of all ten passes. A candidate costs about 1.6× as much.
+- **Faster refits:** `m27_fit.py --start round1` starts warm restarts from an earlier round's fits; parameters new since start mid-range. A candidate's time is ≈ 70% the 100-season stand (≈ 0.3 s a seed), so round 2 runs 2 warm restarts, 50 generations and 3 seeds, an estimated 4–5× faster.
 - **Fixed:** the round-1 note of a fitted "oak needs 6.3%" was a shade-leaf value; saplings need 11.4%.
 
 ## 2026-10-28: M27, a hyperbolic hydraulic discount (ADR 0021)

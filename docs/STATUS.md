@@ -18,7 +18,7 @@ _Last updated: 2026-10-28 (M26 done; M27 round 1 fitted, round 2 waiting on the 
 
 ## Next
 1. **The user:** review M26 (the loupe on a phone); say whether to open the PR and release garden-v0.13.0 (tag push is the user's).
-2. **Handoff (the user), round 2:** plugged in, with Node 24 on PATH: `uv run --project analysis python analysis/experiments/m27_fit.py --species all --skip-done --restarts 2,1` (≈ 30 min a species).
+2. **Handoff (the user), round 2:** plugged in, with Node 24 on PATH: `uv run --project analysis python analysis/experiments/m27_fit.py --species all --skip-done --start round1 --restarts 2,0 --generations 50 --seeds 3` (warm from round 1's fits; ≈ 6–10 min a species, estimated).
 3. **Then (session):** `m27_holdout.py`, round 2 in the M27 note, and the user's decision on adoption (M27b).
 4. **Ideas:** rooting in windthrow; the leaf–section slope against live pipe area (r_live); measured holly and rowan growth curves, and quantum-sensor light under fir and the small trees (their targets are estimates).
 

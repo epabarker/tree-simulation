@@ -256,13 +256,20 @@ class FitSettings:
 SPECIES = ["birch", "beech", "oak", "fir", "hornbeam", "maple", "holly", "rowan", "willow", "pine"]
 
 
-def fit(spec: Spec, settings: FitSettings, log=print) -> dict:
+def fit(spec: Spec, settings: FitSettings, log=print, start: dict | None = None) -> dict:
+    """Fits `spec`. Warm restarts start from the hand-tuned values, or from `start` (an earlier fit's
+    assignments) where given; a parameter `start` lacks (one added since) starts mid-range."""
     rng = np.random.default_rng(settings.rng_seed)
     pool = Pool(settings.workers)
     rows: list[dict] = []
     try:
         start_values = pool.ask({"describe": spec.species, "paths": spec.paths})["values"]
         x_hand = encode(spec, start_values)
+        if start is not None:
+            x_hand = np.array([
+                encode(Spec(spec.species, [], [p]), {p["path"]: start[p["path"]]})[0] if p["path"] in start else 0.5
+                for p in spec.params
+            ])
         n = len(spec.params)
         bounds = np.array([[0.0, 1.0]] * n)
         restarts = ["warm"] * settings.warm_restarts + ["random"] * settings.random_restarts

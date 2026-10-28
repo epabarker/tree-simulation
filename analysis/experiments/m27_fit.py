@@ -4,6 +4,8 @@
     uv run --project analysis python analysis/experiments/m27_fit.py --species all --skip-done
     uv run --project analysis python analysis/experiments/m27_fit.py --species all --budget quick
     uv run --project analysis python analysis/experiments/m27_fit.py --species birch --smoke
+    uv run --project analysis python analysis/experiments/m27_fit.py --species all --skip-done \
+        --start round1 --restarts 2,0 --generations 50 --seeds 3     # a later round, from round 1's fits
 
 Needs Node 24 first on PATH. The full budget takes about 20–40 minutes per species on a 12-core
 laptop (up to 30,000 tree-runs of ≈ 0.6 s; see the handoff in docs/STATUS.md); `--budget quick`
@@ -18,6 +20,7 @@ interrupted run where it stopped.
 """
 
 import argparse
+import json
 import os
 
 from treesim import REPO
@@ -30,6 +33,8 @@ parser.add_argument("--budget", choices=["full", "quick"], default="full")
 parser.add_argument("--generations", type=int, help="overrides the budget's")
 parser.add_argument("--seeds", type=int, help="overrides the budget's")
 parser.add_argument("--restarts", help="warm,random restarts, e.g. 2,1; overrides the budget's")
+parser.add_argument("--start", default="hand",
+                    help="warm restarts start from the hand-tuned values (hand) or an earlier round's fits, e.g. round1")
 parser.add_argument("--skip-done", action="store_true", help="skip species that already have a results file")
 parser.add_argument("--smoke", action="store_true", help="2 generations, 2 seeds, 1 restart; writes under runs/ only")
 args = parser.parse_args()
@@ -75,7 +80,12 @@ for sp in species:
         continue
     print(f"\n=== {sp} ({'smoke' if args.smoke else args.budget}) ===", flush=True)
     spec = load_spec(sp)
-    result = fit(spec, settings, log=lambda s: print(s, flush=True))
+    start = None
+    if args.start != "hand":
+        earlier = json.loads((REPO / "docs" / "experiments" / "fits" / args.start / f"{sp}.json").read_text())
+        start = earlier["fit"]["assign"]
+    result = fit(spec, settings, log=lambda s: print(s, flush=True), start=start)
+    result["start"] = args.start
     path = write_results(result, out_dir(sp), log_root / sp)
     report(spec, result, path)
     done.append(sp)

@@ -14,8 +14,8 @@
 
 import * as Comlink from "comlink";
 import type { TreeMetrics } from "../core/metrics.ts";
-import { mergeParams, type Obstacle, type Params, type ParamsPatch } from "../core/params.ts";
-import { presetParams } from "../core/presets.ts";
+import type { Obstacle, Params, ParamsPatch } from "../core/params.ts";
+import { forestParams, specimenParams } from "../core/presets.ts";
 import type { Snapshot, SnapshotOptions } from "../core/snapshot.ts";
 import type { RunRecord } from "../core/world.ts";
 import type { SimApi } from "../worker/api.ts";
@@ -104,6 +104,14 @@ export interface GardenOptions {
    * where it stood when the focus returns to it (M19). Unset: the specimen is a forest tree.
    */
   specimen?: "oak";
+  /**
+   * First paint (M21): grown forests to open on, saved at a few world widths. The garden picks the
+   * width nearest its own and one of `seeds` by the day of the year, fetches
+   * `${base}/${width}-${seed}.bin.gz` (a gzipped checkpoint, core/checkpoint.ts) and grows on from
+   * it at the ambient pace. If the fetch fails it grows a forest from seed as usual. Ignored with
+   * `params` or `seed`.
+   */
+  first?: { base: string; widths: number[]; seeds: number[] };
   /** CSS pixels kept free above the crowns, e.g. for text over the sky. Default 0. */
   headroom?: number;
   /** Leave the sky out so the page shows through. */
@@ -209,30 +217,18 @@ const SPRING = 0.3;
 /** Rows of sky above the forest's ground in its preset (130): the ring's width follows the host. */
 const WORLD_HEIGHT = 130;
 
-/** Planted species around the ring (M19): half birch pioneers, with oak and beech among them. */
-const PLANTING = ["birch", "oak", "birch", "beech"] as const;
-
 /**
- * The `succession` woodland (M19) on a ring `width` cells wide, with a tree every ≈ 21 cells: about
- * as wide as the host is wide relative to the world's height, so a phone gets a narrower forest.
- * The seed turns the planting pattern, so each forest starts from a different mix.
+ * The ring's width for a host of this size: as wide as the host is wide relative to the world's
+ * height. A portrait host (a phone) gets two thirds of that, so fewer trees are drawn larger and
+ * fill the plate's height rather than its lower half (M21 art pass).
  */
-export function forestParams(width = 210, seed?: number): Params {
-  const base = presetParams("succession", seed);
-  // A phone in portrait gets a narrow ring of two or three trees, drawn large (D1).
-  const W = Math.round(Math.min(520, Math.max(54, width)));
-  const n = Math.max(2, Math.round(W / 21));
-  const trees = Array.from({ length: n }, (_, k) => ({
-    x: ((k + 0.5) * W) / n,
-    species: PLANTING[(k + base.seed) % PLANTING.length] as string,
-  }));
-  return mergeParams(base, { world: { ...base.world, width: W }, trees });
+export function plateWidth(width: number, height: number): number {
+  const aspect = width / Math.max(1, height);
+  return WORLD_HEIGHT * aspect * (aspect < 1 ? 0.65 : 1);
 }
 
-/** Plate II (M19): an oak grown alone in the open, a new one for each seed. */
-export function specimenParams(seed: number): Params {
-  return presetParams("oakOpen", seed);
-}
+// The home forest and Plate II's oak live with the presets, so the CLI can grow them too (M21).
+export { forestParams, specimenParams } from "../core/presets.ts";
 
 /** Puts the scene's colour tokens first in <head>, once: their cascade layer then loses to any host. */
 function injectSceneTokens(): void {
@@ -281,10 +277,7 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
   const rect = renderer.canvas.getBoundingClientRect();
   const params =
     options.params ??
-    forestParams(
-      (WORLD_HEIGHT * rect.width) / Math.max(1, rect.height),
-      options.seed ?? randomSeed(),
-    );
+    forestParams(plateWidth(rect.width, rect.height), options.seed ?? randomSeed());
 
   const view = Object.assign(options.view ?? {}, {
     colorMode: "natural",
@@ -334,6 +327,8 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
   let inFlight = false;
   /** The run's params (for obstacle events) and the obstacles last sent, as JSON. */
   let current = params;
+  /** The seed of the forest shown (a grown forest's, once one is opened; option `first`). */
+  let seedNow = params.seed;
   let sentObstacles = JSON.stringify(params.world.obstacles ?? []);
   const obstacleSelector =
     options.obstacles === undefined ? "[data-garden-obstacle]" : options.obstacles;
@@ -408,6 +403,7 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
   async function restart(next: Params): Promise<void> {
     generation += 1;
     ownSpecimen = false; // a new run drops any world put aside
+    seedNow = next.seed;
     const mine = generation;
     inFlight = true;
     ahead = null;
@@ -488,7 +484,7 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
 
   /** Reduced motion, "still": the forest as it stands after the intro, without animation. */
   async function growStill(): Promise<void> {
-    if (!pace) return;
+    if (!pace || season >= pace.introSeasons) return; // a grown forest (option `first`) is grown
     const mine = generation;
     inFlight = true;
     const s = await sim.step(pace.introSeasons);
@@ -733,7 +729,52 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
     attributeFilter: ["data-theme", "class"],
   });
 
-  const ready = restart(params).then(async () => {
+  /** The width and seed of the grown forest to open on (option `first`), or null. */
+  const firstForest = (): { url: string; width: number; seed: number } | null => {
+    const first = options.first;
+    if (!first || options.params || options.seed !== undefined) return null;
+    if (first.widths.length === 0 || first.seeds.length === 0) return null;
+    const wanted = params.world.width;
+    let width = first.widths[0] as number;
+    for (const w of first.widths) if (Math.abs(w - wanted) < Math.abs(width - wanted)) width = w;
+    const day = Math.floor(Date.now() / 86_400_000);
+    const seed = first.seeds[day % first.seeds.length] as number;
+    return { url: `${first.base}/${width}-${seed}.bin.gz`, width, seed };
+  };
+
+  /** Opens on a grown forest: like `restart`, but the worker loads a checkpoint (SimApi.restore). */
+  async function restoreFirst(at: { url: string; width: number; seed: number }): Promise<boolean> {
+    generation += 1;
+    const mine = generation;
+    inFlight = true;
+    ahead = null;
+    try {
+      const response = await fetch(at.url);
+      if (!response.ok) throw new Error(`${response.status}`);
+      const bytes = await response.arrayBuffer();
+      const s = await sim.restore(Comlink.transfer(bytes, [bytes]));
+      if (mine !== generation || destroyed) return true;
+      // The run it came from, for obstacle events and for sharing (?forest=seed regrows it).
+      current = forestParams(at.width, at.seed);
+      seedNow = at.seed;
+      sentObstacles = JSON.stringify(current.world.obstacles ?? []);
+      inFlight = false;
+      autoFit = true;
+      accept(s, false, true);
+      measureObstacles();
+      if (playback.playing) request();
+      return true;
+    } catch {
+      inFlight = false;
+      return false;
+    }
+  }
+
+  const first = firstForest();
+  const opening = first
+    ? restoreFirst(first).then((ok) => (ok ? undefined : restart(params)))
+    : restart(params);
+  const ready = opening.then(async () => {
     if (destroyed) return;
     if (focus === "specimen" && options.specimen === "oak") {
       ownSpecimen = true;
@@ -781,7 +822,9 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
     redraw() {
       dirty = true;
     },
-    seed: params.seed,
+    get seed() {
+      return seedNow;
+    },
     setYearSeconds(seconds) {
       yearSeconds = Math.max(0, seconds);
     },

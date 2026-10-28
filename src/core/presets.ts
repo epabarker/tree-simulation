@@ -565,3 +565,28 @@ export function presetParams(name: PresetName, seed?: number): Params {
 export function isPresetName(name: string): name is PresetName {
   return Object.hasOwn(presets, name);
 }
+
+/** Planted species around the ring (M19): half birch pioneers, with oak and beech among them. */
+const PLANTING = ["birch", "oak", "birch", "beech"] as const;
+
+/**
+ * The `succession` woodland (M19) on a ring `width` cells wide, with a tree every ≈ 21 cells: about
+ * as wide as the host is wide relative to the world's height, so a phone gets a narrower forest.
+ * The seed turns the planting pattern, so each forest starts from a different mix.
+ */
+export function forestParams(width = 210, seed?: number): Params {
+  const base = presetParams("succession", seed);
+  // A phone in portrait gets a narrow ring of two or three trees, drawn large (D1).
+  const W = Math.round(Math.min(520, Math.max(54, width)));
+  const n = Math.max(2, Math.round(W / 21));
+  const trees = Array.from({ length: n }, (_, k) => ({
+    x: ((k + 0.5) * W) / n,
+    species: PLANTING[(k + base.seed) % PLANTING.length] as string,
+  }));
+  return mergeParams(base, { world: { ...base.world, width: W }, trees });
+}
+
+/** Plate II (M19): an oak grown alone in the open, a new one for each seed. */
+export function specimenParams(seed: number): Params {
+  return presetParams("oakOpen", seed);
+}

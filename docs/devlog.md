@@ -2,6 +2,61 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-28: M21 step 2, art pass and first paint on the site
+
+- **User choices:**
+  - open on a grown forest;
+  - no poster image;
+  - Lighthouse through the installed Chrome (a Flatpak, so not on PATH);
+  - art pass on phone composition, the choice of grown forests, and the night scene.
+- **Grown forests:**
+  - **Chosen by eye** from twelve seeds: 6, 9 and 10.
+  - **At 40 seasons, not 60.** At 60 the stand has self-thinned into tall poles with small crowns: true, but not handsome.
+  - **Widths** 66, 100, 160 and 220; 300 is dropped, since the site's plate never wants it.
+- **Phone:** `plateWidth` gives a portrait plate two thirds of its aspect's width: about three trees, drawn large, filling the plate's height instead of its lower half.
+- **Site** (branch `claude/m21-launch`):
+  - the garden opens on the release's grown forests (`first`, read from the manifest at build time);
+  - plate labels that would overlap, or be cut off at the edge, are dropped;
+  - species inks in the Field guide's palette: the species tokens had fallen back to the garden's bright defaults;
+  - **a moonlit night:** cool sky, silvered foliage, grey-brown bark, muted autumn.
+- **Measured** (local build):
+  - the grown forest shows 0.26 s after `load`;
+  - Lighthouse mobile 100/100/100/100, largest paint 1.4 s, layout shift 0.001;
+  - reduced motion shows the grown forest still.
+  - Production scored 99/100/96/92 (before M21); the deductions were Cloudflare's: its analytics beacon refused in headless Chrome, and its managed robots.txt `Content-Signal` line.
+
+## 2026-10-28: M21 step 1, checkpoints and grown forests
+
+- **Core:**
+  - `core/checkpoint.ts`: `saveWorld` and `loadWorld`. Restoring at N and running k seasons hashes exactly as N + k, with a fell and a sown seed still queued.
+  - `World.restoreState` and `World.queued`.
+  - `forestParams` and `specimenParams` moved to `presets.ts`, so the CLI can grow the home forest.
+- **CLI:** `--checkpoint-at N`, and `cli/first-paint.ts` (run by `build:garden`), which writes 12 grown forests: 4 widths × 3 seeds, 60 seasons, 40–210 kB each, 1.3 MB in all.
+- **Worker:** `restore(bytes)`.
+- **Garden:**
+  - option `first`: it opens on a grown forest nearest its width, with one seed a day, and falls back to growing from seed;
+  - `seed` is now a getter;
+  - reduced motion doesn't regrow a grown forest;
+  - `garden.html?first`.
+- **Measured:** the grown forest shows 173 ms after `load` (Firefox, local preview).
+- **Surprises:**
+  - **Double unzip.** Vite's preview server sends `.gz` with `Content-Encoding: gzip`, so the browser had already unzipped it. The worker now unzips only bytes that start with gzip's magic number.
+  - **No text codec.** The core has no `TextEncoder`, so the header is ASCII JSON with \uXXXX escapes.
+- **Tests:** 201 pass, goldens unchanged.
+
+## 2026-10-28: garden-v0.7.0 live
+
+- **Releases:**
+  - PR #13 merged here; `garden-v0.7.0` released by the workflow.
+  - The site synced from the release; the only difference from the local build is that source maps are left out.
+  - edbarker-dev PR #1 merged; Workers Builds deployed it to production.
+- **Smoke test on edbarker.dev** (Firefox, headless):
+  - a species card ("Silver birch, *Betula pendula*");
+  - Plate II's oak caption;
+  - the forest resumes on return.
+  - The only console errors are Cloudflare's analytics beacon, which headless Firefox blocks.
+- **Surprise:** `git tag` needs `-a -m` in this repo's config.
+
 ## 2026-10-28: M19–M20 realism pass
 
 - **User:** the first species release had lost realism. The fix was M18 first, then this pass, then one release.

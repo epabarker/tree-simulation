@@ -5,6 +5,7 @@
  */
 
 import * as Comlink from "comlink";
+import { loadWorld } from "../core/checkpoint.ts";
 import { defaultParams, type Params, type ParamsPatch } from "../core/params.ts";
 import {
   FULL_SNAPSHOT,
@@ -32,6 +33,19 @@ function snapshot(ms: number): Snapshot {
 const api: SimApi = {
   init(params: Params) {
     world = new World(params);
+    aside = null;
+    builder.reset();
+    return snapshot(0);
+  },
+  async restore(gzipped: ArrayBuffer) {
+    // A server may already have undone the gzip (Content-Encoding): only unzip gzip's own bytes.
+    const head = new Uint8Array(gzipped, 0, Math.min(2, gzipped.byteLength));
+    let bytes = gzipped;
+    if (head[0] === 0x1f && head[1] === 0x8b) {
+      const stream = new Blob([gzipped]).stream().pipeThrough(new DecompressionStream("gzip"));
+      bytes = await new Response(stream).arrayBuffer();
+    }
+    world = loadWorld(new Uint8Array(bytes));
     aside = null;
     builder.reset();
     return snapshot(0);

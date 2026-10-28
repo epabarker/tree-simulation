@@ -1,0 +1,189 @@
+# M27 fit targets: European beech (Fagus sylvatica). Read by analysis/treesim/fit.py.
+# Units: 1 cell ≈ 0.25 m, 1 season = 1 year (ROADMAP). Each trait is a trial's trait, the mean
+# over seeds; it costs ((mean − target) / band)² × weight. "measured": a number from a study;
+# "described": a field-guide description turned into a wide band, at half weight.
+# Sources: docs/research/2026-10-28-species-traits.md.
+
+species = "beech"
+
+[[trait]]
+name = "stand.height"
+target = 84
+band = 18
+weight = 1
+kind = "measured"
+source = "dominant height ≈ 20–22 m at 60 years, site index ≈ 27–33 m at 100 (beech site-index curves: Nord-Larsen et al. 2009; Bončina et al. 2021; Stajić et al. 2021)"
+
+[[trait]]
+name = "lone.earlyShare"
+target = 0.5
+band = 0.08
+weight = 1
+kind = "measured"
+source = "height at 30 over height at 60: beech grows slowly when young, its height increment culminating late (Stajić et al. 2021; Matisons et al. 2018)"
+
+[[trait]]
+name = "lone.spread"
+target = 0.9
+band = 0.2
+weight = 0.5
+kind = "described"
+source = "an open-grown crown about as wide as it is long (Hein et al. 2008); a broad dome"
+
+[[trait]]
+name = "lone.slenderness"
+target = 48
+band = 8
+weight = 1
+kind = "measured"
+source = "open-grown trees are squat, H/D ≈ 40–55 (MacFarlane et al. 2017)"
+
+[[trait]]
+name = "stand.slenderness"
+target = 70
+band = 10
+weight = 1
+kind = "measured"
+source = "stand-grown H/D 60–80 (Watt et al. 2023)"
+
+[[trait]]
+name = "stand.crownRatio"
+target = 0.55
+band = 0.1
+weight = 0.5
+kind = "described"
+source = "shade-tolerant species keep deep crowns in stands (Kothari et al. 2025; Dieler et al. 2013)"
+
+[[trait]]
+name = "stand.floor"
+target = 0.03
+band = 0.015
+weight = 1
+kind = "measured"
+source = "a closed beech canopy lets 2–5% of open-sky light through (M19 targets; literature review §4)"
+
+[[trait]]
+name = "lone.widestAt"
+target = 0.4
+band = 0.15
+weight = 0.5
+kind = "described"
+source = "a broad dome, widest in its lower middle, not at the base (M26 note)"
+
+[[trait]]
+name = "lone.crownFullness"
+target = 0.75
+band = 0.1
+weight = 0.5
+kind = "described"
+source = "a full, rounded dome (an ellipse is 0.79)"
+
+[[trait]]
+name = "lone.forkHeight"
+target = 0.7
+band = 0.2
+weight = 0.5
+kind = "described"
+source = "Troll's model: a leader that keeps its lead, open-grown trunks often dividing into a few big limbs"
+
+[[trait]]
+name = "lone.leaderDominance"
+target = 2.0
+band = 0.8
+weight = 0.5
+kind = "described"
+source = "moderate apical control"
+
+[[trait]]
+name = "lone.branchAngle"
+target = 55
+band = 10
+weight = 0.5
+kind = "described"
+source = "ascending to spreading limbs, flatter where competition is low (Bayer et al. 2013)"
+
+[[trait]]
+name = "lone.limbDroop"
+target = 10
+band = 10
+weight = 0.25
+kind = "described"
+source = "level limbs that arch a little at the tips"
+
+# Free parameters: dotted paths into the species' patch, with bounds (literature review §4,
+# ROADMAP calibration table). log = true searches the bound's log scale.
+[[param]]
+path = "c3.alpha"
+lo = 2.5
+hi = 6
+[[param]]
+path = "r2.levels.0.lambda"
+lo = 0.5
+hi = 0.6
+[[param]]
+path = "r2.levels.1.lambda"
+lo = 0.48
+hi = 0.58
+[[param]]
+path = "r2.levels.1.setPoint"
+lo = 20
+hi = 90
+[[param]]
+path = "r2.levels.1.branchAngle"
+lo = 25
+hi = 70
+[[param]]
+path = "r2.levels.1.eta"
+lo = 0.05
+hi = 1.5
+log = true
+[[param]]
+path = "r2.levels.2.setPoint"
+lo = 40
+hi = 160
+[[param]]
+path = "r2.aC"
+lo = 0
+hi = 40
+[[param]]
+path = "r2.dLambda"
+lo = 0
+hi = 0.12
+[[param]]
+path = "r2.kappa"
+lo = 0
+hi = 4
+[[param]]
+path = "c5.Trel"
+lo = 0.005
+hi = 0.6
+[[param]]
+path = "c6.r0"
+lo = 0.015
+hi = 0.05
+[[param]]
+path = "r1.Lh"
+lo = 25
+hi = 100
+[[param]]
+path = "r1.mf"
+lo = 0.02
+hi = 0.15
+[[param]]
+path = "r3.c"
+lo = 0.01
+hi = 0.3
+log = true
+[[param]]
+path = "r6.qMin"
+lo = 0.01
+hi = 0.2
+log = true
+[[param]]
+path = "r6.leafArea"
+lo = 1
+hi = 3
+
+# Held out: never in the loss, checked after the fit (analysis/experiments/m27_holdout.py).
+[holdout]
+survivalLight = [0.01, 0.03]   # lowest light all seedlings survive (Kobe et al. 1995; Niinemets & Valladares 2006: 4.56)

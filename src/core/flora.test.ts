@@ -3,6 +3,7 @@ import type { FloraName } from "./flora.ts";
 import { groundLight, treeMetrics } from "./metrics.ts";
 import { mergeParams, type Params } from "./params.ts";
 import { presetParams } from "./presets.ts";
+import { loneParams, shadeParams, standParams } from "./trials.ts";
 import { World } from "./world.ts";
 
 const SEEDS = [1, 2, 3];
@@ -19,15 +20,7 @@ function shadeHouse(species: FloraName, roof: number): { alive: number; light: n
   let alive = 0;
   let light = 0;
   for (const seed of SEEDS) {
-    const world = grown(seed, {
-      world: {
-        width: 40,
-        height: 60,
-        walls: [{ x: 0, y: 40, width: 40, height: 1, shade: roof }],
-        sides: "periodic",
-      },
-      trees: [{ x: 20, species }],
-    });
+    const world = new World(shadeParams(species, seed, roof));
     world.step();
     light += groundLight(world, 0, 6) / SEEDS.length;
     world.run(29);
@@ -36,16 +29,11 @@ function shadeHouse(species: FloraName, roof: number): { alive: number; light: n
   return { alive, light };
 }
 
-const STAND = [20, 41, 62, 83, 104, 125, 146, 167, 188, 209];
-
 function stand(species: FloraName) {
   const ms = [];
   const floor = [];
   for (const seed of SEEDS) {
-    const world = grown(seed, {
-      world: { width: 230, height: 130, walls: [] },
-      trees: STAND.map((x) => ({ x, species })),
-    });
+    const world = new World(standParams(species, seed));
     world.run(60);
     for (const t of world.trees.slice(2, -2)) if (t.alive) ms.push(treeMetrics(t, world));
     floor.push(groundLight(world, 50, 180));
@@ -59,7 +47,7 @@ function stand(species: FloraName) {
 
 function lone(species: FloraName) {
   const ms = SEEDS.map((seed) => {
-    const world = grown(seed, { trees: [{ x: 80, species }] });
+    const world = new World(loneParams(species, seed));
     world.run(60);
     return treeMetrics(world.trees[0] as NonNullable<(typeof world.trees)[0]>, world);
   });

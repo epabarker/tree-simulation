@@ -1,8 +1,8 @@
 # Status
 
-_Last updated: 2026-10-28 (M26 done; M27 next)_
+_Last updated: 2026-10-28 (M26 done; M27 waiting on the user's fits)_
 
-**M26 is done** on `claude/gallant-brown-5k4g33`: form metrics, the §10 measurements, retired presets, shareable lab links and the loupe. **M27** fits species to literature traits (plan approved; long runs are handed to the user).
+**M26 is done** on `claude/gallant-brown-5k4g33`: form metrics, the §10 measurements, retired presets, shareable lab links and the loupe. **M27's machinery is done** (ADR 0020): targets, `src/core/trials.ts`, `cli/fit-eval.ts`, `analysis/treesim/fit.py`, the hold-out script. **Waiting on the user** to run the two pilot fits.
 
 ## Works
 - **Core:** C1–C6, R1–R6, O2 and O4 (ADRs 0005–0013); the sky sweep with open or periodic sides; golden hashes. `World.discardDead` for long page runs.
@@ -18,8 +18,8 @@ _Last updated: 2026-10-28 (M26 done; M27 next)_
 
 ## Next
 1. **The user:** review M26 (the loupe on a phone); say whether to open the PR and release garden-v0.13.0 (tag push is the user's).
-2. **M27:** 27a trait targets for birch and beech (`docs/research/`, `analysis/fit/targets/*.toml`); 27b `cli/fit-eval.ts` and `src/core/trials.ts`; 27c the CMA-ES driver and a smoke fit.
-3. **Handoff:** the user runs the pilot fits and the hold-out run; then 27e, the note and the decision.
+2. **Handoff (the user):** with Node 24 on PATH, run `uv run --project analysis python analysis/experiments/m27_fit.py --species birch`, then `--species beech` (≈ 20–40 min each on 12 cores). Push `docs/experiments/fits/` (four small files).
+3. **Then (session):** `m27_holdout.py` (a few minutes), the M27 note, and the user's decision on adoption (M27b).
 4. **Ideas:** rooting in windthrow; the leaf–section slope against live pipe area (r_live).
 
 ## Open questions (ask when the milestone comes up)
@@ -30,7 +30,8 @@ _Last updated: 2026-10-28 (M26 done; M27 next)_
 
 ## Notes for the next session
 - **Node:** this container's default is 22; `npm test` now refuses it. Install 24 (`npm i node@24` in the scratchpad, then put its `bin` first on PATH). Playwright runs under the system Node (`NODE_PATH=$(npm root -g)`).
-- **Species patches:** a `species` entry in a params patch replaces that species' whole patch. Amend one with `patchSpecies` (CLI `--species-patch`).
+- **Species patches:** a `species` entry in a params patch replaces that species' whole patch. Amend one with `patchSpecies` (CLI `--species-patch`), or dotted paths (`trials.ts` `amendSpecies`).
+- **Fitting:** `--smoke` on either M27 script checks the pipeline in seconds and writes only under `runs/`.
 - **Site deploys** (Cloudflare Workers Builds): a push to `main` goes to production; any other branch gets `<branch>-edbarker-dev.edbarker.workers.dev`. For a new garden: tag `garden-vX.Y.Z` here, then run `node scripts/sync-garden.mjs X.Y.Z` there. **Tag pushes are refused (403) from cloud sessions:** ask the user to push the tag.
 - **Golden-safe means bit-identical.** Check with goldens and `npm run bench -- --compare runs/bench/<sha>.json` (baseline `efb3bbd` after the `firWood` swap).
 - **Headless checks:** Playwright Chromium with SwiftShader WebGL works; adaptive quality drops to "lite" there. Long-press a touch with CDP `Input.dispatchTouchEvent`.

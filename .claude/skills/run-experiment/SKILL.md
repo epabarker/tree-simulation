@@ -18,3 +18,14 @@ description: Run a parameter sweep, ablation or validation analysis for the tree
 4. **Analyse.** Load with `treesim_io.load_runs("runs/<experiment>")` into polars, with one row per run, season and tree. Plot with plotnine. Save small figures to `docs/experiments/figures/<note-name>-*.png`.
 5. **Write up.** Create `docs/experiments/YYYY-MM-DD-<milestone>-<topic>.md` covering the question, setup (the exact `uv run …` command), result (numbers and figures), and conclusion with follow-ups.
 6. **Report.** Give a short summary to the user, and add follow-ups to STATUS or ROADMAP.
+
+## Fitting a species (M27, ADR 0020)
+1. **Targets:** write `analysis/fit/targets/<species>.toml`:
+   - `[[trait]]` entries: `name` as `trial.trait`, `target`, `band`, `weight`, `kind` (measured or described), `source`;
+   - `[[param]]` entries: a dotted `path`, `lo`, `hi`, optional `log`;
+   - `[holdout]`.
+   Record the sources in `docs/research/`.
+2. **Smoke:** `uv run --project analysis python analysis/experiments/m27_fit.py --species <name> --smoke` checks the pipeline in seconds (Node 24 first on PATH).
+3. **Hand off the full fit:** it runs about 25 minutes on 12 cores per species. Anything over about 10 minutes goes to the user to run: give the exact command, the expected time, and the files it writes.
+4. **Hold-out:** `analysis/experiments/m27_holdout.py` (a few minutes, so it runs in the session). It compares the hand-tuned and fitted patches on shade survival, the mixed wood, the allometries, release and plausibility, and writes lab links.
+5. **Never adopt a fit by editing `flora.ts` without the user's decision.**

@@ -3,6 +3,7 @@ import { type TreeMetrics, treeMetrics } from "./metrics.ts";
 import { mergeParams, type ParamsPatch } from "./params.ts";
 import { presetParams } from "./presets.ts";
 import type { Tree } from "./tree.ts";
+import { epicormic } from "./trials.ts";
 import { World } from "./world.ts";
 
 // M10 visible test (§7, ADR 0012): an epicormic flush after a neighbour is felled, and slender
@@ -12,19 +13,6 @@ const FELL = 50;
 const WINDOW = 6;
 const NO_R5 = { r5: { enabled: false } } satisfies ParamsPatch;
 const median = (xs: number[]) => [...xs].sort((a, b) => a - b)[Math.floor(xs.length / 2)] as number;
-
-/** Axes started in seasons [from, to] on trunk wood at least 10 seasons old: epicormic shoots. */
-function epicormic(tree: Tree, from: number, to: number): number {
-  const c = tree.m.cols;
-  let k = 0;
-  for (let i = 0; i < tree.m.length; i++) {
-    const p = c.parent[i];
-    if (p < 0 || c.axisNode[i] !== 0 || c.order[p] !== 0) continue;
-    if (c.birthSeason[i] < from || c.birthSeason[i] > to) continue;
-    if (c.birthSeason[i] - c.birthSeason[p] >= 10) k += 1;
-  }
-  return k;
-}
 
 /** Epicormic shoots on the felled tree's two neighbours (3 and 5) in the seasons after felling. */
 function flush(seed: number, fell: boolean, patch: ParamsPatch = {}): number {

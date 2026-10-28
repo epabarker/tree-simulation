@@ -2,6 +2,16 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-28: M27 machinery: fitting species to literature traits
+
+- **Targets** ([research note](research/2026-10-28-species-traits.md)): 13 traits each for birch and beech in `analysis/fit/targets/*.toml`, 17 free parameters with bounds. Heights from site-index studies (as commonly reported ranges; the searches returned abstracts only); shape and angles are descriptions turned into wide bands at half weight.
+- **Trials** (`src/core/trials.ts`): lone, stand, shade house and a felled-gap release, M25's settings, now shared with `flora.test.ts` (unchanged results). Candidates are dotted-path assignments (`amendSpecies`), applied over the species' effective params.
+- **Evaluator** (`cli/fit-eval.ts`): a long-lived JSON-lines process per core; ≈ 0.6 s per tree-run here.
+- **Driver** (`analysis/treesim/fit.py`, `m27_fit.py`): CMA-ES (`cmaes` 0.13) in a unit cube, common random seeds per generation, three warm and two random restarts, finalists re-measured on 10 fixed seeds beside the hand-tuned patch.
+- **Hold-out** (`m27_holdout.py`): shade survival and its order across the ten species, Δ and the M26 slopes, release, the mixed wood over 400 seasons, plausibility (bounds, restart spread), crown silhouettes and lab links.
+- **Smoke runs** pass end to end (6 s and 10 s). The hand-tuned birch scores 8.1 (stand height 69 against 95, open H/D 63 against 48); beech 7.8.
+- **Handed to the user:** the two full fits (≈ 20–40 minutes each on 12 cores).
+
 ## 2026-10-28: M26, measurements, polish and the loupe
 
 - **User:** agreed M26 and M27 (plan reviewed in session): polish with small fixes, shareable lab links and the loupe; retire the old species presets; crown-shape targets from literature numbers; fitted values reported, not adopted; long computations handed to the user.

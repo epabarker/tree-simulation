@@ -56,11 +56,11 @@ source = "a shade-tolerant conifer keeps a deep crown in a stand, roughly 0.5–
 
 [[trait]]
 name = "stand.floor"
-target = 0.04
-band = 0.02
+target = 0.013
+band = 0.008
 weight = 0.5
 kind = "described"
-source = "a deep shade, near beech's: a shade-tolerant evergreen with a deep crown (M19)"
+source = "1.3% (0.7–3.0%), estimated from Hagemeier & Leuschner 2019's five measured species: ln(floor %) = 4.92 − 1.08 × Niinemets & Valladares score, cross-checked by LAI and Beer–Lambert (user's research, analysis/fit/sources/floor_light_targets.csv)"
 
 [[trait]]
 name = "lone.widestAt"

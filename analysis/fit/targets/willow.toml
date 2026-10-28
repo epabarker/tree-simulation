@@ -8,19 +8,19 @@ species = "willow"
 
 [[trait]]
 name = "stand.height"
-target = 40
-band = 10
+target = 52
+band = 14
 weight = 1
 kind = "measured"
-source = "≈ 10 m at 60 years: mature height in the field guides (M25 note) ≈ 10 m, reached early; short-lived"
+source = "13 m at 60 years: between British field guides (≈ 10 m, up to 15) and taiga tree-willow stands (16.6–18 m, Paramonov et al. 2021)"
 
 [[trait]]
 name = "lone.earlyShare"
-target = 0.9
-band = 0.08
-weight = 0.5
-kind = "described"
-source = "height at 30 over height at 60: reaches its ultimate height in 10–20 years and lives about 60 (arboretum and LWF profiles)"
+target = 0.73
+band = 0.06
+weight = 1
+kind = "measured"
+source = "height at 30 over height at 60: 0.69–0.77 for classes II–I of the tree-willow yield tables of Arkhangelsk (Paramonov, Tretyakov & Koptev 2021; mostly goat willow; mean height × 1.1; age 60 partly extrapolated; analysis/fit/sources/minor_species_growth_curves.csv)"
 
 [[trait]]
 name = "lone.spread"
@@ -60,7 +60,7 @@ target = 0.12
 band = 0.05
 weight = 0.5
 kind = "described"
-source = "light shade, a little deeper than birch's (M25 expectation)"
+source = "12% (8–18%), estimated from Hagemeier & Leuschner 2019's five measured species: ln(floor %) = 4.92 − 1.08 × Niinemets & Valladares score, cross-checked by LAI and Beer–Lambert (user's research, analysis/fit/sources/floor_light_targets.csv); near birch's measured 14.8%"
 
 [[trait]]
 name = "lone.widestAt"

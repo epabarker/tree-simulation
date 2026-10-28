@@ -8,19 +8,19 @@ species = "rowan"
 
 [[trait]]
 name = "stand.height"
-target = 48
-band = 12
-weight = 1
-kind = "measured"
-source = "≈ 12 m at 60 years: mature height in the field guides (M25 note) 10–15 m"
+target = 60
+band = 14
+weight = 0.5
+kind = "described"
+source = "≈ 15 m at 60 years: the same fitted curve gives 15.5 m forest top height; field guides 10–15 m mature"
 
 [[trait]]
 name = "lone.earlyShare"
-target = 0.78
+target = 0.74
 band = 0.08
 weight = 0.5
 kind = "described"
-source = "height at 30 over height at 60: fast juvenile growth (up to 2 m a year) that slows after about 25 years (WSL; Ward 2014, SLU thesis)"
+source = "height at 30 over height at 60: 0.735 on a Chapman–Richards curve fitted through rowan's published growth facts (80 cm a year young, slowing after ≈ 20, level with spruce to 45; LWF Nr. 17; Swiss NFI)"
 
 [[trait]]
 name = "lone.spread"
@@ -56,11 +56,11 @@ source = "light-demanding: the crown lifts in a stand (Kothari et al. 2025)"
 
 [[trait]]
 name = "stand.floor"
-target = 0.12
-band = 0.05
+target = 0.075
+band = 0.03
 weight = 0.5
 kind = "described"
-source = "a light, open canopy of pinnate leaves (field guides)"
+source = "7.5% (5–12%), estimated from Hagemeier & Leuschner 2019's five measured species: ln(floor %) = 4.92 − 1.08 × Niinemets & Valladares score, cross-checked by LAI and Beer–Lambert (user's research, analysis/fit/sources/floor_light_targets.csv); anchored near oak's measured 8.4% (same score)"
 
 [[trait]]
 name = "lone.widestAt"
@@ -187,5 +187,5 @@ hi = 3
 
 # Held out: never in the loss, checked after the fit (analysis/experiments/m27_holdout.py).
 [holdout]
-survivalLight = [0.06, 0.12]   # lowest light all seedlings survive (between oak and maple in score)
+survivalLight = [0.08, 0.14]   # lowest light all seedlings survive (oak's band: the same score; saplings estimated to need 11.4%)
 shadeScore = 2.73   # Niinemets & Valladares 2006, Appendix A

@@ -36,22 +36,31 @@ The same 13 traits and 17 parameters for oak, fir, hornbeam, field maple, holly,
   - **Height at 60 seasons:**
     - oak, pine, fir and hornbeam from yield tables;
     - field maple from Germany's national forest inventory;
-    - holly, rowan and willow still from the field guides' mature heights (M25 note), converted to age 60. That conversion is a judgement: a small tree is near its mature height at 60, a big one well short of it.
-  - **Height at 30 over height at 60:** for oak, pine, fir and hornbeam, from the same yield tables.
+    - willow between the field guides' ≈ 10 m and taiga willow stands' 16.6–18 m (Paramonov et al. 2021): 52 ± 14 cells.
+    - Rowan and holly are now estimates at half weight (below).
+  - **Height at 30 over height at 60:** for oak, pine, fir and hornbeam from the same yield tables, and for willow from the Arkhangelsk tree-willow yield tables.
   - **Floor light:** oak and hornbeam, and the pilot's birch and beech (Hagemeier & Leuschner 2019).
   - **H/D:** open-grown 48 ± 8 (MacFarlane et al. 2017), stand-grown 70 ± 10 (Watt et al. 2023), for every species as for the pilot. Field maple's measured canopy trees agree: H/D 64 and 73 in two Bavarian stands (LWF Wissen 77).
 - **Described, weight 0.5:**
-  - **Floor light** for fir, maple, holly, rowan, willow and pine. These are bands set by the M25 ordering. Pine's is scaled from birch's: all-day light under pine is 1.15 times that under birch (Dobrowolska 2008).
-  - **Height at 30 over height at 60** for the small trees (maple, holly, rowan, willow), from growth descriptions: willow reaches its ultimate height in 10–20 years; rowan grows fast while young and slows after about 25; field maple's height growth is largely done by about 25; holly keeps growing at accelerating rates.
+  - **Floor light** for fir, maple, holly, rowan and willow (`analysis/fit/sources/floor_light_targets.csv`, the user's research). These are estimates from Hagemeier & Leuschner's five measured species:
+    - log floor light falls linearly with Niinemets & Valladares's tolerance score: ln(floor %) = 4.92 − 1.08 × score;
+    - leaving each species out and predicting it from the other four errs within a factor of ≈ 1.6;
+    - a second estimate, from leaf area index and Beer–Lambert extinction, agrees within ≈ 1.5;
+    - the same fit gives 22% for pine, inside its band, so pine keeps its scaled 17%.
+    - **A caveat:** these floors carry the tolerance score into the fit, which the hold-out compares against. Half weight limits that, but the Spearman check is a little less independent for these five species.
+  - **Growth curves for rowan and holly:** Chapman–Richards curves fitted through the few published facts (`minor_species_growth_curves.csv`), giving height at 60 and H30/H60:
+    - **Rowan:** fast young growth, slowing after about 20, level with spruce to 45, mature 15–20 m.
+    - **Holly:** maximum heights, a 260-year-old tree of 12 m, and young forest holly. It is open or edge growth: shaded holly grows only 20–30% as much (Peterken & Newbould 1966), and the model's light response should carry that.
+  - **Maple's H30/H60** is still from growth descriptions.
   - **Form,** as the user specified: fir and holly cones; oak, maple and hornbeam rounded and forking low; willow broad and low; rowan's limbs steep (35°); pine excurrent.
 
 | Trait | Oak | Fir | Hornbeam | Maple | Holly | Rowan | Willow | Pine |
 |---|---|---|---|---|---|---|---|---|
-| Stand height, cells | 78 ± 13 | 80 ± 14 | 84 ± 13 | 64 ± 11 | 44 ± 12 | 48 ± 12 | 40 ± 10 | 84 ± 14 |
-| H30 / H60 | 0.62 ± 0.05 | 0.42 ± 0.06 | 0.67 ± 0.05 | 0.7 | 0.55 | 0.78 | 0.9 | 0.6 ± 0.05 |
+| Stand height, cells | 78 ± 13 | 80 ± 14 | 84 ± 13 | 64 ± 11 | 41 ± 12 (est.) | 60 ± 14 (est.) | 52 ± 14 | 84 ± 14 |
+| H30 / H60 | 0.62 ± 0.05 | 0.42 ± 0.06 | 0.67 ± 0.05 | 0.7 | 0.63 (est.) | 0.74 (est.) | 0.73 ± 0.06 | 0.6 ± 0.05 |
 | Open W/H | 1.3 | 0.4 | 1.0 | 1.0 | 0.5 | 0.6 | 1.6 | 0.6 |
 | Stand crown ratio | 0.4 | 0.6 | 0.55 | 0.5 | 0.75 | 0.45 | 0.45 | 0.35 |
-| Floor light | 8.4% ± 3 | 4% | 1.5% ± 0.8 | 5% | 3% | 12% | 12% | 17% |
+| Floor light | 8.4% ± 3 | 1.3% (est.) | 1.5% ± 0.8 | 4.5% (est.) | 2% (est.) | 7.5% (est.) | 12% (est.) | 17% |
 | Widest band | 0.5 | 0.1 | 0.45 | 0.45 | 0.15 | 0.5 | 0.5 | 0.3 |
 | Fork height | 0.3 | 0.92 | 0.4 | 0.35 | 0.9 | 0.6 | 0.15 | 0.9 |
 | Leader dominance | 1.3 | 4 | 1.6 | 1.6 | 3 | 2 | 1.1 | 3 |
@@ -67,7 +76,7 @@ The same 13 traits and 17 parameters for oak, fir, hornbeam, field maple, holly,
 Every hand-tuned value lies inside its bounds.
 
 **Held out:**
-- **Survival light bands:** birch 15–25%, oak 8–14%, beech and hornbeam 2.5–4.5% (saplings' measured minimum light demand, Hagemeier & Leuschner 2019); the rest placed by tolerance score: pine 20–30%, willow 12–20%, rowan 6–12%, maple 4–8%, holly 2–5% (Valladares et al. 2005), fir 1.5–4%.
+- **Survival light bands:** birch 15–25%, oak 8–14%, beech and hornbeam 2.5–4.5% (saplings' measured minimum light demand, Hagemeier & Leuschner 2019); the rest placed by tolerance score: pine 20–30%, willow 12–20%, rowan 8–14% (oak's: the same score), maple 5–10%, holly 2–5% (Valladares et al. 2005), fir 1.5–4%. The score regression puts these species' saplings at fir 2.6%, maple 8%, holly 4.7%, rowan 11.4%, willow 17.8% and pine 26.1%.
 - **Shade scores** (`shadeScore`, Niinemets & Valladares 2006) for all ten species, for the Spearman check.
 
 ### Sources found (2026-10-28)
@@ -115,7 +124,14 @@ Every hand-tuned value lies inside its bounds.
   - It grows up to 25 m; Mayer gives 15–22 m as typical. It lives about 150 years in the mountains, 60–80 in the lowlands.
   - It keeps pace with spruce to age 45 in the Thuringian uplands.
   - Saplings at 34–44% light grew about 23 cm a year; young rowan in the open up to 80 cm.
-- **Not found:** growth curves for holly (the Peterken papers are paywalled), rowan and goat willow; measured transmittance under fir, field maple, holly, rowan and willow; Hale et al. 2009's curve (paywalled).
+- **Goat willow** (`minor_species_growth_curves.csv`): Paramonov, Tretyakov & Koptev 2021, yield tables for tree-willow stands in Arkhangelsk.
+  - 42 plots and 53 sample trees, mostly goat willow and its hybrids.
+  - Mean height × 1.10 gives top height (the hornbeam table's ratio at 40–100). Chapman–Richards fits per class, with the asymptote capped at 19 m (uncapped fits climb to 23–29 m; the capped ones stay within 0.4 m of the data).
+  - Data end at 45–65 years, where stand volume starts to fall, so heights at 60 are partly extrapolated.
+  - **Class I:** 13.9 m at 30 and 18.0 m at 60, ratio 0.77. **Class II:** 11.5 and 16.6 m, ratio 0.69. For a British lowland site, the user's research suggests class I as the middle.
+  - The "ultimate height in 10–20 years" of the horticultural profiles (previous entry) was wrong for stands: willow keeps growing to 40–50.
+- **Light by method:** hemispherical photographs give far higher values than quantum sensors under overcast sky (a Belgian study: 14.6% under beech, against 1.3%). Every floor target here is on the quantum-sensor scale (pine's only as a ratio), so don't mix in photograph-based numbers.
+- **Not found:** measured growth curves for holly and rowan; measured transmittance under fir, field maple, holly, rowan and willow; Hale et al. 2009's curve (paywalled).
 
 **How far the hand-tuned species are from the tightened targets** (10 seeds; (value − target) / band):
 - **Height at 30 over height at 60 is the largest miss.**
@@ -127,6 +143,8 @@ Every hand-tuned value lies inside its bounds.
   - Revisit it if the fit strains for willow's H/D.
 - **Hornbeam's** stand crowns are shallow (0.28 against 0.55), and its stands short (63 cells against the table's 84).
 - **The measured floors are darker than the model's:** beech casts 3.3% against 1.3–1.5% (2.2 bands), hornbeam 2.6% against 1.5%.
+- **Willow is now the worst:** its lone tree is shorter at 60 than at 30 (H30/H60 1.03 against 0.73, 5.1 bands). Its height falls after season 30, through dieback, shedding or sag (not yet diagnosed). The fit can only change that through its free parameters (L_h, m_f, Q_ss, …).
+- **Fir's floor** is 6% against an estimated 1.3% (5.9 bands, at half weight).
 - **Birch's seedlings are too tolerant** for the measured survival band: the model's birch survives 13%, Hagemeier & Leuschner's saplings need 21%. That is a hold-out, so the fit will not see it.
 - **Rowan's** open-grown stem is slender (H/D 68).
 
@@ -139,4 +157,4 @@ Every hand-tuned value lies inside its bounds.
 ## Gaps
 - **Branch angles:** no per-species numbers for birch's or beech's first-order angles came back. Yun et al. 2025 (literature review) is the lead to follow.
 - **Crown shape:** taken from descriptions. Open-grown profiles from terrestrial laser scans (Bayer et al. 2013 for beech) would make the shape targets measured.
-- **Still described for the eight newer species:** floor light for fir, maple, holly, rowan, willow and pine, and growth-curve shape for maple, holly, rowan and willow. The next to find: holly's growth (Peterken & Tubbs 1965; Peterken 1966), Hale et al. 2009's pine curve, and any measured light under fir.
+- **Still estimates for the eight newer species:** floor light for fir, maple, holly, rowan, willow and pine; growth curves for maple, holly and rowan. The next to find: holly's growth (Peterken & Tubbs 1965; Peterken 1966), Hale et al. 2009's pine curve, and any quantum-sensor light measured under fir.

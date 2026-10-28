@@ -56,11 +56,11 @@ source = "mid-tolerant: a crown between birch's and beech's in depth (Kothari et
 
 [[trait]]
 name = "stand.floor"
-target = 0.05
+target = 0.045
 band = 0.02
 weight = 0.5
 kind = "described"
-source = "between oak's and beech's (M25 follow-up)"
+source = "4.5% (2.5–8%), estimated from Hagemeier & Leuschner 2019's five measured species: ln(floor %) = 4.92 − 1.08 × Niinemets & Valladares score, cross-checked by LAI and Beer–Lambert (user's research, analysis/fit/sources/floor_light_targets.csv)"
 
 [[trait]]
 name = "lone.widestAt"
@@ -187,5 +187,5 @@ hi = 3
 
 # Held out: never in the loss, checked after the fit (analysis/experiments/m27_holdout.py).
 [holdout]
-survivalLight = [0.04, 0.08]   # lowest light all seedlings survive (between rowan and holly in score)
+survivalLight = [0.05, 0.1]   # lowest light all seedlings survive (saplings estimated to need 8% (score regression, floor_light_targets.csv))
 shadeScore = 3.18   # Niinemets & Valladares 2006, Appendix A

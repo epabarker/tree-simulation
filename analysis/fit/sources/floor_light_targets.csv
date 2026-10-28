@@ -1,0 +1,12 @@
+species,status,floor_light_central_pct_PAR,floor_light_low,floor_light_high,sapling_min_light_pct,shade_tolerance_NV2006,basis
+Betula pendula,measured,14.8,6.4,19.8,21.0,2.03,Hagemeier & Leuschner 2019 (median; range = individual points)
+Quercus petraea,measured,8.4,4.9,12.8,11.4,2.73,Hagemeier & Leuschner 2019
+Carpinus betulus,measured,1.3,0.6,2.8,3.3,3.97,Hagemeier & Leuschner 2019 (range pooled across late-successional spp.)
+Tilia cordata,measured,1.4,0.6,2.8,3.6,4.18,Hagemeier & Leuschner 2019
+Fagus sylvatica,measured,1.3,0.6,2.8,3.4,4.56,Hagemeier & Leuschner 2019
+Abies alba,estimated,1.3,0.7,3.0,2.6,4.60,"log-linear fit of H&L floor light on N&V shade tolerance gives 0.9; LAI/Beer-Lambert cross-check 1.7"
+Acer campestre,estimated,4.5,2.5,8.0,8.0,3.18,"tolerance fit 4.4; Beer-Lambert cross-check 4.8"
+Ilex aquifolium,estimated,2.0,1.0,3.5,4.7,3.86,"tolerance fit 2.1; Beer-Lambert 3.0; evergreen dense crown so kept at low end; shades year-round"
+Sorbus aucuparia,estimated,7.5,5.0,12.0,11.4,2.73,"tolerance fit 7.1; Beer-Lambert 6.7; same tolerance score as Q. petraea (measured 8.4)"
+Salix caprea,estimated,12.0,8.0,18.0,17.8,2.16,"tolerance fit 13.2; Beer-Lambert 10.1; near Betula pendula (measured 14.8)"
+Pinus sylvestris,check only,22.0,13.0,27.0,26.1,1.67,"tolerance fit 22.4 sits inside the existing 13-27% band; not a replacement target"

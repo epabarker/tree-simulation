@@ -2,6 +2,20 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-28: M27, willow's yield table and estimated floors for the rest
+
+- **User supplied** (`analysis/fit/sources/`):
+  - `minor_species_growth_curves.csv`: willow from the Arkhangelsk tree-willow yield tables (Paramonov et al. 2021), and fitted estimates for rowan and holly;
+  - `floor_light_targets.csv`: floors for fir, maple, holly, rowan and willow, regressed on tolerance score from Hagemeier & Leuschner's five species.
+- **Willow:** H30/H60 is 0.73 ± 0.06, now measured (was 0.9 from horticultural profiles). Stand height is 52 ± 14 cells, between British field guides and taiga stands (16.6–18 m).
+- **Rowan and holly:** fitted-curve estimates at half weight. Rowan is 60 cells with ratio 0.74; holly 41 cells with ratio 0.63, for open or edge growth.
+- **Floors** (estimates, half weight): fir 1.3% (was 4%), maple 4.5%, holly 2%, rowan 7.5% (was 12%), willow 12%.
+  - **A caveat:** they come from the tolerance score that the hold-out tests against.
+- **Held-out survival bands:** rowan 8–14% and maple 5–10%.
+- **Hand-tuned misses:**
+  - willow's lone tree shrinks after season 30 (H30/H60 1.03, 5.1 bands);
+  - fir's floor is 6% against 1.3% (5.9 bands at half weight).
+
 ## 2026-10-28: M27, hornbeam's yield table and Hagemeier & Leuschner's full numbers
 
 - **User supplied:**

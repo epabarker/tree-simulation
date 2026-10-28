@@ -8,19 +8,19 @@ species = "holly"
 
 [[trait]]
 name = "stand.height"
-target = 44
+target = 41
 band = 12
-weight = 1
-kind = "measured"
-source = "≈ 11 m at 60 years: mature height in the field guides (M25 note) 10–15 m; slow-growing"
+weight = 0.5
+kind = "described"
+source = "≈ 10 m at 60 years on the same fitted curve (open or edge growth); field guides 10–15 m mature"
 
 [[trait]]
 name = "lone.earlyShare"
-target = 0.55
+target = 0.63
 band = 0.1
 weight = 0.5
 kind = "described"
-source = "height at 30 over height at 60: slow and steady; trees over 10 years grow at accelerating rates (Stokes et al. 2014)"
+source = "height at 30 over height at 60: 0.63 on a curve fitted through holly's maximum heights and a few dated trees (open or edge growth; Peterken & Lloyd 1967; waldwissen; Church 2016)"
 
 [[trait]]
 name = "lone.spread"
@@ -56,11 +56,11 @@ source = "keeps its shaded lower limbs: a crown most of the stem long (M25)"
 
 [[trait]]
 name = "stand.floor"
-target = 0.03
-band = 0.015
+target = 0.02
+band = 0.01
 weight = 0.5
 kind = "described"
-source = "a dark evergreen crown: deep shade (M25 expectation)"
+source = "2% (1–3.5%), estimated from Hagemeier & Leuschner 2019's five measured species: ln(floor %) = 4.92 − 1.08 × Niinemets & Valladares score, cross-checked by LAI and Beer–Lambert (user's research, analysis/fit/sources/floor_light_targets.csv); set low in its range: an evergreen, dense crown"
 
 [[trait]]
 name = "lone.widestAt"

@@ -382,15 +382,15 @@ Ordering: (1) every tree reads the same snapshot, so iteration order cannot bias
 |---|---|---|
 | C5 | Cluttered interior, no bole | Palubicki et al.; Guerra's on/off figure |
 | C3 → equal sharing | Hemispherical crowns; tree loses in competition | Takenaka 1994; Palubicki Fig. 21b |
-| ξ = 0 | Crowns ignore gaps and neighbours | Palubicki Fig. 12 |
+| ξ = 0 | Shoots no longer turn to the light; crowns still lean into gaps through allocation (C3) and shedding (C5), so ξ is one cause of lean among three (ADR 0017) | Palubicki Fig. 12; M22 note |
 | Constant λ (no apical-control decline) | Stays conical, no mature decurrent form | Palubicki Figs. 10–11 |
 | R1 | No plateau, no suppression death, no self-thinning | Koch et al. 2004 (hypothesis) |
 | R3 | Straight old limbs, no weeping or Troll forms | Moulia et al. 2006 |
 | R3 posture only (sag without posture) | Progressive droop, possible collapse | Alméras & Fournier 2009 |
-| R4 | Gaps refill slowly | Reiteration (Barthélémy & Caraglio 2007) |
+| R4 | No dormant bud bank and no release after a disturbance, nor epicormic shoots; gaps refill no slower, because without R4 any bud with v ≥ 1 grows (ADR 0017) | Reiteration (Barthélémy & Caraglio 2007); M22 note |
 | R6 | Foliage only at shoot tips; thin shell, bare older limbs | Millan et al. 2022 |
 | C5 T_rel = 0 | Suppressed and dominant trees prune at the same local light | Sprugel 2002; Kothari et al. 2025 |
-| Shared pooled light instead of directional shade | Size inequality drops, no bimodality | Weiner 1990; Schwinning & Weiner 1998 |
+| Shared pooled light instead of directional shade (`c2.model: "pooled"`) | Size inequality drops and nothing is suppressed (bimodality is not testable while the directional stand is not clearly bimodal) | Weiner 1990; Schwinning & Weiner 1998; M22 note |
 
 **Sweeps:** λ ∈ [0.44, 0.58] (look for a threshold-like shift in trunk dominance); n ∈ [1.8, 3]; shadow b and q_max (4–8); shedding T × spacing (crown-base height); L_h (asymptotic height); E × posture gain (stiff → weeping phase diagram); sky weighting (lean toward light).
 

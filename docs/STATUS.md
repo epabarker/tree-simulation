@@ -18,9 +18,8 @@ _Last updated: 2026-10-28 (M22)_
 
 ## Next
 1. **M23, then M24** (the ROADMAP rows): leaves and the intro first, then the species (holly, rowan, hornbeam, goat willow, field maple; Scots pine in the lab).
-2. **Ask the user:** amend spec §8's ξ and R4 rows with M22's findings?
-3. **The user:** an hour's soak on a phone (heat, memory); the site's `TODO(Ed)` items.
-4. **Follow-ups:** rooting in windthrow.
+2. **The user:** an hour's soak on a phone (heat, memory); the site's `TODO(Ed)` items.
+3. **Follow-ups:** rooting in windthrow.
 
 ## Open questions (ask when the milestone comes up)
 - None open.

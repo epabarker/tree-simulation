@@ -20,7 +20,7 @@ The targets `analysis/fit/targets/<species>.toml` fits against, and where each c
 | Open-grown H/D | 48 ± 8 | 48 ± 8 | measured | MacFarlane et al. 2017 (M19 note) |
 | Stand H/D | 70 ± 10 | 70 ± 10 | measured | Watt et al. 2023 (M19 note) |
 | Stand crown ratio | 0.38 ± 0.1 | 0.55 ± 0.1 | described | Light-demanders lift their crowns fast, shade-tolerant species keep them deep (Kothari et al. 2025); beech crowns respond to competition ([Dieler et al. 2013](https://consensus.app/papers/details/70289f5dd2c051c0b1b7de15bf1d454f/?utm_source=claude_desktop); [del Río et al. 2018](https://consensus.app/papers/details/5a823d3b799052ff98f4497a163771da/?utm_source=claude_desktop)) |
-| Floor light under a pure stand | 0.18 ± 0.06 | 0.03 ± 0.015 | measured | M19's targets: a light shade under birch, 2–5% under beech (literature review §4) |
+| Floor light under a pure stand | 0.15 ± 0.05 | 0.015 ± 0.008 | measured | Hagemeier & Leuschner 2019, overcast PAR: birch median 14.8% (6.4–19.8%), beech 1.3% (0.9–2.1% in 100–150-year stands). Revised from M19's 0.18 and 0.03 |
 | Widest band (open) | 0.4 ± 0.15 | 0.4 ± 0.15 | described | Birch ovoid; beech a broad dome. M26 measured birch as an hourglass and beech as widest at the base |
 | Crown fullness (open) | 0.7 ± 0.1 | 0.75 ± 0.1 | described | Ovoid and dome outlines; an ellipse is 0.79 |
 | Fork height (open) | 0.9 ± 0.1 | 0.7 ± 0.2 | described | Birch excurrent (§9); open-grown beech often divides into a few big limbs |
@@ -34,24 +34,24 @@ The same 13 traits and 17 parameters for oak, fir, hornbeam, field maple, holly,
 
 - **Measured, weight 1** (tightened 2026-10-28; see "Sources found" below):
   - **Height at 60 seasons:**
-    - oak, pine and fir from yield tables;
+    - oak, pine, fir and hornbeam from yield tables;
     - field maple from Germany's national forest inventory;
-    - hornbeam, holly, rowan and willow still from the field guides' mature heights (M25 note), converted to age 60. That conversion is a judgement: a small tree is near its mature height at 60, a big one well short of it.
-  - **Height at 30 over height at 60:** for oak, pine and fir, from the same yield tables.
-  - **Floor light:** oak and hornbeam (Hagemeier & Leuschner 2019).
+    - holly, rowan and willow still from the field guides' mature heights (M25 note), converted to age 60. That conversion is a judgement: a small tree is near its mature height at 60, a big one well short of it.
+  - **Height at 30 over height at 60:** for oak, pine, fir and hornbeam, from the same yield tables.
+  - **Floor light:** oak and hornbeam, and the pilot's birch and beech (Hagemeier & Leuschner 2019).
   - **H/D:** open-grown 48 ± 8 (MacFarlane et al. 2017), stand-grown 70 ± 10 (Watt et al. 2023), for every species as for the pilot. Field maple's measured canopy trees agree: H/D 64 and 73 in two Bavarian stands (LWF Wissen 77).
 - **Described, weight 0.5:**
-  - **Floor light** for fir, maple, holly, rowan, willow and pine. These are bands set by the M25 ordering and by which canopies are known to transmit more light: pine more than oak (Pérot et al. 2017; Hale et al. 2009), birch more than pine at a given leaf area (Lintunen et al. 2013).
-  - **Height at 30 over height at 60** for the small trees, from growth descriptions: willow reaches its ultimate height in 10–20 years; rowan grows fast while young and slows after about 25; field maple's height growth is largely done by about 25; holly keeps growing at accelerating rates.
+  - **Floor light** for fir, maple, holly, rowan, willow and pine. These are bands set by the M25 ordering. Pine's is scaled from birch's: all-day light under pine is 1.15 times that under birch (Dobrowolska 2008).
+  - **Height at 30 over height at 60** for the small trees (maple, holly, rowan, willow), from growth descriptions: willow reaches its ultimate height in 10–20 years; rowan grows fast while young and slows after about 25; field maple's height growth is largely done by about 25; holly keeps growing at accelerating rates.
   - **Form,** as the user specified: fir and holly cones; oak, maple and hornbeam rounded and forking low; willow broad and low; rowan's limbs steep (35°); pine excurrent.
 
 | Trait | Oak | Fir | Hornbeam | Maple | Holly | Rowan | Willow | Pine |
 |---|---|---|---|---|---|---|---|---|
-| Stand height, cells | 78 ± 13 | 80 ± 14 | 68 ± 16 | 64 ± 11 | 44 ± 12 | 48 ± 12 | 40 ± 10 | 84 ± 14 |
-| H30 / H60 | 0.62 ± 0.05 | 0.42 ± 0.06 | 0.6 | 0.7 | 0.55 | 0.78 | 0.9 | 0.6 ± 0.05 |
+| Stand height, cells | 78 ± 13 | 80 ± 14 | 84 ± 13 | 64 ± 11 | 44 ± 12 | 48 ± 12 | 40 ± 10 | 84 ± 14 |
+| H30 / H60 | 0.62 ± 0.05 | 0.42 ± 0.06 | 0.67 ± 0.05 | 0.7 | 0.55 | 0.78 | 0.9 | 0.6 ± 0.05 |
 | Open W/H | 1.3 | 0.4 | 1.0 | 1.0 | 0.5 | 0.6 | 1.6 | 0.6 |
 | Stand crown ratio | 0.4 | 0.6 | 0.55 | 0.5 | 0.75 | 0.45 | 0.45 | 0.35 |
-| Floor light | 8.4% ± 3 | 4% | 2% ± 1 | 5% | 3% | 12% | 12% | 20% |
+| Floor light | 8.4% ± 3 | 4% | 1.5% ± 0.8 | 5% | 3% | 12% | 12% | 17% |
 | Widest band | 0.5 | 0.1 | 0.45 | 0.45 | 0.15 | 0.5 | 0.5 | 0.3 |
 | Fork height | 0.3 | 0.92 | 0.4 | 0.35 | 0.9 | 0.6 | 0.15 | 0.9 |
 | Leader dominance | 1.3 | 4 | 1.6 | 1.6 | 3 | 2 | 1.1 | 3 |
@@ -67,7 +67,7 @@ The same 13 traits and 17 parameters for oak, fir, hornbeam, field maple, holly,
 Every hand-tuned value lies inside its bounds.
 
 **Held out:**
-- **Survival light bands:** pine 15–25%, willow 10–15%, oak and rowan 5–10%, maple 3–8%, holly 2–5%, hornbeam 1–4% and fir 1–3%.
+- **Survival light bands:** birch 15–25%, oak 8–14%, beech and hornbeam 2.5–4.5% (saplings' measured minimum light demand, Hagemeier & Leuschner 2019); the rest placed by tolerance score: pine 20–30%, willow 12–20%, rowan 6–12%, maple 4–8%, holly 2–5% (Valladares et al. 2005), fir 1.5–4%.
 - **Shade scores** (`shadeScore`, Niinemets & Valladares 2006) for all ten species, for the Spearman check.
 
 ### Sources found (2026-10-28)
@@ -87,18 +87,35 @@ Every hand-tuned value lies inside its bounds.
 - **Field maple** (LWF Wissen 77, Bavaria; data from the 2012 national forest inventory, BWI):
   - 782 trees, with a mean height of 16.1 m at a mean age of 63;
   - in two stands it shares the canopy with sessile oak and beech: 24.6–26.4 m at 88–102 years.
-- **Canopy transmittance** (Hagemeier & Leuschner 2019, *Forests* 10:925, abstract and search excerpts):
-  - PAR reaching the floor falls from ≈ 15% under birch to 1–3% under hornbeam, lime and beech;
-  - sessile oak transmits a median 8.4% (4.9–12.8%).
-  - **Saplings' minimum light demand,** a check on the held-out survival bands:
-    - birch 21%, against the band's 10–15%: the model's birch is more tolerant than measured here;
-    - oak 6.3%, inside its 5–10% band;
-    - hornbeam 2.5%, inside its 1–4% band.
-- **Scots pine floor:** PAR transmittance ranges 2–59% across the growth stages of Alsatian pine stands (Walter & Himmler 1996). That is too wide to tighten the band.
-- **Not found** (searches in English and German):
-  - yield tables or site-index curves for hornbeam, rowan, goat willow and holly;
-  - per-species transmittance numbers for maple, holly, rowan, willow and fir;
-  - Hagemeier & Leuschner's full tables. MDPI refuses automated downloads, so their Fig. or Table values beyond the abstract were not read.
+- **Hornbeam** (`analysis/fit/sources/hornbeam_yield_table_lockow2009.csv`): Lockow & Lockow 2009, *Die Hainbuche im nordostdeutschen Tiefland* (Eberswalder Forstliche Schriftenreihe 41), the hornbeam yield table for the north-east German lowlands.
+  - It rests on 124 plots aged 5–132 years, with stem analyses. The user extracted all 15 site classes (H100 = 18–32 m), every 5 years from 10 to 160.
+  - Site index 25–27 m, around class II.0: top height 20.3–22.0 m at 60 years, H30/H60 0.665–0.673. Over all classes H30/H60 is 0.60–0.68.
+  - Hornbeam's curve is earlier than beech's (0.5) and close to oak's: it slows sooner, as the field guides say.
+  - **A caveat:** stand age here is a volume-weighted mean, since these naturally regenerated stands are uneven-aged.
+  - The 68 cells used before, from field guides, was too low: the table gives 84.
+- **Canopy transmittance and light demand** (Hagemeier & Leuschner 2019, *Forests* 10:925, from the open-access full text, read by the user's research agent):
+  - **Measurement conditions:** overcast sky, 11:00–14:00, June–July. These are diffuse values with no sunflecks, the right comparison for the sky sweep.
+  - **PAR on the floor under a closed canopy:** birch median 14.8% (6.4–19.8%); sessile oak 8.4% (4.9–12.8%); hornbeam 1.3%, beech 1.3% and lime 1.4% (the three together 0.6–2.8%). Beech gives 0.9–2.1% in 100–150-year stands and 0.7% in a 26-year stand.
+  - **Minimum light demand** (% of incident PAR):
+
+    | Species | Lowest shade leaves | Saplings (50–90 cm) |
+    |---|---|---|
+    | Birch | 21.0 | 21.0 |
+    | Sessile oak | 6.3 | 11.4 |
+    | Hornbeam | 2.5 | 3.3 |
+    | Lime | 3.0 | 3.6 |
+    | Beech | 0.8 | 3.4 |
+
+    The sapling column sets the held-out survival bands for birch, oak, beech and hornbeam. An earlier draft of this note quoted the shade-leaf column (oak 6.3%, hornbeam 2.5%) as if it were saplings'. The paper calls these medians of 120–150 measurements, so treat them as approximate floors.
+  - **Leaf area index, K_PAR and clumping Ω:** birch 4.6, 0.37, 0.42; sessile oak 5.5, 0.48, 0.51; hornbeam 8.3, 0.51, 0.55; lime 7.1, 0.48, 0.51; beech 8.4, 0.51, 0.55. These are not fit targets yet; they are a lead for checking R6's leaf area.
+- **Light under pine** (Dobrowolska 2008, *J. For. Sci.* 54:398, Karkonosze): all-day relative light under pine 12.8% (up to 53.9%), birch 11.1%, spruce 7.0%, beech 4.2%.
+  - All-day values run about three times the overcast ones for beech, so only the ratio is used: pine over birch, 1.15.
+  - Walter & Himmler 1996 give 2–59% across the growth stages of Alsatian pine stands.
+- **Rowan** (LWF Nr. 17, *Beiträge zur Vogelbeere*): no growth table.
+  - It grows up to 25 m; Mayer gives 15–22 m as typical. It lives about 150 years in the mountains, 60–80 in the lowlands.
+  - It keeps pace with spruce to age 45 in the Thuringian uplands.
+  - Saplings at 34–44% light grew about 23 cm a year; young rowan in the open up to 80 cm.
+- **Not found:** growth curves for holly (the Peterken papers are paywalled), rowan and goat willow; measured transmittance under fir, field maple, holly, rowan and willow; Hale et al. 2009's curve (paywalled).
 
 **How far the hand-tuned species are from the tightened targets** (10 seeds; (value − target) / band):
 - **Height at 30 over height at 60 is the largest miss.**
@@ -108,11 +125,13 @@ Every hand-tuned value lies inside its bounds.
 - **Willow** scores worst after them: it is squat open-grown and in a stand (H/D 26 and 41).
   - Watt et al.'s 60–80 is for conifer stands, so for a multi-stemmed willow the band may be wrong rather than the tree.
   - Revisit it if the fit strains for willow's H/D.
-- **Hornbeam's** stand crowns are shallow (0.28 against 0.55).
+- **Hornbeam's** stand crowns are shallow (0.28 against 0.55), and its stands short (63 cells against the table's 84).
+- **The measured floors are darker than the model's:** beech casts 3.3% against 1.3–1.5% (2.2 bands), hornbeam 2.6% against 1.5%.
+- **Birch's seedlings are too tolerant** for the measured survival band: the model's birch survives 13%, Hagemeier & Leuschner's saplings need 21%. That is a hold-out, so the fit will not see it.
 - **Rowan's** open-grown stem is slender (H/D 68).
 
 ## Held out (never in the loss)
-- **Shade survival:** the lowest light at which every seedling lives through 30 seasons. Birch 10–15%, beech 1–3%, in the order of Niinemets & Valladares's tolerance scores (2.03 and 4.56; M25 note).
+- **Shade survival:** the lowest light at which every seedling lives through 30 seasons. Birch 15–25%, beech 2.5–4.5% (saplings' minimum light demand, Hagemeier & Leuschner 2019; revised from 10–15% and 1–3%), in the order of Niinemets & Valladares's tolerance scores (2.03 and 4.56; M25 note).
 - **The mixed wood:** birch leads for about a century and fades; beech ends with the most canopy trees (M25 note).
 - **§10 allometry:** Δ within 1.8–2.3; the l–d and leaf–section slopes no worse than the hand-tuned species' (M26 note).
 - **Release:** epicormic shoots and lean into a felled neighbour's gap, of the hand-tuned size (M10).
@@ -120,4 +139,4 @@ Every hand-tuned value lies inside its bounds.
 ## Gaps
 - **Branch angles:** no per-species numbers for birch's or beech's first-order angles came back. Yun et al. 2025 (literature review) is the lead to follow.
 - **Crown shape:** taken from descriptions. Open-grown profiles from terrestrial laser scans (Bayer et al. 2013 for beech) would make the shape targets measured.
-- **Still described for the eight newer species:** floor light for fir, maple, holly, rowan, willow and pine, and growth-curve shape for hornbeam, maple, holly, rowan and willow. Hagemeier & Leuschner's full tables, and a hornbeam yield table (perhaps among the Czech or Polish tables), would be the next to find.
+- **Still described for the eight newer species:** floor light for fir, maple, holly, rowan, willow and pine, and growth-curve shape for maple, holly, rowan and willow. The next to find: holly's growth (Peterken & Tubbs 1965; Peterken 1966), Hale et al. 2009's pine curve, and any measured light under fir.

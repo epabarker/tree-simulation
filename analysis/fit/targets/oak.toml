@@ -60,7 +60,7 @@ target = 0.084
 band = 0.03
 weight = 1
 kind = "measured"
-source = "sessile oak canopies transmit a median 8.4% of PAR (4.9–12.8%; Hagemeier & Leuschner 2019)"
+source = "sessile oak canopies transmit a median 8.4% of PAR (4.9–12.8%; Hagemeier & Leuschner 2019 (overcast, diffuse PAR))"
 
 [[trait]]
 name = "lone.widestAt"
@@ -186,5 +186,5 @@ hi = 3
 
 # Held out: never in the loss, checked after the fit (analysis/experiments/m27_holdout.py).
 [holdout]
-survivalLight = [0.05, 0.10]   # lowest light all seedlings survive (Hagemeier & Leuschner 2019: sessile oak saplings need 6.3%; Ligot et al. 2013)
+survivalLight = [0.08, 0.14]   # lowest light all seedlings survive (Hagemeier & Leuschner 2019: sessile oak saplings need 11.4%; Ligot et al. 2013)
 shadeScore = 2.45   # Niinemets & Valladares 2006, Appendix A

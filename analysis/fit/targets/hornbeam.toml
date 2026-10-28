@@ -8,19 +8,19 @@ species = "hornbeam"
 
 [[trait]]
 name = "stand.height"
-target = 68
-band = 16
+target = 84
+band = 13
 weight = 1
 kind = "measured"
-source = "≈ 17 m at 60 years: mature height in the field guides (M25 note) 20–25 m; slower than beech (Schmucker et al. 2023; Szwagrzyk et al. 2012)"
+source = "Lockow & Lockow 2009 hornbeam yield table (NE German lowlands; stand age volume-weighted): top height 20.3–22.0 m at 60 years for site index 25–27 m"
 
 [[trait]]
 name = "lone.earlyShare"
-target = 0.6
-band = 0.1
-weight = 0.5
-kind = "described"
-source = "height at 30 over height at 60: a mid-sized tree that slows earlier than beech"
+target = 0.67
+band = 0.05
+weight = 1
+kind = "measured"
+source = "height at 30 over height at 60: 0.665–0.673 for site index 25–27 m, 0.60–0.68 over all classes (Lockow & Lockow 2009 hornbeam yield table (NE German lowlands; stand age volume-weighted))"
 
 [[trait]]
 name = "lone.spread"
@@ -56,11 +56,11 @@ source = "shade-tolerant species keep deep crowns in stands (Kothari et al. 2025
 
 [[trait]]
 name = "stand.floor"
-target = 0.02
-band = 0.01
+target = 0.015
+band = 0.008
 weight = 1
 kind = "measured"
-source = "late-successional canopies (hornbeam, lime, beech) transmit 1–3% of PAR (Hagemeier & Leuschner 2019)"
+source = "hornbeam canopies transmit a median 1.3% of PAR; hornbeam, lime and beech together 0.6–2.8% (Hagemeier & Leuschner 2019 (overcast, diffuse PAR))"
 
 [[trait]]
 name = "lone.widestAt"
@@ -186,5 +186,5 @@ hi = 3
 
 # Held out: never in the loss, checked after the fit (analysis/experiments/m27_holdout.py).
 [holdout]
-survivalLight = [0.01, 0.04]   # lowest light all seedlings survive (Hagemeier & Leuschner 2019: hornbeam saplings need 2.5%)
+survivalLight = [0.025, 0.045]   # lowest light all seedlings survive (Hagemeier & Leuschner 2019: hornbeam saplings need 3.3%)
 shadeScore = 3.97   # Niinemets & Valladares 2006, Appendix A

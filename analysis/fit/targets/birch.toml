@@ -56,11 +56,11 @@ source = "light-demanding species lift their crowns fast in stands (Kothari et a
 
 [[trait]]
 name = "stand.floor"
-target = 0.18
-band = 0.06
+target = 0.15
+band = 0.05
 weight = 1
 kind = "measured"
-source = "light under a birch canopy, a light shade (M19 targets; Hallik et al. 2009)"
+source = "birch canopies transmit a median 14.8% of PAR (6.4–19.8%; Hagemeier & Leuschner 2019 (overcast, diffuse PAR))"
 
 [[trait]]
 name = "lone.widestAt"
@@ -186,5 +186,5 @@ hi = 3
 
 # Held out: never in the loss, checked after the fit (analysis/experiments/m27_holdout.py).
 [holdout]
-survivalLight = [0.10, 0.15]   # lowest light all seedlings survive (Kobe et al. 1995; Niinemets & Valladares 2006: 2.03)
+survivalLight = [0.15, 0.25]   # lowest light all seedlings survive (Hagemeier & Leuschner 2019: birch saplings need 21%; Kobe et al. 1995)
 shadeScore = 2.03   # Niinemets & Valladares 2006, Appendix A

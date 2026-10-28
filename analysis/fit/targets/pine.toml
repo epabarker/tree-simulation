@@ -56,11 +56,11 @@ source = "a high crown on a clean bole in a stand (M25; Kothari et al. 2025)"
 
 [[trait]]
 name = "stand.floor"
-target = 0.2
-band = 0.07
+target = 0.17
+band = 0.06
 weight = 0.5
 kind = "described"
-source = "pine stands transmit more light than oak's or beech's: a light shade; PAR transmittance 2–59% across stand ages (Walter & Himmler 1996; Pérot et al. 2017; Hale et al. 2009)"
+source = "all-day relative light under pine 1.15 times that under birch (12.8% against 11.1%; Dobrowolska 2008), applied to birch's 14.8% (Hagemeier & Leuschner 2019); 2–59% across stand ages (Walter & Himmler 1996)"
 
 [[trait]]
 name = "lone.widestAt"
@@ -186,5 +186,5 @@ hi = 3
 
 # Held out: never in the loss, checked after the fit (analysis/experiments/m27_holdout.py).
 [holdout]
-survivalLight = [0.15, 0.25]   # lowest light all seedlings survive (the least tolerant of the ten)
+survivalLight = [0.2, 0.3]   # lowest light all seedlings survive (less tolerant than birch, whose saplings need 21%)
 shadeScore = 1.67   # Niinemets & Valladares 2006, Appendix A

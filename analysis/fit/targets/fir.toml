@@ -186,5 +186,5 @@ hi = 3
 
 # Held out: never in the loss, checked after the fit (analysis/experiments/m27_holdout.py).
 [holdout]
-survivalLight = [0.01, 0.03]   # lowest light all seedlings survive (Kobe et al. 1995: tolerant saplings survive 1–3%)
+survivalLight = [0.015, 0.04]   # lowest light all seedlings survive (beech's band: scored as tolerant as beech (4.6 against 4.56))
 shadeScore = 4.6   # Niinemets & Valladares 2006, Appendix A

@@ -2,6 +2,26 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-28: M27, hornbeam's yield table and Hagemeier & Leuschner's full numbers
+
+- **User supplied:**
+  - Lockow & Lockow 2009's hornbeam yield table, extracted to CSV (`analysis/fit/sources/`);
+  - Hagemeier & Leuschner 2019's full-text values, gathered by their research agent;
+  - Dobrowolska 2008 on light under pine.
+- **Hornbeam:** stand height 84 ± 13 cells (20.3–22.0 m at 60, site index 25–27) and H30/H60 0.67 ± 0.05, both measured. The field-guide guess (68) was low.
+- **Floors (overcast PAR):**
+  - hornbeam 1.5% ± 0.8;
+  - pilot birch 15% ± 5 (was 18%);
+  - pilot beech 1.5% ± 0.8 (was 3%, from M19's 2–5%);
+  - pine 17% (described), scaled from birch by Dobrowolska's ratio.
+- **Held-out survival bands** from the saplings' minimum light demand: birch 15–25%, oak 8–14%, beech and hornbeam 2.5–4.5%. Pine and willow move up to stay in score order.
+  - **Correction:** the previous entry quoted shade-leaf values (oak 6.3%, hornbeam 2.5%) as if they were the saplings'.
+- **Generator bug fixed:** survival bands were printed to two decimals, rounding 0.015 and 0.045 to the wrong edges.
+- **Hand-tuned misses:**
+  - beech's floor (3.3%) is now 2.2 bands too light;
+  - hornbeam's stands are short (63 cells against 84) and its curve levels off early (0.81 against 0.67);
+  - birch's seedlings survive 13%, where saplings need 21% (a hold-out).
+
 ## 2026-10-28: M27, measured targets for the eight newer species
 
 - **User:** find measured canopy transmittance and height-growth curves, and tighten the targets.

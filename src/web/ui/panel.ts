@@ -245,6 +245,8 @@ export interface PanelCallbacks {
   onView(): void;
   onFit(): void;
   onExport(): void;
+  /** Copy a link to these params (M26). */
+  onShare(): void;
 }
 
 export class Panel {
@@ -291,6 +293,7 @@ export class Panel {
     pane.addBinding(this.params, "seed", { label: "seed", step: 1 }).on("change", (ev) => {
       if (ev.last) cb.onRestart(this.params);
     });
+    pane.addButton({ title: "Copy link" }).on("click", () => cb.onShare());
 
     const monitors = pane.addFolder({ title: "Stats", expanded: false });
     monitors.addBinding(stats, "season", { readonly: true, format: (v: number) => v.toFixed(0) });

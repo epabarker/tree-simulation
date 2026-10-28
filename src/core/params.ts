@@ -557,6 +557,33 @@ export function mergeParams(base: Params, patch: ParamsPatch): Params {
 }
 
 /**
+ * The patch that turns `base` into `current`: each group's fields that differ (arrays and
+ * species entries whole), and any other top-level value that differs. The inverse of
+ * `mergeParams`: mergeParams(base, diffParams(base, current)) equals `current` when both have the
+ * same keys, as params always do. The lab's shareable links carry it (M26).
+ */
+export function diffParams(base: Params, current: Params): ParamsPatch {
+  const out: Record<string, unknown> = {};
+  const b = base as unknown as Record<string, unknown>;
+  const c = current as unknown as Record<string, unknown>;
+  const same = (x: unknown, y: unknown) => JSON.stringify(x) === JSON.stringify(y);
+  for (const key of Object.keys(c)) {
+    const now = c[key];
+    const was = b[key];
+    if (same(now, was)) continue;
+    const isGroup = (v: unknown) => v !== null && typeof v === "object" && !Array.isArray(v);
+    if (isGroup(now) && isGroup(was)) {
+      const group: Record<string, unknown> = {};
+      for (const [k, v] of Object.entries(now as Record<string, unknown>)) {
+        if (!same(v, (was as Record<string, unknown>)[k])) group[k] = clone(v);
+      }
+      out[key] = group;
+    } else out[key] = clone(now);
+  }
+  return out as ParamsPatch;
+}
+
+/**
  * Params with one species' patch amended: `patch` merges into that species' groups the way
  * `mergeParams` merges into the world's (each group shallowly), where a `species` entry inside a
  * plain `mergeParams` patch would replace the species' whole patch (M26; M27 fits species this way).

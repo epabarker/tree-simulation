@@ -111,7 +111,18 @@ export interface GardenOptions {
    * it at the ambient pace. If the fetch fails it grows a forest from seed as usual. Ignored with
    * `params` or `seed`.
    */
-  first?: { base: string; widths: number[]; seeds: number[] };
+  first?: {
+    base: string;
+    widths: number[];
+    seeds: number[];
+    /** "always" (default), or only for reduced motion, which then shows the grown forest still. */
+    when?: "always" | "reduced-motion";
+  };
+  /**
+   * Seeds the default forest grows from, one a day in turn (M23: the time-lapse grows a forest
+   * chosen to end handsome). Unset: a random seed per visit. Ignored with `params` or `seed`.
+   */
+  seeds?: number[];
   /** CSS pixels kept free above the crowns, e.g. for text over the sky. Default 0. */
   headroom?: number;
   /** Leave the sky out so the page shows through. */
@@ -277,7 +288,7 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
   const rect = renderer.canvas.getBoundingClientRect();
   const params =
     options.params ??
-    forestParams(plateWidth(rect.width, rect.height), options.seed ?? randomSeed());
+    forestParams(plateWidth(rect.width, rect.height), options.seed ?? dailySeed(options.seeds));
 
   const view = Object.assign(options.view ?? {}, {
     colorMode: "natural",
@@ -733,6 +744,7 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
   const firstForest = (): { url: string; width: number; seed: number } | null => {
     const first = options.first;
     if (!first || options.params || options.seed !== undefined) return null;
+    if (first.when === "reduced-motion" && !reduceMotion) return null;
     if (first.widths.length === 0 || first.seeds.length === 0) return null;
     const wanted = params.world.width;
     let width = first.widths[0] as number;
@@ -860,6 +872,12 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
       if (ownCanvas) renderer.canvas.remove();
     },
   };
+}
+
+/** Today's seed from `seeds` (one a day, in turn), or a random one without them. */
+function dailySeed(seeds: number[] | undefined): number {
+  if (!seeds || seeds.length === 0) return randomSeed();
+  return seeds[Math.floor(Date.now() / 86_400_000) % seeds.length] as number;
 }
 
 /** A fresh forest per visit (the page may use Math.random; the core may not). */

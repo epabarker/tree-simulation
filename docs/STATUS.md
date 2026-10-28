@@ -1,8 +1,8 @@
 # Status
 
-_Last updated: 2026-10-28 (garden-v0.8.0 live)_
+_Last updated: 2026-10-28 (M23)_
 
-**All planned milestones (M12–M21) are done.** edbarker.dev runs garden-v0.8.0 (PR #14 here, PR #2 in edbarker-dev): it opens on a grown mixed wood (birch, oak and beech), with Plate II's own oak, phone-sized plates and a moonlit night.
+**Current milestone: release M22–M23** (branch `claude/m23-leaves`, stacked on `claude/m22-ablations`; site branch `claude/m23-leaves`). The §8 ablations and pooled light, a leaf outline per species at true scale, and the time-lapse back. Then M24 (new species). edbarker.dev runs garden-v0.8.0.
 
 ## Works
 - **Core:** C1–C6, R1–R6, O2 and O4 (ADRs 0005–0013); the sky sweep with open or periodic sides; golden hashes. `World.discardDead` for long page runs.
@@ -17,12 +17,12 @@ _Last updated: 2026-10-28 (garden-v0.8.0 live)_
 - **Lab:** WebGL2 with pseudo-depth, Tweakpane, charts, tap to fell, phone layout. **Headless:** `npm run sim`, `npm run bench` (rings 3.8 ms a season), `analysis/experiments/` m0–m11.
 
 ## Next
-1. **The user:** an hour's soak on a phone (heat, memory); the site's `TODO(Ed)` items.
-2. **Follow-ups:** willow; rooting in windthrow; the §8 ablation tests.
-3. **The user:** the site's `TODO(Ed)` items.
+1. **Release** `garden-v0.9.0` on the user's go-ahead after the preview. Then **M24**: holly, rowan, hornbeam, goat willow and field maple for the home forest, and Scots pine for the lab.
+2. **The user:** an hour's soak on a phone (heat, memory); the site's `TODO(Ed)` items.
+3. **Follow-ups:** rooting in windthrow.
 
 ## Open questions (ask when the milestone comes up)
-- Art direction (M21).
+- None open.
 
 ## Parked (user, 2026-10-27; raise again only when asked)
 - The Pages demo URL is unreachable (`barker.garden` NXDOMAIN; `edbarker.dev/lab` works around it). Delete the early `runs/` and `dist/` copies on pCloud?

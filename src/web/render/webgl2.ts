@@ -4,7 +4,8 @@
  *  - Branches: one quad per metamer, shaded in the fragment shader as a capsule tapering from the
  *    metamer's radius to its continuation's (a signed-distance function, so joints are round and
  *    edges antialiased without multisampling).
- *  - Leaves: one quad per leaf, shaded as a lens (vesica). Buds: squares. Walls: rectangles.
+ *  - Leaves: one quad per leaf, shaded as its species' outline (leaf-styles.ts LEAF_SHAPES: a width
+ *    profile along the leaf, or five lobes about a centre). Buds: squares. Walls: rectangles.
  *  - Shade overlay: a texture. Sky and ground: full-screen gradients.
  *
  * Positions come from the shared Scene (the tween needs them on the CPU, and picking uses them).
@@ -97,23 +98,26 @@ void main() {
 
 const LEAF_VS = /* glsl */ `#version 300 es
 ${VIEW}
-uniform vec3 u_leaf; // full length (world), width / length, minimum length (CSS px)
+uniform vec3 u_leaf; // full length (world), unused, minimum length (CSS px)
 in vec2 a_corner;
 in vec2 a_pos;
 in vec2 a_dir;
 in float a_grow;
+in vec2 a_shape; // outline (LEAF_SHAPES index), width over length
 in vec4 a_color;
 out vec2 v_p;
 out vec2 v_size;
+flat out float v_shape;
 out vec4 v_color;
 void main() {
   float len = max(u_leaf.x, u_leaf.z * u_px) * a_grow;
-  float wid = min(max(len * u_leaf.y, u_px), 0.9 * len);
+  float wid = min(max(len * a_shape.y, u_px), 0.9 * len);
   float along = mix(-u_px, len + u_px, a_corner.y * 0.5 + 0.5);
   float across = a_corner.x * (0.5 * wid + u_px);
   vec2 nrm = vec2(-a_dir.y, a_dir.x);
   v_p = vec2(across, along - 0.5 * len);
   v_size = vec2(len, wid);
+  v_shape = a_shape.x;
   v_color = a_color;
   gl_Position = toClip(a_pos + a_dir * along + nrm * across);
 }`;
@@ -123,19 +127,36 @@ precision highp float;
 uniform float u_px;
 in vec2 v_p;
 in vec2 v_size;
+flat in float v_shape;
 in vec4 v_color;
 out vec4 outColor;
-// Lens of half-length b and half-width w: two circles of radius r centred at (±d, 0).
-float sdVesica(vec2 p, float r, float d) {
-  p = abs(p);
-  float b = sqrt(r * r - d * d);
-  return ((p.y - b) * d > p.x * b) ? length(p - vec2(0.0, b)) : length(p - vec2(-d, 0.0)) - r;
+const float PI = 3.14159265;
+// Half-width as a share of the full half-width at t (base 0, tip 1): leaf-styles.ts leafProfile.
+float profile(int shape, float t) {
+  float s = sin(PI * t);
+  if (shape == 1) return pow(s, 0.6) * (1.0 - 0.25 * t) * (1.0 + 0.06 * sin(t * 40.0));
+  if (shape == 2) return (t < 0.3 ? pow(t / 0.3, 0.7) : pow((1.0 - t) / 0.7, 1.1)) * (1.0 + 0.08 * abs(sin(t * 30.0)));
+  if (shape == 3) return pow(s, 0.5) * (0.62 + 0.38 * abs(sin(t * PI * 4.5)));
+  if (shape == 5) return pow(s, 0.6) * (0.85 + 0.25 * abs(fract(t * 4.5) - 0.5) * 2.0);
+  if (shape == 6) return t < 0.08 ? 0.08 : max(0.08, pow(sin(PI * fract(t * 6.0)), 0.8));
+  return s;
 }
 void main() {
-  float b = 0.5 * v_size.x;
+  float len = v_size.x;
   float w = 0.5 * v_size.y;
-  float d = (b * b - w * w) / (2.0 * w);
-  float dist = sdVesica(v_p, d + w, d);
+  int shape = int(v_shape + 0.5);
+  float dist;
+  if (shape == 4) {
+    // Palmate (field maple): five lobes about the leaf's centre (palmateRadius).
+    vec2 q = vec2(v_p.x / w, v_p.y / (0.5 * len));
+    float theta = atan(q.x, q.y);
+    float r = 0.55 + 0.45 * pow(abs(cos(2.5 * theta)), 2.0);
+    dist = (length(q) - r) * min(w, 0.5 * len);
+  } else {
+    float t = v_p.y / len + 0.5;
+    float hw = w * profile(shape, clamp(t, 0.0, 1.0));
+    dist = max(abs(v_p.x) - hw, max(-t * len, (t - 1.0) * len));
+  }
   float alpha = clamp(0.5 - dist / u_px, 0.0, 1.0) * v_color.a;
   if (alpha <= 0.0) discard;
   outColor = vec4(v_color.rgb * alpha, alpha);
@@ -369,6 +390,7 @@ export class WebGL2Renderer implements Renderer {
       a_pos: { size: 2 },
       a_dir: { size: 2 },
       a_grow: { size: 1 },
+      a_shape: { size: 2 },
       a_color: { size: 4, bytes: true },
     };
     this.leafBatch = this.batch(leafProgram, leafAttribs);
@@ -714,9 +736,12 @@ export class WebGL2Renderer implements Renderer {
     const pos = this.stream<Floats>(batch, "a_pos", n);
     const dir = this.stream<Floats>(batch, "a_dir", n);
     const grow = this.stream<Floats>(batch, "a_grow", n);
+    const shape = this.stream<Floats>(batch, "a_shape", n);
     const color = this.stream<Bytes>(batch, "a_color", n);
     for (let i = 0; i < n; i++) {
       const k = from + i;
+      shape[2 * i] = leaves.shape[k] as number;
+      shape[2 * i + 1] = leaves.aspect[k] as number;
       pos[2 * i] = leaves.x[k];
       pos[2 * i + 1] = leaves.y[k];
       dir[2 * i] = leaves.ux[k];

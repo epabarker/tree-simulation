@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { LEAF_SHAPES, LEAF_STYLES, leafProfile, palmateRadius } from "./leaf-styles.ts";
+import {
+  LEAF_SHAPES,
+  LEAF_STYLES,
+  leafProfile,
+  leafStudyPath,
+  palmateRadius,
+} from "./leaf-styles.ts";
 
 describe("leaf styles (M23)", () => {
   it("gives every style a known outline, smaller leaves for smaller-leaved species", () => {
@@ -23,6 +29,18 @@ describe("leaf styles (M23)", () => {
       const r = palmateRadius((2 * Math.PI * i) / 100);
       expect(r).toBeGreaterThanOrEqual(0.55);
       expect(r).toBeLessThanOrEqual(1);
+    }
+  });
+
+  it("draws a leaf study inside its 100 × 100 box, stalk at the foot (M24)", () => {
+    for (const style of Object.values(LEAF_STYLES)) {
+      const path = leafStudyPath(style);
+      expect(path.startsWith("M50 99L50 92L")).toBe(true);
+      expect(path.endsWith("Z")).toBe(true);
+      for (const n of path.slice(1, -1).split(/[ L]/).map(Number)) {
+        expect(n).toBeGreaterThanOrEqual(0);
+        expect(n).toBeLessThanOrEqual(100);
+      }
     }
   });
 });

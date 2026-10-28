@@ -57,6 +57,51 @@ export function palmateRadius(theta: number): number {
   return 0.55 + 0.45 * Math.abs(Math.cos(2.5 * theta)) ** 2;
 }
 
+const outlines = new Map<LeafShape, Float32Array>();
+
+/**
+ * A shape's outline as (along, across) points of a leaf of unit length and unit width, base at
+ * (0, 0), tip at (1, 0): the profile sampled up one side and down the other, or the palmate lobes
+ * around the centre. Canvas 2D and the field card's study draw it; WebGL draws the same profile
+ * in its fragment shader.
+ */
+export function leafOutline(shape: LeafShape): Float32Array {
+  let out = outlines.get(shape);
+  if (out) return out;
+  const pts: number[] = [];
+  if (shape === "palmate") {
+    for (let i = 0; i < 40; i++) {
+      const theta = (2 * Math.PI * i) / 40;
+      const r = palmateRadius(theta);
+      pts.push(0.5 + 0.5 * r * Math.cos(theta), 0.5 * r * Math.sin(theta));
+    }
+  } else {
+    const n = shape === "lens" || shape === "needle" ? 12 : 48;
+    for (let i = 0; i <= n; i++) pts.push(i / n, 0.5 * leafProfile(shape, i / n));
+    for (let i = n - 1; i > 0; i--) pts.push(i / n, -0.5 * leafProfile(shape, i / n));
+  }
+  out = new Float32Array(pts);
+  outlines.set(shape, out);
+  return out;
+}
+
+/**
+ * An SVG path of the style's leaf standing upright in a 100 × 100 box, tip at the top, with a
+ * short stalk: a field guide's leaf study (M24).
+ */
+export function leafStudyPath(style: LeafStyle): string {
+  const outline = leafOutline(style.shape);
+  const tall = 86;
+  const wide = Math.min(90, tall * style.aspect);
+  const pts: string[] = [];
+  for (let q = 0; q < outline.length; q += 2) {
+    const x = 50 + (outline[q + 1] as number) * wide;
+    const y = 92 - (outline[q] as number) * tall;
+    pts.push(`${x.toFixed(1)} ${y.toFixed(1)}`);
+  }
+  return `M50 99L50 92L${pts.join("L")}Z`;
+}
+
 export type LeafPalette = "broadleaf" | "needle" | "birch" | "tropical" | "oak" | "beech";
 export const LEAF_PALETTES: readonly LeafPalette[] = [
   "broadleaf",
@@ -73,6 +118,8 @@ export interface LeafStyle {
   aspect: number;
   /** The outline (LEAF_SHAPES). */
   shape: LeafShape;
+  /** A real leaf's length in cm (a compound leaf's whole length), for the field card's study. */
+  cm: number;
   /** Angle between a leaf and its shoot, radians. */
   spread: number;
   /** Leaves per young metamer in the pseudo-depth view, spaced evenly around the shoot. */
@@ -107,6 +154,7 @@ export const LEAF_STYLES = {
     length: 0.8,
     aspect: 0.41,
     shape: "lens",
+    cm: 8,
     spread: 0.95,
     cluster: 5,
     xray: 1,
@@ -119,6 +167,7 @@ export const LEAF_STYLES = {
     length: 0.7,
     aspect: 0.12,
     shape: "needle",
+    cm: 2.5,
     spread: 1.25,
     cluster: 8,
     xray: 2,
@@ -131,6 +180,7 @@ export const LEAF_STYLES = {
     length: 0.5,
     aspect: 0.62,
     shape: "deltoid",
+    cm: 5,
     spread: 1.05,
     cluster: 8,
     xray: 1,
@@ -145,6 +195,7 @@ export const LEAF_STYLES = {
     length: 0.85,
     aspect: 0.55,
     shape: "lobed",
+    cm: 10,
     spread: 0.9,
     cluster: 6,
     xray: 1,
@@ -159,6 +210,7 @@ export const LEAF_STYLES = {
     length: 0.7,
     aspect: 0.55,
     shape: "ovate",
+    cm: 8,
     spread: 1,
     cluster: 7,
     xray: 1,
@@ -174,6 +226,7 @@ export const LEAF_STYLES = {
     length: 1.5,
     aspect: 0.46,
     shape: "lens",
+    cm: 20,
     spread: 0.8,
     cluster: 4,
     xray: 2,

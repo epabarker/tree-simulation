@@ -21,7 +21,12 @@ import type { RunRecord } from "../core/world.ts";
 import type { SimApi } from "../worker/api.ts";
 import { createRenderer } from "./render/create.ts";
 import { attachInput } from "./render/input.ts";
-import { LEAF_STYLES } from "./render/leaf-styles.ts";
+import {
+  isLeafStyleName,
+  LEAF_STYLES,
+  type LeafStyle,
+  leafStudyPath,
+} from "./render/leaf-styles.ts";
 import { governor, judge, type QualityLevel, qualityLevels } from "./render/quality.ts";
 import { MAX_DPR, type Renderer } from "./render/renderer.ts";
 import sceneTokens from "./render/scene.css?inline";
@@ -205,6 +210,11 @@ export interface Garden {
   setFocus(focus: "forest" | "specimen"): void;
   /** The tree a "specimen" focus frames, or -1. */
   readonly focusTree: number;
+  /**
+   * A field guide's leaf study for a tree's species (M24): its leaf as an SVG path in a 100 × 100
+   * box, the real leaf's length in cm and the species' names; null for a tree without a species.
+   */
+  leafStudy(tree: number): { path: string; cm: number; common?: string; latin?: string } | null;
   /** Seed of the specimen's own world (option `specimen`) while it is shown, else 0. */
   readonly specimenSeed: number;
   /** Each live tree's crown top and trunk base in canvas pixels, for labels (Scene.anchors). */
@@ -229,13 +239,15 @@ const SPRING = 0.3;
 const WORLD_HEIGHT = 130;
 
 /**
- * The ring's width for a host of this size: as wide as the host is wide relative to the world's
- * height. A portrait host (a phone) gets two thirds of that, so fewer trees are drawn larger and
- * fill the plate's height rather than its lower half (M21 art pass).
+ * The ring's width for a host of this size: a share of what the host's aspect would give the
+ * world's full height. The plate fits the ring's width, so the share sets how large the trees are
+ * drawn: two thirds on a portrait host (a phone; M21 art pass) and 0.7 on a landscape one (M24:
+ * with the site's wide plate, about as many trees as before, 1.7 times larger). Crowns taller than
+ * the plate ease the camera out, as ever.
  */
 export function plateWidth(width: number, height: number): number {
   const aspect = width / Math.max(1, height);
-  return WORLD_HEIGHT * aspect * (aspect < 1 ? 0.65 : 1);
+  return WORLD_HEIGHT * aspect * (aspect < 1 ? 0.65 : 0.7);
 }
 
 // The home forest and Plate II's oak live with the presets, so the CLI can grow them too (M21).
@@ -846,6 +858,19 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
       return tau < 0.25 ? "spring" : tau < 0.52 ? "summer" : tau < 0.85 ? "autumn" : "winter";
     },
     setFocus,
+    leafStudy(tree) {
+      const s = scene.next;
+      const species = s?.metrics.find((m) => m.tree === tree)?.species;
+      const labels = species ? s?.species[species] : undefined;
+      if (!labels?.leaf || !isLeafStyleName(labels.leaf)) return null;
+      const style: LeafStyle = LEAF_STYLES[labels.leaf];
+      return {
+        path: leafStudyPath(style),
+        cm: style.cm,
+        common: labels.common,
+        latin: labels.latin,
+      };
+    },
     get specimenSeed() {
       return ownSpecimen ? specimenSeed : 0;
     },

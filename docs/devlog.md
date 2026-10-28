@@ -2,6 +2,18 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-28: garden-v0.9.0 live; M24, the wide plate and leaf studies
+
+- **Release:** PR #16 merged and `garden-v0.9.0` released; site PR #3 merged and deployed. The live time-lapse grows from seed 6.
+- **User:** on a 2880 × 1800 laptop the content takes about 40% of the screen. Is that expected and best practice? Could leaves be both true to life and visible?
+- **Answer:** the text column (768 px) keeps a 65–70 character measure, which is right for reading. Figures commonly break out wider.
+- **Site:** on screens of 64rem or wider, the plate breaks out to min(1200 px, viewport − 4rem), with the caption and hint at the text measure.
+- **Garden:**
+  - **The plate's scale is set by the world's width,** so a wider plate alone would only add trees. `plateWidth` now gives landscape plates 0.7 of the aspect's width: on a 1200 × 624 plate, 175 cells at 6.85 px a cell, against 3.2 before.
+  - **Leaf studies:** `leafStudy(tree)` gives the card the species' leaf as an SVG path with its real length (`LeafStyle.cm`). Outlines now live in `leaf-styles.ts` (`leafOutline`).
+- **The limit stays:** true-scale leaves over a whole forest are 1–2 px. Painters and field guides draw leaf masses for trees and single leaves apart, and so does the site now.
+- **Tests:** 212 pass, goldens unchanged.
+
 ## 2026-10-28: M23, leaves and the intro
 
 - **User:**

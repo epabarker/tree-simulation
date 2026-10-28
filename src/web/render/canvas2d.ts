@@ -12,30 +12,11 @@ import {
   LEAF_SHAPES,
   LEAF_STYLES,
   type LeafPalette,
-  leafProfile,
-  palmateRadius,
+  leafOutline,
 } from "./leaf-styles.ts";
 
-/**
- * Each leaf shape's outline as (along, across) points of a leaf of unit length and unit width,
- * base at (0, 0), tip at (1, 0): the profile sampled up one side and down the other, or the
- * palmate lobes around the centre. The WebGL shader draws the same profiles exactly.
- */
-const OUTLINES: Float32Array[] = LEAF_SHAPES.map((shape) => {
-  const pts: number[] = [];
-  if (shape === "palmate") {
-    for (let i = 0; i < 30; i++) {
-      const theta = (2 * Math.PI * i) / 30;
-      const r = palmateRadius(theta);
-      pts.push(0.5 + 0.5 * r * Math.cos(theta), 0.5 * r * Math.sin(theta));
-    }
-  } else {
-    const n = shape === "lens" || shape === "needle" ? 8 : 24;
-    for (let i = 0; i <= n; i++) pts.push(i / n, 0.5 * leafProfile(shape, i / n));
-    for (let i = n - 1; i > 0; i--) pts.push(i / n, -0.5 * leafProfile(shape, i / n));
-  }
-  return new Float32Array(pts);
-});
+/** Each leaf shape's outline, in LEAF_SHAPES order (leaf-styles.ts `leafOutline`). */
+const OUTLINES: Float32Array[] = LEAF_SHAPES.map(leafOutline);
 
 import { MAX_DPR, type Renderer, type RendererOptions } from "./renderer.ts";
 import { type ColorMode, type Leaves, leafLength, Scene, type ViewOptions } from "./scene.ts";

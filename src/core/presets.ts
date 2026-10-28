@@ -57,6 +57,13 @@ export const PRE_R1 = {
   r5: { enabled: false },
 } satisfies ParamsPatch;
 
+/**
+ * The M6 sky sweep (columns, periodic laps) the light model had before M18's row march: the M6–M7
+ * evidence tests pin it, as they pin PRE_R1, so their calibrated thresholds keep testing what
+ * they measured (the M18 note).
+ */
+export const M6_LIGHT = { c2: { sweep: "columns" } } satisfies ParamsPatch;
+
 /** The sky presets before R4 and R5 (M8–M9): the tests of those milestones pin it. */
 export const PRE_R4 = { r4: { enabled: false }, r5: { enabled: false } } satisfies ParamsPatch;
 

@@ -80,18 +80,25 @@ describe("M11: stand dynamics without edges (§O4, §O2, ADR 0013)", () => {
   }, 90_000);
 
   it("removes the open-edge effect: edge trees no longer lean out (periodic sides)", () => {
-    const lean = (patch: ParamsPatch) =>
-      median(
-        [1, 2, 3].flatMap((seed) => {
-          const world = new World(mergeParams(presetParams("forest", seed), patch));
-          world.run(50);
-          return [0, 9].map((k) => Math.abs(treeMetrics(world.trees[k] as Tree).centroidOffset));
-        }),
-      );
+    // Outward lean of the two end trees: the left one leaning left and the right one right count
+    // as positive. Signed, so the random lean every tree has (larger since M18) averages out.
+    const outward = (patch: ParamsPatch) => {
+      const leans = [1, 2, 3, 4, 5].flatMap((seed) => {
+        const world = new World(mergeParams(presetParams("forest", seed), patch));
+        world.run(50);
+        const off = (k: number) => treeMetrics(world.trees[k] as Tree).centroidOffset;
+        return [-off(0), off(9)];
+      });
+      return leans.reduce((a, b) => a + b, 0) / leans.length;
+    };
     const NO_O4 = { o4: { enabled: false } };
-    const ring = lean(NO_O4);
-    const open = lean({ ...NO_O4, world: { width: 210, height: 130, walls: [], sides: "open" } });
-    // Measured: 1.1 cells against 4.0.
-    expect(ring).toBeLessThan(0.6 * open);
+    const ring = outward(NO_O4);
+    const open = outward({
+      ...NO_O4,
+      world: { width: 210, height: 130, walls: [], sides: "open" },
+    });
+    // Measured (M18): −0.4 cells on the ring against 2.7 in the open.
+    expect(open).toBeGreaterThan(1.5);
+    expect(ring).toBeLessThan(0.5 * open);
   });
 });

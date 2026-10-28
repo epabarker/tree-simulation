@@ -1,8 +1,8 @@
 # Status
 
-_Last updated: 2026-10-28 (M19 step 4)_
+_Last updated: 2026-10-28 (M18)_
 
-**Current milestone: M19–M20** (species), on branch `claude/m19-species` (also in edbarker-dev), not yet pushed. Steps 1–4 are done: species per tree (ADR 0016), R5's neighbour signal, calibrated birch, oak, beech and fir ([note](experiments/2026-10-27-m19-species.md)), and species on the page, with the mixed forest, per-species leaves and calendars, names on the cards, and Plate II's own oak. M17 is live (garden-v0.6.0). M18 is deferred.
+**Current milestone: the M19–M20 realism pass**, on branch `claude/m19-species` (also in edbarker-dev). M18 is done: the row-marched sweep ([note](experiments/2026-10-28-m18-light.md)), with goldens updated. M19–M20 steps 1–4 are done (species per tree, calibration, species on the page) but held back from release: the user found realism lost, and chose M18, then one realism pass, then one release. M17 is live (garden-v0.6.0).
 
 ## Works
 - **Core:** C1–C6, R1–R6, O2 and O4 (ADRs 0005–0013); the sky sweep with open or periodic sides; golden hashes. `World.discardDead` for long page runs.
@@ -17,12 +17,18 @@ _Last updated: 2026-10-28 (M19 step 4)_
 - **Lab:** WebGL2 with pseudo-depth, Tweakpane, charts, tap to fell, phone layout. **Headless:** `npm run sim`, `npm run bench` (rings 3.8 ms a season), `analysis/experiments/` m0–m11.
 
 ## Next
-1. **Ship M19–M20:** the user looks at the previews (the home forest is leaner than M17's even-aged crowns, so check that the look is wanted). Then PR and merge here, tag `garden-v0.7.0`, sync the site from the release (it has a local 0.7.0 now), and merge the site on the user's go-ahead.
-2. **Follow-ups:** windthrow by slenderness (changes `forest` goldens); acrotony for decurrent oaks; willow; then M18.
+1. **Realism pass:**
+   - recalibrate the species under the row march;
+   - acrotony, for decurrent oaks;
+   - windthrow by slenderness, so squat open-grown trees stand up to storms;
+   - birch's spread (per-order stiffness) and its shade tolerance (back to 10–15%);
+   - the home forest's fullness against M17's.
+   Then previews, `garden-v0.7.0`, the site sync, and merges on the user's go-ahead.
+2. **Follow-ups:** willow.
 3. **The user:** the site's `TODO(Ed)` items.
 
 ## Open questions (ask when the milestone comes up)
-- The design direction (D2). ADR 0016, species per tree (M19). Amendments to ADR 0011 and §O2 (M16), and to ADR 0005 (M18). Art direction (M21).
+- Art direction (M21).
 
 ## Parked (user, 2026-10-27; raise again only when asked)
 - The Pages demo URL is unreachable (`barker.garden` NXDOMAIN; `edbarker.dev/lab` works around it). Delete the early `runs/` and `dist/` copies on pCloud?

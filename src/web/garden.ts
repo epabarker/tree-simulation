@@ -220,7 +220,7 @@ const PLANTING = ["birch", "oak", "birch", "beech"] as const;
 export function forestParams(width = 210, seed?: number): Params {
   const base = presetParams("succession", seed);
   // A phone in portrait gets a narrow ring of two or three trees, drawn large (D1).
-  const W = Math.round(Math.min(320, Math.max(54, width)));
+  const W = Math.round(Math.min(520, Math.max(54, width)));
   const n = Math.max(2, Math.round(W / 21));
   const trees = Array.from({ length: n }, (_, k) => ({
     x: ((k + 0.5) * W) / n,

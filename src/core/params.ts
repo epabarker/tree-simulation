@@ -111,6 +111,13 @@ export interface Params {
      * equal slice of the sky) so the streaks of a small K average out (M6e). Off: the fixed M6 grid.
      */
     rotate: boolean;
+    /**
+     * Sky sweep (M18, ADR 0005 amendment): "rows" marches every ray up one row at a time and
+     * integrates the exact segment it crosses in each row from that row's prefix sums of leaf
+     * area, so shallow rays need no laps around a ring and diffuse once per row, not per column.
+     * "columns" is the M6 sweep (shallow rays step a column at a time, periodic ones lap the ring).
+     */
+    sweep?: "rows" | "columns";
   };
 
   /** C3 Basipetal light summation and acropetal Borchert–Honda allocation. */

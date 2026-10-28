@@ -2,6 +2,25 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-28: M18, the row-marched light sweep
+
+- **User:** do M18 before releasing the species, then one realism pass, then one release.
+- **Core:**
+  - The sky sweep marches every ray one row at a time and integrates the exact segment it crosses from each row's prefix sums (`c2.sweep: "rows"`, the default; ADR 0005 addendum). The M6 sweep stays as `"columns"`.
+  - A periodic shallow ray needs one pass, not laps.
+  - The light phase is about twice as fast on rings. The 520 × 140 panorama (55 trees) costs 7.6 ms a season, so the garden's ring may be up to 520 cells wide (`forestParams`).
+- **Evidence** ([note](experiments/2026-10-28-m18-light.md)):
+  - 20–30% less error than the M6 sweep against an exact ray trace.
+  - Crown ratio, width, edge lean and ground light within noise over 10 seeds.
+  - Stand trees are fuller, with H/D 75 → 66.
+- **Goldens:** updated on purpose. The 13 sky-model goldens change because the light field changes; the triangle ones do not.
+- **Surprises:**
+  - **A near-vertical NaN.** cos 90° is 6e-17, so the vertical ray's segment had zero width and gave 0/0. It is now guarded.
+  - **Slower at first.** The first row march was slower than the laps it replaced: per-cell floors and modulos. Padding each row once fixed it.
+  - **A lost leader.** Two open-grown `skyTree` seeds now lose their first leader to a lateral, which reads as a 71° "trunk" tilt along the order-0 axis. The mechanics test now follows the main stem (the thickest child).
+  - **Phantom mismatch.** I chased a discrepancy between my script and a test for a while: the M6 tests run with `PRE_R1`.
+- **Tests:** the M6–M7 evidence tests pin the M6 sweep (`M6_LIGHT`), and three current-model tests are re-measured (the note lists them). There are three new sweep unit tests. 196 pass.
+
 ## 2026-10-28: M19–M20 step 4, species on the page
 
 - **Page:**

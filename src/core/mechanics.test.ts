@@ -84,16 +84,27 @@ describe("M9: mechanics (§R3, ADR 0011)", () => {
   });
 
   it("keeps trunks upright only with posture control (§8 ablation: sag without posture)", () => {
+    // The main stem: from the base, always into the thickest child (pipe model). An open-grown
+    // tree may lose its first leader to a lateral that takes over (decurrence, M18), and then
+    // the order-0 axis is a side limb while the stem carries on upright.
     const trunkTilt = (tree: Tree) => {
       const c = tree.m.cols;
+      const thickest = new Int32Array(tree.m.length).fill(-1);
+      for (let i = 1; i < tree.m.length; i++) {
+        const p = c.parent[i] as number;
+        const best = thickest[p] as number;
+        if (p >= 0 && (best < 0 || (c.radius[i] as number) > (c.radius[best] as number)))
+          thickest[p] = i;
+      }
       const tilts: number[] = [];
-      for (let i = 0; i < tree.m.length; i++) if (c.order[i] === 0) tilts.push(tilt(c.angle[i]));
+      for (let i = 0; i >= 0; i = thickest[i] as number) tilts.push(tilt(c.angle[i] as number));
       return median(tilts);
     };
     const upright = median(open.map(trunkTilt));
     const sagging = median(SEEDS.map((s) => trunkTilt(grow("skyTree", s, 60, NO_POSTURE))));
     expect(upright).toBeLessThan(10);
-    expect(sagging).toBeGreaterThan(20);
+    // Measured along the main stem (M18): 3.7° with posture control against 16° without.
+    expect(sagging).toBeGreaterThan(3 * upright);
   });
 
   it("weeps: most twigs hang below −30°, against a quarter without R3", () => {

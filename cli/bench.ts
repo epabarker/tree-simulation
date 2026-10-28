@@ -41,6 +41,19 @@ function wideForest(): Params {
   return mergeParams(base, { world: { ...base.world, width: 2 * W }, trees });
 }
 
+/** M18's target: the home woodland on a 520 × 140 ring, a tree every 21 cells (a panoramic screen). */
+function panorama(): Params {
+  const base = presetParams("succession");
+  const W = 520;
+  const n = Math.round(W / 21);
+  const kinds = ["birch", "oak", "birch", "beech"];
+  const trees = Array.from({ length: n }, (_, k) => ({
+    x: ((k + 0.5) * W) / n,
+    species: kinds[k % 4],
+  }));
+  return mergeParams(base, { world: { ...base.world, width: W, height: 140 }, trees });
+}
+
 const CASES: Record<string, () => Params> = {
   skyTree: () => presetParams("skyTree"),
   skyStand: () => presetParams("skyStand"),
@@ -48,6 +61,7 @@ const CASES: Record<string, () => Params> = {
   thinning: () => presetParams("thinning"),
   forest: () => presetParams("forest"),
   wideForest,
+  panorama,
 };
 
 type Bucket = Phase | "snapshot";

@@ -1,13 +1,13 @@
 import { describe, expect, it } from "vitest";
 import { type TreeMetrics, treeMetrics } from "./metrics.ts";
 import { mergeParams, type ParamsPatch } from "./params.ts";
-import { presetParams as currentPreset, PRE_R1, type PresetName } from "./presets.ts";
+import { presetParams as currentPreset, M6_LIGHT, PRE_R1, type PresetName } from "./presets.ts";
 import type { Tree } from "./tree.ts";
 import { World } from "./world.ts";
 
-/** These checks are the M6–M7 evidence, so they run the presets as they were before R1 and R3. */
+/** These checks are the M6–M7 evidence, so they run the presets as they were before R1 and R3, under the M6 light sweep. */
 const presetParams = (name: PresetName, seed?: number) =>
-  mergeParams(currentPreset(name, seed), PRE_R1);
+  mergeParams(mergeParams(currentPreset(name, seed), PRE_R1), M6_LIGHT);
 
 // M7 visible test (§7, ADR 0009): the three species presets against their §9 silhouettes.
 const SEEDS = [1, 2, 3, 4, 5];

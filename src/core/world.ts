@@ -150,6 +150,39 @@ export class World {
     return n;
   }
 
+  /** Events queued for the next season boundary (a checkpoint carries them, M21). */
+  get queued(): readonly RunEvent[] {
+    return this.pending;
+  }
+
+  /**
+   * Takes over a saved state (checkpoint.ts, M21): params, season, flags, the event log and
+   * queue, and the trees. The light model and the species cache are rebuilt from the params;
+   * everything else a season reads is recomputed in that season.
+   */
+  restoreState(state: {
+    params: Params;
+    season: number;
+    recruits: number;
+    storm: boolean;
+    log: RunEvent[];
+    pending: RunEvent[];
+    trees: Tree[];
+  }): void {
+    this.params = clone(state.params);
+    this.season = state.season;
+    this.recruits = state.recruits;
+    this.storm = state.storm;
+    this.log.length = 0;
+    this.log.push(...state.log);
+    this.pending = [...state.pending];
+    this.trees.length = 0;
+    this.trees.push(...state.trees);
+    this.speciesParams.clear();
+    this.light = makeLight(this.params);
+    this.owner = new Int32Array(this.params.world.width * this.params.world.height);
+  }
+
   record(): RunRecord {
     return { params: clone(this.initialParams), events: clone(this.log), seasons: this.season };
   }

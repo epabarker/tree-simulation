@@ -21,7 +21,7 @@
     "sim": "node cli/run.ts",
     "golden:update": "node tests/update-golden.ts",
     "bench": "node cli/bench.ts",
-    "build:garden": "vite build -c vite.garden.config.ts && node cli/garden-size.ts"
+    "build:garden": "vite build -c vite.garden.config.ts && node cli/garden-size.ts && node cli/first-paint.ts"
   },
   "dependencies": {
     "@observablehq/plot": "^0.6.17",

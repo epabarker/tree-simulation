@@ -2,6 +2,25 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-28: M21 step 1, checkpoints and grown forests
+
+- **Core:**
+  - `core/checkpoint.ts`: `saveWorld` and `loadWorld`. Restoring at N and running k seasons hashes exactly as N + k, with a fell and a sown seed still queued.
+  - `World.restoreState` and `World.queued`.
+  - `forestParams` and `specimenParams` moved to `presets.ts`, so the CLI can grow the home forest.
+- **CLI:** `--checkpoint-at N`, and `cli/first-paint.ts` (run by `build:garden`), which writes 12 grown forests: 4 widths × 3 seeds, 60 seasons, 40–210 kB each, 1.3 MB in all.
+- **Worker:** `restore(bytes)`.
+- **Garden:**
+  - option `first`: it opens on a grown forest nearest its width, with one seed a day, and falls back to growing from seed;
+  - `seed` is now a getter;
+  - reduced motion doesn't regrow a grown forest;
+  - `garden.html?first`.
+- **Measured:** the grown forest shows 173 ms after `load` (Firefox, local preview).
+- **Surprises:**
+  - **Double unzip.** Vite's preview server sends `.gz` with `Content-Encoding: gzip`, so the browser had already unzipped it. The worker now unzips only bytes that start with gzip's magic number.
+  - **No text codec.** The core has no `TextEncoder`, so the header is ASCII JSON with \uXXXX escapes.
+- **Tests:** 201 pass, goldens unchanged.
+
 ## 2026-10-28: garden-v0.7.0 live
 
 - **Releases:**

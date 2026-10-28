@@ -5,16 +5,20 @@
  *   npm run sim -- --params my.json --snapshots 25,50 --out runs/x   (patch over the preset)
  *   npm run sim -- --replay tree-run.json --out runs/replay          (page's "Export run")
  *   echo '{"c3":{"lambda":0.56}}' | npm run sim -- --params - --out runs/y
+ *   npm run sim -- --preset succession --checkpoint-at 60 --seasons 60 --out runs/c   (M21)
  *
  * Writes to --out: run.json (resolved params, events, metadata), metrics.csv (one row per tree
  * per season), metamers.csv (geometry at --snapshots seasons and the last), hash.txt, and with
- * --light light.csv (the light model's per-cell shade 1 − Q/C at the same seasons; M6e).
+ * --light light.csv (the light model's per-cell shade 1 − Q/C at the same seasons; M6e), and with
+ * --checkpoint-at N checkpoint-N.bin.gz, the world after season N (core/checkpoint.ts; M21).
  */
 
 import { execFileSync } from "node:child_process";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { parseArgs } from "node:util";
+import { gzipSync } from "node:zlib";
+import { saveWorld } from "../src/core/checkpoint.ts";
 import { hashWorld } from "../src/core/hash.ts";
 import { METRIC_COLUMNS, treeMetrics } from "../src/core/metrics.ts";
 import { mergeParams, type Params, type ParamsPatch } from "../src/core/params.ts";
@@ -32,6 +36,7 @@ const { values } = parseArgs({
     out: { type: "string" },
     quiet: { type: "boolean", default: false },
     light: { type: "boolean", default: false },
+    "checkpoint-at": { type: "string" },
   },
 });
 
@@ -105,6 +110,10 @@ for (let s = 0; s < seasons; s++) {
         )
         .join(","),
     );
+  }
+  if (values["checkpoint-at"] !== undefined && world.season === Number(values["checkpoint-at"])) {
+    const bytes = gzipSync(saveWorld(world), { level: 9 });
+    writeFileSync(join(out, `checkpoint-${world.season}.bin.gz`), bytes);
   }
   const field = values.light && snapshotSeasons.has(world.season) ? world.light.field() : null;
   if (field) {

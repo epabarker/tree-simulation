@@ -74,12 +74,17 @@
         : undefined;
       // `?specimen` frames Plate II's oak grown in the open (M19); setFocus("forest") returns.
       const specimen = query.has("specimen");
+      // `?first` opens on a grown forest from ./first/ (M21; copy dist-garden/first there to try it).
+      const first = query.has("first")
+        ? { base: "./first", ...(await (await fetch("./first/manifest.json")).json()) }
+        : undefined;
       // Exposed for poking at from the console (and headless checks); a host page needn't.
       window.garden = mountGarden(document.getElementById("garden"), {
         headroom: 140,
         bench,
         specimen: "oak",
         focus: specimen ? "specimen" : "forest",
+        first,
       });
     </script>
   </body>

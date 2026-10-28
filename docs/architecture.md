@@ -43,6 +43,12 @@ How the code realises the spec. For *why* a choice was made, see `docs/decisions
 - The scene's tokens live in `render/scene.css` inside `@layer tree-garden`. The garden injects that sheet first in `<head>`, so the layer comes first and any host declaration of a token wins.
 - `theme.ts` converts any CSS colour a host gives (oklch(), names) to hex by painting one pixel. A custom property's computed value is its raw text, and the WebGL parser only reads hex and rgb().
 
+**First paint (M21):**
+- **Checkpoints** (`core/checkpoint.ts`): `saveWorld` writes a whole World as bytes. The layout is a u32 header length, a JSON header (ASCII, with anything else escaped as \uXXXX, since the core has no text codec), then every tree's metamer and bud columns, padded to 8 bytes. It holds the params, season, flags, event log and queue, and each tree's scalars and tables. `loadWorld` restores it: k more seasons hash exactly as N + k from scratch (`checkpoint.test.ts`). Light, owners and per-season scratch are rebuilt by the season that reads them.
+- **Grown forests:** `cli/first-paint.ts`, run by `npm run build:garden`, grows `forestParams` at widths 100, 160, 220 and 300 for seeds 11, 23 and 37, 60 seasons each, into `dist-garden/first/` with a `manifest.json` (40–210 kB each).
+- **Opening on one:** `mountGarden({ first: { base, widths, seeds } })` picks the width nearest its own and a seed by the day, opens on that forest at the ambient pace, and falls back to growing from seed. `?forest=seed` (option `seed`) still grows from seed. The checkpoint was grown from `forestParams(width, seed)`, so that link regrows the same forest.
+- **CLI:** `npm run sim -- --checkpoint-at N` saves the CLI's world (dead trees included) as `checkpoint-N.bin.gz`.
+
 **Long runs:** the worker calls `World.discardDead()` after each season. It frees dead trees' tables (a forest piles up ≈ 20 MB per 1000 seasons otherwise) without changing any live tree (`world.test.ts`). Page worlds therefore do not hash like CLI worlds.
 
 ## Data model (spec §5)
@@ -156,6 +162,7 @@ Tapping a tree on the page fells it. `Scene.pickTree` finds the nearest drawn se
 |---|---|
 | `init(params)` | New World; returns the season-0 snapshot |
 | `step(n)` | Runs n seasons; returns a snapshot. The page asks for one season at a time. While playing it asks as soon as a season is shown, so the worker computes season s+1 while the page tweens to s, and the result waits for its turn (pipelining, M15). Pausing shows the waiting season; while playing, events apply one season later |
+| `restore(bytes)` | Starts from a world checkpoint (M21), gzipped or already unzipped by the server; returns the snapshot of its season |
 | `swap(params \| null)` | Puts the running world aside and starts `params`, or with null resumes the world put aside (M19: Plate II's own oak while the forest waits). Returns a season snapshot; `init` drops anything put aside |
 | `setParams(patch)`, `removeTree(id)` | Queue events |
 | `setSnapshotOptions({junctions, field})` | Which optional parts later snapshots carry: the Δ histogram's junction exponents and the shade field. Both default to on (the lab); the home page turns both off (M13) |

@@ -11,6 +11,11 @@ export interface SimApi {
   /** Starts a new run and returns the snapshot of season 0. */
   init(params: Params): Snapshot;
   /**
+   * Starts from a world checkpoint (core/checkpoint.ts, M21) instead, gzipped or already unzipped
+   * by the server, and returns the snapshot of the season it was saved at.
+   */
+  restore(gzipped: ArrayBuffer): Promise<Snapshot>;
+  /**
    * Puts the running world aside and starts `params` in its place, returning its season 0; with
    * null, drops that world and resumes the one put aside where it stood (M19: a page's specimen
    * plate grows its own tree while the forest waits).

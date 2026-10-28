@@ -57,7 +57,7 @@ function panorama(): Params {
 const CASES: Record<string, () => Params> = {
   skyTree: () => presetParams("skyTree"),
   skyStand: () => presetParams("skyStand"),
-  coniferStand: () => presetParams("coniferStand"),
+  firWood: () => presetParams("firWood"),
   thinning: () => presetParams("thinning"),
   forest: () => presetParams("forest"),
   wideForest,

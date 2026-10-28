@@ -1,20 +1,21 @@
 import { describe, expect, it } from "vitest";
+import { type FixtureName, fixtureParams } from "./fixtures.ts";
 import { type TreeMetrics, treeMetrics } from "./metrics.ts";
 import { mergeParams, type ParamsPatch } from "./params.ts";
-import { presetParams as currentPreset, M6_LIGHT, PRE_R1, type PresetName } from "./presets.ts";
+import { M6_LIGHT, PRE_R1 } from "./presets.ts";
 import type { Tree } from "./tree.ts";
 import { World } from "./world.ts";
 
-/** These checks are the M6–M7 evidence, so they run the presets as they were before R1 and R3, under the M6 light sweep. */
-const presetParams = (name: PresetName, seed?: number) =>
-  mergeParams(mergeParams(currentPreset(name, seed), PRE_R1), M6_LIGHT);
+/** These checks are the M6–M7 evidence, so they run the retired presets (fixtures.ts) as they were before R1 and R3, under the M6 light sweep. */
+const presetParams = (name: FixtureName, seed?: number) =>
+  mergeParams(mergeParams(fixtureParams(name, seed), PRE_R1), M6_LIGHT);
 
 // M7 visible test (§7, ADR 0009): the three species presets against their §9 silhouettes.
 const SEEDS = [1, 2, 3, 4, 5];
 const SEASONS = 50;
 const median = (xs: number[]) => [...xs].sort((a, b) => a - b)[Math.floor(xs.length / 2)] as number;
 
-function grow(preset: PresetName, seed: number, patch: ParamsPatch = {}): World {
+function grow(preset: FixtureName, seed: number, patch: ParamsPatch = {}): World {
   const world = new World(mergeParams(presetParams(preset, seed), patch));
   world.run(SEASONS);
   return world;
@@ -46,12 +47,12 @@ function lowerOverUpper(tree: Tree): number {
   return lower / upper;
 }
 
-const open = (preset: PresetName, patch: ParamsPatch = {}) =>
+const open = (preset: FixtureName, patch: ParamsPatch = {}) =>
   SEEDS.map((seed) => grow(preset, seed, patch).trees[0] as Tree);
 const conifers = open("conifer");
 const birches = open("birch");
 const tropicals = open("tropical");
-const interior = (preset: PresetName): TreeMetrics[] =>
+const interior = (preset: FixtureName): TreeMetrics[] =>
   SEEDS.flatMap((seed) =>
     grow(preset, seed)
       .trees.slice(1, -1)

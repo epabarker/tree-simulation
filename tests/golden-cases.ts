@@ -4,12 +4,14 @@
  * say why in docs/devlog.md (AGENTS.md).
  */
 
+import { type FixtureName, fixtureParams, isFixtureName } from "../src/core/fixtures.ts";
 import { hashWorld } from "../src/core/hash.ts";
 import { type PresetName, presetParams } from "../src/core/presets.ts";
 import { World } from "../src/core/world.ts";
 
 export interface GoldenCase {
-  preset: PresetName;
+  /** A preset, or a retired one kept as a fixture under its old name (ADR 0019). */
+  preset: PresetName | FixtureName;
   seed: number;
   seasons: number;
 }
@@ -49,7 +51,10 @@ export function caseKey(c: GoldenCase): string {
 }
 
 export function runCase(c: GoldenCase): string {
-  const world = new World(presetParams(c.preset, c.seed));
+  const params = isFixtureName(c.preset)
+    ? fixtureParams(c.preset, c.seed)
+    : presetParams(c.preset, c.seed);
+  const world = new World(params);
   world.run(c.seasons);
   return hashWorld(world);
 }

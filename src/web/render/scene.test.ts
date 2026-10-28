@@ -162,7 +162,7 @@ describe("Leaf styles (page only, per species)", () => {
     for (const preset of Object.values(presets) as { leaf?: string }[]) {
       if (preset.leaf !== undefined) expect(isLeafStyleName(preset.leaf)).toBe(true);
     }
-    expect((presets.conifer as { leaf?: string }).leaf).toBe("needle");
+    expect((presets.firWood as { leaf?: string }).leaf).toBe("needle");
   });
 });
 

@@ -1,13 +1,14 @@
 import { describe, expect, it } from "vitest";
+import { type FixtureName, fixtureParams } from "../fixtures.ts";
 import { defaultParams, mergeParams, type PaLevel, type Params } from "../params.ts";
-import { presetParams as currentPreset, PRE_R1, type PresetName } from "../presets.ts";
+import { PRE_R1 } from "../presets.ts";
 import { BudState, Slot, type Tree } from "../tree.ts";
 import { World } from "../world.ts";
 import { directionParams, lambdaAt, lateralCount, terminates } from "./r2-physiological-age.ts";
 
-/** These checks are the M7 evidence, so they run the presets as they were before R1 and R3. */
-const presetParams = (name: PresetName, seed?: number) =>
-  mergeParams(currentPreset(name, seed), PRE_R1);
+/** These checks are the M7 evidence, so they run the retired presets (fixtures.ts) as they were before R1 and R3. */
+const presetParams = (name: FixtureName, seed?: number) =>
+  mergeParams(fixtureParams(name, seed), PRE_R1);
 
 const row = (r: Partial<PaLevel>): PaLevel => ({
   lambda: 0.5,

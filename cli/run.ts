@@ -24,6 +24,7 @@ import { join } from "node:path";
 import { parseArgs } from "node:util";
 import { gzipSync } from "node:zlib";
 import { saveWorld } from "../src/core/checkpoint.ts";
+import { fixtureParams, isFixtureName } from "../src/core/fixtures.ts";
 import { FORM_COLUMNS, formMetrics, PROFILE_BANDS } from "../src/core/form.ts";
 import { hashWorld } from "../src/core/hash.ts";
 import { METRIC_COLUMNS, treeMetrics } from "../src/core/metrics.ts";
@@ -81,8 +82,10 @@ if (values.replay) {
   events = record.events;
   seasons = values.seasons ? Number(values.seasons) : record.seasons;
 } else {
-  if (!isPresetName(values.preset)) throw new Error(`Unknown preset '${values.preset}'`);
-  params = presetParams(values.preset);
+  // Retired presets (fixtures.ts, ADR 0019) still run, so the M7 and M9 experiments reproduce.
+  if (isPresetName(values.preset)) params = presetParams(values.preset);
+  else if (isFixtureName(values.preset)) params = fixtureParams(values.preset);
+  else throw new Error(`Unknown preset '${values.preset}'`);
   if (values.params) params = mergeParams(params, readJson(values.params) as ParamsPatch);
   if (values["species-patch"]) {
     const amend = JSON.parse(values["species-patch"]) as Record<string, SpeciesPatch>;

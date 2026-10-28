@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { type FixtureName, fixtureParams, isFixtureName } from "./fixtures.ts";
 import { limbShapes } from "./form.ts";
 import { mergeParams, type ParamsPatch, patchSpecies } from "./params.ts";
 import { PRE_R4, type PresetName, presetParams } from "./presets.ts";
@@ -21,8 +22,14 @@ const PRE_R3 = { r3: { enabled: false } } satisfies ParamsPatch;
 const NO_POSTURE = { r3: { posture: false } } satisfies ParamsPatch;
 
 /** These checks are the M9 evidence, so they run the presets as they were before R4 and R5. */
-function grow(preset: PresetName, seed: number, seasons: number, patch: ParamsPatch = {}): Tree {
-  const world = new World(mergeParams(mergeParams(presetParams(preset, seed), PRE_R4), patch));
+function grow(
+  preset: PresetName | FixtureName,
+  seed: number,
+  seasons: number,
+  patch: ParamsPatch = {},
+): Tree {
+  const base = isFixtureName(preset) ? fixtureParams(preset, seed) : presetParams(preset, seed);
+  const world = new World(mergeParams(mergeParams(base, PRE_R4), patch));
   world.run(seasons);
   return world.trees[0] as Tree;
 }

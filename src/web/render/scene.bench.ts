@@ -44,7 +44,7 @@ function time(frame: () => void, rounds = 15, perRound = 40): number {
 
 for (const [preset, seasons] of [
   ["forest", 80],
-  ["coniferStand", 80],
+  ["firWood", 80],
 ] as const) {
   const scene = tweening(preset, seasons);
   let t = 0;

@@ -270,9 +270,9 @@ Low R:FR also suppresses bud outgrowth, through ABA in the bud (Schneider et al.
 1. **Statement.** Surplus carbon produces seeds that disperse and establish where ground light suffices; trees die of starvation, breakage or background risk; self-thinning emerges.
 2. **Biology/models.** JABOWA (Botkin et al. 1972) and SORTIE (Pacala et al. 1993, 1996) build forest dynamics from individual growth, light competition, recruitment and mortality.\[36\]\[37\] Self-thinning: w ∝ ρ^(−3/2) (Yoda et al. 1963), qualified by Westoby (1984).\[38\]\[39\] Asymmetric light competition raises size inequality with density (Weiner 1990; Weiner et al. 2001).\[40\]\[41\]\[42\] In individual-based models the slope ranges from −0.9 to −1.8 (Mrad et al. 2020) and depends mainly on the mode of competition (Ma et al. 2019); models should be judged on several patterns at once, not the line alone (Reynolds & Ford 2005). A minimal cellular crown model already reproduces self-thinning, gap filling and crown asymmetry (Loehle 2025).
 3. **Evidence.** Individual-based modelling well established; −3/2 exponent debated.\[43\]
-4. **Local rule.** Seeds = ⌊f_rep·N⁺/c_seed⌋; position ~ parent + Laplace(0,d) **[RNG]**; establish if ground Q > Q_est with p_est **[RNG]**; p_die = m₀ + starvation + breakage **[RNG]**.
+4. **Local rule.** Seeds = ⌊f_rep·N⁺/c_seed⌋; position ~ parent + Laplace(0,d) **[RNG]**; establish if ground Q > Q_est with p_est **[RNG]**; p_die = m₀ + starvation + breakage **[RNG]**. Seed rain (ADR 0018): a species may also receive `rain` seeds per 100 cells a season from beyond the world, landing uniformly **[RNG]** and establishing by the same rule.
 5. **2D translation.** Ground is a line; density per metre. Stand experiments run on a ring (periodic world sides), so no tree has an open edge (ADR 0013). Establishment also needs no live trunk within one cell.
-6. **Parameters.** f_rep, c_seed, maturity, d, Q_est, p_est, m₀.
+6. **Parameters.** f_rep, c_seed, maturity, d, Q_est, p_est, m₀, rain.
 7. **Feedback.** Population-scale loop E.
 8. **Module boundary.** Separate; needs R1.
 9. **Multi-tree.** Population-only.
@@ -315,7 +315,7 @@ Parents-before-children order makes the basipetal pass a reverse loop and the ac
 
 **Global state:** season t; master seed with per-purpose streams hash(seed, tree_id, purpose), so enabling a principle never reshuffles another's numbers; species tables; principle flags; sky model; event queue; tree registry and seed bank; metrics log.
 
-**Randomness entry points:** side s₀ (C1), direction noise (C4), stochastic shedding (C5), sympodial termination (R2), stochastic break (R4), abrasion and wind (O2), seeds, dispersal, establishment, mortality (O4), initial positions.
+**Randomness entry points:** side s₀ (C1), direction noise (C4), stochastic shedding (C5), sympodial termination (R2), stochastic break (R4), abrasion and wind (O2), seeds, dispersal, establishment, mortality, seed rain (O4), initial positions.
 
 ---
 

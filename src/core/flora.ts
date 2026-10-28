@@ -18,9 +18,10 @@
  *   young; oak and beech make few heavy seeds that land close, and beech establishes in shade.
  *
  * M25 (docs/experiments/2026-10-28-m25-species.md) adds hornbeam, field maple, holly, rowan and
- * goat willow, fitted the same way, and Scots pine. Their survival lights run from willow and pine
- * (≈ 19%) through rowan (8%) and maple (5%) to hornbeam and holly (3%), in Niinemets & Valladares's
- * order; holly and hornbeam cast the deepest shade, pine and willow the lightest.
+ * goat willow, fitted the same way, and Scots pine. Niinemets & Valladares score them pine 1.67,
+ * willow 2.16, rowan 2.73, maple 3.18, holly 3.86 and hornbeam 3.97; their survival lights run
+ * from pine (19%) through willow (13%, birch's), rowan (8%) and maple (5%) to hornbeam and holly
+ * (3%). Holly and hornbeam cast the deepest shade, pine and willow the lightest.
  *
  * Labels are the field guide's: a common name, a Latin name and the leaf style the page draws.
  * Fir and pine are lab species; the home forest (`mixedWood`) mixes the other nine.
@@ -70,7 +71,8 @@ export const FLORA = {
     r3: { leafMass: 0.001, phi: 0.5 },
     r4: { qRel: 0.3 },
     r6: { enabled: true, qMin: 0.12, leafArea: 1.6 },
-    o4: { cSeed: 2, d: 40, qEst: 0.25, pEst: 0.3, m0: 0.008 },
+    // Seed rain (ADR 0018): wind-borne seed from birches beyond the world reaches large gaps.
+    o4: { cSeed: 2, d: 40, qEst: 0.25, pEst: 0.3, m0: 0.008, rain: 0.2 },
   },
   /** Mid-tolerant, long-lived, broad and decurrent when grown in the open. */
   oak: {
@@ -146,7 +148,8 @@ export const FLORA = {
     latin: "Carpinus betulus",
     leaf: "hornbeam",
     c5: { enabled: true, T: 0.01, Trel: 0.02 },
-    r1: { mf: 0.04, Lh: 50 },
+    // Costlier leaves than beech's: less tolerant (3.97 against 4.56), so beech outgrows it in shade.
+    r1: { mf: 0.045, Lh: 50 },
     // Troll's model, like beech (Hallé et al. 1978), with weaker apical control.
     r2: {
       enabled: true,
@@ -171,7 +174,10 @@ export const FLORA = {
     leaf: "maple",
     c3: { mode: "bh", lambda: 0.5, alpha: 3.2 },
     c5: { enabled: true, T: 0.02, Trel: 0.06 },
-    r1: { mf: 0.05, Lh: 45, maturity: 30 },
+    // A lighter crown than beech's (fewer short-shoot leaves, M25 follow-up): its floor sits
+    // between oak's and beech's; cheaper leaves and thicker tips keep saplings and stems as before.
+    c6: { enabled: true, r0: 0.024 },
+    r1: { mf: 0.04, Lh: 45, maturity: 30 },
     // Maple's buds are opposite and decussate: each pair turns 90° from the last, so only every
     // other pair lies in the plane. That is one bud a node, as distichous gives; the "opposite"
     // generator doubled the in-plane buds and cast a floor darker than beech's.
@@ -188,7 +194,7 @@ export const FLORA = {
     },
     // Hard, dense wood (as oak's): ascending limbs hold a rounded crown instead of sagging flat.
     r3: { E: 2.5e6, c: 0.15, betaG: 0.2 },
-    r6: { enabled: true, qMin: 0.045, leafArea: 1.8 },
+    r6: { enabled: true, qMin: 0.045, leafArea: 1.5 },
     o4: { cSeed: 5, d: 25, qEst: 0.05, pEst: 0.3, m0: 0.004 },
   },
   /** Evergreen understorey tree: a deep, dark, conical crown that keeps its lower limbs in shade. */
@@ -263,9 +269,11 @@ export const FLORA = {
       ],
     },
     r4: { qRel: 0.3 },
-    r6: { enabled: true, qMin: 0.15, leafArea: 1.5 },
-    // Tiny plumed seeds blow far but need bare, lit ground; a short life.
-    o4: { cSeed: 1.5, d: 60, qEst: 0.3, pEst: 0.3, m0: 0.012 },
+    // Survives birch's shade, no deeper: Niinemets & Valladares score it 2.16, birch 2.03.
+    r6: { enabled: true, qMin: 0.12, leafArea: 1.5 },
+    // Tiny plumed seeds blow far but need bare, lit ground; a short life. Seed rain (ADR 0018)
+    // brings willow back to clearings after it has died out in the wood.
+    o4: { cSeed: 1.5, d: 60, qEst: 0.3, pEst: 0.3, m0: 0.012, rain: 1 },
   },
   /** Light-demanding pine, Rauh's model: whorls, a clean bole and a high crown (a lab species). */
   pine: {

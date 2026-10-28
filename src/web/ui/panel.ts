@@ -231,6 +231,7 @@ const SECTIONS: SectionSpec[] = [
       { key: "qEst", label: "Q_est ground light", min: 0, max: 1, step: 0.01 },
       { key: "pEst", label: "p_est", min: 0, max: 1, step: 0.05 },
       { key: "m0", label: "m₀ background death", min: 0, max: 0.05, step: 0.001 },
+      { key: "rain", label: "seed rain /100 cells", min: 0, max: 5, step: 0.1 },
     ],
   },
 ];

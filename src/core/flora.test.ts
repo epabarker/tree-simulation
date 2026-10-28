@@ -6,6 +6,7 @@ import { presetParams } from "./presets.ts";
 import { World } from "./world.ts";
 
 const SEEDS = [1, 2, 3];
+const SIX = [1, 2, 3, 4, 5, 6];
 const mean = (a: number[]) => a.reduce((s, x) => s + x, 0) / a.length;
 
 /** The woodland's growth rules without stand dynamics or storms (oakOpen's), for `trees`. */
@@ -181,11 +182,15 @@ describe("calibrated species (M19)", () => {
 });
 
 describe("the M25 species", () => {
-  it("orders shade tolerance pine, willow < rowan < maple < holly, hornbeam", () => {
-    // ≈ 13% of the sky: rowan waits, the pioneers starve (Pinus and Salix score lowest).
+  it("orders shade tolerance pine < willow < rowan < maple < holly, hornbeam", () => {
+    // Niinemets & Valladares 2006: pine 1.67, willow 2.16, rowan 2.73, maple 3.18, holly 3.86,
+    // hornbeam 3.97. At ≈ 13% of the sky willow and rowan wait, as birch does; pine starves.
     expect(shadeHouse("rowan", 3.3).alive).toBe(3);
-    expect(shadeHouse("willow", 3.3).alive).toBe(0);
+    expect(shadeHouse("willow", 3.3).alive).toBe(3);
     expect(shadeHouse("pine", 3.3).alive).toBe(0);
+    // ≈ 8%: rowan still lives; willow, a pioneer, does not.
+    expect(shadeHouse("rowan", 4).alive).toBe(3);
+    expect(shadeHouse("willow", 4).alive).toBe(0);
     // ≈ 5%: field maple, mid-tolerant, lives; rowan does not.
     expect(shadeHouse("maple", 4.8).alive).toBe(3);
     expect(shadeHouse("rowan", 4.8).alive).toBe(0);
@@ -226,6 +231,9 @@ describe("the M25 species", () => {
   });
 
   it("lets the mixed wood's pioneers give way to beech, with holly and hornbeam beneath", () => {
+    // Totals over six seeds: single runs vary widely (one grows no beech, another keeps its
+    // pioneers in storm gaps). Measured: birch and willow 19 canopy trees at season 50, 6 at 400;
+    // beech 13 and hornbeam 9 at 400.
     const canopy = (world: World) =>
       world.trees.filter((t) => t.alive && treeMetrics(t, world).height >= 30);
     const of = (trees: World["trees"], sp: string[]) =>
@@ -233,24 +241,49 @@ describe("the M25 species", () => {
     let early = 0;
     let late = 0;
     let beech = 0;
+    let hornbeam = 0;
     let shadeBearers = 0;
-    for (const seed of SEEDS) {
+    for (const seed of SIX) {
       const world = new World(presetParams("mixedWood", seed));
       world.run(50);
       early += of(canopy(world), ["birch", "willow"]);
-      world.run(300);
+      world.run(350);
       const trees = canopy(world);
       late += of(trees, ["birch", "willow"]);
       beech += of(trees, ["beech"]);
+      hornbeam += of(trees, ["hornbeam"]);
       shadeBearers += of(
         world.trees.filter((t) => t.alive),
         ["holly", "hornbeam"],
       );
     }
-    // Measured (5 seeds): birch and willow 2.8 canopy trees a run at season 50, 0.6 at 350;
-    // beech 2.6 at 350, the most of any species; holly and hornbeam 4.4 live trees.
-    expect(late).toBeLessThan(0.4 * early);
-    expect(beech).toBeGreaterThanOrEqual(SEEDS.length);
-    expect(shadeBearers).toBeGreaterThanOrEqual(2 * SEEDS.length);
-  });
+    expect(late).toBeLessThan(0.5 * early);
+    expect(beech).toBeGreaterThan(hornbeam);
+    expect(shadeBearers).toBeGreaterThanOrEqual(2 * SIX.length);
+  }, 90_000);
+
+  it("brings goat willow back to a clearing only through seed rain (ADR 0018)", () => {
+    // An old mixed wood, a 60-cell clearing felled at season 300, then 40 seasons. Measured
+    // (six seeds): 9 willows in all with rain, in 4 of the 6 clearings; none without.
+    const willows = (rain: boolean) =>
+      SIX.reduce((sum, seed) => {
+        const params = presetParams("mixedWood", seed);
+        if (!rain)
+          for (const sp of Object.values(params.species ?? {}))
+            if (sp.o4) sp.o4 = { ...sp.o4, rain: 0 };
+        const world = new World(params);
+        world.run(300);
+        for (const t of world.trees)
+          if (t.alive && t.rootX >= 60 && t.rootX < 120) world.removeTree(t.id);
+        world.run(40);
+        return (
+          sum +
+          world.trees.filter(
+            (t) => t.alive && t.rootX >= 55 && t.rootX < 125 && t.species === "willow",
+          ).length
+        );
+      }, 0);
+    expect(willows(false)).toBe(0);
+    expect(willows(true)).toBeGreaterThanOrEqual(4);
+  }, 120_000);
 });

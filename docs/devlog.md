@@ -2,6 +2,41 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-28: M25 follow-ups: maple's shade and seed rain
+
+- **User:** do the three M25 follow-ups, and agreed to extend O4 with seed rain.
+- **Field maple:**
+  - its floor was as dark as beech's (3.4%), and it was as common in the canopy as hornbeam;
+  - it now has a lighter crown (a_ss 1.5), cheaper leaves (m_f 0.04) and thicker tips (r₀ 0.024);
+  - its floor is 4.0%, between oak's and beech's; shade survival (5%) and the round crown are kept;
+  - in the mixed wood it holds 0.2–1 canopy trees.
+  - **Surprise:** a lower α alone did not lighten the floor.
+- **Seed rain** (ADR 0018, spec §O4 amended):
+  - `o4.rain` gives seeds per 100 cells a season from beyond the world, per species, establishing by the usual rule;
+  - it has a new RNG purpose, `seedRain` (13), keyed by an FNV hash of the species name;
+  - it is off by default, so goldens are unchanged;
+  - values: willow 1, birch 0.2;
+  - a 60-cell clearing at season 300 gets 1–2 willows in every seed, against none without rain;
+  - the closed wood is almost unchanged.
+  - **Surprise:** birch at 0.5 kept birch in the canopy past season 350.
+  - The lab's O4 folder has a slider for it.
+- **Tolerance scores:** checked against Appendix A (the user supplied it). Pine, rowan, maple and hornbeam matched.
+  - **Goat willow** scores 2.16, a shade above birch's 2.03, where the model had it below. Its Q_ss is now birch's (0.12), and it survives 13%.
+  - **Beech against hornbeam:** that let hornbeam outgrow beech in the mixed wood. Hornbeam's leaves now cost a little more than beech's (m_f 0.045), as its lower score (3.97 against 4.56) suggests, and beech leads again.
+- **Checks:**
+  - The daily seeds 9, 10 and 12 still look right.
+  - Garden: 55.5 kB gzip. Tests: 219 pass (a seed-rain unit test and the clearing test are new); goldens unchanged.
+  - **Six-seed totals:** the mixed-wood and clearing tests now sum over six seeds, since single seeds vary too widely (one grows no beech). The suite takes 77 s, against 51 s.
+
+## 2026-10-28: garden-v0.11.0 live
+
+- **User:** previewed M25 and gave the go-ahead.
+- **Release:**
+  - PR #18 merged with CI green.
+  - The session's `git push` of the tag was refused (HTTP 403), so the user pushed `garden-v0.11.0` and the workflow built the release.
+  - The release was byte-identical to the site branch's local build.
+  - Site PR #5 merged to production.
+
 ## 2026-10-28: garden-v0.10.0 live; M25, six new species and the mixed wood
 
 - **Release:** `garden-v0.10.0` had already been built by the workflow when PR #17 merged. Here the site's `claude/m24-plate` was re-synced from that release (only gzip headers and source maps differed from the local build), and site PR #4 was merged to production.

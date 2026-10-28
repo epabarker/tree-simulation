@@ -11,8 +11,13 @@
  * become seedlings that start growing next season; they keep R1's seed reserve, so a seedling in
  * deep shade starves within a few seasons. The stand is capped at `maxTrees` live trees.
  *
+ * Seed rain (ADR 0018): a species with o4.rain > 0 also gets that many seeds a season per 100
+ * cells from beyond the world (wind-borne willow and birch travel kilometres), the count's
+ * fraction drawn and each landing uniformly [RNG: seedRain, keyed by species, seed and season].
+ * They establish by the same light, spacing and p_est rule, so they take only in large gaps.
+ *
  * Params: o4.enabled, o4.cSeed (c_seed), o4.d, o4.qEst (Q_est), o4.pEst (p_est), o4.m0 (m₀),
- * o4.maxTrees; r1.fRep, r1.maturity (the seed supply); c2.C.
+ * o4.maxTrees, o4.rain; r1.fRep, r1.maturity (the seed supply); c2.C.
  */
 
 import type { LightSample } from "../light/light-model.ts";
@@ -27,6 +32,13 @@ const ground: LightSample = { q: 0, vx: 0, vy: 0 };
 export function diesOfBackground(world: World, tree: Tree): boolean {
   const { params, season } = world;
   return uniform(params.seed, Purpose.mortality, tree.id, 0, season) < world.paramsOf(tree).o4.m0;
+}
+
+/** A stable number for a species name, to key its seed-rain draws (FNV-1a). */
+export function speciesKey(name: string): number {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < name.length; i++) h = Math.imul(h ^ name.charCodeAt(i), 0x01000193);
+  return h >>> 0;
 }
 
 /** Laplace(0, d) from a uniform u in [0, 1). */
@@ -70,6 +82,32 @@ export function standDynamics(world: World): number {
       if (world.trees.some((t) => t.alive && Math.abs(t.rootX - x) < 1)) continue;
       const seedling = new Tree(world.trees.length, x);
       seedling.species = parent.species;
+      plantSeedling(seedling, own, season + 1);
+      world.trees.push(seedling);
+      live += 1;
+      recruits += 1;
+    }
+  }
+  // Seed rain from beyond the world, species by species in the table's order.
+  const kinds = params.species ? Object.keys(params.species) : [undefined];
+  for (const species of kinds) {
+    const own = world.paramsOfSpecies(species);
+    const rain = ((own.o4.rain ?? 0) * W) / 100;
+    if (!(rain > 0)) continue;
+    const key = species ? speciesKey(species) : 0;
+    const { qEst, pEst } = own.o4;
+    const n =
+      Math.floor(rain) +
+      (uniform(params.seed, Purpose.seedRain, key, 0, season) < rain % 1 ? 1 : 0);
+    for (let k = 0; k < n; k++) {
+      if (live >= o4.maxTrees) return recruits;
+      const x = uniform(params.seed, Purpose.seedRain, key, 1, season, k) * W;
+      light.sample(x, 0.5, Math.PI / 2, ground);
+      if (C <= 0 || ground.q / C < qEst) continue;
+      if (uniform(params.seed, Purpose.seedRain, key, 2, season, k) >= pEst) continue;
+      if (world.trees.some((t) => t.alive && Math.abs(t.rootX - x) < 1)) continue;
+      const seedling = new Tree(world.trees.length, x);
+      if (species) seedling.species = species;
       plantSeedling(seedling, own, season + 1);
       world.trees.push(seedling);
       live += 1;

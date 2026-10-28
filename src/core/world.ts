@@ -101,17 +101,22 @@ export class World {
    * params object itself, so single-species worlds are exactly as before.
    */
   paramsOf(tree: Tree): Params {
-    if (!tree.species) return this.params;
-    let p = this.speciesParams.get(tree.species);
+    return this.paramsOfSpecies(tree.species);
+  }
+
+  /** The params a tree of `species` grows by (the world's for none; cached per species). */
+  paramsOfSpecies(species: string | undefined): Params {
+    if (!species) return this.params;
+    let p = this.speciesParams.get(species);
     if (!p) {
-      const patch = this.params.species?.[tree.species];
+      const patch = this.params.species?.[species];
       if (patch) {
         const { common: _c, latin: _l, leaf: _f, ...groups } = patch;
         p = mergeParams(this.params, groups);
       } else {
         p = this.params;
       }
-      this.speciesParams.set(tree.species, p);
+      this.speciesParams.set(species, p);
     }
     return p;
   }

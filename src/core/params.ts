@@ -384,6 +384,13 @@ export interface Params {
     m0: number;
     /** Cap on live trees, so a page cannot run away. */
     maxTrees: number;
+    /**
+     * Seed rain (ADR 0018): seeds a season, per 100 cells of ground, that blow or are carried in
+     * from beyond the world and land anywhere, then establish by the same rule as local seeds.
+     * Per species, so a light-seeded pioneer can return to a clearing after it has died out
+     * locally. 0 or absent: off, only parents in the world seed it (calibrate).
+     */
+    rain?: number;
   };
 
   /** R6 Short shoots (spec §R6, ADR 0006). Off = baseline: every live bud is one unit of leaf area. */
@@ -498,7 +505,7 @@ export const defaultParams: Params = {
   r6: { enabled: false, qMin: 0.2, leafArea: 1 }, // calibrate (M6d)
   // M11 calibration (docs/experiments/2026-10-27-m11-stand-dynamics.md).
   o2: { enabled: false, sway: 0.0005, maxSway: 3, pAbr: 0.5, stormP: 0, stormLoad: 1.5 },
-  o4: { enabled: false, cSeed: 5, d: 20, qEst: 0.1, pEst: 0.3, m0: 0.002, maxTrees: 300 },
+  o4: { enabled: false, cSeed: 5, d: 20, qEst: 0.1, pEst: 0.3, m0: 0.002, maxTrees: 300, rain: 0 },
 };
 
 /** A partial set of overrides, merged one level deep into each section. */

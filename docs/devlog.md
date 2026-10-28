@@ -2,6 +2,30 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-28: M26, measurements, polish and the loupe
+
+- **User:** agreed M26 and M27 (plan reviewed in session): polish with small fixes, shareable lab links and the loupe; retire the old species presets; crown-shape targets from literature numbers; fitted values reported, not adopted; long computations handed to the user.
+- **Form metrics** (`src/core/form.ts`, CLI `form.csv` at snapshot seasons):
+  - the crown's width profile in 10 bands, widest band, centre and fullness;
+  - apical control (fork height, leader dominance), order-2 angles, limb droop and upturn;
+  - median Δ, the length–diameter slope and the leaf–section slope.
+  - They separate the species as field guides do (fir and holly cones; oak and willow fork low).
+- **§10 validation** ([note](experiments/2026-10-28-m26-validation.md), 230 runs, 77 s):
+  - neighbour response and gravitropic recovery match; Δ trivially;
+  - **misses:** the l–d slope is ≈ 1, not 2/3 (limbs are geometrically, not elastically, similar), and the leaf–section slope is 0.46–0.75 (total section area includes heartwood);
+  - crown shyness has no link to slenderness (O2 off, as expected);
+  - birch's open crown is an hourglass and beech's is bottom-heavy: targets for M27.
+- **New knobs:** `trees[].lean` (a tilted seedling); `patchSpecies` and CLI `--species-patch`. **Surprise:** a `species` entry in a params patch *replaces* that species' whole patch (`mergeParams` merges two levels), so the first lean runs silently grew every species with default params.
+- **Polish:**
+  - The lab frames a ring whole and draws the copies either side, so crowns wrap at the seam.
+  - `skyTree` is 160 cells tall (golden-safe: nothing differs until the tree nears the old top).
+  - No R3 preset sinks limbs below the ground by season 100, so `r3.ground` stays as it was.
+  - `npm test` and `golden:update` stop under Node < 24 (`cli/require-node.mjs`).
+- **Retired presets** (ADR 0019): `conifer`, `coniferStand`, `birch`, `birchStand`, `tropical`, `weeping` and `troll` moved to `src/core/fixtures.ts`. Goldens keep their keys and hashes; the CLI still runs them; the benches use `firWood` (new baseline `runs/bench/efb3bbd.json`).
+- **Shareable lab links:** `?preset&seed&p`, `p` a base64url `diffParams` patch; a Copy link button; a broken link falls back with a notice.
+- **The loupe** (`render/loupe.ts`): hold 450 ms to open a glass at 4× with true-scale leaves; a hold is never a tap and stops panning and scrolling. **Surprise:** the glass first cost ≈ 130 ms a frame in headless Chromium, drawing the whole forest off-screen; Canvas 2D now culls to the view (≈ 5 ms). It shows whatever the adaptive quality, since it is drawn only while held.
+- **Checks:** 232 tests pass; goldens unchanged; garden 56.1 kB gzip (gate 60). Seen headless in the lab (ring seam, link round trip, loupe) and in `garden.html` at desktop and phone sizes.
+
 ## 2026-10-28: garden-v0.12.0 live
 
 - **Release:**

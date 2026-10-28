@@ -130,4 +130,52 @@ describe("calibrated species (M19)", () => {
     expect(mean(beech)).toBeGreaterThan(0.45);
     expect(mean(birch[1])).toBeLessThan(0.75 * mean(birch[0]));
   });
+
+  it("breaks an open oak into big limbs through acrotony (§R2.4, 5 seeds)", () => {
+    // First-order limbs at least half as thick as the stem where they leave it.
+    const bigLimbs = (kappa: number) =>
+      [1, 2, 3, 4, 5].reduce((sum, seed) => {
+        const base = presetParams("oakOpen", seed);
+        const oak = base.species?.oak as NonNullable<Params["species"]>[string];
+        const world = new World(
+          mergeParams(base, {
+            species: { ...base.species, oak: { ...oak, r2: { ...oak.r2, kappa } } },
+          }),
+        );
+        world.run(80);
+        const t = world.trees[0] as NonNullable<(typeof world.trees)[0]>;
+        const c = t.m.cols;
+        let n = 0;
+        for (let i = 1; i < t.m.length; i++) {
+          const p = c.parent[i] as number;
+          if (c.order[i] === 1 && c.order[p] === 0 && c.radius[i] > 0.5 * c.radius[p]) n++;
+        }
+        return sum + n;
+      }, 0);
+    // Measured: 30 big limbs with κ = 3 against 24 without acrotony.
+    expect(bigLimbs(3)).toBeGreaterThan(bigLimbs(0));
+  });
+
+  it("throws slender stand trees in storms far more often than a squat open oak", () => {
+    const thrownShare = (preset: "oakOpen" | "oakWood") => {
+      let thrown = 0;
+      let trees = 0;
+      for (const seed of [1, 2, 3, 4, 5]) {
+        const world = new World(
+          mergeParams(presetParams(preset, seed), {
+            o2: { stormP: 0.3, stormLoad: 1.5 },
+            o4: { enabled: false },
+          }),
+        );
+        world.run(80);
+        for (const t of world.trees) {
+          trees++;
+          if (!t.alive && t.broken === t.m.length) thrown++;
+        }
+      }
+      return thrown / trees;
+    };
+    // Measured: 1 lone oak in 5 against 21 of 50 stand oaks.
+    expect(thrownShare("oakWood")).toBeGreaterThan(2 * thrownShare("oakOpen"));
+  });
 });

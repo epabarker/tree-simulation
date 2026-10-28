@@ -42,8 +42,9 @@ export const FLORA = {
     latin: "Betula pendula",
     leaf: "small",
     c3: { mode: "bh", lambda: 0.5, alpha: 4 },
-    // Sheds dim limbs early and wakes dormant buds only in strong light: a clean bole in a stand.
-    c5: { enabled: true, T: 0.12, Trel: 0.6 },
+    // Sheds limbs that get under 40% of the crown top's light, and wakes dormant buds only in
+    // strong light: a clean bole in a stand, yet a lone birch keeps branches down its stem.
+    c5: { enabled: true, T: 0.1, Trel: 0.4 },
     c6: { enabled: true, r0: 0.033 },
     // A short hydraulic scale: birch levels off lower than oak and beech.
     r1: { mf: 0.1, Lh: 45 },
@@ -54,12 +55,13 @@ export const FLORA = {
       ramp: 20,
       levels: [
         level({ lambda: 0.56, setPoint: 0, eta: 0.3 }),
-        level({ lambda: 0.53, setPoint: 55, eta: 0.3, branchAngle: 45 }),
+        level({ lambda: 0.53, setPoint: 55, eta: 0.3, branchAngle: 45, postureSetPoint: 70 }),
         // The finest twigs hang.
         level({ lambda: 0.5, setPoint: 120, eta: 0.25, branchAngle: 40 }),
       ],
     },
-    // Slender trunks need firm posture control, or the hanging twigs bow them into hoops.
+    // Light leaves and little permanent sag, or the hanging twigs bow the slender leaders into
+    // hoops; firm posture control keeps the leader upright while the limbs settle to 70°.
     r3: { leafMass: 0.001, phi: 0.5 },
     r4: { qRel: 0.3 },
     r6: { enabled: true, qMin: 0.12, leafArea: 1.6 },
@@ -75,10 +77,12 @@ export const FLORA = {
     r1: { mf: 0.08, Lh: 75 },
     r2: {
       enabled: true,
-      // Apical control fades early, so the crown breaks up into wide-angled limbs.
+      // Apical control fades early, and acrotony favours the laterals at the top of each year's
+      // shoot, so the trunk divides into a few big ascending limbs (decurrent, §R2.4).
       aC: 8,
       dLambda: 0.07,
       ramp: 15,
+      kappa: 3,
       levels: [
         level({ lambda: 0.54, setPoint: 0, eta: 0.25 }),
         level({ lambda: 0.5, setPoint: 60, eta: 0.3, branchAngle: 55 }),

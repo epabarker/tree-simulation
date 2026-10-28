@@ -278,6 +278,11 @@ export interface Params {
     aC: number;
     dLambda: number;
     ramp: number;
+    /**
+     * κ, acrotony (§R2.4, M19): a lateral's light counts exp(κ(pos − 1)) where its node splits,
+     * pos its node's place in the season's shoot (0 base, 1 tip). 0 or absent: off.
+     */
+    kappa?: number;
   };
 
   /**

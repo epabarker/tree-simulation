@@ -2,6 +2,22 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-28: M19–M20 realism pass
+
+- **User:** the first species release had lost realism. The fix was M18 first, then this pass, then one release.
+- **Core:**
+  - **Acrotony,** a new R2 rule (§R2.4): `r2.kappa`. A lateral's light counts exp(κ(pos − 1)) where its node splits, pos its place in the season's shoot. It is off by default, so goldens are unchanged without it. Oak has κ = 3, so the open oak's trunk divides into big limbs: 30 big limbs against 24 over 5 seeds.
+  - **Windthrow scales with slenderness:** (H/D − 40)/30, clamped to [0, 2]. A squat open oak is rarely thrown (1 in 5 under frequent storms, against 21 of 50 stand oaks). The forest loses a tree about every 4 storms, against 2–3 before. The `forest` and `clearing` goldens change.
+- **Species** (under the M18 light; [note](experiments/2026-10-27-m19-species.md)):
+  - **Shade-survival bands:** all match the literature, at fir 2%, beech 3%, oak 8% and birch 13%.
+  - **Birch:** relative shedding is down from 0.6 to 0.4, so a lone birch keeps branches down its stem (W/H 0.46, against 0.24–0.36 before), and its limbs settle to 70°. Its stand crown ratio is 0.43, against beech's 0.47.
+- **Surprises:**
+  - **Bare birch.** `Trel` 0.6 stripped even a birch standing in the open: the relative threshold doesn't know whether the shade comes from neighbours or from the tree itself.
+  - **`c5.T` does nothing** under R1's carbon shedding; only `Trel` and P_b < M_b decide.
+  - **The light reading.** The shade house read the light under the seedling's own crown. It now uses the exact light under a uniform roof.
+- **Page:** the home forest's crowns are rounder and fuller than at step 4 (garden view checked).
+- **Tests:** two new species tests (acrotony, windthrow by slenderness). 198 pass.
+
 ## 2026-10-28: M18, the row-marched light sweep
 
 - **User:** do M18 before releasing the species, then one realism pass, then one release.

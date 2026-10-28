@@ -8,6 +8,8 @@ preset itself: which species hold the canopy over 400 seasons.
     uv run --project analysis python analysis/experiments/m19_species.py
 """
 
+import math
+
 import polars as pl
 from plotnine import (
     aes,
@@ -84,12 +86,19 @@ summary = (
 shade = species_of(load_runs(REPO / EXPERIMENT / "shade")).with_columns(
     pl.col("run").str.extract(r"_r([\d.]+)_").cast(pl.Float64).alias("roof")
 )
-light = shade.filter(pl.col("season") == 1).group_by("sp", "roof").agg(pl.col("groundLight").mean().alias("light"))
+# The light under a uniform roof one cell thick, exactly as the sky sweep sees it: each of the K = 7
+# sky directions (15°–165°, weights ∝ sin θ) crosses the roof over a path 1/sin θ (the seedling's
+# own crown would shade the ground under it, so its groundLight is not the light it lives in).
+THETAS = [math.radians(15 + 150 * k / 6) for k in range(7)]
+def roof_light(roof: float, k_ext: float = 0.5) -> float:
+    w = [math.sin(t) for t in THETAS]
+    return sum(wk * math.exp(-k_ext * roof / math.sin(t)) for wk, t in zip(w, THETAS)) / sum(w)
+light = pl.DataFrame({"roof": [float(r) for r in ROOFS], "light": [roof_light(r) for r in ROOFS]})
 survival = (
     shade.filter(pl.col("season") == 30)
     .group_by("sp", "roof")
     .agg(pl.col("alive").mean().alias("survival"))
-    .join(light, on=["sp", "roof"])
+    .join(light, on="roof")
     .sort("sp", "roof")
 )
 lowest = (

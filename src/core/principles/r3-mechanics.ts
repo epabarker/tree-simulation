@@ -21,8 +21,8 @@
  * - **Breakage** (§R3.4 optional, M10): a metamer whose stress exceeds σ_break breaks off with its
  *   subtree, leaving a scar; R4 can then release dormant buds below the break. In a storm (M16, O2
  *   `stormP`) stress counts (1 + stormLoad · h/H) times, h the metamer's height and H the tree's,
- *   and a tree may be thrown, with chance 0.06 · stormLoad · (H/100)² (a draw keyed by tree and
- *   season).
+ *   and a tree may be thrown, with chance 0.06 · stormLoad · (H/100)² · (H/D − 40)/30, the last
+ *   factor clamped to [0, 2] so squat trees stand (a draw keyed by tree and season).
  * - **Ground contact** (M16, `r3.ground`, opt-in): a limb whose tip would end below the ground is turned to
  *   rest on it, with its subtree; it lies there, alive, instead of sinking.
  *
@@ -144,11 +144,14 @@ export function updateMechanics(tree: Tree, params: Params, storm = false, seaso
         : sigma;
     breaks[i] = r3.sigmaBreak > 0 && p >= 0 && loaded > r3.sigmaBreak ? 1 : 0;
     if (breaks[i]) anyBreak = true;
-    // Windthrow: the wind's moment on a crown grows with about the square of its height, so a
-    // storm throws a tree with chance THROW·stormLoad·(H/100)² (100 cells ≈ 25 m). A draw keyed
-    // by tree and season, so the run replays.
+    // Windthrow: the wind's moment on a crown grows with about the square of its height, and a
+    // slender stem resists it far less than a squat one (risk rises steeply above H/D ≈ 60–80
+    // and is slight below 50; Watt et al. 2023, Stăncioiu et al. 2021). So a storm throws a tree
+    // with chance THROW·stormLoad·(H/100)²·(H/D − 40)/30, the last factor in [0, 2] (100 cells
+    // ≈ 25 m; M19). A draw keyed by tree and season, so the run replays.
     if (p < 0 && stormLoad > 0 && r3.sigmaBreak > 0) {
-      const chance = THROW * stormLoad * Math.min(1, height / 100) ** 2;
+      const slender = Math.min(2, Math.max(0, (height / (2 * rNew) - 40) / 30));
+      const chance = THROW * stormLoad * Math.min(1, height / 100) ** 2 * slender;
       if (uniform(params.seed, Purpose.wind, tree.id, 1, season) < chance) thrown = true;
     }
 

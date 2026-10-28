@@ -7,13 +7,14 @@
  * the main slot and the lateral slots (§C3.4); a slot holding a bud delivers its share to the
  * bud, a slot holding a metamer passes it on.
  *
- * Params: c3.mode, c3.lambda (λ), c3.alpha (α); with R2, λ by pa and tree age; with R5, λ rises
- * at shaded nodes; with R1, v_base is the tree's net production (r1-carbon.ts).
+ * Params: c3.mode, c3.lambda (λ), c3.alpha (α); with R2, λ by pa and tree age and acrotony κ
+ * weighting each node's laterals; with R5, λ rises at shaded nodes; with R1, v_base is the
+ * tree's net production (r1-carbon.ts).
  */
 
 import type { Params } from "../params.ts";
 import { BudState, type Tree } from "../tree.ts";
-import { lambdaAt } from "./r2-physiological-age.ts";
+import { acrotonyWeights, lambdaAt } from "./r2-physiological-age.ts";
 import { shadedLambda } from "./r5-shade.ts";
 import { lightWeight } from "./r6-short-shoots.ts";
 
@@ -91,6 +92,7 @@ export function allocate(tree: Tree, params: Params): void {
       const { qSlot, vSlot } = tree;
       const { parent, slot, vIn, order, paShift } = tree.m.cols;
       if (!params.r1.enabled) tree.vBase = nm > 0 ? alpha * tree.qBase : 0; // else R1's net
+      const acro = acrotonyWeights(tree, params); // R2 acrotony, null without it
       for (let i = 0; i < nm; i++) {
         const p = parent[i];
         const v = p < 0 ? tree.vBase : vSlot[3 * p + slot[i]];
@@ -105,7 +107,7 @@ export function allocate(tree: Tree, params: Params): void {
           tree.nodeShade[i] ?? 0,
           params.r5,
         );
-        const vMain = bhMainShare(v, qMain, qLat, lambda);
+        const vMain = bhMainShare(v, qMain, acro ? qLat * (acro[i] as number) : qLat, lambda);
         const vLat = qMain + qLat > 0 ? v - vMain : 0;
         vSlot[3 * i] = vMain;
         vSlot[3 * i + 1] = qLat > 0 ? (vLat * qLeft) / qLat : 0;

@@ -2,6 +2,20 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-28: M27, diagnosis: the shrinking willow and the early height plateau
+
+- **User:** find out why the lone willow's height falls after season 30, before running the fits.
+- **Willow** ([note](experiments/2026-10-28-m27-height-curves.md); `node cli/height-diagnosis.ts`): sag after a plateau. Not dieback, not shedding.
+  - **The plateau:** R1's path discount with willow's short L_h (30) stops height at about season 25. The leader passes from lateral to lateral, so the path to the top is 1.56 times the height.
+  - **The loss:** R3's posture correction is capped by relative girth growth (c · Δr / r), so once growth stalls, loaded limbs settle by up to 12 cells.
+  - Willow's c is the default 0.05 (as for birch, rowan, fir and pine; 0.15 for the others).
+  - **Within the fit's bounds:** L_h 60 gives H30/H60 0.78, and L_h 45 with c 0.3 gives 0.87, with no seed shrinking.
+- **Surprise:** `c5.enabled: false` does not stop shedding under R1's `carbon` mode (by design, season.ts); ablate it with `r1.shed: "c5"` too.
+- **Every species:**
+  - The early plateau is structural. L_h at its upper bound (100) moves H30/H60 by 0.01–0.06; L_h 200 nears the yield tables but overshoots height by 25–100%.
+  - Stand top heights level off as early as lone trees.
+  - The fits will show whether α, λ or m_f can slow the juvenile ramp. If not, a slower juvenile phase is a model change for its own decision.
+
 ## 2026-10-28: M27, willow's yield table and estimated floors for the rest
 
 - **User supplied** (`analysis/fit/sources/`):

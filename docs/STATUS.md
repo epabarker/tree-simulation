@@ -26,7 +26,7 @@ _Last updated: 2026-10-28 (M26 done; M27 targets for all ten species, waiting on
 - None open.
 
 ## Known issues
-- The l–d slope is ≈ 1, not 2/3 (M26). Height growth levels off early: H30/H60 is 0.64–1.03 for every species, 3.6–4.1 bands above the yield tables for oak, fir and pine (M27). Measured floors (Hagemeier & Leuschner) are darker than hand-tuned beech's and hornbeam's; the lone willow shrinks after season 30. Breakage fires only under storms. R5 reads self-shade by default (the woodland uses the neighbour signal). In the lab, a ring crown's copies show beyond the world's ends on wide screens (as in the garden). Bimodality is marginal; K = 7 puts the crown base ≈ 7 cells low.
+- The l–d slope is ≈ 1, not 2/3 (M26). Height growth levels off early: H30/H60 is 0.64–1.03 for every species, 3.6–4.1 bands above the yield tables for oak, fir and pine (M27). Measured floors (Hagemeier & Leuschner) are darker than hand-tuned beech's and hornbeam's. The lone willow sags after an R1 plateau; the early plateau in all species is structural (L_h can't remove it; [note](experiments/2026-10-28-m27-height-curves.md)). Breakage fires only under storms. R5 reads self-shade by default (the woodland uses the neighbour signal). In the lab, a ring crown's copies show beyond the world's ends on wide screens (as in the garden). Bimodality is marginal; K = 7 puts the crown base ≈ 7 cells low.
 
 ## Notes for the next session
 - **Node:** this container's default is 22; `npm test` now refuses it. Install 24 (`npm i node@24` in the scratchpad, then put its `bin` first on PATH). Playwright runs under the system Node (`NODE_PATH=$(npm root -g)`).

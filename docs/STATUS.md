@@ -1,11 +1,12 @@
 # Status
 
-_Last updated: 2026-10-27_
+_Last updated: 2026-10-28 (realism pass)_
 
-**Current milestone: M17** (seasons), built on `claude/m17-seasons` (with the M16 close-out; not pushed) and previewed with the site at https://m17-seasons-edbarker-dev.edbarker.workers.dev (garden 0.6.0, a local build). edbarker.dev runs garden-v0.5.0 (wind, storms, falling wood).
+**Current milestone: release M18–M20** from branch `claude/m19-species` (also in edbarker-dev). M18 is done (the row-marched sweep), and so is the M19–M20 realism pass (acrotony, windthrow by slenderness, species recalibrated: [note](experiments/2026-10-27-m19-species.md)). M17 is live (garden-v0.6.0).
 
 ## Works
 - **Core:** C1–C6, R1–R6, O2 and O4 (ADRs 0005–0013); the sky sweep with open or periodic sides; golden hashes. `World.discardDead` for long page runs.
+- **Species** (`src/core/flora.ts`): silver birch, pedunculate oak, beech and silver fir, with field-guide names. Presets `oakOpen` (Plate II), the four woods and `succession` (birch → beech emerges; oak dwindles). The garden's `forestParams` is the succession woodland; `specimen: "oak"` swaps in Plate II's own oak (worker `swap`).
 - **Presets:** `skyStand`, `skyGrove`, `skyTree`, `forest`, `thinning`, `weeping`, `troll`; species `conifer`, `birch` and `tropical`, still without R1, R3, R4 and R5.
 - **Garden** (`src/web/garden.ts`, ADR 0014):
   - `mountGarden(host, options)`, the living view the lab and the home page share;
@@ -16,12 +17,12 @@ _Last updated: 2026-10-27_
 - **Lab:** WebGL2 with pseudo-depth, Tweakpane, charts, tap to fell, phone layout. **Headless:** `npm run sim`, `npm run bench` (rings 3.8 ms a season), `analysis/experiments/` m0–m11.
 
 ## Next
-1. **Ship M17, on the user's go-ahead:** PR, release garden-v0.6.0, sync edbarker-dev, merge `m17-seasons`.
-2. **M18:** the row-marched light sweep (changes goldens) and bigger, viewport-shaped worlds. Then **M19–M20**: species per tree (ADR 0016), calibrated species, the succession forest, an open-grown specimen for Plate II.
+1. **Release:** previews to the user. Then, on their go-ahead: PR and merge here, tag `garden-v0.7.0`, sync the site from the release, and merge the site.
+2. **Follow-ups:** willow; rooting in windthrow; M21 (first paint, art direction, launch).
 3. **The user:** the site's `TODO(Ed)` items.
 
 ## Open questions (ask when the milestone comes up)
-- The design direction (D2). ADR 0016, species per tree (M19). Amendments to ADR 0011 and §O2 (M16), and to ADR 0005 (M18). Art direction (M21).
+- Art direction (M21).
 
 ## Parked (user, 2026-10-27; raise again only when asked)
 - The Pages demo URL is unreachable (`barker.garden` NXDOMAIN; `edbarker.dev/lab` works around it). Delete the early `runs/` and `dist/` copies on pCloud?

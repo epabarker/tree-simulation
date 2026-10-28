@@ -54,6 +54,8 @@ export interface Snapshot {
   walls: Wall[];
   /** Obstacles (ADR 0015), for the lab to outline. */
   obstacles: Obstacle[];
+  /** Species labels (ADR 0016): common and Latin names and leaf style; trees name theirs in metrics. */
+  species: Record<string, { common?: string; latin?: string; leaf?: string }>;
   /** Leonardo exponent Δ at every junction of every live tree (C6 on and asked for), for the histogram. */
   junctions: F32;
   metrics: TreeMetrics[];
@@ -148,6 +150,12 @@ export class SnapshotBuilder {
       shadow: null,
       walls: world.params.c2.enabled ? world.params.world.walls : [],
       obstacles: world.params.world.obstacles ?? [],
+      species: Object.fromEntries(
+        Object.entries(world.params.species ?? {}).map(([name, p]) => [
+          name,
+          { common: p.common, latin: p.latin, leaf: p.leaf },
+        ]),
+      ),
       junctions: new Float32Array(junctions),
       metrics: live.map((t) => treeMetrics(t, world)),
       seasonMs,
@@ -156,8 +164,8 @@ export class SnapshotBuilder {
 
     let offset = 0;
     let k = 0;
-    const mechanics = world.params.r3.enabled;
     for (const t of live) {
+      const mechanics = world.paramsOf(t).r3.enabled; // a species may have R3 of its own
       const c = t.m.cols;
       for (let i = 0; i < t.m.length; i++) {
         const j = offset + i;

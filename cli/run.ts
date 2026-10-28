@@ -100,7 +100,9 @@ for (let s = 0; s < seasons; s++) {
     const m = treeMetrics(tree, world);
     metricsLines.push(
       [world.season, ...METRIC_COLUMNS.map((k) => m[k])]
-        .map((v) => (typeof v === "boolean" ? (v ? 1 : 0) : num(v as number)))
+        .map((v) =>
+          typeof v === "boolean" ? (v ? 1 : 0) : typeof v === "string" ? v : num(v as number),
+        )
         .join(","),
     );
   }

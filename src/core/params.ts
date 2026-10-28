@@ -30,6 +30,8 @@ export interface Obstacle {
 export interface TreeSpec {
   /** Root position along the ground, in cells. */
   x: number;
+  /** Its species, a key of `Params.species` (ADR 0016). Omitted: the world's own params. */
+  species?: string;
   /** Season in which the seedling appears (default 0). */
   plantSeason?: number;
 }
@@ -56,6 +58,11 @@ export interface Params {
     sides?: "open" | "periodic";
   };
   trees: TreeSpec[];
+  /**
+   * Species (ADR 0016): named overrides of the per-tree groups, so one world can hold several.
+   * A tree of a species grows by the world's params with its species' patch on top.
+   */
+  species?: Record<string, SpeciesPatch>;
 
   /** C1 Metamer structure, bud fate and 2D side sequence (always on). */
   c1: {
@@ -104,6 +111,13 @@ export interface Params {
      * equal slice of the sky) so the streaks of a small K average out (M6e). Off: the fixed M6 grid.
      */
     rotate: boolean;
+    /**
+     * Sky sweep (M18, ADR 0005 amendment): "rows" marches every ray up one row at a time and
+     * integrates the exact segment it crosses in each row from that row's prefix sums of leaf
+     * area, so shallow rays need no laps around a ring and diffuse once per row, not per column.
+     * "columns" is the M6 sweep (shallow rays step a column at a time, periodic ones lap the ring).
+     */
+    sweep?: "rows" | "columns";
   };
 
   /** C3 Basipetal light summation and acropetal Borchert–Honda allocation. */
@@ -264,6 +278,11 @@ export interface Params {
     aC: number;
     dLambda: number;
     ramp: number;
+    /**
+     * κ, acrotony (§R2.4, M19): a lateral's light counts exp(κ(pos − 1)) where its node splits,
+     * pos its node's place in the season's shoot (0 base, 1 tip). 0 or absent: off.
+     */
+    kappa?: number;
   };
 
   /**
@@ -312,6 +331,13 @@ export interface Params {
     dB: number;
     /** δ_A: A_set·(1 − δ_A·s): shade makes shoots more upright (Roychoudhry et al. 2017) (calibrate). */
     dA: number;
+    /**
+     * What the shade signal s reads (M19). "light" (default): 1 − Q/C, own foliage included, so a
+     * lone tree avoids its own shade and grows tall. "neighbours": that shade scaled by the share
+     * of the foliage above the node that belongs to other trees (O2's owner grid), standing in for
+     * the low R:FR of neighbours' light, so a lone tree grows squat (MacFarlane et al. 2017).
+     */
+    signal?: "light" | "neighbours";
   };
 
   /**
@@ -479,6 +505,18 @@ export type ParamsPatch = {
     : Params[K] extends object
       ? Partial<Params[K]>
       : Params[K];
+};
+
+/**
+ * A species (ADR 0016): overrides of the groups that differ between trees (not the world, the
+ * light model, the seed or the tree list), plus labels for the page: a common name, a Latin name
+ * and the leaf style it is drawn with. O4's per-tree quantities (c_seed, d, Q_est, p_est, m₀) come
+ * from the parent's (or the tree's) species; its cap on live trees stays the world's.
+ */
+export type SpeciesPatch = Omit<ParamsPatch, "seed" | "world" | "trees" | "species" | "c2"> & {
+  common?: string;
+  latin?: string;
+  leaf?: string;
 };
 
 /** Returns a new Params with `patch` applied on top of `base` (sections merge, arrays replace). */

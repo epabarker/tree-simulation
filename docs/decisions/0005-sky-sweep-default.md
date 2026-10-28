@@ -16,3 +16,17 @@ The shadow triangle reaches only q_max layers below a bud, so neither isolated t
 
 ## Consequences
 Stands form clear boles and gaps refill by lean; cost is O(K·W·H) per season (≈ 3 ms for a 10-tree stand). Suppressed decurrent trees can lose their crown to C5 in one season (onset of self-thinning). Revisit the weighting if R5 (shade avoidance) or O4 (stands) need a directional sun.
+
+## Addendum (2026-10-28, M18): the row march
+
+- **Change:** the sweep marches every ray one row at a time (`c2.sweep: "rows"`, the default). It integrates the exact segment a ray crosses in each row from the row's prefix sums of leaf area, and interpolates between cell centres once per row.
+- **What it replaces:** the M6 sweep, which stepped shallow rays one column at a time and lapped a ring until the field stopped changing. It remains as `c2.sweep: "columns"`, pinned by the M6–M7 evidence tests (`M6_LIGHT`).
+- **Why:**
+  - **Accuracy:** 20–30% less error against an exact ray trace.
+  - **Speed:** no laps, so about twice as fast on a ring.
+  - **Bigger worlds:** a 520-cell ring costs a quarter of its 30 ms budget.
+- **Consequences:**
+  - The sky-model goldens change.
+  - Stand trees are a little fuller and their trunks thicker (H/D 75 → 66).
+  - Open-grown trees are sometimes decurrent.
+  - Evidence: `docs/experiments/2026-10-28-m18-light.md`.

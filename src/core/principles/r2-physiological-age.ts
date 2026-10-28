@@ -9,15 +9,20 @@
  * and the probability p_term that a shoot's terminal bud ends, which makes growth sympodial:
  * laterals at the distal node take over [RNG: sympodialTermination, keyed by the shoot's last
  * metamer and the season]. Ontogeny: from tree age a_c every λ falls linearly by Δλ over `ramp`
- * seasons, turning an excurrent young tree decurrent (Palubicki et al. 2009).
+ * seasons, turning an excurrent young tree decurrent (Palubicki et al. 2009). Acrotony (§R2.4,
+ * M19): a lateral's light counts exp(κ(pos − 1)) in the Borchert–Honda split at its node, pos
+ * the node's place in the season's shoot (0 at its base, 1 at its tip), so laterals near the
+ * top of each year's growth outgrow those below them and the crown breaks into limbs.
  *
  * Params: r2.enabled, r2.levels (λ, A_set, η, β, generator, tierEvery, p_term), r2.aC,
- * r2.dLambda, r2.ramp. Off = baseline (c1.branchAngle, c3.lambda, c4.setPoint, c4.eta,
+ * r2.dLambda, r2.ramp, r2.kappa (κ). Off = baseline (c1.branchAngle, c3.lambda, c4.setPoint, c4.eta,
  * distichous, monopodial).
  */
 
 import type { PaLevel, Params } from "../params.ts";
 import { Purpose, uniform } from "../rng.ts";
+import { ensureFloat64 } from "../soa.ts";
+import type { Tree } from "../tree.ts";
 
 /** The table row for an axis of branching order `order`, or null when R2 is off. */
 export function paLevel(order: number, r2: Params["r2"]): PaLevel | null {
@@ -85,4 +90,36 @@ export function directionParams(params: Params): (order: number) => Params["c4"]
   if (!r2.enabled || r2.levels.length === 0) return () => c4;
   const byPa = r2.levels.map((l) => ({ ...c4, setPoint: l.setPoint, eta: l.eta }));
   return (order) => byPa[Math.min(order, byPa.length - 1)] as Params["c4"];
+}
+
+/**
+ * Acrotony weights (§R2.4): exp(κ(pos − 1)) per metamer, pos its node's place in the shoot it
+ * grew with (metamers of one axis born in one season), in tree.scratchF. Null when κ is 0.
+ */
+export function acrotonyWeights(tree: Tree, params: Params): Float64Array | null {
+  const kappa = params.r2.enabled ? (params.r2.kappa ?? 0) : 0;
+  if (kappa === 0) return null;
+  const nm = tree.m.length;
+  const { parent, slot, birthSeason } = tree.m.cols;
+  tree.scratchF = ensureFloat64(tree.scratchF, 2 * nm);
+  const w = tree.scratchF;
+  // w[i]: the node's index within its shoot; w[nm + i]: the shoot's last index (filled below).
+  for (let i = 0; i < nm; i++) {
+    const p = parent[i];
+    const sameShoot = p >= 0 && slot[i] === 0 && birthSeason[p] === birthSeason[i];
+    w[i] = sameShoot ? (w[p] as number) + 1 : 0;
+    w[nm + i] = w[i] as number;
+  }
+  for (let i = nm - 1; i > 0; i--) {
+    const p = parent[i];
+    if (slot[i] === 0 && birthSeason[p] === birthSeason[i]) {
+      w[nm + p] = Math.max(w[nm + p] as number, w[nm + i] as number);
+    }
+  }
+  for (let i = 0; i < nm; i++) {
+    const last = w[nm + i] as number;
+    const pos = last > 0 ? (w[i] as number) / last : 1;
+    w[i] = Math.exp(kappa * (pos - 1));
+  }
+  return w;
 }

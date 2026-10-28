@@ -2,6 +2,82 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-28: M19–M20 realism pass
+
+- **User:** the first species release had lost realism. The fix was M18 first, then this pass, then one release.
+- **Core:**
+  - **Acrotony,** a new R2 rule (§R2.4): `r2.kappa`. A lateral's light counts exp(κ(pos − 1)) where its node splits, pos its place in the season's shoot. It is off by default, so goldens are unchanged without it. Oak has κ = 3, so the open oak's trunk divides into big limbs: 30 big limbs against 24 over 5 seeds.
+  - **Windthrow scales with slenderness:** (H/D − 40)/30, clamped to [0, 2]. A squat open oak is rarely thrown (1 in 5 under frequent storms, against 21 of 50 stand oaks). The forest loses a tree about every 4 storms, against 2–3 before. The `forest` and `clearing` goldens change.
+- **Species** (under the M18 light; [note](experiments/2026-10-27-m19-species.md)):
+  - **Shade-survival bands:** all match the literature, at fir 2%, beech 3%, oak 8% and birch 13%.
+  - **Birch:** relative shedding is down from 0.6 to 0.4, so a lone birch keeps branches down its stem (W/H 0.46, against 0.24–0.36 before), and its limbs settle to 70°. Its stand crown ratio is 0.43, against beech's 0.47.
+- **Surprises:**
+  - **Bare birch.** `Trel` 0.6 stripped even a birch standing in the open: the relative threshold doesn't know whether the shade comes from neighbours or from the tree itself.
+  - **`c5.T` does nothing** under R1's carbon shedding; only `Trel` and P_b < M_b decide.
+  - **The light reading.** The shade house read the light under the seedling's own crown. It now uses the exact light under a uniform roof.
+- **Page:** the home forest's crowns are rounder and fuller than at step 4 (garden view checked).
+- **Tests:** two new species tests (acrotony, windthrow by slenderness). 198 pass.
+
+## 2026-10-28: M18, the row-marched light sweep
+
+- **User:** do M18 before releasing the species, then one realism pass, then one release.
+- **Core:**
+  - The sky sweep marches every ray one row at a time and integrates the exact segment it crosses from each row's prefix sums (`c2.sweep: "rows"`, the default; ADR 0005 addendum). The M6 sweep stays as `"columns"`.
+  - A periodic shallow ray needs one pass, not laps.
+  - The light phase is about twice as fast on rings. The 520 × 140 panorama (55 trees) costs 7.6 ms a season, so the garden's ring may be up to 520 cells wide (`forestParams`).
+- **Evidence** ([note](experiments/2026-10-28-m18-light.md)):
+  - 20–30% less error than the M6 sweep against an exact ray trace.
+  - Crown ratio, width, edge lean and ground light within noise over 10 seeds.
+  - Stand trees are fuller, with H/D 75 → 66.
+- **Goldens:** updated on purpose. The 13 sky-model goldens change because the light field changes; the triangle ones do not.
+- **Surprises:**
+  - **A near-vertical NaN.** cos 90° is 6e-17, so the vertical ray's segment had zero width and gave 0/0. It is now guarded.
+  - **Slower at first.** The first row march was slower than the laps it replaced: per-cell floors and modulos. Padding each row once fixed it.
+  - **A lost leader.** Two open-grown `skyTree` seeds now lose their first leader to a lateral, which reads as a 71° "trunk" tilt along the order-0 axis. The mechanics test now follows the main stem (the thickest child).
+  - **Phantom mismatch.** I chased a discrepancy between my script and a test for a while: the M6 tests run with `PRE_R1`.
+- **Tests:** the M6–M7 evidence tests pin the M6 sweep (`M6_LIGHT`), and three current-model tests are re-measured (the note lists them). There are three new sweep unit tests. 196 pass.
+
+## 2026-10-28: M19–M20 step 4, species on the page
+
+- **Page:**
+  - Each tree is drawn as its species. There are new `oak` and `beech` leaf styles, palettes and tokens (light and dark).
+  - Each species keeps its own calendar: birch flushes first and turns yellow first; oak flushes late and turns russet late; young beeches keep their copper leaves through the winter (marcescence).
+  - Both renderers colour each leaf from its own palette.
+- **The home forest** (`forestParams`) is now the `succession` woodland. Birch, oak, birch and beech are planted around the ring, turned by the seed.
+- **Plate II:**
+  - `mountGarden({ specimen: "oak" })` grows a lone open-grown oak for the specimen focus, with a new seed each time.
+  - The worker's new `swap` keeps the forest aside meanwhile, so it resumes where it stood (checked in Firefox: season 31 → oak → back at 33).
+  - `garden.html` takes `?specimen`.
+- **Site** (branch `claude/m19-species` in edbarker-dev, local garden 0.7.0):
+  - cards give the common and Latin names, and a Standing row;
+  - labels read "No. 4, silver birch";
+  - Plate II's caption names the oak.
+- **Surprises:**
+  - **Birch hoops.** In the garden view, birch leaders bent into hoops. The thin young tips sagged under the hanging twigs, and a no-R3 render showed straight leaders. Lighter leaves, less permanent sag and firmer posture control fixed it, at the cost of a narrower lone birch.
+  - **Storms.** The woodland's harder storms (8% of seasons at load 2) snapped the young forest's tops, so it uses the forest's storms again. Succession still emerges.
+  - **Leafier birch.** It is now leafier (Q_ss 0.12), which puts its survival light at 7%, slightly below the intolerant band. The note records it.
+- **Size:** `garden.js` plus worker is 51.5 kB gzip (gate 60). **Tests:** 193 pass, goldens unchanged.
+
+## 2026-10-27: M19–M20 step 3, calibrated species
+
+- **User:** birch → beech and oak in the home forest; conifer a lab species; Plate II an open-grown oak; field-guide names; "as close to a botanical simulation as possible" (the species-calibrated route).
+- **Core** (golden-safe: no golden changed):
+  - `src/core/flora.ts`: `FLORA`, calibrated patches for silver birch, pedunculate oak, beech and silver fir, with common and Latin names and leaf styles.
+  - Presets: `oakOpen` (Plate II), `birchWood`, `oakWood`, `beechWood`, `firWood` and `succession`, on a `WOODLAND` base: the forest's principles, R5's neighbour signal and storms at 0.08/2.
+  - `metrics.csv` gains a `species` column.
+- **Calibration** ([note](experiments/2026-10-27-m19-species.md)):
+  - Shade survival is fir 1%, beech 2%, oak 5% and birch 11%, matching the Niinemets & Valladares scores.
+  - Floors darken from birch (15–20%) to oak (5%) to beech (3%).
+  - Stands have H/D 70–80. Open oak is broad (W/H 1.4) and squat.
+  - Birch → beech succession emerges in all 5 seeds; oak dwindles under beech.
+- **Surprises:**
+  - **The survival threshold is Q_ss.** A seedling whose one bud rests below `r6.qMin` holds no leaves and starves, while `r1.mf` barely moved survival.
+  - **Epicormic shoots in birch stands.** Light under birch woke epicormic shoots all down the trunks, so crowns never lifted. Birch needs a high release light (`r4.qRel` 0.3).
+  - **Drooping oak.** The first open oak drooped like a willow; stiffer wood and posture control fixed it.
+  - **Lone oaks were windthrown.** Windthrow scales with height only, so `oakOpen` has no storms or recruits.
+  - **I misquoted birch's score.** From memory I had birch's shade score as 1.85, which is its drought score; the table says 2.03.
+- **Tests:** `flora.test.ts` covers the shade-house order, stand floors and slenderness, the open oak's form, and succession. 192 pass.
+
 ## 2026-10-27: M17, seasons
 
 - **User:** slower years with four seasons, and a few pace options.

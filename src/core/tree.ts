@@ -104,6 +104,8 @@ export class Tree {
   discarded = false;
   /** Sown by a visitor (World.plantTree), not planted by the params or recruited by O4. */
   sown = false;
+  /** Its species, a key of `Params.species` (ADR 0016); "" grows by the world's own params. */
+  species = "";
   /** Seasons since planting. */
   age = 0;
   nextMetamerId = 0;

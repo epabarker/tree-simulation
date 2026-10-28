@@ -47,6 +47,12 @@ export class SkySweep implements LightModel {
   private readonly kExt: number;
   private readonly c2: Params["c2"];
   private readonly depth: Float64Array<ArrayBuffer>;
+  /** Row march scratch: G on two lines, and one row padded either side (G, ℓ and ∫ℓ). */
+  private readonly lineA: Float64Array<ArrayBuffer>;
+  private readonly lineB: Float64Array<ArrayBuffer>;
+  private padG = new Float64Array(0);
+  private padL = new Float64Array(0);
+  private padI = new Float64Array(0);
   /** Rows 0 … top − 1 hold all of this season's leaf area; rows from `top` up are empty. */
   private top = 0;
   private shade: Float64Array<ArrayBuffer> | null = null;
@@ -64,6 +70,8 @@ export class SkySweep implements LightModel {
     this.vx = new Float64Array(n);
     this.vy = new Float64Array(n);
     this.depth = new Float64Array(n);
+    this.lineA = new Float64Array(width);
+    this.lineB = new Float64Array(width);
     this.kExt = c2.kExt;
     this.c2 = c2;
     const K = Math.max(1, Math.floor(c2.K));
@@ -180,6 +188,85 @@ export class SkySweep implements LightModel {
    * below `top` are written; row `top` (if inside the grid) must hold zeros.
    */
   private sweep(dx: number, dy: number): void {
+    if (this.c2.sweep === "columns") this.sweepColumns(dx, dy);
+    else this.sweepRows(dx, dy);
+  }
+
+  /**
+   * The row march (M18). G_y(x) is the optical depth from the sky down to the point x on the
+   * horizontal line y. Going down one row, a ray that reaches (x, y) entered that row at its top
+   * edge at x + s, s = dx/dy columns per row, and crossed the row's foliage over the segment
+   * between: G_y(x) = G_{y+1}(x + s) + (mean ℓ over [x, x + s] in row y) / dy. The mean comes
+   * exactly from the row's prefix sums; G_{y+1} is known at cell centres and read between them
+   * linearly, the only approximation, made once per row. A cell's entry depth is G at its top
+   * edge, at the centre of the cell: depth(col, row) = G_{row+1}(col + ½). Beyond the sides of an
+   * open world the sky is clear (G = 0, ℓ = 0); on a ring x wraps, however far a shallow ray runs.
+   */
+  private sweepRows(dx: number, dy: number): void {
+    const { width: W, lad, depth, periodic, top } = this;
+    const s = dx / dy;
+    const perRow = 1 / dy; // path length across one row
+    // The ray's offset is the same for every column, so split it once: G is read between the
+    // centres col + k and col + k + 1 (weight f), and the segment's far end is at col + m + fr.
+    const k = Math.floor(s);
+    const f = s - k;
+    const m = Math.floor(0.5 + s);
+    const fr = 0.5 + s - m;
+    const vertical = Math.abs(s) < 1e-9; // cos 90° is 6e-17, not 0: the segment has no width
+    // Each row is copied with `pad` columns either side (wrapped on a ring, open sky otherwise), so
+    // the inner loop only indexes.
+    const pad = Math.max(Math.abs(k), Math.abs(m)) + 2;
+    const n = W + 2 * pad;
+    if (this.padG.length < n) {
+      this.padG = new Float64Array(n);
+      this.padL = new Float64Array(n);
+      this.padI = new Float64Array(n + 1);
+    }
+    const G = this.padG; // G on the line above, at centres j − pad
+    const Lr = this.padL; // ℓ of this row at columns j − pad
+    const I = this.padI; // ∫ ℓ from 0 to the left edge of column j − pad
+    let up = this.lineA;
+    let next = this.lineB;
+    up.fill(0); // the line above the foliage sees open sky
+    for (let row = top - 1; row >= 0; row--) {
+      const base = row * W;
+      for (let col = 0; col < W; col++) depth[base + col] = up[col];
+      if (row === 0) break;
+      for (let j = 0; j < n; j++) {
+        let c = j - pad;
+        if (periodic) c = ((c % W) + W) % W;
+        const inside = c >= 0 && c < W;
+        G[j] = inside ? up[c] : 0;
+        Lr[j] = inside ? lad[base + c] : 0;
+      }
+      // Only differences of I are used, so it may start anywhere: at 0 left of the padding.
+      let acc = 0;
+      for (let j = 0; j < n; j++) {
+        I[j] = acc;
+        acc += Lr[j];
+      }
+      I[n] = acc;
+      for (let col = 0; col < W; col++) {
+        const j = col + pad;
+        const g = G[j + k] * (1 - f) + G[j + k + 1] * f;
+        let mean: number;
+        if (vertical) {
+          mean = Lr[j];
+        } else {
+          const from = I[j] + 0.5 * Lr[j];
+          const to = I[j + m] + fr * Lr[j + m];
+          mean = (to - from) / s;
+        }
+        next[col] = g + mean * perRow;
+      }
+      const t = up;
+      up = next;
+      next = t;
+    }
+  }
+
+  /** The M6 sweep (`c2.sweep: "columns"`). */
+  private sweepColumns(dx: number, dy: number): void {
     const { width: W, height: H, lad, depth, periodic, top } = this;
     // The optical depth on leaving a cell along the ray is its entry depth plus its own foliage,
     // depth[i] + lad[i]·step; upstream cells outside the grid are open sky (0). Columns are

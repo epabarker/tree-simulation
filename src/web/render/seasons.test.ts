@@ -1,8 +1,9 @@
 import { describe, expect, it } from "vitest";
+import { mergeParams } from "../../core/params.ts";
 import { presetParams } from "../../core/presets.ts";
 import { SnapshotBuilder } from "../../core/snapshot.ts";
 import { World } from "../../core/world.ts";
-import { LEAF_STYLES, type LeafStyleName } from "./leaf-styles.ts";
+import { LEAF_PALETTES, LEAF_STYLES, type LeafStyleName } from "./leaf-styles.ts";
 import { Scene } from "./scene.ts";
 
 function grown(style: LeafStyleName): Scene {
@@ -82,5 +83,62 @@ describe("seasons (M17)", () => {
     const summer = play(scene, 0.3, 0.4).count;
     const winter = play(scene, 0.4, 0.95).count;
     expect(winter).toBe(summer);
+  });
+
+  it("draws each tree as its species, on its own calendar (M19)", () => {
+    // Birch, oak and beech side by side, young enough that the beech keeps its dead leaves.
+    const base = presetParams("succession", 3);
+    const world = new World(
+      mergeParams(base, {
+        world: { width: 120, height: 100, walls: [], sides: "periodic" },
+        trees: [
+          { x: 20, species: "birch" },
+          { x: 60, species: "oak" },
+          { x: 100, species: "beech" },
+        ],
+        o4: { enabled: false },
+        o2: { stormP: 0 },
+      }),
+    );
+    world.run(12);
+    const scene = new Scene();
+    scene.setSize(1000, 700, 1);
+    scene.depth = true;
+    scene.setSnapshot(new SnapshotBuilder().build(world, 0, { junctions: false, field: false }));
+    scene.computeGeometry(1);
+    scene.seasons = true;
+    const share = (
+      l: ReturnType<Scene["leaves"]>,
+      palette: string,
+      test: (k: number) => boolean,
+    ) => {
+      const p = LEAF_PALETTES.indexOf(palette as (typeof LEAF_PALETTES)[number]);
+      let n = 0;
+      let hit = 0;
+      for (let k = 0; k < l.count - scene.fallenLeaves; k++) {
+        if (l.palette[k] !== p) continue;
+        n++;
+        if (test(k)) hit++;
+      }
+      return n === 0 ? Number.NaN : hit / n;
+    };
+    // Each species keeps its own palette.
+    const summer = play(scene, 0, 0.4);
+    for (const p of ["birch", "oak", "beech"]) expect(share(summer, p, () => true)).toBe(1);
+    // Mid-autumn, birch has turned further than oak.
+    const autumn = play(scene, 0.4, 0.6);
+    const turned = (k: number) => (autumn.turn[k] as number) > 0.5;
+    expect(share(autumn, "birch", turned)).toBeGreaterThan(share(autumn, "oak", turned) + 0.2);
+    // In winter the young beech still holds its leaves, turned; birch and oak stand bare.
+    const winter = play(scene, 0.6, 0.95);
+    const p = (name: string) => LEAF_PALETTES.indexOf(name as (typeof LEAF_PALETTES)[number]);
+    let beech = 0;
+    let others = 0;
+    for (let k = 0; k < winter.count - scene.fallenLeaves; k++) {
+      if (winter.palette[k] === p("beech")) beech++;
+      else others++;
+    }
+    expect(beech).toBeGreaterThan(50);
+    expect(others).toBe(0);
   });
 });

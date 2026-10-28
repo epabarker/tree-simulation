@@ -200,3 +200,75 @@ describe("C2 sky sweep with periodic sides (M11, ADR 0013)", () => {
     expect(out.q).toBeGreaterThan(0);
   });
 });
+
+describe("C2 row-marched sky sweep (M18, ADR 0005 amendment)", () => {
+  /** A patchy canopy: clumps of foliage of varied density, the same in every run. */
+  function canopy(s: SkySweep): void {
+    let h = 7;
+    for (let y = 10; y < 26; y++) {
+      for (let x = 4; x < s.width - 4; x++) {
+        h = (h * 1103515245 + 12345) % 2147483648;
+        if (h % 5 < 2) s.deposit(x + 0.5, y + 0.5, 0.5 + (h % 7) / 4);
+      }
+    }
+  }
+
+  /** Exact optical depth from the top edge of a cell to the sky: fine steps along the ray. */
+  function exactQ(s: SkySweep, col: number, row: number): number {
+    let q = 0;
+    for (let k = 0; k < s.weight.length; k++) {
+      let T = 0;
+      const h = 0.01;
+      let x = col + 0.5;
+      let y = row + 1 + 1e-9;
+      while (y < s.height && x >= 0 && x < s.width) {
+        T += (s.lad[Math.floor(y) * s.width + Math.floor(x)] as number) * h;
+        x += (s.dirX[k] as number) * h;
+        y += (s.dirY[k] as number) * h;
+      }
+      q += (s.weight[k] as number) * Math.exp(-base.kExt * T);
+    }
+    return q;
+  }
+
+  it("is closer to an exact ray trace than the M6 column sweep", () => {
+    const error = (sweep: "rows" | "columns") => {
+      const s = sky(48, 32, { sweep });
+      canopy(s);
+      s.compute();
+      let sum = 0;
+      for (let row = 0; row < 26; row += 3) {
+        for (let col = 0; col < s.width; col += 3) {
+          sum += Math.abs((s.q[row * s.width + col] as number) - exactQ(s, col, row));
+        }
+      }
+      return sum;
+    };
+    // Measured: about two thirds of the column sweep's error.
+    expect(error("rows")).toBeLessThan(0.85 * error("columns"));
+  });
+
+  it("is mirror symmetric: mirrored foliage gives the mirrored field", () => {
+    const s = sky(40, 30, { sweep: "rows" });
+    for (let y = 8; y < 18; y++) for (let x = 14; x < 26; x++) s.deposit(x + 0.5, y + 0.5, 1);
+    s.compute();
+    for (let y = 0; y < 30; y++) {
+      for (let x = 0; x < 40; x++) {
+        const a = y * 40 + x;
+        const b = y * 40 + 39 - x;
+        expect(s.q[a]).toBeCloseTo(s.q[b] as number, 12);
+        expect(s.vx[a]).toBeCloseTo(-(s.vx[b] as number), 12);
+      }
+    }
+  });
+
+  it("sweeps a ring in one pass: shallow rays wrap however far they run", () => {
+    // A ring narrower than a shallow ray's run across the foliage: a uniform layer must still
+    // give every column the same light, as on the M6 sweep after its laps.
+    const s = new SkySweep(6, 40, { ...base, sweep: "rows", minElevation: 10 }, true);
+    for (let x = 0; x < 6; x++) s.deposit(x + 0.5, 20.5, 1);
+    s.compute();
+    for (let x = 1; x < 6; x++) expect(s.q[5 * 6 + x]).toBeCloseTo(s.q[5 * 6] as number, 12);
+    expect(s.q[5 * 6]).toBeLessThan(1);
+  });
+});

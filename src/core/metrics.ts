@@ -58,6 +58,15 @@ export interface TreeMetrics {
   seeds: number;
   /** Sown by a visitor on the page (World.plantTree, D3). */
   sown: boolean;
+  /** Its species (ADR 0016), "" for the world's own params. */
+  species: string;
+  /** Crown length over height, (height − bole)/height: the share of the stem in live crown (M19). */
+  crownRatio: number;
+  /**
+   * Mean angle from vertical, degrees, of the first-order branches where they leave the trunk
+   * (their first metamer): steep in birch, wide in oak, near flat in a fir's tiers (M19, §10).
+   */
+  branchAngle: number;
   released: number;
   /** Of those, released from trunk wood at least 10 seasons old: epicormic shoots. */
   epicormic: number;
@@ -68,6 +77,7 @@ export interface TreeMetrics {
 export const METRIC_COLUMNS: readonly (keyof TreeMetrics)[] = [
   "tree",
   "alive",
+  "species",
   "rootX",
   "age",
   "metamers",
@@ -93,6 +103,8 @@ export const METRIC_COLUMNS: readonly (keyof TreeMetrics)[] = [
   "starved",
   "abraded",
   "seeds",
+  "crownRatio",
+  "branchAngle",
   "released",
   "epicormic",
   "aborted",
@@ -125,6 +137,8 @@ export function treeMetrics(tree: Tree, world?: World): TreeMetrics {
   let sumX = 0;
   let bole = Number.POSITIVE_INFINITY;
   let wood = 0;
+  let angleSum = 0;
+  let branches = 0;
   for (let i = 0; i < nm; i++) {
     wood += Math.PI * c.radius[i] * c.radius[i] * c.length[i];
     const x = tree.tipX(i);
@@ -134,7 +148,12 @@ export function treeMetrics(tree: Tree, world?: World): TreeMetrics {
     if (x > maxX) maxX = x;
     sumX += x;
     const p = c.parent[i];
-    if (c.order[i] === 1 && p >= 0 && c.order[p] === 0 && c.baseY[i] < bole) bole = c.baseY[i];
+    if (c.order[i] === 1 && p >= 0 && c.order[p] === 0) {
+      if (c.baseY[i] < bole) bole = c.baseY[i];
+      // Angle from straight up, for any (unwrapped) direction: acos of its upward component.
+      angleSum += Math.acos(Math.max(-1, Math.min(1, Math.sin(c.angle[i])))) * (180 / Math.PI);
+      branches += 1;
+    }
   }
   let buds = 0;
   let dormant = 0;
@@ -175,6 +194,9 @@ export function treeMetrics(tree: Tree, world?: World): TreeMetrics {
     abraded: tree.abraded,
     seeds: tree.seeds,
     sown: tree.sown,
+    species: tree.species,
+    crownRatio: height > 0 ? (height - (Number.isFinite(bole) ? bole : height)) / height : 0,
+    branchAngle: branches > 0 ? angleSum / branches : 0,
     released: tree.released,
     epicormic: tree.epicormic,
     aborted: tree.aborted,

@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { FLORA } from "../../core/flora.ts";
 import {
   LEAF_SHAPES,
   LEAF_STYLES,
@@ -13,6 +14,18 @@ describe("leaf styles (M23)", () => {
     // Real leaf lengths: birch ≈ 5 cm < beech ≈ 8 < oak ≈ 10.
     expect(LEAF_STYLES.small.length).toBeLessThan(LEAF_STYLES.beech.length);
     expect(LEAF_STYLES.beech.length).toBeLessThan(LEAF_STYLES.oak.length);
+    // M25: field maple ≈ 6 cm < hornbeam ≈ 7 < oak ≈ 10 < a rowan's compound leaf ≈ 18.
+    expect(LEAF_STYLES.maple.length).toBeLessThan(LEAF_STYLES.hornbeam.length);
+    expect(LEAF_STYLES.oak.length).toBeLessThan(LEAF_STYLES.rowan.length);
+  });
+
+  it("draws every calibrated species with a style of its own (M25)", () => {
+    const leaves = Object.values(FLORA).map((sp) => sp.leaf);
+    for (const leaf of leaves) expect(Object.keys(LEAF_STYLES)).toContain(leaf);
+    expect(new Set(leaves).size).toBe(leaves.length);
+    // Holly and the conifers keep their foliage through the winter.
+    for (const name of ["holly", "pine", "needle"] as const)
+      expect(LEAF_STYLES[name].deciduous).toBe(false);
   });
 
   it("keeps every outline within the leaf's box, closed at base and tip", () => {

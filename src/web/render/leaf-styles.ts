@@ -7,7 +7,8 @@
  *
  * Sizes (M23): a cell is 0.25 m and a plate draws one in 3–5 px, so a real leaf would be a pixel
  * or two. A drawn leaf therefore stands for a small spray of leaves, its length in proportion to
- * the species' real leaf (birch ≈ 5 cm, beech ≈ 8, oak ≈ 10, a rowan's compound leaf ≈ 18), and
+ * the species' real leaf (birch ≈ 5 cm, maple ≈ 6, hornbeam and holly ≈ 7, beech and goat willow
+ * ≈ 8, oak ≈ 10, a rowan's compound leaf ≈ 18), and
  * the renderers keep a minimum on-screen size scaled the same way.
  */
 
@@ -102,7 +103,20 @@ export function leafStudyPath(style: LeafStyle): string {
   return `M50 99L50 92L${pts.join("L")}Z`;
 }
 
-export type LeafPalette = "broadleaf" | "needle" | "birch" | "tropical" | "oak" | "beech";
+export type LeafPalette =
+  | "broadleaf"
+  | "needle"
+  | "birch"
+  | "tropical"
+  | "oak"
+  | "beech"
+  | "hornbeam"
+  | "maple"
+  | "holly"
+  | "rowan"
+  | "willow"
+  | "pine";
+/** Palette order is an index the renderers store per leaf: append, never reorder. */
 export const LEAF_PALETTES: readonly LeafPalette[] = [
   "broadleaf",
   "needle",
@@ -110,6 +124,12 @@ export const LEAF_PALETTES: readonly LeafPalette[] = [
   "tropical",
   "oak",
   "beech",
+  "hornbeam",
+  "maple",
+  "holly",
+  "rowan",
+  "willow",
+  "pine",
 ];
 
 export interface LeafStyle {
@@ -220,6 +240,93 @@ export const LEAF_STYLES = {
     flush: 0.03,
     turn: 0.01,
     marcescent: 30,
+  },
+  /** Hornbeam: oval, pleated, doubly toothed leaves that turn yellow; young trees keep them in winter. */
+  hornbeam: {
+    length: 0.65,
+    aspect: 0.5,
+    shape: "ovate",
+    cm: 7,
+    spread: 1,
+    cluster: 7,
+    xray: 1,
+    palette: "hornbeam",
+    leafAge: 5,
+    deciduous: true,
+    flush: 0.02,
+    turn: 0.02,
+    marcescent: 25,
+  },
+  /** Field maple: small five-lobed leaves, as wide as long, that turn butter-yellow. */
+  maple: {
+    length: 0.6,
+    aspect: 1,
+    shape: "palmate",
+    cm: 6,
+    spread: 1,
+    cluster: 6,
+    xray: 1,
+    palette: "maple",
+    leafAge: 5,
+    deciduous: true,
+    flush: 0.02,
+    turn: 0,
+  },
+  /** Holly: dark, glossy, spiny evergreen leaves kept for several years. */
+  holly: {
+    length: 0.65,
+    aspect: 0.5,
+    shape: "spiny",
+    cm: 7,
+    spread: 1.05,
+    cluster: 6,
+    xray: 1,
+    palette: "holly",
+    leafAge: 6,
+    deciduous: false,
+  },
+  /** Rowan: long compound leaves of paired leaflets; early to flush, early to turn scarlet. */
+  rowan: {
+    length: 1.1,
+    aspect: 0.45,
+    shape: "pinnate",
+    cm: 18,
+    spread: 0.85,
+    cluster: 4,
+    xray: 1,
+    palette: "rowan",
+    leafAge: 4,
+    deciduous: true,
+    flush: 0.01,
+    turn: -0.02,
+  },
+  /** Goat willow: broad, oval, grey-green leaves (not a narrow willow leaf) that turn dull yellow. */
+  willow: {
+    length: 0.7,
+    aspect: 0.55,
+    shape: "lens",
+    cm: 8,
+    spread: 0.95,
+    cluster: 6,
+    xray: 1,
+    palette: "willow",
+    leafAge: 4,
+    deciduous: true,
+    flush: 0.01,
+    turn: 0.02,
+  },
+  /** Scots pine: paired, blue-green needles, longer than a fir's, kept about three years. */
+  pine: {
+    length: 0.8,
+    aspect: 0.1,
+    shape: "needle",
+    cm: 5,
+    spread: 0.9,
+    cluster: 7,
+    xray: 2,
+    palette: "pine",
+    leafAge: 3,
+    deciduous: false,
   },
   /** Terminalia-like: large, glossy leaves crowded at the shoot tips. */
   large: {

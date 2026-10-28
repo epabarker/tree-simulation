@@ -2,6 +2,14 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-28: garden-v0.8.0 live
+
+- **Releases:**
+  - PR #14 merged; `garden-v0.8.0` released.
+  - The site synced from it; site PR #2 merged and deployed.
+- **Determinism check:** the release's grown forests decompress bit-identical to the local build's. Only the gzip bytes differ, since CI's zlib packs about 3% looser, so the simulation is deterministic across machines.
+- **Smoke test on edbarker.dev:** the grown forest shows 0.6 s after navigation on desktop, and phones get the 66-cell portrait forest.
+
 ## 2026-10-28: M21 step 2, art pass and first paint on the site
 
 - **User choices:**

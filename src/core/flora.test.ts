@@ -247,10 +247,32 @@ describe("the M25 species", () => {
         ["holly", "hornbeam"],
       );
     }
-    // Measured (5 seeds): birch and willow 2.8 canopy trees a run at season 50, 0.6 at 350;
-    // beech 2.6 at 350, the most of any species; holly and hornbeam 4.4 live trees.
+    // Measured (10 seeds, with seed rain): birch and willow 2.8 canopy trees a run at season 50,
+    // 0.1 at 350; beech 3.1 at 350, the most of any species; holly and hornbeam 6.8 live trees.
     expect(late).toBeLessThan(0.4 * early);
     expect(beech).toBeGreaterThanOrEqual(SEEDS.length);
     expect(shadeBearers).toBeGreaterThanOrEqual(2 * SEEDS.length);
+  });
+
+  it("brings goat willow back to a clearing only through seed rain (ADR 0018)", () => {
+    // An old mixed wood, a 60-cell clearing felled at season 300, then 40 seasons. Measured
+    // (6 seeds): no willow in any clearing without rain, 1–2 in every one with it.
+    const willows = (rain: boolean) =>
+      SEEDS.map((seed) => {
+        const params = presetParams("mixedWood", seed);
+        if (!rain)
+          for (const sp of Object.values(params.species ?? {}))
+            if (sp.o4) sp.o4 = { ...sp.o4, rain: 0 };
+        const world = new World(params);
+        world.run(300);
+        for (const t of world.trees)
+          if (t.alive && t.rootX >= 60 && t.rootX < 120) world.removeTree(t.id);
+        world.run(40);
+        return world.trees.filter(
+          (t) => t.alive && t.rootX >= 55 && t.rootX < 125 && t.species === "willow",
+        ).length;
+      });
+    for (const n of willows(false)) expect(n).toBe(0);
+    for (const n of willows(true)) expect(n).toBeGreaterThanOrEqual(1);
   });
 });

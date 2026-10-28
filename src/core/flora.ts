@@ -70,7 +70,8 @@ export const FLORA = {
     r3: { leafMass: 0.001, phi: 0.5 },
     r4: { qRel: 0.3 },
     r6: { enabled: true, qMin: 0.12, leafArea: 1.6 },
-    o4: { cSeed: 2, d: 40, qEst: 0.25, pEst: 0.3, m0: 0.008 },
+    // Seed rain (ADR 0018): wind-borne seed from birches beyond the world reaches large gaps.
+    o4: { cSeed: 2, d: 40, qEst: 0.25, pEst: 0.3, m0: 0.008, rain: 0.2 },
   },
   /** Mid-tolerant, long-lived, broad and decurrent when grown in the open. */
   oak: {
@@ -171,7 +172,10 @@ export const FLORA = {
     leaf: "maple",
     c3: { mode: "bh", lambda: 0.5, alpha: 3.2 },
     c5: { enabled: true, T: 0.02, Trel: 0.06 },
-    r1: { mf: 0.05, Lh: 45, maturity: 30 },
+    // A lighter crown than beech's (fewer short-shoot leaves, M25 follow-up): its floor sits
+    // between oak's and beech's; cheaper leaves and thicker tips keep saplings and stems as before.
+    c6: { enabled: true, r0: 0.024 },
+    r1: { mf: 0.04, Lh: 45, maturity: 30 },
     // Maple's buds are opposite and decussate: each pair turns 90° from the last, so only every
     // other pair lies in the plane. That is one bud a node, as distichous gives; the "opposite"
     // generator doubled the in-plane buds and cast a floor darker than beech's.
@@ -188,7 +192,7 @@ export const FLORA = {
     },
     // Hard, dense wood (as oak's): ascending limbs hold a rounded crown instead of sagging flat.
     r3: { E: 2.5e6, c: 0.15, betaG: 0.2 },
-    r6: { enabled: true, qMin: 0.045, leafArea: 1.8 },
+    r6: { enabled: true, qMin: 0.045, leafArea: 1.5 },
     o4: { cSeed: 5, d: 25, qEst: 0.05, pEst: 0.3, m0: 0.004 },
   },
   /** Evergreen understorey tree: a deep, dark, conical crown that keeps its lower limbs in shade. */
@@ -264,8 +268,9 @@ export const FLORA = {
     },
     r4: { qRel: 0.3 },
     r6: { enabled: true, qMin: 0.15, leafArea: 1.5 },
-    // Tiny plumed seeds blow far but need bare, lit ground; a short life.
-    o4: { cSeed: 1.5, d: 60, qEst: 0.3, pEst: 0.3, m0: 0.012 },
+    // Tiny plumed seeds blow far but need bare, lit ground; a short life. Seed rain (ADR 0018)
+    // brings willow back to clearings after it has died out in the wood.
+    o4: { cSeed: 1.5, d: 60, qEst: 0.3, pEst: 0.3, m0: 0.012, rain: 1 },
   },
   /** Light-demanding pine, Rauh's model: whorls, a clean bole and a high crown (a lab species). */
   pine: {

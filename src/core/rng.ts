@@ -28,6 +28,7 @@ export const Purpose = {
   establishment: 10, // O4
   mortality: 11, // O4
   initialPositions: 12,
+  seedRain: 13, // O4: seeds from beyond the world (ADR 0018)
 } as const;
 export type Purpose = (typeof Purpose)[keyof typeof Purpose];
 

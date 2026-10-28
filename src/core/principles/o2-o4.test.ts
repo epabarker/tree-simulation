@@ -69,6 +69,25 @@ describe("O4 stand dynamics (§O4, ADR 0013)", () => {
     expect(open.trees.length).toBeLessThan(ring.trees.length);
   });
 
+  it("rains seeds in from beyond the world, per species, at rain per 100 cells (ADR 0018)", () => {
+    // A world with no seed pool: only the rain recruits. 100 cells, rain 3 → 3 seeds a season.
+    const rained = (rain: number, species?: ParamsPatch["species"]) => {
+      const w = world({ species, o4: { enabled: true, rain } as Params["o4"] });
+      return { recruits: standDynamics(w), trees: w.trees };
+    };
+    expect(rained(0).recruits).toBe(0);
+    const on = rained(3);
+    expect(on.recruits).toBe(3); // every cell lit, p_est 1, the planted trunk at 50 aside
+    // Per species: only the species with rain arrives, and it is of that species.
+    const mixed = rained(0, { willow: { o4: { rain: 3 } }, oak: {} });
+    expect(mixed.recruits).toBe(3);
+    for (const t of mixed.trees.slice(1)) expect(t.species).toBe("willow");
+    // The same light rule as local seeds: nothing where the ground is below Q_est.
+    expect(rained(3, undefined).trees.length).toBe(4);
+    const shaded = world({ o4: { enabled: true, rain: 3, qEst: 2 } as Params["o4"] });
+    expect(standDynamics(shaded)).toBe(0);
+  });
+
   it("kills trees of background risk at rate m₀", () => {
     const w = world({ o4: { m0: 1 } });
     (w.trees[0] as Tree).age = 1;

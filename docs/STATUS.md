@@ -1,8 +1,8 @@
 # Status
 
-_Last updated: 2026-10-28 (realism pass)_
+_Last updated: 2026-10-28 (garden-v0.7.0 live)_
 
-**Current milestone: release M18–M20** from branch `claude/m19-species` (also in edbarker-dev). M18 is done (the row-marched sweep), and so is the M19–M20 realism pass (acrotony, windthrow by slenderness, species recalibrated: [note](experiments/2026-10-27-m19-species.md)). M17 is live (garden-v0.6.0).
+**Current milestone: M21** (first paint, art direction, launch), on branch `claude/m21-launch`. M18–M20 are live on edbarker.dev as garden-v0.7.0 (PR #13 here, PR #1 in edbarker-dev): the row-marched light, and birch, oak and beech in the home forest, with Plate II's own oak.
 
 ## Works
 - **Core:** C1–C6, R1–R6, O2 and O4 (ADRs 0005–0013); the sky sweep with open or periodic sides; golden hashes. `World.discardDead` for long page runs.
@@ -17,8 +17,12 @@ _Last updated: 2026-10-28 (realism pass)_
 - **Lab:** WebGL2 with pseudo-depth, Tweakpane, charts, tap to fell, phone layout. **Headless:** `npm run sim`, `npm run bench` (rings 3.8 ms a season), `analysis/experiments/` m0–m11.
 
 ## Next
-1. **Release:** previews to the user. Then, on their go-ahead: PR and merge here, tag `garden-v0.7.0`, sync the site from the release, and merge the site.
-2. **Follow-ups:** willow; rooting in windthrow; M21 (first paint, art direction, launch).
+1. **M21:**
+   - checkpoints, and a poster for first paint;
+   - art direction;
+   - accessibility;
+   - launch checks (Lighthouse, a phone soak).
+2. **Follow-ups:** willow; rooting in windthrow; the §8 ablation tests.
 3. **The user:** the site's `TODO(Ed)` items.
 
 ## Open questions (ask when the milestone comes up)

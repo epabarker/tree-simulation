@@ -2,6 +2,19 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-28: garden-v0.7.0 live
+
+- **Releases:**
+  - PR #13 merged here; `garden-v0.7.0` released by the workflow.
+  - The site synced from the release; the only difference from the local build is that source maps are left out.
+  - edbarker-dev PR #1 merged; Workers Builds deployed it to production.
+- **Smoke test on edbarker.dev** (Firefox, headless):
+  - a species card ("Silver birch, *Betula pendula*");
+  - Plate II's oak caption;
+  - the forest resumes on return.
+  - The only console errors are Cloudflare's analytics beacon, which headless Firefox blocks.
+- **Surprise:** `git tag` needs `-a -m` in this repo's config.
+
 ## 2026-10-28: M19–M20 realism pass
 
 - **User:** the first species release had lost realism. The fix was M18 first, then this pass, then one release.

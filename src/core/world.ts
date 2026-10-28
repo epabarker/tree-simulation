@@ -230,7 +230,7 @@ export class World {
       const unplanted = tree.m.length === 0 && !tree.discarded;
       if (unplanted && (spec.plantSeason ?? 0) <= this.season && !this.isRemoved(id)) {
         tree.alive = true;
-        plantSeedling(tree, this.paramsOf(tree), this.season);
+        plantSeedling(tree, this.paramsOf(tree), this.season, spec.lean);
       }
     });
   }

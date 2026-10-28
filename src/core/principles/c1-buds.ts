@@ -127,13 +127,13 @@ export function formTerminalBud(tree: Tree, m: number, params: Params, season: n
   }
 }
 
-/** Plants a seedling: one vertical metamer with its terminal and axillary buds. */
-export function plantSeedling(tree: Tree, params: Params, season: number): void {
+/** Plants a seedling: one metamer, vertical unless `lean` tilts it (degrees right of vertical), with its terminal and axillary buds. */
+export function plantSeedling(tree: Tree, params: Params, season: number, lean = 0): void {
   const m = addMetamer(
     tree,
     -1,
     Slot.main,
-    Math.PI / 2,
+    Math.PI / 2 - (lean * Math.PI) / 180,
     params.c1.internodeLength,
     params.c6.r0,
     season,

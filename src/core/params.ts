@@ -34,6 +34,11 @@ export interface TreeSpec {
   species?: string;
   /** Season in which the seedling appears (default 0). */
   plantSeason?: number;
+  /**
+   * Tilt of the seedling's first shoot from vertical, degrees, positive to the right (default 0):
+   * a tilted stem for the gravitropic-recovery check (§10, Bastien et al. 2013; M26).
+   */
+  lean?: number;
 }
 
 export interface Params {
@@ -549,6 +554,21 @@ export function mergeParams(base: Params, patch: ParamsPatch): Params {
     }
   }
   return out as unknown as Params;
+}
+
+/**
+ * Params with one species' patch amended: `patch` merges into that species' groups the way
+ * `mergeParams` merges into the world's (each group shallowly), where a `species` entry inside a
+ * plain `mergeParams` patch would replace the species' whole patch (M26; M27 fits species this way).
+ */
+export function patchSpecies(params: Params, name: string, patch: SpeciesPatch): Params {
+  const out = clone(params);
+  const entry = (out.species?.[name] ?? {}) as unknown as Params;
+  out.species = {
+    ...out.species,
+    [name]: mergeParams(entry, patch as ParamsPatch) as unknown as SpeciesPatch,
+  };
+  return out;
 }
 
 /** Deep copy of plain JSON data (params never hold functions, dates or typed arrays). */

@@ -1,8 +1,8 @@
 # Status
 
-_Last updated: 2026-10-28 (M21 art pass)_
+_Last updated: 2026-10-28 (garden-v0.8.0 live)_
 
-**Current milestone: M21** (first paint, art direction, launch), on branch `claude/m21-launch`. M18–M20 are live on edbarker.dev as garden-v0.7.0 (PR #13 here, PR #1 in edbarker-dev): the row-marched light, and birch, oak and beech in the home forest, with Plate II's own oak.
+**All planned milestones (M12–M21) are done.** edbarker.dev runs garden-v0.8.0 (PR #14 here, PR #2 in edbarker-dev): it opens on a grown mixed wood (birch, oak and beech), with Plate II's own oak, phone-sized plates and a moonlit night.
 
 ## Works
 - **Core:** C1–C6, R1–R6, O2 and O4 (ADRs 0005–0013); the sky sweep with open or periodic sides; golden hashes. `World.discardDead` for long page runs.
@@ -17,10 +17,7 @@ _Last updated: 2026-10-28 (M21 art pass)_
 - **Lab:** WebGL2 with pseudo-depth, Tweakpane, charts, tap to fell, phone layout. **Headless:** `npm run sim`, `npm run bench` (rings 3.8 ms a season), `analysis/experiments/` m0–m11.
 
 ## Next
-1. **M21:** steps 1–2 are done (checkpoints, grown forests on the site, the art pass). Left:
-   - previews to the user;
-   - a soak test (an hour on the user's phone);
-   - release `garden-v0.8.0`, sync the site, and merge on the user's go-ahead.
+1. **The user:** an hour's soak on a phone (heat, memory); the site's `TODO(Ed)` items.
 2. **Follow-ups:** willow; rooting in windthrow; the §8 ablation tests.
 3. **The user:** the site's `TODO(Ed)` items.
 

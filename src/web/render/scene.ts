@@ -546,6 +546,11 @@ export class Scene {
       cx = s.width / 2;
       spanX = s.width;
       spanY = Math.max(0.5 * s.height, maxY * 1.05 + LEAF_LENGTH);
+    } else if (this.frame === "trees" && s.periodic) {
+      // A ring has no edge to frame: show one lap, the crowns that cross the seam drawn at both
+      // sides (wrapOffsets), as the garden does (M26; the lab drew them past the world's end).
+      cx = s.width / 2;
+      spanX = s.width;
     }
     const fitH = Math.max(1, this.height - GROUND_MARGIN - this.headroom);
     const first = this.target === null;
@@ -578,12 +583,12 @@ export class Scene {
   }
 
   /**
-   * World-x offsets at which to draw the trees: on a ring in the "world" frame, one copy either
-   * side as well, so crowns that grew across the seam show at both edges.
+   * World-x offsets at which to draw the trees: on a ring framed whole ("world", or the lab's
+   * "trees"), one copy either side as well, so crowns that grew across the seam show at both edges.
    */
   wrapOffsets(): number[] {
     const s = this.next;
-    return s?.periodic && this.frame === "world" ? [-s.width, 0, s.width] : [0];
+    return s?.periodic && this.frame !== "tree" ? [-s.width, 0, s.width] : [0];
   }
 
   /** Canvas pixels of a world point (the inverse of `screenToWorld`). */

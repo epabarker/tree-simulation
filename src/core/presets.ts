@@ -387,7 +387,7 @@ export const presets = {
     label: "M6: one tree under a full sky",
     description: "An open-grown tree keeps its low, side-lit branches.",
     patch: {
-      world: { width: 120, height: 100, walls: [] },
+      world: { width: 120, height: 160, walls: [] },
       trees: [{ x: 60 }],
       ...SKY,
     },

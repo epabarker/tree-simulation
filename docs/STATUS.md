@@ -1,8 +1,8 @@
 # Status
 
-_Last updated: 2026-10-28 (M22)_
+_Last updated: 2026-10-28 (M23)_
 
-**Current milestone: M23** (leaves at a true scale, a silhouette per species, the intro back). M22 is done on branch `claude/m22-ablations`: the §8 ablations and pooled light ([note](experiments/2026-10-28-m22-ablations.md)). edbarker.dev runs garden-v0.8.0.
+**Current milestone: release M22–M23** (branch `claude/m23-leaves`, stacked on `claude/m22-ablations`; site branch `claude/m23-leaves`). The §8 ablations and pooled light, a leaf outline per species at true scale, and the time-lapse back. Then M24 (new species). edbarker.dev runs garden-v0.8.0.
 
 ## Works
 - **Core:** C1–C6, R1–R6, O2 and O4 (ADRs 0005–0013); the sky sweep with open or periodic sides; golden hashes. `World.discardDead` for long page runs.
@@ -17,7 +17,7 @@ _Last updated: 2026-10-28 (M22)_
 - **Lab:** WebGL2 with pseudo-depth, Tweakpane, charts, tap to fell, phone layout. **Headless:** `npm run sim`, `npm run bench` (rings 3.8 ms a season), `analysis/experiments/` m0–m11.
 
 ## Next
-1. **M23, then M24** (the ROADMAP rows): leaves and the intro first, then the species (holly, rowan, hornbeam, goat willow, field maple; Scots pine in the lab).
+1. **Release** `garden-v0.9.0` on the user's go-ahead after the preview. Then **M24**: holly, rowan, hornbeam, goat willow and field maple for the home forest, and Scots pine for the lab.
 2. **The user:** an hour's soak on a phone (heat, memory); the site's `TODO(Ed)` items.
 3. **Follow-ups:** rooting in windthrow.
 

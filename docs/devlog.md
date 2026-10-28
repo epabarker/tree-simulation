@@ -2,6 +2,25 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-28: M23, leaves and the intro
+
+- **User:**
+  - leaves looked large, and each species' leaf should be its own and correct;
+  - the growth at the start looked nice, so bring it back.
+- **Spec §8 amended** (ADR 0017): the ξ, R4 and pooled-light rows follow M22.
+- **Leaves:**
+  - **One outline per species,** drawn by both renderers from one width profile: birch deltoid and toothed, oak lobed, beech oval and wavy-edged, needles thin. Palmate, spiny and pinnate outlines are ready for M24's maple, holly and rowan.
+  - **Lengths** follow real leaf sizes (birch 0.5, beech 0.7, oak 0.85 cells, against 0.85–1.05 before).
+  - **The minimum on-screen size** drops from 5 to 3.5 CSS px, which is what had made every leaf look large at plate scale.
+  - **More leaves a shoot** (5–8), chosen by eye, keep the crowns full.
+  - **Cost:** the CPU frame cost for the forest rises from 0.10 to 0.14 ms.
+- **The intro is back.** The home forest grows from one of the chosen seeds a day (`seeds`). Grown forests are for reduced motion only (`first.when`).
+- **Surprises:**
+  - **The size floor.** At plate scale every leaf was held at the 5 px minimum, so the leaf length hardly mattered; the floor set the look.
+  - **`half` is a reserved word** in GLSL ES 3.0.
+- **Not done:** drawn density is matched to each species' simulated leaf area by eye, not exactly.
+- **Tests:** 211 pass; goldens unchanged.
+
 ## 2026-10-28: M22, the §8 ablations
 
 - **User:** a plan for all the remaining ablation tests and pooled light, plus new species. The suite may take longer.

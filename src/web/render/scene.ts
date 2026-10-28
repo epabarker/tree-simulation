@@ -22,6 +22,7 @@ import { CATEGORICAL, SEQUENTIAL } from "./colors.ts";
 import {
   isLeafStyleName,
   LEAF_PALETTES,
+  LEAF_SHAPES,
   LEAF_STYLES,
   type LeafStyle,
   type LeafStyleName,
@@ -138,6 +139,9 @@ export interface Leaves {
   turn: Float32Array;
   /** Its species' palette, an index into LEAF_PALETTES (M19: each tree is drawn as its species). */
   palette: Uint8Array;
+  /** Its species' outline, an index into LEAF_SHAPES, and width over length (M23). */
+  shape: Uint8Array;
+  aspect: Float32Array;
 }
 
 /** Ground sits this many CSS pixels above the bottom edge when the view is fitted. */
@@ -150,7 +154,7 @@ const CAMERA_EASE_MS = 380;
 export const LEAF_LENGTH = LEAF_STYLES.broadleaf.length;
 export const LEAF_ASPECT = LEAF_STYLES.broadleaf.aspect;
 /** Leaves never draw shorter than this on screen, so zoomed-out crowns still read as foliage. */
-export const LEAF_MIN_PX = 5;
+export const LEAF_MIN_PX = 3.5;
 
 /** Length of a full-size leaf of `length` world units at `scale` CSS pixels per world unit. */
 export function leafLength(scale: number, length: number = LEAF_LENGTH): number {
@@ -257,6 +261,8 @@ export class Scene {
     size: new Float32Array(FALLEN_MAX),
     color: new Uint8Array(FALLEN_MAX),
     palette: new Uint8Array(FALLEN_MAX),
+    shape: new Uint8Array(FALLEN_MAX),
+    aspect: new Float32Array(FALLEN_MAX),
     phase: new Float32Array(FALLEN_MAX),
     landed: new Uint8Array(FALLEN_MAX),
   };
@@ -323,6 +329,8 @@ export class Scene {
     color: new Uint8Array(0),
     turn: new Float32Array(0),
     palette: new Uint8Array(0),
+    shape: new Uint8Array(0),
+    aspect: new Float32Array(0),
   };
   /** Where the fitted view wants the camera; the ground line stays pinned while it eases. */
   private target: { cx: number; scale: number } | null = null;
@@ -919,9 +927,12 @@ export class Scene {
       out.color = new Uint8Array(cap);
       out.turn = new Float32Array(cap);
       out.palette = new Uint8Array(cap);
+      out.shape = new Uint8Array(cap);
+      out.aspect = new Float32Array(cap);
     }
     const tau = this.tau;
     const palettes = L.styles.map((st) => LEAF_PALETTES.indexOf(st.palette));
+    const shapes = L.styles.map((st) => LEAF_SHAPES.indexOf(st.shape));
     if (this.seasons && tau < this.lastTau) this.fallen.count = 0; // a new year: last year's litter is gone
     const g = this.geom;
     let k = 0;
@@ -982,6 +993,8 @@ export class Scene {
       out.color[k] = L.color[i];
       out.turn[k] = turn;
       out.palette[k] = palettes[kind] as number;
+      out.shape[k] = shapes[kind] as number;
+      out.aspect[k] = style.aspect;
       k++;
     }
     if (L.back >= L.count) out.back = k;
@@ -1008,7 +1021,10 @@ export class Scene {
     f.uy[k] = L.b[i] as number;
     f.size[k] = (L.scale[i] as number) * 0.9;
     f.color[k] = L.color[i] as number;
-    f.palette[k] = LEAF_PALETTES.indexOf((L.styles[L.kind[i] as number] as LeafStyle).palette);
+    const style = L.styles[L.kind[i] as number] as LeafStyle;
+    f.palette[k] = LEAF_PALETTES.indexOf(style.palette);
+    f.shape[k] = LEAF_SHAPES.indexOf(style.shape);
+    f.aspect[k] = style.aspect;
     f.phase[k] = (i * 0.618) % (2 * Math.PI);
     f.landed[k] = 0;
   }
@@ -1046,6 +1062,8 @@ export class Scene {
       out.color[k] = f.color[i] as number;
       out.turn[k] = 1;
       out.palette[k] = f.palette[i] as number;
+      out.shape[k] = f.shape[i] as number;
+      out.aspect[k] = f.aspect[i] as number;
       k++;
     }
     return k;

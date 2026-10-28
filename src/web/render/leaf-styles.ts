@@ -1,10 +1,61 @@
 /**
  * How the page draws foliage, per species (M7 follow-up; page only, like ADR 0008's depth). The
  * model's leaf area is unchanged: buds still cast the shade. A style sets the drawn leaf's size
- * and shape (a lens of `aspect` width over length, so a needle is a thin lens), how many leaves a
- * young metamer carries and at what angle to its shoot, its colour ramp (CSS tokens in
- * layout.css, read by theme.ts) and how many seasons foliage stays on (evergreen needles longer).
+ * and shape (its outline, `shape`, `aspect` width over length), how many leaves a young metamer
+ * carries and at what angle to its shoot, its colour ramp (CSS tokens in layout.css, read by
+ * theme.ts) and how many seasons foliage stays on (evergreen needles longer).
+ *
+ * Sizes (M23): a cell is 0.25 m and a plate draws one in 3–5 px, so a real leaf would be a pixel
+ * or two. A drawn leaf therefore stands for a small spray of leaves, its length in proportion to
+ * the species' real leaf (birch ≈ 5 cm, beech ≈ 8, oak ≈ 10, a rowan's compound leaf ≈ 18), and
+ * the renderers keep a minimum on-screen size scaled the same way.
  */
+
+/**
+ * Leaf outlines, drawn by both renderers from the same width profile (`leafProfile`): the leaf's
+ * half-width at a point a fraction t of the way from its base to its tip, as a share of its
+ * full half-width. Values are stored in leaf lists: append new shapes, never reorder.
+ */
+export const LEAF_SHAPES = [
+  "lens", // a plain lens: the generic broadleaf
+  "ovate", // fuller near the base, wavy-edged: beech, hornbeam
+  "deltoid", // widest near the base, pointed, toothed: birch
+  "lobed", // rounded lobes, almost no stalk: oak
+  "palmate", // five lobes about a centre: field maple
+  "spiny", // a wavy edge of spines: holly
+  "pinnate", // leaflets along a midrib: rowan
+  "needle", // a thin lens: fir
+] as const;
+export type LeafShape = (typeof LEAF_SHAPES)[number];
+
+/** Half-width, as a share of the full half-width, at t ∈ [0, 1] from base to tip (not palmate). */
+export function leafProfile(shape: LeafShape, t: number): number {
+  const s = Math.sin(Math.PI * t);
+  switch (shape) {
+    case "ovate":
+      return s ** 0.6 * (1 - 0.25 * t) * (1 + 0.06 * Math.sin(t * 40));
+    case "deltoid":
+      return (
+        (t < 0.3 ? (t / 0.3) ** 0.7 : ((1 - t) / 0.7) ** 1.1) *
+        (1 + 0.08 * Math.abs(Math.sin(t * 30)))
+      );
+    case "lobed":
+      return s ** 0.5 * (0.62 + 0.38 * Math.abs(Math.sin(t * Math.PI * 4.5)));
+    case "spiny": {
+      const tri = Math.abs(((t * 4.5) % 1) - 0.5) * 2;
+      return s ** 0.6 * (0.85 + 0.25 * tri);
+    }
+    case "pinnate":
+      return t < 0.08 ? 0.08 : Math.max(0.08, Math.sin(Math.PI * ((t * 6) % 1)) ** 0.8);
+    default:
+      return s;
+  }
+}
+
+/** Palmate (maple) outline radius, as a share of the half-length, at angle θ about the centre. */
+export function palmateRadius(theta: number): number {
+  return 0.55 + 0.45 * Math.abs(Math.cos(2.5 * theta)) ** 2;
+}
 
 export type LeafPalette = "broadleaf" | "needle" | "birch" | "tropical" | "oak" | "beech";
 export const LEAF_PALETTES: readonly LeafPalette[] = [
@@ -20,6 +71,8 @@ export interface LeafStyle {
   /** Full leaf length in world units (one unit = one internode), and width over length. */
   length: number;
   aspect: number;
+  /** The outline (LEAF_SHAPES). */
+  shape: LeafShape;
   /** Angle between a leaf and its shoot, radians. */
   spread: number;
   /** Leaves per young metamer in the pseudo-depth view, spaced evenly around the shoot. */
@@ -49,12 +102,13 @@ export interface LeafStyle {
 }
 
 export const LEAF_STYLES = {
-  /** The M6c lens: mid-sized, three to a cluster. */
+  /** The M6c lens: the generic broadleaf. */
   broadleaf: {
-    length: 1.1,
+    length: 0.8,
     aspect: 0.41,
+    shape: "lens",
     spread: 0.95,
-    cluster: 3,
+    cluster: 5,
     xray: 1,
     palette: "broadleaf",
     leafAge: 5,
@@ -62,21 +116,23 @@ export const LEAF_STYLES = {
   },
   /** Fir-like sprays: many thin, dark needles set wide on both sides, kept for years (Abies ≈ 8–10). */
   needle: {
-    length: 0.9,
+    length: 0.7,
     aspect: 0.12,
+    shape: "needle",
     spread: 1.25,
-    cluster: 6,
+    cluster: 8,
     xray: 2,
     palette: "needle",
     leafAge: 8,
     deciduous: false,
   },
-  /** Birch-like: small, broad, light leaves; the first to flush and the first to turn yellow. */
+  /** Birch: small, triangular, toothed leaves; the first to flush and the first to turn yellow. */
   small: {
-    length: 0.85,
-    aspect: 0.6,
+    length: 0.5,
+    aspect: 0.62,
+    shape: "deltoid",
     spread: 1.05,
-    cluster: 4,
+    cluster: 8,
     xray: 1,
     palette: "birch",
     leafAge: 4,
@@ -84,12 +140,13 @@ export const LEAF_STYLES = {
     flush: 0,
     turn: -0.03,
   },
-  /** Oak: broad, dark leaves that flush late and turn russet late in autumn. */
+  /** Oak: lobed, dark leaves that flush late and turn russet late in autumn. */
   oak: {
-    length: 1.05,
-    aspect: 0.5,
+    length: 0.85,
+    aspect: 0.55,
+    shape: "lobed",
     spread: 0.9,
-    cluster: 3,
+    cluster: 6,
     xray: 1,
     palette: "oak",
     leafAge: 5,
@@ -97,12 +154,13 @@ export const LEAF_STYLES = {
     flush: 0.06,
     turn: 0.04,
   },
-  /** Beech: dense, fresh leaves that turn copper; young beeches keep them brown all winter. */
+  /** Beech: dense, oval, wavy-edged leaves that turn copper; young beeches keep them all winter. */
   beech: {
-    length: 1,
+    length: 0.7,
     aspect: 0.55,
+    shape: "ovate",
     spread: 1,
-    cluster: 4,
+    cluster: 7,
     xray: 1,
     palette: "beech",
     leafAge: 5,
@@ -113,8 +171,9 @@ export const LEAF_STYLES = {
   },
   /** Terminalia-like: large, glossy leaves crowded at the shoot tips. */
   large: {
-    length: 1.9,
+    length: 1.5,
     aspect: 0.46,
+    shape: "lens",
     spread: 0.8,
     cluster: 4,
     xray: 2,

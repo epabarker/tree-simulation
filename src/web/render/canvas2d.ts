@@ -7,7 +7,36 @@
 import type { Snapshot } from "../../core/snapshot.ts";
 import { BudState } from "../../core/tree.ts";
 import { BUD_ACTIVE, BUD_DORMANT, SEQUENTIAL, shadeImage } from "./colors.ts";
-import { LEAF_PALETTES, LEAF_STYLES, type LeafPalette } from "./leaf-styles.ts";
+import {
+  LEAF_PALETTES,
+  LEAF_SHAPES,
+  LEAF_STYLES,
+  type LeafPalette,
+  leafProfile,
+  palmateRadius,
+} from "./leaf-styles.ts";
+
+/**
+ * Each leaf shape's outline as (along, across) points of a leaf of unit length and unit width,
+ * base at (0, 0), tip at (1, 0): the profile sampled up one side and down the other, or the
+ * palmate lobes around the centre. The WebGL shader draws the same profiles exactly.
+ */
+const OUTLINES: Float32Array[] = LEAF_SHAPES.map((shape) => {
+  const pts: number[] = [];
+  if (shape === "palmate") {
+    for (let i = 0; i < 30; i++) {
+      const theta = (2 * Math.PI * i) / 30;
+      const r = palmateRadius(theta);
+      pts.push(0.5 + 0.5 * r * Math.cos(theta), 0.5 * r * Math.sin(theta));
+    }
+  } else {
+    const n = shape === "lens" || shape === "needle" ? 8 : 24;
+    for (let i = 0; i <= n; i++) pts.push(i / n, 0.5 * leafProfile(shape, i / n));
+    for (let i = n - 1; i > 0; i--) pts.push(i / n, -0.5 * leafProfile(shape, i / n));
+  }
+  return new Float32Array(pts);
+});
+
 import { MAX_DPR, type Renderer, type RendererOptions } from "./renderer.ts";
 import { type ColorMode, type Leaves, leafLength, Scene, type ViewOptions } from "./scene.ts";
 import { RAMP_STEPS, readTheme, type Theme } from "./theme.ts";
@@ -240,15 +269,18 @@ export class Canvas2DRenderer implements Renderer {
           const ux = leaves.ux[k];
           const uy = leaves.uy[k];
           const len = full * leaves.size[k];
-          const bulge = len * style.aspect; // control points at twice the half-width
-          const tx = bx + ux * len;
-          const ty = by + uy * len;
-          const mx = bx + ux * len * 0.5;
-          const my = by + uy * len * 0.5;
-          // A lens: two quadratic curves bulging either side of the midrib.
-          ctx.moveTo(bx, by);
-          ctx.quadraticCurveTo(mx - uy * bulge, my + ux * bulge, tx, ty);
-          ctx.quadraticCurveTo(mx + uy * bulge, my - ux * bulge, bx, by);
+          const wid = len * (leaves.aspect[k] as number);
+          // The species' outline (M23): (along, across) points of a unit leaf, laid on the shoot.
+          const outline = OUTLINES[leaves.shape[k] as number] as Float32Array;
+          for (let q = 0; q < outline.length; q += 2) {
+            const al = (outline[q] as number) * len;
+            const ac = (outline[q + 1] as number) * wid;
+            const x = bx + ux * al - uy * ac;
+            const y = by + uy * al + ux * ac;
+            if (q === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+          }
+          ctx.closePath();
         }
         ctx.fill();
       }

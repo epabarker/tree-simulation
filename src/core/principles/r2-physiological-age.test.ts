@@ -162,7 +162,7 @@ describe("R2 juvenile phase (§R2.4, ADR 0022)", () => {
       w.run(50);
       return [h10, treeMetrics(t, w).height] as const;
     };
-    const [full10, full60] = heights({});
+    const [full10, full60] = heights({ "r2.hJ": 0 });
     const [young10, young60] = heights({ "r2.hJ": 60 });
     // At 10 seasons the juvenile oak is less than half as tall; by 60 it is within a fifth.
     expect(young10).toBeLessThan(0.5 * full10);

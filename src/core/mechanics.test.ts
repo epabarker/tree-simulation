@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { type FixtureName, fixtureParams, isFixtureName } from "./fixtures.ts";
+import { HAND_FLORA } from "./flora.ts";
 import { limbShapes } from "./form.ts";
 import { mergeParams, type ParamsPatch, patchSpecies } from "./params.ts";
 import { PRE_R4, type PresetName, presetParams } from "./presets.ts";
@@ -163,7 +164,10 @@ describe("M9: mechanics (§R3, ADR 0011)", () => {
           world: { width: 160, height: 160, walls: [] },
           trees: [{ x: 80, species: "oak", lean: 40 }],
         });
-        const world = new World(patchSpecies(base, "oak", { r3: { posture } }));
+        // A test of R3 on the hand-tuned oak (M19, M26): the fitted one's juvenile phase keeps a
+        // seedling light, so it barely sags even without posture control.
+        const hand = mergeParams(base, { species: { ...base.species, oak: HAND_FLORA.oak } });
+        const world = new World(patchSpecies(hand, "oak", { r3: { posture } }));
         let overshoot = 0;
         for (let s = 0; s < 20; s++) {
           world.run(1);

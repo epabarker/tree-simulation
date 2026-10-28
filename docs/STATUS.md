@@ -1,12 +1,12 @@
 # Status
 
-_Last updated: 2026-10-28 (M26 done; M27 round 1 fitted, round 2 waiting on the user's run)_
+_Last updated: 2026-10-28 (M27 done: the fitted species are adopted, garden 0.14.0)_
 
-**M26 is done** on `claude/gallant-brown-5k4g33`. **M27 round 1** is fitted and held out ([note](experiments/2026-10-28-m27-fits.md); `fits/round1/`). After it, survival light (four species) and late growth (H100/H60) entered the fit (ADR 0020 addendum), and two model changes landed, both off by default: the hyperbolic hydraulic discount (`r1.hydraulic`, ADR 0021) and the juvenile phase (`r2.hJ`, ADR 0022). The home forest is unchanged. **Round 2 is fitted and held out** (79 min, in session): every measured target is met; open are holly's tolerance, the understorey's collapse under fitted beech, and height after season 100. **Waiting on the user** to decide on them and on adoption (M27b).
+**M26 and M27 are done** on `claude/gallant-brown-5k4g33`. The woodland grows the species fitted to literature traits (two CMA-ES rounds, then hand adjustments: ADR 0020–0023; [note](experiments/2026-10-28-m27-fits.md)), with the hyperbolic hydraulic discount (ADR 0021) and a juvenile phase (ADR 0022) set per species. The hand-tuned species are kept as `HAND_FLORA`.
 
 ## Works
 - **Core:** C1–C6, R1–R6, O2 and O4 (ADRs 0005–0013); the sky sweep with open or periodic sides; golden hashes. `World.discardDead` for long page runs.
-- **Species** (`src/core/flora.ts`): M19's birch, oak, beech and fir; M25's hornbeam, field maple, holly, rowan, goat willow and Scots pine (lab) ([note](experiments/2026-10-28-m25-species.md)).
+- **Species** (`src/core/flora.ts`, `flora-fitted.ts`): birch, oak, beech, hornbeam, field maple, holly, rowan, goat willow; fir and Scots pine (lab). Fitted in M27 ([note](experiments/2026-10-28-m27-fits.md)); the hand-tuned M19/M25 versions are `HAND_FLORA`.
 - **Measuring form** (`src/core/form.ts`, CLI `form.csv`): crown profile, apical control, angles by order, droop, Δ, l–d and leaf–section slopes ([M26 note](experiments/2026-10-28-m26-validation.md)).
 - **Woodland presets:** `mixedWood`, the home forest (`forestParams`; pioneers fade, beech and hornbeam rise); `oakOpen` (Plate II; `specimen: "oak"`); one wood per species; `succession` (M19).
 - **Other presets:** `skyStand`, `skyGrove`, `skyTree`, `forest`, `thinning`. The M7/M9 forms are test fixtures (`fixtures.ts`, ADR 0019).
@@ -17,10 +17,10 @@ _Last updated: 2026-10-28 (M26 done; M27 round 1 fitted, round 2 waiting on the 
 - **Lab:** WebGL2 with pseudo-depth, Tweakpane, charts, tap to fell, phone layout, shareable links (`?preset&seed&p`). **Headless:** `npm run sim` (`--species-patch`), `npm run bench`, `analysis/experiments/` m0–m26.
 
 ## Next
-1. **The user:** garden 0.13.0 is live on edbarker.dev (synced 2026-10-28); try the loupe on a phone. The lab's PR to `main` is not opened yet.
-2. **The user:** review round 2 ([note](experiments/2026-10-28-m27-fits.md)): fix holly's tolerance, the understorey under beech and the tail after season 100 (a round 3), or adopt (M27b).
-3. **Faster refits:** `m27_fit.py --species all --skip-done --start <earlier round> --restarts 2,0 --generations 50 --seeds 3` (≈ 8 min a species), after moving `fits/*.json` to a round folder.
-4. **Ideas:** rooting in windthrow; the leaf–section slope against live pipe area (r_live); measured holly and rowan growth curves, and quantum-sensor light under fir and the small trees (their targets are estimates).
+1. **The user:** try garden 0.14.0 on edbarker.dev, and the loupe on a phone; say whether to open the lab's PR to `main` (GitHub Pages).
+2. **Possible:** a thinner understorey than the hand-tuned wood's by season 400 (holly, rowan, willow 0.3–0.7 a run): revisit if it reads wrong. Measured light under fir, holly and the small trees would replace estimated floors.
+3. **Refits:** move `fits/*.json` to a round folder, then `m27_fit.py --species all --skip-done --start <round> --restarts 2,0 --generations 50 --seeds 3` (≈ 8 min a species); `m27_adopt.py` regenerates `flora-fitted.ts`.
+4. **Ideas:** rooting in windthrow; the leaf–section slope against live pipe area (r_live).
 
 ## Open questions (ask when the milestone comes up)
 - None open.

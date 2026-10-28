@@ -68,7 +68,8 @@ The same 13 traits and 17 parameters for oak, fir, hornbeam, field maple, holly,
 
 **Bounds** are birch's, with these changes:
 - **Fir and pine:** level 1's η stays within 1.5–2, the strong plagiotropic pull that makes their tiers, and their branch angle within 50–90°.
-- **Maple, holly, rowan and willow:** L_h can go down to 12, since these are small trees.
+- **L_h, every species:** 10–200 on a log scale, since the fits use the hyperbolic discount (ADR 0021). That form needs larger values than the exponential for the same height. This supersedes the earlier 25–100, and 12–70 for the small trees.
+- **Fixed in every fit:** `r1.hydraulic = "hyperbolic"` (`[fixed]` in each targets file).
 - **Holly:** α 1.8–4.5 and branch angle 35–80°.
 - **Rowan:** branch angle 20–60°.
 - **Willow:** α 3–7.

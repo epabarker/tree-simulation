@@ -111,8 +111,8 @@ kind = "described"
 source = "limbs that arch a little at the tips"
 
 # Free parameters: dotted paths into the species' patch, with bounds (literature review §4,
-# ROADMAP calibration table). log = true searches the bound's log scale.
-# A small tree: L_h may go lower than the big species'.
+# ROADMAP calibration table). log = true searches the bound's log scale. L_h spans 10–200 for
+# every species: the hyperbolic discount needs larger values than the exponential (ADR 0021).
 [[param]]
 path = "c3.alpha"
 lo = 2.5
@@ -164,8 +164,9 @@ lo = 0.015
 hi = 0.05
 [[param]]
 path = "r1.Lh"
-lo = 12
-hi = 70
+lo = 10
+hi = 200
+log = true
 [[param]]
 path = "r1.mf"
 lo = 0.02
@@ -184,6 +185,10 @@ log = true
 path = "r6.leafArea"
 lo = 1
 hi = 3
+
+# Assignments every candidate carries unchanged (analysis/treesim/fit.py).
+[fixed]
+"r1.hydraulic" = "hyperbolic"   # 1/(1 + L_path/L_h): height keeps rising slowly (ADR 0021)
 
 # Held out: never in the loss, checked after the fit (analysis/experiments/m27_holdout.py).
 [holdout]

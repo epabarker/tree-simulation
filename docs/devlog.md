@@ -2,6 +2,22 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-28: M27, a hyperbolic hydraulic discount (ADR 0021)
+
+- **User:** adjust the model so species stop levelling off early, aiming at realism; leave the home forest unchanged until fitted patches are adopted.
+- **The switch:** `r1.hydraulic: "exp" | "hyperbolic"` (default `exp`, goldens unchanged). The hyperbolic form discounts production by 1/(1 + L_path/L_h), a resistance growing linearly with path length.
+  - Unit test in `r1-carbon.test.ts`.
+  - Spec §R1 amended; ADR 0021.
+- **The comparison** ([note](experiments/2026-10-28-m27-height-curves.md), addendum; table 4 of `cli/height-diagnosis.ts`):
+  - with the hyperbolic form, stand top heights follow the yield tables after season 30, hornbeam and beech to within about a metre;
+  - the lone willow no longer shrinks;
+  - juvenile growth is still too fast (oak, pine, fir).
+- **Fits:**
+  - Each targets file gains `[fixed] "r1.hydraulic" = "hyperbolic"`, applied to every candidate and written into the fitted patch.
+  - L_h is searched over 10–200 on a log scale for all species.
+  - The hand-tuned comparison keeps `exp`.
+  - Smoke fits of all ten and the hold-out pass (hold-out ρ hand −0.98, smoke-fitted −0.94).
+
 ## 2026-10-28: M27, diagnosis: the shrinking willow and the early height plateau
 
 - **User:** find out why the lone willow's height falls after season 30, before running the fits.

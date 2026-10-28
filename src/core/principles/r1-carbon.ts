@@ -3,9 +3,12 @@
  * 2004; Mencuccini et al. 2005; Becker et al. 2000; Weber et al. 2018).
  *
  * The resource a tree distributes is what its foliage produces minus what its living tissue
- * costs. Production P = α·Σ a·Q·exp(−L_path/L_h) over live buds, where a is the bud's leaf area
- * as the light model sees it (R6: a dormant bud has none) and L_path the path length from the base
- * to its node: hydraulic resistance makes distant foliage less productive. Maintenance
+ * costs. Production P = α·Σ a·Q·d(L_path) over live buds, where a is the bud's leaf area as the
+ * light model sees it (R6: a dormant bud has none) and L_path the path length from the base to its
+ * node: hydraulic resistance makes distant foliage less productive. The discount d is
+ * exp(−L_path/L_h) (ADR 0010) or, with r1.hydraulic "hyperbolic", 1/(1 + L_path/L_h): the
+ * conductance of a path whose resistance grows linearly with its length, whose long tail lets a
+ * tall tree keep growing slowly instead of stalling (ADR 0021; yield-table height curves). Maintenance
  * M = m_w·Σ π r_live²·l + m_f·Σ a: live sapwood, where r_live is the pipe-model radius of the pipes
  * that still serve foliage (Shinozaki et al. 1964; stem respiration follows sapwood volume, Ryan
  * 1990), so pipes kept by C6's memory and scars are heartwood and cost nothing; and foliage with
@@ -19,8 +22,8 @@
  * `carbon` shedding mode in C5: a lateral is shed when it cannot pay for itself or is dim
  * relative to the crown top.
  *
- * Params: r1.enabled, r1.mw (m_w), r1.mf (m_f), r1.Lh (L_h), r1.sr (s_r), r1.fRep (f_rep),
- * r1.maturity, r1.kStarve (k_starve), r1.reserve0, r1.store, r1.shed; c3.alpha (α); c6.n, c6.r0;
+ * Params: r1.enabled, r1.mw (m_w), r1.mf (m_f), r1.Lh (L_h), r1.hydraulic, r1.sr (s_r),
+ * r1.fRep (f_rep), r1.maturity, r1.kStarve (k_starve), r1.reserve0, r1.store, r1.shed; c3.alpha (α); c6.n, c6.r0;
  * r6 leaf areas.
  */
 
@@ -56,7 +59,12 @@ export function carbonBalance(tree: Tree, params: Params): void {
   for (let j = 0; j < tree.b.length; j++) {
     if (!isLiveBud(b.state[j])) continue;
     const m = b.metamer[j];
-    const discount = r1.Lh > 0 ? Math.exp(-pathLen[m] / r1.Lh) : 1;
+    const discount =
+      r1.Lh <= 0
+        ? 1
+        : r1.hydraulic === "hyperbolic"
+          ? 1 / (1 + pathLen[m] / r1.Lh)
+          : Math.exp(-pathLen[m] / r1.Lh);
     // Only foliage produces and respires: the leaf area the light model sees (R6: active 1,
     // short shoot a_ss, dormant 0; every bud 1 without R6).
     const leaf = depositArea(b.state[j], params.r6);

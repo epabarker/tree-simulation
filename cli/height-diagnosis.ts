@@ -1,13 +1,14 @@
 /**
  * Why the lone willow stops growing, then loses height (M27 diagnosis;
- * docs/experiments/2026-10-28-m27-height-curves.md). Three tables over the standard trials
+ * docs/experiments/2026-10-28-m27-height-curves.md). Four tables over the standard trials
  * (src/core/trials.ts):
  *
  * 1. willow's height at seasons 30 and 60 with one cause switched off at a time;
  * 2. the topmost metamers at each willow's peak: shed by season 60, or still there and lower (sag);
- * 3. every species' H30/H60, lone and stand top, at its own L_h and at L_h 100 and 200.
+ * 3. every species' H30/H60, lone and stand top, at its own L_h and at L_h 100 and 200;
+ * 4. stand top heights under the exponential and the hyperbolic discount, beside yield tables.
  *
- *   node cli/height-diagnosis.ts            # about a minute
+ *   node cli/height-diagnosis.ts            # about two minutes
  */
 
 import { treeMetrics } from "../src/core/metrics.ts";
@@ -145,6 +146,44 @@ function curves(): void {
   }
 }
 
+/** Stand top height (m, 0.25 m a cell) at seasons 30, 60 and 100, mean of 3 seeds. */
+function standTop(sp: string, assign: Record<string, unknown>): string {
+  const at = [30, 60, 100];
+  const hs: number[][] = at.map(() => []);
+  for (const seed of SEEDS.slice(0, 3)) {
+    const w = new World(withAssign(standParams(sp, seed), sp, assign));
+    let s = 0;
+    at.forEach((season, k) => {
+      w.run(season - s);
+      s = season;
+      const top = Math.max(...w.trees.slice(2, -2).map((t) => (t.alive ? height(w, t) : 0)));
+      hs[k]?.push(top * 0.25);
+    });
+  }
+  return hs.map((h) => mean(h).toFixed(1)).join(", ");
+}
+
+/** ADR 0021: the exponential discount against the hyperbolic one, beside the yield tables. */
+function hyperbolic(): void {
+  console.log("\n4. stand top height (m) at seasons 30, 60, 100: exp (as tuned) and 1/(1 + L/L_h)");
+  const cases: [string, number, string][] = [
+    ["hornbeam", 100, "14.2, 21.2, 26.0 (Lockow & Lockow 2009, SI 26)"],
+    ["pine", 100, "13.8, 22.8, 29.0 (NW-FVA class 1)"],
+    ["oak", 70, "13.1, 21.0, 27.0 (NW-FVA class 1)"],
+    ["willow", 40, "13.9, 18.0, 18.9 (Paramonov et al. 2021, class I)"],
+    ["beech", 70, "–, 23.1, 32.5 (NW-FVA class 1)"],
+    ["fir", 100, "7.8, 20.4, 31.0 (Tirol, SI 31)"],
+  ];
+  for (const [sp, lh, table] of cases) {
+    const exp = standTop(sp, {});
+    const hyp = standTop(sp, { "r1.hydraulic": "hyperbolic", "r1.Lh": lh });
+    console.log(
+      `   ${sp.padEnd(9)} exp ${exp}  |  hyperbolic L_h ${lh}: ${hyp}  |  table ${table}`,
+    );
+  }
+}
+
 ablations();
 sagOrShed();
 curves();
+hyperbolic();

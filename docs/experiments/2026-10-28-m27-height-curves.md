@@ -73,3 +73,27 @@ node cli/height-diagnosis.ts     # about a minute
 **Implications for the fits:**
 - Expect the measured H30/H60 targets (weight 1, bands 0.05–0.06) to dominate the loss for oak, beech, fir, pine and hornbeam. Expect fits to push L_h towards 100 and trade the curve against height.
 - Per ADR 0020, a target the model can't reach is a finding about the model. The candidate fix is a slower juvenile phase in the height curve, a model change that would need its own decision.
+
+## Addendum: the hyperbolic discount (ADR 0021, same day)
+The user asked for the model to change, aiming at realism. The new switch `r1.hydraulic: "hyperbolic"` discounts production by 1/(1 + L_path/L_h): the conductance of a path whose resistance grows linearly with its length.
+
+**Stand top height** (m at seasons 30, 60 and 100, 3 seeds; table 4 of `node cli/height-diagnosis.ts`):
+
+| Species | exp, as tuned | Hyperbolic | Yield table |
+|---|---|---|---|
+| Hornbeam | 12.1, 16.2, 17.4 | 14.7, 21.5, 26.7 (L_h 100) | 14.2, 21.2, 26.0 |
+| Pine | 14.0, 17.8, 18.8 | 17.0, 24.9, 30.7 (L_h 100) | 13.8, 22.8, 29.0 |
+| Oak | 16.1, 20.1, 21.5 | 17.2, 23.2, 27.5 (L_h 70) | 13.1, 21.0, 27.0 |
+| Willow | 12.3, 11.9, 11.7 | 15.3, 21.1, 23.2 (L_h 40) | 13.9, 18.0, 18.9 |
+| Beech | 13.1, 20.2, 26.2 | 14.4, 23.0, 33.2 (L_h 70) | –, 23.1, 32.5 |
+| Fir | 15.1, 21.5, 25.0 | 19.0, 29.9, 40.3 (L_h 100) | 7.8, 20.4, 31.0 |
+
+- **The tail is fixed:** height keeps rising after season 60 at about the yield tables' rate. Hornbeam and beech match their tables to within a metre or so.
+- **Willow:** its lone tree no longer shrinks.
+- **The start is still too fast:**
+  - Oak and pine are 3–4 m ahead at season 30.
+  - Fir is far ahead of its mountain table, which has 10–20 years to breast height.
+  - Every species reaches about 7.7 m by season 10.
+- **What next:** the fits use the hyperbolic form with L_h 10–200 (log). Whether α, λ or m_f can slow the juvenile ramp is for them to show. If not, a slower juvenile phase is the next model change.
+- **What doesn't change:** the default stays exponential, so the presets, the home forest and the goldens are unchanged.
+

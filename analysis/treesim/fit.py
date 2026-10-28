@@ -1,8 +1,9 @@
 """Fit a species' patch to literature traits by CMA-ES (M27, ADR 0020).
 
-A candidate is a set of dotted-path assignments to the species' patch (src/core/trials.ts). Each is
-grown in the standard trials by a pool of long-lived evaluators (`node cli/fit-eval.ts`, one per
-worker), and scored against the targets in analysis/fit/targets/<species>.toml:
+A candidate is a set of dotted-path assignments to the species' patch (src/core/trials.ts), plus the
+targets file's fixed assignments (the hyperbolic hydraulic discount, ADR 0021). Each is grown in the
+standard trials by a pool of long-lived evaluators (`node cli/fit-eval.ts`, one per worker), and
+scored against the targets in analysis/fit/targets/<species>.toml:
 
     loss = Σ weight · ((seed-mean trait − target) / band)²  + penalties for dead trees
 
@@ -43,6 +44,8 @@ class Spec:
     traits: list[dict]
     params: list[dict]
     holdout: dict = field(default_factory=dict)
+    #: Assignments every candidate carries unchanged, e.g. {"r1.hydraulic": "hyperbolic"} (ADR 0021).
+    fixed: dict = field(default_factory=dict)
 
     @property
     def paths(self) -> list[str]:
@@ -51,7 +54,7 @@ class Spec:
 
 def load_spec(species: str) -> Spec:
     data = tomllib.loads((TARGETS / f"{species}.toml").read_text())
-    return Spec(data["species"], data["trait"], data["param"], data.get("holdout", {}))
+    return Spec(data["species"], data["trait"], data["param"], data.get("holdout", {}), data.get("fixed", {}))
 
 
 class Evaluator:
@@ -119,9 +122,10 @@ class Pool:
 # --- Encoding --------------------------------------------------------------------------------
 
 
-def decode(spec: Spec, x: np.ndarray) -> dict[str, float]:
-    """Unit-cube point → parameter values, to 4 significant figures (short patches and links)."""
-    out = {}
+def decode(spec: Spec, x: np.ndarray) -> dict:
+    """Unit-cube point → the candidate's assignments: the fixed ones, then the free parameters to 4
+    significant figures (short patches and links)."""
+    out = dict(spec.fixed)
     for p, u in zip(spec.params, np.clip(x, 0, 1)):
         lo, hi = p["lo"], p["hi"]
         if p.get("log"):
@@ -283,14 +287,14 @@ def fit(spec: Spec, settings: FitSettings, log=print) -> dict:
         ranked = sorted(rows, key=lambda row: row["loss"])
         finalists: list[dict] = []
         for row in ranked:
-            a = {p: row[p] for p in spec.paths}
+            a = {**spec.fixed, **{p: row[p] for p in spec.paths}}
             if a not in finalists:
                 finalists.append(a)
             if len(finalists) >= settings.finalists:
                 break
-        fixed = list(range(1, settings.final_seeds + 1))
-        hand_traits = measure(pool, spec, [{}], fixed)[0]
-        final_traits = measure(pool, spec, finalists, fixed)
+        fixed_seeds = list(range(1, settings.final_seeds + 1))
+        hand_traits = measure(pool, spec, [{}], fixed_seeds)[0]
+        final_traits = measure(pool, spec, finalists, fixed_seeds)
         final_losses = [loss(spec, t) for t in final_traits]
         k = int(np.argmin(final_losses))
         patch = pool.ask({"amend": spec.species, "assign": finalists[k]})["patch"]

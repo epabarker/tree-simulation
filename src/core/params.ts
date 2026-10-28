@@ -204,6 +204,11 @@ export interface Params {
     mf: number;
     /** L_h: hydraulic path-length scale in cells; 0 switches the path-length cause off. */
     Lh: number;
+    /**
+     * How production falls with path length L: 'exp', exp(−L/L_h) (ADR 0010); 'hyperbolic',
+     * 1/(1 + L/L_h), a conductance under a resistance that grows linearly with path length.
+     */
+    hydraulic: "exp" | "hyperbolic";
     /** s_r: share of a surplus put into the reserve. */
     sr: number;
     /** f_rep: share of a surplus going to reproduction once the tree is mature; 0 = off. */
@@ -468,6 +473,7 @@ export const defaultParams: Params = {
     mw: 1, // stem maintenance ≈ 5–13% of production (Ryan et al. 1995)
     mf: 0.06, // Q_c = m_f/α ≈ 0.02–0.03 of open sky
     Lh: 60, // the plateau cause: stand trees level off at ≈ 78 cells
+    hydraulic: "exp",
     sr: 0.1,
     fRep: 0, // the alternative plateau cause, off
     maturity: 70,

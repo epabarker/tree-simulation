@@ -2,7 +2,7 @@
 
 _Last updated: 2026-10-28 (M26 done; M27 targets for all ten species, waiting on the user's fits)_
 
-**M26 is done** on `claude/gallant-brown-5k4g33`: form metrics, the §10 measurements, retired presets, shareable lab links and the loupe. **M27's machinery and targets for all ten species are done** (ADR 0020 and its addendum): `analysis/fit/targets/*.toml`, `src/core/trials.ts`, `cli/fit-eval.ts`, `analysis/treesim/fit.py`, the fit and hold-out scripts. **Waiting on the user** to run the fits.
+**M26 is done** on `claude/gallant-brown-5k4g33`: form metrics, the §10 measurements, retired presets, shareable lab links and the loupe. **M27's machinery and targets for all ten species are done** (ADR 0020 and its addendum): `analysis/fit/targets/*.toml`, `src/core/trials.ts`, `cli/fit-eval.ts`, `analysis/treesim/fit.py`, the fit and hold-out scripts. The fits use a hyperbolic hydraulic discount (`r1.hydraulic`, ADR 0021) so height keeps rising; the default and the home forest are unchanged. **Waiting on the user** to run the fits.
 
 ## Works
 - **Core:** C1–C6, R1–R6, O2 and O4 (ADRs 0005–0013); the sky sweep with open or periodic sides; golden hashes. `World.discardDead` for long page runs.
@@ -26,7 +26,7 @@ _Last updated: 2026-10-28 (M26 done; M27 targets for all ten species, waiting on
 - None open.
 
 ## Known issues
-- The l–d slope is ≈ 1, not 2/3 (M26). Height growth levels off early: H30/H60 is 0.64–1.03 for every species, 3.6–4.1 bands above the yield tables for oak, fir and pine (M27). Measured floors (Hagemeier & Leuschner) are darker than hand-tuned beech's and hornbeam's. The lone willow sags after an R1 plateau; the early plateau in all species is structural (L_h can't remove it; [note](experiments/2026-10-28-m27-height-curves.md)). Breakage fires only under storms. R5 reads self-shade by default (the woodland uses the neighbour signal). In the lab, a ring crown's copies show beyond the world's ends on wide screens (as in the garden). Bimodality is marginal; K = 7 puts the crown base ≈ 7 cells low.
+- The l–d slope is ≈ 1, not 2/3 (M26). With the default exponential discount height stalls early in every species (the hand-tuned ones); the hyperbolic form fixes the tail, but juvenile growth is still too fast for oak, pine and fir ([note](experiments/2026-10-28-m27-height-curves.md)). Measured floors (Hagemeier & Leuschner) are darker than hand-tuned beech's and hornbeam's. Breakage fires only under storms. R5 reads self-shade by default (the woodland uses the neighbour signal). In the lab, a ring crown's copies show beyond the world's ends on wide screens (as in the garden). Bimodality is marginal; K = 7 puts the crown base ≈ 7 cells low.
 
 ## Notes for the next session
 - **Node:** this container's default is 22; `npm test` now refuses it. Install 24 (`npm i node@24` in the scratchpad, then put its `bin` first on PATH). Playwright runs under the system Node (`NODE_PATH=$(npm root -g)`).

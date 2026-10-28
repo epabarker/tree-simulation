@@ -179,3 +179,78 @@ describe("calibrated species (M19)", () => {
     expect(thrownShare("oakWood")).toBeGreaterThan(2 * thrownShare("oakOpen"));
   });
 });
+
+describe("the M25 species", () => {
+  it("orders shade tolerance pine, willow < rowan < maple < holly, hornbeam", () => {
+    // ≈ 13% of the sky: rowan waits, the pioneers starve (Pinus and Salix score lowest).
+    expect(shadeHouse("rowan", 3.3).alive).toBe(3);
+    expect(shadeHouse("willow", 3.3).alive).toBe(0);
+    expect(shadeHouse("pine", 3.3).alive).toBe(0);
+    // ≈ 5%: field maple, mid-tolerant, lives; rowan does not.
+    expect(shadeHouse("maple", 4.8).alive).toBe(3);
+    expect(shadeHouse("rowan", 4.8).alive).toBe(0);
+    // ≈ 3%: holly and hornbeam live with beech; maple does not.
+    expect(shadeHouse("holly", 5.6).alive).toBe(3);
+    expect(shadeHouse("hornbeam", 5.6).alive).toBe(3);
+    expect(shadeHouse("maple", 5.6).alive).toBe(0);
+  });
+
+  it("casts deep shade under hornbeam and holly, light shade under pine and willow", () => {
+    const pine = stand("pine");
+    const willow = stand("willow");
+    const hornbeam = stand("hornbeam");
+    const holly = stand("holly");
+    for (const s of [hornbeam, holly]) expect(s.ground).toBeLessThan(0.05);
+    for (const s of [pine, willow]) expect(s.ground).toBeGreaterThan(0.1);
+    // Holly keeps its shaded lower limbs; Scots pine sheds them for a high crown.
+    expect(holly.crownRatio).toBeGreaterThan(0.65);
+    expect(pine.crownRatio).toBeLessThan(0.4);
+  });
+
+  it("grows a broad willow, a round maple, a conical holly, all smaller than beech", () => {
+    const beech = lone("beech");
+    const height = (sp: FloraName) => {
+      const world = grown(1, { trees: [{ x: 80, species: sp }] });
+      world.run(60);
+      return treeMetrics(world.trees[0] as NonNullable<(typeof world.trees)[0]>, world).height;
+    };
+    expect(lone("willow").spread).toBeGreaterThan(1.5);
+    const maple = lone("maple").spread;
+    expect(maple).toBeGreaterThan(0.8);
+    expect(maple).toBeLessThan(1.4);
+    expect(lone("holly").spread).toBeLessThan(0.7);
+    expect(lone("rowan").branchAngle).toBeLessThan(beech.branchAngle - 10);
+    const tall = height("beech");
+    for (const sp of ["holly", "rowan", "willow", "maple"] as const)
+      expect(height(sp)).toBeLessThan(0.8 * tall);
+  });
+
+  it("lets the mixed wood's pioneers give way to beech, with holly and hornbeam beneath", () => {
+    const canopy = (world: World) =>
+      world.trees.filter((t) => t.alive && treeMetrics(t, world).height >= 30);
+    const of = (trees: World["trees"], sp: string[]) =>
+      trees.filter((t) => sp.includes(t.species ?? "")).length;
+    let early = 0;
+    let late = 0;
+    let beech = 0;
+    let shadeBearers = 0;
+    for (const seed of SEEDS) {
+      const world = new World(presetParams("mixedWood", seed));
+      world.run(50);
+      early += of(canopy(world), ["birch", "willow"]);
+      world.run(300);
+      const trees = canopy(world);
+      late += of(trees, ["birch", "willow"]);
+      beech += of(trees, ["beech"]);
+      shadeBearers += of(
+        world.trees.filter((t) => t.alive),
+        ["holly", "hornbeam"],
+      );
+    }
+    // Measured (5 seeds): birch and willow 2.8 canopy trees a run at season 50, 0.6 at 350;
+    // beech 2.6 at 350, the most of any species; holly and hornbeam 4.4 live trees.
+    expect(late).toBeLessThan(0.4 * early);
+    expect(beech).toBeGreaterThanOrEqual(SEEDS.length);
+    expect(shadeBearers).toBeGreaterThanOrEqual(2 * SEEDS.length);
+  });
+});

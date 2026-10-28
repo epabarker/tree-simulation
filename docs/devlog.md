@@ -2,6 +2,40 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-28: garden-v0.10.0 live; M25, six new species and the mixed wood
+
+- **Release:** `garden-v0.10.0` had already been built by the workflow when PR #17 merged. Here the site's `claude/m24-plate` was re-synced from that release (only gzip headers and source maps differed from the local build), and site PR #4 was merged to production.
+- **User:** release 0.10.0 and go on to M25, the new species.
+- **Species** (`flora.ts`; [note](experiments/2026-10-28-m25-species.md)):
+  - **Hornbeam:** Troll's model like beech, but slower and smaller.
+  - **Field maple:** round, with stiff, ascending limbs.
+  - **Holly:** an evergreen cone that keeps its shaded limbs.
+  - **Rowan:** steep limbs.
+  - **Goat willow:** broad, low and short-lived.
+  - **Scots pine** (lab): whorls and a high crown in a stand.
+  - **Shade survival:** willow and pine 19%, rowan 8%, maple 5%, hornbeam and holly 3%, the expected order.
+  - **The small trees mature small** (`r1.maturity` 20–30), so they seed.
+- **Presets:** `mixedWood`, the new home forest (`forestParams`): nine species around the ring, with three birch and a willow pioneering. `pineWood` for the lab. `succession` stays as M19 left it.
+- **The mixed wood over 400 seasons:**
+  - birch leads for a century and is gone by 400;
+  - willow dies out by about 225;
+  - beech rises to the most canopy trees, with hornbeam beside it;
+  - holly, rowan, maple and oak persist.
+- **Page:**
+  - leaf styles and palettes for the six (palmate maple, spiny evergreen holly, pinnate rowan, ovate hornbeam, a broad willow leaf, long pine needles), with light, dark and autumn tokens in `scene.css`;
+  - the lab's leaf menu lists every species;
+  - the daily seeds are re-chosen by eye for the new mix: 9, 10, 12.
+- **Surprises:**
+  - **Opposite buds on every axis** gave maple a floor darker than beech's. Maple is decussate, so only every other pair lies in the plane; it now uses distichous buds.
+  - **Holly overran the wood** at a seed cost of 4. It is dioecious, so a doubled cost now stands in for its fruitless males.
+  - **The lone willow and pine were lollipops** at birch's T_rel 0.4; they now use 0.25 and 0.3.
+  - **This container's Node is 22,** and the goldens fail under it (they pass on 24, as in CI). Node 24 was installed from npm into the scratchpad.
+- **Not done:**
+  - the new species' tolerance scores are approximate (esapubs.org is unreachable from the session);
+  - maple's shade is a little dark;
+  - willow does not return after its first generation.
+- **Tests:** 217 pass (4 new species tests, 1 leaf-style test); goldens unchanged. Garden 55.3 kB gzip (main 54.0).
+
 ## 2026-10-28: garden-v0.9.0 live; M24, the wide plate and leaf studies
 
 - **Release:** PR #16 merged and `garden-v0.9.0` released; site PR #3 merged and deployed. The live time-lapse grows from seed 6.

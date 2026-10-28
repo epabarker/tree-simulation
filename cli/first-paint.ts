@@ -22,9 +22,10 @@ import { World } from "../src/core/world.ts";
 const WIDTHS = [66, 100, 160, 220];
 /**
  * One forest a day, in turn (a returning visitor sees another): chosen by eye from twelve, at 220
- * cells, for rounded crowns and a broad oak or two among the birches (M21 art pass).
+ * cells, for rounded crowns and a mix of kinds, broad oaks and maples among birch and willow, with
+ * holly and hornbeam coming up beneath (M21 art pass; re-chosen for M25's mixed wood).
  */
-const SEEDS = [6, 9, 10];
+const SEEDS = [9, 10, 12];
 /**
  * As old as the intro grows a forest (40 seasons): a young closed wood with full crowns. At 60 the
  * stand has self-thinned into tall poles with small crowns, true to a stand but less handsome.

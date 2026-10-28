@@ -348,6 +348,14 @@ export class Panel {
       broadleaf: "broadleaf",
       "needles (conifer)": "needle",
       "small (birch)": "small",
+      oak: "oak",
+      beech: "beech",
+      hornbeam: "hornbeam",
+      "field maple": "maple",
+      holly: "holly",
+      rowan: "rowan",
+      "goat willow": "willow",
+      "Scots pine": "pine",
       "large (tropical)": "large",
     };
     viewFolder.addBinding(view, "leafStyle", { label: "leaf style", options: leafOptions });

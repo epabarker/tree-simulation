@@ -17,8 +17,13 @@
  * - **Life history** (O4): birch makes many small wind-borne seeds that need open ground and dies
  *   young; oak and beech make few heavy seeds that land close, and beech establishes in shade.
  *
+ * M25 (docs/experiments/2026-10-28-m25-species.md) adds hornbeam, field maple, holly, rowan and
+ * goat willow, fitted the same way, and Scots pine. Their survival lights run from willow and pine
+ * (≈ 19%) through rowan (8%) and maple (5%) to hornbeam and holly (3%), in Niinemets & Valladares's
+ * order; holly and hornbeam cast the deepest shade, pine and willow the lightest.
+ *
  * Labels are the field guide's: a common name, a Latin name and the leaf style the page draws.
- * Conifer (fir) is a lab species; the home forest mixes birch, oak and beech.
+ * Fir and pine are lab species; the home forest (`mixedWood`) mixes the other nine.
  */
 
 import type { PaLevel, SpeciesPatch } from "./params.ts";
@@ -134,6 +139,160 @@ export const FLORA = {
     },
     r6: { enabled: true, qMin: 0.02, leafArea: 2.4 },
     o4: { cSeed: 6, d: 25, qEst: 0.02, pEst: 0.3, m0: 0.002 },
+  },
+  /** Shade-tolerant, slower than beech: a dense, rounded crown of fine, ascending limbs. */
+  hornbeam: {
+    common: "Hornbeam",
+    latin: "Carpinus betulus",
+    leaf: "hornbeam",
+    c5: { enabled: true, T: 0.01, Trel: 0.02 },
+    r1: { mf: 0.04, Lh: 50 },
+    // Troll's model, like beech (Hallé et al. 1978), with weaker apical control.
+    r2: {
+      enabled: true,
+      aC: 20,
+      dLambda: 0.05,
+      ramp: 20,
+      levels: [
+        level({ lambda: 0.51, setPoint: 30, eta: 0.4, postureSetPoint: 0 }),
+        level({ lambda: 0.5, setPoint: 50, eta: 0.4, branchAngle: 45 }),
+        level({ lambda: 0.5, setPoint: 75, eta: 0.4, branchAngle: 45 }),
+      ],
+    },
+    r3: { c: 0.15, betaG: 0.2 },
+    r6: { enabled: true, qMin: 0.03, leafArea: 2.3 },
+    // Winged nutlets on the wind, a little further than beechmast.
+    o4: { cSeed: 5, d: 20, qEst: 0.04, pEst: 0.3, m0: 0.003 },
+  },
+  /** Mid-tolerant small tree: opposite buds, a low, rounded, dense crown. */
+  maple: {
+    common: "Field maple",
+    latin: "Acer campestre",
+    leaf: "maple",
+    c3: { mode: "bh", lambda: 0.5, alpha: 3.2 },
+    c5: { enabled: true, T: 0.02, Trel: 0.06 },
+    r1: { mf: 0.05, Lh: 45, maturity: 30 },
+    // Maple's buds are opposite and decussate: each pair turns 90° from the last, so only every
+    // other pair lies in the plane. That is one bud a node, as distichous gives; the "opposite"
+    // generator doubled the in-plane buds and cast a floor darker than beech's.
+    r2: {
+      enabled: true,
+      aC: 12,
+      dLambda: 0.06,
+      ramp: 15,
+      levels: [
+        level({ lambda: 0.52, setPoint: 0, eta: 0.25 }),
+        level({ lambda: 0.5, setPoint: 45, eta: 0.3, branchAngle: 45 }),
+        level({ lambda: 0.5, setPoint: 65, eta: 0.25, branchAngle: 45 }),
+      ],
+    },
+    // Hard, dense wood (as oak's): ascending limbs hold a rounded crown instead of sagging flat.
+    r3: { E: 2.5e6, c: 0.15, betaG: 0.2 },
+    r6: { enabled: true, qMin: 0.045, leafArea: 1.8 },
+    o4: { cSeed: 5, d: 25, qEst: 0.05, pEst: 0.3, m0: 0.004 },
+  },
+  /** Evergreen understorey tree: a deep, dark, conical crown that keeps its lower limbs in shade. */
+  holly: {
+    common: "Holly",
+    latin: "Ilex aquifolium",
+    leaf: "holly",
+    c3: { mode: "bh", lambda: 0.5, alpha: 2.6 },
+    c5: { enabled: true, T: 0.01, Trel: 0.02 },
+    c6: { enabled: true, r0: 0.026 },
+    // Evergreen leaves live several years, so their yearly cost is low; a short tree.
+    r1: { mf: 0.03, Lh: 25, maturity: 30 },
+    r2: {
+      enabled: true,
+      levels: [
+        level({ lambda: 0.52, setPoint: 0, eta: 0.4 }),
+        level({ lambda: 0.5, setPoint: 70, eta: 0.35, branchAngle: 60 }),
+        level({ lambda: 0.5, setPoint: 75, eta: 0.25, branchAngle: 45 }),
+      ],
+    },
+    r3: { c: 0.15, betaG: 0.2 },
+    r6: { enabled: true, qMin: 0.03, leafArea: 2.6 },
+    // Berries carried by thrushes; seedlings establish under trees and hedges. Holly is dioecious,
+    // so only about half the trees fruit: twice the seed cost stands in for that.
+    o4: { cSeed: 8, d: 40, qEst: 0.03, pEst: 0.3, m0: 0.003 },
+  },
+  /** Light-demanding small tree: steep, ascending limbs and an open, oval crown. */
+  rowan: {
+    common: "Rowan",
+    latin: "Sorbus aucuparia",
+    leaf: "rowan",
+    c3: { mode: "bh", lambda: 0.5, alpha: 3.6 },
+    c5: { enabled: true, T: 0.05, Trel: 0.2 },
+    c6: { enabled: true, r0: 0.026 },
+    r1: { mf: 0.08, Lh: 38, maturity: 25 },
+    r2: {
+      enabled: true,
+      aC: 12,
+      dLambda: 0.05,
+      ramp: 20,
+      levels: [
+        level({ lambda: 0.54, setPoint: 0, eta: 0.3 }),
+        level({ lambda: 0.52, setPoint: 40, eta: 0.35, branchAngle: 35 }),
+        level({ lambda: 0.5, setPoint: 60, eta: 0.25, branchAngle: 40 }),
+      ],
+    },
+    r4: { qRel: 0.25 },
+    r6: { enabled: true, qMin: 0.06, leafArea: 1.5 },
+    // Berries carried far by birds; seedlings wait in light shade, saplings need a gap.
+    o4: { cSeed: 3, d: 50, qEst: 0.06, pEst: 0.3, m0: 0.006 },
+  },
+  /** Pioneer: the most light-demanding, short-lived, a broad, many-limbed crown. */
+  willow: {
+    common: "Goat willow",
+    latin: "Salix caprea",
+    leaf: "willow",
+    c3: { mode: "bh", lambda: 0.5, alpha: 5.5 },
+    // Sheds less than birch: limbs stay low on a short, stout stem.
+    c5: { enabled: true, T: 0.1, Trel: 0.25 },
+    c6: { enabled: true, r0: 0.03 },
+    r1: { mf: 0.12, Lh: 30, maturity: 20 },
+    // Weak apical control from early on: the stem soon divides into several spreading limbs.
+    r2: {
+      enabled: true,
+      aC: 6,
+      dLambda: 0.07,
+      ramp: 10,
+      levels: [
+        level({ lambda: 0.52, setPoint: 0, eta: 0.25 }),
+        level({ lambda: 0.5, setPoint: 55, eta: 0.25, branchAngle: 50 }),
+        level({ lambda: 0.49, setPoint: 70, eta: 0.2, branchAngle: 45 }),
+      ],
+    },
+    r4: { qRel: 0.3 },
+    r6: { enabled: true, qMin: 0.15, leafArea: 1.5 },
+    // Tiny plumed seeds blow far but need bare, lit ground; a short life.
+    o4: { cSeed: 1.5, d: 60, qEst: 0.3, pEst: 0.3, m0: 0.012 },
+  },
+  /** Light-demanding pine, Rauh's model: whorls, a clean bole and a high crown (a lab species). */
+  pine: {
+    common: "Scots pine",
+    latin: "Pinus sylvestris",
+    leaf: "pine",
+    c3: { mode: "bh", lambda: 0.5, alpha: 3.8 },
+    // Sheds hard in a stand (a high crown on a clean bole), yet keeps low limbs in the open.
+    c5: { enabled: true, T: 0.1, Trel: 0.3 },
+    c6: { enabled: true, r0: 0.03 },
+    r1: { mf: 0.09, Lh: 60 },
+    // Strong apical control while young, fading late: old pines' crowns flatten.
+    r2: {
+      enabled: true,
+      aC: 30,
+      dLambda: 0.06,
+      ramp: 30,
+      levels: [
+        level({ lambda: 0.51, setPoint: 0, eta: 0.4, generator: "whorled" }),
+        level({ lambda: 0.51, setPoint: 75, eta: 1.5, branchAngle: 70 }),
+        level({ lambda: 0.5, setPoint: 80, eta: 0.4, branchAngle: 45 }),
+      ],
+    },
+    r4: { qRel: 0.3 },
+    r6: { enabled: true, qMin: 0.15, leafArea: 1.4 },
+    // Winged seeds from cones; seedlings need open ground.
+    o4: { cSeed: 3, d: 40, qEst: 0.3, pEst: 0.3, m0: 0.003 },
   },
 } satisfies Record<string, SpeciesPatch>;
 

@@ -213,6 +213,23 @@ const flora = (name: FloraName, xs: number[]) => xs.map((x) => ({ x, species: na
 
 const RING: Params["world"] = { width: 210, height: 130, walls: [], sides: "periodic" };
 
+/**
+ * The mixed wood's planting (M25), one tree every 21 cells: three birch and a goat willow
+ * pioneering, with one of each of the others, spaced so no two of a kind stand side by side.
+ */
+const MIXED = [
+  "birch",
+  "oak",
+  "willow",
+  "beech",
+  "birch",
+  "hornbeam",
+  "rowan",
+  "birch",
+  "holly",
+  "maple",
+] as const;
+
 const STAND_X = [20, 41, 62, 83, 104, 125, 146, 167, 188, 209].map((x) => ({ x }));
 
 export const presets = {
@@ -514,6 +531,33 @@ export const presets = {
       ...WOODLAND,
     },
   },
+  pineWood: {
+    leaf: "pine",
+    label: "M25: a Scots pine wood",
+    description:
+      "Pinus sylvestris: light-demanding whorled pines that shed their lower limbs, high crowns over a light floor (a lab species).",
+    patch: {
+      world: { width: 230, height: 160, walls: [] },
+      trees: flora(
+        "pine",
+        STAND_X.map((t) => t.x),
+      ),
+      ...WOODLAND,
+    },
+  },
+  mixedWood: {
+    label: "M25: a mixed wood",
+    description:
+      "Nine native species around a ring: birch and goat willow pioneer, rowan and field maple fill gaps, holly and hornbeam wait beneath, and beech and oak take the canopy.",
+    patch: {
+      world: RING,
+      trees: [10, 31, 52, 73, 94, 115, 136, 157, 178, 199].map((x, i) => ({
+        x,
+        species: MIXED[i] as string,
+      })),
+      ...WOODLAND,
+    },
+  },
   succession: {
     label: "M19: succession, birch to beech",
     description:
@@ -566,22 +610,19 @@ export function isPresetName(name: string): name is PresetName {
   return Object.hasOwn(presets, name);
 }
 
-/** Planted species around the ring (M19): half birch pioneers, with oak and beech among them. */
-const PLANTING = ["birch", "oak", "birch", "beech"] as const;
-
 /**
- * The `succession` woodland (M19) on a ring `width` cells wide, with a tree every ≈ 21 cells: about
+ * The `mixedWood` woodland (M25) on a ring `width` cells wide, with a tree every ≈ 21 cells: about
  * as wide as the host is wide relative to the world's height, so a phone gets a narrower forest.
- * The seed turns the planting pattern, so each forest starts from a different mix.
+ * The seed turns the planting pattern (`MIXED`), so each forest starts from a different mix.
  */
 export function forestParams(width = 210, seed?: number): Params {
-  const base = presetParams("succession", seed);
+  const base = presetParams("mixedWood", seed);
   // A phone in portrait gets a narrow ring of two or three trees, drawn large (D1).
   const W = Math.round(Math.min(520, Math.max(54, width)));
   const n = Math.max(2, Math.round(W / 21));
   const trees = Array.from({ length: n }, (_, k) => ({
     x: ((k + 0.5) * W) / n,
-    species: PLANTING[(k + base.seed) % PLANTING.length] as string,
+    species: MIXED[(k + base.seed) % MIXED.length] as string,
   }));
   return mergeParams(base, { world: { ...base.world, width: W }, trees });
 }

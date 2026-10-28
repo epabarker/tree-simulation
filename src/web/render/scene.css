@@ -14,7 +14,8 @@
     --bark-old: #4c3d31;
     --leaf-shade: #35502a;
     --leaf-sun: #a3cf5b;
-    /* Species foliage (render/leaf-styles.ts): fir needles, birch, Terminalia, oak, beech. */
+    /* Species foliage (render/leaf-styles.ts): fir needles, birch, Terminalia, oak, beech, and
+       M25's hornbeam, field maple, holly, rowan, goat willow and Scots pine. */
     --needle-shade: #1f3b2c;
     --needle-sun: #5d8a5a;
     --birch-leaf-shade: #4a6a2a;
@@ -25,6 +26,18 @@
     --oak-leaf-sun: #8bb44e;
     --beech-leaf-shade: #2c4a22;
     --beech-leaf-sun: #9ccc4e;
+    --hornbeam-leaf-shade: #2e4a24;
+    --hornbeam-leaf-sun: #95c24f;
+    --maple-leaf-shade: #34502a;
+    --maple-leaf-sun: #a3c95a;
+    --holly-leaf-shade: #17331f;
+    --holly-leaf-sun: #3f6b3a;
+    --rowan-leaf-shade: #35512a;
+    --rowan-leaf-sun: #9cc455;
+    --willow-leaf-shade: #4a5f3a;
+    --willow-leaf-sun: #b2c483;
+    --pine-needle-shade: #23402f;
+    --pine-needle-sun: #6a8f6a;
     --ghost: #9a8f80;
     --wall: rgba(90, 90, 100, 0.35);
     /* Autumn (M17): what each foliage turns to before it falls. */
@@ -38,6 +51,18 @@
     --oak-leaf-autumn-sun: #c98a3a;
     --beech-leaf-autumn-shade: #7a3412;
     --beech-leaf-autumn-sun: #d9772b;
+    --hornbeam-leaf-autumn-shade: #7a5a14;
+    --hornbeam-leaf-autumn-sun: #d9a83a;
+    --maple-leaf-autumn-shade: #94740f;
+    --maple-leaf-autumn-sun: #f0cd3c;
+    --holly-leaf-autumn-shade: #16301d;
+    --holly-leaf-autumn-sun: #3b6536;
+    --rowan-leaf-autumn-shade: #8a2a12;
+    --rowan-leaf-autumn-sun: #e2522a;
+    --willow-leaf-autumn-shade: #80722a;
+    --willow-leaf-autumn-sun: #d6c25a;
+    --pine-needle-autumn-shade: #213b2b;
+    --pine-needle-autumn-sun: #628763;
   }
 
   @media (prefers-color-scheme: dark) {
@@ -60,6 +85,18 @@
       --oak-leaf-sun: #789e44;
       --beech-leaf-shade: #263f1d;
       --beech-leaf-sun: #88b445;
+      --hornbeam-leaf-shade: #28401f;
+      --hornbeam-leaf-sun: #80a744;
+      --maple-leaf-shade: #2d4524;
+      --maple-leaf-sun: #8cad4d;
+      --holly-leaf-shade: #142c1b;
+      --holly-leaf-sun: #365c32;
+      --rowan-leaf-shade: #2e4624;
+      --rowan-leaf-sun: #86a949;
+      --willow-leaf-shade: #405232;
+      --willow-leaf-sun: #99a971;
+      --pine-needle-shade: #1e3728;
+      --pine-needle-sun: #5b7b5b;
       --ghost: #6f6a62;
       --wall: rgba(160, 160, 175, 0.25);
     }
@@ -84,6 +121,18 @@
     --oak-leaf-sun: #789e44;
     --beech-leaf-shade: #263f1d;
     --beech-leaf-sun: #88b445;
+    --hornbeam-leaf-shade: #28401f;
+    --hornbeam-leaf-sun: #80a744;
+    --maple-leaf-shade: #2d4524;
+    --maple-leaf-sun: #8cad4d;
+    --holly-leaf-shade: #142c1b;
+    --holly-leaf-sun: #365c32;
+    --rowan-leaf-shade: #2e4624;
+    --rowan-leaf-sun: #86a949;
+    --willow-leaf-shade: #405232;
+    --willow-leaf-sun: #99a971;
+    --pine-needle-shade: #1e3728;
+    --pine-needle-sun: #5b7b5b;
     --ghost: #6f6a62;
     --wall: rgba(160, 160, 175, 0.25);
   }

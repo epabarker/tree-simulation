@@ -32,6 +32,9 @@ from treesim.sweep import REPO
 
 TARGETS = REPO / "analysis" / "fit" / "targets"
 TRIALS = ["lone", "stand"]
+#: Light a seedling that dies under every roof of the shade house is taken to need: above the
+#: lightest roof (≈ 61%), so the loss still ranks how far a candidate is from surviving.
+NO_SURVIVAL_LIGHT = 0.7
 #: Loss added for each lone tree that dies, and for each fifth of a stand's interior lost.
 DEATH_PENALTY = 25.0
 #: Loss for a trait that could not be measured (a tree with no limbs to measure, say).
@@ -50,6 +53,16 @@ class Spec:
     @property
     def paths(self) -> list[str]:
         return [p["path"] for p in self.params]
+
+    @property
+    def trials(self) -> list[str]:
+        """The trials its traits need: the stand runs on to season 100 for stand.lateShare, and the
+        shade house runs only for shade.survivalLight (each costs time)."""
+        names = {t["name"] for t in self.traits}
+        trials = ["lone", "stand100" if "stand.lateShare" in names else "stand"]
+        if any(n.startswith("shade.") for n in names):
+            trials.append("shade")
+        return trials
 
 
 def load_spec(species: str) -> Spec:
@@ -154,7 +167,8 @@ def encode(spec: Spec, values: dict[str, float | None]) -> np.ndarray:
 
 
 def seed_traits(reply: dict) -> dict[str, float | None]:
-    """Flat traits of one seed's reply, `trial.trait`, with derived ones (lone.earlyShare)."""
+    """Flat traits of one seed's reply, `trial.trait`, with derived ones: lone.earlyShare (H30/H60),
+    stand.lateShare (H100/H60) and shade.survivalLight (the lowest light the seedling survives)."""
     flat: dict[str, float | None] = {}
     for trial in TRIALS:
         for rec in reply.get(trial, []):
@@ -163,6 +177,11 @@ def seed_traits(reply: dict) -> dict[str, float | None]:
                 flat[f"{trial}.{k}"] = None if v is None else float(v)
     h30, h60 = flat.get("lone.height30"), flat.get("lone.height60")
     flat["lone.earlyShare"] = h30 / h60 if h30 is not None and h60 else None
+    s60, s100 = flat.get("stand.height"), flat.get("stand.height100")
+    flat["stand.lateShare"] = s100 / s60 if s100 is not None and s60 else None
+    if "shade" in reply:
+        lit = [reply["light"][roof] for roof, alive in reply["shade"].items() if alive[0]]
+        flat["shade.survivalLight"] = min(lit) if lit else NO_SURVIVAL_LIGHT
     return flat
 
 
@@ -195,7 +214,7 @@ def loss(spec: Spec, traits: dict[str, float | None]) -> float:
 def measure(pool: Pool, spec: Spec, assigns: list[dict], seeds: list[int]) -> list[dict]:
     """Seed-mean traits of each candidate, every (candidate, seed) a request of its own."""
     requests = [
-        {"species": spec.species, "assign": a, "seeds": [s], "trials": TRIALS}
+        {"species": spec.species, "assign": a, "seeds": [s], "trials": spec.trials}
         for a in assigns
         for s in seeds
     ]

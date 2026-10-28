@@ -7,7 +7,8 @@
  *   {"id": 1, "species": "birch", "assign": {"c3.alpha": 4.2}, "seeds": [1, 2],
  *    "trials": ["lone", "stand", "shade"], "roofs": [2.6, 4]}
  *     → {"id": 1, "lone": [traits per seed], "stand": [...], "shade": {"2.6": [alive per seed]},
- *        "light": {"2.6": light}, "ms": 812}      ("release" adds the felled-gap trial, M10)
+ *        "light": {"2.6": light}, "ms": 812}      ("release" adds the felled-gap trial, M10;
+ *                                                  "stand100" runs the stand on to season 100)
  *   {"id": 2, "describe": "birch", "paths": ["c3.alpha", "r2.levels.1.setPoint"]}
  *     → {"id": 2, "values": {"c3.alpha": 4, ...}}        (what the species grows by now)
  *   {"id": 3, "amend": "birch", "assign": {...}}
@@ -34,7 +35,7 @@ interface Request {
   species?: string;
   assign?: Record<string, unknown>;
   seeds?: number[];
-  trials?: ("lone" | "stand" | "shade" | "release")[];
+  trials?: ("lone" | "stand" | "stand100" | "shade" | "release")[];
   roofs?: number[];
   describe?: string;
   paths?: string[];
@@ -63,6 +64,8 @@ function handle(req: Request): Record<string, unknown> {
   const out: Record<string, unknown> = { id: req.id };
   if (trials.includes("lone")) out.lone = seeds.map((s) => runLone(species, s, assign));
   if (trials.includes("stand")) out.stand = seeds.map((s) => runStand(species, s, assign));
+  // The stand run on to season 100: its traits at 60, and height100 (ADR 0021, 0022).
+  if (trials.includes("stand100")) out.stand = seeds.map((s) => runStand(species, s, assign, true));
   if (trials.includes("release")) out.release = seeds.map((s) => runRelease(species, s, assign));
   if (trials.includes("shade")) {
     const shade: Record<string, boolean[]> = {};

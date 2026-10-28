@@ -5,7 +5,8 @@
  * woodland's growth rules without recruitment or storms (`oakOpen`), and
  *
  * - lone: one tree on 160 × 160, open-grown, measured at seasons 30 and 60;
- * - stand: ten trees 21 cells apart on 230 × 160, interior trees 2–7 measured at season 60;
+ * - stand: ten trees 21 cells apart on 230 × 160, interior trees 2–7 measured at season 60 (and,
+ *   when asked, again at season 100: how much height they gain late, against yield tables);
  * - shade: a seedling under a roof one cell thick across a 40-cell ring, alive at season 30;
  * - release: the stand with its middle tree felled at season 40 (M10's test): the epicormic
  *   shoots on its two neighbours and how far their crowns lean into the gap over 10 seasons.
@@ -173,6 +174,8 @@ export interface StandTraits {
   /** Light on the floor under the interior, a fraction of open sky. */
   floor: number;
   widestAt: number;
+  /** Mean interior height at season 100, when the stand is run on (`late`); else absent. */
+  height100?: number;
 }
 
 const mean = (xs: number[]): number =>
@@ -182,13 +185,14 @@ export function runStand(
   species: string,
   seed: number,
   assign: Record<string, unknown> = {},
+  late = false,
 ): StandTraits {
   const world = new World(withAssign(standParams(species, seed), species, assign));
   world.run(60);
   const interior = world.trees.slice(2, -2);
   const live = interior.filter((t) => t.alive);
   const ms = live.map((t) => treeMetrics(t, world));
-  return {
+  const traits: StandTraits = {
     alive: live.length / interior.length,
     height: mean(ms.map((m) => m.height)),
     slenderness: mean(ms.map((m) => m.slenderness)),
@@ -196,6 +200,12 @@ export function runStand(
     floor: groundLight(world, 50, 180),
     widestAt: mean(live.map((t) => formMetrics(t, world.paramsOf(t)).widestAt)),
   };
+  if (late) {
+    world.run(40);
+    const still = interior.filter((t) => t.alive);
+    traits.height100 = mean(still.map((t) => treeMetrics(t, world).height));
+  }
+  return traits;
 }
 
 /** Whether the seedling lives to season 30 under the roof, and the light it gets there. */

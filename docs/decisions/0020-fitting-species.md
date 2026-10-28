@@ -42,3 +42,13 @@ The user agreed the plan (2026-10-28):
   - the mixed wood with every fitted woodland patch at once;
   - fir and pine in their own woods, since the mixed wood leaves them out.
 
+## Addendum (2026-10-28): shade survival and late growth enter the fit
+- **What round 1 showed** ([note](../experiments/2026-10-28-m27-fits.md)): fitting on form alone let shade tolerance drift (Spearman ρ −0.98 → −0.90; holly lost most of its tolerance). It also left height after season 60 unchecked: fitted pine and fir grew to the world's top by season 150.
+- **Survival light is fitted** for the four species with measured sapling minimum light (Hagemeier & Leuschner 2019):
+  - birch, oak, beech and hornbeam;
+  - the trait is `shade.survivalLight`, at full weight; the shade house runs in their fits.
+  - The hold-out keeps the other six's survival bands and the Spearman order over all ten. That test is weaker than before, since four of its ten points are now fitted.
+- **Late growth is fitted:** the stand runs on to season 100 for every species, and `stand.lateShare` (mean height at 100 over that at 60) is a target, from yield tables where they exist.
+- **The juvenile height h_j** (ADR 0022) is free for every species, on 2–150 cells (log).
+- **Unchanged:** the mixed wood, allometry, release and the lab woods stay held out.
+

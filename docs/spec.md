@@ -155,9 +155,9 @@ I found no study testing a vertical-plane tree model against 3D. Forestry reduce
 1. **Statement.** Each meristem carries a physiological age (pa); a lookup by pa gives orientation, set-point, branching, λ, rhythm and terminal-flowering probability.
 2. **Biology.** Architecture is described by models, physiological age, ontogenetic stages and reiteration (Barthélémy & Caraglio 2007).\[18\] Hallé and Oldeman (1970; Hallé et al. 1978) grouped trees into 23 models from binary choices: monopodial/sympodial, rhythmic/continuous, orthotropic/plagiotropic, terminal/lateral flowering.\[19\]\[20\] Examples: Rauh (rhythmic, orthotropic; *Hevea*, *Pinus*); Massart (orthotropic trunk, tiers of plagiotropic branches; "*Abies* type"); Roux (Massart-like but continuous; *Coffea arabica*); Troll (plagiotropic axes straightening secondarily; "*Fagus* type").\[19\]\[21\] AMAPsim formalizes physiological age (Barczi et al. 2008).\[22\] Palubicki et al. show removing apical control turns an excurrent young tree decurrent.\[2\]
 3. **Evidence.** Well established as description; mechanisms partial.
-4. **Local rule.** pa_child = pa_parent + Δpa(order, position, tree age); params = Table[pa]. Sympodial: terminal bud terminates with p_term(pa) **[RNG]**; distal laterals take over. Acrotony: v × exp(κ(pos−1)). Ontogeny: λ declines after age a_c.
+4. **Local rule.** pa_child = pa_parent + Δpa(order, position, tree age); params = Table[pa]. Sympodial: terminal bud terminates with p_term(pa) **[RNG]**; distal laterals take over. Acrotony: v × exp(κ(pos−1)). Ontogeny: λ declines after age a_c; a juvenile phase caps every shoot at 1 + (n_max − 1)·min(1, H/h_j) metamers, H the tree's height, so shoots lengthen as a seedling grows (ADR 0022).
 5. **2D translation.** Direct; orthotropic/plagiotropic = vertical/horizontal.
-6. **Parameters.** pa table (2–4 levels), Δpa, κ, p_term, a_c.
+6. **Parameters.** pa table (2–4 levels), Δpa, κ, p_term, a_c, h_j.
 7. **Feedback.** Modulates loops B and D.
 8. **Module boundary.** Switchable (one level = baseline).
 9. **Multi-tree.** Indirect.

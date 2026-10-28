@@ -110,9 +110,18 @@ weight = 0.25
 kind = "described"
 source = "limbs that arch a little at the tips"
 
+[[trait]]
+name = "stand.lateShare"
+target = 1.3
+band = 0.1
+weight = 0.5
+kind = "described"
+source = "stand height at 100 over height at 60: canopy maples reach 24.6–26.4 m at 88–102 years against a mean of 16.1 m at 63 across the inventory (LWF Wissen 77); an estimate"
+
 # Free parameters: dotted paths into the species' patch, with bounds (literature review §4,
 # ROADMAP calibration table). log = true searches the bound's log scale. L_h spans 10–200 for
 # every species: the hyperbolic discount needs larger values than the exponential (ADR 0021).
+# r2.hJ is the juvenile height (ADR 0022): shoots lengthen as the tree grows to it.
 [[param]]
 path = "c3.alpha"
 lo = 2.5
@@ -185,6 +194,11 @@ log = true
 path = "r6.leafArea"
 lo = 1
 hi = 3
+[[param]]
+path = "r2.hJ"
+lo = 2
+hi = 150
+log = true
 
 # Assignments every candidate carries unchanged (analysis/treesim/fit.py).
 [fixed]

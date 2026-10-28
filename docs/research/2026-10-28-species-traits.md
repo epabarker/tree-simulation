@@ -149,6 +149,15 @@ Every hand-tuned value lies inside its bounds.
 - **Birch's seedlings are too tolerant** for the measured survival band: the model's birch survives 13%, Hagemeier & Leuschner's saplings need 21%. That is a hold-out, so the fit will not see it.
 - **Rowan's** open-grown stem is slender (H/D 68).
 
+### Added after round 1 (2026-10-28)
+- **`shade.survivalLight`** (fitted, weight 1): birch 0.21 ± 0.05, oak 0.114 ± 0.03, beech 0.034 ± 0.01, hornbeam 0.033 ± 0.01. These are the saplings' minimum light demand (Hagemeier & Leuschner 2019). The shade house's roofs give survival lights in steps of about 2–19%, which the seed mean smooths.
+- **`stand.lateShare`** (stand height at 100 over that at 60):
+  - **Measured:** oak 1.31 ± 0.06, pine 1.28 ± 0.06 and beech 1.43 ± 0.06 (NW-FVA classes 1–2); hornbeam 1.23 ± 0.05 (Lockow, SI 25–27).
+  - **Measured, half weight:** fir 1.53 ± 0.08 (Tirol, mountain); willow 1.08 ± 0.06 (Paramonov, extrapolated).
+  - **Estimated, half weight:** rowan 1.09 and holly 1.22 (fitted curves); birch 1.12 (early culmination); maple 1.3 ± 0.1 (canopy maples against the inventory mean, LWF Wissen 77).
+- **Fir's H30/H60** goes to half weight (a mountain table).
+- **`r2.hJ`,** the juvenile height (ADR 0022), is free on 2–150 cells, log scale, for every species.
+
 ## Held out (never in the loss)
 - **Shade survival:** the lowest light at which every seedling lives through 30 seasons. Birch 15–25%, beech 2.5–4.5% (saplings' minimum light demand, Hagemeier & Leuschner 2019; revised from 10–15% and 1–3%), in the order of Niinemets & Valladares's tolerance scores (2.03 and 4.56; M25 note).
 - **The mixed wood:** birch leads for about a century and fades; beech ends with the most canopy trees (M25 note).

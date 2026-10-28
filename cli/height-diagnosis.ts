@@ -6,7 +6,8 @@
  * 1. willow's height at seasons 30 and 60 with one cause switched off at a time;
  * 2. the topmost metamers at each willow's peak: shed by season 60, or still there and lower (sag);
  * 3. every species' H30/H60, lone and stand top, at its own L_h and at L_h 100 and 200;
- * 4. stand top heights under the exponential and the hyperbolic discount, beside yield tables.
+ * 4. stand top heights under the exponential and the hyperbolic discount, and with the juvenile
+ *    phase (h_j 80, ADR 0022), beside yield tables.
  *
  *   node cli/height-diagnosis.ts            # about two minutes
  */
@@ -163,9 +164,12 @@ function standTop(sp: string, assign: Record<string, unknown>): string {
   return hs.map((h) => mean(h).toFixed(1)).join(", ");
 }
 
-/** ADR 0021: the exponential discount against the hyperbolic one, beside the yield tables. */
+/**
+ * ADR 0021–0022: the exponential discount against the hyperbolic one, then with the juvenile
+ * phase (h_j 80), beside the yield tables.
+ */
 function hyperbolic(): void {
-  console.log("\n4. stand top height (m) at seasons 30, 60, 100: exp (as tuned) and 1/(1 + L/L_h)");
+  console.log("\n4. stand top height (m) at seasons 30, 60, 100: exp, 1/(1 + L/L_h), and with h_j");
   const cases: [string, number, string][] = [
     ["hornbeam", 100, "14.2, 21.2, 26.0 (Lockow & Lockow 2009, SI 26)"],
     ["pine", 100, "13.8, 22.8, 29.0 (NW-FVA class 1)"],
@@ -177,8 +181,10 @@ function hyperbolic(): void {
   for (const [sp, lh, table] of cases) {
     const exp = standTop(sp, {});
     const hyp = standTop(sp, { "r1.hydraulic": "hyperbolic", "r1.Lh": lh });
+    const juv = standTop(sp, { "r1.hydraulic": "hyperbolic", "r1.Lh": lh, "r2.hJ": 80 });
     console.log(
-      `   ${sp.padEnd(9)} exp ${exp}  |  hyperbolic L_h ${lh}: ${hyp}  |  table ${table}`,
+      `   ${sp.padEnd(9)} exp ${exp}  |  hyperbolic L_h ${lh}: ${hyp}  |  with h_j 80: ${juv}` +
+        `  |  table ${table}`,
     );
   }
 }

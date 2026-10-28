@@ -2,6 +2,28 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-28: M27 round 1, and the juvenile phase (ADR 0022)
+
+- **Round 1** ([note](experiments/2026-10-28-m27-fits.md)): the user ran all ten fits (1 h 51 min).
+  - Nine beat their hand-tuned patch, most by 5–80×. Holly tied (2.43 against 2.30); fir stayed high (11.3).
+  - **The hold-out:**
+    - shade tolerance drifted (Spearman −0.98 → −0.90; holly 8.5% against 2–5%);
+    - the fitted mixed wood lost willow and rowan, and holly and oak were down to 0.17 trees a run;
+    - fitted fir and pine reached the world's top (160 cells) by season 150.
+  - **Kept** in `docs/experiments/fits/round1/` with `round1` figures.
+- **User:** move shade survival into the fit for the four measured species, and do the juvenile-phase model change now.
+- **Juvenile phase** (`r2.hJ`, default off, goldens unchanged; spec §R2.4; ADR 0022):
+  - the shoot cap rises from 1 metamer to `c1.maxMetamersPerShoot` as the tree grows to h_j (`juvenileCap`);
+  - with h_j 80, pine's curve error against its table falls from 0.12 to 0.02, oak's from 0.12 to 0.08 and fir's from 0.27 to 0.11;
+  - three unit tests in `r2-physiological-age.test.ts`.
+- **Fit changes** (ADR 0020 addendum):
+  - `shade.survivalLight` is fitted for birch (21%), oak (11.4%), beech (3.4%) and hornbeam (3.3%);
+  - `stand.lateShare` (H100/H60) for every species, with `runStand(…, late)` and fit-eval's `stand100`;
+  - fir's H30/H60 goes to half weight;
+  - `r2.hJ` is free on 2–150 (log).
+  - Smoke fit of all ten passes. A candidate costs about 1.6× as much.
+- **Fixed:** the round-1 note of a fitted "oak needs 6.3%" was a shade-leaf value; saplings need 11.4%.
+
 ## 2026-10-28: M27, a hyperbolic hydraulic discount (ADR 0021)
 
 - **User:** adjust the model so species stop levelling off early, aiming at realism; leave the home forest unchanged until fitted patches are adopted.

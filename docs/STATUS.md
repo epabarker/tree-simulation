@@ -1,8 +1,8 @@
 # Status
 
-_Last updated: 2026-10-28 (M26 done; M27 targets for all ten species, waiting on the user's fits)_
+_Last updated: 2026-10-28 (M26 done; M27 round 1 fitted, round 2 waiting on the user's run)_
 
-**M26 is done** on `claude/gallant-brown-5k4g33`: form metrics, the §10 measurements, retired presets, shareable lab links and the loupe. **M27's machinery and targets for all ten species are done** (ADR 0020 and its addendum): `analysis/fit/targets/*.toml`, `src/core/trials.ts`, `cli/fit-eval.ts`, `analysis/treesim/fit.py`, the fit and hold-out scripts. The fits use a hyperbolic hydraulic discount (`r1.hydraulic`, ADR 0021) so height keeps rising; the default and the home forest are unchanged. **Waiting on the user** to run the fits.
+**M26 is done** on `claude/gallant-brown-5k4g33`. **M27 round 1** is fitted and held out ([note](experiments/2026-10-28-m27-fits.md); `fits/round1/`). After it, survival light (four species) and late growth (H100/H60) entered the fit (ADR 0020 addendum), and two model changes landed, both off by default: the hyperbolic hydraulic discount (`r1.hydraulic`, ADR 0021) and the juvenile phase (`r2.hJ`, ADR 0022). The home forest is unchanged. **Waiting on the user** to run round 2.
 
 ## Works
 - **Core:** C1–C6, R1–R6, O2 and O4 (ADRs 0005–0013); the sky sweep with open or periodic sides; golden hashes. `World.discardDead` for long page runs.
@@ -18,8 +18,8 @@ _Last updated: 2026-10-28 (M26 done; M27 targets for all ten species, waiting on
 
 ## Next
 1. **The user:** review M26 (the loupe on a phone); say whether to open the PR and release garden-v0.13.0 (tag push is the user's).
-2. **Handoff (the user):** with Node 24 on PATH, run `uv run --project analysis python analysis/experiments/m27_fit.py --species all --skip-done` (≈ 20–40 min a species on 12 cores; `--budget quick` for about a sixth of that). Push `docs/experiments/fits/` (two small files a species).
-3. **Then (session):** `m27_holdout.py` (a few minutes), the M27 note, and the user's decision on adoption (M27b).
+2. **Handoff (the user), round 2:** plugged in, with Node 24 on PATH: `uv run --project analysis python analysis/experiments/m27_fit.py --species all --skip-done --restarts 2,1` (≈ 30 min a species).
+3. **Then (session):** `m27_holdout.py`, round 2 in the M27 note, and the user's decision on adoption (M27b).
 4. **Ideas:** rooting in windthrow; the leaf–section slope against live pipe area (r_live); measured holly and rowan growth curves, and quantum-sensor light under fir and the small trees (their targets are estimates).
 
 ## Open questions (ask when the milestone comes up)

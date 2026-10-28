@@ -296,6 +296,13 @@ export interface Params {
      * pos its node's place in the season's shoot (0 base, 1 tip). 0 or absent: off.
      */
     kappa?: number;
+    /**
+     * h_j, the juvenile phase (ADR 0022): a tree's shoots may carry at most
+     * 1 + (c1.maxMetamersPerShoot − 1)·min(1, H/h_j) metamers' worth of resource, H its height in
+     * cells at the start of the season, so a seedling's shoots start short and lengthen as it grows.
+     * 0 or absent: off (the full cap from the first season).
+     */
+    hJ?: number;
   };
 
   /**

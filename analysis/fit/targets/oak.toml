@@ -8,19 +8,19 @@ species = "oak"
 
 [[trait]]
 name = "stand.height"
-target = 72
-band = 16
+target = 78
+band = 13
 weight = 1
 kind = "measured"
-source = "top height ≈ 16–20 m at 60 years (oak yield classes 4–8; Forestry Commission yield models), mature 25–35 m"
+source = "NW-FVA yield tables (Albert et al. 2021, after Schober), oak yield classes 1–2: top height 18.1–21.0 m at 60 years"
 
 [[trait]]
 name = "lone.earlyShare"
-target = 0.6
-band = 0.1
-weight = 0.5
-kind = "described"
-source = "height at 30 over height at 60: oak's height growth culminates later than birch's, earlier than beech's (yield-model curve shape)"
+target = 0.62
+band = 0.05
+weight = 1
+kind = "measured"
+source = "height at 30 over height at 60: 0.59–0.65 over oak yield classes −1 to 2 (NW-FVA yield tables (Albert et al. 2021, after Schober))"
 
 [[trait]]
 name = "lone.spread"
@@ -56,11 +56,11 @@ source = "a light-demander's crown lifts in a stand (Kothari et al. 2025; M19 no
 
 [[trait]]
 name = "stand.floor"
-target = 0.08
+target = 0.084
 band = 0.03
-weight = 0.5
-kind = "described"
-source = "oak canopies let through more light than beech's, less than birch's or pine's (Pérot et al. 2017; Sercu et al. 2017; M19 targets)"
+weight = 1
+kind = "measured"
+source = "sessile oak canopies transmit a median 8.4% of PAR (4.9–12.8%; Hagemeier & Leuschner 2019)"
 
 [[trait]]
 name = "lone.widestAt"
@@ -186,5 +186,5 @@ hi = 3
 
 # Held out: never in the loss, checked after the fit (analysis/experiments/m27_holdout.py).
 [holdout]
-survivalLight = [0.05, 0.10]   # lowest light all seedlings survive (Kobe et al. 1995; Ligot et al. 2013: oak needs over 20% to grow well)
+survivalLight = [0.05, 0.10]   # lowest light all seedlings survive (Hagemeier & Leuschner 2019: sessile oak saplings need 6.3%; Ligot et al. 2013)
 shadeScore = 2.45   # Niinemets & Valladares 2006, Appendix A

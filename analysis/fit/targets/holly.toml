@@ -20,7 +20,7 @@ target = 0.55
 band = 0.1
 weight = 0.5
 kind = "described"
-source = "height at 30 over height at 60: slow and steady"
+source = "height at 30 over height at 60: slow and steady; trees over 10 years grow at accelerating rates (Stokes et al. 2014)"
 
 [[trait]]
 name = "lone.spread"

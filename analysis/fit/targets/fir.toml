@@ -9,18 +9,18 @@ species = "fir"
 [[trait]]
 name = "stand.height"
 target = 80
-band = 18
+band = 14
 weight = 1
 kind = "measured"
-source = "dominant height ≈ 18–22 m at 60 years on good sites; slow while young (silver fir site-index curves), mature 40–50 m"
+source = "silver fir top height 17.6–23.0 m at 60 years for site index 28–34 m (Tirol fir tables, 2004, from the Baden-Württemberg fir yield table)"
 
 [[trait]]
 name = "lone.earlyShare"
-target = 0.45
-band = 0.1
-weight = 0.5
-kind = "described"
-source = "height at 30 over height at 60: a shade-tolerant conifer, slow in youth, its height increment culminating late"
+target = 0.42
+band = 0.06
+weight = 1
+kind = "measured"
+source = "height at 30 over height at 60: 0.35–0.47 for site index 28–38 m (Tirol fir tables, 2004): slow in youth"
 
 [[trait]]
 name = "lone.spread"

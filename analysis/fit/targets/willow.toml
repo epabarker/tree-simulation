@@ -16,11 +16,11 @@ source = "≈ 10 m at 60 years: mature height in the field guides (M25 note) ≈
 
 [[trait]]
 name = "lone.earlyShare"
-target = 0.8
-band = 0.1
+target = 0.9
+band = 0.08
 weight = 0.5
 kind = "described"
-source = "height at 30 over height at 60: a pioneer that grows fast and stops early"
+source = "height at 30 over height at 60: reaches its ultimate height in 10–20 years and lives about 60 (arboretum and LWF profiles)"
 
 [[trait]]
 name = "lone.spread"

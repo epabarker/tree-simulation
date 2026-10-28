@@ -56,11 +56,11 @@ source = "shade-tolerant species keep deep crowns in stands (Kothari et al. 2025
 
 [[trait]]
 name = "stand.floor"
-target = 0.03
-band = 0.015
-weight = 0.5
-kind = "described"
-source = "deep shade, as deep as beech's (M25 expectation; Sercu et al. 2017)"
+target = 0.02
+band = 0.01
+weight = 1
+kind = "measured"
+source = "late-successional canopies (hornbeam, lime, beech) transmit 1–3% of PAR (Hagemeier & Leuschner 2019)"
 
 [[trait]]
 name = "lone.widestAt"
@@ -186,5 +186,5 @@ hi = 3
 
 # Held out: never in the loss, checked after the fit (analysis/experiments/m27_holdout.py).
 [holdout]
-survivalLight = [0.01, 0.04]   # lowest light all seedlings survive (Kobe et al. 1995; Dietz et al. 2022)
+survivalLight = [0.01, 0.04]   # lowest light all seedlings survive (Hagemeier & Leuschner 2019: hornbeam saplings need 2.5%)
 shadeScore = 3.97   # Niinemets & Valladares 2006, Appendix A

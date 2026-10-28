@@ -2,6 +2,23 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-28: M27, measured targets for the eight newer species
+
+- **User:** find measured canopy transmittance and height-growth curves, and tighten the targets.
+- **Found** ([research note](research/2026-10-28-species-traits.md), "Sources found"):
+  - **Yield tables** for oak and pine: the NW-FVA tables, read from the data in CRAN `et.nwfva`.
+  - **Fir:** the Tirol fir tables (from Baden-Württemberg's).
+  - **Field maple:** heights from the 2012 national forest inventory (LWF Wissen 77).
+  - **Transmittance:** oak (median 8.4%) and hornbeam (1–3%), from Hagemeier & Leuschner 2019.
+- **Now measured at weight 1:**
+  - **Heights:** oak 78, fir 80, maple 64 and pine 84 cells, with narrower bands.
+  - **H30/H60:** oak 0.62, fir 0.42 and pine 0.60.
+  - **Floors:** oak 8.4% and hornbeam 2%.
+- **Described curve shapes revised** from growth descriptions: willow 0.9, rowan 0.78, maple 0.7.
+- **Checks on the held-out survival bands:** saplings' minimum light demand is oak 6.3% and hornbeam 2.5%, both in band. Birch's is 21%, above its 10–15% band (pilot, unchanged).
+- **Surprise:** with measured curves, the early height plateau is the largest miss. Hand-tuned oak, fir and pine sit 3.6–4.1 bands above their H30/H60.
+- **Not found:** curves for hornbeam, rowan, willow and holly; per-species transmittance for maple, holly, rowan, willow and fir. MDPI blocks automated downloads, so only the abstracts and excerpts of Hagemeier & Leuschner were read.
+
 ## 2026-10-28: M27, targets and fitting for all ten species
 
 - **User:** fit all ten species, not only the pilot. Fir and pine keep their level-1 η at about 1.5–2.

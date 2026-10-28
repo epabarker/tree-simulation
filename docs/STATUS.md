@@ -17,7 +17,7 @@ _Last updated: 2026-10-28 (M26 done; M27 round 1 fitted, round 2 waiting on the 
 - **Lab:** WebGL2 with pseudo-depth, Tweakpane, charts, tap to fell, phone layout, shareable links (`?preset&seed&p`). **Headless:** `npm run sim` (`--species-patch`), `npm run bench`, `analysis/experiments/` m0–m26.
 
 ## Next
-1. **The user:** review M26 (the loupe on a phone); say whether to open the PR and release garden-v0.13.0 (tag push is the user's).
+1. **The user:** garden-v0.13.0 is released (2026-10-28); run `node scripts/sync-garden.mjs 0.13.0` in epabarker/edbarker-dev and push, then try the loupe on a phone. The lab's PR to `main` is not opened yet.
 2. **The user:** review round 2 ([note](experiments/2026-10-28-m27-fits.md)): fix holly's tolerance, the understorey under beech and the tail after season 100 (a round 3), or adopt (M27b).
 3. **Faster refits:** `m27_fit.py --species all --skip-done --start <earlier round> --restarts 2,0 --generations 50 --seeds 3` (≈ 8 min a species), after moving `fits/*.json` to a round folder.
 4. **Ideas:** rooting in windthrow; the leaf–section slope against live pipe area (r_live); measured holly and rowan growth curves, and quantum-sensor light under fir and the small trees (their targets are estimates).

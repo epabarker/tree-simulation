@@ -29,7 +29,7 @@ import {
 import type { Snapshot } from "../../core/snapshot.ts";
 import { BudState } from "../../core/tree.ts";
 import { BUD_ACTIVE, BUD_DORMANT, parseColor, SEQUENTIAL, shadeImage } from "./colors.ts";
-import { LEAF_STYLES } from "./leaf-styles.ts";
+import { LEAF_PALETTES, LEAF_STYLES } from "./leaf-styles.ts";
 import { MAX_DPR, type Renderer, type RendererOptions } from "./renderer.ts";
 import { LEAF_MIN_PX, type Leaves, Scene, type ViewOptions } from "./scene.ts";
 import { readTheme, type Theme } from "./theme.ts";
@@ -694,9 +694,9 @@ export class WebGL2Renderer implements Renderer {
 
   private buildLeaves(leafAge: number, t: number): void {
     const leaves = this.scene.leaves(leafAge, t);
-    const style = this.scene.leafStyle.palette;
-    const palette = this.paletteBytes(this.theme.leaf[style], 0.92);
-    const autumn = this.paletteBytes(this.theme.autumn[style], 0.92);
+    // One summer and one autumn ramp per palette; each leaf takes its species' (M19).
+    const palette = LEAF_PALETTES.map((p) => this.paletteBytes(this.theme.leaf[p], 0.92));
+    const autumn = LEAF_PALETTES.map((p) => this.paletteBytes(this.theme.autumn[p], 0.92));
     this.fillLeaves(this.leafBackBatch, leaves, 0, leaves.back, palette, autumn);
     this.fillLeaves(this.leafBatch, leaves, leaves.back, leaves.count, palette, autumn);
   }
@@ -707,8 +707,8 @@ export class WebGL2Renderer implements Renderer {
     leaves: Leaves,
     from: number,
     to: number,
-    palette: Bytes,
-    autumn: Bytes,
+    palettes: Bytes[],
+    autumns: Bytes[],
   ): void {
     const n = to - from;
     const pos = this.stream<Floats>(batch, "a_pos", n);
@@ -723,6 +723,8 @@ export class WebGL2Renderer implements Renderer {
       dir[2 * i + 1] = leaves.uy[k];
       grow[i] = leaves.size[k];
       const c = leaves.color[k] * 4;
+      const palette = palettes[leaves.palette[k] as number] as Bytes;
+      const autumn = autumns[leaves.palette[k] as number] as Bytes;
       // Green to autumn colour as the leaf turns (M17).
       const u = leaves.turn[k] as number;
       for (let q = 0; q < 4; q++) {

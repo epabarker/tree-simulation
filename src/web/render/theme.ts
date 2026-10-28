@@ -86,6 +86,8 @@ const LEAF_FALLBACK: Record<LeafPalette, [string, string, string]> = {
   needle: ["--needle", "#1f3b2c", "#5d8a5a"],
   birch: ["--birch-leaf", "#4a6a2a", "#c3dc6a"],
   tropical: ["--tropical-leaf", "#1d4a26", "#6fb04a"],
+  oak: ["--oak-leaf", "#2f4a26", "#8bb44e"],
+  beech: ["--beech-leaf", "#2c4a22", "#9ccc4e"],
 };
 
 /** Autumn fallbacks per palette (`--leaf-autumn-shade`/`-sun`, …); needles barely change. */
@@ -94,6 +96,8 @@ const AUTUMN_FALLBACK: Record<LeafPalette, [string, string, string]> = {
   needle: ["--needle-autumn", "#1c3527", "#4f7a4c"],
   birch: ["--birch-leaf-autumn", "#9a6b17", "#f1d14f"],
   tropical: ["--tropical-leaf-autumn", "#7a1e14", "#d8572e"],
+  oak: ["--oak-leaf-autumn", "#6b3a17", "#c98a3a"],
+  beech: ["--beech-leaf-autumn", "#7a3412", "#d9772b"],
 };
 
 function autumnRamps(v: (name: string, fallback: string) => string): Record<LeafPalette, string[]> {

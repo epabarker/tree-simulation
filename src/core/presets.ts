@@ -193,13 +193,11 @@ const FOREST = {
 /**
  * M19: the woodland the calibrated species (flora.ts) grow in, the forest's principles with R5
  * sensing its neighbours' shade rather than its own, so lone trees grow squat and stands slender.
- * Storms come a little more often and harder than in `forest`, so gaps keep reopening for birch
- * and oak (the succession note).
+ * Storms are the forest's: harder ones snapped the young woodland's tops (the succession note).
  */
 const WOODLAND = {
   ...FOREST,
   r5: { enabled: true, signal: "neighbours" },
-  o2: { stormP: 0.08, stormLoad: 2 },
   species: FLORA,
 } satisfies ParamsPatch;
 

@@ -75,7 +75,7 @@ export interface Pace {
 }
 
 export interface GardenOptions {
-  /** The run. Default: the `forest` preset on a ring shaped to the host (`forestParams`). */
+  /** The run. Default: the `succession` woodland on a ring shaped to the host (`forestParams`). */
   params?: Params;
   /** Seed of the default run (ignored with `params`). Default: a new one per visit. */
   seed?: number;
@@ -98,6 +98,12 @@ export interface GardenOptions {
    * `setFocus`; the camera eases.
    */
   focus?: "forest" | "specimen";
+  /**
+   * With "oak", the specimen focus grows its own specimen, an oak alone in a field
+   * (`specimenParams`) with a new seed each time, while the forest waits in the worker and resumes
+   * where it stood when the focus returns to it (M19). Unset: the specimen is a forest tree.
+   */
+  specimen?: "oak";
   /** CSS pixels kept free above the crowns, e.g. for text over the sky. Default 0. */
   headroom?: number;
   /** Leave the sky out so the page shows through. */
@@ -180,6 +186,8 @@ export interface Garden {
   setFocus(focus: "forest" | "specimen"): void;
   /** The tree a "specimen" focus frames, or -1. */
   readonly focusTree: number;
+  /** Seed of the specimen's own world (option `specimen`) while it is shown, else 0. */
+  readonly specimenSeed: number;
   /** Each live tree's crown top and trunk base in canvas pixels, for labels (Scene.anchors). */
   anchors(): { tree: number; x: number; y: number; baseX: number; baseY: number }[];
   /** The latest metrics of a live tree, or undefined. */
@@ -201,17 +209,29 @@ const SPRING = 0.3;
 /** Rows of sky above the forest's ground in its preset (130): the ring's width follows the host. */
 const WORLD_HEIGHT = 130;
 
+/** Planted species around the ring (M19): half birch pioneers, with oak and beech among them. */
+const PLANTING = ["birch", "oak", "birch", "beech"] as const;
+
 /**
- * The `forest` preset (M11) on a ring `width` cells wide, with a tree every ≈ 21 cells: about as
- * wide as the host is wide relative to the world's height, so a phone gets a narrower forest.
+ * The `succession` woodland (M19) on a ring `width` cells wide, with a tree every ≈ 21 cells: about
+ * as wide as the host is wide relative to the world's height, so a phone gets a narrower forest.
+ * The seed turns the planting pattern, so each forest starts from a different mix.
  */
 export function forestParams(width = 210, seed?: number): Params {
-  const base = presetParams("forest", seed);
+  const base = presetParams("succession", seed);
   // A phone in portrait gets a narrow ring of two or three trees, drawn large (D1).
   const W = Math.round(Math.min(320, Math.max(54, width)));
   const n = Math.max(2, Math.round(W / 21));
-  const trees = Array.from({ length: n }, (_, k) => ({ x: ((k + 0.5) * W) / n }));
+  const trees = Array.from({ length: n }, (_, k) => ({
+    x: ((k + 0.5) * W) / n,
+    species: PLANTING[(k + base.seed) % PLANTING.length] as string,
+  }));
   return mergeParams(base, { world: { ...base.world, width: W }, trees });
+}
+
+/** Plate II (M19): an oak grown alone in the open, a new one for each seed. */
+export function specimenParams(seed: number): Params {
+  return presetParams("oakOpen", seed);
 }
 
 /** Puts the scene's colour tokens first in <head>, once: their cascade layer then loses to any host. */
@@ -387,6 +407,7 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
 
   async function restart(next: Params): Promise<void> {
     generation += 1;
+    ownSpecimen = false; // a new run drops any world put aside
     const mine = generation;
     inFlight = true;
     ahead = null;
@@ -600,7 +621,42 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
     scene.solo = scene.focusTree;
   }
 
+  /**
+   * Swaps the specimen's own world in (params) or the forest back (null): like `restart`, but the
+   * worker keeps the forest aside (SimApi.swap).
+   */
+  let ownSpecimen = false;
+  let specimenSeed = 0;
+  let forestParamsNow = params;
+  async function swapWorld(next: Params | null): Promise<void> {
+    generation += 1;
+    const mine = generation;
+    inFlight = true;
+    ahead = null;
+    if (next) forestParamsNow = current;
+    current = next ?? forestParamsNow;
+    sentObstacles = "";
+    const s = await sim.swap(next);
+    if (mine !== generation || destroyed) return;
+    inFlight = false;
+    autoFit = true;
+    scene.focusTree = -1;
+    accept(s, false, true);
+    measureObstacles();
+    if (playback.playing) request();
+  }
+
   function setFocus(next: "forest" | "specimen"): void {
+    if (options.specimen === "oak") {
+      if (next === "specimen" && !ownSpecimen) {
+        ownSpecimen = true;
+        specimenSeed = randomSeed();
+        void swapWorld(specimenParams(specimenSeed));
+      } else if (next === "forest" && ownSpecimen) {
+        ownSpecimen = false;
+        void swapWorld(null);
+      }
+    }
     focus = next;
     scene.frame = next === "specimen" ? "tree" : (options.frame ?? "world");
     scene.solo = -1;
@@ -679,6 +735,11 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
 
   const ready = restart(params).then(async () => {
     if (destroyed) return;
+    if (focus === "specimen" && options.specimen === "oak") {
+      ownSpecimen = true;
+      specimenSeed = randomSeed();
+      await swapWorld(specimenParams(specimenSeed));
+    }
     if (reduceMotion) {
       if (reducedMode === "still") await growStill();
     } else if (options.autoplay ?? true) {
@@ -730,6 +791,9 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
       return tau < 0.25 ? "spring" : tau < 0.52 ? "summer" : tau < 0.85 ? "autumn" : "winter";
     },
     setFocus,
+    get specimenSeed() {
+      return ownSpecimen ? specimenSeed : 0;
+    },
     get focusTree() {
       return scene.focusTree;
     },

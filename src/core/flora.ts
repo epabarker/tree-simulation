@@ -43,31 +43,33 @@ export const FLORA = {
     leaf: "small",
     c3: { mode: "bh", lambda: 0.5, alpha: 4 },
     // Sheds dim limbs early and wakes dormant buds only in strong light: a clean bole in a stand.
-    c5: { enabled: true, T: 0.1, Trel: 0.3 },
-    c6: { enabled: true, r0: 0.028 },
+    c5: { enabled: true, T: 0.12, Trel: 0.6 },
+    c6: { enabled: true, r0: 0.033 },
     // A short hydraulic scale: birch levels off lower than oak and beech.
     r1: { mf: 0.1, Lh: 45 },
     r2: {
       enabled: true,
-      aC: 20,
-      dLambda: 0.04,
-      ramp: 25,
+      aC: 15,
+      dLambda: 0.06,
+      ramp: 20,
       levels: [
         level({ lambda: 0.56, setPoint: 0, eta: 0.3 }),
-        level({ lambda: 0.53, setPoint: 30, eta: 0.25, branchAngle: 30 }),
+        level({ lambda: 0.53, setPoint: 55, eta: 0.3, branchAngle: 45 }),
         // The finest twigs hang.
         level({ lambda: 0.5, setPoint: 120, eta: 0.25, branchAngle: 40 }),
       ],
     },
+    // Slender trunks need firm posture control, or the hanging twigs bow them into hoops.
+    r3: { leafMass: 0.001, phi: 0.5 },
     r4: { qRel: 0.3 },
-    r6: { enabled: true, qMin: 0.15, leafArea: 1.2 },
+    r6: { enabled: true, qMin: 0.12, leafArea: 1.6 },
     o4: { cSeed: 2, d: 40, qEst: 0.25, pEst: 0.3, m0: 0.008 },
   },
   /** Mid-tolerant, long-lived, broad and decurrent when grown in the open. */
   oak: {
     common: "Pedunculate oak",
     latin: "Quercus robur",
-    leaf: "broadleaf",
+    leaf: "oak",
     c3: { mode: "bh", lambda: 0.5, alpha: 3.5 },
     c5: { enabled: true, T: 0.05, Trel: 0.08 },
     r1: { mf: 0.08, Lh: 75 },
@@ -93,7 +95,7 @@ export const FLORA = {
   beech: {
     common: "Beech",
     latin: "Fagus sylvatica",
-    leaf: "broadleaf",
+    leaf: "beech",
     c5: { enabled: true, T: 0.01, Trel: 0.03 },
     r1: { mf: 0.035 },
     // Troll's model (§9): axes grow out sideways and the trunk straightens behind them.

@@ -17,6 +17,8 @@ import { World } from "../core/world.ts";
 import type { SimApi } from "./api.ts";
 
 let world = new World(defaultParams);
+/** The world put aside by `swap`, if any. */
+let aside: World | null = null;
 const builder = new SnapshotBuilder();
 let options: SnapshotOptions = FULL_SNAPSHOT;
 
@@ -30,6 +32,18 @@ function snapshot(ms: number): Snapshot {
 const api: SimApi = {
   init(params: Params) {
     world = new World(params);
+    aside = null;
+    builder.reset();
+    return snapshot(0);
+  },
+  swap(params: Params | null) {
+    if (params) {
+      aside ??= world;
+      world = new World(params);
+    } else if (aside) {
+      world = aside;
+      aside = null;
+    }
     builder.reset();
     return snapshot(0);
   },

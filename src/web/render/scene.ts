@@ -19,7 +19,13 @@
 import type { Snapshot } from "../../core/snapshot.ts";
 import { BudState } from "../../core/tree.ts";
 import { CATEGORICAL, SEQUENTIAL } from "./colors.ts";
-import { LEAF_STYLES, type LeafStyle, type LeafStyleName } from "./leaf-styles.ts";
+import {
+  isLeafStyleName,
+  LEAF_PALETTES,
+  LEAF_STYLES,
+  type LeafStyle,
+  type LeafStyleName,
+} from "./leaf-styles.ts";
 import { RAMP_STEPS, type Theme } from "./theme.ts";
 import { type Wind, windAt } from "./wind.ts";
 
@@ -130,6 +136,8 @@ export interface Leaves {
   color: Uint8Array;
   /** How far each leaf has turned to autumn colour, 0 → 1 (M17). */
   turn: Float32Array;
+  /** Its species' palette, an index into LEAF_PALETTES (M19: each tree is drawn as its species). */
+  palette: Uint8Array;
 }
 
 /** Ground sits this many CSS pixels above the bottom edge when the view is fitted. */
@@ -248,6 +256,7 @@ export class Scene {
     uy: new Float32Array(FALLEN_MAX),
     size: new Float32Array(FALLEN_MAX),
     color: new Uint8Array(FALLEN_MAX),
+    palette: new Uint8Array(FALLEN_MAX),
     phase: new Float32Array(FALLEN_MAX),
     landed: new Uint8Array(FALLEN_MAX),
   };
@@ -298,6 +307,10 @@ export class Scene {
     scale: new Float32Array(0),
     color: new Uint8Array(0),
     rosette: new Uint8Array(0),
+    /** The style each leaf is drawn in (an index into `styles`), and whether it stays on in winter. */
+    kind: new Uint8Array(0),
+    keep: new Uint8Array(0),
+    styles: [] as LeafStyle[],
   };
   private leafList: Leaves = {
     count: 0,
@@ -309,6 +322,7 @@ export class Scene {
     size: new Float32Array(0),
     color: new Uint8Array(0),
     turn: new Float32Array(0),
+    palette: new Uint8Array(0),
   };
   /** Where the fitted view wants the camera; the ground line stays pinned while it eases. */
   private target: { cx: number; scale: number } | null = null;
@@ -904,9 +918,10 @@ export class Scene {
       out.size = new Float32Array(cap);
       out.color = new Uint8Array(cap);
       out.turn = new Float32Array(cap);
+      out.palette = new Uint8Array(cap);
     }
     const tau = this.tau;
-    const phenology = this.seasons && this.leafStyle.deciduous;
+    const palettes = L.styles.map((st) => LEAF_PALETTES.indexOf(st.palette));
     if (this.seasons && tau < this.lastTau) this.fallen.count = 0; // a new year: last year's litter is gone
     const g = this.geom;
     let k = 0;
@@ -919,14 +934,18 @@ export class Scene {
       let turn = 0;
       let fallAt = 2;
       let h = 0;
-      if (phenology) {
+      const kind = L.kind[i] as number;
+      const style = L.styles[kind] as LeafStyle;
+      if (this.seasons && style.deciduous) {
         // Each leaf's own year: it flushes early in spring; it turns in autumn, shaded leaves
-        // first; it falls soon after. h spreads the leaves of a crown over a few weeks.
+        // first; it falls soon after. h spreads the leaves of a crown over a few weeks, and each
+        // species keeps its own calendar (birch flushes and turns first, oak last; M19).
         h = ((Math.imul(i + 1, 0x9e3779b1) >>> 0) % 1000) / 1000;
         const light = (L.color[i] as number) / (RAMP_STEPS - 1);
-        const flushAt = 0.01 + 0.1 * h;
-        const turnAt = 0.52 + 0.1 * light + 0.04 * h;
-        fallAt = turnAt + 0.06 + 0.06 * h; // by 0.78: every leaf is down before winter (0.85)
+        const flushAt = 0.01 + (style.flush ?? 0) + 0.1 * h;
+        const turnAt = 0.52 + (style.turn ?? 0) + 0.1 * light + 0.04 * h;
+        // By 0.82 every leaf is down before winter (0.85), unless a young beech keeps it.
+        fallAt = L.keep[i] ? 2 : turnAt + 0.06 + 0.06 * h;
         turn = smooth(turnAt, turnAt + 0.08, tau);
         size *= smooth(flushAt, flushAt + 0.12, tau) * (1 - smooth(fallAt, fallAt + 0.015, tau));
       }
@@ -962,6 +981,7 @@ export class Scene {
       out.size[k] = size * L.scale[i];
       out.color[k] = L.color[i];
       out.turn[k] = turn;
+      out.palette[k] = palettes[kind] as number;
       k++;
     }
     if (L.back >= L.count) out.back = k;
@@ -988,6 +1008,7 @@ export class Scene {
     f.uy[k] = L.b[i] as number;
     f.size[k] = (L.scale[i] as number) * 0.9;
     f.color[k] = L.color[i] as number;
+    f.palette[k] = LEAF_PALETTES.indexOf((L.styles[L.kind[i] as number] as LeafStyle).palette);
     f.phase[k] = (i * 0.618) % (2 * Math.PI);
     f.landed[k] = 0;
   }
@@ -1024,6 +1045,7 @@ export class Scene {
       out.size[k] = (f.size[i] as number) * fade;
       out.color[k] = f.color[i] as number;
       out.turn[k] = 1;
+      out.palette[k] = f.palette[i] as number;
       k++;
     }
     return k;
@@ -1038,7 +1060,19 @@ export class Scene {
     }
     if (this.depth) this.projectAll(s);
     const n = s.metamerCount;
-    const per = this.depth ? style.cluster : 2;
+    // Each tree is drawn as its species (M19): the style its species names, else the view's.
+    const styles: LeafStyle[] = [style];
+    const kindOf = new Map<number, number>();
+    const keepOf = new Map<number, number>();
+    for (const m of s.metrics) {
+      const name = m.species ? s.species[m.species]?.leaf : undefined;
+      const own: LeafStyle = name && isLeafStyleName(name) ? LEAF_STYLES[name] : style;
+      let kind = styles.indexOf(own);
+      if (kind < 0) kind = styles.push(own) - 1;
+      kindOf.set(m.tree, kind);
+      keepOf.set(m.tree, own.marcescent !== undefined && m.height < own.marcescent ? 1 : 0);
+    }
+    const per = this.depth ? Math.max(...styles.map((st) => st.cluster)) : 2;
     const cap = (n + s.budCount) * per;
     if (L.metamer.length < cap) {
       L.metamer = new Int32Array(2 * cap);
@@ -1047,7 +1081,10 @@ export class Scene {
       L.scale = new Float32Array(2 * cap);
       L.color = new Uint8Array(2 * cap);
       L.rosette = new Uint8Array(2 * cap);
+      L.kind = new Uint8Array(2 * cap);
+      L.keep = new Uint8Array(2 * cap);
     }
+    L.styles = styles;
     let maxLight = 0;
     for (let j = 0; j < n; j++) {
       if (s.age[j] <= leafAge + 1 && s.light[j] > maxLight) maxLight = s.light[j];
@@ -1067,21 +1104,31 @@ export class Scene {
       L.metamer[k] = j;
       L.a[k] = a;
       L.b[k] = b;
-      L.scale[k] = scale;
       L.color[k] = Math.max(0, Math.min(RAMP_STEPS - 1, color));
       L.rosette[k] = rosette;
+      const tree = s.tree[j] as number;
+      const kind = kindOf.get(tree) ?? 0;
+      L.kind[k] = kind;
+      L.keep[k] = keepOf.get(tree) ?? 0;
+      // A species' leaf length relative to the view's style (the renderers draw at the latter).
+      L.scale[k] = scale * ((styles[kind] as LeafStyle).length / style.length);
       k++;
     };
+    const styleOf = (j: number): LeafStyle =>
+      styles[kindOf.get(s.tree[j] as number) ?? 0] as LeafStyle;
     // One x-ray leaf turned `side` · spread from its shoot.
-    const xray = (j: number, side: number, c: number, rosette: number) =>
-      push(j, Math.cos(style.spread), side * Math.sin(style.spread), 1, c, rosette);
+    const xray = (j: number, side: number, c: number, rosette: number) => {
+      const spread = styleOf(j).spread;
+      push(j, Math.cos(spread), side * Math.sin(spread), 1, c, rosette);
+    };
     // The leaves of a pseudo-depth cluster at metamer j that belong to layer `pass`.
     const cluster = (j: number, id: number, pass: number, c: number, rosette: number) => {
-      const along = Math.cos(style.spread);
-      const across = Math.sin(style.spread);
+      const own = styleOf(j);
+      const along = Math.cos(own.spread);
+      const across = Math.sin(own.spread);
       const turn = hash01(s.tree[j], id, 2);
-      for (let i = 0; i < style.cluster; i++) {
-        const psi = 2 * Math.PI * (turn + i / style.cluster);
+      for (let i = 0; i < own.cluster; i++) {
+        const psi = 2 * Math.PI * (turn + i / own.cluster);
         const z = 0.6 * this.axisZ[j] + 0.4 * Math.sin(psi);
         if ((z < 0 ? 0 : 1) !== pass) continue;
         // Leaf direction in 3D is along·d + across·(n cos ψ + z-axis sin ψ); its drawn in-plane
@@ -1100,7 +1147,7 @@ export class Scene {
         if (!this.depth) {
           const side = s.birthId[j] & 1 ? 1 : -1;
           xray(j, side, c, 0);
-          if (style.xray === 2) xray(j, -side, c, 0);
+          if (styleOf(j).xray === 2) xray(j, -side, c, 0);
         } else {
           cluster(j, s.birthId[j], pass, c, 0);
         }

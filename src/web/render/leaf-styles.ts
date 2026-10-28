@@ -6,8 +6,15 @@
  * layout.css, read by theme.ts) and how many seasons foliage stays on (evergreen needles longer).
  */
 
-export type LeafPalette = "broadleaf" | "needle" | "birch" | "tropical";
-export const LEAF_PALETTES: readonly LeafPalette[] = ["broadleaf", "needle", "birch", "tropical"];
+export type LeafPalette = "broadleaf" | "needle" | "birch" | "tropical" | "oak" | "beech";
+export const LEAF_PALETTES: readonly LeafPalette[] = [
+  "broadleaf",
+  "needle",
+  "birch",
+  "tropical",
+  "oak",
+  "beech",
+];
 
 export interface LeafStyle {
   /** Full leaf length in world units (one unit = one internode), and width over length. */
@@ -27,6 +34,18 @@ export interface LeafStyle {
    * autumn, and the crown stands bare in winter. Evergreen foliage stays.
    */
   deciduous: boolean;
+  /**
+   * Phenology by species (M19), shifts of the visual year τ: `flush` delays leaf-out (birch flushes
+   * first, oak last), `turn` delays autumn colour and leaf fall (birch turns early, oak late).
+   */
+  flush?: number;
+  turn?: number;
+  /**
+   * Marcescence: young trees, and the lower crowns of older ones, keep their dead leaves through
+   * the winter until the new leaves push them off (beech, young oak). Height in cells below which
+   * the leaves stay on.
+   */
+  marcescent?: number;
 }
 
 export const LEAF_STYLES = {
@@ -52,16 +71,45 @@ export const LEAF_STYLES = {
     leafAge: 8,
     deciduous: false,
   },
-  /** Birch-like: small, broad, light leaves. */
+  /** Birch-like: small, broad, light leaves; the first to flush and the first to turn yellow. */
   small: {
-    length: 0.75,
+    length: 0.85,
     aspect: 0.6,
     spread: 1.05,
-    cluster: 3,
+    cluster: 4,
     xray: 1,
     palette: "birch",
     leafAge: 4,
     deciduous: true,
+    flush: 0,
+    turn: -0.03,
+  },
+  /** Oak: broad, dark leaves that flush late and turn russet late in autumn. */
+  oak: {
+    length: 1.05,
+    aspect: 0.5,
+    spread: 0.9,
+    cluster: 3,
+    xray: 1,
+    palette: "oak",
+    leafAge: 5,
+    deciduous: true,
+    flush: 0.06,
+    turn: 0.04,
+  },
+  /** Beech: dense, fresh leaves that turn copper; young beeches keep them brown all winter. */
+  beech: {
+    length: 1,
+    aspect: 0.55,
+    spread: 1,
+    cluster: 4,
+    xray: 1,
+    palette: "beech",
+    leafAge: 5,
+    deciduous: true,
+    flush: 0.03,
+    turn: 0.01,
+    marcescent: 30,
   },
   /** Terminalia-like: large, glossy leaves crowded at the shoot tips. */
   large: {

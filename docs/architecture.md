@@ -24,7 +24,9 @@ How the code realises the spec. For *why* a choice was made, see `docs/decisions
 `mountGarden(host, options)` (`src/web/garden.ts`) is the whole living view: worker, renderer, pull loop, input, and the resize, visibility and theme observers. It returns a `Garden` with `view`, `playback`, `stats`, `ready`, `restart`, `step`, `setPlaying`, `setParams`, `record`, `fit`, `redraw` and `destroy`. Two hosts use it:
 - **The lab** (`main.ts`, `index.html`): a garden with `interaction: "full"`, `frame: "trees"`, a fixed speed, full snapshots, and the panel, charts and HUD around it.
 - **A home page** (`garden.html` here; edbarker.dev in production): the defaults.
-  - **World:** `forestParams` puts the `forest` preset on a ring whose width follows the host's aspect (54–320 cells, a tree every ≈ 21 cells; a portrait phone gets two or three large trees), with a random seed per visit.
+  - **World:** `forestParams` puts the `succession` woodland (M19) on a ring whose width follows the host's aspect (54–320 cells, a tree every ≈ 21 cells; a portrait phone gets two or three large trees), with a random seed per visit. The planting runs birch, oak, birch, beech around the ring, turned by the seed.
+  - **Species on the page (M19):** each tree is drawn as its species. The snapshot's species table names a leaf style; `Scene.layoutLeaves` gives every leaf its tree's palette, size and cluster; and `leaf-styles.ts` sets each species' calendar: when it flushes, when it turns, and marcescence (young beeches keep their dead leaves through the winter). Both renderers colour each leaf from its own palette's summer and autumn ramps.
+  - **Plate II (M19):** with `specimen: "oak"`, the specimen focus grows its own oak alone in a field (`specimenParams`, the `oakOpen` preset), with a new seed each time. The worker keeps the forest aside meanwhile (`swap`), and the forest resumes where it stood when the focus returns.
   - **Pace:** a 40-season intro at 4 seasons/s that slows geometrically to 0.5 seasons/s over its last 12 seasons. While playing, each season's tween is linear and fills its whole interval, so growth never stops between seasons (D1); a single step eases.
   - **Interaction:** tap to fell only. There is no pan, zoom or scroll capture (`touch-action: manipulation`).
   - **Snapshots:** lean (no junctions, no field).
@@ -154,6 +156,7 @@ Tapping a tree on the page fells it. `Scene.pickTree` finds the nearest drawn se
 |---|---|
 | `init(params)` | New World; returns the season-0 snapshot |
 | `step(n)` | Runs n seasons; returns a snapshot. The page asks for one season at a time. While playing it asks as soon as a season is shown, so the worker computes season s+1 while the page tweens to s, and the result waits for its turn (pipelining, M15). Pausing shows the waiting season; while playing, events apply one season later |
+| `swap(params \| null)` | Puts the running world aside and starts `params`, or with null resumes the world put aside (M19: Plate II's own oak while the forest waits). Returns a season snapshot; `init` drops anything put aside |
 | `setParams(patch)`, `removeTree(id)` | Queue events |
 | `setSnapshotOptions({junctions, field})` | Which optional parts later snapshots carry: the Δ histogram's junction exponents and the shade field. Both default to on (the lab); the home page turns both off (M13) |
 | `record()` | Returns the run record |
@@ -162,7 +165,7 @@ Tapping a tree on the page fells it. `Scene.pickTree` finds the nearest drawn se
 
 - **Metamers:** `parent` (row in the snapshot), `x0`, `y0`, `angle`, `length`, `radius`, `tree`, `birthId`, `order`, `light` (Q_sum/n_b), `resource` (vIn), `age`, `stress` (σ/σ_target, R3), `prevIndex`.
 - **Buds:** `budMetamer`, `budState`, `budQ`.
-- **Other:** `shadow` (W×H, or null), `junctions`, `metrics`, `seasonMs`, `snapshotMs` (the worker's time to build the snapshot; the HUD's worker time is the sum).
+- **Other:** `shadow` (W×H, or null), `junctions`, `metrics` (with each tree's `species`), `species` (the species table's labels: common and Latin names and leaf style, ADR 0016), `seasonMs`, `snapshotMs` (the worker's time to build the snapshot; the HUD's worker time is the sum).
 
 Every typed array is transferred, not copied.
 

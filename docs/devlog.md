@@ -2,6 +2,27 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-28: M19–M20 step 4, species on the page
+
+- **Page:**
+  - Each tree is drawn as its species. There are new `oak` and `beech` leaf styles, palettes and tokens (light and dark).
+  - Each species keeps its own calendar: birch flushes first and turns yellow first; oak flushes late and turns russet late; young beeches keep their copper leaves through the winter (marcescence).
+  - Both renderers colour each leaf from its own palette.
+- **The home forest** (`forestParams`) is now the `succession` woodland. Birch, oak, birch and beech are planted around the ring, turned by the seed.
+- **Plate II:**
+  - `mountGarden({ specimen: "oak" })` grows a lone open-grown oak for the specimen focus, with a new seed each time.
+  - The worker's new `swap` keeps the forest aside meanwhile, so it resumes where it stood (checked in Firefox: season 31 → oak → back at 33).
+  - `garden.html` takes `?specimen`.
+- **Site** (branch `claude/m19-species` in edbarker-dev, local garden 0.7.0):
+  - cards give the common and Latin names, and a Standing row;
+  - labels read "No. 4, silver birch";
+  - Plate II's caption names the oak.
+- **Surprises:**
+  - **Birch hoops.** In the garden view, birch leaders bent into hoops. The thin young tips sagged under the hanging twigs, and a no-R3 render showed straight leaders. Lighter leaves, less permanent sag and firmer posture control fixed it, at the cost of a narrower lone birch.
+  - **Storms.** The woodland's harder storms (8% of seasons at load 2) snapped the young forest's tops, so it uses the forest's storms again. Succession still emerges.
+  - **Leafier birch.** It is now leafier (Q_ss 0.12), which puts its survival light at 7%, slightly below the intolerant band. The note records it.
+- **Size:** `garden.js` plus worker is 51.5 kB gzip (gate 60). **Tests:** 193 pass, goldens unchanged.
+
 ## 2026-10-27: M19–M20 step 3, calibrated species
 
 - **User:** birch → beech and oak in the home forest; conifer a lab species; Plate II an open-grown oak; field-guide names; "as close to a botanical simulation as possible" (the species-calibrated route).

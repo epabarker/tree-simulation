@@ -10,6 +10,12 @@ import type { RunRecord } from "../core/world.ts";
 export interface SimApi {
   /** Starts a new run and returns the snapshot of season 0. */
   init(params: Params): Snapshot;
+  /**
+   * Puts the running world aside and starts `params` in its place, returning its season 0; with
+   * null, drops that world and resumes the one put aside where it stood (M19: a page's specimen
+   * plate grows its own tree while the forest waits).
+   */
+  swap(params: Params | null): Snapshot;
   /** Runs `seasons` seasons and returns the snapshot after the last one. */
   step(seasons: number): Snapshot;
   /** Which optional parts later snapshots carry (default: all, as the lab needs). */

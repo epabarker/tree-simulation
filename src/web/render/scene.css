@@ -14,13 +14,17 @@
     --bark-old: #4c3d31;
     --leaf-shade: #35502a;
     --leaf-sun: #a3cf5b;
-    /* Species foliage (render/leaf-styles.ts): fir needles, birch, Terminalia. */
+    /* Species foliage (render/leaf-styles.ts): fir needles, birch, Terminalia, oak, beech. */
     --needle-shade: #1f3b2c;
     --needle-sun: #5d8a5a;
     --birch-leaf-shade: #4a6a2a;
     --birch-leaf-sun: #c3dc6a;
     --tropical-leaf-shade: #1d4a26;
     --tropical-leaf-sun: #6fb04a;
+    --oak-leaf-shade: #2f4a26;
+    --oak-leaf-sun: #8bb44e;
+    --beech-leaf-shade: #2c4a22;
+    --beech-leaf-sun: #9ccc4e;
     --ghost: #9a8f80;
     --wall: rgba(90, 90, 100, 0.35);
     /* Autumn (M17): what each foliage turns to before it falls. */
@@ -30,6 +34,10 @@
     --birch-leaf-autumn-sun: #f1d14f;
     --tropical-leaf-autumn-shade: #7a1e14;
     --tropical-leaf-autumn-sun: #d8572e;
+    --oak-leaf-autumn-shade: #6b3a17;
+    --oak-leaf-autumn-sun: #c98a3a;
+    --beech-leaf-autumn-shade: #7a3412;
+    --beech-leaf-autumn-sun: #d9772b;
   }
 
   @media (prefers-color-scheme: dark) {
@@ -48,6 +56,10 @@
       --birch-leaf-sun: #a9c45a;
       --tropical-leaf-shade: #18401f;
       --tropical-leaf-sun: #5f9a3f;
+      --oak-leaf-shade: #284020;
+      --oak-leaf-sun: #789e44;
+      --beech-leaf-shade: #263f1d;
+      --beech-leaf-sun: #88b445;
       --ghost: #6f6a62;
       --wall: rgba(160, 160, 175, 0.25);
     }
@@ -68,6 +80,10 @@
     --birch-leaf-sun: #a9c45a;
     --tropical-leaf-shade: #18401f;
     --tropical-leaf-sun: #5f9a3f;
+    --oak-leaf-shade: #284020;
+    --oak-leaf-sun: #789e44;
+    --beech-leaf-shade: #263f1d;
+    --beech-leaf-sun: #88b445;
     --ghost: #6f6a62;
     --wall: rgba(160, 160, 175, 0.25);
   }

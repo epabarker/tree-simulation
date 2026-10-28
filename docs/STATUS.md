@@ -1,12 +1,12 @@
 # Status
 
-_Last updated: 2026-10-27 (M19 step 3)_
+_Last updated: 2026-10-28 (M19 step 4)_
 
-**Current milestone: M19–M20** (species), on branch `claude/m19-species`, not yet pushed. Steps 1–3 are done: species per tree (ADR 0016), R5's neighbour signal, and calibrated birch, oak, beech and fir ([note](experiments/2026-10-27-m19-species.md)). M17 is live on edbarker.dev (garden-v0.6.0). M18 is deferred.
+**Current milestone: M19–M20** (species), on branch `claude/m19-species` (also in edbarker-dev), not yet pushed. Steps 1–4 are done: species per tree (ADR 0016), R5's neighbour signal, calibrated birch, oak, beech and fir ([note](experiments/2026-10-27-m19-species.md)), and species on the page, with the mixed forest, per-species leaves and calendars, names on the cards, and Plate II's own oak. M17 is live (garden-v0.6.0). M18 is deferred.
 
 ## Works
 - **Core:** C1–C6, R1–R6, O2 and O4 (ADRs 0005–0013); the sky sweep with open or periodic sides; golden hashes. `World.discardDead` for long page runs.
-- **Species** (`src/core/flora.ts`): silver birch, pedunculate oak, beech and silver fir, with field-guide names. Presets `oakOpen` (Plate II), `birchWood`, `oakWood`, `beechWood`, `firWood` and `succession` (birch → beech emerges; oak dwindles).
+- **Species** (`src/core/flora.ts`): silver birch, pedunculate oak, beech and silver fir, with field-guide names. Presets `oakOpen` (Plate II), the four woods and `succession` (birch → beech emerges; oak dwindles). The garden's `forestParams` is the succession woodland; `specimen: "oak"` swaps in Plate II's own oak (worker `swap`).
 - **Presets:** `skyStand`, `skyGrove`, `skyTree`, `forest`, `thinning`, `weeping`, `troll`; species `conifer`, `birch` and `tropical`, still without R1, R3, R4 and R5.
 - **Garden** (`src/web/garden.ts`, ADR 0014):
   - `mountGarden(host, options)`, the living view the lab and the home page share;
@@ -17,13 +17,7 @@ _Last updated: 2026-10-27 (M19 step 3)_
 - **Lab:** WebGL2 with pseudo-depth, Tweakpane, charts, tap to fell, phone layout. **Headless:** `npm run sim`, `npm run bench` (rings 3.8 ms a season), `analysis/experiments/` m0–m11.
 
 ## Next
-1. **M19–M20 step 4, the page:**
-   - the home forest from `succession`, sized by `forestParams`;
-   - per-species leaves, autumn colours and phenology: birch flushes early, oak late, beech keeps its dead leaves;
-   - species names on the cards and labels;
-   - Plate II as `oakOpen` with a new seed per visit;
-   - check the woods' look in the garden view (storms may strip crowns).
-   Then ship in releases with previews.
+1. **Ship M19–M20:** the user looks at the previews (the home forest is leaner than M17's even-aged crowns, so check that the look is wanted). Then PR and merge here, tag `garden-v0.7.0`, sync the site from the release (it has a local 0.7.0 now), and merge the site on the user's go-ahead.
 2. **Follow-ups:** windthrow by slenderness (changes `forest` goldens); acrotony for decurrent oaks; willow; then M18.
 3. **The user:** the site's `TODO(Ed)` items.
 

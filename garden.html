@@ -72,8 +72,15 @@
             },
           }
         : undefined;
+      // `?specimen` frames Plate II's oak grown in the open (M19); setFocus("forest") returns.
+      const specimen = query.has("specimen");
       // Exposed for poking at from the console (and headless checks); a host page needn't.
-      window.garden = mountGarden(document.getElementById("garden"), { headroom: 140, bench });
+      window.garden = mountGarden(document.getElementById("garden"), {
+        headroom: 140,
+        bench,
+        specimen: "oak",
+        focus: specimen ? "specimen" : "forest",
+      });
     </script>
   </body>
 </html>

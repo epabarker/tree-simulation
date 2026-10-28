@@ -7,7 +7,7 @@
 import type { Snapshot } from "../../core/snapshot.ts";
 import { BudState } from "../../core/tree.ts";
 import { BUD_ACTIVE, BUD_DORMANT, SEQUENTIAL, shadeImage } from "./colors.ts";
-import { LEAF_STYLES } from "./leaf-styles.ts";
+import { LEAF_PALETTES, LEAF_STYLES, type LeafPalette } from "./leaf-styles.ts";
 import { MAX_DPR, type Renderer, type RendererOptions } from "./renderer.ts";
 import { type ColorMode, type Leaves, leafLength, Scene, type ViewOptions } from "./scene.ts";
 import { RAMP_STEPS, readTheme, type Theme } from "./theme.ts";
@@ -216,35 +216,42 @@ export class Canvas2DRenderer implements Renderer {
   private drawLeaves(leaves: Leaves, from: number, to: number): void {
     const { ctx } = this;
     const style = this.scene.leafStyle;
-    const palette = this.theme.leaf[style.palette];
-    const autumn = this.theme.autumn[style.palette];
     const full = leafLength(this.scene.camera.scale, style.length);
+    // The palettes this frame's leaves use (each tree is drawn as its species, M19).
+    const used = new Set<number>();
+    for (let k = from; k < to; k++) used.add(leaves.palette[k] as number);
     ctx.save();
     ctx.globalAlpha = 0.92;
     // Leaves drawn in two passes per colour: green, then those past halfway to autumn (M17).
-    for (let pass = 0; pass < 2 * RAMP_STEPS; pass++) {
-      const c = pass % RAMP_STEPS;
-      const turned = pass >= RAMP_STEPS;
-      ctx.fillStyle = (turned ? autumn : palette)[c] as string;
-      ctx.beginPath();
-      for (let k = from; k < to; k++) {
-        if (leaves.color[k] !== c || (leaves.turn[k] as number) > 0.5 !== turned) continue;
-        const bx = leaves.x[k];
-        const by = leaves.y[k];
-        const ux = leaves.ux[k];
-        const uy = leaves.uy[k];
-        const len = full * leaves.size[k];
-        const bulge = len * style.aspect; // control points at twice the half-width
-        const tx = bx + ux * len;
-        const ty = by + uy * len;
-        const mx = bx + ux * len * 0.5;
-        const my = by + uy * len * 0.5;
-        // A lens: two quadratic curves bulging either side of the midrib.
-        ctx.moveTo(bx, by);
-        ctx.quadraticCurveTo(mx - uy * bulge, my + ux * bulge, tx, ty);
-        ctx.quadraticCurveTo(mx + uy * bulge, my - ux * bulge, bx, by);
+    for (const p of used) {
+      const name = LEAF_PALETTES[p] as LeafPalette;
+      const palette = this.theme.leaf[name];
+      const autumn = this.theme.autumn[name];
+      for (let pass = 0; pass < 2 * RAMP_STEPS; pass++) {
+        const c = pass % RAMP_STEPS;
+        const turned = pass >= RAMP_STEPS;
+        ctx.fillStyle = (turned ? autumn : palette)[c] as string;
+        ctx.beginPath();
+        for (let k = from; k < to; k++) {
+          if (leaves.palette[k] !== p) continue;
+          if (leaves.color[k] !== c || (leaves.turn[k] as number) > 0.5 !== turned) continue;
+          const bx = leaves.x[k];
+          const by = leaves.y[k];
+          const ux = leaves.ux[k];
+          const uy = leaves.uy[k];
+          const len = full * leaves.size[k];
+          const bulge = len * style.aspect; // control points at twice the half-width
+          const tx = bx + ux * len;
+          const ty = by + uy * len;
+          const mx = bx + ux * len * 0.5;
+          const my = by + uy * len * 0.5;
+          // A lens: two quadratic curves bulging either side of the midrib.
+          ctx.moveTo(bx, by);
+          ctx.quadraticCurveTo(mx - uy * bulge, my + ux * bulge, tx, ty);
+          ctx.quadraticCurveTo(mx + uy * bulge, my - ux * bulge, bx, by);
+        }
+        ctx.fill();
       }
-      ctx.fill();
     }
     ctx.restore();
   }

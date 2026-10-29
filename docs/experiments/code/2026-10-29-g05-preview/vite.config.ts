@@ -14,6 +14,8 @@ export default defineConfig({
     outDir: out,
     emptyOutDir: true,
     target: "es2023",
-    rollupOptions: { input: { index: resolve(here, "index.html"), kernel: resolve(here, "kernel.html") } },
+    rollupOptions: {
+      input: { index: resolve(here, "index.html"), kernel: resolve(here, "kernel.html"), proto: resolve(here, "proto.html") },
+    },
   },
 });

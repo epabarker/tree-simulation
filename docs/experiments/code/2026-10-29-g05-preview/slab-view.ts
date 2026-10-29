@@ -47,6 +47,11 @@ export interface SlabOptions {
   darken: number;
   /** Fade of the second rank toward the sky (periodic only). */
   dim: number;
+  /**
+   * The 3D prototype (code/2026-10-29-proto3d): each metamer's own z (snapshot rows), drawn
+   * orthographically, (x, y) in z order, with no perspective, darkening or rank behind.
+   */
+  z?: Float32Array;
 }
 
 export const DEFAULTS: Omit<SlabOptions, "model"> = {
@@ -191,15 +196,16 @@ export function drawSlab(renderer: Renderer, s: Snapshot, o: SlabOptions): void 
   scene.computeGeometry(1);
   const g = scene.geom;
   const n = s.metamerCount;
-  const z = assignDepth(s, o.model, o.D);
+  const ortho = o.z !== undefined;
+  const z = o.z ?? assignDepth(s, o.model, o.D);
   const leafAge = LEAF_STYLES.broadleaf.leafAge;
   const L = layoutLeaves(s, leafAge);
 
   const F = (0.5 * (w / scale)) / Math.tan((0.5 * o.fovDeg * Math.PI) / 180);
-  const ranks = o.model === "periodic" ? 2 : 1;
+  const ranks = o.model === "periodic" && !ortho ? 2 : 1;
   const zMax = o.D * ranks;
   // The picture plane is the trunks' line (z = D/2), so trunks draw at the garden's own scale.
-  const k = (zz: number) => F / (F + zz - o.D / 2);
+  const k = ortho ? (_: number) => 1 : (zz: number) => F / (F + zz - o.D / 2);
 
   // Wood colours: the natural bark ramp, as the garden draws it.
   const bark: Uint8Array = R.paletteBytes(scene.palette("natural", theme));
@@ -214,7 +220,7 @@ export function drawSlab(renderer: Renderer, s: Snapshot, o: SlabOptions): void 
   for (let r = 0; r < ranks; r++) {
     for (let j = 0; j < n; j++) {
       const zz = (z[j] as number) + r * o.D;
-      wood[Math.min(slices - 1, Math.floor(zz))]?.push(r * n + j);
+      wood[Math.min(slices - 1, Math.max(0, Math.floor(zz)))]?.push(r * n + j);
     }
     for (let i = 0; i < L.count; i++) {
       const zz = (z[L.metamer[i] as number] as number) + (L.dz[i] as number) + r * o.D;
@@ -237,7 +243,7 @@ export function drawSlab(renderer: Renderer, s: Snapshot, o: SlabOptions): void 
   };
   const offsets = s.periodic ? [-s.width, 0, s.width] : [0];
   const tint = (out: Uint8Array, at: number, rgba: ArrayLike<number>, zz: number, r: number) => {
-    const dark = 1 - o.darken * Math.min(1, zz / o.D);
+    const dark = ortho ? 1 : 1 - o.darken * Math.min(1, zz / o.D);
     const fade = r > 0 ? o.dim : 0;
     for (let c = 0; c < 3; c++) {
       // The rank behind fades toward the sky, as distance does.

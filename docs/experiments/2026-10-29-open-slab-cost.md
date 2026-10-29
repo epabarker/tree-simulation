@@ -107,3 +107,35 @@ Lone trees in the open, per column of their crown's width:
 - **The coarse lattice** cuts the light 8× at D = 64. The light is not where the open slab's cost goes at D ≥ 48, though: the review's projection puts more than half of each season in the tree passes.
 - **Free crowns** of the canopy species want 80–150 cells of depth, so the faces clip them at every D measured: they keep 23–29% of that depth at D = 32, 35–44% at 48, and 47–59% at 64. The understorey's 40–60-cell crowns fit at D = 48 and 64.
 - **The open-z metamer multiplier** is D × fill × side-light factor (1.0–1.6) instead of the periodic stand's D × closure. The review restates it.
+
+## Addendum: G1 on the user's phone and laptop (2026-10-29)
+The G1 page (`kernel.html`, this note's §1 configuration) was run by the user, cross-origin isolated, in Chrome 156 on both machines:
+- **Phone:** a Pixel 8a, 9 cores reported;
+- **Laptop:** a ThinkPad X1 Carbon, Linux, 16 cores reported.
+
+Medians in ms:
+
+| Kernel, slab | Pixel 8a | X1 Carbon | This VM (§1) |
+|---|---|---|---|
+| TypeScript (fused), D = 32 | 222.1 | 217.4 | 241 (bench) |
+| WASM scalar, D = 32 | 117.6 | 118.4 | 118–120 |
+| WASM SIMD, 1 lane, D = 32 | 48.2 | 42.2 | 54–59 |
+| WASM SIMD, 4 lanes, D = 32 | **32.1** | **13.1** | 23 |
+| WASM SIMD, 1 lane, D = 48 | 65.8 | 64.4 | 76–77 |
+| WASM SIMD, 4 lanes, D = 48 | 35.8 | 27.5 | 28 |
+| WASM SIMD, 1 lane, D = 64 | 86.1 | 88.4 | 105–111 |
+| WASM SIMD, 4 lanes, D = 64 | **42.9** | 31.6 | 43 |
+| WASM SIMD, 1 lane, D = 64 in 2× cells | 19.6 | 11.2 | 12–15 |
+| WASM SIMD, 4 lanes, D = 64 in 2× cells | 11.9 | 2.9 | 6 |
+
+- **The stop rule passes with room:** 4-lane SIMD at D = 32 is 32 ms on the phone, against the rule's 150. Even D = 64 is 43 ms, so the light no longer constrains D.
+- **Single-threaded, the phone is within 15% of the laptop:** TypeScript 1.02×, scalar 0.99×, SIMD 1.0–1.14×. It is 0.8–1.0× this VM. **The review's 2.7× phone-per-core multiplier (from M15) is wrong for this phone and these kernels,** and is replaced by these ratios.
+- **Lane scaling, 1 to 4 lanes:**
+
+  | | D = 32 | D = 48 | D = 64 | 2× cells |
+  |---|---|---|---|---|
+  | Pixel 8a | 1.50× | 1.84× | 2.0× | 1.65× |
+  | X1 Carbon | 3.2× | 2.3× | 2.8× | 3.9× |
+
+  The review uses the phone's measured ratio per D for the light and, as the user asked, 1.5× for the tree passes' thread gain.
+- **Memory held:** the phone ran D = 64 with four lanes (about 170 MB by §2c of the review) without failing.

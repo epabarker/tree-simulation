@@ -2,6 +2,28 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-29: 3D port, G1 passed; a throwaway 3D prototype; ADR 0024 accepted
+
+- **G1 (user, on a Pixel 8a and an X1 Carbon):**
+  - 4-lane WASM SIMD light at D = 32 takes 32 ms on the phone (rule: 150) and 13 ms on the laptop; D = 64 takes 43 and 32 ms.
+  - Single-threaded the phone is within 15% of the laptop, so M15's 2.7× is replaced.
+  - Lane scaling: phone 1.5–2.0×, laptop 2.3–3.2×.
+  - The results are in the open-slab note's addendum.
+- **Prototype** ([note](experiments/2026-10-29-proto3d.md)): throwaway, outside `src/`.
+  - **What it reuses:** the core's `Tree`, its tables widened at run time by 3D columns, and its dimension-free passes by import (C3, R1, C5, C6, R6).
+  - **What is new:** C1 laterals by divergence angle, C4 as a vector, and the slab sweep, open z with face clipping and an optional 3-cell fade.
+  - **The stand:** `forest`'s planting for 100 seasons at D = 32, 48 and 64.
+- **Surprise: the requested rules stunt the trees.** Under C1–C6 and R1 alone, 2D and 3D both stop at height 48 by season 40, because dormant buds keep leaves and their cost. With R6 (no new code) the trees reach 85–90, so a second set runs with R6, labelled.
+- **Measured:**
+  - **m:** 13–26 while growing, about 8 at a plateau, nearly independent of D.
+  - **Passes:** 1.1–1.8× a 2D metamer's cost, up to 2.7× in the fastest growth.
+  - **Crowns:** free crowns about 0.8 × height deep.
+  - **Faces, with R6:** foliage stacks at them. At D = 32 the fade moves the pile but does not cure it; at D = 48 it cures it; at D = 64 crowns taper of their own accord.
+- **Re-projected** (review §2): `forest` on the phone at season 40 costs ≈ 61–75 ms at D = 32–64 under SIMD and lanes, and single-threaded SIMD fits the intro too. D is chosen by the crowns: **D = 64 with the 3-cell fade**.
+- **The page:** `proto.html` on the site preview draws the 3D stands orthographically beside today's view of the same planting grown in 2D. They are uncalibrated and read as hedges (open-z side light keeps lower crowns leafy).
+- **ADR 0024 accepted,** with D and the fade filled in, for the user to confirm before G2.
+- **Nothing in `src/`, the goldens or the default light model changed.**
+
 ## 2026-10-29: 3D port, re-costed at the open slab; G1 at three depths
 
 - **User:** G0.5 revealed a misunderstanding.

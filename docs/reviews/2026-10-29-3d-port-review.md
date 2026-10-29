@@ -24,6 +24,12 @@ So it needs the user's agreement and an ADR. [ADR 0024](../decisions/0024-3d-sla
 - **D is deferred to I2.** §2 is re-costed at D = 32, 48 and 64 with open z ([note](../experiments/2026-10-29-open-slab-cost.md)).
 - **Accepted from the second version:** the narrowed freeze, the WASM after first paint, and the pyramid as G3's fallback.
 
+**Amended a third time, after G1 and the 3D prototype** (fourth session):
+- **G1 passed with room** ([open-slab note](../experiments/2026-10-29-open-slab-cost.md), addendum). 4-lane SIMD light at D = 32 is 32 ms on the user's Pixel 8a and 13 ms on their laptop; D = 64 is 43 and 32. **Light no longer constrains D.**
+- **The 2.7× phone multiplier is replaced** by the two measured ratios: single-threaded the phone is within 15% of the laptop, and its 1-to-4-lane scaling is 1.5–2.0× against the laptop's 2.3–3.2×.
+- **A throwaway 3D growth prototype measured the tree passes and the crowns** ([note](../experiments/2026-10-29-proto3d.md)). Its numbers replace §2's estimates, labelled measured-in-prototype.
+- **D = 64 with a 3-cell fade** is recommended (§2a, Qz). ADR 0024 moves to accepted with D and the fade filled in, as the user asked, and may be revised before G2.
+
 ## Decisions already made (user, 2026-10-29)
 1. **World shape:** a slab one crown deep, seen from the front, as the garden is now. A full volume and a free camera are out of scope. D is to be measured from crown widths.
 2. **Hosting:** edbarker.dev is on Cloudflare and can send COOP/COEP, so WASM threads are available to the garden. GitHub Pages cannot send them, so the lab question is left to this review.
@@ -42,128 +48,119 @@ So it needs the user's agreement and an ADR. [ADR 0024](../decisions/0024-3d-sla
 | §3.1: 170 M updates ≈ 0.5 s in JS "at the current per-update cost" (estimate): about 3 ns an update | 2D row march 18–24 ns an update; 3D 24–28 ns. The same 170 M would take 4–5 s | **Rejected:** 6–9× too optimistic |
 | §3.1: about 50× for a thin slab (estimate; the ROADMAP's own figure) | D = 16, K = 16: 48–58× the 2D light phase. D = 32, K = 16: 104–120× (`forest`), 85–89× (`panorama`). D = 32, K = 32: ≈ 210× | **Kept for D = 16, rejected for the slab we chose:** about 100× there |
 | §3.1: pyramid 343 updates a bud, "independent of world volume"; "likely the right default" (estimate) | Deposit 400–420 cells a bud (Σ(2q + 1)² is 455, not (q + 1)³). The V cone search, which the brief omits, dominates in TypeScript: 21 µs a sample, 0.6–1.9 s at 3D counts. **On equal terms** (Rust, a precomputed cone): 33–35 ms single-threaded for `forest` at 3D counts, against the sweep's 63–153; about the same as the sweep threaded | **Cost figure rejected** (343, and "independent of volume": it scales with buds). **The recommendation is not rejected on cost;** it is declined on behaviour (Q2) |
-| §3.2: 5–20× more metamers (estimate) | Leaf area per ground column is about the same in every closed 2D stand, because Beer–Lambert sets it; side-lit crowns carry 0.8–2.4× more. With open z, foliage scales by D × plan fill × a side-light factor: **22–46× at D = 32, 29–69× at 48, 35–92× at 64** (§2) | **Rejected as too low** for this slab |
-| §3.2: tree passes 10–80 ms in JS for `forest` (estimate) | Projected 66–280 ms at D = 32, up to 105–550 at D = 64 (§2; still an estimate) | **Rejected as too low** |
+| §3.2: 5–20× more metamers (estimate) | Measured in the prototype, 3D over 2D under the same rules: **13–26× while the stand grows, about 8× once it plateaus**, nearly independent of D. My own estimate of 22–92× was too high: the neighbours every 21 cells close a crown in x, whatever D | **Kept, roughly**; my estimate rejected |
+| §3.2: tree passes 10–80 ms in JS for `forest` (estimate) | 61–70 ms on the phone at season 40 (19–252 over the range); measured-in-prototype multipliers on the full model's measured 2D costs (§2) | **Kept** |
+| §3.2: 2–4× per metamer (estimate; mine was 1.5–3×) | Measured in the prototype: **1.1–1.8×**, up to 2.7× in the fastest growth | **Both rejected as too high** |
 | §3.3: memory 100–200 MB (estimate, for a 300 × 120 × 120 volume) | The volume is out of scope. The slab's field is 17.5 MB (`forest`) or 47 MB (`panorama`) in Float32, plus 12–33 MB of partial field per thread lane | Not applicable |
 | §4.1: scalar Rust 1.2–2.5× (estimate) | 1.2–3.3×, median 2.0× (light kernel, 48 configurations) | **Kept**, upper half |
 | §4.2: f64x2 ≈ 2×, f32x4 ≈ 4× (estimate) | Against TS: SIMD f64 1.8–3.6× (median 2.3), but only 1.3× over scalar WASM; SIMD f32 3.7–6.3× (median 5.2), 2.5× over scalar | **Kept for f32**; f64 SIMD is barely worth having |
 | §4.2: polynomial exp makes the exp pass 5–10× faster (estimate) | In scalar code it is slower than libm, which skips zero depth. In SIMD lanes it gains 1.1–1.4× on the whole kernel. Error 4·10⁻⁸ | **Rejected** as a separate lever; it matters only inside SIMD |
-| §4.2: threads 3–4× on a phone's cores (estimate) | Native, 4 desktop cores: 2.6–3.0× with a private partial field per thread; 1.5–2.1× with any reduction or per-row barrier. A phone with 2–4 big cores: 2.0–2.5× (estimate) | **Rejected** for phones; the scheme matters as much as the core count |
+| §4.2: threads 3–4× on a phone's cores (estimate) | Native, 4 desktop cores: 2.6–3.0× with a private partial field per thread; 1.5–2.1× with any reduction or per-row barrier. **G1, Pixel 8a: 1.5× at D = 32, 1.8–2.0× at 48–64**; laptop 2.3–3.2× | **Rejected** for phones; mine (2.0–2.5×) too high at D = 32 |
+| (mine, M15) phone 2.7× slower per core | **G1: the Pixel 8a is within 15% of the laptop single-threaded** (TS 222 against 217 ms; 1-lane SIMD 48 against 42) | **Rejected** |
 | §4.4: about 15× over JS with threads, 4–5× without (estimate) | Desktop: 5.2 × 2.8 ≈ 14×; without threads ≈ 5×. Phone ≈ 10–12× | **Kept** for desktop |
 | §4.2: "only exp is implementation-defined; a vendored exp removes that" (estimate) | On about 10⁷ cells, Rust's f64 `exp` on wasm32 gave the same bits as V8's `Math.exp`: the Float64 WASM kernel is bit-identical to the TS kernel | **Kept, and stronger:** a bit-identical port of the 2D goldens looks attainable |
 | §4.3: .wasm 40–100 kB gzipped (estimate) | The light kernel alone (both precisions, later with the pyramid) is 24–32 kB, mostly std. A whole 3D core: 40–80 kB (estimate; Q7) | Kept, lower half |
 | §2 baseline table (measured) | Stale against M25's presets: `forest` now carries 1905 metamers at season 100 (it said 1575), `panorama` 4751. Re-measured here | Updated |
 | §1: first paint about 60 kB against 100 kB (measured) | The garden is 55.3 kB against ADR 0014's 60 kB gate | Corrected |
 
-## 2. Projected season at the open slab: D = 32, 48 and 64, K = 16, Float32, open z
-
-Where the inputs come from: measured where marked; the rest are estimates, with what would narrow them. The script that combines them is `code/2026-10-29-3d-port/project.py`.
+## 2. Projected season at the open slab (second version: after G1 and the prototype)
+At the end of the garden's intro, season 40, when growth and cost peak; for `forest` (the phone's ring) and `panorama` (the wide desktop's), on the user's two devices. The script is `code/2026-10-29-3d-port/project.py`.
 
 | Input | Value | Source |
 |---|---|---|
-| Light, TS | `forest` 241 / 362 / 472 ms at D = 32 / 48 / 64; `panorama` 826 / 1291 / 1613 | measured (bench, fused march, open z) |
-| Light, scalar WASM | `forest` 119 / 220 / 241; `panorama` 447 / 647 / 792 | measured (Node) |
-| Light, SIMD f32, 1 lane | `forest` 54–59 / 76–77 / 105–111; `panorama` 191 / 242 / 335 | measured (Node and browser) |
-| Light, SIMD, 4 lanes | `forest` 23 / 28 (up to 37 if linear) / 43 | measured (desktop browser, the G1 page) |
-| | `panorama` ≈ 73 / 86 / 134 | estimated from `forest`'s 1-to-4 ratio |
-| Light, D = 64 in 2× cells | `forest`: scalar 43, SIMD 12–15, 4 lanes 6; `panorama`: scalar 171, SIMD 41 | measured. TS ≈ fine D = 64 ÷ 8, estimate |
-| Lanes on light, phone | 2.0–2.5× | estimate (big.LITTLE); G1 measures it |
-| 2D tree passes (sample through deaths), mature seasons | `forest` 2.0 ms (1905 metamers), `panorama` 6.8 ms (5092) | measured on garden-v0.14.0; bench mean × last-20/mean |
-| 2D lean snapshot, mature seasons | `forest` 0.25 ms, `panorama` 0.94 ms | measured, the same way |
-| Metamer multiplier m, open z | D × plan fill (0.7–0.9) × side-light factor (1.0–1.6) × D_eff/D. D_eff: understorey crowns (40–60 cells) do not fill D = 48 or 64. Result: 32 (22–46) at D = 32; 45 (29–69) at 48; 57 (35–92) at 64 | the factors measured in 2D (open-slab note §2–3); combining them is an estimate. A grown 3D stand (I2) replaces it |
-| Cost multiplier per metamer, 3D against 2D | 1.5–3× | estimate. I2 measures it |
-| Rust against TS on tree passes | 1.3–2.0× | estimate. I1 measures it |
-| Threads on tree passes | desktop 2–3×, phone 1.7–2.3× | estimate: trees are independent between §6 phases, but unequal in size |
-| Snapshot | 2D × m × 1.3 (more columns); Rust 1.5× faster | estimate from measured 2D |
-| Phone against desktop | 2.7× per core | measured once (M15, the user's phone, JS). Assumed for WASM; G1 measures it |
+| Light, by device, tier and D | phone 4-lane SIMD 32 / 36 / 43 ms at D = 32 / 48 / 64; 1-lane 48 / 66 / 86; scalar 118 and TypeScript 222 at D = 32. Laptop 13 / 28 / 32, 1-lane 42 / 64 / 88 | **measured (G1)**. TS and scalar at D = 48 and 64 scale D = 32 by this VM's ratios (estimate) |
+| Light, `panorama` | this VM's measured `panorama` × the device's ratio to the VM on `forest` | estimate |
+| Single-thread speed of the passes, device against this VM | phone 0.92×, laptop 0.90× | **measured (G1)**, on the TypeScript kernel |
+| Full model's 2D passes per metamer | 1.05 μs (`forest`), 1.34 μs (`panorama`) | measured (VM) |
+| Full model's 2D metamers at season 40 | `forest` 1972; `panorama` 5092 (season 100) | measured (VM) |
+| m, 3D over 2D | 19.0 / 20.1 / 20.5 at D = 32 / 48 / 64 (season 40, with R6); low 8.2–8.3 (the plateau without R6); high 42–45 (the prototype's absolute count over the full model's) | **measured in prototype** |
+| 3D over 2D cost per metamer | 1.69 / 1.65 / 1.78 (season 40, with R6); range 1.1–2.7 | **measured in prototype** |
+| Rust over TypeScript on the passes | 1.6× (1.3–2.0) | estimate; I1 measures it |
+| Lanes on the passes | phone 1.5×, as the light at D = 32 (the user's rule); laptop 2× (1.5–3) | estimate |
+| Snapshot | 0.13 μs a metamer, Rust 1.5× faster | estimate from measured 2D |
 
-In 3D that is about 61k metamers for `forest` at D = 32 (42k–88k), 86k at 48 and 109k at 64; `panorama` about 163k, 229k and 290k.
+**What is left estimated:**
+- Rust's speed-up on the passes and their lane gain;
+- what R2–R5, mechanics and stand dynamics do to m and to the per-metamer cost. In 2D, R4 and R5 cut the same planting's metamers 2–9×, while mechanics adds about a quarter to the passes.
 
-Each cell below reads light · tree passes · snapshot = **season, central (range)**, in ms unless marked s. The "2× cells" row coarsens the light grid only (§2b).
+The ranges' high ends assume none of that pruning.
 
-**`forest`, desktop**: light · tree passes · snapshot = season, ms
+Each cell reads light · tree passes · snapshot = **season, central (range)**, ms unless marked s.
 
-| D | (a) TypeScript | (b) scalar Rust/WASM | (c) Rust, SIMD f32 | (d) SIMD + 4 lanes |
-|---|---|---|---|---|
-| 32 | 241 · 128 · 10 = **379 (295–551)** | 119 · 80 · 7 = **206 (156–342)** | 57 · 80 · 7 = **144 (92–281)** | 23 · 32 · 7 = **62 (37–141)** |
-| 48 | 362 · 180 · 15 = **557 (429–827)** | 220 · 112 · 10 = **342 (270–553)** | 77 · 112 · 10 = **199 (126–410)** | 32 · 45 · 10 = **87 (49–211)** |
-| 64 | 472 · 228 · 19 = **0.72 s (0.55–1.09)** | 241 · 142 · 12 = **396 (301–686)** | 108 · 142 · 12 = **263 (165–556)** | 43 · 57 · 12 = **112 (65–278)** |
-| 64, light in 2× cells | 59 · 228 · 19 = **306 (170–646)** | 43 · 142 · 12 = **198 (103–488)** | 14 · 142 · 12 = **169 (72–460)** | 6 · 57 · 12 = **75 (30–239)** |
-
-**`forest`, phone (×2.7)**: light · tree passes · snapshot = season, ms
+**`forest`, phone**, season 40: light · tree passes · snapshot = season, ms
 
 | D | (a) TypeScript | (b) scalar Rust/WASM | (c) Rust, SIMD f32 | (d) SIMD + 4 lanes |
 |---|---|---|---|---|
-| 32 | 651 · 346 · 28 = **1.02 s (0.80–1.49)** | 321 · 216 · 19 = **556 (421–924)** | 154 · 216 · 19 = **389 (248–759)** | 70 · 108 · 19 = **197 (110–444)** |
-| 48 | 977 · 486 · 39 = **1.50 s (1.16–2.23)** | 594 · 304 · 26 = **0.92 s (0.73–1.49)** | 208 · 304 · 26 = **0.54 s (0.34–1.11)** | 94 · 152 · 26 = **273 (150–650)** |
-| 64 | 1274 · 616 · 50 = **1.94 s (1.49–2.95)** | 651 · 385 · 33 = **1.07 s (0.81–1.85)** | 292 · 385 · 33 = **0.71 s (0.45–1.50)** | 133 · 192 · 33 = **358 (196–878)** |
-| 64, light in 2× cells | 159 · 616 · 50 = **0.82 s (0.46–1.74)** | 116 · 385 · 33 = **0.53 s (0.28–1.32)** | 38 · 385 · 33 = **0.46 s (0.19–1.24)** | 17 · 192 · 33 = **243 (95–748)** |
+| 32 | 222 · 61 · 4 = **288 (229–479)** | 118 · 38 · 3 = **159 (121–311)** | 48 · 38 · 3 = **89 (55–238)** | 32 · 25 · 3 = **61 (37–161)** |
+| 48 | 334 · 63 · 5 = **402 (335–609)** | 217 · 39 · 3 = **260 (216–426)** | 66 · 39 · 3 = **108 (72–267)** | 36 · 26 · 3 = **65 (41–172)** |
+| 64 | 435 · 70 · 5 = **509 (431–720)** | 238 · 43 · 3 = **285 (235–452)** | 86 · 43 · 3 = **133 (91–292)** | 43 · 29 · 3 = **75 (47–182)** |
+| 64, light in 2× cells | 54 · 70 · 5 = **129 (70–321)** | 30 · 43 · 3 = **76 (38–233)** | 20 · 43 · 3 = **66 (28–222)** | 12 · 29 · 3 = **44 (18–150)** |
 
-**`panorama`, desktop**: light · tree passes · snapshot = season, ms
-
-| D | (a) TypeScript | (b) scalar Rust/WASM | (c) Rust, SIMD f32 | (d) SIMD + 4 lanes |
-|---|---|---|---|---|
-| 32 | 826 · 435 · 39 = **1.30 s (1.01–1.89)** | 447 · 272 · 26 = **0.75 s (0.58–1.21)** | 191 · 272 · 26 = **489 (321–950)** | 73 · 109 · 26 = **208 (115–485)** |
-| 48 | 1291 · 612 · 55 = **1.96 s (1.52–2.89)** | 647 · 382 · 37 = **1.07 s (0.82–1.79)** | 242 · 382 · 37 = **0.66 s (0.41–1.38)** | 86 · 153 · 37 = **276 (149–708)** |
-| 64 | 1613 · 775 · 70 = **2.46 s (1.88–3.73)** | 792 · 484 · 46 = **1.32 s (1.00–2.31)** | 335 · 484 · 46 = **0.87 s (0.54–1.85)** | 134 · 194 · 46 = **374 (193–949)** |
-| 64, light in 2× cells | 202 · 775 · 70 = **1.05 s (0.59–2.21)** | 171 · 484 · 46 = **0.70 s (0.38–1.69)** | 41 · 484 · 46 = **0.57 s (0.25–1.56)** | 17 · 194 · 46 = **257 (101–815)** |
-
-**`panorama`, phone (×2.7)**: light · tree passes · snapshot = season, ms
+**`forest`, laptop**, season 40: light · tree passes · snapshot = season, ms
 
 | D | (a) TypeScript | (b) scalar Rust/WASM | (c) Rust, SIMD f32 | (d) SIMD + 4 lanes |
 |---|---|---|---|---|
-| 32 | 2230 · 1175 · 106 = **3.51 s (2.73–5.09)** | 1207 · 734 · 70 = **2.01 s (1.56–3.26)** | 516 · 734 · 70 = **1.32 s (0.87–2.57)** | 234 · 367 · 70 = **0.67 s (0.39–1.51)** |
-| 48 | 3486 · 1652 · 148 = **5.29 s (4.10–7.79)** | 1747 · 1033 · 99 = **2.88 s (2.21–4.82)** | 653 · 1033 · 99 = **1.79 s (1.12–3.73)** | 297 · 516 · 99 = **0.91 s (0.50–2.20)** |
-| 64 | 4355 · 2093 · 188 = **6.64 s (5.09–10.07)** | 2138 · 1308 · 125 = **3.57 s (2.70–6.24)** | 905 · 1308 · 125 = **2.34 s (1.46–5.00)** | 411 · 654 · 125 = **1.19 s (0.65–2.95)** |
-| 64, light in 2× cells | 545 · 2093 · 188 = **2.83 s (1.58–5.96)** | 462 · 1308 · 125 = **1.90 s (1.02–4.56)** | 111 · 1308 · 125 = **1.54 s (0.67–4.21)** | 50 · 654 · 125 = **0.83 s (0.33–2.55)** |
+| 32 | 217 · 60 · 4 = **282 (224–474)** | 118 · 37 · 3 = **159 (122–312)** | 42 · 37 · 3 = **83 (49–232)** | 13 · 19 · 3 = **35 (16–141)** |
+| 48 | 327 · 62 · 5 = **393 (328–602)** | 219 · 39 · 3 = **261 (217–428)** | 64 · 39 · 3 = **106 (70–266)** | 28 · 19 · 3 = **50 (30–163)** |
+| 64 | 426 · 68 · 5 = **499 (422–711)** | 240 · 43 · 3 = **285 (237–453)** | 88 · 43 · 3 = **134 (93–294)** | 32 · 21 · 3 = **56 (34–170)** |
+| 64, light in 2× cells | 53 · 68 · 5 = **126 (68–320)** | 30 · 43 · 3 = **76 (38–233)** | 11 · 43 · 3 = **57 (20–213)** | 3 · 21 · 3 = **27 (7–140)** |
 
-**How to read them against the budgets:**
-- **The intro sets the budget:** 4 seasons a second, 250 ms a season, with the worker pipelined behind the tween. The ambient pace allows seconds, so every tier fits it.
-- **Phones get the narrow ring:** `forestParams` caps W by the host's width, so `forest` is the phone's upper case and `panorama` belongs to a wide desktop.
-- **Where the phone's intro holds under (d):** D = 32, at ≈ 197 ms (110–444).
-  - **D = 48:** ≈ 273 ms (150–650), about 10% over, an intro at about 3.7 seasons a second.
-  - **D = 64:** ≈ 358 ms (196–878), about 2.8 seasons a second.
-- **Where the desktop panorama's intro holds under (d):** D = 32 only, at ≈ 208 ms; 276 at 48 and 374 at 64.
-- **No tier without lanes holds the intro on a phone at any D.**
-- **At D ≥ 48 the tree passes are the larger share,** and they are the estimated half. Every range above is set by the m and per-metamer estimates, not by the light.
+**`panorama`, phone**, season 40: light · tree passes · snapshot = season, ms
 
-### 2a. What the faces clip, at each D
-A free crown's depth is taken as its open-grown crown width at season 100 (2D stand-ins; open-slab note §2). The share of that depth inside the slab is min(1, D/width):
+| D | (a) TypeScript | (b) scalar Rust/WASM | (c) Rust, SIMD f32 | (d) SIMD + 4 lanes |
+|---|---|---|---|---|
+| 32 | 761 · 202 · 12 = **0.97 s (0.74–1.68)** | 442 · 126 · 8 = **0.58 s (0.43–1.12)** | 162 · 126 · 8 = **295 (175–799)** | 108 · 84 · 8 = **199 (117–539)** |
+| 48 | 1190 · 208 · 12 = **1.41 s (1.13–2.21)** | 639 · 130 · 8 = **0.78 s (0.61–1.38)** | 207 · 130 · 8 = **345 (216–885)** | 113 · 87 · 8 = **207 (122–567)** |
+| 64 | 1487 · 229 · 12 = **1.73 s (1.40–2.57)** | 783 · 143 · 8 = **0.93 s (0.73–1.56)** | 267 · 143 · 8 = **419 (270–966)** | 133 · 95 · 8 = **237 (141–599)** |
+| 64, light in 2× cells | 186 · 229 · 12 = **0.43 s (0.23–1.07)** | 169 · 143 · 8 = **320 (182–853)** | 57 · 143 · 8 = **209 (81–725)** | 35 · 95 · 8 = **139 (52–486)** |
 
-| Species (open-grown width) | D = 32 | D = 48 | D = 64 |
+**`panorama`, laptop**, season 40: light · tree passes · snapshot = season, ms
+
+| D | (a) TypeScript | (b) scalar Rust/WASM | (c) Rust, SIMD f32 | (d) SIMD + 4 lanes |
+|---|---|---|---|---|
+| 32 | 745 · 197 · 11 = **0.95 s (0.73–1.66)** | 445 · 123 · 8 = **0.58 s (0.43–1.13)** | 141 · 123 · 8 = **272 (156–776)** | 44 · 62 · 8 = **113 (51–466)** |
+| 48 | 1165 · 204 · 12 = **1.38 s (1.11–2.18)** | 644 · 127 · 8 = **0.78 s (0.61–1.39)** | 202 · 127 · 8 = **338 (212–880)** | 86 · 64 · 8 = **158 (90–537)** |
+| 64 | 1455 · 224 · 12 = **1.69 s (1.37–2.53)** | 788 · 140 · 8 = **0.94 s (0.74–1.57)** | 274 · 140 · 8 = **422 (276–974)** | 98 · 70 · 8 = **176 (100–559)** |
+| 64, light in 2× cells | 182 · 224 · 12 = **0.42 s (0.22–1.07)** | 170 · 140 · 8 = **318 (183–855)** | 33 · 140 · 8 = **181 (59–697)** | 8 · 70 · 8 = **87 (20–456)** |
+
+**Reading them against the budgets:**
+- **The intro sets the budget:** 4 seasons a second, 250 ms a season.
+- **On the phone under (d), `forest`'s intro holds at every D:** ≈ 61 / 65 / 75 ms. Even the ranges' high ends (161–182) fit.
+- **Without lanes it still holds:** under (c), single-threaded SIMD, 89 / 108 / 133 ms, so the lab and a phone without cross-origin isolation keep the intro too. Scalar (b) holds at D = 32 only; TypeScript (a) holds at none.
+- **The desktop `panorama`** under (d) on the laptop: 113 / 158 / 176 ms.
+- **D no longer has a cost answer between 32 and 64.** D = 64 costs about 14 ms more than D = 32 on the phone. It is chosen by the crowns (§2a).
+- **The coarse lattice** (light in 2× cells) is no longer needed, and §2b's caution about it stands.
+
+### 2a. What the faces do, at each D (measured in prototype)
+Replacing the first version's table, which assumed 2D open-grown widths:
+- **Free crowns in 3D are about 0.8 × their height deep:** 39 cells at height 48, 49 at 57, 65 at 71–89. The full model's trees reach 90–96 cells by season 100, so they would want about 70–85.
+- **With R6** (lit resting buds become leafy short shoots), clipping stacks foliage at the faces:
+  - **D = 32:** the outer 4-cell bands hold twice the interior's share by season 100, with 3.5k leaves stranded beyond the faces. The 3-cell fade removes the stranded leaves but not the pile, which moves 3 cells inward.
+  - **D = 48:** a mild pile (outer bands 10–11% against 6–10%); the fade cures it, at 4 cells of crown depth.
+  - **D = 64:** crowns taper to 2–3% at the faces; by season 100 they are just reaching them (128 leaves beyond).
+- **Without R6** the trees stop at height 48, their crowns fit inside D = 48, and nothing piles.
+
+**So D = 64, with the 3-cell fade:**
+- it is the only D at which the prototype's crowns taper of their own accord;
+- the fade costs nothing, and keeps the full model's taller trees (70–85 cells of free depth) from stranding leaves at the faces as they near full height;
+- D = 48 with the fade is the fallback if memory or the phone's budget ever bites (about 10 ms and 40 MB less).
+
+The fade at D = 64 was not grown in the prototype; I2 should grow D = 64 with and without it.
+
+### 2b. The coarser lattice
+Light in 2× cells cut the light 8× at D = 64 in every measurement. With light already cheap it is not needed, and it is not the same result (§2 of the second version: half the light resolution, coarser shade, more recalibration). It stays a reserve.
+
+### 2c. Memory (Float32, 4 lanes, `forest` on the phone)
+
+| | D = 32 | D = 48 | D = 64 |
 |---|---|---|---|
-| rowan, holly (45) | 71% | all | all |
-| birch (54), goat willow (56) | 57–59% | 86–89% | all |
-| field maple (80) | 40% | 60% | 80% |
-| oak (109) | 29% | 44% | 59% |
-| beech (127), hornbeam (137) | 23–25% | 35–38% | 47–50% |
-| for reference: `skyTree` (74), `oakOpen` (115–145) | 22–43% | 33–65% | 44–86% |
+| Light field (ℓ, Q, V) | 17.5 MB | 26 MB | 35 MB |
+| Partial fields, 4 lanes | 48 MB | 72 MB | 96 MB |
+| Tree tables (≈ 35 columns × 37k–40k metamers; high 89k) | ≈ 8 (19) MB | ≈ 9 (19) MB | ≈ 9 (19) MB |
+| Snapshot buffers | ≈ 5 MB | ≈ 5 MB | ≈ 5 MB |
+| **Total** | **≈ 79 MB** | **≈ 112 MB** | **≈ 145 MB** |
 
-The canopy's dominants are clipped at every D costed here. They would fit only at D ≈ 110–150, where `forest`'s light alone is 2.3–3× D = 48's.
-
-**Seen from the front the clipping is invisible, as the user says, but it is not free in the model.** See Qz.
-
-### 2b. The coarser lattice: a cheaper way to the same result?
-**Light in cells twice the size at D = 64** (32 coarse cells deep) costs 1/8 of the fine light: `forest` 6 ms in 4 lanes, against 43. But at D = 64 the light was not what broke the budget. With the tree passes unchanged, the phone's `forest` season under (d) is ≈ 243 ms (95–748), against 358 at fine cells and 197 at fine D = 32.
-
-So coarse light buys D = 64 about the time budget of fine D = 32. It is **not the same result:**
-- **light at half the resolution:** a bud's "own cell" (which it does not shade) becomes 8 cells' worth of foliage;
-- **coarser shade:** gaps narrower than 2 cells close, and a crown's self-shading is averaged over 2 × 2 × 2 blocks;
-- **recalibration:** M18's accuracy work and every k_ext and threshold calibration assumed unit cells, so C1 recalibrates more.
-
-**Coarsening the whole model** (metamers twice as long, so a tree has 4–8× fewer) would cut the tree passes too, and make D = 64 cheap. But it changes the picture: fewer, longer twigs, a coarser silhouette. Against the user's aim it is the wrong trade, so I have not costed it as a row.
-
-### 2c. Memory (Float32, 4 lanes)
-
-| | `forest` D = 32 / 48 / 64 | `panorama` D = 32 / 48 / 64 |
-|---|---|---|
-| Light field (ℓ, Q, V) | 17.5 / 26 / 35 MB | 47 / 70 / 93 MB |
-| Partial fields, 4 lanes | 48 / 72 / 96 MB | 132 / 200 / 264 MB |
-| Tree tables (≈ 35 columns) | ≈ 13 / 18 / 23 MB | ≈ 34 / 48 / 61 MB |
-| Snapshot buffers | ≈ 7 / 10 / 13 MB | ≈ 20 / 27 / 35 MB |
-| **Total** | **≈ 86 / 126 / 167 MB** | **≈ 233 / 345 / 453 MB** |
-
-Two lanes save about a third on the phone. The desktop panorama at D = 64 is near half a gigabyte, so there the lane count is a memory decision.
+G1 ran D = 64 on the phone with four lanes, the field and the partials included, without trouble. Two lanes would save about 50 MB at D = 64, at the cost of the phone's lane gain.
 
 ## 3. The remaining §7 questions
 Q1 (world shape) and Q4 (hosting) are decided above. The lab part of Q4 is answered here.
@@ -207,13 +204,11 @@ Q1 (world shape) and Q4 (hosting) are decided above. The lab part of Q4 is answe
 - **G3:** the exact tracer stops at the faces, as M6's side-light tests do in x.
 - **Cost:** open z is the cheaper boundary in TypeScript (zero pads), and no different in WASM.
 
-**Where I disagree, in part:** the clipping is invisible from the front, but it is not only a cost choice. Three effects reach the picture through the trees' form:
-1. **Foliage piles up at the faces.** Light is best near a face, where low-elevation rays come in through open sky. The face also stops growth: shoots reaching for that light end there, and the lit buds they leave become short shoots or dormant buds.
-   - So the front of every clipped crown fills with leaves in a layer one or two cells deep.
-   - In the frontal view, "leaves pile up where the crown is deep" becomes "leaves pile up at the face", most of all at small D, where the dominants keep under a third of their depth.
-2. **Allocation.** Borchert–Honda sends resource toward the best-lit buds, and at a face those buds cannot extend. The resource then goes to their siblings, or is lost to the budget (R1). That shifts the balance of height against spread, so D changes the silhouette as well as the depth.
-3. **D and the look are coupled.** The visual check after I2 should therefore show the grown stand at two values of D (say 32 and 48). It is the only way to see whether face-clipped crowns read as volumes or as hedges.
-- **A possible softening, to try at I2:** the faces stay hard for growth, but Q fades over the last 2–3 cells before a face, so crowns round off toward it instead of flattening.
+**Measured in the prototype** (§2a): the clipping is invisible from the front, but it shapes the crowns, as the second version argued. The outcome depends on R6:
+- **With R6, foliage stacks at the faces.** At D = 32 the outer bands hold twice the interior's share, and the fade only moves the pile inward; at D = 48 the fade cures a mild pile; at D = 64 crowns taper of their own accord.
+- **Without R6 nothing piles**, since crowns stop small.
+- **Allocation:** the prototype grew equal metamer counts at every D (within 2–8%), so the effect on the balance of height against spread is small next to the pile.
+- **The decision:** D = 64 with Q fading linearly to 0 over the last 3 cells before each face (§2a).
 - **Rejected:** letting growth cross the faces while light stays bounded. A bud beyond the slab would see unshaded sky, which is the M0 runaway that the closed-box rule exists to stop.
 
 **Q3, grid policy.**
@@ -222,7 +217,7 @@ Q1 (world shape) and Q4 (hosting) are decided above. The lab part of Q4 is answe
   - **A bricked sparse grid.** Under a closed canopy nearly every column is non-empty, the `top` bound already skips the empty sky, and bricks would break the march's padded row copies.
   - **Per-tree local grids.** Trees compete through one shared field (§C2.9).
   - **Float64.** It is no faster in TS, about 2× slower in SIMD, and buys 10⁻⁶ of C against a model error of 0.04.
-- **D:** deferred to I2. The phone's intro holds at D = 32 under (d) (§2). D = 48 costs about 10% of the intro's pace, and D = 64 about 30%; memory grows with D (§2c).
+- **D = 64** (§2a), with a 3-cell fade at the faces. Its cost is ≈ 75 ms a season on the phone under (d), and about 145 MB (§2c).
 
 **Q5, language boundary.**
 - **Answer:** the whole core in Rust. The light phase goes first behind `LightModel`, only as the step that proves the toolchain and the goldens.
@@ -262,9 +257,9 @@ Q1 (world shape) and Q4 (hosting) are decided above. The lab part of Q4 is answe
 3. **The 2D goldens** are archived with a tag when 3D lands. The evidence tests, not hashes, carry behaviour from then on, as they do now.
 - **Rejected:** tolerance goldens. Hashes of rounded values flip at rounding boundaries.
 
-**Q7, renderer budget.** The view is the garden's orthographic frontal illustration: (x, y) projected, drawn in z order, as today's renderer draws but with real depth. ADR 0008's pseudo-depth squeeze goes, since the geometry carries its own depth. There is no perspective, depth darkening or second rank, so none of G0.5's drawing code is in scope. The target is the user's phone (2.7× the desktop per core), at the phone ring (W ≤ 210, about 60k metamers and 30k leafy buds at D = 32, about 100k at D = 64):
+**Q7, renderer budget.** The view is the garden's orthographic frontal illustration: (x, y) projected, drawn in z order, as today's renderer draws but with real depth. ADR 0008's pseudo-depth squeeze goes, since the geometry carries its own depth. There is no perspective, depth darkening or second rank, so none of G0.5's drawing code is in scope. The target is the user's phone (a Pixel 8a, within 15% of their laptop per core; G1), at the phone ring (W ≤ 210, about 40k metamers at D = 64 by the prototype's multiplier, up to 90k without R4/R5 pruning):
 - **Frame:** main-thread p95 ≤ 6 ms and GPU ≤ 8 ms, to hold 60 fps.
-- **Tween and wind move to the vertex shader.** M15 measured CPU tween at 0.05 µs a metamer a frame, and M16's wind adds 0.09. At 50k that is ≈ 7 ms on desktop and ≈ 20 ms on the phone: over budget.
+- **Tween and wind move to the vertex shader.** M15 measured CPU tween at 0.05 µs a metamer a frame, and M16's wind adds 0.09. At 40–90k that is ≈ 6–13 ms a frame on desktop and about the same on this phone: over budget at the high end.
 - **Instances:** ≤ 60k branch instances after twig LOD (M15's adaptive quality). Leaves are one card per leafy bud, alpha-tested, in a z-buffer, with no sorting and no per-leaf instances.
 - **The light field is not uploaded as a 3D texture.** Leaves keep today's colour by their own light (a per-instance value), which is light, not depth. The lab's shade overlay shows a z-slice.
 - **Bundle: argued, not set.** The first version proposed a separate 120 kB WASM gate on a page whose whole first-paint budget is 60 kB (ADR 0014). On measurement:
@@ -295,9 +290,10 @@ Q1 (world shape) and Q4 (hosting) are decided above. The lab part of Q4 is answe
 - **Rejected for now:** PyO3. It adds maturin to the uv project and freezes a Python-facing API, and in-process import is not wanted yet.
 - **What keeps PyO3 cheap later:** the native build exists anyway. The core crate must depend on nothing wasm-only (wasm-bindgen sits in a thin wrapper crate), and threads go behind a feature.
 
-**Q9, milestone order** (third session):
-- **G1 now**, on the existing deploy, at D = 32, 48 and 64. The stop rule applies at D = 32, the depth §2 recommends for the phone's intro.
-- Then G2, G3, I1 and I2.
+**Q9, milestone order** (fourth session):
+- **G1** passed.
+- **The prototype** has reported, and ADR 0024 is accepted with D = 64 and the fade.
+- **G2 starts next**, after the user confirms the two filled values. Then G3, I1 and I2.
 - **Then the visual check:** a stand grown in 3D, drawn orthographically with the existing renderer, beside today's pseudo-depth, on the user's phone. The user decides by eye.
 - Only then calibration.
 - Step (b) is held to bit-identical goldens.
@@ -306,11 +302,12 @@ Q1 (world shape) and Q4 (hosting) are decided above. The lab part of Q4 is answe
 |---|---|---|
 | G0 | This note and review | done |
 | G0.5 | A preview deploy with COOP/COEP (its perspective panels misread the intent; kept as a record) | hosting: `require-corp` breaks nothing on the site (checked locally). **Not a visual gate** |
-| G1 | The measured kernel on the user's phone, from the same deploy: 1 and 4 lanes at D = 32, 48, 64, and D = 64 in 2× cells | phone multiplier, lane scaling, memory. Stop if 4-lane SIMD at D = 32 > 150 ms |
+| G1 | The measured kernel on the user's phone, from the same deploy: 1 and 4 lanes at D = 32, 48, 64, and D = 64 in 2× cells | **passed:** phone 32 ms at D = 32 against the 150 ms rule; lane scaling and device ratios measured |
+| P | A throwaway 3D growth prototype (C1–C6, R1, and R6 as a second set), outside `src/` | **done:** m, the per-metamer cost, the foliage profile across z, D = 64 with the fade |
 | G2 | The Rust 2D sky sweep behind `LightModel`, f64 scalar; CI toolchain | bit-identical goldens; wasm size |
 | G3 | 3D light in Rust: exact-trace accuracy, K convergence, timing in the browser | the light model's error and K |
 | I1 | The whole Rust 2D core, every golden bit-identical; delete the TS core | r (Rust against TS on the tree passes), measured |
-| I2 | 3D topology and directions: lateral slots by divergence angle, direction frames, C4 in vectors, R3 vector moments; a stand grown at two values of D | m and the per-metamer multiplier, measured; D's cost |
+| I2 | 3D topology and directions: lateral slots by divergence angle, direction frames, C4 in vectors, R3 vector moments; a stand grown at D = 64 with and without the fade, with every principle | m and the per-metamer cost with R2–R5 in; the fade at D = 64 |
 | V | **The visual check:** I2's stand drawn orthographically with the existing renderer, beside today's pseudo-depth, on the user's phone | whether 3D-grown crowns are worth the port (the user's eye); which D |
 | I3 | Frontal 3D renderer with GPU tween and wind; garden on threads behind COOP/COEP; checkpoint policy | frame budget, first paint |
 | C1–C8 | Calibration (§4), only after V | — |
@@ -373,46 +370,38 @@ The 3D model shares its principles with the 2D one but is not the same model.
 
 Add the five or six steps G1–I3 of §3, and the port is about 14 milestones. That is the size of everything since M13.
 
-## 5. Recommendation: go, with a reduced scope; first G1, and the first look at V
+## 5. Recommendation: go, with a reduced scope; G2 after ADR 0024's values are confirmed
 
-**Compute does not stop the port at D = 32.**
-- With Rust, Float32 SIMD and 4 lanes on edbarker.dev, an open-z `forest` at D = 32 projects to ≈ 197 ms a season on the user's phone (110–444). The desktop `panorama` projects to ≈ 208 ms. Both fit the 4-seasons-a-second intro.
-- At D = 48 and 64 the intro slows to about 3.7 and 2.8 seasons a second.
-- Plain TypeScript would take about 1 s on the phone at D = 32, which keeps up with the ambient pace but not the intro.
+**Compute does not stop the port, at any D from 32 to 64.**
+- With Rust, Float32 SIMD and 4 lanes, `forest` at season 40 projects to ≈ 61–75 ms a season on the user's phone, against the intro's 250 ms. Even the ranges' high ends fit, and so does single-threaded SIMD.
+- Light is measured on the device. The tree passes rest on measured-in-prototype multipliers, with Rust's speed-up and the missing principles' effect still estimated.
 
-**What could stop it:**
-- the estimated half: the tree passes, which I1 and I2 measure;
-- the phone's SIMD and lane scaling, which G1 measures;
+**What could still stop it:**
+- what R2–R5 do in 3D, which I2 measures;
 - the calibration bill, about 8 milestones;
-- above all, whether crowns grown in 3D are worth it in the garden's flat illustration. That is the user's judgement at V, after I2.
+- above all, whether crowns grown in 3D are worth it in the garden's flat illustration. That is the user's judgement at V.
+
+The prototype's page is an uncalibrated first look, not V. Under open z the side light keeps lower crowns leafy, so its stands read as hedges.
 
 **The reduced scope:**
-- **World:** a slab periodic in x and open in z, the faces clipping growth but not light; D chosen at I2 (32 recommended for the phone's intro); K = 16 with rotation; Float32.
+- **World:** a slab periodic in x and open in z, the faces clipping growth but not light; **D = 64, with Q fading over the last 3 cells before each face**; K = 16 with rotation; Float32.
 - **View:** the garden's orthographic frontal illustration, drawn in z order. No perspective anywhere in scope.
 - **Core:** all of it in Rust. Threads only for the garden on edbarker.dev; the lab single-threaded on Pages.
 - **Out:** a full volume, a free camera, perspective, periodic z, PyO3 (until wanted), WebGPU, and a dual 2D/3D core. The pyramid is not the default but stays G3's fallback (Q2).
 - **One implementation:** the TS core is kept only until the Rust 2D core reproduces every golden, then deleted. That is 5–8 sessions, with the full 2D freeze narrowed to I1's 3–5 (Q5).
 - **The live garden** stays on its last 2D release until the 3D one passes C7 (four species).
 
-**The smallest step that can fail cheaply is G1, now,** from the existing deploy (`/preview/3d/kernel.html`). It runs the measured kernel at D = 32, 48 and 64, and at D = 64 in 2× cells. On desktop Chromium it takes 23, 28 and 43 ms in 4 lanes.
-- **What stops the port:** on the user's phone, 4-lane SIMD at D = 32 above 150 ms a season, about twice the projected 70–80. Light alone would then take more than half of the intro's 250 ms before the tree passes (≈ 110 ms projected).
-- **What the other rows tell:** how much D = 48 or 64 would cost on the phone, for the choice at I2.
-
-**After G1:**
-- **G2** can fail cheaply on bit-identical goldens and on toolchain friction.
+**G1 and the prototype are done.** The next steps, and what can stop them:
+- **G2,** once the user confirms ADR 0024's D = 64 and fade: the Rust 2D sweep behind `LightModel`. It can fail cheaply on bit-identical goldens and on toolchain friction.
 - **G3** can fail on the box-mean error, measured with the exact tracer stopping at the faces. Stop, or switch to the exact segment integral or the pyramid, if mean |ΔQ|/C is above 0.08 (twice M18's 2D error) and the fix costs more than 2×.
-- **I2** is the last cheap point to stop on cost. If a grown 3D `forest` costs more than 250 ms a season on the phone at D = 32 with lanes, fall back to coarser light cells (§2b) before any calibration is spent.
+- **I2** is the last cheap point to stop on cost. If a grown 3D `forest` with every principle costs more than 250 ms a season on the phone at D = 64 with lanes, fall back to D = 48 with the fade (§2a) before any calibration is spent.
 
-**Where I still disagree:**
-- **Face clipping and D** (Qz): D shapes the crowns, not only the cost, so V should see two values of D.
-- **V is the first look, and it comes after 5–8 sessions of porting** (G2, G3, I1) plus I2. A cheaper first look exists: a throwaway 3D growth prototype in a scratch copy, outside `src/` like G0.5's code, covering C1–C5 only (buds in 3D, the measured slab sweep in TypeScript, Borchert–Honda, shoot direction, shedding). It would grow one open-z stand and draw it orthographically with the existing renderer in about two sessions.
-  - It would not be the model, and it could not be calibrated.
-  - It would show whether 3D-grown crowns read better than fans before any Rust work.
-  - That is the user's call. The user has said there is no earlier way to judge, and I think this one is worth two sessions if the port's value is in real doubt.
+**Where I still disagree, or add:**
+- **The prototype's rules.** C1–C6 and R1 alone stunt both models at height 48, so I added R6 (dimension-free, already imported, no new code) as a second set. The D answer rests on that set. Without it the answer would have been "anything from 48 up", for the wrong reason.
+- **The phone's lane gain on the tree passes.** You set 1.5× from the light at D = 32. The light itself scaled 1.8–2.0× at D = 48 and 64, so 1.5× is the floor. I kept it.
+- **The prototype's page is not V.** Its stands are uncalibrated, and under open z they read as hedges leafy to the ground. V must wait for I2's stand with every principle, as the ADR says.
 
 **Open questions for the user:**
-- **Now:** run G1 on the phone.
-- **Then:** agree ADR 0024 or not.
-- **Before G2:** whether to spend two sessions on the throwaway 3D prototype before the Rust work.
-- **At I2:** D, and the face softening (Qz).
+- **Now:** confirm or change ADR 0024's two filled values, D = 64 and the 3-cell fade.
+- **Then:** G2.
 - **Later:** the first-paint policy for 3D (Q7).

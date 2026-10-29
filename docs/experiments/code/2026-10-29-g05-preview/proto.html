@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>3D prototype stands</title>
+    <style>
+      :root { color-scheme: light dark; --ink: #2b2a26; --paper: #f6f2e9; --rule: #d8d1c2; --muted: #6b665c; }
+      @media (prefers-color-scheme: dark) { :root { --ink: #e9e4d8; --paper: #1b1a17; --rule: #3a3731; --muted: #a39d90; } }
+      * { box-sizing: border-box; }
+      body { margin: 0; background: var(--paper); color: var(--ink); font: 16px/1.45 Georgia, "Times New Roman", serif; }
+      main { max-width: 1500px; margin: 0 auto; padding: 16px; }
+      h1 { font-size: 1.3rem; margin: 0 0 0.4rem; }
+      p { margin: 0.3rem 0 0.6rem; max-width: 72ch; }
+      .warn { border-left: 3px solid #b5651d; padding-left: 0.6rem; }
+      .status { font: 13px/1.4 ui-monospace, Menlo, monospace; color: var(--muted); }
+      form { display: flex; flex-wrap: wrap; gap: 0.5rem 1.2rem; margin: 0.8rem 0; align-items: center; }
+      fieldset { border: 0; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; }
+      legend { float: left; margin-right: 0.4rem; color: var(--muted); font-size: 0.9rem; }
+      label { display: inline-flex; gap: 0.2rem; align-items: center; padding: 0.35rem 0.55rem; border: 1px solid var(--rule); border-radius: 6px; cursor: pointer; }
+      label:has(input:checked) { border-color: var(--ink); }
+      .panels { display: grid; gap: 14px; grid-template-columns: 1fr; }
+      @media (min-width: 900px) { .panels { grid-template-columns: 1fr 1fr; } }
+      figure { margin: 0; }
+      canvas { display: block; width: 100%; border: 1px solid var(--rule); border-radius: 4px; }
+      figcaption { font-size: 0.92rem; margin-top: 0.3rem; }
+      figcaption span { color: var(--muted); }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Trees grown in 3D, drawn as today</h1>
+      <p class="warn">
+        <b>Throwaway prototype, not the model.</b> <code>forest</code>'s planting grown uncalibrated with
+        C1–C6 and R1 (and, by default, R6 short shoots), once in 2D by today's core and once in 3D by
+        the prototype, in an open slab D cells deep. Without R6 both stands stop at height 48 by
+        season 40 and the renderer, which draws leaves on new growth and short shoots, shows them
+        nearly bare. With R6 they reach 85–90 by season 100.
+      </p>
+      <p class="status" id="status">loading…</p>
+      <form id="controls">
+        <fieldset><legend>Rules</legend>
+          <label><input type="radio" name="rules" value="-r6" checked /> C1–C6, R1, R6</label>
+          <label><input type="radio" name="rules" value="" /> C1–C6, R1 only</label>
+        </fieldset>
+        <fieldset><legend>Slab</legend>
+          <label><input type="radio" name="cfg" value="d32-hard" /> D 32</label>
+          <label><input type="radio" name="cfg" value="d48-hard" checked /> D 48</label>
+          <label><input type="radio" name="cfg" value="d64-hard" /> D 64</label>
+          <label><input type="radio" name="cfg" value="d32-fade" /> D 32, faded faces</label>
+          <label><input type="radio" name="cfg" value="d48-fade" /> D 48, faded (R6)</label>
+        </fieldset>
+        <fieldset><legend>Season</legend>
+          <label><input type="radio" name="season" value="40" checked /> 40</label>
+          <label><input type="radio" name="season" value="100" /> 100</label>
+        </fieldset>
+      </form>
+      <div class="panels">
+        <figure><canvas id="flat"></canvas><figcaption><b>Today's view</b> <span>The planting grown in 2D under the same rules, drawn by the garden's renderer with ADR 0008's pseudo-depth.</span></figcaption></figure>
+        <figure><canvas id="solid"></canvas><figcaption><b>Grown in 3D</b> <span>The same renderer, orthographic: (x, y) projected, drawn far to near by z. No perspective, no depth darkening.</span></figcaption></figure>
+      </div>
+    </main>
+    <script type="module" src="./proto.ts"></script>
+  </body>
+</html>

@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Renderer A</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        background: #fff;
+      }
+      canvas {
+        display: block;
+        width: 1000px;
+        height: 1000px;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="c"></canvas>
+    <script type="module">
+      // Renderer A: our page's own renderer (Scene + WebGL2, natural view with pseudo-depth),
+      // drawing one tree from a snapshot file. ?tree=<name>&leaves=0|1
+      import sceneTokens from "/src/web/render/scene.css?inline";
+      import { createRenderer } from "/src/web/render/create.ts";
+
+      const style = document.createElement("style");
+      style.textContent = sceneTokens;
+      document.head.prepend(style);
+
+      const q = new URLSearchParams(location.search);
+      const raw = await (await fetch(`/runs/structure-vs-drawing/data/${q.get("tree")}.snap.json`)).json();
+      const n = raw.metamerCount;
+      const f32 = (a) => Float32Array.from(a);
+      const i32 = (a) => Int32Array.from(a);
+      const s = {
+        season: raw.season,
+        width: raw.width,
+        height: raw.height,
+        periodic: false,
+        storm: false,
+        metamerCount: n,
+        parent: i32(raw.parent),
+        x0: f32(raw.x0),
+        y0: f32(raw.y0),
+        angle: f32(raw.angle),
+        length: f32(raw.length),
+        radius: f32(raw.radius),
+        tree: i32(raw.tree),
+        birthId: i32(raw.birthId),
+        order: Uint8Array.from(raw.order),
+        light: f32(raw.light),
+        resource: f32(raw.resource),
+        age: f32(raw.age),
+        stress: f32(raw.stress),
+        prevIndex: new Int32Array(n).fill(-1),
+        budCount: raw.budMetamer.length,
+        budMetamer: i32(raw.budMetamer),
+        budState: Uint8Array.from(raw.budState),
+        budQ: f32(raw.budQ),
+        shadow: null,
+        walls: [],
+        obstacles: [],
+        species: raw.species,
+        junctions: new Float32Array(0),
+        metrics: raw.metrics,
+        seasonMs: 0,
+        snapshotMs: 0,
+      };
+      const r = createRenderer(document.getElementById("c"), "auto");
+      r.scene.frame = "trees";
+      r.scene.headroom = 16;
+      r.resize();
+      r.setSnapshot(s);
+      r.scene.clearHistory();
+      r.scene.fit(true);
+      const view = {
+        colorMode: "natural",
+        showLeaves: q.get("leaves") !== "0",
+        depth: true,
+        leafAge: 5,
+        leafStyle: "oak",
+        showBuds: false,
+        showShadow: false,
+        showGhosts: false,
+      };
+      r.draw(1, view);
+      requestAnimationFrame(() => {
+        r.draw(1, view);
+        window.rendered = r.kind;
+      });
+    </script>
+  </body>
+</html>

@@ -2,6 +2,23 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-29: structure vs drawing (realism 2×2)
+
+- **User:** the trees still don't look the way they should. Asked for a realism moonshot, then for its first step: a 2×2 test of structure against drawing ([note](experiments/2026-10-29-structure-vs-drawing.md)).
+- **Data:** two laser-scanned Wytham Woods oaks, TreeQSM models from Calders et al. 2022 (CC BY 4.0). About 90 MB was read out of the 39 GB Zenodo archive by HTTP range requests.
+- **Harness:** `analysis/experiments/structure_vs_drawing/`:
+  - renderer A is the page's own Scene + WebGL2;
+  - renderer B is a three.js renderer with sun shadows, voxel sky occlusion, bark and supersampling;
+  - capture uses puppeteer-core and headless Firefox.
+- **Result:** structure is the bottleneck.
+  - A real oak drawn by our renderer reads as a real oak. Ours drawn by the better renderer still reads wrong.
+  - Our 31 m open oak has 452 tips, 451 forks and Strahler order 5. A 24 m Wytham oak has 5,873, 4,538 and 8.
+  - Our oak limbs zigzag every metamer or two.
+- **Surprises:**
+  - **Leaves vanished in renderer B, twice:** a 3 px leaf samples a mip level whose averaged alpha is under the alpha test, and headless Firefox dithers alpha-to-coverage.
+  - **No oak in the mixed wood at season 300** (seed 9).
+- **Goldens:** unchanged (no core change). `.claude/launch.json` was added for the dev preview.
+
 ## 2026-10-28: M27b, the fitted species adopted (ADR 0023)
 
 - **User:** fit the rest by hand and put the fits on the site.

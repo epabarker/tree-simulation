@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Renderer B</title>
+    <style>
+      html, body { margin: 0; background: #fff; }
+      canvas { display: block; }
+    </style>
+  </head>
+  <body>
+    <script type="module">
+      // Renderer B: a deliberately better drawing of any 3D tree skeleton (metres, y up).
+      // Same rules for every tree: tapered bark-textured wood; foliage in clumps at the leaf sites
+      // the structure names, with total leaf area set by LAI × crown area; sun with soft shadows;
+      // sky light occluded through a voxel grid of the foliage (crown depth). ?tree=&leaves=0|1
+      import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js";
+
+      const SIZE = Number(new URLSearchParams(location.search).get("px") ?? 2000); // supersampled; downscaled after
+      const LAI = 3;
+      const LEAF_LEN = 0.1; // oak leaf, m
+      const LEAF_AREA = 0.004; // m², one side
+      const MAX_LEAVES = Number(new URLSearchParams(location.search).get("max") ?? 400000);
+      const q = new URLSearchParams(location.search);
+      const leavesOn = q.get("leaves") !== "0";
+      const sk = await (await fetch(`/runs/structure-vs-drawing/data/${q.get("tree")}.skel.json`)).json();
+      const S = sk.seg;
+      const par = sk.parent;
+      const n = par.length;
+
+      function mulberry32(a) {
+        return () => {
+          a |= 0; a = (a + 0x6d2b79f5) | 0;
+          let t = Math.imul(a ^ (a >>> 15), 1 | a);
+          t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+          return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+        };
+      }
+      const rnd = mulberry32(20261029);
+      const gauss = () => Math.sqrt(-2 * Math.log(rnd() + 1e-12)) * Math.cos(2 * Math.PI * rnd());
+
+      // Bounds.
+      const lo = [Infinity, Infinity, Infinity], hi = [-Infinity, -Infinity, -Infinity];
+      for (let i = 0; i < n; i++)
+        for (let e = 0; e < 2; e++)
+          for (let k = 0; k < 3; k++) {
+            const v = S[7 * i + 3 * e + k];
+            lo[k] = Math.min(lo[k], v); hi[k] = Math.max(hi[k], v);
+          }
+
+      // Taper: a segment narrows to its thickest child, a terminal one to 0.7 of its radius.
+      const rTip = new Float32Array(n);
+      for (let i = 0; i < n; i++) { const p = par[i]; if (p >= 0 && S[7 * i + 6] > rTip[p]) rTip[p] = S[7 * i + 6]; }
+      for (let i = 0; i < n; i++) rTip[i] = rTip[i] > 0 ? Math.min(S[7 * i + 6], rTip[i]) : 0.7 * S[7 * i + 6];
+
+      // ---- Foliage placement ----
+      const sites = sk.leafy;
+      const sitePos = sites.map((i) => [S[7 * i + 3], S[7 * i + 4], S[7 * i + 5]]);
+      // Crown area: convex hull of the sites seen from above (x, z).
+      function hullArea(pts) {
+        const p = pts.map((v) => [v[0], v[2]]).sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+        const cross = (o, a, b) => (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]);
+        const lower = [], upper = [];
+        for (const v of p) { while (lower.length >= 2 && cross(lower.at(-2), lower.at(-1), v) <= 0) lower.pop(); lower.push(v); }
+        for (const v of p.reverse()) { while (upper.length >= 2 && cross(upper.at(-2), upper.at(-1), v) <= 0) upper.pop(); upper.push(v); }
+        const h = lower.slice(0, -1).concat(upper.slice(0, -1));
+        let a = 0; for (let i = 0; i < h.length; i++) { const u = h[i], w = h[(i + 1) % h.length]; a += u[0] * w[1] - w[0] * u[1]; }
+        return Math.abs(a) / 2;
+      }
+      // A crown is taken as round in plan, its diameter the sites' wider horizontal extent (a
+      // planar tree's hull from above would be a sliver).
+      const ext = (k) => Math.max(...sitePos.map((v) => v[k])) - Math.min(...sitePos.map((v) => v[k]));
+      const crownD = Math.max(ext(0), ext(2));
+      const crownArea = (Math.PI / 4) * crownD * crownD;
+      const hullA = hullArea(sitePos);
+      const want = Math.round((LAI * crownArea) / LEAF_AREA);
+      const nLeaves = leavesOn ? Math.min(MAX_LEAVES, want) : 0;
+      // Clump radius from the sites' spacing: 0.75 × median nearest-neighbour distance, 0.5–1.2 m
+      // (a scan's tips are its finest resolved twigs; leafy shoots reach about 0.5 m beyond them).
+      function medianNN(pts) {
+        const cell = 0.5, map = new Map();
+        const key = (a, b, c) => `${a},${b},${c}`;
+        pts.forEach((v, i) => { const k = key(...v.map((x) => Math.floor(x / cell))); (map.get(k) ?? map.set(k, []).get(k)).push(i); });
+        const d = [];
+        const sample = pts.length > 3000 ? 3000 : pts.length;
+        for (let s = 0; s < sample; s++) {
+          const i = Math.floor((s * pts.length) / sample), v = pts[i];
+          const c = v.map((x) => Math.floor(x / cell));
+          let best = Infinity;
+          for (let r = 1; r <= 8 && best === Infinity; r++)
+            for (let a = -r; a <= r; a++) for (let b = -r; b <= r; b++) for (let e = -r; e <= r; e++) {
+              const l = map.get(key(c[0] + a, c[1] + b, c[2] + e)); if (!l) continue;
+              for (const j of l) if (j !== i) best = Math.min(best, Math.hypot(pts[j][0] - v[0], pts[j][1] - v[1], pts[j][2] - v[2]));
+            }
+          if (best < Infinity) d.push(best);
+        }
+        d.sort((a, b) => a - b); return d[Math.floor(d.length / 2)] ?? 0.5;
+      }
+      const nn = medianNN(sitePos);
+      const clumpR = Math.min(1.2, Math.max(0.5, 0.75 * nn));
+      const centre = [(lo[0] + hi[0]) / 2, lo[1] + 0.6 * (hi[1] - lo[1]), (lo[2] + hi[2]) / 2];
+      const leafPos = new Float32Array(3 * nLeaves), leafNrm = new Float32Array(3 * nLeaves);
+      for (let k = 0; k < nLeaves; k++) {
+        const s = sitePos[Math.floor((k * sitePos.length) / Math.max(1, nLeaves))];
+        let x, y, z; do { x = 2 * rnd() - 1; y = 2 * rnd() - 1; z = 2 * rnd() - 1; } while (x * x + y * y + z * z > 1);
+        const p = [s[0] + clumpR * x, s[1] + clumpR * y, s[2] + clumpR * z];
+        leafPos.set(p, 3 * k);
+        // Near-spherical leaf angles (shoots hold leaves every way), biased a little up and out from
+        // the crown centre; upward-facing leaves alone would be edge-on to a side view.
+        const out = [p[0] - centre[0], 0.6 * (p[1] - centre[1]), p[2] - centre[2]];
+        const ol = Math.hypot(...out) || 1;
+        const nv = [0.4 * out[0] / ol + gauss(), 0.4 + gauss(), 0.4 * out[2] / ol + gauss()];
+        const nl = Math.hypot(...nv) || 1;
+        leafNrm.set(nv.map((v) => v / nl), 3 * k);
+      }
+
+      // ---- Sky occlusion through a voxel grid (leaf area + wood area) ----
+      const VOX = 0.4;
+      const g0 = [lo[0] - clumpR - 1, lo[1] - 1, lo[2] - clumpR - 1];
+      const dims = [0, 1, 2].map((k) => Math.ceil((hi[k] - g0[k] + clumpR + 1) / VOX) + 1);
+      const grid = new Float32Array(dims[0] * dims[1] * dims[2]);
+      const vidx = (x, y, z) => {
+        const a = Math.floor((x - g0[0]) / VOX), b = Math.floor((y - g0[1]) / VOX), c = Math.floor((z - g0[2]) / VOX);
+        if (a < 0 || b < 0 || c < 0 || a >= dims[0] || b >= dims[1] || c >= dims[2]) return -1;
+        return (c * dims[1] + b) * dims[0] + a;
+      };
+      for (let k = 0; k < nLeaves; k++) { const v = vidx(leafPos[3 * k], leafPos[3 * k + 1], leafPos[3 * k + 2]); if (v >= 0) grid[v] += LEAF_AREA; }
+      for (let i = 0; i < n; i++) {
+        const v = vidx((S[7 * i] + S[7 * i + 3]) / 2, (S[7 * i + 1] + S[7 * i + 4]) / 2, (S[7 * i + 2] + S[7 * i + 5]) / 2);
+        const len = Math.hypot(S[7 * i + 3] - S[7 * i], S[7 * i + 4] - S[7 * i + 1], S[7 * i + 5] - S[7 * i + 2]);
+        if (v >= 0) grid[v] += 2 * S[7 * i + 6] * len;
+      }
+      const DIRS = [];
+      for (let i = 0; i < 14; i++) {
+        const el = Math.asin(0.15 + 0.85 * ((i + 0.5) / 14)), az = i * 2.39996;
+        DIRS.push([Math.cos(el) * Math.cos(az), Math.sin(el), Math.cos(el) * Math.sin(az)]);
+      }
+      const G = 0.5;
+      let oSum = 0;
+      function openness(x, y, z) {
+        let sum = 0, wsum = 0;
+        for (const d of DIRS) {
+          let tau = 0;
+          for (let t = VOX; t < 40; t += VOX) {
+            const v = vidx(x + d[0] * t, y + d[1] * t, z + d[2] * t);
+            if (v < 0) break;
+            tau += (G * grid[v]) / (VOX * VOX);
+            if (tau > 6) break;
+          }
+          sum += d[1] * Math.exp(-tau); wsum += d[1];
+        }
+        return sum / wsum;
+      }
+
+      // ---- Textures ----
+      function leafTexture() {
+        const c = document.createElement("canvas"); c.width = c.height = 128;
+        const x = c.getContext("2d");
+        x.translate(64, 124); x.fillStyle = "#fff";
+        x.beginPath(); x.moveTo(0, 0);
+        // A lobed oak outline: five lobes a side along the midrib.
+        const lobes = 5, L = 116;
+        for (const side of [1, -1]) {
+          x.moveTo(0, 0);
+          for (let i = 0; i <= 40; i++) {
+            const t = i / 40, y = -L * t;
+            const env = Math.sin(Math.PI * Math.min(1, t * 1.15)) * 30 + 6 * (1 - t);
+            const lobe = 0.55 + 0.45 * Math.abs(Math.sin(Math.PI * lobes * t));
+            x.lineTo(side * env * lobe * (t < 0.06 ? t / 0.06 : 1), y);
+          }
+          x.lineTo(0, -L);
+        }
+        x.fill();
+        x.strokeStyle = "rgba(0,0,0,0.25)"; x.lineWidth = 2; x.beginPath(); x.moveTo(0, 0); x.lineTo(0, -L); x.stroke();
+        // No mipmaps, and no alpha-to-coverage: at a few pixels a mip's averaged alpha falls under
+        // the alpha test, and headless Firefox dithers coverage, so leaves vanish either way. Supersampling (2×, downscaled after) does the averaging instead.
+        const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
+        t.generateMipmaps = false; t.minFilter = THREE.LinearFilter; return t;
+      }
+      function barkTexture() {
+        const W = 256, H = 512, c = document.createElement("canvas"); c.width = W; c.height = H;
+        const x = c.getContext("2d");
+        const img = x.createImageData(W, H);
+        const r2 = mulberry32(7);
+        const ridges = Array.from({ length: 14 }, () => ({ x: r2() * W, w: 6 + r2() * 10, ph: r2() * 10 }));
+        for (let j = 0; j < H; j++) for (let i = 0; i < W; i++) {
+          let d = 1;
+          for (const r of ridges) {
+            const cx = r.x + 6 * Math.sin(j / 37 + r.ph) + 3 * Math.sin(j / 11 + r.ph * 2);
+            const dx = Math.min(Math.abs(i - cx), W - Math.abs(i - cx));
+            d = Math.min(d, dx / r.w);
+          }
+          const crack = Math.min(1, d * 1.6);
+          const v = 95 + 95 * crack + 25 * (r2() - 0.5);
+          const k = 4 * (j * W + i);
+          img.data[k] = v * 1.0; img.data[k + 1] = v * 0.93; img.data[k + 2] = v * 0.82; img.data[k + 3] = 255;
+        }
+        x.putImageData(img, 0, 0);
+        const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.colorSpace = THREE.SRGBColorSpace; return t;
+      }
+
+      // ---- Scene ----
+      const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+      renderer.setPixelRatio(1);
+      renderer.setSize(SIZE, SIZE);
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.05;
+      document.body.append(renderer.domElement);
+      const scene = new THREE.Scene();
+      {
+        const c = document.createElement("canvas"); c.width = 4; c.height = 256;
+        const x = c.getContext("2d"); const gr = x.createLinearGradient(0, 0, 0, 256);
+        gr.addColorStop(0, "#6f9fd6"); gr.addColorStop(0.65, "#b9d2ea"); gr.addColorStop(1, "#e8eef0");
+        x.fillStyle = gr; x.fillRect(0, 0, 4, 256);
+        const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; scene.background = t;
+      }
+      scene.add(new THREE.HemisphereLight(0xdfe6e8, 0x5d5236, 1.4));
+      const sun = new THREE.DirectionalLight(0xfff1dc, 2.6);
+      const span = Math.max(hi[0] - lo[0], hi[1] - lo[1], hi[2] - lo[2]) + 4;
+      const cx = (lo[0] + hi[0]) / 2, cz = (lo[2] + hi[2]) / 2;
+      sun.position.set(cx - 0.45 * span * 2, hi[1] + span * 1.4, cz + 0.6 * span * 2);
+      sun.target.position.set(cx, (lo[1] + hi[1]) / 2, cz);
+      sun.castShadow = true;
+      sun.shadow.mapSize.set(4096, 4096);
+      Object.assign(sun.shadow.camera, { left: -span, right: span, top: span, bottom: -span, near: 0.1, far: span * 6 });
+      sun.shadow.bias = -0.0004; sun.shadow.normalBias = 0.03; sun.shadow.radius = 3;
+      scene.add(sun, sun.target);
+      const ground = new THREE.Mesh(new THREE.CircleGeometry(span * 3, 64), new THREE.MeshStandardMaterial({ color: 0x6f7a45, roughness: 1 }));
+      ground.rotation.x = -Math.PI / 2; ground.position.set(cx, 0, cz); ground.receiveShadow = true; scene.add(ground);
+
+      // Wood: one merged mesh of tapered tubes, vertex colours carrying sky occlusion.
+      {
+        const pos = [], nrm = [], uv = [], col = [], idx = [];
+        const up = new THREE.Vector3(), a = new THREE.Vector3(), b = new THREE.Vector3(), d = new THREE.Vector3();
+        const u1 = new THREE.Vector3(), u2 = new THREE.Vector3();
+        for (let i = 0; i < n; i++) {
+          a.set(S[7 * i], S[7 * i + 1], S[7 * i + 2]); b.set(S[7 * i + 3], S[7 * i + 4], S[7 * i + 5]);
+          d.subVectors(b, a); const len = d.length(); if (len < 1e-5) continue; d.divideScalar(len);
+          const r0 = S[7 * i + 6], r1 = rTip[i];
+          const k = r0 > 0.15 ? 20 : r0 > 0.05 ? 12 : r0 > 0.015 ? 7 : r0 > 0.005 ? 5 : 3;
+          up.set(Math.abs(d.y) < 0.9 ? 0 : 1, Math.abs(d.y) < 0.9 ? 1 : 0, 0);
+          u1.crossVectors(d, up).normalize(); u2.crossVectors(d, u1);
+          const o0 = openness(a.x, a.y, a.z), o1 = openness(b.x, b.y, b.z);
+          const base = pos.length / 3;
+          const circ = 2 * Math.PI * r0;
+          for (let e = 0; e < 2; e++) {
+            const c = e ? b : a, r = e ? r1 : r0, o = 0.3 + 0.7 * (e ? o1 : o0);
+            for (let j = 0; j <= k; j++) {
+              const th = (2 * Math.PI * j) / k, cs = Math.cos(th), sn = Math.sin(th);
+              const nx = u1.x * cs + u2.x * sn, ny = u1.y * cs + u2.y * sn, nz = u1.z * cs + u2.z * sn;
+              pos.push(c.x + r * nx, c.y + r * ny, c.z + r * nz); nrm.push(nx, ny, nz);
+              uv.push((j / k) * Math.max(0.25, circ / 0.6), (e * len) / 0.6); col.push(o, o, o);
+            }
+          }
+          for (let j = 0; j < k; j++) { const p = base + j, q2 = base + k + 1 + j; idx.push(p, q2, p + 1, p + 1, q2, q2 + 1); }
+          // A joint sphere at the base closes kinks and the seam where a branch leaves its parent.
+          if (r0 > 0.004) {
+            const lat = Math.max(3, Math.ceil(k / 2)), b0 = pos.length / 3, o = 0.3 + 0.7 * o0;
+            for (let y = 0; y <= lat; y++) {
+              const ph = (Math.PI * y) / lat;
+              for (let j = 0; j <= k; j++) {
+                const th = (2 * Math.PI * j) / k;
+                const nx = Math.sin(ph) * Math.cos(th), ny = Math.cos(ph), nz = Math.sin(ph) * Math.sin(th);
+                pos.push(a.x + r0 * nx, a.y + r0 * ny, a.z + r0 * nz); nrm.push(nx, ny, nz);
+                uv.push(j / k, y / lat); col.push(o, o, o);
+              }
+            }
+            for (let y = 0; y < lat; y++) for (let j = 0; j < k; j++) {
+              const p = b0 + y * (k + 1) + j, q2 = p + k + 1; idx.push(p, p + 1, q2, p + 1, q2 + 1, q2);
+            }
+          }
+        }
+        const g = new THREE.BufferGeometry();
+        g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3));
+        g.setAttribute("normal", new THREE.Float32BufferAttribute(nrm, 3));
+        g.setAttribute("uv", new THREE.Float32BufferAttribute(uv, 2));
+        g.setAttribute("color", new THREE.Float32BufferAttribute(col, 3));
+        g.setIndex(idx);
+        const bark = barkTexture();
+        const m = new THREE.MeshStandardMaterial({ map: bark, bumpMap: bark, bumpScale: 0.6, color: 0xe2dbcf, roughness: 0.95, vertexColors: true, side: THREE.DoubleSide });
+        const mesh = new THREE.Mesh(g, m); mesh.castShadow = mesh.receiveShadow = true; scene.add(mesh);
+      }
+
+      // Leaves: alpha-tested quads, instanced, colour varied per leaf and darkened by occlusion.
+      if (nLeaves > 0) {
+        const tex = leafTexture();
+        const geo = new THREE.PlaneGeometry(LEAF_LEN * 0.6, LEAF_LEN);
+        geo.translate(0, LEAF_LEN / 2, 0); geo.rotateX(-Math.PI / 2); // lies in xz, normal +y, base at origin
+        const mat = new THREE.MeshStandardMaterial({ map: tex, alphaTest: 0.5, side: THREE.DoubleSide, roughness: 0.65, emissive: 0x071204 });
+        // Chunks of 50k: one huge instanced draw is dropped by software WebGL.
+        const CHUNK = 50000, meshes = [];
+        const depthMat = new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking, map: tex, alphaTest: 0.5 });
+        for (let c = 0; c < nLeaves; c += CHUNK) {
+          const mc = new THREE.InstancedMesh(geo, mat, Math.min(CHUNK, nLeaves - c));
+          mc.customDepthMaterial = depthMat; mc.castShadow = mc.receiveShadow = true; meshes.push(mc); scene.add(mc);
+        }
+        const mesh = { setMatrixAt: (k, m) => meshes[Math.floor(k / CHUNK)].setMatrixAt(k % CHUNK, m),
+                       setColorAt: (k, c) => meshes[Math.floor(k / CHUNK)].setColorAt(k % CHUNK, c) };
+        const m4 = new THREE.Matrix4(), qn = new THREE.Quaternion(), qs = new THREE.Quaternion(), sc = new THREE.Vector3();
+        const Y = new THREE.Vector3(0, 1, 0), nv = new THREE.Vector3(), pv = new THREE.Vector3(), col = new THREE.Color();
+        for (let k = 0; k < nLeaves; k++) {
+          nv.set(leafNrm[3 * k], leafNrm[3 * k + 1], leafNrm[3 * k + 2]);
+          qn.setFromUnitVectors(Y, nv); qs.setFromAxisAngle(Y, rnd() * 2 * Math.PI); qn.multiply(qs);
+          const s = 0.8 + 0.4 * rnd(); sc.set(s, s, s);
+          pv.set(leafPos[3 * k], leafPos[3 * k + 1], leafPos[3 * k + 2]);
+          m4.compose(pv, qn, sc); mesh.setMatrixAt(k, m4);
+          const o = openness(pv.x, pv.y, pv.z);
+          col.setHSL((80 + 20 * rnd()) / 360, 0.5 + 0.15 * rnd(), 0.21 + 0.08 * rnd(), THREE.SRGBColorSpace);
+          col.multiplyScalar(0.25 + 0.95 * o);
+          oSum += o;
+          mesh.setColorAt(k, col);
+        }
+      }
+
+      // Camera: a long lens from the south (looking toward −z), from a little above eye height.
+      const H = hi[1] - Math.max(0, lo[1]);
+      const W = hi[0] - lo[0];
+      const camera = new THREE.PerspectiveCamera(26, 1, 0.5, 2000);
+      const fit = (Math.max(H, W) * 1.12) / 2 / Math.tan((26 * Math.PI) / 360);
+      camera.position.set(cx, 1.7 + 0.3 * H, hi[2] + fit);
+      camera.lookAt(cx, 0.5 * H, cz);
+            renderer.render(scene, camera);
+      window.rendered = { meanOpen: +(oSum / Math.max(1, nLeaves)).toFixed(3), hullArea: Math.round(hullA), leaves: nLeaves, wanted: want, crownArea: Math.round(crownArea), clumpR: +clumpR.toFixed(2), nn: +nn.toFixed(2), sites: sites.length };
+    </script>
+  </body>
+</html>

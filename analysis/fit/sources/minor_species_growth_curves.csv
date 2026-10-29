@@ -1,0 +1,51 @@
+species,curve,age_yr,top_height_m,status,chapman_richards_params
+Salix caprea,class I,10,5.3,measured-range fit,A=19.0;k=0.0550;p=1.478
+Salix caprea,class I,20,10.4,measured-range fit,A=19.0;k=0.0550;p=1.478
+Salix caprea,class I,30,13.9,measured-range fit,A=19.0;k=0.0550;p=1.478
+Salix caprea,class I,40,16.0,measured-range fit,A=19.0;k=0.0550;p=1.478
+Salix caprea,class I,50,17.2,extrapolated (capped A=19 m),A=19.0;k=0.0550;p=1.478
+Salix caprea,class I,60,18.0,extrapolated (capped A=19 m),A=19.0;k=0.0550;p=1.478
+Salix caprea,class I,70,18.4,extrapolated (capped A=19 m),A=19.0;k=0.0550;p=1.478
+Salix caprea,class I,80,18.7,extrapolated (capped A=19 m),A=19.0;k=0.0550;p=1.478
+Salix caprea,class I,90,18.8,extrapolated (capped A=19 m),A=19.0;k=0.0550;p=1.478
+Salix caprea,class I,100,18.9,extrapolated (capped A=19 m),A=19.0;k=0.0550;p=1.478
+Salix caprea,class II,10,4.1,measured-range fit,A=19.0;k=0.0398;p=1.387
+Salix caprea,class II,20,8.3,measured-range fit,A=19.0;k=0.0398;p=1.387
+Salix caprea,class II,30,11.5,measured-range fit,A=19.0;k=0.0398;p=1.387
+Salix caprea,class II,40,13.9,measured-range fit,A=19.0;k=0.0398;p=1.387
+Salix caprea,class II,50,15.5,measured-range fit,A=19.0;k=0.0398;p=1.387
+Salix caprea,class II,60,16.6,extrapolated (capped A=19 m),A=19.0;k=0.0398;p=1.387
+Salix caprea,class II,70,17.4,extrapolated (capped A=19 m),A=19.0;k=0.0398;p=1.387
+Salix caprea,class II,80,17.9,extrapolated (capped A=19 m),A=19.0;k=0.0398;p=1.387
+Salix caprea,class II,90,18.3,extrapolated (capped A=19 m),A=19.0;k=0.0398;p=1.387
+Salix caprea,class II,100,18.5,extrapolated (capped A=19 m),A=19.0;k=0.0398;p=1.387
+Salix caprea,class III,10,3.0,measured-range fit,A=19.0;k=0.0280;p=1.306
+Salix caprea,class III,20,6.3,measured-range fit,A=19.0;k=0.0280;p=1.306
+Salix caprea,class III,30,9.1,measured-range fit,A=19.0;k=0.0280;p=1.306
+Salix caprea,class III,40,11.4,measured-range fit,A=19.0;k=0.0280;p=1.306
+Salix caprea,class III,50,13.1,measured-range fit,A=19.0;k=0.0280;p=1.306
+Salix caprea,class III,60,14.5,measured-range fit,A=19.0;k=0.0280;p=1.306
+Salix caprea,class III,70,15.6,extrapolated (capped A=19 m),A=19.0;k=0.0280;p=1.306
+Salix caprea,class III,80,16.4,extrapolated (capped A=19 m),A=19.0;k=0.0280;p=1.306
+Salix caprea,class III,90,17.0,extrapolated (capped A=19 m),A=19.0;k=0.0280;p=1.306
+Salix caprea,class III,100,17.5,extrapolated (capped A=19 m),A=19.0;k=0.0280;p=1.306
+Sorbus aucuparia,"estimate, forest top height",10,4.5,estimated,A=17.3;k=0.0420;p=1.251
+Sorbus aucuparia,"estimate, forest top height",20,8.5,estimated,A=17.3;k=0.0420;p=1.251
+Sorbus aucuparia,"estimate, forest top height",30,11.4,estimated,A=17.3;k=0.0420;p=1.251
+Sorbus aucuparia,"estimate, forest top height",40,13.3,estimated,A=17.3;k=0.0420;p=1.251
+Sorbus aucuparia,"estimate, forest top height",50,14.7,estimated,A=17.3;k=0.0420;p=1.251
+Sorbus aucuparia,"estimate, forest top height",60,15.5,estimated,A=17.3;k=0.0420;p=1.251
+Sorbus aucuparia,"estimate, forest top height",70,16.1,estimated,A=17.3;k=0.0420;p=1.251
+Sorbus aucuparia,"estimate, forest top height",80,16.5,estimated,A=17.3;k=0.0420;p=1.251
+Sorbus aucuparia,"estimate, forest top height",90,16.8,estimated,A=17.3;k=0.0420;p=1.251
+Sorbus aucuparia,"estimate, forest top height",100,16.9,estimated,A=17.3;k=0.0420;p=1.251
+Ilex aquifolium,"estimate, open/edge-grown top height",10,2.2,estimated,A=13.6;k=0.0265;p=1.259
+Ilex aquifolium,"estimate, open/edge-grown top height",20,4.4,estimated,A=13.6;k=0.0265;p=1.259
+Ilex aquifolium,"estimate, open/edge-grown top height",30,6.4,estimated,A=13.6;k=0.0265;p=1.259
+Ilex aquifolium,"estimate, open/edge-grown top height",40,7.9,estimated,A=13.6;k=0.0265;p=1.259
+Ilex aquifolium,"estimate, open/edge-grown top height",50,9.2,estimated,A=13.6;k=0.0265;p=1.259
+Ilex aquifolium,"estimate, open/edge-grown top height",60,10.2,estimated,A=13.6;k=0.0265;p=1.259
+Ilex aquifolium,"estimate, open/edge-grown top height",70,11.0,estimated,A=13.6;k=0.0265;p=1.259
+Ilex aquifolium,"estimate, open/edge-grown top height",80,11.6,estimated,A=13.6;k=0.0265;p=1.259
+Ilex aquifolium,"estimate, open/edge-grown top height",90,12.0,estimated,A=13.6;k=0.0265;p=1.259
+Ilex aquifolium,"estimate, open/edge-grown top height",100,12.4,estimated,A=13.6;k=0.0265;p=1.259

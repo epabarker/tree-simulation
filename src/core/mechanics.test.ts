@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { mergeParams, type ParamsPatch } from "./params.ts";
+import { type FixtureName, fixtureParams, isFixtureName } from "./fixtures.ts";
+import { HAND_FLORA } from "./flora.ts";
+import { limbShapes } from "./form.ts";
+import { mergeParams, type ParamsPatch, patchSpecies } from "./params.ts";
 import { PRE_R4, type PresetName, presetParams } from "./presets.ts";
 import { isLiveBud } from "./principles/c3-allocation.ts";
 import type { Tree } from "./tree.ts";
@@ -11,35 +14,25 @@ const SEEDS = [1, 2, 3, 4, 5];
 const median = (xs: number[]) => [...xs].sort((a, b) => a - b)[Math.floor(xs.length / 2)] as number;
 /** Elevation of a direction above the horizontal, degrees, whichever side it heads. */
 const elevation = (a: number) => (Math.atan2(Math.sin(a), Math.abs(Math.cos(a))) * 180) / Math.PI;
-/** Deviation of a direction from vertical, degrees. */
-const tilt = (a: number) => Math.abs((Math.atan2(Math.cos(a), Math.sin(a)) * 180) / Math.PI);
+/** Deviation of a direction from vertical, degrees, positive to the right. */
+const signedTilt = (a: number) => (Math.atan2(Math.cos(a), Math.sin(a)) * 180) / Math.PI;
+/** Deviation of a direction from vertical, degrees, either side. */
+const tilt = (a: number) => Math.abs(signedTilt(a));
 /** R3 off, and R3 without posture control. */
 const PRE_R3 = { r3: { enabled: false } } satisfies ParamsPatch;
 const NO_POSTURE = { r3: { posture: false } } satisfies ParamsPatch;
 
 /** These checks are the M9 evidence, so they run the presets as they were before R4 and R5. */
-function grow(preset: PresetName, seed: number, seasons: number, patch: ParamsPatch = {}): Tree {
-  const world = new World(mergeParams(mergeParams(presetParams(preset, seed), PRE_R4), patch));
+function grow(
+  preset: PresetName | FixtureName,
+  seed: number,
+  seasons: number,
+  patch: ParamsPatch = {},
+): Tree {
+  const base = isFixtureName(preset) ? fixtureParams(preset, seed) : presetParams(preset, seed);
+  const world = new World(mergeParams(mergeParams(base, PRE_R4), patch));
   world.run(seasons);
   return world.trees[0] as Tree;
-}
-
-/** Per first-order limb of ≥ 10 metamers: droop (base − lowest elevation), upturn (tip − lowest). */
-function limbShapes(tree: Tree): { droop: number; upturn: number }[] {
-  const c = tree.m.cols;
-  const axes = new Map<number, number[]>();
-  for (let i = 0; i < tree.m.length; i++) {
-    if (c.order[i] !== 1) continue;
-    const list = axes.get(c.axis[i]) ?? [];
-    list.push(elevation(c.angle[i] as number));
-    axes.set(c.axis[i], list);
-  }
-  return [...axes.values()]
-    .filter((e) => e.length >= 10)
-    .map((e) => {
-      const low = Math.min(...e);
-      return { droop: (e[0] as number) - low, upturn: (e[e.length - 1] as number) - low };
-    });
 }
 
 /** Leonardo exponent at each junction, split by whether a lateral there carries stress wood. */
@@ -149,5 +142,43 @@ describe("M9: mechanics (§R3, ADR 0011)", () => {
     expect(heavy.length).toBeGreaterThan(20);
     expect(median(heavy)).toBeGreaterThan(2.03);
     expect(Math.abs(median(other) - 2)).toBeLessThan(0.02);
+  });
+
+  it("rights a seedling planted at 40° within a few seasons, overshooting a little (§10, Bastien et al. 2013)", () => {
+    // The trunk's chord, root to the top of the trunk axis, and its mid-stem metamer (M26).
+    const trunk = (tree: Tree) => {
+      const c = tree.m.cols;
+      const up = new Int32Array(tree.m.length).fill(-1);
+      for (let i = 1; i < tree.m.length; i++) {
+        if (c.slot[i] === 0 && c.order[i] === 0) up[c.parent[i]] = i;
+      }
+      const axis: number[] = [];
+      for (let i = 0; i >= 0; i = up[i] as number) axis.push(i);
+      const top = axis[axis.length - 1] as number;
+      const chord = Math.atan2(tree.tipY(top), tree.tipX(top) - tree.rootX);
+      return { chord: tilt(chord), mid: signedTilt(c.angle[axis[axis.length >> 1] as number]) };
+    };
+    for (const seed of SEEDS) {
+      for (const posture of [true, false]) {
+        const base = mergeParams(presetParams("oakOpen", seed), {
+          world: { width: 160, height: 160, walls: [] },
+          trees: [{ x: 80, species: "oak", lean: 40 }],
+        });
+        // A test of R3 on the hand-tuned oak (M19, M26): the fitted one's juvenile phase keeps a
+        // seedling light, so it barely sags even without posture control.
+        const hand = mergeParams(base, { species: { ...base.species, oak: HAND_FLORA.oak } });
+        const world = new World(patchSpecies(hand, "oak", { r3: { posture } }));
+        let overshoot = 0;
+        for (let s = 0; s < 20; s++) {
+          world.run(1);
+          overshoot = Math.min(overshoot, trunk(world.trees[0] as Tree).mid);
+        }
+        const { chord } = trunk(world.trees[0] as Tree);
+        if (posture) {
+          expect(chord).toBeLessThan(5);
+          expect(overshoot).toBeLessThan(-1); // swings past vertical on the way
+        } else expect(chord).toBeGreaterThan(30);
+      }
+    }
   });
 });

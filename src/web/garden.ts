@@ -27,6 +27,7 @@ import {
   type LeafStyle,
   leafStudyPath,
 } from "./render/leaf-styles.ts";
+import { createLoupe } from "./render/loupe.ts";
 import { governor, judge, type QualityLevel, qualityLevels } from "./render/quality.ts";
 import { MAX_DPR, type Renderer } from "./render/renderer.ts";
 import sceneTokens from "./render/scene.css?inline";
@@ -178,6 +179,12 @@ export interface GardenOptions {
   onEmptyTap?(x: number, at: { x: number; y: number }): void;
   /** Bench mode (`?bench`): play to `seasons`, sampling every animated frame, then report. */
   bench?: { seasons: number; onDone(result: BenchResult): void };
+  /**
+   * The loupe (M26, render/loupe.ts): hold a finger or the mouse still on the forest to see the
+   * spot under it four times nearer, leaves at their true length. Default on, unless
+   * `interaction` is "none". It is drawn only while held, so it costs nothing otherwise.
+   */
+  loupe?: boolean;
 }
 
 export interface Garden {
@@ -290,6 +297,10 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
     maxDpr: options.maxDpr,
   });
   const { scene } = renderer;
+  const loupe =
+    (options.loupe ?? true) && interaction !== "none"
+      ? createLoupe(scene, renderer.canvas, host, options.transparent)
+      : null;
   let focus = options.focus ?? "forest";
   // Motion (M16): off with reduced motion.
   const wind = (options.wind ?? true) && !reduceMotion ? createWind() : null;
@@ -393,6 +404,7 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
 
   function accept(s: Snapshot, animate: boolean, fresh: boolean): void {
     renderer.setSnapshot(s);
+    loupe?.setSnapshot(s, animate);
     if (focus === "specimen") chooseSpecimen(s);
     if (wind) wind.target = s.storm ? GALE : CALM;
     if (!animate) scene.clearHistory();
@@ -551,6 +563,14 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
               scene.fit();
               dirty = true;
             },
+            onHold: loupe
+              ? (phase, sx, sy) => {
+                  if (phase === "start" && scene.next) loupe.show(sx, sy, scene.next);
+                  else if (phase === "move") loupe.move(sx, sy);
+                  else if (phase === "end") loupe.hide();
+                  dirty = true;
+                }
+              : undefined,
           },
           { panZoom: interaction === "full" },
         );
@@ -568,7 +588,9 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
     const t = Math.min(1, (now - tweenStart) / tweenMs);
     if (dirty || t < 1) {
       const t0 = performance.now();
-      renderer.draw(continuous ? t : t * t * (3 - 2 * t), view);
+      const eased = continuous ? t : t * t * (3 - 2 * t);
+      renderer.draw(eased, view);
+      loupe?.draw(eased, view);
       const ms = performance.now() - t0;
       // Smoothed CPU cost of a draw, and frame rate while drawing every frame.
       stats.drawMs += (ms - stats.drawMs) * 0.1;
@@ -579,7 +601,7 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
         if (drewLastFrame) samples.frame.push(dt);
       }
       drewLastFrame = true;
-      dirty = t < 1;
+      dirty = t < 1 || !!loupe?.open;
     } else {
       drewLastFrame = false;
     }
@@ -894,6 +916,7 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
       worker.terminate();
       renderer.canvas.removeEventListener("pointermove", onPointerMove);
       renderer.canvas.removeEventListener("pointerleave", onPointerLeave);
+      loupe?.destroy();
       if (ownCanvas) renderer.canvas.remove();
     },
   };

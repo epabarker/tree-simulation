@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "Batch runs and analysis for the tree simulation (drives the Node CLI, reads its CSV)"
 requires-python = ">=3.13"
 dependencies = [
+    "cmaes>=0.13.1",
     "pandas>=2.2",
     "plotnine>=0.14",
     "polars>=1.20",

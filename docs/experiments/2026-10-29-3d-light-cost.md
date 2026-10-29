@@ -231,7 +231,7 @@ All 48 configurations (D ∈ {4, 16, 32, 64} × K ∈ {7, 16, 32} × both cases 
   - **TypeScript:** `forest` 250–290 ms, `panorama` 680–710 ms;
   - **WASM SIMD f32:** about 5× less (`forest` 63 ms);
   - **4 threads:** a further 2.6–3.0× (`forest` ≈ 22 ms).
-- **The pyramid is not the cheap option in 3D:** its V search costs 8× its deposit.
+- **The pyramid is not the cheap option in 3D** *in TypeScript*: its V search costs 8× its deposit. **Corrected by the addendum:** on equal terms (Rust, the same kinds of rewrite) the pyramid costs about what the sweep does.
 - **Not measured, and needed before any decision rests on them:**
   - the box-mean approximation's error against an exact 3D ray trace (the M18 test, in 3D);
   - K convergence in 3D (the M6e test);
@@ -239,4 +239,69 @@ All 48 configurations (D ∈ {4, 16, 32, 64} × K ∈ {7, 16, 32} × both cases 
   - the 3D tree passes.
 
   The review projects the tree passes from the 2D ones and labels them as estimates.
-- **Follow-ups:** in the [review](../reviews/2026-10-29-3d-port-review.md) and [ADR 0019](../decisions/0019-3d-slab-port.md) (proposed).
+- **Follow-ups:** in the [review](../reviews/2026-10-29-3d-port-review.md) and [ADR 0024](../decisions/0024-3d-slab-port.md) (proposed).
+
+## Addendum (2026-10-29, the G0.5 session): the pyramid on equal terms, the kernel in a browser, and the bundle
+
+### The pyramid on equal terms
+**Question:** the measurements above timed the pyramid in TypeScript only, while the sweep got Rust, SIMD and threads. Under the same treatment, is the pyramid still dearer?
+
+**Setup:**
+- The pyramid is ported to Rust (`code/2026-10-29-3d-port/rust`, `mod pyr`) in two versions:
+  - **literal:** as `SlabPyramid`, searching every cell of the (2r + 1)³ box with the bud at its true position;
+  - **precomputed cone:** the 40 cone cells listed once, with the bud at its cell's centre. This is the counterpart of the sweep's fused rewrite. It changes V slightly, by quantising the bud's position.
+- The deposit wraps x without a modulo, as the sweep does.
+- **3D bud counts:** the season-96 deposits of `forest` and `wideForest`, 27 copies each placed at its own golden-ratio depth: 28,485 and 49,410 buds, D = 32, Float32. That is the review's metamer multiplier at the middle of its range.
+- **Runs:** TypeScript and WASM in Node 24 (`pyramid.ts`); native threads split the buds (`native pyr`). Medians.
+
+```bash
+SLAB_DIR=runs/slab node docs/experiments/code/2026-10-29-3d-port/pyramid.ts forest 27
+docs/experiments/code/2026-10-29-3d-port/rust/target/release/native pyr runs/slab/dep-forest-x27.bin 210 130 32 4 7
+```
+
+**Result** (ms a season, deposit + V search):
+
+| `forest`, 28.5k buds | Deposit | V, literal | V, cone | Total, literal | Total, cone |
+|---|---|---|---|---|---|
+| TypeScript | 54 | 608 | — | 662 | — |
+| WASM scalar | 27 | 82 | 8.5 | 109 | 35 |
+| WASM SIMD build | 24 | 86 | 9.4 | 110 | 33 |
+| Native, 1 thread | 33 | 81 | 9.9 | 114 | 43 |
+| Native, 4 threads (deposit serial) | 34 | 21 | 4.4 | 55 | 38 |
+
+| `wideForest`, 49.4k buds | Deposit | V, literal | V, cone |
+|---|---|---|---|
+| TypeScript | 77 | 1010 | — |
+| WASM scalar | 54 | 148 | 24 |
+| Native, 4 threads | 62 | 38 | 8.7 |
+
+**Against the sweep at D = 32, K = 16, Float32** (same field sizes):
+
+| | `forest` sweep | `forest` pyramid (cone) | `wideForest` sweep | `wideForest` pyramid (cone) |
+|---|---|---|---|---|
+| WASM scalar | 128–153 | 35 | 270–276 | 78 |
+| WASM SIMD | 63–74 | 33 | 111–148 | 77 |
+| 4 threads | 22 (in a browser) | 38 serial deposit; ≈ 15 with a parallel deposit (estimate) | 39 (native) | 71 serial deposit; ≈ 25 parallel (estimate) |
+
+- **Rust buys the pyramid more than the sweep:** 7× on the literal search, against the sweep's 2× scalar. The literal search's distance and angle tests per cell are what V8 handled worst.
+- **SIMD buys it nothing:** it is gathers and scattered adds.
+- **The precomputed cone cuts the search 8–10×.** It is a rewrite of the same kind as the sweep's fused march.
+- **The deposit is serial here.** It scatters into the shared grid, so a parallel deposit needs per-thread grids and a reduction (one ≈ 2.6 MB memset and sum per thread). The ≈ 15 and ≈ 25 ms are estimates.
+- **Costs scale differently:** the pyramid ∝ buds (∝ D at fixed closure), the sweep ∝ K·D·W·(leafy rows). A denser stand or a larger K favours the pyramid; a sparser one, the sweep.
+
+**Conclusion:** on equal terms the pyramid with a precomputed cone costs a quarter to two thirds of the sweep single-threaded, and about the same threaded. **The TypeScript-only figure (0.6–1.9 s) does not reject it.** Any rejection must rest on behaviour; the review's Q2 says which.
+
+### The kernel in a browser
+The G1 page (`code/2026-10-29-g05-preview/kernel.html`) in headless Chromium 153 on this machine:
+- 4-lane WASM SIMD: 22 ms (1 lane 70 ms, scalar 158, TypeScript 335);
+- the lanes are Web Workers, each with its own instance and partial field;
+- details in the [G0.5 note](2026-10-29-g05-slab-preview.md).
+
+### The garden bundle and the WASM
+- **What the TypeScript core costs the garden now** (garden-v0.14.0, `npm run build:garden`, 55.5 kB gzipped). Attributed by source map, gzipping each source's generated code:
+  - `src/core` is 14.0 kB of the worker's 15.7 kB, and 5.1 kB of `garden.js`'s 39.8 kB (params, presets and flora, for `forestParams` on the page);
+  - the rest of `garden.js` is the renderer and page (19.4 kB) and twgl.js (12.1 kB).
+- **What the scratch WASM costs:**
+  - **Sizes:** the kernel crate (sweep in both precisions, the pyramid and the exports, std, no wasm-bindgen) is 77–84 kB raw and **28–32 kB gzipped**. `opt-level = "z"` saves nothing (27.8 kB); it is std's panic and format code, not the kernels.
+  - **Compile:** `WebAssembly.compile` takes 0.3 ms in Node 24 (Liftoff, lazy tier-up). A phone would take a few times that.
+- **Not measured:** a whole Rust core. The estimate is 40–80 kB gzipped for 6.7k lines of core logic in 3D, from these 28–32 kB for about 600 lines, most of which is fixed std overhead.

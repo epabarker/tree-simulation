@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>Slab preview (G0.5)</title>
+    <style>
+      :root { color-scheme: light dark; --ink: #2b2a26; --paper: #f6f2e9; --rule: #d8d1c2; --muted: #6b665c; }
+      @media (prefers-color-scheme: dark) { :root { --ink: #e9e4d8; --paper: #1b1a17; --rule: #3a3731; --muted: #a39d90; } }
+      * { box-sizing: border-box; }
+      body { margin: 0; background: var(--paper); color: var(--ink); font: 16px/1.45 Georgia, "Times New Roman", serif; }
+      main { max-width: 1500px; margin: 0 auto; padding: 16px; }
+      h1 { font-size: 1.35rem; margin: 0 0 0.4rem; }
+      p { margin: 0.3rem 0 0.6rem; max-width: 72ch; }
+      .warn { border-left: 3px solid #b5651d; padding-left: 0.6rem; }
+      .status { font: 13px/1.4 ui-monospace, Menlo, monospace; color: var(--muted); }
+      form { display: flex; flex-wrap: wrap; gap: 0.5rem 1.2rem; margin: 0.8rem 0; align-items: center; }
+      fieldset { border: 0; padding: 0; margin: 0; display: flex; gap: 0.4rem; align-items: center; }
+      legend { float: left; margin-right: 0.4rem; color: var(--muted); font-size: 0.9rem; }
+      label { display: inline-flex; gap: 0.2rem; align-items: center; padding: 0.35rem 0.55rem; border: 1px solid var(--rule); border-radius: 6px; cursor: pointer; }
+      label:has(input:checked) { border-color: var(--ink); }
+      input[type="radio"] { margin: 0; }
+      .panels { display: grid; gap: 14px; grid-template-columns: 1fr; }
+      .narrow .panels { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+      figure { margin: 0; }
+      canvas { display: block; width: 100%; border: 1px solid var(--rule); border-radius: 4px; }
+      figcaption { font-size: 0.92rem; margin-top: 0.3rem; }
+      figcaption b { display: block; }
+      figcaption span { color: var(--muted); }
+      a { color: inherit; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Slab preview: true depth against pseudo-depth</h1>
+      <p>
+        The same grown home wood three ways. <b>Top:</b> today's garden view (ADR 0008 pseudo-depth).
+        <b>Below:</b> the 2D trees given depth in a slab 32 cells deep and seen through a fixed
+        frontal camera, once for each z-boundary model.
+      </p>
+      <p class="warn">
+        A crude stand-in: these trees grew in 2D and were spread in depth by a rule (golden-ratio
+        targets per limb, each limb continuous with its parent). Trees grown in a slab would differ,
+        in crown shape most of all. Judge the look of depth, not the trees' form.
+      </p>
+      <p class="status" id="status">loading…</p>
+      <form id="controls">
+        <fieldset><legend>Ring</legend>
+          <label><input type="radio" name="width" value="66" checked /> 66 (phone)</label>
+          <label><input type="radio" name="width" value="520" /> 520 (panorama)</label>
+        </fieldset>
+        <fieldset><legend>Seed</legend>
+          <label><input type="radio" name="seed" value="9" checked /> 9</label>
+          <label><input type="radio" name="seed" value="10" /> 10</label>
+          <label><input type="radio" name="seed" value="12" /> 12</label>
+        </fieldset>
+        <fieldset><legend>Season</legend>
+          <label><input type="radio" name="season" value="60" /> 60</label>
+          <label><input type="radio" name="season" value="100" checked /> 100</label>
+        </fieldset>
+      </form>
+      <div class="panels">
+        <figure><canvas id="today"></canvas><figcaption><b>Today: pseudo-depth</b><span>The garden's renderer as shipped (ADR 0008).</span></figcaption></figure>
+        <figure><canvas id="open"></canvas><figcaption><b>Slab, open z: a hedgerow</b><span>One row with open sky front and back; crowns reach for both faces and fill the slab. Nothing behind.</span></figcaption></figure>
+        <figure><canvas id="periodic"></canvas><figcaption><b>Slab, periodic z: the front row of a wood</b><span>Crowns clipped to the 32-cell lattice. The dimmed rank behind is the same stand, 32 cells back: under periodic z every tree's neighbour in depth is its own clone.</span></figcaption></figure>
+      </div>
+      <p class="status">
+        Camera: 40° horizontal field of view, eye 8 cells up, so the narrow ring is seen from
+        near (strong foreshortening) and the panorama from far (little). Back of the slab 40%
+        darker. <a href="./kernel.html">G1: the light kernel on this device</a> (run only once
+        G0.5 has passed).
+      </p>
+    </main>
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>

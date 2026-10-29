@@ -1,0 +1,210 @@
+# M27 fit targets: Scots pine (Pinus sylvestris). Read by analysis/treesim/fit.py.
+# Units: 1 cell ≈ 0.25 m, 1 season = 1 year (ROADMAP). Each trait is a trial's trait, the mean
+# over seeds; it costs ((mean − target) / band)² × weight. "measured": a number from a study;
+# "described": a field-guide description turned into a wide band, at half weight.
+# Sources: docs/research/2026-10-28-species-traits.md.
+
+species = "pine"
+
+[[trait]]
+name = "stand.height"
+target = 84
+band = 14
+weight = 1
+kind = "measured"
+source = "NW-FVA yield tables (Albert et al. 2021, after Schober), pine yield classes 1–2: top height 19.4–22.8 m at 60 years"
+
+[[trait]]
+name = "lone.earlyShare"
+target = 0.6
+band = 0.05
+weight = 1
+kind = "measured"
+source = "height at 30 over height at 60: 0.59–0.62 over pine yield classes −1 to 2 (NW-FVA yield tables (Albert et al. 2021, after Schober))"
+
+[[trait]]
+name = "lone.spread"
+target = 0.6
+band = 0.2
+weight = 0.5
+kind = "described"
+source = "a young open-grown pine: conical to ovoid, taller than wide (M25)"
+
+[[trait]]
+name = "lone.slenderness"
+target = 48
+band = 8
+weight = 1
+kind = "measured"
+source = "open-grown trees are squat, H/D ≈ 40–55 (MacFarlane et al. 2017)"
+
+[[trait]]
+name = "stand.slenderness"
+target = 70
+band = 10
+weight = 1
+kind = "measured"
+source = "stand-grown H/D 60–80 (Watt et al. 2023)"
+
+[[trait]]
+name = "stand.crownRatio"
+target = 0.35
+band = 0.1
+weight = 0.5
+kind = "described"
+source = "a high crown on a clean bole in a stand (M25; Kothari et al. 2025)"
+
+[[trait]]
+name = "stand.floor"
+target = 0.17
+band = 0.06
+weight = 0.5
+kind = "described"
+source = "all-day relative light under pine 1.15 times that under birch (12.8% against 11.1%; Dobrowolska 2008), applied to birch's 14.8% (Hagemeier & Leuschner 2019); 2–59% across stand ages (Walter & Himmler 1996)"
+
+[[trait]]
+name = "lone.widestAt"
+target = 0.3
+band = 0.15
+weight = 0.5
+kind = "described"
+source = "a young pine's crown, widest in its lower part"
+
+[[trait]]
+name = "lone.crownFullness"
+target = 0.6
+band = 0.1
+weight = 0.5
+kind = "described"
+source = "between a cone (0.5) and an ellipse (0.79)"
+
+[[trait]]
+name = "lone.forkHeight"
+target = 0.9
+band = 0.1
+weight = 0.5
+kind = "described"
+source = "excurrent: one stem to the top (Rauh's model, M25)"
+
+[[trait]]
+name = "lone.leaderDominance"
+target = 3
+band = 1
+weight = 0.5
+kind = "described"
+source = "strong apical control while young (M25)"
+
+[[trait]]
+name = "lone.branchAngle"
+target = 70
+band = 10
+weight = 0.5
+kind = "described"
+source = "whorled tiers, near-horizontal (M25)"
+
+[[trait]]
+name = "lone.limbDroop"
+target = 10
+band = 10
+weight = 0.25
+kind = "described"
+source = "level tiers that droop a little at the tips"
+
+[[trait]]
+name = "stand.lateShare"
+target = 1.28
+band = 0.06
+weight = 1
+kind = "measured"
+source = "stand height at 100 over height at 60: 1.27–1.29 for pine classes 1–2 (NW-FVA yield tables (Albert et al. 2021))"
+
+# Free parameters: dotted paths into the species' patch, with bounds (literature review §4,
+# ROADMAP calibration table). log = true searches the bound's log scale. L_h spans 10–200 for
+# every species: the hyperbolic discount needs larger values than the exponential (ADR 0021).
+# r2.hJ is the juvenile height (ADR 0022): shoots lengthen as the tree grows to it.
+# Level 1's η stays at 1.5–2: Rauh's whorled tiers need the strong plagiotropic pull (M25).
+[[param]]
+path = "c3.alpha"
+lo = 2.5
+hi = 6
+[[param]]
+path = "r2.levels.0.lambda"
+lo = 0.5
+hi = 0.6
+[[param]]
+path = "r2.levels.1.lambda"
+lo = 0.48
+hi = 0.58
+[[param]]
+path = "r2.levels.1.setPoint"
+lo = 20
+hi = 90
+[[param]]
+path = "r2.levels.1.branchAngle"
+lo = 50
+hi = 90
+[[param]]
+path = "r2.levels.1.eta"
+lo = 1.5
+hi = 2
+[[param]]
+path = "r2.levels.2.setPoint"
+lo = 40
+hi = 160
+[[param]]
+path = "r2.aC"
+lo = 0
+hi = 40
+[[param]]
+path = "r2.dLambda"
+lo = 0
+hi = 0.12
+[[param]]
+path = "r2.kappa"
+lo = 0
+hi = 4
+[[param]]
+path = "c5.Trel"
+lo = 0.005
+hi = 0.6
+[[param]]
+path = "c6.r0"
+lo = 0.015
+hi = 0.05
+[[param]]
+path = "r1.Lh"
+lo = 10
+hi = 200
+log = true
+[[param]]
+path = "r1.mf"
+lo = 0.02
+hi = 0.15
+[[param]]
+path = "r3.c"
+lo = 0.01
+hi = 0.3
+log = true
+[[param]]
+path = "r6.qMin"
+lo = 0.01
+hi = 0.2
+log = true
+[[param]]
+path = "r6.leafArea"
+lo = 1
+hi = 3
+[[param]]
+path = "r2.hJ"
+lo = 2
+hi = 150
+log = true
+
+# Assignments every candidate carries unchanged (analysis/treesim/fit.py).
+[fixed]
+"r1.hydraulic" = "hyperbolic"   # 1/(1 + L_path/L_h): height keeps rising slowly (ADR 0021)
+
+# Held out: never in the loss, checked after the fit (analysis/experiments/m27_holdout.py).
+[holdout]
+survivalLight = [0.2, 0.3]   # lowest light all seedlings survive (less tolerant than birch, whose saplings need 21%)
+shadeScore = 1.67   # Niinemets & Valladares 2006, Appendix A

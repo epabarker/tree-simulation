@@ -704,3 +704,152 @@ pub extern "C" fn compute32simd() {
         simd32::compute(s, sc);
     }
 }
+
+/// One lane of the lane-parallel march (G1): directions k ≡ lane (mod lanes) into this instance's
+/// own (q, v), its partial field. A sample would sum the lanes' fields at one cell.
+#[cfg(target_arch = "wasm32")]
+#[no_mangle]
+pub extern "C" fn compute32simd_lane(lane: usize, lanes: usize) {
+    unsafe {
+        let (s, sc) = (*core::ptr::addr_of_mut!(wasm_exports::S32)).as_mut().unwrap();
+        let ks: Vec<usize> = (0..s.dirs.w.len()).filter(|k| k % lanes == lane).collect();
+        let mut q = core::mem::take(&mut s.q);
+        let mut vx = core::mem::take(&mut s.vx);
+        let mut vy = core::mem::take(&mut s.vy);
+        let mut vz = core::mem::take(&mut s.vz);
+        simd32::march(s, &ks, sc, &mut q, &mut vx, &mut vy, &mut vz);
+        s.q = q; s.vx = vx; s.vy = vy; s.vz = vz;
+    }
+}
+
+/// The 3D shadow pyramid (cli/slab-light.ts SlabPyramid) in Rust, for the review's equal-terms
+/// comparison: deposit a·b^(−q) over (2q+1)² cells per layer; V from the perception cone, either
+/// literally (every cell of the (2r+1)³ box, distance and angle tested per cell, bud at its true
+/// position) or from a cone precomputed once with the bud at its cell's centre.
+pub mod pyr {
+    pub struct Pyr {
+        pub w: usize, pub h: usize, pub d: usize, pub px: bool, pub pz: bool,
+        pub s: Vec<f32>, pub weights: Vec<f32>, pub a: f32, pub c: f32,
+        pub cos_half: f32, pub r: i32, pub top: usize,
+        /// (dx, dy, dz, unit vector) of every cone cell, for the precomputed search.
+        pub cone: Vec<(i32, i32, i32, f32, f32, f32)>,
+    }
+    impl Pyr {
+        pub fn new(w: usize, h: usize, d: usize, px: bool, pz: bool, a: f64, b: f64, qmax: usize, c: f64, angle_deg: f64, r: usize) -> Pyr {
+            let weights = (0..=qmax).map(|q| (a * b.powi(-(q as i32))) as f32).collect();
+            let cos_half = (angle_deg * std::f64::consts::PI / 180.0).cos() as f32;
+            let r = r.max(1) as i32;
+            let mut cone = vec![];
+            for dy in -r..=r { for dz in -r..=r { for dx in -r..=r {
+                let (ex, ey, ez) = (dx as f32, dy as f32, dz as f32);
+                let dd = (ex * ex + ey * ey + ez * ez).sqrt();
+                if dd == 0.0 || dd > r as f32 || ey / dd < cos_half { continue; }
+                cone.push((dx, dy, dz, ex / dd, ey / dd, ez / dd));
+            }}}
+            Pyr { w, h, d, px, pz, s: vec![0.0; w * h * d], weights, a: a as f32, c: c as f32, cos_half, r, top: 0, cone }
+        }
+        pub fn clear(&mut self) { let n = self.top * self.w * self.d; self.s[..n].fill(0.0); self.top = 0; }
+        pub fn deposit(&mut self, x: f64, y: f64, z: f64, area: f32) {
+            let (w, h, d) = (self.w as isize, self.h as isize, self.d as isize);
+            let i = x.floor() as isize; let j = y.floor() as isize; let zc = z.floor() as isize;
+            if j < 0 || j >= h { return; }
+            self.top = self.top.max(j as usize + 1);
+            for (q, &wq) in self.weights.iter().enumerate() {
+                let q = q as isize;
+                let row = j - q;
+                if row < 0 { break; }
+                let wv = wq * area;
+                for dz in -q..=q {
+                    let mut zz = zc + dz;
+                    if self.pz { zz = zz.rem_euclid(d); } else if zz < 0 || zz >= d { continue; }
+                    let base = ((row * d + zz) * w) as usize;
+                    if self.px {
+                        for dx in -q..=q { let mut col = i.rem_euclid(w) + dx; if col < 0 { col += w } else if col >= w { col -= w } self.s[base + col as usize] += wv; }
+                    } else {
+                        let lo = (i - q).max(0); let hi = (i + q).min(w - 1);
+                        for col in lo..=hi { self.s[base + col as usize] += wv; }
+                    }
+                }
+            }
+        }
+        #[inline]
+        fn cell(&self, col: isize, row: isize, zz: isize) -> Option<usize> {
+            let (w, h, d) = (self.w as isize, self.h as isize, self.d as isize);
+            if row < 0 || row >= h { return None; }
+            let col = if self.px { col.rem_euclid(w) } else if col < 0 || col >= w { return None } else { col };
+            let zz = if self.pz { zz.rem_euclid(d) } else if zz < 0 || zz >= d { return None } else { zz };
+            Some(((row * d + zz) * w + col) as usize)
+        }
+        /// Q and V at a bud, the TS way.
+        pub fn sample_literal(&self, x: f64, y: f64, z: f64) -> [f32; 4] {
+            let (i, j, zc) = (x.floor() as isize, y.floor() as isize, z.floor() as isize);
+            let Some(c0) = self.cell(i, j, zc) else { return [0.0, 0.0, 1.0, 0.0] };
+            let q = (self.c - self.s[c0] + self.a).max(0.0);
+            let (fx, fy, fz) = ((x - x.floor()) as f32, y as f32, (z - z.floor()) as f32);
+            let r = self.r as isize;
+            let mut best = f32::INFINITY; let mut v = [0.0f32, 1.0, 0.0];
+            for row in (j - r).max(0)..=(j + r).min(self.h as isize - 1) {
+                for dzc in -r..=r { for dxc in -r..=r {
+                    let Some(c) = self.cell(i + dxc, row, zc + dzc) else { continue };
+                    let ex = dxc as f32 + 0.5 - fx; let ey = row as f32 + 0.5 - fy; let ez = dzc as f32 + 0.5 - fz;
+                    let dd = (ex * ex + ey * ey + ez * ez).sqrt();
+                    if dd > self.r as f32 || dd == 0.0 || ey / dd < self.cos_half { continue; }
+                    let sh = self.s[c];
+                    if sh < best { best = sh; v = [ex / dd, ey / dd, ez / dd]; }
+                }}
+            }
+            [q, v[0], v[1], v[2]]
+        }
+        /// Q and V with the cone precomputed (the bud at its cell's centre).
+        pub fn sample_cone(&self, x: f64, y: f64, z: f64) -> [f32; 4] {
+            let (i, j, zc) = (x.floor() as isize, y.floor() as isize, z.floor() as isize);
+            let Some(c0) = self.cell(i, j, zc) else { return [0.0, 0.0, 1.0, 0.0] };
+            let q = (self.c - self.s[c0] + self.a).max(0.0);
+            let mut best = f32::INFINITY; let mut v = [0.0f32, 1.0, 0.0];
+            for &(dx, dy, dz, ux, uy, uz) in &self.cone {
+                let Some(c) = self.cell(i + dx as isize, j + dy as isize, zc + dz as isize) else { continue };
+                let sh = self.s[c];
+                if sh < best { best = sh; v = [ux, uy, uz]; }
+            }
+            [q, v[0], v[1], v[2]]
+        }
+    }
+}
+
+pub mod pyr_exports {
+    use super::pyr::Pyr;
+    static mut P: Option<Pyr> = None;
+    static mut BUF: Vec<f64> = Vec::new();
+    #[no_mangle]
+    pub extern "C" fn pyr_new(w: usize, h: usize, d: usize, px: u32, pz: u32) {
+        unsafe { P = Some(Pyr::new(w, h, d, px != 0, pz != 0, 0.15, 1.5, 6, 1.0, 45.0, 4)); }
+    }
+    #[no_mangle]
+    pub extern "C" fn pyr_buf(n: usize) -> *mut f64 {
+        unsafe { let b = &mut *core::ptr::addr_of_mut!(BUF); b.resize(n, 0.0); b.as_mut_ptr() }
+    }
+    /// Deposits the n buds (x, y, z, area) in the buffer.
+    #[no_mangle]
+    pub extern "C" fn pyr_deposit(n: usize) {
+        unsafe {
+            let p = (*core::ptr::addr_of_mut!(P)).as_mut().unwrap();
+            let b = &*core::ptr::addr_of!(BUF);
+            p.clear();
+            for k in 0..n { p.deposit(b[4 * k], b[4 * k + 1], b[4 * k + 2], b[4 * k + 3] as f32); }
+        }
+    }
+    /// Samples the n buds; mode 0 literal, 1 precomputed cone. Returns Σ Q + Σ vy (a checksum).
+    #[no_mangle]
+    pub extern "C" fn pyr_sample(n: usize, mode: u32) -> f64 {
+        unsafe {
+            let p = (*core::ptr::addr_of!(P)).as_ref().unwrap();
+            let b = &*core::ptr::addr_of!(BUF);
+            let mut acc = 0.0f64;
+            for k in 0..n {
+                let o = if mode == 0 { p.sample_literal(b[4 * k], b[4 * k + 1], b[4 * k + 2]) } else { p.sample_cone(b[4 * k], b[4 * k + 1], b[4 * k + 2]) };
+                acc += (o[0] + o[2]) as f64;
+            }
+            acc
+        }
+    }
+}

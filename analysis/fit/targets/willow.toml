@@ -1,0 +1,211 @@
+# M27 fit targets: goat willow (Salix caprea). Read by analysis/treesim/fit.py.
+# Units: 1 cell ≈ 0.25 m, 1 season = 1 year (ROADMAP). Each trait is a trial's trait, the mean
+# over seeds; it costs ((mean − target) / band)² × weight. "measured": a number from a study;
+# "described": a field-guide description turned into a wide band, at half weight.
+# Sources: docs/research/2026-10-28-species-traits.md.
+
+species = "willow"
+
+[[trait]]
+name = "stand.height"
+target = 52
+band = 14
+weight = 1
+kind = "measured"
+source = "13 m at 60 years: between British field guides (≈ 10 m, up to 15) and taiga tree-willow stands (16.6–18 m, Paramonov et al. 2021)"
+
+[[trait]]
+name = "lone.earlyShare"
+target = 0.73
+band = 0.06
+weight = 1
+kind = "measured"
+source = "height at 30 over height at 60: 0.69–0.77 for classes II–I of the tree-willow yield tables of Arkhangelsk (Paramonov, Tretyakov & Koptev 2021; mostly goat willow; mean height × 1.1; age 60 partly extrapolated; analysis/fit/sources/minor_species_growth_curves.csv)"
+
+[[trait]]
+name = "lone.spread"
+target = 1.6
+band = 0.4
+weight = 0.5
+kind = "described"
+source = "broad and low: a many-limbed crown wider than it is tall (M25)"
+
+[[trait]]
+name = "lone.slenderness"
+target = 48
+band = 8
+weight = 1
+kind = "measured"
+source = "open-grown trees are squat, H/D ≈ 40–55 (MacFarlane et al. 2017)"
+
+[[trait]]
+name = "stand.slenderness"
+target = 70
+band = 10
+weight = 1
+kind = "measured"
+source = "stand-grown H/D 60–80 (Watt et al. 2023)"
+
+[[trait]]
+name = "stand.crownRatio"
+target = 0.45
+band = 0.12
+weight = 0.5
+kind = "described"
+source = "light-demanding, but sheds less than birch (M25)"
+
+[[trait]]
+name = "stand.floor"
+target = 0.12
+band = 0.05
+weight = 0.5
+kind = "described"
+source = "12% (8–18%), estimated from Hagemeier & Leuschner 2019's five measured species: ln(floor %) = 4.92 − 1.08 × Niinemets & Valladares score, cross-checked by LAI and Beer–Lambert (user's research, analysis/fit/sources/floor_light_targets.csv); near birch's measured 14.8%"
+
+[[trait]]
+name = "lone.widestAt"
+target = 0.5
+band = 0.15
+weight = 0.5
+kind = "described"
+source = "a broad crown, widest about its middle"
+
+[[trait]]
+name = "lone.crownFullness"
+target = 0.72
+band = 0.1
+weight = 0.5
+kind = "described"
+source = "a broad, full crown"
+
+[[trait]]
+name = "lone.forkHeight"
+target = 0.15
+band = 0.15
+weight = 0.5
+kind = "described"
+source = "a short stem that divides low into spreading limbs (M25)"
+
+[[trait]]
+name = "lone.leaderDominance"
+target = 1.1
+band = 0.4
+weight = 0.5
+kind = "described"
+source = "apical control fades almost at once"
+
+[[trait]]
+name = "lone.branchAngle"
+target = 45
+band = 10
+weight = 0.5
+kind = "described"
+source = "spreading, ascending limbs"
+
+[[trait]]
+name = "lone.limbDroop"
+target = 10
+band = 10
+weight = 0.25
+kind = "described"
+source = "limbs that arch outward"
+
+[[trait]]
+name = "stand.lateShare"
+target = 1.08
+band = 0.06
+weight = 0.5
+kind = "measured"
+source = "stand height at 100 over height at 60: 1.05–1.11 for classes I–II (Paramonov et al. 2021), extrapolated past age 45–65, so half weight"
+
+# Free parameters: dotted paths into the species' patch, with bounds (literature review §4,
+# ROADMAP calibration table). log = true searches the bound's log scale. L_h spans 10–200 for
+# every species: the hyperbolic discount needs larger values than the exponential (ADR 0021).
+# r2.hJ is the juvenile height (ADR 0022): shoots lengthen as the tree grows to it.
+# α may go higher (fast, costly leaves).
+[[param]]
+path = "c3.alpha"
+lo = 3
+hi = 7
+[[param]]
+path = "r2.levels.0.lambda"
+lo = 0.5
+hi = 0.6
+[[param]]
+path = "r2.levels.1.lambda"
+lo = 0.48
+hi = 0.58
+[[param]]
+path = "r2.levels.1.setPoint"
+lo = 20
+hi = 90
+[[param]]
+path = "r2.levels.1.branchAngle"
+lo = 25
+hi = 70
+[[param]]
+path = "r2.levels.1.eta"
+lo = 0.05
+hi = 1.5
+log = true
+[[param]]
+path = "r2.levels.2.setPoint"
+lo = 40
+hi = 160
+[[param]]
+path = "r2.aC"
+lo = 0
+hi = 40
+[[param]]
+path = "r2.dLambda"
+lo = 0
+hi = 0.12
+[[param]]
+path = "r2.kappa"
+lo = 0
+hi = 4
+[[param]]
+path = "c5.Trel"
+lo = 0.005
+hi = 0.6
+[[param]]
+path = "c6.r0"
+lo = 0.015
+hi = 0.05
+[[param]]
+path = "r1.Lh"
+lo = 10
+hi = 200
+log = true
+[[param]]
+path = "r1.mf"
+lo = 0.02
+hi = 0.15
+[[param]]
+path = "r3.c"
+lo = 0.01
+hi = 0.3
+log = true
+[[param]]
+path = "r6.qMin"
+lo = 0.01
+hi = 0.2
+log = true
+[[param]]
+path = "r6.leafArea"
+lo = 1
+hi = 3
+[[param]]
+path = "r2.hJ"
+lo = 2
+hi = 150
+log = true
+
+# Assignments every candidate carries unchanged (analysis/treesim/fit.py).
+[fixed]
+"r1.hydraulic" = "hyperbolic"   # 1/(1 + L_path/L_h): height keeps rising slowly (ADR 0021)
+
+# Held out: never in the loss, checked after the fit (analysis/experiments/m27_holdout.py).
+[holdout]
+survivalLight = [0.12, 0.2]   # lowest light all seedlings survive (a shade more tolerant than birch (2.16 against 2.03))
+shadeScore = 2.16   # Niinemets & Valladares 2006, Appendix A

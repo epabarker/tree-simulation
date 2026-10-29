@@ -30,6 +30,17 @@ describe("R1 carbon balance (§R1, ADR 0010)", () => {
     expect(tree.maintenance).toBeCloseTo(sapwood + 0.05 * buds, 12);
   });
 
+  it("with the hyperbolic form, discounts by 1/(1 + L_path/L_h), a longer tail than exp (ADR 0021)", () => {
+    const p = params({ mw: 0, mf: 0, Lh: 10, hydraulic: "hyperbolic" });
+    const tree = seedling(p, 0.5);
+    carbonBalance(tree, p);
+    const L = tree.m.cols.length[0] as number;
+    const buds = tree.b.length;
+    expect(tree.production).toBeCloseTo((p.c3.alpha * buds * 0.5) / (1 + L / 10), 12);
+    // At 3 L_h the exponential keeps 5% of production, the hyperbolic form 25%.
+    expect(1 / (1 + 3)).toBeGreaterThan(5 * Math.exp(-3));
+  });
+
   it("charges only the pipes that serve foliage: heartwood (scars, kept radius) costs nothing", () => {
     const p = params({ mw: 2, mf: 0 });
     const a = seedling(p, 0.5);

@@ -1,0 +1,218 @@
+# M27 fit targets: silver birch (Betula pendula). Read by analysis/treesim/fit.py.
+# Units: 1 cell ≈ 0.25 m, 1 season = 1 year (ROADMAP). Each trait is a trial's trait, the mean
+# over seeds; it costs ((mean − target) / band)² × weight. "measured": a number from a study;
+# "described": a field-guide description turned into a wide band, at half weight.
+# Sources: docs/research/2026-10-28-species-traits.md.
+
+species = "birch"
+
+[[trait]]
+name = "stand.height"
+target = 95
+band = 20
+weight = 1
+kind = "measured"
+source = "dominant height ≈ 22–26 m at 60 years on fertile sites (birch yield tables and site-index curves: Lee et al. 2024; Jansen et al. 2018)"
+
+[[trait]]
+name = "lone.earlyShare"
+target = 0.72
+band = 0.08
+weight = 1
+kind = "measured"
+source = "height at 30 over height at 60: birch's height growth culminates early (site-index curve shape; Zeoli et al. 2025)"
+
+[[trait]]
+name = "lone.spread"
+target = 0.45
+band = 0.12
+weight = 0.5
+kind = "described"
+source = "a narrow, open crown (M19 note; field guides)"
+
+[[trait]]
+name = "lone.slenderness"
+target = 48
+band = 8
+weight = 1
+kind = "measured"
+source = "open-grown trees are squat, H/D ≈ 40–55 (MacFarlane et al. 2017)"
+
+[[trait]]
+name = "stand.slenderness"
+target = 70
+band = 10
+weight = 1
+kind = "measured"
+source = "stand-grown H/D 60–80 (Watt et al. 2023)"
+
+[[trait]]
+name = "stand.crownRatio"
+target = 0.38
+band = 0.1
+weight = 0.5
+kind = "described"
+source = "light-demanding species lift their crowns fast in stands (Kothari et al. 2025; M19 note)"
+
+[[trait]]
+name = "stand.floor"
+target = 0.15
+band = 0.05
+weight = 1
+kind = "measured"
+source = "birch canopies transmit a median 14.8% of PAR (6.4–19.8%; Hagemeier & Leuschner 2019 (overcast, diffuse PAR))"
+
+[[trait]]
+name = "lone.widestAt"
+target = 0.4
+band = 0.15
+weight = 0.5
+kind = "described"
+source = "an ovoid crown, widest below the middle (field guides)"
+
+[[trait]]
+name = "lone.crownFullness"
+target = 0.7
+band = 0.1
+weight = 0.5
+kind = "described"
+source = "an ovoid outline (an ellipse is 0.79), not an hourglass (M26 note)"
+
+[[trait]]
+name = "lone.forkHeight"
+target = 0.9
+band = 0.1
+weight = 0.5
+kind = "described"
+source = "excurrent: one stem to the top (§9 'birch-like pioneer')"
+
+[[trait]]
+name = "lone.leaderDominance"
+target = 3.0
+band = 1.0
+weight = 0.5
+kind = "described"
+source = "strong apical control while young (§9)"
+
+[[trait]]
+name = "lone.branchAngle"
+target = 45
+band = 10
+weight = 0.5
+kind = "described"
+source = "fine, ascending first-order branches (§9; Yun et al. 2025 on angle and light demand)"
+
+[[trait]]
+name = "lone.limbDroop"
+target = 15
+band = 10
+weight = 0.25
+kind = "described"
+source = "limbs arch, twigs hang (Betula pendula)"
+
+[[trait]]
+name = "stand.lateShare"
+target = 1.12
+band = 0.08
+weight = 0.5
+kind = "described"
+source = "stand height at 100 over height at 60: birch's height growth culminates early and it is short-lived (site-index curve shape, Zeoli et al. 2025); an estimate"
+
+[[trait]]
+name = "shade.survivalLight"
+target = 0.21
+band = 0.05
+weight = 1
+kind = "measured"
+source = "lowest light the seedling survives: birch saplings need 21% of PAR (Hagemeier & Leuschner 2019); fitted, not held out (ADR 0020 addendum)"
+
+# Free parameters: dotted paths into the species' patch, with bounds (literature review §4,
+# ROADMAP calibration table). log = true searches the bound's log scale. L_h spans 10–200 for
+# every species: the hyperbolic discount needs larger values than the exponential (ADR 0021).
+# r2.hJ is the juvenile height (ADR 0022): shoots lengthen as the tree grows to it.
+[[param]]
+path = "c3.alpha"
+lo = 2.5
+hi = 6
+[[param]]
+path = "r2.levels.0.lambda"
+lo = 0.5
+hi = 0.6
+[[param]]
+path = "r2.levels.1.lambda"
+lo = 0.48
+hi = 0.58
+[[param]]
+path = "r2.levels.1.setPoint"
+lo = 20
+hi = 90
+[[param]]
+path = "r2.levels.1.branchAngle"
+lo = 25
+hi = 70
+[[param]]
+path = "r2.levels.1.eta"
+lo = 0.05
+hi = 1.5
+log = true
+[[param]]
+path = "r2.levels.2.setPoint"
+lo = 40
+hi = 160
+[[param]]
+path = "r2.aC"
+lo = 0
+hi = 40
+[[param]]
+path = "r2.dLambda"
+lo = 0
+hi = 0.12
+[[param]]
+path = "r2.kappa"
+lo = 0
+hi = 4
+[[param]]
+path = "c5.Trel"
+lo = 0.005
+hi = 0.6
+[[param]]
+path = "c6.r0"
+lo = 0.015
+hi = 0.05
+[[param]]
+path = "r1.Lh"
+lo = 10
+hi = 200
+log = true
+[[param]]
+path = "r1.mf"
+lo = 0.02
+hi = 0.15
+[[param]]
+path = "r3.c"
+lo = 0.01
+hi = 0.3
+log = true
+[[param]]
+path = "r6.qMin"
+lo = 0.01
+hi = 0.2
+log = true
+[[param]]
+path = "r6.leafArea"
+lo = 1
+hi = 3
+[[param]]
+path = "r2.hJ"
+lo = 2
+hi = 150
+log = true
+
+# Assignments every candidate carries unchanged (analysis/treesim/fit.py).
+[fixed]
+"r1.hydraulic" = "hyperbolic"   # 1/(1 + L_path/L_h): height keeps rising slowly (ADR 0021)
+
+# Held out: never in the loss, checked after the fit (analysis/experiments/m27_holdout.py).
+[holdout]
+survivalLight = [0.15, 0.25]   # lowest light all seedlings survive (Hagemeier & Leuschner 2019: birch saplings need 21%; Kobe et al. 1995)
+shadeScore = 2.03   # Niinemets & Valladares 2006, Appendix A

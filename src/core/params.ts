@@ -34,6 +34,11 @@ export interface TreeSpec {
   species?: string;
   /** Season in which the seedling appears (default 0). */
   plantSeason?: number;
+  /**
+   * Tilt of the seedling's first shoot from vertical, degrees, positive to the right (default 0):
+   * a tilted stem for the gravitropic-recovery check (§10, Bastien et al. 2013; M26).
+   */
+  lean?: number;
 }
 
 export interface Params {
@@ -199,6 +204,11 @@ export interface Params {
     mf: number;
     /** L_h: hydraulic path-length scale in cells; 0 switches the path-length cause off. */
     Lh: number;
+    /**
+     * How production falls with path length L: 'exp', exp(−L/L_h) (ADR 0010); 'hyperbolic',
+     * 1/(1 + L/L_h), a conductance under a resistance that grows linearly with path length.
+     */
+    hydraulic: "exp" | "hyperbolic";
     /** s_r: share of a surplus put into the reserve. */
     sr: number;
     /** f_rep: share of a surplus going to reproduction once the tree is mature; 0 = off. */
@@ -286,6 +296,13 @@ export interface Params {
      * pos its node's place in the season's shoot (0 base, 1 tip). 0 or absent: off.
      */
     kappa?: number;
+    /**
+     * h_j, the juvenile phase (ADR 0022): a tree's shoots may carry at most
+     * 1 + (c1.maxMetamersPerShoot − 1)·min(1, H/h_j) metamers' worth of resource, H its height in
+     * cells at the start of the season, so a seedling's shoots start short and lengthen as it grows.
+     * 0 or absent: off (the full cap from the first season).
+     */
+    hJ?: number;
   };
 
   /**
@@ -463,6 +480,7 @@ export const defaultParams: Params = {
     mw: 1, // stem maintenance ≈ 5–13% of production (Ryan et al. 1995)
     mf: 0.06, // Q_c = m_f/α ≈ 0.02–0.03 of open sky
     Lh: 60, // the plateau cause: stand trees level off at ≈ 78 cells
+    hydraulic: "exp",
     sr: 0.1,
     fRep: 0, // the alternative plateau cause, off
     maturity: 70,
@@ -549,6 +567,48 @@ export function mergeParams(base: Params, patch: ParamsPatch): Params {
     }
   }
   return out as unknown as Params;
+}
+
+/**
+ * The patch that turns `base` into `current`: each group's fields that differ (arrays and
+ * species entries whole), and any other top-level value that differs. The inverse of
+ * `mergeParams`: mergeParams(base, diffParams(base, current)) equals `current` when both have the
+ * same keys, as params always do. The lab's shareable links carry it (M26).
+ */
+export function diffParams(base: Params, current: Params): ParamsPatch {
+  const out: Record<string, unknown> = {};
+  const b = base as unknown as Record<string, unknown>;
+  const c = current as unknown as Record<string, unknown>;
+  const same = (x: unknown, y: unknown) => JSON.stringify(x) === JSON.stringify(y);
+  for (const key of Object.keys(c)) {
+    const now = c[key];
+    const was = b[key];
+    if (same(now, was)) continue;
+    const isGroup = (v: unknown) => v !== null && typeof v === "object" && !Array.isArray(v);
+    if (isGroup(now) && isGroup(was)) {
+      const group: Record<string, unknown> = {};
+      for (const [k, v] of Object.entries(now as Record<string, unknown>)) {
+        if (!same(v, (was as Record<string, unknown>)[k])) group[k] = clone(v);
+      }
+      out[key] = group;
+    } else out[key] = clone(now);
+  }
+  return out as ParamsPatch;
+}
+
+/**
+ * Params with one species' patch amended: `patch` merges into that species' groups the way
+ * `mergeParams` merges into the world's (each group shallowly), where a `species` entry inside a
+ * plain `mergeParams` patch would replace the species' whole patch (M26; M27 fits species this way).
+ */
+export function patchSpecies(params: Params, name: string, patch: SpeciesPatch): Params {
+  const out = clone(params);
+  const entry = (out.species?.[name] ?? {}) as unknown as Params;
+  out.species = {
+    ...out.species,
+    [name]: mergeParams(entry, patch as ParamsPatch) as unknown as SpeciesPatch,
+  };
+  return out;
 }
 
 /** Deep copy of plain JSON data (params never hold functions, dates or typed arrays). */

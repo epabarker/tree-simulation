@@ -1,13 +1,17 @@
 import { describe, expect, it } from "vitest";
+import { type FixtureName, fixtureParams } from "../fixtures.ts";
+import { treeMetrics } from "../metrics.ts";
 import { defaultParams, mergeParams, type PaLevel, type Params } from "../params.ts";
-import { presetParams as currentPreset, PRE_R1, type PresetName } from "../presets.ts";
+import { PRE_R1 } from "../presets.ts";
 import { BudState, Slot, type Tree } from "../tree.ts";
+import { loneParams, withAssign } from "../trials.ts";
 import { World } from "../world.ts";
+import { juvenileCap, shootSize } from "./c1-buds.ts";
 import { directionParams, lambdaAt, lateralCount, terminates } from "./r2-physiological-age.ts";
 
-/** These checks are the M7 evidence, so they run the presets as they were before R1 and R3. */
-const presetParams = (name: PresetName, seed?: number) =>
-  mergeParams(currentPreset(name, seed), PRE_R1);
+/** These checks are the M7 evidence, so they run the retired presets (fixtures.ts) as they were before R1 and R3. */
+const presetParams = (name: FixtureName, seed?: number) =>
+  mergeParams(fixtureParams(name, seed), PRE_R1);
 
 const row = (r: Partial<PaLevel>): PaLevel => ({
   lambda: 0.5,
@@ -127,5 +131,41 @@ describe("R2 physiological age (§R2, ADR 0009)", () => {
     let ended = 0;
     for (let i = 0; i < tree.b.length; i++) if (b.state[i] === BudState.terminated) ended += 1;
     expect(ended).toBeGreaterThan(20);
+  });
+});
+
+describe("R2 juvenile phase (§R2.4, ADR 0022)", () => {
+  it("raises the shoot cap from 1 metamer to the full cap as the tree grows to h_j", () => {
+    const p = withR2([row({})], { hJ: 20 });
+    const max = p.c1.maxMetamersPerShoot;
+    expect(juvenileCap(0, p)).toBe(1);
+    expect(juvenileCap(10, p)).toBeCloseTo(1 + (max - 1) / 2, 12);
+    expect(juvenileCap(20, p)).toBe(max);
+    expect(juvenileCap(80, p)).toBe(max);
+    // Off: h_j 0 or absent, or R2 off.
+    expect(juvenileCap(0, withR2([row({})]))).toBe(max);
+    expect(juvenileCap(0, mergeParams(p, { r2: { enabled: false } }))).toBe(max);
+  });
+
+  it("caps a shoot's resource: a fractional cap gives one longer metamer", () => {
+    const out = { length: 0 };
+    expect(shootSize(10, defaultParams, out, 1.5)).toBe(1);
+    expect(out.length).toBeCloseTo(1.5 * defaultParams.c1.internodeLength, 12);
+  });
+
+  it("slows a young tree's height growth, most while it is small", () => {
+    const heights = (assign: Record<string, unknown>) => {
+      const w = new World(withAssign(loneParams("oak", 1), "oak", assign));
+      const t = w.trees[0] as Tree;
+      w.run(10);
+      const h10 = treeMetrics(t, w).height;
+      w.run(50);
+      return [h10, treeMetrics(t, w).height] as const;
+    };
+    const [full10, full60] = heights({ "r2.hJ": 0 });
+    const [young10, young60] = heights({ "r2.hJ": 60 });
+    // At 10 seasons the juvenile oak is less than half as tall; by 60 it is within a fifth.
+    expect(young10).toBeLessThan(0.5 * full10);
+    expect(young60).toBeGreaterThan(0.8 * full60);
   });
 });

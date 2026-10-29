@@ -162,6 +162,27 @@ describe("Leaf styles (page only, per species)", () => {
     for (const preset of Object.values(presets) as { leaf?: string }[]) {
       if (preset.leaf !== undefined) expect(isLeafStyleName(preset.leaf)).toBe(true);
     }
-    expect((presets.conifer as { leaf?: string }).leaf).toBe("needle");
+    expect((presets.firWood as { leaf?: string }).leaf).toBe("needle");
+  });
+});
+
+describe("rings in the lab's frame (M26)", () => {
+  it("frames one lap of a ring and draws the copies either side, so crowns wrap at the seam", () => {
+    const world = new World(presetParams("forest", 1));
+    world.run(30);
+    const scene = new Scene();
+    scene.setSize(800, 600, 1);
+    scene.frame = "trees";
+    scene.setSnapshot(new SnapshotBuilder().build(world, 0));
+    scene.fit(true);
+    const W = world.params.world.width;
+    expect(scene.camera.cx).toBe(W / 2);
+    expect(scene.wrapOffsets()).toEqual([-W, 0, W]);
+    // An open world keeps the trees' own frame and one copy.
+    const open = new Scene();
+    open.setSize(800, 600, 1);
+    open.frame = "trees";
+    open.setSnapshot(new SnapshotBuilder().build(new World(presetParams("skyTree", 1)), 0));
+    expect(open.wrapOffsets()).toEqual([0]);
   });
 });

@@ -56,8 +56,38 @@ macro_rules! run {
 
 struct A { noreduce: bool, rows: bool, w: usize, h: usize, d: usize, k: usize, px: bool, pz: bool, fast: bool, threads: usize, reps: usize, dep: Vec<f64> }
 
+fn pyr_main(v: &[String]) {
+    // pyr <deposits> W H D threads reps
+    let bytes = std::fs::read(&v[2]).unwrap();
+    let dep: Vec<f64> = bytes.chunks_exact(8).map(|c| f64::from_le_bytes(c.try_into().unwrap())).collect();
+    let p = |i: usize| v[i].parse::<usize>().unwrap();
+    let (w, h, d, threads, reps) = (p(3), p(4), p(5), p(6), p(7));
+    let g = (5f64.sqrt() - 1.0) / 2.0;
+    let buds: Vec<[f64; 4]> = (0..dep.len() / 4).map(|i| [dep[4 * i], dep[4 * i + 1], d as f64 * ((0.5 + i as f64 * g) % 1.0), dep[4 * i + 3]]).collect();
+    let mut pyr = slab::pyr::Pyr::new(w, h, d, true, false, 0.15, 1.5, 6, 1.0, 45.0, 4);
+    let med = |mut t: Vec<f64>| { t.sort_by(|a, b| a.partial_cmp(b).unwrap()); t[t.len() / 2] };
+    let mut td = vec![];
+    for _ in 0..reps { let t0 = Instant::now(); pyr.clear(); for b in &buds { pyr.deposit(b[0], b[1], b[2], b[3] as f32); } td.push(t0.elapsed().as_secs_f64() * 1e3); }
+    for mode in 0..2 {
+        let mut ts = vec![];
+        let mut sum = 0.0;
+        for _ in 0..reps {
+            let t0 = Instant::now();
+            let chunk = buds.len().div_ceil(threads);
+            let pr = &pyr;
+            sum = std::thread::scope(|sco| {
+                let hs: Vec<_> = buds.chunks(chunk).map(|ch| sco.spawn(move || ch.iter().map(|b| { let o = if mode == 0 { pr.sample_literal(b[0], b[1], b[2]) } else { pr.sample_cone(b[0], b[1], b[2]) }; (o[0] + o[2]) as f64 }).sum::<f64>())).collect();
+                hs.into_iter().map(|h| h.join().unwrap()).sum::<f64>()
+            });
+            ts.push(t0.elapsed().as_secs_f64() * 1e3);
+        }
+        println!("{{\"buds\":{},\"threads\":{},\"deposit_ms\":{:.3},\"mode\":\"{}\",\"sample_ms\":{:.3},\"cone_cells\":{},\"checksum\":{:.4}}}", buds.len(), threads, med(td.clone()), if mode == 0 { "literal" } else { "cone" }, med(ts), pyr.cone.len(), sum);
+    }
+}
+
 fn main() {
     let v: Vec<String> = std::env::args().collect();
+    if v[1] == "pyr" { pyr_main(&v); return; }
     let bytes = std::fs::read(&v[1]).unwrap();
     let dep: Vec<f64> = bytes.chunks_exact(8).map(|c| f64::from_le_bytes(c.try_into().unwrap())).collect();
     let p = |i: usize| v[i].parse::<usize>().unwrap();

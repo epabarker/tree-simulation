@@ -127,13 +127,13 @@ export function formTerminalBud(tree: Tree, m: number, params: Params, season: n
   }
 }
 
-/** Plants a seedling: one vertical metamer with its terminal and axillary buds. */
-export function plantSeedling(tree: Tree, params: Params, season: number): void {
+/** Plants a seedling: one metamer, vertical unless `lean` tilts it (degrees right of vertical), with its terminal and axillary buds. */
+export function plantSeedling(tree: Tree, params: Params, season: number, lean = 0): void {
   const m = addMetamer(
     tree,
     -1,
     Slot.main,
-    Math.PI / 2,
+    Math.PI / 2 - (lean * Math.PI) / 180,
     params.c1.internodeLength,
     params.c6.r0,
     season,
@@ -144,13 +144,18 @@ export function plantSeedling(tree: Tree, params: Params, season: number): void 
 
 /**
  * Number of metamers and internode length for a bud receiving resource v (§C3.4, ADR 0004).
- * The resource is capped first, v' = min(v, c1.maxMetamersPerShoot), then Palubicki et al.'s
- * rule applies unchanged: n = ⌊v'⌋ and l = v'/n in units of l0, so l stays within [1, 2)·l0 and
- * resource above the cap is lost (as in the LPFG SOT model's MAXGROW). Writes the length into
- * `out` and returns n (0 = no growth).
+ * The resource is capped first, v' = min(v, cap), then Palubicki et al.'s rule applies
+ * unchanged: n = ⌊v'⌋ and l = v'/n in units of l0, so l stays within [1, 2)·l0 and resource above
+ * the cap is lost (as in the LPFG SOT model's MAXGROW). The cap is c1.maxMetamersPerShoot, or the
+ * juvenile cap (`juvenileCap`, ADR 0022). Writes the length into `out` and returns n (0 = no growth).
  */
-export function shootSize(v: number, params: Params, out: { length: number }): number {
-  const capped = Math.min(v, params.c1.maxMetamersPerShoot);
+export function shootSize(
+  v: number,
+  params: Params,
+  out: { length: number },
+  cap = params.c1.maxMetamersPerShoot,
+): number {
+  const capped = Math.min(v, cap);
   const n = Math.floor(capped);
   if (n < 1) {
     out.length = 0;
@@ -158,6 +163,20 @@ export function shootSize(v: number, params: Params, out: { length: number }): n
   }
   out.length = (capped / n) * params.c1.internodeLength;
   return n;
+}
+
+/**
+ * The juvenile phase (R2 ontogeny, ADR 0022): the shoot cap rises from 1 metamer for a seedling to
+ * c1.maxMetamersPerShoot once the tree is h_j cells tall, by its height at the start of the season.
+ * Young trees make short shoots (an ontogenetic gradient, Barthélémy & Caraglio 2007), so height
+ * growth starts slowly and accelerates, giving the sigmoid of yield tables instead of a ramp at
+ * the full rate from the first season.
+ */
+export function juvenileCap(height: number, params: Params): number {
+  const max = params.c1.maxMetamersPerShoot;
+  const hJ = params.r2.enabled ? (params.r2.hJ ?? 0) : 0;
+  if (hJ <= 0 || max <= 1) return max;
+  return 1 + (max - 1) * Math.min(1, height / hJ);
 }
 
 /**

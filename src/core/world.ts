@@ -25,6 +25,14 @@ export interface RunRecord {
   seasons: number;
 }
 
+/** The params a tree of `species` grows by: `params` with the species' patch on top (ADR 0016). */
+export function speciesParams(params: Params, species: string): Params {
+  const patch = params.species?.[species];
+  if (!patch) return params;
+  const { common: _c, latin: _l, leaf: _f, ...groups } = patch;
+  return mergeParams(params, groups);
+}
+
 export function makeLight(params: Params): LightModel {
   const { width, height } = params.world;
   if (params.c2.enabled && params.c2.model === "pooled") {
@@ -109,13 +117,7 @@ export class World {
     if (!species) return this.params;
     let p = this.speciesParams.get(species);
     if (!p) {
-      const patch = this.params.species?.[species];
-      if (patch) {
-        const { common: _c, latin: _l, leaf: _f, ...groups } = patch;
-        p = mergeParams(this.params, groups);
-      } else {
-        p = this.params;
-      }
+      p = speciesParams(this.params, species);
       this.speciesParams.set(species, p);
     }
     return p;
@@ -230,7 +232,7 @@ export class World {
       const unplanted = tree.m.length === 0 && !tree.discarded;
       if (unplanted && (spec.plantSeason ?? 0) <= this.season && !this.isRemoved(id)) {
         tree.alive = true;
-        plantSeedling(tree, this.paramsOf(tree), this.season);
+        plantSeedling(tree, this.paramsOf(tree), this.season, spec.lean);
       }
     });
   }

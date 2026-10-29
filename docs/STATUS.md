@@ -1,36 +1,40 @@
 # Status
 
-_Last updated: 2026-10-29 (3D-port review)_
+_Last updated: 2026-10-29 (3D port: G0.5 preview deployed, awaiting the user's verdict)_
 
-**M25 is live** as garden-v0.11.0. Its follow-ups are on `claude/gallant-brown-5k4g33`, to release as garden-v0.12.0 after the user's preview: field maple's lighter shade, seed rain (ADR 0018), and tolerance scores checked against Appendix A.
+**M26 and M27 are done** on `claude/gallant-brown-5k4g33`. The woodland grows the species fitted to literature traits (two CMA-ES rounds, then hand adjustments: ADR 0020–0023; [note](experiments/2026-10-28-m27-fits.md)), with the hyperbolic hydraulic discount (ADR 0021) and a juvenile phase (ADR 0022) set per species. The hand-tuned species are kept as `HAND_FLORA`.
 
-**3D-port review** (branch `claude/quirky-archimedes-x14c8k`): [measurement](experiments/2026-10-29-3d-light-cost.md), [go/no-go](reviews/2026-10-29-3d-port-review.md), ADR 0019 *proposed*. A D = 32 slab costs ≈ 100× today's light. The verdict is go with a reduced scope (Rust, SIMD, threads on edbarker.dev), through gates. Nothing in `src/` changed.
+**3D port** (branch `claude/quirky-archimedes-x14c8k`, which merges this one; nothing in `src/` changed): [measurement](experiments/2026-10-29-3d-light-cost.md), [review](reviews/2026-10-29-3d-port-review.md), ADR 0024 *proposed*. The G0.5 preview ([note](experiments/2026-10-29-g05-slab-preview.md)) is on the site's `preview-3d` branch with COOP/COEP: `preview-3d-edbarker-dev.edbarker.workers.dev/preview/3d/`, G1 at `…/kernel.html`.
 
 ## Works
 - **Core:** C1–C6, R1–R6, O2 and O4 (ADRs 0005–0013); the sky sweep with open or periodic sides; golden hashes. `World.discardDead` for long page runs.
-- **Species** (`src/core/flora.ts`): M19's birch, oak, beech and fir; M25's hornbeam, field maple, holly, rowan, goat willow and Scots pine (lab) ([note](experiments/2026-10-28-m25-species.md)).
+- **Species** (`src/core/flora.ts`, `flora-fitted.ts`): birch, oak, beech, hornbeam, field maple, holly, rowan, goat willow; fir and Scots pine (lab). Fitted in M27 ([note](experiments/2026-10-28-m27-fits.md)); the hand-tuned M19/M25 versions are `HAND_FLORA`.
+- **Measuring form** (`src/core/form.ts`, CLI `form.csv`): crown profile, apical control, angles by order, droop, Δ, l–d and leaf–section slopes ([M26 note](experiments/2026-10-28-m26-validation.md)).
 - **Woodland presets:** `mixedWood`, the home forest (`forestParams`; pioneers fade, beech and hornbeam rise); `oakOpen` (Plate II; `specimen: "oak"`); one wood per species; `succession` (M19).
-- **Other presets:** `skyStand`, `skyGrove`, `skyTree`, `forest`, `thinning`, `weeping`, `troll`; species `conifer`, `birch` and `tropical`, still without R1, R3, R4 and R5.
+- **Other presets:** `skyStand`, `skyGrove`, `skyTree`, `forest`, `thinning`. The M7/M9 forms are test fixtures (`fixtures.ts`, ADR 0019).
 - **Garden** (`src/web/garden.ts`, ADR 0014):
-  - `mountGarden(host, options)`, shared by the lab and the home page; `npm run build:garden` (55.3 kB gzip, gate 60);
-  - a release workflow on `garden-v*` tags; grown forests for first paint (seeds 9, 10, 12); a leaf style per species.
-- **Lab:** WebGL2 with pseudo-depth, Tweakpane, charts, tap to fell, phone layout. **Headless:** `npm run sim`, `npm run bench`, and `analysis/experiments/` m0–m25.
+  - `mountGarden(host, options)`, shared by the lab and the home page; `npm run build:garden` (56.1 kB gzip, gate 60);
+  - a release workflow on `garden-v*` tags; grown forests for first paint (seeds 9, 10, 12); a leaf style per species;
+  - the loupe: hold on the forest for a 4× glass with true-scale leaves (`loupe` option, default on).
+- **Lab:** WebGL2 with pseudo-depth, Tweakpane, charts, tap to fell, phone layout, shareable links (`?preset&seed&p`). **Headless:** `npm run sim` (`--species-patch`), `npm run bench`, `analysis/experiments/` m0–m26.
 
 ## Next
-1. **Release garden-v0.12.0** on the user's go-ahead: merge the PR, the user pushes the tag, sync the site and merge it.
-2. **The user:** an hour's soak on a phone (heat, memory); the site's `TODO(Ed)` items.
-3. **3D port, if ADR 0019 is agreed:** gate G1, the measured slab kernel (WASM SIMD, 4 lanes) on the user's phone from a site preview with COOP/COEP. The port stops if light exceeds 150 ms a season at `forest` size.
-4. **Ideas:** a magnifying loupe over the plate (true-scale leaves); rooting in windthrow.
+1. **3D, the user:** judge G0.5 on the phone (no clear gain → stop; Rust then reopens as 2D-only, review Q5); choose the z boundary (review Qz); then run G1. Never merge the site's `preview-3d` branch.
+2. **The user:** try garden 0.14.0 on edbarker.dev, and the loupe on a phone; say whether to open the lab's PR to `main` (GitHub Pages).
+3. **Possible:** a thinner understorey than the hand-tuned wood's by season 400 (holly, rowan, willow 0.3–0.7 a run): revisit if it reads wrong. Measured light under fir, holly and the small trees would replace estimated floors.
+4. **Refits:** move `fits/*.json` to a round folder, then `m27_fit.py --species all --skip-done --start <round> --restarts 2,0 --generations 50 --seeds 3` (≈ 8 min a species); `m27_adopt.py` regenerates `flora-fitted.ts`. **Ideas:** rooting in windthrow; the leaf–section slope against live pipe area (r_live).
 
 ## Open questions (ask when the milestone comes up)
-- **ADR 0019:** agree to the gated 3D slab port or not. Also: may the first 3D forest grow during the intro, since 3D checkpoints would be MB-sized? And what visual check must pass before calibration starts (review §5)?
+- **3D:** the G0.5 verdict; open or periodic z; then ADR 0024. Later: the 3D first-paint policy (review Q7), and narrowing the 2D freeze to I1 (Q5).
 
 ## Known issues
-- R5 reads self-shade; breakage never fires; sagging limbs can sink below the ground; in the lab, ring crowns cross the seam beyond the edge (the garden wraps them). Bimodality is marginal; K = 7 puts the crown base ≈ 7 cells low.
+- The l–d slope is ≈ 1, not 2/3 (M26). With the default exponential discount height stalls early in every species (the hand-tuned ones); the hyperbolic form fixes the tail, but juvenile growth is still too fast for oak, pine and fir ([note](experiments/2026-10-28-m27-height-curves.md)). Measured floors (Hagemeier & Leuschner) are darker than hand-tuned beech's and hornbeam's. Breakage fires only under storms. R5 reads self-shade by default (the woodland uses the neighbour signal). In the lab, a ring crown's copies show beyond the world's ends on wide screens (as in the garden). Bimodality is marginal; K = 7 puts the crown base ≈ 7 cells low.
 
 ## Notes for the next session
-- **Node:** this container's default is 22, and the goldens fail under it. Install 24 (`npm i node@24` in the scratchpad, then put its `bin` first on PATH).
-- **Site deploys** (Cloudflare Workers Builds): a push to `main` goes to production; any other branch gets `<branch>-edbarker-dev.edbarker.workers.dev`. For a new garden: tag `garden-vX.Y.Z` here, then run `node scripts/sync-garden.mjs X.Y.Z` there. A new species needs ink tokens in the site's `global.css`. **Tag pushes are refused (403) from cloud sessions:** ask the user to push the tag.
-- **Golden-safe means bit-identical.** Check with goldens and `npm run bench -- --compare runs/bench/<sha>.json`.
-- **Site loader:** keep it `is:inline`. In `.astro` text, break lines inside tags.
-- **Headless checks:** Playwright Chromium with SwiftShader WebGL works. To see a grown forest, bake checkpoints into `first/` and open `garden.html?first=SEED` under reduced motion. `garden.step()` while paused does not advance in a script.
+- **Node:** this container's default is 22; `npm test` now refuses it. Install 24 (`npm i node@24` in the scratchpad, then put its `bin` first on PATH). Playwright runs under the system Node (`NODE_PATH=$(npm root -g)`).
+- **Species patches:** a `species` entry in a params patch replaces that species' whole patch. Amend one with `patchSpecies` (CLI `--species-patch`), or dotted paths (`trials.ts` `amendSpecies`).
+- **Fitting:** `--smoke` on either M27 script checks the pipeline in seconds and writes only under `runs/`.
+- **Site deploys** (Cloudflare Workers Builds): a push to `main` goes to production; any other branch gets `<branch>-edbarker-dev.edbarker.workers.dev`. For a new garden: tag `garden-vX.Y.Z` here, then run `node scripts/sync-garden.mjs X.Y.Z` there. **Tag pushes are refused (403) from cloud sessions:** ask the user to push the tag.
+- **Golden-safe means bit-identical.** Check with goldens and `npm run bench -- --compare runs/bench/<sha>.json` (baseline `efb3bbd` after the `firWood` swap).
+- **3D preview:** build with `npx vite build -c docs/experiments/code/2026-10-29-g05-preview/vite.config.ts` after `bake.ts` (outputs in `runs/`), and copy to the site's `public/preview/3d/`. This container cannot reach edbarker.dev or workers.dev.
+- **Headless checks:** Playwright Chromium with SwiftShader WebGL works; adaptive quality drops to "lite" there. Long-press a touch with CDP `Input.dispatchTouchEvent`.

@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { fixtureParams } from "./fixtures.ts";
 import { mergeParams } from "./params.ts";
 import { presetParams } from "./presets.ts";
 import type { Tree } from "./tree.ts";
@@ -17,7 +18,7 @@ describe("ground contact (M16, r3.ground)", () => {
   it("lets weeping limbs sink below the ground without it, and rest on it with it (3 seeds)", () => {
     let sankSomewhere = false;
     for (let seed = 1; seed <= 3; seed++) {
-      const base = presetParams("weeping", seed);
+      const base = fixtureParams("weeping", seed);
       const sinking = new World(base);
       const resting = new World(mergeParams(base, { r3: { ...base.r3, ground: true } }));
       for (let s = 0; s < 60; s++) {

@@ -34,6 +34,11 @@ export class Canvas2DRenderer implements Renderer {
   private keys = new Uint16Array(0);
   private order = new Int32Array(0);
   private theme: Theme;
+  /**
+   * The world rectangle in view for the copy being drawn: segments and leaves outside it are
+   * skipped. A zoomed view (the loupe, M26) then pays only for what it shows.
+   */
+  private cull = { x0: 0, x1: 0, y0: 0, y1: 0 };
 
   private readonly transparent: boolean;
   private maxDpr: number;
@@ -94,6 +99,14 @@ export class Canvas2DRenderer implements Renderer {
         groundY * dpr,
       );
     world(0);
+    const halfW = w / 2 / scale;
+    const setCull = (offset: number): void => {
+      const margin = 2; // world units: room for a leaf or a thick limb reaching in
+      this.cull.x0 = cx - offset - halfW - margin;
+      this.cull.x1 = cx - offset + halfW + margin;
+      this.cull.y0 = (groundY - h) / scale - margin;
+      this.cull.y1 = groundY / scale + margin;
+    };
 
     if (view.showShadow && this.shadowFor !== s) {
       // Built once per snapshot, and only while the overlay is shown.
@@ -127,6 +140,7 @@ export class Canvas2DRenderer implements Renderer {
     // On a ring seen whole, the trees are drawn once per copy of the world (Scene.wrapOffsets).
     for (const offset of scene.wrapOffsets()) {
       world(offset);
+      setCull(offset);
       if (view.showGhosts && scene.physics) this.drawDebris();
       else if (view.showGhosts && scene.prev && t < 1) this.drawGhosts(1 - t);
       // Back-layer leaves (pseudo-depth, ADR 0008) go behind the wood, the rest in front.
@@ -213,9 +227,18 @@ export class Canvas2DRenderer implements Renderer {
       ctx.strokeStyle = palette[Math.floor(k / WIDTH_BUCKETS)] as string;
       ctx.lineWidth = 0.6 * 2 ** ((k % WIDTH_BUCKETS) / 4) * unitsPerPx;
       ctx.beginPath();
+      const { x0, x1, y0, y1 } = this.cull;
       for (let i = a; i < b; i++) {
         const j = this.order[i];
         if (scene.solo >= 0 && s.tree[j] !== scene.solo) continue; // a solo plate: one specimen
+        const r = g.radius[j];
+        if (
+          Math.max(g.baseX[j], g.tipX[j]) + r < x0 ||
+          Math.min(g.baseX[j], g.tipX[j]) - r > x1 ||
+          Math.max(g.baseY[j], g.tipY[j]) + r < y0 ||
+          Math.min(g.baseY[j], g.tipY[j]) - r > y1
+        )
+          continue;
         ctx.moveTo(g.baseX[j], g.baseY[j]);
         ctx.lineTo(g.tipX[j], g.tipY[j]);
       }
@@ -227,6 +250,7 @@ export class Canvas2DRenderer implements Renderer {
     const { ctx } = this;
     const style = this.scene.leafStyle;
     const full = leafLength(this.scene.camera.scale, style.length);
+    const { x0, x1, y0, y1 } = this.cull;
     // The palettes this frame's leaves use (each tree is drawn as its species, M19).
     const used = new Set<number>();
     for (let k = from; k < to; k++) used.add(leaves.palette[k] as number);
@@ -247,6 +271,7 @@ export class Canvas2DRenderer implements Renderer {
           if (leaves.color[k] !== c || (leaves.turn[k] as number) > 0.5 !== turned) continue;
           const bx = leaves.x[k];
           const by = leaves.y[k];
+          if (bx + full < x0 || bx - full > x1 || by + full < y0 || by - full > y1) continue;
           const ux = leaves.ux[k];
           const uy = leaves.uy[k];
           const len = full * leaves.size[k];

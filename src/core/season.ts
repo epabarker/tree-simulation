@@ -10,7 +10,7 @@
 
 import type { LightSample } from "./light/light-model.ts";
 import { DEG } from "./params.ts";
-import { type DirectionFn, growShoot, shootSize } from "./principles/c1-buds.ts";
+import { type DirectionFn, growShoot, juvenileCap, shootSize } from "./principles/c1-buds.ts";
 import { allocate, gatherLight, isLiveBud } from "./principles/c3-allocation.ts";
 import { shootDirection } from "./principles/c4-direction.ts";
 import { crownTopLight, shedBranches } from "./principles/c5-shedding.ts";
@@ -233,6 +233,13 @@ export function growBuds(world: World, tree: Tree, season: number): void {
     : (prev) => prev;
   const b = tree.b.cols;
   const count = tree.b.length;
+  // R2's juvenile phase caps every shoot by the tree's height before this season's growth.
+  let cap = params.c1.maxMetamersPerShoot;
+  if (params.r2.enabled && (params.r2.hJ ?? 0) > 0) {
+    let height = 0;
+    for (let j = 0; j < tree.m.length; j++) height = Math.max(height, tree.tipY(j));
+    cap = juvenileCap(height, params);
+  }
   for (let i = 0; i < count; i++) {
     if (!isLiveBud(b.state[i])) continue;
     // A bud senses the shade at its node: by light, or by neighbours (sampleNodes, M19).
@@ -243,7 +250,7 @@ export function growBuds(world: World, tree: Tree, season: number): void {
         : shadeOf(b.q[i], C);
     const state = b.state[i];
     const threshold = growthThreshold(state, b.age[i], shade, params);
-    let n = b.v[i] >= threshold ? shootSize(b.v[i], params, shoot) : 0;
+    let n = b.v[i] >= threshold ? shootSize(b.v[i], params, shoot, cap) : 0;
     if (n === 0 && state === BudState.dormant && lightReleases(b.q[i], b.age[i], params)) {
       // R4 light trigger: the first metamer is paid from the reserve (free without R1).
       const cost = 1;

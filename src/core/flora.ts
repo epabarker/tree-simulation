@@ -25,8 +25,12 @@
  *
  * Labels are the field guide's: a common name, a Latin name and the leaf style the page draws.
  * Fir and pine are lab species; the home forest (`mixedWood`) mixes the other nine.
+ *
+ * M27b (ADR 0023): these hand-tuned species are kept as HAND_FLORA; the woodland now grows FLORA,
+ * the species fitted to literature traits by CMA-ES with hand adjustments (flora-fitted.ts).
  */
 
+import { FITTED_FLORA } from "./flora-fitted.ts";
 import type { PaLevel, SpeciesPatch } from "./params.ts";
 
 /** One R2 table row (ADR 0009); unspecified fields take baseline values. */
@@ -41,7 +45,11 @@ export const level = (row: Partial<PaLevel>): PaLevel => ({
   ...row,
 });
 
-export const FLORA = {
+/**
+ * The hand-tuned species of M19 and M25, as they were before M27 adopted the fitted ones (FLORA,
+ * below). Kept for comparison and as a record of the reasoning in their comments.
+ */
+export const HAND_FLORA = {
   /** Pioneer: fast, light-demanding, short-lived, a light open crown (§9 "pioneer"). */
   birch: {
     common: "Silver birch",
@@ -303,5 +311,12 @@ export const FLORA = {
     o4: { cSeed: 3, d: 40, qEst: 0.3, pEst: 0.3, m0: 0.003 },
   },
 } satisfies Record<string, SpeciesPatch>;
+
+/**
+ * The species the woodland presets grow (M27b, ADR 0023): the round-2 CMA-ES fits to literature
+ * traits with hand adjustments (flora-fitted.ts, generated). They grow with the hyperbolic
+ * hydraulic discount (ADR 0021) and a juvenile phase (ADR 0022), set in each patch.
+ */
+export const FLORA = FITTED_FLORA;
 
 export type FloraName = keyof typeof FLORA;

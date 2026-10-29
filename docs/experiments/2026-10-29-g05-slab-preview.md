@@ -1,5 +1,7 @@
 # G0.5: a frontal preview of the slab, against today's pseudo-depth
 
+> **Superseded as a visual gate** (user, 2026-10-29, third session). The port is about trees that *grow* in 3D, drawn as today's flat orthographic illustration. A perspective view of 2D-grown limbs spread through z is neither the model nor the view, so this page cannot judge the port. It stands as the record of the **hosting check**, which passed: COOP/COEP break nothing on the site. The first visual check is V, after I2 ([ADR 0024](../decisions/0024-3d-slab-port.md)). The deployed page carries the same banner.
+
 ## Question
 Does true depth seen from the front look better than ADR 0008's pseudo-depth? The 3D port exists for that and nothing else ([review](../reviews/2026-10-29-3d-port-review.md) §5), and it was unmeasured. The user decides by eye, on their phone. If the slab is not a clear improvement, the port stops, and the Rust question reopens as a 2D-only port.
 

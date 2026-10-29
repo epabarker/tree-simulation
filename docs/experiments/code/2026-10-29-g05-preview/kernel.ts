@@ -1,6 +1,6 @@
 /** G1 page: times the slab kernel single-threaded (TS, WASM scalar, WASM SIMD) and in 4 lanes. */
 import { SlabSweep } from "../../../../cli/slab-light.ts";
-import { C2, D, field, H, instance, K, setup, W } from "./kernel-shared.ts";
+import { C2, type Cfg, dims, type Exports, field, instance, K, setup } from "./kernel-shared.ts";
 
 const env = document.getElementById("env") as HTMLElement;
 const tbody = document.querySelector("#out tbody") as HTMLElement;
@@ -14,14 +14,14 @@ const info = {
   simd: WebAssembly.validate(new Uint8Array([0, 97, 115, 109, 1, 0, 0, 0, 1, 5, 1, 96, 0, 1, 123, 3, 2, 1, 0, 10, 10, 1, 8, 0, 65, 0, 253, 15, 253, 98, 11])),
 };
 env.textContent = `cores ${info.cores}; crossOriginIsolated ${info.crossOriginIsolated}; WASM SIMD ${info.simd}`;
-const results: { kernel: string; z: string; median: number; min: number; runs: number }[] = [];
+const results: { kernel: string; slab: string; median: number; min: number; runs: number }[] = [];
 
 const med = (a: number[]) => [...a].sort((x, y) => x - y)[Math.floor(a.length / 2)] as number;
-function row(kernel: string, z: string, t: number[]): void {
-  const r = { kernel, z, median: +med(t).toFixed(1), min: +Math.min(...t).toFixed(1), runs: t.length };
+function row(kernel: string, slab: string, t: number[]): void {
+  const r = { kernel, slab, median: +med(t).toFixed(1), min: +Math.min(...t).toFixed(1), runs: t.length };
   results.push(r);
   const tr = document.createElement("tr");
-  tr.innerHTML = `<td>${kernel}</td><td>${z}</td><td>${r.median}</td><td>${r.min}</td><td>${r.runs}</td>`;
+  tr.innerHTML = `<td>${kernel}</td><td>${slab}</td><td>${r.median}</td><td>${r.min}</td><td>${r.runs}</td>`;
   tbody.append(tr);
   json.textContent = JSON.stringify({ ...info, results }, null, 1);
 }
@@ -38,13 +38,16 @@ async function time(fn: () => void, reps: number): Promise<number[]> {
   return t;
 }
 
-async function lanes(wasm: ArrayBuffer, lad: Float32Array, top: number, periodicZ: boolean, n: number, reps: number): Promise<number[]> {
-  let shared: ArrayBufferLike = lad.buffer;
-  if (self.crossOriginIsolated) {
-    const sab = new SharedArrayBuffer(lad.byteLength);
-    new Float32Array(sab).set(lad);
-    shared = sab;
-  }
+/** The review's recommended slab (D = 32); the stop rule applies to it. */
+const RULE = "D 32";
+const SLABS: Cfg[] = [
+  { label: "D 32", D: 32, cell: 1 },
+  { label: "D 48", D: 48, cell: 1 },
+  { label: "D 64", D: 64, cell: 1 },
+  { label: "D 64, 2× cells", D: 64, cell: 2 },
+];
+
+async function lanes(wasm: ArrayBuffer, c: Cfg, lad: Float32Array, top: number, n: number, reps: number): Promise<number[]> {
   const workers = Array.from({ length: n }, () => new Worker(new URL("./kernel-worker.ts", import.meta.url), { type: "module" }));
   const reply = (w: Worker, type: string) =>
     new Promise<{ ms: number }>((res) => {
@@ -56,10 +59,16 @@ async function lanes(wasm: ArrayBuffer, lad: Float32Array, top: number, periodic
       };
       w.addEventListener("message", h);
     });
+  // Under cross-origin isolation the field is shared; otherwise each lane gets a copy.
+  let shared: ArrayBufferLike | null = null;
+  if (self.crossOriginIsolated) {
+    shared = new SharedArrayBuffer(lad.byteLength);
+    new Float32Array(shared).set(lad);
+  }
   await Promise.all(
     workers.map((w) => {
       const p = reply(w, "ready");
-      w.postMessage({ type: "init", wasm, lad: shared instanceof SharedArrayBuffer ? shared : lad.slice().buffer, top, periodicZ });
+      w.postMessage({ type: "init", wasm, cfg: c, lad: shared ?? lad.slice().buffer, top });
       return p;
     }),
   );
@@ -82,30 +91,34 @@ async function run(): Promise<void> {
   const dep = new Float64Array(await (await fetch("./kernel/dep-forest.bin")).arrayBuffer());
   const scalar = await (await fetch("./kernel/slab-scalar.wasm")).arrayBuffer();
   const simd = await (await fetch("./kernel/slab-simd.wasm")).arrayBuffer();
-  for (const periodicZ of [false, true]) {
-    const z = periodicZ ? "periodic" : "open";
-    const { lad, top } = field(dep, periodicZ);
-    if (!periodicZ) {
-      const ts = new SlabSweep(W, H, D, { ...C2 } as never, K, true, periodicZ, Float32Array, true);
+  for (const c of SLABS) {
+    const { lad, top } = field(dep, c);
+    if (c.label === RULE) {
+      const { W, H, D } = dims(c);
+      const ts = new SlabSweep(W, H, D, { ...C2 } as never, K, true, false, Float32Array, true);
       ts.lad.set(lad);
       (ts as unknown as { top: number }).top = top;
-      row("TypeScript (fused)", z, await time(() => ts.compute(), 3));
+      row("TypeScript (fused)", c.label, await time(() => ts.compute(), 3));
       const e = await instance(scalar);
-      setup(e, lad, top, periodicZ, false);
-      row("WASM scalar", z, await time(() => e.compute32(), 5));
+      setup(e, c, lad, top, false);
+      row("WASM scalar", c.label, await time(() => e.compute32(), 5));
     }
     if (info.simd) {
-      const e = await instance(simd);
-      setup(e, lad, top, periodicZ, true);
-      row("WASM SIMD, 1 lane", z, await time(() => e.compute32simd(), 7));
-      row("WASM SIMD, 4 lanes", z, await lanes(simd, lad, top, periodicZ, 4, 7));
+      // The single-lane instance lives only inside this call, so it can go before four more are made.
+      const single = async () => {
+        const one: Exports = await instance(simd);
+        setup(one, c, lad, top, true);
+        return time(() => one.compute32simd(), 5);
+      };
+      row("WASM SIMD, 1 lane", c.label, await single());
+      row("WASM SIMD, 4 lanes", c.label, await lanes(simd, c, lad, top, 4, 7));
     }
   }
-  const four = results.find((r) => r.kernel === "WASM SIMD, 4 lanes" && r.z === "open");
+  const four = results.find((r) => r.kernel === "WASM SIMD, 4 lanes" && r.slab === RULE);
   verdict.textContent = four
     ? four.median > 150
-      ? `4-lane SIMD ${four.median} ms > 150 ms: by the G1 rule the port stops.`
-      : `4-lane SIMD ${four.median} ms ≤ 150 ms: G1 passes.`
+      ? `4-lane SIMD at ${RULE}: ${four.median} ms > 150 ms. By the G1 rule the port stops.`
+      : `4-lane SIMD at ${RULE}: ${four.median} ms ≤ 150 ms. G1 passes.`
     : "No WASM SIMD on this browser: G1 cannot pass.";
   button.disabled = false;
 }

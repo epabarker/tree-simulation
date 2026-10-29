@@ -2,6 +2,31 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-29: 3D port, re-costed at the open slab; G1 at three depths
+
+- **User:** G0.5 revealed a misunderstanding.
+  - **The aim:** the port is for trees that grow in 3D (branches toward and away from the viewer, crowns as volumes), drawn as today's orthographic frontal illustration in z order, with no perspective, darkening or second rank.
+  - **The world:** open in z, the faces clipping growth but not light.
+  - **D:** deferred to I2.
+  - **Gates:** G0.5 is not a gate; the visual check is after I2.
+- **Measured** ([note](experiments/2026-10-29-open-slab-cost.md)): light at D = 32 / 48 / 64, open z, K = 16, Float32.
+  - **TypeScript:** `forest` 241 / 362 / 472 ms, `panorama` 826 / 1291 / 1613.
+  - **WASM SIMD, 1 lane:** `forest` 54–111 ms.
+  - **4 lanes** (desktop browser, the updated G1 page): `forest` 23 / 28 / 43 ms.
+  - **Light in 2× cells at D = 64:** 1/8 of fine.
+- **Crowns:**
+  - Home-wood species grown alone are 45–137 cells wide at season 100. The faces clip beech, hornbeam and oak at every D.
+  - Side-lit crowns carry 0.8–2.4× a closed stand's leaf area per column.
+- **Re-costed** (review §2): under Rust, SIMD and 4 lanes the phone's `forest` intro holds at D = 32 (≈ 197 ms), not at 48 (≈ 273) or 64 (≈ 358). At D ≥ 48 the estimated tree passes dominate, so coarser light cells don't buy the same result.
+- **Disagreements, written into the review:**
+  - face clipping piles foliage at the faces and shifts allocation, so D shapes the crowns and V should see two values of D;
+  - a throwaway 3D prototype (about two sessions) could give a first look before the Rust work.
+- **Pages:**
+  - the G1 page runs all three depths and the coarse lattice, with the stop rule at D = 32;
+  - the G0.5 page carries a "superseded" banner.
+- **ADR 0024 restated,** still proposed.
+- **Nothing in `src/`, the goldens or the default light model changed.**
+
 ## 2026-10-29: 3D port, G0.5: a frontal slab preview, and the review amended
 
 - **User:** the measurement and review are accepted. Before G1 and before the ADR leaves *proposed*, they asked for:

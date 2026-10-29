@@ -6,8 +6,8 @@ self.onmessage = async (ev: MessageEvent) => {
   const m = ev.data;
   if (m.type === "init") {
     e = await instance(m.wasm);
-    const lad = m.lad instanceof SharedArrayBuffer ? new Float32Array(m.lad) : new Float32Array(m.lad);
-    setup(e, lad, m.top, m.periodicZ, true);
+    const lad = new Float32Array(m.lad);
+    setup(e, m.cfg, lad, m.top, true);
     self.postMessage({ type: "ready" });
   } else if (m.type === "run" && e) {
     const t0 = performance.now();

@@ -22,13 +22,15 @@
       <h1>G1: the slab light kernel on this device</h1>
       <p>
         The 3D-port review's measured kernel, on the <code>forest</code> field at season 96 (210 × 130
-        ring), D = 32, K = 16, Float32. One light computation is one season's light. Rule: if
-        <b>4-lane SIMD</b> takes more than <b>150 ms</b>, the port stops. Keep the screen on and the
-        phone cool; it takes about a minute.
+        ring), K = 16, Float32, open in z, at slab depths D = 32, 48 and 64, and at D = 64 in cells
+        twice the size. One light computation is one season's light. Rule: if <b>4-lane SIMD at
+        D = 32</b> (the review's recommendation) takes more than <b>150 ms</b>, the port stops; the
+        other depths are for the record. Keep the screen on and the phone cool; it takes about two
+        minutes and up to about 200 MB.
       </p>
       <p id="env"></p>
       <button id="run">Run</button>
-      <table id="out"><thead><tr><th>kernel</th><th>z</th><th>median ms</th><th>min ms</th><th>runs</th></tr></thead><tbody></tbody></table>
+      <table id="out"><thead><tr><th>kernel</th><th>slab</th><th>median ms</th><th>min ms</th><th>runs</th></tr></thead><tbody></tbody></table>
       <p class="verdict" id="verdict"></p>
       <p>Copy this to the session:</p>
       <pre id="json"></pre>

@@ -9,11 +9,10 @@
 import * as Comlink from "comlink";
 import { defaultParams, type Params, type ParamsPatch } from "../core/params.ts";
 import { FULL_SNAPSHOT, type Snapshot, type SnapshotOptions } from "../core/types.ts";
-import "../wasm/production.ts";
 import { loadWorlds, RustWorld, snapshotTransferables } from "../wasm/world.ts";
 import type { SimApi } from "./api.ts";
 
-const ready = loadWorlds("production");
+const ready = loadWorlds();
 let world: RustWorld | null = null;
 /** The world put aside by `swap`, if any. */
 let aside: RustWorld | null = null;

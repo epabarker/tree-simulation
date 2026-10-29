@@ -20,11 +20,9 @@ How the code realises the spec. For *why* a choice was made, see `docs/decisions
 
 The simulation is the Rust core, `rust/core` (`tree-core`; I1, ADR 0024). The page's worker runs it as WASM through `src/wasm/world.ts`; the CLI runs it natively (`rust/cli`, the `treesim` binary). `src/core` keeps what is plain data, shared by every host and read by the Rust core as JSON (`rust/presets.json`, written by `cli/export-presets.ts` and held to them by `tests/presets-json.test.ts`): the params and their defaults (`params.ts`), presets, species and fixtures, and `types.ts` (the snapshot, metrics and run-record shapes the page reads). It compiles against `lib: es2023` only, so a DOM or Node API used there is a type error.
 
-**Two builds** (`npm run build:wasm`, and `cargo` features natively):
-- **production** (`src/wasm/pkg/`, the default): the `libm` crate's Math, simd128 on. The page, the CLI and the bench run it. Its goldens are `tests/golden-production.json`.
-- **parity** (`src/wasm/pkg-parity/`, feature `parity`): V8's Math, ported (fdlibm sin, cos, exp, log, atan, atan2, cbrt; glibc's pow; V8's hypot), bit for bit (`tests/wasm-math.test.ts`). It reproduces the TypeScript core's runs: `tests/golden.json`, the cross-core records in `tests/fixtures/ts-core.json`, and the shipped opening forests. The evidence tests (`tests/evidence/`) and `cli/first-paint.ts` run it; `npm run sim -- --parity` selects it.
+**One build** (`npm run build:wasm` into `src/wasm/pkg/`, and natively): the `libm` crate's Math, simd128 in WASM. The page, the CLI, the bench, the tests and the opening forests all run it, and `tests/golden.json` holds it natively and in WASM.
 
-The TypeScript core it replaced is archived at the tag `golden-2d-ts`.
+**The 2D proof is archived.** The TypeScript core it replaced, and the Rust core's parity build (V8's Math, ported bit for bit) that reproduced it, are at the tag `golden-2d-ts`. CI's `golden-2d` job checks out that tag and runs the 2D goldens there, the TypeScript core's and the parity build's, in WASM and natively.
 
 ## The garden and the lab (M14, ADR 0014)
 
@@ -56,7 +54,7 @@ The TypeScript core it replaced is archived at the tag `golden-2d-ts`.
 
 **First paint (M21):**
 - **Checkpoints** (`rust/core/src/checkpoint.rs`; the TypeScript core's byte for byte): `save` writes a whole World as bytes. The layout is a u32 header length, a JSON header (ASCII, with anything else escaped as \uXXXX, since the core has no text codec), then every tree's metamer and bud columns, padded to 8 bytes. It holds the params, season, flags, event log and queue, and each tree's scalars and tables. `load` restores it: k more seasons hash exactly as N + k from scratch (`tests/evidence/checkpoint.test.ts`). Bytes written by the TypeScript core load in the Rust one (`tests/rust-world.test.ts`, with garden 0.14.0's shipped forest). Light, owners and per-season scratch are rebuilt by the season that reads them.
-- **Grown forests:** `cli/first-paint.ts`, run by `npm run build:garden`, grows (in the parity build, so the bytes are the ones chosen by eye) `forestParams` into `dist-garden/first/` with a `manifest.json`: widths 66, 100, 160 and 220, seeds 6, 9 and 10 (chosen by eye), 40 seasons each, 57–192 kB each and 1.4 MB in all.
+- **Grown forests:** `cli/first-paint.ts`, run by `npm run build:garden`, grows `forestParams` into `dist-garden/first/` with a `manifest.json`: widths 66, 100, 160 and 220, seeds 6, 9 and 10 (chosen by eye), 40 seasons each, 57–192 kB each and 1.4 MB in all.
 - **Plate width:** `plateWidth` sizes the ring to a share of the host's aspect: 0.65 on a portrait host, 0.7 on a landscape one (M24). The plate fits the ring's width, so the share sets how large trees are drawn. A phone shows about three trees; the site's wide plate (1200 px) shows about ten at about 7 px a cell.
 - **Leaf studies:** `leafStudy(tree)` returns the tree's species' leaf as an SVG path (`leafStudyPath`), with its real length, for the field card.
 - **Opening on one:** `mountGarden({ first: { base, widths, seeds, when } })` picks the width nearest its own and a seed by the day, opens on that forest at the ambient pace, and falls back to growing from seed. With `when: "reduced-motion"` (the site, M23) it does so only for reduced motion.
@@ -155,7 +153,7 @@ All of them sit behind `LightModel.sample(x, y, dir) → {q, vx, vy}` (§C2.8):
 G2 moved the sky sweep (`rust/core/src/light/sky_sweep.rs`) into Rust behind the TypeScript core's `LightModel` ([G2 note](experiments/2026-10-29-g2-rust-sweep.md)). I1 moved the rest, phase by phase, each held to the TypeScript core side by side before the next ([I1 note](experiments/2026-10-29-i1-rust-core.md)).
 - **The boundary** (`rust/wasm/src/world.rs`, `src/wasm/world.ts`): params go in as JSON, read with JavaScript's semantics (`rust/core/src/json.rs`: key order kept, numbers printed as `Number.prototype.toString`). Events, checkpoints and records cross as JSON or bytes. A tree's columns are read on demand (`tree_column`), never per frame.
 - **The snapshot** is built in Rust into one buffer (`rust/core/src/snapshot.rs`) and copied out of linear memory once; every array the page gets is a view on that copy, and the copy is the transferable.
-- **The math** (`rust/core/src/math/`): never a platform `Math`. Production: the `libm` crate. Parity: V8's, ported, behind the `parity` feature.
+- **The math** (`rust/core/src/math/`): never a platform `Math`; the `libm` crate, pure Rust.
 
 ### The 3D slab sweep (ADR 0024, G3)
 `rust/core/src/light/slab_sweep.rs`: the 3D light, in the production build only, not yet behind `LightModel`.
@@ -168,7 +166,7 @@ G2 moved the sky sweep (`rust/core/src/light/sky_sweep.rs`) into Rust behind the
 
 ## Randomness (ADR 0002)
 
-`rust/core/src/rng.rs`: `hash_key(seed, purpose, tree, entity, season, k)` mixes 32-bit integers (as `Math.imul` did), so it is bit-exact everywhere. `normal` uses the core's log and cos, so its draws are the same in every engine and natively; in the parity build they are V8's, as the TypeScript core's were.
+`rust/core/src/rng.rs`: `hash_key(seed, purpose, tree, entity, season, k)` mixes 32-bit integers (as `Math.imul` did), so it is bit-exact everywhere. `normal` uses the core's log and cos, so its draws are the same in every engine and natively.
 
 | Draw | Key (tree, entity, season) |
 |---|---|
@@ -186,7 +184,7 @@ Tapping a tree on the page fells it. `Scene.pickTree` finds the nearest drawn se
 
 ## Events and replay
 
-`setParams`, `removeTree` and `plantTree` queue events that apply at the next season boundary. Applied events are logged, and `World.record()` returns `{params, events, seasons}`. The page's **Export run** downloads this record; `npm run sim -- --replay file.json` reproduces the run exactly (the page and the CLI both run the production build; a record made before I1 replays with `--parity`). Changing `trees` mid-run is ignored; a new tree layout needs a new run.
+`setParams`, `removeTree` and `plantTree` queue events that apply at the next season boundary. Applied events are logged, and `World.record()` returns `{params, events, seasons}`. The page's **Export run** downloads this record; `npm run sim -- --replay file.json` reproduces the run exactly (the page and the CLI run the same core; a record exported before I1 replays exactly only at the tag `golden-2d-ts`). Changing `trees` mid-run is ignored; a new tree layout needs a new run.
 
 ## Worker protocol (`src/worker/api.ts`)
 
@@ -244,7 +242,7 @@ Measured in headless Firefox (desktop GPU; phones are slower): a 10-tree stand o
 
 ## CLI output (`cli/run.ts` → `rust/cli`)
 
-`cli/run.ts` builds the native binary when its sources are newer and runs it with the same arguments, so `analysis/treesim/sweep.py` runs unchanged. `--parity` selects the parity build. Its files are byte for byte the TypeScript CLI's in the parity build. `runs/<id>/` contains:
+`cli/run.ts` builds the native binary when its sources are newer and runs it with the same arguments, so `analysis/treesim/sweep.py` runs unchanged. Its files are the TypeScript CLI's formats (at I1 they were byte for byte the TypeScript CLI's, in the archived parity build). `runs/<id>/` contains:
 
 | File | Contents |
 |---|---|

@@ -9,10 +9,9 @@
  *   npm run bench -- --case forest --seasons 50     one case
  *   npm run bench -- --compare runs/bench/abc1234.json
  *   npm run bench -- --snapshot lean                 snapshots as the home page asks for them
- *   npm run bench -- --parity                        the parity build (V8's Math, the goldens')
  *
- * Writes runs/bench/<commit>[-dirty][-parity].json unless --out names another file. Benches
- * before I1 (light "ts" or "rust": the TypeScript core) compare by hash with --parity.
+ * Writes runs/bench/<commit>[-dirty].json unless --out names another file. Benches made before
+ * I1 ran the TypeScript core, whose hashes the archived 2D build reproduces (tag golden-2d-ts).
  */
 
 import { execFileSync } from "node:child_process";
@@ -23,9 +22,7 @@ import { parseArgs } from "node:util";
 import { mergeParams, type Params } from "../src/core/params.ts";
 import { presetParams } from "../src/core/presets.ts";
 import { FULL_SNAPSHOT, type SnapshotOptions } from "../src/core/types.ts";
-import { parityWasm } from "../src/wasm/parity.ts";
-import { productionWasm } from "../src/wasm/production.ts";
-import { type Build, loadWorldsSync, RustWorld } from "../src/wasm/world.ts";
+import { coreWasm, loadWorldsSync, RustWorld } from "../src/wasm/world.ts";
 
 const { values } = parseArgs({
   options: {
@@ -35,12 +32,10 @@ const { values } = parseArgs({
     compare: { type: "string" },
     snapshot: { type: "string", default: "full" },
     out: { type: "string" },
-    parity: { type: "boolean", default: false },
   },
 });
 
-const build: Build = values.parity ? "parity" : "production";
-loadWorldsSync(build, readFileSync(values.parity ? parityWasm : productionWasm));
+loadWorldsSync(readFileSync(coreWasm));
 /** The forest preset on a ring twice as wide, with twice the trees (M18's bigger worlds). */
 function wideForest(): Params {
   const base = presetParams("forest");
@@ -110,7 +105,7 @@ interface BenchFile {
   node: string;
   repeat: number;
   snapshot: string;
-  /** The core: "rust" (production build) or "rust-parity"; before I1, "ts" or "rust" (G2). */
+  /** The core: "rust"; before I1, "ts" or "rust" (G2's sky sweep in the TypeScript core). */
   light: string;
   cases: Record<string, CaseResult>;
 }
@@ -151,7 +146,6 @@ function native(params: Params, seasons: number): Record<string, number | string
       "-",
       "--seasons",
       String(seasons),
-      ...(values.parity ? ["--parity"] : []),
     ],
     { input: JSON.stringify(params), encoding: "utf8", cwd: rust },
   );
@@ -159,7 +153,7 @@ function native(params: Params, seasons: number): Record<string, number | string
 }
 
 function runOnce(params: Params, seasons: number): CaseResult {
-  const world = RustWorld.create(params, build);
+  const world = RustWorld.create(params);
   let snapshotMs = 0;
   const perSeason: number[] = [];
   for (let s = 0; s < seasons; s++) {
@@ -235,15 +229,15 @@ const file: BenchFile = {
   node: process.version,
   repeat,
   snapshot: values.snapshot,
-  light: values.parity ? "rust-parity" : "rust",
+  light: "rust",
   cases: results,
 };
-const out = values.out ?? join("runs", "bench", `${commit}${values.parity ? "-parity" : ""}.json`);
+const out = values.out ?? join("runs", "bench", `${commit}.json`);
 mkdirSync(dirname(out), { recursive: true });
 writeFileSync(out, `${JSON.stringify(file, null, 2)}\n`);
 
 console.log(
-  `\n${commit}, ${build} build, ${seasons} seasons, best of ${repeat}, ${values.snapshot} snapshots (ms per season: WASM, then native)\n`,
+  `\n${commit}, ${seasons} seasons, best of ${repeat}, ${values.snapshot} snapshots (ms per season: WASM, then native)\n`,
 );
 printTable([
   ["case", "grid", "trees", "metamers", "mean", "p50", "p95", "last 20", "native", "hash"],

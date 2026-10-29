@@ -1,5 +1,5 @@
-//! The headless runner (I1, ADR 0024): the Rust core natively, writing what cli/run.ts wrote, byte
-//! for byte in parity mode, so the analysis (analysis/treesim) reads it unchanged.
+//! The headless runner (I1, ADR 0024): the Rust core natively, writing the files the TypeScript
+//! CLI wrote, in the same formats, so the analysis (analysis/treesim) reads them unchanged.
 //!
 //!   treesim --preset explosion --seed 3 --seasons 12 --out runs/m0
 //!   treesim --params my.json --snapshots 25,50 --out runs/x     (patch over the preset)
@@ -357,7 +357,6 @@ fn main() {
     let ms = t0.elapsed().as_secs_f64() * 1000.0;
 
     let hash = hash_world(&world);
-    let parity = cfg!(feature = "parity");
     let mut run = Value::Obj(vec![(
         "meta".into(),
         Value::Obj(vec![
@@ -373,10 +372,7 @@ fn main() {
             ("commit".into(), Value::Str(git_commit())),
             ("hash".into(), Value::Str(hash.clone())),
             ("ms".into(), Value::Num(ms.round())),
-            (
-                "core".into(),
-                Value::Str(if parity { "rust-parity" } else { "rust" }.into()),
-            ),
+            ("core".into(), Value::Str("rust".into())),
         ]),
     )]);
     if let Value::Obj(fields) = world.record() {

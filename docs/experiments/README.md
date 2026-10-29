@@ -9,7 +9,7 @@ One note per experiment, named `YYYY-MM-DD-<milestone>-<topic>.md`. Use `/run-ex
 
 ## Code that ran on the TypeScript core
 
-The TypeScript core was deleted at I1 (ADR 0024). Scripts in `code/` written before then import `src/core/world.ts` and its siblings, and `cli/slab-light.ts`, `cli/run-ts.ts` and `npm run bench -- --slab` are gone. To rerun one, check out the tag `golden-2d-ts`, where all of them still run, and build the WASM there (`node cli/build-wasm.ts`). Its runs are the parity build's today (`npm run sim -- --parity`), bit for bit.
+The TypeScript core was deleted at I1 (ADR 0024). Scripts in `code/` written before then import `src/core/world.ts` and its siblings, and `cli/slab-light.ts`, `cli/run-ts.ts` and `npm run bench -- --slab` are gone. To rerun one, check out the tag `golden-2d-ts`, where all of them still run, and build the WASM there (`node cli/build-wasm.ts`); its `npm run sim -- --parity` reproduces the TypeScript core's runs bit for bit. Runs at HEAD are the Rust core's own and differ in the last bits, then more.
 
 ## Outside this repository: the site's `preview-3d` branch
 
@@ -19,7 +19,8 @@ The 3D port's preview pages (ADR 0024) live on a branch of the site, not here. T
   - `kernel.html`, G1's light kernels;
   - `proto.html`, the prototype's and the τ runs' stands;
   - `g3.html`, G3's timing of the Rust slab sweep on three prototype stands (`g3/*.bin`);
-  - `../i1/i1.html`, I1's goldens and seasons in each core, from `code/2026-10-29-i1/preview/` (built at the tag `golden-2d-ts`: it runs the TypeScript core beside the Rust one).
+  - `../i1/i1.html`, I1's goldens and seasons in each core, from `code/2026-10-29-i1/preview/` (built at the tag `golden-2d-ts`: it runs the TypeScript core beside the Rust one);
+  - `../first/compare.html`, each opening forest as garden 0.14.0 shipped it beside the Rust core's, from `code/2026-10-30-first-paint/`.
 
   It is about **114 MB**, almost all of it baked stands (`proto/stands/*.json.gz`, `g3/`).
 - **Never merge it.** It would put 108 MB of throwaway stands and site-wide COOP/COEP on production.

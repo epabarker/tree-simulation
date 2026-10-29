@@ -24,15 +24,11 @@ import {
   speciesParams,
 } from "../src/core/params.ts";
 import { presetParams } from "../src/core/presets.ts";
-import { parityWasm } from "../src/wasm/parity.ts";
-import { productionWasm } from "../src/wasm/production.ts";
-import { loadWorldsSync, RustWorld, type TreeView as Tree } from "../src/wasm/world.ts";
+import { coreWasm, loadWorldsSync, RustWorld, type TreeView as Tree } from "../src/wasm/world.ts";
 
-// The trials run the Rust core's parity build (I1): the TypeScript core's runs, as M27 fitted on.
-const BUILD = (process.env.TREE_BUILD ?? "parity") as "parity" | "production";
-loadWorldsSync(BUILD, readFileSync(BUILD === "parity" ? parityWasm : productionWasm));
-/** A trial's world: the Rust core, parity build. */
-export const newWorld = (params: Params): RustWorld => RustWorld.create(params, BUILD);
+loadWorldsSync(readFileSync(coreWasm));
+/** A trial's world: the Rust core. */
+export const newWorld = (params: Params): RustWorld => RustWorld.create(params);
 
 export const STAND_ROOTS = [20, 41, 62, 83, 104, 125, 146, 167, 188, 209];
 /** Roof densities of the shade house, ≈ 61% to 2% of the open sky under the K = 7 sweep. */

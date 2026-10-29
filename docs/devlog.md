@@ -2,6 +2,22 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-30: parity becomes a proof; production is the only build
+
+- **User:** accepted I1 and the diagnosis of the two M5 tests. Asked for them to be restated over 20 seeds, a seed rule in AGENTS.md, production as the only build, parity as a CI job at the tag, and the opening forests regenerated and checked by eye. Then I2. The user's i1.html runs: all 27 goldens in both Rust builds on an X1 Carbon and a Pixel 8a, against 7 for the TypeScript core. Production is 0.8× TypeScript's time a season on the laptop and level on the phone.
+- **PR #20 had merged** before the request reached me, so this goes in a new PR into `claude/gallant-brown-5k4g33`. The branch was fast-forwarded to the merge.
+- **The thresholds on production** ([note](experiments/2026-10-30-production-thresholds.md)): 88 of 90 evidence tests passed. The two M5 stand tests failed on seeds 1 and 4. Over seeds 1–20 both builds fail them on 10–20% of seeds (parity 17/20/19/18 of 20, production 16/20/20/18), so the tests checked five seeds, not the behaviour.
+  - **Restated:** thresholds unchanged, each measure on at least 15 of seeds 1–20; nothing on the median.
+  - **AGENTS.md:** a claim about all of N seeds needs N ≥ 20 and a stated pass rate, with the counts beside it. The existing all-of-5 tests are listed in the note and stay until one fails.
+  - **On record:** `flora.test.ts:256` (beech over hornbeam in the canopy at season 400): 9 against 4 on parity, 7 against 4 on production (0.75× the threshold). Unchanged.
+- **One build:**
+  - removed: the `parity` feature and its V8 ports (`fdlibm.rs`, `pow.rs`), `src/wasm/pkg-parity`, `--parity` in the CLI and the bench, `TREE_BUILD`, `tests/wasm-math.test.ts`, the cross-core records (`tests/fixtures/ts-core.json`);
+  - `src/wasm/world.ts` loads one package (`coreWasm`, `loadWorlds()`, `RustWorld.create(params)`).
+  - **Goldens:** `tests/golden.json` is now the production hashes (it was `tests/golden-production.json`; no hash changed). The TypeScript core's 2D goldens are at the tag `golden-2d-ts`, where CI's new `golden-2d` job checks out the tag and runs them: the TypeScript core, the parity build in WASM with its records and Math, and natively. That takes 53 s here.
+  - `tests/checkpoint-bytes.test.ts` (was `rust-world.test.ts`): checkpoints round-trip and grow on alike, and garden 0.14.0's forest, written by the TypeScript core, still loads byte for byte.
+- **Opening forests:** regenerated on production. The bytes differ, but the forests are the same: topology identical in all twelve, tips within 10⁻¹² cells. The comparison page is at `/preview/first/compare.html` on the site's preview deploy. **The seed list stays.**
+- **Goldens:** none changed (`golden.json`'s contents are the former production file's).
+
 ## 2026-10-29: I1 passed: the whole 2D core in Rust; the TypeScript core deleted
 
 - **User:** accepted G3, whole-cell shifts and K 16 with rotation (calibration runs with rotation on), and asked for two G3 checks and the SIMD path dropped unless the phone disagreed. Then I1: the whole 2D core in Rust, phase by phase, bit-identical to every golden; the TypeScript core deleted.

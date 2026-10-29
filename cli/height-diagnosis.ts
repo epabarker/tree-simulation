@@ -1,7 +1,7 @@
 /**
  * Why the lone willow stops growing, then loses height (M27 diagnosis;
  * docs/experiments/2026-10-28-m27-height-curves.md). Four tables over the standard trials
- * (cli/trials.ts), on the Rust core's parity build (I1):
+ * (cli/trials.ts), on the Rust core (I1):
  *
  * 1. willow's height at seasons 30 and 60 with one cause switched off at a time;
  * 2. the topmost metamers at each willow's peak: shed by season 60, or still there and lower (sag);

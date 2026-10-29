@@ -18,7 +18,7 @@ Replace `X` with the principle id (e.g. `C2`).
 4. **Code.** Write `rust/core/src/principles/cX.rs` (or `light/` for C2-like models):
    - The header cites §X, states the rule in one paragraph and lists the params.
    - Use plain loops over the column `Vec`s: reverse loops for basipetal passes, forward loops for acropetal.
-   - Any Math goes through `crate::math`, in both modes (AGENTS.md). A routine new to the core needs a V8 port in parity mode and a case in `tests/wasm-math.test.ts`.
+   - Any Math goes through `crate::math` (AGENTS.md): a routine new to the core is added there, from the `libm` crate.
    - Respect the invariants in AGENTS.md: append-only rows, compact plus remap, and loop bounds fixed at the start of each phase.
 5. **Season loop.** Call it from `rust/core/src/season.rs` in the §6 phase where it belongs, and update the mapping table in `docs/architecture.md`.
 6. **Tests.**

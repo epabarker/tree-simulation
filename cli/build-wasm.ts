@@ -1,9 +1,6 @@
 /**
- * Builds the Rust core for the page and Node (ADR 0024): `cargo build` for wasm32, then
- * wasm-bindgen, twice (generated, not committed):
- *  - src/wasm/pkg-parity/: the core's Math as V8's, bit for bit (`parity`), for the 2D golden and
- *    side-by-side tests and `--rust`;
- *  - src/wasm/pkg/: the production build, Rust's libm and WASM SIMD (simd128).
+ * Builds the Rust core for the page and Node (ADR 0024): `cargo build` for wasm32 with WASM SIMD
+ * (simd128), then wasm-bindgen, into src/wasm/pkg/ (generated, not committed).
  * Run by `npm run check` and the tests, so the TypeScript that imports a package always sees the
  * current Rust.
  *
@@ -42,7 +39,7 @@ if (!want || have !== want) {
 
 const kb = (n: number) => (n / 1024).toFixed(1);
 
-/** One build: cargo into its own target directory (so the two do not rebuild each other). */
+/** The build: cargo into its own target directory (so it does not rebuild the native one). */
 function build(name: string, features: string[], rustflags: string): void {
   const target = `rust/target/${name}`;
   execFileSync(
@@ -87,5 +84,4 @@ function build(name: string, features: string[], rustflags: string): void {
   );
 }
 
-build("pkg-parity", ["--features", "parity,testing"], "");
 build("pkg", [], "-C target-feature=+simd128");

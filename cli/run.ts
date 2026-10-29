@@ -9,9 +9,8 @@
  *   echo '{"c3":{"lambda":0.56}}' | npm run sim -- --params - --out runs/y
  *   npm run sim -- --preset oakOpen --species-patch '{"oak":{"r3":{"posture":false}}}'   (M26)
  *   npm run sim -- --preset succession --checkpoint-at 60 --seasons 60 --out runs/c   (M21)
- *   npm run sim -- --preset forest --parity   (V8's Math: the TypeScript core's runs and goldens)
  *
- * Without --parity it is the production build, the page's: an "Export run" replays exactly.
+ * It is the page's core, so an "Export run" replays exactly.
  * Writes to --out: run.json, metrics.csv (one row per tree per season), metamers.csv (geometry at
  * --snapshots seasons and the last), form.csv (crown form at the same seasons), hash.txt, with
  * --light light.csv, with --checkpoint-at N checkpoint-N.bin.gz. --species-patch amends species in
@@ -25,9 +24,7 @@ import { fileURLToPath } from "node:url";
 
 const rust = fileURLToPath(new URL("../rust", import.meta.url));
 const args = process.argv.slice(2);
-const parity = args.includes("--parity");
-const passed = args.filter((a) => a !== "--parity");
-const targetDir = join(rust, "target", parity ? "parity" : "native");
+const targetDir = join(rust, "target", "native");
 const binary = join(targetDir, "release", "treesim");
 
 /** The newest modification time under the sources the binary is built from. */
@@ -53,19 +50,9 @@ try {
 if (built < sources) {
   execFileSync(
     "cargo",
-    [
-      "build",
-      "--release",
-      "--quiet",
-      "--locked",
-      "-p",
-      "treesim",
-      "--target-dir",
-      targetDir,
-      ...(parity ? ["--features", "parity"] : []),
-    ],
+    ["build", "--release", "--quiet", "--locked", "-p", "treesim", "--target-dir", targetDir],
     { cwd: rust, stdio: "inherit" },
   );
 }
-const run = spawnSync(binary, passed, { stdio: "inherit" });
+const run = spawnSync(binary, args, { stdio: "inherit" });
 process.exit(run.status ?? 1);

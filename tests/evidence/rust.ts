@@ -1,26 +1,23 @@
 /**
- * The evidence tests (once src/core/*.test.ts) run on the Rust core (I1, ADR 0024), parity build,
- * so their calibrated thresholds see the runs they were set on. This shim gives them the names
+ * The evidence tests (once src/core/*.test.ts) run on the Rust core (I1, ADR 0024). Their
+ * thresholds were set on the TypeScript core's runs and re-derived on this build (2026-10-30
+ * production-thresholds note). This shim gives them the names
  * the TypeScript core had: `new World(params)`, `treeMetrics`, `groundLight`, `hashWorld`.
  */
 import { readFileSync } from "node:fs";
 import type { Params } from "../../src/core/params.ts";
 import { BudState, type TreeMetrics } from "../../src/core/types.ts";
-import { parityWasm } from "../../src/wasm/parity.ts";
-import { productionWasm } from "../../src/wasm/production.ts";
-import { type Build, loadWorldsSync, RustWorld, type TreeView } from "../../src/wasm/world.ts";
+import { coreWasm, loadWorldsSync, RustWorld, type TreeView } from "../../src/wasm/world.ts";
 
-const BUILD = (process.env.TREE_BUILD ?? "parity") as Build;
-loadWorldsSync(BUILD, readFileSync(BUILD === "parity" ? parityWasm : productionWasm));
+loadWorldsSync(readFileSync(coreWasm));
 
 export type Tree = TreeView;
 export type { TreeMetrics };
 
-/** `new World(params)`: a Rust world, parity build. */
+/** `new World(params)`: a Rust world. */
 export class World extends RustWorld {
   constructor(params: Params) {
-    const made = RustWorld.create(params, BUILD);
-    super(BUILD, made.core());
+    super(RustWorld.create(params).core());
   }
 }
 
@@ -47,9 +44,9 @@ export function saveWorld(world: RustWorld): Uint8Array {
   return world.save();
 }
 
-/** A world from checkpoint bytes, parity build. */
+/** A world from checkpoint bytes. */
 export function loadWorld(bytes: Uint8Array): RustWorld {
-  return RustWorld.load(bytes, BUILD);
+  return RustWorld.load(bytes);
 }
 
 /** Elevation of a direction above the horizontal, degrees, whichever side it heads. */

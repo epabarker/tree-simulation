@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>I1: the Rust core in this browser</title>
+    <style>
+      body { font: 15px/1.45 system-ui, sans-serif; margin: 16px; max-width: 860px; color: #222; background: #fff; }
+      table { border-collapse: collapse; margin: 8px 0 16px; }
+      td, th { border-bottom: 1px solid #ddd; padding: 3px 10px 3px 0; text-align: left; font-variant-numeric: tabular-nums; }
+      button { font: inherit; padding: 6px 14px; }
+      pre { background: #f4f4f4; padding: 8px; white-space: pre-wrap; font-size: 12px; }
+      #status { color: #555; }
+    </style>
+  </head>
+  <body>
+    <h1>I1: the Rust core in this browser</h1>
+    <p>
+      Runs every 2D golden with the TypeScript core, the Rust core's parity build (V8's Math) and
+      its production build (Rust's libm, the page's), then times a season and a snapshot in each.
+      It takes a minute or two on a phone; keep the screen on. Copy the JSON at the end.
+    </p>
+    <button id="go">Run</button> <span id="status"></span>
+    <div id="out"></div>
+    <pre id="json"></pre>
+    <script type="module" src="./i1.ts"></script>
+  </body>
+</html>

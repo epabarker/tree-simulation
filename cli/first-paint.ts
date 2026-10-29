@@ -4,15 +4,20 @@
  * grows it (dead trees discarded every season), each saved as a gzipped checkpoint, plus a
  * manifest the host page can pass straight to `first`.
  *
+ * Grown in the Rust core's parity build (I1): the bytes are the TypeScript core's, so the forests
+ * chosen by eye in M21 and M25 stay the ones shipped. The page grows them on in production.
+ *
  *   node cli/first-paint.ts [out]     (default dist-garden/first; `npm run build:garden` runs it)
  */
 
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { gzipSync } from "node:zlib";
-import { saveWorld } from "../src/core/checkpoint.ts";
 import { forestParams } from "../src/core/presets.ts";
-import { World } from "../src/core/world.ts";
+import { parityWasm } from "../src/wasm/parity.ts";
+import { loadWorldsSync, RustWorld } from "../src/wasm/world.ts";
+
+loadWorldsSync("parity", readFileSync(parityWasm));
 
 /**
  * World widths a plate may want (garden.ts `plateWidth`): a portrait phone (≈ 66 cells, three
@@ -39,12 +44,10 @@ mkdirSync(out, { recursive: true });
 let total = 0;
 for (const width of WIDTHS) {
   for (const seed of SEEDS) {
-    const world = new World(forestParams(width, seed));
-    for (let s = 0; s < SEASONS; s++) {
-      world.step();
-      world.discardDead();
-    }
-    const bytes = gzipSync(saveWorld(world), { level: 9 });
+    const world = RustWorld.create(forestParams(width, seed), "parity");
+    world.step(SEASONS, true);
+    const bytes = gzipSync(world.save(), { level: 9 });
+    world.dispose();
     const kb = bytes.length / 1024;
     total += kb;
     if (kb > BUDGET_KB)

@@ -1,0 +1,20 @@
+[package]
+name = "tree-wasm"
+version = "0.1.0"
+description = "wasm-bindgen wrapper around tree-core, for the page and Node"
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[lib]
+crate-type = ["cdylib"]
+
+# `parity`: the core's Math as V8's (the build the golden and side-by-side tests load).
+# `testing`: the Math exports, for the tests only.
+[features]
+parity = ["tree-core/parity"]
+testing = []
+
+[dependencies]
+tree-core = { path = "../core" }
+wasm-bindgen = "=0.2.129"

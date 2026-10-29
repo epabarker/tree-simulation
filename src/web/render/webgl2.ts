@@ -27,8 +27,8 @@ import {
   setUniforms,
   type VertexArrayInfo,
 } from "twgl.js";
-import type { Snapshot } from "../../core/snapshot.ts";
-import { BudState } from "../../core/tree.ts";
+import type { Snapshot } from "../../core/types.ts";
+import { BudState } from "../../core/types.ts";
 import { BUD_ACTIVE, BUD_DORMANT, parseColor, SEQUENTIAL, shadeImage } from "./colors.ts";
 import { LEAF_PALETTES, LEAF_STYLES } from "./leaf-styles.ts";
 import { MAX_DPR, type Renderer, type RendererOptions } from "./renderer.ts";

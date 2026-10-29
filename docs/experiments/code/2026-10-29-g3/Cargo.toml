@@ -1,0 +1,16 @@
+# THROWAWAY: G3's measurements of the Rust slab sweep (ADR 0024). Native, release:
+#   cargo run --release --manifest-path docs/experiments/code/2026-10-29-g3/Cargo.toml -- <deposits dir> <out.json>
+[package]
+name = "g3"
+version = "0.0.0"
+edition = "2024"
+publish = false
+
+[dependencies]
+tree-core = { path = "../../../../rust/core" }
+
+[profile.release]
+opt-level = 3
+codegen-units = 1
+
+[workspace]

@@ -6,7 +6,7 @@
  * is open, so it costs nothing until it is used.
  */
 
-import type { Snapshot } from "../../core/snapshot.ts";
+import type { Snapshot } from "../../core/types.ts";
 import { Canvas2DRenderer } from "./canvas2d.ts";
 import type { Scene, ViewOptions } from "./scene.ts";
 import { readTheme } from "./theme.ts";

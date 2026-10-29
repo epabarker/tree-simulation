@@ -2,6 +2,202 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-29: I1 passed: the whole 2D core in Rust; the TypeScript core deleted
+
+- **User:** accepted G3, whole-cell shifts and K 16 with rotation (calibration runs with rotation on), and asked for two G3 checks and the SIMD path dropped unless the phone disagreed. Then I1: the whole 2D core in Rust, phase by phase, bit-identical to every golden; the TypeScript core deleted.
+- **Two things differed from the brief.** PR #20 was still open, not merged, so this work went onto it. The g3.html timings never arrived, so the hand-written SIMD path was dropped on the VM's numbers alone; it is in 77d4105 if the phone disagrees.
+- **G3 follow-ups** (5465008): mirror symmetry of the 3D field to rounding, and the lab's light heatmap at one season under shifts and under bilinear transport ([G3 note](experiments/2026-10-29-g3-slab-light.md) §4).
+- **I1** ([note](experiments/2026-10-29-i1-rust-core.md)):
+  - **How it landed:** the whole core was written in Rust first (4569037), then switched in one phase at a time, in the season loop's order. Each phase ran in Rust with the rest still TypeScript, the trees synced across around it, and passed every golden and a side-by-side comparison of every column before the next.
+  - **Math:** of the nine candidates only log, atan2 (with atan) and cbrt differed from V8 and were ported into parity mode; asin and acos match in the libm crate; log1p, tanh and expm1 are not called.
+  - **The world** (`rust/wasm/src/world.rs`, `src/wasm/world.ts` `RustWorld`): params as JSON with JavaScript's semantics, events, records and checkpoints byte for byte the TypeScript core's; the snapshot built in Rust and copied out once (lab view, forest: 2.44 → 1.11 ms in Chromium).
+  - **The page** runs the production build; the worker switched only after both builds passed their goldens.
+  - **The CLI** is a native binary (`rust/cli`, `treesim`); `cli/run.ts` builds and runs it, so `analysis/treesim/sweep.py` runs unchanged. In the parity build its files are byte for byte the TypeScript CLI's.
+  - **Tests:** every hand-built unit test is now a Rust test in the principle's file (110 Rust tests in all). The milestone tests moved to `tests/evidence/` and run on the parity build, since their thresholds were set on the TypeScript core's runs. Before the deletion, the TypeScript core's snapshots, checkpoint bytes and regrowth hashes were recorded in `tests/fixtures/ts-core.json` (`code/2026-10-29-i1/ts-records.ts`), and the Rust world is held to them.
+  - **Deleted** (a1bc8cf): the TypeScript core, its CLI, the G2 sky-sweep wrapper, the phase bridge, and the bench's `--slab`. All are at the tag `golden-2d-ts` (made locally; tag pushes are refused from cloud sessions, so the user pushes it).
+- **Goldens:** `tests/golden.json` is unchanged; it is the parity build's now. New: `tests/golden-production.json` (25 of 27 differ from parity; only the light-off `explosion` cases agree). In headless Chromium the parity build reproduces 27 of 27, against the TypeScript core's 7.
+- **Surprises:**
+  - **The speed-up is modest in the browser:** production 0.74–0.77 of the TypeScript core's time a season in Chromium, and parity 1.07–1.18 (slower). Natively the step takes 0.44–0.72 of it.
+  - **Hybrid runs broke where TypeScript wrote into scratch that Rust had sized:** mechanics writes `scratchU`, which girth's `ensureScratch` sizes. The bridge now sizes TypeScript's scratch before copying in (9f99ff9).
+  - **Biome reformatted `rust/presets.json`,** which broke its up-to-date test; it is excluded.
+  - **Opening forests:** `cli/first-paint.ts` grows in the parity build, so the shipped bytes stay the ones chosen by eye (all twelve: same bytes); the page grows them on in production.
+- **Sizes:** production WASM 141.4 kB gzip (gate 170), parity 144.3 kB, garden JS 49.1 kB.
+
+## 2026-10-29: 3D port, G3 passed: the 3D slab sweep in Rust; parity becomes a mode; PR #20 for CI
+
+- **User:** accepted G2 and asked for three adjustments, then G3.
+  - Put the V8 `Math` ports behind a `parity` feature.
+  - Run CI on a PR, without merging.
+  - Say in ADR 0002 and the README what non-determinism means for users.
+  - G3: the 3D slab sweep in Rust (production build), measured for accuracy, K and browser timing.
+- **Parity mode:**
+  - `tree-core`'s ports sit behind `parity`; without it the core uses the `libm` crate, which is pure Rust and the same natively and on wasm32 (`std` is glibc's natively);
+  - two packages, `src/wasm/pkg-parity/` for the tests and `--rust`, and `src/wasm/pkg/` for production (simd128);
+  - `rust:check` runs clippy and the tests in both modes, with threads, and for wasm32 with SIMD;
+  - **without parity the 2D sweep is 1.2× faster than TypeScript;** the G2 note and the review now carry both numbers.
+- **CI** ([PR #20](https://github.com/epabarker/tree-simulation/pull/20), into `claude/gallant-brown-5k4g33`): green. The cold run took 4:34 against 1:29 before, of which 1:53 was the toolchain (compiling wasm-bindgen-cli) and +1:03 was `check`.
+- **ADR 0002, corrected against the code:**
+  - `?forest=<seed>` does **not** open a checkpoint: with a seed set, the garden regrows from seed in the browser, so it is browser-specific like the lab's seed;
+  - a CLI replay repeats in Node but is not the run a Chrome visitor exported;
+  - only the opening checkpoint is the same for everyone.
+
+  The README says so. The user's brief had it the other way for `?forest`.
+- **G3** ([note](experiments/2026-10-29-g3-slab-light.md)): `rust/core/src/light/slab_sweep.rs`.
+  - **What it is:** Float32; a spherical Fibonacci sky rotated each season; τ per face; a polynomial exp with a Cody–Waite ln 2 split (relative error 2.5·10⁻⁷ on [−80, 0], where the first version was 4·10⁻⁶); scalar and SIMD kernels written alike; lanes; the exact tracer.
+  - **Tests:** with flat directions and the same ℓ on every z line it is the 2D sweep (2·10⁻⁵), and native, scalar WASM and SIMD WASM give the same bits.
+- **Surprise 1: the bilinear read of G, not the box mean, is the 3D light's error.**
+  - The first build gave mean |ΔQ|/C up to 0.095 on the mature hedgerow, over the 0.08 stop rule.
+  - The prescribed fallback (the exact segment integral) took it to 0.091 at 1.8–1.9× the cost.
+  - One-direction diagnostics showed a darkening bias in every direction, worst for the steepest: blurring shadows across four cells each row, under a convex exp.
+  - **Whole-cell shifts** (Bresenham) remove it: 0.045–0.053 on every stand, at 0.6–0.8× the bilinear cost. Adopted as the slab's default; the user is to confirm.
+- **K:** static, K = 16 is where Q at the buds stops changing by more than the model's error. Rotated, ten seasons take every K ≥ 8 under it. The prototype regrown under the Rust kernel (M6e's protocol, 2 seeds) has height, crown depth and width converged at every K.
+- **Surprise 2: rotation matters in 3D.** It cuts the stand's metamers 15–30%, where in 2D it changed nothing. Calibrate under it.
+- **Timing:** `…/preview/3d/g3.html` on the site's preview.
+  - Headless on the VM: 25–35 ms in four lanes at D = 64 (G1's kernel: 43), and 54–85 ms in one lane.
+  - **Surprise 3:** the hand-written SIMD path is 5–7% slower than the scalar code that LLVM vectorises under simd128.
+  - The user's devices are to run the page.
+- **Goldens unchanged.**
+
+## 2026-10-29: 3D port, G2 passed: the sky sweep in Rust, bit for bit; ADR 0024 accepted
+
+- **User:** looked at the τ stands and decided:
+  - ADR 0024 accepted, with D = 64 and τ a world parameter per face;
+  - the wood interior (0.2, 0.2) is the default look, with the edge and the hedgerow as presets;
+  - foliage density is a calibration and renderer target, split between C1 and I3;
+  - only the sky sweep is frozen until I1.
+
+  They asked for G2, Float64 scalar and bit-identical, and for a check of whether V8's sin, cos, atan2, pow and hypot match ("port the fdlibm routine rather than re-hash").
+- **Built** (`rust/`, `src/wasm/`): `tree-core` (dependency-free; the sweep ported operation for operation; `math/`; `threads` native-only) and `tree-wasm` (the wasm-bindgen wrapper). The core gains `setSkySweepFactory` and `LightModel.dispose()`. The CLI and bench take `--rust`.
+- **Toolchain:** `rust-toolchain.toml` (1.97); `cli/build-wasm.ts`; `npm run check` now runs `build:wasm` and `rust:check` first. CI and release use `.github/actions/rust`, which this push has not yet exercised: the workflows run on PRs and `main` only.
+- **Surprise 1: V8's Math is four implementations, not one.** Node's sin, cos and exp are V8's fdlibm port. `Math.pow` calls the C library: glibc's FMA variant of Arm's pow, compiled with GCC's contractions. hypot is V8's own formula. Rust's libm matches none of sin, cos, pow or hypot.
+  - All four are ported and match on 4M random and adversarial samples (G2 note §2).
+  - pow first missed 7 in 1M: GCC does not fuse a product reused in another basic block.
+  - "Port the fdlibm routine" would have been wrong for pow.
+- **Bit-identical:**
+  - 27/27 goldens with the Rust sweep;
+  - field-by-field parity on 10 configurations, including rotation and the M6 column sweep, which no golden uses;
+  - a native fixture held to the TypeScript hashes with and without threads;
+  - a planted one-bit error caught everywhere.
+- **Surprise 2: the TypeScript core is not deterministic across engines.** In Chromium 153, 7 of 27 goldens hold: Chrome's V8 has glibc trig, and its exp differs. ADR 0002 is corrected. I1 is the fix; G2 cannot be, since the rest of the core still calls the browser's Math.
+- **Surprise 3: bit-identical Rust is slower in WASM.** Light is 1.35× TypeScript's on `forest` (3.05 against 2.27 ms a season), because the exp is WASM-compiled fdlibm (≈ 18 ns) against V8's native one; the march itself is 2× faster. So the page keeps the TS sweep until I1, and the review drops "I1 ≈ 2× faster".
+- **Size:** `core_bg.wasm` 50.0 kB, 23.8 kB gzip (names stripped), plus 2.3 kB of glue.
+- **Docs:**
+  - the review rewritten as one document, with G1, the prototype, τ and G2 folded in;
+  - ADR 0024 accepted, with the density split;
+  - an experiments README note on the site's `preview-3d` branch (108 MB; never merge; delete after V);
+  - AGENTS invariants for the two sweeps and the vendored Math.
+- **Goldens unchanged.**
+
+## 2026-10-29: 3D port, the faces' transmission τ; ADR 0024 held open
+
+- **User:** the 3D stands read as hedges. They argued that this is structural: open faces light the lower crown, and nothing prunes lit foliage. They asked for a face transmission τ, the R6 set at D = 48 and 64 for τ ∈ {1, 0.5, 0.2, 0}, and a 42-cell planting, all on the proto page. ADR 0024 is held at accepted-in-principle with D and τ open.
+- **τ** (`cli/slab-light.ts`, default 1, so the bench is unchanged): the padded line beyond each z face carries depth −ln τ / k_ext. It is set per face (front, back), and τ = 1 reproduces the prototype's stands exactly.
+- **Added, not asked:**
+  - a wood edge (1 in front, 0 or 0.2 behind), since a symmetric τ cannot make one;
+  - the "below half" share on today's full 2D model, as an anchor;
+  - a picture-cover measure, because the share did not separate the 3D stands from the garden.
+- **Measured** ([note](experiments/2026-10-29-face-transmission.md)):
+  - **The lower crown follows τ:** τ 1 keeps 12–16% of each tree's leaves below half height and covers 26–33% of the picture's lower half; τ 0.5 7–9% and 14–19%; τ ≤ 0.2 0–2%. The edge gives 4–7%, on the viewer's side.
+  - **At τ < 1** crowns stop short of the faces and nothing piles, and m falls 12–38%.
+  - **The 42-cell planting** gives separate domes, as leafy low as the closed row.
+- **Surprise: today's 2D garden is as leafy below half height** (`forest`, `mixedWood` 13–15%; `oakOpen` 36%), but it covers 1–3% of the picture there. The 3D stands put 10–20× the leaves on the same picture at every τ. **The hedge is half faces, half density,** and the density is calibration's.
+- **Review §2d:** per look, hedgerow 1, 1 at D 64 (≈ 75 ms on the phone); wood edge 1, 0.2 at D 64 (≈ 71); wood interior 0.2, 0.2 at D 48 (≈ 56) or 64 (≈ 69). One D for all looks, 64, since τ is a world parameter the garden can expose and D is fixed per world.
+- **Site:** `preview-3d` carries 24 more stands (108 MB in all), with τ, edge and spacing controls on `proto.html`.
+- **Nothing in `src/`, the goldens or the default light model changed.**
+
+## 2026-10-29: 3D port, G1 passed; a throwaway 3D prototype; ADR 0024 accepted
+
+- **G1 (user, on a Pixel 8a and an X1 Carbon):**
+  - 4-lane WASM SIMD light at D = 32 takes 32 ms on the phone (rule: 150) and 13 ms on the laptop; D = 64 takes 43 and 32 ms.
+  - Single-threaded the phone is within 15% of the laptop, so M15's 2.7× is replaced.
+  - Lane scaling: phone 1.5–2.0×, laptop 2.3–3.2×.
+  - The results are in the open-slab note's addendum.
+- **Prototype** ([note](experiments/2026-10-29-proto3d.md)): throwaway, outside `src/`.
+  - **What it reuses:** the core's `Tree`, its tables widened at run time by 3D columns, and its dimension-free passes by import (C3, R1, C5, C6, R6).
+  - **What is new:** C1 laterals by divergence angle, C4 as a vector, and the slab sweep, open z with face clipping and an optional 3-cell fade.
+  - **The stand:** `forest`'s planting for 100 seasons at D = 32, 48 and 64.
+- **Surprise: the requested rules stunt the trees.** Under C1–C6 and R1 alone, 2D and 3D both stop at height 48 by season 40, because dormant buds keep leaves and their cost. With R6 (no new code) the trees reach 85–90, so a second set runs with R6, labelled.
+- **Measured:**
+  - **m:** 13–26 while growing, about 8 at a plateau, nearly independent of D.
+  - **Passes:** 1.1–1.8× a 2D metamer's cost, up to 2.7× in the fastest growth.
+  - **Crowns:** free crowns about 0.8 × height deep.
+  - **Faces, with R6:** foliage stacks at them. At D = 32 the fade moves the pile but does not cure it; at D = 48 it cures it; at D = 64 crowns taper of their own accord.
+- **Re-projected** (review §2): `forest` on the phone at season 40 costs ≈ 61–75 ms at D = 32–64 under SIMD and lanes, and single-threaded SIMD fits the intro too. D is chosen by the crowns: **D = 64 with the 3-cell fade**.
+- **The page:** `proto.html` on the site preview draws the 3D stands orthographically beside today's view of the same planting grown in 2D. They are uncalibrated and read as hedges (open-z side light keeps lower crowns leafy).
+- **ADR 0024 accepted,** with D and the fade filled in, for the user to confirm before G2.
+- **Nothing in `src/`, the goldens or the default light model changed.**
+
+## 2026-10-29: 3D port, re-costed at the open slab; G1 at three depths
+
+- **User:** G0.5 revealed a misunderstanding.
+  - **The aim:** the port is for trees that grow in 3D (branches toward and away from the viewer, crowns as volumes), drawn as today's orthographic frontal illustration in z order, with no perspective, darkening or second rank.
+  - **The world:** open in z, the faces clipping growth but not light.
+  - **D:** deferred to I2.
+  - **Gates:** G0.5 is not a gate; the visual check is after I2.
+- **Measured** ([note](experiments/2026-10-29-open-slab-cost.md)): light at D = 32 / 48 / 64, open z, K = 16, Float32.
+  - **TypeScript:** `forest` 241 / 362 / 472 ms, `panorama` 826 / 1291 / 1613.
+  - **WASM SIMD, 1 lane:** `forest` 54–111 ms.
+  - **4 lanes** (desktop browser, the updated G1 page): `forest` 23 / 28 / 43 ms.
+  - **Light in 2× cells at D = 64:** 1/8 of fine.
+- **Crowns:**
+  - Home-wood species grown alone are 45–137 cells wide at season 100. The faces clip beech, hornbeam and oak at every D.
+  - Side-lit crowns carry 0.8–2.4× a closed stand's leaf area per column.
+- **Re-costed** (review §2): under Rust, SIMD and 4 lanes the phone's `forest` intro holds at D = 32 (≈ 197 ms), not at 48 (≈ 273) or 64 (≈ 358). At D ≥ 48 the estimated tree passes dominate, so coarser light cells don't buy the same result.
+- **Disagreements, written into the review:**
+  - face clipping piles foliage at the faces and shifts allocation, so D shapes the crowns and V should see two values of D;
+  - a throwaway 3D prototype (about two sessions) could give a first look before the Rust work.
+- **Pages:**
+  - the G1 page runs all three depths and the coarse lattice, with the stop rule at D = 32;
+  - the G0.5 page carries a "superseded" banner.
+- **ADR 0024 restated,** still proposed.
+- **Nothing in `src/`, the goldens or the default light model changed.**
+
+## 2026-10-29: 3D port, G0.5: a frontal slab preview, and the review amended
+
+- **User:** the measurement and review are accepted. Before G1 and before the ADR leaves *proposed*, they asked for:
+  - G0.5, a frontal preview judged by eye on their phone, with both z boundaries, on a COOP/COEP preview deploy;
+  - four amendments: the z boundary left open, the pyramid on equal terms, the WASM gate argued, and the 2D freeze in sessions.
+- **Merged `claude/gallant-brown-5k4g33`** (garden-v0.14.0, M26–M27b) into this branch. Reasons:
+  - the preview's "today" panel and stands must be the live garden's code and species;
+  - that branch already has ADRs 0019–0023, so this port's ADR is renumbered **0024**.
+- **G0.5** ([note](experiments/2026-10-29-g05-slab-preview.md)):
+  - **Stands:** grown home woods at 66 and 520 cells (seeds 9, 10, 12; seasons 60, 100).
+  - **Depth:** per-limb golden-ratio targets, each limb continuous in depth.
+  - **Drawing:** the garden's WebGL2 renderer with only its draw call replaced at run time (perspective about the trunks' line, depth darkening, far-to-near slices).
+  - **Panels:** today, open z (a hedgerow), and periodic z (with the clone rank drawn behind).
+  - **Where:** deployed on the site's `preview-3d` branch with global COOP/COEP (never to merge).
+  - **COEP check:** locally, with the same headers, every page is cross-origin isolated with no failed request. The site has nothing cross-origin.
+  - **Not verified:** the deployed URL; the container cannot reach the site.
+- **G1 page** on the same deploy: WASM SIMD in 4 lanes, each a worker with its own instance, takes 22 ms in desktop Chromium (1 lane 70, TypeScript 335).
+- **Surprise: the pyramid on equal terms.** In Rust, with a precomputed 40-cell cone, it costs 33–35 ms single-threaded against the sweep's 63–153, and about the same threaded. The TS-only rejection was unequal. The sweep is kept on behaviour (side light through open faces, the light-weighted V, the M6–M27 calibrations), and the pyramid becomes the fallback.
+- **Surprise: the clone under periodic z** is not only a calibration matter. Tap-to-fell would fell every rank at once.
+- **Bundle:** `src/core` is 19 kB of the garden's 55.5 kB gzipped. The scratch WASM is 28–32 kB (mostly std) and compiles in 0.3 ms. 3D first-paint *data* (MB-sized checkpoints) outweighs any code gate.
+- **Review and ADR 0024 amended**, still proposed:
+  - the z boundary is the user's, with both options' consequences set out (Qz);
+  - the pyramid is compared on equal terms;
+  - the WASM moves after first paint, with ADR 0014's 60 kB kept;
+  - the 2D freeze is costed at 5–8 sessions, narrowable to I1's 3–5;
+  - I1 is described as an end state on its own;
+  - no calibration before the user has seen I2.
+
+## 2026-10-29: Should the model go 3D? The measurement, and a go/no-go review
+
+- **User:** review a 3D port (a slab one crown deep, seen from the front; threads allowed on edbarker.dev), measuring before judging. Do not start the port.
+- **Measured** ([note](experiments/2026-10-29-3d-light-cost.md)):
+  - **The bench:** `cli/bench.ts --slab model:D:K:precision[:periodic]` times a scratch 3D light model (`cli/slab-light.ts`) on the real run's deposits. Behaviour, goldens and bench hashes are unchanged.
+  - **D:** canopy crowns are 20–30 cells wide, so D = 32.
+  - **The 3D row march:** 24–28 ns per cell–direction update in TS (2D: 18–24), linear in D·K. At D = 32, K = 16: `forest` 250–290 ms, `panorama` ≈ 700, about 100× the 2D light.
+  - **The pyramid:** its deposit is cheap, but the V cone search takes 21 µs a sample, which makes it dearer than the sweep at 3D bud counts.
+  - **The kernel in Rust:** scalar WASM 2.0×, SIMD f32 5.2× (24 kB gzipped); 4 native threads a further 2.6–3.0×, but only with a private partial field per thread (reductions cap it at 1.5–2×).
+- **Surprise:** Float64 WASM gave bit-identical Q to the TS kernel, `exp` included, so a bit-identical Rust port of the 2D goldens looks attainable.
+- **Surprise:** foliage per ground column is the same in every 2D stand (Beer–Lambert sets it), so a closed slab carries D × closure ≈ 22–32× the metamers, more than the brief's 5–20×.
+- **Review** ([review](reviews/2026-10-29-3d-port-review.md)):
+  - per-season projections for TS, scalar WASM, SIMD, and SIMD with threads;
+  - answers to the brief's open questions;
+  - about 8 calibration milestones, about 14 in all.
+  - **Recommendation:** go with a reduced scope, through cheap gates, starting with G1 (the kernel on the user's phone).
+- **ADR 0024 (numbered after the 0019–0023 of M26–M27)** is proposed and awaits the user. Nothing in `src/` changed.
+- **Scratch code:** in `docs/experiments/code/2026-10-29-3d-port/` (Rust crate and harnesses), outside lint and typecheck.
 ## 2026-10-28: M27b, the fitted species adopted (ADR 0023)
 
 - **User:** fit the rest by hand and put the fits on the site.

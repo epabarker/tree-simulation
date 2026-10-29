@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
+import { productionWorld } from "../../../tests/production-world.ts";
 import { presetParams, presets } from "../../core/presets.ts";
-import { SnapshotBuilder } from "../../core/snapshot.ts";
-import { BudState, type Tree } from "../../core/tree.ts";
-import { World } from "../../core/world.ts";
+import { BudState } from "../../core/types.ts";
+import type { RustWorld, TreeView as Tree } from "../../wasm/world.ts";
 import { isLeafStyleName, LEAF_STYLES } from "./leaf-styles.ts";
 import { CLUSTER_LEAVES, Scene } from "./scene.ts";
 
@@ -19,15 +19,14 @@ function leafSites(scene: Scene, leafAge: number): { young: number; rosettes: nu
   return { young, rosettes };
 }
 
-function sceneAfter(seasons: number): { scene: Scene; world: World } {
-  const world = new World(presetParams("skyTree", 3));
-  const builder = new SnapshotBuilder();
+function sceneAfter(seasons: number): { scene: Scene; world: RustWorld } {
+  const world = productionWorld(presetParams("skyTree", 3));
   const scene = new Scene();
   scene.setSize(800, 600, 1);
-  scene.setSnapshot(builder.build(world, 0));
+  scene.setSnapshot(world.snapshot(0));
   for (let s = 0; s < seasons; s++) {
     world.step();
-    scene.setSnapshot(builder.build(world, 0));
+    scene.setSnapshot(world.snapshot(0));
   }
   return { scene, world };
 }
@@ -168,12 +167,12 @@ describe("Leaf styles (page only, per species)", () => {
 
 describe("rings in the lab's frame (M26)", () => {
   it("frames one lap of a ring and draws the copies either side, so crowns wrap at the seam", () => {
-    const world = new World(presetParams("forest", 1));
+    const world = productionWorld(presetParams("forest", 1));
     world.run(30);
     const scene = new Scene();
     scene.setSize(800, 600, 1);
     scene.frame = "trees";
-    scene.setSnapshot(new SnapshotBuilder().build(world, 0));
+    scene.setSnapshot(world.snapshot(0));
     scene.fit(true);
     const W = world.params.world.width;
     expect(scene.camera.cx).toBe(W / 2);
@@ -182,7 +181,7 @@ describe("rings in the lab's frame (M26)", () => {
     const open = new Scene();
     open.setSize(800, 600, 1);
     open.frame = "trees";
-    open.setSnapshot(new SnapshotBuilder().build(new World(presetParams("skyTree", 1)), 0));
+    open.setSnapshot(productionWorld(presetParams("skyTree", 1)).snapshot(0));
     expect(open.wrapOffsets()).toEqual([0]);
   });
 });

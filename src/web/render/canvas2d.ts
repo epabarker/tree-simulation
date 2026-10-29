@@ -4,8 +4,8 @@
  * Canvas 2D usable into the tens of thousands of segments.
  */
 
-import type { Snapshot } from "../../core/snapshot.ts";
-import { BudState } from "../../core/tree.ts";
+import type { Snapshot } from "../../core/types.ts";
+import { BudState } from "../../core/types.ts";
 import { BUD_ACTIVE, BUD_DORMANT, SEQUENTIAL, shadeImage } from "./colors.ts";
 import {
   LEAF_PALETTES,

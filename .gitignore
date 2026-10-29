@@ -13,3 +13,8 @@ __pycache__/
 
 # Personal Claude Code settings (shared ones live in .claude/settings.json)
 .claude/settings.local.json
+
+# The Rust core (ADR 0024): build output, and wasm-bindgen's generated package
+rust/target/
+src/wasm/pkg/
+src/wasm/pkg-parity/

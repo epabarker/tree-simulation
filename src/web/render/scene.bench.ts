@@ -6,25 +6,23 @@
  *   node src/web/render/scene.bench.ts
  */
 
+import { productionWorld } from "../../../tests/production-world.ts";
 import { type PresetName, presetParams } from "../../core/presets.ts";
-import { SnapshotBuilder } from "../../core/snapshot.ts";
-import { World } from "../../core/world.ts";
 import { LEAF_STYLES } from "./leaf-styles.ts";
 import { Scene } from "./scene.ts";
 
 /** A scene tweening between the last two seasons of `seasons` seasons of `preset`. */
 function tweening(preset: PresetName, seasons: number): Scene {
-  const world = new World(presetParams(preset, 1));
-  const builder = new SnapshotBuilder();
+  const world = productionWorld(presetParams(preset, 1));
   const lean = { junctions: false, field: false };
   world.run(seasons - 1);
   const scene = new Scene();
   scene.setSize(1280, 800, 1);
   scene.depth = true;
   scene.leafStyle = LEAF_STYLES.broadleaf;
-  scene.setSnapshot(builder.build(world, 0, lean));
+  scene.setSnapshot(world.snapshot(0, lean));
   world.step();
-  scene.setSnapshot(builder.build(world, 0, lean));
+  scene.setSnapshot(world.snapshot(0, lean));
   scene.fit(true);
   return scene;
 }

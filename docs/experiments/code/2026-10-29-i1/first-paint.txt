@@ -1,0 +1,12 @@
+100-10.bin.gz    bytes same 20 seasons on: same hash ce977697
+100-12.bin.gz    bytes same 20 seasons on: same hash b4c81529
+100-9.bin.gz     bytes same 20 seasons on: same hash 88edf33a
+160-10.bin.gz    bytes same 20 seasons on: same hash ed7958d7
+160-12.bin.gz    bytes same 20 seasons on: same hash 55ac518b
+160-9.bin.gz     bytes same 20 seasons on: same hash 0fe6758e
+220-10.bin.gz    bytes same 20 seasons on: same hash ffbc645f
+220-12.bin.gz    bytes same 20 seasons on: same hash 2ad1a22b
+220-9.bin.gz     bytes same 20 seasons on: same hash 1fbef60e
+66-10.bin.gz     bytes same 20 seasons on: same hash a862561f
+66-12.bin.gz     bytes same 20 seasons on: same hash 3da03a22
+66-9.bin.gz      bytes same 20 seasons on: same hash 61f17985

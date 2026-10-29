@@ -20,21 +20,18 @@ npm run build:garden   # garden.js and its worker in dist-garden/, for a host pa
 
 ### Headless runs and analysis
 
-The browser and batch runs share the same TypeScript simulation core.
+The browser and batch runs share one simulation core, in Rust: WebAssembly on the page, a native binary for batch runs.
 
 ```bash
 npm run sim -- --preset explosion --seed 3 --seasons 12 --out runs/demo
 uv run --project analysis python analysis/experiments/m0_growth.py
 ```
 
-Each run writes `run.json`, `metrics.csv`, `metamers.csv` and `hash.txt` (see [`docs/architecture.md`](docs/architecture.md)). The page's **Export run** button saves a JSON file that `npm run sim -- --replay <file>` replays. **Until the Rust core carries the whole simulation (I1), runs are exact only within one JavaScript engine.** Node and Chrome compute `Math` differently in the last bit, and 20 of the 27 golden runs differ in Chromium ([G2 note](docs/experiments/2026-10-29-g2-rust-sweep.md), [ADR 0002](docs/decisions/0002-keyed-hash-rng.md)). So:
-- a CLI replay repeats exactly in Node, but does not reproduce a run exported from Chrome;
-- the lab's seed, its shared links and the garden's `?forest=<seed>` regrow in each visitor's browser, so they can differ between browsers and devices;
-- only the garden's opening checkpoint is the same for everyone, at first paint.
+Each run writes `run.json`, `metrics.csv`, `metamers.csv` and `hash.txt` (see [`docs/architecture.md`](docs/architecture.md)). The page's **Export run** button saves a JSON file that `npm run sim -- --replay <file>` replays exactly. **Runs no longer depend on the JavaScript engine** (I1): the core computes its own `Math` rather than the engine's, so the lab's seeds, shared links and the garden's `?forest=<seed>` regrow the same forest in every browser and in the CLI (checked in Node, headless Chromium and natively; phones are still to be checked) ([I1 note](docs/experiments/2026-10-29-i1-rust-core.md), [ADR 0002](docs/decisions/0002-keyed-hash-rng.md)). The TypeScript core it replaced reproduced runs only within one JavaScript engine; its runs are reproduced by the parity build (`npm run sim -- --parity`), and the code is at the tag `golden-2d-ts`.
 
 ## How it's built
 
-- **Language and threading:** TypeScript, with the core moving to Rust compiled to WebAssembly in bit-identical steps ([ADR 0024](docs/decisions/0024-3d-slab-port.md); `rust/`). So far the sky sweep is ported. The simulation runs in a Web Worker, so the page never stutters.
+- **Language and threading:** the simulation core is Rust (`rust/`), compiled to WebAssembly for the page and natively for batch runs. It was ported from TypeScript phase by phase, bit-identical at every step ([ADR 0024](docs/decisions/0024-3d-slab-port.md)). The page is TypeScript. The simulation runs in a Web Worker, so the page never stutters.
 - **Data layout:** each tree is a set of flat typed arrays (structure-of-arrays) kept in parent-before-child order. Every pass over the tree is a plain loop.
 - **Randomness:** each random number is a hash of what it is for (ADR 0002), so switching one principle off for an ablation leaves every other draw unchanged.
 - **Rendering:** Canvas 2D for the prototype; WebGL2 is planned (ADR 0001).

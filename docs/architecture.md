@@ -12,12 +12,19 @@ How the code realises the spec. For *why* a choice was made, see `docs/decisions
             │                       │ Comlink (calls, transferred buffers)
             └───────────────────────┼─────────────────────────────┘
                                     ▼
-            sim.worker.ts ── World (src/core) ── SnapshotBuilder
-                                   ▲
-            cli/run.ts ────────────┘  (same core under Node → CSV for Python/R)
+            sim.worker.ts ── RustWorld (src/wasm) ══ World (rust/core, WASM)
+                                                                   ║
+            cli/run.ts ── treesim (rust/cli, native) ══════════════╝
+                          (same core, natively → CSV for Python/R)
 ```
 
-`src/core` is pure TypeScript. It compiles against `lib: es2023` only, so a DOM or Node API used there is a type error. The worker, the page, the CLI and the tests are thin hosts around it.
+The simulation is the Rust core, `rust/core` (`tree-core`; I1, ADR 0024). The page's worker runs it as WASM through `src/wasm/world.ts`; the CLI runs it natively (`rust/cli`, the `treesim` binary). `src/core` keeps what is plain data, shared by every host and read by the Rust core as JSON (`rust/presets.json`, written by `cli/export-presets.ts` and held to them by `tests/presets-json.test.ts`): the params and their defaults (`params.ts`), presets, species and fixtures, and `types.ts` (the snapshot, metrics and run-record shapes the page reads). It compiles against `lib: es2023` only, so a DOM or Node API used there is a type error.
+
+**Two builds** (`npm run build:wasm`, and `cargo` features natively):
+- **production** (`src/wasm/pkg/`, the default): the `libm` crate's Math, simd128 on. The page, the CLI and the bench run it. Its goldens are `tests/golden-production.json`.
+- **parity** (`src/wasm/pkg-parity/`, feature `parity`): V8's Math, ported (fdlibm sin, cos, exp, log, atan, atan2, cbrt; glibc's pow; V8's hypot), bit for bit (`tests/wasm-math.test.ts`). It reproduces the TypeScript core's runs: `tests/golden.json`, the cross-core records in `tests/fixtures/ts-core.json`, and the shipped opening forests. The evidence tests (`tests/evidence/`) and `cli/first-paint.ts` run it; `npm run sim -- --parity` selects it.
+
+The TypeScript core it replaced is archived at the tag `golden-2d-ts`.
 
 ## The garden and the lab (M14, ADR 0014)
 
@@ -48,21 +55,21 @@ How the code realises the spec. For *why* a choice was made, see `docs/decisions
 - `theme.ts` converts any CSS colour a host gives (oklch(), names) to hex by painting one pixel. A custom property's computed value is its raw text, and the WebGL parser only reads hex and rgb().
 
 **First paint (M21):**
-- **Checkpoints** (`core/checkpoint.ts`): `saveWorld` writes a whole World as bytes. The layout is a u32 header length, a JSON header (ASCII, with anything else escaped as \uXXXX, since the core has no text codec), then every tree's metamer and bud columns, padded to 8 bytes. It holds the params, season, flags, event log and queue, and each tree's scalars and tables. `loadWorld` restores it: k more seasons hash exactly as N + k from scratch (`checkpoint.test.ts`). Light, owners and per-season scratch are rebuilt by the season that reads them.
-- **Grown forests:** `cli/first-paint.ts`, run by `npm run build:garden`, grows `forestParams` into `dist-garden/first/` with a `manifest.json`: widths 66, 100, 160 and 220, seeds 6, 9 and 10 (chosen by eye), 40 seasons each, 57–192 kB each and 1.4 MB in all.
+- **Checkpoints** (`rust/core/src/checkpoint.rs`; the TypeScript core's byte for byte): `save` writes a whole World as bytes. The layout is a u32 header length, a JSON header (ASCII, with anything else escaped as \uXXXX, since the core has no text codec), then every tree's metamer and bud columns, padded to 8 bytes. It holds the params, season, flags, event log and queue, and each tree's scalars and tables. `load` restores it: k more seasons hash exactly as N + k from scratch (`tests/evidence/checkpoint.test.ts`). Bytes written by the TypeScript core load in the Rust one (`tests/rust-world.test.ts`, with garden 0.14.0's shipped forest). Light, owners and per-season scratch are rebuilt by the season that reads them.
+- **Grown forests:** `cli/first-paint.ts`, run by `npm run build:garden`, grows (in the parity build, so the bytes are the ones chosen by eye) `forestParams` into `dist-garden/first/` with a `manifest.json`: widths 66, 100, 160 and 220, seeds 6, 9 and 10 (chosen by eye), 40 seasons each, 57–192 kB each and 1.4 MB in all.
 - **Plate width:** `plateWidth` sizes the ring to a share of the host's aspect: 0.65 on a portrait host, 0.7 on a landscape one (M24). The plate fits the ring's width, so the share sets how large trees are drawn. A phone shows about three trees; the site's wide plate (1200 px) shows about ten at about 7 px a cell.
 - **Leaf studies:** `leafStudy(tree)` returns the tree's species' leaf as an SVG path (`leafStudyPath`), with its real length, for the field card.
 - **Opening on one:** `mountGarden({ first: { base, widths, seeds, when } })` picks the width nearest its own and a seed by the day, opens on that forest at the ambient pace, and falls back to growing from seed. With `when: "reduced-motion"` (the site, M23) it does so only for reduced motion.
 - **The time-lapse:** `seeds` makes the default forest grow from one of those seeds a day, so it ends in a chosen wood. `?forest=seed` (option `seed`) still grows from seed. The checkpoint was grown from `forestParams(width, seed)`, so that link regrows the same forest only where the browser's `Math` matches Node's (not Chrome's: ADR 0002), at the same ring width.
 - **CLI:** `npm run sim -- --checkpoint-at N` saves the CLI's world (dead trees included) as `checkpoint-N.bin.gz`.
 
-**Long runs:** the worker calls `World.discardDead()` after each season. It frees dead trees' tables (a forest piles up ≈ 20 MB per 1000 seasons otherwise) without changing any live tree (`world.test.ts`). Page worlds therefore do not hash like CLI worlds.
+**Long runs:** the worker steps with `discard` on, which calls `World::discard_dead` after each season. It frees dead trees' tables (a forest piles up ≈ 20 MB per 1000 seasons otherwise) without changing any live tree (`tests/evidence/world.test.ts`). Page worlds therefore do not hash like CLI worlds.
 
 ## Data model (spec §5)
 
-Each `Tree` owns two structure-of-arrays tables (`soa.ts` `Table`), one typed array per column.
+Each `Tree` owns two structure-of-arrays tables (`rust/core/src/tree.rs`, the `table!` macro), one `Vec` per column, stored with the TypeScript typed arrays' conversions (`store_i32` and the like) so the bits match. `src/core/types.ts` names the columns for the page (`METAMER_SCHEMA`, `BUD_SCHEMA`), and `TreeView` reads them out of WASM memory.
 
-**Metamers** (`METAMER_SCHEMA` in `tree.ts`)
+**Metamers** (`METAMER_SCHEMA`)
 
 | Column | Meaning |
 |---|---|
@@ -98,13 +105,15 @@ The passes need only `parent` and `slot`:
 
 `qSlot` and `vSlot` are per-tree scratch arrays, resized on demand and never compacted.
 
-**Ordering invariants.** Rows are appended, so parents always come before children. `Table.compact(keep)` removes rows, keeps the order of the rest, and returns old → new indices; every stored index (`parent`, `bud.metamer`) must be remapped through it. Because tables are append-only and compaction keeps order, `birthId` ascends in array order, which lets snapshots match rows across seasons with a two-pointer merge.
+**Ordering invariants.** Rows are appended, so parents always come before children. `compact(keep)` removes rows, keeps the order of the rest, and returns old → new indices; every stored index (`parent`, `bud.metamer`) must be remapped through it. Because tables are append-only and compaction keeps order, `birthId` ascends in array order, which lets snapshots match rows across seasons with a two-pointer merge.
 
-**Late columns.** `hash.ts` skips `stressWood`, `moment` and `paShift` while every row is zero, so runs with R3 and R4 off hash exactly as before those columns existed.
+**Late columns.** `hash.rs` skips `stressWood`, `moment` and `paShift` while every row is zero, so runs with R3 and R4 off hash exactly as before those columns existed.
 
-**Reallocation.** `Table.add()` may reallocate every column. Read `t.cols.x[i]` through the `cols` object after an add; never hold on to an old array.
+**Reallocation.** In Rust the borrow checker keeps a column from being held across an add. On the page, a `TreeView` reads its columns again whenever the world's `version` changes.
 
-## Season loop (spec §6 → `season.ts`)
+## Season loop (spec §6 → `rust/core/src/season.rs`)
+
+One function per phase (`phase_light` … `phase_deaths`, in `PHASES` order); `World::step` calls them with a hook after each, which the bench times. The table names each rule's function as the TypeScript core named it; the Rust function is its snake_case (`growBuds` → `grow_buds`), in `rust/core/src/principles/`.
 
 | §6 step | Code | Milestone |
 |---|---|---|
@@ -130,7 +139,7 @@ The passes need only `parent` and `slot`:
 
 Before this rule, shoots that left the grid saw unshaded sky and grew exponentially (found at M1). Make the world large enough for the trees it holds.
 
-## Light models (`src/core/light/`)
+## Light models (`rust/core/src/light/`)
 
 All of them sit behind `LightModel.sample(x, y, dir) → {q, vx, vy}` (§C2.8):
 - `SkySweep` (M6, default `c2.model: "sky"`, ADR 0005): each bud adds one unit of leaf area to its cell; `compute()` (end of Phase 1) sweeps K sky directions from the sky side, accumulating optical depth T_k into every cell with linear interpolation between the two upstream cells, then stores Q = Σ w_k e^(−k_ext T_k) and the light-weighted direction per cell. A bud gets its cell's values (its own cell's foliage does not shade it); rays from beyond the world's sides are open sky; outside the box Q = 0. The shade overlay shows 1 − Q/Q_open. `compute(season)` takes the season so that `c2.rotate` (M6e, off by default) can move the K directions each season: they then sit at (k + f)/K of the sky's span with f = frac(0.5 + season·(φ − 1)), one per equal stratum, and the weights are renormalised to Σw = C.
@@ -138,20 +147,15 @@ All of them sit behind `LightModel.sample(x, y, dir) → {q, vx, vy}` (§C2.8):
 - `ShadowTriangle` (M1): deposits a·b^(−q) per bud, Q = max(C − s + a, 0), and V points at the least-shaded cell in a wedge of half-angle θ and radius r.
 - The sky sweep: M6.
 
-`World.makeLight(params)` picks one. It is rebuilt whenever params change.
+`make_light(params)` picks one (the `Light` enum). It is rebuilt whenever params change.
 
 **Periodic sides (M11, ADR 0013).** With `world.sides: "periodic"` the sky sweep wraps x for deposits, samples and rays. Shallow rays are swept up to ⌈3H/(rise·W)⌉ + 1 times around the ring from open sky, so the field is translation invariant. Since M13 the sweep stops at the first lap that changes nothing (a lap is a fixed map of the field, so the result is bit-identical), and every sweep stops at the highest leafy row. On `forest` light now costs 2.7 ms a season, against 10.2 before ([M13 note](experiments/2026-10-27-m13-perf.md)). Growth wraps too, and the page draws crowns where they grew.
 
-### The Rust core's sky sweep (ADR 0024, G2)
-`rust/core/src/light/sky_sweep.rs` is the same sweep, operation for operation, built to WASM by `npm run build:wasm` and loaded by `src/wasm/`.
-- **How it is switched in:** `useRustSkySweep()` registers it with the core's `setSkySweepFactory`, so worlds made afterwards sweep in Rust. The core never loads WASM; the CLI and bench do so with `--rust`. The page does not yet: it switches whole, at I1.
-- **The boundary:**
-  - deposits and samples are one call each, with the sample's Q, V written into a three-double buffer that the wrapper views;
-  - the fields (`lad`, `q`, `vx`, `vy`, the overlay's shade) are views onto WASM memory, rebuilt whenever the memory has grown;
-  - `LightModel.dispose()` frees a sweep when `World` replaces its light.
-- **The math:** the Rust core's `Math` is V8's, ported: fdlibm sin, cos and exp; glibc's pow, which V8's `Math.pow` calls; V8's hypot.
-- **How it is held:** the goldens, a field-by-field parity test and a math test hold it to the TypeScript sweep bit for bit ([G2 note](experiments/2026-10-29-g2-rust-sweep.md)).
-- **Two builds** (`npm run build:wasm`): `src/wasm/pkg-parity/` with the `parity` feature (V8's Math), which `src/wasm/` and the tests load, and `src/wasm/pkg/`, the production build (the `libm` crate, simd128 on).
+### The Rust core (ADR 0024, G2 and I1)
+G2 moved the sky sweep (`rust/core/src/light/sky_sweep.rs`) into Rust behind the TypeScript core's `LightModel` ([G2 note](experiments/2026-10-29-g2-rust-sweep.md)). I1 moved the rest, phase by phase, each held to the TypeScript core side by side before the next ([I1 note](experiments/2026-10-29-i1-rust-core.md)).
+- **The boundary** (`rust/wasm/src/world.rs`, `src/wasm/world.ts`): params go in as JSON, read with JavaScript's semantics (`rust/core/src/json.rs`: key order kept, numbers printed as `Number.prototype.toString`). Events, checkpoints and records cross as JSON or bytes. A tree's columns are read on demand (`tree_column`), never per frame.
+- **The snapshot** is built in Rust into one buffer (`rust/core/src/snapshot.rs`) and copied out of linear memory once; every array the page gets is a view on that copy, and the copy is the transferable.
+- **The math** (`rust/core/src/math/`): never a platform `Math`. Production: the `libm` crate. Parity: V8's, ported, behind the `parity` feature.
 
 ### The 3D slab sweep (ADR 0024, G3)
 `rust/core/src/light/slab_sweep.rs`: the 3D light, in the production build only, not yet behind `LightModel`.
@@ -164,7 +168,7 @@ All of them sit behind `LightModel.sample(x, y, dir) → {q, vx, vy}` (§C2.8):
 
 ## Randomness (ADR 0002)
 
-`rng.ts`: `hashKey(seed, purpose, tree, entity, season, k)` mixes 32-bit integers with `Math.imul`, so it is bit-exact in every engine. `normal` uses `Math.log` and `Math.cos`, which are exact only on V8 (Node and Chrome).
+`rust/core/src/rng.rs`: `hash_key(seed, purpose, tree, entity, season, k)` mixes 32-bit integers (as `Math.imul` did), so it is bit-exact everywhere. `normal` uses the core's log and cos, so its draws are the same in every engine and natively; in the parity build they are V8's, as the TypeScript core's were.
 
 | Draw | Key (tree, entity, season) |
 |---|---|
@@ -182,7 +186,7 @@ Tapping a tree on the page fells it. `Scene.pickTree` finds the nearest drawn se
 
 ## Events and replay
 
-`World.setParams` and `World.removeTree` queue events that apply at the next season boundary. Applied events are logged, and `World.record()` returns `{params, events, seasons}`. The page's **Export run** downloads this record; `npm run sim -- --replay file.json` reproduces the run exactly on V8. Changing `trees` mid-run is ignored; a new tree layout needs a new run.
+`setParams`, `removeTree` and `plantTree` queue events that apply at the next season boundary. Applied events are logged, and `World.record()` returns `{params, events, seasons}`. The page's **Export run** downloads this record; `npm run sim -- --replay file.json` reproduces the run exactly (the page and the CLI both run the production build; a record made before I1 replays with `--parity`). Changing `trees` mid-run is ignored; a new tree layout needs a new run.
 
 ## Worker protocol (`src/worker/api.ts`)
 
@@ -196,13 +200,13 @@ Tapping a tree on the page fells it. `Scene.pickTree` finds the nearest drawn se
 | `setSnapshotOptions({junctions, field})` | Which optional parts later snapshots carry: the Δ histogram's junction exponents and the shade field. Both default to on (the lab); the home page turns both off (M13) |
 | `record()` | Returns the run record |
 
-**Snapshot** (`snapshot.ts`). Flat arrays over all live trees, concatenated in tree-id order:
+**Snapshot** (`rust/core/src/snapshot.rs`; the shape is `Snapshot` in `src/core/types.ts`). Flat arrays over all live trees, concatenated in tree-id order:
 
 - **Metamers:** `parent` (row in the snapshot), `x0`, `y0`, `angle`, `length`, `radius`, `tree`, `birthId`, `order`, `light` (Q_sum/n_b), `resource` (vIn), `age`, `stress` (σ/σ_target, R3), `prevIndex`.
 - **Buds:** `budMetamer`, `budState`, `budQ`.
 - **Other:** `shadow` (W×H, or null), `junctions`, `metrics` (with each tree's `species`), `species` (the species table's labels: common and Latin names and leaf style, ADR 0016), `seasonMs`, `snapshotMs` (the worker's time to build the snapshot; the HUD's worker time is the sum).
 
-Every typed array is transferred, not copied.
+The arrays share one buffer, copied once out of WASM memory and transferred, not copied again.
 
 **Natural view (default).** Branches are coloured bark-young → bark-old by √(age/max age). Leaves are drawn as lens shapes at the tip of every metamer up to `leafAge` seasons old (default 5), alternating sides by birthId parity, coloured shade → sun by the metamer's light, with a small stable per-leaf variation. They are a view of the foliage only: in the model, buds cast the shade (§C2). Leaves unfold with their metamer, shrink away in the season they age out, and never draw shorter than 5 px so zoomed-out crowns still read as foliage. Sky and ground are screen-space gradients.
 
@@ -238,14 +242,14 @@ The lab's Stats shows the level. `?bench` turns it off, and also measures the pa
 
 Measured in headless Firefox (desktop GPU; phones are slower): a 10-tree stand of about 4k metamers draws in 2.3 ms of CPU per frame during growth playback with WebGL2 against 19 ms with Canvas 2D; 28k metamers in 5.8 ms; panning a paused 55k-metamer scene costs 0.35 ms.
 
-## CLI output (`cli/run.ts`)
+## CLI output (`cli/run.ts` → `rust/cli`)
 
-`runs/<id>/` contains:
+`cli/run.ts` builds the native binary when its sources are newer and runs it with the same arguments, so `analysis/treesim/sweep.py` runs unchanged. `--parity` selects the parity build. Its files are byte for byte the TypeScript CLI's in the parity build. `runs/<id>/` contains:
 
 | File | Contents |
 |---|---|
 | `run.json` | `meta` (preset, seasons, git commit, hash, ms), `params`, `events`, `seasons` |
-| `metrics.csv` | One row per tree per season after the season ran. Columns: `season` + `METRIC_COLUMNS` (`metrics.ts`) |
+| `metrics.csv` | One row per tree per season after the season ran. Columns: `season` + `METRIC_COLUMNS` (`types.ts`; `rust/core/src/metrics.rs`) |
 | `metamers.csv` | Every metamer at each `--snapshots` season and at the final season. Columns: `season,tree,birthId,parentBirthId,order,axis,x0,y0,x1,y1,length,angle,radius,qSum,nSum,vIn,birthSeason,stressWood` |
 | `hash.txt` | State hash (same function as the golden tests) |
 | `light.csv` | With `--light` only: the light model's per-cell shade (1 − Q/C for the sky sweep) at the same seasons as `metamers.csv`, i.e. the start-of-season field those seasons' buds saw. Columns: `season,col,row,shade`, row 0 at the ground |

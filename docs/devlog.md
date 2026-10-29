@@ -2,6 +2,27 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-29: I1 passed: the whole 2D core in Rust; the TypeScript core deleted
+
+- **User:** accepted G3, whole-cell shifts and K 16 with rotation (calibration runs with rotation on), and asked for two G3 checks and the SIMD path dropped unless the phone disagreed. Then I1: the whole 2D core in Rust, phase by phase, bit-identical to every golden; the TypeScript core deleted.
+- **Two things differed from the brief.** PR #20 was still open, not merged, so this work went onto it. The g3.html timings never arrived, so the hand-written SIMD path was dropped on the VM's numbers alone; it is in 77d4105 if the phone disagrees.
+- **G3 follow-ups** (5465008): mirror symmetry of the 3D field to rounding, and the lab's light heatmap at one season under shifts and under bilinear transport ([G3 note](experiments/2026-10-29-g3-slab-light.md) §4).
+- **I1** ([note](experiments/2026-10-29-i1-rust-core.md)):
+  - **How it landed:** the whole core was written in Rust first (4569037), then switched in one phase at a time, in the season loop's order. Each phase ran in Rust with the rest still TypeScript, the trees synced across around it, and passed every golden and a side-by-side comparison of every column before the next.
+  - **Math:** of the nine candidates only log, atan2 (with atan) and cbrt differed from V8 and were ported into parity mode; asin and acos match in the libm crate; log1p, tanh and expm1 are not called.
+  - **The world** (`rust/wasm/src/world.rs`, `src/wasm/world.ts` `RustWorld`): params as JSON with JavaScript's semantics, events, records and checkpoints byte for byte the TypeScript core's; the snapshot built in Rust and copied out once (lab view, forest: 2.44 → 1.11 ms in Chromium).
+  - **The page** runs the production build; the worker switched only after both builds passed their goldens.
+  - **The CLI** is a native binary (`rust/cli`, `treesim`); `cli/run.ts` builds and runs it, so `analysis/treesim/sweep.py` runs unchanged. In the parity build its files are byte for byte the TypeScript CLI's.
+  - **Tests:** every hand-built unit test is now a Rust test in the principle's file (110 Rust tests in all). The milestone tests moved to `tests/evidence/` and run on the parity build, since their thresholds were set on the TypeScript core's runs. Before the deletion, the TypeScript core's snapshots, checkpoint bytes and regrowth hashes were recorded in `tests/fixtures/ts-core.json` (`code/2026-10-29-i1/ts-records.ts`), and the Rust world is held to them.
+  - **Deleted** (a1bc8cf): the TypeScript core, its CLI, the G2 sky-sweep wrapper, the phase bridge, and the bench's `--slab`. All are at the tag `golden-2d-ts` (made locally; tag pushes are refused from cloud sessions, so the user pushes it).
+- **Goldens:** `tests/golden.json` is unchanged; it is the parity build's now. New: `tests/golden-production.json` (25 of 27 differ from parity; only the light-off `explosion` cases agree). In headless Chromium the parity build reproduces 27 of 27, against the TypeScript core's 7.
+- **Surprises:**
+  - **The speed-up is modest in the browser:** production 0.74–0.77 of the TypeScript core's time a season in Chromium, and parity 1.07–1.18 (slower). Natively the step takes 0.44–0.72 of it.
+  - **Hybrid runs broke where TypeScript wrote into scratch that Rust had sized:** mechanics writes `scratchU`, which girth's `ensureScratch` sizes. The bridge now sizes TypeScript's scratch before copying in (9f99ff9).
+  - **Biome reformatted `rust/presets.json`,** which broke its up-to-date test; it is excluded.
+  - **Opening forests:** `cli/first-paint.ts` grows in the parity build, so the shipped bytes stay the ones chosen by eye (all twelve: same bytes); the page grows them on in production.
+- **Sizes:** production WASM 141.4 kB gzip (gate 170), parity 144.3 kB, garden JS 49.1 kB.
+
 ## 2026-10-29: 3D port, G3 passed: the 3D slab sweep in Rust; parity becomes a mode; PR #20 for CI
 
 - **User:** accepted G2 and asked for three adjustments, then G3.

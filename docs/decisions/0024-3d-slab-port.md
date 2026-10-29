@@ -61,26 +61,26 @@
 **The whole core moves to Rust:**
 - **Builds:** WASM (SIMD; threads for the garden on edbarker.dev, where cross-origin isolation is served; the lab single-threaded) and natively for the CLI.
 - **The crates:** `rust/core` is dependency-free, with nothing wasm-only and threads behind a feature; `rust/wasm` is the thin wasm-bindgen wrapper.
-- **One implementation:** the TypeScript core stays only until the Rust 2D core reproduces every golden bit for bit (I1), then is deleted.
+- **One implementation:** the TypeScript core stays only until the Rust 2D core reproduces every golden bit for bit (I1), then is deleted. Done: it is archived at the tag `golden-2d-ts`.
 - **The freeze:**
   - during G2–G3 only the sky sweep (`src/core/light/sky-sweep.ts`) is frozen. A change to it lands in both cores and passes the parity test;
-  - the full 2D freeze covers I1 (3–5 sessions).
+  - the full 2D freeze covers I1 (3–5 sessions). It ended with the TypeScript core's deletion; `src/core`'s params and presets are open again, in step with `rust/core`.
 - **Math, in two modes:** the Rust core never calls a platform `Math`.
-  - **With the `parity` feature** (the 2D golden and side-by-side tests only) it carries V8's routines bit for bit, so its results are the TypeScript goldens' on every engine.
+  - **With the `parity` feature** it carries V8's routines bit for bit, so its results are the TypeScript goldens' on every engine. Since I1 it runs the goldens, the cross-core records, the evidence tests (whose thresholds were calibrated on the TypeScript core's runs) and the opening forests (`cli/first-paint.ts`, so the shipped bytes stay the ones chosen by eye).
   - **Without it** (production) it uses the `libm` crate, identical natively and in WASM, and for the 3D light a Float32 polynomial exp and SIMD.
   - The production build gets its own goldens at I1 stage 2.
 
-**The bundle:** ADR 0014's 60 kB stays the first-paint JS budget. The WASM loads after first paint, and gets its own gate (its measured size plus 25%) at I1. 3D first-paint data gets its own budget at I3.
+**The bundle:** ADR 0014's 60 kB stays the first-paint JS budget. The WASM loads after first paint, and gets its own gate (its measured size plus 25%) at I1: 170 kB gzip (`cli/garden-size.ts`; 141.4 kB at the deletion). 3D first-paint data gets its own budget at I3.
 
 **The sequence:**
 - **G1:** passed.
 - **The prototype and τ runs:** done.
 - **G2:** passed. The page keeps the TypeScript sweep until I1 switches the whole core, since a Rust sweep alone would give browser visitors Node's light and Chrome's everything else.
 - **G3:** passed, with whole-cell-shift transport (above), confirmed. The user's phone and laptop numbers from `…/preview/3d/g3.html` replace G1's.
-- **I1:**
-  - **stage 1:** the Rust 2D core in parity mode, every golden bit-identical, the rest of `Math` vendored (atan2, log, log1p, cbrt, tanh, asin, acos, atan, expm1);
-  - the TS core deleted;
-  - **stage 2:** the production build's own goldens, and the page switched to it whole.
+- **I1:** passed ([note](../experiments/2026-10-29-i1-rust-core.md)).
+  - **stage 1:** the Rust 2D core in parity mode, every golden bit-identical, landed phase by phase in the season loop's order, each held side by side to the TypeScript core with the rest still TypeScript. Of the candidate routines only log, atan2 (with atan) and cbrt differed from V8 and were ported; asin and acos are the libm crate's in both modes; log1p, tanh and expm1 are not called;
+  - the TS core deleted, its snapshots and checkpoints recorded first (`tests/fixtures/ts-core.json`);
+  - **stage 2:** the production build's own goldens (`tests/golden-production.json`: 25 of 27 differ from parity), and the page and the CLI switched to it whole.
 - **I2:** a stand grown in 3D with every principle at D = 64 and the interior's τ, with and without the fade. Fall back to D = 48 for the interior only if a season exceeds 250 ms on the phone with lanes.
 - **V, the visual check:** I2's stand drawn orthographically with the existing renderer, beside today's view, on the user's phone. The user decides by eye; if it is not worth it, 3D stops and I1 stands as the end state.
 - **I3:** the 3D renderer, including the drawing half of foliage density.
@@ -88,15 +88,15 @@
 
 ## Consequences
 - **Easier:**
-  - **Exact reproducibility on every engine** once I1 lands. Today's TypeScript core is exact only on one engine build: Chromium reproduces 7 of the 27 goldens.
+  - **Exact reproducibility on every engine** since I1. The TypeScript core was exact only on one engine build: Chromium reproduced 7 of the 27 goldens; the Rust core's builds reproduce all 27 of theirs there.
   - Faster native sweeps for experiments.
   - §10's 3D allometries (self-thinning −3/2, crowding) become directly comparable.
   - Rust's types can guard the ordering invariants.
   - τ gives the garden three looks from one model.
-- **Worth having even if 3D stops at V:** I1, a Rust 2D core, deterministic across browsers and native, with PyO3 a feature flag away. In parity mode it is 1.35× slower in the browser (G2). In production mode it is faster (the 2D sweep 1.2×), with its own goldens. It does not make the 2D garden visibly better.
+- **Worth having even if 3D stops at V:** I1, a Rust 2D core, deterministic across browsers and native, with PyO3 a feature flag away. In the browser (VM, headless Chromium) the production build takes 0.74–0.77 of the TypeScript core's time a season and the parity build 1.07–1.18 of it; natively a season's step takes 0.44–0.72 of the TypeScript core's in Node ([I1 note](../experiments/2026-10-29-i1-rust-core.md)). It does not make the 2D garden visibly better.
 - **Harder:**
   - A second toolchain in CI and in `npm run check` (Rust 1.97, the wasm32 target, wasm-bindgen-cli pinned to the crate's version).
-  - **The goldens' bits are tied to Node on x86-64 Linux with glibc's FMA pow,** which the Rust core reproduces and pins. A CI runner with another glibc would break the TypeScript goldens first.
+  - **The parity goldens' bits are tied to Node on x86-64 Linux with glibc's FMA pow,** which the Rust core reproduces and pins. Only `tests/wasm-math.test.ts` still reads the engine's Math, so another platform would fail that test, not the goldens.
   - The WASM after first paint, and a first frame the JS renderer draws without the core.
   - COOP/COEP on the site.
   - Checkpoints MB-sized, unless the intro grows the forest.
@@ -105,6 +105,7 @@
   - About 145 MB of memory on the phone at D = 64 with four lanes.
   - Every golden, evidence test and species calibration redone, at the default τ with the presets checked.
   - **Foliage density is a target in two milestones,** C1 (what the model carries) and I3 (how it draws), each measured by picture coverage.
-  - A 2D freeze of 3–5 sessions (I1).
+  - A 2D freeze of 3–5 sessions (I1). Done.
+  - **Two sets of goldens,** parity and production. A behaviour change moves both.
   - About 14 milestones in all.
 - **Revisit** if G3 or I2 fails, if V does not show a clear gain, or if the user wants trees seen from an angle (a full volume, out of this decision's scope).

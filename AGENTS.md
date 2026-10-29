@@ -4,7 +4,7 @@ Instructions for any coding agent (Claude Code reads this through `CLAUDE.md`).
 
 ## What this is
 
-An interactive 2D tree-growth simulator for a personal website. The trees self-organise in the style of Palubicki et al. (2009): buds compete for light in a shared grid, resources are allocated by the Borchert–Honda rule, shaded branches are shed, and girth follows the pipe model. The goal is beautiful behaviour that emerges from simple local principles. It is served as static files, and the same simulation core runs headless for batch experiments analysed in Python or R.
+An interactive 2D tree-growth simulator for a personal website. The trees self-organise in the style of Palubicki et al. (2009): buds compete for light in a shared grid, resources are allocated by the Borchert–Honda rule, shaded branches are shed, and girth follows the pipe model. The goal is beautiful behaviour that emerges from simple local principles. It is served as static files. The simulation core is Rust (ADR 0024): WASM on the page, and a native binary for batch experiments analysed in Python or R.
 
 ## Where the truth lives
 
@@ -32,9 +32,10 @@ npm run test               # tests only
 npm run format             # Biome auto-fix
 npm run build              # static site in dist/ (the lab, and garden.html)
 npm run build:garden       # garden.js + worker in dist-garden/ for a host page, size-gated (ADR 0014)
-npm run bench              # per-phase timings and final hashes; --compare runs/bench/<sha>.json
-npm run sim -- --preset explosion --seasons 12 --out runs/x   # headless run → CSV (--rust: the sky sweep in Rust)
-npm run golden:update      # regenerate golden hashes (intended behaviour changes only)
+npm run bench              # per phase (native), per season and snapshot (WASM), hashes; --compare runs/bench/<sha>.json
+npm run sim -- --preset explosion --seasons 12 --out runs/x   # native headless run → CSV (--parity: V8's Math)
+npm run golden:update      # regenerate golden hashes, both builds (intended behaviour changes only)
+node cli/export-presets.ts # regenerate rust/presets.json after changing params, presets or species
 uv run --project analysis python analysis/experiments/m0_growth.py runs/x
 ```
 
@@ -43,51 +44,54 @@ The toolchain is Node 24 (it runs `.ts` files directly), npm, uv, and for the Ru
 ## Layout
 
 ```
-src/core/            simulation: pure TypeScript, no DOM, no Node (its tsconfig enforces this)
+src/core/            the core's data, in TypeScript: no DOM, no Node (its tsconfig enforces this)
   params.ts          Params type and defaults (names follow spec symbols)
-  presets.ts         named param patches, shared by the page and the CLI
-  rng.ts             keyed-hash randomness and the Purpose registry (ADR 0002)
-  soa.ts             structure-of-arrays tables
-  tree.ts            metamer and bud tables, slots, bud states
-  world.ts           World: trees, light model, events, replay
-  season.ts          the §6 season loop, phase by phase
-  light/             LightModel boundary (§C2.8) and its implementations
-  principles/        one file per principle: c1-buds.ts, c3-allocation.ts, …
-  metrics.ts snapshot.ts hash.ts
-src/worker/          Web Worker (Comlink) running the core; api.ts is the shared interface
+  presets.ts         named param patches, shared by the page and the CLI (→ rust/presets.json)
+  flora.ts flora-fitted.ts fixtures.ts   species, the fitted ones, retired presets as fixtures
+  types.ts           what the page reads: slots, bud states, column schemas, Snapshot, TreeMetrics, RunRecord
+src/worker/          Web Worker (Comlink) running the Rust core; api.ts is the shared interface
 src/web/             page: garden.ts (mountGarden, the living view any page embeds), main.ts (the lab),
                      render/ (WebGL2, Canvas 2D, scene, input, scene.css tokens), ui/ (Tweakpane, charts, CSS)
-src/wasm/            the Rust core's loader and LightModel wrappers (G2: the sky sweep); pkg/ (production)
-                     and pkg-parity/ (V8's Math) are generated
-rust/core/           tree-core: the core in Rust (light/: the 2D sky sweep, the 3D slab sweep; math/: the
-                     core's Math, V8's bit for bit behind the `parity` feature, the libm crate otherwise)
-rust/wasm/           tree-wasm: the thin wasm-bindgen wrapper
-cli/run.ts           headless runner → runs/<id>/{run.json,metrics.csv,metamers.csv,hash.txt}
-tests/               golden-hash tests; unit tests sit next to code as src/core/**/*.test.ts
+src/wasm/            world.ts: RustWorld, the Rust core for the worker, Node tools and tests; production.ts
+                     and parity.ts register the builds; pkg/ (production) and pkg-parity/ are generated
+rust/core/           tree-core, the simulation:
+  src/params.rs json.rs        typed Params read from the JSON params, with JavaScript's semantics
+  src/rng.rs                   keyed-hash randomness and the Purpose registry (ADR 0002)
+  src/tree.rs world.rs         SoA tables, slots, bud states; World: trees, light, events, replay
+  src/season.rs                the §6 season loop, one function per phase
+  src/light/                   light models (§C2.8): shadow triangle, the 2D sky sweep, the 3D slab sweep
+  src/principles/              one file per principle: c1.rs, c3.rs, …, each with its unit tests
+  src/checkpoint.rs snapshot.rs metrics.rs form.rs hash.rs
+  src/math/                    the core's Math: V8's bit for bit behind `parity`, the libm crate otherwise
+  tests/                       goldens of both builds, natively
+rust/wasm/           tree-wasm: the thin wasm-bindgen wrapper (World, SlabSweep; Math exports with `testing`)
+rust/cli/            treesim: the native headless runner → runs/<id>/{run.json,metrics.csv,metamers.csv,hash.txt}
+cli/run.ts           builds treesim when stale and runs it (analysis/treesim/sweep.py calls this)
+tests/               goldens in WASM, cross-core records, evidence/ (milestone tests on the parity build)
 analysis/            uv project: polars + plotnine; experiments/ holds one script per milestone
 ```
 
 ## Invariants (keep these true)
 
-- **The core is pure.** `src/core` imports no DOM or Node APIs; `npm run typecheck` fails if it does.
-- **Parent-before-child.** In every tree, `parent[i] < i`. New metamers and buds are only appended. Removal uses `Table.compact`, which keeps row order, and every stored index is remapped through the map it returns. As a result, `birthId` ascends in array order.
+- **The core is Rust** (`rust/core`, I1, ADR 0024). The page, the CLI and the tests all run it; there is no second implementation. `src/core` holds its params and presets as plain data and imports no DOM or Node APIs (`npm run typecheck` fails if it does). The TypeScript core is archived at the tag `golden-2d-ts`.
+- **Parent-before-child.** In every tree, `parent[i] < i`. New metamers and buds are only appended. Removal uses `compact`, which keeps row order, and every stored index is remapped through the map it returns. As a result, `birthId` ascends in array order.
 - **Topology is a parent plus a slot.** Each node has three slots: main = 0, left = 1, right = 2. A slot holds either a bud or a child metamer. There are no child pointers.
 - **Stable ids.** `birthId` (metamers and buds) keys RNG draws and tweening. Never key anything on an array index.
-- **Randomness** comes only from `rng.ts`: `hash(seed, purpose, tree, entity, season, k)`. Register new purposes in `Purpose` and never renumber them. There is no `Math.random` in `src/core` (the page may use it, e.g. for "Reseed").
+- **Randomness** comes only from `rng.rs`: `hash(seed, purpose, tree, entity, season, k)`. Register new purposes in `purpose` and never renumber them. The core has no other source of randomness (the page may use `Math.random`, e.g. for "Reseed").
 - **Season order follows spec §6.** All trees read one start-of-season light field. Loops over a table run only over the rows that existed when their phase began; this is the "staging".
 - **Principles sit behind params.** Each has an `enabled` flag, or a `mode` that names its §8 ablation. Param names follow spec symbols (`lambda`, `alpha`, `qMax`, …). Params are plain JSON.
 - **No SharedArrayBuffer.** Snapshots move to the page as transferable buffers. (GitHub Pages can't send the COOP/COEP headers that SharedArrayBuffer needs.)
-- **Two sky sweeps, one behaviour** (ADR 0024, G2–G3). `src/core/light/sky-sweep.ts` and `rust/core/src/light/sky_sweep.rs` are frozen together: a change lands in both and passes `tests/wasm-sky.test.ts` and `tests/golden-rust.test.ts`. The rest of `src/core` is open until I1.
-- **The Rust core never calls a platform `Math`.** It uses `rust/core/src/math`, in two modes. With the `parity` feature (the 2D golden and side-by-side tests only), the functions are ported from V8 (and glibc's pow, which V8 calls) and held to V8 bit for bit by `tests/wasm-math.test.ts`. Without it (production) they are the `libm` crate's, identical natively and in WASM. A function the core starts to use goes into `math/` in both modes, never taken from `std` (only the exact ones, `sqrt`, `floor`, `ceil` and `abs`, are).
-- **Goldens change only on purpose.** If `tests/golden.json` must change, run `npm run golden:update` and give the reason in `docs/devlog.md`.
-- **Column arrays may be reallocated** by `Table.add()`. Don't hoist `tree.m.cols.x` above a loop that adds rows.
+- **Two builds, two sets of goldens** (ADR 0024, I1). The parity build (V8's Math) reproduces the TypeScript core: `tests/golden.json`, `tests/fixtures/ts-core.json`, the shipped opening forests. The production build (the page's and the CLI's) has `tests/golden-production.json`. Both hold natively and in WASM.
+- **The Rust core never calls a platform `Math`.** It uses `rust/core/src/math`, in two modes. With the `parity` feature the functions are ported from V8 (and glibc's pow, which V8 calls) and held to V8 bit for bit by `tests/wasm-math.test.ts`. Without it (production) they are the `libm` crate's, identical natively and in WASM. A function the core starts to use goes into `math/` in both modes, never taken from `std` (only the exact ones, `sqrt`, `floor`, `ceil` and `abs`, are).
+- **Goldens change only on purpose.** If `tests/golden.json` or `tests/golden-production.json` must change, run `npm run golden:update` and give the reason in `docs/devlog.md`. A change to the parity goldens leaves the TypeScript core's behaviour: say so.
+- **Checkpoints keep their bytes.** `checkpoint.rs` writes and reads the layout the TypeScript core did; shipped forests are those bytes. Change the layout only with a version and a reader for the old one.
 
 ## Conventions
 
 - Each principle file starts with a header naming the principle, its spec section, its rule in one paragraph, and the params it reads.
-- Comments explain _why_, citing spec sections or papers. Code reads like the existing files: plain loops over typed arrays, with no classes beyond `Table`, `Tree` and `World`.
-- Formatting comes from Biome: 2 spaces, double quotes, width 100. TypeScript is strict with `erasableSyntaxOnly`: no enums, namespaces or constructor parameter properties. Use `as const` objects instead.
-- Tests: one unit test per local rule, plus each milestone's "visible test" from §7 as an automated check where possible.
+- Comments explain _why_, citing spec sections or papers. Code reads like the existing files: in Rust, plain loops over column `Vec`s, free functions per rule, and no structs beyond the tables, `Tree`, `World` and the params.
+- Formatting: `cargo fmt` and clippy with `-D warnings` for Rust; Biome for TypeScript (2 spaces, double quotes, width 100). TypeScript is strict with `erasableSyntaxOnly`: no enums, namespaces or constructor parameter properties. Use `as const` objects instead.
+- Tests: one unit test per local rule (a `#[cfg(test)]` module in the principle's file; `crate::testing::preset` gives a preset's params), plus each milestone's "visible test" from §7 as an automated check where possible (`tests/evidence/`).
 - Scene colours are CSS tokens in `src/web/render/scene.css` (light and dark, in a layer a host page can override); the lab's own are in `src/web/ui/layout.css`. The canvas reads them via `src/web/render/theme.ts`. Don't hard-code colours in TypeScript.
 - Generated output (`runs/`, `dist/`, `analysis/out/`) is never committed. Small figures that support an experiment note go in `docs/experiments/figures/`.
 

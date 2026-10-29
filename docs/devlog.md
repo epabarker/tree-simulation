@@ -2,6 +2,36 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-29: 3D port, G2 passed: the sky sweep in Rust, bit for bit; ADR 0024 accepted
+
+- **User:** looked at the τ stands and decided:
+  - ADR 0024 accepted, with D = 64 and τ a world parameter per face;
+  - the wood interior (0.2, 0.2) is the default look, with the edge and the hedgerow as presets;
+  - foliage density is a calibration and renderer target, split between C1 and I3;
+  - only the sky sweep is frozen until I1.
+
+  They asked for G2, Float64 scalar and bit-identical, and for a check of whether V8's sin, cos, atan2, pow and hypot match ("port the fdlibm routine rather than re-hash").
+- **Built** (`rust/`, `src/wasm/`): `tree-core` (dependency-free; the sweep ported operation for operation; `math/`; `threads` native-only) and `tree-wasm` (the wasm-bindgen wrapper). The core gains `setSkySweepFactory` and `LightModel.dispose()`. The CLI and bench take `--rust`.
+- **Toolchain:** `rust-toolchain.toml` (1.97); `cli/build-wasm.ts`; `npm run check` now runs `build:wasm` and `rust:check` first. CI and release use `.github/actions/rust`, which this push has not yet exercised: the workflows run on PRs and `main` only.
+- **Surprise 1: V8's Math is four implementations, not one.** Node's sin, cos and exp are V8's fdlibm port. `Math.pow` calls the C library: glibc's FMA variant of Arm's pow, compiled with GCC's contractions. hypot is V8's own formula. Rust's libm matches none of sin, cos, pow or hypot.
+  - All four are ported and match on 4M random and adversarial samples (G2 note §2).
+  - pow first missed 7 in 1M: GCC does not fuse a product reused in another basic block.
+  - "Port the fdlibm routine" would have been wrong for pow.
+- **Bit-identical:**
+  - 27/27 goldens with the Rust sweep;
+  - field-by-field parity on 10 configurations, including rotation and the M6 column sweep, which no golden uses;
+  - a native fixture held to the TypeScript hashes with and without threads;
+  - a planted one-bit error caught everywhere.
+- **Surprise 2: the TypeScript core is not deterministic across engines.** In Chromium 153, 7 of 27 goldens hold: Chrome's V8 has glibc trig, and its exp differs. ADR 0002 is corrected. I1 is the fix; G2 cannot be, since the rest of the core still calls the browser's Math.
+- **Surprise 3: bit-identical Rust is slower in WASM.** Light is 1.35× TypeScript's on `forest` (3.05 against 2.27 ms a season), because the exp is WASM-compiled fdlibm (≈ 18 ns) against V8's native one; the march itself is 2× faster. So the page keeps the TS sweep until I1, and the review drops "I1 ≈ 2× faster".
+- **Size:** `core_bg.wasm` 50.0 kB, 23.8 kB gzip (names stripped), plus 2.3 kB of glue.
+- **Docs:**
+  - the review rewritten as one document, with G1, the prototype, τ and G2 folded in;
+  - ADR 0024 accepted, with the density split;
+  - an experiments README note on the site's `preview-3d` branch (108 MB; never merge; delete after V);
+  - AGENTS invariants for the two sweeps and the vendored Math.
+- **Goldens unchanged.**
+
 ## 2026-10-29: 3D port, the faces' transmission τ; ADR 0024 held open
 
 - **User:** the 3D stands read as hedges. They argued that this is structural: open faces light the lower crown, and nothing prunes lit foliage. They asked for a face transmission τ, the R6 set at D = 48 and 64 for τ ∈ {1, 0.5, 0.2, 0}, and a 42-cell planting, all on the proto page. ADR 0024 is held at accepted-in-principle with D and τ open.

@@ -8,7 +8,7 @@ The design is specified principle by principle in [`docs/spec.md`](docs/spec.md)
 
 ## Run it
 
-You need Node 24 and npm. The analysis also needs [uv](https://docs.astral.sh/uv/).
+You need Node 24 and npm. The analysis also needs [uv](https://docs.astral.sh/uv/). `npm run check` also builds the Rust core ([ADR 0024](docs/decisions/0024-3d-slab-port.md)). For that you need [rustup](https://rustup.rs/), which installs the version in `rust-toolchain.toml`, and wasm-bindgen-cli at the version `rust/Cargo.lock` pins (`npm run build:wasm` prints the install command).
 
 ```bash
 npm install
@@ -27,11 +27,11 @@ npm run sim -- --preset explosion --seed 3 --seasons 12 --out runs/demo
 uv run --project analysis python analysis/experiments/m0_growth.py
 ```
 
-Each run writes `run.json`, `metrics.csv`, `metamers.csv` and `hash.txt` (see [`docs/architecture.md`](docs/architecture.md)). The page's **Export run** button saves a JSON file that `npm run sim -- --replay <file>` reproduces exactly.
+Each run writes `run.json`, `metrics.csv`, `metamers.csv` and `hash.txt` (see [`docs/architecture.md`](docs/architecture.md)). The page's **Export run** button saves a JSON file that `npm run sim -- --replay <file>` replays. The replay is exact on the same JavaScript engine, but not between Node and a browser: their `Math` functions differ in the last bit ([G2 note](docs/experiments/2026-10-29-g2-rust-sweep.md)). The Rust core removes that once it carries the whole simulation.
 
 ## How it's built
 
-- **Language and threading:** TypeScript throughout. The simulation runs in a Web Worker, so the page never stutters.
+- **Language and threading:** TypeScript, with the core moving to Rust compiled to WebAssembly in bit-identical steps ([ADR 0024](docs/decisions/0024-3d-slab-port.md); `rust/`). So far the sky sweep is ported. The simulation runs in a Web Worker, so the page never stutters.
 - **Data layout:** each tree is a set of flat typed arrays (structure-of-arrays) kept in parent-before-child order. Every pass over the tree is a plain loop.
 - **Randomness:** each random number is a hash of what it is for (ADR 0002), so switching one principle off for an ablation leaves every other draw unchanged.
 - **Rendering:** Canvas 2D for the prototype; WebGL2 is planned (ADR 0001).

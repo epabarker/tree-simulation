@@ -142,6 +142,16 @@ All of them sit behind `LightModel.sample(x, y, dir) → {q, vx, vy}` (§C2.8):
 
 **Periodic sides (M11, ADR 0013).** With `world.sides: "periodic"` the sky sweep wraps x for deposits, samples and rays. Shallow rays are swept up to ⌈3H/(rise·W)⌉ + 1 times around the ring from open sky, so the field is translation invariant. Since M13 the sweep stops at the first lap that changes nothing (a lap is a fixed map of the field, so the result is bit-identical), and every sweep stops at the highest leafy row. On `forest` light now costs 2.7 ms a season, against 10.2 before ([M13 note](experiments/2026-10-27-m13-perf.md)). Growth wraps too, and the page draws crowns where they grew.
 
+### The Rust core's sky sweep (ADR 0024, G2)
+`rust/core/src/light/sky_sweep.rs` is the same sweep, operation for operation, built to WASM by `npm run build:wasm` and loaded by `src/wasm/`.
+- **How it is switched in:** `useRustSkySweep()` registers it with the core's `setSkySweepFactory`, so worlds made afterwards sweep in Rust. The core never loads WASM; the CLI and bench do so with `--rust`. The page does not yet: it switches whole, at I1.
+- **The boundary:**
+  - deposits and samples are one call each, with the sample's Q, V written into a three-double buffer that the wrapper views;
+  - the fields (`lad`, `q`, `vx`, `vy`, the overlay's shade) are views onto WASM memory, rebuilt whenever the memory has grown;
+  - `LightModel.dispose()` frees a sweep when `World` replaces its light.
+- **The math:** the Rust core's `Math` is V8's, ported: fdlibm sin, cos and exp; glibc's pow, which V8's `Math.pow` calls; V8's hypot.
+- **How it is held:** the goldens, a field-by-field parity test and a math test hold it to the TypeScript sweep bit for bit ([G2 note](experiments/2026-10-29-g2-rust-sweep.md)).
+
 ## Randomness (ADR 0002)
 
 `rng.ts`: `hashKey(seed, purpose, tree, entity, season, k)` mixes 32-bit integers with `Math.imul`, so it is bit-exact in every engine. `normal` uses `Math.log` and `Math.cos`, which are exact only on V8 (Node and Chrome).

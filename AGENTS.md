@@ -25,18 +25,20 @@ An interactive 2D tree-growth simulator for a personal website. The trees self-o
 
 ```
 npm run dev                # page with hot reload (add -- --host to test on a phone over the LAN)
-npm run check              # lint + typecheck + tests: run before saying anything is done
+npm run check              # builds the WASM, Rust fmt/clippy/tests, lint, typecheck, tests: run before saying anything is done
+npm run build:wasm         # the Rust core → src/wasm/pkg/ (generated; check and test build it too)
+npm run rust:check         # cargo fmt, clippy -D warnings and tests, with and without the threads feature
 npm run test               # tests only
 npm run format             # Biome auto-fix
 npm run build              # static site in dist/ (the lab, and garden.html)
 npm run build:garden       # garden.js + worker in dist-garden/ for a host page, size-gated (ADR 0014)
 npm run bench              # per-phase timings and final hashes; --compare runs/bench/<sha>.json
-npm run sim -- --preset explosion --seasons 12 --out runs/x   # headless run → CSV
+npm run sim -- --preset explosion --seasons 12 --out runs/x   # headless run → CSV (--rust: the sky sweep in Rust)
 npm run golden:update      # regenerate golden hashes (intended behaviour changes only)
 uv run --project analysis python analysis/experiments/m0_growth.py runs/x
 ```
 
-The toolchain is Node 24 (it runs `.ts` files directly), npm and uv; versions are in `.node-version` and `analysis/.python-version`.
+The toolchain is Node 24 (it runs `.ts` files directly), npm, uv, and for the Rust core (ADR 0024) Rust with the wasm32 target and wasm-bindgen-cli. Versions are in `.node-version`, `analysis/.python-version` and `rust-toolchain.toml` (rustup installs it on first use). wasm-bindgen-cli must match `rust/Cargo.lock`; `npm run build:wasm` says how to install it.
 
 ## Layout
 
@@ -55,6 +57,9 @@ src/core/            simulation: pure TypeScript, no DOM, no Node (its tsconfig 
 src/worker/          Web Worker (Comlink) running the core; api.ts is the shared interface
 src/web/             page: garden.ts (mountGarden, the living view any page embeds), main.ts (the lab),
                      render/ (WebGL2, Canvas 2D, scene, input, scene.css tokens), ui/ (Tweakpane, charts, CSS)
+src/wasm/            the Rust core's loader and LightModel wrappers (G2: the sky sweep); pkg/ is generated
+rust/core/           tree-core: the core in Rust, no dependencies (light/, math/: V8's Math, bit for bit)
+rust/wasm/           tree-wasm: the thin wasm-bindgen wrapper
 cli/run.ts           headless runner → runs/<id>/{run.json,metrics.csv,metamers.csv,hash.txt}
 tests/               golden-hash tests; unit tests sit next to code as src/core/**/*.test.ts
 analysis/            uv project: polars + plotnine; experiments/ holds one script per milestone
@@ -70,6 +75,8 @@ analysis/            uv project: polars + plotnine; experiments/ holds one scrip
 - **Season order follows spec §6.** All trees read one start-of-season light field. Loops over a table run only over the rows that existed when their phase began; this is the "staging".
 - **Principles sit behind params.** Each has an `enabled` flag, or a `mode` that names its §8 ablation. Param names follow spec symbols (`lambda`, `alpha`, `qMax`, …). Params are plain JSON.
 - **No SharedArrayBuffer.** Snapshots move to the page as transferable buffers. (GitHub Pages can't send the COOP/COEP headers that SharedArrayBuffer needs.)
+- **Two sky sweeps, one behaviour** (ADR 0024, G2–G3). `src/core/light/sky-sweep.ts` and `rust/core/src/light/sky_sweep.rs` are frozen together: a change lands in both and passes `tests/wasm-sky.test.ts` and `tests/golden-rust.test.ts`. The rest of `src/core` is open until I1.
+- **The Rust core never calls a platform `Math`.** It uses `rust/core/src/math`, ported from V8 (and glibc's pow, which V8 calls) and held to V8 bit for bit by `tests/wasm-math.test.ts`. A function the core starts to use is ported and tested the same way, never taken from `std` (only the exact ones, `sqrt`, `floor`, `ceil` and `abs`, are).
 - **Goldens change only on purpose.** If `tests/golden.json` must change, run `npm run golden:update` and give the reason in `docs/devlog.md`.
 - **Column arrays may be reallocated** by `Table.add()`. Don't hoist `tree.m.cols.x` above a loop that adds rows.
 

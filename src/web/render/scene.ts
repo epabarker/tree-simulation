@@ -859,6 +859,25 @@ export class Scene {
   }
 
   /** The palette a colour mode draws with. */
+  private orderFor: Snapshot | null = null;
+  private order = new Int32Array(0);
+
+  /**
+   * The snapshot's metamers far to near (z0 descending; the viewer faces z = 0), computed once
+   * per snapshot: the order the branches are drawn in until I3's depth buffer (I2).
+   */
+  drawOrder(s: Snapshot): Int32Array {
+    if (this.orderFor !== s) {
+      const n = s.metamerCount;
+      const order = Int32Array.from({ length: n }, (_, j) => j);
+      const z = s.z0;
+      order.sort((a, b) => (z[b] as number) - (z[a] as number) || a - b);
+      this.order = order;
+      this.orderFor = s;
+    }
+    return this.order;
+  }
+
   palette(mode: ColorMode, theme: Theme): string[] {
     if (mode === "natural") return theme.bark;
     if (mode === "light" || mode === "resource" || mode === "age" || mode === "stress") {

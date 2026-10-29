@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { presetParams } from "../../src/core/presets.ts";
-import type { Tree } from "./rust.ts";
-import { treeMetrics, World } from "./rust.ts";
+import type { Tree } from "../world.ts";
+import { treeMetrics, World } from "../world.ts";
 
 const SEEDS = [1, 2, 3, 4, 5];
 const TWENTY = Array.from({ length: 20 }, (_, k) => k + 1);

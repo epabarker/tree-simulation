@@ -40,9 +40,9 @@ pub fn resting_state(q: f64, r6: &R6) -> u8 {
 mod tests {
     use super::*;
     use crate::params::Params;
-    use crate::principles::c1::{add_bud, add_metamer};
     use crate::principles::c3::gather_light;
     use crate::testing::preset;
+    use crate::testing::{LEFT, bud, metamer};
     use crate::tree::{Tree, slot};
     use crate::world::World;
 
@@ -80,10 +80,10 @@ mod tests {
     #[test]
     fn a_short_shoots_light_counts_by_its_leaf_area() {
         let up = std::f64::consts::FRAC_PI_2;
-        let mut t = Tree::new(0, 10.0);
-        let root = add_metamer(&mut t, -1, slot::MAIN, up, 1.0, 0.02, 0.0);
-        add_bud(&mut t, root, slot::MAIN, up, 0.0);
-        add_bud(&mut t, root, slot::LEFT, up, 1.0);
+        let mut t = Tree::new(0, 10.0, 0.5);
+        let root = metamer(&mut t, -1, slot::MAIN, up, 1.0, 0.02, 0.0);
+        bud(&mut t, root, slot::MAIN, up, 0.0);
+        bud(&mut t, root, LEFT, up, 1.0);
         t.b.q[0] = 0.5;
         t.b.q[1] = 0.4;
         t.b.state[1] = bud::SHORT_SHOOT;

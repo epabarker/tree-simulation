@@ -5,7 +5,7 @@
 import { describe, expect, it } from "vitest";
 import { mergeParams } from "../../src/core/params.ts";
 import { presetParams } from "../../src/core/presets.ts";
-import { isLiveBud, type Tree, World } from "./rust.ts";
+import { isLiveBud, type Tree, World } from "../world.ts";
 
 function liveBudResource(tree: Tree): number[] {
   const b = tree.b.cols;

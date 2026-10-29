@@ -7,7 +7,7 @@
 //! c3.lambda, c4.setPoint, c4.eta when off.
 
 use crate::math;
-use crate::params::{C4, Generator, PaLevel, Params, R2};
+use crate::params::{C4, Generator, PaLevel, Params, Phyllotaxis, R2};
 use crate::rng::{purpose, uniform};
 use crate::tree::{Tree, ensure};
 
@@ -44,29 +44,38 @@ pub fn branch_angle_of(order: f64, params: &Params) -> f64 {
     pa_level(order, &params.r2).map_or(params.c1.branch_angle, |l| l.branch_angle)
 }
 
-/// Lateral buds at the node above metamer `axis_node` of an axis of order `order`: 0, 1 or 2.
-pub fn lateral_count(order: f64, axis_node: f64, last_of_shoot: bool, r2: &R2) -> u8 {
-    let Some(level) = pa_level(order, r2) else {
-        return 1;
+/// The laterals at the node above metamer `axis_node` of an axis of physiological age `order`
+/// (I2): how many, and the azimuth step δ from one node to the next, radians. Without R2, C1's
+/// phyllotaxis: one lateral a node, spiral (δ = c1.divergence) or distichous (δ = π).
+pub fn laterals(order: f64, axis_node: f64, last_of_shoot: bool, params: &Params) -> (u8, f64) {
+    let pi = std::f64::consts::PI;
+    let spiral = params.c1.divergence * crate::params::DEG;
+    let Some(level) = pa_level(order, &params.r2) else {
+        return match params.c1.phyllotaxis {
+            Phyllotaxis::Spiral => (1, spiral),
+            Phyllotaxis::Distichous => (1, pi),
+        };
     };
     match level.generator {
-        // An unknown generator falls through TypeScript's switch (undefined): distichous.
-        Generator::Distichous | Generator::Unknown => 1,
-        Generator::Opposite => 2,
+        // An unknown generator falls through to distichous, as the TypeScript switch did.
+        Generator::Distichous | Generator::Unknown => (1, pi),
+        Generator::Spiral => (1, spiral),
+        // Decussate: each pair a quarter turn from the last.
+        Generator::Opposite => (2, pi / 2.0),
         Generator::Whorled => {
-            if level.tier_every > 0.0 {
-                if (axis_node + 1.0) % level.tier_every == 0.0 {
-                    2
-                } else {
-                    0
-                }
-            } else if last_of_shoot {
-                2
+            let at = if level.tier_every > 0.0 {
+                (axis_node + 1.0) % level.tier_every == 0.0
             } else {
-                0
+                last_of_shoot
+            };
+            if !at {
+                return (0, 0.0);
             }
+            let n = math::max(1.0, math::min(7.0, level.whorl.unwrap_or(4.0).floor()));
+            // Alternate whorls sit between the last whorl's branches.
+            (n as u8, pi / n)
         }
-        Generator::None => 0,
+        Generator::None => (0, 0.0),
     }
 }
 
@@ -174,18 +183,21 @@ mod tests {
             ],
             "",
         );
-        let r2 = &p.r2;
-        assert_eq!(lateral_count(0.0, 4.0, false, r2), 0); // whorled: only where a growth unit starts
-        assert_eq!(lateral_count(0.0, 4.0, true, r2), 2);
-        let tiers: Vec<u8> = (0..6)
-            .map(|k| lateral_count(1.0, k as f64, false, r2))
-            .collect();
-        assert_eq!(tiers, vec![0, 0, 2, 0, 0, 2]);
-        assert_eq!(lateral_count(2.0, 0.0, false, r2), 2);
-        assert_eq!(lateral_count(3.0, 0.0, true, r2), 0);
-        assert_eq!(lateral_count(7.0, 0.0, true, r2), 0); // pa is capped at the last row
+        let pi = std::f64::consts::PI;
+        let count = |pa: f64, k: f64, last: bool| laterals(pa, k, last, &p).0;
+        assert_eq!(count(0.0, 4.0, false), 0); // whorled: only where a growth unit starts
+        assert_eq!(laterals(0.0, 4.0, true, &p), (4, pi / 4.0)); // four, the next whorl between
+        let tiers: Vec<u8> = (0..6).map(|k| count(1.0, k as f64, false)).collect();
+        assert_eq!(tiers, vec![0, 0, 4, 0, 0, 4]);
+        assert_eq!(laterals(2.0, 0.0, false, &p), (2, pi / 2.0)); // decussate
+        assert_eq!(count(3.0, 0.0, true), 0);
+        assert_eq!(count(7.0, 0.0, true), 0); // pa is capped at the last row
         let off = Params::from_json(&preset("default", "{}"));
-        assert_eq!(lateral_count(0.0, 0.0, true, &off.r2), 1); // off: the distichous baseline
+        let (n, step) = laterals(0.0, 0.0, true, &off);
+        assert_eq!(n, 1); // off: C1's spiral
+        assert!((step - 137.5f64.to_radians()).abs() < 1e-12);
+        let two = Params::from_json(&preset("default", r#"{"c1":{"phyllotaxis":"distichous"}}"#));
+        assert_eq!(laterals(0.0, 0.0, true, &two), (1, pi));
     }
 
     #[test]

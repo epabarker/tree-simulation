@@ -2,8 +2,8 @@ import { describe, expect, it } from "vitest";
 import { type FixtureName, fixtureParams } from "../../src/core/fixtures.ts";
 import { mergeParams, type ParamsPatch } from "../../src/core/params.ts";
 import { M6_LIGHT, PRE_R1 } from "../../src/core/presets.ts";
-import type { Tree } from "./rust.ts";
-import { type TreeMetrics, treeMetrics, World } from "./rust.ts";
+import type { Tree } from "../world.ts";
+import { type TreeMetrics, treeMetrics, World } from "../world.ts";
 
 /** These checks are the M6–M7 evidence, so they run the retired presets (fixtures.ts) as they were before R1 and R3, under the M6 light sweep. */
 const presetParams = (name: FixtureName, seed?: number) =>
@@ -26,7 +26,14 @@ function branchAngle(tree: Tree): number {
   const angles: number[] = [];
   for (let i = 0; i < tree.m.length; i++) {
     if (c.order[i] !== 1) continue;
-    angles.push((Math.atan2(Math.abs(Math.cos(c.angle[i])), Math.sin(c.angle[i])) * 180) / Math.PI);
+    angles.push(
+      (Math.atan2(
+        Math.abs(Math.cos(Math.atan2(c.hy[i] as number, c.hx[i] as number))),
+        Math.sin(Math.atan2(c.hy[i] as number, c.hx[i] as number)),
+      ) *
+        180) /
+        Math.PI,
+    );
   }
   return median(angles);
 }

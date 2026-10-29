@@ -58,8 +58,10 @@ pub struct World {
     pub pending: Vec<Value>,
 }
 
+/// The owner grid (O2, R5): one cell per light cell, W × H × D.
 fn grid(params: &Params) -> Vec<i32> {
-    vec![0; (params.world.width * params.world.height) as usize]
+    let d = crate::light::depth_of(params);
+    vec![0; (params.world.width * params.world.height * d) as usize]
 }
 
 fn event(season: f64, kind: &str) -> Value {
@@ -78,7 +80,7 @@ impl World {
             .iter()
             .enumerate()
             .map(|(id, spec)| {
-                let mut t = Tree::new(id, spec.x);
+                let mut t = Tree::new(id, spec.x, spec.z);
                 t.species = spec.species.clone();
                 t.alive = false; // planted when its season comes
                 t
@@ -125,9 +127,13 @@ impl World {
         self.pending.push(e);
     }
 
-    pub fn plant_tree(&mut self, x: f64, species: Option<&str>) {
+    /// Queues a sown tree at (x, z); z absent, the slab's middle.
+    pub fn plant_tree(&mut self, x: f64, z: Option<f64>, species: Option<&str>) {
         let mut e = event(self.season, "plantTree");
         e.set("x", Value::Num(x));
+        if let Some(z) = z {
+            e.set("z", Value::Num(z));
+        }
         if let Some(s) = species.filter(|s| !s.is_empty()) {
             e.set("species", Value::Str(s.into()));
         }
@@ -209,30 +215,26 @@ impl World {
             }
             "plantTree" => {
                 let p = &self.rules.params;
-                let w = p.world.width;
+                let (w, d) = (p.world.width, crate::light::depth_of(p));
                 let x0 = e.get("x").and_then(Value::as_f64).unwrap_or(f64::NAN);
+                let z = e.get("z").and_then(Value::as_f64).unwrap_or(d / 2.0);
                 let x = if p.world.periodic {
                     ((x0 % w) + w) % w
                 } else {
                     x0
                 };
-                if x < 0.0 || x >= w {
+                if x < 0.0 || x >= w || !(z >= 0.0 && z < d) {
                     return;
                 }
-                if self
-                    .trees
-                    .iter()
-                    .any(|t| t.alive && (t.root_x - x).abs() < 1.0)
-                {
+                let gap = |t: &Tree| crate::math::hypot(t.root_x - x, t.root_z - z);
+                if self.trees.iter().any(|t| t.alive && gap(t) < 1.0) {
                     return;
                 }
-                let mut tree = Tree::new(self.trees.len(), x);
+                let mut tree = Tree::new(self.trees.len(), x, z);
                 tree.sown = true;
                 let mut nearest: Option<&Tree> = None;
                 for t in &self.trees {
-                    if t.alive
-                        && nearest.is_none_or(|n| (t.root_x - x).abs() < (n.root_x - x).abs())
-                    {
+                    if t.alive && nearest.is_none_or(|n| gap(t) < gap(n)) {
                         nearest = Some(t);
                     }
                 }

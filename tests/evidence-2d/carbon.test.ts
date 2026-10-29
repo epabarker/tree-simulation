@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { mergeParams } from "../../src/core/params.ts";
 import { presetParams } from "../../src/core/presets.ts";
-import type { Tree } from "./rust.ts";
-import { type TreeMetrics, treeMetrics, World } from "./rust.ts";
+import type { Tree } from "../world.ts";
+import { type TreeMetrics, treeMetrics, World } from "../world.ts";
 
 // M8 visible test (§7, ADR 0010): a height plateau, a suppressed tree that dies, a rising crown
 // base, with the sky presets' R1 settings. 5 seeds, 100 seasons.

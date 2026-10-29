@@ -10,7 +10,7 @@ use super::r2::{acrotony_weights, lambda_at};
 use super::r5::shaded_lambda;
 use super::r6::light_weight;
 use crate::params::{C3Mode, Params, R6};
-use crate::tree::{Tree, bud, ensure};
+use crate::tree::{SLOTS, Tree, bud, ensure};
 
 /// True for buds that still take part in growth (not consumed, aborted or terminated).
 pub fn is_live_bud(state: u8) -> bool {
@@ -21,27 +21,27 @@ pub fn is_live_bud(state: u8) -> bool {
 pub fn gather_light(tree: &mut Tree, r6: &R6) {
     let nm = tree.m.len();
     let nb = tree.b.len();
-    ensure(&mut tree.q_slot, 3 * nm);
+    ensure(&mut tree.q_slot, SLOTS * nm);
     let q_slot = &mut tree.q_slot;
-    q_slot[..3 * nm].fill(0.0);
+    q_slot[..SLOTS * nm].fill(0.0);
     let b = &tree.b;
     for i in 0..nb {
         if !is_live_bud(b.state[i]) {
             continue;
         }
         let w = light_weight(b.state[i], r6);
-        q_slot[3 * b.metamer[i] as usize + b.slot[i] as usize] += w * b.q[i];
+        q_slot[SLOTS * b.metamer[i] as usize + b.slot[i] as usize] += w * b.q[i];
     }
     let m = &mut tree.m;
     m.n_sum[..nm].fill(0);
     for i in (0..nm).rev() {
-        let q = q_slot[3 * i] + q_slot[3 * i + 1] + q_slot[3 * i + 2];
+        let q: f64 = q_slot[SLOTS * i..SLOTS * (i + 1)].iter().sum();
         m.q_sum[i] = q;
         m.n_sum[i] = m.n_sum[i].wrapping_add(1);
         let p = m.parent[i];
         if p >= 0 {
             let p = p as usize;
-            q_slot[3 * p + m.slot[i] as usize] += q;
+            q_slot[SLOTS * p + m.slot[i] as usize] += q;
             m.n_sum[p] = m.n_sum[p].wrapping_add(m.n_sum[i]);
         }
     }
@@ -100,7 +100,7 @@ pub fn allocate(tree: &mut Tree, params: &Params) {
                 tree.v_base = if nm > 0 { alpha * tree.q_base } else { 0.0 };
             }
             let acro = acrotony_weights(tree, params);
-            ensure(&mut tree.v_slot, 3 * nm);
+            ensure(&mut tree.v_slot, SLOTS * nm);
             ensure(&mut tree.node_shade, nm);
             let age = tree.age;
             let v_base = tree.v_base;
@@ -116,13 +116,12 @@ pub fn allocate(tree: &mut Tree, params: &Params) {
                 let v = if p < 0 {
                     v_base
                 } else {
-                    v_slot[3 * p as usize + m.slot[i] as usize]
+                    v_slot[SLOTS * p as usize + m.slot[i] as usize]
                 };
                 m.v_in[i] = v;
-                let q_main = q_slot[3 * i];
-                let q_left = q_slot[3 * i + 1];
-                let q_right = q_slot[3 * i + 2];
-                let q_lat = q_left + q_right;
+                let at = SLOTS * i;
+                let q_main = q_slot[at];
+                let q_lat: f64 = q_slot[at + 1..at + SLOTS].iter().sum();
                 let pa = m.order[i] as f64 - m.pa_shift[i] as f64;
                 let lambda = shaded_lambda(lambda_at(pa, age, params), shade[i], &params.r5);
                 let lateral = if acro { q_lat * w[i] } else { q_lat };
@@ -132,22 +131,19 @@ pub fn allocate(tree: &mut Tree, params: &Params) {
                 } else {
                     0.0
                 };
-                v_slot[3 * i] = v_main;
-                v_slot[3 * i + 1] = if q_lat > 0.0 {
-                    (v_lat * q_left) / q_lat
-                } else {
-                    0.0
-                };
-                v_slot[3 * i + 2] = if q_lat > 0.0 {
-                    (v_lat * q_right) / q_lat
-                } else {
-                    0.0
-                };
+                v_slot[at] = v_main;
+                for k in at + 1..at + SLOTS {
+                    v_slot[k] = if q_lat > 0.0 {
+                        (v_lat * q_slot[k]) / q_lat
+                    } else {
+                        0.0
+                    };
+                }
             }
             let b = &mut tree.b;
             for i in 0..nb {
                 b.v[i] = if is_live_bud(b.state[i]) {
-                    v_slot[3 * b.metamer[i] as usize + b.slot[i] as usize]
+                    v_slot[SLOTS * b.metamer[i] as usize + b.slot[i] as usize]
                 } else {
                     0.0
                 };
@@ -198,7 +194,7 @@ mod tests {
 
     #[test]
     fn splits_conservatively_at_every_node() {
-        // M2: the three slot shares sum to the inflow, at every row of the last allocation.
+        // M2: the slot shares sum to the inflow, at every row of the last allocation.
         let mut world = World::new(preset("bh", "{}"));
         world.run(15, &[]);
         let t = &world.trees[0];
@@ -208,7 +204,7 @@ mod tests {
             if v <= 0.0 {
                 continue; // rows grown this season have vIn = 0
             }
-            let total = t.v_slot[3 * i] + t.v_slot[3 * i + 1] + t.v_slot[3 * i + 2];
+            let total: f64 = t.v_slot[SLOTS * i..SLOTS * (i + 1)].iter().sum();
             assert!((total - v).abs() < 1e-9, "row {i}: {total} vs {v}");
             checked += 1;
         }

@@ -20,6 +20,7 @@
     "rust:check": "cd rust && cargo fmt --check && cargo clippy --locked --all-targets -- -D warnings && cargo clippy --locked -p tree-core --all-targets --features threads -- -D warnings && RUSTFLAGS='-C target-feature=+simd128' cargo clippy --locked --target wasm32-unknown-unknown --target-dir target/clippy-wasm -p tree-wasm -- -D warnings && cargo test --locked -q && cargo test --locked -q -p tree-core --features threads",
     "pretest": "node cli/require-node.mjs && node cli/build-wasm.ts",
     "test": "vitest run",
+    "evidence:2d": "vitest run -c tests/evidence-2d/vitest.config.ts",
     "check": "npm run build:wasm && npm run rust:check && npm run lint && npm run typecheck && npm run test",
     "sim": "node cli/run.ts",
     "pregolden:update": "node cli/require-node.mjs",

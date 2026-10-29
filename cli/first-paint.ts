@@ -40,6 +40,20 @@ const BUDGET_KB = 300;
 
 const out = process.argv[2] ?? join("dist-garden", "first");
 mkdirSync(out, { recursive: true });
+/**
+ * I2 (ADR 0025): no opening forests while the trees grow in 3D and the 3D renderer is not built.
+ * A 3D checkpoint is 1–6 MB (the review's Q7), so first paint's policy is decided at I3. The
+ * manifest lists no widths, so the garden grows its forest from seed.
+ */
+const FIRST_PAINT_3D = false;
+if (!FIRST_PAINT_3D) {
+  writeFileSync(
+    join(out, "manifest.json"),
+    `${JSON.stringify({ widths: [], seeds: SEEDS, season: SEASONS })}\n`,
+  );
+  console.log("no grown forests until I3 (ADR 0025): the garden grows from seed");
+  process.exit(0);
+}
 let total = 0;
 for (const width of WIDTHS) {
   for (const seed of SEEDS) {

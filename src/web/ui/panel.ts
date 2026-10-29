@@ -49,6 +49,12 @@ const SECTIONS: SectionSpec[] = [
     section: "c1",
     title: "C1 Buds",
     fields: [
+      {
+        key: "phyllotaxis",
+        label: "phyllotaxis (no R2)",
+        options: { spiral: "spiral", distichous: "distichous" },
+      },
+      { key: "divergence", label: "δ divergence°", min: 90, max: 180, step: 0.5 },
       { key: "branchAngle", label: "β branch angle°", min: 10, max: 90, step: 1 },
       { key: "maxMetamersPerShoot", label: "shoot cap", min: 1, max: 8, step: 1 },
     ],
@@ -62,22 +68,16 @@ const SECTIONS: SectionSpec[] = [
         key: "model",
         label: "model",
         options: {
-          "sky sweep (M6)": "sky",
-          "shadow triangle": "triangle",
+          "slab sky sweep": "slab",
           "pooled (§8 ablation)": "pooled",
         },
       },
-      { key: "kExt", label: "k_ext (sky)", min: 0.05, max: 3, step: 0.05 },
-      { key: "K", label: "K directions (sky)", min: 1, max: 31, step: 1 },
-      { key: "rotate", label: "rotate directions (sky)" },
+      { key: "kExt", label: "k_ext", min: 0.05, max: 3, step: 0.05 },
+      { key: "K", label: "K directions", min: 1, max: 64, step: 1 },
+      { key: "rotate", label: "rotate directions" },
       { key: "skyTilt", label: "sky tilt (sun side)", min: -1, max: 1, step: 0.05 },
       { key: "skyExponent", label: "zenith weighting", min: 0, max: 4, step: 0.1 },
-      { key: "a", label: "a strength (triangle)", min: 0.05, max: 3, step: 0.05 },
-      { key: "b", label: "b decay", min: 1.05, max: 4, step: 0.05 },
-      { key: "qMax", label: "q max depth", min: 1, max: 12, step: 1 },
       { key: "C", label: "C full light", min: 0.1, max: 3, step: 0.05 },
-      { key: "perceptionAngle", label: "θ wedge half-angle°", min: 10, max: 90, step: 1 },
-      { key: "perceptionDistance", label: "r perception", min: 1, max: 8, step: 1 },
     ],
   },
   {
@@ -312,6 +312,32 @@ export class Panel {
       format: (v: number) => v.toFixed(2),
     });
 
+    // The faces' transmission τ (ADR 0024): the three looks, or any pair.
+    const world = pane.addFolder({ title: "World: the slab's faces", expanded: false });
+    const faces = { front: params.world.faces?.[0] ?? 1, back: params.world.faces?.[1] ?? 1 };
+    const looks: Record<string, string> = {
+      "wood interior (0.2, 0.2)": "0.2,0.2",
+      "wood edge (1, 0.2)": "1,0.2",
+      "hedgerow (1, 1)": "1,1",
+    };
+    const look = { look: `${faces.front},${faces.back}` };
+    const patchFaces = () =>
+      cb.onPatch({ world: { ...this.params.world, faces: [faces.front, faces.back] } });
+    world.addBinding(look, "look", { label: "look", options: looks }).on("change", (ev) => {
+      const [f, b] = (ev.value as string).split(",").map(Number);
+      faces.front = f as number;
+      faces.back = b as number;
+      world.refresh();
+      patchFaces();
+    });
+    for (const k of ["front", "back"] as const) {
+      world
+        .addBinding(faces, k, { label: `τ ${k}`, min: 0, max: 1, step: 0.05 })
+        .on("change", (ev) => {
+          if (ev.last) patchFaces();
+        });
+    }
+
     for (const spec of SECTIONS) {
       const folder = pane.addFolder({ title: spec.title, expanded: false });
       const target = this.params[spec.section] as unknown as Record<string, unknown>;
@@ -347,7 +373,6 @@ export class Panel {
     };
     viewFolder.addBinding(view, "colorMode", { label: "colour", options: colorOptions });
     viewFolder.addBinding(view, "showLeaves", { label: "leaves" });
-    viewFolder.addBinding(view, "depth", { label: "depth (off = x-ray)" });
     const leafOptions: Record<string, LeafStyleName> = {
       broadleaf: "broadleaf",
       "needles (conifer)": "needle",

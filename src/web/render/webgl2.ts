@@ -628,19 +628,22 @@ export class WebGL2Renderer implements Renderer {
     const r = this.stream<Floats>(batch, "a_r", n);
     const color = this.stream<Bytes>(batch, "a_color", n);
     const g = scene.geom;
-    for (let j = 0; j < n; j++) {
-      a[2 * j] = g.baseX[j];
-      a[2 * j + 1] = g.baseY[j];
-      b[2 * j] = g.tipX[j];
-      b[2 * j + 1] = g.tipY[j];
-      r[2 * j] = g.radius[j];
-      r[2 * j + 1] = g.tipRadius[j];
+    // Far to near in z (I2), so nearer wood covers farther.
+    const order = scene.drawOrder(s);
+    for (let k = 0; k < n; k++) {
+      const j = order[k] as number;
+      a[2 * k] = g.baseX[j];
+      a[2 * k + 1] = g.baseY[j];
+      b[2 * k] = g.tipX[j];
+      b[2 * k + 1] = g.tipY[j];
+      r[2 * k] = g.radius[j];
+      r[2 * k + 1] = g.tipRadius[j];
       const c = index[j] * 4;
-      color[4 * j] = palette[c] as number;
-      color[4 * j + 1] = palette[c + 1] as number;
-      color[4 * j + 2] = palette[c + 2] as number;
+      color[4 * k] = palette[c] as number;
+      color[4 * k + 1] = palette[c + 1] as number;
+      color[4 * k + 2] = palette[c + 2] as number;
       // A solo plate draws one specimen: the other trees' wood is fully transparent.
-      color[4 * j + 3] =
+      color[4 * k + 3] =
         scene.solo >= 0 && s.tree[j] !== scene.solo ? 0 : (palette[c + 3] as number);
     }
     this.upload(batch, n);

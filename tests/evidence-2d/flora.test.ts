@@ -3,7 +3,7 @@ import { loneParams, shadeParams, standParams } from "../../cli/trials.ts";
 import { type FloraName, HAND_FLORA } from "../../src/core/flora.ts";
 import { mergeParams, type Params } from "../../src/core/params.ts";
 import { presetParams } from "../../src/core/presets.ts";
-import { groundLight, treeMetrics, World } from "./rust.ts";
+import { groundLight, treeMetrics, World } from "../world.ts";
 
 const SEEDS = [1, 2, 3];
 const SIX = [1, 2, 3, 4, 5, 6];

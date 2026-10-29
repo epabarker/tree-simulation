@@ -2,6 +2,39 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-30: I2, the trees grow in 3D
+
+- **User:** I2 as specified: 3D topology and directions, C4 as a vector sum, R3 with vector moments and E restored, R4's bank in 3D, the slab light at D = 64 with K = 16 rotating, τ as a world parameter. Also z and frames in the formats, the 2D goldens archived and new ones seeded. Deliverables: V on the preview, m and cost against the prototype, the phone's season in one lane and four, and the prototype's contradictions.
+- **The design:** ADR 0025 (proposed).
+  - Every metamer and bud carries a frame (heading H, reference L), carried by parallel transport (`rust/core/src/geom.rs`).
+  - Up to seven laterals a node, placed by phyllotaxis: spiral (new, 137.5°), distichous, decussate opposite, whorls of `whorl` (default 4).
+  - C4 is a vector sum; R3 uses vector moments and composed rotations, with E = 4·10⁶.
+  - The slab sweep is the only light model with the pooled ablation (the triangle and the 2D sky sweep are at the tag), computed in fixed lanes: one thread or four give the same bits (checked: the goldens with `threads`). The sky's tilt carries over.
+  - O4 disperses on the ground plane; the owner grid is the slab's.
+  - Species take their botanical phyllotaxis and wood's E in an overlay in `flora.ts`.
+- **Formats:**
+  - checkpoints are version 2; version 1 (2D) loads as a planar forest in a one-cell slab;
+  - the snapshot gains z0, H and L, with `angle` and `length` as drawn in the picture's plane;
+  - metrics gain rootZ, crownDepth and centroidOffsetZ;
+  - metamers.csv gains z0, z1 and H.
+- **Goldens:** `tests/golden.json` is 14 new 3D cases (10–20 seasons, 12 s natively). The 2D goldens are the tag's. The unit tests are in 3D: the 2D ones run on planar helpers (`crate::testing::{metamer, bud}`), with new ones for phyllotaxis, transport, the vector C4, moments in depth, ground rest, the slab's faces, fade and walls, and the 3D bank. Tests compile optimised (`[profile.test]`).
+- **The 2D evidence:**
+  - `tests/evidence/` is now `tests/evidence-2d/`: calibration's backlog, out of `npm test` (`npm run evidence:2d`). Against the 3D core, 47 of 90 pass, 29 miss their thresholds and 14 could not run cleanly (`code/2026-10-30-i2/evidence-2d-in-3d.md`).
+  - The structural tests (checkpoints, obstacles, trials, and a new `tests/structure.test.ts`) run on the 3D core in the default suite.
+- **Results** ([note](experiments/2026-10-30-i2-3d-growth.md)):
+  - **m:** under the prototype's rules the full core reproduces the prototype's m (within 1–3). With every principle m is 25–83 and does not fall back, two to four times the prototype's: R2–R5 do not prune 3D as they prune 2D.
+  - **Passes:** a 3D metamer costs 1.5–2.2× a 2D one.
+  - **Browser timing:** `forest` at season 40 in headless Chromium on the VM takes 191–235 ms a season in one lane, 130–185 with the light in four.
+  - **Crowns:** 0.25–0.57 × height deep, not 0.8. The edge and hedgerow pile foliage at their open faces by season 100. Trees reach 114–116 cells, near the world's top.
+  - **Recruits:** O4 fills every plate to its cap of 300 trees.
+- **V:** `/preview/i2/i2.html` on the site's preview deploy, beside garden 0.14.0; the phone's numbers are the user's.
+- **Surprises:**
+  - **WASM ran out of memory.** A 3D world holds ≈ 70 MB of light field, so the evidence tests now free their worlds after each test.
+  - **`shadow` exploded.** It (C3 `none` under light) grows without bound in 3D (Beer–Lambert light never reaches 0), and is out of the goldens.
+  - **The fade changed nothing at the interior's τ.** No crown comes within 3 cells of a face.
+- **The page:** pseudo-depth is off, and branches draw far to near (the 3D renderer is I3's). The lab has a World folder for τ (the three looks) and C1's phyllotaxis. No opening forests until I3 (Q7): the garden grows from seed.
+- **Goldens:** all new (3D); the 2D ones are archived at the tag.
+
 ## 2026-10-30: parity becomes a proof; production is the only build
 
 - **User:** accepted I1 and the diagnosis of the two M5 tests. Asked for them to be restated over 20 seeds, a seed rule in AGENTS.md, production as the only build, parity as a CI job at the tag, and the opening forests regenerated and checked by eye. Then I2. The user's i1.html runs: all 27 goldens in both Rust builds on an X1 Carbon and a Pixel 8a, against 7 for the TypeScript core. Production is 0.8× TypeScript's time a season on the laptop and level on the phone.

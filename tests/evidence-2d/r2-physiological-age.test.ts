@@ -8,7 +8,7 @@ import { type FixtureName, fixtureParams } from "../../src/core/fixtures.ts";
 import { mergeParams } from "../../src/core/params.ts";
 import { PRE_R1 } from "../../src/core/presets.ts";
 import { BudState, Slot } from "../../src/core/types.ts";
-import { type Tree, treeMetrics, World } from "./rust.ts";
+import { type Tree, treeMetrics, World } from "../world.ts";
 
 /** These checks are the M7 evidence, so they run the retired presets (fixtures.ts) as they were before R1 and R3. */
 const presetParams = (name: FixtureName, seed?: number) =>

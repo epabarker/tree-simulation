@@ -9,7 +9,7 @@ import { defineConfig } from "vitest/config";
 export default defineConfig({
   test: {
     root: fileURLToPath(new URL("../../../..", import.meta.url)),
-    include: ["tests/evidence/**/*.test.ts"],
+    include: ["tests/evidence-2d/**/*.test.ts"],
     environment: "node",
     testTimeout: 300_000,
     setupFiles: [fileURLToPath(new URL("./margins-setup.ts", import.meta.url))],

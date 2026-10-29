@@ -19,34 +19,25 @@ export interface GoldenCase {
   seasons: number;
 }
 
+/**
+ * The 3D goldens (I2, ADR 0025): a dozen worlds that between them run every principle, short
+ * enough to run natively and in WASM on every check. The 2D cases are archived at golden-2d-ts.
+ */
 export const GOLDEN_CASES: GoldenCase[] = [
   { preset: "explosion", seed: 1, seasons: 10 },
-  { preset: "explosion", seed: 2, seasons: 10 },
-  { preset: "shadow", seed: 1, seasons: 40 },
-  { preset: "shadow", seed: 2, seasons: 40 },
-  { preset: "bh", seed: 1, seasons: 40 },
-  { preset: "leader", seed: 1, seasons: 30 },
-  { preset: "spreading", seed: 1, seasons: 30 },
-  { preset: "direction", seed: 1, seasons: 30 },
-  { preset: "wall", seed: 1, seasons: 30 },
-  { preset: "pruned", seed: 1, seasons: 40 },
-  { preset: "pruned", seed: 2, seasons: 40 },
-  { preset: "pair", seed: 1, seasons: 35 },
-  { preset: "late", seed: 1, seasons: 45 },
-  { preset: "stand", seed: 1, seasons: 30 },
-  { preset: "skyStand", seed: 1, seasons: 30 },
-  { preset: "skyTree", seed: 1, seasons: 40 },
-  { preset: "obliqueSun", seed: 1, seasons: 30 },
-  { preset: "skyLate", seed: 1, seasons: 40 },
-  { preset: "overcast", seed: 1, seasons: 30 },
-  { preset: "conifer", seed: 1, seasons: 30 },
-  { preset: "birch", seed: 1, seasons: 30 },
-  { preset: "tropical", seed: 1, seasons: 30 },
-  { preset: "weeping", seed: 1, seasons: 40 },
-  { preset: "troll", seed: 1, seasons: 40 },
-  { preset: "forest", seed: 1, seasons: 50 },
-  { preset: "thinning", seed: 1, seasons: 30 },
-  { preset: "clearing", seed: 1, seasons: 50 },
+  { preset: "bh", seed: 1, seasons: 15 },
+  { preset: "wall", seed: 1, seasons: 15 },
+  { preset: "pair", seed: 1, seasons: 15 },
+  { preset: "skyTree", seed: 1, seasons: 20 },
+  { preset: "skyStand", seed: 1, seasons: 15 },
+  { preset: "obliqueSun", seed: 1, seasons: 15 },
+  { preset: "conifer", seed: 1, seasons: 15 },
+  { preset: "weeping", seed: 1, seasons: 20 },
+  { preset: "troll", seed: 1, seasons: 20 },
+  { preset: "forest", seed: 1, seasons: 20 },
+  { preset: "thinning", seed: 1, seasons: 15 },
+  { preset: "mixedWood", seed: 1, seasons: 15 },
+  { preset: "oakOpen", seed: 1, seasons: 15 },
 ];
 
 export function caseKey(c: GoldenCase): string {

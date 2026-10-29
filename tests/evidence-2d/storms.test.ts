@@ -2,8 +2,8 @@ import { describe, expect, it } from "vitest";
 import { fixtureParams } from "../../src/core/fixtures.ts";
 import { mergeParams } from "../../src/core/params.ts";
 import { presetParams } from "../../src/core/presets.ts";
-import type { Tree } from "./rust.ts";
-import { World } from "./rust.ts";
+import type { Tree } from "../world.ts";
+import { World } from "../world.ts";
 
 const lowestTip = (world: World): number => {
   let low = Number.POSITIVE_INFINITY;

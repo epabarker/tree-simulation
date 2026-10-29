@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { mergeParams, type Params } from "../../src/core/params.ts";
 import { presetParams } from "../../src/core/presets.ts";
-import type { Tree } from "./rust.ts";
-import { hashWorld, treeMetrics, World } from "./rust.ts";
+import type { Tree } from "../world.ts";
+import { hashWorld, treeMetrics, World } from "../world.ts";
 
 const height = (t: Tree): number => {
   let h = 0;

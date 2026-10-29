@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
-import type { Params } from "../../src/core/params.ts";
-import { mergeParams, type Obstacle } from "../../src/core/params.ts";
-import { presetParams } from "../../src/core/presets.ts";
-import type { Tree } from "./rust.ts";
-import { hashWorld, World } from "./rust.ts";
+import type { Params } from "../src/core/params.ts";
+import { mergeParams, type Obstacle } from "../src/core/params.ts";
+import { presetParams } from "../src/core/presets.ts";
+import type { Tree } from "./world.ts";
+import { hashWorld, World } from "./world.ts";
 
 /** Whether (x, y) is inside an obstacle (x wrapped on a ring): the check, independent of the core. */
 function insideObstacle(params: Params, x: number, y: number): boolean {

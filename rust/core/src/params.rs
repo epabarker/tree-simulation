@@ -1,7 +1,7 @@
 //! Simulation parameters (`src/core/params.ts`): one plain-JSON object, read here into typed
 //! groups the passes use. The JSON stays the source: species patches merge into it
 //! (`species_params`), events patch it, checkpoints and run records carry it, all through
-//! `json::merge`, so a run's params are the TypeScript core's byte for byte.
+//! `json::merge`, with JavaScript's semantics (key order, number printing).
 //!
 //! A field the JSON lacks reads as JavaScript reads `undefined`: NaN for a number, false for a
 //! flag, "" for a string. The optional fields params.ts marks with `?` are `Option`s, defaulted
@@ -46,6 +46,8 @@ pub struct Rect {
 #[derive(Clone, Debug)]
 pub struct TreeSpec {
     pub x: f64,
+    /// Depth in the slab; absent, the slab's middle.
+    pub z: f64,
     pub species: String,
     pub plant_season: f64,
     pub lean: f64,
@@ -55,14 +57,30 @@ pub struct TreeSpec {
 pub struct WorldP {
     pub width: f64,
     pub height: f64,
+    /// D, the slab's depth in cells (ADR 0024: 64).
+    pub depth: f64,
+    /// τ beyond the front (z < 0, the viewer's) and back (z ≥ D) faces (ADR 0024).
+    pub faces: [f64; 2],
+    /// Q fades linearly to 0 over this many cells before each face (0: hard faces).
+    pub fade: f64,
     pub walls: Vec<Rect>,
     /// `world.obstacles`: None when absent (growth then skips the check, as `!== undefined`).
     pub obstacles: Option<Vec<Rect>>,
     pub periodic: bool,
 }
 
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum Phyllotaxis {
+    Spiral,
+    Distichous,
+}
+
 #[derive(Clone, Debug)]
 pub struct C1 {
+    /// Without R2: one lateral a node, at successive azimuths `divergence` (spiral) or 180° apart.
+    pub phyllotaxis: Phyllotaxis,
+    /// The spiral's divergence angle, degrees (137.5°, the golden angle).
+    pub divergence: f64,
     pub branch_angle: f64,
     pub internode_length: f64,
     pub max_metamers_per_shoot: f64,
@@ -70,8 +88,9 @@ pub struct C1 {
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum LightKind {
-    Triangle,
-    Sky,
+    /// The slab sweep (G3): Beer–Lambert over W × H × D.
+    Slab,
+    /// The §8 ablation (M22): one homogeneous canopy's mean light.
     Pooled,
 }
 
@@ -79,20 +98,13 @@ pub enum LightKind {
 pub struct C2 {
     pub enabled: bool,
     pub model: LightKind,
-    pub a: f64,
-    pub b: f64,
-    pub q_max: f64,
     pub c: f64,
-    pub perception_angle: f64,
-    pub perception_distance: f64,
     pub k: f64,
     pub k_ext: f64,
     pub sky_exponent: f64,
     pub sky_tilt: f64,
     pub min_elevation: f64,
     pub rotate: bool,
-    /// `c2.sweep === "columns"`: the M6 sweep.
-    pub columns: bool,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -156,6 +168,8 @@ pub struct R1 {
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Generator {
     Distichous,
+    /// One lateral a node at the divergence angle (c1.divergence).
+    Spiral,
     Opposite,
     Whorled,
     None,
@@ -173,6 +187,8 @@ pub struct PaLevel {
     pub tier_every: f64,
     pub p_term: f64,
     pub posture_set_point: Option<f64>,
+    /// Laterals in a whorl ("whorled"); absent, 4.
+    pub whorl: Option<f64>,
 }
 
 #[derive(Clone, Debug)]
@@ -316,6 +332,15 @@ impl Params {
             world: WorldP {
                 width: num(w, "width"),
                 height: num(w, "height"),
+                depth: num(w, "depth"),
+                faces: match w.get("faces").and_then(Value::as_array) {
+                    Some(f) => [
+                        f.first().and_then(Value::as_f64).unwrap_or(1.0),
+                        f.get(1).and_then(Value::as_f64).unwrap_or(1.0),
+                    ],
+                    None => [1.0, 1.0],
+                },
+                fade: opt(w, "fade").unwrap_or(0.0),
                 walls: rects(w.get("walls"), true),
                 obstacles: w.get("obstacles").map(|o| rects(Some(o), false)),
                 periodic: text(w, "sides") == "periodic",
@@ -327,6 +352,7 @@ impl Params {
                 .iter()
                 .map(|t| TreeSpec {
                     x: num(t, "x"),
+                    z: opt(t, "z").unwrap_or(num(w, "depth") / 2.0),
                     species: text(t, "species"),
                     plant_season: opt(t, "plantSeason").unwrap_or(0.0),
                     lean: opt(t, "lean").unwrap_or(0.0),
@@ -335,6 +361,11 @@ impl Params {
             c1: {
                 let g = group(v, "c1");
                 C1 {
+                    phyllotaxis: match text(g, "phyllotaxis").as_str() {
+                        "distichous" => Phyllotaxis::Distichous,
+                        _ => Phyllotaxis::Spiral,
+                    },
+                    divergence: opt(g, "divergence").unwrap_or(137.5),
                     branch_angle: num(g, "branchAngle"),
                     internode_length: num(g, "internodeLength"),
                     max_metamers_per_shoot: num(g, "maxMetamersPerShoot"),
@@ -343,23 +374,16 @@ impl Params {
             c2: C2 {
                 enabled: flag(c2, "enabled"),
                 model: match text(c2, "model").as_str() {
-                    "sky" => LightKind::Sky,
                     "pooled" => LightKind::Pooled,
-                    _ => LightKind::Triangle,
+                    _ => LightKind::Slab,
                 },
-                a: num(c2, "a"),
-                b: num(c2, "b"),
-                q_max: num(c2, "qMax"),
                 c: num(c2, "C"),
-                perception_angle: num(c2, "perceptionAngle"),
-                perception_distance: num(c2, "perceptionDistance"),
                 k: num(c2, "K"),
                 k_ext: num(c2, "kExt"),
                 sky_exponent: num(c2, "skyExponent"),
-                sky_tilt: num(c2, "skyTilt"),
+                sky_tilt: opt(c2, "skyTilt").unwrap_or(0.0),
                 min_elevation: num(c2, "minElevation"),
                 rotate: flag(c2, "rotate"),
-                columns: text(c2, "sweep") == "columns",
             },
             c3: C3 {
                 mode: match text(c3, "mode").as_str() {
@@ -425,6 +449,7 @@ impl Params {
                         branch_angle: num(l, "branchAngle"),
                         generator: match text(l, "generator").as_str() {
                             "distichous" => Generator::Distichous,
+                            "spiral" => Generator::Spiral,
                             "opposite" => Generator::Opposite,
                             "whorled" => Generator::Whorled,
                             "none" => Generator::None,
@@ -433,6 +458,7 @@ impl Params {
                         tier_every: num(l, "tierEvery"),
                         p_term: num(l, "pTerm"),
                         posture_set_point: opt(l, "postureSetPoint"),
+                        whorl: opt(l, "whorl"),
                     })
                     .collect(),
                 a_c: num(r2, "aC"),

@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { mergeParams, type ParamsPatch } from "../../src/core/params.ts";
 import { presetParams } from "../../src/core/presets.ts";
 import { BudState } from "../../src/core/types.ts";
-import { type Tree, treeMetrics, World } from "./rust.ts";
+import { type Tree, treeMetrics, World } from "../world.ts";
 
 // The §8 ablations (M22): switch one rule off and check the predicted change, against the same
 // runs with every rule on. Measured values are in docs/experiments/2026-10-28-m22-ablations.md.
@@ -62,7 +62,8 @@ describe("§8 ablations (M22)", () => {
         const t = grown("obliqueSun", seed, 40, { c4: { ...p.c4, xi } }).trees[0] as Tree;
         const c = t.m.cols;
         let cos = 0;
-        for (let i = 0; i < t.m.length; i++) cos += Math.cos(c.angle[i] as number);
+        for (let i = 0; i < t.m.length; i++)
+          cos += Math.cos(Math.atan2(c.hy[i] as number, c.hx[i] as number));
         return { cos: cos / t.m.length, offset: treeMetrics(t).centroidOffset };
       });
     const on = toSun(0.3);
@@ -159,7 +160,7 @@ describe("§8 ablations (M22)", () => {
     // far less and no seedling starves. Measured: CV 0.03–0.11 against 0.26–0.33; 60 of 60 alive
     // against about 21. (The directional stand is not clearly bimodal either, so bimodality itself
     // is not tested; STATUS known issues.)
-    const stand = (model: "sky" | "pooled") =>
+    const stand = (model: "slab" | "pooled") =>
       [1, 2, 3].map((seed) => {
         const p = presetParams("thinning", seed);
         const world = grown("thinning", seed, 40, { c2: { ...p.c2, model } });
@@ -168,7 +169,7 @@ describe("§8 ablations (M22)", () => {
         const sd = Math.sqrt(mean(mass.map((x) => (x - m) ** 2)));
         return { cv: sd / m, alive: mass.length };
       });
-    const sky = stand("sky");
+    const sky = stand("slab");
     const pooled = stand("pooled");
     expect(mean(pooled.map((r) => r.cv))).toBeLessThan(0.5 * mean(sky.map((r) => r.cv)));
     expect(pooled.every((r) => r.alive === 60)).toBe(true);

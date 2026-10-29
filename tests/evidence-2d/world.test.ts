@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { presetParams } from "../../src/core/presets.ts";
 import { Slot } from "../../src/core/types.ts";
-import { hashWorld, type Tree, treeMetrics, World } from "./rust.ts";
+import { hashWorld, type Tree, treeMetrics, World } from "../world.ts";
 
 function checkInvariants(tree: Tree): void {
   const c = tree.m.cols;

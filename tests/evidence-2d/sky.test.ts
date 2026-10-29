@@ -6,8 +6,8 @@ import {
   PRE_R1,
   type PresetName,
 } from "../../src/core/presets.ts";
-import type { Tree } from "./rust.ts";
-import { groundLight, type TreeMetrics, treeMetrics, World } from "./rust.ts";
+import type { Tree } from "../world.ts";
+import { groundLight, type TreeMetrics, treeMetrics, World } from "../world.ts";
 
 /** These checks are the M6–M7 evidence, so they run the presets as they were before R1 and R3, under the M6 light sweep. */
 const presetParams = (name: PresetName, seed?: number) =>
@@ -95,7 +95,7 @@ describe("M6: the Beer–Lambert sky sweep (§C2, §7 M6)", () => {
   });
 
   it("does not depend on the order trees are processed in", () => {
-    const params = mergeParams(presetParams("pair", 2), { c2: { model: "sky" } });
+    const params = mergeParams(presetParams("pair", 2), { c2: { model: "slab" } });
     const forward = new World(params);
     const reversed = new World(params);
     (reversed.trees as Tree[]).reverse();

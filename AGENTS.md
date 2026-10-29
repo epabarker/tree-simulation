@@ -4,7 +4,7 @@ Instructions for any coding agent (Claude Code reads this through `CLAUDE.md`).
 
 ## What this is
 
-An interactive 2D tree-growth simulator for a personal website. The trees self-organise in the style of Palubicki et al. (2009): buds compete for light in a shared grid, resources are allocated by the Borchert–Honda rule, shaded branches are shed, and girth follows the pipe model. The goal is beautiful behaviour that emerges from simple local principles. It is served as static files. The simulation core is Rust (ADR 0024): WASM on the page, and a native binary for batch experiments analysed in Python or R.
+An interactive tree-growth simulator for a personal website: trees grow in a 3D slab and are drawn as a flat, frontal illustration (ADR 0024, 0025). The trees self-organise in the style of Palubicki et al. (2009): buds compete for light in a shared grid, resources are allocated by the Borchert–Honda rule, shaded branches are shed, and girth follows the pipe model. The goal is beautiful behaviour that emerges from simple local principles. It is served as static files. The simulation core is Rust (ADR 0024): WASM on the page, and a native binary for batch experiments analysed in Python or R.
 
 ## Where the truth lives
 
@@ -29,6 +29,7 @@ npm run check              # builds the WASM, Rust fmt/clippy/tests, lint, typec
 npm run build:wasm         # the Rust core → src/wasm/pkg/ (generated; check and test build it too)
 npm run rust:check         # cargo fmt, clippy -D warnings and tests, with and without the threads feature
 npm run test               # tests only
+npm run evidence:2d        # the 2D-calibrated milestone tests against the 3D core: calibration's backlog
 npm run format             # Biome auto-fix
 npm run build              # static site in dist/ (the lab, and garden.html)
 npm run build:garden       # garden.js + worker in dist-garden/ for a host page, size-gated (ADR 0014)
@@ -58,7 +59,8 @@ rust/core/           tree-core, the simulation:
   src/rng.rs                   keyed-hash randomness and the Purpose registry (ADR 0002)
   src/tree.rs world.rs         SoA tables, slots, bud states; World: trees, light, events, replay
   src/season.rs                the §6 season loop, one function per phase
-  src/light/                   light models (§C2.8): shadow triangle, the 2D sky sweep, the 3D slab sweep
+  src/geom.rs                  3D vectors, rotations, frames and parallel transport
+  src/light/                   light models (§C2.8): the 3D slab sweep (fixed lanes), pooled
   src/principles/              one file per principle: c1.rs, c3.rs, …, each with its unit tests
   src/checkpoint.rs snapshot.rs metrics.rs form.rs hash.rs
   src/math/                    the core's Math: the libm crate, the same natively and in WASM
@@ -66,7 +68,8 @@ rust/core/           tree-core, the simulation:
 rust/wasm/           tree-wasm: the thin wasm-bindgen wrapper (World, SlabSweep; Math exports with `testing`)
 rust/cli/            treesim: the native headless runner → runs/<id>/{run.json,metrics.csv,metamers.csv,hash.txt}
 cli/run.ts           builds treesim when stale and runs it (analysis/treesim/sweep.py calls this)
-tests/               goldens in WASM, checkpoints, evidence/ (the milestone tests)
+tests/               goldens in WASM, checkpoints, structure; world.ts (the core under test names);
+                     evidence-2d/ (the 2D-calibrated milestone tests, C1–C8's backlog, not in `npm test`)
 analysis/            uv project: polars + plotnine; experiments/ holds one script per milestone
 ```
 
@@ -74,7 +77,8 @@ analysis/            uv project: polars + plotnine; experiments/ holds one scrip
 
 - **The core is Rust** (`rust/core`, I1, ADR 0024). The page, the CLI and the tests all run it; there is no second implementation. `src/core` holds its params and presets as plain data and imports no DOM or Node APIs (`npm run typecheck` fails if it does). The TypeScript core is archived at the tag `golden-2d-ts`.
 - **Parent-before-child.** In every tree, `parent[i] < i`. New metamers and buds are only appended. Removal uses `compact`, which keeps row order, and every stored index is remapped through the map it returns. As a result, `birthId` ascends in array order.
-- **Topology is a parent plus a slot.** Each node has three slots: main = 0, left = 1, right = 2. A slot holds either a bud or a child metamer. There are no child pointers.
+- **Topology is a parent plus a slot.** Each node has the main slot (0) and up to seven laterals (1–7), placed by phyllotaxis (ADR 0025). A slot holds either a bud or a child metamer. There are no child pointers.
+- **Directions are frames.** Every metamer and bud has a heading H and a reference L ⟂ H, both unit; L travels by parallel transport (`geom::transport`). Never store an angle; the picture's angle is derived (the snapshot's `angle`).
 - **Stable ids.** `birthId` (metamers and buds) keys RNG draws and tweening. Never key anything on an array index.
 - **Randomness** comes only from `rng.rs`: `hash(seed, purpose, tree, entity, season, k)`. Register new purposes in `purpose` and never renumber them. The core has no other source of randomness (the page may use `Math.random`, e.g. for "Reseed").
 - **Season order follows spec §6.** All trees read one start-of-season light field. Loops over a table run only over the rows that existed when their phase began; this is the "staging".
@@ -90,7 +94,7 @@ analysis/            uv project: polars + plotnine; experiments/ holds one scrip
 - Each principle file starts with a header naming the principle, its spec section, its rule in one paragraph, and the params it reads.
 - Comments explain _why_, citing spec sections or papers. Code reads like the existing files: in Rust, plain loops over column `Vec`s, free functions per rule, and no structs beyond the tables, `Tree`, `World` and the params.
 - Formatting: `cargo fmt` and clippy with `-D warnings` for Rust; Biome for TypeScript (2 spaces, double quotes, width 100). TypeScript is strict with `erasableSyntaxOnly`: no enums, namespaces or constructor parameter properties. Use `as const` objects instead.
-- Tests: one unit test per local rule (a `#[cfg(test)]` module in the principle's file; `crate::testing::preset` gives a preset's params), plus each milestone's "visible test" from §7 as an automated check where possible (`tests/evidence/`).
+- Tests: one unit test per local rule (a `#[cfg(test)]` module in the principle's file; `crate::testing::preset` gives a preset's params), plus each milestone's "visible test" from §7 as an automated check where possible. Since I2 the milestone tests calibrated in 2D are `tests/evidence-2d/` (not in `npm test`): re-derive each in 3D at its calibration milestone and move it back.
 - **Seeds in evidence tests:** a claim about all of N seeds needs N ≥ 20 and a stated pass rate ("≥ 15 of seeds 1–20"), with the counts each build reached written beside it. Five fixed seeds test the seeds, not the behaviour: any change of realisation breaks them ([note](docs/experiments/2026-10-30-production-thresholds.md)).
 - Scene colours are CSS tokens in `src/web/render/scene.css` (light and dark, in a layer a host page can override); the lab's own are in `src/web/ui/layout.css`. The canvas reads them via `src/web/render/theme.ts`. Don't hard-code colours in TypeScript.
 - Generated output (`runs/`, `dist/`, `analysis/out/`) is never committed. Small figures that support an experiment note go in `docs/experiments/figures/`.

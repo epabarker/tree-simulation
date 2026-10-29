@@ -3,8 +3,8 @@ import { type FixtureName, fixtureParams, isFixtureName } from "../../src/core/f
 import { HAND_FLORA } from "../../src/core/flora.ts";
 import { mergeParams, type ParamsPatch, patchSpecies } from "../../src/core/params.ts";
 import { PRE_R4, type PresetName, presetParams } from "../../src/core/presets.ts";
-import type { Tree } from "./rust.ts";
-import { isLiveBud, limbShapes, World } from "./rust.ts";
+import type { Tree } from "../world.ts";
+import { isLiveBud, limbShapes, World } from "../world.ts";
 
 // M9 visible test (§7, ADR 0011): drooping limbs with upturned tips, a weeping form, Troll
 // straightening, and Δ > 2 at heavy junctions with stress-driven girth. 5 seeds each.
@@ -88,7 +88,8 @@ describe("M9: mechanics (§R3, ADR 0011)", () => {
           thickest[p] = i;
       }
       const tilts: number[] = [];
-      for (let i = 0; i >= 0; i = thickest[i] as number) tilts.push(tilt(c.angle[i] as number));
+      for (let i = 0; i >= 0; i = thickest[i] as number)
+        tilts.push(tilt(Math.atan2(c.hy[i] as number, c.hx[i] as number)));
       return median(tilts);
     };
     const upright = median(open.map(trunkTilt));
@@ -108,7 +109,7 @@ describe("M9: mechanics (§R3, ADR 0011)", () => {
         const m = b.metamer[j];
         if (!isLiveBud(b.state[j]) || c.order[m] < 1) continue;
         n += 1;
-        if (elevation(c.angle[m]) < -30) down += 1;
+        if (elevation(Math.atan2(c.hy[m] as number, c.hx[m] as number)) < -30) down += 1;
       }
       return down / n;
     };
@@ -123,7 +124,8 @@ describe("M9: mechanics (§R3, ADR 0011)", () => {
       const c = tree.m.cols;
       const tilts: number[] = [];
       for (let i = 0; i < tree.m.length; i++) {
-        if (c.order[i] === 0 && season - c.birthSeason[i] >= 10) tilts.push(tilt(c.angle[i]));
+        if (c.order[i] === 0 && season - c.birthSeason[i] >= 10)
+          tilts.push(tilt(Math.atan2(c.hy[i] as number, c.hx[i] as number)));
       }
       return median(tilts);
     };
@@ -154,7 +156,11 @@ describe("M9: mechanics (§R3, ADR 0011)", () => {
       for (let i = 0; i >= 0; i = up[i] as number) axis.push(i);
       const top = axis[axis.length - 1] as number;
       const chord = Math.atan2(tree.tipY(top), tree.tipX(top) - tree.rootX);
-      return { chord: tilt(chord), mid: signedTilt(c.angle[axis[axis.length >> 1] as number]) };
+      const mid = axis[axis.length >> 1] as number;
+      return {
+        chord: tilt(chord),
+        mid: signedTilt(Math.atan2(c.hy[mid] as number, c.hx[mid] as number)),
+      };
     };
     for (const seed of SEEDS) {
       for (const posture of [true, false]) {

@@ -80,6 +80,9 @@ const METRIC_NUMBERS = [
   "epicormic",
   "aborted",
   "broken",
+  "rootZ",
+  "crownDepth",
+  "centroidOffsetZ",
 ] as const;
 const FLAGS = new Set(["alive", "sown"]);
 
@@ -100,7 +103,7 @@ export function snapshotTransferables(s: Snapshot): ArrayBuffer[] {
   return [...new Set([s.parent.buffer, s.shadow?.buffer].filter(Boolean))] as ArrayBuffer[];
 }
 
-/** tree.rs NUMBERS, after [id, rootX, alive, discarded, sown, metamers, buds] in tree_scalars. */
+/** tree.rs NUMBERS, after [id, rootX, alive, discarded, sown, metamers, buds] in tree_scalars (then rootZ). */
 const NUMBERS = [
   "age",
   "nextMetamerId",
@@ -179,6 +182,9 @@ export class TreeView {
   }
   get rootX(): number {
     return this.scalars()[1] as number;
+  }
+  get rootZ(): number {
+    return this.scalars()[7 + NUMBERS.length] as number;
   }
   get alive(): boolean {
     return this.scalars()[2] === 1;
@@ -263,12 +269,23 @@ export class TreeView {
 
   tipX(i: number): number {
     const c = this.m.cols;
-    return (c.baseX[i] as number) + (c.length[i] as number) * Math.cos(c.angle[i] as number);
+    return (c.baseX[i] as number) + (c.length[i] as number) * (c.hx[i] as number);
   }
 
   tipY(i: number): number {
     const c = this.m.cols;
-    return (c.baseY[i] as number) + (c.length[i] as number) * Math.sin(c.angle[i] as number);
+    return (c.baseY[i] as number) + (c.length[i] as number) * (c.hy[i] as number);
+  }
+
+  tipZ(i: number): number {
+    const c = this.m.cols;
+    return (c.baseZ[i] as number) + (c.length[i] as number) * (c.hz[i] as number);
+  }
+
+  /** Metamer `i`'s direction as drawn in the picture's plane, radians (0 = +x, π/2 = up). */
+  angle(i: number): number {
+    const c = this.m.cols;
+    return Math.atan2(c.hy[i] as number, c.hx[i] as number);
   }
 }
 
@@ -365,9 +382,10 @@ export class RustWorld {
     this.inner.remove_tree(tree);
   }
 
-  plantTree(x: number, species?: string): void {
+  /** Sows a tree at (x, z) (z absent: the slab's middle) at the next season boundary. */
+  plantTree(x: number, species?: string, z?: number): void {
     this.version += 1;
-    this.inner.plant_tree(x, species);
+    this.inner.plant_tree(x, z, species);
   }
 
   record(): RunRecord {
@@ -411,15 +429,15 @@ export class RustWorld {
     return out as unknown as FormMetrics;
   }
 
-  /** Mean light on the ground over columns [x0, x1], as a fraction of open sky. */
+  /** Mean light on the ground over columns [x0, x1] through the slab's depth, as a fraction of open sky. */
   groundLight(x0: number, x1: number): number {
     return this.inner.ground_light(x0, x1);
   }
 
-  /** {q, vx, vy} of this season's light field at (x, y) for a bud heading `dir`. */
-  sample(x: number, y: number, dir: number): { q: number; vx: number; vy: number } {
-    const [q, vx, vy] = this.inner.sample(x, y, dir) as unknown as [number, number, number];
-    return { q, vx, vy };
+  /** {q, vx, vy, vz} of this season's light field at (x, y, z). */
+  sample(x: number, y: number, z: number): { q: number; vx: number; vy: number; vz: number } {
+    const [q, vx, vy, vz] = this.inner.sample(x, y, z) as unknown as number[];
+    return { q: q as number, vx: vx as number, vy: vy as number, vz: vz as number };
   }
 
   /** The wasm-bindgen object (TreeView reads through it). */
@@ -476,11 +494,19 @@ export class RustWorld {
       storm: this.storm,
       metamerCount: nm,
       parent: i32(nm),
+      // In the buffer's order (rust/core/src/snapshot.rs): evaluated top to bottom.
       x0: f32(nm),
       y0: f32(nm),
       angle: f32(nm),
       length: f32(nm),
       radius: f32(nm),
+      z0: f32(nm),
+      dirX: f32(nm),
+      dirY: f32(nm),
+      dirZ: f32(nm),
+      refX: f32(nm),
+      refY: f32(nm),
+      refZ: f32(nm),
       tree: i32(nm),
       birthId: i32(nm),
       order: u8(nm),

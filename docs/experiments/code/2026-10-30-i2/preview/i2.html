@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>I2: forests grown in 3D</title>
+    <style>
+      body { font: 15px/1.45 system-ui, sans-serif; margin: 0; color: #222; background: #fff; }
+      header, section { padding: 10px 16px; }
+      h1 { font-size: 18px; margin: 0 0 6px; }
+      h2 { font-size: 16px; margin: 14px 0 6px; }
+      label { margin-right: 12px; }
+      select, button { font: inherit; padding: 4px 10px; }
+      .pair { display: grid; grid-template-columns: 1fr; gap: 8px; padding: 0 16px; }
+      @media (min-width: 900px) { .pair { grid-template-columns: 1fr 1fr; } }
+      figure { margin: 0; }
+      figcaption { font-size: 13px; color: #555; padding: 2px 0; }
+      .plate { position: relative; width: 100%; aspect-ratio: var(--aspect, 0.6); border: 1px solid #ddd; overflow: hidden; }
+      .plate canvas { width: 100%; height: 100%; display: block; }
+      table { border-collapse: collapse; margin: 6px 0 12px; }
+      td, th { border-bottom: 1px solid #ddd; padding: 3px 10px 3px 0; text-align: right; font-variant-numeric: tabular-nums; }
+      td:first-child, th:first-child { text-align: left; }
+      pre { background: #f4f4f4; padding: 8px; white-space: pre-wrap; font-size: 12px; }
+      #status { color: #555; }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>I2: the garden's forest grown in 3D, beside today's</h1>
+      <p>
+        Left: today's garden (0.14.0, 2D). Right: the same planting and seed grown in the slab
+        (D = 64, every principle), drawn orthographically: (x, y) in depth order, far to near,
+        with no perspective. Uncalibrated (calibration comes after this check). With O4's
+        recruits on, seeds land over the whole ground plane and fill every plate to its cap of 300
+        trees, a carpet the 2D row never had; the planting alone shows the planted crowns.
+      </p>
+      <label>plate <select id="width"><option value="66">phone (66 cells)</option><option value="160">laptop (160)</option></select></label>
+      <label>look <select id="look"><option value="interior">wood interior (τ 0.2, 0.2)</option><option value="edge">wood edge (1, 0.2)</option><option value="hedgerow">hedgerow (1, 1)</option></select></label>
+      <label>season <select id="season"><option>40</option><option>100</option></select></label>
+      <label>trees <select id="trees"><option value="planted">the planting alone (no recruits)</option><option value="grown">as the model grows it (O4 recruits)</option></select></label>
+      <span id="stats"></span>
+    </header>
+    <div class="pair">
+      <figure><figcaption>Today (2D, garden 0.14.0)</figcaption><div class="plate" id="flat"></div></figure>
+      <figure><figcaption>Grown in 3D (I2)</figcaption><div class="plate" id="deep"><canvas id="deepCanvas"></canvas></div></figure>
+    </div>
+    <section>
+      <h2>Season time on this device</h2>
+      <p>
+        From each stand at season 40 (the intro's end), ten seasons: the whole season in one lane,
+        and its light in four lanes (G3's model: four workers, each its own instance, every fourth
+        sky direction; the passes stay on one thread). Keep the screen on; it takes a few minutes.
+      </p>
+      <button id="go">Run</button> <span id="status"></span>
+      <div id="out"></div>
+      <pre id="json"></pre>
+    </section>
+    <script type="module" src="./i2.ts"></script>
+  </body>
+</html>

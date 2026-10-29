@@ -314,7 +314,8 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
   const view = Object.assign(options.view ?? {}, {
     colorMode: "natural",
     showLeaves: true,
-    depth: true,
+    // ADR 0008's pseudo-depth squeeze is retired: the trees are 3D (I2); depth order is I3's.
+    depth: false,
     leafAge: LEAF_STYLES.broadleaf.leafAge,
     leafStyle: "broadleaf",
     showBuds: false,

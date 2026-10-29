@@ -1,0 +1,24 @@
+== interior
+season 40: 99 trees, height p50 20.1, crown depth p50 9.6 (depth/height 0.46); faces 2.3% (even 6.2), beyond 93
+  bands: 2.2 2.1 3.1 3.3 2.4 6.7 12.0 17.1 17.1 11.5 6.5 3.0 2.8 3.5 3.5 2.9
+season 100: 78 trees, height p50 51.1, crown depth p50 9.1 (depth/height 0.19); faces 3.4% (even 6.2), beyond 54
+  bands: 4.3 3.4 4.1 5.0 2.3 4.1 8.8 18.1 17.9 8.3 4.1 2.9 3.6 4.5 4.9 3.6
+== edge
+season 40: 93 trees, height p50 22.0, crown depth p50 10.6 (depth/height 0.47); faces 7.2% (even 6.2), beyond 714
+  bands: 10.2 7.6 5.9 4.3 4.4 6.7 9.5 13.5 12.8 8.8 4.6 1.9 1.9 2.4 2.6 2.2
+season 100: 73 trees, height p50 58.0, crown depth p50 10.3 (depth/height 0.18); faces 14.5% (even 6.2), beyond 834
+  bands: 23.4 12.9 8.3 4.2 2.2 2.6 4.4 10.8 10.7 5.4 2.6 1.7 2.0 2.4 3.1 2.5
+== hedgerow
+season 40: 97 trees, height p50 29.8, crown depth p50 10.8 (depth/height 0.38); faces 11.6% (even 6.2), beyond 1563
+  bands: 8.0 5.3 4.2 3.5 3.6 5.6 7.7 10.7 10.5 7.5 5.5 3.7 2.9 3.8 5.9 10.4
+season 100: 79 trees, height p50 68.2, crown depth p50 10.8 (depth/height 0.19); faces 22.0% (even 6.2), beyond 2062
+  bands: 16.9 9.0 5.7 2.9 2.1 2.3 3.3 7.5 7.5 3.5 2.0 1.9 1.9 4.1 8.4 19.7
+== interior (planted)
+season 40: 9 trees, height p50 69.7, crown depth p50 30.5 (depth/height 0.44); faces 2.3% (even 6.2), beyond 93
+season 100: 7 trees, height p50 113.6, crown depth p50 28.0 (depth/height 0.25); faces 3.4% (even 6.2), beyond 54
+== edge (planted)
+season 40: 9 trees, height p50 70.6, crown depth p50 35.8 (depth/height 0.51); faces 7.2% (even 6.2), beyond 714
+season 100: 7 trees, height p50 114.7, crown depth p50 32.4 (depth/height 0.28); faces 14.5% (even 6.2), beyond 834
+== hedgerow (planted)
+season 40: 9 trees, height p50 71.3, crown depth p50 40.8 (depth/height 0.57); faces 11.6% (even 6.2), beyond 1563
+season 100: 7 trees, height p50 115.8, crown depth p50 33.1 (depth/height 0.29); faces 22.0% (even 6.2), beyond 2062

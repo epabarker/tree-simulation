@@ -20,7 +20,8 @@ The 3D port's preview pages (ADR 0024) live on a branch of the site, not here. T
   - `proto.html`, the prototype's and the τ runs' stands;
   - `g3.html`, G3's timing of the Rust slab sweep on three prototype stands (`g3/*.bin`);
   - `../i1/i1.html`, I1's goldens and seasons in each core, from `code/2026-10-29-i1/preview/` (built at the tag `golden-2d-ts`: it runs the TypeScript core beside the Rust one);
-  - `../first/compare.html`, each opening forest as garden 0.14.0 shipped it beside the Rust core's, from `code/2026-10-30-first-paint/`.
+  - `../first/compare.html`, each opening forest as garden 0.14.0 shipped it beside the Rust core's, from `code/2026-10-30-first-paint/`;
+  - `../i2/i2.html`, I2's visual check V (the garden's planting grown in 3D beside today's garden, served from the site's `/garden/0.14.0/`) and the season's time on the visitor's device, from `code/2026-10-30-i2/preview/` (stands from `bake.ts`, `trim.ts`, `bake-2d.sh`; about 245 MB).
 
   It is about **114 MB**, almost all of it baked stands (`proto/stands/*.json.gz`, `g3/`).
 - **Never merge it.** It would put 108 MB of throwaway stands and site-wide COOP/COEP on production.

@@ -1,13 +1,18 @@
-//! One tree's state (spec §5; `src/core/tree.ts`, `src/core/soa.ts`): a metamer table and a bud
-//! table, structure-of-arrays, rows appended and compacted in order, so `parent[i] < i` and
-//! `birth_id` ascends. Topology is a parent plus a slot (main 0, left 1, right 2).
+//! One tree's state (spec §5): a metamer table and a bud table, structure-of-arrays, rows appended
+//! and compacted in order, so `parent[i] < i` and `birth_id` ascends. Topology is a parent plus a
+//! slot: main 0, laterals 1 to `SLOTS − 1` (I2, ADR 0025: C1's phyllotaxis places them).
 //!
-//! Columns are listed in the TypeScript schema's order: the state hash, checkpoints and the
-//! bridge to the TypeScript core walk them in that order. Integer columns keep JavaScript's
-//! typed-array semantics: a value stored into an `Int32Array` or `Uint8Array` wraps (`store_i32`,
+//! Directions are frames (`geom`): a heading H and a reference L ⟂ H per metamer and per bud. A
+//! metamer runs from its base along H for its length; a lateral's `azimuth` is its angle around
+//! its parent's H from the parent's L, kept so that R4's bud bank can put a bud back where a
+//! branch was shed.
+//!
+//! Columns are listed in `src/core/types.ts`'s schema order: the state hash, checkpoints and the
+//! page's `TreeView` walk them in that order. Integer columns keep JavaScript's typed-array
+//! semantics: a value stored into an `Int32Array` or `Uint8Array` wraps (`store_i32`,
 //! `store_u8`).
 
-use crate::math;
+use crate::geom::V3;
 
 /// A column of a table, by element type (the typed arrays the TypeScript core uses).
 pub enum Col<'a> {
@@ -147,7 +152,7 @@ macro_rules! table {
 }
 
 table!(
-    /// METAMER_SCHEMA (tree.ts).
+    /// METAMER_SCHEMA (types.ts). (mx, my, mz): R3's bending moment at the base, last season.
     Metamers {
         birth_id: i32 = "birthId",
         parent: i32 = "parent",
@@ -157,7 +162,14 @@ table!(
         order: u8 = "order",
         base_x: f64 = "baseX",
         base_y: f64 = "baseY",
-        angle: f64 = "angle",
+        base_z: f64 = "baseZ",
+        hx: f64 = "hx",
+        hy: f64 = "hy",
+        hz: f64 = "hz",
+        lx: f64 = "lx",
+        ly: f64 = "ly",
+        lz: f64 = "lz",
+        azimuth: f64 = "azimuth",
         length: f64 = "length",
         radius: f64 = "radius",
         scar_sum_n: f64 = "scarSumN",
@@ -166,13 +178,15 @@ table!(
         n_sum: i32 = "nSum",
         v_in: f64 = "vIn",
         stress_wood: f64 = "stressWood",
-        moment: f64 = "moment",
+        mx: f64 = "mx",
+        my: f64 = "my",
+        mz: f64 = "mz",
         pa_shift: u8 = "paShift",
     }
 );
 
 table!(
-    /// BUD_SCHEMA (tree.ts).
+    /// BUD_SCHEMA (types.ts). (hx, hy, hz) the default growth direction, (vx, vy, vz) C2's V.
     Buds {
         birth_id: i32 = "birthId",
         metamer: i32 = "metamer",
@@ -180,20 +194,31 @@ table!(
         state: u8 = "state",
         age: i32 = "age",
         order: u8 = "order",
-        angle: f64 = "angle",
+        hx: f64 = "hx",
+        hy: f64 = "hy",
+        hz: f64 = "hz",
+        lx: f64 = "lx",
+        ly: f64 = "ly",
+        lz: f64 = "lz",
+        azimuth: f64 = "azimuth",
         q: f64 = "q",
         vx: f64 = "vx",
         vy: f64 = "vy",
+        vz: f64 = "vz",
         v: f64 = "v",
     }
 );
 
-/// Slots at a node.
+/// Slots at a node: the main continuation, then laterals 1, 2, … in phyllotactic order.
 pub mod slot {
     pub const MAIN: u8 = 0;
-    pub const LEFT: u8 = 1;
-    pub const RIGHT: u8 = 2;
+    /// The first lateral.
+    pub const LATERAL: u8 = 1;
 }
+
+/// Slots per node (the main one and up to seven laterals: a whorl of seven): the stride of the
+/// per-slot scratch arrays.
+pub const SLOTS: usize = 8;
 
 /// Bud fates, stored in tables and snapshots: append, never renumber.
 pub mod bud {
@@ -261,6 +286,7 @@ pub const NUMBERS: &[&str] = &[
 pub struct Tree {
     pub id: usize,
     pub root_x: f64,
+    pub root_z: f64,
     pub alive: bool,
     /// A dead tree whose tables were freed (`World::discard_dead`).
     pub discarded: bool,
@@ -317,10 +343,11 @@ pub fn ensure<T: Default + Clone>(v: &mut Vec<T>, n: usize) {
 }
 
 impl Tree {
-    pub fn new(id: usize, root_x: f64) -> Tree {
+    pub fn new(id: usize, root_x: f64, root_z: f64) -> Tree {
         Tree {
             id,
             root_x,
+            root_z,
             alive: true,
             ..Tree::default()
         }
@@ -329,8 +356,8 @@ impl Tree {
     /// Sizes every per-metamer scratch array for the rows now in the table (`ensureScratch`).
     pub fn ensure_scratch(&mut self) {
         let n = self.m.len();
-        ensure(&mut self.q_slot, 3 * n);
-        ensure(&mut self.v_slot, 3 * n);
+        ensure(&mut self.q_slot, SLOTS * n);
+        ensure(&mut self.v_slot, SLOTS * n);
         ensure(&mut self.scratch_f, n);
         ensure(&mut self.scratch_u, n.max(self.b.len()));
         for v in [
@@ -371,11 +398,54 @@ impl Tree {
     }
 
     pub fn tip_x(&self, i: usize) -> f64 {
-        self.m.base_x[i] + self.m.length[i] * math::cos(self.m.angle[i])
+        self.m.base_x[i] + self.m.length[i] * self.m.hx[i]
     }
 
     pub fn tip_y(&self, i: usize) -> f64 {
-        self.m.base_y[i] + self.m.length[i] * math::sin(self.m.angle[i])
+        self.m.base_y[i] + self.m.length[i] * self.m.hy[i]
+    }
+
+    pub fn tip_z(&self, i: usize) -> f64 {
+        self.m.base_z[i] + self.m.length[i] * self.m.hz[i]
+    }
+
+    pub fn tip(&self, i: usize) -> V3 {
+        [self.tip_x(i), self.tip_y(i), self.tip_z(i)]
+    }
+
+    pub fn base(&self, i: usize) -> V3 {
+        [self.m.base_x[i], self.m.base_y[i], self.m.base_z[i]]
+    }
+
+    /// Metamer `i`'s heading H.
+    pub fn heading(&self, i: usize) -> V3 {
+        [self.m.hx[i], self.m.hy[i], self.m.hz[i]]
+    }
+
+    /// Metamer `i`'s reference L.
+    pub fn reference(&self, i: usize) -> V3 {
+        [self.m.lx[i], self.m.ly[i], self.m.lz[i]]
+    }
+
+    pub fn set_frame(&mut self, i: usize, h: V3, l: V3) {
+        let c = &mut self.m;
+        (c.hx[i], c.hy[i], c.hz[i]) = (h[0], h[1], h[2]);
+        (c.lx[i], c.ly[i], c.lz[i]) = (l[0], l[1], l[2]);
+    }
+
+    /// Bud `j`'s default growth direction.
+    pub fn bud_heading(&self, j: usize) -> V3 {
+        [self.b.hx[j], self.b.hy[j], self.b.hz[j]]
+    }
+
+    pub fn bud_reference(&self, j: usize) -> V3 {
+        [self.b.lx[j], self.b.ly[j], self.b.lz[j]]
+    }
+
+    pub fn set_bud_frame(&mut self, j: usize, h: V3, l: V3) {
+        let c = &mut self.b;
+        (c.hx[j], c.hy[j], c.hz[j]) = (h[0], h[1], h[2]);
+        (c.lx[j], c.ly[j], c.lz[j]) = (l[0], l[1], l[2]);
     }
 
     /// A numeric scalar by its TypeScript name.

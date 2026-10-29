@@ -6,7 +6,8 @@
 //! The phases are separate functions so that I1 could port them one at a time behind the
 //! TypeScript core (the bridge in `rust/wasm`) and so that `bench` can time them.
 
-use crate::light::Light;
+use crate::geom::V3;
+use crate::light::{Light, depth_of};
 use crate::math;
 use crate::params::{DEG, Params};
 use crate::principles::c1::{grow_shoot, juvenile_cap, shoot_size};
@@ -14,7 +15,7 @@ use crate::principles::c3::{allocate, gather_light, is_live_bud};
 use crate::principles::c4::shoot_direction;
 use crate::principles::c5::{crown_top_light, shed_branches};
 use crate::principles::c6::update_girth;
-use crate::principles::o2::{EMPTY, abrade, tag_owner};
+use crate::principles::o2::{EMPTY, Grid, abrade, tag_owner};
 use crate::principles::o4::stand_dynamics;
 use crate::principles::obstacles::clear_obstacles;
 use crate::principles::r1::{carbon_balance, starved_to_death};
@@ -174,30 +175,29 @@ fn deposit_buds(
             continue;
         }
         let m = b.metamer[i] as usize;
-        let (x, y) = (tree.tip_x(m), tree.tip_y(m));
-        light.deposit(x, y, area);
+        let [x, y, z] = tree.tip(m);
+        light.deposit(x, y, z, area);
         if owners {
-            tag_foliage(world_params, owner, tree, x, y);
+            tag_foliage(world_params, owner, tree, x, y, z);
         }
     }
 }
 
-/// O2: tags the cell at (x, y) as holding foliage of `tree`.
-fn tag_foliage(params: &Params, owner: &mut [i32], tree: &Tree, x: f64, y: f64) {
-    let (w, h) = (params.world.width, params.world.height);
+/// O2: tags the cell at (x, y, z) as holding foliage of `tree`.
+fn tag_foliage(params: &Params, owner: &mut [i32], tree: &Tree, x: f64, y: f64, z: f64) {
+    let (w, h, d) = (params.world.width, params.world.height, depth_of(params));
     let mut col = x.floor();
-    let row = y.floor();
+    let (row, layer) = (y.floor(), z.floor());
     if params.world.periodic {
         col = ((col % w) + w) % w;
     }
-    if col < 0.0 || col >= w || row < 0.0 || row >= h {
+    if col < 0.0 || col >= w || row < 0.0 || row >= h || layer < 0.0 || layer >= d {
         return;
     }
     tag_owner(
         owner,
-        w as usize,
-        col as usize,
-        row as usize,
+        (w as usize, d as usize),
+        (col as usize, row as usize, layer as usize),
         tree.id as i32,
     );
 }
@@ -239,10 +239,10 @@ fn sample_buds(light: &Light, tree: &mut Tree) {
             continue;
         }
         let m = tree.b.metamer[i] as usize;
-        let (q, vx, vy) = light.sample(tree.tip_x(m), tree.tip_y(m), tree.b.angle[i]);
+        let [x, y, z] = tree.tip(m);
+        let (q, v) = light.sample(x, y, z);
         tree.b.q[i] = q;
-        tree.b.vx[i] = vx;
-        tree.b.vy[i] = vy;
+        (tree.b.vx[i], tree.b.vy[i], tree.b.vz[i]) = (v[0], v[1], v[2]);
         sum += q;
         count += 1.0;
     }
@@ -254,14 +254,13 @@ fn sample_buds(light: &Light, tree: &mut Tree) {
 fn sample_nodes(wp: &Params, own: &Params, light: &Light, owner: &[i32], tree: &mut Tree) {
     let c = wp.c2.c;
     let by_neighbours = own.r5.neighbours;
-    let (w, h, periodic) = (wp.world.width, wp.world.height, wp.world.periodic);
+    let grid = Grid::of(wp);
     for i in 0..tree.m.len() {
-        let x = tree.tip_x(i);
-        let y = tree.tip_y(i);
-        let (q, _, _) = light.sample(x, y, tree.m.angle[i]);
+        let [x, y, z] = tree.tip(i);
+        let (q, _) = light.sample(x, y, z);
         let mut s = shade_of(q, c);
         if by_neighbours && s > 0.0 {
-            s *= neighbour_share(owner, w, h, periodic, x, y, tree.id as f64);
+            s *= neighbour_share(owner, &grid, [x, y, z], tree.id as f64);
         }
         tree.node_shade[i] = s;
     }
@@ -367,12 +366,12 @@ pub fn phase_deaths(world: &mut World, live: &[usize]) {
             ..
         } = &mut *world;
         let wp = &rules.params;
-        let (w, h, periodic) = (wp.world.width, wp.world.height, wp.world.periodic);
+        let grid = Grid::of(wp);
         let abrasion = wp.o2.enabled;
         for &i in live {
             let own = rules.of(&trees[i].species);
             trees[i].abraded = if abrasion {
-                abrade(&mut trees[i], owner, w, h, periodic, own, season)
+                abrade(&mut trees[i], owner, &grid, own, season)
             } else {
                 0.0
             };
@@ -459,24 +458,22 @@ pub fn grow_buds(tree: &mut Tree, params: &Params, season: f64) {
             let pa = bud_order - shift;
             let upright = set_point_scale(shade, r5);
             let length = shoot_length * elongation(shade, r5);
-            let mut direct = |tree: &Tree, prev: f64, b: usize, id: f64| -> f64 {
+            let mut direct = |tree: &Tree, prev: V3, b: usize, id: f64| -> V3 {
                 if !c4.enabled {
                     return prev;
                 }
-                let noise = sigma
-                    * normal(
-                        params.seed,
-                        purpose::DIRECTION_NOISE,
-                        tree.id as f64,
-                        id,
-                        season,
-                        0.0,
-                    );
+                let (tid, seed) = (tree.id as f64, params.seed);
+                // normal() takes keys 0 and 1; the turn's axis is key 2.
+                let noise = sigma * normal(seed, purpose::DIRECTION_NOISE, tid, id, season, 0.0);
+                let around = 2.0
+                    * std::f64::consts::PI
+                    * uniform(seed, purpose::DIRECTION_NOISE, tid, id, season, 2.0);
                 let mut dir = direction_params(params, pa);
                 if upright != 1.0 {
                     dir.set_point *= upright;
                 }
-                shoot_direction(prev, tree.b.vx[b], tree.b.vy[b], noise, &dir)
+                let v = [tree.b.vx[b], tree.b.vy[b], tree.b.vz[b]];
+                shoot_direction(prev, tree.bud_reference(b), v, noise, around, &dir)
             };
             let pa_shift = if reiterates { shift } else { -1.0 };
             grow_shoot(tree, i, n, length, params, season, &mut direct, pa_shift);

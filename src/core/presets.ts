@@ -16,7 +16,7 @@ export interface Preset {
 
 /** Principles shared by every stand preset (C2–C6 on, λ = 0.5). */
 const STAND = {
-  c2: { enabled: true, model: "triangle" },
+  c2: { enabled: true, model: "slab" },
   c3: { mode: "bh", lambda: 0.5 },
   c4: { enabled: true },
   c5: { enabled: true },
@@ -35,7 +35,7 @@ const STAND = {
  */
 export const SKY = {
   ...STAND,
-  c2: { enabled: true, model: "sky" },
+  c2: { enabled: true, model: "slab" },
   c3: { mode: "bh", lambda: 0.5, alpha: 3 },
   c5: { enabled: true, T: 0.03, Trel: 0.12 },
   r1: { enabled: true },
@@ -58,11 +58,11 @@ export const PRE_R1 = {
 } satisfies ParamsPatch;
 
 /**
- * The M6 sky sweep (columns, periodic laps) the light model had before M18's row march: the M6–M7
- * evidence tests pin it, as they pin PRE_R1, so their calibrated thresholds keep testing what
- * they measured (the M18 note).
+ * The M6 sky sweep (columns, periodic laps) the light model had before M18's row march. The 2D
+ * sweeps are gone with I2 (the slab replaced them), so this patch is empty; the M6–M7 tests that
+ * pinned it are 2D-calibrated (tests/evidence-2d/).
  */
-export const M6_LIGHT = { c2: { sweep: "columns" } } satisfies ParamsPatch;
+export const M6_LIGHT = {} satisfies ParamsPatch;
 
 /** The sky presets before R4 and R5 (M8–M9): the tests of those milestones pin it. */
 export const PRE_R4 = { r4: { enabled: false }, r5: { enabled: false } } satisfies ParamsPatch;
@@ -133,7 +133,7 @@ export const presets = {
     patch: {
       world: { width: 100, height: 70, walls: [] },
       trees: [{ x: 50 }],
-      c2: { enabled: true, model: "triangle" },
+      c2: { enabled: true, model: "slab" },
       c3: { mode: "none" },
     },
   },
@@ -143,7 +143,7 @@ export const presets = {
     patch: {
       world: { width: 120, height: 90, walls: [] },
       trees: [{ x: 60 }],
-      c2: { enabled: true, model: "triangle" },
+      c2: { enabled: true, model: "slab" },
       c3: { mode: "bh", lambda: 0.5 },
     },
   },
@@ -153,7 +153,7 @@ export const presets = {
     patch: {
       world: { width: 120, height: 90, walls: [] },
       trees: [{ x: 60 }],
-      c2: { enabled: true, model: "triangle" },
+      c2: { enabled: true, model: "slab" },
       c3: { mode: "bh", lambda: 0.56 },
     },
   },
@@ -163,7 +163,7 @@ export const presets = {
     patch: {
       world: { width: 120, height: 90, walls: [] },
       trees: [{ x: 60 }],
-      c2: { enabled: true, model: "triangle" },
+      c2: { enabled: true, model: "slab" },
       c3: { mode: "bh", lambda: 0.46 },
     },
   },
@@ -173,7 +173,7 @@ export const presets = {
     patch: {
       world: { width: 120, height: 90, walls: [] },
       trees: [{ x: 60 }],
-      c2: { enabled: true, model: "triangle" },
+      c2: { enabled: true, model: "slab" },
       c3: { mode: "bh", lambda: 0.5 },
       c4: { enabled: true },
     },
@@ -184,7 +184,7 @@ export const presets = {
     patch: {
       world: { width: 100, height: 80, walls: [{ x: 36, y: 0, width: 8, height: 80, shade: 3 }] },
       trees: [{ x: 50 }],
-      c2: { enabled: true, model: "triangle" },
+      c2: { enabled: true, model: "slab" },
       c3: { mode: "bh", lambda: 0.5 },
       c4: { enabled: true },
     },
@@ -195,7 +195,7 @@ export const presets = {
     patch: {
       world: { width: 120, height: 100, walls: [] },
       trees: [{ x: 60 }],
-      c2: { enabled: true, model: "triangle" },
+      c2: { enabled: true, model: "slab" },
       c3: { mode: "bh", lambda: 0.5 },
       c4: { enabled: true },
       c5: { enabled: true },
@@ -284,7 +284,7 @@ export const presets = {
       world: { width: 230, height: 110, walls: [] },
       trees: [20, 41, 62, 83, 104, 125, 146, 167, 188, 209].map((x) => ({ x })),
       ...SKY,
-      c2: { enabled: true, model: "sky", skyExponent: 1.5 },
+      c2: { enabled: true, model: "slab", skyExponent: 1.5 },
     },
   },
   obliqueSun: {
@@ -294,7 +294,7 @@ export const presets = {
       world: { width: 120, height: 100, walls: [] },
       trees: [{ x: 50 }],
       ...SKY,
-      c2: { enabled: true, model: "sky", skyTilt: 0.5 },
+      c2: { enabled: true, model: "slab", skyTilt: 0.5 },
     },
   },
   forest: {

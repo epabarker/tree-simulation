@@ -31,18 +31,28 @@ export const METAMER_SCHEMA = {
   birthId: Int32Array,
   /** Index of the parent metamer, -1 for the root. Always less than the row's own index. */
   parent: Int32Array,
-  /** Slot at the parent's upper node (Slot). */
+  /** Slot at the parent's upper node: 0 the main one, 1 to 7 laterals in phyllotactic order. */
   slot: Uint8Array,
   /** birthId of the first metamer of this metamer's axis. */
   axis: Int32Array,
-  /** Position along the axis (0 = first metamer of the axis). Drives the side sequence. */
+  /** Position along the axis (0 = first metamer of the axis). Drives the phyllotaxis. */
   axisNode: Int32Array,
   /** Branching order (0 = trunk). */
   order: Uint8Array,
   baseX: Float64Array,
   baseY: Float64Array,
-  /** Absolute direction, radians (0 = +x, π/2 = up). */
-  angle: Float64Array,
+  /** Depth of the base in the slab, cells from the front face (I2). */
+  baseZ: Float64Array,
+  /** Heading H, a unit vector (y up): the metamer runs from its base along H for its length. */
+  hx: Float64Array,
+  hy: Float64Array,
+  hz: Float64Array,
+  /** The frame's reference L ⟂ H, carried by parallel transport; laterals' azimuths start at it. */
+  lx: Float64Array,
+  ly: Float64Array,
+  lz: Float64Array,
+  /** A lateral's azimuth round its parent's heading from the parent's L, radians (0 on the main slot). */
+  azimuth: Float64Array,
   length: Float64Array,
   radius: Float64Array,
   /** Σ r^n of branches shed from this metamer's upper node (C6 scars). */
@@ -58,18 +68,19 @@ export const METAMER_SCHEMA = {
   vIn: Float64Array,
   /**
    * Radius added by stress-driven girth (R3, ADR 0011): local reinforcement that does not carry on
-   * into the parent's pipe sum, so the pipe radius is `radius − stressWood`. Hashed only when
-   * non-zero (hash.ts), so runs without R3 keep their golden hashes.
+   * into the parent's pipe sum, so the pipe radius is `radius − stressWood`.
    */
   stressWood: Float64Array,
   /**
-   * Bending moment at the base after last season's mechanics pass (R3): the load increment
-   * M − M_prev sets this season's sag (Alméras & Fournier 2009). Hashed only when non-zero.
+   * Bending moment vector at the base after last season's mechanics pass (R3): the load increment
+   * M − M_prev sets this season's sag (Alméras & Fournier 2009).
    */
-  moment: Float64Array,
+  mx: Float64Array,
+  my: Float64Array,
+  mz: Float64Array,
   /**
    * Reiteration (R4): how many levels younger this axis's physiological age is than its order says;
-   * pa = min(order − paShift, levels − 1). Inherited by the whole subtree. Hashed only when non-zero.
+   * pa = min(order − paShift, levels − 1). Inherited by the whole subtree.
    */
   paShift: Uint8Array,
 } as const;
@@ -85,12 +96,20 @@ export const BUD_SCHEMA = {
   age: Int32Array,
   /** Order of the shoot this bud would produce. */
   order: Uint8Array,
-  /** Default growth direction, radians: the parent's direction, rotated by β for laterals. */
-  angle: Float64Array,
+  /** Default growth direction H (unit) and its frame's reference L: a lateral's is β from its metamer's. */
+  hx: Float64Array,
+  hy: Float64Array,
+  hz: Float64Array,
+  lx: Float64Array,
+  ly: Float64Array,
+  lz: Float64Array,
+  /** A lateral's azimuth round its metamer's heading (where R4's bank puts a bud back). */
+  azimuth: Float64Array,
   /** Light exposure Q and optimal direction V from the light model (C2). */
   q: Float64Array,
   vx: Float64Array,
   vy: Float64Array,
+  vz: Float64Array,
   /** Resource v delivered this season (C3). */
   v: Float64Array,
 } as const;
@@ -109,9 +128,19 @@ export interface Snapshot {
   /** Base position: used for roots; other rows start at their parent's tip. */
   x0: F32;
   y0: F32;
+  /** The segment as drawn in the picture's plane (projected along z): direction and length. */
   angle: F32;
   length: F32;
   radius: F32;
+  /** Depth of the base, cells from the front face (I2): draw far (large z) first. */
+  z0: F32;
+  /** The 3D heading H (unit) and the frame's reference L. */
+  dirX: F32;
+  dirY: F32;
+  dirZ: F32;
+  refX: F32;
+  refY: F32;
+  refZ: F32;
   tree: I32;
   birthId: I32;
   order: U8;
@@ -169,7 +198,7 @@ export interface TreeMetrics {
   shortShoots: number;
   /** Highest tip above the ground. */
   height: number;
-  /** Horizontal extent of all tips. */
+  /** Extent of all tips in x (the picture's plane). */
   crownWidth: number;
   /** Mean tip x minus root x: positive means the crown leans right. */
   centroidOffset: number;
@@ -189,7 +218,7 @@ export interface TreeMetrics {
   shed: number;
   /**
    * Mean light on the ground under the crown, as a fraction of open sky (Q/C in the bottom row
-   * of cells across the crown's width), from this season's start-of-season field (M6e; a closed
+   * of cells across the crown's width and depth), from this season's start-of-season field (M6e; a closed
    * stand's floor gets ≈ 2–10%, §10). NaN without a world.
    */
   groundLight: number;
@@ -220,6 +249,12 @@ export interface TreeMetrics {
   epicormic: number;
   aborted: number;
   broken: number;
+  /** Root position in depth (I2). */
+  rootZ: number;
+  /** Extent of all tips in z: the crown's depth (I2). */
+  crownDepth: number;
+  /** Mean tip z minus root z: positive means the crown leans back, away from the viewer. */
+  centroidOffsetZ: number;
 }
 
 export const METRIC_COLUMNS: readonly (keyof TreeMetrics)[] = [
@@ -257,6 +292,9 @@ export const METRIC_COLUMNS: readonly (keyof TreeMetrics)[] = [
   "epicormic",
   "aborted",
   "broken",
+  "rootZ",
+  "crownDepth",
+  "centroidOffsetZ",
 ];
 
 /** A change applied at the start of `season` (before that season runs). */

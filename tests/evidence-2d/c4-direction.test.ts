@@ -2,8 +2,8 @@
 import { describe, expect, it } from "vitest";
 import { mergeParams } from "../../src/core/params.ts";
 import { presetParams } from "../../src/core/presets.ts";
-import type { Tree } from "./rust.ts";
-import { World } from "./rust.ts";
+import type { Tree } from "../world.ts";
+import { World } from "../world.ts";
 
 const SEEDS = [1, 2, 3, 4, 5];
 const mean = (xs: number[]) => xs.reduce((a, b) => a + b, 0) / xs.length;

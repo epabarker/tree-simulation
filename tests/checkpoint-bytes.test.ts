@@ -1,8 +1,8 @@
 /**
- * Checkpoints (M21, I1): bytes saved by the Rust core load back and save the same, and a world
- * loaded from them grows on exactly as the one that saved them. The layout is the TypeScript
- * core's, so garden 0.14.0's shipped forest, written by that core, still loads and saves back the
- * same bytes. (The cross-core records are archived at the tag golden-2d-ts.)
+ * Checkpoints (M21, I1, I2): bytes saved by the Rust core load back and save the same, and a world
+ * loaded from them grows on exactly as the one that saved them. Version 1 (the 2D cores', so garden
+ * 0.14.0's shipped forests) still loads, as a planar forest (ADR 0025). (The cross-core records are
+ * archived at the tag golden-2d-ts.)
  */
 import { readFileSync } from "node:fs";
 import { gunzipSync } from "node:zlib";
@@ -51,12 +51,20 @@ describe("checkpoints round-trip and grow on alike", () => {
   }
 
   // garden-v0.14.0's first-paint checkpoint for a 66-cell plate, seed 10, written by the
-  // TypeScript core; docs/experiments/code/2026-10-29-i1/first-paint.ts checked all twelve.
-  it("garden 0.14.0's shipped forest (the TypeScript core's bytes) loads and saves back the same", () => {
+  // TypeScript core (version 1, 2D): it loads as a planar forest in a one-cell slab (ADR 0025).
+  it("garden 0.14.0's shipped 2D forest (version 1) loads as a planar forest and grows on", () => {
     const gz = readFileSync(new URL("./fixtures/garden-0.14.0-66-10.bin.gz", import.meta.url));
     const bytes = new Uint8Array(gunzipSync(gz));
     const a = RustWorld.load(bytes);
-    expect(same(a.save(), bytes)).toBe(true);
+    expect(a.season).toBe(40);
+    const trees = a.trees.filter((t) => t.alive);
+    expect(trees.length).toBeGreaterThan(0);
+    for (const t of trees) {
+      for (let i = 0; i < t.m.length; i++) expect(t.m.cols.hz[i]).toBe(0); // in the plane
+    }
+    // Saved again it is version 2, which loads back to the same bytes.
+    const again = a.save();
+    expect(same(RustWorld.load(again).save(), again)).toBe(true);
     const b = RustWorld.load(bytes);
     a.step(10, true);
     b.step(10, true);

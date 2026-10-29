@@ -53,7 +53,7 @@ How the code realises the spec. For *why* a choice was made, see `docs/decisions
 - **Plate width:** `plateWidth` sizes the ring to a share of the host's aspect: 0.65 on a portrait host, 0.7 on a landscape one (M24). The plate fits the ring's width, so the share sets how large trees are drawn. A phone shows about three trees; the site's wide plate (1200 px) shows about ten at about 7 px a cell.
 - **Leaf studies:** `leafStudy(tree)` returns the tree's species' leaf as an SVG path (`leafStudyPath`), with its real length, for the field card.
 - **Opening on one:** `mountGarden({ first: { base, widths, seeds, when } })` picks the width nearest its own and a seed by the day, opens on that forest at the ambient pace, and falls back to growing from seed. With `when: "reduced-motion"` (the site, M23) it does so only for reduced motion.
-- **The time-lapse:** `seeds` makes the default forest grow from one of those seeds a day, so it ends in a chosen wood. `?forest=seed` (option `seed`) still grows from seed. The checkpoint was grown from `forestParams(width, seed)`, so that link regrows the same forest.
+- **The time-lapse:** `seeds` makes the default forest grow from one of those seeds a day, so it ends in a chosen wood. `?forest=seed` (option `seed`) still grows from seed. The checkpoint was grown from `forestParams(width, seed)`, so that link regrows the same forest only where the browser's `Math` matches Node's (not Chrome's: ADR 0002), at the same ring width.
 - **CLI:** `npm run sim -- --checkpoint-at N` saves the CLI's world (dead trees included) as `checkpoint-N.bin.gz`.
 
 **Long runs:** the worker calls `World.discardDead()` after each season. It frees dead trees' tables (a forest piles up ≈ 20 MB per 1000 seasons otherwise) without changing any live tree (`world.test.ts`). Page worlds therefore do not hash like CLI worlds.
@@ -151,6 +151,16 @@ All of them sit behind `LightModel.sample(x, y, dir) → {q, vx, vy}` (§C2.8):
   - `LightModel.dispose()` frees a sweep when `World` replaces its light.
 - **The math:** the Rust core's `Math` is V8's, ported: fdlibm sin, cos and exp; glibc's pow, which V8's `Math.pow` calls; V8's hypot.
 - **How it is held:** the goldens, a field-by-field parity test and a math test hold it to the TypeScript sweep bit for bit ([G2 note](experiments/2026-10-29-g2-rust-sweep.md)).
+- **Two builds** (`npm run build:wasm`): `src/wasm/pkg-parity/` with the `parity` feature (V8's Math), which `src/wasm/` and the tests load, and `src/wasm/pkg/`, the production build (the `libm` crate, simd128 on).
+
+### The 3D slab sweep (ADR 0024, G3)
+`rust/core/src/light/slab_sweep.rs`: the 3D light, in the production build only, not yet behind `LightModel`.
+- **Fields:** Float32 fields W × H × D, rows of W × D.
+- **Sky:** K directions on a spherical Fibonacci set, rotated each season.
+- **The march:** the 2D sweep's row march, with the segment averaged over its box. G is carried down by whole-cell shifts, not read bilinearly (G3 measured the bilinear read's blur as a bias).
+- **Edges:** periodic x; open z with τ per face.
+- **Speed:** a polynomial Float32 exp, and scalar and SIMD kernels that give the same bits. Lanes come from `compute_part`.
+- **Reference:** `exact_q` is the exact tracer the G3 gate measures against ([G3 note](experiments/2026-10-29-g3-slab-light.md)).
 
 ## Randomness (ADR 0002)
 

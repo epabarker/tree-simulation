@@ -65,6 +65,12 @@ pub fn hypot(a: f64, b: f64) -> f64 {
     libm::hypot(a, b)
 }
 
+/// Natural log, used by the 3D light (once per sweep, for the faces' depth). Not yet V8's in
+/// parity mode: nothing the TypeScript goldens see calls it. I1 ports V8's `Math.log`.
+pub fn ln(x: f64) -> f64 {
+    libm::log(x)
+}
+
 /// `Math.max(a, b)`: NaN if either is NaN, and +0 over −0.
 pub fn max(a: f64, b: f64) -> f64 {
     if a.is_nan() || b.is_nan() {

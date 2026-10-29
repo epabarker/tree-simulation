@@ -13,9 +13,10 @@ The 3D port's preview pages (ADR 0024) live on a branch of the site, not here. T
 - **What it holds:** `public/_headers` with COOP/COEP for the whole site, plus built copies of three pages from `code/2026-10-29-g05-preview/`:
   - `index.html`, the G0.5 hosting check;
   - `kernel.html`, G1's light kernels;
-  - `proto.html`, the prototype's and the τ runs' stands.
+  - `proto.html`, the prototype's and the τ runs' stands;
+  - `g3.html`, G3's timing of the Rust slab sweep on three prototype stands (`g3/*.bin`).
 
-  It is about **108 MB**, almost all of it baked stands (`proto/stands/*.json.gz`).
+  It is about **114 MB**, almost all of it baked stands (`proto/stands/*.json.gz`, `g3/`).
 - **Never merge it.** It would put 108 MB of throwaway stands and site-wide COOP/COEP on production.
 - **Rebuild it** from this repository, as the notes say: `bake.ts` and `run.ts` write the stands to `runs/`, then `vite build -c code/2026-10-29-g05-preview/vite.config.ts`. Copy the result to the branch's `public/preview/3d/`.
-- **Delete it** when V (the visual check, ADR 0024) has been made on I2's stand, which replaces the prototype's. Delete it sooner if the user no longer wants to compare the τ stands on a phone. Nothing in this repository depends on it, and the hosting record it proved is in the G0.5 note. Its head when this was written was `88db458`.
+- **Delete it** when V (the visual check, ADR 0024) has been made on I2's stand, which replaces the prototype's. Delete it sooner if the user no longer wants to compare the τ stands on a phone. Nothing in this repository depends on it, and the hosting record it proved is in the G0.5 note. Its head when this was written was `d7d72c6`.

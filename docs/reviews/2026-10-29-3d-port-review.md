@@ -5,8 +5,8 @@ Whether, and how, to move from the planar model (spec §2, Option P) to trees th
 **Status:** go. [ADR 0024](../decisions/0024-3d-slab-port.md) is accepted:
 - D = 64;
 - the faces' transmission τ is a world parameter, with the wood interior the default look;
-- G1 and G2 have passed;
-- G3 is next.
+- G1, G2 and G3 have passed. G3's browser timing on the user's phone and laptop is still to come;
+- I1 is next.
 
 The port reverses four earlier decisions:
 - spec §2 (Option P);
@@ -20,7 +20,8 @@ The port reverses four earlier decisions:
 3. the open slab's cost at D = 32–64, and G1 on the user's phone ([open-slab note](../experiments/2026-10-29-open-slab-cost.md));
 4. a throwaway 3D growth prototype ([prototype note](../experiments/2026-10-29-proto3d.md));
 5. the faces' transmission ([τ note](../experiments/2026-10-29-face-transmission.md));
-6. G2, the Rust sky sweep ([G2 note](../experiments/2026-10-29-g2-rust-sweep.md)).
+6. G2, the Rust sky sweep ([G2 note](../experiments/2026-10-29-g2-rust-sweep.md));
+7. G3, the 3D slab sweep in Rust: accuracy, K, and timing ([G3 note](../experiments/2026-10-29-g3-slab-light.md)).
 
 ## Decisions (the user's, 2026-10-29)
 1. **The goal:** trees that grow in three dimensions: branches toward and away from the viewer, crowns that are volumes, buds competing in three dimensions.
@@ -34,6 +35,7 @@ The port reverses four earlier decisions:
 6. **Hosting:** edbarker.dev is on Cloudflare and sends COOP/COEP, so the garden gets WASM threads. The lab on GitHub Pages is single-threaded.
 7. **The core moves to Rust, whole,** through gates. During G2–G3 only the sky sweep is frozen; the full 2D freeze starts at I1.
 8. **Measurement before judgement.** The prototype's measurements replace the earlier estimates, labelled measured-in-prototype.
+9. **Parity is a mode, not the end state.** The V8 `Math` ports sit behind the core's `parity` feature, on only for the 2D golden and side-by-side tests. The production build uses Rust's `libm` and, for the 3D light, the polynomial exp and SIMD, and it gets its own goldens at I1 stage 2.
 
 ## 1. Measured, against the brief's §3 and §4
 
@@ -44,24 +46,24 @@ The port reverses four earlier decisions:
 | §3.1: pyramid 343 updates a bud, "independent of world volume"; "likely the right default" | 400–420 cells a bud, plus a V cone search the brief omits. On equal terms (Rust, a precomputed cone) 33–35 ms single-threaded for `forest`, against the sweep's 63–153 | Cost figure rejected; the pyramid is declined on behaviour (Q2), not cost |
 | §3.2: 5–20× more metamers | Measured in prototype: **13–26× while a stand grows, about 8× at a plateau**, nearly independent of D | Kept, roughly |
 | §3.2: 2–4× cost per metamer | Measured in prototype: **1.1–1.8×**, up to 2.7× in the fastest growth | Rejected as too high |
-| §4.1: scalar Rust 1.2–2.5× | The f32 light kernel: 1.2–3.3×, median 2.0×. **The bit-identical f64 2D sweep (G2) is 0.74× in WASM:** its march is 2× faster, but exp in WASM costs 2.2× V8's native one | Kept for new kernels; **not for a port held to V8's bits** |
+| §4.1: scalar Rust 1.2–2.5× | **Production:** the f32 light kernel 1.2–3.3× (median 2.0×); the f64 2D sweep without parity 1.2×. **Parity mode:** the f64 2D sweep is 0.74×, a 1.35× cost (G2). Its march is 2× faster, but its exp is V8's fdlibm compiled to WASM, at 2.2× V8's native one | **Kept for production;** parity mode is a test mode and pays for its bits |
 | §4.2: f64x2 ≈ 2×, f32x4 ≈ 4× | SIMD f64 1.3× over scalar WASM; SIMD f32 2.5× over scalar (5.2× over TS) | Kept for f32 |
 | §4.2: threads 3–4× on a phone | **G1, Pixel 8a: 1.5× at D = 32, 1.8–2.0× at 48–64**; laptop 2.3–3.2×; native 4 cores 2.6–3.0× | Rejected for phones |
 | (mine, M15) phone 2.7× slower per core | **G1:** the Pixel 8a is within 15% of the laptop single-threaded | Rejected |
 | §4.2: "only exp is implementation-defined; a vendored exp removes that" | **G2:** Node's V8 computes sin, cos and exp by fdlibm, pow by the C library (glibc), and hypot by its own formula. Rust's libm matches none of sin, cos, pow or hypot. All four are ported, and match on 4M samples | **Rejected:** five functions, not one; pow is not fdlibm's |
-| §4.3: .wasm 40–100 kB gzipped | **G2:** the 2D sweep with its math is 24 kB gzip (50 kB raw), plus 2.3 kB of glue | Lower than estimated, so far |
+| §4.3: .wasm 40–100 kB gzipped | **G2:** the 2D sweep with its math is 24 kB gzip (parity) and 19 kB (production). **G3:** with the slab sweep, 32 kB (production), plus 2.3 kB of glue | Lower than estimated, so far |
 
 ## 2. The season at the open slab: projected costs
 For the end of the garden's intro, season 40, when growth and cost peak. `forest` is the phone's ring and `panorama` the wide desktop's, each on the user's two devices. The script is `code/2026-10-29-3d-port/project.py`.
 
 | Input | Value | Source |
 |---|---|---|
-| Light, by device, tier and D | phone 4-lane SIMD 32 / 36 / 43 ms at D = 32 / 48 / 64; 1-lane 48 / 66 / 86; scalar 118 and TS 222 at D = 32. Laptop 13 / 28 / 32, 1-lane 42 / 64 / 88 | **measured (G1)** |
+| Light, by device, tier and D | phone 4-lane SIMD 32 / 36 / 43 ms at D = 32 / 48 / 64; 1-lane 48 / 66 / 86; scalar 118 and TS 222 at D = 32. Laptop 13 / 28 / 32, 1-lane 42 / 64 / 88 | **measured (G1),** G1's kernel on a 2D field scattered in z. G3's real kernel on 3D stands, headless on this VM: 25–35 ms in four lanes at D = 64, against G1's 43 there. The devices' G3 numbers replace these when the user has run the page |
 | Single-thread speed of the passes, device against this VM | phone 0.92×, laptop 0.90× | **measured (G1)** |
 | Full model's 2D passes | 1.05 μs a metamer (`forest`), 1.34 (`panorama`); 1972 metamers at season 40 (`forest`) | measured |
 | m, 3D over 2D | 19.0 / 20.1 / 20.5 at D = 32 / 48 / 64 (season 40, R6 set, τ = 1); 15–18 at τ ≤ 0.5 | **measured in prototype** |
 | 3D over 2D cost per metamer | 1.65–1.78 (season 40); range 1.1–2.7 | **measured in prototype** |
-| Rust over TypeScript on the passes | 1.6× (1.3–2.0) | **estimate**, and G2 is a caution: under bit-identity, any pass that leans on exp or trig is slower in WASM, not faster. I1 measures it |
+| Rust over TypeScript on the passes | **Production:** 1.6× (1.3–2.0). **Parity mode** (the 2D goldens only): slower where a pass leans on exp or trig, as the light's 0.74× shows | Production **estimate**, which I1 stage 2 measures; parity mode **measured** on the light (G2) |
 | Lanes on the passes | phone 1.5×; laptop 2× | estimate |
 
 What is left estimated: Rust's gain on the passes, their lane gain, and what R2–R5, mechanics and stand dynamics do to m. In 2D, R4 and R5 cut the same planting's metamers 2–9×. The ranges' high ends assume none of that pruning.
@@ -154,15 +156,28 @@ Neither milestone tries to fix the other's half. I3 does not thin the drawing to
 
 **Q4, the lab.** Single-threaded on Pages, with threads in the copy at edbarker.dev/lab. Single-threaded SIMD runs `forest` at about 140 ms a season on desktop, plenty for watching mechanisms. The core gives the same bits threaded or not (Q6). Rejected: a `coi-serviceworker` shim for Pages, which is fragile and buys nothing the edbarker.dev lab lacks.
 
-**Q2, the light model.** The row-marched Beer–Lambert sweep extended to the slab: K = 16 with `c2.rotate`, Float32 SIMD, periodic x, open z with τ at the faces.
+**Q2, the light model.** The row-marched Beer–Lambert sweep extended to the slab: K = 16 with rotation, Float32 with SIMD, periodic x, open z with τ at the faces (`rust/core/src/light/slab_sweep.rs`).
 - **It keeps** everything the 2D sweep gives: side light, directional V, and the canopy M6–M27 were calibrated under.
-- **It changes** one thing: the 3D march uses a box mean over each row's segment, where the 2D march integrates it exactly. Its error against an exact trace is G3's.
+- **It changes two things.**
+  - Each row's segment is averaged over its box (from separable prefix sums), where the 2D march integrates it exactly.
+  - **G carries down the rows by whole-cell shifts** (Bresenham: the cumulative shift is round(y·s)), where the 2D march reads it linearly.
+- **G3 measured both** ([note](../experiments/2026-10-29-g3-slab-light.md)):
+  - **The first build** read G bilinearly, as the 2D march does in one dimension. It gave mean |ΔQ|/C 0.038–0.095 against the exact trace, and 0.095 on the mature hedgerow, above the 0.08 stop rule. The error was a bias: every direction darker, worst for the steepest. A four-way blend each row smears shadows into gaps, and e^(−kT) is convex.
+  - **The prescribed fallback, the exact segment integral,** was the wrong fix: 0.091 at 1.8–1.9× the cost.
+  - **Whole-cell shifts** remove the blur. The error is 0.045–0.053 on every stand, M18's 2D level, flat across the faces, at 0.6–0.8× the bilinear cost. The one price is half-cell placement noise, which makes one already-good stand slightly worse (0.038 → 0.045).
+- **K = 16 with rotation:**
+  - static, Q at the buds stops changing by more than the model's own error (0.045–0.053) at K = 16 (0.033–0.040 against K = 128);
+  - rotated, ten seasons average every K ≥ 8 to 0.011–0.020;
+  - height, crown depth and width are converged at every K;
+  - total metamers converge by K = 24 rotated, so K = 16 rotated is at the edge.
+  - **Rotation matters more in 3D than in 2D:** it cuts the stand's metamers 15–30%. So C1 calibrates under rotation.
+- **Bits:** the 3D light gives the same bits natively, in scalar WASM and in SIMD WASM.
 - **The pyramid, on equal terms,** is no dearer (single-threaded 2–4× cheaper) but is **declined on behaviour:**
   - it casts shade straight down, with no low-elevation sky, and so no light through the faces (which τ now controls);
   - its V comes from a cone search, not the sky;
   - it was last calibrated at M1–M5.
 
-  It stays G3's fallback. Rejected: the hybrid (pyramid for Q, a sweep for V).
+  It was G3's fallback and is no longer needed. Rejected: the hybrid (pyramid for Q, a sweep for V).
 
 **Qz, the z boundary.** Open, with the closed-box rule at the faces. What lies beyond each face is τ (§2d). Rejected: letting growth cross the faces while light stays bounded (the M0 runaway).
 
@@ -170,7 +185,7 @@ Neither milestone tries to fix the other's half. I3 does not thin the drawing to
 
 **Q5, the language boundary.** The whole core in Rust.
 - **Sequence:** the sky sweep first, behind `LightModel` (G2, done), to prove the toolchain and the goldens. Light-only Rust is not an end state: the tree passes would set the pace.
-- **Two cores coexist from G2 until I1** reproduces every golden: G2 took 1 session; G3 is 1–2; I1 is 3–5.
+- **Two cores coexist from G2 until I1** reproduces every golden: G2 took 1 session, G3 1, and I1 is 3–5.
 - **The freeze:** during G2–G3 only `light/sky-sweep.ts` is frozen, and any change to it must land in both cores and pass the parity test. The full 2D freeze covers I1 alone.
 - **After I1** the TS core is deleted, and 3D replaces 2D in place. There is no dual mode.
 - **I1 as an end state,** if 3D stops after it:
@@ -178,7 +193,8 @@ Neither milestone tries to fix the other's half. I3 does not thin the drawing to
   - deterministic across browsers and native;
   - PyO3 a feature flag away;
   - Rust's types guarding the ordering invariants;
-  - **not**, under bit-identity, faster in the browser. G2 measured the light 1.35× slower in WASM, where exp costs 2.2× V8's native one. Natively it is faster.
+  - in parity mode, slower in the browser: G2 measured the light 1.35× slower in WASM, where exp costs 2.2× V8's native one;
+  - in production mode faster (the 2D sweep 1.2×, the f32 light 5.2× in one lane), with its own goldens (Q6, stage 3).
 
   Its worth is reproducibility and experiments, not the 2D garden's speed.
 
@@ -193,7 +209,9 @@ Neither milestone tries to fix the other's half. I3 does not thin the drawing to
    - So a seed or a shared link grown by the CLI is not the forest a Chrome visitor sees, and phones can differ from laptops.
    - The goldens are defined by Node on x86-64 Linux with glibc's FMA pow.
    - **The Rust core, with vendored math, gives those bits everywhere; I1 is where that starts.**
-3. **The 3D core gets new goldens:** Float32 and its own polynomial exp, identical across native, scalar WASM, SIMD WASM and any lane count (directions in fixed lanes, summed in lane order; no FMA contraction, no relaxed SIMD).
+3. **The production build gets new goldens** (I1 stage 2, then the 3D core): Rust's `libm`, and for the 3D light Float32 with its own polynomial exp, identical across native, scalar WASM, SIMD WASM and any lane count (directions in fixed lanes, summed in lane order; no FMA contraction, no relaxed SIMD).
+   - **G3 checks the light already:** one fixture's fingerprint matches natively, in scalar WASM and in SIMD WASM.
+   - Lane-count invariance needs the fixed lanes, which I2 builds; today's `compute_part` sums lanes in the caller's order.
 4. **The 2D goldens are archived** with a tag when 3D lands. The evidence tests carry behaviour from then on.
 
 Rejected: tolerance goldens, since hashes of rounded values flip at rounding boundaries.
@@ -204,7 +222,7 @@ Rejected: tolerance goldens, since hashes of rounded values flip at rounding bou
 - **The bundle:**
   - ADR 0014's 60 kB stays the first-paint JS budget.
   - The WASM loads after first paint, so the first frame is a lean snapshot the JS renderer draws without the core.
-  - G2's module is 24 kB gzip; the gate (measured size plus 25%) is set at I1.
+  - The production module is 32 kB gzip with both sweeps (G3); the gate (measured size plus 25%) is set at I1.
 - **The larger cost is data, not code:** 3D checkpoints would be 1–6 MB each, against M21's 300 kB, so the frame and checkpoint budget is set at I3.
 - Rejected: Three.js (150 kB for a fixed camera), and WebGPU-only.
 
@@ -220,12 +238,12 @@ Rejected: tolerance goldens, since hashes of rounded values flip at rounding bou
 | P | A throwaway 3D growth prototype (C1–C6, R1, R6) | m, cost per metamer, crown depth, the faces |
 | P-τ | The prototype with τ per face, and a 42-cell planting | the three looks; the density split |
 | G2 | The Rust 2D sky sweep behind `LightModel`, Float64 scalar; the toolchain in CI and `check` | **passed:** 27/27 goldens and field parity bit for bit; 24 kB gzip; see its note for what would have stopped it |
-| **G3** | 3D light in Rust: exact-trace accuracy (the tracer stopping at the faces, τ applied), K convergence, timing in the browser | the light model's error and K. **Next** |
-| I1 | The whole Rust 2D core, every golden bit-identical; the rest of `Math` vendored; the TS core deleted | Rust's speed on the passes, measured; cross-engine determinism |
+| G3 | 3D light in Rust (production build): exact-trace accuracy (the tracer stopping at the faces, τ applied), K convergence, timing in the browser | **passed with integer-shift transport:** 0.045–0.053 mean \|ΔQ\|/C; K = 16 rotating; 25–35 ms in four lanes on this VM. The devices' timings are to come |
+| **I1** | The whole Rust 2D core, every golden bit-identical; the rest of `Math` vendored; the TS core deleted | Rust's speed on the passes, measured; cross-engine determinism |
 | I2 | 3D topology and directions, a stand grown at D = 64 with every principle, with and without the fade, at the interior's τ | m and the cost with R2–R5; the fade |
 | V | **The visual check:** I2's stand drawn orthographically beside today's view, on the user's phone | whether 3D-grown crowns are worth it (the user's eye) |
 | I3 | The 3D renderer: GPU tween and wind, crown drawing (§2e), threads behind COOP/COEP, checkpoints | frame budget, first paint |
-| C1–C8 | Calibration (§4), only after V | — |
+| C1–C8 | Calibration (§4), only after V, under rotation | — |
 
 ## 4. What the model has to recalibrate
 The 3D model shares its principles with the 2D one but is not the same model.
@@ -259,14 +277,14 @@ The 3D model shares its principles with the 2D one but is not the same model.
 
 With the gates G1–I3 the port is about 14 milestones, the size of everything since M13.
 
-## 5. Recommendation: go; G3 next
+## 5. Recommendation: go; I1 next
 
 **Compute does not stop the port.**
 - With Rust, Float32 SIMD and 4 lanes, `forest` at season 40 projects to ≈ 61–75 ms a season on the user's phone, against the intro's 250 ms. Even the ranges' high ends fit, and so does single-threaded SIMD.
-- The light is measured on the device. The passes rest on the prototype's multipliers, with Rust's gain on them unmeasured until I1.
+- The light is measured on the devices with G1's kernel, and on this VM with G3's real kernel, which is faster (25–35 ms in four lanes at D = 64, against G1's 43). The passes rest on the prototype's multipliers, with Rust's gain on them unmeasured until I1.
 
 **What could still stop it:**
-- G3's box-mean error. Stop, or switch to the exact segment integral or the pyramid, if mean |ΔQ|/C is above 0.08 (twice M18's 2D error) and the fix costs more than 2×.
+- The devices' G3 timing, if the phone's four lanes were far slower than G1's (unlikely: the real kernel is faster on this VM).
 - I1's size: about 6.7k lines and the rest of `Math`, bit for bit.
 - What R2–R5 do in 3D (I2): fall back to D = 48 only if a season exceeds 250 ms on the phone with lanes, and then only for the interior look.
 - The calibration bill, about 8 milestones.
@@ -282,7 +300,13 @@ With the gates G1–I3 the port is about 14 milestones, the size of everything s
 **Where I disagree, or add:**
 - **"Port the fdlibm routine" does not hold for pow.** V8's `Math.pow` is not fdlibm's; it is the C library's. An fdlibm pow would have broken 9% of results, so G2 ports glibc's (Arm's code, MIT), FMA variant included. That ties the goldens to glibc on x86-64 with FMA: a CI runner with another glibc would fail the *TypeScript* goldens, while the Rust core gives the same bits anywhere.
 - **Reproducibility is already broken in the browser.** Shared links and "Export run" replays are exact in Node and between identical browsers, not between Node and Chrome (20 of the 27 goldens differ in Chromium) or, likely, across devices. Until I1, nothing should promise more; ADR 0002's "exact on V8 only" should read "exact on one engine build".
-- **Bit-identical Rust is not faster in the browser.** The page should not switch to the Rust sweep at G2: it would add 26 kB, run the light 1.35× slower, and change what browser visitors see, since it gives Node's bits while the rest of the core gives Chrome's. The switch comes whole, at I1.
+- **Parity costs 1.35×; production does not.** The page should not switch to the parity sweep: it would add 26 kB, run the light 1.35× slower, and change what browser visitors see, since it gives Node's bits while the rest of the core gives Chrome's. The production build is faster (G1, G3), and the page switches to it whole, at I1 stage 2, with its own goldens.
+- **G3's stop rule pointed at the wrong fix.** Read literally, 0.095 with a DDA that fixes nothing and costs 1.8–1.9× meant stop or the pyramid. The error was the transport's, not the segment's.
+  - I adopted whole-cell shifts as the 3D default: still the row-marched sweep the ADR decided, but carried differently from the 2D march's linear read.
+  - **That is a choice for the user to confirm.** Bilinear stays a switch.
+- **Rotation is not optional in 3D.** It changes the stand's metamer count by 15–30%, where in 2D it changed nothing. Calibrate with it on, as the ADR already says.
 - **The prototype's page is not V.** Its stands are uncalibrated. V waits for I2's stand with every principle.
 
-**Open questions for the user:** none for G3. Later: the first-paint policy for 3D (Q7), at I3.
+**Open questions for the user:**
+- **Now:** run G3's page (`…/preview/3d/g3.html`) on the phone and the laptop, and confirm whole-cell shifts as the 3D light's transport.
+- **Later:** the first-paint policy for 3D (Q7), at I3.

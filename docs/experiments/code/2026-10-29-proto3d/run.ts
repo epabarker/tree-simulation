@@ -33,7 +33,7 @@ const tag = R6 ? "-r6" : "";
 const only = process.argv.slice(3);
 mkdirSync(join(out, "stands"), { recursive: true });
 
-type Config = Omit<Options, "K" | "seed"> & { planting?: "wide" };
+type Config = Omit<Options, "K" | "seed"> & { planting?: "wide"; K?: number };
 const CONFIGS: Record<string, Config> = {
   "d32-hard": { D: 32, fade: 0, divergence: 137.5 },
   "d48-hard": { D: 48, fade: 0, divergence: 137.5 },
@@ -53,6 +53,13 @@ const CONFIGS: Record<string, Config> = {
   "d48-edge": { D: 48, fade: 0, divergence: 137.5, tau: [1, 0] },
   "d64-edge": { D: 64, fade: 0, divergence: 137.5, tau: [1, 0] },
   "d64-edge02": { D: 64, fade: 0, divergence: 137.5, tau: [1, 0.2] },
+  // G3: the M6e protocol in 3D, under the Rust kernel at the default look (τ 0.2): K and rotation.
+  ...Object.fromEntries(
+    [8, 12, 16, 24, 32].flatMap((K) => [
+      [`g3-k${K}`, { D: 64, fade: 0, divergence: 137.5, tau: 0.2, rust: true, K }],
+      [`g3-k${K}-rot`, { D: 64, fade: 0, divergence: 137.5, tau: 0.2, rust: true, rotate: true, K }],
+    ]),
+  ),
   // A row of individual trees: every other tree of `forest`'s 21-cell planting, open faces.
   "d64-wide": { D: 64, fade: 0, divergence: 137.5, planting: "wide" },
   "d48-wide": { D: 48, fade: 0, divergence: 137.5, planting: "wide" },
@@ -245,7 +252,7 @@ for (const planting of new Set(selected.map(([, c]) => c.planting))) {
 
 for (const [name, cfg] of selected) {
   const p = plantingParams(cfg.planting);
-  const stand = new Stand3D(p, { ...cfg, K: 16, seed: 1 });
+  const stand = new Stand3D(p, { ...cfg, K: cfg.K ?? 16, seed: Number(process.env.SEED ?? 1) });
   const window: { light: number; passes: number; metamers: number }[] = [];
   const rows: Record<string, unknown> = {};
   for (let s = 1; s <= SEASONS; s++) {
@@ -261,6 +268,20 @@ for (const [name, cfg] of selected) {
       console.log(`${name} s${s}`, JSON.stringify({ ...r, bins: undefined }));
     }
     if (BAKE.includes(s)) writeFileSync(join(out, "stands", `${name}${tag}-s${s}.json.gz`), bake3D(stand));
+    // G3: every live bud's tip and leaf area (Float64 x, y, z, area), the field the light sees.
+    if (process.env.DUMP && BAKE.includes(s)) {
+      const v: number[] = [];
+      for (const t of stand.trees) {
+        if (!t.alive) continue;
+        const b = bc(t);
+        for (let i = 0; i < t.b.length; i++) {
+          if (!isLiveBud(b.state[i] as number)) continue;
+          v.push(...stand.tip(t, b.metamer[i] as number), depositArea(b.state[i] as number, stand.params.r6));
+        }
+      }
+      mkdirSync(process.env.DUMP, { recursive: true });
+      writeFileSync(join(process.env.DUMP, `${name}${tag}-s${s}.bin`), new Float64Array(v));
+    }
   }
   results[`${name}${tag}`] = { config: cfg, rows };
   writeFileSync(join(out, `results${tag}${process.env.SET ?? ""}.json`), `${JSON.stringify(results, null, 1)}\n`);

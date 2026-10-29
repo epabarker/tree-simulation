@@ -27,7 +27,10 @@ npm run sim -- --preset explosion --seed 3 --seasons 12 --out runs/demo
 uv run --project analysis python analysis/experiments/m0_growth.py
 ```
 
-Each run writes `run.json`, `metrics.csv`, `metamers.csv` and `hash.txt` (see [`docs/architecture.md`](docs/architecture.md)). The page's **Export run** button saves a JSON file that `npm run sim -- --replay <file>` replays. The replay is exact on the same JavaScript engine, but not between Node and a browser: their `Math` functions differ in the last bit ([G2 note](docs/experiments/2026-10-29-g2-rust-sweep.md)). The Rust core removes that once it carries the whole simulation.
+Each run writes `run.json`, `metrics.csv`, `metamers.csv` and `hash.txt` (see [`docs/architecture.md`](docs/architecture.md)). The page's **Export run** button saves a JSON file that `npm run sim -- --replay <file>` replays. **Until the Rust core carries the whole simulation (I1), runs are exact only within one JavaScript engine.** Node and Chrome compute `Math` differently in the last bit, and 20 of the 27 golden runs differ in Chromium ([G2 note](docs/experiments/2026-10-29-g2-rust-sweep.md), [ADR 0002](docs/decisions/0002-keyed-hash-rng.md)). So:
+- a CLI replay repeats exactly in Node, but does not reproduce a run exported from Chrome;
+- the lab's seed, its shared links and the garden's `?forest=<seed>` regrow in each visitor's browser, so they can differ between browsers and devices;
+- only the garden's opening checkpoint is the same for everyone, at first paint.
 
 ## How it's built
 

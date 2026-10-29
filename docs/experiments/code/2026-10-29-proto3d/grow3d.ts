@@ -20,6 +20,7 @@
  */
 
 import { SlabSweep } from "../../../../cli/slab-light.ts";
+import { type Light3D, RustSlab } from "./rust-light.ts";
 import type { Params } from "../../../../src/core/params.ts";
 import { DEG } from "../../../../src/core/params.ts";
 import { addBud, addMetamer, shootSize } from "../../../../src/core/principles/c1-buds.ts";
@@ -63,6 +64,10 @@ export interface Options {
   /** Transmission of the sky beyond each z face (1 open, 0 dark: the row inside a wood), or
    * [front, back] with front the viewer's face (z < 0). */
   tau?: number | readonly [number, number];
+  /** G3: grow under the Rust slab sweep (the production WASM) instead of cli/slab-light.ts. */
+  rust?: boolean;
+  /** With `rust`: rotate the sky each season. */
+  rotate?: boolean;
 }
 
 /** mulberry32: the prototype's only randomness (direction noise, axis phases). */
@@ -116,7 +121,7 @@ function tilt(dx: number, dy: number, dz: number, b: number, phi: number): [numb
 export class Stand3D {
   readonly params: Params;
   readonly o: Options;
-  readonly light: SlabSweep;
+  readonly light: Light3D;
   readonly trees: Tree[] = [];
   season = 0;
   private readonly r: () => number;
@@ -129,7 +134,9 @@ export class Stand3D {
     this.o = o;
     this.r = rng(o.seed);
     const { width: W, height: H } = params.world;
-    this.light = new SlabSweep(W, H, o.D, params.c2, o.K, true, false, Float32Array, true, o.tau ?? 1);
+    this.light = o.rust
+      ? new RustSlab(W, H, o.D, params.c2, o.K, o.tau ?? 1, o.rotate ?? false)
+      : new SlabSweep(W, H, o.D, params.c2, o.K, true, false, Float32Array, true, o.tau ?? 1);
     params.trees.forEach((spec, id) => {
       const t = new Tree(id, spec.x);
       // Widen the core's tables with the 3D columns (runtime only; the core never sees the type).
@@ -265,7 +272,7 @@ export class Stand3D {
         this.light.deposit(x, y, z, depositArea(b.state[i] as number, p.r6));
       }
     }
-    this.light.compute();
+    this.light.compute(this.season);
     const t1 = performance.now();
     // Phase 2: per tree, as the core's runSeason with R2–R6 off.
     const shoot = { length: 0 };

@@ -2,6 +2,41 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-29: 3D port, G3 passed: the 3D slab sweep in Rust; parity becomes a mode; PR #20 for CI
+
+- **User:** accepted G2 and asked for three adjustments, then G3.
+  - Put the V8 `Math` ports behind a `parity` feature.
+  - Run CI on a PR, without merging.
+  - Say in ADR 0002 and the README what non-determinism means for users.
+  - G3: the 3D slab sweep in Rust (production build), measured for accuracy, K and browser timing.
+- **Parity mode:**
+  - `tree-core`'s ports sit behind `parity`; without it the core uses the `libm` crate, which is pure Rust and the same natively and on wasm32 (`std` is glibc's natively);
+  - two packages, `src/wasm/pkg-parity/` for the tests and `--rust`, and `src/wasm/pkg/` for production (simd128);
+  - `rust:check` runs clippy and the tests in both modes, with threads, and for wasm32 with SIMD;
+  - **without parity the 2D sweep is 1.2× faster than TypeScript;** the G2 note and the review now carry both numbers.
+- **CI** ([PR #20](https://github.com/epabarker/tree-simulation/pull/20), into `claude/gallant-brown-5k4g33`): green. The cold run took 4:34 against 1:29 before, of which 1:53 was the toolchain (compiling wasm-bindgen-cli) and +1:03 was `check`.
+- **ADR 0002, corrected against the code:**
+  - `?forest=<seed>` does **not** open a checkpoint: with a seed set, the garden regrows from seed in the browser, so it is browser-specific like the lab's seed;
+  - a CLI replay repeats in Node but is not the run a Chrome visitor exported;
+  - only the opening checkpoint is the same for everyone.
+
+  The README says so. The user's brief had it the other way for `?forest`.
+- **G3** ([note](experiments/2026-10-29-g3-slab-light.md)): `rust/core/src/light/slab_sweep.rs`.
+  - **What it is:** Float32; a spherical Fibonacci sky rotated each season; τ per face; a polynomial exp with a Cody–Waite ln 2 split (relative error 2.5·10⁻⁷ on [−80, 0], where the first version was 4·10⁻⁶); scalar and SIMD kernels written alike; lanes; the exact tracer.
+  - **Tests:** with flat directions and the same ℓ on every z line it is the 2D sweep (2·10⁻⁵), and native, scalar WASM and SIMD WASM give the same bits.
+- **Surprise 1: the bilinear read of G, not the box mean, is the 3D light's error.**
+  - The first build gave mean |ΔQ|/C up to 0.095 on the mature hedgerow, over the 0.08 stop rule.
+  - The prescribed fallback (the exact segment integral) took it to 0.091 at 1.8–1.9× the cost.
+  - One-direction diagnostics showed a darkening bias in every direction, worst for the steepest: blurring shadows across four cells each row, under a convex exp.
+  - **Whole-cell shifts** (Bresenham) remove it: 0.045–0.053 on every stand, at 0.6–0.8× the bilinear cost. Adopted as the slab's default; the user is to confirm.
+- **K:** static, K = 16 is where Q at the buds stops changing by more than the model's error. Rotated, ten seasons take every K ≥ 8 under it. The prototype regrown under the Rust kernel (M6e's protocol, 2 seeds) has height, crown depth and width converged at every K.
+- **Surprise 2: rotation matters in 3D.** It cuts the stand's metamers 15–30%, where in 2D it changed nothing. Calibrate under it.
+- **Timing:** `…/preview/3d/g3.html` on the site's preview.
+  - Headless on the VM: 25–35 ms in four lanes at D = 64 (G1's kernel: 43), and 54–85 ms in one lane.
+  - **Surprise 3:** the hand-written SIMD path is 5–7% slower than the scalar code that LLVM vectorises under simd128.
+  - The user's devices are to run the page.
+- **Goldens unchanged.**
+
 ## 2026-10-29: 3D port, G2 passed: the sky sweep in Rust, bit for bit; ADR 0024 accepted
 
 - **User:** looked at the τ stands and decided:

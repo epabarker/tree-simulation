@@ -116,7 +116,8 @@ Where the bytes go (twiggy, before stripping names):
 - Nothing here touches the first-paint budget: the garden does not load it yet (§6).
 - **What I1 will add:** the passes are mostly loops over typed arrays; the `Math` left to port is listed in §2. The allocator and panic machinery are paid once already.
 
-### 5. Speed (Float64 scalar, as asked)
+### 5. Speed: what parity costs (Float64 scalar, as asked)
+*Revised after G2, when the user made parity a mode rather than the end state (`parity` feature; see the addendum below). The 1.35× here is the cost of parity mode, measured. The production light's speed-up is G1's and G3's, measured on the light; the tree passes' is still projected.*
 
 **Per season, bench medians** (100 seasons, best of 3; ms):
 
@@ -133,12 +134,18 @@ Where the bytes go (twiggy, before stripping names):
 | TypeScript | 2.61 | 0.012 | 0.069 |
 | Rust in WASM | 3.51 | 0.022 | 0.083 |
 | Rust in WASM, exp replaced by a stand-in (timing only) | 1.23 | | |
+| Rust in WASM, no parity (production build: `libm`'s exp, simd128 on), from a later 25-round run in which TypeScript took 2.72 and parity 3.63 | 2.26 | 0.029 | 0.116 |
 
-- **The row march itself is about 2× faster in WASM; exp makes the whole 1.35× slower.** The sweep takes ≈ 130k exps a season on `forest`.
+On `skyStand` (25 rounds) the TypeScript sweep took 2.87 ms, parity 3.77 and production 2.27.
+
+- **In parity mode the row march itself is about 2× faster in WASM, but exp makes the whole 1.35× slower.** The sweep takes ≈ 130k exps a season on `forest`.
   - **TypeScript's `Math.exp`** is a call into V8's fdlibm compiled natively for x86-64.
   - **The Rust core's** is the same fdlibm compiled to WASM: ≈ 18 ns a call, against 8.2 ns for the same code natively (glibc's exp: 6.2).
 - **The boundary is cheap:** deposits and samples cross it for 0.01–0.02 ms a season.
-- **Bit-identity forces this.** A faster exp (Float32, polynomial, SIMD) changes the bits, so it waits until the TypeScript core is gone (after I1). The 3D light is not bound to it: G1's kernels use Float32 and their own exp.
+- **Parity forces this, and only parity.** A faster exp changes the bits.
+  - **Without parity,** the same Float64 2D sweep is 1.20–1.26× faster than TypeScript (`libm`'s exp, still scalar).
+  - **The production 3D light goes further:** Float32 with a polynomial exp and SIMD. G1 measured 5.2× over TypeScript in one SIMD lane, and G3's real kernel takes 25–35 ms a season at D = 64 in four lanes on this VM ([G3 note](2026-10-29-g3-slab-light.md)).
+  - **The tree passes' Rust speed-up** (1.6×, 1.3–2.0) remains a projection until I1.
 
 ### 6. Toolchain
 - **`rust-toolchain.toml`** pins Rust 1.97.0 with the wasm32 target, rustfmt and clippy; rustup installs them on first use.
@@ -161,9 +168,22 @@ Where the bytes go (twiggy, before stripping names):
   - the toolchain is in `check` and in CI.
 - **Of the five functions asked about, sin, cos and hypot needed ports, and pow needed glibc's, not fdlibm's** (V8 calls the C library). atan2 is not used by the sweep and is I1's (§2).
 - **The TypeScript core is not deterministic across engines:** in Chromium only 7 of 27 goldens hold. Only the whole Rust core (I1) fixes that.
-- **Bit-identical Rust is not faster here:** the light is 1.35× slower in WASM because of exp, while the march is 2× faster. The review's "Rust ≈ 1.6× on the passes" is unmeasured until I1. The light cannot get faster while it must match V8.
+- **Parity mode costs 1.35×:** the bit-identical light is slower in WASM because its exp is V8's fdlibm compiled to WASM, while its march is 2× faster.
+  - **The production build is faster:** the same 2D sweep without parity is 1.2× faster than TypeScript, and the 3D light is G1's 5.2× in one lane (G3: 25–35 ms in four lanes at D = 64).
+  - The tree passes' Rust speed-up remains projected until I1.
 - **What would have stopped G2:**
   - **a `Math` routine whose bits could not be reproduced.** pow came closest: V8 delegates it to the C library, so its bits depend on glibc's version, its FMA variant and GCC's contraction rules, and the first port missed 7 in 1M;
   - **any reordering for speed** (SIMD, a faster exp), which would have meant re-hashing.
 
   Neither happened. **The fragility pow exposes is in the TypeScript goldens, not the port:** a CI runner with another glibc or without FMA would fail the TypeScript goldens, while the Rust core gives the same bits anywhere.
+
+## Addendum: parity becomes a mode (user, 2026-10-29)
+- **The `parity` feature:** `tree-core`'s V8 ports (sin, cos, exp, hypot, pow, and what I1 adds) now sit behind it. It is on for the 2D golden and side-by-side tests and for `--rust`, off otherwise.
+- **Without it,** the core uses the `libm` crate. It is pure Rust and identical natively and on wasm32, whereas `std`'s functions are glibc's natively and libm's on wasm32.
+- **Two builds:**
+  - `src/wasm/pkg-parity/` (V8's Math) for the tests;
+  - `src/wasm/pkg/`, the production build, with simd128 on: 19.4 kB gzip against parity's 23.8 at the time of the split. With G3's slab sweep in both, they are 32.1 and 34.1 kB.
+- **`rust:check`** runs clippy and the tests in both modes, with threads, and for wasm32 with SIMD. The TypeScript-hash fixture is parity-only.
+- **CI on PR #20:** the first run took 4 min 34 s against 1 min 29 s before.
+  - 1 min 53 s of it is the toolchain, compiling wasm-bindgen-cli on a cold cache;
+  - `check` grew from 1 min 14 s to 2 min 17 s.

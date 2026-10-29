@@ -1,6 +1,6 @@
 # 0024: Trees that grow in 3D, drawn as today, with a Rust core, through gates
 
-- **Status:** accepted (user, 2026-10-29). D = 64; the faces' transmission τ a world parameter with the wood interior as the default look. The interior's exact τ and the face fade are settled at I2/C1. G1 and G2 have passed.
+- **Status:** accepted (user, 2026-10-29). D = 64; the faces' transmission τ a world parameter with the wood interior as the default look. The interior's exact τ and the face fade are settled at I2/C1. G1, G2 and G3 have passed. G3 passed with whole-cell-shift transport for the 3D light, a choice the user is to confirm, and G3's device timings are to come.
 - **Date:** 2026-10-29
 - **Spec:** §2 (reverses Option P), §5, §6, §C2.4, §C2.8, §10. It also reverses the M12 review's decision 3 and ADR 0008's pseudo-depth squeeze (the geometry carries real depth). For the garden, it ends the AGENTS invariant "No SharedArrayBuffer". It meets ADR 0001's Rust/WASM trigger.
 - **Review:** [3D port review](../reviews/2026-10-29-3d-port-review.md), which carries the conclusions of every note below.
@@ -23,8 +23,16 @@
   - the 2D sky sweep in Rust reproduces all 27 goldens, and every field, bit for bit;
   - this needed V8's `Math` ported: fdlibm sin, cos and exp, glibc's pow (V8's `Math.pow` calls the C library), and V8's hypot;
   - the module is 24 kB gzip;
-  - bit-identical, the light is 1.35× slower in WASM than in V8, because exp is;
+  - in parity mode (V8's `Math`, for the 2D goldens) the light is 1.35× slower in WASM than in V8, because exp is; without parity the same sweep is 1.2× faster than TypeScript;
   - the TypeScript core reproduces only 7 of the 27 goldens in Chromium.
+
+- **G3** ([note](../experiments/2026-10-29-g3-slab-light.md)):
+  - the 3D slab sweep in Rust, production build, on the prototype's stands at D = 64;
+  - read bilinearly, G gave mean |ΔQ|/C up to 0.095 against an exact trace. That was a bias from blurring shadows, which the exact segment integral does not fix (0.091, at 1.8–1.9× the cost);
+  - carried by whole-cell shifts, the error is 0.045–0.053 everywhere, M18's 2D level, at 0.6–0.8× the bilinear cost;
+  - K = 16 with rotation is converged within the model's error;
+  - in four WASM lanes the light takes 25–35 ms a season (headless, 4-core VM), against G1's 43;
+  - native, scalar WASM and SIMD WASM give the same bits.
 
 ## Decision
 **The world:** trees grow in a slab W × H × D.
@@ -39,7 +47,10 @@
 
 **The view:** the garden's orthographic frontal illustration, (x, y) drawn in z order. No perspective, foreshortening cue, depth darkening or second rank is in scope.
 
-**The light:** the row-marched Beer–Lambert sweep at K = 16 with rotation, in Float32, with τ at the faces. It is chosen over the pyramid for its sky, which is what gives the faces' light, and for the M6–M27 calibrations. The pyramid with a precomputed cone is the fallback if G3 fails.
+**The light:** the row-marched Beer–Lambert sweep at K = 16 with rotation, in Float32, with τ at the faces. It is chosen over the pyramid for its sky, which is what gives the faces' light, and for the M6–M27 calibrations.
+- **Transport (G3; proposed, for the user to confirm):** G is carried down the rows by whole-cell shifts, the cumulative shift round(y·s), not read bilinearly. Each row's segment is averaged over its box. Bilinear stays a switch, and is the 2D sweep's read.
+- **Calibration under rotation:** rotation changes the 3D stand's metamers by 15–30%, so C1 calibrates with it on.
+- **The pyramid** is no longer needed as a fallback.
 
 **Foliage density** is a calibration and renderer target, not a modelling one. It is measured by picture coverage: the share of the picture's cells holding a leaf in the lower and upper halves of the canopy, and the leaves per covered cell (τ note §3). It has two halves, and neither milestone fixes the other's:
 - **I3 (the renderer) decides how thick the crowns draw:** leaf size, opacity, level of detail. Some coverage is inherent to projecting a volume orthographically, and that is I3's.
@@ -53,7 +64,10 @@
 - **The freeze:**
   - during G2–G3 only the sky sweep (`src/core/light/sky-sweep.ts`) is frozen. A change to it lands in both cores and passes the parity test;
   - the full 2D freeze covers I1 (3–5 sessions).
-- **Math:** the Rust core never calls a platform `Math`. It carries V8's routines bit for bit, so its results are the goldens' on every engine.
+- **Math, in two modes:** the Rust core never calls a platform `Math`.
+  - **With the `parity` feature** (the 2D golden and side-by-side tests only) it carries V8's routines bit for bit, so its results are the TypeScript goldens' on every engine.
+  - **Without it** (production) it uses the `libm` crate, identical natively and in WASM, and for the 3D light a Float32 polynomial exp and SIMD.
+  - The production build gets its own goldens at I1 stage 2.
 
 **The bundle:** ADR 0014's 60 kB stays the first-paint JS budget. The WASM loads after first paint, and gets its own gate (its measured size plus 25%) at I1. 3D first-paint data gets its own budget at I3.
 
@@ -61,8 +75,11 @@
 - **G1:** passed.
 - **The prototype and τ runs:** done.
 - **G2:** passed. The page keeps the TypeScript sweep until I1 switches the whole core, since a Rust sweep alone would give browser visitors Node's light and Chrome's everything else.
-- **G3:** 3D light accuracy against an exact trace that stops at the faces and applies τ. Fall back to the exact segment integral or the pyramid, or stop, if the error is above twice M18's.
-- **I1:** the Rust 2D core with every golden bit-identical and the rest of `Math` vendored (atan2, log, log1p, cbrt, tanh, asin, acos, atan, expm1); the TS core deleted.
+- **G3:** passed, with whole-cell-shift transport (above). The user's phone and laptop are to run `…/preview/3d/g3.html`; their numbers replace G1's.
+- **I1:**
+  - **stage 1:** the Rust 2D core in parity mode, every golden bit-identical, the rest of `Math` vendored (atan2, log, log1p, cbrt, tanh, asin, acos, atan, expm1);
+  - the TS core deleted;
+  - **stage 2:** the production build's own goldens, and the page switched to it whole.
 - **I2:** a stand grown in 3D with every principle at D = 64 and the interior's τ, with and without the fade. Fall back to D = 48 for the interior only if a season exceeds 250 ms on the phone with lanes.
 - **V, the visual check:** I2's stand drawn orthographically with the existing renderer, beside today's view, on the user's phone. The user decides by eye; if it is not worth it, 3D stops and I1 stands as the end state.
 - **I3:** the 3D renderer, including the drawing half of foliage density.
@@ -75,7 +92,7 @@
   - §10's 3D allometries (self-thinning −3/2, crowding) become directly comparable.
   - Rust's types can guard the ordering invariants.
   - τ gives the garden three looks from one model.
-- **Worth having even if 3D stops at V:** I1, a bit-identical Rust 2D core, deterministic across browsers and native, with PyO3 a feature flag away. It is not faster in the browser under bit-identity (G2), and it does not make the 2D garden visibly better.
+- **Worth having even if 3D stops at V:** I1, a Rust 2D core, deterministic across browsers and native, with PyO3 a feature flag away. In parity mode it is 1.35× slower in the browser (G2). In production mode it is faster (the 2D sweep 1.2×), with its own goldens. It does not make the 2D garden visibly better.
 - **Harder:**
   - A second toolchain in CI and in `npm run check` (Rust 1.97, the wasm32 target, wasm-bindgen-cli pinned to the crate's version).
   - **The goldens' bits are tied to Node on x86-64 Linux with glibc's FMA pow,** which the Rust core reproduces and pins. A CI runner with another glibc would break the TypeScript goldens first.

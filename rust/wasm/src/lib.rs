@@ -120,6 +120,31 @@ pub fn math_hypot(x: f64, y: f64) -> f64 {
     math::hypot(x, y)
 }
 
+#[wasm_bindgen]
+pub fn math_log(x: f64) -> f64 {
+    math::ln(x)
+}
+
+#[wasm_bindgen]
+pub fn math_atan2(y: f64, x: f64) -> f64 {
+    math::atan2(y, x)
+}
+
+#[wasm_bindgen]
+pub fn math_asin(x: f64) -> f64 {
+    math::asin(x)
+}
+
+#[wasm_bindgen]
+pub fn math_acos(x: f64) -> f64 {
+    math::acos(x)
+}
+
+#[wasm_bindgen]
+pub fn math_cbrt(x: f64) -> f64 {
+    math::cbrt(x)
+}
+
 /// The 3D slab sweep (ADR 0024, G3): Float32, the production build's light.
 #[wasm_bindgen]
 pub struct SlabSweep {
@@ -220,3 +245,5 @@ pub fn slab_fixture_fingerprint() -> u32 {
 pub fn slab_has_simd() -> bool {
     cfg!(target_feature = "simd128")
 }
+
+pub mod bridge;

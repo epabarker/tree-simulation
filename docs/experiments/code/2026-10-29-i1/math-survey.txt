@@ -1,0 +1,31 @@
+I1 Math survey, Node 24.22.2 (V8) on x86-64 Linux, 10^6 inputs per routine (half in the core's
+range, half any bit pattern). Mismatches against V8, bit for bit.
+
+Production build (src/wasm/pkg: the libm crate 0.2), before any port:
+sin       6523 of 1000000 differ sin(-4.419395974371582) = 0.9573837280494654 (V8 0.9573837280494655)
+cos       7195 of 1000000 differ cos(-6.989822841715068) = 0.7605493533224682 (V8 0.7605493533224681)
+exp          0 of 1000000 differ
+log       8699 of 1000000 differ log(0.769138737116009) = -0.2624839133743243 (V8 -0.26248391337432436)
+atan2      332 of 1000000 differ atan2(8.290495667879954e+35, -64523372386866070) = 1.5707963267948968 (V8 1.5707963267948966)
+asin         0 of 1000000 differ
+acos         0 of 1000000 differ
+cbrt     83079 of 1000000 differ cbrt(-7.180013125560306e-183) = -1.9291903434089948e-61 (V8 -1.929190343408995e-61)
+hypot   184753 of 1000000 differ hypot(-0.19449402811005712, 0.23439115844666958) = 0.3045769888360699 (V8 0.30457698883606993)
+pow      66711 of 1000000 differ pow(0.45205137645825744, 2.8881184698315336) = 0.10095817816200583 (V8 0.10095817816200585)
+(not called by the core, surveyed for the record)
+atan         0 of 1000000 differ
+log1p      423 of 1000000 differ log1p(1.4422962044598533) = 0.8929386641803722 (V8 0.8929386641803723)
+expm1        0 of 1000000 differ
+tanh     40136 of 1000000 differ tanh(0.45764745213091373) = 0.4281648816013746 (V8 0.42816488160137456)
+
+Parity build (src/wasm/pkg-parity), after porting log, atan2 (with atan) and cbrt:
+sin          0 of 1000000 differ
+cos          0 of 1000000 differ
+exp          0 of 1000000 differ
+log          0 of 1000000 differ
+atan2        0 of 1000000 differ
+asin         0 of 1000000 differ
+acos         0 of 1000000 differ
+cbrt         0 of 1000000 differ
+hypot        0 of 1000000 differ
+pow          0 of 1000000 differ

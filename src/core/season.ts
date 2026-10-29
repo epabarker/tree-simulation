@@ -51,7 +51,79 @@ export type Phase = (typeof PHASES)[number];
 export type PhaseMark = (phase: Phase) => void;
 const noMark: PhaseMark = () => {};
 
+/**
+ * The season's phases, as functions of the world (and a tree, in Phase 2). I1 (ADR 0024) ports
+ * them to the Rust core one at a time: `setSeasonPhases` swaps in an implementation that runs
+ * some of them in Rust (src/wasm/hybrid.ts), so each can be held to the TypeScript bit for bit
+ * with the rest still here. `evaluated` is the tree's metamer count before growth: C5 sheds only
+ * among the rows that took part in this season's passes.
+ */
+export interface SeasonPhases {
+  /** Phase 1: the storm draw, obstacles, then the light field. Returns the trees still live. */
+  light(world: World): Tree[];
+  sample(world: World, tree: Tree): void;
+  allocate(world: World, tree: Tree): void;
+  grow(world: World, tree: Tree): void;
+  shed(world: World, tree: Tree, evaluated: number): void;
+  girth(world: World, tree: Tree): void;
+  mechanics(world: World, tree: Tree): void;
+  commit(world: World, tree: Tree): void;
+  /** Phase 3 over the trees `light` returned. */
+  deaths(world: World, live: Tree[]): void;
+}
+
+export const TS_PHASES: SeasonPhases = {
+  light: lightPhase,
+  sample: samplePhase,
+  allocate: allocatePhase,
+  grow: (world, tree) => growBuds(world, tree, world.season), // C1 bud fate, GROW (C4 direction)
+  shed: shedPhase,
+  girth: girthPhase,
+  mechanics: mechanicsPhase,
+  commit: (_world, tree) => {
+    commitBuds(tree);
+    tree.age += 1;
+  },
+  deaths: deathsPhase,
+};
+
+let phases: SeasonPhases = TS_PHASES;
+
+/** Sets the season's phases (null: the TypeScript ones) for every world. */
+export function setSeasonPhases(next: SeasonPhases | null): void {
+  phases = next ?? TS_PHASES;
+}
+
 export function runSeason(world: World, mark: PhaseMark = noMark): void {
+  const live = phases.light(world);
+  mark("light");
+
+  // Phase 2: per-tree passes, reading the environment only. Each tree grows by its own species'
+  // params (ADR 0016); without species that is the world's params object itself.
+  for (const tree of live) {
+    phases.sample(world, tree);
+    mark("sample");
+    phases.allocate(world, tree);
+    mark("allocate");
+    const evaluated = tree.m.length; // rows that took part in this season's passes
+    phases.grow(world, tree);
+    mark("grow");
+    phases.shed(world, tree, evaluated);
+    mark("shed");
+    phases.girth(world, tree);
+    mark("girth");
+    phases.mechanics(world, tree);
+    mark("mechanics");
+    phases.commit(world, tree);
+    mark("commit");
+  }
+
+  // Phase 3: deaths last (§6), so a dead tree's shade is gone next season; then O4 recruitment.
+  phases.deaths(world, live);
+  mark("deaths");
+}
+
+function lightPhase(world: World): Tree[] {
   const { params, light, season } = world;
   const live: Tree[] = [];
   for (const tree of world.trees) if (tree.alive) live.push(tree);
@@ -83,55 +155,62 @@ export function runSeason(world: World, mark: PhaseMark = noMark): void {
     for (const tree of live) depositBuds(world, tree);
   }
   light.compute(season);
-  mark("light");
+  return live;
+}
 
-  // Phase 2: per-tree passes, reading the environment only. Each tree grows by its own species'
-  // params (ADR 0016); without species that is the world's params object itself.
-  for (const tree of live) {
-    const params = world.paramsOf(tree);
-    const carbonShedding = params.r1.enabled && params.r1.shed === "carbon";
-    tree.ensureScratch();
-    tree.shedCount = 0;
-    tree.released = 0;
-    tree.epicormic = 0;
-    tree.aborted = 0;
-    tree.broken = 0;
-    sampleBuds(world, tree); // C2: Q and V at every bud
-    if (params.r5.enabled) sampleNodes(world, tree); // R5: shade at every node
-    if ((params.c5.enabled || carbonShedding) && params.c5.Trel > 0) {
-      tree.qTop = crownTopLight(tree, params.c5.topQuantile); // C5 relative threshold
-    }
-    mark("sample");
-    gatherLight(tree, params.r6); // C3 basipetal: Q_sum, n_b (short shoots by leaf area, R6)
-    if (params.r1.enabled) carbonBalance(tree, params); // R1 CARBON: v_base = net production
-    allocate(tree, params); // C3 acropetal: v at every bud
-    mark("allocate");
-    const evaluated = tree.m.length; // rows that took part in this season's passes
-    growBuds(world, tree, season); // C1 bud fate, GROW (C4 direction)
-    mark("grow");
-    if (params.c5.enabled || carbonShedding) {
-      tree.shedCount = shedBranches(tree, params, season, evaluated); // C5, or R1 by carbon
-    }
-    mark("shed");
-    if (params.r3.enabled) {
-      tree.ensureScratch(); // growth may have outgrown the scratch arrays
-      tree.prevRadius.set(tree.m.cols.radius.subarray(0, tree.m.length)); // R3: Δr/r for posture
-    }
-    if (params.c6.enabled) updateGirth(tree, params); // C6, after shedding so scars count
-    mark("girth");
-    if (params.r3.enabled) updateMechanics(tree, params, storm, season); // R3 MECHANICS: girth first (§6 rule 2)
-    // Obstacles again (ADR 0015): a limb that sagged into one this season is shed now, so no season
-    // ends with wood inside the page's content.
-    if (params.world.obstacles?.length) {
-      tree.shedCount += clearObstacles(tree, params, params.r3.enabled ? [tree.stress] : []);
-    }
-    mark("mechanics");
-    commitBuds(tree);
-    tree.age += 1;
-    mark("commit");
+function samplePhase(world: World, tree: Tree): void {
+  const params = world.paramsOf(tree);
+  const carbonShedding = params.r1.enabled && params.r1.shed === "carbon";
+  tree.ensureScratch();
+  tree.shedCount = 0;
+  tree.released = 0;
+  tree.epicormic = 0;
+  tree.aborted = 0;
+  tree.broken = 0;
+  sampleBuds(world, tree); // C2: Q and V at every bud
+  if (params.r5.enabled) sampleNodes(world, tree); // R5: shade at every node
+  if ((params.c5.enabled || carbonShedding) && params.c5.Trel > 0) {
+    tree.qTop = crownTopLight(tree, params.c5.topQuantile); // C5 relative threshold
   }
+}
 
-  // Phase 3: deaths last (§6), so a dead tree's shade is gone next season; then O4 recruitment.
+function allocatePhase(world: World, tree: Tree): void {
+  const params = world.paramsOf(tree);
+  gatherLight(tree, params.r6); // C3 basipetal: Q_sum, n_b (short shoots by leaf area, R6)
+  if (params.r1.enabled) carbonBalance(tree, params); // R1 CARBON: v_base = net production
+  allocate(tree, params); // C3 acropetal: v at every bud
+}
+
+function shedPhase(world: World, tree: Tree, evaluated: number): void {
+  const params = world.paramsOf(tree);
+  const carbonShedding = params.r1.enabled && params.r1.shed === "carbon";
+  if (params.c5.enabled || carbonShedding) {
+    tree.shedCount = shedBranches(tree, params, world.season, evaluated); // C5, or R1 by carbon
+  }
+}
+
+function girthPhase(world: World, tree: Tree): void {
+  const params = world.paramsOf(tree);
+  if (params.r3.enabled) {
+    tree.ensureScratch(); // growth may have outgrown the scratch arrays
+    tree.prevRadius.set(tree.m.cols.radius.subarray(0, tree.m.length)); // R3: Δr/r for posture
+  }
+  if (params.c6.enabled) updateGirth(tree, params); // C6, after shedding so scars count
+}
+
+function mechanicsPhase(world: World, tree: Tree): void {
+  const params = world.paramsOf(tree);
+  if (params.r3.enabled) updateMechanics(tree, params, world.storm, world.season); // R3 MECHANICS: girth first (§6 rule 2)
+  // Obstacles again (ADR 0015): a limb that sagged into one this season is shed now, so no season
+  // ends with wood inside the page's content.
+  if (params.world.obstacles?.length) {
+    tree.shedCount += clearObstacles(tree, params, params.r3.enabled ? [tree.stress] : []);
+  }
+}
+
+function deathsPhase(world: World, live: Tree[]): void {
+  const { params, season } = world;
+  const abrasion = params.o2.enabled;
   const { width: W, height: H } = params.world;
   const periodic = params.world.sides === "periodic";
   for (const tree of live) {
@@ -141,7 +220,6 @@ export function runSeason(world: World, mark: PhaseMark = noMark): void {
   for (const tree of live) if (starvedToDeath(tree, world.paramsOf(tree).r1)) tree.alive = false;
   for (const tree of live) tree.seeds = 0;
   if (params.o4.enabled) world.recruits = standDynamics(world); // O4: background deaths, seeds
-  mark("deaths");
 }
 
 function depositBuds(world: World, tree: Tree): void {

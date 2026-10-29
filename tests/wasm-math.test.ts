@@ -1,10 +1,22 @@
 /**
- * G2 (ADR 0024): the Rust core's Math against V8's, bit for bit, on this machine's Node (whose
- * Math.pow is the C library's). A failure here on a new platform means its JavaScript differs,
- * not that the Rust does: the goldens are made on x86-64 Linux (G2 note).
+ * G2 and I1 (ADR 0024): every Math routine the core calls, the Rust core's against V8's, bit for
+ * bit, on this machine's Node (whose Math.pow is the C library's). A failure here on a new
+ * platform means its JavaScript differs, not that the Rust does: the goldens are made on x86-64
+ * Linux (G2 note).
  */
 import { beforeAll, describe, expect, it } from "vitest";
-import { math_cos, math_exp, math_hypot, math_pow, math_sin } from "../src/wasm/pkg-parity/core.js";
+import {
+  math_acos,
+  math_asin,
+  math_atan2,
+  math_cbrt,
+  math_cos,
+  math_exp,
+  math_hypot,
+  math_log,
+  math_pow,
+  math_sin,
+} from "../src/wasm/pkg-parity/core.js";
 import { loadRustCore } from "./wasm.ts";
 
 let a = 2026;
@@ -53,7 +65,7 @@ function mismatches2(
 const angle = () =>
   rnd() < 0.7 ? u(-2 * Math.PI, 2 * Math.PI) : rnd() < 0.7 ? u(-1e6, 1e6) : anyBits();
 
-describe("the Rust core's Math is V8's, bit for bit (G2)", () => {
+describe("the Rust core's Math is V8's, bit for bit (G2, I1)", () => {
   beforeAll(loadRustCore);
   it("sin", () => expect(mismatches(math_sin, Math.sin, angle)).toEqual([]));
   it("cos", () => expect(mismatches(math_cos, Math.cos, angle)).toEqual([]));
@@ -75,6 +87,26 @@ describe("the Rust core's Math is V8's, bit for bit (G2)", () => {
         },
       ),
     ).toEqual([]));
+  it("log", () =>
+    expect(mismatches(math_log, Math.log, () => (rnd() < 0.7 ? u(0, 2) : anyBits()))).toEqual([]));
+  it("atan2", () =>
+    expect(
+      mismatches2(math_atan2, Math.atan2, () =>
+        rnd() < 0.7 ? [u(-3, 3), u(-3, 3)] : [anyBits(), anyBits()],
+      ),
+    ).toEqual([]));
+  it("asin", () =>
+    expect(mismatches(math_asin, Math.asin, () => (rnd() < 0.7 ? u(-1, 1) : anyBits()))).toEqual(
+      [],
+    ));
+  it("acos", () =>
+    expect(mismatches(math_acos, Math.acos, () => (rnd() < 0.7 ? u(-1, 1) : anyBits()))).toEqual(
+      [],
+    ));
+  it("cbrt", () =>
+    expect(mismatches(math_cbrt, Math.cbrt, () => (rnd() < 0.7 ? u(0, 1e4) : anyBits()))).toEqual(
+      [],
+    ));
   it("hypot", () =>
     expect(
       mismatches2(math_hypot, Math.hypot, () =>

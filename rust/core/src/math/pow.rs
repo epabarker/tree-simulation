@@ -163,7 +163,8 @@ fn checkint(iy: u64) -> i32 {
 
 #[inline]
 fn zeroinfnan(i: u64) -> bool {
-    (2 * i).wrapping_sub(1) >= (2 * f64::INFINITY.to_bits()).wrapping_sub(1)
+    // 2·i wraps in C (uint64_t), and does here (as every 2·ix and 2·iy below).
+    i.wrapping_mul(2).wrapping_sub(1) >= (2 * f64::INFINITY.to_bits()).wrapping_sub(1)
 }
 
 /// glibc's pow (the FMA variant), for finite non-special JS cases and the rest.
@@ -177,19 +178,21 @@ fn c_pow(x: f64, y: f64) -> f64 {
         || (topy & 0x7ff).wrapping_sub(0x3be) >= 0x43e - 0x3be
     {
         if zeroinfnan(iy) {
-            if 2 * iy == 0 {
+            if iy.wrapping_mul(2) == 0 {
                 return 1.0;
             }
             if ix == 1.0f64.to_bits() {
                 return 1.0;
             }
-            if 2 * ix > 2 * f64::INFINITY.to_bits() || 2 * iy > 2 * f64::INFINITY.to_bits() {
+            if ix.wrapping_mul(2) > 2 * f64::INFINITY.to_bits()
+                || iy.wrapping_mul(2) > 2 * f64::INFINITY.to_bits()
+            {
                 return x + y;
             }
-            if 2 * ix == 2 * 1.0f64.to_bits() {
+            if ix.wrapping_mul(2) == 2 * 1.0f64.to_bits() {
                 return 1.0;
             }
-            if (2 * ix < 2 * 1.0f64.to_bits()) == (iy >> 63 == 0) {
+            if (ix.wrapping_mul(2) < 2 * 1.0f64.to_bits()) == (iy >> 63 == 0) {
                 return 0.0;
             }
             return y * y;
@@ -200,7 +203,7 @@ fn c_pow(x: f64, y: f64) -> f64 {
                 x2 = -x2;
                 sign_bias = 1;
             }
-            if 2 * ix == 0 && iy >> 63 != 0 {
+            if ix.wrapping_mul(2) == 0 && iy >> 63 != 0 {
                 return (if sign_bias != 0 { -1.0 } else { 1.0 }) / 0.0;
             }
             return if iy >> 63 != 0 { 1.0 / x2 } else { x2 };

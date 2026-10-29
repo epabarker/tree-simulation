@@ -52,7 +52,23 @@ export function setSkySweepFactory(factory: SkySweepFactory | null): void {
   skySweepFactory = factory;
 }
 
+/**
+ * Builds a world's whole light model, whatever c2 asks for; null falls back to the TypeScript
+ * models. I1 (ADR 0024) sets one that hands back the Rust core's (src/wasm/hybrid.ts), so phases
+ * running in Rust and in TypeScript share one field.
+ */
+export type LightFactory = (params: Params) => LightModel | null;
+
+let lightFactory: LightFactory | null = null;
+
+/** Sets the light models' implementation for worlds made from now on (null: the core's own). */
+export function setLightFactory(factory: LightFactory | null): void {
+  lightFactory = factory;
+}
+
 export function makeLight(params: Params): LightModel {
+  const custom = lightFactory?.(params);
+  if (custom) return custom;
   const { width, height } = params.world;
   if (params.c2.enabled && params.c2.model === "pooled") {
     return new PooledLight(width, height, params.c2);

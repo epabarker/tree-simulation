@@ -582,3 +582,267 @@ pub fn exp(mut x: f64) -> f64 {
         y * twopk * TWOM1000
     }
 }
+
+/// `Math.log` as V8 computes it (fdlibm's e_log.c).
+pub fn log(mut x: f64) -> f64 {
+    const LN2_HI: f64 = 6.93147180369123816490e-01;
+    const LN2_LO: f64 = 1.90821492927058770002e-10;
+    const TWO54: f64 = 1.80143985094819840000e+16;
+    const LG1: f64 = 6.666666666666735130e-01;
+    const LG2: f64 = 3.999999999940941908e-01;
+    const LG3: f64 = 2.857142874366239149e-01;
+    const LG4: f64 = 2.222219843214978396e-01;
+    const LG5: f64 = 1.818357216161805012e-01;
+    const LG6: f64 = 1.531383769920937332e-01;
+    const LG7: f64 = 1.479819860511658591e-01;
+
+    let mut hx = high(x);
+    let lx = low(x);
+    let mut k: i32 = 0;
+    if hx < 0x00100000 {
+        if ((hx & 0x7fffffff) as u32 | lx) == 0 {
+            return f64::NEG_INFINITY; // -two54 / 0
+        }
+        if hx < 0 {
+            return f64::NAN; // (x - x) / 0
+        }
+        k -= 54;
+        x *= TWO54;
+        hx = high(x);
+    }
+    if hx >= 0x7ff00000 {
+        return x + x;
+    }
+    k += (hx >> 20) - 1023;
+    hx &= 0x000fffff;
+    let i = (hx + 0x95f64) & 0x100000;
+    x = with_high(x, (hx | (i ^ 0x3ff00000)) as u32);
+    k += i >> 20;
+    let f = x - 1.0;
+    if (0x000fffff & (2 + hx)) < 3 {
+        if f == 0.0 {
+            if k == 0 {
+                return 0.0;
+            }
+            let dk = k as f64;
+            return dk * LN2_HI + dk * LN2_LO;
+        }
+        let r = f * f * (0.5 - 0.33333333333333333 * f);
+        if k == 0 {
+            return f - r;
+        }
+        let dk = k as f64;
+        return dk * LN2_HI - ((r - dk * LN2_LO) - f);
+    }
+    let s = f / (2.0 + f);
+    let dk = k as f64;
+    let z = s * s;
+    let mut i = hx - 0x6147a;
+    let w = z * z;
+    let j = 0x6b851 - hx;
+    let t1 = w * (LG2 + w * (LG4 + w * LG6));
+    let t2 = z * (LG1 + w * (LG3 + w * (LG5 + w * LG7)));
+    i |= j;
+    let r = t2 + t1;
+    if i > 0 {
+        let hfsq = 0.5 * f * f;
+        if k == 0 {
+            f - (hfsq - s * (hfsq + r))
+        } else {
+            dk * LN2_HI - ((hfsq - (s * (hfsq + r) + dk * LN2_LO)) - f)
+        }
+    } else if k == 0 {
+        f - s * (f - r)
+    } else {
+        dk * LN2_HI - ((s * (f - r) - dk * LN2_LO) - f)
+    }
+}
+
+/// `Math.atan` as V8 computes it (fdlibm's s_atan.c).
+pub fn atan(mut x: f64) -> f64 {
+    const ATANHI: [f64; 4] = [
+        4.63647609000806093515e-01,
+        7.85398163397448278999e-01,
+        9.82793723247329054082e-01,
+        1.57079632679489655800e+00,
+    ];
+    const ATANLO: [f64; 4] = [
+        2.26987774529616870924e-17,
+        3.06161699786838301793e-17,
+        1.39033110312309984516e-17,
+        6.12323399573676603587e-17,
+    ];
+    const AT: [f64; 11] = [
+        3.33333333333329318027e-01,
+        -1.99999999998764832476e-01,
+        1.42857142725034663711e-01,
+        -1.11111104054623557880e-01,
+        9.09088713343650656196e-02,
+        -7.69187620504482999495e-02,
+        6.66107313738753120669e-02,
+        -5.83357013379057348645e-02,
+        4.97687799461593236017e-02,
+        -3.65315727442169155270e-02,
+        1.62858201153657823623e-02,
+    ];
+    let hx = high(x);
+    let ix = hx & 0x7fffffff;
+    let id: i32;
+    if ix >= 0x44100000 {
+        if ix > 0x7ff00000 || (ix == 0x7ff00000 && low(x) != 0) {
+            return x + x;
+        }
+        return if hx > 0 {
+            ATANHI[3] + ATANLO[3]
+        } else {
+            -ATANHI[3] - ATANLO[3]
+        };
+    }
+    if ix < 0x3fdc0000 {
+        if ix < 0x3e400000 {
+            return x; // huge + x > one: raise inexact
+        }
+        id = -1;
+    } else {
+        x = x.abs();
+        if ix < 0x3ff30000 {
+            if ix < 0x3fe60000 {
+                id = 0;
+                x = (2.0 * x - 1.0) / (2.0 + x);
+            } else {
+                id = 1;
+                x = (x - 1.0) / (x + 1.0);
+            }
+        } else if ix < 0x40038000 {
+            id = 2;
+            x = (x - 1.5) / (1.0 + 1.5 * x);
+        } else {
+            id = 3;
+            x = -1.0 / x;
+        }
+    }
+    let z = x * x;
+    let w = z * z;
+    let s1 = z * (AT[0] + w * (AT[2] + w * (AT[4] + w * (AT[6] + w * (AT[8] + w * AT[10])))));
+    let s2 = w * (AT[1] + w * (AT[3] + w * (AT[5] + w * (AT[7] + w * AT[9]))));
+    if id < 0 {
+        return x - x * (s1 + s2);
+    }
+    let id = id as usize;
+    let z = ATANHI[id] - ((x * (s1 + s2) - ATANLO[id]) - x);
+    if hx < 0 { -z } else { z }
+}
+
+/// `Math.atan2` as V8 computes it (fdlibm's e_atan2.c, as FreeBSD and V8 carry it).
+pub fn atan2(y: f64, x: f64) -> f64 {
+    const TINY: f64 = 1.0e-300;
+    const PI_O_4: f64 = 7.8539816339744827900E-01;
+    const PI_O_2: f64 = 1.5707963267948965580E+00;
+    const PI: f64 = 3.1415926535897931160E+00;
+    const PI_LO: f64 = 1.2246467991473531772E-16;
+
+    let hx = high(x);
+    let lx = low(x);
+    let ix = hx & 0x7fffffff;
+    let hy = high(y);
+    let ly = low(y);
+    let iy = hy & 0x7fffffff;
+    let nan = |i: i32, l: u32| (i as u32 | ((l | l.wrapping_neg()) >> 31)) > 0x7ff00000;
+    if nan(ix, lx) || nan(iy, ly) {
+        return x + y;
+    }
+    if (hx.wrapping_sub(0x3ff00000) as u32 | lx) == 0 {
+        return atan(y);
+    }
+    let mut m = ((hy >> 31) & 1) | ((hx >> 30) & 2);
+    if (iy as u32 | ly) == 0 {
+        return match m {
+            0 | 1 => y,
+            2 => PI + TINY,
+            _ => -PI - TINY,
+        };
+    }
+    if (ix as u32 | lx) == 0 {
+        return if hy < 0 {
+            -PI_O_2 - TINY
+        } else {
+            PI_O_2 + TINY
+        };
+    }
+    if ix == 0x7ff00000 {
+        if iy == 0x7ff00000 {
+            return match m {
+                0 => PI_O_4 + TINY,
+                1 => -PI_O_4 - TINY,
+                2 => 3.0 * PI_O_4 + TINY,
+                _ => -3.0 * PI_O_4 - TINY,
+            };
+        }
+        return match m {
+            0 => 0.0,
+            1 => -0.0,
+            2 => PI + TINY,
+            _ => -PI - TINY,
+        };
+    }
+    if iy == 0x7ff00000 {
+        return if hy < 0 {
+            -PI_O_2 - TINY
+        } else {
+            PI_O_2 + TINY
+        };
+    }
+    let k = (iy - ix) >> 20;
+    let z = if k > 60 {
+        m &= 1;
+        PI_O_2 + 0.5 * PI_LO
+    } else if hx < 0 && k < -60 {
+        0.0
+    } else {
+        atan((y / x).abs())
+    };
+    match m {
+        0 => z,
+        1 => -z,
+        2 => PI - (z - PI_LO),
+        _ => (z - PI_LO) - PI,
+    }
+}
+
+/// `Math.cbrt` as V8 computes it (FreeBSD's s_cbrt.c).
+pub fn cbrt(x: f64) -> f64 {
+    const B1: u32 = 715094163;
+    const B2: u32 = 696219795;
+    const P0: f64 = 1.87595182427177009643;
+    const P1: f64 = -1.88497979543377169875;
+    const P2: f64 = 1.621429720105354466140;
+    const P3: f64 = -0.758397934778766047437;
+    const P4: f64 = 0.145996192886612446982;
+
+    let mut hx = high(x) as u32;
+    let lo = low(x);
+    let sign = hx & 0x80000000;
+    hx ^= sign;
+    if hx >= 0x7ff00000 {
+        return x + x;
+    }
+    let mut t: f64;
+    if hx < 0x00100000 {
+        if (hx | lo) == 0 {
+            return x;
+        }
+        t = from_words(0x43500000, 0) * x;
+        let high = high(t) as u32;
+        t = from_words(sign | ((high & 0x7fffffff) / 3 + B2), 0);
+    } else {
+        t = from_words(sign | (hx / 3 + B1), 0);
+    }
+    let r = (t * t) * (t / x);
+    t *= (P0 + r * (P1 + r * P2)) + ((r * r) * r) * (P3 + r * P4);
+    t = f64::from_bits((t.to_bits().wrapping_add(0x80000000)) & 0xffffffffc0000000);
+    let s = t * t;
+    let mut r = x / s;
+    let w = t + t;
+    r = (r - t) / (w + r);
+    t + t * r
+}

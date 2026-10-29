@@ -38,3 +38,6 @@
   - Calm seasons break nothing: stress wood holds σ ≤ σ_target < σ_break.
   - `forest` sets σ_break 4500, `stormP` 0.05 and `stormLoad` 1.5 ([M16 note](../experiments/2026-10-27-m16-storms.md)).
 - **The page shows storms:** snapshots carry `storm`, which turns the page's wind into a gale (page only; the simulation never sees the page's wind or the pointer).
+
+## Addendum (2026-10-29): proprioception along the dominant path
+ADR 0024 adds `r3.proprioception: "dominant"`. The γ term then senses a metamer's kink to its parent wherever it is the parent's thickest child, not only along its own axis, so the corner a relay makes straightens as it thickens. "axis" (the default) keeps the rule above. Oak is fitted with "dominant".

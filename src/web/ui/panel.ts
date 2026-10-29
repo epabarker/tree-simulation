@@ -172,6 +172,11 @@ const SECTIONS: SectionSpec[] = [
       { key: "posture", label: "posture control" },
       { key: "betaG", label: "β_g gravitropism", min: 0, max: 1, step: 0.01 },
       { key: "gamma", label: "γ proprioception", min: 0, max: 1, step: 0.01 },
+      {
+        key: "proprioception",
+        label: "γ senses",
+        options: { "own axis": "axis", "dominant path": "dominant" },
+      },
       { key: "c", label: "c reaction-wood rate", min: 0, max: 1, step: 0.01 },
       { key: "sigmaTarget", label: "σ_target stress", min: 500, max: 20000, step: 100 },
       { key: "girthGain", label: "stress girth gain", min: 0, max: 1, step: 0.05 },

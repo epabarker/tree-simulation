@@ -126,6 +126,44 @@ weight = 1
 kind = "measured"
 source = "lowest light the seedling survives: sessile oak saplings need 11.4% of PAR (Hagemeier & Leuschner 2019); fitted, not held out (ADR 0020 addendum)"
 
+# Laser-scanned woodland oaks (ADR 0024): the 35 live Quercus robur of the Wytham Woods plot
+# (Calders et al. 2022, TreeQSM, CC BY 4.0), 10.8–24.4 m tall, measured as form.ts measures the
+# model (analysis/experiments/structure_vs_drawing/wytham_targets.py): mean ± SD over trees. The
+# stand at season 100 is about their height. Limb shape follows thick wood (r ≥ 5 cm) along each
+# node's thickest child; turn is between successive 1 m chords.
+
+[[trait]]
+name = "stand.limbStraightness"
+target = 0.922
+band = 0.04
+weight = 1
+kind = "measured"
+source = "Wytham Woods oaks, chord/path of 3 m windows along limbs: 0.922 ± 0.040 (n = 35; ADR 0024)"
+
+[[trait]]
+name = "stand.limbTurn"
+target = 20.2
+band = 5.5
+weight = 1
+kind = "measured"
+source = "Wytham Woods oaks, median turn between 1 m chords along limbs: 20.2 ± 5.5 °/m (n = 35; ADR 0024)"
+
+[[trait]]
+name = "stand.limbTurnP90"
+target = 48.9
+band = 19.4
+weight = 1
+kind = "measured"
+source = "Wytham Woods oaks, 90th-percentile turn along limbs: 48.9 ± 19.4 °/m (n = 35; ADR 0024)"
+
+[[trait]]
+name = "stand.forkHeight"
+target = 0.446
+band = 0.146
+weight = 1
+kind = "measured"
+source = "Wytham Woods oaks, relative height where the trunk forks (form.ts's rule): 0.446 ± 0.146 (n = 35; ADR 0024)"
+
 # Free parameters: dotted paths into the species' patch, with bounds (literature review §4,
 # ROADMAP calibration table). log = true searches the bound's log scale. L_h spans 10–200 for
 # every species: the hyperbolic discount needs larger values than the exponential (ADR 0021).
@@ -191,8 +229,22 @@ hi = 0.15
 [[param]]
 path = "r3.c"
 lo = 0.01
-hi = 0.3
+hi = 0.6
 log = true
+[[param]]
+path = "r3.gamma"
+lo = 0.02
+hi = 1
+log = true
+[[param]]
+path = "r3.betaG"
+lo = 0.02
+hi = 0.5
+log = true
+[[param]]
+path = "c4.sigma"
+lo = 5
+hi = 60
 [[param]]
 path = "r6.qMin"
 lo = 0.01
@@ -211,6 +263,7 @@ log = true
 # Assignments every candidate carries unchanged (analysis/treesim/fit.py).
 [fixed]
 "r1.hydraulic" = "hyperbolic"   # 1/(1 + L_path/L_h): height keeps rising slowly (ADR 0021)
+"r3.proprioception" = "dominant"   # posture senses the corner where a lateral took over (ADR 0024)
 
 # Held out: never in the loss, checked after the fit (analysis/experiments/m27_holdout.py).
 [holdout]

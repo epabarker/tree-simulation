@@ -14,7 +14,10 @@
  *   the ground, so a hanging branch is at rest.
  * - **Posture control:** reaction wood turns the metamer toward its posture set-point, Bastien's
  *   AC model: Δθ = −β_g·sin(A − A_set) − γ·κ·l, with κ·l the kink to the previous metamer of the
- *   same axis (proprioception). It is clamped to ±c·Δr/r: no new girth, no correction.
+ *   same axis (proprioception). With `proprioception: "dominant"` (ADR 0024) the organ is the
+ *   dominant path instead: a metamer senses its kink to its parent when it is the parent's
+ *   thickest child, so a lateral that has taken over a limb straightens the corner it made, and
+ *   the axis it overtook stops sensing one. It is clamped to ±c·Δr/r: no new girth, no correction.
  * Every metamer's turn is computed from the start-of-pass geometry (all elements sense at once, so
  * gravitropism alone overshoots as in Bastien et al. 2013), then turns accumulate acropetally:
  * each rotates its whole subtree about its base. Buds turn with their metamer.
@@ -27,7 +30,7 @@
  *   rest on it, with its subtree; it lies there, alive, instead of sinking.
  *
  * Params: r3.enabled, r3.rho (ρ_w), r3.leafMass, r3.E, r3.phi (φ), r3.posture, r3.betaG (β_g),
- * r3.gamma (γ), r3.c, r3.sigmaTarget (σ_target), r3.girthGain, r3.sigmaBreak (σ_break); posture set-points from r2.levels
+ * r3.gamma (γ), r3.proprioception, r3.c, r3.sigmaTarget (σ_target), r3.girthGain, r3.sigmaBreak (σ_break); posture set-points from r2.levels
  * (`postureSetPoint`, else `setPoint`) or c4.setPoint; r6 leaf areas.
  */
 
@@ -109,6 +112,17 @@ export function updateMechanics(tree: Tree, params: Params, storm = false, seaso
   // Basipetal: loads, moments, stress-driven girth, and each metamer's own turn (children always
   // come later in the table, so their loads are in W and S by the time their parent is reached).
   const turn = tree.scratchF;
+  // Proprioception along the dominant path (ADR 0024): each node's thickest child (this season's
+  // radii, after girth) continues the organ, whichever slot it grew from.
+  const dominant = r3.proprioception === "dominant" ? tree.dominant : null;
+  if (dominant) {
+    dominant.fill(-1, 0, nm);
+    for (let i = 1; i < nm; i++) {
+      const q = c.parent[i];
+      const d = dominant[q] as number;
+      if (d < 0 || c.radius[i] > c.radius[d]) dominant[q] = i;
+    }
+  }
   const sigmaT = r3.sigmaTarget;
   const breaks = tree.scratchU; // sized by ensureScratch to the metamer capacity
   let anyBreak = false;
@@ -163,7 +177,8 @@ export function updateMechanics(tree: Tree, params: Params, storm = false, seaso
     let post = 0;
     if (r3.posture) {
       const a = c.angle[i];
-      const kink = p >= 0 && c.slot[i] === Slot.main ? wrapAngle(a - c.angle[p]) : 0;
+      const onAxis = dominant ? p >= 0 && dominant[p] === i : p >= 0 && c.slot[i] === Slot.main;
+      const kink = onAxis ? wrapAngle(a - c.angle[p]) : 0;
       const prev = prevRadius[i] > 0 ? prevRadius[i] : rNew;
       const dr = (rNew - prev) / rNew;
       const setPoint = postureSetPoint(c.order[i] - c.paShift[i], params);

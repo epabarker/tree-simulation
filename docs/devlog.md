@@ -2,6 +2,36 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-29: oak limbs refitted to 35 scanned oaks (ADR 0024)
+
+- **User:** fix the limb faults the 2×2 found. Then: adopt the thickest-path posture change (amending ADR 0011), add the scanned oaks' limb-shape and fork targets to the fit, and refit oak ([note](experiments/2026-10-29-oak-limbs.md)).
+- **Cause of the zigzag:** half of each limb's thickest path is relays, laterals that outgrew their axis, each turning about 36°. ADR 0011's proprioception never senses a relay's corner.
+- **Built:**
+  - `r3.proprioception` (`axis` default, `dominant`), with a unit test;
+  - `form.ts` `limbCurves` (`limbStraightness`, `limbTurn`, `limbTurnP90`), with a unit test, and these traits plus fork height on the stand at season 100;
+  - in the lab, an R3 panel control for the mode.
+- **Targets:** all 35 live Wytham oaks (≈ 500 MB by range requests):
+  - straightness 0.922 ± 0.040;
+  - turn 20.2 ± 5.5° per m;
+  - p90 48.9 ± 19.4° per m;
+  - fork height 0.45 ± 0.15.
+- **Refit oak:** 2,160 candidates, loss 9.88 → 8.51.
+  - **Chosen:** γ 0.034, β_g 0.13, σ 38°, c 0.074.
+  - **Open oak:** its limbs turn like the scans' across scales, and the zigzag and V are gone.
+  - **Woodland limbs:** still a third of the real turn.
+  - **Floor light:** 5.3% against 8.4%.
+- **Adopted:** `flora-fitted.ts` regenerated; only oak's values change, and the others gain an explicit `proprioception: "axis"`. The round-2 oak fit is kept in `fits/round2/`.
+- **Hold-out:**
+  - oak survival light 12.7% (in band);
+  - Spearman −0.91 (unchanged);
+  - the succession holds, with beech less dominant;
+  - oak keeps 0.5 canopy trees per run at season 400 in the adopted wood.
+- **Bench:** panorama +2%, other cases bit-identical. **Goldens:** unchanged (no golden case grows the fitted oak). The garden rebuilds within its gate (first paints regenerated locally; not released).
+- **Surprises:**
+  - **Relay pa inheritance did nothing:** oak's pa 1 and 2 set-points differ by 9°, so I reverted it.
+  - **Strong straightening makes rods.** The scans turn steadily and are rough at short scales.
+  - **Age matters:** at season 60 every oak's limbs are near-straight, so limb traits are measured at season 100.
+
 ## 2026-10-29: structure vs drawing (realism 2×2)
 
 - **User:** the trees still don't look the way they should. Asked for a realism moonshot, then for its first step: a 2×2 test of structure against drawing ([note](experiments/2026-10-29-structure-vs-drawing.md)).

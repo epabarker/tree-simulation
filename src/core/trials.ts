@@ -176,10 +176,21 @@ export interface StandTraits {
   widestAt: number;
   /** Mean interior height at season 100, when the stand is run on (`late`); else absent. */
   height100?: number;
+  /**
+   * At season 100 when run on (ADR 0024), means over the interior trees, to compare with
+   * laser-scanned woodland trees of about that height: relative fork height, and limb shape
+   * (form.ts `limbCurves`: straightness of 3 m windows, median and 90th-percentile turn, °/m).
+   */
+  forkHeight?: number;
+  limbStraightness?: number;
+  limbTurn?: number;
+  limbTurnP90?: number;
 }
 
 const mean = (xs: number[]): number =>
   xs.length > 0 ? xs.reduce((s, x) => s + x, 0) / xs.length : Number.NaN;
+/** Mean of the finite values (a tree with no thick limb has no limb shape). */
+const finiteMean = (xs: number[]): number => mean(xs.filter(Number.isFinite));
 
 export function runStand(
   species: string,
@@ -204,6 +215,11 @@ export function runStand(
     world.run(40);
     const still = interior.filter((t) => t.alive);
     traits.height100 = mean(still.map((t) => treeMetrics(t, world).height));
+    const forms = still.map((t) => formMetrics(t, world.paramsOf(t)));
+    traits.forkHeight = finiteMean(forms.map((f) => f.forkHeight));
+    traits.limbStraightness = finiteMean(forms.map((f) => f.limbStraightness));
+    traits.limbTurn = finiteMean(forms.map((f) => f.limbTurn));
+    traits.limbTurnP90 = finiteMean(forms.map((f) => f.limbTurnP90));
   }
   return traits;
 }

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { crownProfile, formMetrics, olsSlope } from "./form.ts";
+import { crownProfile, formMetrics, limbCurves, olsSlope } from "./form.ts";
 import { defaultParams, mergeParams } from "./params.ts";
 import { addBud, addMetamer } from "./principles/c1-buds.ts";
 import { updateGirth } from "./principles/c6-girth.ts";
@@ -135,6 +135,27 @@ describe("§10 allometries (M26)", () => {
     const f = formMetrics(t, params);
     expect(f.leafStemSlope).toBeCloseTo(1, 9);
     expect(f.junctionDelta).toBeCloseTo(params.c6.n, 6);
+  });
+
+  it("measures limb shape along thick wood: straight, constant curvature, thin (ADR 0024)", () => {
+    // A limb of 40 one-cell metamers (10 m) turning δ per metamer; radius r.
+    const limb = (delta: number, r: number) => {
+      const t = new Tree(0, 50);
+      let m = -1;
+      for (let k = 0; k < 40; k++) m = addMetamer(t, m, Slot.main, UP - k * delta, 1, r, 0);
+      return limbCurves(t);
+    };
+    const straight = limb(0, 0.5);
+    expect(straight.straightness.every((s) => Math.abs(s - 1) < 1e-9)).toBe(true);
+    expect(straight.turn.every((d) => Math.abs(d) < 1e-9)).toBe(true);
+    // An arc: 1 m chords (4 cells) turn 4δ = 20° per metre; a 3 m window's chord over its path
+    // is sin(6δ) / (12·sin(δ/2)).
+    const d = (5 * Math.PI) / 180;
+    const arc = limb(d, 0.5);
+    for (const v of arc.turn) expect(v).toBeCloseTo(20, 9);
+    for (const v of arc.straightness)
+      expect(v).toBeCloseTo(Math.sin(6 * d) / (12 * Math.sin(d / 2)), 9);
+    expect(limb(d, 0.1).turn).toHaveLength(0); // thinner than 5 cm: not a limb
   });
 
   it("fits a least-squares slope and refuses too few points", () => {

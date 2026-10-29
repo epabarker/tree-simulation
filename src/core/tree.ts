@@ -9,7 +9,7 @@
  * new metamer takes its slot.
  */
 
-import { ensureFloat64, ensureUint8, Table } from "./soa.ts";
+import { ensureFloat64, ensureInt32, ensureUint8, Table } from "./soa.ts";
 
 export const Slot = { main: 0, left: 1, right: 2 } as const;
 export type Slot = (typeof Slot)[keyof typeof Slot];
@@ -160,6 +160,8 @@ export class Tree {
   loadS = new Float64Array(0);
   /** Bending stress at each metamer's base over σ_target (for the stress colour). */
   stress = new Float64Array(0);
+  /** Each metamer's thickest child, −1 if none (R3 proprioception "dominant", ADR 0024). */
+  dominant = new Int32Array(0);
   /** R5: shade s = 1 − Q/C at each metamer's upper node, from this season's light field. */
   nodeShade = new Float64Array(0);
   /** This season's counts: dormant buds released (R4), dormant buds aborted (R4), breaks (R3). */
@@ -187,6 +189,7 @@ export class Tree {
     this.loadW = ensureFloat64(this.loadW, n);
     this.loadS = ensureFloat64(this.loadS, n);
     this.stress = ensureFloat64(this.stress, n);
+    this.dominant = ensureInt32(this.dominant, n);
     this.nodeShade = ensureFloat64(this.nodeShade, n);
   }
 
@@ -198,6 +201,7 @@ export class Tree {
     this.pSum = this.mSum = this.pathLen = new Float64Array(0);
     this.prevRadius = this.loadW = this.loadS = this.stress = this.nodeShade = new Float64Array(0);
     this.scratchU = new Uint8Array(0);
+    this.dominant = new Int32Array(0);
     this.discarded = true;
   }
 

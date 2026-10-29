@@ -2,7 +2,7 @@
   <name>.skel.json  3D skeleton in metres, y up (renderer B), and
   <name>.snap.json  a one-tree planar Snapshot in cells (renderer A), seen from the side.
 Leaf sites are the terminal cylinders (no child): TLS QSMs stop at about the finest twigs scanned.
-usage: qsm_export.py <in.mat> <out-dir> <name>
+usage: qsm_export.py <in.mat> <out-dir> <name> [--skeleton-only]
 """
 import json, sys
 import numpy as np, scipy.io as sio
@@ -26,9 +26,15 @@ def yup(p):
 a3, b3 = yup(sta), yup(end)
 seg = np.concatenate([a3, b3, rad[:, None]], axis=1)
 leafy = np.flatnonzero(tip)
+# ext: the cylinder continuing each one's branch (TreeQSM's CExt), −1 if none; order: branch order.
+ext = m["CExt"].astype(np.int64) - 1
 json.dump({"name": name, "source": src.split("/")[-1], "parent": par.tolist(),
-           "seg": np.round(seg, 5).ravel().tolist(), "leafy": leafy.tolist()},
+           "seg": np.round(seg, 5).ravel().tolist(), "leafy": leafy.tolist(),
+           "ext": ext.tolist(), "order": m["BoC"][:, 1].astype(int).tolist()},
           open(f"{out}/{name}.skel.json", "w"))
+
+if "--skeleton-only" in sys.argv:
+    sys.exit(0)
 
 # Light proxy for renderer A's leaf shading (the sim gives Q; a scan does not): the openness of
 # each cylinder's tip to the sky through a 0.5 m grid of tip counts, along 5 upward directions.

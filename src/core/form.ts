@@ -6,7 +6,10 @@
  * control (where the trunk forks, how much thicker the leader stays than its laterals), branch
  * angles by order, limb droop, the junction exponent Δ, the length–diameter slope of limbs
  * (l ∝ d^(2/3) under elastic similarity; McMahon & Kronauer 1976) and the leaf-area–section-area
- * slope (≈ 1 by the pipe model; Shinozaki et al. 1964).
+ * slope (≈ 1 by the pipe model; Shinozaki et al. 1964). Limb shape (ADR 0024): how straight thick
+ * limbs are over 3 m and how much they turn per metre, along each node's thickest child, so the
+ * model can be held to laser-scanned trees (`limbCurves`; analysis/experiments/structure_vs_drawing/
+ * limb_shape.py measures QSMs the same way).
  *
  * Costlier than `treeMetrics` (a few O(M) passes and a median), so the CLI writes them only at
  * snapshot seasons (form.csv). Reads the tables only; nothing here touches the simulation.
@@ -26,6 +29,15 @@ const FORK_RATIO = 0.7;
 const MIN_SUBTREE = 5;
 /** First-order limbs need this many metamers on their axis for droop and upturn (M9). */
 const MIN_LIMB = 10;
+/**
+ * Limb shape (ADR 0024), in cells (1 cell ≈ 0.25 m): wood of radius ≥ 5 cm, resampled every
+ * 0.5 m; straightness over 3 m windows taken every 1 m, turning between successive 1 m chords.
+ */
+const LIMB_R = 0.2;
+const LIMB_STEP = 2;
+const LIMB_WINDOW = 6; // steps: 3 m
+const LIMB_CHORD = 2; // steps: 1 m
+const CELLS_PER_M = 4;
 
 export interface FormMetrics {
   /** Relative crown height (0 = crown base, 1 = top) of the widest profile band. */
@@ -52,6 +64,11 @@ export interface FormMetrics {
   ldSlope: number;
   /** Slope of log leaf area above a section on log pipe section area (§10: ≈ 1). */
   leafStemSlope: number;
+  /** Median chord over path of 3 m windows along thick limbs (radius ≥ 5 cm; ADR 0024). */
+  limbStraightness: number;
+  /** Median and 90th percentile turn between successive 1 m chords along thick limbs, degrees per metre. */
+  limbTurn: number;
+  limbTurnP90: number;
   /** The crown's width in each of PROFILE_BANDS height bands, over the widest band. */
   profile: number[];
 }
@@ -68,6 +85,9 @@ export const FORM_COLUMNS = [
   "junctionDelta",
   "ldSlope",
   "leafStemSlope",
+  "limbStraightness",
+  "limbTurn",
+  "limbTurnP90",
 ] as const satisfies readonly (keyof FormMetrics)[];
 
 /** Elevation of a direction above the horizontal, degrees, whichever side it heads. */
@@ -77,10 +97,89 @@ const fromVertical = (a: number) =>
   Math.acos(Math.max(-1, Math.min(1, Math.sin(a)))) * (180 / Math.PI);
 
 function median(xs: number[]): number {
+  return quantile(xs, 0.5);
+}
+
+/** The q quantile, interpolating linearly between order statistics (numpy's default). */
+export function quantile(xs: number[], q: number): number {
   if (xs.length === 0) return Number.NaN;
   const s = [...xs].sort((a, b) => a - b);
-  const k = s.length >> 1;
-  return s.length % 2 === 1 ? (s[k] as number) : ((s[k - 1] as number) + (s[k] as number)) / 2;
+  const h = (s.length - 1) * q;
+  const k = Math.floor(h);
+  const lo = s[k] as number;
+  return k + 1 < s.length ? lo + (h - k) * ((s[k + 1] as number) - lo) : lo;
+}
+
+/**
+ * Straightness of 3 m windows and turning per metre along thick limbs (ADR 0024). A limb is a
+ * chain of thick wood (radius ≥ 5 cm) that follows each node's thickest child, from wherever thick
+ * wood is not its parent's thickest child (or is the root); it is resampled every 0.5 m along its
+ * length, and chains shorter than 3 m are left out. Laser-scanned limbs wander steadily; a model
+ * whose limbs run straight and then kink has a low median turn and a high 90th percentile.
+ */
+export function limbCurves(tree: Tree): { straightness: number[]; turn: number[] } {
+  const nm = tree.m.length;
+  const c = tree.m.cols;
+  const dom = new Int32Array(nm).fill(-1);
+  for (let i = 1; i < nm; i++) {
+    const p = c.parent[i];
+    const d = dom[p] as number;
+    if (d < 0 || c.radius[i] > c.radius[d]) dom[p] = i;
+  }
+  const straightness: number[] = [];
+  const turn: number[] = [];
+  const xs: number[] = [];
+  const ys: number[] = [];
+  const at: number[] = [];
+  for (let s = 0; s < nm; s++) {
+    const p = c.parent[s];
+    if (c.radius[s] < LIMB_R || (p >= 0 && dom[p] === s)) continue;
+    // The chain's polyline: the first metamer's base, then each tip; cumulative length in `at`.
+    xs.length = ys.length = at.length = 0;
+    xs.push(c.baseX[s]);
+    ys.push(c.baseY[s]);
+    at.push(0);
+    for (let i = s; i >= 0; ) {
+      xs.push(tree.tipX(i));
+      ys.push(tree.tipY(i));
+      at.push((at[at.length - 1] as number) + c.length[i]);
+      const next = dom[i] as number;
+      i = next >= 0 && c.radius[next] >= LIMB_R ? next : -1;
+    }
+    const total = at[at.length - 1] as number;
+    if (total < LIMB_WINDOW * LIMB_STEP) continue;
+    // Resample every LIMB_STEP cells.
+    const px: number[] = [];
+    const py: number[] = [];
+    let k = 0;
+    for (let q = 0; q < total; q += LIMB_STEP) {
+      while (k < at.length - 2 && (at[k + 1] as number) < q) k++;
+      const span = (at[k + 1] as number) - (at[k] as number);
+      const u = span > 0 ? (q - (at[k] as number)) / span : 0;
+      px.push((xs[k] as number) + u * ((xs[k + 1] as number) - (xs[k] as number)));
+      py.push((ys[k] as number) + u * ((ys[k + 1] as number) - (ys[k] as number)));
+    }
+    for (let i = 0; i + LIMB_WINDOW < px.length; i += LIMB_CHORD) {
+      const chord = Math.hypot(
+        (px[i + LIMB_WINDOW] as number) - (px[i] as number),
+        (py[i + LIMB_WINDOW] as number) - (py[i] as number),
+      );
+      straightness.push(chord / (LIMB_WINDOW * LIMB_STEP));
+    }
+    let prev = Number.NaN;
+    for (let i = 0; i + LIMB_CHORD < px.length; i += LIMB_CHORD) {
+      const a = Math.atan2(
+        (py[i + LIMB_CHORD] as number) - (py[i] as number),
+        (px[i + LIMB_CHORD] as number) - (px[i] as number),
+      );
+      if (!Number.isNaN(prev)) {
+        const d = Math.abs(Math.atan2(Math.sin(a - prev), Math.cos(a - prev)));
+        turn.push((d * 180) / Math.PI / ((LIMB_CHORD * LIMB_STEP) / CELLS_PER_M));
+      }
+      prev = a;
+    }
+  }
+  return { straightness, turn };
 }
 
 /** Ordinary least-squares slope of y on x; NaN with fewer than 5 points or no spread in x. */
@@ -270,6 +369,7 @@ export function formMetrics(tree: Tree, params: Params): FormMetrics {
   }
 
   const shapes = limbShapes(tree);
+  const curves = limbCurves(tree);
   return {
     widestAt,
     profileCentre: sumW > 0 ? sumWH / sumW : Number.NaN,
@@ -282,6 +382,9 @@ export function formMetrics(tree: Tree, params: Params): FormMetrics {
     junctionDelta: median(junctionExponents(tree)),
     ldSlope: olsSlope(logD, logL),
     leafStemSlope: olsSlope(logA, logLeaf),
+    limbStraightness: median(curves.straightness),
+    limbTurn: median(curves.turn),
+    limbTurnP90: quantile(curves.turn, 0.9),
     profile,
   };
 }

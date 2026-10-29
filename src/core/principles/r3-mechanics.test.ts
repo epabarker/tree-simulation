@@ -149,6 +149,32 @@ describe("R3 mechanics (§R3, ADR 0011)", () => {
     expect(b.slot[1]).toBe(Slot.right);
   });
 
+  it("senses a relay's corner along the dominant path, not the overtaken axis's (ADR 0024)", () => {
+    // A vertical stem; its thin continuation leans 0.1 rad, a thicker right lateral 0.6 rad.
+    // Only the γ term acts (β_g = 0, weightless, no c limit to speak of).
+    const turns = (proprioception: Params["r3"]["proprioception"]) => {
+      const p = params({ posture: true, betaG: 0, gamma: 0.5, c: 100, E: 1e30, proprioception });
+      const tree = new Tree(0, 10);
+      const stem = addMetamer(tree, -1, Slot.main, Math.PI / 2, 1, 0.2, 0);
+      const cont = addMetamer(tree, stem, Slot.main, Math.PI / 2 + 0.1, 1, 0.05, 0);
+      const relay = addMetamer(tree, stem, Slot.right, Math.PI / 2 - 0.6, 1, 0.1, 0);
+      tree.ensureScratch();
+      for (let i = 0; i < 3; i++) tree.prevRadius[i] = 0.5 * (tree.m.cols.radius[i] as number);
+      updateMechanics(tree, p);
+      const c = tree.m.cols;
+      return [
+        (c.angle[cont] as number) - (Math.PI / 2 + 0.1),
+        (c.angle[relay] as number) - (Math.PI / 2 - 0.6),
+      ];
+    };
+    const [axisCont, axisRelay] = turns("axis");
+    expect(axisCont).toBeCloseTo(-0.5 * 0.1, 9); // the continuation senses its kink
+    expect(axisRelay).toBeCloseTo(0, 9); // the relay's corner is never sensed
+    const [domCont, domRelay] = turns("dominant");
+    expect(domCont).toBeCloseTo(0, 9); // overtaken: no longer the organ
+    expect(domRelay).toBeCloseTo(0.5 * 0.6, 9); // straightens toward its parent
+  });
+
   it("wraps angles into (−π, π]", () => {
     expect(wrapAngle(3 * Math.PI)).toBeCloseTo(Math.PI, 12);
     expect(wrapAngle(-Math.PI / 2 - 2 * Math.PI)).toBeCloseTo(-Math.PI / 2, 12);

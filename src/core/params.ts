@@ -276,6 +276,14 @@ export interface Params {
      * `forest` preset (the home page's) turns it on.
      */
     ground?: boolean;
+    /**
+     * What posture control's proprioception (the γ term) senses as the organ (ADR 0024):
+     * "axis" (absent: ADR 0011), the kink to the previous metamer of the same axis; "dominant",
+     * the kink to the parent wherever the metamer is its parent's thickest child, so a lateral
+     * that takes over a limb straightens its corner (Bastien et al. 2013's organ is the wood
+     * that carries on, not the meristem that made it).
+     */
+    proprioception?: "axis" | "dominant";
   };
 
   /**
@@ -503,6 +511,7 @@ export const defaultParams: Params = {
     posture: true,
     betaG: 0.1, // calibrate
     gamma: 0.2, // calibrate
+    proprioception: "axis", // ADR 0011; oak is fitted with "dominant" (ADR 0024)
     c: 0.05, // calibrate
     sigmaTarget: 3000, // calibrate: ≈ 7.5 MPa
     girthGain: 0.3, // calibrate

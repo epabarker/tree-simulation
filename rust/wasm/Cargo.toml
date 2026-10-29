@@ -9,6 +9,10 @@ rust-version.workspace = true
 [lib]
 crate-type = ["cdylib"]
 
+# `parity`: the core's Math as V8's (the build the golden and side-by-side tests load).
+[features]
+parity = ["tree-core/parity"]
+
 [dependencies]
 tree-core = { path = "../core" }
 wasm-bindgen = "=0.2.129"

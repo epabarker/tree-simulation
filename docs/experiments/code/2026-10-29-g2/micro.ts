@@ -3,6 +3,8 @@
  * field. Grows `forest` (or the preset named) for 60 seasons in TypeScript, copies the season's
  * deposits into both sweeps, then times compute(), the deposits and the samples separately.
  *
+ * "rust" is the parity build (V8's Math), "fast" the production build (Rust's libm, SIMD on).
+ *
  *   node docs/experiments/code/2026-10-29-g2/micro.ts [preset] [seasons]
  */
 import { readFileSync } from "node:fs";
@@ -12,8 +14,32 @@ import { presetParams, type PresetName } from "../../../../src/core/presets.ts";
 import { World } from "../../../../src/core/world.ts";
 import { coreWasmUrl, loadCoreSync } from "../../../../src/wasm/core.ts";
 import { WasmSkySweep } from "../../../../src/wasm/sky-sweep.ts";
+import * as prod from "../../../../src/wasm/pkg/core.js";
 
 loadCoreSync(readFileSync(coreWasmUrl));
+// The production build (no parity: Rust's libm, SIMD on), as a LightModel over its own instance.
+const prodWasm = prod.initSync({
+  module: readFileSync(new URL("../../../../src/wasm/pkg/core_bg.wasm", import.meta.url)),
+});
+function prodSweep(W: number, H: number, c2: typeof params.c2, periodic: boolean): LightModel {
+  const s = new prod.SkySweep(W, H, c2.K, c2.kExt, c2.skyExponent, c2.skyTilt, c2.minElevation, c2.C, c2.rotate, c2.sweep === "columns", periodic);
+  return {
+    width: W,
+    height: H,
+    clear: () => s.clear(),
+    deposit: (x, y, a = 1) => s.deposit(x, y, a),
+    addWall: (w) => s.add_wall(w.x, w.y, w.width, w.height, w.shade),
+    compute: (season) => s.compute(season),
+    sample: (x, y, dir, o) => {
+      s.sample(x, y, dir);
+      const v = new Float64Array(prodWasm.memory.buffer, s.sample_ptr(), 3);
+      o.q = v[0] as number;
+      o.vx = v[1] as number;
+      o.vy = v[2] as number;
+    },
+    field: () => null,
+  };
+}
 const preset = (process.argv[2] ?? "forest") as PresetName;
 const params = presetParams(preset, 1);
 const world = new World(params);
@@ -33,6 +59,7 @@ const periodic = params.world.sides === "periodic";
 const models: [string, LightModel][] = [
   ["ts", new SkySweep(W, H, params.c2, periodic)],
   ["rust", new WasmSkySweep(W, H, params.c2, periodic)],
+  ["fast", prodSweep(W, H, params.c2, periodic)],
 ];
 const out: LightSample = { q: 0, vx: 0, vy: 0 };
 const time = (f: () => void, reps: number) => {

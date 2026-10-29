@@ -19,7 +19,7 @@ jobs:
           cache: npm
       - uses: ./.github/actions/rust
       - run: npm ci
-      - name: Lint, typecheck, tests (incl. golden hashes)
+      - name: "Check: WASM builds (parity, production), Rust fmt, clippy and tests (both modes, threads), lint, typecheck, vitest (goldens in TS and Rust, parity)"
         run: npm run check
       - run: npm run build
       - name: Garden build, within its size budget (ADR 0014)

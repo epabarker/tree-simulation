@@ -1,7 +1,11 @@
 /**
  * Builds the Rust core for the page and Node (ADR 0024): `cargo build` for wasm32, then
- * wasm-bindgen into src/wasm/pkg/ (generated, not committed). Run by `npm run check` and the
- * builds, so the TypeScript that imports the package always sees the current Rust.
+ * wasm-bindgen, twice (generated, not committed):
+ *  - src/wasm/pkg-parity/: the core's Math as V8's, bit for bit (`parity`), for the 2D golden and
+ *    side-by-side tests and `--rust`;
+ *  - src/wasm/pkg/: the production build, Rust's libm and WASM SIMD (simd128).
+ * Run by `npm run check` and the tests, so the TypeScript that imports a package always sees the
+ * current Rust.
  *
  *   node cli/build-wasm.ts
  *
@@ -36,32 +40,52 @@ if (!want || have !== want) {
   process.exit(1);
 }
 
-run("cargo", [
-  "build",
-  "--quiet",
-  "--release",
-  "--locked",
-  "--target",
-  "wasm32-unknown-unknown",
-  "--manifest-path",
-  "rust/Cargo.toml",
-  "-p",
-  "tree-wasm",
-]);
-const raw = `${root}rust/target/wasm32-unknown-unknown/release/tree_wasm.wasm`;
-run("wasm-bindgen", [
-  "--target",
-  "web",
-  "--remove-name-section",
-  "--remove-producers-section",
-  "--out-dir",
-  "src/wasm/pkg",
-  "--out-name",
-  "core",
-  raw,
-]);
-const out = readFileSync(`${root}src/wasm/pkg/core_bg.wasm`);
 const kb = (n: number) => (n / 1024).toFixed(1);
-console.log(
-  `src/wasm/pkg/core_bg.wasm: ${kb(statSync(raw).size)} kB from cargo, ${kb(out.length)} kB after wasm-bindgen, ${kb(gzipSync(out, { level: 9 }).length)} kB gzip`,
-);
+
+/** One build: cargo into its own target directory (so the two do not rebuild each other). */
+function build(name: string, features: string[], rustflags: string): void {
+  const target = `rust/target/${name}`;
+  execFileSync(
+    "cargo",
+    [
+      "build",
+      "--quiet",
+      "--release",
+      "--locked",
+      "--target",
+      "wasm32-unknown-unknown",
+      "--manifest-path",
+      "rust/Cargo.toml",
+      "--target-dir",
+      target,
+      "-p",
+      "tree-wasm",
+      ...features,
+    ],
+    {
+      cwd: root,
+      stdio: ["ignore", "inherit", "inherit"],
+      env: { ...process.env, RUSTFLAGS: rustflags },
+    },
+  );
+  const raw = `${root}${target}/wasm32-unknown-unknown/release/tree_wasm.wasm`;
+  const dir = `src/wasm/${name}`;
+  run("wasm-bindgen", [
+    "--target",
+    "web",
+    "--remove-name-section",
+    "--remove-producers-section",
+    "--out-dir",
+    dir,
+    "--out-name",
+    "core",
+    raw,
+  ]);
+  const out = readFileSync(`${root}${dir}/core_bg.wasm`);
+  console.log(
+    `${dir}/core_bg.wasm: ${kb(statSync(raw).size)} kB from cargo, ${kb(out.length)} kB after wasm-bindgen, ${kb(gzipSync(out, { level: 9 }).length)} kB gzip`,
+  );
+}
+
+build("pkg-parity", ["--features", "parity"], "");
+build("pkg", [], "-C target-feature=+simd128");

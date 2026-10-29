@@ -4,7 +4,7 @@
  * not that the Rust does: the goldens are made on x86-64 Linux (G2 note).
  */
 import { beforeAll, describe, expect, it } from "vitest";
-import { math_cos, math_exp, math_hypot, math_pow, math_sin } from "../src/wasm/pkg/core.js";
+import { math_cos, math_exp, math_hypot, math_pow, math_sin } from "../src/wasm/pkg-parity/core.js";
 import { loadRustCore } from "./wasm.ts";
 
 let a = 2026;

@@ -8,7 +8,7 @@
 import golden from "../../../../tests/golden.json";
 import { caseKey, GOLDEN_CASES, runCase } from "../../../../tests/golden-cases.ts";
 import { loadCore, useRustSkySweep } from "../../../../src/wasm/core.ts";
-import { math_cos, math_exp, math_hypot, math_pow, math_sin } from "../../../../src/wasm/pkg/core.js";
+import { math_cos, math_exp, math_hypot, math_pow, math_sin } from "../../../../src/wasm/pkg-parity/core.js";
 
 const out = document.getElementById("out") as HTMLElement;
 const want = golden as Record<string, string>;

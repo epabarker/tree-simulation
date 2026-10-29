@@ -2,6 +2,8 @@
 //! `node rust/tools/sweep_fixture.ts` prints for the same fixture. `npm run check` runs this test
 //! with and without the `threads` feature, so it also holds the threaded sweep to the serial bits.
 //! (The WASM build is held to TypeScript in the vitest suite: tests/wasm-sky.test.ts.)
+//! The hashes are TypeScript's, so the test runs in parity mode only.
+#![cfg(feature = "parity")]
 
 use tree_core::light::sky_sweep::{SkyParams, SkySweep};
 

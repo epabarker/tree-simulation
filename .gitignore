@@ -17,3 +17,4 @@ __pycache__/
 # The Rust core (ADR 0024): build output, and wasm-bindgen's generated package
 rust/target/
 src/wasm/pkg/
+src/wasm/pkg-parity/

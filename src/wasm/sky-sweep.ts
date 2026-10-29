@@ -10,7 +10,7 @@
 import type { LightModel, LightSample } from "../core/light/light-model.ts";
 import type { Params, Wall } from "../core/params.ts";
 import { wasm } from "./core.ts";
-import { SkySweep } from "./pkg/core.js";
+import { SkySweep } from "./pkg-parity/core.js";
 
 export class WasmSkySweep implements LightModel {
   readonly width: number;

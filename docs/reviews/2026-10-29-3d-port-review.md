@@ -303,10 +303,10 @@ With the gates G1–I3 the port is about 14 milestones, the size of everything s
 - **Parity costs 1.35×; production does not.** The page should not switch to the parity sweep: it would add 26 kB, run the light 1.35× slower, and change what browser visitors see, since it gives Node's bits while the rest of the core gives Chrome's. The production build is faster (G1, G3), and the page switches to it whole, at I1 stage 2, with its own goldens.
 - **G3's stop rule pointed at the wrong fix.** Read literally, 0.095 with a DDA that fixes nothing and costs 1.8–1.9× meant stop or the pyramid. The error was the transport's, not the segment's.
   - I adopted whole-cell shifts as the 3D default: still the row-marched sweep the ADR decided, but carried differently from the 2D march's linear read.
-  - **That is a choice for the user to confirm.** Bilinear stays a switch.
+  - **The user confirmed it** (2026-10-29). Bilinear stays a switch. The after-G3 checks: the field is mirror-symmetric to rounding, and its face-entry seams are in the exact trace too (G3 note §4).
 - **Rotation is not optional in 3D.** It changes the stand's metamer count by 15–30%, where in 2D it changed nothing. Calibrate with it on, as the ADR already says.
 - **The prototype's page is not V.** Its stands are uncalibrated. V waits for I2's stand with every principle.
 
 **Open questions for the user:**
-- **Now:** run G3's page (`…/preview/3d/g3.html`) on the phone and the laptop, and confirm whole-cell shifts as the 3D light's transport.
+- **Answered:** whole-cell shifts confirmed; the hand-written SIMD path dropped; K = 16 with rotation stands. Next is I1.
 - **Later:** the first-paint policy for 3D (Q7), at I3.

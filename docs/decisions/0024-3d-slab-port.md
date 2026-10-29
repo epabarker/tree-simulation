@@ -1,6 +1,6 @@
 # 0024: Trees that grow in 3D, drawn as today, with a Rust core, through gates
 
-- **Status:** accepted (user, 2026-10-29). D = 64; the faces' transmission τ a world parameter with the wood interior as the default look. The interior's exact τ and the face fade are settled at I2/C1. G1, G2 and G3 have passed. G3 passed with whole-cell-shift transport for the 3D light, a choice the user is to confirm, and G3's device timings are to come.
+- **Status:** accepted (user, 2026-10-29). D = 64; the faces' transmission τ a world parameter with the wood interior as the default look. The interior's exact τ and the face fade are settled at I2/C1. G1, G2 and G3 have passed. G3 passed with whole-cell-shift transport for the 3D light, which the user confirmed (2026-10-29); its device timings are the user's.
 - **Date:** 2026-10-29
 - **Spec:** §2 (reverses Option P), §5, §6, §C2.4, §C2.8, §10. It also reverses the M12 review's decision 3 and ADR 0008's pseudo-depth squeeze (the geometry carries real depth). For the garden, it ends the AGENTS invariant "No SharedArrayBuffer". It meets ADR 0001's Rust/WASM trigger.
 - **Review:** [3D port review](../reviews/2026-10-29-3d-port-review.md), which carries the conclusions of every note below.
@@ -48,7 +48,8 @@
 **The view:** the garden's orthographic frontal illustration, (x, y) drawn in z order. No perspective, foreshortening cue, depth darkening or second rank is in scope.
 
 **The light:** the row-marched Beer–Lambert sweep at K = 16 with rotation, in Float32, with τ at the faces. It is chosen over the pyramid for its sky, which is what gives the faces' light, and for the M6–M27 calibrations.
-- **Transport (G3; proposed, for the user to confirm):** G is carried down the rows by whole-cell shifts, the cumulative shift round(y·s), not read bilinearly. Each row's segment is averaged over its box. Bilinear stays a switch, and is the 2D sweep's read.
+- **Transport (G3; confirmed by the user):** G is carried down the rows by whole-cell shifts, the cumulative shift round(y·s), not read bilinearly. Each row's segment is averaged over its box. Bilinear stays a switch, and is the 2D sweep's read. The field is mirror-symmetric to Float32 rounding. Its seams at the face-entry rows are the exact trace's too, and rotation averages them (G3 note §4).
+- **One kernel:** plain Float32 loops that LLVM vectorises for `simd128`. The hand-written SIMD path was 5–7% slower and is dropped.
 - **Calibration under rotation:** rotation changes the 3D stand's metamers by 15–30%, so C1 calibrates with it on.
 - **The pyramid** is no longer needed as a fallback.
 
@@ -75,7 +76,7 @@
 - **G1:** passed.
 - **The prototype and τ runs:** done.
 - **G2:** passed. The page keeps the TypeScript sweep until I1 switches the whole core, since a Rust sweep alone would give browser visitors Node's light and Chrome's everything else.
-- **G3:** passed, with whole-cell-shift transport (above). The user's phone and laptop are to run `…/preview/3d/g3.html`; their numbers replace G1's.
+- **G3:** passed, with whole-cell-shift transport (above), confirmed. The user's phone and laptop numbers from `…/preview/3d/g3.html` replace G1's.
 - **I1:**
   - **stage 1:** the Rust 2D core in parity mode, every golden bit-identical, the rest of `Math` vendored (atan2, log, log1p, cbrt, tanh, asin, acos, atan, expm1);
   - the TS core deleted;

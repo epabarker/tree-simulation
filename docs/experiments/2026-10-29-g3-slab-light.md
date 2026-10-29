@@ -125,13 +125,48 @@ Mean |ΔQ|/C (p90), over every second foliage cell below the stand's top:
 | Interior τ 0.2, season 100, **K 12** | — | 63.9 | 33.4 |
 
 - **Against G1's kernel** on the same VM (D = 64, `forest`'s 2D field scattered across z): 105–111 ms in one SIMD lane and 43 in four. The real kernel on real 3D stands is 25–35 ms in four lanes.
-- **The hand-written SIMD path is 5–7% slower than the "scalar" one.** The production build sets `simd128` for the whole crate, so LLVM vectorises the scalar formula itself, and does it better. Both give the same bits (tests/wasm-slab.test.ts). Whether to keep the explicit path waits for the phone, whose engine is ARM.
+- **The hand-written SIMD path is 5–7% slower than the "scalar" one.** The production build sets `simd128` for the whole crate, so LLVM vectorises the scalar formula itself, and does it better. Both gave the same bits (tests/wasm-slab.test.ts). The explicit path was dropped after G3 (§4).
 - **K = 12** saves 25% in one lane and almost nothing in four (33 against 35 ms): lanes divide the directions, and 12 do not divide into fours as well.
 - **The lanes' partial fields are not summed here** (G1's model): a bud's Q is the sum of the four lanes' values at its cell, read at sampling.
 - **On the user's phone and laptop: not yet measured.** The page is deployed for them, and these rows replace G1's once their numbers are in.
 
 ### Bits
-The 3D light gives the same bits natively, in scalar WASM and in SIMD WASM: the fixture's fingerprint 0xd3060733 matches in `rust/core` and in `tests/wasm-slab.test.ts`. That is Q6's requirement for the 3D core's goldens.
+The 3D light gave the same bits natively, in scalar WASM and in SIMD WASM: the fixture's fingerprint 0xd3060733 matches in `rust/core` and in `tests/wasm-slab.test.ts`. That is Q6's requirement for the 3D core's goldens.
+
+### 4. After G3: symmetry, banding, and the SIMD path (the user's checks)
+**Mirror symmetry.** The 2D sweep's test, in 3D (`mirrored_foliage_gives_the_mirrored_field` in `slab_sweep.rs`):
+- **Setup:** a sky symmetric in x and z (the K = 16 sky at season 5's rotation, with each direction's mirror images in x and z at a quarter weight), open sides, τ 0.2 on both faces, and an uneven canopy on 31 × 24 × 13 against its mirror image.
+- **Largest difference** in Q or any component of V, after mirroring back:
+
+  | Transport | Mirror in x | Mirror in z |
+  |---|---|---|
+  | Whole-cell shifts | 1.2·10⁻⁷ | 1.2·10⁻⁷ |
+  | Bilinear | 1.1·10⁻⁶ | 2.4·10⁻⁷ |
+
+  This is Float32 rounding: the sums run in the other order. The test holds both under 2·10⁻⁶. Rounding half away from zero gives round(−y·s) = −round(y·s), so the shifts lean neither way.
+
+**Heatmaps** (`figures/2026-10-29-g3-heatmaps.png`, made by `code/2026-10-29-g3/heatmaps.ts`):
+- **What is drawn:** the shade 1 − Q/C at season 100 (K = 16 rotating, as the buds see it) on both R6 stands. Each stand has the mid-depth slice (z = 32) and the mean over z, with shifts, bilinear, and their difference.
+- **Not literally the lab:** the lab is 2D and cannot show the 3D field. The maps go through the lab's own overlay code (`shadeImage` in `src/web/render/colors.ts`, over the lab's sky) instead.
+
+![Slab light heatmaps, shifts against bilinear](figures/2026-10-29-g3-heatmaps.png)
+
+What the maps show:
+- **Texture.** Bilinear blurs: smooth, dark interiors with faint diagonal streaks. The shifts keep the canopy's grain: speckled shade, and short streaks along the rays.
+- **Banding.** The shifted wood interior (τ 0.2) has horizontal seams in the mid-depth slice: its row means step by 0.04 at rows 44, 28 and 25 (raw: `code/2026-10-29-g3/seam.txt`). Bilinear has none. **The seams are in the light, not in the transport.** The exact trace, run on the same slice (every third column, steps of 0.02), steps at the same rows by as much:
+
+  | Row (top 84) | Shifts | Bilinear | Exact |
+  |---|---|---|---|
+  | 45 / 44 / 43 | 0.188 / 0.190 / 0.162 | 0.062 / 0.062 / 0.063 | 0.215 / 0.220 / 0.179 |
+  | 28 / 27 | 0.227 / 0.189 | 0.100 / 0.100 | 0.241 / 0.199 |
+  | 25 / 24 | 0.148 / 0.148 | 0.100 / 0.100 | 0.196 / 0.159 |
+  | 60 | 0.161 | 0.033 | 0.191 |
+  | 0 (ground) | 0.184 | 0.124 | 0.200 |
+
+  - **Cause:** below a certain depth under the stand's flat top, one of the steep directions starts to come in through a z face instead of the canopy. That depth is 32 cells over the ray's z slope. The stand's top is one row for every column, so the switch falls on one row across the whole slice. Bilinear smears each switch over a row or two. It is also **two to eight times too dark** in the interior (0.02–0.10 against the exact 0.15–0.24), the darkening bias of §1.
+  - **Calibration:** rotation moves the switching rows every season, so the seams average out over seasons. They are the face model's: a real stand's uneven top and C1's τ fade would soften them. C1 should look at the floor's light under rotation, not one season's slice.
+
+**The hand-written SIMD path is dropped.** It was 5–7% slower than LLVM's vectorised scalar loops on the VM. The production build still sets `simd128`, so the scalar code vectorises, and the bits are unchanged (fingerprint 0xd3060733, native and WASM). The user's timings did not reach this session, so the phone's verdict is not recorded here. If the phone shows the explicit path faster, it is in commit `77d4105`.
 
 ## Conclusion
 - **G3 passes, with integer-shift transport in place of the bilinear read:**

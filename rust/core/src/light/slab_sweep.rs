@@ -19,9 +19,10 @@
 //! a ray entering through a face below the stand's top carries depth −ln τ / k_ext, as if a wood as
 //! tall as the stand stood there (τ = 1 open, 0 dark). Buds outside the slab get Q = 0.
 //!
-//! **One formula for scalar and SIMD.** The exp is a polynomial (Taylor to r⁶ after 2ⁿ range
-//! reduction, relative error ≈ 1.2·10⁻⁷), and every step is written in the order the WASM SIMD
-//! path computes it, so the scalar and SIMD paths give the same bits.
+//! **One formula on every target.** The exp is a polynomial (Taylor to r⁶ after 2ⁿ range
+//! reduction, relative error ≈ 1.2·10⁻⁷) in plain Float32 steps, which LLVM vectorises for WASM
+//! SIMD without reordering them, so native, scalar WASM and SIMD WASM give the same bits. (A
+//! hand-written SIMD path was 5–7% slower than LLVM's and was dropped after G3.)
 //!
 //! Params: K, k_ext, the sky exponent p, minimum elevation, C, rotation, τ front and back.
 
@@ -102,7 +103,7 @@ const LN2_HI: f32 = 0.693_145_75;
 const LN2_LO: f32 = 1.428_606_8e-6;
 
 /// e^x for x ≤ 0 in Float32: 2ⁿ·e^r, |r| ≤ ln2/2, Taylor to r⁶; relative error under 3·10⁻⁷ on
-/// [−80, 0] (G3 note). Written step for step as the SIMD `vexp`, so the two give the same bits.
+/// [−80, 0] (G3 note).
 #[inline(always)]
 pub fn fexp(x: f32) -> f32 {
     let x = if x < -80.0 { -80.0 } else { x };
@@ -145,8 +146,6 @@ pub struct SlabSweep {
     pad: usize,
     top: usize,
     scratch: Scratch,
-    /// March with WASM SIMD where it is built in (the same bits either way).
-    pub simd: bool,
     /// Integrate each row's segment exactly (a DDA over the cells it crosses) instead of taking
     /// the mean over its box: G3's fallback, scalar only.
     pub exact_segments: bool,
@@ -201,7 +200,6 @@ impl SlabSweep {
             pad: slope + 3,
             top: 0,
             scratch: Scratch::default(),
-            simd: true,
             exact_segments: false,
             integer_shifts: true,
         }
@@ -376,7 +374,6 @@ impl SlabSweep {
         let (mut up, mut next) = (up, next);
         up[..kk * plane].fill(0.0);
         let kext = self.p.k_ext as f32;
-        let simd = self.simd && kernels::HAS_SIMD;
         for row in (0..top).rev() {
             let base = row * plane;
             // This row's light from every direction: its entry depth is G on the line above.
@@ -394,11 +391,7 @@ impl SlabSweep {
                     &mut self.vy[base..base + plane],
                     &mut self.vz[base..base + plane],
                 );
-                if simd {
-                    kernels::light_simd(u, dir, kext, out);
-                } else {
-                    kernels::light(u, dir, kext, out);
-                }
+                kernels::light(u, dir, kext, out);
             }
             if row == 0 {
                 break;
@@ -455,8 +448,6 @@ impl SlabSweep {
                 let args = (w, d, pad, nx, nz);
                 if self.exact_segments {
                     kernels::row_dda(&geo, args, g, l, &mut next[u0..u0 + plane]);
-                } else if simd {
-                    kernels::row_simd(&geo, args, g, l, i, r, s, &mut next[u0..u0 + plane]);
                 } else {
                     kernels::row(&geo, args, g, l, i, r, s, &mut next[u0..u0 + plane]);
                 }
@@ -575,11 +566,9 @@ impl Step {
     }
 }
 
-/// The inner loops, scalar and SIMD, step for step alike.
+/// The inner loops.
 mod kernels {
     use super::{Step, fexp};
-
-    pub const HAS_SIMD: bool = cfg!(all(target_arch = "wasm32", target_feature = "simd128"));
 
     type Out<'a> = (&'a mut [f32], &'a mut [f32], &'a mut [f32], &'a mut [f32]);
 
@@ -714,215 +703,6 @@ mod kernels {
             }
         }
     }
-
-    #[cfg(all(target_arch = "wasm32", target_feature = "simd128"))]
-    pub use simd::{light_simd, row_simd};
-
-    #[cfg(not(all(target_arch = "wasm32", target_feature = "simd128")))]
-    pub fn light_simd(u: &[f32], dir: [f32; 4], kext: f32, out: Out) {
-        light(u, dir, kext, out);
-    }
-
-    #[cfg(not(all(target_arch = "wasm32", target_feature = "simd128")))]
-    pub fn row_simd(
-        st: &Step,
-        dims: (usize, usize, usize, usize, usize),
-        g: &[f32],
-        l: &[f32],
-        i: &[f32],
-        r: &mut [f32],
-        s: &mut [f32],
-        next: &mut [f32],
-    ) {
-        row(st, dims, g, l, i, r, s, next);
-    }
-
-    #[cfg(all(target_arch = "wasm32", target_feature = "simd128"))]
-    mod simd {
-        use super::{Out, Step, fexp};
-        use core::arch::wasm32::*;
-
-        #[inline(always)]
-        unsafe fn ld(p: &[f32], i: usize) -> v128 {
-            debug_assert!(i + 4 <= p.len());
-            unsafe { v128_load(p.as_ptr().add(i) as *const v128) }
-        }
-
-        #[inline(always)]
-        unsafe fn st(p: &mut [f32], i: usize, v: v128) {
-            debug_assert!(i + 4 <= p.len());
-            unsafe { v128_store(p.as_mut_ptr().add(i) as *mut v128, v) }
-        }
-
-        /// `fexp`, four lanes at a time, step for step.
-        #[inline(always)]
-        fn vexp(x: v128) -> v128 {
-            let x = f32x4_pmax(x, f32x4_splat(-80.0));
-            let n = f32x4_floor(f32x4_add(
-                f32x4_mul(x, f32x4_splat(core::f32::consts::LOG2_E)),
-                f32x4_splat(0.5),
-            ));
-            let r = f32x4_sub(
-                f32x4_sub(x, f32x4_mul(n, f32x4_splat(super::super::LN2_HI))),
-                f32x4_mul(n, f32x4_splat(super::super::LN2_LO)),
-            );
-            let mut p = f32x4_splat(1.0 / 720.0);
-            for c in [1.0 / 120.0, 1.0 / 24.0, 1.0 / 6.0, 0.5, 1.0, 1.0] {
-                p = f32x4_add(f32x4_mul(p, r), f32x4_splat(c));
-            }
-            let e = i32x4_shl(i32x4_add(i32x4_trunc_sat_f32x4(n), i32x4_splat(127)), 23);
-            f32x4_mul(p, e)
-        }
-
-        pub fn light_simd(u: &[f32], dir: [f32; 4], kext: f32, (q, vx, vy, vz): Out) {
-            let [w, dx, dy, dz] = dir;
-            let n = u.len();
-            let n4 = n & !3;
-            let (vw, vdx, vdy, vdz) = (
-                f32x4_splat(w),
-                f32x4_splat(dx),
-                f32x4_splat(dy),
-                f32x4_splat(dz),
-            );
-            let vk = f32x4_splat(-kext);
-            let mut c = 0;
-            unsafe {
-                while c < n4 {
-                    let l = f32x4_mul(vw, vexp(f32x4_mul(vk, ld(u, c))));
-                    st(q, c, f32x4_add(ld(q, c), l));
-                    st(vx, c, f32x4_add(ld(vx, c), f32x4_mul(l, vdx)));
-                    st(vy, c, f32x4_add(ld(vy, c), f32x4_mul(l, vdy)));
-                    st(vz, c, f32x4_add(ld(vz, c), f32x4_mul(l, vdz)));
-                    c += 4;
-                }
-            }
-            while c < n {
-                let l = w * fexp(-kext * u[c]);
-                q[c] += l;
-                vx[c] += l * dx;
-                vy[c] += l * dy;
-                vz[c] += l * dz;
-                c += 1;
-            }
-        }
-
-        pub fn row_simd(
-            st_: &Step,
-            (w, d, pad, nx, nz): (usize, usize, usize, usize, usize),
-            g: &[f32],
-            l: &[f32],
-            i: &[f32],
-            r: &mut [f32],
-            s: &mut [f32],
-            next: &mut [f32],
-        ) {
-            let w4 = w & !3;
-            let half = f32x4_splat(0.5);
-            let (vfrx, vfrz) = (f32x4_splat(st_.frx), f32x4_splat(st_.frz));
-            let (isx, isz) = (f32x4_splat(st_.inv_sx), f32x4_splat(st_.inv_sz));
-            unsafe {
-                for zi in 0..nz {
-                    let (d0, i0, r0) = (zi * nx, zi * (nx + 1), zi * w);
-                    if st_.vert_x {
-                        r[r0..r0 + w].copy_from_slice(&l[d0 + pad..d0 + pad + w]);
-                        continue;
-                    }
-                    let (a0, l0) = (i0 + pad, d0 + pad);
-                    let a1 = (a0 as isize + st_.mx) as usize;
-                    let l1 = (l0 as isize + st_.mx) as usize;
-                    let mut col = 0;
-                    while col < w4 {
-                        let from = f32x4_add(ld(i, a0 + col), f32x4_mul(half, ld(l, l0 + col)));
-                        let to = f32x4_add(ld(i, a1 + col), f32x4_mul(vfrx, ld(l, l1 + col)));
-                        st(r, r0 + col, f32x4_mul(f32x4_sub(to, from), isx));
-                        col += 4;
-                    }
-                    while col < w {
-                        let from = i[a0 + col] + 0.5 * l[l0 + col];
-                        let to = i[a1 + col] + st_.frx * l[l1 + col];
-                        r[r0 + col] = (to - from) * st_.inv_sx;
-                        col += 1;
-                    }
-                }
-                if !st_.vert_z {
-                    s[..w].fill(0.0);
-                    for zi in 0..nz {
-                        let s0 = zi * w;
-                        let mut col = 0;
-                        while col < w4 {
-                            let v = f32x4_add(ld(s, s0 + col), ld(r, s0 + col));
-                            st(s, s0 + w + col, v);
-                            col += 4;
-                        }
-                        while col < w {
-                            s[s0 + w + col] = s[s0 + col] + r[s0 + col];
-                            col += 1;
-                        }
-                    }
-                }
-                let [a00, a01, a10, a11] = st_.a;
-                let (v00, v01, v10, v11) = (
-                    f32x4_splat(a00),
-                    f32x4_splat(a01),
-                    f32x4_splat(a10),
-                    f32x4_splat(a11),
-                );
-                let vpr = f32x4_splat(st_.per_row);
-                for z in 0..d {
-                    let zj = z + pad;
-                    let g0 =
-                        ((zj as isize + st_.kz) * nx as isize + pad as isize + st_.kx) as usize;
-                    let g1 = g0 + nx;
-                    let rr = zj * w;
-                    let rm = (zj as isize + st_.mz) as usize * w;
-                    let o = z * w;
-                    let mut col = 0;
-                    while col < w4 {
-                        let gv = if st_.shift_only {
-                            ld(g, g0 + col)
-                        } else {
-                            f32x4_add(
-                                f32x4_add(
-                                    f32x4_mul(v00, ld(g, g0 + col)),
-                                    f32x4_mul(v01, ld(g, g0 + col + 1)),
-                                ),
-                                f32x4_add(
-                                    f32x4_mul(v10, ld(g, g1 + col)),
-                                    f32x4_mul(v11, ld(g, g1 + col + 1)),
-                                ),
-                            )
-                        };
-                        let mean = if st_.vert_z {
-                            ld(r, rr + col)
-                        } else {
-                            let from = f32x4_add(ld(s, rr + col), f32x4_mul(half, ld(r, rr + col)));
-                            let to = f32x4_add(ld(s, rm + col), f32x4_mul(vfrz, ld(r, rm + col)));
-                            f32x4_mul(f32x4_sub(to, from), isz)
-                        };
-                        st(next, o + col, f32x4_add(gv, f32x4_mul(mean, vpr)));
-                        col += 4;
-                    }
-                    while col < w {
-                        let gv = if st_.shift_only {
-                            g[g0 + col]
-                        } else {
-                            (a00 * g[g0 + col] + a01 * g[g0 + col + 1])
-                                + (a10 * g[g1 + col] + a11 * g[g1 + col + 1])
-                        };
-                        let mean = if st_.vert_z {
-                            r[rr + col]
-                        } else {
-                            let from = s[rr + col] + 0.5 * r[rr + col];
-                            let to = s[rm + col] + st_.frz * r[rm + col];
-                            (to - from) * st_.inv_sz
-                        };
-                        next[o + col] = gv + mean * st_.per_row;
-                        col += 1;
-                    }
-                }
-            }
-        }
-    }
 }
 
 /// A fixed patchy canopy over rows 8–20 (tests, and the WASM build's same-bits check).
@@ -944,7 +724,7 @@ pub fn fixture(w: usize, h: usize, d: usize, p: SlabParams) -> SlabSweep {
 }
 
 /// The fixture the same-bits check uses: 37 × 26 × 11, K = 16, rotating, τ = (1, 0.2), season 3.
-pub fn fixture_fingerprint(simd: bool) -> u32 {
+pub fn fixture_fingerprint() -> u32 {
     let p = SlabParams {
         k: 16,
         k_ext: 0.5,
@@ -956,7 +736,6 @@ pub fn fixture_fingerprint(simd: bool) -> u32 {
         periodic_x: true,
     };
     let mut s = fixture(37, 26, 11, p);
-    s.simd = simd;
     s.compute(3.0);
     s.fingerprint()
 }
@@ -1061,31 +840,95 @@ mod tests {
         assert!(worst < 2e-5, "largest difference {worst}");
     }
 
+    /// The sky of `params` with each direction's mirror images in x and in z added, every copy
+    /// at a quarter of the weight: a sky symmetric under both mirrors.
+    fn mirrored_sky(p: SlabParams) -> Directions {
+        let (f, a) = sky_offsets(true, 5.0);
+        let base = sky(p.k, p.min_elevation, p.sky_exponent, p.c, f, a);
+        let mut out = Directions::default();
+        for k in 0..base.w.len() {
+            for (sx, sz) in [(1.0, 1.0), (-1.0, 1.0), (1.0, -1.0), (-1.0, -1.0)] {
+                out.x.push(sx * base.x[k]);
+                out.y.push(base.y[k]);
+                out.z.push(sz * base.z[k]);
+                out.w.push(0.25 * base.w[k]);
+            }
+        }
+        out
+    }
+
+    /// Largest |a − b| over the whole field, Q and each component of V, after mirroring b's cell
+    /// (and V) back into a's frame.
+    fn mirror_error(a: &SlabSweep, b: &SlabSweep, in_x: bool) -> f32 {
+        let (w, h, d) = a.dims();
+        let mut worst = 0.0f32;
+        for y in 0..h {
+            for z in 0..d {
+                for x in 0..w {
+                    let i = (y * d + z) * w + x;
+                    let j = if in_x {
+                        (y * d + z) * w + (w - 1 - x)
+                    } else {
+                        (y * d + (d - 1 - z)) * w + x
+                    };
+                    let (sx, sz) = if in_x { (-1.0, 1.0) } else { (1.0, -1.0) };
+                    for (u, v) in [
+                        (a.q[i], b.q[j]),
+                        (a.vx[i], sx * b.vx[j]),
+                        (a.vy[i], b.vy[j]),
+                        (a.vz[i], sz * b.vz[j]),
+                    ] {
+                        worst = worst.max((u - v).abs());
+                    }
+                }
+            }
+        }
+        worst
+    }
+
     #[test]
-    fn scalar_and_simd_paths_agree_bit_for_bit() {
-        // Natively both run the scalar kernel; on wasm32 with simd128 (tests/wasm-slab.test.ts
-        // repeats this there) the second is SIMD.
-        let mut a = SlabSweep::new(37, 26, 11, params([1.0, 0.2]));
-        canopy(&mut a);
-        let mut b = SlabSweep::new(37, 26, 11, params([1.0, 0.2]));
-        canopy(&mut b);
-        a.simd = false;
-        b.simd = true;
-        a.compute(3.0);
-        b.compute(3.0);
-        assert!(
-            a.q()
-                .iter()
-                .zip(b.q())
-                .all(|(x, y)| x.to_bits() == y.to_bits())
-        );
+    fn mirrored_foliage_gives_the_mirrored_field() {
+        // The 2D sweep's symmetry test in 3D: under a sky symmetric in x and z, an uneven canopy
+        // and its mirror image give mirror-image fields, to Float32 rounding (sums run in another
+        // order), with whole-cell shifts and with bilinear reads, in both mirrors.
+        let (w, h, d) = (31, 24, 13);
+        for shifts in [true, false] {
+            for in_x in [true, false] {
+                let mut p = params([0.2, 0.2]);
+                p.periodic_x = false;
+                let run = |mirror: bool| {
+                    let mut s = SlabSweep::with_directions(w, h, d, p, mirrored_sky(p));
+                    s.integer_shifts = shifts;
+                    let mut seed: u64 = 11;
+                    for y in 6..16 {
+                        for z in 2..10 {
+                            for x in 4..22 {
+                                seed = (seed * 1103515245 + 12345) % 2147483648;
+                                if seed.is_multiple_of(3) {
+                                    let (mx, mz) = match (mirror, in_x) {
+                                        (false, _) => (x, z),
+                                        (true, true) => (w - 1 - x, z),
+                                        (true, false) => (x, d - 1 - z),
+                                    };
+                                    let a = 0.5 + (seed % 5) as f32 / 2.0;
+                                    s.deposit(mx as f64 + 0.5, y as f64 + 0.5, mz as f64 + 0.5, a);
+                                }
+                            }
+                        }
+                    }
+                    s.compute(0.0);
+                    s
+                };
+                let worst = mirror_error(&run(false), &run(true), in_x);
+                assert!(worst < 2e-6, "shifts {shifts}, mirror in x {in_x}: {worst}");
+            }
+        }
     }
 
     #[test]
     fn the_same_bits_on_every_target() {
-        // tests/wasm-slab.test.ts holds the WASM build, scalar and SIMD, to this constant.
-        assert_eq!(fixture_fingerprint(false), FIXTURE_FINGERPRINT);
-        assert_eq!(fixture_fingerprint(true), FIXTURE_FINGERPRINT);
+        // tests/wasm-slab.test.ts holds the WASM build to this constant.
+        assert_eq!(fixture_fingerprint(), FIXTURE_FINGERPRINT);
     }
 
     const FIXTURE_FINGERPRINT: u32 = 0xd3060733;

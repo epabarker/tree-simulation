@@ -182,10 +182,6 @@ impl SlabSweep {
         self.core.top()
     }
 
-    pub fn set_simd(&mut self, on: bool) {
-        self.core.simd = on;
-    }
-
     pub fn compute(&mut self, season: f64) {
         self.core.compute(season);
     }
@@ -213,13 +209,13 @@ impl SlabSweep {
     }
 }
 
-/// The slab's same-bits fixture (tests/wasm-slab.test.ts): scalar or SIMD.
+/// The slab's same-bits fixture (tests/wasm-slab.test.ts).
 #[wasm_bindgen]
-pub fn slab_fixture_fingerprint(simd: bool) -> u32 {
-    tree_core::light::slab_sweep::fixture_fingerprint(simd)
+pub fn slab_fixture_fingerprint() -> u32 {
+    tree_core::light::slab_sweep::fixture_fingerprint()
 }
 
-/// Whether this build marches with WASM SIMD.
+/// Whether this build may use WASM SIMD (LLVM vectorises the slab's loops with it).
 #[wasm_bindgen]
 pub fn slab_has_simd() -> bool {
     cfg!(target_feature = "simd128")

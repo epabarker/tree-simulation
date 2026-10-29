@@ -9,6 +9,10 @@
 //!    K = 128 static, as mean |ΔQ|/C.
 //! 3. Cost natively: compute at each K, single-threaded, median of 5.
 //!
+//! 4. `heatmap` (after G3, for the record before calibration): the shade 1 − Q/C of the mid-depth
+//!    slice (z = 32) and of the mean over z, at season 100 (K = 16, rotating, as the buds see it),
+//!    with whole-cell shifts and with bilinear reads, as Float32 W × H maps for heatmaps.mjs.
+//!
 //! The deposits are run.ts's DUMP files: Float64 (x, y, z, area) per live bud.
 
 mod diag;
@@ -155,7 +159,6 @@ fn cost(buds: &[[f64; 4]], tau: f64) -> String {
         let mut s = sweep(buds, params(16, false, tau));
         s.exact_segments = exact;
         s.integer_shifts = shifts;
-        s.simd = false;
         let mut t = Vec::new();
         for _ in 0..5 {
             let t0 = Instant::now();
@@ -174,6 +177,74 @@ fn main() {
             for season in [40, 100] {
                 let buds = load(&format!("{dir}/{name}-s{season}.bin"));
                 println!("{name} s{season} integer shifts {}", accuracy(&buds, tau, false, true));
+            }
+        }
+        return;
+    }
+    if std::env::args().nth(3).as_deref() == Some("heatmap") {
+        let out = std::env::args().nth(2).expect("out dir");
+        std::fs::create_dir_all(&out).unwrap();
+        for (name, tau) in [("d64-hard-r6", 1.0), ("d64-t020-r6", 0.2)] {
+            let buds = load(&format!("{dir}/{name}-s100.bin"));
+            for shifts in [true, false] {
+                let mut s = sweep(&buds, params(16, true, tau));
+                s.integer_shifts = shifts;
+                s.compute(100.0);
+                let q = s.q();
+                let (mut slice, mut mean) = (vec![0f32; W * H], vec![0f32; W * H]);
+                for y in 0..H {
+                    for x in 0..W {
+                        slice[y * W + x] = 1.0 - q[(y * D + D / 2) * W + x];
+                        let sum: f32 = (0..D).map(|z| 1.0 - q[(y * D + z) * W + x]).sum();
+                        mean[y * W + x] = sum / D as f32;
+                    }
+                }
+                let mode = if shifts { "shifts" } else { "bilinear" };
+                for (what, map) in [("slice", &slice), ("mean", &mean)] {
+                    let bytes: Vec<u8> = map.iter().flat_map(|v| v.to_le_bytes()).collect();
+                    std::fs::write(format!("{out}/{name}-s100-{mode}-{what}.f32"), bytes).unwrap();
+                }
+            }
+        }
+        return;
+    }
+    if std::env::args().nth(3).as_deref() == Some("seam") {
+        // Row means of Q over the mid-depth slice at season 100 (K 16 rotating): shifts, bilinear
+        // and the exact trace (every third column, steps of 0.02), to tell a seam from the light.
+        for (name, tau) in [("d64-t020-r6", 0.2), ("d64-hard-r6", 1.0)] {
+            let buds = load(&format!("{dir}/{name}-s100.bin"));
+            let mut a = sweep(&buds, params(16, true, tau));
+            a.compute(100.0);
+            let mut b = sweep(&buds, params(16, true, tau));
+            b.integer_shifts = false;
+            b.compute(100.0);
+            let top = a.top();
+            println!("{name}: row shifts bilinear exact (Q, mid slice)");
+            let rows: Vec<usize> = (0..top).rev().collect();
+            let exact: Vec<f64> = std::thread::scope(|sc| {
+                let hs: Vec<_> = rows
+                    .chunks(rows.len().div_ceil(4))
+                    .map(|ch| {
+                        let a = &a;
+                        sc.spawn(move || {
+                            ch.iter()
+                                .map(|&y| {
+                                    let cols: Vec<usize> = (0..W).step_by(3).collect();
+                                    cols.iter().map(|&x| a.exact_q(x, y, D / 2, 0.02)).sum::<f64>()
+                                        / cols.len() as f64
+                                })
+                                .collect::<Vec<_>>()
+                        })
+                    })
+                    .collect();
+                hs.into_iter().flat_map(|h| h.join().unwrap()).collect()
+            });
+            for (n, &y) in rows.iter().enumerate() {
+                let mean = |s: &SlabSweep| {
+                    (0..W).step_by(3).map(|x| s.q()[(y * D + D / 2) * W + x] as f64).sum::<f64>()
+                        / (0..W).step_by(3).count() as f64
+                };
+                println!("{y} {:.3} {:.3} {:.3}", mean(&a), mean(&b), exact[n]);
             }
         }
         return;

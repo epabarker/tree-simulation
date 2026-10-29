@@ -7,9 +7,11 @@ import { readFileSync } from "node:fs";
 import type { Params } from "../../src/core/params.ts";
 import { BudState, type TreeMetrics } from "../../src/core/types.ts";
 import { parityWasm } from "../../src/wasm/parity.ts";
-import { loadWorldsSync, RustWorld, type TreeView } from "../../src/wasm/world.ts";
+import { productionWasm } from "../../src/wasm/production.ts";
+import { type Build, loadWorldsSync, RustWorld, type TreeView } from "../../src/wasm/world.ts";
 
-loadWorldsSync("parity", readFileSync(parityWasm));
+const BUILD = (process.env.TREE_BUILD ?? "parity") as Build;
+loadWorldsSync(BUILD, readFileSync(BUILD === "parity" ? parityWasm : productionWasm));
 
 export type Tree = TreeView;
 export type { TreeMetrics };
@@ -17,8 +19,8 @@ export type { TreeMetrics };
 /** `new World(params)`: a Rust world, parity build. */
 export class World extends RustWorld {
   constructor(params: Params) {
-    const made = RustWorld.create(params, "parity");
-    super("parity", made.core());
+    const made = RustWorld.create(params, BUILD);
+    super(BUILD, made.core());
   }
 }
 
@@ -47,7 +49,7 @@ export function saveWorld(world: RustWorld): Uint8Array {
 
 /** A world from checkpoint bytes, parity build. */
 export function loadWorld(bytes: Uint8Array): RustWorld {
-  return RustWorld.load(bytes, "parity");
+  return RustWorld.load(bytes, BUILD);
 }
 
 /** Elevation of a direction above the horizontal, degrees, whichever side it heads. */

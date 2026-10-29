@@ -2,6 +2,23 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-29: prototype B, stacked slices drawn flat
+
+- **User:** build prototype B, planned first. The user's goals: the scanned oak's side profile, a flat ink-drawing render, species likeness, and sim/render separation with performance in mind; open to a 3D core later ([note](experiments/2026-10-29-stacked-slices.md)).
+- **Built (analysis only, no `src/` change):**
+  - `compose_slices.ts`: N independently grown oaks around one trunk, at trunk level or limb level, girth by the pipe model, self-checking;
+  - `a.html?mask=1`: silhouettes from the page's own renderer, by overriding colour tokens;
+  - `capture_flat.mjs` and `profile.py`: spread, crown base, fill, big gaps, width profile; self-tested;
+  - all 35 Wytham oaks drawn and measured the same way.
+- **Result:**
+  - **Fullness:** composition fixes it. Fill reaches the scans' band (0.60 ± 0.12) at N ≈ 32.
+  - **A first match:** a 32-slice limb-level composite of a woodland oak with Wytham's spacing (12 m) is within the 35 scans' spread on every silhouette measure. It is the first simulated oak here to do so.
+  - **Architecture is not fixed:** woodland slices are poles, the open oak is a low fan, and wood is thin (winter fill 0.14–0.20 against 0.39).
+  - **Trunk-level stacking makes a broom;** limb-level stacking keeps heavy limbs.
+  - **Cost at N = 32:** 66k metamers (open) or 13k (wood) per tree, about 3× the draw time; live simulation of all slices is out of budget. A donor library of pre-grown slices keeps the simulation at one slice per tree.
+- **Surprise:** at 12 m spacing the fitted oak still grows a pole with a small crown (95 tips).
+- **Goldens:** unchanged (nothing in `src/` changed).
+
 ## 2026-10-29: oak limbs refitted to 35 scanned oaks (ADR 0024)
 
 - **User:** fix the limb faults the 2×2 found. Then: adopt the thickest-path posture change (amending ADR 0011), add the scanned oaks' limb-shape and fork targets to the fit, and refit oak ([note](experiments/2026-10-29-oak-limbs.md)).

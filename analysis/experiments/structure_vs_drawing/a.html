@@ -29,6 +29,18 @@
       document.head.prepend(style);
 
       const q = new URLSearchParams(location.search);
+      // ?mask=1: the same renderer drawing a flat silhouette, black tree on white, by overriding
+      // the scene's colour tokens (host-overridable by design, scene.css): for profile measures.
+      if (q.get("mask") === "1") {
+        const mask = document.createElement("style");
+        mask.textContent = `:root {
+          --sky-top: #ffffff; --sky-bottom: #ffffff; --ground: #ffffff; --ground-deep: #ffffff;
+          --bark-young: #000000; --bark-old: #000000;
+          --oak-leaf-shade: #000000; --oak-leaf-sun: #000000;
+          --leaf-shade: #000000; --leaf-sun: #000000;
+        }`;
+        document.head.append(mask);
+      }
       const raw = await (await fetch(`/runs/structure-vs-drawing/data/${q.get("tree")}.snap.json`)).json();
       const n = raw.metamerCount;
       const f32 = (a) => Float32Array.from(a);
@@ -87,7 +99,19 @@
       r.draw(1, view);
       requestAnimationFrame(() => {
         r.draw(1, view);
-        window.rendered = r.kind;
+        // ?bench=1: mean draw time over 20 frames, the GPU flushed after each (indicative only:
+        // headless browsers render WebGL in software).
+        let drawMs = null;
+        if (q.get("bench") === "1") {
+          const gl = r.kind === "webgl2" ? r.canvas.getContext("webgl2") : null;
+          const t0 = performance.now();
+          for (let i = 0; i < 20; i++) {
+            r.draw(1, view);
+            gl?.finish();
+          }
+          drawMs = (performance.now() - t0) / 20;
+        }
+        window.rendered = { kind: r.kind, metamers: n, drawMs };
       });
     </script>
   </body>

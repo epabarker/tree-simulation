@@ -1,6 +1,6 @@
 # Status
 
-_Last updated: 2026-10-29 (oak limbs refitted to 35 scanned oaks, ADR 0024)_
+_Last updated: 2026-10-29 (prototype B: stacked slices match the scanned oaks' silhouette at N ≈ 32)_
 
 **M26 and M27 are done** on `claude/gallant-brown-5k4g33`. The woodland grows the species fitted to literature traits (two CMA-ES rounds, then hand adjustments: ADR 0020–0023; [note](experiments/2026-10-28-m27-fits.md)), with the hyperbolic hydraulic discount (ADR 0021) and a juvenile phase (ADR 0022) set per species. The hand-tuned species are kept as `HAND_FLORA`.
 
@@ -17,7 +17,7 @@ _Last updated: 2026-10-29 (oak limbs refitted to 35 scanned oaks, ADR 0024)_
 - **Lab:** WebGL2 with pseudo-depth, Tweakpane, charts, tap to fell, phone layout, shareable links (`?preset&seed&p`). **Headless:** `npm run sim` (`--species-patch`), `npm run bench`, `analysis/experiments/` m0–m26.
 
 ## Next
-1. **Realism** ([2×2 note](experiments/2026-10-29-structure-vs-drawing.md), [limbs note](experiments/2026-10-29-oak-limbs.md)): our renderer is fine; our tree holds what a 1 m slab of a real oak does. Oak is refitted to 35 Wytham scans (ADR 0024): no zigzag, limbs wander like real ones in the open; woodland limbs still a third of the real turn. Next: prototype B, stacked slices around one trunk.
+1. **Realism** ([2×2](experiments/2026-10-29-structure-vs-drawing.md), [limbs](experiments/2026-10-29-oak-limbs.md), [slices](experiments/2026-10-29-stacked-slices.md)): our renderer is fine; a slice holds a 1 m slab's worth. Composing ≈ 32 slices at limb level (drawing side) matches the 35 Wytham silhouettes; the skeleton (poles, low fans, thin wood) is the gap. **The user:** choose (B) a donor-slice library at draw time, or (C) a 3D core; either way, fit slice architecture to the scanned profiles first.
 2. **The user:** try garden 0.14.0 on edbarker.dev, and the loupe on a phone; say whether to open the lab's PR to `main` (GitHub Pages).
 3. **Possible:** a thinner understorey than the hand-tuned wood's by season 400 (holly, rowan, willow 0.3–0.7 a run): revisit if it reads wrong. Measured light under fir, holly and the small trees would replace estimated floors.
 4. **Refits:** move `fits/*.json` to a round folder, then `m27_fit.py --species all --skip-done --start <round> --restarts 2,0 --generations 50 --seeds 3` (≈ 8 min a species); `m27_adopt.py` regenerates `flora-fitted.ts`.

@@ -19,3 +19,31 @@ pub mod season;
 pub mod snapshot;
 pub mod tree;
 pub mod world;
+
+/// Test helpers: presets and the default params from rust/presets.json (the TypeScript ones).
+#[cfg(test)]
+pub(crate) mod testing {
+    use crate::json::{self, Value};
+
+    fn presets() -> Value {
+        json::parse(include_str!("../../presets.json")).unwrap()
+    }
+
+    /// A preset's (or fixture's) params JSON, with `patch` merged as mergeParams does.
+    pub fn preset(name: &str, patch: &str) -> Value {
+        let all = presets();
+        let base = all
+            .get("presets")
+            .and_then(|t| t.get(name))
+            .or_else(|| all.get("fixtures").and_then(|t| t.get(name)))
+            .or_else(|| (name == "default").then(|| all.get("defaultParams").unwrap()))
+            .unwrap_or_else(|| panic!("no preset {name}"))
+            .clone();
+        json::merge(&base, &json::parse(patch).unwrap())
+    }
+
+    /// A preset's typed params.
+    pub fn params(name: &str) -> crate::params::Params {
+        crate::params::Params::from_json(&preset(name, "{}"))
+    }
+}

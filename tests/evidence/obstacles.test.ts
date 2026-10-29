@@ -1,10 +1,21 @@
 import { describe, expect, it } from "vitest";
-import { hashWorld } from "../hash.ts";
-import { mergeParams, type Obstacle } from "../params.ts";
-import { presetParams } from "../presets.ts";
-import type { Tree } from "../tree.ts";
-import { World } from "../world.ts";
-import { insideObstacle } from "./obstacles.ts";
+import type { Params } from "../../src/core/params.ts";
+import { mergeParams, type Obstacle } from "../../src/core/params.ts";
+import { presetParams } from "../../src/core/presets.ts";
+import type { Tree } from "./rust.ts";
+import { hashWorld, World } from "./rust.ts";
+
+/** Whether (x, y) is inside an obstacle (x wrapped on a ring): the check, independent of the core. */
+function insideObstacle(params: Params, x: number, y: number): boolean {
+  const W = params.world.width;
+  for (const o of params.world.obstacles ?? []) {
+    if (y < o.y || y >= o.y + o.height) continue;
+    let dx = x - o.x;
+    if (params.world.sides === "periodic") dx = ((dx % W) + W) % W;
+    if (dx >= 0 && dx < o.width) return true;
+  }
+  return false;
+}
 
 /** Tips of every live tree's metamers that lie inside an obstacle. */
 function tipsInside(world: World): number {

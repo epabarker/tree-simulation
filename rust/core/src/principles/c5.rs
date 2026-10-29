@@ -142,3 +142,209 @@ pub fn remove_branches(
     }
     removed
 }
+
+#[cfg(test)]
+pub(crate) mod tests {
+    use super::*;
+    use crate::principles::c1::{add_bud, add_metamer};
+    use crate::principles::c6::{junction_exponents, update_girth};
+    use crate::testing::preset;
+    use crate::world::World;
+
+    pub const UP: f64 = std::f64::consts::FRAC_PI_2;
+
+    pub fn params(extra: &str) -> Params {
+        let base = r#"{"c5":{"enabled":true,"T":0.1,"g":2,"Trel":0,"topQuantile":0.9},"c6":{"enabled":true,"n":2,"r0":0.02}}"#;
+        let p = preset("default", base);
+        Params::from_json(&crate::json::merge(&p, &crate::json::parse(extra).unwrap()))
+    }
+
+    /// root → (main continuation, lateral → lateral's continuation), with a bud on each tip.
+    pub fn small_tree(p: &Params) -> Tree {
+        let mut t = Tree::new(0, 10.0);
+        let r0 = p.c6.r0;
+        let root = add_metamer(&mut t, -1, slot::MAIN, UP, 1.0, r0, 0.0) as i32;
+        let main = add_metamer(&mut t, root, slot::MAIN, UP, 1.0, r0, 0.0);
+        let lat = add_metamer(&mut t, root, slot::RIGHT, UP - 0.7, 1.0, r0, 0.0) as i32;
+        let lat_tip = add_metamer(&mut t, lat, slot::MAIN, UP - 0.7, 1.0, r0, 0.0);
+        add_bud(&mut t, main, slot::MAIN, UP, 0.0);
+        add_bud(&mut t, lat_tip, slot::MAIN, UP - 0.7, 1.0);
+        t.ensure_scratch();
+        t
+    }
+
+    fn close(a: f64, b: f64, eps: f64) -> bool {
+        (a - b).abs() < eps
+    }
+
+    #[test]
+    fn girth_adds_children_and_scars_and_tips_have_r0() {
+        let p = params("{}");
+        let mut t = small_tree(&p);
+        update_girth(&mut t, &p);
+        let (r, r0) = (&t.m.radius, p.c6.r0);
+        assert!(close(r[1], r0, 1e-12) && close(r[3], r0, 1e-12) && close(r[2], r0, 1e-12));
+        assert!(close(r[0], 2f64.sqrt() * r0, 1e-12)); // n = 2: r² = r0² + r0²
+        let mut d = Vec::new();
+        junction_exponents(&t, &mut d);
+        assert_eq!(d.len(), 1);
+        assert!(close(d[0], p.c6.n, 1e-6));
+    }
+
+    #[test]
+    fn solves_the_leonardo_exponent_at_two_and_three_way_junctions() {
+        for (delta, xs) in [(2.5, vec![0.6]), (1.8, vec![0.5, 0.3]), (3.2, vec![0.7])] {
+            let rest = 1.0 - xs.iter().map(|x: &f64| x.powf(delta)).sum::<f64>();
+            let mut t = Tree::new(0, 10.0);
+            let root = add_metamer(&mut t, -1, slot::MAIN, UP, 1.0, 1.0, 0.0) as i32;
+            let mut radii = xs.clone();
+            radii.push(rest.powf(1.0 / delta));
+            for (k, r) in radii.iter().enumerate() {
+                add_metamer(
+                    &mut t,
+                    root,
+                    [slot::MAIN, slot::LEFT, slot::RIGHT][k],
+                    UP,
+                    1.0,
+                    *r,
+                    0.0,
+                );
+            }
+            let mut d = Vec::new();
+            junction_exponents(&t, &mut d);
+            assert_eq!(d.len(), 1);
+            assert!(close(d[0], delta, 1e-10), "{delta}: {}", d[0]);
+        }
+    }
+
+    #[test]
+    fn a_radius_never_decreases() {
+        let p = params("{}");
+        let mut t = small_tree(&p);
+        t.m.radius[0] = 1.0;
+        update_girth(&mut t, &p);
+        assert_eq!(t.m.radius[0], 1.0);
+    }
+
+    #[test]
+    fn sheds_a_dim_lateral_with_its_subtree_leaving_a_scar() {
+        let p = params("{}");
+        let mut t = small_tree(&p);
+        t.m.q_sum[2] = 0.05;
+        t.m.n_sum[2] = 2;
+        t.m.q_sum[1] = 1.0;
+        t.m.n_sum[1] = 1;
+        update_girth(&mut t, &p);
+        let lateral_r = t.m.radius[2];
+        let nm = t.m.len();
+        assert_eq!(shed_branches(&mut t, &p, 5.0, nm), 2.0);
+        assert_eq!(t.m.len(), 2);
+        assert_eq!(&t.m.parent[..2], &[-1, 0]);
+        assert!(close(t.m.scar_sum_n[0], lateral_r.powf(p.c6.n), 1e-12));
+        // The lateral's bud is gone; the main tip's bud now points at row 1.
+        let live: Vec<usize> = (0..2).filter(|&j| t.b.state[j] != bud::GONE).collect();
+        assert_eq!(live.len(), 1);
+        assert_eq!(t.b.metamer[live[0]], 1);
+        // Girth below the scar does not shrink.
+        let before = t.m.radius[0];
+        update_girth(&mut t, &p);
+        assert!(close(t.m.radius[0], before, 1e-12));
+    }
+
+    #[test]
+    fn judges_a_branch_against_its_own_crown_top() {
+        // Lateral light per metamer 0.15 is above T = 0.1, so the baseline rule keeps it.
+        let relative = params(r#"{"c5":{"Trel":0.3}}"#);
+        let dim_lateral = |q_top: f64, p: &Params| {
+            let mut t = small_tree(p);
+            t.m.q_sum[2] = 0.3;
+            t.m.n_sum[2] = 2;
+            t.q_top = q_top;
+            let nm = t.m.len();
+            shed_branches(&mut t, p, 5.0, nm)
+        };
+        assert_eq!(dim_lateral(1.0, &relative), 2.0); // bright top: T_eff = 0.3 > 0.15, shed
+        assert_eq!(dim_lateral(0.4, &relative), 0.0); // dim top: T_eff = 0.12 < 0.15, kept
+        assert_eq!(dim_lateral(1.0, &params("{}")), 0.0); // T_rel = 0 ignores the top
+    }
+
+    #[test]
+    fn the_crown_top_light_is_a_quantile_of_live_bud_q() {
+        let p = params("{}");
+        let mut t = Tree::new(0, 10.0);
+        let root = add_metamer(&mut t, -1, slot::MAIN, UP, 1.0, p.c6.r0, 0.0);
+        for i in 0..10 {
+            let b = add_bud(&mut t, root, slot::MAIN, UP, 0.0);
+            t.b.q[b] = (i + 1) as f64 / 10.0;
+        }
+        t.b.state[9] = bud::GONE; // consumed buds do not count
+        assert!(close(crown_top_light(&t, 0.9), 0.9, 1e-12));
+        assert!(close(crown_top_light(&t, 0.5), 0.5, 1e-12));
+    }
+
+    #[test]
+    fn respects_the_grace_period() {
+        let p = params("{}");
+        let mut t = small_tree(&p);
+        t.m.q_sum[2] = 0.0;
+        t.m.n_sum[2] = 2;
+        let nm = t.m.len();
+        assert_eq!(shed_branches(&mut t, &p, 1.0, nm), 0.0); // age 1 < g = 2
+    }
+
+    #[test]
+    fn m4_never_thins_a_metamer_and_gives_delta_n_without_shedding() {
+        let mut world = World::new(preset("pruned", "{}"));
+        let mut prev = std::collections::HashMap::new();
+        for _ in 0..30 {
+            world.step(&mut |_| {});
+            let t = &world.trees[0];
+            let mut next = std::collections::HashMap::new();
+            for i in 0..t.m.len() {
+                let (id, r) = (t.m.birth_id[i], t.m.radius[i]);
+                if let Some(&before) = prev.get(&id) {
+                    assert!(r >= before);
+                }
+                next.insert(id, r);
+            }
+            prev = next;
+        }
+        let mut world = World::new(preset("pruned", r#"{"c5":{"enabled":false}}"#));
+        world.run(25, &[]);
+        let mut d = Vec::new();
+        junction_exponents(&world.trees[0], &mut d);
+        assert!(d.len() > 20);
+        assert!(d.iter().all(|&x| close(x, world.params().c6.n, 1e-5)));
+    }
+
+    #[test]
+    fn m4_clears_the_interior_without_lowering_the_crown_base() {
+        let run = |c5: bool, seed: u32| {
+            let patch = format!(r#"{{"seed":{seed},"c5":{{"enabled":{c5}}}}}"#);
+            let mut world = World::new(preset("pruned", &patch));
+            let mut shed = 0.0;
+            for _ in 0..40 {
+                world.step(&mut |_| {});
+                shed += world.trees[0].shed_count;
+            }
+            let t = &world.trees[0];
+            let mut bole = f64::INFINITY;
+            for i in 0..t.m.len() {
+                let p = t.m.parent[i];
+                if t.m.order[i] == 1 && p >= 0 && t.m.order[p as usize] == 0 {
+                    bole = bole.min(t.m.base_y[i]);
+                }
+            }
+            (t.m.len() as f64, shed, bole)
+        };
+        let mean = |v: &[f64]| v.iter().sum::<f64>() / v.len() as f64;
+        let on: Vec<_> = (1..=5).map(|s| run(true, s)).collect();
+        let off: Vec<_> = (1..=5).map(|s| run(false, s)).collect();
+        assert!(on.iter().all(|r| r.1 > 0.0));
+        let m = |v: &[(f64, f64, f64)], k: usize| {
+            mean(&v.iter().map(|r| [r.0, r.1, r.2][k]).collect::<Vec<_>>())
+        };
+        assert!(m(&on, 0) < m(&off, 0));
+        assert!(m(&on, 2) >= m(&off, 2));
+    }
+}

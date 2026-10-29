@@ -100,9 +100,72 @@ mod tests {
         assert_eq!(uniform(3.0, 4, 5.0, 6.0, 7.0, 1.0), 0.9250604065600783);
     }
 
+    #[test]
+    fn matches_frozen_known_answer_vectors() {
+        // Changing these breaks reproducibility of every saved run: only with an ADR.
+        assert_eq!(
+            hash_key(1.0, purpose::SIDE_SEQUENCE, 0.0, 0.0, 0.0, 0.0),
+            1382201895
+        );
+        assert_eq!(
+            hash_key(42.0, purpose::DIRECTION_NOISE, 3.0, 1234.0, 17.0, 2.0),
+            3388988208
+        );
+        assert_eq!(
+            hash_key(4294967295.0, purpose::MORTALITY, 9.0, 99999.0, 500.0, 7.0),
+            2673640170
+        );
+        assert_eq!(
+            uniform(7.0, purpose::SHEDDING, 1.0, 2.0, 3.0, 0.0),
+            0.27200592774897814
+        );
+    }
+
+    #[test]
+    fn changes_when_any_key_component_changes() {
+        let base = hash_key(1.0, 2, 2.0, 3.0, 4.0, 5.0);
+        for v in [
+            hash_key(2.0, 2, 2.0, 3.0, 4.0, 5.0),
+            hash_key(1.0, 3, 2.0, 3.0, 4.0, 5.0),
+            hash_key(1.0, 2, 3.0, 3.0, 4.0, 5.0),
+            hash_key(1.0, 2, 2.0, 4.0, 4.0, 5.0),
+            hash_key(1.0, 2, 2.0, 3.0, 5.0, 5.0),
+            hash_key(1.0, 2, 2.0, 3.0, 4.0, 6.0),
+        ] {
+            assert_ne!(v, base);
+        }
+    }
+
+    #[test]
+    fn gives_uniform_and_normal_draws_with_the_right_moments() {
+        let n = 100_000;
+        let (mut su, mut sz, mut sz2, mut heads) = (0.0, 0.0, 0.0, 0.0);
+        for i in 0..n {
+            let i = i as f64;
+            let u = uniform(5.0, purpose::SHEDDING, 0.0, i, 0.0, 0.0);
+            assert!((0.0..1.0).contains(&u));
+            su += u;
+            let z = normal(5.0, purpose::DIRECTION_NOISE, 0.0, i, 0.0, 0.0);
+            sz += z;
+            sz2 += z * z;
+            if sign(5.0, purpose::SIDE_SEQUENCE, 0.0, i, 0.0, 0.0) > 0.0 {
+                heads += 1.0;
+            }
+        }
+        let n = n as f64;
+        assert!((su / n - 0.5).abs() < 0.005);
+        assert!((sz / n).abs() < 0.05);
+        assert!((sz2 / n - 1.0).abs() < 0.05);
+        assert!((heads / n - 0.5).abs() < 0.005);
+    }
+
     #[cfg(feature = "parity")]
     #[test]
     fn normal_matches_the_typescript_core() {
+        assert_eq!(
+            normal(7.0, purpose::DIRECTION_NOISE, 1.0, 2.0, 3.0, 0.0),
+            0.5882301320315867
+        );
         assert_eq!(normal(9.0, 2, 1.0, 2.0, 3.0, 0.0), -0.8179644073063318);
     }
 }

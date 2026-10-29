@@ -301,3 +301,109 @@ impl ShadowTriangle {
         (q, vx, vy)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::testing::preset;
+
+    fn params(c2: &str) -> Params {
+        Params::from_json(&preset("default", &format!(r#"{{"c2":{c2}}}"#)))
+    }
+
+    #[test]
+    fn pooled_light_is_a_homogeneous_canopys_mean_light() {
+        let p = params(
+            r#"{"enabled":true,"model":"pooled","a":0.15,"b":1.5,"qMax":6,"C":1,"perceptionAngle":45,"perceptionDistance":4,"K":7,"kExt":0.5,"skyExponent":1,"skyTilt":0,"minElevation":15,"rotate":false}"#,
+        );
+        let mut p = p;
+        p.world.width = 10.0;
+        p.world.height = 20.0;
+        let mut light = make_light(&p);
+        // 40 units of leaf area over 10 columns: L = 4, kL = 2.
+        for i in 0..40 {
+            light.deposit((i % 10) as f64 + 0.5, 3.0 + (i % 7) as f64, 1.0);
+        }
+        light.compute(0.0);
+        let expected = (1.0 - (-2.0f64).exp()) / 2.0;
+        for (x, y) in [(0.5, 0.5), (5.5, 12.5), (9.5, 19.5)] {
+            let (q, vx, vy) = light.sample(x, y, std::f64::consts::FRAC_PI_2);
+            assert!((q - expected).abs() < 1e-12);
+            assert_eq!((vx, vy), (0.0, 1.0));
+        }
+        // An empty world gives full light, outside it none; last season is forgotten.
+        light.deposit(5.0, 5.0, 50.0);
+        light.compute(0.0);
+        light.clear();
+        light.compute(0.0);
+        assert_eq!(light.sample(5.0, 5.0, 0.0).0, 1.0);
+        assert_eq!(light.sample(-1.0, 5.0, 0.0).0, 0.0);
+        assert_eq!(light.sample(5.0, 25.0, 0.0).0, 0.0);
+    }
+
+    fn triangle(w: f64, h: f64, extra: &str) -> ShadowTriangle {
+        let p = params(&format!(
+            r#"{{"enabled":true,"model":"triangle","a":1,"b":2,"qMax":3,"C":1,"perceptionAngle":45,"perceptionDistance":4{extra}}}"#
+        ));
+        ShadowTriangle::new(w, h, &p)
+    }
+
+    #[test]
+    fn the_triangle_deposits_a_b_to_the_minus_q_widening_downwards() {
+        let mut g = triangle(21.0, 21.0, "");
+        g.deposit(10.5, 10.5, 1.0);
+        let at = |g: &ShadowTriangle, col: usize, row: usize| g.s[row * 21 + col];
+        assert_eq!(at(&g, 10, 10), 1.0); // own cell, q = 0
+        assert_eq!(at(&g, 10, 11), 0.0); // nothing above
+        for col in [9, 10, 11] {
+            assert_eq!(at(&g, col, 9), 0.5);
+        }
+        assert_eq!(at(&g, 8, 9), 0.0);
+        for col in 8..=12 {
+            assert_eq!(at(&g, col, 8), 0.25);
+        }
+        for col in 7..=13 {
+            assert_eq!(at(&g, col, 7), 0.125);
+        }
+        assert_eq!(at(&g, 6, 7), 0.0);
+        assert_eq!(at(&g, 10, 6), 0.0); // beyond qMax
+        let total: f64 = g.s.iter().sum();
+        assert!((total - (1.0 + 1.5 + 1.25 + 0.875)).abs() < 1e-12);
+    }
+
+    #[test]
+    fn a_bud_does_not_shade_itself() {
+        let mut g = triangle(21.0, 21.0, "");
+        let up = std::f64::consts::FRAC_PI_2;
+        g.deposit(10.5, 10.5, 1.0);
+        assert_eq!(g.sample(10.5, 10.5, up).0, 1.0); // own deposit cancelled
+        g.deposit(10.5, 9.5, 1.0); // a second bud one cell below
+        assert!((g.sample(10.5, 9.5, up).0 - 0.5).abs() < 1e-12); // C − (a + a/b) + a
+        g.deposit(10.5, 9.5, 1.0); // a third sharing that cell
+        assert_eq!(g.sample(10.5, 9.5, up).0, 0.0); // clamped at zero
+    }
+
+    #[test]
+    fn v_points_at_the_least_shaded_cell_in_the_wedge() {
+        let mut g = triangle(30.0, 30.0, r#","perceptionAngle":90"#);
+        let wall = Rect {
+            x: 0.0,
+            y: 0.0,
+            width: 15.0,
+            height: 30.0,
+            shade: 5.0,
+        };
+        g.add_wall(&wall);
+        let (_, vx, vy) = g.sample(15.2, 10.5, std::f64::consts::FRAC_PI_2);
+        assert!(vx > 0.0);
+        assert!((vx.hypot(vy) - 1.0).abs() < 1e-12);
+    }
+
+    #[test]
+    fn everything_outside_the_world_box_is_opaque() {
+        let g = triangle(10.0, 10.0, "");
+        for (x, y) in [(-0.5, 5.0), (10.5, 5.0), (5.0, 10.5), (5.0, -0.5)] {
+            assert_eq!(g.sample(x, y, std::f64::consts::FRAC_PI_2).0, 0.0);
+        }
+    }
+}

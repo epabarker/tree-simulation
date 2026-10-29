@@ -65,3 +65,32 @@ pub fn clear_obstacles(tree: &mut Tree, params: &Params, carry: &mut [&mut Vec<f
     tree.scratch_u = dead;
     removed
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::params::Rect;
+
+    fn ring(obstacles: Option<Vec<Rect>>) -> Params {
+        let mut p = crate::testing::params("forest");
+        p.world.obstacles = obstacles;
+        p
+    }
+
+    #[test]
+    fn tests_points_against_rectangles_wrapping_x_on_a_ring() {
+        let o = Rect {
+            x: 205.0,
+            y: 10.0,
+            width: 10.0,
+            height: 5.0,
+            shade: 0.0,
+        };
+        let p = ring(Some(vec![o]));
+        assert!(inside_obstacle(&p, 207.0, 12.0));
+        assert!(inside_obstacle(&p, 3.0, 12.0)); // wrapped past the seam
+        assert!(!inside_obstacle(&p, 6.0, 12.0));
+        assert!(!inside_obstacle(&p, 207.0, 15.0)); // the top edge is open
+        assert!(!inside_obstacle(&ring(None), 60.0, 10.0)); // none
+    }
+}

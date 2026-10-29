@@ -319,3 +319,156 @@ pub fn form_metrics(tree: &Tree, params: &Params) -> FormMetrics {
         profile,
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::principles::c1::{add_bud, add_metamer};
+    use crate::principles::c6::update_girth;
+    use crate::testing::preset;
+
+    const UP: f64 = std::f64::consts::FRAC_PI_2;
+
+    fn params() -> Params {
+        Params::from_json(&preset("default", r#"{"c6":{"enabled":true}}"#))
+    }
+
+    fn get(f: &FormMetrics, name: &str) -> f64 {
+        f.values[FORM_COLUMNS.iter().position(|&n| n == name).unwrap()]
+    }
+
+    /// A trunk of `n` unit metamers with horizontal laterals of length `len(k)` either side at node k.
+    fn crown(n: usize, len: impl Fn(usize) -> f64) -> Tree {
+        let mut t = Tree::new(0, 50.0);
+        let mut trunk = Vec::new();
+        for k in 0..n {
+            let parent = if k == 0 { -1 } else { trunk[k - 1] as i32 };
+            trunk.push(add_metamer(&mut t, parent, slot::MAIN, UP, 1.0, 1.0, 0.0));
+        }
+        for k in 0..n - 1 {
+            let l = len(k + 1);
+            add_metamer(&mut t, trunk[k] as i32, slot::LEFT, PI, l, 0.1, 0.0);
+            add_metamer(&mut t, trunk[k] as i32, slot::RIGHT, 0.0, l, 0.1, 0.0);
+        }
+        t
+    }
+
+    /// A straight chain of `n` metamers from `parent`, its first of radius `r`, the rest r/2.
+    fn chain(t: &mut Tree, parent: usize, s: u8, angle: f64, n: usize, r: f64) -> usize {
+        let mut m = add_metamer(t, parent as i32, s, angle, 1.0, r, 0.0);
+        let first = m;
+        for _ in 1..n {
+            m = add_metamer(t, m as i32, slot::MAIN, angle, 1.0, r * 0.5, 0.0);
+        }
+        first
+    }
+
+    fn height(t: &Tree) -> f64 {
+        (0..t.m.len()).map(|i| t.tip_y(i)).fold(f64::MIN, f64::max)
+    }
+
+    #[test]
+    fn tells_a_column_from_a_cone_and_an_inverted_cone() {
+        let p = params();
+        let column = form_metrics(&crown(20, |_| 5.0), &p);
+        let cone = form_metrics(&crown(20, |k| 20.0 - k as f64), &p);
+        let vase = form_metrics(&crown(20, |k| k as f64), &p);
+        assert!(get(&column, "crownFullness") > 0.85);
+        assert!((get(&column, "profileCentre") - 0.5).abs() < 0.05);
+        assert!(get(&cone, "widestAt") < 0.2);
+        assert!(get(&cone, "profileCentre") < 0.42);
+        assert!(get(&cone, "crownFullness") < 0.65);
+        assert!(get(&vase, "widestAt") > 0.8);
+        assert!(get(&vase, "profileCentre") > 0.58);
+        let prof = crown_profile(&crown(20, |k| 20.0 - k as f64), PROFILE_BANDS);
+        assert_eq!(prof.iter().cloned().fold(0.0, f64::max), 1.0);
+        assert!(prof.iter().all(|&w| (0.0..=1.0).contains(&w)));
+    }
+
+    fn forked(r: f64) -> Tree {
+        let mut t = Tree::new(0, 50.0);
+        let mut m: i32 = -1;
+        for k in 0..10 {
+            m = add_metamer(&mut t, m, slot::MAIN, UP, 1.0, 1.0, 0.0) as i32;
+            if k == 4 {
+                chain(&mut t, m as usize, slot::RIGHT, UP - 0.4, 6, r);
+            }
+        }
+        t
+    }
+
+    #[test]
+    fn finds_the_fork_where_a_limb_reaches_0_7_of_the_leader() {
+        let p = params();
+        let decurrent = forked(0.8);
+        let f = form_metrics(&decurrent, &p);
+        assert!((get(&f, "forkHeight") - 5.0 / height(&decurrent)).abs() < 1e-9);
+        assert!((get(&f, "leaderDominance") - 1.0 / 0.8).abs() < 1e-9);
+        let excurrent = form_metrics(&forked(0.3), &p);
+        assert_eq!(get(&excurrent, "forkHeight"), 1.0);
+        assert!((get(&excurrent, "leaderDominance") - 1.0 / 0.3).abs() < 1e-9);
+    }
+
+    #[test]
+    fn a_trunk_ending_under_its_laterals_is_a_fork() {
+        let mut t = Tree::new(0, 50.0);
+        let mut m: i32 = -1;
+        for _ in 0..4 {
+            m = add_metamer(&mut t, m, slot::MAIN, UP, 1.0, 1.0, 0.0) as i32;
+        }
+        chain(&mut t, m as usize, slot::LEFT, UP + 0.5, 6, 0.6);
+        chain(&mut t, m as usize, slot::RIGHT, UP - 0.5, 6, 0.6);
+        let f = form_metrics(&t, &params());
+        assert!((get(&f, "forkHeight") - 4.0 / height(&t)).abs() < 1e-9);
+    }
+
+    #[test]
+    fn recovers_a_length_diameter_slope_of_two_thirds() {
+        let mut t = Tree::new(0, 50.0);
+        let mut m: i32 = -1;
+        for k in 0..12 {
+            m = add_metamer(&mut t, m, slot::MAIN, UP, 1.0, 5.0, 0.0) as i32;
+            let n = 5 + k; // limb length n, base diameter ∝ n^(3/2)
+            let (s, a) = if k % 2 == 0 {
+                (slot::LEFT, PI)
+            } else {
+                (slot::RIGHT, 0.0)
+            };
+            chain(&mut t, m as usize, s, a, n, 0.01 * (n as f64).powf(1.5));
+        }
+        let f = form_metrics(&t, &params());
+        assert!((get(&f, "ldSlope") - 2.0 / 3.0).abs() < 1e-9);
+    }
+
+    #[test]
+    fn a_pipe_model_tree_has_leaf_section_slope_1_and_delta_2() {
+        let p = params();
+        let mut t = Tree::new(0, 50.0);
+        fn grow(t: &mut Tree, parent: i32, angle: f64, depth: u32) {
+            let main = add_metamer(t, parent, slot::MAIN, angle, 1.0, 0.0, 0.0);
+            if depth == 0 {
+                add_bud(t, main, slot::MAIN, angle, 1.0);
+                return;
+            }
+            grow(t, main as i32, angle + 0.3, depth - 1);
+            let side = add_metamer(t, main as i32, slot::RIGHT, angle - 0.5, 1.0, 0.0, 0.0);
+            grow(t, side as i32, angle - 0.5, depth - 1);
+        }
+        grow(&mut t, -1, UP, 6);
+        t.ensure_scratch();
+        update_girth(&mut t, &p);
+        let f = form_metrics(&t, &p);
+        assert!((get(&f, "leafStemSlope") - 1.0).abs() < 1e-9);
+        assert!((get(&f, "junctionDelta") - p.c6.n).abs() < 1e-6);
+    }
+
+    #[test]
+    fn fits_a_least_squares_slope_and_refuses_too_few_points() {
+        assert!(
+            (ols_slope(&[1.0, 2.0, 3.0, 4.0, 5.0], &[3.0, 5.0, 7.0, 9.0, 11.0]) - 2.0).abs()
+                < 1e-12
+        );
+        assert!(ols_slope(&[1.0, 2.0, 3.0], &[1.0, 2.0, 3.0]).is_nan());
+        assert!(ols_slope(&[1.0; 5], &[1.0, 2.0, 3.0, 4.0, 5.0]).is_nan());
+    }
+}

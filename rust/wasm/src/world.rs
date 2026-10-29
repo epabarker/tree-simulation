@@ -3,10 +3,13 @@
 //! caller copies out once (`snapshot_ptr`, `snapshot_len`; layout in tree-core's snapshot.rs).
 
 use tree_core::checkpoint::{load_world, save_world};
+use tree_core::form::form_metrics;
 use tree_core::hash::hash_world;
 use tree_core::json::{self, Value};
+use tree_core::metrics::ground_light;
 use tree_core::metrics::tree_metrics;
 use tree_core::snapshot::SnapshotBuilder;
+use tree_core::tree::{Col, NUMBERS};
 use tree_core::world::World as Core;
 use wasm_bindgen::prelude::*;
 
@@ -159,5 +162,60 @@ impl World {
 
     pub fn storm(&self) -> bool {
         self.core.storm
+    }
+
+    /// Mean Q/C on the bottom row over columns [x0, x1] (metrics' groundLight).
+    pub fn ground_light(&self, x0: f64, x1: f64) -> f64 {
+        ground_light(&self.core, x0, x1)
+    }
+
+    /// Q, V_x, V_y of this season's light field at (x, y) for a bud heading `dir`.
+    pub fn sample(&self, x: f64, y: f64, dir: f64) -> Vec<f64> {
+        let (q, vx, vy) = self.core.light.sample(x, y, dir);
+        vec![q, vx, vy]
+    }
+
+    // A tree's state, read-only, for the tools and the tests (src/wasm/world.ts's TreeView).
+
+    /// [id, rootX, alive, discarded, sown, metamers, buds, …tree.rs NUMBERS].
+    pub fn tree_scalars(&self, i: usize) -> Vec<f64> {
+        let t = &self.core.trees[i];
+        let mut out = vec![
+            t.id as f64,
+            t.root_x,
+            t.alive as u8 as f64,
+            t.discarded as u8 as f64,
+            t.sown as u8 as f64,
+            t.m.len() as f64,
+            t.b.len() as f64,
+        ];
+        out.extend(NUMBERS.iter().map(|&n| t.number(n)));
+        out
+    }
+
+    /// Column `col` of table 0 (metamers) or 1 (buds) of tree `i`, its rows in use, as bytes.
+    pub fn tree_column(&self, i: usize, table: u8, col: usize) -> Vec<u8> {
+        let t = &self.core.trees[i];
+        let cols: Vec<Col<'_>> = if table == 0 {
+            t.m.columns()
+        } else {
+            t.b.columns()
+        };
+        cols[col].bytes()
+    }
+
+    /// Tree `i`'s crown form (form.rs): FORM_COLUMNS' eleven values, then the profile's bands.
+    pub fn tree_form(&self, i: usize) -> Vec<f64> {
+        let t = &self.core.trees[i];
+        let f = form_metrics(t, self.core.params_of(t));
+        let mut out = f.values.to_vec();
+        out.extend(f.profile);
+        out
+    }
+
+    /// R3's stress per metamer this season (σ/σ_target), for the tests.
+    pub fn tree_stress(&self, i: usize) -> Vec<f64> {
+        let t = &self.core.trees[i];
+        t.stress.iter().take(t.m.len()).copied().collect()
     }
 }

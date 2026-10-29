@@ -1,10 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { type FloraName, HAND_FLORA } from "./flora.ts";
-import { groundLight, treeMetrics } from "./metrics.ts";
-import { mergeParams, type Params } from "./params.ts";
-import { presetParams } from "./presets.ts";
-import { loneParams, shadeParams, standParams } from "./trials.ts";
-import { World } from "./world.ts";
+import { loneParams, shadeParams, standParams } from "../../cli/trials.ts";
+import { type FloraName, HAND_FLORA } from "../../src/core/flora.ts";
+import { mergeParams, type Params } from "../../src/core/params.ts";
+import { presetParams } from "../../src/core/presets.ts";
+import { groundLight, treeMetrics, World } from "./rust.ts";
 
 const SEEDS = [1, 2, 3];
 const SIX = [1, 2, 3, 4, 5, 6];

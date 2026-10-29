@@ -611,6 +611,14 @@ export function patchSpecies(params: Params, name: string, patch: SpeciesPatch):
   return out;
 }
 
+/** The params a tree of `species` grows by: `params` with the species' patch on top (ADR 0016). */
+export function speciesParams(params: Params, species: string): Params {
+  const patch = params.species?.[species];
+  if (!patch) return params;
+  const { common: _c, latin: _l, leaf: _f, ...groups } = patch;
+  return mergeParams(params, groups);
+}
+
 /** Deep copy of plain JSON data (params never hold functions, dates or typed arrays). */
 export function clone<T>(value: T): T {
   return JSON.parse(JSON.stringify(value)) as T;

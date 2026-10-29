@@ -1,9 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { treeMetrics } from "./metrics.ts";
-import { mergeParams, type ParamsPatch } from "./params.ts";
-import { presetParams } from "./presets.ts";
-import type { Tree } from "./tree.ts";
-import { World } from "./world.ts";
+import { mergeParams, type ParamsPatch } from "../../src/core/params.ts";
+import { presetParams } from "../../src/core/presets.ts";
+import type { Tree } from "./rust.ts";
+import { treeMetrics, World } from "./rust.ts";
 
 // M11 visible test (§7, ADR 0013): a log–log self-thinning line, judged with size inequality
 // (§10; Reynolds & Ford 2005); gaps refill from seed; and periodic sides remove the open-edge

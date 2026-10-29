@@ -87,3 +87,58 @@ pub fn abrade(
     }
     lost
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn o2() -> O2 {
+        O2 {
+            enabled: true,
+            sway: 0.001,
+            max_sway: 3.0,
+            p_abr: 1.0,
+            ..crate::testing::params("default").o2
+        }
+    }
+
+    #[test]
+    fn tags_cells_by_owner_marking_shared_ones() {
+        let mut owner = [EMPTY; 4];
+        tag_owner(&mut owner, 2, 0, 0, 5);
+        tag_owner(&mut owner, 2, 0, 0, 5);
+        tag_owner(&mut owner, 2, 1, 1, 5);
+        tag_owner(&mut owner, 2, 1, 1, 6);
+        assert_eq!(owner, [5, EMPTY, EMPTY, SHARED]);
+    }
+
+    #[test]
+    fn sways_k_q_h_over_r_capped() {
+        assert!((sway_of(0.5, 40.0, 0.02, &o2()) - 1.0).abs() < 1e-12);
+        assert_eq!(sway_of(1.0, 1000.0, 0.02, &o2()), 3.0);
+        assert_eq!(sway_of(1.0, 10.0, 0.0, &o2()), 0.0);
+    }
+
+    #[test]
+    fn kills_a_leafy_bud_that_sways_into_another_trees_foliage_not_its_own() {
+        let mut w = crate::principles::o4::tests::world(
+            r#"{"c6":{"enabled":true},"o2":{"enabled":true,"sway":0.001,"maxSway":3,"pAbr":1}}"#,
+        );
+        let params = w.rules.params.clone();
+        let tree = &mut w.trees[0];
+        for j in 0..tree.b.len() {
+            tree.b.q[j] = 1.0;
+        }
+        let (cw, ch) = (100usize, 50usize);
+        let x = tree.tip_x(0).floor() as usize;
+        let row = tree.tip_y(0).floor() as usize;
+        let mut own = vec![EMPTY; cw * ch];
+        tag_owner(&mut own, cw, x, row, tree.id as i32); // a seedling sways ≈ 0.05 cells
+        assert_eq!(abrade(tree, &own, 100.0, 50.0, false, &params, 0.0), 0.0);
+        let mut other = vec![EMPTY; cw * ch];
+        tag_owner(&mut other, cw, x, row, 7);
+        let n = tree.b.len() as f64;
+        assert_eq!(abrade(tree, &other, 100.0, 50.0, false, &params, 0.0), n);
+        assert_eq!(tree.b.state[0], bud::GONE);
+    }
+}

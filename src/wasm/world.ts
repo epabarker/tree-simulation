@@ -8,10 +8,16 @@
  * and load it with `loadWorlds` before making worlds.
  */
 
-import type { TreeMetrics } from "../core/metrics.ts";
-import type { Params, ParamsPatch } from "../core/params.ts";
-import type { Snapshot, SnapshotOptions } from "../core/snapshot.ts";
-import type { RunEvent, RunRecord } from "../core/world.ts";
+import { type Params, type ParamsPatch, speciesParams } from "../core/params.ts";
+import {
+  BUD_SCHEMA,
+  METAMER_SCHEMA,
+  type RunEvent,
+  type RunRecord,
+  type Snapshot,
+  type SnapshotOptions,
+  type TreeMetrics,
+} from "../core/types.ts";
 import type * as production from "./pkg/core.js";
 
 export type Build = "production" | "parity";
@@ -19,7 +25,7 @@ export type Build = "production" | "parity";
 export type Pkg = typeof production;
 
 const pkgs: Partial<Record<Build, Pkg>> = {};
-const loaded: Partial<Record<Build, { pkg: Pkg; memory: WebAssembly.Memory }>> = {};
+const loaded: Partial<Record<Build, { pkg: Pkg; memory: { buffer: ArrayBufferLike } }>> = {};
 
 /**
  * Makes a build loadable. `./production.ts` and `./parity.ts` register theirs, so a bundle holds
@@ -51,7 +57,7 @@ export async function loadWorlds(build: Build, url?: URL | string): Promise<void
   loaded[build] = { pkg, memory: out.memory };
 }
 
-function build(b: Build): { pkg: Pkg; memory: WebAssembly.Memory } {
+function build(b: Build): { pkg: Pkg; memory: { buffer: ArrayBufferLike } } {
   const l = loaded[b];
   if (!l) throw new Error(`The Rust core's ${b} build is not loaded: call loadWorlds first`);
   return l;
@@ -113,15 +119,212 @@ export function snapshotTransferables(s: Snapshot): ArrayBuffer[] {
   return [...new Set([s.parent.buffer, s.shadow?.buffer].filter(Boolean))] as ArrayBuffer[];
 }
 
+/** tree.rs NUMBERS, after [id, rootX, alive, discarded, sown, metamers, buds] in tree_scalars. */
+const NUMBERS = [
+  "age",
+  "nextMetamerId",
+  "nextBudId",
+  "qBase",
+  "vBase",
+  "shedCount",
+  "meanBudQ",
+  "qTop",
+  "production",
+  "maintenance",
+  "reserve",
+  "starved",
+  "reproduction",
+  "seedPool",
+  "seeds",
+  "abraded",
+  "released",
+  "epicormic",
+  "aborted",
+  "broken",
+] as const;
+
+type Schema = Record<
+  string,
+  Float64ArrayConstructor | Int32ArrayConstructor | Uint8ArrayConstructor
+>;
+type ColumnsOf<S extends Schema> = { [K in keyof S]: InstanceType<S[K]> };
+
+/** A table's rows in use, copied out of the Rust core. */
+export interface TableView<S extends Schema> {
+  length: number;
+  cols: ColumnsOf<S>;
+}
+
+/**
+ * One tree of a Rust world, read-only: its scalars and tables as the TypeScript core's Tree had
+ * them. Read lazily and again after the world steps, so a view held across seasons stays current.
+ */
+export class TreeView {
+  readonly index: number;
+  readonly world: RustWorld;
+  private at = -1;
+  private s: Float64Array<ArrayBuffer> = new Float64Array(0);
+  private tables: { m?: TableView<typeof METAMER_SCHEMA>; b?: TableView<typeof BUD_SCHEMA> } = {};
+
+  constructor(world: RustWorld, index: number) {
+    this.world = world;
+    this.index = index;
+  }
+
+  private scalars(): Float64Array<ArrayBuffer> {
+    if (this.at !== this.world.version) {
+      this.s = this.world.core().tree_scalars(this.index) as Float64Array<ArrayBuffer>;
+      this.tables = {};
+      this.at = this.world.version;
+    }
+    return this.s;
+  }
+
+  private number(k: (typeof NUMBERS)[number]): number {
+    return this.scalars()[7 + NUMBERS.indexOf(k)] as number;
+  }
+
+  private table<S extends Schema>(which: 0 | 1, schema: S, length: number): TableView<S> {
+    const cols: Record<string, ArrayLike<number>> = {};
+    Object.entries(schema).forEach(([name, Ctor], k) => {
+      const bytes = this.world.core().tree_column(this.index, which, k);
+      cols[name] = new Ctor(bytes.buffer as ArrayBuffer, bytes.byteOffset, length);
+    });
+    return { length, cols: cols as ColumnsOf<S> };
+  }
+
+  get id(): number {
+    return this.scalars()[0] as number;
+  }
+  get rootX(): number {
+    return this.scalars()[1] as number;
+  }
+  get alive(): boolean {
+    return this.scalars()[2] === 1;
+  }
+  get discarded(): boolean {
+    return this.scalars()[3] === 1;
+  }
+  get sown(): boolean {
+    return this.scalars()[4] === 1;
+  }
+  get species(): string {
+    return this.world.core().species_of(this.index);
+  }
+  get m(): TableView<typeof METAMER_SCHEMA> {
+    const n = this.scalars()[5] as number;
+    this.tables.m ??= this.table(0, METAMER_SCHEMA, n);
+    return this.tables.m;
+  }
+  get b(): TableView<typeof BUD_SCHEMA> {
+    const n = this.scalars()[6] as number;
+    this.tables.b ??= this.table(1, BUD_SCHEMA, n);
+    return this.tables.b;
+  }
+  /** R3's σ/σ_target per metamer this season. */
+  get stress(): Float64Array {
+    return this.world.core().tree_stress(this.index);
+  }
+  get age(): number {
+    return this.number("age");
+  }
+  get qBase(): number {
+    return this.number("qBase");
+  }
+  get vBase(): number {
+    return this.number("vBase");
+  }
+  get shedCount(): number {
+    return this.number("shedCount");
+  }
+  get meanBudQ(): number {
+    return this.number("meanBudQ");
+  }
+  get qTop(): number {
+    return this.number("qTop");
+  }
+  get production(): number {
+    return this.number("production");
+  }
+  get maintenance(): number {
+    return this.number("maintenance");
+  }
+  get reserve(): number {
+    return this.number("reserve");
+  }
+  get starved(): number {
+    return this.number("starved");
+  }
+  get reproduction(): number {
+    return this.number("reproduction");
+  }
+  get seedPool(): number {
+    return this.number("seedPool");
+  }
+  get seeds(): number {
+    return this.number("seeds");
+  }
+  get abraded(): number {
+    return this.number("abraded");
+  }
+  get released(): number {
+    return this.number("released");
+  }
+  get epicormic(): number {
+    return this.number("epicormic");
+  }
+  get aborted(): number {
+    return this.number("aborted");
+  }
+  get broken(): number {
+    return this.number("broken");
+  }
+
+  tipX(i: number): number {
+    const c = this.m.cols;
+    return (c.baseX[i] as number) + (c.length[i] as number) * Math.cos(c.angle[i] as number);
+  }
+
+  tipY(i: number): number {
+    const c = this.m.cols;
+    return (c.baseY[i] as number) + (c.length[i] as number) * Math.sin(c.angle[i] as number);
+  }
+}
+
+/** form.ts's FORM_COLUMNS (rust/core/src/form.rs), in order. */
+export const FORM_COLUMNS = [
+  "widestAt",
+  "profileCentre",
+  "crownFullness",
+  "forkHeight",
+  "leaderDominance",
+  "branchAngle2",
+  "limbDroop",
+  "limbUpturn",
+  "junctionDelta",
+  "ldSlope",
+  "leafStemSlope",
+] as const;
+/** Crown-form bands in `profile`. */
+export const PROFILE_BANDS = 10;
+
+/** A tree's crown form and allometry (M26): FORM_COLUMNS, and the width profile by height. */
+export type FormMetrics = Record<(typeof FORM_COLUMNS)[number], number> & { profile: number[] };
+
 export class RustWorld {
   readonly build: Build;
-  private readonly core: Pkg["World"]["prototype"];
+  /** Bumped whenever the world's state may have changed (TreeView reads again). */
+  version = 0;
+  private views: TreeView[] = [];
+  private metricsAt = -1;
+  private metricsCache: TreeMetrics[] = [];
+  private readonly inner: Pkg["World"]["prototype"];
   private paramsAt = -1;
   private cached: Params | null = null;
 
-  private constructor(b: Build, core: Pkg["World"]["prototype"]) {
+  protected constructor(b: Build, core: Pkg["World"]["prototype"]) {
     this.build = b;
-    this.core = core;
+    this.inner = core;
   }
 
   static create(params: Params, b: Build = "production"): RustWorld {
@@ -134,86 +337,140 @@ export class RustWorld {
   }
 
   save(): Uint8Array {
-    return this.core.save();
+    return this.inner.save();
   }
 
   /** Runs `seasons` seasons; `discard` frees dead trees after each (World.discardDead). */
   step(seasons = 1, discard = false): void {
-    this.core.step(seasons, discard);
+    this.inner.step(seasons, discard);
+    this.version += 1;
   }
 
   /** Runs `seasons` seasons, applying recorded events at their seasons (CLI replay). */
   run(seasons: number, events: readonly RunEvent[] = []): void {
-    this.core.run(seasons, JSON.stringify(events));
+    this.inner.run(seasons, JSON.stringify(events));
+    this.version += 1;
   }
 
   hash(): string {
-    return this.core.hash();
+    return this.inner.hash();
   }
 
   get season(): number {
-    return this.core.season();
+    return this.inner.season();
   }
 
   get storm(): boolean {
-    return this.core.storm();
+    return this.inner.storm();
   }
 
   /** The world's current params (parsed once per change). */
   get params(): Params {
-    const v = this.core.params_version();
+    const v = this.inner.params_version();
     if (!this.cached || v !== this.paramsAt) {
-      this.cached = JSON.parse(this.core.params()) as Params;
+      this.cached = JSON.parse(this.inner.params()) as Params;
       this.paramsAt = v;
     }
     return this.cached;
   }
 
   setParams(patch: ParamsPatch): void {
-    this.core.set_params(JSON.stringify(patch));
+    this.version += 1;
+    this.inner.set_params(JSON.stringify(patch));
   }
 
   removeTree(tree: number): void {
-    this.core.remove_tree(tree);
+    this.version += 1;
+    this.inner.remove_tree(tree);
   }
 
   plantTree(x: number, species?: string): void {
-    this.core.plant_tree(x, species);
+    this.version += 1;
+    this.inner.plant_tree(x, species);
   }
 
   record(): RunRecord {
-    return JSON.parse(this.core.record()) as RunRecord;
+    return JSON.parse(this.inner.record()) as RunRecord;
   }
 
   discardDead(): number {
-    return this.core.discard_dead();
+    this.version += 1;
+    return this.inner.discard_dead();
+  }
+
+  /** The world's trees, as views (read-only; current after every step). */
+  get trees(): TreeView[] {
+    const n = this.inner.tree_count();
+    for (let i = this.views.length; i < n; i++) this.views.push(new TreeView(this, i));
+    return this.views.slice(0, n);
+  }
+
+  /** The params tree `t` grows by (its species' merged over the world's, ADR 0016). */
+  paramsOf(t: TreeView | { species: string }): Params {
+    return t.species ? speciesParams(this.params, t.species) : this.params;
+  }
+
+  /** Tree `t`'s metrics this season (metrics.ts's treeMetrics, with the world for groundLight). */
+  metricsOf(t: TreeView): TreeMetrics {
+    if (this.metricsAt !== this.version) {
+      this.metricsCache = this.metrics();
+      this.metricsAt = this.version;
+    }
+    return this.metricsCache[t.index] as TreeMetrics;
+  }
+
+  /** Tree `t`'s crown form and allometry (form.ts's formMetrics, M26). */
+  formOf(t: TreeView): FormMetrics {
+    const v = this.inner.tree_form(t.index);
+    const out: Record<string, number | number[]> = {};
+    FORM_COLUMNS.forEach((k, i) => {
+      out[k] = v[i] as number;
+    });
+    out.profile = [...v.subarray(FORM_COLUMNS.length)];
+    return out as unknown as FormMetrics;
+  }
+
+  /** Mean light on the ground over columns [x0, x1], as a fraction of open sky. */
+  groundLight(x0: number, x1: number): number {
+    return this.inner.ground_light(x0, x1);
+  }
+
+  /** {q, vx, vy} of this season's light field at (x, y) for a bud heading `dir`. */
+  sample(x: number, y: number, dir: number): { q: number; vx: number; vy: number } {
+    const [q, vx, vy] = this.inner.sample(x, y, dir) as unknown as [number, number, number];
+    return { q, vx, vy };
+  }
+
+  /** The wasm-bindgen object (TreeView reads through it). */
+  core(): Pkg["World"]["prototype"] {
+    return this.inner;
   }
 
   get treeCount(): number {
-    return this.core.tree_count();
+    return this.inner.tree_count();
   }
 
   /** Every tree's metrics, dead ones too (the CLI's metrics.csv rows, the Node tools). */
   metrics(): TreeMetrics[] {
-    const n = this.core.tree_count();
-    const species = Array.from({ length: n }, (_, i) => this.core.species_of(i));
-    return metricsFrom(this.core.metrics(), species);
+    const n = this.inner.tree_count();
+    const species = Array.from({ length: n }, (_, i) => this.inner.species_of(i));
+    return metricsFrom(this.inner.metrics(), species);
   }
 
   resetSnapshots(): void {
-    this.core.reset_snapshots();
+    this.inner.reset_snapshots();
   }
 
   /** The season's snapshot, copied out of linear memory once; its arrays share one buffer. */
   snapshot(seasonMs: number, options: SnapshotOptions): Snapshot {
-    this.core.snapshot(options.junctions, options.field);
-    const [trees, nm, nb, nj, ns] = this.core.snapshot_counts() as unknown as number[];
-    const species = this.core.snapshot_species();
+    this.inner.snapshot(options.junctions, options.field);
+    const [trees, nm, nb, nj, ns] = this.inner.snapshot_counts() as unknown as number[];
+    const species = this.inner.snapshot_species();
     const { memory } = build(this.build);
     const buffer = new Uint8Array(
       memory.buffer,
-      this.core.snapshot_ptr(),
-      this.core.snapshot_len(),
+      this.inner.snapshot_ptr(),
+      this.inner.snapshot_len(),
     ).slice().buffer;
     let at = 0;
     const take = <T>(
@@ -275,6 +532,6 @@ export class RustWorld {
   }
 
   dispose(): void {
-    this.core.free();
+    this.inner.free();
   }
 }

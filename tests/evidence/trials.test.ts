@@ -1,8 +1,15 @@
 import { describe, expect, it } from "vitest";
-import { FLORA } from "./flora.ts";
-import { hashWorld } from "./hash.ts";
-import { amendSpecies, getPath, loneParams, runLone, setPath, withAssign } from "./trials.ts";
-import { speciesParams, World } from "./world.ts";
+import {
+  amendSpecies,
+  getPath,
+  loneParams,
+  runLone,
+  setPath,
+  withAssign,
+} from "../../cli/trials.ts";
+import { FLORA } from "../../src/core/flora.ts";
+import { speciesParams } from "../../src/core/params.ts";
+import { hashWorld, World } from "./rust.ts";
 
 describe("species trials and amended patches (M27)", () => {
   it("sets and reads dotted paths, array indices included", () => {

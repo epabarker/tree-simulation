@@ -1,10 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { hashWorld } from "./hash.ts";
-import { treeMetrics } from "./metrics.ts";
-import { presetParams } from "./presets.ts";
-import { SnapshotBuilder } from "./snapshot.ts";
-import { Slot, type Tree } from "./tree.ts";
-import { World } from "./world.ts";
+import { presetParams } from "../../src/core/presets.ts";
+import { Slot } from "../../src/core/types.ts";
+import { hashWorld, type Tree, treeMetrics, World } from "./rust.ts";
 
 function checkInvariants(tree: Tree): void {
   const c = tree.m.cols;
@@ -114,8 +111,8 @@ describe("discarding dead trees (the page's memory, M14)", () => {
       expect(discarded).toBeGreaterThan(5); // trees did die and were freed
       for (const t of freed.trees) if (!t.alive) expect(t.m.length + t.b.length).toBe(0);
       const lean = { junctions: false, field: false };
-      const a = new SnapshotBuilder().build(kept, 0, lean);
-      const b = new SnapshotBuilder().build(freed, 0, lean);
+      const a = kept.snapshot(0, lean);
+      const b = freed.snapshot(0, lean);
       expect(b.metamerCount).toBe(a.metamerCount);
       for (const key of ["tree", "birthId", "x0", "y0", "angle", "length", "radius"] as const) {
         expect(Array.from(b[key])).toEqual(Array.from(a[key]));

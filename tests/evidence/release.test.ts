@@ -1,10 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { type TreeMetrics, treeMetrics } from "./metrics.ts";
-import { mergeParams, type ParamsPatch } from "./params.ts";
-import { presetParams } from "./presets.ts";
-import type { Tree } from "./tree.ts";
-import { epicormic } from "./trials.ts";
-import { World } from "./world.ts";
+import { epicormic } from "../../cli/trials.ts";
+import { mergeParams, type ParamsPatch } from "../../src/core/params.ts";
+import { presetParams } from "../../src/core/presets.ts";
+import type { Tree } from "./rust.ts";
+import { type TreeMetrics, treeMetrics, World } from "./rust.ts";
 
 // M10 visible test (§7, ADR 0012): an epicormic flush after a neighbour is felled, and slender
 // stand trees. The sky presets carry R4 and R5. 5 seeds.

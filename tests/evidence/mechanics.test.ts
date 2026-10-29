@@ -1,12 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { type FixtureName, fixtureParams, isFixtureName } from "./fixtures.ts";
-import { HAND_FLORA } from "./flora.ts";
-import { limbShapes } from "./form.ts";
-import { mergeParams, type ParamsPatch, patchSpecies } from "./params.ts";
-import { PRE_R4, type PresetName, presetParams } from "./presets.ts";
-import { isLiveBud } from "./principles/c3-allocation.ts";
-import type { Tree } from "./tree.ts";
-import { World } from "./world.ts";
+import { type FixtureName, fixtureParams, isFixtureName } from "../../src/core/fixtures.ts";
+import { HAND_FLORA } from "../../src/core/flora.ts";
+import { mergeParams, type ParamsPatch, patchSpecies } from "../../src/core/params.ts";
+import { PRE_R4, type PresetName, presetParams } from "../../src/core/presets.ts";
+import type { Tree } from "./rust.ts";
+import { isLiveBud, limbShapes, World } from "./rust.ts";
 
 // M9 visible test (§7, ADR 0011): drooping limbs with upturned tips, a weeping form, Troll
 // straightening, and Δ > 2 at heavy junctions with stress-driven girth. 5 seeds each.

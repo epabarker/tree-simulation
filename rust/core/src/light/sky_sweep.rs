@@ -119,6 +119,11 @@ impl SkySweep {
         &self.vy
     }
 
+    /// The sky directions' unit vectors (x, y), this season's.
+    pub fn directions(&self) -> (&[f64], &[f64]) {
+        (&self.dir_x, &self.dir_y)
+    }
+
     pub fn weights(&self) -> &[f64] {
         &self.weight
     }
@@ -619,5 +624,317 @@ mod tests {
         assert_eq!(s.lad()[4 * 10 + 2], 2.0);
         s.clear();
         assert!(s.lad().iter().all(|&l| l == 0.0));
+    }
+
+    // The TypeScript sweep's tests (src/core/light/sky-sweep.test.ts until I1), on the default c2.
+
+    const UP: f64 = std::f64::consts::FRAC_PI_2;
+
+    fn base() -> SkyParams {
+        SkyParams {
+            k: 7.0,
+            k_ext: 0.5,
+            sky_exponent: 1.0,
+            sky_tilt: 0.0,
+            min_elevation: 15.0,
+            c: 1.0,
+            rotate: false,
+            columns: false,
+        }
+    }
+
+    fn sky(w: usize, h: usize, p: SkyParams) -> SkySweep {
+        SkySweep::new(w, h, p, false)
+    }
+
+    fn close(a: f64, b: f64) -> bool {
+        (a - b).abs() < 1e-12
+    }
+
+    #[test]
+    fn full_light_and_an_upward_v_under_an_empty_symmetric_sky() {
+        let mut g = sky(12, 10, base());
+        g.clear();
+        g.compute(0.0);
+        for (x, y) in [(0.5, 0.5), (6.5, 4.5), (11.5, 9.5)] {
+            let (q, vx, vy) = g.sample(x, y, UP);
+            assert!(close(q, 1.0) && close(vx, 0.0) && close(vy, 1.0));
+        }
+    }
+
+    #[test]
+    fn attenuates_exactly_by_beer_lambert_along_a_vertical_ray() {
+        let mut g = sky(11, 10, SkyParams { k: 1.0, ..base() }); // zenith only
+        g.deposit(5.5, 8.5, 1.0);
+        g.deposit(5.5, 8.5, 1.0);
+        g.deposit(5.5, 7.5, 1.0);
+        g.compute(0.0);
+        assert!(close(g.sample(5.5, 6.5, UP).0, (-0.5f64 * 3.0).exp()));
+        assert!(close(g.sample(4.5, 6.5, UP).0, 1.0)); // the next column is unshaded
+    }
+
+    #[test]
+    fn a_cells_own_foliage_does_not_shade_its_buds() {
+        let mut g = sky(11, 10, SkyParams { k: 1.0, ..base() });
+        for _ in 0..4 {
+            g.deposit(5.5, 5.5, 1.0);
+        }
+        g.compute(0.0);
+        assert!(close(g.sample(5.5, 5.5, UP).0, 1.0));
+        assert!(close(g.sample(5.5, 4.5, UP).0, (-0.5f64 * 4.0).exp()));
+    }
+
+    #[test]
+    fn attenuates_shallow_rays_exactly_through_a_full_height_column() {
+        let p = SkyParams {
+            k: 2.0,
+            min_elevation: 20.0,
+            ..base()
+        };
+        let mut g = sky(20, 12, p); // two shallow rays, 20° and 160°
+        for row in 0..12 {
+            for _ in 0..3 {
+                g.deposit(12.5, row as f64 + 0.5, 1.0);
+            }
+        }
+        g.compute(0.0);
+        let (q, vx, _) = g.sample(11.5, 5.5, UP); // just left of the column
+        let step = 1.0 / (20.0f64 * (std::f64::consts::PI / 180.0)).cos();
+        assert!(close(q, 0.5 * (-0.5 * 3.0 * step).exp() + 0.5));
+        assert!(vx < 0.0); // brighter sky to the left
+    }
+
+    #[test]
+    fn v_turns_away_from_foliage_to_one_side() {
+        let mut g = sky(30, 20, base());
+        for row in 4..20 {
+            for col in 4..12 {
+                g.deposit(col as f64 + 0.5, row as f64 + 0.5, 1.0);
+            }
+        }
+        g.compute(0.0);
+        let (q, vx, _) = g.sample(14.5, 3.5, UP); // right of and below a dense block
+        assert!(q < 1.0 && vx > 0.1);
+    }
+
+    #[test]
+    fn sky_light_comes_in_through_the_sides_but_nothing_grows_outside() {
+        let mut g = sky(20, 20, base());
+        for row in 0..20 {
+            for col in 2..20 {
+                g.deposit(col as f64 + 0.5, row as f64 + 0.5, 1.0);
+            }
+        }
+        g.compute(0.0);
+        let (q, vx, _) = g.sample(0.5, 2.5, UP);
+        assert!(q > 0.1 && vx < 0.0); // light from beyond the left side
+        assert_eq!(g.sample(-0.5, 2.5, UP).0, 0.0);
+        assert_eq!(g.sample(5.0, 20.5, UP).0, 0.0);
+    }
+
+    #[test]
+    fn a_tilted_sky_brightens_its_side() {
+        let mut g = sky(
+            12,
+            10,
+            SkyParams {
+                sky_tilt: 0.6,
+                ..base()
+            },
+        );
+        g.compute(0.0);
+        let (q, vx, _) = g.sample(6.5, 4.5, UP);
+        assert!(close(q, 1.0)); // weights still sum to C
+        assert!(vx > 0.1);
+    }
+
+    #[test]
+    fn rotation_moves_the_directions_each_season_keeping_the_sum_of_weights() {
+        let mut g = sky(
+            12,
+            10,
+            SkyParams {
+                rotate: true,
+                ..base()
+            },
+        );
+        let lo = 15.0 * std::f64::consts::PI / 180.0;
+        let mut angles: Vec<Vec<f64>> = Vec::new();
+        for season in [0.0, 1.0, 2.0, 7.0] {
+            g.clear();
+            g.compute(season);
+            assert!(close(g.sample(6.5, 4.5, UP).0, 1.0));
+            let (dx, dy) = g.directions();
+            let theta: Vec<f64> = dx.iter().zip(dy).map(|(x, y)| y.atan2(*x)).collect();
+            for &t in &theta {
+                assert!(t >= lo - 1e-12 && t <= std::f64::consts::PI - lo + 1e-12);
+            }
+            angles.push(theta);
+        }
+        assert_ne!(angles[1], angles[0]);
+        assert_ne!(angles[3], angles[2]);
+        // Without rotate the M6 grid stays put whatever the season.
+        let mut fixed = sky(12, 10, base());
+        fixed.compute(0.0);
+        let before = fixed.directions().0.to_vec();
+        fixed.compute(5.0);
+        assert_eq!(fixed.directions().0, &before[..]);
+    }
+
+    #[test]
+    fn a_ring_is_translation_invariant_across_the_seam() {
+        let (w, h) = (30, 40);
+        let mut a = SkySweep::new(w, h, base(), true);
+        let mut b = SkySweep::new(w, h, base(), true);
+        let shift = 27; // pushes part of the blob across the right edge
+        for (x, y) in [(3, 20), (4, 20), (4, 21), (5, 25)] {
+            a.deposit(x as f64 + 0.5, y as f64 + 0.5, 2.0);
+            b.deposit((x + shift) as f64 + 0.5, y as f64 + 0.5, 2.0);
+        }
+        a.compute(0.0);
+        b.compute(0.0);
+        for col in 0..w {
+            for row in [0, 10, 19, 30] {
+                let q = a.q()[row * w + col];
+                assert!((b.q()[row * w + (col + shift) % w] - q).abs() < 1e-9);
+            }
+        }
+    }
+
+    #[test]
+    fn no_side_light_under_a_full_width_layer_on_a_ring() {
+        let (w, h) = (20, 60);
+        let mut g = SkySweep::new(w, h, base(), true);
+        let mut open = sky(w, h, base());
+        for f in [&mut g, &mut open] {
+            for col in 0..w {
+                f.deposit(col as f64 + 0.5, 30.5, 1.0);
+            }
+            f.compute(0.0);
+        }
+        let q0 = g.q()[5 * w];
+        for col in 0..w {
+            assert!((g.q()[5 * w + col] - q0).abs() < 1e-9);
+        }
+        assert!(q0 < 0.75); // the layer shades every ray
+        // With open sides, low rays from beyond the edge reach the floor at the edge columns.
+        assert!(open.q()[5 * w] > q0 + 0.05);
+    }
+
+    #[test]
+    fn a_taller_season_is_forgotten() {
+        for periodic in [false, true] {
+            let mut reused = SkySweep::new(24, 40, base(), periodic);
+            let mut fresh = SkySweep::new(24, 40, base(), periodic);
+            for row in 10..36 {
+                reused.deposit(12.5, row as f64 + 0.5, 2.0);
+            }
+            reused.compute(0.0);
+            reused.clear();
+            for f in [&mut reused, &mut fresh] {
+                for col in 8..16 {
+                    f.deposit(col as f64 + 0.5, 6.5, 2.0);
+                }
+                f.compute(1.0);
+            }
+            assert_eq!(reused.q(), fresh.q());
+            assert_eq!(reused.vx(), fresh.vx());
+            assert_eq!(reused.field().to_vec(), fresh.field().to_vec());
+        }
+    }
+
+    #[test]
+    fn samples_and_deposits_wrap_beyond_the_sides_of_a_ring() {
+        let mut g = SkySweep::new(10, 10, base(), true);
+        g.deposit(12.5, 5.5, 3.0); // lands in column 2
+        g.compute(0.0);
+        assert_eq!(g.lad()[5 * 10 + 2], 3.0);
+        let (q, _, _) = g.sample(-7.5, 2.5, UP); // column 2
+        assert!(close(q, g.q()[2 * 10 + 2]) && q > 0.0);
+    }
+
+    /// A patchy canopy: clumps of foliage of varied density, the same in every run.
+    fn canopy(s: &mut SkySweep) {
+        let mut h: u64 = 7;
+        for y in 10..26 {
+            for x in 4..s.width() - 4 {
+                h = (h * 1103515245 + 12345) % 2147483648;
+                if h % 5 < 2 {
+                    s.deposit(x as f64 + 0.5, y as f64 + 0.5, 0.5 + (h % 7) as f64 / 4.0);
+                }
+            }
+        }
+    }
+
+    /// The exact optical depth from a cell's top edge to the sky, in fine steps along each ray.
+    fn exact_q(s: &SkySweep, col: usize, row: usize) -> f64 {
+        let (dx, dy) = s.directions();
+        let (w, h) = (s.width() as f64, s.height() as f64);
+        let mut q = 0.0;
+        for k in 0..s.weights().len() {
+            let mut t = 0.0;
+            let step = 0.01;
+            let (mut x, mut y) = (col as f64 + 0.5, row as f64 + 1.0 + 1e-9);
+            while y < h && x >= 0.0 && x < w {
+                t += s.lad()[y.floor() as usize * s.width() + x.floor() as usize] * step;
+                x += dx[k] * step;
+                y += dy[k] * step;
+            }
+            q += s.weights()[k] * (-0.5 * t).exp();
+        }
+        q
+    }
+
+    #[test]
+    fn the_row_march_is_closer_to_an_exact_trace_than_the_column_sweep() {
+        let error = |columns: bool| {
+            let mut s = sky(48, 32, SkyParams { columns, ..base() });
+            canopy(&mut s);
+            s.compute(0.0);
+            let mut sum = 0.0;
+            for row in (0..26).step_by(3) {
+                for col in (0..s.width()).step_by(3) {
+                    sum += (s.q()[row * s.width() + col] - exact_q(&s, col, row)).abs();
+                }
+            }
+            sum
+        };
+        // Measured: about two thirds of the column sweep's error.
+        assert!(error(false) < 0.85 * error(true));
+    }
+
+    #[test]
+    fn mirrored_foliage_gives_the_mirrored_field() {
+        let mut s = sky(40, 30, base());
+        for y in 8..18 {
+            for x in 14..26 {
+                s.deposit(x as f64 + 0.5, y as f64 + 0.5, 1.0);
+            }
+        }
+        s.compute(0.0);
+        for y in 0..30 {
+            for x in 0..40 {
+                let (a, b) = (y * 40 + x, y * 40 + 39 - x);
+                assert!((s.q()[a] - s.q()[b]).abs() < 1e-12);
+                assert!((s.vx()[a] + s.vx()[b]).abs() < 1e-12);
+            }
+        }
+    }
+
+    #[test]
+    fn a_ring_is_swept_in_one_pass_however_far_shallow_rays_run() {
+        let p = SkyParams {
+            min_elevation: 10.0,
+            ..base()
+        };
+        let mut s = SkySweep::new(6, 40, p, true);
+        for x in 0..6 {
+            s.deposit(x as f64 + 0.5, 20.5, 1.0);
+        }
+        s.compute(0.0);
+        for x in 1..6 {
+            assert!((s.q()[5 * 6 + x] - s.q()[5 * 6]).abs() < 1e-12);
+        }
+        assert!(s.q()[5 * 6] < 1.0);
     }
 }

@@ -237,3 +237,40 @@ pub fn grow_shoot(
         j += 1.0;
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::testing::preset;
+
+    #[test]
+    fn the_juvenile_cap_rises_from_one_metamer_to_the_full_cap_at_h_j() {
+        let row = r#"{"lambda":0.5,"setPoint":0,"eta":0.15,"branchAngle":45,"generator":"distichous","tierEvery":0,"pTerm":0}"#;
+        let p = Params::from_json(&preset(
+            "default",
+            &format!(r#"{{"r2":{{"enabled":true,"levels":[{row}],"hJ":20}}}}"#),
+        ));
+        let max = p.c1.max_metamers_per_shoot;
+        assert_eq!(juvenile_cap(0.0, &p), 1.0);
+        assert!((juvenile_cap(10.0, &p) - (1.0 + (max - 1.0) / 2.0)).abs() < 1e-12);
+        assert_eq!(juvenile_cap(20.0, &p), max);
+        assert_eq!(juvenile_cap(80.0, &p), max);
+        // Off: h_j absent, or R2 off.
+        let no_hj = Params::from_json(&preset(
+            "default",
+            &format!(r#"{{"r2":{{"enabled":true,"levels":[{row}]}}}}"#),
+        ));
+        assert_eq!(juvenile_cap(0.0, &no_hj), max);
+        let mut off = p.clone();
+        off.r2.enabled = false;
+        assert_eq!(juvenile_cap(0.0, &off), max);
+    }
+
+    #[test]
+    fn a_fractional_cap_gives_one_longer_metamer() {
+        let p = Params::from_json(&preset("default", "{}"));
+        let mut length = 0.0;
+        assert_eq!(shoot_size(10.0, &p, &mut length, 1.5), 1.0);
+        assert!((length - 1.5 * p.c1.internode_length).abs() < 1e-12);
+    }
+}

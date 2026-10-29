@@ -89,3 +89,56 @@ pub fn neighbour_share(
         0.0
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::params::Params;
+    use crate::principles::c1::plant_seedling;
+    use crate::season::grow_buds;
+    use crate::testing::preset;
+    use crate::tree::{Tree, bud};
+
+    fn close(a: f64, b: f64) -> bool {
+        (a - b).abs() < 1e-12
+    }
+
+    #[test]
+    fn maps_shade_to_elongation_leader_bias_and_a_more_upright_set_point() {
+        let off = Params::from_json(&preset("default", "{}")).r5;
+        let r5 = R5 {
+            enabled: true,
+            e_s: 0.4,
+            d_lambda: 0.05,
+            d_a: 0.5,
+            ..off.clone()
+        };
+        assert_eq!(shade_of(0.25, 1.0), 0.75);
+        assert_eq!(shade_of(2.0, 1.0), 0.0);
+        assert!(close(elongation(0.5, &r5), 1.2));
+        assert!(close(shaded_lambda(0.5, 0.5, &r5), 0.525));
+        assert_eq!(shaded_lambda(0.98, 1.0, &r5), 0.99);
+        assert!(close(set_point_scale(0.5, &r5), 0.75));
+        assert_eq!(elongation(1.0, &off), 1.0);
+        assert_eq!(shaded_lambda(0.5, 1.0, &off), 0.5);
+        assert_eq!(set_point_scale(1.0, &off), 1.0);
+    }
+
+    #[test]
+    fn lengthens_a_shaded_buds_internodes() {
+        let p = Params::from_json(&preset("default", r#"{"r5":{"enabled":true,"eS":0.5}}"#));
+        let mut t = Tree::new(0, 10.0);
+        plant_seedling(&mut t, &p, 0.0, 0.0);
+        t.ensure_scratch();
+        t.b.state[1] = bud::ACTIVE;
+        t.b.q[0] = 1.0; // open sky: s = 0
+        t.b.q[1] = 0.2; // s = 0.8
+        t.b.v[0] = 1.0;
+        t.b.v[1] = 1.0;
+        grow_buds(&mut t, &p, 0.0);
+        let mut lengths = [t.m.length[1], t.m.length[2]];
+        lengths.sort_by(|a, b| a.partial_cmp(b).unwrap());
+        assert!(close(lengths[0], 1.0));
+        assert!(close(lengths[1], 1.4));
+    }
+}

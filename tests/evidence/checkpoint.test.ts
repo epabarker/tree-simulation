@@ -1,8 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { loadWorld, saveWorld } from "./checkpoint.ts";
-import { hashWorld } from "./hash.ts";
-import { presetParams } from "./presets.ts";
-import { World } from "./world.ts";
+import { presetParams } from "../../src/core/presets.ts";
+import { hashWorld, loadWorld, saveWorld, World } from "./rust.ts";
 
 describe("world checkpoints (M21)", () => {
   it("restores at season N so that k more seasons match N + k from scratch", () => {

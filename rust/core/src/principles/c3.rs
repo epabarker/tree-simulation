@@ -175,3 +175,43 @@ fn sum_resource_basipetally(tree: &mut Tree) {
         m.v_in[p] += m.v_in[i];
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::testing::preset;
+    use crate::world::World;
+
+    fn close(a: f64, b: f64) -> bool {
+        (a - b).abs() < 1e-12
+    }
+
+    #[test]
+    fn splits_v_by_lambda_q_main_to_one_minus_lambda_q_lateral() {
+        assert_eq!(bh_main_share(10.0, 1.0, 1.0, 0.5), 5.0);
+        assert!(close(bh_main_share(10.0, 1.0, 1.0, 0.6), 6.0));
+        assert!(close(bh_main_share(10.0, 3.0, 1.0, 0.5), 7.5));
+        assert_eq!(bh_main_share(10.0, 1.0, 0.0, 0.3), 10.0); // no lateral light: all to the main axis
+        assert_eq!(bh_main_share(10.0, 0.0, 1.0, 0.7), 0.0);
+        assert_eq!(bh_main_share(10.0, 0.0, 0.0, 0.5), 0.0); // no light at all
+    }
+
+    #[test]
+    fn splits_conservatively_at_every_node() {
+        // M2: the three slot shares sum to the inflow, at every row of the last allocation.
+        let mut world = World::new(preset("bh", "{}"));
+        world.run(15, &[]);
+        let t = &world.trees[0];
+        let mut checked = 0;
+        for i in 0..t.m.len() {
+            let v = t.m.v_in[i];
+            if v <= 0.0 {
+                continue; // rows grown this season have vIn = 0
+            }
+            let total = t.v_slot[3 * i] + t.v_slot[3 * i + 1] + t.v_slot[3 * i + 2];
+            assert!((total - v).abs() < 1e-9, "row {i}: {total} vs {v}");
+            checked += 1;
+        }
+        assert!(checked > 50);
+    }
+}

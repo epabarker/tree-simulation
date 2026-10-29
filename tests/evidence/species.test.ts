@@ -1,10 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { type FixtureName, fixtureParams } from "./fixtures.ts";
-import { type TreeMetrics, treeMetrics } from "./metrics.ts";
-import { mergeParams, type ParamsPatch } from "./params.ts";
-import { M6_LIGHT, PRE_R1 } from "./presets.ts";
-import type { Tree } from "./tree.ts";
-import { World } from "./world.ts";
+import { type FixtureName, fixtureParams } from "../../src/core/fixtures.ts";
+import { mergeParams, type ParamsPatch } from "../../src/core/params.ts";
+import { M6_LIGHT, PRE_R1 } from "../../src/core/presets.ts";
+import type { Tree } from "./rust.ts";
+import { type TreeMetrics, treeMetrics, World } from "./rust.ts";
 
 /** These checks are the M6–M7 evidence, so they run the retired presets (fixtures.ts) as they were before R1 and R3, under the M6 light sweep. */
 const presetParams = (name: FixtureName, seed?: number) =>

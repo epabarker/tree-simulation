@@ -1,8 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { treeMetrics } from "./metrics.ts";
-import { presetParams } from "./presets.ts";
-import type { Tree } from "./tree.ts";
-import { World } from "./world.ts";
+import { presetParams } from "../../src/core/presets.ts";
+import type { Tree } from "./rust.ts";
+import { treeMetrics, World } from "./rust.ts";
 
 const SEEDS = [1, 2, 3, 4, 5];
 const metricsOf = (world: World, id: number) => treeMetrics(world.trees[id] as Tree);

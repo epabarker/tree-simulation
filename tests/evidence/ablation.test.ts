@@ -1,9 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { treeMetrics } from "./metrics.ts";
-import { mergeParams, type ParamsPatch } from "./params.ts";
-import { presetParams } from "./presets.ts";
-import { BudState, type Tree } from "./tree.ts";
-import { World } from "./world.ts";
+import { mergeParams, type ParamsPatch } from "../../src/core/params.ts";
+import { presetParams } from "../../src/core/presets.ts";
+import { BudState } from "../../src/core/types.ts";
+import { type Tree, treeMetrics, World } from "./rust.ts";
 
 // The §8 ablations (M22): switch one rule off and check the predicted change, against the same
 // runs with every rule on. Measured values are in docs/experiments/2026-10-28-m22-ablations.md.

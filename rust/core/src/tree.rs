@@ -468,6 +468,24 @@ mod tests {
     }
 
     #[test]
+    fn adds_zeroed_rows_and_compacts_in_order() {
+        let mut t = Metamers::default();
+        for i in 0..10 {
+            let r = t.add();
+            assert_eq!(t.base_x[r], 0.0);
+            t.birth_id[r] = i;
+            t.base_x[r] = i as f64 * 1.5;
+        }
+        let keep: Vec<u8> = (0..10).map(|i| if i % 3 == 0 { 0 } else { 1 }).collect();
+        let map = t.compact(&keep);
+        assert_eq!(t.birth_id, vec![1, 2, 4, 5, 7, 8]);
+        assert_eq!(map, vec![-1, 0, 1, -1, 2, 3, -1, 4, 5, -1]);
+        // A reused row must not keep stale values from before compaction.
+        let r = t.add();
+        assert_eq!((t.birth_id[r], t.base_x[r]), (0, 0.0));
+    }
+
+    #[test]
     fn stores_wrap_as_typed_arrays_do() {
         assert_eq!(store_u8(256.0), 0);
         assert_eq!(store_u8(-1.0), 255);

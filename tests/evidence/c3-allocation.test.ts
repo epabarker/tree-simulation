@@ -1,20 +1,11 @@
+/**
+ * C3 evidence (M2) on the Rust core. The split itself, and its conservation at every node, are
+ * tested in rust/core/src/principles/c3.rs.
+ */
 import { describe, expect, it } from "vitest";
-import { mergeParams } from "../params.ts";
-import { presetParams } from "../presets.ts";
-import type { Tree } from "../tree.ts";
-import { World } from "../world.ts";
-import { bhMainShare, isLiveBud } from "./c3-allocation.ts";
-
-describe("C3 Borchert–Honda split (§C3.4)", () => {
-  it("splits v by λQ_m : (1 − λ)Q_l", () => {
-    expect(bhMainShare(10, 1, 1, 0.5)).toBe(5);
-    expect(bhMainShare(10, 1, 1, 0.6)).toBeCloseTo(6, 12);
-    expect(bhMainShare(10, 3, 1, 0.5)).toBeCloseTo(7.5, 12);
-    expect(bhMainShare(10, 1, 0, 0.3)).toBe(10); // no lateral light: all to the main axis
-    expect(bhMainShare(10, 0, 1, 0.7)).toBe(0);
-    expect(bhMainShare(10, 0, 0, 0.5)).toBe(0); // no light at all
-  });
-});
+import { mergeParams } from "../../src/core/params.ts";
+import { presetParams } from "../../src/core/presets.ts";
+import { isLiveBud, type Tree, World } from "./rust.ts";
 
 function liveBudResource(tree: Tree): number[] {
   const b = tree.b.cols;
@@ -44,20 +35,6 @@ describe("M2: Borchert–Honda allocation", () => {
       expect(tree.vBase).toBeCloseTo(world.params.c3.alpha * tree.qBase, 9);
       expect(tree.m.cols.vIn[0]).toBeCloseTo(tree.vBase, 9);
     }
-  });
-
-  it("splits conservatively at every node: the three slot shares sum to the inflow", () => {
-    const tree = treeAfter("bh", 15);
-    const { vIn } = tree.m.cols;
-    let checked = 0;
-    // Rows that existed during the last allocation (new rows have vIn = 0).
-    for (let i = 0; i < tree.m.length; i++) {
-      if (vIn[i] <= 0) continue;
-      const total = tree.vSlot[3 * i] + tree.vSlot[3 * i + 1] + tree.vSlot[3 * i + 2];
-      expect(total).toBeCloseTo(vIn[i], 9);
-      checked += 1;
-    }
-    expect(checked).toBeGreaterThan(50);
   });
 
   it("gives every live bud the same share in the 'equal' ablation (§8)", () => {

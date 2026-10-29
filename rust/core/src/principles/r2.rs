@@ -137,3 +137,99 @@ pub fn acrotony_weights(tree: &mut Tree, params: &Params) -> bool {
     }
     true
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::params::Params;
+    use crate::testing::preset;
+
+    /// The default params with R2 on and `levels` (each a JSON row over the baseline row).
+    pub fn with_r2(levels: &[&str], extra: &str) -> Params {
+        let rows: Vec<String> = levels
+            .iter()
+            .map(|r| {
+                let base = r#"{"lambda":0.5,"setPoint":0,"eta":0.15,"branchAngle":45,"generator":"distichous","tierEvery":0,"pTerm":0}"#;
+                let row = crate::json::merge(&crate::json::parse(base).unwrap(), &crate::json::parse(r).unwrap());
+                crate::json::stringify(&row, false)
+            })
+            .collect();
+        let extra = extra.trim_start_matches('{').trim_end_matches('}');
+        let sep = if extra.is_empty() { "" } else { "," };
+        let patch = format!(
+            r#"{{"r2":{{"enabled":true,"levels":[{}]{sep}{extra}}}}}"#,
+            rows.join(",")
+        );
+        Params::from_json(&preset("default", &patch))
+    }
+
+    #[test]
+    fn places_lateral_buds_by_the_axis_generator() {
+        let p = with_r2(
+            &[
+                r#"{"generator":"whorled"}"#,
+                r#"{"generator":"whorled","tierEvery":3}"#,
+                r#"{"generator":"opposite"}"#,
+                r#"{"generator":"none"}"#,
+            ],
+            "",
+        );
+        let r2 = &p.r2;
+        assert_eq!(lateral_count(0.0, 4.0, false, r2), 0); // whorled: only where a growth unit starts
+        assert_eq!(lateral_count(0.0, 4.0, true, r2), 2);
+        let tiers: Vec<u8> = (0..6)
+            .map(|k| lateral_count(1.0, k as f64, false, r2))
+            .collect();
+        assert_eq!(tiers, vec![0, 0, 2, 0, 0, 2]);
+        assert_eq!(lateral_count(2.0, 0.0, false, r2), 2);
+        assert_eq!(lateral_count(3.0, 0.0, true, r2), 0);
+        assert_eq!(lateral_count(7.0, 0.0, true, r2), 0); // pa is capped at the last row
+        let off = Params::from_json(&preset("default", "{}"));
+        assert_eq!(lateral_count(0.0, 0.0, true, &off.r2), 1); // off: the distichous baseline
+    }
+
+    #[test]
+    fn reads_lambda_by_pa_and_lowers_it_after_age_a_c() {
+        let p = with_r2(
+            &[r#"{"lambda":0.56}"#, r#"{"lambda":0.52}"#],
+            r#""aC":10,"dLambda":0.06,"ramp":20"#,
+        );
+        assert_eq!(lambda_at(0.0, 5.0, &p), 0.56);
+        assert_eq!(lambda_at(3.0, 10.0, &p), 0.52);
+        assert!((lambda_at(0.0, 20.0, &p) - 0.53).abs() < 1e-12);
+        assert!((lambda_at(0.0, 100.0, &p) - 0.5).abs() < 1e-12);
+        let off = Params::from_json(&preset("default", "{}"));
+        assert_eq!(lambda_at(0.0, 100.0, &off), off.c3.lambda);
+    }
+
+    #[test]
+    fn terminates_shoots_with_probability_p_term_deterministically() {
+        let p = with_r2(
+            &[r#"{"pTerm":0}"#, r#"{"pTerm":1}"#, r#"{"pTerm":0.5}"#],
+            "",
+        );
+        let ids: Vec<f64> = (0..2000).map(|i| i as f64).collect();
+        assert!(!ids.iter().any(|&id| terminates(0.0, 0.0, id, 3.0, &p)));
+        assert!(ids.iter().all(|&id| terminates(1.0, 0.0, id, 3.0, &p)));
+        let half = ids
+            .iter()
+            .filter(|&&id| terminates(2.0, 0.0, id, 3.0, &p))
+            .count() as f64
+            / ids.len() as f64;
+        assert!(half > 0.45 && half < 0.55, "{half}");
+    }
+
+    #[test]
+    fn gives_each_pa_its_own_set_point_and_eta() {
+        let p = with_r2(
+            &[r#"{"setPoint":0,"eta":0.4}"#, r#"{"setPoint":85,"eta":2}"#],
+            "",
+        );
+        assert_eq!(direction_params(&p, 0.0).set_point, 0.0);
+        let one = direction_params(&p, 1.0);
+        assert_eq!((one.set_point, one.eta, one.xi), (85.0, 2.0, p.c4.xi));
+        assert_eq!(direction_params(&p, 4.0).set_point, 85.0);
+        let off = Params::from_json(&preset("default", "{}"));
+        assert_eq!(direction_params(&off, 3.0).set_point, off.c4.set_point);
+    }
+}

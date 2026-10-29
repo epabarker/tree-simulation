@@ -1,7 +1,7 @@
 /**
  * Why the lone willow stops growing, then loses height (M27 diagnosis;
  * docs/experiments/2026-10-28-m27-height-curves.md). Four tables over the standard trials
- * (src/core/trials.ts):
+ * (cli/trials.ts), on the Rust core's parity build (I1):
  *
  * 1. willow's height at seasons 30 and 60 with one cause switched off at a time;
  * 2. the topmost metamers at each willow's peak: shed by season 60, or still there and lower (sag);
@@ -12,14 +12,13 @@
  *   node cli/height-diagnosis.ts            # about two minutes
  */
 
-import { treeMetrics } from "../src/core/metrics.ts";
-import type { Tree } from "../src/core/tree.ts";
-import { loneParams, standParams, withAssign } from "../src/core/trials.ts";
-import { speciesParams, World } from "../src/core/world.ts";
+import { speciesParams } from "../src/core/params.ts";
+import type { TreeView as Tree, RustWorld as World } from "../src/wasm/world.ts";
+import { loneParams, newWorld, standParams, withAssign } from "./trials.ts";
 
 const SEEDS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 const mean = (xs: number[]): number => xs.reduce((a, b) => a + b, 0) / xs.length;
-const height = (w: World, t: Tree): number => treeMetrics(t, w).height;
+const height = (w: World, t: Tree): number => w.metricsOf(t).height;
 
 /** Path length from the base to the highest tip, over the tree's height. */
 function pathOverHeight(t: Tree): number {
@@ -58,7 +57,7 @@ function ablations(): void {
     const h60: number[] = [];
     const path: number[] = [];
     for (const seed of SEEDS) {
-      const w = new World(withAssign(loneParams("willow", seed), "willow", assign));
+      const w = newWorld(withAssign(loneParams("willow", seed), "willow", assign));
       const t = w.trees[0] as Tree;
       w.run(30);
       h30.push(height(w, t));
@@ -78,7 +77,7 @@ function ablations(): void {
 function sagOrShed(): void {
   console.log("\n2. the 20 highest metamers at each willow's peak, at season 60");
   for (const seed of SEEDS) {
-    const w = new World(loneParams("willow", seed));
+    const w = newWorld(loneParams("willow", seed));
     const t = w.trees[0] as Tree;
     let peak = 0;
     let peakSeason = 0;
@@ -124,13 +123,13 @@ function curves(): void {
       const s30: number[] = [];
       const s60: number[] = [];
       for (const seed of SEEDS.slice(0, 5)) {
-        const lone = new World(withAssign(loneParams(sp, seed), sp, assign));
+        const lone = newWorld(withAssign(loneParams(sp, seed), sp, assign));
         const t = lone.trees[0] as Tree;
         lone.run(30);
         l30.push(height(lone, t));
         lone.run(30);
         l60.push(height(lone, t));
-        const stand = new World(withAssign(standParams(sp, seed), sp, assign));
+        const stand = newWorld(withAssign(standParams(sp, seed), sp, assign));
         const top = (): number =>
           Math.max(...stand.trees.slice(2, -2).map((tr) => (tr.alive ? height(stand, tr) : 0)));
         stand.run(30);
@@ -152,7 +151,7 @@ function standTop(sp: string, assign: Record<string, unknown>): string {
   const at = [30, 60, 100];
   const hs: number[][] = at.map(() => []);
   for (const seed of SEEDS.slice(0, 3)) {
-    const w = new World(withAssign(standParams(sp, seed), sp, assign));
+    const w = newWorld(withAssign(standParams(sp, seed), sp, assign));
     let s = 0;
     at.forEach((season, k) => {
       w.run(season - s);

@@ -18,6 +18,7 @@
  */
 
 import { createInterface } from "node:readline";
+import { speciesParams } from "../src/core/params.ts";
 import {
   amendSpecies,
   getPath,
@@ -27,8 +28,7 @@ import {
   runRelease,
   runShade,
   runStand,
-} from "../src/core/trials.ts";
-import { speciesParams } from "../src/core/world.ts";
+} from "./trials.ts";
 
 interface Request {
   id: number;

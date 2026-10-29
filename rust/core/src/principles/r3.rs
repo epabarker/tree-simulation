@@ -214,3 +214,207 @@ pub fn update_mechanics(tree: &mut Tree, params: &Params, storm: bool, season: f
         tree.scratch_u = breaks;
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::principles::c1::{add_bud, add_metamer};
+    use crate::principles::c6::{junction_exponents, update_girth};
+    use crate::testing::preset;
+    use crate::tree::bud;
+
+    fn params(r3: &str, extra: &str) -> Params {
+        let base = preset(
+            "default",
+            r#"{"c6":{"enabled":true},"r3":{"enabled":true,"posture":false,"girthGain":0}}"#,
+        );
+        let v = crate::json::merge(
+            &base,
+            &crate::json::parse(&format!(r#"{{"r3":{r3}}}"#)).unwrap(),
+        );
+        Params::from_json(&crate::json::merge(&v, &crate::json::parse(extra).unwrap()))
+    }
+
+    /// A horizontal limb of `n` metamers pointing right from x = 10, radius r, one leafy tip bud.
+    fn limb(n: usize, r: f64) -> Tree {
+        let mut t = Tree::new(0, 10.0);
+        let mut parent: i32 = -1;
+        for _ in 0..n {
+            parent = add_metamer(&mut t, parent, slot::MAIN, 0.0, 1.0, r, 0.0) as i32;
+        }
+        add_bud(&mut t, parent as usize, slot::MAIN, 0.0, 0.0);
+        t.ensure_scratch();
+        for i in 0..n {
+            t.prev_radius[i] = r;
+        }
+        t
+    }
+
+    fn second_moment(r: f64) -> f64 {
+        (PI * r.powi(4)) / 4.0
+    }
+
+    fn close(a: f64, b: f64, eps: f64) -> bool {
+        (a - b).abs() < eps
+    }
+
+    #[test]
+    fn bends_each_metamer_by_its_moment_and_carries_children_along() {
+        let p = params(r#"{"sag":"creep","phi":0.5,"E":1e4,"leafMass":0.01}"#, "{}");
+        let r = 0.1;
+        let mut t = limb(2, r);
+        update_mechanics(&mut t, &p, false, 0.0);
+        let wood = PI * r * r;
+        let m1 = wood * 0.5 + 0.01; // the second metamer about its own base (x = 11)
+        let m0 = wood * 0.5 + wood * 1.5 + 0.01 * 2.0; // the first about the root
+        assert!(close(t.m.moment[1], m1, 1e-12) && close(t.m.moment[0], m0, 1e-12));
+        let turn0 = (-0.5 * m0) / (1e4 * second_moment(r));
+        let turn1 = (-0.5 * m1) / (1e4 * second_moment(r));
+        assert!(close(t.m.angle[0], turn0, 1e-12)); // clockwise: the limb droops
+        assert!(close(t.m.angle[1], turn0 + turn1, 1e-12));
+        assert!(close(t.m.base_x[1], 10.0 + turn0.cos(), 1e-12));
+        assert!(close(t.m.base_y[1], turn0.sin(), 1e-12));
+        assert!(close(t.b.angle[0], turn0 + turn1, 1e-12)); // buds turn with their metamer
+    }
+
+    #[test]
+    fn only_the_load_increment_sets_by_default() {
+        let run = |sag: &str| {
+            let p = params(
+                &format!(r#"{{"sag":"{sag}","E":1e4,"leafMass":0.01}}"#),
+                "{}",
+            );
+            let mut t = limb(3, 0.1);
+            update_mechanics(&mut t, &p, false, 0.0);
+            let first = t.m.angle[0];
+            update_mechanics(&mut t, &p, false, 0.0);
+            (first, t.m.angle[0] - first)
+        };
+        let (first, second) = run("increment");
+        assert!(first < 0.0);
+        assert!(second.abs() < 0.05 * first.abs());
+        let (first, second) = run("creep");
+        assert!(second < 0.8 * first); // creep keeps bending
+    }
+
+    #[test]
+    fn a_limb_springs_back_up_when_its_load_drops() {
+        let p = params(r#"{"E":1e4,"leafMass":0.05}"#, "{}");
+        let mut t = limb(3, 0.1);
+        update_mechanics(&mut t, &p, false, 0.0);
+        let before = t.m.angle[0];
+        t.b.state[0] = bud::GONE; // the leaves go
+        update_mechanics(&mut t, &p, false, 0.0);
+        assert!(t.m.angle[0] > before);
+    }
+
+    #[test]
+    fn posture_turns_toward_the_set_point_within_c_dr_over_r() {
+        let r3 = R3 {
+            beta_g: 0.1,
+            gamma: 0.2,
+            c: 1.0,
+            ..params("{}", "{}").r3
+        };
+        let h = PI / 2.0;
+        assert!(close(
+            posture_turn(h + 0.3, 0.0, 0.0, 1.0, &r3),
+            -0.1 * 0.3f64.sin(),
+            1e-12
+        ));
+        assert!(posture_turn(h - 0.3, 0.0, 0.0, 1.0, &r3) > 0.0);
+        assert!(posture_turn(0.2, 80.0 * DEG, 0.0, 1.0, &r3) < 0.0);
+        assert!(posture_turn(PI - 0.2, 80.0 * DEG, 0.0, 1.0, &r3) > 0.0);
+        assert!(close(posture_turn(h, 0.0, 0.1, 1.0, &r3), -0.02, 1e-12)); // a kink straightens
+        assert!(close(posture_turn(h + 1.0, 0.0, 0.0, 0.0, &r3), 0.0, 1e-12)); // no new girth
+        assert!(close(
+            posture_turn(h + 1.0, 0.0, 0.0, 0.01, &r3),
+            -0.01,
+            1e-12
+        ));
+    }
+
+    #[test]
+    fn rights_a_leaning_stem_only_as_fast_as_it_thickens() {
+        let p = params(r#"{"posture":true,"E":1e12,"betaG":0.2,"c":1}"#, "{}");
+        let lean = |grown: f64| {
+            let mut t = limb(1, 0.1);
+            t.m.angle[0] = PI / 2.0 + 0.5;
+            t.prev_radius[0] = 0.1 / (1.0 + grown);
+            update_mechanics(&mut t, &p, false, 0.0);
+            PI / 2.0 + 0.5 - t.m.angle[0]
+        };
+        assert!(close(lean(0.0), 0.0, 1e-6));
+        assert!(close(lean(0.01), 0.01 / 1.01, 1e-6)); // clamped at c·Δr/r
+        assert!(close(lean(1.0), 0.2 * 0.5f64.sin(), 1e-6)); // the full gravitropic turn
+    }
+
+    #[test]
+    fn stress_wood_reaches_sigma_target_and_stays_out_of_the_pipe_sum() {
+        let p = params(
+            r#"{"E":1e12,"sigmaTarget":2e4,"girthGain":1,"leafMass":1}"#,
+            "{}",
+        );
+        let mut t = Tree::new(0, 10.0);
+        let trunk = add_metamer(&mut t, -1, slot::MAIN, PI / 2.0, 1.0, 0.05, 0.0);
+        let top = add_metamer(&mut t, trunk as i32, slot::MAIN, PI / 2.0, 1.0, 0.05, 0.0);
+        let side = add_metamer(&mut t, trunk as i32, slot::RIGHT, 0.0, 3.0, 0.05, 0.0);
+        add_bud(&mut t, top, slot::MAIN, PI / 2.0, 0.0);
+        add_bud(&mut t, side, slot::MAIN, 0.0, 1.0);
+        t.ensure_scratch();
+        update_girth(&mut t, &p);
+        let radius = t.m.radius.clone();
+        t.prev_radius[..3].copy_from_slice(&radius[..3]);
+        let mut d = Vec::new();
+        junction_exponents(&t, &mut d);
+        assert!(close(d[0], 2.0, 1e-6));
+        update_mechanics(&mut t, &p, false, 0.0);
+        assert!(t.m.stress_wood[side] > 0.0);
+        assert!(t.stress[side] <= 1.0 + 1e-9); // never past σ_target
+        let r = t.m.radius[side];
+        assert!(close(
+            (4.0 * t.m.moment[side].abs()) / (PI * r.powi(3)),
+            2e4,
+            1e-6
+        ));
+        assert_eq!(t.m.stress_wood[trunk], 0.0);
+        update_girth(&mut t, &p);
+        assert!(close(
+            t.m.radius[trunk],
+            (0.05f64.powi(2) * 2.0).sqrt(),
+            1e-12
+        )); // pipes only
+        let mut d = Vec::new();
+        junction_exponents(&t, &mut d);
+        assert!(d[0] > 2.1);
+    }
+
+    #[test]
+    fn breaks_an_overstressed_limb_leaving_a_scar_and_a_banked_bud() {
+        let p = params(
+            r#"{"E":1e12,"sigmaBreak":1e4,"leafMass":1}"#,
+            r#"{"r4":{"enabled":true}}"#,
+        );
+        let mut t = Tree::new(0, 10.0);
+        let trunk = add_metamer(&mut t, -1, slot::MAIN, PI / 2.0, 1.0, 0.1, 0.0);
+        let side = add_metamer(&mut t, trunk as i32, slot::RIGHT, 0.0, 3.0, 0.05, 0.0);
+        let tip = add_metamer(&mut t, side as i32, slot::MAIN, 0.0, 1.0, 0.05, 0.0);
+        add_bud(&mut t, tip, slot::MAIN, 0.0, 1.0);
+        t.ensure_scratch();
+        let radius = t.m.radius.clone();
+        t.prev_radius[..3].copy_from_slice(&radius[..3]);
+        update_mechanics(&mut t, &p, false, 0.0);
+        assert_eq!(t.broken, 2.0);
+        assert_eq!(t.m.len(), 1);
+        assert!(close(t.m.scar_sum_n[0], 0.05f64.powi(2), 1e-12));
+        assert_eq!(t.b.state[0], bud::GONE);
+        assert_eq!(t.b.state[1], bud::DORMANT); // the bud bank
+        assert_eq!(t.b.slot[1], slot::RIGHT);
+    }
+
+    #[test]
+    fn wraps_angles() {
+        assert!(close(wrap_angle(3.0 * PI), PI, 1e-12));
+        assert!(close(wrap_angle(-PI / 2.0 - 2.0 * PI), -PI / 2.0, 1e-12));
+    }
+}

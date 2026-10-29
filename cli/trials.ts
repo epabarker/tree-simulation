@@ -1,6 +1,6 @@
 /**
  * Species trials (M27): the standard settings a species is measured in, shared by the calibration
- * tests (flora.test.ts) and the fitting evaluator (cli/fit-eval.ts), so the fit and the tests see
+ * tests (tests/evidence/flora.test.ts) and the fitting evaluator (cli/fit-eval.ts), so they see
  * the same worlds. They are M19's and M25's (docs/experiments/2026-10-28-m25-species.md): the
  * woodland's growth rules without recruitment or storms (`oakOpen`), and
  *
@@ -15,12 +15,22 @@
  * applied over its whole effective params, so a fit never has to restate a table it leaves alone.
  */
 
-import { formMetrics } from "./form.ts";
-import { groundLight, treeMetrics } from "./metrics.ts";
-import { clone, mergeParams, type Params, type SpeciesPatch } from "./params.ts";
-import { presetParams } from "./presets.ts";
-import type { Tree } from "./tree.ts";
-import { speciesParams, World } from "./world.ts";
+import { readFileSync } from "node:fs";
+import {
+  clone,
+  mergeParams,
+  type Params,
+  type SpeciesPatch,
+  speciesParams,
+} from "../src/core/params.ts";
+import { presetParams } from "../src/core/presets.ts";
+import { parityWasm } from "../src/wasm/parity.ts";
+import { loadWorldsSync, RustWorld, type TreeView as Tree } from "../src/wasm/world.ts";
+
+// The trials run the Rust core's parity build (I1): the TypeScript core's runs, as M27 fitted on.
+loadWorldsSync("parity", readFileSync(parityWasm));
+/** A trial's world: the Rust core, parity build. */
+export const newWorld = (params: Params): RustWorld => RustWorld.create(params, "parity");
 
 export const STAND_ROOTS = [20, 41, 62, 83, 104, 125, 146, 167, 188, 209];
 /** Roof densities of the shade house, ≈ 61% to 2% of the open sky under the K = 7 sweep. */
@@ -138,13 +148,13 @@ export function runLone(
   seed: number,
   assign: Record<string, unknown> = {},
 ): LoneTraits {
-  const world = new World(withAssign(loneParams(species, seed), species, assign));
+  const world = newWorld(withAssign(loneParams(species, seed), species, assign));
   world.run(30);
   const tree = world.trees[0] as Tree;
-  const height30 = treeMetrics(tree, world).height;
+  const height30 = world.metricsOf(tree).height;
   world.run(30);
-  const m = treeMetrics(tree, world);
-  const f = formMetrics(tree, world.paramsOf(tree));
+  const m = world.metricsOf(tree);
+  const f = world.formOf(tree);
   return {
     alive: tree.alive,
     height30,
@@ -187,23 +197,23 @@ export function runStand(
   assign: Record<string, unknown> = {},
   late = false,
 ): StandTraits {
-  const world = new World(withAssign(standParams(species, seed), species, assign));
+  const world = newWorld(withAssign(standParams(species, seed), species, assign));
   world.run(60);
   const interior = world.trees.slice(2, -2);
   const live = interior.filter((t) => t.alive);
-  const ms = live.map((t) => treeMetrics(t, world));
+  const ms = live.map((t) => world.metricsOf(t));
   const traits: StandTraits = {
     alive: live.length / interior.length,
     height: mean(ms.map((m) => m.height)),
     slenderness: mean(ms.map((m) => m.slenderness)),
     crownRatio: mean(ms.map((m) => m.crownRatio)),
-    floor: groundLight(world, 50, 180),
-    widestAt: mean(live.map((t) => formMetrics(t, world.paramsOf(t)).widestAt)),
+    floor: world.groundLight(50, 180),
+    widestAt: mean(live.map((t) => world.formOf(t).widestAt)),
   };
   if (late) {
     world.run(40);
     const still = interior.filter((t) => t.alive);
-    traits.height100 = mean(still.map((t) => treeMetrics(t, world).height));
+    traits.height100 = mean(still.map((t) => world.metricsOf(t).height));
   }
   return traits;
 }
@@ -215,9 +225,9 @@ export function runShade(
   roof: number,
   assign: Record<string, unknown> = {},
 ): { alive: boolean; light: number } {
-  const world = new World(withAssign(shadeParams(species, seed, roof), species, assign));
+  const world = newWorld(withAssign(shadeParams(species, seed, roof), species, assign));
   world.step();
-  const light = groundLight(world, 0, 6);
+  const light = world.groundLight(0, 6);
   world.run(29);
   return { alive: (world.trees[0] as Tree).alive, light };
 }
@@ -247,16 +257,16 @@ export function runRelease(
   seed: number,
   assign: Record<string, unknown> = {},
 ): { epicormic: number; lean: number } {
-  const world = new World(withAssign(standParams(species, seed), species, assign));
+  const world = newWorld(withAssign(standParams(species, seed), species, assign));
   world.run(FELL);
   const [left, right] = [world.trees[4] as Tree, world.trees[6] as Tree];
-  const before = [treeMetrics(left).centroidOffset, treeMetrics(right).centroidOffset];
+  const before = [world.metricsOf(left).centroidOffset, world.metricsOf(right).centroidOffset];
   world.removeTree(5);
   world.run(AFTER);
   const shift =
-    treeMetrics(left).centroidOffset -
+    world.metricsOf(left).centroidOffset -
     (before[0] as number) -
-    (treeMetrics(right).centroidOffset - (before[1] as number));
+    (world.metricsOf(right).centroidOffset - (before[1] as number));
   return {
     epicormic: [left, right].reduce((n, t) => n + epicormic(t, FELL, FELL + AFTER - 1), 0),
     lean: shift / 2,

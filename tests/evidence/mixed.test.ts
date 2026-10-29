@@ -1,10 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { hashWorld } from "./hash.ts";
-import { treeMetrics } from "./metrics.ts";
-import { mergeParams, type Params } from "./params.ts";
-import { presetParams } from "./presets.ts";
-import type { Tree } from "./tree.ts";
-import { World } from "./world.ts";
+import { mergeParams, type Params } from "../../src/core/params.ts";
+import { presetParams } from "../../src/core/presets.ts";
+import type { Tree } from "./rust.ts";
+import { hashWorld, treeMetrics, World } from "./rust.ts";
 
 const height = (t: Tree): number => {
   let h = 0;
@@ -56,12 +54,12 @@ describe("species per tree (ADR 0016)", () => {
     expect(leaderTaller).toBeGreaterThanOrEqual(4);
   });
 
-  it("resolves a species once, and again after a params event", () => {
+  it("resolves a species, and again after a params event", () => {
     const world = new World(mixed(1, { leader: { c3: { lambda: 0.58 } }, spreading: {} }));
     const tree = world.trees[0] as Tree;
     const first = world.paramsOf(tree);
     expect(first.c3.lambda).toBe(0.58);
-    expect(world.paramsOf(tree)).toBe(first);
+    expect(world.paramsOf(tree)).toEqual(first); // the TypeScript core cached it; values suffice
     world.setParams({ species: { leader: { c3: { lambda: 0.52 } }, spreading: {} } });
     world.step();
     expect(world.paramsOf(tree).c3.lambda).toBe(0.52);

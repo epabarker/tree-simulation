@@ -13,11 +13,9 @@
  */
 
 import * as Comlink from "comlink";
-import type { TreeMetrics } from "../core/metrics.ts";
 import type { Obstacle, Params, ParamsPatch } from "../core/params.ts";
 import { forestParams, specimenParams } from "../core/presets.ts";
-import type { Snapshot, SnapshotOptions } from "../core/snapshot.ts";
-import type { RunRecord } from "../core/world.ts";
+import type { RunRecord, Snapshot, SnapshotOptions, TreeMetrics } from "../core/types.ts";
 import type { SimApi } from "../worker/api.ts";
 import { createRenderer } from "./render/create.ts";
 import { attachInput } from "./render/input.ts";

@@ -1,19 +1,18 @@
 import { describe, expect, it } from "vitest";
+import { productionWorld } from "../../../tests/production-world.ts";
 import { mergeParams } from "../../core/params.ts";
 import { presetParams } from "../../core/presets.ts";
-import { SnapshotBuilder } from "../../core/snapshot.ts";
-import { World } from "../../core/world.ts";
 import { LEAF_PALETTES, LEAF_STYLES, type LeafStyleName } from "./leaf-styles.ts";
 import { Scene } from "./scene.ts";
 
 function grown(style: LeafStyleName): Scene {
-  const world = new World(presetParams("forest", 2));
+  const world = productionWorld(presetParams("forest", 2));
   world.run(40);
   const scene = new Scene();
   scene.setSize(1000, 700, 1);
   scene.depth = true;
   scene.leafStyle = LEAF_STYLES[style];
-  scene.setSnapshot(new SnapshotBuilder().build(world, 0, { junctions: false, field: false }));
+  scene.setSnapshot(world.snapshot(0, { junctions: false, field: false }));
   scene.computeGeometry(1);
   scene.seasons = true;
   return scene;
@@ -88,7 +87,7 @@ describe("seasons (M17)", () => {
   it("draws each tree as its species, on its own calendar (M19)", () => {
     // Birch, oak and beech side by side, young enough that the beech keeps its dead leaves.
     const base = presetParams("succession", 3);
-    const world = new World(
+    const world = productionWorld(
       mergeParams(base, {
         world: { width: 120, height: 100, walls: [], sides: "periodic" },
         trees: [
@@ -104,7 +103,7 @@ describe("seasons (M17)", () => {
     const scene = new Scene();
     scene.setSize(1000, 700, 1);
     scene.depth = true;
-    scene.setSnapshot(new SnapshotBuilder().build(world, 0, { junctions: false, field: false }));
+    scene.setSnapshot(world.snapshot(0, { junctions: false, field: false }));
     scene.computeGeometry(1);
     scene.seasons = true;
     const share = (

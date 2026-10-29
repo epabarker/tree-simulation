@@ -4,8 +4,7 @@
  */
 
 import type { Params, ParamsPatch } from "../core/params.ts";
-import type { Snapshot, SnapshotOptions } from "../core/snapshot.ts";
-import type { RunRecord } from "../core/world.ts";
+import type { RunRecord, Snapshot, SnapshotOptions } from "../core/types.ts";
 
 export interface SimApi {
   /** Starts a new run and returns the snapshot of season 0. */

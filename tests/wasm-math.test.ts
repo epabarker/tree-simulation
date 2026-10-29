@@ -4,7 +4,9 @@
  * platform means its JavaScript differs, not that the Rust does: the goldens are made on x86-64
  * Linux (G2 note).
  */
+import { readFileSync } from "node:fs";
 import { beforeAll, describe, expect, it } from "vitest";
+import { parityWasm } from "../src/wasm/parity.ts";
 import {
   math_acos,
   math_asin,
@@ -17,7 +19,7 @@ import {
   math_pow,
   math_sin,
 } from "../src/wasm/pkg-parity/core.js";
-import { loadRustCore } from "./wasm.ts";
+import { loadWorldsSync } from "../src/wasm/world.ts";
 
 let a = 2026;
 const rnd = () => {
@@ -66,7 +68,7 @@ const angle = () =>
   rnd() < 0.7 ? u(-2 * Math.PI, 2 * Math.PI) : rnd() < 0.7 ? u(-1e6, 1e6) : anyBits();
 
 describe("the Rust core's Math is V8's, bit for bit (G2, I1)", () => {
-  beforeAll(loadRustCore);
+  beforeAll(() => loadWorldsSync("parity", readFileSync(parityWasm)));
   it("sin", () => expect(mismatches(math_sin, Math.sin, angle)).toEqual([]));
   it("cos", () => expect(mismatches(math_cos, Math.cos, angle)).toEqual([]));
   it("exp", () =>

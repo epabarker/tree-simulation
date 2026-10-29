@@ -4,7 +4,7 @@
  * most a few times a second.
  */
 
-import type { TreeMetrics } from "../../core/metrics.ts";
+import type { TreeMetrics } from "../../core/types.ts";
 
 export type MetricsRow = TreeMetrics & { season: number };
 

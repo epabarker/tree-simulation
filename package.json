@@ -22,7 +22,6 @@
     "test": "vitest run",
     "check": "npm run build:wasm && npm run rust:check && npm run lint && npm run typecheck && npm run test",
     "sim": "node cli/run.ts",
-    "sim:ts": "node cli/run-ts.ts",
     "pregolden:update": "node cli/require-node.mjs",
     "golden:update": "node tests/update-golden.ts",
     "bench": "node cli/bench.ts",

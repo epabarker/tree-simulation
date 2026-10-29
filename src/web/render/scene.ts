@@ -16,8 +16,8 @@
  * With `depth` off (the x-ray view) the page draws exactly the simulated geometry.
  */
 
-import type { Snapshot } from "../../core/snapshot.ts";
-import { BudState } from "../../core/tree.ts";
+import type { Snapshot } from "../../core/types.ts";
+import { BudState } from "../../core/types.ts";
 import { CATEGORICAL, SEQUENTIAL } from "./colors.ts";
 import {
   isLeafStyleName,

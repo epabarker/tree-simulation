@@ -10,7 +10,7 @@ import {
   presetParams,
   presets,
 } from "../core/presets.ts";
-import { FULL_SNAPSHOT } from "../core/snapshot.ts";
+import { FULL_SNAPSHOT } from "../core/types.ts";
 import { mountGarden } from "./garden.ts";
 import { isLeafStyleName, LEAF_STYLES, type LeafStyleName } from "./render/leaf-styles.ts";
 import type { ViewOptions } from "./render/scene.ts";

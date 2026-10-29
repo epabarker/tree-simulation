@@ -11,6 +11,7 @@
 import { type Params, type ParamsPatch, speciesParams } from "../core/params.ts";
 import {
   BUD_SCHEMA,
+  FULL_SNAPSHOT,
   METAMER_SCHEMA,
   type RunEvent,
   type RunRecord,
@@ -462,7 +463,7 @@ export class RustWorld {
   }
 
   /** The season's snapshot, copied out of linear memory once; its arrays share one buffer. */
-  snapshot(seasonMs: number, options: SnapshotOptions): Snapshot {
+  snapshot(seasonMs: number, options: SnapshotOptions = FULL_SNAPSHOT): Snapshot {
     this.inner.snapshot(options.junctions, options.field);
     const [trees, nm, nb, nj, ns] = this.inner.snapshot_counts() as unknown as number[];
     const species = this.inner.snapshot_species();

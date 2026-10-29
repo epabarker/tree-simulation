@@ -1,20 +1,16 @@
 /**
- * I1 (ADR 0024): the whole world in the Rust core (src/wasm/world.ts) held to the TypeScript
- * core's results: every golden (parity build); snapshots and checkpoints against what the
- * TypeScript core produced, recorded in tests/fixtures/ts-core.json at the tag golden-2d-ts
- * (docs/experiments/code/2026-10-29-i1/ts-records.ts); and the production build's own goldens.
+ * I1 (ADR 0024): the whole world in the Rust core (src/wasm/world.ts, parity build) held to the
+ * TypeScript core's snapshots and checkpoints, recorded in tests/fixtures/ts-core.json at the tag
+ * golden-2d-ts (docs/experiments/code/2026-10-29-i1/ts-records.ts). The goldens are
+ * golden.test.ts's.
  */
 import { readFileSync } from "node:fs";
 import { gunzipSync } from "node:zlib";
 import { beforeAll, describe, expect, it } from "vitest";
-import { fixtureParams, isFixtureName } from "../src/core/fixtures.ts";
-import { presetParams } from "../src/core/presets.ts";
 import { FULL_SNAPSHOT } from "../src/core/types.ts";
 import { parityWasm } from "../src/wasm/parity.ts";
-import { productionWasm } from "../src/wasm/production.ts";
-import { type Build, loadWorldsSync, RustWorld } from "../src/wasm/world.ts";
+import { loadWorldsSync, RustWorld } from "../src/wasm/world.ts";
 import { fingerprint, sha256 } from "./fingerprint.ts";
-import { caseKey, GOLDEN_CASES, type GoldenCase } from "./golden-cases.ts";
 import {
   CHECKPOINT_RUNS,
   GARDEN_FIXTURE,
@@ -24,34 +20,13 @@ import {
 
 const json = <T>(path: string): T =>
   JSON.parse(readFileSync(new URL(path, import.meta.url), "utf8")) as T;
-const golden = json<Record<string, string>>("./golden.json");
-const production = json<Record<string, string>>("./golden-production.json");
 const ts = json<{
   snapshots: Record<string, Record<string, string>>;
   checkpoints: Record<string, { bytes: string; grown: string }>;
   garden: string;
 }>("./fixtures/ts-core.json");
 
-beforeAll(() => {
-  loadWorldsSync("parity", readFileSync(parityWasm));
-  loadWorldsSync("production", readFileSync(productionWasm));
-});
-
-function runCase(c: GoldenCase, build: Build): string {
-  const params = isFixtureName(c.preset)
-    ? fixtureParams(c.preset, c.seed)
-    : presetParams(c.preset, c.seed);
-  const world = RustWorld.create(params, build);
-  world.run(c.seasons);
-  const hash = world.hash();
-  world.dispose();
-  return hash;
-}
-
-describe("goldens: the TypeScript core's, in the Rust world's parity build (I1)", () => {
-  for (const c of GOLDEN_CASES)
-    it(caseKey(c), () => expect(runCase(c, "parity")).toBe(golden[caseKey(c)]));
-});
+beforeAll(() => loadWorldsSync("parity", readFileSync(parityWasm)));
 
 describe("snapshots: the TypeScript core's, array for array and metric for metric (I1)", () => {
   for (const [name, params, seasons] of SNAPSHOT_RUNS) {
@@ -100,10 +75,4 @@ describe("checkpoints: the TypeScript core's bytes, written and read (I1)", () =
     expect(world.hash()).toBe(ts.garden);
     world.dispose();
   });
-});
-
-describe("production goldens: the WASM build's are the native build's (I1 stage 2)", () => {
-  for (const c of GOLDEN_CASES) {
-    it(caseKey(c), () => expect(runCase(c, "production")).toBe(production[caseKey(c)]));
-  }
 });

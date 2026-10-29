@@ -26,6 +26,8 @@ export interface LightModel {
   sample(x: number, y: number, dir: number, out: LightSample): void;
   /** Per-cell shadow for overlays, or null when the model has no grid. */
   field(): Float64Array<ArrayBuffer> | null;
+  /** Releases what the model holds outside JavaScript's heap (the Rust sweep's WASM memory). */
+  dispose?(): void;
 }
 
 /**

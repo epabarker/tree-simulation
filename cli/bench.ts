@@ -7,6 +7,7 @@
  *   npm run bench -- --case forest --seasons 50     one case
  *   npm run bench -- --compare runs/bench/abc1234.json
  *   npm run bench -- --snapshot lean                 snapshots as the home page asks for them
+ *   npm run bench -- --rust                          the sky sweep in the Rust core (G2, ADR 0024)
  *   npm run bench -- --case forest --slab sweep:32:16:f32   also time a 3D slab light model (scratch,
  *                                                   cli/slab-light.ts) on the same deposits; see
  *                                                   docs/experiments/2026-10-29-3d-light-cost.md
@@ -24,6 +25,7 @@ import { presetParams } from "../src/core/presets.ts";
 import { PHASES, type Phase } from "../src/core/season.ts";
 import { FULL_SNAPSHOT, SnapshotBuilder, type SnapshotOptions } from "../src/core/snapshot.ts";
 import { World } from "../src/core/world.ts";
+import { coreWasmUrl, loadCoreSync, useRustSkySweep } from "../src/wasm/core.ts";
 import { Shadowed, type SlabLight, SlabPyramid, SlabSweep, type SlabTiming } from "./slab-light.ts";
 
 const { values } = parseArgs({
@@ -39,8 +41,14 @@ const { values } = parseArgs({
     slabFrom: { type: "string", default: "60" },
     slabEvery: { type: "string", default: "4" },
     dumpDeposits: { type: "string" },
+    rust: { type: "boolean", default: false },
   },
 });
+
+if (values.rust) {
+  loadCoreSync(readFileSync(coreWasmUrl));
+  useRustSkySweep();
+}
 
 /** The forest preset on a ring twice as wide, with twice the trees (M18's bigger worlds). */
 function wideForest(): Params {
@@ -99,6 +107,8 @@ interface BenchFile {
   node: string;
   repeat: number;
   snapshot: string;
+  /** The sky sweep's implementation: "ts", or "rust" with --rust. */
+  light: string;
   cases: Record<string, CaseResult>;
 }
 
@@ -233,9 +243,10 @@ const file: BenchFile = {
   node: process.version,
   repeat,
   snapshot: values.snapshot,
+  light: values.rust ? "rust" : "ts",
   cases: results,
 };
-const out = values.out ?? join("runs", "bench", `${commit}.json`);
+const out = values.out ?? join("runs", "bench", `${commit}${values.rust ? "-rust" : ""}.json`);
 mkdirSync(dirname(out), { recursive: true });
 writeFileSync(out, `${JSON.stringify(file, null, 2)}\n`);
 

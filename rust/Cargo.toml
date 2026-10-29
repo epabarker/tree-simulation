@@ -1,0 +1,16 @@
+# The Rust core (ADR 0024). `core` is the simulation, dependency-free, built natively (CLI,
+# tests) and for wasm32; `wasm` is the thin wasm-bindgen wrapper the page and Node load.
+[workspace]
+members = ["core", "wasm"]
+resolver = "3"
+
+[workspace.package]
+edition = "2024"
+license = "MIT"
+rust-version = "1.97"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"

@@ -1,0 +1,14 @@
+[package]
+name = "tree-core"
+version = "0.1.0"
+description = "The tree simulation's core in Rust (ADR 0024): G2, the 2D sky sweep"
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+# No dependencies: nothing here may be wasm-only, so the same crate builds natively (and, later,
+# for PyO3). Threads are native-only and opt-in.
+[features]
+threads = []
+
+[dependencies]

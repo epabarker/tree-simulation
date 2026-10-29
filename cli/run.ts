@@ -7,6 +7,7 @@
  *   echo '{"c3":{"lambda":0.56}}' | npm run sim -- --params - --out runs/y
  *   npm run sim -- --preset oakOpen --species-patch '{"oak":{"r3":{"posture":false}}}'   (M26)
  *   npm run sim -- --preset succession --checkpoint-at 60 --seasons 60 --out runs/c   (M21)
+ *   npm run sim -- --preset forest --rust   (the sky sweep in the Rust core; same hash: G2, ADR 0024)
  *
  * Writes to --out: run.json (resolved params, events, metadata), metrics.csv (one row per tree
  * per season), metamers.csv (geometry at --snapshots seasons and the last), form.csv (crown form
@@ -37,6 +38,7 @@ import {
 } from "../src/core/params.ts";
 import { defaultPreset, isPresetName, presetParams } from "../src/core/presets.ts";
 import { type RunEvent, type RunRecord, World } from "../src/core/world.ts";
+import { coreWasmUrl, loadCoreSync, useRustSkySweep } from "../src/wasm/core.ts";
 
 const { values } = parseArgs({
   options: {
@@ -51,8 +53,15 @@ const { values } = parseArgs({
     light: { type: "boolean", default: false },
     "checkpoint-at": { type: "string" },
     "species-patch": { type: "string" },
+    rust: { type: "boolean", default: false },
   },
 });
+
+// G2 (ADR 0024): the sky sweep in the Rust core, bit-identical to the TypeScript one.
+if (values.rust) {
+  loadCoreSync(readFileSync(coreWasmUrl));
+  useRustSkySweep();
+}
 
 function readJson(path: string): unknown {
   return JSON.parse(readFileSync(path === "-" ? 0 : path, "utf8"));
@@ -203,6 +212,7 @@ const run = {
     commit: gitCommit(),
     hash,
     ms: Math.round(ms),
+    light: values.rust ? "rust" : "ts",
   },
   ...world.record(),
 };

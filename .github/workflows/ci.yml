@@ -17,6 +17,7 @@ jobs:
         with:
           node-version-file: .node-version
           cache: npm
+      - uses: ./.github/actions/rust
       - run: npm ci
       - name: Lint, typecheck, tests (incl. golden hashes)
         run: npm run check

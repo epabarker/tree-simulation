@@ -33,13 +33,34 @@ export function speciesParams(params: Params, species: string): Params {
   return mergeParams(params, groups);
 }
 
+/** Builds the sky sweep for a world: width, height, the c2 params, periodic sides. */
+export type SkySweepFactory = (
+  width: number,
+  height: number,
+  c2: Params["c2"],
+  periodic: boolean,
+) => LightModel;
+
+/**
+ * The sky sweep's implementation: the TypeScript one unless another is set. G2 (ADR 0024) sets
+ * the Rust core's here (src/wasm/), which is bit-identical to it; the core never loads WASM.
+ */
+let skySweepFactory: SkySweepFactory | null = null;
+
+/** Sets the sky sweep's implementation for worlds made from now on (null: TypeScript's). */
+export function setSkySweepFactory(factory: SkySweepFactory | null): void {
+  skySweepFactory = factory;
+}
+
 export function makeLight(params: Params): LightModel {
   const { width, height } = params.world;
   if (params.c2.enabled && params.c2.model === "pooled") {
     return new PooledLight(width, height, params.c2);
   }
   if (params.c2.enabled && params.c2.model === "sky") {
-    return new SkySweep(width, height, params.c2, params.world.sides === "periodic");
+    const periodic = params.world.sides === "periodic";
+    if (skySweepFactory) return skySweepFactory(width, height, params.c2, periodic);
+    return new SkySweep(width, height, params.c2, periodic);
   }
   if (params.c2.enabled) return new ShadowTriangle(width, height, params.c2);
   return new UniformLight(width, height, params.c2.C);
@@ -190,6 +211,7 @@ export class World {
     this.trees.length = 0;
     this.trees.push(...state.trees);
     this.speciesParams.clear();
+    this.light.dispose?.();
     this.light = makeLight(this.params);
     this.owner = new Int32Array(this.params.world.width * this.params.world.height);
   }
@@ -203,6 +225,7 @@ export class World {
     if (event.type === "params") {
       this.params = mergeParams(this.params, event.patch);
       this.speciesParams.clear();
+      this.light.dispose?.();
       this.light = makeLight(this.params);
     } else if (event.type === "plantTree") {
       const { width: W, sides } = this.params.world;

@@ -1,0 +1,8 @@
+{
+  // The Rust core's loader and its LightModel wrappers (ADR 0024, G2). Runs in Node and the
+  // page; the DOM lib is here only for the WebAssembly types of wasm-bindgen's generated pkg/.
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": { "lib": ["es2023", "dom"] },
+  "include": ["./**/*.ts"],
+  "exclude": ["./**/*.test.ts"]
+}

@@ -14,6 +14,7 @@ Newest first. One entry per session or milestone: what changed, why, surprises, 
   - A real oak drawn by our renderer reads as a real oak. Ours drawn by the better renderer still reads wrong.
   - Our 31 m open oak has 452 tips, 451 forks and Strahler order 5. A 24 m Wytham oak has 5,873, 4,538 and 8.
   - Our oak limbs zigzag every metamer or two.
+  - **Addendum:** a 1 m slab of a real oak holds 450–560 tips, about our 452. Most of the detail gap is the page drawing a slice as a whole tree. The kinks are not C4 noise or R3 posture.
 - **Surprises:**
   - **Leaves vanished in renderer B, twice:** a 3 px leaf samples a mip level whose averaged alpha is under the alpha test, and headless Firefox dithers alpha-to-coverage.
   - **No oak in the mixed wood at season 300** (seed 9).

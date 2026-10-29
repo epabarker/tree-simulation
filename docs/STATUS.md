@@ -17,7 +17,7 @@ _Last updated: 2026-10-29 (realism 2×2: structure, not drawing, is the bottlene
 - **Lab:** WebGL2 with pseudo-depth, Tweakpane, charts, tap to fell, phone layout, shareable links (`?preset&seed&p`). **Headless:** `npm run sim` (`--species-patch`), `npm run bench`, `analysis/experiments/` m0–m26.
 
 ## Next
-1. **Realism** ([note](experiments/2026-10-29-structure-vs-drawing.md)): a scanned real oak drawn by our renderer looks real, and our oak drawn by a better renderer doesn't. Chase the zigzag in oak limbs first, then the detail budget (≈ 10× too few tips and forks).
+1. **Realism** ([note](experiments/2026-10-29-structure-vs-drawing.md)): a scanned real oak drawn by our renderer looks real, and our oak drawn by a better renderer doesn't. Our tree holds about what a 1 m slab of a real oak does: the page draws a slice as a whole tree. Next: decide between composing slices and a 3D core; the limb kinks are not noise or posture.
 2. **The user:** try garden 0.14.0 on edbarker.dev, and the loupe on a phone; say whether to open the lab's PR to `main` (GitHub Pages).
 3. **Possible:** a thinner understorey than the hand-tuned wood's by season 400 (holly, rowan, willow 0.3–0.7 a run): revisit if it reads wrong. Measured light under fir, holly and the small trees would replace estimated floors.
 4. **Refits:** move `fits/*.json` to a round folder, then `m27_fit.py --species all --skip-done --start <round> --restarts 2,0 --generations 50 --seeds 3` (≈ 8 min a species); `m27_adopt.py` regenerates `flora-fitted.ts`.

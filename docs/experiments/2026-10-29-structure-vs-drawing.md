@@ -102,3 +102,25 @@ Our leaf sites include R6 short-shoot rosettes. That is why they outnumber tips.
 - **The zigzag** is a concrete, local fault in every oak limb, and the cheapest to chase. Find which rule makes it: the distichous side alternation, C4 direction weights, or R3 sag and posture.
 - **Detail budget:** tips and forks are an order of magnitude below a real oak's. Smaller internodes, more orders and a twig layer, or the moonshot's two-level detail, are the levers.
 - **A quantitative realism target:** the structural statistics above (tips, forks, wood length, Strahler order, straightness) can serve as fitting targets alongside the §10 ones. The Wytham plot has QSMs for 835 trees: 37 oaks, 541 sycamores, and ash, hazel, hawthorn and field maple.
+
+## Addendum: a slab of a real oak, and the zigzag
+
+A planar model is meant to be a thin slab through a tree (spec §2), so the fair structural comparison is with a *slab* of a real oak, not the whole tree. `slab.py` counts the scanned tips and wood whose midpoints lie within w/2 of the trunk's vertical plane:
+
+| | All | 0.5 m slab | 1 m slab | 2 m slab | 4 m slab |
+|---|---|---|---|---|---|
+| Wytham tree 6: tips / wood | 5,873 / 4,242 m | 284 / 255 m | 561 / 478 m | 1,058 / 852 m | 2,058 / 1,601 m |
+| Wytham tree 195: tips / wood | 6,351 / 4,135 m | 210 / 131 m | 448 / 276 m | 910 / 570 m | 1,761 / 1,111 m |
+
+Our open oak (452 tips, 515 m) has about the detail of a **1 m slab** of a real oak. So most of the "≈ 10× too few tips" is not a fault of the rules. The simulation grows roughly what a slab should hold, and the page then draws that slab as if it were the whole tree. ADR 0008's pseudo-depth turns the limbs, but it adds no structure. What remains wrong *for a slab* is the form: the V of long straight limbs, and the kinks.
+
+**The zigzag** (`zigzag.ts`, `oakOpen` seed 3, season 150, along each axis):
+
+| Case | Mean turn per metamer | Sign alternation |
+|---|---|---|
+| Default | 6.0° | 0.28 |
+| R3 posture off | 8.5° | 0.35 |
+| R3 off | 6.5° | 0.43 |
+| C4 noise σ = 0 | 5.6° | 0.17 |
+
+Alternation is well below the 0.5 of random turns, so axes curve persistently. The kinks are not per-metamer jitter, and neither noise nor posture control causes them. They are more likely at forks, where the thickest continuation switches to a lateral, or in curvature reversals over several metamers. That is untested.

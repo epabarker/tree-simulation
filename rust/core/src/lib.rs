@@ -6,10 +6,12 @@
 #![allow(clippy::needless_range_loop, clippy::neg_cmp_op_on_partial_ord)]
 
 pub mod checkpoint;
+pub mod form;
 pub mod hash;
 pub mod json;
 pub mod light;
 pub mod math;
+pub mod metrics;
 pub mod params;
 pub mod principles;
 pub mod rng;

@@ -29,6 +29,7 @@ const LANDED = (process.env.I1_PHASES?.split(",") ?? [
   "shed",
   "girth",
   "mechanics",
+  "commit",
 ]) as Phase[];
 
 const golden = JSON.parse(

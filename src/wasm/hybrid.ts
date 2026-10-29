@@ -131,6 +131,10 @@ function pull(bridge: Bridge, i: number, t: Tree): void {
     (t as unknown as Scalars)[k] = s[3 + j] as number;
   });
   t.species = bridge.tree_species(i);
+  // Size the scratch for the tables first, as the TypeScript phase would have (ensureScratch
+  // reallocates, dropping contents): later TypeScript phases write into it by row, as mechanics
+  // writes its break marks into scratchU after girth's ensureScratch.
+  t.ensureScratch();
   SCRATCH.forEach((name, k) => {
     const v = bridge.scratch(i, k);
     if (t[name].length < v.length) t[name] = new Float64Array(v.length);

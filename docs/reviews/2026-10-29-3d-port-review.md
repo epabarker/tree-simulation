@@ -30,6 +30,11 @@ So it needs the user's agreement and an ADR. [ADR 0024](../decisions/0024-3d-sla
 - **A throwaway 3D growth prototype measured the tree passes and the crowns** ([note](../experiments/2026-10-29-proto3d.md)). Its numbers replace §2's estimates, labelled measured-in-prototype.
 - **D = 64 with a 3-cell fade** is recommended (§2a, Qz). ADR 0024 moves to accepted with D and the fade filled in, as the user asked, and may be revised before G2.
 
+**Amended a fourth time, after the face-transmission runs** (fifth session):
+- **The faces' transmission τ** was added to the prototype's light, per face ([note](../experiments/2026-10-29-face-transmission.md)). It is run at D = 48 and 64 for τ ∈ {1, 0.5, 0.2, 0}, for a wood edge (1 in front, 0 or 0.2 behind), and for a 42-cell planting.
+- **The user's thesis holds for the lower crown:** open faces keep it, and τ ≤ 0.2 removes it. It is incomplete for the hedge, whose other half is density (§2d).
+- **ADR 0024 is back to accepted in principle,** with D and the faces (τ, the fade) open until the user has looked. §2d gives τ and D for three looks and their costs. **τ is a world parameter the garden can expose, not a one-time choice.**
+
 ## Decisions already made (user, 2026-10-29)
 1. **World shape:** a slab one crown deep, seen from the front, as the garden is now. A full volume and a free camera are out of scope. D is to be measured from crown widths.
 2. **Hosting:** edbarker.dev is on Cloudflare and can send COOP/COEP, so WASM threads are available to the garden. GitHub Pages cannot send them, so the lab question is left to this review.
@@ -140,12 +145,12 @@ Replacing the first version's table, which assumed 2D open-grown widths:
   - **D = 64:** crowns taper to 2–3% at the faces; by season 100 they are just reaching them (128 leaves beyond).
 - **Without R6** the trees stop at height 48, their crowns fit inside D = 48, and nothing piles.
 
-**So D = 64, with the 3-cell fade:**
+**So D = 64, with the 3-cell fade** (fourth session; held open in the fifth, §2d):
 - it is the only D at which the prototype's crowns taper of their own accord;
 - the fade costs nothing, and keeps the full model's taller trees (70–85 cells of free depth) from stranding leaves at the faces as they near full height;
 - D = 48 with the fade is the fallback if memory or the phone's budget ever bites (about 10 ms and 40 MB less).
 
-The fade at D = 64 was not grown in the prototype; I2 should grow D = 64 with and without it.
+The fade at D = 64 was not grown in the prototype; I2 should grow D = 64 with and without it. **All of this is at τ = 1.** At every τ < 1 the crowns stop short of the faces and nothing piles (§2d).
 
 ### 2b. The coarser lattice
 Light in 2× cells cut the light 8× at D = 64 in every measurement. With light already cheap it is not needed, and it is not the same result (§2 of the second version: half the light resolution, coarser shade, more recalibration). It stays a reserve.
@@ -161,6 +166,52 @@ Light in 2× cells cut the light 8× at D = 64 in every measurement. With light 
 | **Total** | **≈ 79 MB** | **≈ 112 MB** | **≈ 145 MB** |
 
 G1 ran D = 64 on the phone with four lanes, the field and the partials included, without trouble. Two lanes would save about 50 MB at D = 64, at the cost of the phone's lane gain.
+
+### 2d. The faces' transmission τ, and three looks (measured in prototype)
+**The mechanism** ([note](../experiments/2026-10-29-face-transmission.md)):
+- A ray entering the slab through a z face, below the stand's top, carries transmission τ, as if a wood as tall as the stand stood beyond that face.
+- τ is set per face, as [front, back], front being the viewer's.
+- In the sweep it is one constant per face in the padded line, so it costs no time.
+
+**What τ does,** in the R6 set at seasons 40–100:
+
+| Faces (front, back) | Below half height, p50 | Picture cover below half | Crown depth (D 64) | Faces' share | m at season 40 (D 64) |
+|---|---|---|---|---|---|
+| 1, 1 (today's open z) | 12–15% | 26–33% | 56–64 | 2% at D 64; 11–13% at D 48 | 20.5 |
+| 0.5, 0.5 | 7–9% | 14–19% | 50–52 | 0 | 18.0 |
+| 1, 0.2 (edge) | 7% | 14–16% | 51–56 | 1% | 18.0 |
+| 1, 0 (edge) | 4–7% | 10–14% | 51–54 | 1% at D 64; front band 17% at D 48 | 18.1 |
+| 0.2, 0.2 | 0–1% | 1–2% | 46 | 0 | 16.4 |
+| 0, 0 | 0 | 0 | 43 | 0 | 15.1 |
+| Today's 2D garden (`forest`, `mixedWood`) | 13–15% | 1–3% | — | — | — |
+
+**τ and D for each look,** with costs from the note's §5 (forest, season 40, tier (d); light is measured, the passes rest on the prototype's m and §2's estimates):
+
+| Look | Faces (front, back) | D | Why this D | Phone | Laptop | Memory |
+|---|---|---|---|---|---|---|
+| **Hedgerow** (a row in open country) | 1, 1 | 64 | At D 48 the open faces pile 11–13% of the foliage by season 100; at 64 crowns taper (2%) | ≈ 75 ms | ≈ 56 ms | ≈ 145 MB |
+| … as single trees | 1, 1; trees 42 cells apart | 64 | Crowns fill D 64 (60–64 deep) | ≈ 71 | ≈ 53 | ≈ 145 |
+| **Wood edge** (seen from the field) | 1, 0.2 | 64 | At D 48 the open face piles (front band 17%); at 64 the crown leans forward without reaching it | ≈ 71 | ≈ 53 | ≈ 145 |
+| **Wood interior** | 0.2, 0.2 | 48 | Crowns are 37–40 deep and stop 4 cells short of each face | ≈ 56 | ≈ 43 | ≈ 112 |
+| … at the one D below | 0.2, 0.2 | 64 | | ≈ 69 | ≈ 51 | ≈ 145 |
+
+- **Why 0.2 and not 0 for the interior and the edge's back:** both leave bare stems (0–2% cover below half). τ 0 is a black wall, from which nothing in a real wood comes. τ 0.2 keeps the canopy's response to side light (crowns 46 deep, not 43).
+- **Why 0.5 is no look:** it is half a hedge. The lower crown is halved but still there, on both sides.
+
+**One D for every look: 64.** τ is a world parameter the garden can expose, not a one-time choice:
+- **In the core** it is plain JSON, `world.faces: [front, back]`, read by the sweep each season. A change takes effect the next season, and the crowns answer it over tens of seasons, as they would answer a felled neighbour.
+- **In the garden** it can be a host option (the home page a wood edge, another page a hedgerow), or a control.
+- **D cannot move like that.** It sizes the field, the owner grid and every tree's z. Changing it means reallocating, and it clips or strands the crowns already grown, so it is fixed per world.
+- **So D must hold the most demanding look,** the hedgerow and the edge at τ 1, which want 64. The interior's saving at 48 (13 ms and 33 MB) does not pay for a second calibration.
+- **The fade** is then only a hedge-row question at full height, and I2 grows D = 64 with and without it as planned. At τ < 1 it has nothing to do.
+
+**Where I disagree, or add:**
+- **The thesis is half the hedge.** τ moves the lower crown exactly as the user argued: open faces light it, nothing prunes it, and dark faces remove it.
+  - **But the share below half height does not separate the 3D stands from today's garden.** `forest` and `mixedWood` keep 13–15% of their canopy trees' leaf area below half height, and the open-grown oak 36%.
+  - **What differs is how much of the picture is leaf:** 26–33% of the lower half at τ 1 against the garden's 1–3%; and even at τ 0, 19–46% of the upper half against its 3–7%. That is 10–20× the leaves on the same picture, from m and from R2–R5 being off. τ does not touch it; calibration does.
+- **So judge τ by where the foliage is, not by how dense it is.** The density is the prototype's, not the faces'.
+- **The interior's τ is calibration's to fine-tune.** With R4 and R5 on, which prune shaded branches, an interior will read barer than these stands at the same τ, so 0.2 may become 0.3–0.5 after C1 and C8.
+- **The τ wood is crude:** uniform, as tall as the stand, the same in every direction. A lower or a gapped neighbour, or a south-facing edge, would need τ to vary with height or azimuth. Nothing so far asks for that.
 
 ## 3. The remaining §7 questions
 Q1 (world shape) and Q4 (hosting) are decided above. The lab part of Q4 is answered here.
@@ -208,7 +259,7 @@ Q1 (world shape) and Q4 (hosting) are decided above. The lab part of Q4 is answe
 - **With R6, foliage stacks at the faces.** At D = 32 the outer bands hold twice the interior's share, and the fade only moves the pile inward; at D = 48 the fade cures a mild pile; at D = 64 crowns taper of their own accord.
 - **Without R6 nothing piles**, since crowns stop small.
 - **Allocation:** the prototype grew equal metamer counts at every D (within 2–8%), so the effect on the balance of height against spread is small next to the pile.
-- **The decision:** D = 64 with Q fading linearly to 0 over the last 3 cells before each face (§2a).
+- **The decision** (fourth session): D = 64 with Q fading linearly to 0 over the last 3 cells before each face (§2a). **Held open in the fifth:** what is beyond each face is now a world parameter, the transmission τ (§2d). With D, it waits for the user's look.
 - **Rejected:** letting growth cross the faces while light stays bounded. A bud beyond the slab would see unshaded sky, which is the M0 runaway that the closed-box rule exists to stop.
 
 **Q3, grid policy.**
@@ -217,7 +268,7 @@ Q1 (world shape) and Q4 (hosting) are decided above. The lab part of Q4 is answe
   - **A bricked sparse grid.** Under a closed canopy nearly every column is non-empty, the `top` bound already skips the empty sky, and bricks would break the march's padded row copies.
   - **Per-tree local grids.** Trees compete through one shared field (§C2.9).
   - **Float64.** It is no faster in TS, about 2× slower in SIMD, and buys 10⁻⁶ of C against a model error of 0.04.
-- **D = 64** (§2a), with a 3-cell fade at the faces. Its cost is ≈ 75 ms a season on the phone under (d), and about 145 MB (§2c).
+- **D = 64** recommended (§2a, §2d), open until the user has looked at the τ stands. Its cost is ≈ 69–75 ms a season on the phone under (d), by τ, and about 145 MB (§2c).
 
 **Q5, language boundary.**
 - **Answer:** the whole core in Rust. The light phase goes first behind `LightModel`, only as the step that proves the toolchain and the goldens.
@@ -292,8 +343,8 @@ Q1 (world shape) and Q4 (hosting) are decided above. The lab part of Q4 is answe
 
 **Q9, milestone order** (fourth session):
 - **G1** passed.
-- **The prototype** has reported, and ADR 0024 is accepted with D = 64 and the fade.
-- **G2 starts next**, after the user confirms the two filled values. Then G3, I1 and I2.
+- **The prototype** has reported, and so have the τ runs. ADR 0024 is accepted in principle, with D and the faces (τ, the fade) open.
+- **G2 starts next**, after the user has looked at the τ stands and settled D and τ. Then G3, I1 and I2.
 - **Then the visual check:** a stand grown in 3D, drawn orthographically with the existing renderer, beside today's pseudo-depth, on the user's phone. The user decides by eye.
 - Only then calibration.
 - Step (b) is held to bit-identical goldens.
@@ -304,6 +355,7 @@ Q1 (world shape) and Q4 (hosting) are decided above. The lab part of Q4 is answe
 | G0.5 | A preview deploy with COOP/COEP (its perspective panels misread the intent; kept as a record) | hosting: `require-corp` breaks nothing on the site (checked locally). **Not a visual gate** |
 | G1 | The measured kernel on the user's phone, from the same deploy: 1 and 4 lanes at D = 32, 48, 64, and D = 64 in 2× cells | **passed:** phone 32 ms at D = 32 against the 150 ms rule; lane scaling and device ratios measured |
 | P | A throwaway 3D growth prototype (C1–C6, R1, and R6 as a second set), outside `src/` | **done:** m, the per-metamer cost, the foliage profile across z, D = 64 with the fade |
+| P-τ | The prototype with a face transmission τ per face: τ 1, 0.5, 0.2, 0, the edge, 42-cell spacing | **done:** τ and D for three looks (§2d); the user looks before G2 |
 | G2 | The Rust 2D sky sweep behind `LightModel`, f64 scalar; CI toolchain | bit-identical goldens; wasm size |
 | G3 | 3D light in Rust: exact-trace accuracy, K convergence, timing in the browser | the light model's error and K |
 | I1 | The whole Rust 2D core, every golden bit-identical; delete the TS core | r (Rust against TS on the tree passes), measured |
@@ -338,6 +390,7 @@ The 3D model shares its principles with the 2D one but is not the same model.
 - k_ext may transfer, since leaf area per column is set the same way.
 - Edge lean becomes a 2-vector.
 - **Open z makes every tree an edge tree in z** (Qz). Floor light, crown base, shade order and succession all move from today's woodland values, because the understorey is lit through the faces. Face clipping adds its own effect on allocation. C1 and C8 carry most of this.
+  - **How much depends on τ** (§2d). Each look the garden exposes must be calibrated at its τ, or the calibration held at one τ and the others checked against it.
 
 **R1 carbon:** production scales with leaves (D×), while sapwood cost follows the pipe area. m_f, m_w and L_h are recalibrated, as at M8.
 
@@ -381,10 +434,10 @@ Add the five or six steps G1–I3 of §3, and the port is about 14 milestones. T
 - the calibration bill, about 8 milestones;
 - above all, whether crowns grown in 3D are worth it in the garden's flat illustration. That is the user's judgement at V.
 
-The prototype's page is an uncalibrated first look, not V. Under open z the side light keeps lower crowns leafy, so its stands read as hedges.
+The prototype's page is an uncalibrated first look, not V. Under open z the side light keeps lower crowns leafy, so its stands read as hedges. A face transmission τ moves that lower crown as the user predicted (§2d); the stands' density, 10–20× the garden's leaves on the same picture, is calibration's.
 
 **The reduced scope:**
-- **World:** a slab periodic in x and open in z, the faces clipping growth but not light; **D = 64, with Q fading over the last 3 cells before each face**; K = 16 with rotation; Float32.
+- **World:** a slab periodic in x and open in z, the faces clipping growth; the sky beyond each face seen through a world parameter τ (§2d); **D = 64 recommended, with τ by look and the fade for I2 to settle** (open until the user has looked); K = 16 with rotation; Float32.
 - **View:** the garden's orthographic frontal illustration, drawn in z order. No perspective anywhere in scope.
 - **Core:** all of it in Rust. Threads only for the garden on edbarker.dev; the lab single-threaded on Pages.
 - **Out:** a full volume, a free camera, perspective, periodic z, PyO3 (until wanted), WebGPU, and a dual 2D/3D core. The pyramid is not the default but stays G3's fallback (Q2).
@@ -392,7 +445,7 @@ The prototype's page is an uncalibrated first look, not V. Under open z the side
 - **The live garden** stays on its last 2D release until the 3D one passes C7 (four species).
 
 **G1 and the prototype are done.** The next steps, and what can stop them:
-- **G2,** once the user confirms ADR 0024's D = 64 and fade: the Rust 2D sweep behind `LightModel`. It can fail cheaply on bit-identical goldens and on toolchain friction.
+- **G2,** once the user has looked at the τ stands and settled D and τ: the Rust 2D sweep behind `LightModel`. It can fail cheaply on bit-identical goldens and on toolchain friction.
 - **G3** can fail on the box-mean error, measured with the exact tracer stopping at the faces. Stop, or switch to the exact segment integral or the pyramid, if mean |ΔQ|/C is above 0.08 (twice M18's 2D error) and the fix costs more than 2×.
 - **I2** is the last cheap point to stop on cost. If a grown 3D `forest` with every principle costs more than 250 ms a season on the phone at D = 64 with lanes, fall back to D = 48 with the fade (§2a) before any calibration is spent.
 
@@ -402,6 +455,6 @@ The prototype's page is an uncalibrated first look, not V. Under open z the side
 - **The prototype's page is not V.** Its stands are uncalibrated, and under open z they read as hedges leafy to the ground. V must wait for I2's stand with every principle, as the ADR says.
 
 **Open questions for the user:**
-- **Now:** confirm or change ADR 0024's two filled values, D = 64 and the 3-cell fade.
+- **Now:** look at the τ stands on the proto page; then settle D (64 recommended) and which looks τ should offer (§2d).
 - **Then:** G2.
 - **Later:** the first-paint policy for 3D (Q7).

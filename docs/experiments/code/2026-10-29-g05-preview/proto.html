@@ -34,7 +34,9 @@
       <p class="warn">
         <b>Throwaway prototype, not the model.</b> <code>forest</code>'s planting grown uncalibrated with
         C1–C6 and R1 (and, by default, R6 short shoots), once in 2D by today's core and once in 3D by
-        the prototype, in an open slab D cells deep. Without R6 both stands stop at height 48 by
+        the prototype, in a slab D cells deep. τ is the share of the sky that
+        reaches the slab through its front and back faces: 1 is open country on both sides, 0 is a
+        row standing inside a wood as tall as itself. Without R6 both stands stop at height 48 by
         season 40 and the renderer, which draws leaves on new growth and short shoots, shows them
         nearly bare. With R6 they reach 85–90 by season 100.
       </p>
@@ -44,12 +46,23 @@
           <label><input type="radio" name="rules" value="-r6" checked /> C1–C6, R1, R6</label>
           <label><input type="radio" name="rules" value="" /> C1–C6, R1 only</label>
         </fieldset>
-        <fieldset><legend>Slab</legend>
-          <label><input type="radio" name="cfg" value="d32-hard" /> D 32</label>
-          <label><input type="radio" name="cfg" value="d48-hard" checked /> D 48</label>
-          <label><input type="radio" name="cfg" value="d64-hard" /> D 64</label>
-          <label><input type="radio" name="cfg" value="d32-fade" /> D 32, faded faces</label>
-          <label><input type="radio" name="cfg" value="d48-fade" /> D 48, faded (R6)</label>
+        <fieldset><legend>Depth</legend>
+          <label><input type="radio" name="D" value="32" /> D 32</label>
+          <label><input type="radio" name="D" value="48" /> D 48</label>
+          <label><input type="radio" name="D" value="64" checked /> D 64</label>
+        </fieldset>
+        <fieldset><legend>Faces</legend>
+          <label><input type="radio" name="faces" value="1" checked /> τ 1 (open)</label>
+          <label><input type="radio" name="faces" value="0.5" /> τ 0.5</label>
+          <label><input type="radio" name="faces" value="0.2" /> τ 0.2</label>
+          <label><input type="radio" name="faces" value="0" /> τ 0 (dark)</label>
+          <label><input type="radio" name="faces" value="edge" /> wood edge: τ 1 in front, 0 behind</label>
+          <label><input type="radio" name="faces" value="edge02" /> τ 1 in front, 0.2 behind (D 64)</label>
+          <label><input type="radio" name="faces" value="fade" /> τ 1, faded</label>
+        </fieldset>
+        <fieldset><legend>Spacing</legend>
+          <label><input type="radio" name="spacing" value="21" checked /> 21 cells (closed row)</label>
+          <label><input type="radio" name="spacing" value="42" /> 42 cells (single trees)</label>
         </fieldset>
         <fieldset><legend>Season</legend>
           <label><input type="radio" name="season" value="40" checked /> 40</label>
@@ -57,8 +70,8 @@
         </fieldset>
       </form>
       <div class="panels">
-        <figure><canvas id="flat"></canvas><figcaption><b>Today's view</b> <span>The planting grown in 2D under the same rules, drawn by the garden's renderer with ADR 0008's pseudo-depth.</span></figcaption></figure>
-        <figure><canvas id="solid"></canvas><figcaption><b>Grown in 3D</b> <span>The same renderer, orthographic: (x, y) projected, drawn far to near by z. No perspective, no depth darkening.</span></figcaption></figure>
+        <figure><canvas id="flat"></canvas><figcaption><b>Today's view</b> <b id="label2d"></b> <span>The planting grown in 2D under the same rules, drawn by the garden's renderer with ADR 0008's pseudo-depth.</span></figcaption></figure>
+        <figure><canvas id="solid"></canvas><figcaption><b>Grown in 3D</b> <b id="label3d"></b> <span>The same renderer, orthographic: (x, y) projected, drawn far to near by z. No perspective, no depth darkening.</span></figcaption></figure>
       </div>
     </main>
     <script type="module" src="./proto.ts"></script>

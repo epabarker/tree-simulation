@@ -2,6 +2,23 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-29: 3D port, the faces' transmission τ; ADR 0024 held open
+
+- **User:** the 3D stands read as hedges. They argued that this is structural: open faces light the lower crown, and nothing prunes lit foliage. They asked for a face transmission τ, the R6 set at D = 48 and 64 for τ ∈ {1, 0.5, 0.2, 0}, and a 42-cell planting, all on the proto page. ADR 0024 is held at accepted-in-principle with D and τ open.
+- **τ** (`cli/slab-light.ts`, default 1, so the bench is unchanged): the padded line beyond each z face carries depth −ln τ / k_ext. It is set per face (front, back), and τ = 1 reproduces the prototype's stands exactly.
+- **Added, not asked:**
+  - a wood edge (1 in front, 0 or 0.2 behind), since a symmetric τ cannot make one;
+  - the "below half" share on today's full 2D model, as an anchor;
+  - a picture-cover measure, because the share did not separate the 3D stands from the garden.
+- **Measured** ([note](experiments/2026-10-29-face-transmission.md)):
+  - **The lower crown follows τ:** τ 1 keeps 12–16% of each tree's leaves below half height and covers 26–33% of the picture's lower half; τ 0.5 7–9% and 14–19%; τ ≤ 0.2 0–2%. The edge gives 4–7%, on the viewer's side.
+  - **At τ < 1** crowns stop short of the faces and nothing piles, and m falls 12–38%.
+  - **The 42-cell planting** gives separate domes, as leafy low as the closed row.
+- **Surprise: today's 2D garden is as leafy below half height** (`forest`, `mixedWood` 13–15%; `oakOpen` 36%), but it covers 1–3% of the picture there. The 3D stands put 10–20× the leaves on the same picture at every τ. **The hedge is half faces, half density,** and the density is calibration's.
+- **Review §2d:** per look, hedgerow 1, 1 at D 64 (≈ 75 ms on the phone); wood edge 1, 0.2 at D 64 (≈ 71); wood interior 0.2, 0.2 at D 48 (≈ 56) or 64 (≈ 69). One D for all looks, 64, since τ is a world parameter the garden can expose and D is fixed per world.
+- **Site:** `preview-3d` carries 24 more stands (108 MB in all), with τ, edge and spacing controls on `proto.html`.
+- **Nothing in `src/`, the goldens or the default light model changed.**
+
 ## 2026-10-29: 3D port, G1 passed; a throwaway 3D prototype; ADR 0024 accepted
 
 - **G1 (user, on a Pixel 8a and an X1 Carbon):**

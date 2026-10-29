@@ -66,6 +66,7 @@ export class SlabSweep implements SlabLight {
   updates = 0;
   /** March all K directions down together, one row at a time (see computeFused). */
   readonly fused: boolean;
+  private readonly faceG: readonly [number, number];
 
   constructor(
     W: number,
@@ -77,8 +78,15 @@ export class SlabSweep implements SlabLight {
     periodicZ: boolean,
     A: ArrCtor,
     fused = false,
+    faceTau: number | readonly [number, number] = 1,
   ) {
     this.fused = fused;
+    // The sky beyond each z face, seen through an attenuation τ (1 open, 0 dark): a depth G the
+    // padded line carries outside the slab below the stand's top, as if a wood as tall stood there.
+    // One τ for both faces, or [front (z < 0, the viewer's side), back (z ≥ D)].
+    const g = (t: number) => (t >= 1 ? 0 : t <= 0 ? 50 / c2.kExt : -Math.log(t) / c2.kExt);
+    const [front, back] = typeof faceTau === "number" ? [faceTau, faceTau] : faceTau;
+    this.faceG = [g(front), g(back)];
     this.W = W;
     this.H = H;
     this.D = D;
@@ -290,7 +298,7 @@ export class SlabSweep implements SlabLight {
           let z = zz - padZ;
           if (periodicZ) z = ((z % D) + D) % D;
           const d0 = zz * NX;
-          if (z < 0 || z >= D) G.fill(0, d0, d0 + NX);
+          if (z < 0 || z >= D) G.fill(this.faceG[z < 0 ? 0 : 1], d0, d0 + NX);
           else SlabSweep.padLine(up, u0 + z * W, W, G, d0, padX, periodicX);
           const i0 = zz * (NX + 1);
           const r0 = zz * W;
@@ -430,7 +438,7 @@ export class SlabSweep implements SlabLight {
         if (periodicZ) z = ((z % D) + D) % D;
         const d0 = zz * NX;
         if (z < 0 || z >= D) {
-          G.fill(0, d0, d0 + NX);
+          G.fill(this.faceG[z < 0 ? 0 : 1], d0, d0 + NX);
           L.fill(0, d0, d0 + NX);
           continue;
         }

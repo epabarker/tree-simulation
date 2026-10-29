@@ -60,6 +60,9 @@ export interface Options {
   divergence: number;
   K: number;
   seed: number;
+  /** Transmission of the sky beyond each z face (1 open, 0 dark: the row inside a wood), or
+   * [front, back] with front the viewer's face (z < 0). */
+  tau?: number | readonly [number, number];
 }
 
 /** mulberry32: the prototype's only randomness (direction noise, axis phases). */
@@ -126,7 +129,7 @@ export class Stand3D {
     this.o = o;
     this.r = rng(o.seed);
     const { width: W, height: H } = params.world;
-    this.light = new SlabSweep(W, H, o.D, params.c2, o.K, true, false, Float32Array, true);
+    this.light = new SlabSweep(W, H, o.D, params.c2, o.K, true, false, Float32Array, true, o.tau ?? 1);
     params.trees.forEach((spec, id) => {
       const t = new Tree(id, spec.x);
       // Widen the core's tables with the 3D columns (runtime only; the core never sees the type).

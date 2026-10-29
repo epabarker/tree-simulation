@@ -13,14 +13,16 @@ import { mergeParams, type Params } from "../src/core/params.ts";
 import { forestParams, type PresetName, presetParams } from "../src/core/presets.ts";
 import { FULL_SNAPSHOT, type Snapshot, SnapshotBuilder } from "../src/core/snapshot.ts";
 import { World } from "../src/core/world.ts";
-import { loadWorldsSync, RustWorld, wasmUrl } from "../src/wasm/world.ts";
+import { parityWasm } from "../src/wasm/parity.ts";
+import { productionWasm } from "../src/wasm/production.ts";
+import { loadWorldsSync, RustWorld } from "../src/wasm/world.ts";
 import { caseKey, GOLDEN_CASES } from "./golden-cases.ts";
 
 const golden = JSON.parse(
   readFileSync(new URL("./golden.json", import.meta.url), "utf8"),
 ) as Record<string, string>;
 
-beforeAll(() => loadWorldsSync("parity", readFileSync(wasmUrl.parity)));
+beforeAll(() => loadWorldsSync("parity", readFileSync(parityWasm)));
 
 describe("goldens in the Rust world (I1, parity build)", () => {
   for (const c of GOLDEN_CASES) {
@@ -175,7 +177,7 @@ describe("production goldens: the WASM build's are the native build's (I1 stage 
   const production = JSON.parse(
     readFileSync(new URL("./golden-production.json", import.meta.url), "utf8"),
   ) as Record<string, string>;
-  beforeAll(() => loadWorldsSync("production", readFileSync(wasmUrl.production)));
+  beforeAll(() => loadWorldsSync("production", readFileSync(productionWasm)));
   for (const c of GOLDEN_CASES) {
     it(caseKey(c), () => {
       const params = isFixtureName(c.preset)

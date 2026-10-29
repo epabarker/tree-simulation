@@ -4,41 +4,51 @@
  * snapshots built in Rust and taken out of linear memory in one copy.
  *
  * Two builds: production (`pkg/`: Rust's libm, WASM SIMD, the page's) and parity (`pkg-parity/`:
- * V8's Math, the TypeScript goldens'). Load one with `loadWorlds` before making worlds.
+ * V8's Math, the TypeScript goldens'). Import `./production.ts` or `./parity.ts` to register one,
+ * and load it with `loadWorlds` before making worlds.
  */
 
 import type { TreeMetrics } from "../core/metrics.ts";
 import type { Params, ParamsPatch } from "../core/params.ts";
 import type { Snapshot, SnapshotOptions } from "../core/snapshot.ts";
 import type { RunEvent, RunRecord } from "../core/world.ts";
-import * as production from "./pkg/core.js";
-import * as parity from "./pkg-parity/core.js";
+import type * as production from "./pkg/core.js";
 
 export type Build = "production" | "parity";
-type Pkg = typeof production;
+/** A build's wasm-bindgen module (both builds export the same API). */
+export type Pkg = typeof production;
 
+const pkgs: Partial<Record<Build, Pkg>> = {};
 const loaded: Partial<Record<Build, { pkg: Pkg; memory: WebAssembly.Memory }>> = {};
 
-/** Where each build's module sits next to this file. */
-export const wasmUrl: Record<Build, URL> = {
-  production: new URL("./pkg/core_bg.wasm", import.meta.url),
-  parity: new URL("./pkg-parity/core_bg.wasm", import.meta.url),
-};
-
-const pkgs: Record<Build, Pkg> = { production, parity: parity as unknown as Pkg };
-
-/** Loads a build from its bytes (Node: `readFileSync(wasmUrl[build])`). */
-export function loadWorldsSync(build: Build, bytes: Uint8Array | ArrayBuffer): void {
-  if (loaded[build]) return;
-  const out = pkgs[build].initSync({ module: bytes });
-  loaded[build] = { pkg: pkgs[build], memory: out.memory };
+/**
+ * Makes a build loadable. `./production.ts` and `./parity.ts` register theirs, so a bundle holds
+ * only the builds it imports (the garden's worker: production alone).
+ */
+export function registerBuild(build: Build, pkg: Pkg): void {
+  pkgs[build] = pkg;
 }
 
-/** Loads a build by fetching it (the page's worker). */
-export async function loadWorlds(build: Build, url: URL | string = wasmUrl[build]): Promise<void> {
+function pkgOf(build: Build): Pkg {
+  const pkg = pkgs[build];
+  if (!pkg) throw new Error(`Import src/wasm/${build}.ts to use the ${build} build`);
+  return pkg;
+}
+
+/** Loads a build from its bytes (Node: `readFileSync(productionWasm)`, from production.ts). */
+export function loadWorldsSync(build: Build, bytes: Uint8Array | ArrayBuffer): void {
   if (loaded[build]) return;
-  const out = await pkgs[build].default({ module_or_path: url });
-  loaded[build] = { pkg: pkgs[build], memory: out.memory };
+  const pkg = pkgOf(build);
+  const out = pkg.initSync({ module: bytes });
+  loaded[build] = { pkg, memory: out.memory };
+}
+
+/** Loads a build by fetching it (the page's worker), from wasm-bindgen's URL beside its glue. */
+export async function loadWorlds(build: Build, url?: URL | string): Promise<void> {
+  if (loaded[build]) return;
+  const pkg = pkgOf(build);
+  const out = await pkg.default(url ? { module_or_path: url } : undefined);
+  loaded[build] = { pkg, memory: out.memory };
 }
 
 function build(b: Build): { pkg: Pkg; memory: WebAssembly.Memory } {
@@ -105,11 +115,11 @@ export function snapshotTransferables(s: Snapshot): ArrayBuffer[] {
 
 export class RustWorld {
   readonly build: Build;
-  private readonly core: production.World;
+  private readonly core: Pkg["World"]["prototype"];
   private paramsAt = -1;
   private cached: Params | null = null;
 
-  private constructor(b: Build, core: production.World) {
+  private constructor(b: Build, core: Pkg["World"]["prototype"]) {
     this.build = b;
     this.core = core;
   }

@@ -10,9 +10,11 @@ import { join } from "node:path";
 import { gunzipSync } from "node:zlib";
 import { loadWorld } from "../../../../src/core/checkpoint.ts";
 import { hashWorld } from "../../../../src/core/hash.ts";
-import { loadWorldsSync, RustWorld, wasmUrl } from "../../../../src/wasm/world.ts";
+import { parityWasm } from "../../../../src/wasm/parity.ts";
+import { productionWasm } from "../../../../src/wasm/production.ts";
+import { loadWorldsSync, RustWorld } from "../../../../src/wasm/world.ts";
 
-loadWorldsSync("parity", readFileSync(wasmUrl.parity));
+loadWorldsSync("parity", readFileSync(parityWasm));
 const dir = process.argv[2] ?? "../edbarker-dev/public/garden/0.14.0/first";
 for (const f of readdirSync(dir).filter((f) => f.endsWith(".bin.gz")).sort()) {
   const bytes = new Uint8Array(gunzipSync(readFileSync(join(dir, f))));

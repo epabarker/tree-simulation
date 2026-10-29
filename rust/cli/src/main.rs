@@ -88,6 +88,8 @@ struct Args {
     light: bool,
     checkpoint_at: Option<String>,
     species_patch: Option<String>,
+    /// Time each phase of each season instead of writing files (`npm run bench`'s table).
+    bench: bool,
 }
 
 fn args() -> Args {
@@ -103,6 +105,7 @@ fn args() -> Args {
         light: false,
         checkpoint_at: None,
         species_patch: None,
+        bench: false,
     };
     let mut it = std::env::args().skip(1);
     while let Some(flag) = it.next() {
@@ -123,6 +126,7 @@ fn args() -> Args {
             "--species-patch" => a.species_patch = Some(value()),
             "--quiet" => a.quiet = true,
             "--light" => a.light = true,
+            "--bench" => a.bench = true,
             // The TypeScript CLI's G2 switch: the whole core is Rust now.
             "--rust" => {}
             _ => fail(&format!("Unknown option '{flag}'")),
@@ -254,6 +258,10 @@ fn main() {
     let mut light_lines = vec!["season,col,row,shade".to_string()];
 
     let mut world = World::new(params);
+    if a.bench {
+        bench(&mut world, seasons);
+        return;
+    }
     let mut queue: Vec<Value> = events.clone();
     let at = |e: &Value| e.get("season").and_then(Value::as_f64).unwrap_or(0.0);
     queue.sort_by(|x, y| at(x).total_cmp(&at(y)));
@@ -395,6 +403,36 @@ fn main() {
             ms
         );
     }
+}
+
+/// Mean ms per season by phase, as JSON on stdout (as cli/bench.ts runs a case, its hash too).
+fn bench(world: &mut World, seasons: f64) {
+    use tree_core::season::{PHASES, Phase};
+    let mut totals = [0.0f64; 9];
+    let mut seasons_ms = Vec::new();
+    let mut s = 0.0;
+    while s < seasons {
+        s += 1.0;
+        let t_season = Instant::now();
+        let mut last = Instant::now();
+        world.step(&mut |phase: Phase| {
+            let now = Instant::now();
+            let k = PHASES.iter().position(|&p| p == phase).unwrap();
+            totals[k] += (now - last).as_secs_f64() * 1000.0;
+            last = now;
+        });
+        seasons_ms.push(t_season.elapsed().as_secs_f64() * 1000.0);
+    }
+    let n = seasons_ms.len().max(1) as f64;
+    let mut fields = vec![(
+        "mean".to_string(),
+        Value::Num(seasons_ms.iter().sum::<f64>() / n),
+    )];
+    for (k, p) in PHASES.iter().enumerate() {
+        fields.push((p.name().into(), Value::Num(totals[k] / n)));
+    }
+    fields.push(("hash".into(), Value::Str(hash_world(world))));
+    println!("{}", json::stringify(&Value::Obj(fields), false));
 }
 
 #[cfg(test)]

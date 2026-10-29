@@ -87,5 +87,5 @@ function build(name: string, features: string[], rustflags: string): void {
   );
 }
 
-build("pkg-parity", ["--features", "parity"], "");
+build("pkg-parity", ["--features", "parity,testing"], "");
 build("pkg", [], "-C target-feature=+simd128");

@@ -16,5 +16,6 @@ pub mod params;
 pub mod principles;
 pub mod rng;
 pub mod season;
+pub mod snapshot;
 pub mod tree;
 pub mod world;

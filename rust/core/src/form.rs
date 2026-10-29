@@ -52,7 +52,7 @@ pub fn median(xs: &[f64]) -> f64 {
     let mut s = xs.to_vec();
     s.sort_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal));
     let k = s.len() >> 1;
-    if s.len() % 2 == 1 {
+    if !s.len().is_multiple_of(2) {
         s[k]
     } else {
         (s[k - 1] + s[k]) / 2.0

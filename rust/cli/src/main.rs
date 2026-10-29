@@ -1,5 +1,5 @@
-//! The headless runner (I1, ADR 0024): the Rust core natively, writing what cli/run.ts wrote, byte
-//! for byte in parity mode, so the analysis (analysis/treesim) reads it unchanged.
+//! The headless runner (I1, ADR 0024): the Rust core natively, writing the files the TypeScript
+//! CLI wrote, in the same formats, so the analysis (analysis/treesim) reads them unchanged.
 //!
 //!   treesim --preset explosion --seed 3 --seasons 12 --out runs/m0
 //!   treesim --params my.json --snapshots 25,50 --out runs/x     (patch over the preset)
@@ -246,7 +246,7 @@ fn main() {
 
     let mut metrics_lines = vec![format!("season,{}", METRIC_COLUMNS.join(","))];
     let mut metamer_lines = vec![
-        "season,tree,birthId,parentBirthId,order,axis,x0,y0,x1,y1,length,angle,radius,qSum,nSum,vIn,birthSeason,stressWood"
+        "season,tree,birthId,parentBirthId,order,axis,x0,y0,x1,y1,length,angle,radius,qSum,nSum,vIn,birthSeason,stressWood,z0,z1,hx,hy,hz"
             .to_string(),
     ];
     let profile: Vec<String> = (0..PROFILE_BANDS).map(|k| format!("p{k}")).collect();
@@ -299,7 +299,7 @@ fn main() {
         }
         if a.light && snap(season) {
             let w = world.light.width() as usize;
-            if let Some(field) = world.light.field() {
+            if let Some(field) = world.light.field(world.params().c2.c) {
                 for (c, &v) in field.iter().enumerate() {
                     light_lines.push(format!("{},{},{},{}", num(season), c % w, c / w, num(v)));
                 }
@@ -340,13 +340,19 @@ fn main() {
                         tree.tip_x(i),
                         tree.tip_y(i),
                         c.length[i],
-                        c.angle[i],
+                        // As drawn in the picture's plane; the heading follows.
+                        tree_core::math::atan2(c.hy[i], c.hx[i]),
                         c.radius[i],
                         c.q_sum[i],
                         c.n_sum[i] as f64,
                         c.v_in[i],
                         c.birth_season[i] as f64,
                         c.stress_wood[i],
+                        c.base_z[i],
+                        tree.tip_z(i),
+                        c.hx[i],
+                        c.hy[i],
+                        c.hz[i],
                     ];
                     let cells: Vec<String> = row.iter().map(|&v| num(v)).collect();
                     metamer_lines.push(cells.join(","));
@@ -357,7 +363,6 @@ fn main() {
     let ms = t0.elapsed().as_secs_f64() * 1000.0;
 
     let hash = hash_world(&world);
-    let parity = cfg!(feature = "parity");
     let mut run = Value::Obj(vec![(
         "meta".into(),
         Value::Obj(vec![
@@ -373,10 +378,7 @@ fn main() {
             ("commit".into(), Value::Str(git_commit())),
             ("hash".into(), Value::Str(hash.clone())),
             ("ms".into(), Value::Num(ms.round())),
-            (
-                "core".into(),
-                Value::Str(if parity { "rust-parity" } else { "rust" }.into()),
-            ),
+            ("core".into(), Value::Str("rust".into())),
         ]),
     )]);
     if let Value::Obj(fields) = world.record() {
@@ -405,23 +407,42 @@ fn main() {
     }
 }
 
-/// Mean ms per season by phase, as JSON on stdout (as cli/bench.ts runs a case, its hash too).
+/// Mean ms per season by phase, as JSON on stdout (as cli/bench.ts runs a case, its hash too),
+/// and the series [season, live metamers, light ms, passes ms] per season (I2's measurements).
 fn bench(world: &mut World, seasons: f64) {
     use tree_core::season::{PHASES, Phase};
     let mut totals = [0.0f64; 9];
     let mut seasons_ms = Vec::new();
+    let mut series = Vec::new();
     let mut s = 0.0;
     while s < seasons {
         s += 1.0;
         let t_season = Instant::now();
         let mut last = Instant::now();
+        let mut this = [0.0f64; 9];
         world.step(&mut |phase: Phase| {
             let now = Instant::now();
             let k = PHASES.iter().position(|&p| p == phase).unwrap();
-            totals[k] += (now - last).as_secs_f64() * 1000.0;
+            this[k] += (now - last).as_secs_f64() * 1000.0;
             last = now;
         });
         seasons_ms.push(t_season.elapsed().as_secs_f64() * 1000.0);
+        for k in 0..9 {
+            totals[k] += this[k];
+        }
+        let live: usize = world
+            .trees
+            .iter()
+            .filter(|t| t.alive)
+            .map(|t| t.m.len())
+            .sum();
+        let passes: f64 = this[1..].iter().sum();
+        series.push(Value::Arr(vec![
+            Value::Num(s),
+            Value::Num(live as f64),
+            Value::Num(this[0]),
+            Value::Num(passes),
+        ]));
     }
     let n = seasons_ms.len().max(1) as f64;
     let mut fields = vec![(
@@ -432,6 +453,7 @@ fn bench(world: &mut World, seasons: f64) {
         fields.push((p.name().into(), Value::Num(totals[k] / n)));
     }
     fields.push(("hash".into(), Value::Str(hash_world(world))));
+    fields.push(("series".into(), Value::Arr(series)));
     println!("{}", json::stringify(&Value::Obj(fields), false));
 }
 

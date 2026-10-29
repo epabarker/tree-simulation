@@ -69,6 +69,7 @@
   - **With the `parity` feature** it carries V8's routines bit for bit, so its results are the TypeScript goldens' on every engine. Since I1 it runs the goldens, the cross-core records, the evidence tests (whose thresholds were calibrated on the TypeScript core's runs) and the opening forests (`cli/first-paint.ts`, so the shipped bytes stay the ones chosen by eye).
   - **Without it** (production) it uses the `libm` crate, identical natively and in WASM, and for the 3D light a Float32 polynomial exp and SIMD.
   - The production build gets its own goldens at I1 stage 2.
+  - **After I1, parity is a proof, not a mode** (user, 2026-10-30): the production build is the only one at HEAD, for the page, the CLI, the bench, the tests and the opening forests. The parity feature, its V8 ports and its WASM package are removed; they stay at the tag `golden-2d-ts`, where CI's `golden-2d` job runs the 2D goldens. The evidence tests' thresholds were re-derived on production first ([note](../experiments/2026-10-30-production-thresholds.md)); two M5 tests were restated over 20 seeds.
 
 **The bundle:** ADR 0014's 60 kB stays the first-paint JS budget. The WASM loads after first paint, and gets its own gate (its measured size plus 25%) at I1: 170 kB gzip (`cli/garden-size.ts`; 141.4 kB at the deletion). 3D first-paint data gets its own budget at I3.
 
@@ -96,7 +97,7 @@
 - **Worth having even if 3D stops at V:** I1, a Rust 2D core, deterministic across browsers and native, with PyO3 a feature flag away. In the browser (VM, headless Chromium) the production build takes 0.74–0.77 of the TypeScript core's time a season and the parity build 1.07–1.18 of it; natively a season's step takes 0.44–0.72 of the TypeScript core's in Node ([I1 note](../experiments/2026-10-29-i1-rust-core.md)). It does not make the 2D garden visibly better.
 - **Harder:**
   - A second toolchain in CI and in `npm run check` (Rust 1.97, the wasm32 target, wasm-bindgen-cli pinned to the crate's version).
-  - **The parity goldens' bits are tied to Node on x86-64 Linux with glibc's FMA pow,** which the Rust core reproduces and pins. Only `tests/wasm-math.test.ts` still reads the engine's Math, so another platform would fail that test, not the goldens.
+  - **The archived 2D goldens' bits are tied to Node on x86-64 Linux with glibc's FMA pow,** which the parity build reproduced and pinned. The `golden-2d` job runs on such a runner; elsewhere the tag's `tests/wasm-math.test.ts` would fail first.
   - The WASM after first paint, and a first frame the JS renderer draws without the core.
   - COOP/COEP on the site.
   - Checkpoints MB-sized, unless the intro grows the forest.
@@ -106,6 +107,6 @@
   - Every golden, evidence test and species calibration redone, at the default τ with the presets checked.
   - **Foliage density is a target in two milestones,** C1 (what the model carries) and I3 (how it draws), each measured by picture coverage.
   - A 2D freeze of 3–5 sessions (I1). Done.
-  - **Two sets of goldens,** parity and production. A behaviour change moves both.
+  - **The 2D goldens are frozen at the tag:** behaviour changes from I2 on move only `tests/golden.json`.
   - About 14 milestones in all.
 - **Revisit** if G3 or I2 fails, if V does not show a clear gain, or if the user wants trees seen from an angle (a full volume, out of this decision's scope).

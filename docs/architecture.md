@@ -20,11 +20,9 @@ How the code realises the spec. For *why* a choice was made, see `docs/decisions
 
 The simulation is the Rust core, `rust/core` (`tree-core`; I1, ADR 0024). The page's worker runs it as WASM through `src/wasm/world.ts`; the CLI runs it natively (`rust/cli`, the `treesim` binary). `src/core` keeps what is plain data, shared by every host and read by the Rust core as JSON (`rust/presets.json`, written by `cli/export-presets.ts` and held to them by `tests/presets-json.test.ts`): the params and their defaults (`params.ts`), presets, species and fixtures, and `types.ts` (the snapshot, metrics and run-record shapes the page reads). It compiles against `lib: es2023` only, so a DOM or Node API used there is a type error.
 
-**Two builds** (`npm run build:wasm`, and `cargo` features natively):
-- **production** (`src/wasm/pkg/`, the default): the `libm` crate's Math, simd128 on. The page, the CLI and the bench run it. Its goldens are `tests/golden-production.json`.
-- **parity** (`src/wasm/pkg-parity/`, feature `parity`): V8's Math, ported (fdlibm sin, cos, exp, log, atan, atan2, cbrt; glibc's pow; V8's hypot), bit for bit (`tests/wasm-math.test.ts`). It reproduces the TypeScript core's runs: `tests/golden.json`, the cross-core records in `tests/fixtures/ts-core.json`, and the shipped opening forests. The evidence tests (`tests/evidence/`) and `cli/first-paint.ts` run it; `npm run sim -- --parity` selects it.
+**One build** (`npm run build:wasm` into `src/wasm/pkg/`, and natively): the `libm` crate's Math, simd128 in WASM. The page, the CLI, the bench, the tests and the opening forests all run it, and `tests/golden.json` holds it natively and in WASM.
 
-The TypeScript core it replaced is archived at the tag `golden-2d-ts`.
+**The 2D proof is archived.** The TypeScript core it replaced, and the Rust core's parity build (V8's Math, ported bit for bit) that reproduced it, are at the tag `golden-2d-ts`. CI's `golden-2d` job checks out that tag and runs the 2D goldens there, the TypeScript core's and the parity build's, in WASM and natively.
 
 ## The garden and the lab (M14, ADR 0014)
 
@@ -56,14 +54,14 @@ The TypeScript core it replaced is archived at the tag `golden-2d-ts`.
 
 **First paint (M21):**
 - **Checkpoints** (`rust/core/src/checkpoint.rs`; the TypeScript core's byte for byte): `save` writes a whole World as bytes. The layout is a u32 header length, a JSON header (ASCII, with anything else escaped as \uXXXX, since the core has no text codec), then every tree's metamer and bud columns, padded to 8 bytes. It holds the params, season, flags, event log and queue, and each tree's scalars and tables. `load` restores it: k more seasons hash exactly as N + k from scratch (`tests/evidence/checkpoint.test.ts`). Bytes written by the TypeScript core load in the Rust one (`tests/rust-world.test.ts`, with garden 0.14.0's shipped forest). Light, owners and per-season scratch are rebuilt by the season that reads them.
-- **Grown forests:** `cli/first-paint.ts`, run by `npm run build:garden`, grows (in the parity build, so the bytes are the ones chosen by eye) `forestParams` into `dist-garden/first/` with a `manifest.json`: widths 66, 100, 160 and 220, seeds 6, 9 and 10 (chosen by eye), 40 seasons each, 57–192 kB each and 1.4 MB in all.
+- **Grown forests:** `cli/first-paint.ts`, run by `npm run build:garden`, grows `forestParams` into `dist-garden/first/` with a `manifest.json`: widths 66, 100, 160 and 220, seeds 6, 9 and 10 (chosen by eye), 40 seasons each, 57–192 kB each and 1.4 MB in all.
 - **Plate width:** `plateWidth` sizes the ring to a share of the host's aspect: 0.65 on a portrait host, 0.7 on a landscape one (M24). The plate fits the ring's width, so the share sets how large trees are drawn. A phone shows about three trees; the site's wide plate (1200 px) shows about ten at about 7 px a cell.
 - **Leaf studies:** `leafStudy(tree)` returns the tree's species' leaf as an SVG path (`leafStudyPath`), with its real length, for the field card.
 - **Opening on one:** `mountGarden({ first: { base, widths, seeds, when } })` picks the width nearest its own and a seed by the day, opens on that forest at the ambient pace, and falls back to growing from seed. With `when: "reduced-motion"` (the site, M23) it does so only for reduced motion.
 - **The time-lapse:** `seeds` makes the default forest grow from one of those seeds a day, so it ends in a chosen wood. `?forest=seed` (option `seed`) still grows from seed. The checkpoint was grown from `forestParams(width, seed)`, so that link regrows the same forest only where the browser's `Math` matches Node's (not Chrome's: ADR 0002), at the same ring width.
 - **CLI:** `npm run sim -- --checkpoint-at N` saves the CLI's world (dead trees included) as `checkpoint-N.bin.gz`.
 
-**Long runs:** the worker steps with `discard` on, which calls `World::discard_dead` after each season. It frees dead trees' tables (a forest piles up ≈ 20 MB per 1000 seasons otherwise) without changing any live tree (`tests/evidence/world.test.ts`). Page worlds therefore do not hash like CLI worlds.
+**Long runs:** the worker steps with `discard` on, which calls `World::discard_dead` after each season. It frees dead trees' tables (a forest piles up ≈ 20 MB per 1000 seasons otherwise) without changing any live tree (`tests/structure.test.ts`). Page worlds therefore do not hash like CLI worlds.
 
 ## Data model (spec §5)
 
@@ -76,12 +74,14 @@ Each `Tree` owns two structure-of-arrays tables (`rust/core/src/tree.rs`, the `t
 | `birthId` | Stable id, ascending in array order |
 | `parent`, `slot` | Topology: the parent's row, and which slot of the parent's upper node this metamer fills |
 | `axis`, `axisNode`, `order` | `birthId` of the axis's first metamer; position along the axis; branching order |
-| `baseX`, `baseY`, `angle`, `length`, `radius` | Geometry. `angle` is absolute radians, with 0 = +x and π/2 = up |
+| `baseX`, `baseY`, `baseZ`, `length`, `radius` | Geometry: the base, y up, z the slab's depth from the front face. The metamer runs from its base along H for `length` |
+| `hx`, `hy`, `hz`, `lx`, `ly`, `lz` | The frame (I2, ADR 0025): heading H (unit) and reference L ⟂ H, carried by parallel transport |
+| `azimuth` | A lateral's angle round its parent's H from the parent's L (0 on the main slot): where R4's bank puts a bud back |
 | `scarSumN` | Σ r^n of branches shed at this node (C6 memory) |
 | `birthSeason` | |
 | `qSum`, `nSum`, `vIn` | Per-season pass results (Q_sum, n_b, resource in). Stored with the row so they survive compaction and can be drawn |
 | `stressWood` | Radius added by R3's stress-driven girth. It is local, so C6 sums and remembers only the pipe radius `radius − stressWood` (ADR 0011) |
-| `moment` | Bending moment at the base after last season's R3 pass; this season's sag comes from M − `moment` (ADR 0011) |
+| `mx`, `my`, `mz` | Bending moment vector at the base after last season's R3 pass; this season's sag comes from M − it (ADR 0011, 0025) |
 | `paShift` | R4 reiteration: pa = min(order − paShift, levels − 1) for every R2 lookup. A released dormant bud's shoot gets its host's shift + `r4.juvenile`, and the subtree inherits it (ADR 0012) |
 
 **Buds** (`BUD_SCHEMA`)
@@ -93,21 +93,21 @@ Each `Tree` owns two structure-of-arrays tables (`rust/core/src/tree.rs`, the `t
 | `state` | Active, dormant, terminated or aborted; `gone` = consumed, awaiting compaction. M6d appends `shortShoot` (R6, ADR 0006) |
 | `age` | |
 | `order` | Order of the shoot the bud would produce |
-| `angle` | Default growth direction |
-| `q`, `vx`, `vy` | Light from C2 |
+| `hx`…`lz`, `azimuth` | Default growth frame: a terminal bud's is its metamer's; a lateral's is β from it at its azimuth, its L toward the parent axis |
+| `q`, `vx`, `vy`, `vz` | Light from C2: Q and the 3D direction V |
 | `v` | Resource from C3 |
 
-**Slots instead of child pointers.** A node (the top of a metamer) has three slots: main continuation = 0, left lateral = 1, right lateral = 2. In 2D a node has only two sides, so three slots cover every phyllotaxis in §C1. A slot holds a bud or a child metamer, never both: when a bud grows it is consumed, and the new metamer takes its slot.
+**Slots instead of child pointers.** A node (the top of a metamer) has the main continuation (slot 0) and up to seven laterals (1–7), as many as its phyllotaxis places (ADR 0025): one for spiral and distichous, two for opposite, `whorl` for a whorl. A slot holds a bud or a child metamer, never both: when a bud grows it is consumed, and the new metamer takes its slot.
 
-The passes need only `parent` and `slot`:
-- **Basipetal** (a reverse loop): `qSlot[3·parent + slot] += Q_sum[i]`.
-- **Acropetal** (a forward loop): `vIn[i] = vSlot[3·parent + slot]`.
+The passes need only `parent` and `slot` (`SLOTS` = 8, the stride):
+- **Basipetal** (a reverse loop): `qSlot[8·parent + slot] += Q_sum[i]`.
+- **Acropetal** (a forward loop): `vIn[i] = vSlot[8·parent + slot]`; the Borchert–Honda split gives the main slot λQ_m/(λQ_m + (1−λ)ΣQ_l) and shares the rest among the laterals by their Q.
 
 `qSlot` and `vSlot` are per-tree scratch arrays, resized on demand and never compacted.
 
 **Ordering invariants.** Rows are appended, so parents always come before children. `compact(keep)` removes rows, keeps the order of the rest, and returns old → new indices; every stored index (`parent`, `bud.metamer`) must be remapped through it. Because tables are append-only and compaction keeps order, `birthId` ascends in array order, which lets snapshots match rows across seasons with a two-pointer merge.
 
-**Late columns.** `hash.rs` skips `stressWood`, `moment` and `paShift` while every row is zero, so runs with R3 and R4 off hash exactly as before those columns existed.
+**The hash** (`hash.rs`) is FNV-1a over every column of both tables, in schema order.
 
 **Reallocation.** In Rust the borrow checker keeps a column from being held across an add. On the page, a `TreeView` reads its columns again whenever the world's `version` changes.
 
@@ -122,63 +122,61 @@ One function per phase (`phase_light` … `phase_deaths`, in `PHASES` order); `W
 | BASIPETAL | `gatherLight` (C3): Q_sum, n_b, Q_base | M0 |
 | CARBON (R1, M8, ADR 0010) | `carbonBalance` after `gatherLight` when `r1.enabled`: acropetal `pathLen`; per-node production from live buds' leaf area (`depositArea`) and Q, discounted by exp(−L_path/L_h); basipetal live-pipe sapwood cost plus foliage cost into `tree.pSum`/`mSum` (per-metamer scratch, not hashed); tree totals set `production`, `maintenance`, `reserve` (capped at `store`·M), `reproduction`, `starved` and `vBase`, which `allocate` then splits instead of α·Q_base. Phase 3 kills trees with `starvedToDeath` | M8 |
 | ACROPETAL | `allocate` (C3, by `c3.mode`): `bh` splits by λ at every node; `equal` shares α·Q_base over live buds; `none` gives v = 1 to any bud with Q > 0. Every mode fills `vIn` | M0 `none`, M2 `bh`/`equal` |
-| BUD_FATE, GROW | `growBuds` → `shootSize`, `growShoot`; each new metamer's angle comes from `shootDirection` (C4) when `c4.enabled`, using the bud's V | M0, M3 |
-| R2 (M7, ADR 0009) | No pass of its own: pa = min(order, levels − 1) is looked up where each rule reads its params. `allocate` reads λ per node (`lambdaAt`, with the ontogeny decline); `growBuds` reads A_set and η per bud (`directionParams`); `growShoot` places lateral buds by the axis's generator (`lateralCount`; whorls on the shoot's last metamer) and forms the terminal bud `terminated` with p_term (`terminates`, `Purpose.sympodialTermination`) | M7 |
+| BUD_FATE, GROW | `growBuds` → `shootSize`, `growShoot`; each new metamer's heading comes from `shootDirection` (C4, a vector sum, ADR 0025) when `c4.enabled`, using the bud's 3D V; its frame's L by parallel transport. `formAxillaryBuds` places laterals by phyllotaxis (`laterals`: count and azimuth step) | M0, M3, I2 |
+| R2 (M7, ADR 0009) | No pass of its own: pa = min(order, levels − 1) is looked up where each rule reads its params. `allocate` reads λ per node (`lambdaAt`, with the ontogeny decline); `growBuds` reads A_set and η per bud (`directionParams`); `growShoot` places lateral buds by the axis's generator (`laterals`: spiral, distichous, opposite, whorled with `whorl` laterals on the shoot's last metamer, or none) and forms the terminal bud `terminated` with p_term (`terminates`, `Purpose.sympodialTermination`) | M7 |
 | BUD_FATE (R6, M6d) | In `growBuds`: a live bud with n = 0 becomes `shortShoot` if Q ≥ `r6.qMin`, else `dormant`. With R6 on, `depositBuds` deposits leaf area by state (active 1, short shoot `r6.leafArea`, dormant 0) and `gatherLight` weights Q by it | M6d |
 | BUD_FATE (R4, R5, M10, ADR 0012) | In `growBuds` (exported for tests), a bud needs `growthThreshold`: 1 without R4, v_cont for active buds and short shoots, and v_break·(1 + δ·age)·(1 + δ_b·s) for dormant ones. A dormant bud that falls short is still released if `lightReleases` (Q ≥ Q_rel·(1 + δ·age)) and the R1 reserve can pay one unit: it grows one metamer. A released bud's shoot gets `paShift` (reiteration). A resting dormant bud older than L_dorm is set `gone` (`tree.aborted`). R5 multiplies internode length by 1 + e_s·s and the shoot's A_set by 1 − δ_A·s. Counters `released`, `epicormic` (from trunk wood ≥ 10 seasons old) and `aborted` feed the metrics | M10 |
-| SHED, GIRTH | `shedBranches` (C5; threshold max(T, T_rel·Q_top), Q_top from `crownTopLight` after sampling, ADR 0007): marks dim laterals' subtrees on this season's Q_sum/n_b, records scars, compacts metamers and buds, remaps `parent` and `bud.metamer`. With `r1.shed: "carbon"` (R1 on) the test is P_b < M_b or light per metamer < T_rel·Q_top. Removal is shared with R3 breakage (`removeBranches`), which with R4's bud bank leaves a dormant bud in each vacated slot (`budAngle`). Then `updateGirth` (C6): basipetal pipe sums with memory, over the pipe radius r − stressWood | M4, M8, M10 |
-| MECHANICS (R3, ADR 0011) | When `r3.enabled`, `tree.prevRadius` takes the radius before `updateGirth`. After it, `updateMechanics` runs a basipetal pass for weight W, first moment S and M = S − W·x_base, with leaf weight from `depositArea`. It adds local stress wood where σ = 4·abs(M)/(πr³) > σ_target, and sets each metamer's turn: sag −φ·(M − `moment`)/(E·πr⁴/4)·l (`r3.sag: "creep"` uses the whole M), capped at `MAX_SAG`, plus posture −β_g·sin(A − A_set) − γ·kink, clamped to ±c·Δr/r. A_set comes from `postureSetPoint`: the R2 row's `postureSetPoint`, else its growth set-point, else `c4.setPoint`. All turns come from the start-of-pass geometry. An acropetal pass then accumulates them, rotates the metamers, rebuilds base positions and turns the buds. Metamers with σ > `r3.sigmaBreak` (off by default) break off through `removeBranches`, with `tree.stress` compacted alongside (`tree.broken`). `tree.stress` keeps σ/σ_target for the page | M9, M10 |
+| SHED, GIRTH | `shedBranches` (C5; threshold max(T, T_rel·Q_top), Q_top from `crownTopLight` after sampling, ADR 0007): marks dim laterals' subtrees on this season's Q_sum/n_b, records scars, compacts metamers and buds, remaps `parent` and `bud.metamer`. With `r1.shed: "carbon"` (R1 on) the test is P_b < M_b or light per metamer < T_rel·Q_top. Removal is shared with R3 breakage (`removeBranches`), which with R4's bud bank leaves a dormant bud in each vacated slot at the shed branch's azimuth (`budFrame`). Then `updateGirth` (C6): basipetal pipe sums with memory, over the pipe radius r − stressWood | M4, M8, M10 |
+| MECHANICS (R3, ADR 0011, 0025) | When `r3.enabled`, `tree.prevRadius` takes the radius before `updateGirth`. After it, `updateMechanics` runs a basipetal pass for weight W and the first moment S (a 3-vector), and the bending moment M = (S − W·base) × (−ŷ), its part across the axis, with leaf weight from `depositArea`. It adds local stress wood where σ = 4·|M|/(πr³) > σ_target, and sets each metamer's turn as a rotation vector: sag φ·l·(M − M_prev)/(E·πr⁴/4) about the moment (`r3.sag: "creep"` uses the whole M), capped at `MAX_SAG`, plus posture toward the set-point direction (β_g·sin θ) and the previous metamer (γ·kink), together at most c·Δr/r. A_set comes from `postureSetPoint`: the R2 row's `postureSetPoint`, else its growth set-point, else `c4.setPoint`. All turns come from the start-of-pass geometry. An acropetal pass then composes them (each metamer turns by its own and all its parent's), rotates the frames, rebuilds base positions and turns the buds. Metamers with σ > `r3.sigmaBreak` (off by default) break off through `removeBranches`, with `tree.stress` compacted alongside (`tree.broken`). `tree.stress` keeps σ/σ_target for the page | M9, M10 |
 | COMMIT_STAGING | `commitBuds` compacts consumed buds; new rows were appended past the phase's loop bounds | M0 |
-| Phase 3 abrasion, stand (M11, ADR 0013) | With O2, `depositBuds` also tags `world.owner` (tree id, −2 shared) and `abrade` kills leafy buds whose sway k·Q·h/r reaches another tree's foliage. R1 starvation deaths follow. With O4, `standDynamics` then applies background mortality m₀, turns each tree's `seedPool` (filled by R1's reproductive sink) into seeds, disperses them by Laplace(0, d), and establishes seedlings where ground light ≥ Q_est (p_est, no trunk within a cell, at most `maxTrees`), appending them to `world.trees` to grow next season. Seed rain (ADR 0018) then lands each species' `o4.rain` seeds per 100 cells uniformly and establishes them by the same rule | M11, M25 |
+| Phase 3 abrasion, stand (M11, ADR 0013, 0025) | With O2, `depositBuds` also tags `world.owner` (W × H × D; tree id, −2 shared) and `abrade` kills leafy buds whose sway k·Q·h/r, in x and z, reaches another tree's foliage. R1 starvation deaths follow. With O4, `standDynamics` then applies background mortality m₀, turns each tree's `seedPool` (filled by R1's reproductive sink) into seeds, disperses them a Laplace(0, d) distance at a drawn azimuth on the ground (lost beyond a face), and establishes seedlings where ground light ≥ Q_est (p_est, no trunk within a cell on the ground, at most `maxTrees`), appending them to `world.trees` to grow next season. Seed rain (ADR 0018) then lands each species' `o4.rain` seeds per 100 cells of width anywhere on the ground and establishes them by the same rule | M11, M25, I2 |
 
 **Shoot size (ADR 0004).** v' = min(v, `c1.maxMetamersPerShoot`), n = ⌊v'⌋, l = v'/n · l0: the resource is capped, then Palubicki's rule applies unchanged, as in the LPFG SOT model. Internodes stay within [1, 2)·l0.
 
-**Milestone scaffold.** Until C3 lands at M2, `c3.mode: "none"` gives each bud with Q > 0 exactly one metamer of length l0. With C2 off (M0) that is "all buds grow".
+**Milestone scaffold.** Until C3 lands at M2, `c3.mode: "none"` gives each bud with Q > 0 exactly one metamer of length l0. With C2 off (M0) that is "all buds grow". In 3D it no longer regulates under light (I2): Beer–Lambert light never reaches 0 inside the slab, where the shadow triangle's did, so `shadow` grows as `explosion` does.
 
-**The world is a closed box.** In every light model, everything outside the W×H grid is opaque: below the ground, beyond the sides and above the top. A bud there gets Q = 0 and never grows, and V never points out of the box. A shoot can overshoot the edge by one metamer, which then stops. The renderer draws the ground over stubs that pushed below it.
+**The world is a closed box.** In every light model, everything outside the W × H × D slab is opaque to growth: below the ground, beyond the sides, above the top and beyond the z faces (light still passes the faces, through τ). A bud there gets Q = 0 and never grows, and V never points out of the box. A shoot can overshoot the edge by one metamer, which then stops. The renderer draws the ground over stubs that pushed below it.
 
 Before this rule, shoots that left the grid saw unshaded sky and grew exponentially (found at M1). Make the world large enough for the trees it holds.
 
 ## Light models (`rust/core/src/light/`)
 
-All of them sit behind `LightModel.sample(x, y, dir) → {q, vx, vy}` (§C2.8):
-- `SkySweep` (M6, default `c2.model: "sky"`, ADR 0005): each bud adds one unit of leaf area to its cell; `compute()` (end of Phase 1) sweeps K sky directions from the sky side, accumulating optical depth T_k into every cell with linear interpolation between the two upstream cells, then stores Q = Σ w_k e^(−k_ext T_k) and the light-weighted direction per cell. A bud gets its cell's values (its own cell's foliage does not shade it); rays from beyond the world's sides are open sky; outside the box Q = 0. The shade overlay shows 1 − Q/Q_open. `compute(season)` takes the season so that `c2.rotate` (M6e, off by default) can move the K directions each season: they then sit at (k + f)/K of the sky's span with f = frac(0.5 + season·(φ − 1)), one per equal stratum, and the weights are renormalised to Σw = C.
-- `UniformLight`: C2 off.
-- `ShadowTriangle` (M1): deposits a·b^(−q) per bud, Q = max(C − s + a, 0), and V points at the least-shaded cell in a wedge of half-angle θ and radius r.
-- The sky sweep: M6.
+All of them sit behind `Light::sample(x, y, z) → (Q, V)` (§C2.8), V a 3D unit vector:
+- **The slab sweep** (`slab_sweep.rs`, default `c2.model: "slab"`; G3, ADR 0024): each live bud adds its leaf area to its cell of a Float32 field W × H × D; `compute_lanes` sweeps K sky directions (16, on a spherical Fibonacci set, rotated each season with `c2.rotate`) down from the highest leafy row, row by row, carrying each direction's optical depth G down by whole-cell shifts and adding the row's mean leaf area over each step's box. Q = Σ w_k e^(−k_ext G_k), V the light-weighted direction. Above the foliage, open sky. The sky's weights ∝ sin(elevation)^p · max(0, 1 + tilt·d_x) (`skyTilt`, an oblique sun). x is periodic on a ring or open; z is open, the sky beyond each face seen through τ (`world.faces`, front then back). `world.fade` scales Q to 0 over that many cells before a face. Walls are leaf area through the whole depth.
+- **Fixed lanes** (I2): the directions are always split into 4 lanes (k ≡ lane mod 4), each into its own partial field, summed in lane order: one thread or four (`threads`) give the same bits.
+- **Pooled** (`c2.model: "pooled"`, the §8 ablation, M22): every leaf gets the mean light of one homogeneous canopy of the slab's leaf area per column.
+- **Uniform:** C2 off.
 
-`make_light(params)` picks one (the `Light` enum). It is rebuilt whenever params change.
-
-**Periodic sides (M11, ADR 0013).** With `world.sides: "periodic"` the sky sweep wraps x for deposits, samples and rays. Shallow rays are swept up to ⌈3H/(rise·W)⌉ + 1 times around the ring from open sky, so the field is translation invariant. Since M13 the sweep stops at the first lap that changes nothing (a lap is a fixed map of the field, so the result is bit-identical), and every sweep stops at the highest leafy row. On `forest` light now costs 2.7 ms a season, against 10.2 before ([M13 note](experiments/2026-10-27-m13-perf.md)). Growth wraps too, and the page draws crowns where they grew.
+The shadow triangle (M1) and the 2D sky sweep (M6, M18) left with 2D; they are at the tag `golden-2d-ts`. `make_light(params)` picks one (the `Light` enum). It is rebuilt whenever params change. The page's shade overlay is 1 − Q/C averaged across the depth.
 
 ### The Rust core (ADR 0024, G2 and I1)
 G2 moved the sky sweep (`rust/core/src/light/sky_sweep.rs`) into Rust behind the TypeScript core's `LightModel` ([G2 note](experiments/2026-10-29-g2-rust-sweep.md)). I1 moved the rest, phase by phase, each held to the TypeScript core side by side before the next ([I1 note](experiments/2026-10-29-i1-rust-core.md)).
 - **The boundary** (`rust/wasm/src/world.rs`, `src/wasm/world.ts`): params go in as JSON, read with JavaScript's semantics (`rust/core/src/json.rs`: key order kept, numbers printed as `Number.prototype.toString`). Events, checkpoints and records cross as JSON or bytes. A tree's columns are read on demand (`tree_column`), never per frame.
 - **The snapshot** is built in Rust into one buffer (`rust/core/src/snapshot.rs`) and copied out of linear memory once; every array the page gets is a view on that copy, and the copy is the transferable.
-- **The math** (`rust/core/src/math/`): never a platform `Math`. Production: the `libm` crate. Parity: V8's, ported, behind the `parity` feature.
+- **The math** (`rust/core/src/math/`): never a platform `Math`; the `libm` crate, pure Rust.
 
 ### The 3D slab sweep (ADR 0024, G3)
-`rust/core/src/light/slab_sweep.rs`: the 3D light, in the production build only, not yet behind `LightModel`.
+`rust/core/src/light/slab_sweep.rs`: the world's light since I2.
 - **Fields:** Float32 fields W × H × D, rows of W × D.
 - **Sky:** K directions on a spherical Fibonacci set, rotated each season.
 - **The march:** the 2D sweep's row march, with the segment averaged over its box. G is carried down by whole-cell shifts, not read bilinearly (G3 measured the bilinear read's blur as a bias).
 - **Edges:** periodic x; open z with τ per face.
-- **Speed:** a polynomial Float32 exp, and scalar and SIMD kernels that give the same bits. Lanes come from `compute_part`.
+- **Speed:** a polynomial Float32 exp, and scalar and SIMD kernels that give the same bits. Lanes come from `compute_part`; the world's are fixed (`compute_lanes`).
 - **Reference:** `exact_q` is the exact tracer the G3 gate measures against ([G3 note](experiments/2026-10-29-g3-slab-light.md)).
 
 ## Randomness (ADR 0002)
 
-`rust/core/src/rng.rs`: `hash_key(seed, purpose, tree, entity, season, k)` mixes 32-bit integers (as `Math.imul` did), so it is bit-exact everywhere. `normal` uses the core's log and cos, so its draws are the same in every engine and natively; in the parity build they are V8's, as the TypeScript core's were.
+`rust/core/src/rng.rs`: `hash_key(seed, purpose, tree, entity, season, k)` mixes 32-bit integers (as `Math.imul` did), so it is bit-exact everywhere. `normal` uses the core's log and cos, so its draws are the same in every engine and natively.
 
 | Draw | Key (tree, entity, season) |
 |---|---|
-| C1 side sequence | (tree id, axis id, 0) |
-| C4 direction noise | (tree id, new metamer's birthId, season) |
+| C1 phyllotaxis: the axis's first azimuth (`sideSequence`) | (tree id, axis id, 0) |
+| C4 direction noise: the turn's size (keys 0–1, a normal) and its axis's azimuth (key 2) | (tree id, new metamer's birthId, season) |
 | R2 sympodial termination | (tree id, shoot's last metamer birthId, season) |
 | O2 abrasion | (tree id, bud birthId, season) |
 | O4 mortality | (tree id, 0, season) |
-| O4 dispersal, establishment | (parent tree id, seed index, season) |
-| O4 seed rain (`seedRain`, 13) | (FNV hash of the species name, 0 count / 1 position / 2 establishment, season, seed index) |
+| O4 dispersal (key 0 distance, 1 azimuth), establishment | (parent tree id, seed index, season) |
+| O4 seed rain (`seedRain`, 13) | (FNV hash of the species name, 0 count / 1 x / 3 z / 2 establishment, season, seed index) |
 
 ## Direct manipulation
 
@@ -186,7 +184,7 @@ Tapping a tree on the page fells it. `Scene.pickTree` finds the nearest drawn se
 
 ## Events and replay
 
-`setParams`, `removeTree` and `plantTree` queue events that apply at the next season boundary. Applied events are logged, and `World.record()` returns `{params, events, seasons}`. The page's **Export run** downloads this record; `npm run sim -- --replay file.json` reproduces the run exactly (the page and the CLI both run the production build; a record made before I1 replays with `--parity`). Changing `trees` mid-run is ignored; a new tree layout needs a new run.
+`setParams`, `removeTree` and `plantTree` queue events that apply at the next season boundary. Applied events are logged, and `World.record()` returns `{params, events, seasons}`. The page's **Export run** downloads this record; `npm run sim -- --replay file.json` reproduces the run exactly (the page and the CLI run the same core; a record exported before I1 replays exactly only at the tag `golden-2d-ts`). Changing `trees` mid-run is ignored; a new tree layout needs a new run.
 
 ## Worker protocol (`src/worker/api.ts`)
 
@@ -202,7 +200,7 @@ Tapping a tree on the page fells it. `Scene.pickTree` finds the nearest drawn se
 
 **Snapshot** (`rust/core/src/snapshot.rs`; the shape is `Snapshot` in `src/core/types.ts`). Flat arrays over all live trees, concatenated in tree-id order:
 
-- **Metamers:** `parent` (row in the snapshot), `x0`, `y0`, `angle`, `length`, `radius`, `tree`, `birthId`, `order`, `light` (Q_sum/n_b), `resource` (vIn), `age`, `stress` (σ/σ_target, R3), `prevIndex`.
+- **Metamers:** `parent` (row in the snapshot), `x0`, `y0`, `angle`, `length`, `radius`, `z0`, `dirX`…`dirZ` (H), `refX`…`refZ` (L), `tree`, `birthId`, `order`, `light` (Q_sum/n_b), `resource` (vIn), `age`, `stress` (σ/σ_target, R3), `prevIndex`. `angle` and `length` are the segment as drawn in the picture's plane (projected along z), so the renderer rebuilds (x, y) positions from them as it always did; it draws branches far to near by `z0` (I2) until I3's depth buffer.
 - **Buds:** `budMetamer`, `budState`, `budQ`.
 - **Other:** `shadow` (W×H, or null), `junctions`, `metrics` (with each tree's `species`), `species` (the species table's labels: common and Latin names and leaf style, ADR 0016), `seasonMs`, `snapshotMs` (the worker's time to build the snapshot; the HUD's worker time is the sum).
 
@@ -244,7 +242,7 @@ Measured in headless Firefox (desktop GPU; phones are slower): a 10-tree stand o
 
 ## CLI output (`cli/run.ts` → `rust/cli`)
 
-`cli/run.ts` builds the native binary when its sources are newer and runs it with the same arguments, so `analysis/treesim/sweep.py` runs unchanged. `--parity` selects the parity build. Its files are byte for byte the TypeScript CLI's in the parity build. `runs/<id>/` contains:
+`cli/run.ts` builds the native binary when its sources are newer and runs it with the same arguments, so `analysis/treesim/sweep.py` runs unchanged. Its files are the TypeScript CLI's formats (at I1 they were byte for byte the TypeScript CLI's, in the archived parity build). `runs/<id>/` contains:
 
 | File | Contents |
 |---|---|

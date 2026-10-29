@@ -1,5 +1,5 @@
 /**
- * G3 (ADR 0024): the 3D slab sweep in the production build (no parity, built for WASM SIMD, which
+ * G3 (ADR 0024): the 3D slab sweep in the WASM build (built for WASM SIMD, which
  * LLVM's vectoriser uses) gives the same bits as natively. The constant is rust/core's
  * `the_same_bits_on_every_target`.
  */

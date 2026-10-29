@@ -46,10 +46,11 @@ pub fn released_shift(order: f64, shift: f64, r4: &R4) -> f64 {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::principles::c1::{add_bud, add_metamer, form_axillary_buds, plant_seedling};
+    use crate::principles::c1::{form_axillary_buds, plant_seedling};
     use crate::principles::c5::remove_branches;
     use crate::season::grow_buds;
     use crate::testing::preset;
+    use crate::testing::{LEFT, RIGHT, bud, metamer};
     use crate::tree::{Tree, slot};
     use std::f64::consts::PI;
 
@@ -63,7 +64,7 @@ mod tests {
 
     /// A seedling at x = 10; its lateral bud (index 1) is made dormant at light q.
     fn seedling(p: &Params, q: f64) -> Tree {
-        let mut t = Tree::new(0, 10.0);
+        let mut t = Tree::new(0, 10.0, 0.5);
         plant_seedling(&mut t, p, 0.0, 0.0);
         t.ensure_scratch();
         for j in 0..t.b.len() {
@@ -159,7 +160,7 @@ mod tests {
             row("none")
         ));
         let mut t = seedling(&p, 0.0);
-        let lateral = add_metamer(&mut t, 0, slot::RIGHT, 0.0, 1.0, 0.02, 1.0);
+        let lateral = metamer(&mut t, 0, RIGHT, 0.0, 1.0, 0.02, 1.0);
         let before = t.b.len();
         form_axillary_buds(&mut t, lateral, &p, false);
         assert_eq!(t.b.len(), before); // pa 1: no laterals
@@ -172,8 +173,8 @@ mod tests {
     fn leaves_a_dormant_bud_in_the_slot_of_a_shed_branch() {
         let p = params("{}");
         let mut t = seedling(&p, 0.0);
-        let limb = add_metamer(&mut t, 0, slot::LEFT, PI / 2.0 + 0.7, 1.0, 0.02, 1.0);
-        add_bud(&mut t, limb, slot::MAIN, PI / 2.0 + 0.7, 1.0);
+        let limb = metamer(&mut t, 0, LEFT, PI / 2.0 + 0.7, 1.0, 0.02, 1.0);
+        bud(&mut t, limb, slot::MAIN, PI / 2.0 + 0.7, 1.0);
         t.ensure_scratch();
         let mut dead = vec![0u8; t.m.len()];
         dead[limb] = 1;
@@ -183,14 +184,22 @@ mod tests {
         assert_eq!(t.b.len(), before + 1);
         assert_eq!(t.b.state[banked], bud::DORMANT);
         assert_eq!(t.b.metamer[banked], 0);
-        assert_eq!(t.b.slot[banked], slot::LEFT);
+        assert_eq!(t.b.slot[banked], LEFT);
         assert_eq!(t.b.order[banked], 1);
-        assert!(close(t.b.angle[banked], PI / 2.0 + (45.0 * PI) / 180.0));
+        // Back where the limb was: 45° from the trunk, at its azimuth around it.
+        let h = t.bud_heading(banked);
+        assert!(close(
+            crate::geom::angle_between(h, crate::geom::UP),
+            PI / 4.0
+        ));
+        assert!(close(t.b.azimuth[banked], -PI / 2.0));
+        let (want, _) = crate::principles::c1::lateral_frame(&t, 0, -PI / 2.0, PI / 4.0);
+        assert!((0..3).all(|k| (h[k] - want[k]).abs() < 1e-12));
         assert!(close(t.m.scar_sum_n[0], 0.02f64.powi(2)));
 
         let p = params(r#"{"r4":{"bank":false}}"#);
         let mut t = seedling(&p, 0.0);
-        let limb = add_metamer(&mut t, 0, slot::LEFT, 1.0, 1.0, 0.02, 1.0);
+        let limb = metamer(&mut t, 0, LEFT, 1.0, 1.0, 0.02, 1.0);
         t.ensure_scratch();
         let mut dead = vec![0u8; t.m.len()];
         dead[limb] = 1;

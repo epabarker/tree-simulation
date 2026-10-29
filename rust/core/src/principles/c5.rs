@@ -6,7 +6,7 @@
 //!
 //! Params: c5.T, c5.g, c5.Trel, c5.topQuantile; c6.n; r1.shed; r4.bank.
 
-use super::c1::{add_bud, bud_angle};
+use super::c1::{add_bud, bud_frame};
 use super::c3::is_live_bud;
 use crate::math;
 use crate::params::Params;
@@ -109,9 +109,12 @@ pub fn remove_branches(
             tree.b.state[j] = bud::GONE;
         }
     }
-    let bank_rows: Vec<(i32, u8, u8)> = roots
+    let bank_rows: Vec<(i32, u8, u8, f64)> = roots
         .iter()
-        .map(|&i| (tree.m.parent[i], tree.m.slot[i], tree.m.order[i]))
+        .map(|&i| {
+            let c = &tree.m;
+            (c.parent[i], c.slot[i], c.order[i], c.azimuth[i])
+        })
         .collect();
     let keep: Vec<u8> = (0..nm).map(|i| if dead[i] != 0 { 0 } else { 1 }).collect();
     let old_to_new = tree.m.compact(&keep);
@@ -134,10 +137,12 @@ pub fn remove_branches(
             }
         }
     }
-    for (parent, slot_, order) in bank_rows {
+    // R4's bud bank: a dormant bud where each branch was, at its azimuth around the parent as
+    // the parent now lies.
+    for (parent, slot_, order, azimuth) in bank_rows {
         let m = old_to_new[parent as usize] as usize;
-        let angle = bud_angle(tree, m, slot_, params);
-        let i = add_bud(tree, m, slot_, angle, order as f64);
+        let (h, l) = bud_frame(tree, m, slot_, azimuth, params);
+        let i = add_bud(tree, m, slot_, h, l, azimuth, order as f64);
         tree.b.state[i] = bud::DORMANT;
     }
     removed
@@ -146,9 +151,9 @@ pub fn remove_branches(
 #[cfg(test)]
 pub(crate) mod tests {
     use super::*;
-    use crate::principles::c1::{add_bud, add_metamer};
     use crate::principles::c6::{junction_exponents, update_girth};
     use crate::testing::preset;
+    use crate::testing::{LEFT, RIGHT, bud, metamer};
     use crate::world::World;
 
     pub const UP: f64 = std::f64::consts::FRAC_PI_2;
@@ -161,14 +166,14 @@ pub(crate) mod tests {
 
     /// root → (main continuation, lateral → lateral's continuation), with a bud on each tip.
     pub fn small_tree(p: &Params) -> Tree {
-        let mut t = Tree::new(0, 10.0);
+        let mut t = Tree::new(0, 10.0, 0.5);
         let r0 = p.c6.r0;
-        let root = add_metamer(&mut t, -1, slot::MAIN, UP, 1.0, r0, 0.0) as i32;
-        let main = add_metamer(&mut t, root, slot::MAIN, UP, 1.0, r0, 0.0);
-        let lat = add_metamer(&mut t, root, slot::RIGHT, UP - 0.7, 1.0, r0, 0.0) as i32;
-        let lat_tip = add_metamer(&mut t, lat, slot::MAIN, UP - 0.7, 1.0, r0, 0.0);
-        add_bud(&mut t, main, slot::MAIN, UP, 0.0);
-        add_bud(&mut t, lat_tip, slot::MAIN, UP - 0.7, 1.0);
+        let root = metamer(&mut t, -1, slot::MAIN, UP, 1.0, r0, 0.0) as i32;
+        let main = metamer(&mut t, root, slot::MAIN, UP, 1.0, r0, 0.0);
+        let lat = metamer(&mut t, root, RIGHT, UP - 0.7, 1.0, r0, 0.0) as i32;
+        let lat_tip = metamer(&mut t, lat, slot::MAIN, UP - 0.7, 1.0, r0, 0.0);
+        bud(&mut t, main, slot::MAIN, UP, 0.0);
+        bud(&mut t, lat_tip, slot::MAIN, UP - 0.7, 1.0);
         t.ensure_scratch();
         t
     }
@@ -195,20 +200,12 @@ pub(crate) mod tests {
     fn solves_the_leonardo_exponent_at_two_and_three_way_junctions() {
         for (delta, xs) in [(2.5, vec![0.6]), (1.8, vec![0.5, 0.3]), (3.2, vec![0.7])] {
             let rest = 1.0 - xs.iter().map(|x: &f64| x.powf(delta)).sum::<f64>();
-            let mut t = Tree::new(0, 10.0);
-            let root = add_metamer(&mut t, -1, slot::MAIN, UP, 1.0, 1.0, 0.0) as i32;
+            let mut t = Tree::new(0, 10.0, 0.5);
+            let root = metamer(&mut t, -1, slot::MAIN, UP, 1.0, 1.0, 0.0) as i32;
             let mut radii = xs.clone();
             radii.push(rest.powf(1.0 / delta));
             for (k, r) in radii.iter().enumerate() {
-                add_metamer(
-                    &mut t,
-                    root,
-                    [slot::MAIN, slot::LEFT, slot::RIGHT][k],
-                    UP,
-                    1.0,
-                    *r,
-                    0.0,
-                );
+                metamer(&mut t, root, [slot::MAIN, LEFT, RIGHT][k], UP, 1.0, *r, 0.0);
             }
             let mut d = Vec::new();
             junction_exponents(&t, &mut d);
@@ -271,10 +268,10 @@ pub(crate) mod tests {
     #[test]
     fn the_crown_top_light_is_a_quantile_of_live_bud_q() {
         let p = params("{}");
-        let mut t = Tree::new(0, 10.0);
-        let root = add_metamer(&mut t, -1, slot::MAIN, UP, 1.0, p.c6.r0, 0.0);
+        let mut t = Tree::new(0, 10.0, 0.5);
+        let root = metamer(&mut t, -1, slot::MAIN, UP, 1.0, p.c6.r0, 0.0);
         for i in 0..10 {
-            let b = add_bud(&mut t, root, slot::MAIN, UP, 0.0);
+            let b = bud(&mut t, root, slot::MAIN, UP, 0.0);
             t.b.q[b] = (i + 1) as f64 / 10.0;
         }
         t.b.state[9] = bud::GONE; // consumed buds do not count

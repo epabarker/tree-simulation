@@ -1,14 +1,20 @@
-//! Per-season snapshots for the renderer (snapshot.ts), built into one buffer so that the page
+//! Per-season snapshots for the renderer, built into one buffer so that the page
 //! takes them out of linear memory in a single copy (I1). Flat arrays over every live tree's
 //! metamers, trees in id order, each tree's rows parent-before-child; `prev_index` maps each
 //! metamer to its row in the previous snapshot (−1 if new), merged by birth id tree by tree.
 //!
+//! In 3D (I2) a metamer's segment runs from (x0, y0, z0) along its heading (dirX, dirY, dirZ); its
+//! frame's reference is (refX, refY, refZ). `angle` and `length` are the segment as drawn in the
+//! picture's plane (projected along z), so a renderer that draws (x, y) can rebuild positions
+//! from them exactly as before.
+//!
 //! Layout (each array starts on an 8-byte boundary, in this order; `src/wasm/world.ts` reads it):
 //! metrics f64[trees × METRIC_NUMBERS], parent i32[nm], x0 f32, y0 f32, angle f32, length f32,
-//! radius f32, tree i32, birthId i32, order u8, light f32, resource f32, age f32, stress f32,
-//! prevIndex i32, budMetamer i32[nb], budState u8[nb], budQ f32[nb], junctions f32[nj],
-//! shadow f32[W·H or 0].
+//! radius f32, z0 f32, dirX f32, dirY f32, dirZ f32, refX f32, refY f32, refZ f32, tree i32,
+//! birthId i32, order u8, light f32, resource f32, age f32, stress f32, prevIndex i32,
+//! budMetamer i32[nb], budState u8[nb], budQ f32[nb], junctions f32[nj], shadow f32[W·H or 0].
 
+use crate::math;
 use crate::metrics::{METRIC_NUMBERS, tree_metrics};
 use crate::principles::c3::is_live_bud;
 use crate::principles::c6::junction_exponents;
@@ -74,6 +80,8 @@ impl SnapshotBuilder {
             vec![0f32; nm],
             vec![0f32; nm],
         );
+        // z0, the heading, the reference.
+        let mut depth: [Vec<f32>; 7] = std::array::from_fn(|_| vec![0f32; nm]);
         let (mut tree_of, mut birth) = (vec![0i32; nm], vec![0i32; nm]);
         let mut order = vec![0u8; nm];
         let (mut light, mut resource, mut age, mut stress) = (
@@ -102,8 +110,22 @@ impl SnapshotBuilder {
                 };
                 x0[j] = c.base_x[i] as f32;
                 y0[j] = c.base_y[i] as f32;
-                angle[j] = c.angle[i] as f32;
-                length[j] = c.length[i] as f32;
+                angle[j] = math::atan2(c.hy[i], c.hx[i]) as f32;
+                length[j] = (c.length[i] * math::hypot(c.hx[i], c.hy[i])) as f32;
+                for (k, v) in [
+                    c.base_z[i],
+                    c.hx[i],
+                    c.hy[i],
+                    c.hz[i],
+                    c.lx[i],
+                    c.ly[i],
+                    c.lz[i],
+                ]
+                .into_iter()
+                .enumerate()
+                {
+                    depth[k][j] = v as f32;
+                }
                 radius[j] = c.radius[i] as f32;
                 tree_of[j] = t.id as i32;
                 birth[j] = c.birth_id[i];
@@ -176,7 +198,7 @@ impl SnapshotBuilder {
         let shadow: Vec<f32> = if field {
             world
                 .light
-                .field()
+                .field(world.params().c2.c)
                 .map(|f| f.iter().map(|&x| x as f32).collect())
                 .unwrap_or_default()
         } else {
@@ -191,9 +213,12 @@ impl SnapshotBuilder {
             }
             self.species.push(m.species);
         }
-        debug_assert_eq!(METRIC_NUMBERS.len(), 34);
+        debug_assert_eq!(METRIC_NUMBERS.len(), 37);
         put_i32(&mut v, &parent);
         for a in [&x0, &y0, &angle, &length, &radius] {
+            put_f32(&mut v, a);
+        }
+        for a in &depth {
             put_f32(&mut v, a);
         }
         put_i32(&mut v, &tree_of);

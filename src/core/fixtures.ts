@@ -31,7 +31,7 @@ const SPECIES_PRE_R1 = {
 const CONIFER = {
   ...SKY,
   ...SPECIES_PRE_R1,
-  c2: { enabled: true, model: "sky", kExt: 0.6 },
+  c2: { enabled: true, model: "slab", kExt: 0.6 },
   c5: { enabled: true, T: 0.02, Trel: 0.12 },
   // Whorls carry few tips, so the pipe model gives a thin trunk; a thicker tip radius brings
   // stand H/D to ≈ 78 (stand-grown conifers 60–80, Watt et al. 2023; M7 note).
@@ -51,7 +51,7 @@ const CONIFER = {
 const BIRCH = {
   ...SKY,
   ...SPECIES_PRE_R1,
-  c2: { enabled: true, model: "sky", kExt: 0.35 },
+  c2: { enabled: true, model: "slab", kExt: 0.35 },
   c5: { enabled: true, T: 0.08, Trel: 0.2 },
   r2: {
     enabled: true,
@@ -71,7 +71,7 @@ const BIRCH = {
 const TROPICAL = {
   ...SKY,
   ...SPECIES_PRE_R1,
-  c2: { enabled: true, model: "sky", kExt: 0.6 },
+  c2: { enabled: true, model: "slab", kExt: 0.6 },
   r2: {
     enabled: true,
     levels: [

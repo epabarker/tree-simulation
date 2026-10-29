@@ -21,6 +21,13 @@ pub struct World {
     params_version: u32,
 }
 
+#[wasm_bindgen]
+extern "C" {
+    /// The host's clock (browser or Node), for the timed step: std's Instant panics on wasm32.
+    #[wasm_bindgen(js_namespace = performance)]
+    fn now() -> f64;
+}
+
 fn parse(text: &str) -> Result<Value, JsError> {
     json::parse(text).map_err(|e| JsError::new(&e.to_string()))
 }
@@ -95,12 +102,40 @@ impl World {
         Ok(())
     }
 
+    /// One season with each phase timed: [light, sample, allocate, grow, shed, girth,
+    /// mechanics, commit, deaths] in ms (the measurement pages; `step` for everything else).
+    pub fn step_timed(&mut self, discard: bool) -> Vec<f64> {
+        use tree_core::season::{PHASES, Phase};
+        let mut ms = vec![0.0; PHASES.len()];
+        let mut last = now();
+        self.core.step(&mut |phase: Phase| {
+            let t = now();
+            let k = PHASES.iter().position(|&p| p == phase).unwrap();
+            ms[k] += t - last;
+            last = t;
+        });
+        if discard {
+            self.core.discard_dead();
+        }
+        ms
+    }
+
+    /// The light's leaf-area field this season (W × H × D floats, rows of W × D), and its top
+    /// row: what a light lane in another worker needs (the measurement pages).
+    pub fn light_lad(&self) -> Vec<f32> {
+        match &self.core.light {
+            tree_core::light::Light::Slab(s) => s.sweep.lad().to_vec(),
+            _ => Vec::new(),
+        }
+    }
+
     pub fn remove_tree(&mut self, tree: f64) {
         self.core.remove_tree(tree);
     }
 
-    pub fn plant_tree(&mut self, x: f64, species: Option<String>) {
-        self.core.plant_tree(x, species.as_deref());
+    /// Sows a tree at (x, z); z absent, the slab's middle.
+    pub fn plant_tree(&mut self, x: f64, z: Option<f64>, species: Option<String>) {
+        self.core.plant_tree(x, z, species.as_deref());
     }
 
     /// The run record (initial params, applied events, seasons), as JSON.
@@ -164,20 +199,21 @@ impl World {
         self.core.storm
     }
 
-    /// Mean Q/C on the bottom row over columns [x0, x1] (metrics' groundLight).
+    /// Mean Q/C on the bottom row over columns [x0, x1], through the whole depth (metrics'
+    /// groundLight).
     pub fn ground_light(&self, x0: f64, x1: f64) -> f64 {
-        ground_light(&self.core, x0, x1)
+        ground_light(&self.core, x0, x1, 0.0, self.core.light.depth())
     }
 
-    /// Q, V_x, V_y of this season's light field at (x, y) for a bud heading `dir`.
-    pub fn sample(&self, x: f64, y: f64, dir: f64) -> Vec<f64> {
-        let (q, vx, vy) = self.core.light.sample(x, y, dir);
-        vec![q, vx, vy]
+    /// Q and V (x, y, z) of this season's light field at (x, y, z).
+    pub fn sample(&self, x: f64, y: f64, z: f64) -> Vec<f64> {
+        let (q, v) = self.core.light.sample(x, y, z);
+        vec![q, v[0], v[1], v[2]]
     }
 
     // A tree's state, read-only, for the tools and the tests (src/wasm/world.ts's TreeView).
 
-    /// [id, rootX, alive, discarded, sown, metamers, buds, …tree.rs NUMBERS].
+    /// [id, rootX, alive, discarded, sown, metamers, buds, …tree.rs NUMBERS, rootZ].
     pub fn tree_scalars(&self, i: usize) -> Vec<f64> {
         let t = &self.core.trees[i];
         let mut out = vec![
@@ -190,6 +226,7 @@ impl World {
             t.b.len() as f64,
         ];
         out.extend(NUMBERS.iter().map(|&n| t.number(n)));
+        out.push(t.root_z);
         out
     }
 

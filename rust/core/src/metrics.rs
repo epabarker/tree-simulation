@@ -1,5 +1,6 @@
-//! Per-tree, per-season measurements (spec §8, §10; metrics.ts): one row per tree per season
-//! in the CLI's metrics.csv, and the page's charts.
+//! Per-tree, per-season measurements (spec §8, §10): one row per tree per season in the CLI's
+//! metrics.csv, and the page's charts. Crown width and the centroid's offset are along x (the
+//! picture's plane); depth and its offset along z (I2).
 
 use crate::math;
 use crate::principles::c3::is_live_bud;
@@ -10,7 +11,7 @@ const PI: f64 = std::f64::consts::PI;
 
 /// metrics.csv's columns (METRIC_COLUMNS), in order. `alive` and `sown` are flags (1/0) and
 /// `species` a string; every other column is a number.
-pub const METRIC_COLUMNS: [&str; 34] = [
+pub const METRIC_COLUMNS: [&str; 37] = [
     "tree",
     "alive",
     "species",
@@ -45,11 +46,14 @@ pub const METRIC_COLUMNS: [&str; 34] = [
     "epicormic",
     "aborted",
     "broken",
+    "rootZ",
+    "crownDepth",
+    "centroidOffsetZ",
 ];
 
 /// The numeric fields of TreeMetrics, in this order (`sown` among them, as a flag), which the
 /// snapshot carries as a block: everything but `species`.
-pub const METRIC_NUMBERS: [&str; 34] = [
+pub const METRIC_NUMBERS: [&str; 37] = [
     "tree",
     "alive",
     "rootX",
@@ -84,11 +88,14 @@ pub const METRIC_NUMBERS: [&str; 34] = [
     "epicormic",
     "aborted",
     "broken",
+    "rootZ",
+    "crownDepth",
+    "centroidOffsetZ",
 ];
 
 pub struct TreeMetrics {
     /// By METRIC_NUMBERS.
-    pub values: [f64; 34],
+    pub values: [f64; 37],
     pub species: String,
 }
 
@@ -101,22 +108,28 @@ impl TreeMetrics {
     }
 }
 
-/// Mean Q/C over the bottom row of cells whose columns lie in [x0, x1].
-pub fn ground_light(world: &World, x0: f64, x1: f64) -> f64 {
+/// Mean Q/C over the bottom row of cells whose columns lie in [x0, x1] and layers in [z0, z1].
+pub fn ground_light(world: &World, x0: f64, x1: f64, z0: f64, z1: f64) -> f64 {
     let light = &world.light;
     let c = world.params().c2.c;
     let lo = math::max(0.0, x0.floor());
     let hi = math::min(light.width() - 1.0, x1.floor());
-    if hi < lo || c <= 0.0 {
+    let near = math::max(0.0, z0.floor());
+    let far = math::min(light.depth() - 1.0, z1.floor());
+    if hi < lo || far < near || c <= 0.0 {
         return f64::NAN;
     }
     let mut sum = 0.0;
-    let mut col = lo;
-    while col <= hi {
-        sum += light.sample(col + 0.5, 0.5, PI / 2.0).0;
-        col += 1.0;
+    let mut layer = near;
+    while layer <= far {
+        let mut col = lo;
+        while col <= hi {
+            sum += light.sample(col + 0.5, 0.5, layer + 0.5).0;
+            col += 1.0;
+        }
+        layer += 1.0;
     }
-    sum / ((hi - lo + 1.0) * c)
+    sum / ((hi - lo + 1.0) * (far - near + 1.0) * c)
 }
 
 pub fn tree_metrics(tree: &Tree, world: Option<&World>) -> TreeMetrics {
@@ -126,14 +139,17 @@ pub fn tree_metrics(tree: &Tree, world: Option<&World>) -> TreeMetrics {
     let mut min_x = f64::INFINITY;
     let mut max_x = f64::NEG_INFINITY;
     let mut sum_x = 0.0;
+    let (mut min_z, mut max_z, mut sum_z) = (f64::INFINITY, f64::NEG_INFINITY, 0.0);
     let mut bole = f64::INFINITY;
     let mut wood = 0.0;
     let mut angle_sum = 0.0;
     let mut branches = 0.0;
     for i in 0..nm {
         wood += PI * c.radius[i] * c.radius[i] * c.length[i];
-        let x = tree.tip_x(i);
-        let y = tree.tip_y(i);
+        let [x, y, z] = tree.tip(i);
+        min_z = math::min(min_z, z);
+        max_z = math::max(max_z, z);
+        sum_z += z;
         if y > height {
             height = y;
         }
@@ -149,7 +165,7 @@ pub fn tree_metrics(tree: &Tree, world: Option<&World>) -> TreeMetrics {
             if c.base_y[i] < bole {
                 bole = c.base_y[i];
             }
-            let up = math::max(-1.0, math::min(1.0, math::sin(c.angle[i])));
+            let up = math::max(-1.0, math::min(1.0, c.hy[i]));
             angle_sum += math::acos(up) * (180.0 / PI);
             branches += 1.0;
         }
@@ -171,7 +187,7 @@ pub fn tree_metrics(tree: &Tree, world: Option<&World>) -> TreeMetrics {
     let trunk = if nm > 0 { c.radius[0] } else { 0.0 };
     let bole_height = if bole.is_finite() { bole } else { height };
     let ground = match world {
-        Some(w) if nm > 0 => ground_light(w, min_x, max_x),
+        Some(w) if nm > 0 => ground_light(w, min_x, max_x, min_z, max_z),
         _ => f64::NAN,
     };
     TreeMetrics {
@@ -222,6 +238,9 @@ pub fn tree_metrics(tree: &Tree, world: Option<&World>) -> TreeMetrics {
             tree.epicormic,
             tree.aborted,
             tree.broken,
+            tree.root_z,
+            if nm > 0 { max_z - min_z } else { 0.0 },
+            if nm > 0 { sum_z / n - tree.root_z } else { 0.0 },
         ],
         species: tree.species.clone(),
     }

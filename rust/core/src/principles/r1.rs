@@ -150,7 +150,7 @@ mod tests {
 
     /// A seedling (one metamer, a terminal and an axillary bud) with every bud at light q.
     fn seedling(p: &Params, q: f64) -> Tree {
-        let mut t = Tree::new(0, 10.0);
+        let mut t = Tree::new(0, 10.0, 0.5);
         plant_seedling(&mut t, p, 0.0, 0.0);
         t.ensure_scratch();
         for i in 0..t.b.len() {

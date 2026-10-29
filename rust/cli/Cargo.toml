@@ -6,10 +6,7 @@ edition.workspace = true
 license.workspace = true
 rust-version.workspace = true
 
-# `parity`: the core's Math as V8's, so runs are the TypeScript core's (and the 2D goldens');
-# without it, the production build the page runs (Rust's libm).
 [features]
-parity = ["tree-core/parity"]
 threads = ["tree-core/threads"]
 
 [dependencies]

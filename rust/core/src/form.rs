@@ -7,7 +7,7 @@ use crate::params::Params;
 use crate::principles::c3::is_live_bud;
 use crate::principles::c6::junction_exponents;
 use crate::principles::r6::deposit_area;
-use crate::tree::{Tree, slot};
+use crate::tree::{Metamers, Tree, slot};
 
 pub const PROFILE_BANDS: usize = 10;
 const FORK_RATIO: f64 = 0.7;
@@ -36,12 +36,14 @@ pub struct FormMetrics {
     pub profile: Vec<f64>,
 }
 
-fn elevation(a: f64) -> f64 {
-    (math::atan2(math::sin(a), math::cos(a).abs()) * 180.0) / PI
+/// Elevation of metamer `i`'s heading above the horizontal, degrees.
+fn elevation(c: &Metamers, i: usize) -> f64 {
+    (math::atan2(c.hy[i], math::hypot(c.hx[i], c.hz[i])) * 180.0) / PI
 }
 
-fn from_vertical(a: f64) -> f64 {
-    math::acos(math::max(-1.0, math::min(1.0, math::sin(a)))) * (180.0 / PI)
+/// Metamer `i`'s heading from vertical, degrees.
+fn from_vertical(c: &Metamers, i: usize) -> f64 {
+    math::acos(math::max(-1.0, math::min(1.0, c.hy[i]))) * (180.0 / PI)
 }
 
 /// The median (NaN of none), as form.ts sorts: ascending, stable.
@@ -94,7 +96,7 @@ pub fn limb_shapes(tree: &Tree) -> Vec<(f64, f64)> {
             axes.push((c.axis[i], Vec::new()));
             axes.len() - 1
         });
-        axes[k].1.push(elevation(c.angle[i]));
+        axes[k].1.push(elevation(c, i));
     }
     axes.into_iter()
         .filter(|(_, e)| e.len() >= MIN_LIMB)
@@ -273,7 +275,7 @@ pub fn form_metrics(tree: &Tree, params: &Params) -> FormMetrics {
         }
         let p = p as usize;
         if c.order[i] == 2 && c.order[p] == 1 {
-            angle2 += from_vertical(c.angle[i]);
+            angle2 += from_vertical(c, i);
             n2 += 1.0;
         }
         if (c.order[i] == 1 || c.order[i] == 2) && count[i] >= MIN_SUBTREE && c.radius[i] > 0.0 {
@@ -323,9 +325,9 @@ pub fn form_metrics(tree: &Tree, params: &Params) -> FormMetrics {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::principles::c1::{add_bud, add_metamer};
     use crate::principles::c6::update_girth;
     use crate::testing::preset;
+    use crate::testing::{LEFT, RIGHT, bud, metamer};
 
     const UP: f64 = std::f64::consts::FRAC_PI_2;
 
@@ -339,26 +341,26 @@ mod tests {
 
     /// A trunk of `n` unit metamers with horizontal laterals of length `len(k)` either side at node k.
     fn crown(n: usize, len: impl Fn(usize) -> f64) -> Tree {
-        let mut t = Tree::new(0, 50.0);
+        let mut t = Tree::new(0, 50.0, 0.5);
         let mut trunk = Vec::new();
         for k in 0..n {
             let parent = if k == 0 { -1 } else { trunk[k - 1] as i32 };
-            trunk.push(add_metamer(&mut t, parent, slot::MAIN, UP, 1.0, 1.0, 0.0));
+            trunk.push(metamer(&mut t, parent, slot::MAIN, UP, 1.0, 1.0, 0.0));
         }
         for k in 0..n - 1 {
             let l = len(k + 1);
-            add_metamer(&mut t, trunk[k] as i32, slot::LEFT, PI, l, 0.1, 0.0);
-            add_metamer(&mut t, trunk[k] as i32, slot::RIGHT, 0.0, l, 0.1, 0.0);
+            metamer(&mut t, trunk[k] as i32, LEFT, PI, l, 0.1, 0.0);
+            metamer(&mut t, trunk[k] as i32, RIGHT, 0.0, l, 0.1, 0.0);
         }
         t
     }
 
     /// A straight chain of `n` metamers from `parent`, its first of radius `r`, the rest r/2.
     fn chain(t: &mut Tree, parent: usize, s: u8, angle: f64, n: usize, r: f64) -> usize {
-        let mut m = add_metamer(t, parent as i32, s, angle, 1.0, r, 0.0);
+        let mut m = metamer(t, parent as i32, s, angle, 1.0, r, 0.0);
         let first = m;
         for _ in 1..n {
-            m = add_metamer(t, m as i32, slot::MAIN, angle, 1.0, r * 0.5, 0.0);
+            m = metamer(t, m as i32, slot::MAIN, angle, 1.0, r * 0.5, 0.0);
         }
         first
     }
@@ -386,12 +388,12 @@ mod tests {
     }
 
     fn forked(r: f64) -> Tree {
-        let mut t = Tree::new(0, 50.0);
+        let mut t = Tree::new(0, 50.0, 0.5);
         let mut m: i32 = -1;
         for k in 0..10 {
-            m = add_metamer(&mut t, m, slot::MAIN, UP, 1.0, 1.0, 0.0) as i32;
+            m = metamer(&mut t, m, slot::MAIN, UP, 1.0, 1.0, 0.0) as i32;
             if k == 4 {
-                chain(&mut t, m as usize, slot::RIGHT, UP - 0.4, 6, r);
+                chain(&mut t, m as usize, RIGHT, UP - 0.4, 6, r);
             }
         }
         t
@@ -411,29 +413,25 @@ mod tests {
 
     #[test]
     fn a_trunk_ending_under_its_laterals_is_a_fork() {
-        let mut t = Tree::new(0, 50.0);
+        let mut t = Tree::new(0, 50.0, 0.5);
         let mut m: i32 = -1;
         for _ in 0..4 {
-            m = add_metamer(&mut t, m, slot::MAIN, UP, 1.0, 1.0, 0.0) as i32;
+            m = metamer(&mut t, m, slot::MAIN, UP, 1.0, 1.0, 0.0) as i32;
         }
-        chain(&mut t, m as usize, slot::LEFT, UP + 0.5, 6, 0.6);
-        chain(&mut t, m as usize, slot::RIGHT, UP - 0.5, 6, 0.6);
+        chain(&mut t, m as usize, LEFT, UP + 0.5, 6, 0.6);
+        chain(&mut t, m as usize, RIGHT, UP - 0.5, 6, 0.6);
         let f = form_metrics(&t, &params());
         assert!((get(&f, "forkHeight") - 4.0 / height(&t)).abs() < 1e-9);
     }
 
     #[test]
     fn recovers_a_length_diameter_slope_of_two_thirds() {
-        let mut t = Tree::new(0, 50.0);
+        let mut t = Tree::new(0, 50.0, 0.5);
         let mut m: i32 = -1;
         for k in 0..12 {
-            m = add_metamer(&mut t, m, slot::MAIN, UP, 1.0, 5.0, 0.0) as i32;
+            m = metamer(&mut t, m, slot::MAIN, UP, 1.0, 5.0, 0.0) as i32;
             let n = 5 + k; // limb length n, base diameter ∝ n^(3/2)
-            let (s, a) = if k % 2 == 0 {
-                (slot::LEFT, PI)
-            } else {
-                (slot::RIGHT, 0.0)
-            };
+            let (s, a) = if k % 2 == 0 { (LEFT, PI) } else { (RIGHT, 0.0) };
             chain(&mut t, m as usize, s, a, n, 0.01 * (n as f64).powf(1.5));
         }
         let f = form_metrics(&t, &params());
@@ -443,15 +441,15 @@ mod tests {
     #[test]
     fn a_pipe_model_tree_has_leaf_section_slope_1_and_delta_2() {
         let p = params();
-        let mut t = Tree::new(0, 50.0);
+        let mut t = Tree::new(0, 50.0, 0.5);
         fn grow(t: &mut Tree, parent: i32, angle: f64, depth: u32) {
-            let main = add_metamer(t, parent, slot::MAIN, angle, 1.0, 0.0, 0.0);
+            let main = metamer(t, parent, slot::MAIN, angle, 1.0, 0.0, 0.0);
             if depth == 0 {
-                add_bud(t, main, slot::MAIN, angle, 1.0);
+                bud(t, main, slot::MAIN, angle, 1.0);
                 return;
             }
             grow(t, main as i32, angle + 0.3, depth - 1);
-            let side = add_metamer(t, main as i32, slot::RIGHT, angle - 0.5, 1.0, 0.0, 0.0);
+            let side = metamer(t, main as i32, RIGHT, angle - 0.5, 1.0, 0.0, 0.0);
             grow(t, side as i32, angle - 0.5, depth - 1);
         }
         grow(&mut t, -1, UP, 6);

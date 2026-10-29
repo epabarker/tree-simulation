@@ -1,22 +1,17 @@
 [package]
 name = "tree-core"
 version = "0.1.0"
-description = "The tree simulation's core in Rust (ADR 0024): G2, the 2D sky sweep"
+description = "The tree simulation's core in Rust (ADR 0024)"
 edition.workspace = true
 license.workspace = true
 rust-version.workspace = true
 
 # Nothing here may be wasm-only, so the same crate builds natively (and, later, for PyO3).
-# Threads are native-only and opt-in.
-#
-# `parity` swaps the core's Math for V8's, ported bit for bit (fdlibm sin, cos, exp; glibc's pow;
-# V8's hypot), so it reproduces the TypeScript core's goldens: on for the 2D golden and
-# side-by-side tests, off otherwise. Without it the core uses the `libm` crate, pure Rust and
-# the same on every target (std's f64 functions are the platform's natively and libm's on
-# wasm32, so they would differ between the CLI and the page).
+# Threads are native-only and opt-in. The core's Math is the `libm` crate, pure Rust and the same
+# on every target (std's f64 functions are the platform's natively and libm's on wasm32, so they
+# would differ between the CLI and the page).
 [features]
 threads = []
-parity = []
 
 [dependencies]
 libm = "0.2"

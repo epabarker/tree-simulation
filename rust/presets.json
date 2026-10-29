@@ -5,6 +5,11 @@
   "world": {
    "width": 160,
    "height": 120,
+   "depth": 64,
+   "faces": [
+    0.2,
+    0.2
+   ],
    "walls": []
   },
   "trees": [
@@ -13,26 +18,22 @@
    }
   ],
   "c1": {
-   "generator": "distichous",
+   "phyllotaxis": "spiral",
+   "divergence": 137.5,
    "branchAngle": 45,
    "internodeLength": 1,
    "maxMetamersPerShoot": 3
   },
   "c2": {
    "enabled": false,
-   "model": "sky",
-   "a": 0.15,
-   "b": 1.5,
-   "qMax": 6,
+   "model": "slab",
    "C": 1,
-   "perceptionAngle": 45,
-   "perceptionDistance": 4,
-   "K": 7,
+   "K": 16,
    "kExt": 0.5,
    "skyExponent": 1,
    "skyTilt": 0,
    "minElevation": 15,
-   "rotate": false
+   "rotate": true
   },
   "c3": {
    "mode": "none",
@@ -85,7 +86,7 @@
    "enabled": false,
    "rho": 1,
    "leafMass": 0.002,
-   "E": 1000000,
+   "E": 4000000,
    "sag": "increment",
    "phi": 1,
    "posture": true,
@@ -143,6 +144,11 @@
    "world": {
     "width": 80,
     "height": 60,
+    "depth": 64,
+    "faces": [
+     0.2,
+     0.2
+    ],
     "walls": []
    },
    "trees": [
@@ -151,26 +157,22 @@
     }
    ],
    "c1": {
-    "generator": "distichous",
+    "phyllotaxis": "spiral",
+    "divergence": 137.5,
     "branchAngle": 45,
     "internodeLength": 1,
     "maxMetamersPerShoot": 3
    },
    "c2": {
     "enabled": false,
-    "model": "sky",
-    "a": 0.15,
-    "b": 1.5,
-    "qMax": 6,
+    "model": "slab",
     "C": 1,
-    "perceptionAngle": 45,
-    "perceptionDistance": 4,
-    "K": 7,
+    "K": 16,
     "kExt": 0.5,
     "skyExponent": 1,
     "skyTilt": 0,
     "minElevation": 15,
-    "rotate": false
+    "rotate": true
    },
    "c3": {
     "mode": "none",
@@ -223,7 +225,7 @@
     "enabled": false,
     "rho": 1,
     "leafMass": 0.002,
-    "E": 1000000,
+    "E": 4000000,
     "sag": "increment",
     "phi": 1,
     "posture": true,
@@ -280,6 +282,11 @@
    "world": {
     "width": 100,
     "height": 70,
+    "depth": 64,
+    "faces": [
+     0.2,
+     0.2
+    ],
     "walls": []
    },
    "trees": [
@@ -288,26 +295,22 @@
     }
    ],
    "c1": {
-    "generator": "distichous",
+    "phyllotaxis": "spiral",
+    "divergence": 137.5,
     "branchAngle": 45,
     "internodeLength": 1,
     "maxMetamersPerShoot": 3
    },
    "c2": {
     "enabled": true,
-    "model": "triangle",
-    "a": 0.15,
-    "b": 1.5,
-    "qMax": 6,
+    "model": "slab",
     "C": 1,
-    "perceptionAngle": 45,
-    "perceptionDistance": 4,
-    "K": 7,
+    "K": 16,
     "kExt": 0.5,
     "skyExponent": 1,
     "skyTilt": 0,
     "minElevation": 15,
-    "rotate": false
+    "rotate": true
    },
    "c3": {
     "mode": "none",
@@ -360,7 +363,7 @@
     "enabled": false,
     "rho": 1,
     "leafMass": 0.002,
-    "E": 1000000,
+    "E": 4000000,
     "sag": "increment",
     "phi": 1,
     "posture": true,
@@ -417,6 +420,11 @@
    "world": {
     "width": 120,
     "height": 90,
+    "depth": 64,
+    "faces": [
+     0.2,
+     0.2
+    ],
     "walls": []
    },
    "trees": [
@@ -425,26 +433,22 @@
     }
    ],
    "c1": {
-    "generator": "distichous",
+    "phyllotaxis": "spiral",
+    "divergence": 137.5,
     "branchAngle": 45,
     "internodeLength": 1,
     "maxMetamersPerShoot": 3
    },
    "c2": {
     "enabled": true,
-    "model": "triangle",
-    "a": 0.15,
-    "b": 1.5,
-    "qMax": 6,
+    "model": "slab",
     "C": 1,
-    "perceptionAngle": 45,
-    "perceptionDistance": 4,
-    "K": 7,
+    "K": 16,
     "kExt": 0.5,
     "skyExponent": 1,
     "skyTilt": 0,
     "minElevation": 15,
-    "rotate": false
+    "rotate": true
    },
    "c3": {
     "mode": "bh",
@@ -497,7 +501,7 @@
     "enabled": false,
     "rho": 1,
     "leafMass": 0.002,
-    "E": 1000000,
+    "E": 4000000,
     "sag": "increment",
     "phi": 1,
     "posture": true,
@@ -554,6 +558,11 @@
    "world": {
     "width": 120,
     "height": 90,
+    "depth": 64,
+    "faces": [
+     0.2,
+     0.2
+    ],
     "walls": []
    },
    "trees": [
@@ -562,26 +571,22 @@
     }
    ],
    "c1": {
-    "generator": "distichous",
+    "phyllotaxis": "spiral",
+    "divergence": 137.5,
     "branchAngle": 45,
     "internodeLength": 1,
     "maxMetamersPerShoot": 3
    },
    "c2": {
     "enabled": true,
-    "model": "triangle",
-    "a": 0.15,
-    "b": 1.5,
-    "qMax": 6,
+    "model": "slab",
     "C": 1,
-    "perceptionAngle": 45,
-    "perceptionDistance": 4,
-    "K": 7,
+    "K": 16,
     "kExt": 0.5,
     "skyExponent": 1,
     "skyTilt": 0,
     "minElevation": 15,
-    "rotate": false
+    "rotate": true
    },
    "c3": {
     "mode": "bh",
@@ -634,7 +639,7 @@
     "enabled": false,
     "rho": 1,
     "leafMass": 0.002,
-    "E": 1000000,
+    "E": 4000000,
     "sag": "increment",
     "phi": 1,
     "posture": true,
@@ -691,6 +696,11 @@
    "world": {
     "width": 120,
     "height": 90,
+    "depth": 64,
+    "faces": [
+     0.2,
+     0.2
+    ],
     "walls": []
    },
    "trees": [
@@ -699,26 +709,22 @@
     }
    ],
    "c1": {
-    "generator": "distichous",
+    "phyllotaxis": "spiral",
+    "divergence": 137.5,
     "branchAngle": 45,
     "internodeLength": 1,
     "maxMetamersPerShoot": 3
    },
    "c2": {
     "enabled": true,
-    "model": "triangle",
-    "a": 0.15,
-    "b": 1.5,
-    "qMax": 6,
+    "model": "slab",
     "C": 1,
-    "perceptionAngle": 45,
-    "perceptionDistance": 4,
-    "K": 7,
+    "K": 16,
     "kExt": 0.5,
     "skyExponent": 1,
     "skyTilt": 0,
     "minElevation": 15,
-    "rotate": false
+    "rotate": true
    },
    "c3": {
     "mode": "bh",
@@ -771,7 +777,7 @@
     "enabled": false,
     "rho": 1,
     "leafMass": 0.002,
-    "E": 1000000,
+    "E": 4000000,
     "sag": "increment",
     "phi": 1,
     "posture": true,
@@ -828,6 +834,11 @@
    "world": {
     "width": 120,
     "height": 90,
+    "depth": 64,
+    "faces": [
+     0.2,
+     0.2
+    ],
     "walls": []
    },
    "trees": [
@@ -836,26 +847,22 @@
     }
    ],
    "c1": {
-    "generator": "distichous",
+    "phyllotaxis": "spiral",
+    "divergence": 137.5,
     "branchAngle": 45,
     "internodeLength": 1,
     "maxMetamersPerShoot": 3
    },
    "c2": {
     "enabled": true,
-    "model": "triangle",
-    "a": 0.15,
-    "b": 1.5,
-    "qMax": 6,
+    "model": "slab",
     "C": 1,
-    "perceptionAngle": 45,
-    "perceptionDistance": 4,
-    "K": 7,
+    "K": 16,
     "kExt": 0.5,
     "skyExponent": 1,
     "skyTilt": 0,
     "minElevation": 15,
-    "rotate": false
+    "rotate": true
    },
    "c3": {
     "mode": "bh",
@@ -908,7 +915,7 @@
     "enabled": false,
     "rho": 1,
     "leafMass": 0.002,
-    "E": 1000000,
+    "E": 4000000,
     "sag": "increment",
     "phi": 1,
     "posture": true,
@@ -965,6 +972,11 @@
    "world": {
     "width": 100,
     "height": 80,
+    "depth": 64,
+    "faces": [
+     0.2,
+     0.2
+    ],
     "walls": [
      {
       "x": 36,
@@ -981,26 +993,22 @@
     }
    ],
    "c1": {
-    "generator": "distichous",
+    "phyllotaxis": "spiral",
+    "divergence": 137.5,
     "branchAngle": 45,
     "internodeLength": 1,
     "maxMetamersPerShoot": 3
    },
    "c2": {
     "enabled": true,
-    "model": "triangle",
-    "a": 0.15,
-    "b": 1.5,
-    "qMax": 6,
+    "model": "slab",
     "C": 1,
-    "perceptionAngle": 45,
-    "perceptionDistance": 4,
-    "K": 7,
+    "K": 16,
     "kExt": 0.5,
     "skyExponent": 1,
     "skyTilt": 0,
     "minElevation": 15,
-    "rotate": false
+    "rotate": true
    },
    "c3": {
     "mode": "bh",
@@ -1053,7 +1061,7 @@
     "enabled": false,
     "rho": 1,
     "leafMass": 0.002,
-    "E": 1000000,
+    "E": 4000000,
     "sag": "increment",
     "phi": 1,
     "posture": true,
@@ -1110,6 +1118,11 @@
    "world": {
     "width": 120,
     "height": 100,
+    "depth": 64,
+    "faces": [
+     0.2,
+     0.2
+    ],
     "walls": []
    },
    "trees": [
@@ -1118,26 +1131,22 @@
     }
    ],
    "c1": {
-    "generator": "distichous",
+    "phyllotaxis": "spiral",
+    "divergence": 137.5,
     "branchAngle": 45,
     "internodeLength": 1,
     "maxMetamersPerShoot": 3
    },
    "c2": {
     "enabled": true,
-    "model": "triangle",
-    "a": 0.15,
-    "b": 1.5,
-    "qMax": 6,
+    "model": "slab",
     "C": 1,
-    "perceptionAngle": 45,
-    "perceptionDistance": 4,
-    "K": 7,
+    "K": 16,
     "kExt": 0.5,
     "skyExponent": 1,
     "skyTilt": 0,
     "minElevation": 15,
-    "rotate": false
+    "rotate": true
    },
    "c3": {
     "mode": "bh",
@@ -1190,7 +1199,7 @@
     "enabled": false,
     "rho": 1,
     "leafMass": 0.002,
-    "E": 1000000,
+    "E": 4000000,
     "sag": "increment",
     "phi": 1,
     "posture": true,
@@ -1247,6 +1256,11 @@
    "world": {
     "width": 120,
     "height": 100,
+    "depth": 64,
+    "faces": [
+     0.2,
+     0.2
+    ],
     "walls": []
    },
    "trees": [
@@ -1258,26 +1272,22 @@
     }
    ],
    "c1": {
-    "generator": "distichous",
+    "phyllotaxis": "spiral",
+    "divergence": 137.5,
     "branchAngle": 45,
     "internodeLength": 1,
     "maxMetamersPerShoot": 3
    },
    "c2": {
     "enabled": true,
-    "model": "triangle",
-    "a": 0.15,
-    "b": 1.5,
-    "qMax": 6,
+    "model": "slab",
     "C": 1,
-    "perceptionAngle": 45,
-    "perceptionDistance": 4,
-    "K": 7,
+    "K": 16,
     "kExt": 0.5,
     "skyExponent": 1,
     "skyTilt": 0,
     "minElevation": 15,
-    "rotate": false
+    "rotate": true
    },
    "c3": {
     "mode": "bh",
@@ -1330,7 +1340,7 @@
     "enabled": false,
     "rho": 1,
     "leafMass": 0.002,
-    "E": 1000000,
+    "E": 4000000,
     "sag": "increment",
     "phi": 1,
     "posture": true,
@@ -1387,6 +1397,11 @@
    "world": {
     "width": 140,
     "height": 100,
+    "depth": 64,
+    "faces": [
+     0.2,
+     0.2
+    ],
     "walls": []
    },
    "trees": [
@@ -1402,26 +1417,22 @@
     }
    ],
    "c1": {
-    "generator": "distichous",
+    "phyllotaxis": "spiral",
+    "divergence": 137.5,
     "branchAngle": 45,
     "internodeLength": 1,
     "maxMetamersPerShoot": 3
    },
    "c2": {
     "enabled": true,
-    "model": "triangle",
-    "a": 0.15,
-    "b": 1.5,
-    "qMax": 6,
+    "model": "slab",
     "C": 1,
-    "perceptionAngle": 45,
-    "perceptionDistance": 4,
-    "K": 7,
+    "K": 16,
     "kExt": 0.5,
     "skyExponent": 1,
     "skyTilt": 0,
     "minElevation": 15,
-    "rotate": false
+    "rotate": true
    },
    "c3": {
     "mode": "bh",
@@ -1474,7 +1485,7 @@
     "enabled": false,
     "rho": 1,
     "leafMass": 0.002,
-    "E": 1000000,
+    "E": 4000000,
     "sag": "increment",
     "phi": 1,
     "posture": true,
@@ -1531,6 +1542,11 @@
    "world": {
     "width": 110,
     "height": 100,
+    "depth": 64,
+    "faces": [
+     0.2,
+     0.2
+    ],
     "walls": []
    },
    "trees": [
@@ -1548,26 +1564,22 @@
     }
    ],
    "c1": {
-    "generator": "distichous",
+    "phyllotaxis": "spiral",
+    "divergence": 137.5,
     "branchAngle": 45,
     "internodeLength": 1,
     "maxMetamersPerShoot": 3
    },
    "c2": {
     "enabled": true,
-    "model": "triangle",
-    "a": 0.15,
-    "b": 1.5,
-    "qMax": 6,
+    "model": "slab",
     "C": 1,
-    "perceptionAngle": 45,
-    "perceptionDistance": 4,
-    "K": 7,
+    "K": 16,
     "kExt": 0.5,
     "skyExponent": 1,
     "skyTilt": 0,
     "minElevation": 15,
-    "rotate": false
+    "rotate": true
    },
    "c3": {
     "mode": "bh",
@@ -1620,7 +1632,7 @@
     "enabled": false,
     "rho": 1,
     "leafMass": 0.002,
-    "E": 1000000,
+    "E": 4000000,
     "sag": "increment",
     "phi": 1,
     "posture": true,
@@ -1677,6 +1689,11 @@
    "world": {
     "width": 230,
     "height": 110,
+    "depth": 64,
+    "faces": [
+     0.2,
+     0.2
+    ],
     "walls": []
    },
    "trees": [
@@ -1712,26 +1729,22 @@
     }
    ],
    "c1": {
-    "generator": "distichous",
+    "phyllotaxis": "spiral",
+    "divergence": 137.5,
     "branchAngle": 45,
     "internodeLength": 1,
     "maxMetamersPerShoot": 3
    },
    "c2": {
     "enabled": true,
-    "model": "triangle",
-    "a": 0.15,
-    "b": 1.5,
-    "qMax": 6,
+    "model": "slab",
     "C": 1,
-    "perceptionAngle": 45,
-    "perceptionDistance": 4,
-    "K": 7,
+    "K": 16,
     "kExt": 0.5,
     "skyExponent": 1,
     "skyTilt": 0,
     "minElevation": 15,
-    "rotate": false
+    "rotate": true
    },
    "c3": {
     "mode": "bh",
@@ -1784,7 +1797,7 @@
     "enabled": false,
     "rho": 1,
     "leafMass": 0.002,
-    "E": 1000000,
+    "E": 4000000,
     "sag": "increment",
     "phi": 1,
     "posture": true,
@@ -1841,6 +1854,11 @@
    "world": {
     "width": 140,
     "height": 100,
+    "depth": 64,
+    "faces": [
+     0.2,
+     0.2
+    ],
     "walls": []
    },
    "trees": [
@@ -1856,26 +1874,22 @@
     }
    ],
    "c1": {
-    "generator": "distichous",
+    "phyllotaxis": "spiral",
+    "divergence": 137.5,
     "branchAngle": 45,
     "internodeLength": 1,
     "maxMetamersPerShoot": 3
    },
    "c2": {
     "enabled": true,
-    "model": "sky",
-    "a": 0.15,
-    "b": 1.5,
-    "qMax": 6,
+    "model": "slab",
     "C": 1,
-    "perceptionAngle": 45,
-    "perceptionDistance": 4,
-    "K": 7,
+    "K": 16,
     "kExt": 0.5,
     "skyExponent": 1,
     "skyTilt": 0,
     "minElevation": 15,
-    "rotate": false
+    "rotate": true
    },
    "c3": {
     "mode": "bh",
@@ -1928,7 +1942,7 @@
     "enabled": true,
     "rho": 1,
     "leafMass": 0.002,
-    "E": 1000000,
+    "E": 4000000,
     "sag": "increment",
     "phi": 1,
     "posture": true,
@@ -1985,6 +1999,11 @@
    "world": {
     "width": 230,
     "height": 110,
+    "depth": 64,
+    "faces": [
+     0.2,
+     0.2
+    ],
     "walls": []
    },
    "trees": [
@@ -2020,26 +2039,22 @@
     }
    ],
    "c1": {
-    "generator": "distichous",
+    "phyllotaxis": "spiral",
+    "divergence": 137.5,
     "branchAngle": 45,
     "internodeLength": 1,
     "maxMetamersPerShoot": 3
    },
    "c2": {
     "enabled": true,
-    "model": "sky",
-    "a": 0.15,
-    "b": 1.5,
-    "qMax": 6,
+    "model": "slab",
     "C": 1,
-    "perceptionAngle": 45,
-    "perceptionDistance": 4,
-    "K": 7,
+    "K": 16,
     "kExt": 0.5,
     "skyExponent": 1,
     "skyTilt": 0,
     "minElevation": 15,
-    "rotate": false
+    "rotate": true
    },
    "c3": {
     "mode": "bh",
@@ -2092,7 +2107,7 @@
     "enabled": true,
     "rho": 1,
     "leafMass": 0.002,
-    "E": 1000000,
+    "E": 4000000,
     "sag": "increment",
     "phi": 1,
     "posture": true,
@@ -2149,6 +2164,11 @@
    "world": {
     "width": 110,
     "height": 100,
+    "depth": 64,
+    "faces": [
+     0.2,
+     0.2
+    ],
     "walls": []
    },
    "trees": [
@@ -2166,26 +2186,22 @@
     }
    ],
    "c1": {
-    "generator": "distichous",
+    "phyllotaxis": "spiral",
+    "divergence": 137.5,
     "branchAngle": 45,
     "internodeLength": 1,
     "maxMetamersPerShoot": 3
    },
    "c2": {
     "enabled": true,
-    "model": "sky",
-    "a": 0.15,
-    "b": 1.5,
-    "qMax": 6,
+    "model": "slab",
     "C": 1,
-    "perceptionAngle": 45,
-    "perceptionDistance": 4,
-    "K": 7,
+    "K": 16,
     "kExt": 0.5,
     "skyExponent": 1,
     "skyTilt": 0,
     "minElevation": 15,
-    "rotate": false
+    "rotate": true
    },
    "c3": {
     "mode": "bh",
@@ -2238,7 +2254,7 @@
     "enabled": true,
     "rho": 1,
     "leafMass": 0.002,
-    "E": 1000000,
+    "E": 4000000,
     "sag": "increment",
     "phi": 1,
     "posture": true,
@@ -2295,6 +2311,11 @@
    "world": {
     "width": 120,
     "height": 160,
+    "depth": 64,
+    "faces": [
+     0.2,
+     0.2
+    ],
     "walls": []
    },
    "trees": [
@@ -2303,26 +2324,22 @@
     }
    ],
    "c1": {
-    "generator": "distichous",
+    "phyllotaxis": "spiral",
+    "divergence": 137.5,
     "branchAngle": 45,
     "internodeLength": 1,
     "maxMetamersPerShoot": 3
    },
    "c2": {
     "enabled": true,
-    "model": "sky",
-    "a": 0.15,
-    "b": 1.5,
-    "qMax": 6,
+    "model": "slab",
     "C": 1,
-    "perceptionAngle": 45,
-    "perceptionDistance": 4,
-    "K": 7,
+    "K": 16,
     "kExt": 0.5,
     "skyExponent": 1,
     "skyTilt": 0,
     "minElevation": 15,
-    "rotate": false
+    "rotate": true
    },
    "c3": {
     "mode": "bh",
@@ -2375,7 +2392,7 @@
     "enabled": true,
     "rho": 1,
     "leafMass": 0.002,
-    "E": 1000000,
+    "E": 4000000,
     "sag": "increment",
     "phi": 1,
     "posture": true,
@@ -2432,6 +2449,11 @@
    "world": {
     "width": 230,
     "height": 110,
+    "depth": 64,
+    "faces": [
+     0.2,
+     0.2
+    ],
     "walls": []
    },
    "trees": [
@@ -2467,26 +2489,22 @@
     }
    ],
    "c1": {
-    "generator": "distichous",
+    "phyllotaxis": "spiral",
+    "divergence": 137.5,
     "branchAngle": 45,
     "internodeLength": 1,
     "maxMetamersPerShoot": 3
    },
    "c2": {
     "enabled": true,
-    "model": "sky",
-    "a": 0.15,
-    "b": 1.5,
-    "qMax": 6,
+    "model": "slab",
     "C": 1,
-    "perceptionAngle": 45,
-    "perceptionDistance": 4,
-    "K": 7,
+    "K": 16,
     "kExt": 0.5,
     "skyExponent": 1.5,
     "skyTilt": 0,
     "minElevation": 15,
-    "rotate": false
+    "rotate": true
    },
    "c3": {
     "mode": "bh",
@@ -2539,7 +2557,7 @@
     "enabled": true,
     "rho": 1,
     "leafMass": 0.002,
-    "E": 1000000,
+    "E": 4000000,
     "sag": "increment",
     "phi": 1,
     "posture": true,
@@ -2596,6 +2614,11 @@
    "world": {
     "width": 120,
     "height": 100,
+    "depth": 64,
+    "faces": [
+     0.2,
+     0.2
+    ],
     "walls": []
    },
    "trees": [
@@ -2604,26 +2627,22 @@
     }
    ],
    "c1": {
-    "generator": "distichous",
+    "phyllotaxis": "spiral",
+    "divergence": 137.5,
     "branchAngle": 45,
     "internodeLength": 1,
     "maxMetamersPerShoot": 3
    },
    "c2": {
     "enabled": true,
-    "model": "sky",
-    "a": 0.15,
-    "b": 1.5,
-    "qMax": 6,
+    "model": "slab",
     "C": 1,
-    "perceptionAngle": 45,
-    "perceptionDistance": 4,
-    "K": 7,
+    "K": 16,
     "kExt": 0.5,
     "skyExponent": 1,
     "skyTilt": 0.5,
     "minElevation": 15,
-    "rotate": false
+    "rotate": true
    },
    "c3": {
     "mode": "bh",
@@ -2676,7 +2695,7 @@
     "enabled": true,
     "rho": 1,
     "leafMass": 0.002,
-    "E": 1000000,
+    "E": 4000000,
     "sag": "increment",
     "phi": 1,
     "posture": true,
@@ -2733,6 +2752,11 @@
    "world": {
     "width": 210,
     "height": 130,
+    "depth": 64,
+    "faces": [
+     0.2,
+     0.2
+    ],
     "walls": [],
     "sides": "periodic"
    },
@@ -2769,26 +2793,22 @@
     }
    ],
    "c1": {
-    "generator": "distichous",
+    "phyllotaxis": "spiral",
+    "divergence": 137.5,
     "branchAngle": 45,
     "internodeLength": 1,
     "maxMetamersPerShoot": 3
    },
    "c2": {
     "enabled": true,
-    "model": "sky",
-    "a": 0.15,
-    "b": 1.5,
-    "qMax": 6,
+    "model": "slab",
     "C": 1,
-    "perceptionAngle": 45,
-    "perceptionDistance": 4,
-    "K": 7,
+    "K": 16,
     "kExt": 0.5,
     "skyExponent": 1,
     "skyTilt": 0,
     "minElevation": 15,
-    "rotate": false
+    "rotate": true
    },
    "c3": {
     "mode": "bh",
@@ -2841,7 +2861,7 @@
     "enabled": true,
     "rho": 1,
     "leafMass": 0.002,
-    "E": 1000000,
+    "E": 4000000,
     "sag": "increment",
     "phi": 1,
     "posture": true,
@@ -2899,6 +2919,11 @@
    "world": {
     "width": 210,
     "height": 130,
+    "depth": 64,
+    "faces": [
+     0.2,
+     0.2
+    ],
     "walls": [],
     "sides": "periodic",
     "obstacles": [
@@ -2943,26 +2968,22 @@
     }
    ],
    "c1": {
-    "generator": "distichous",
+    "phyllotaxis": "spiral",
+    "divergence": 137.5,
     "branchAngle": 45,
     "internodeLength": 1,
     "maxMetamersPerShoot": 3
    },
    "c2": {
     "enabled": true,
-    "model": "sky",
-    "a": 0.15,
-    "b": 1.5,
-    "qMax": 6,
+    "model": "slab",
     "C": 1,
-    "perceptionAngle": 45,
-    "perceptionDistance": 4,
-    "K": 7,
+    "K": 16,
     "kExt": 0.5,
     "skyExponent": 1,
     "skyTilt": 0,
     "minElevation": 15,
-    "rotate": false
+    "rotate": true
    },
    "c3": {
     "mode": "bh",
@@ -3015,7 +3036,7 @@
     "enabled": true,
     "rho": 1,
     "leafMass": 0.002,
-    "E": 1000000,
+    "E": 4000000,
     "sag": "increment",
     "phi": 1,
     "posture": true,
@@ -3073,6 +3094,11 @@
    "world": {
     "width": 160,
     "height": 120,
+    "depth": 64,
+    "faces": [
+     0.2,
+     0.2
+    ],
     "walls": []
    },
    "trees": [
@@ -3082,26 +3108,22 @@
     }
    ],
    "c1": {
-    "generator": "distichous",
+    "phyllotaxis": "spiral",
+    "divergence": 137.5,
     "branchAngle": 45,
     "internodeLength": 1,
     "maxMetamersPerShoot": 3
    },
    "c2": {
     "enabled": true,
-    "model": "sky",
-    "a": 0.15,
-    "b": 1.5,
-    "qMax": 6,
+    "model": "slab",
     "C": 1,
-    "perceptionAngle": 45,
-    "perceptionDistance": 4,
-    "K": 7,
+    "K": 16,
     "kExt": 0.5,
     "skyExponent": 1,
     "skyTilt": 0,
     "minElevation": 15,
-    "rotate": false
+    "rotate": true
    },
    "c3": {
     "mode": "bh",
@@ -3154,7 +3176,7 @@
     "enabled": true,
     "rho": 1,
     "leafMass": 0.002,
-    "E": 1000000,
+    "E": 4000000,
     "sag": "increment",
     "phi": 1,
     "posture": true,
@@ -3251,7 +3273,7 @@
         "setPoint": 0,
         "eta": 0.3,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -3260,7 +3282,7 @@
         "setPoint": 74.94,
         "eta": 0.2434,
         "branchAngle": 42.94,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0,
         "postureSetPoint": 70
@@ -3270,7 +3292,7 @@
         "setPoint": 144.8,
         "eta": 0.25,
         "branchAngle": 40,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        }
@@ -3285,7 +3307,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.001,
-      "E": 1000000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 0.5,
       "posture": true,
@@ -3381,7 +3403,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.002,
-      "E": 1000000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 1,
       "posture": true,
@@ -3454,7 +3476,7 @@
         "setPoint": 0,
         "eta": 0.25,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -3463,7 +3485,7 @@
         "setPoint": 58.61,
         "eta": 0.1512,
         "branchAngle": 56.94,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -3472,7 +3494,7 @@
         "setPoint": 49.63,
         "eta": 0.2,
         "branchAngle": 50,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        }
@@ -3487,7 +3509,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.002,
-      "E": 2500000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 1,
       "posture": true,
@@ -3605,7 +3627,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.002,
-      "E": 1000000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 1,
       "posture": true,
@@ -3685,7 +3707,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.002,
-      "E": 1000000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 1,
       "posture": true,
@@ -3763,7 +3785,7 @@
         "setPoint": 0,
         "eta": 0.25,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "opposite",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -3772,7 +3794,7 @@
         "setPoint": 51.12,
         "eta": 0.1405,
         "branchAngle": 44.65,
-        "generator": "distichous",
+        "generator": "opposite",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -3781,7 +3803,7 @@
         "setPoint": 45.87,
         "eta": 0.25,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "opposite",
         "tierEvery": 0,
         "pTerm": 0
        }
@@ -3796,7 +3818,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.002,
-      "E": 2500000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 1,
       "posture": true,
@@ -3864,7 +3886,7 @@
         "setPoint": 0,
         "eta": 0.4,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -3873,7 +3895,7 @@
         "setPoint": 62.09,
         "eta": 0.5767,
         "branchAngle": 59.22,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -3882,7 +3904,7 @@
         "setPoint": 126.3,
         "eta": 0.25,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        }
@@ -3897,7 +3919,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.002,
-      "E": 1000000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 1,
       "posture": true,
@@ -3968,7 +3990,7 @@
         "setPoint": 0,
         "eta": 0.3,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -3977,7 +3999,7 @@
         "setPoint": 28.22,
         "eta": 0.3169,
         "branchAngle": 31.45,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -3986,7 +4008,7 @@
         "setPoint": 57.91,
         "eta": 0.25,
         "branchAngle": 40,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        }
@@ -4016,7 +4038,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.002,
-      "E": 1000000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 1,
       "posture": true,
@@ -4072,7 +4094,7 @@
         "setPoint": 0,
         "eta": 0.25,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -4081,7 +4103,7 @@
         "setPoint": 38.78,
         "eta": 0.1194,
         "branchAngle": 48.99,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -4090,7 +4112,7 @@
         "setPoint": 54.03,
         "eta": 0.2,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        }
@@ -4121,7 +4143,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.002,
-      "E": 1000000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 1,
       "posture": true,
@@ -4186,7 +4208,7 @@
         "setPoint": 70.53,
         "eta": 1.949,
         "branchAngle": 70.5,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -4195,7 +4217,7 @@
         "setPoint": 89.91,
         "eta": 0.4,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        }
@@ -4225,7 +4247,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.002,
-      "E": 1000000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 1,
       "posture": true,
@@ -4245,6 +4267,11 @@
    "world": {
     "width": 230,
     "height": 130,
+    "depth": 64,
+    "faces": [
+     0.2,
+     0.2
+    ],
     "walls": []
    },
    "trees": [
@@ -4290,26 +4317,22 @@
     }
    ],
    "c1": {
-    "generator": "distichous",
+    "phyllotaxis": "spiral",
+    "divergence": 137.5,
     "branchAngle": 45,
     "internodeLength": 1,
     "maxMetamersPerShoot": 3
    },
    "c2": {
     "enabled": true,
-    "model": "sky",
-    "a": 0.15,
-    "b": 1.5,
-    "qMax": 6,
+    "model": "slab",
     "C": 1,
-    "perceptionAngle": 45,
-    "perceptionDistance": 4,
-    "K": 7,
+    "K": 16,
     "kExt": 0.5,
     "skyExponent": 1,
     "skyTilt": 0,
     "minElevation": 15,
-    "rotate": false
+    "rotate": true
    },
    "c3": {
     "mode": "bh",
@@ -4362,7 +4385,7 @@
     "enabled": true,
     "rho": 1,
     "leafMass": 0.002,
-    "E": 1000000,
+    "E": 4000000,
     "sag": "increment",
     "phi": 1,
     "posture": true,
@@ -4459,7 +4482,7 @@
         "setPoint": 0,
         "eta": 0.3,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -4468,7 +4491,7 @@
         "setPoint": 74.94,
         "eta": 0.2434,
         "branchAngle": 42.94,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0,
         "postureSetPoint": 70
@@ -4478,7 +4501,7 @@
         "setPoint": 144.8,
         "eta": 0.25,
         "branchAngle": 40,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        }
@@ -4493,7 +4516,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.001,
-      "E": 1000000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 0.5,
       "posture": true,
@@ -4589,7 +4612,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.002,
-      "E": 1000000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 1,
       "posture": true,
@@ -4662,7 +4685,7 @@
         "setPoint": 0,
         "eta": 0.25,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -4671,7 +4694,7 @@
         "setPoint": 58.61,
         "eta": 0.1512,
         "branchAngle": 56.94,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -4680,7 +4703,7 @@
         "setPoint": 49.63,
         "eta": 0.2,
         "branchAngle": 50,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        }
@@ -4695,7 +4718,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.002,
-      "E": 2500000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 1,
       "posture": true,
@@ -4813,7 +4836,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.002,
-      "E": 1000000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 1,
       "posture": true,
@@ -4893,7 +4916,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.002,
-      "E": 1000000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 1,
       "posture": true,
@@ -4971,7 +4994,7 @@
         "setPoint": 0,
         "eta": 0.25,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "opposite",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -4980,7 +5003,7 @@
         "setPoint": 51.12,
         "eta": 0.1405,
         "branchAngle": 44.65,
-        "generator": "distichous",
+        "generator": "opposite",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -4989,7 +5012,7 @@
         "setPoint": 45.87,
         "eta": 0.25,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "opposite",
         "tierEvery": 0,
         "pTerm": 0
        }
@@ -5004,7 +5027,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.002,
-      "E": 2500000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 1,
       "posture": true,
@@ -5072,7 +5095,7 @@
         "setPoint": 0,
         "eta": 0.4,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -5081,7 +5104,7 @@
         "setPoint": 62.09,
         "eta": 0.5767,
         "branchAngle": 59.22,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -5090,7 +5113,7 @@
         "setPoint": 126.3,
         "eta": 0.25,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        }
@@ -5105,7 +5128,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.002,
-      "E": 1000000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 1,
       "posture": true,
@@ -5176,7 +5199,7 @@
         "setPoint": 0,
         "eta": 0.3,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -5185,7 +5208,7 @@
         "setPoint": 28.22,
         "eta": 0.3169,
         "branchAngle": 31.45,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -5194,7 +5217,7 @@
         "setPoint": 57.91,
         "eta": 0.25,
         "branchAngle": 40,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        }
@@ -5224,7 +5247,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.002,
-      "E": 1000000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 1,
       "posture": true,
@@ -5280,7 +5303,7 @@
         "setPoint": 0,
         "eta": 0.25,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -5289,7 +5312,7 @@
         "setPoint": 38.78,
         "eta": 0.1194,
         "branchAngle": 48.99,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -5298,7 +5321,7 @@
         "setPoint": 54.03,
         "eta": 0.2,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        }
@@ -5329,7 +5352,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.002,
-      "E": 1000000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 1,
       "posture": true,
@@ -5394,7 +5417,7 @@
         "setPoint": 70.53,
         "eta": 1.949,
         "branchAngle": 70.5,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -5403,7 +5426,7 @@
         "setPoint": 89.91,
         "eta": 0.4,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        }
@@ -5433,7 +5456,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.002,
-      "E": 1000000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 1,
       "posture": true,
@@ -5453,6 +5476,11 @@
    "world": {
     "width": 230,
     "height": 130,
+    "depth": 64,
+    "faces": [
+     0.2,
+     0.2
+    ],
     "walls": []
    },
    "trees": [
@@ -5498,26 +5526,22 @@
     }
    ],
    "c1": {
-    "generator": "distichous",
+    "phyllotaxis": "spiral",
+    "divergence": 137.5,
     "branchAngle": 45,
     "internodeLength": 1,
     "maxMetamersPerShoot": 3
    },
    "c2": {
     "enabled": true,
-    "model": "sky",
-    "a": 0.15,
-    "b": 1.5,
-    "qMax": 6,
+    "model": "slab",
     "C": 1,
-    "perceptionAngle": 45,
-    "perceptionDistance": 4,
-    "K": 7,
+    "K": 16,
     "kExt": 0.5,
     "skyExponent": 1,
     "skyTilt": 0,
     "minElevation": 15,
-    "rotate": false
+    "rotate": true
    },
    "c3": {
     "mode": "bh",
@@ -5570,7 +5594,7 @@
     "enabled": true,
     "rho": 1,
     "leafMass": 0.002,
-    "E": 1000000,
+    "E": 4000000,
     "sag": "increment",
     "phi": 1,
     "posture": true,
@@ -5667,7 +5691,7 @@
         "setPoint": 0,
         "eta": 0.3,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -5676,7 +5700,7 @@
         "setPoint": 74.94,
         "eta": 0.2434,
         "branchAngle": 42.94,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0,
         "postureSetPoint": 70
@@ -5686,7 +5710,7 @@
         "setPoint": 144.8,
         "eta": 0.25,
         "branchAngle": 40,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        }
@@ -5701,7 +5725,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.001,
-      "E": 1000000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 0.5,
       "posture": true,
@@ -5797,7 +5821,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.002,
-      "E": 1000000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 1,
       "posture": true,
@@ -5870,7 +5894,7 @@
         "setPoint": 0,
         "eta": 0.25,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -5879,7 +5903,7 @@
         "setPoint": 58.61,
         "eta": 0.1512,
         "branchAngle": 56.94,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -5888,7 +5912,7 @@
         "setPoint": 49.63,
         "eta": 0.2,
         "branchAngle": 50,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        }
@@ -5903,7 +5927,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.002,
-      "E": 2500000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 1,
       "posture": true,
@@ -6021,7 +6045,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.002,
-      "E": 1000000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 1,
       "posture": true,
@@ -6101,7 +6125,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.002,
-      "E": 1000000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 1,
       "posture": true,
@@ -6179,7 +6203,7 @@
         "setPoint": 0,
         "eta": 0.25,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "opposite",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -6188,7 +6212,7 @@
         "setPoint": 51.12,
         "eta": 0.1405,
         "branchAngle": 44.65,
-        "generator": "distichous",
+        "generator": "opposite",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -6197,7 +6221,7 @@
         "setPoint": 45.87,
         "eta": 0.25,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "opposite",
         "tierEvery": 0,
         "pTerm": 0
        }
@@ -6212,7 +6236,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.002,
-      "E": 2500000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 1,
       "posture": true,
@@ -6280,7 +6304,7 @@
         "setPoint": 0,
         "eta": 0.4,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -6289,7 +6313,7 @@
         "setPoint": 62.09,
         "eta": 0.5767,
         "branchAngle": 59.22,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -6298,7 +6322,7 @@
         "setPoint": 126.3,
         "eta": 0.25,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        }
@@ -6313,7 +6337,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.002,
-      "E": 1000000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 1,
       "posture": true,
@@ -6384,7 +6408,7 @@
         "setPoint": 0,
         "eta": 0.3,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -6393,7 +6417,7 @@
         "setPoint": 28.22,
         "eta": 0.3169,
         "branchAngle": 31.45,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -6402,7 +6426,7 @@
         "setPoint": 57.91,
         "eta": 0.25,
         "branchAngle": 40,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        }
@@ -6432,7 +6456,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.002,
-      "E": 1000000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 1,
       "posture": true,
@@ -6488,7 +6512,7 @@
         "setPoint": 0,
         "eta": 0.25,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -6497,7 +6521,7 @@
         "setPoint": 38.78,
         "eta": 0.1194,
         "branchAngle": 48.99,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -6506,7 +6530,7 @@
         "setPoint": 54.03,
         "eta": 0.2,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        }
@@ -6537,7 +6561,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.002,
-      "E": 1000000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 1,
       "posture": true,
@@ -6602,7 +6626,7 @@
         "setPoint": 70.53,
         "eta": 1.949,
         "branchAngle": 70.5,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -6611,7 +6635,7 @@
         "setPoint": 89.91,
         "eta": 0.4,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        }
@@ -6641,7 +6665,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.002,
-      "E": 1000000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 1,
       "posture": true,
@@ -6661,6 +6685,11 @@
    "world": {
     "width": 230,
     "height": 130,
+    "depth": 64,
+    "faces": [
+     0.2,
+     0.2
+    ],
     "walls": []
    },
    "trees": [
@@ -6706,26 +6735,22 @@
     }
    ],
    "c1": {
-    "generator": "distichous",
+    "phyllotaxis": "spiral",
+    "divergence": 137.5,
     "branchAngle": 45,
     "internodeLength": 1,
     "maxMetamersPerShoot": 3
    },
    "c2": {
     "enabled": true,
-    "model": "sky",
-    "a": 0.15,
-    "b": 1.5,
-    "qMax": 6,
+    "model": "slab",
     "C": 1,
-    "perceptionAngle": 45,
-    "perceptionDistance": 4,
-    "K": 7,
+    "K": 16,
     "kExt": 0.5,
     "skyExponent": 1,
     "skyTilt": 0,
     "minElevation": 15,
-    "rotate": false
+    "rotate": true
    },
    "c3": {
     "mode": "bh",
@@ -6778,7 +6803,7 @@
     "enabled": true,
     "rho": 1,
     "leafMass": 0.002,
-    "E": 1000000,
+    "E": 4000000,
     "sag": "increment",
     "phi": 1,
     "posture": true,
@@ -6875,7 +6900,7 @@
         "setPoint": 0,
         "eta": 0.3,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -6884,7 +6909,7 @@
         "setPoint": 74.94,
         "eta": 0.2434,
         "branchAngle": 42.94,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0,
         "postureSetPoint": 70
@@ -6894,7 +6919,7 @@
         "setPoint": 144.8,
         "eta": 0.25,
         "branchAngle": 40,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        }
@@ -6909,7 +6934,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.001,
-      "E": 1000000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 0.5,
       "posture": true,
@@ -7005,7 +7030,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.002,
-      "E": 1000000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 1,
       "posture": true,
@@ -7078,7 +7103,7 @@
         "setPoint": 0,
         "eta": 0.25,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -7087,7 +7112,7 @@
         "setPoint": 58.61,
         "eta": 0.1512,
         "branchAngle": 56.94,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -7096,7 +7121,7 @@
         "setPoint": 49.63,
         "eta": 0.2,
         "branchAngle": 50,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        }
@@ -7111,7 +7136,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.002,
-      "E": 2500000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 1,
       "posture": true,
@@ -7229,7 +7254,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.002,
-      "E": 1000000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 1,
       "posture": true,
@@ -7309,7 +7334,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.002,
-      "E": 1000000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 1,
       "posture": true,
@@ -7387,7 +7412,7 @@
         "setPoint": 0,
         "eta": 0.25,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "opposite",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -7396,7 +7421,7 @@
         "setPoint": 51.12,
         "eta": 0.1405,
         "branchAngle": 44.65,
-        "generator": "distichous",
+        "generator": "opposite",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -7405,7 +7430,7 @@
         "setPoint": 45.87,
         "eta": 0.25,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "opposite",
         "tierEvery": 0,
         "pTerm": 0
        }
@@ -7420,7 +7445,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.002,
-      "E": 2500000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 1,
       "posture": true,
@@ -7488,7 +7513,7 @@
         "setPoint": 0,
         "eta": 0.4,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -7497,7 +7522,7 @@
         "setPoint": 62.09,
         "eta": 0.5767,
         "branchAngle": 59.22,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -7506,7 +7531,7 @@
         "setPoint": 126.3,
         "eta": 0.25,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        }
@@ -7521,7 +7546,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.002,
-      "E": 1000000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 1,
       "posture": true,
@@ -7592,7 +7617,7 @@
         "setPoint": 0,
         "eta": 0.3,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -7601,7 +7626,7 @@
         "setPoint": 28.22,
         "eta": 0.3169,
         "branchAngle": 31.45,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -7610,7 +7635,7 @@
         "setPoint": 57.91,
         "eta": 0.25,
         "branchAngle": 40,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        }
@@ -7640,7 +7665,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.002,
-      "E": 1000000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 1,
       "posture": true,
@@ -7696,7 +7721,7 @@
         "setPoint": 0,
         "eta": 0.25,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -7705,7 +7730,7 @@
         "setPoint": 38.78,
         "eta": 0.1194,
         "branchAngle": 48.99,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -7714,7 +7739,7 @@
         "setPoint": 54.03,
         "eta": 0.2,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        }
@@ -7745,7 +7770,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.002,
-      "E": 1000000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 1,
       "posture": true,
@@ -7810,7 +7835,7 @@
         "setPoint": 70.53,
         "eta": 1.949,
         "branchAngle": 70.5,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -7819,7 +7844,7 @@
         "setPoint": 89.91,
         "eta": 0.4,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        }
@@ -7849,7 +7874,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.002,
-      "E": 1000000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 1,
       "posture": true,
@@ -7869,6 +7894,11 @@
    "world": {
     "width": 230,
     "height": 160,
+    "depth": 64,
+    "faces": [
+     0.2,
+     0.2
+    ],
     "walls": []
    },
    "trees": [
@@ -7914,26 +7944,22 @@
     }
    ],
    "c1": {
-    "generator": "distichous",
+    "phyllotaxis": "spiral",
+    "divergence": 137.5,
     "branchAngle": 45,
     "internodeLength": 1,
     "maxMetamersPerShoot": 3
    },
    "c2": {
     "enabled": true,
-    "model": "sky",
-    "a": 0.15,
-    "b": 1.5,
-    "qMax": 6,
+    "model": "slab",
     "C": 1,
-    "perceptionAngle": 45,
-    "perceptionDistance": 4,
-    "K": 7,
+    "K": 16,
     "kExt": 0.5,
     "skyExponent": 1,
     "skyTilt": 0,
     "minElevation": 15,
-    "rotate": false
+    "rotate": true
    },
    "c3": {
     "mode": "bh",
@@ -7986,7 +8012,7 @@
     "enabled": true,
     "rho": 1,
     "leafMass": 0.002,
-    "E": 1000000,
+    "E": 4000000,
     "sag": "increment",
     "phi": 1,
     "posture": true,
@@ -8083,7 +8109,7 @@
         "setPoint": 0,
         "eta": 0.3,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -8092,7 +8118,7 @@
         "setPoint": 74.94,
         "eta": 0.2434,
         "branchAngle": 42.94,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0,
         "postureSetPoint": 70
@@ -8102,7 +8128,7 @@
         "setPoint": 144.8,
         "eta": 0.25,
         "branchAngle": 40,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        }
@@ -8117,7 +8143,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.001,
-      "E": 1000000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 0.5,
       "posture": true,
@@ -8213,7 +8239,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.002,
-      "E": 1000000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 1,
       "posture": true,
@@ -8286,7 +8312,7 @@
         "setPoint": 0,
         "eta": 0.25,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -8295,7 +8321,7 @@
         "setPoint": 58.61,
         "eta": 0.1512,
         "branchAngle": 56.94,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -8304,7 +8330,7 @@
         "setPoint": 49.63,
         "eta": 0.2,
         "branchAngle": 50,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        }
@@ -8319,7 +8345,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.002,
-      "E": 2500000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 1,
       "posture": true,
@@ -8437,7 +8463,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.002,
-      "E": 1000000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 1,
       "posture": true,
@@ -8517,7 +8543,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.002,
-      "E": 1000000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 1,
       "posture": true,
@@ -8595,7 +8621,7 @@
         "setPoint": 0,
         "eta": 0.25,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "opposite",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -8604,7 +8630,7 @@
         "setPoint": 51.12,
         "eta": 0.1405,
         "branchAngle": 44.65,
-        "generator": "distichous",
+        "generator": "opposite",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -8613,7 +8639,7 @@
         "setPoint": 45.87,
         "eta": 0.25,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "opposite",
         "tierEvery": 0,
         "pTerm": 0
        }
@@ -8628,7 +8654,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.002,
-      "E": 2500000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 1,
       "posture": true,
@@ -8696,7 +8722,7 @@
         "setPoint": 0,
         "eta": 0.4,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -8705,7 +8731,7 @@
         "setPoint": 62.09,
         "eta": 0.5767,
         "branchAngle": 59.22,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -8714,7 +8740,7 @@
         "setPoint": 126.3,
         "eta": 0.25,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        }
@@ -8729,7 +8755,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.002,
-      "E": 1000000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 1,
       "posture": true,
@@ -8800,7 +8826,7 @@
         "setPoint": 0,
         "eta": 0.3,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -8809,7 +8835,7 @@
         "setPoint": 28.22,
         "eta": 0.3169,
         "branchAngle": 31.45,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -8818,7 +8844,7 @@
         "setPoint": 57.91,
         "eta": 0.25,
         "branchAngle": 40,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        }
@@ -8848,7 +8874,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.002,
-      "E": 1000000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 1,
       "posture": true,
@@ -8904,7 +8930,7 @@
         "setPoint": 0,
         "eta": 0.25,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -8913,7 +8939,7 @@
         "setPoint": 38.78,
         "eta": 0.1194,
         "branchAngle": 48.99,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -8922,7 +8948,7 @@
         "setPoint": 54.03,
         "eta": 0.2,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        }
@@ -8953,7 +8979,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.002,
-      "E": 1000000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 1,
       "posture": true,
@@ -9018,7 +9044,7 @@
         "setPoint": 70.53,
         "eta": 1.949,
         "branchAngle": 70.5,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -9027,7 +9053,7 @@
         "setPoint": 89.91,
         "eta": 0.4,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        }
@@ -9057,7 +9083,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.002,
-      "E": 1000000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 1,
       "posture": true,
@@ -9077,6 +9103,11 @@
    "world": {
     "width": 230,
     "height": 160,
+    "depth": 64,
+    "faces": [
+     0.2,
+     0.2
+    ],
     "walls": []
    },
    "trees": [
@@ -9122,26 +9153,22 @@
     }
    ],
    "c1": {
-    "generator": "distichous",
+    "phyllotaxis": "spiral",
+    "divergence": 137.5,
     "branchAngle": 45,
     "internodeLength": 1,
     "maxMetamersPerShoot": 3
    },
    "c2": {
     "enabled": true,
-    "model": "sky",
-    "a": 0.15,
-    "b": 1.5,
-    "qMax": 6,
+    "model": "slab",
     "C": 1,
-    "perceptionAngle": 45,
-    "perceptionDistance": 4,
-    "K": 7,
+    "K": 16,
     "kExt": 0.5,
     "skyExponent": 1,
     "skyTilt": 0,
     "minElevation": 15,
-    "rotate": false
+    "rotate": true
    },
    "c3": {
     "mode": "bh",
@@ -9194,7 +9221,7 @@
     "enabled": true,
     "rho": 1,
     "leafMass": 0.002,
-    "E": 1000000,
+    "E": 4000000,
     "sag": "increment",
     "phi": 1,
     "posture": true,
@@ -9291,7 +9318,7 @@
         "setPoint": 0,
         "eta": 0.3,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -9300,7 +9327,7 @@
         "setPoint": 74.94,
         "eta": 0.2434,
         "branchAngle": 42.94,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0,
         "postureSetPoint": 70
@@ -9310,7 +9337,7 @@
         "setPoint": 144.8,
         "eta": 0.25,
         "branchAngle": 40,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        }
@@ -9325,7 +9352,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.001,
-      "E": 1000000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 0.5,
       "posture": true,
@@ -9421,7 +9448,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.002,
-      "E": 1000000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 1,
       "posture": true,
@@ -9494,7 +9521,7 @@
         "setPoint": 0,
         "eta": 0.25,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -9503,7 +9530,7 @@
         "setPoint": 58.61,
         "eta": 0.1512,
         "branchAngle": 56.94,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -9512,7 +9539,7 @@
         "setPoint": 49.63,
         "eta": 0.2,
         "branchAngle": 50,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        }
@@ -9527,7 +9554,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.002,
-      "E": 2500000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 1,
       "posture": true,
@@ -9645,7 +9672,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.002,
-      "E": 1000000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 1,
       "posture": true,
@@ -9725,7 +9752,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.002,
-      "E": 1000000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 1,
       "posture": true,
@@ -9803,7 +9830,7 @@
         "setPoint": 0,
         "eta": 0.25,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "opposite",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -9812,7 +9839,7 @@
         "setPoint": 51.12,
         "eta": 0.1405,
         "branchAngle": 44.65,
-        "generator": "distichous",
+        "generator": "opposite",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -9821,7 +9848,7 @@
         "setPoint": 45.87,
         "eta": 0.25,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "opposite",
         "tierEvery": 0,
         "pTerm": 0
        }
@@ -9836,7 +9863,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.002,
-      "E": 2500000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 1,
       "posture": true,
@@ -9904,7 +9931,7 @@
         "setPoint": 0,
         "eta": 0.4,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -9913,7 +9940,7 @@
         "setPoint": 62.09,
         "eta": 0.5767,
         "branchAngle": 59.22,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -9922,7 +9949,7 @@
         "setPoint": 126.3,
         "eta": 0.25,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        }
@@ -9937,7 +9964,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.002,
-      "E": 1000000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 1,
       "posture": true,
@@ -10008,7 +10035,7 @@
         "setPoint": 0,
         "eta": 0.3,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -10017,7 +10044,7 @@
         "setPoint": 28.22,
         "eta": 0.3169,
         "branchAngle": 31.45,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -10026,7 +10053,7 @@
         "setPoint": 57.91,
         "eta": 0.25,
         "branchAngle": 40,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        }
@@ -10056,7 +10083,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.002,
-      "E": 1000000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 1,
       "posture": true,
@@ -10112,7 +10139,7 @@
         "setPoint": 0,
         "eta": 0.25,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -10121,7 +10148,7 @@
         "setPoint": 38.78,
         "eta": 0.1194,
         "branchAngle": 48.99,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -10130,7 +10157,7 @@
         "setPoint": 54.03,
         "eta": 0.2,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        }
@@ -10161,7 +10188,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.002,
-      "E": 1000000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 1,
       "posture": true,
@@ -10226,7 +10253,7 @@
         "setPoint": 70.53,
         "eta": 1.949,
         "branchAngle": 70.5,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -10235,7 +10262,7 @@
         "setPoint": 89.91,
         "eta": 0.4,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        }
@@ -10265,7 +10292,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.002,
-      "E": 1000000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 1,
       "posture": true,
@@ -10285,6 +10312,11 @@
    "world": {
     "width": 210,
     "height": 130,
+    "depth": 64,
+    "faces": [
+     0.2,
+     0.2
+    ],
     "walls": [],
     "sides": "periodic"
    },
@@ -10331,26 +10363,22 @@
     }
    ],
    "c1": {
-    "generator": "distichous",
+    "phyllotaxis": "spiral",
+    "divergence": 137.5,
     "branchAngle": 45,
     "internodeLength": 1,
     "maxMetamersPerShoot": 3
    },
    "c2": {
     "enabled": true,
-    "model": "sky",
-    "a": 0.15,
-    "b": 1.5,
-    "qMax": 6,
+    "model": "slab",
     "C": 1,
-    "perceptionAngle": 45,
-    "perceptionDistance": 4,
-    "K": 7,
+    "K": 16,
     "kExt": 0.5,
     "skyExponent": 1,
     "skyTilt": 0,
     "minElevation": 15,
-    "rotate": false
+    "rotate": true
    },
    "c3": {
     "mode": "bh",
@@ -10403,7 +10431,7 @@
     "enabled": true,
     "rho": 1,
     "leafMass": 0.002,
-    "E": 1000000,
+    "E": 4000000,
     "sag": "increment",
     "phi": 1,
     "posture": true,
@@ -10500,7 +10528,7 @@
         "setPoint": 0,
         "eta": 0.3,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -10509,7 +10537,7 @@
         "setPoint": 74.94,
         "eta": 0.2434,
         "branchAngle": 42.94,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0,
         "postureSetPoint": 70
@@ -10519,7 +10547,7 @@
         "setPoint": 144.8,
         "eta": 0.25,
         "branchAngle": 40,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        }
@@ -10534,7 +10562,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.001,
-      "E": 1000000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 0.5,
       "posture": true,
@@ -10630,7 +10658,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.002,
-      "E": 1000000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 1,
       "posture": true,
@@ -10703,7 +10731,7 @@
         "setPoint": 0,
         "eta": 0.25,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -10712,7 +10740,7 @@
         "setPoint": 58.61,
         "eta": 0.1512,
         "branchAngle": 56.94,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -10721,7 +10749,7 @@
         "setPoint": 49.63,
         "eta": 0.2,
         "branchAngle": 50,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        }
@@ -10736,7 +10764,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.002,
-      "E": 2500000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 1,
       "posture": true,
@@ -10854,7 +10882,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.002,
-      "E": 1000000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 1,
       "posture": true,
@@ -10934,7 +10962,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.002,
-      "E": 1000000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 1,
       "posture": true,
@@ -11012,7 +11040,7 @@
         "setPoint": 0,
         "eta": 0.25,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "opposite",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -11021,7 +11049,7 @@
         "setPoint": 51.12,
         "eta": 0.1405,
         "branchAngle": 44.65,
-        "generator": "distichous",
+        "generator": "opposite",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -11030,7 +11058,7 @@
         "setPoint": 45.87,
         "eta": 0.25,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "opposite",
         "tierEvery": 0,
         "pTerm": 0
        }
@@ -11045,7 +11073,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.002,
-      "E": 2500000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 1,
       "posture": true,
@@ -11113,7 +11141,7 @@
         "setPoint": 0,
         "eta": 0.4,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -11122,7 +11150,7 @@
         "setPoint": 62.09,
         "eta": 0.5767,
         "branchAngle": 59.22,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -11131,7 +11159,7 @@
         "setPoint": 126.3,
         "eta": 0.25,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        }
@@ -11146,7 +11174,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.002,
-      "E": 1000000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 1,
       "posture": true,
@@ -11217,7 +11245,7 @@
         "setPoint": 0,
         "eta": 0.3,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -11226,7 +11254,7 @@
         "setPoint": 28.22,
         "eta": 0.3169,
         "branchAngle": 31.45,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -11235,7 +11263,7 @@
         "setPoint": 57.91,
         "eta": 0.25,
         "branchAngle": 40,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        }
@@ -11265,7 +11293,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.002,
-      "E": 1000000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 1,
       "posture": true,
@@ -11321,7 +11349,7 @@
         "setPoint": 0,
         "eta": 0.25,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -11330,7 +11358,7 @@
         "setPoint": 38.78,
         "eta": 0.1194,
         "branchAngle": 48.99,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -11339,7 +11367,7 @@
         "setPoint": 54.03,
         "eta": 0.2,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        }
@@ -11370,7 +11398,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.002,
-      "E": 1000000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 1,
       "posture": true,
@@ -11435,7 +11463,7 @@
         "setPoint": 70.53,
         "eta": 1.949,
         "branchAngle": 70.5,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -11444,7 +11472,7 @@
         "setPoint": 89.91,
         "eta": 0.4,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        }
@@ -11474,7 +11502,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.002,
-      "E": 1000000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 1,
       "posture": true,
@@ -11494,6 +11522,11 @@
    "world": {
     "width": 210,
     "height": 130,
+    "depth": 64,
+    "faces": [
+     0.2,
+     0.2
+    ],
     "walls": [],
     "sides": "periodic"
    },
@@ -11540,26 +11573,22 @@
     }
    ],
    "c1": {
-    "generator": "distichous",
+    "phyllotaxis": "spiral",
+    "divergence": 137.5,
     "branchAngle": 45,
     "internodeLength": 1,
     "maxMetamersPerShoot": 3
    },
    "c2": {
     "enabled": true,
-    "model": "sky",
-    "a": 0.15,
-    "b": 1.5,
-    "qMax": 6,
+    "model": "slab",
     "C": 1,
-    "perceptionAngle": 45,
-    "perceptionDistance": 4,
-    "K": 7,
+    "K": 16,
     "kExt": 0.5,
     "skyExponent": 1,
     "skyTilt": 0,
     "minElevation": 15,
-    "rotate": false
+    "rotate": true
    },
    "c3": {
     "mode": "bh",
@@ -11612,7 +11641,7 @@
     "enabled": true,
     "rho": 1,
     "leafMass": 0.002,
-    "E": 1000000,
+    "E": 4000000,
     "sag": "increment",
     "phi": 1,
     "posture": true,
@@ -11709,7 +11738,7 @@
         "setPoint": 0,
         "eta": 0.3,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -11718,7 +11747,7 @@
         "setPoint": 74.94,
         "eta": 0.2434,
         "branchAngle": 42.94,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0,
         "postureSetPoint": 70
@@ -11728,7 +11757,7 @@
         "setPoint": 144.8,
         "eta": 0.25,
         "branchAngle": 40,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        }
@@ -11743,7 +11772,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.001,
-      "E": 1000000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 0.5,
       "posture": true,
@@ -11839,7 +11868,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.002,
-      "E": 1000000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 1,
       "posture": true,
@@ -11912,7 +11941,7 @@
         "setPoint": 0,
         "eta": 0.25,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -11921,7 +11950,7 @@
         "setPoint": 58.61,
         "eta": 0.1512,
         "branchAngle": 56.94,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -11930,7 +11959,7 @@
         "setPoint": 49.63,
         "eta": 0.2,
         "branchAngle": 50,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        }
@@ -11945,7 +11974,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.002,
-      "E": 2500000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 1,
       "posture": true,
@@ -12063,7 +12092,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.002,
-      "E": 1000000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 1,
       "posture": true,
@@ -12143,7 +12172,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.002,
-      "E": 1000000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 1,
       "posture": true,
@@ -12221,7 +12250,7 @@
         "setPoint": 0,
         "eta": 0.25,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "opposite",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -12230,7 +12259,7 @@
         "setPoint": 51.12,
         "eta": 0.1405,
         "branchAngle": 44.65,
-        "generator": "distichous",
+        "generator": "opposite",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -12239,7 +12268,7 @@
         "setPoint": 45.87,
         "eta": 0.25,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "opposite",
         "tierEvery": 0,
         "pTerm": 0
        }
@@ -12254,7 +12283,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.002,
-      "E": 2500000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 1,
       "posture": true,
@@ -12322,7 +12351,7 @@
         "setPoint": 0,
         "eta": 0.4,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -12331,7 +12360,7 @@
         "setPoint": 62.09,
         "eta": 0.5767,
         "branchAngle": 59.22,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -12340,7 +12369,7 @@
         "setPoint": 126.3,
         "eta": 0.25,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        }
@@ -12355,7 +12384,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.002,
-      "E": 1000000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 1,
       "posture": true,
@@ -12426,7 +12455,7 @@
         "setPoint": 0,
         "eta": 0.3,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -12435,7 +12464,7 @@
         "setPoint": 28.22,
         "eta": 0.3169,
         "branchAngle": 31.45,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -12444,7 +12473,7 @@
         "setPoint": 57.91,
         "eta": 0.25,
         "branchAngle": 40,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        }
@@ -12474,7 +12503,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.002,
-      "E": 1000000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 1,
       "posture": true,
@@ -12530,7 +12559,7 @@
         "setPoint": 0,
         "eta": 0.25,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -12539,7 +12568,7 @@
         "setPoint": 38.78,
         "eta": 0.1194,
         "branchAngle": 48.99,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -12548,7 +12577,7 @@
         "setPoint": 54.03,
         "eta": 0.2,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        }
@@ -12579,7 +12608,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.002,
-      "E": 1000000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 1,
       "posture": true,
@@ -12644,7 +12673,7 @@
         "setPoint": 70.53,
         "eta": 1.949,
         "branchAngle": 70.5,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        },
@@ -12653,7 +12682,7 @@
         "setPoint": 89.91,
         "eta": 0.4,
         "branchAngle": 45,
-        "generator": "distichous",
+        "generator": "spiral",
         "tierEvery": 0,
         "pTerm": 0
        }
@@ -12683,7 +12712,7 @@
       "enabled": true,
       "rho": 1,
       "leafMass": 0.002,
-      "E": 1000000,
+      "E": 4000000,
       "sag": "increment",
       "phi": 1,
       "posture": true,
@@ -12703,6 +12732,11 @@
    "world": {
     "width": 210,
     "height": 130,
+    "depth": 64,
+    "faces": [
+     0.2,
+     0.2
+    ],
     "walls": [],
     "sides": "periodic"
    },
@@ -12889,26 +12923,22 @@
     }
    ],
    "c1": {
-    "generator": "distichous",
+    "phyllotaxis": "spiral",
+    "divergence": 137.5,
     "branchAngle": 45,
     "internodeLength": 1,
     "maxMetamersPerShoot": 3
    },
    "c2": {
     "enabled": true,
-    "model": "sky",
-    "a": 0.15,
-    "b": 1.5,
-    "qMax": 6,
+    "model": "slab",
     "C": 1,
-    "perceptionAngle": 45,
-    "perceptionDistance": 4,
-    "K": 7,
+    "K": 16,
     "kExt": 0.5,
     "skyExponent": 1,
     "skyTilt": 0,
     "minElevation": 15,
-    "rotate": false
+    "rotate": true
    },
    "c3": {
     "mode": "bh",
@@ -12961,7 +12991,7 @@
     "enabled": true,
     "rho": 1,
     "leafMass": 0.002,
-    "E": 1000000,
+    "E": 4000000,
     "sag": "increment",
     "phi": 1,
     "posture": true,
@@ -13020,6 +13050,11 @@
    "world": {
     "width": 120,
     "height": 160,
+    "depth": 64,
+    "faces": [
+     0.2,
+     0.2
+    ],
     "walls": []
    },
    "trees": [
@@ -13028,26 +13063,22 @@
     }
    ],
    "c1": {
-    "generator": "distichous",
+    "phyllotaxis": "spiral",
+    "divergence": 137.5,
     "branchAngle": 45,
     "internodeLength": 1,
     "maxMetamersPerShoot": 3
    },
    "c2": {
     "enabled": true,
-    "model": "sky",
-    "a": 0.15,
-    "b": 1.5,
-    "qMax": 6,
+    "model": "slab",
     "C": 1,
-    "perceptionAngle": 45,
-    "perceptionDistance": 4,
-    "K": 7,
+    "K": 16,
     "kExt": 0.6,
     "skyExponent": 1,
     "skyTilt": 0,
     "minElevation": 15,
-    "rotate": false
+    "rotate": true
    },
    "c3": {
     "mode": "bh",
@@ -13128,7 +13159,7 @@
     "enabled": false,
     "rho": 1,
     "leafMass": 0.002,
-    "E": 1000000,
+    "E": 4000000,
     "sag": "increment",
     "phi": 1,
     "posture": true,
@@ -13185,6 +13216,11 @@
    "world": {
     "width": 230,
     "height": 160,
+    "depth": 64,
+    "faces": [
+     0.2,
+     0.2
+    ],
     "walls": []
    },
    "trees": [
@@ -13220,26 +13256,22 @@
     }
    ],
    "c1": {
-    "generator": "distichous",
+    "phyllotaxis": "spiral",
+    "divergence": 137.5,
     "branchAngle": 45,
     "internodeLength": 1,
     "maxMetamersPerShoot": 3
    },
    "c2": {
     "enabled": true,
-    "model": "sky",
-    "a": 0.15,
-    "b": 1.5,
-    "qMax": 6,
+    "model": "slab",
     "C": 1,
-    "perceptionAngle": 45,
-    "perceptionDistance": 4,
-    "K": 7,
+    "K": 16,
     "kExt": 0.6,
     "skyExponent": 1,
     "skyTilt": 0,
     "minElevation": 15,
-    "rotate": false
+    "rotate": true
    },
    "c3": {
     "mode": "bh",
@@ -13320,7 +13352,7 @@
     "enabled": false,
     "rho": 1,
     "leafMass": 0.002,
-    "E": 1000000,
+    "E": 4000000,
     "sag": "increment",
     "phi": 1,
     "posture": true,
@@ -13377,6 +13409,11 @@
    "world": {
     "width": 120,
     "height": 160,
+    "depth": 64,
+    "faces": [
+     0.2,
+     0.2
+    ],
     "walls": []
    },
    "trees": [
@@ -13385,26 +13422,22 @@
     }
    ],
    "c1": {
-    "generator": "distichous",
+    "phyllotaxis": "spiral",
+    "divergence": 137.5,
     "branchAngle": 45,
     "internodeLength": 1,
     "maxMetamersPerShoot": 3
    },
    "c2": {
     "enabled": true,
-    "model": "sky",
-    "a": 0.15,
-    "b": 1.5,
-    "qMax": 6,
+    "model": "slab",
     "C": 1,
-    "perceptionAngle": 45,
-    "perceptionDistance": 4,
-    "K": 7,
+    "K": 16,
     "kExt": 0.35,
     "skyExponent": 1,
     "skyTilt": 0,
     "minElevation": 15,
-    "rotate": false
+    "rotate": true
    },
    "c3": {
     "mode": "bh",
@@ -13485,7 +13518,7 @@
     "enabled": false,
     "rho": 1,
     "leafMass": 0.002,
-    "E": 1000000,
+    "E": 4000000,
     "sag": "increment",
     "phi": 1,
     "posture": true,
@@ -13542,6 +13575,11 @@
    "world": {
     "width": 230,
     "height": 160,
+    "depth": 64,
+    "faces": [
+     0.2,
+     0.2
+    ],
     "walls": []
    },
    "trees": [
@@ -13577,26 +13615,22 @@
     }
    ],
    "c1": {
-    "generator": "distichous",
+    "phyllotaxis": "spiral",
+    "divergence": 137.5,
     "branchAngle": 45,
     "internodeLength": 1,
     "maxMetamersPerShoot": 3
    },
    "c2": {
     "enabled": true,
-    "model": "sky",
-    "a": 0.15,
-    "b": 1.5,
-    "qMax": 6,
+    "model": "slab",
     "C": 1,
-    "perceptionAngle": 45,
-    "perceptionDistance": 4,
-    "K": 7,
+    "K": 16,
     "kExt": 0.35,
     "skyExponent": 1,
     "skyTilt": 0,
     "minElevation": 15,
-    "rotate": false
+    "rotate": true
    },
    "c3": {
     "mode": "bh",
@@ -13677,7 +13711,7 @@
     "enabled": false,
     "rho": 1,
     "leafMass": 0.002,
-    "E": 1000000,
+    "E": 4000000,
     "sag": "increment",
     "phi": 1,
     "posture": true,
@@ -13734,6 +13768,11 @@
    "world": {
     "width": 140,
     "height": 160,
+    "depth": 64,
+    "faces": [
+     0.2,
+     0.2
+    ],
     "walls": []
    },
    "trees": [
@@ -13742,26 +13781,22 @@
     }
    ],
    "c1": {
-    "generator": "distichous",
+    "phyllotaxis": "spiral",
+    "divergence": 137.5,
     "branchAngle": 45,
     "internodeLength": 1,
     "maxMetamersPerShoot": 3
    },
    "c2": {
     "enabled": true,
-    "model": "sky",
-    "a": 0.15,
-    "b": 1.5,
-    "qMax": 6,
+    "model": "slab",
     "C": 1,
-    "perceptionAngle": 45,
-    "perceptionDistance": 4,
-    "K": 7,
+    "K": 16,
     "kExt": 0.6,
     "skyExponent": 1,
     "skyTilt": 0,
     "minElevation": 15,
-    "rotate": false
+    "rotate": true
    },
    "c3": {
     "mode": "bh",
@@ -13833,7 +13868,7 @@
     "enabled": false,
     "rho": 1,
     "leafMass": 0.002,
-    "E": 1000000,
+    "E": 4000000,
     "sag": "increment",
     "phi": 1,
     "posture": true,
@@ -13890,6 +13925,11 @@
    "world": {
     "width": 120,
     "height": 120,
+    "depth": 64,
+    "faces": [
+     0.2,
+     0.2
+    ],
     "walls": []
    },
    "trees": [
@@ -13898,26 +13938,22 @@
     }
    ],
    "c1": {
-    "generator": "distichous",
+    "phyllotaxis": "spiral",
+    "divergence": 137.5,
     "branchAngle": 45,
     "internodeLength": 1,
     "maxMetamersPerShoot": 3
    },
    "c2": {
     "enabled": true,
-    "model": "sky",
-    "a": 0.15,
-    "b": 1.5,
-    "qMax": 6,
+    "model": "slab",
     "C": 1,
-    "perceptionAngle": 45,
-    "perceptionDistance": 4,
-    "K": 7,
+    "K": 16,
     "kExt": 0.5,
     "skyExponent": 1,
     "skyTilt": 0,
     "minElevation": 15,
-    "rotate": false
+    "rotate": true
    },
    "c3": {
     "mode": "bh",
@@ -14057,6 +14093,11 @@
    "world": {
     "width": 120,
     "height": 140,
+    "depth": 64,
+    "faces": [
+     0.2,
+     0.2
+    ],
     "walls": []
    },
    "trees": [
@@ -14065,26 +14106,22 @@
     }
    ],
    "c1": {
-    "generator": "distichous",
+    "phyllotaxis": "spiral",
+    "divergence": 137.5,
     "branchAngle": 45,
     "internodeLength": 1,
     "maxMetamersPerShoot": 3
    },
    "c2": {
     "enabled": true,
-    "model": "sky",
-    "a": 0.15,
-    "b": 1.5,
-    "qMax": 6,
+    "model": "slab",
     "C": 1,
-    "perceptionAngle": 45,
-    "perceptionDistance": 4,
-    "K": 7,
+    "K": 16,
     "kExt": 0.5,
     "skyExponent": 1,
     "skyTilt": 0,
     "minElevation": 15,
-    "rotate": false
+    "rotate": true
    },
    "c3": {
     "mode": "bh",
@@ -14157,7 +14194,7 @@
     "enabled": true,
     "rho": 1,
     "leafMass": 0.002,
-    "E": 1000000,
+    "E": 4000000,
     "sag": "increment",
     "phi": 1,
     "posture": true,

@@ -1,6 +1,6 @@
 //! Keyed-hash randomness (ADR 0002; `src/core/rng.ts`): every draw is a pure function of
 //! hash(seed, purpose, tree, entity, season, k). Integer maths only, so the raw hashes are the
-//! same everywhere; `normal` uses log and cos, V8's in parity mode (`crate::math`).
+//! same everywhere; `normal` uses the core's log and cos (`crate::math`).
 
 use crate::math;
 
@@ -157,15 +157,5 @@ mod tests {
         assert!((sz / n).abs() < 0.05);
         assert!((sz2 / n - 1.0).abs() < 0.05);
         assert!((heads / n - 0.5).abs() < 0.005);
-    }
-
-    #[cfg(feature = "parity")]
-    #[test]
-    fn normal_matches_the_typescript_core() {
-        assert_eq!(
-            normal(7.0, purpose::DIRECTION_NOISE, 1.0, 2.0, 3.0, 0.0),
-            0.5882301320315867
-        );
-        assert_eq!(normal(9.0, 2, 1.0, 2.0, 3.0, 0.0), -0.8179644073063318);
     }
 }

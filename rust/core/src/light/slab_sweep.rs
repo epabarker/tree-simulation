@@ -1,6 +1,6 @@
 //! C2 in 3D (ADR 0024, G3): the Beer–Lambert sky sweep over a slab W × H × D, the row march of
 //! the 2D sweep (M18) with the segment's mean taken over a box. Float32, the production build's
-//! light; it is not held to the TypeScript core (it gets its own goldens at I1 stage 2).
+//! light, and from I2 the world's (`crate::light`).
 //!
 //! **Sky.** K directions over the hemisphere above `min_elevation`: sin(elevation) in K equal
 //! bands, azimuth stepped by the golden angle (a spherical Fibonacci set), weights ∝
@@ -35,6 +35,9 @@ use crate::math;
 const GOLDEN: f64 = 0.618_033_988_749_894_9;
 const SILVER: f64 = 0.414_213_562_373_095_1;
 
+/// The fixed lanes the world's light is computed in (`compute_lanes`).
+pub const LANES: usize = 4;
+
 #[derive(Clone, Copy, Debug)]
 pub struct SlabParams {
     pub k: usize,
@@ -45,6 +48,8 @@ pub struct SlabParams {
     pub rotate: bool,
     /// Transmission of the sky beyond the front (z < 0) and back (z ≥ D) faces.
     pub face_tau: [f64; 2],
+    /// −1…1: a sky brighter toward +x (an oblique sun, §C2.6), weights × max(0, 1 + tilt·d_x).
+    pub sky_tilt: f64,
     pub periodic_x: bool,
 }
 
@@ -88,6 +93,22 @@ pub fn sky(k: usize, min_elevation: f64, sky_exponent: f64, c: f64, f: f64, a: f
     d
 }
 
+/// `sky` with its weights leaning toward +x by `tilt`, renormalised to Σw = C.
+pub fn tilted_sky(p: &SlabParams, f: f64, a: f64) -> Directions {
+    let mut d = sky(p.k, p.min_elevation, p.sky_exponent, p.c, f, a);
+    if p.sky_tilt != 0.0 {
+        let mut total = 0.0;
+        for k in 0..d.w.len() {
+            d.w[k] *= math::max(0.0, 1.0 + p.sky_tilt * d.x[k]);
+            total += d.w[k];
+        }
+        for w in d.w.iter_mut() {
+            *w = if total > 0.0 { *w * p.c / total } else { 0.0 };
+        }
+    }
+    d
+}
+
 /// The season's band offset and azimuth turn (the static sky when rotation is off).
 pub fn sky_offsets(rotate: bool, season: f64) -> (f64, f64) {
     if rotate {
@@ -117,7 +138,7 @@ pub fn fexp(x: f32) -> f32 {
 }
 
 /// Row-march scratch: G on two planes per direction, one row of ℓ padded, its prefix sums.
-#[derive(Default)]
+#[derive(Clone, Default)]
 struct Scratch {
     up: Vec<f32>,
     next: Vec<f32>,
@@ -126,8 +147,12 @@ struct Scratch {
     i: Vec<f32>,
     r: Vec<f32>,
     s: Vec<f32>,
+    /// The lanes' sums (`compute_lanes`, one thread).
+    #[cfg_attr(feature = "threads", allow(dead_code))]
+    acc: Vec<f32>,
 }
 
+#[derive(Clone)]
 pub struct SlabSweep {
     w: usize,
     h: usize,
@@ -145,6 +170,9 @@ pub struct SlabSweep {
     face_g: [f32; 2],
     pad: usize,
     top: usize,
+    /// Open sky above the foliage (Q, V) as `compute_lanes` summed it; there, from row `top` up,
+    /// `sample` and `q_at` read this rather than the fields (which it does not fill).
+    open: Option<[f32; 4]>,
     scratch: Scratch,
     /// Integrate each row's segment exactly (a DDA over the cells it crosses) instead of taking
     /// the mean over its box: G3's fallback, scalar only.
@@ -159,7 +187,7 @@ pub struct SlabSweep {
 impl SlabSweep {
     pub fn new(w: usize, h: usize, d: usize, p: SlabParams) -> SlabSweep {
         let (f, a) = sky_offsets(false, 0.0);
-        let dirs = sky(p.k, p.min_elevation, p.sky_exponent, p.c, f, a);
+        let dirs = tilted_sky(&p, f, a);
         let mut s = SlabSweep::with_directions(w, h, d, p, dirs);
         s.fixed = false;
         s
@@ -199,6 +227,7 @@ impl SlabSweep {
             face_g: [g(p.face_tau[0]), g(p.face_tau[1])],
             pad: slope + 3,
             top: 0,
+            open: None,
             scratch: Scratch::default(),
             exact_segments: false,
             integer_shifts: true,
@@ -299,10 +328,11 @@ impl SlabSweep {
     /// hold that lane's partial light (open sky above the foliage included). Summing every lane's
     /// fields gives the whole field.
     pub fn compute_part(&mut self, season: f64, lane: usize, lanes: usize) {
+        self.open = None;
         if !self.fixed {
             let (f, a) = sky_offsets(self.p.rotate, season);
             let p = self.p;
-            self.dirs = sky(p.k, p.min_elevation, p.sky_exponent, p.c, f, a);
+            self.dirs = tilted_sky(&p, f, a);
         }
         let ks: Vec<usize> = (0..self.dirs.w.len())
             .filter(|k| k % lanes == lane)
@@ -323,12 +353,110 @@ impl SlabSweep {
         self.vz[n..].fill(z as f32);
     }
 
+    /// The season's field as `LANES` fixed partial fields (directions k ≡ lane mod LANES), summed
+    /// in lane order (I2): the same bits whether the lanes run one after another or, with the
+    /// `threads` feature, side by side. (`compute` marches every direction in one pass and rounds
+    /// differently.)
+    pub fn compute_lanes(&mut self, season: f64) {
+        let n = self.top * self.w * self.d;
+        #[cfg(feature = "threads")]
+        {
+            let mut parts: Vec<SlabSweep> = (1..LANES).map(|_| self.clone()).collect();
+            std::thread::scope(|scope| {
+                for (k, part) in parts.iter_mut().enumerate() {
+                    scope.spawn(move || part.compute_part(season, k + 1, LANES));
+                }
+                self.compute_part(season, 0, LANES);
+            });
+            for part in &parts {
+                self.add_part(part, n);
+            }
+        }
+        #[cfg(not(feature = "threads"))]
+        {
+            let mut acc = std::mem::take(&mut self.scratch.acc);
+            acc.resize(4 * n, 0.0);
+            for lane in 0..LANES {
+                self.compute_part(season, lane, LANES);
+                for (f, field) in [&self.q, &self.vx, &self.vy, &self.vz].iter().enumerate() {
+                    let a = &mut acc[f * n..(f + 1) * n];
+                    if lane == 0 {
+                        a.copy_from_slice(&field[..n]);
+                    } else {
+                        for (x, y) in a.iter_mut().zip(&field[..n]) {
+                            *x += *y;
+                        }
+                    }
+                }
+            }
+            for (f, field) in [&mut self.q, &mut self.vx, &mut self.vy, &mut self.vz]
+                .into_iter()
+                .enumerate()
+            {
+                field[..n].copy_from_slice(&acc[f * n..(f + 1) * n]);
+            }
+            self.scratch.acc = acc;
+        }
+        // Above the foliage, open sky: the same lane-ordered sum of every direction.
+        let mut sky = [0.0f64; 4];
+        for lane in 0..LANES {
+            let mut part = [0.0f64; 4];
+            for k in (0..self.dirs.w.len()).filter(|k| k % LANES == lane) {
+                let wk = self.dirs.w[k];
+                part[0] += wk;
+                part[1] += wk * self.dirs.x[k];
+                part[2] += wk * self.dirs.y[k];
+                part[3] += wk * self.dirs.z[k];
+            }
+            for f in 0..4 {
+                sky[f] = if lane == 0 {
+                    (part[f] as f32) as f64
+                } else {
+                    ((sky[f] as f32) + (part[f] as f32)) as f64
+                };
+            }
+        }
+        self.open = Some([sky[0] as f32, sky[1] as f32, sky[2] as f32, sky[3] as f32]);
+    }
+
+    #[cfg(feature = "threads")]
+    fn add_part(&mut self, part: &SlabSweep, n: usize) {
+        for (a, b) in [
+            (&mut self.q, &part.q),
+            (&mut self.vx, &part.vx),
+            (&mut self.vy, &part.vy),
+            (&mut self.vz, &part.vz),
+        ] {
+            for (x, y) in a[..n].iter_mut().zip(&b[..n]) {
+                *x += *y;
+            }
+        }
+    }
+
+    /// Q at cell `c` (as `cell` numbers them), open sky included.
+    pub fn q_at(&self, c: usize) -> f32 {
+        match self.open {
+            Some(o) if c >= self.top * self.w * self.d => o[0],
+            _ => self.q[c],
+        }
+    }
+
     /// Q and the unit direction V at (x, y, z); outside the slab Q = 0 and V points up.
     pub fn sample(&self, x: f64, y: f64, z: f64) -> [f32; 4] {
         let Some(c) = self.cell(x, y, z) else {
             return [0.0, 0.0, 1.0, 0.0];
         };
-        let (vx, vy, vz) = (self.vx[c], self.vy[c], self.vz[c]);
+        let (vx, vy, vz) = match self.open {
+            Some(o) if c >= self.top * self.w * self.d => {
+                let len = (o[1] * o[1] + o[2] * o[2] + o[3] * o[3]).sqrt();
+                return if len > 0.0 {
+                    [o[0], o[1] / len, o[2] / len, o[3] / len]
+                } else {
+                    [o[0], 0.0, 1.0, 0.0]
+                };
+            }
+            _ => (self.vx[c], self.vy[c], self.vz[c]),
+        };
         let len = (vx * vx + vy * vy + vz * vz).sqrt();
         if len > 0.0 {
             [self.q[c], vx / len, vy / len, vz / len]
@@ -370,6 +498,7 @@ impl SlabSweep {
             i,
             r,
             s,
+            ..
         } = sc;
         let (mut up, mut next) = (up, next);
         up[..kk * plane].fill(0.0);
@@ -733,6 +862,7 @@ pub fn fixture_fingerprint() -> u32 {
         c: 1.0,
         rotate: true,
         face_tau: [1.0, 0.2],
+        sky_tilt: 0.0,
         periodic_x: true,
     };
     let mut s = fixture(37, 26, 11, p);
@@ -743,7 +873,6 @@ pub fn fixture_fingerprint() -> u32 {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::light::sky_sweep::{SkyParams, SkySweep};
 
     fn params(tau: [f64; 2]) -> SlabParams {
         SlabParams {
@@ -754,6 +883,7 @@ mod tests {
             c: 1.0,
             rotate: false,
             face_tau: tau,
+            sky_tilt: 0.0,
             periodic_x: true,
         }
     }
@@ -764,80 +894,6 @@ mod tests {
         let f = fixture(w, h, d, params([1.0, 1.0]));
         s.lad_mut().copy_from_slice(f.lad());
         s.refresh_top();
-    }
-
-    #[test]
-    fn fexp_is_close_to_exp() {
-        for i in 0..2000 {
-            let x = -(i as f32) * 0.02;
-            let (a, b) = (fexp(x) as f64, (x as f64).exp());
-            assert!((a - b).abs() <= 3e-7 * b, "x {x}: {a} vs {b}");
-        }
-        assert_eq!(fexp(0.0), 1.0);
-    }
-
-    #[test]
-    fn with_flat_directions_and_the_same_foliage_on_every_z_line_it_is_the_2d_sweep() {
-        // The 2D sweep's K = 7 directions, laid in the x–y plane (d_z = 0), over a slab whose every
-        // z line carries the same foliage: each z line must see the 2D field.
-        let (w, h, d) = (48, 30, 6);
-        let sp = SkyParams {
-            k: 7.0,
-            k_ext: 0.5,
-            sky_exponent: 1.0,
-            sky_tilt: 0.0,
-            min_elevation: 15.0,
-            c: 1.0,
-            rotate: false,
-            columns: false,
-        };
-        let mut flat = SkySweep::new(w, h, sp, true);
-        let mut dirs = Directions::default();
-        let lo = 15.0f64.to_radians();
-        let span = std::f64::consts::PI - 2.0 * lo;
-        let mut total = 0.0;
-        for k in 0..7 {
-            let th = lo + span * k as f64 / 6.0;
-            dirs.x.push(math::cos(th));
-            dirs.y.push(math::sin(th));
-            dirs.z.push(0.0);
-            dirs.w.push(math::sin(th));
-            total += math::sin(th);
-        }
-        for v in dirs.w.iter_mut() {
-            *v /= total;
-        }
-        let mut slab = SlabSweep::with_directions(w, h, d, params([1.0, 1.0]), dirs);
-        slab.integer_shifts = false; // the 2D sweep reads G linearly
-        let mut seed: u64 = 3;
-        for y in 6..22 {
-            for x in 0..w {
-                seed = (seed * 1103515245 + 12345) % 2147483648;
-                if seed.is_multiple_of(3) {
-                    let a = 0.4 + (seed % 5) as f64 * 0.3;
-                    flat.deposit(x as f64 + 0.5, y as f64 + 0.5, a);
-                    for z in 0..d {
-                        slab.deposit(x as f64 + 0.5, y as f64 + 0.5, z as f64 + 0.5, a as f32);
-                    }
-                }
-            }
-        }
-        flat.compute(0.0);
-        slab.compute(0.0);
-        let (vx3, vy3, _) = slab.v();
-        let mut worst = 0.0f64;
-        for y in 0..h {
-            for z in 0..d {
-                for x in 0..w {
-                    let c2 = y * w + x;
-                    let c3 = (y * d + z) * w + x;
-                    worst = worst.max((slab.q()[c3] as f64 - flat.q()[c2]).abs());
-                    worst = worst.max((vx3[c3] as f64 - flat.vx()[c2]).abs());
-                    worst = worst.max((vy3[c3] as f64 - flat.vy()[c2]).abs());
-                }
-            }
-        }
-        assert!(worst < 2e-5, "largest difference {worst}");
     }
 
     /// The sky of `params` with each direction's mirror images in x and in z added, every copy
@@ -884,6 +940,16 @@ mod tests {
             }
         }
         worst
+    }
+
+    #[test]
+    fn fexp_is_close_to_exp() {
+        for i in 0..2000 {
+            let x = -(i as f32) * 0.02;
+            let (a, b) = (fexp(x) as f64, (x as f64).exp());
+            assert!((a - b).abs() <= 3e-7 * b, "x {x}: {a} vs {b}");
+        }
+        assert_eq!(fexp(0.0), 1.0);
     }
 
     #[test]

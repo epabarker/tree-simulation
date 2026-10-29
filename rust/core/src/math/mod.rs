@@ -1,91 +1,44 @@
-//! The `Math` functions the core uses, in one of two modes (ADR 0024).
+//! The `Math` functions the core uses (ADR 0024): the `libm` crate, pure Rust and identical on
+//! native and wasm32, so the CLI and the page give the same bits. The C library is never called.
+//! (Until I1 a `parity` feature carried V8's routines, ported bit for bit, to reproduce the
+//! TypeScript core's goldens; it is archived at the tag `golden-2d-ts`.)
 //!
-//! - **`parity` (a feature):** exactly as Node's V8 computes them, so the Rust core reproduces the
-//!   TypeScript core's goldens bit for bit on every target (G2 note, 2026-10-29). `sin`, `cos`,
-//!   `exp`: V8's fdlibm port (`fdlibm.rs`); `pow`: V8's wrapper around glibc's pow, Arm's
-//!   optimized-routines (`pow.rs`); `hypot`: V8's two-argument Torque fast path; `log`, `atan2`
-//!   (with its `atan`) and `cbrt`: V8's fdlibm and FreeBSD ports (`fdlibm.rs`). `asin` and `acos`
-//!   are the `libm` crate's in both modes: they are V8's already (I1's survey).
-//! - **Otherwise:** the `libm` crate, pure Rust and identical on native and wasm32, for the core
-//!   that gets its own goldens (the 3D core, I1 stage 2). The C library is never called.
-//!
-//! `sqrt`, `floor`, `ceil`, `abs` are exact in IEEE 754, so Rust's own in both modes; `max`,
-//! `min`, `round` and `sign` keep JavaScript's NaN and ±0 rules in both.
+//! `sqrt`, `floor`, `ceil`, `abs` are exact in IEEE 754, so Rust's own; `max`, `min`, `round` and
+//! `sign` keep JavaScript's NaN and ±0 rules, which the checkpoints and goldens were made with.
 
-#[cfg(feature = "parity")]
-mod fdlibm;
-#[cfg(feature = "parity")]
-mod pow;
-#[cfg(feature = "parity")]
-mod pow_data;
-
-#[cfg(feature = "parity")]
-pub use fdlibm::{atan2, cbrt, cos, exp, log as ln, sin};
-#[cfg(feature = "parity")]
-pub use pow::pow;
-
-/// `Math.hypot(a, b)` as V8's `FastMathHypot` computes it (`v8/src/builtins/math.tq`).
-#[cfg(feature = "parity")]
-pub fn hypot(a: f64, b: f64) -> f64 {
-    let a = a.abs();
-    let b = b.abs();
-    if a == f64::INFINITY || b == f64::INFINITY {
-        return f64::INFINITY;
-    }
-    let max = max(a, b);
-    if max.is_nan() {
-        return f64::NAN;
-    }
-    if max == 0.0 {
-        return 0.0;
-    }
-    ((a / max) * (a / max) + (b / max) * (b / max)).sqrt() * max
-}
-
-#[cfg(not(feature = "parity"))]
 pub fn sin(x: f64) -> f64 {
     libm::sin(x)
 }
 
-#[cfg(not(feature = "parity"))]
 pub fn cos(x: f64) -> f64 {
     libm::cos(x)
 }
 
-#[cfg(not(feature = "parity"))]
 pub fn exp(x: f64) -> f64 {
     libm::exp(x)
 }
 
-#[cfg(not(feature = "parity"))]
 pub fn pow(x: f64, y: f64) -> f64 {
     libm::pow(x, y)
 }
 
-#[cfg(not(feature = "parity"))]
 pub fn hypot(a: f64, b: f64) -> f64 {
     libm::hypot(a, b)
 }
 
 /// Natural log (`Math.log`).
-#[cfg(not(feature = "parity"))]
 pub fn ln(x: f64) -> f64 {
     libm::log(x)
 }
 
-#[cfg(not(feature = "parity"))]
 pub fn atan2(y: f64, x: f64) -> f64 {
     libm::atan2(y, x)
 }
 
-#[cfg(not(feature = "parity"))]
 pub fn cbrt(x: f64) -> f64 {
     libm::cbrt(x)
 }
 
-/// `Math.asin` and `Math.acos`: the `libm` crate's in both modes, since they are V8's bit for bit
-/// (musl and V8 carry the same fdlibm code; the I1 survey found no difference in 10⁶ inputs each,
-/// and `tests/wasm-math.test.ts` holds them to V8).
 pub fn asin(x: f64) -> f64 {
     libm::asin(x)
 }

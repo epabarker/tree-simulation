@@ -30,6 +30,8 @@ export interface Obstacle {
 export interface TreeSpec {
   /** Root position along the ground, in cells. */
   x: number;
+  /** Root position in depth, in cells from the front face (I2). Optional: the slab's middle. */
+  z?: number;
   /** Its species, a key of `Params.species` (ADR 0016). Omitted: the world's own params. */
   species?: string;
   /** Season in which the seedling appears (default 0). */
@@ -47,6 +49,19 @@ export interface Params {
     /** Grid width and height in cells. */
     width: number;
     height: number;
+    /**
+     * The slab's depth D in cells (ADR 0024, I2): trees grow in W × H × D, periodic or open in x,
+     * open in z. Optional: absent (a 2D record or checkpoint), the slab is one cell deep.
+     */
+    depth?: number;
+    /**
+     * Transmission τ of the sky seen beyond the [front, back] z faces (front = the viewer's, z < 0):
+     * 1 open sky, 0 a black wall, between as through a wood as tall as the stand (ADR 0024). The
+     * looks: wood interior [0.2, 0.2] (default), wood edge [1, 0.2], hedgerow [1, 1]. Optional: [1, 1].
+     */
+    faces?: [number, number];
+    /** Q fades linearly to 0 over this many cells before each z face (0: hard faces). Optional: 0. */
+    fade?: number;
     /** Static shade sources (M3 "lean away from a wall"). */
     walls: Wall[];
     /**
@@ -69,10 +84,15 @@ export interface Params {
    */
   species?: Record<string, SpeciesPatch>;
 
-  /** C1 Metamer structure, bud fate and 2D side sequence (always on). */
+  /** C1 Metamer structure, bud fate and phyllotaxis (always on; in 3D from I2, ADR 0025). */
   c1: {
-    /** Side sequence generator; distichous is the default and only planar phyllotaxis (§C1.5). */
-    generator: "distichous";
+    /**
+     * Without R2, one lateral a node: 'spiral', each a divergence angle round the axis from the
+     * last; 'distichous', alternating sides (180°). With R2 the level's generator decides.
+     */
+    phyllotaxis: "spiral" | "distichous";
+    /** The spiral's divergence angle, degrees (137.5°, the golden angle). */
+    divergence: number;
     /** Branch angle β between a lateral and its parent axis, degrees. */
     branchAngle: number;
     /** Base internode length l0 in cells (≈ one cell, Palubicki et al. §6). */
@@ -81,51 +101,31 @@ export interface Params {
     maxMetamersPerShoot: number;
   };
 
-  /** C2 Shared light field: shadow triangle (Palubicki et al. §4.1) or sky sweep (§C2.4, M6). */
+  /** C2 Shared light field: the Beer–Lambert sky sweep over the slab (§C2.4, G3; ADR 0024). */
   c2: {
     enabled: boolean;
     /**
-     * 'triangle': the baseline shadow triangle. 'sky': the Beer–Lambert sky sweep (M6). 'pooled':
-     * the §8 ablation, every leaf gets one homogeneous canopy's mean light (M22, light/pooled.ts).
+     * 'slab': the 3D sky sweep. 'pooled': the §8 ablation, every leaf gets one homogeneous
+     * canopy's mean light (M22).
      */
-    model: "triangle" | "sky" | "pooled";
-    /**
-     * Shadow strength a > 0 (calibrate). Also the self-shadow a bud removes from its own Q.
-     * Buds of one node share a cell and shade each other, so C must exceed a·(buds per node − 1).
-     */
-    a: number;
-    /** Shadow decay b > 1 per layer below the bud (calibrate). */
-    b: number;
-    /** Depth of the shadow triangle in layers (Palubicki: 4–8). */
-    qMax: number;
-    /** Full-exposure constant C in Q = max(C − s + a, 0) (calibrate). */
+    model: "slab" | "pooled";
+    /** Full-exposure constant C: Σ of the sky's weights (calibrate). */
     C: number;
-    /** Perception half-angle for the optimal direction V, degrees (Palubicki θ ≈ 90° full angle). */
-    perceptionAngle: number;
-    /** Perception distance for V, in cells (Palubicki r = 4–6). */
-    perceptionDistance: number;
-    /** Sky sweep: number of sky directions K (spec: 5–9). */
+    /** Number of sky directions K (G3: 16 with rotation). */
     K: number;
-    /** Sky sweep: extinction coefficient k_ext per unit of leaf area (one bud = one unit) (calibrate). */
+    /** Extinction coefficient k_ext per unit of leaf area (one bud = one unit) (calibrate). */
     kExt: number;
-    /** Sky sweep: weights ∝ sin(elevation)^p; p = 1 is a cosine-weighted (overcast-like) sky. */
+    /** Weights ∝ sin(elevation)^p; p = 1 is a cosine-weighted (overcast-like) sky. */
     skyExponent: number;
-    /** Sky sweep: −1…1; positive skies are brighter to the right (an oblique sun, §C2.6). */
-    skyTilt: number;
-    /** Sky sweep: lowest sky direction above the horizon, degrees. */
+    /** −1…1; positive skies are brighter toward +x (an oblique sun, §C2.6). Optional: 0. */
+    skyTilt?: number;
+    /** Lowest sky direction above the horizon, degrees. */
     minElevation: number;
     /**
-     * Sky sweep: move the K directions by a golden-ratio step each season (stratified, one per
-     * equal slice of the sky) so the streaks of a small K average out (M6e). Off: the fixed M6 grid.
+     * Move the K directions each season, within their bands and round the sky (G3), so the
+     * streaks of a small K average out. In 3D it matters: calibrate with it on (ADR 0024).
      */
     rotate: boolean;
-    /**
-     * Sky sweep (M18, ADR 0005 amendment): "rows" marches every ray up one row at a time and
-     * integrates the exact segment it crosses in each row from that row's prefix sums of leaf
-     * area, so shallow rays need no laps around a ring and diffuse once per row, not per column.
-     * "columns" is the M6 sweep (shallow rays step a column at a time, periodic ones lap the ring).
-     */
-    sweep?: "rows" | "columns";
   };
 
   /** C3 Basipetal light summation and acropetal Borchert–Honda allocation. */
@@ -430,10 +430,16 @@ export interface PaLevel {
   eta: number;
   /** Branch angle β of a lateral of this pa from its parent axis, degrees (C1). */
   branchAngle: number;
-  /** Where this axis forms lateral buds (§C1.4; ADR 0009). */
-  generator: "distichous" | "opposite" | "whorled" | "none";
+  /**
+   * Where this axis forms lateral buds (§C1.4; ADR 0009; in 3D, ADR 0025): one a node at 180°
+   * (distichous) or at c1.divergence (spiral), two at 180° with each pair a quarter turn on
+   * (opposite, decussate), a whorl, or none.
+   */
+  generator: "distichous" | "spiral" | "opposite" | "whorled" | "none";
   /** Whorled only: 0 = a tier at the start of each growth unit; k > 0 = at every k-th node. */
   tierEvery: number;
+  /** Whorled only: laterals in a whorl, 1–7. Optional: 4. */
+  whorl?: number;
   /** Probability that the terminal bud ends when a shoot of this pa ends: sympodial growth. */
   pTerm: number;
   /**
@@ -445,29 +451,25 @@ export interface PaLevel {
 
 export const defaultParams: Params = {
   seed: 1,
-  world: { width: 160, height: 120, walls: [] },
+  world: { width: 160, height: 120, depth: 64, faces: [0.2, 0.2], walls: [] },
   trees: [{ x: 80 }],
   c1: {
-    generator: "distichous",
+    phyllotaxis: "spiral",
+    divergence: 137.5,
     branchAngle: 45,
     internodeLength: 1,
     maxMetamersPerShoot: 3,
   },
   c2: {
     enabled: false,
-    model: "sky", // M6; the M1–M5 presets pin "triangle"
-    a: 0.15, // calibrate (M5: 0.2 stalled 5/40 stand seedlings; 0.15 stalled none)
-    b: 1.5, // calibrate (M4: 1.5 shades deeper than 2 once shedding is on)
-    qMax: 6,
+    model: "slab",
     C: 1, // calibrate
-    perceptionAngle: 45,
-    perceptionDistance: 4,
-    K: 7,
+    K: 16,
     kExt: 0.5, // calibrate
     skyExponent: 1,
     skyTilt: 0,
     minElevation: 15,
-    rotate: false,
+    rotate: true,
   },
   c3: { mode: "none", lambda: 0.5, alpha: 2 },
   c4: { enabled: false, wd: 1, xi: 0.3, eta: 0.15, setPoint: 0, epsilon: 0.5, sigma: 20 },
@@ -495,9 +497,9 @@ export const defaultParams: Params = {
     enabled: false,
     rho: 1,
     leafMass: 0.002, // calibrate: a shoot's leaves weigh about as much as its first-year wood
-    // Wood's E ≈ 4·10⁶ here, but a 2D limb carries less foliage than the 3D limb it stands for,
-    // so the effective stiffness is lower (M9 note).
-    E: 1e6, // calibrate
+    // Wood's own E ≈ 4·10⁶ in these units (ρ_w·g·cell ≈ 2.5 kPa). 2D lowered it to 10⁶ because a
+    // planar limb carried less foliage than the 3D limb it stood for (M9); in 3D it is restored.
+    E: 4e6,
     sag: "increment",
     phi: 1, // calibrate
     posture: true,

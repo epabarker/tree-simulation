@@ -1,8 +1,10 @@
-//! O4. Stand dynamics (spec §O4, ADR 0013, ADR 0018; o4-stand.ts). Background deaths m₀
-//! [RNG: mortality]; R1's reproductive pool turned into seeds (c_seed each), dispersed by
-//! Laplace(0, d) [RNG: dispersal] and established where the ground light is at least Q_est with
-//! probability p_est [RNG: establishment], no live trunk within a cell; seed rain from beyond the
-//! world per species [RNG: seedRain]. Seedlings start next season; live trees capped at maxTrees.
+//! O4. Stand dynamics (spec §O4, ADR 0013, ADR 0018; on the ground plane, ADR 0025). Background
+//! deaths m₀ [RNG: mortality]; R1's reproductive pool turned into seeds (c_seed each), dispersed
+//! a Laplace(0, d) distance at a random azimuth [RNG: dispersal; seeds beyond a z face are lost]
+//! and established where the ground light is at least Q_est with probability p_est [RNG:
+//! establishment], no live trunk within a cell; seed rain from beyond the world per species,
+//! anywhere on the ground [RNG: seedRain]. Seedlings start next season; live trees capped at
+//! maxTrees.
 //!
 //! Params: o4.*, r1.fRep and r1.maturity (the seed supply), c2.C.
 
@@ -39,6 +41,7 @@ pub fn stand_dynamics(world: &mut World) -> f64 {
         params.world.periodic,
         params.c2.c,
     );
+    let depth = crate::light::depth_of(params);
     let max_trees = params.o4.max_trees;
     for i in 0..world.trees.len() {
         let t = &world.trees[i];
@@ -55,8 +58,12 @@ pub fn stand_dynamics(world: &mut World) -> f64 {
         .collect();
     let mut live = parents.len() as f64;
     let mut recruits = 0.0;
-    let spaced =
-        |trees: &[Tree], x: f64| trees.iter().any(|t| t.alive && (t.root_x - x).abs() < 1.0);
+    // No live trunk within a cell, on the ground plane.
+    let spaced = |trees: &[Tree], x: f64, z: f64| {
+        trees
+            .iter()
+            .any(|t| t.alive && math::hypot(t.root_x - x, t.root_z - z) < 1.0)
+    };
     for &pi in &parents {
         let own = world.rules.of(&world.trees[pi].species).clone();
         let (c_seed, d, q_est, p_est) = (own.o4.c_seed, own.o4.d, own.o4.q_est, own.o4.p_est);
@@ -65,10 +72,15 @@ pub fn stand_dynamics(world: &mut World) -> f64 {
         parent.seed_pool -= n * c_seed;
         parent.seeds = n;
         let (pid, root, species) = (parent.id as f64, parent.root_x, parent.species.clone());
+        let root_z = parent.root_z;
         let mut k = 0.0;
         while k < n {
+            // A Laplace(0, d) distance on the ground plane, at an azimuth of its own.
             let u = uniform(seed, purpose::DISPERSAL, pid, k, season, 0.0);
-            let mut x = root + laplace(u, d);
+            let around = 2.0 * PI * uniform(seed, purpose::DISPERSAL, pid, k, season, 1.0);
+            let r = laplace(u, d);
+            let mut x = root + r * math::cos(around);
+            let z = root_z + r * math::sin(around);
             let kk = k;
             k += 1.0;
             if periodic {
@@ -76,20 +88,23 @@ pub fn stand_dynamics(world: &mut World) -> f64 {
             } else if x < 0.0 || x >= w {
                 continue;
             }
+            if z < 0.0 || z >= depth {
+                continue; // beyond an open face
+            }
             if live >= max_trees {
                 return recruits;
             }
-            let (q, _, _) = world.light.sample(x, 0.5, PI / 2.0);
+            let (q, _) = world.light.sample(x, 0.5, z);
             if c <= 0.0 || q / c < q_est {
                 continue;
             }
             if uniform(seed, purpose::ESTABLISHMENT, pid, kk, season, 0.0) >= p_est {
                 continue;
             }
-            if spaced(&world.trees, x) {
+            if spaced(&world.trees, x, z) {
                 continue;
             }
-            let mut seedling = Tree::new(world.trees.len(), x);
+            let mut seedling = Tree::new(world.trees.len(), x, z);
             seedling.species = species.clone();
             plant_seedling(&mut seedling, &own, season + 1.0, 0.0);
             world.trees.push(seedling);
@@ -127,17 +142,18 @@ pub fn stand_dynamics(world: &mut World) -> f64 {
                 return recruits;
             }
             let x = uniform(seed, purpose::SEED_RAIN, key, 1.0, season, kk) * w;
-            let (q, _, _) = world.light.sample(x, 0.5, PI / 2.0);
+            let z = uniform(seed, purpose::SEED_RAIN, key, 3.0, season, kk) * depth;
+            let (q, _) = world.light.sample(x, 0.5, z);
             if c <= 0.0 || q / c < q_est {
                 continue;
             }
             if uniform(seed, purpose::SEED_RAIN, key, 2.0, season, kk) >= p_est {
                 continue;
             }
-            if spaced(&world.trees, x) {
+            if spaced(&world.trees, x, z) {
                 continue;
             }
-            let mut seedling = Tree::new(world.trees.len(), x);
+            let mut seedling = Tree::new(world.trees.len(), x, z);
             if let Some(s) = species.as_ref().filter(|s| !s.is_empty()) {
                 seedling.species = s.clone();
             }

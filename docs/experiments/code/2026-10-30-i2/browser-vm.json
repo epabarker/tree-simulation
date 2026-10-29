@@ -1,0 +1,44 @@
+{
+ "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.8010.12 Safari/537.36",
+ "cores": 4,
+ "forest-interior-40": {
+  "metamers": 73117,
+  "season1": 190.90000000037253,
+  "light1": 115.30000000074506,
+  "passes": 75.59999999962747,
+  "light4": 54.5,
+  "season4": 130.09999999962747
+ },
+ "forest-edge-40": {
+  "metamers": 107321,
+  "season1": 200.5,
+  "light1": 109.90000000037253,
+  "passes": 90.59999999962747,
+  "light4": 63.59999999962747,
+  "season4": 154.19999999925494
+ },
+ "forest-hedgerow-40": {
+  "metamers": 139438,
+  "season1": 234.90000000037253,
+  "light1": 115,
+  "passes": 119.90000000037253,
+  "light4": 65.20000000111759,
+  "season4": 185.10000000149012
+ },
+ "160-interior-40": {
+  "metamers": 37744,
+  "season1": 181.40000000037253,
+  "light1": 116.09999999962747,
+  "passes": 65.30000000074506,
+  "light4": 64,
+  "season4": 129.30000000074506
+ },
+ "66-interior-40": {
+  "metamers": 14560,
+  "season1": 73.5,
+  "light1": 53.29999999888241,
+  "passes": 20.200000001117587,
+  "light4": 30,
+  "season4": 50.20000000111759
+ }
+}

@@ -19,10 +19,32 @@ jobs:
           cache: npm
       - uses: ./.github/actions/rust
       - run: npm ci
-      - name: "Check: WASM builds (parity, production), Rust fmt, clippy and tests (both modes, threads), lint, typecheck, vitest (goldens in TS and Rust, parity)"
+      - name: "Check: the WASM build, Rust fmt, clippy and tests (with threads), lint, typecheck, vitest (goldens in WASM and natively)"
         run: npm run check
       - run: npm run build
       - name: Garden build, within its size budget (ADR 0014)
         run: npm run build:garden
       - name: Headless smoke run
         run: npm run sim -- --seasons 10 --out runs/ci
+
+  # The 2D proof (I1, ADR 0024): the TypeScript core and the Rust core's parity build, archived at
+  # the tag golden-2d-ts, still reproduce the 2D goldens bit for bit on this runner. It checks out
+  # the tag, not this commit: nothing here can change what it runs.
+  golden-2d:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: golden-2d-ts
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .node-version
+          cache: npm
+      - uses: ./.github/actions/rust
+      - run: npm ci
+      - run: node cli/build-wasm.ts
+      - name: "The 2D goldens: the TypeScript core, the Rust core (parity) in WASM, its records and Math"
+        run: npx vitest run tests/golden.test.ts tests/golden-rust.test.ts tests/rust-world.test.ts tests/wasm-math.test.ts
+      - name: The 2D goldens natively (parity)
+        working-directory: rust
+        run: cargo test --release --locked -q -p tree-core --features parity --test golden --test sweep_fixture

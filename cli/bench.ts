@@ -7,6 +7,9 @@
  *   npm run bench -- --case forest --seasons 50     one case
  *   npm run bench -- --compare runs/bench/abc1234.json
  *   npm run bench -- --snapshot lean                 snapshots as the home page asks for them
+ *   npm run bench -- --case forest --slab sweep:32:16:f32   also time a 3D slab light model (scratch,
+ *                                                   cli/slab-light.ts) on the same deposits; see
+ *                                                   docs/experiments/2026-10-29-3d-light-cost.md
  *
  * Writes runs/bench/<commit>[-dirty].json unless --out names another file.
  */
@@ -21,6 +24,7 @@ import { presetParams } from "../src/core/presets.ts";
 import { PHASES, type Phase } from "../src/core/season.ts";
 import { FULL_SNAPSHOT, SnapshotBuilder, type SnapshotOptions } from "../src/core/snapshot.ts";
 import { World } from "../src/core/world.ts";
+import { Shadowed, type SlabLight, SlabPyramid, SlabSweep, type SlabTiming } from "./slab-light.ts";
 
 const { values } = parseArgs({
   options: {
@@ -30,6 +34,11 @@ const { values } = parseArgs({
     compare: { type: "string" },
     snapshot: { type: "string", default: "full" },
     out: { type: "string" },
+    // model:D:K:precision[:zsides], model sweep | fused | pyramid, e.g. sweep:32:16:f32 or pyramid:32:0:f64:periodic
+    slab: { type: "string" },
+    slabFrom: { type: "string", default: "60" },
+    slabEvery: { type: "string", default: "4" },
+    dumpDeposits: { type: "string" },
   },
 });
 
@@ -80,6 +89,8 @@ interface CaseResult {
   late: number;
   /** Mean milliseconds per season spent in each phase. */
   phases: Record<Bucket, number>;
+  /** With --slab: the 3D light model's own timings on the timed seasons. */
+  slab?: { spec: string } & SlabTiming;
 }
 
 interface BenchFile {
@@ -114,8 +125,32 @@ const SNAPSHOTS: Record<string, SnapshotOptions> = {
 const snapshotOptions = SNAPSHOTS[values.snapshot];
 if (!snapshotOptions) throw new Error(`--snapshot must be full or lean`);
 
+function makeSlab(spec: string, params: Params): SlabLight {
+  const [model, d, k, precision = "f64", zSides = "open"] = spec.split(":");
+  const A = precision === "f32" ? Float32Array : Float64Array;
+  const { width: W, height: H, sides } = params.world;
+  const px = sides === "periodic";
+  const pz = zSides === "periodic";
+  if (model === "sweep" || model === "fused") {
+    return new SlabSweep(W, H, Number(d), params.c2, Number(k), px, pz, A, model === "fused");
+  }
+  if (model === "pyramid") return new SlabPyramid(W, H, Number(d), params.c2, px, pz, A);
+  throw new Error(`--slab model must be sweep, fused or pyramid, not '${model}'`);
+}
+
 function runOnce(params: Params, seasons: number): CaseResult {
   const world = new World(params);
+  let shadow: Shadowed | null = null;
+  if (values.slab) {
+    const from = Number(values.slabFrom);
+    const every = Number(values.slabEvery);
+    shadow = new Shadowed(
+      world.light,
+      makeSlab(values.slab, params),
+      (s) => s >= from && (s - from) % every === 0,
+    );
+    world.light = shadow;
+  }
   const builder = new SnapshotBuilder();
   const totals = Object.fromEntries(BUCKETS.map((b) => [b, 0])) as Record<Bucket, number>;
   let last = 0;
@@ -135,6 +170,11 @@ function runOnce(params: Params, seasons: number): CaseResult {
     totals.snapshot += t2 - t1;
     perSeason.push(t2 - t0);
   }
+  shadow?.flush();
+  if (shadow && values.dumpDeposits) {
+    const d = shadow.lastDeposits;
+    writeFileSync(values.dumpDeposits, new Uint8Array(d.buffer, d.byteOffset, d.byteLength));
+  }
   const live = world.trees.filter((t) => t.alive);
   const sorted = [...perSeason].sort((a, b) => a - b);
   const late = perSeason.slice(-20);
@@ -153,6 +193,7 @@ function runOnce(params: Params, seasons: number): CaseResult {
     p95: quantile(sorted, 0.95),
     late: late.reduce((a, b) => a + b, 0) / late.length,
     phases,
+    ...(shadow ? { slab: { spec: values.slab as string, ...shadow.timing } } : {}),
   };
 }
 
@@ -242,6 +283,32 @@ if (values.compare) {
         ratio(b.phases.light, a.phases.light),
         ratio(b.phases.snapshot, a.phases.snapshot),
         a.seasons === b.seasons ? (a.hash === b.hash ? "yes" : "NO") : "(seasons differ)",
+      ];
+    }),
+  ]);
+}
+if (values.slab) {
+  const mean = (a: number[]) => a.reduce((x, y) => x + y, 0) / Math.max(1, a.length);
+  const median = (a: number[]) =>
+    quantile(
+      [...a].sort((x, y) => x - y),
+      0.5,
+    );
+  console.log(`\nslab ${values.slab}: ms per timed season (median; mean)\n`);
+  printTable([
+    ["case", "seasons", "deposit", "compute", "sample", "Mupdates", "ns/update", "deposits"],
+    ...names.map((n) => {
+      const t = (results[n] as CaseResult).slab as SlabTiming;
+      const ns = (1e6 * median(t.computeMs)) / Math.max(1, median(t.updates));
+      return [
+        n,
+        String(t.seasons.length),
+        `${median(t.depositMs).toFixed(2)}; ${mean(t.depositMs).toFixed(2)}`,
+        `${median(t.computeMs).toFixed(1)}; ${mean(t.computeMs).toFixed(1)}`,
+        `${median(t.sampleMs).toFixed(2)}; ${mean(t.sampleMs).toFixed(2)}`,
+        (median(t.updates) / 1e6).toFixed(2),
+        ns.toFixed(2),
+        String(Math.round(mean(t.deposits))),
       ];
     }),
   ]);

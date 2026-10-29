@@ -2,6 +2,25 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-29: Should the model go 3D? The measurement, and a go/no-go review
+
+- **User:** review a 3D port (a slab one crown deep, seen from the front; threads allowed on edbarker.dev), measuring before judging. Do not start the port.
+- **Measured** ([note](experiments/2026-10-29-3d-light-cost.md)):
+  - **The bench:** `cli/bench.ts --slab model:D:K:precision[:periodic]` times a scratch 3D light model (`cli/slab-light.ts`) on the real run's deposits. Behaviour, goldens and bench hashes are unchanged.
+  - **D:** canopy crowns are 20–30 cells wide, so D = 32.
+  - **The 3D row march:** 24–28 ns per cell–direction update in TS (2D: 18–24), linear in D·K. At D = 32, K = 16: `forest` 250–290 ms, `panorama` ≈ 700, about 100× the 2D light.
+  - **The pyramid:** its deposit is cheap, but the V cone search takes 21 µs a sample, which makes it dearer than the sweep at 3D bud counts.
+  - **The kernel in Rust:** scalar WASM 2.0×, SIMD f32 5.2× (24 kB gzipped); 4 native threads a further 2.6–3.0×, but only with a private partial field per thread (reductions cap it at 1.5–2×).
+- **Surprise:** Float64 WASM gave bit-identical Q to the TS kernel, `exp` included, so a bit-identical Rust port of the 2D goldens looks attainable.
+- **Surprise:** foliage per ground column is the same in every 2D stand (Beer–Lambert sets it), so a closed slab carries D × closure ≈ 22–32× the metamers, more than the brief's 5–20×.
+- **Review** ([review](reviews/2026-10-29-3d-port-review.md)):
+  - per-season projections for TS, scalar WASM, SIMD, and SIMD with threads;
+  - answers to the brief's open questions;
+  - about 8 calibration milestones, about 14 in all.
+  - **Recommendation:** go with a reduced scope, through cheap gates, starting with G1 (the kernel on the user's phone).
+- **ADR 0019** is proposed and awaits the user. Nothing in `src/` changed.
+- **Scratch code:** in `docs/experiments/code/2026-10-29-3d-port/` (Rust crate and harnesses), outside lint and typecheck.
+
 ## 2026-10-28: M25 follow-ups: maple's shade and seed rain
 
 - **User:** do the three M25 follow-ups, and agreed to extend O4 with seed rain.

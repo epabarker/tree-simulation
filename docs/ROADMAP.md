@@ -118,7 +118,7 @@ No published value exists for these. Calibrate on *patterns*: several weak targe
 - Arrow output from the CLI.
 - An R analysis environment (`sudo dnf install R`, then the `arrow` or `readr` package).
 - Rust/WASM core and WebGPU: only when the ADR 0001 triggers fire.
-- Depth beyond ADR 0008, held: parallel transects drawn behind each other (forest depth), or a thick 3D slab (W × D × H, about 50× the light cost; reverses spec §2). Revisit if trees must be seen from an angle.
+- Depth beyond ADR 0008: parallel transects drawn behind each other (forest depth), or a 3D slab (W × D × H; reverses spec §2). **Measured 2026-10-29** ([note](experiments/2026-10-29-3d-light-cost.md), [review](reviews/2026-10-29-3d-port-review.md)): at D = 32, K = 16 the light costs ≈ 100× today's (not 50×). Only Rust with SIMD and threads keeps the intro pace. ADR 0019 (a gated port) is proposed and awaits the user; its first gate, G1, is a phone run of the measured kernel.
 - Shareable URLs that hold the seed, preset and param edits (the lab; the home page picks its own seed at M21).
 - Scheduled since the M12 review:
   - Embedding in the personal website → M14 (ADR 0014).

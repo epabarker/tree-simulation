@@ -1,8 +1,10 @@
 # Status
 
-_Last updated: 2026-10-28 (M25)_
+_Last updated: 2026-10-29 (3D-port review)_
 
 **M25 is live** as garden-v0.11.0. Its follow-ups are on `claude/gallant-brown-5k4g33`, to release as garden-v0.12.0 after the user's preview: field maple's lighter shade, seed rain (ADR 0018), and tolerance scores checked against Appendix A.
+
+**3D-port review** (branch `claude/quirky-archimedes-x14c8k`): [measurement](experiments/2026-10-29-3d-light-cost.md), [go/no-go](reviews/2026-10-29-3d-port-review.md), ADR 0019 *proposed*. A D = 32 slab costs ≈ 100× today's light. The verdict is go with a reduced scope (Rust, SIMD, threads on edbarker.dev), through gates. Nothing in `src/` changed.
 
 ## Works
 - **Core:** C1–C6, R1–R6, O2 and O4 (ADRs 0005–0013); the sky sweep with open or periodic sides; golden hashes. `World.discardDead` for long page runs.
@@ -17,10 +19,11 @@ _Last updated: 2026-10-28 (M25)_
 ## Next
 1. **Release garden-v0.12.0** on the user's go-ahead: merge the PR, the user pushes the tag, sync the site and merge it.
 2. **The user:** an hour's soak on a phone (heat, memory); the site's `TODO(Ed)` items.
-3. **Ideas:** a magnifying loupe over the plate (true-scale leaves); rooting in windthrow.
+3. **3D port, if ADR 0019 is agreed:** gate G1, the measured slab kernel (WASM SIMD, 4 lanes) on the user's phone from a site preview with COOP/COEP. The port stops if light exceeds 150 ms a season at `forest` size.
+4. **Ideas:** a magnifying loupe over the plate (true-scale leaves); rooting in windthrow.
 
 ## Open questions (ask when the milestone comes up)
-- None open.
+- **ADR 0019:** agree to the gated 3D slab port or not. Also: may the first 3D forest grow during the intro, since 3D checkpoints would be MB-sized? And what visual check must pass before calibration starts (review §5)?
 
 ## Known issues
 - R5 reads self-shade; breakage never fires; sagging limbs can sink below the ground; in the lab, ring crowns cross the seam beyond the edge (the garden wraps them). Bimodality is marginal; K = 7 puts the crown base ≈ 7 cells low.

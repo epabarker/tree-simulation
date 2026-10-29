@@ -21,7 +21,7 @@ import { caseKey, GOLDEN_CASES, runCase } from "./golden-cases.ts";
 import { loadRustCore } from "./wasm.ts";
 
 /** The phases ported so far, in season order (`I1_PHASES=a,b` runs another set). */
-const LANDED = (process.env.I1_PHASES?.split(",") ?? ["light", "sample"]) as Phase[];
+const LANDED = (process.env.I1_PHASES?.split(",") ?? ["light", "sample", "allocate"]) as Phase[];
 
 const golden = JSON.parse(
   readFileSync(new URL("./golden.json", import.meta.url), "utf8"),

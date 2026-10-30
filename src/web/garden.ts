@@ -17,6 +17,7 @@ import type { Obstacle, Params, ParamsPatch } from "../core/params.ts";
 import { forestParams, specimenParams } from "../core/presets.ts";
 import type { RunRecord, Snapshot, SnapshotOptions, TreeMetrics } from "../core/types.ts";
 import type { SimApi } from "../worker/api.ts";
+import { PLATE_HEIGHT, plateWidth } from "./plate.ts";
 import { createRenderer } from "./render/create.ts";
 import { attachInput } from "./render/input.ts";
 import {
@@ -240,23 +241,10 @@ const SLOWDOWN = 12;
 /** Seasons (M17) show once a year lasts at least this long; spring is this share of a year. */
 const SEASONS_FROM_MS = 3000;
 const SPRING = 0.3;
-/** Rows of sky above the forest's ground in its preset (130): the ring's width follows the host. */
-const WORLD_HEIGHT = 130;
-
-/**
- * The ring's width for a host of this size: a share of what the host's aspect would give the
- * world's full height. The plate fits the ring's width, so the share sets how large the trees are
- * drawn: two thirds on a portrait host (a phone; M21 art pass) and 0.7 on a landscape one (M24:
- * with the site's wide plate, about as many trees as before, 1.7 times larger). Crowns taller than
- * the plate ease the camera out, as ever.
- */
-export function plateWidth(width: number, height: number): number {
-  const aspect = width / Math.max(1, height);
-  return WORLD_HEIGHT * aspect * (aspect < 1 ? 0.65 : 0.7);
-}
 
 // The home forest and Plate II's oak live with the presets, so the CLI can grow them too (M21).
 export { forestParams, specimenParams } from "../core/presets.ts";
+export { PLATE_HEIGHT, PLATE_MAX, plateWidth } from "./plate.ts";
 
 /** Puts the scene's colour tokens first in <head>, once: their cascade layer then loses to any host. */
 function injectSceneTokens(): void {
@@ -305,6 +293,7 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
   scene.wind = wind;
   scene.physics = (options.physics ?? true) && !reduceMotion;
   scene.frame = focus === "specimen" ? "tree" : (options.frame ?? "world");
+  scene.frameHeight = 0.5 * PLATE_HEIGHT;
   if (options.headroom !== undefined) scene.headroom = options.headroom;
   const rect = renderer.canvas.getBoundingClientRect();
   const params =

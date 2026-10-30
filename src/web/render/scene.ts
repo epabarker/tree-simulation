@@ -231,6 +231,11 @@ export class Scene {
    * a ring the crowns are then drawn across the seam as well.
    */
   frame: "trees" | "world" | "tree" = "trees";
+  /**
+   * The least height in cells the "world" frame shows (the garden's half plate, I3); 0: half the
+   * world's height. Under the woods' 200-cell top, half the world framed a young garden for 100.
+   */
+  frameHeight = 0;
   /** The tree the "tree" frame fits: one specimen and the ground beneath it (D3). */
   focusTree = -1;
   /** Draw only this tree, as a botanical plate draws one specimen (-1: every tree). */
@@ -538,7 +543,7 @@ export class Scene {
     if (this.frame === "world") {
       cx = s.width / 2;
       spanX = s.width;
-      spanY = Math.max(0.5 * s.height, maxY * 1.05 + LEAF_LENGTH);
+      spanY = Math.max(this.frameHeight || 0.5 * s.height, maxY * 1.05 + LEAF_LENGTH);
     } else if (this.frame === "trees" && s.periodic) {
       // A ring has no edge to frame: show one lap, the crowns that cross the seam drawn at both
       // sides (wrapOffsets), as the garden does (M26; the lab drew them past the world's end).

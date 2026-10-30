@@ -502,6 +502,8 @@ export function isPresetName(name: string): name is PresetName {
  * The `mixedWood` woodland (M25) on a ring `width` cells wide, with a tree every ≈ 21 cells: about
  * as wide as the host is wide relative to the world's height, so a phone gets a narrower forest.
  * The seed turns the planting pattern (`MIXED`), so each forest starts from a different mix.
+ * Recruits (O4's `maxTrees`) scale with the ground's area, 300 on the ring's 210 × 64 (I3): 300 on
+ * every plate put a seedling every 14 cells² on a phone's. `mixedWood` itself keeps 300.
  */
 export function forestParams(width = 210, seed?: number): Params {
   const base = presetParams("mixedWood", seed);
@@ -512,7 +514,13 @@ export function forestParams(width = 210, seed?: number): Params {
   const trees = perArea(xs, W, (k, r) => ({
     species: MIXED[(k + 3 * r + base.seed) % MIXED.length] as string,
   }));
-  return mergeParams(base, { world: { ...base.world, width: W }, trees });
+  const D = base.world.depth ?? 64;
+  const maxTrees = Math.max(20, Math.round((300 * W * D) / (RING.width * 64)));
+  return mergeParams(base, {
+    world: { ...base.world, width: W },
+    trees,
+    o4: { ...base.o4, maxTrees },
+  });
 }
 
 /** Plate II (M19): an oak grown alone in the open, a new one for each seed. */

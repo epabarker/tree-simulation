@@ -14,9 +14,11 @@
 
 import * as Comlink from "comlink";
 import type { Obstacle, Params, ParamsPatch } from "../core/params.ts";
+import type { Planting } from "../core/presets.ts";
 import { forestParams, specimenParams } from "../core/presets.ts";
 import type { RunRecord, Snapshot, SnapshotOptions, TreeMetrics } from "../core/types.ts";
 import type { SimApi } from "../worker/api.ts";
+import { PLATE_HEIGHT, plateWidth } from "./plate.ts";
 import { createRenderer } from "./render/create.ts";
 import { attachInput } from "./render/input.ts";
 import {
@@ -47,7 +49,7 @@ export interface Stats {
   /** Frames per second while animating, and CPU milliseconds per draw. */
   fps: number;
   drawMs: number;
-  /** The adaptive quality level in use: device pixel ratio, and "lite" without back leaves. */
+  /** The adaptive quality level in use: its device pixel ratio. */
   quality: string;
 }
 
@@ -83,6 +85,8 @@ export interface GardenOptions {
   params?: Params;
   /** Seed of the default run (ignored with `params`). Default: a new one per visit. */
   seed?: number;
+  /** How the default run is planted (ignored with `params`): `forestParams`' Planting (I3). */
+  planting?: Partial<Planting>;
   /** View settings; an object passed here is used (and filled in) by reference. */
   view?: Partial<ViewOptions>;
   /** WebGL2 with a Canvas 2D fallback, or Canvas 2D only. */
@@ -240,23 +244,10 @@ const SLOWDOWN = 12;
 /** Seasons (M17) show once a year lasts at least this long; spring is this share of a year. */
 const SEASONS_FROM_MS = 3000;
 const SPRING = 0.3;
-/** Rows of sky above the forest's ground in its preset (130): the ring's width follows the host. */
-const WORLD_HEIGHT = 130;
-
-/**
- * The ring's width for a host of this size: a share of what the host's aspect would give the
- * world's full height. The plate fits the ring's width, so the share sets how large the trees are
- * drawn: two thirds on a portrait host (a phone; M21 art pass) and 0.7 on a landscape one (M24:
- * with the site's wide plate, about as many trees as before, 1.7 times larger). Crowns taller than
- * the plate ease the camera out, as ever.
- */
-export function plateWidth(width: number, height: number): number {
-  const aspect = width / Math.max(1, height);
-  return WORLD_HEIGHT * aspect * (aspect < 1 ? 0.65 : 0.7);
-}
 
 // The home forest and Plate II's oak live with the presets, so the CLI can grow them too (M21).
 export { forestParams, specimenParams } from "../core/presets.ts";
+export { PLATE_HEIGHT, PLATE_MAX, plateWidth } from "./plate.ts";
 
 /** Puts the scene's colour tokens first in <head>, once: their cascade layer then loses to any host. */
 function injectSceneTokens(): void {
@@ -305,17 +296,20 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
   scene.wind = wind;
   scene.physics = (options.physics ?? true) && !reduceMotion;
   scene.frame = focus === "specimen" ? "tree" : (options.frame ?? "world");
+  scene.frameHeight = 0.5 * PLATE_HEIGHT;
   if (options.headroom !== undefined) scene.headroom = options.headroom;
   const rect = renderer.canvas.getBoundingClientRect();
   const params =
     options.params ??
-    forestParams(plateWidth(rect.width, rect.height), options.seed ?? dailySeed(options.seeds));
+    forestParams(
+      plateWidth(rect.width, rect.height),
+      options.seed ?? dailySeed(options.seeds),
+      options.planting,
+    );
 
   const view = Object.assign(options.view ?? {}, {
     colorMode: "natural",
     showLeaves: true,
-    // ADR 0008's pseudo-depth squeeze is retired: the trees are 3D (I2); depth order is I3's.
-    depth: false,
     leafAge: LEAF_STYLES.broadleaf.leafAge,
     leafStyle: "broadleaf",
     showBuds: false,
@@ -334,17 +328,15 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
     quality: "",
   };
 
-  // Adaptive quality (render/quality.ts): fewer pixels, then fewer leaves, when frames run slow.
+  // Adaptive quality (render/quality.ts): fewer pixels when frames run slow.
   const adaptive = (options.adaptive ?? true) && !options.bench;
   const quality = governor(qualityLevels(window.devicePixelRatio, options.maxDpr ?? MAX_DPR));
-  const describeQuality = (level: QualityLevel): string =>
-    `dpr ${level.dpr}${level.lite ? ", lite" : ""}`;
+  const describeQuality = (level: QualityLevel): string => `dpr ${level.dpr}`;
   stats.quality = describeQuality(quality.levels[0] as QualityLevel);
   const judgeFrame = (dt: number, now: number): void => {
     const next = judge(quality, dt, now);
     if (next === null) return;
     const level = quality.levels[next] as QualityLevel;
-    view.lite = level.lite;
     renderer.setMaxDpr(level.dpr);
     stats.quality = describeQuality(level);
     dirty = true;
@@ -800,7 +792,7 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
       const s = await sim.restore(Comlink.transfer(bytes, [bytes]));
       if (mine !== generation || destroyed) return true;
       // The run it came from, for obstacle events and for sharing (?forest=seed regrows it).
-      current = forestParams(at.width, at.seed);
+      current = forestParams(at.width, at.seed, options.planting);
       seedNow = at.seed;
       sentObstacles = JSON.stringify(current.world.obstacles ?? []);
       inFlight = false;

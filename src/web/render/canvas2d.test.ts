@@ -6,6 +6,7 @@ import { afterAll, describe, expect, it } from "vitest";
 import { productionWorld } from "../../../tests/production-world.ts";
 import { forestParams } from "../../core/presets.ts";
 import { Canvas2DRenderer } from "./canvas2d.ts";
+import { nearAndFar } from "./fixture.ts";
 import { LEAF_STYLES } from "./leaf-styles.ts";
 import type { ViewOptions } from "./scene.ts";
 
@@ -20,6 +21,9 @@ class RecordingContext {
   private path: [number, number][] = [];
   wood: [number, number][] = [];
   leaves: [number, number][] = [];
+  /** Every stroke and fill in turn, with its path's points in world units (before the transform). */
+  events: { kind: "wood" | "leaf"; raw: [number, number][] }[] = [];
+  private raw: [number, number][] = [];
   [key: string]: unknown;
 
   setTransform(a: number, b: number, c: number, d: number, e: number, f: number): void {
@@ -27,6 +31,7 @@ class RecordingContext {
   }
   beginPath(): void {
     this.path = [];
+    this.raw = [];
   }
   moveTo(x: number, y: number): void {
     this.point(x, y);
@@ -36,9 +41,11 @@ class RecordingContext {
   }
   stroke(): void {
     this.wood.push(...this.path);
+    this.events.push({ kind: "wood", raw: this.raw });
   }
   fill(): void {
     this.leaves.push(...this.path);
+    this.events.push({ kind: "leaf", raw: this.raw });
   }
   createLinearGradient(): { addColorStop(): void } {
     return { addColorStop: () => {} };
@@ -49,6 +56,7 @@ class RecordingContext {
   save(): void {}
   restore(): void {}
   private point(x: number, y: number): void {
+    this.raw.push([x, y]);
     const [a, b, c, d, e, f] = this.m as [number, number, number, number, number, number];
     this.path.push([a * x + c * y + e, b * x + d * y + f]);
   }
@@ -65,7 +73,6 @@ afterAll(() => Object.assign(g, saved));
 const view: ViewOptions = {
   colorMode: "natural",
   showLeaves: true,
-  depth: false,
   leafAge: LEAF_STYLES.broadleaf.leafAge,
   leafStyle: "broadleaf",
   showBuds: false,
@@ -82,6 +89,38 @@ function bands(points: [number, number][]): number[] {
   return out;
 }
 
+/** A Canvas2DRenderer drawing into a fresh recording context. */
+function recorder(): { r: Canvas2DRenderer; ctx: RecordingContext; canvas: HTMLCanvasElement } {
+  const ctx = new RecordingContext();
+  const canvas = {
+    getContext: () => ctx,
+    getBoundingClientRect: () => ({ width: W, height: H }),
+    width: 0,
+    height: 0,
+  } as unknown as HTMLCanvasElement;
+  return { r: new Canvas2DRenderer(canvas), ctx, canvas };
+}
+
+describe("Canvas2DRenderer in depth (I3)", () => {
+  it("draws far to near: the far tree's wood and leaf, then the near tree's", () => {
+    const { r, ctx } = recorder();
+    r.setSnapshot(nearAndFar());
+    r.scene.fit(true);
+    r.draw(1, view);
+    // Which event drew each tree's wood (a stroke reaching its tip) and its leaf (a fill near it).
+    const first = (kind: "wood" | "leaf", test: (x: number, y: number) => boolean) =>
+      ctx.events.findIndex((e) => e.kind === kind && e.raw.some(([x, y]) => test(x, y)));
+    const farWood = first("wood", (_, y) => Math.abs(y - 2) < 1e-6);
+    const nearWood = first("wood", (_, y) => Math.abs(y - 4) < 1e-6);
+    const farLeaf = first("leaf", (_, y) => y > 1.5 && y < 3);
+    const nearLeaf = first("leaf", (_, y) => y > 4.2);
+    for (const k of [farWood, nearWood, farLeaf, nearLeaf]) expect(k).toBeGreaterThanOrEqual(0);
+    expect(farWood).toBeLessThan(farLeaf);
+    expect(farLeaf).toBeLessThan(nearWood);
+    expect(nearWood).toBeLessThan(nearLeaf);
+  });
+});
+
 describe("Canvas2DRenderer on a 3D stand", () => {
   it("paints wood and leaves across the canvas (the garden's planting, 20 seasons)", () => {
     const params = forestParams(66, 10);
@@ -91,14 +130,7 @@ describe("Canvas2DRenderer on a 3D stand", () => {
     const s = world.snapshot(0, { junctions: false, field: false });
     world.dispose();
 
-    const ctx = new RecordingContext();
-    const canvas = {
-      getContext: () => ctx,
-      getBoundingClientRect: () => ({ width: W, height: H }),
-      width: 0,
-      height: 0,
-    } as unknown as HTMLCanvasElement;
-    const r = new Canvas2DRenderer(canvas);
+    const { r, ctx, canvas } = recorder();
     expect([canvas.width, canvas.height]).toEqual([W * DPR, H * DPR]);
     r.scene.frame = "world";
     r.setSnapshot(s);

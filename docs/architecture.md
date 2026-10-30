@@ -29,7 +29,7 @@ The simulation is the Rust core, `rust/core` (`tree-core`; I1, ADR 0024). The pa
 `mountGarden(host, options)` (`src/web/garden.ts`) is the whole living view: worker, renderer, pull loop, input, and the resize, visibility and theme observers. It returns a `Garden` with `view`, `playback`, `stats`, `ready`, `restart`, `step`, `setPlaying`, `setParams`, `record`, `fit`, `redraw` and `destroy`. Two hosts use it:
 - **The lab** (`main.ts`, `index.html`): a garden with `interaction: "full"`, `frame: "trees"`, a fixed speed, full snapshots, and the panel, charts and HUD around it.
 - **A home page** (`garden.html` here; edbarker.dev in production): the defaults.
-  - **World:** `forestParams` puts the `succession` woodland (M19) on a ring whose width follows the host's aspect (54–520 cells since M18, a tree every ≈ 21 cells; a portrait phone gets two or three large trees), with a random seed per visit. The planting runs birch, oak, birch, beech around the ring, turned by the seed.
+  - **World:** `forestParams` puts the `succession` woodland (M19) on a ring whose width follows the host's aspect (54–520 cells since M18, at most 160 from the page since I3, a tree every 28 cells since I3; a portrait phone gets two or three large trees), with a random seed per visit. It plants one row down the slab's middle (I3; `Planting`, the page's `?rows=`, `?spacing=` and `?recruits=`), and O4's `band` keeps its recruits about a crown's depth around the row. The planting runs birch, oak, birch, beech around the ring, turned by the seed.
   - **Leaves (M23):**
     - Each style has an outline (`LEAF_SHAPES`): a width profile along the leaf (`leafProfile`), or five lobes for the palmate maple. WebGL draws it in the fragment shader from a per-instance shape and aspect; Canvas 2D draws it as a polygon.
     - Lengths follow real leaf sizes, so a drawn leaf stands for a small spray: birch 0.5 cells, beech 0.7, oak 0.85.
@@ -200,19 +200,19 @@ Tapping a tree on the page fells it. `Scene.pickTree` finds the nearest drawn se
 
 **Snapshot** (`rust/core/src/snapshot.rs`; the shape is `Snapshot` in `src/core/types.ts`). Flat arrays over all live trees, concatenated in tree-id order:
 
-- **Metamers:** `parent` (row in the snapshot), `x0`, `y0`, `angle`, `length`, `radius`, `z0`, `dirX`…`dirZ` (H), `refX`…`refZ` (L), `tree`, `birthId`, `order`, `light` (Q_sum/n_b), `resource` (vIn), `age`, `stress` (σ/σ_target, R3), `prevIndex`. `angle` and `length` are the segment as drawn in the picture's plane (projected along z), so the renderer rebuilds (x, y) positions from them as it always did; it draws branches far to near by `z0` (I2) until I3's depth buffer.
+- **Metamers:** `parent` (row in the snapshot), `x0`, `y0`, `angle`, `length`, `radius`, `z0`, `dirX`…`dirZ` (H), `tree`, `birthId`, `order`, `light` (Q_sum/n_b), `resource` (vIn), `age`, `stress` (σ/σ_target, R3), `prevIndex`, `zOrder`. `angle` and `length` are the segment as drawn in the picture's plane (projected along z), so the renderer rebuilds (x, y) positions from them as it always did. `zOrder` lists the rows far to near (`z0` descending, row ascending on ties), sorted in Rust so the main thread never sorts (I3). The frame's reference L is not carried: nothing on the page reads it.
 - **Buds:** `budMetamer`, `budState`, `budQ`.
-- **Other:** `shadow` (W×H, or null), `junctions`, `metrics` (with each tree's `species`), `species` (the species table's labels: common and Latin names and leaf style, ADR 0016), `seasonMs`, `snapshotMs` (the worker's time to build the snapshot; the HUD's worker time is the sum).
+- **Other:** `depth` (the slab's D, for the depth slices), `shadow` (W×H, or null), `junctions`, `metrics` (with each tree's `species`), `species` (the species table's labels: common and Latin names and leaf style, ADR 0016), `seasonMs`, `snapshotMs` (the worker's time to build the snapshot; the HUD's worker time is the sum).
 
 The arrays share one buffer, copied once out of WASM memory and transferred, not copied again.
 
 **Natural view (default).** Branches are coloured bark-young → bark-old by √(age/max age). Leaves are drawn as lens shapes at the tip of every metamer up to `leafAge` seasons old (default 5), alternating sides by birthId parity, coloured shade → sun by the metamer's light, with a small stable per-leaf variation. They are a view of the foliage only: in the model, buds cast the shade (§C2). Leaves unfold with their metamer, shrink away in the season they age out, and never draw shorter than 5 px so zoomed-out crowns still read as foliage. Sky and ground are screen-space gradients.
 
-**Leaf styles** (`render/leaf-styles.ts`, page only). A species preset names a style in `Preset.leaf` (core/presets.ts); the page copies it into `ViewOptions.leafStyle`, and the renderers into `Scene.leafStyle`. A style sets leaf length and aspect (a needle is a thin lens), spread, leaves per cluster (depth view) and per side (x-ray), the colour ramp (`--needle-*`, `--birch-leaf-*`, `--tropical-leaf-*` tokens in layout.css) and the default leaf age. View → leaf style overrides it. The model's leaf area does not depend on it.
+**Leaf styles** (`render/leaf-styles.ts`, page only). A species preset names a style in `Preset.leaf` (core/presets.ts); the page copies it into `ViewOptions.leafStyle`, and the renderers into `Scene.leafStyle`. A style sets leaf length and aspect (a needle is a thin lens), spread, leaves per side, the colour ramp (`--needle-*`, `--birch-leaf-*`, `--tropical-leaf-*` tokens in layout.css) and the default leaf age. View → leaf style overrides it. The model's leaf area does not depend on it.
 
 **Drawn vs simulated foliage.** Today the model holds one unit of leaf area per live bud (active or dormant), while the page draws leaves on young metamers. With R6 on (M6d) the model's leaf area follows shoot type, and the page draws a rosette at each short shoot, so the two agree.
 
-**Pseudo-depth (M6c, ADR 0008, page only).** With the `depth` view option on (natural default), `Scene.computeGeometry` maps each metamer's simulated direction through a 2×2 projection: identity on the trunk; each first-order limb's subtree squeezed perpendicular to the trunk by 0.55 + 0.45·|sin φ|, φ hashed from the limb's birthId (spec §C1.4's projected spiral, applied once per limb). `Scene.leaves` then emits `CLUSTER_LEAVES` (3) leaves per leafy metamer spaced around the shoot, each foreshortened by its out-of-plane angle, with depth mixing the axis depth and the leaf's; leaves behind the plane come first (`Leaves.back`), darkened, and both renderers draw them before the branches, the rest after (WebGL2 uses a second leaf batch). With `depth` off (the x-ray view) the page draws exactly the simulated geometry. Picking uses the drawn geometry.
+**Depth (I3; ADR 0024's view).** The picture is orthographic along z, drawn far to near. `Scene.drawOrder` is the snapshot's `zOrder`; `Scene.woodSlices` cuts it into `DEPTH_SLICES` (64) slices of the slab's depth, and `Scene.leaves` gives the leaves far to near with their own slice starts (`Leaves.slices`; falling leaves come after the last): the layout reads the snapshot in row order and places each leaf by one counting sort on its slice, and a frame writes each leaf to its place, at size 0 when not drawn. WebGL2 draws per slice the wood's range of its instance batch, then the leaves' (a range is drawn by pointing the instance attributes at its first instance: WebGL2 has no base instance), once per copy of the ring; Canvas 2D draws 8 slices, each grouped by (colour, width) as before. A leaf's drawn length is foreshortened by its shoot's in-plane share, hypot(Hx, Hy), as the shoot itself is. ADR 0008's pseudo-depth (squeezed limbs, two-layer clusters, `Leaves.back`, the `depth` and `lite` view options) is gone: the geometry carries real depth. Picking uses the drawn geometry.
 
 **Colours** live as CSS tokens: the scene's in `src/web/render/scene.css` (light and dark, in a cascade layer a host can override), the lab's own (including the Tweakpane theme) in `src/web/ui/layout.css`. The canvas reads them through `render/theme.ts` and re-reads them when the system scheme or `<html data-theme>` changes, so a host site's theme toggle carries through.
 
@@ -221,14 +221,14 @@ The arrays share one buffer, copied once out of WASM memory and transferred, not
 **Tweening.** `render/scene.ts` (`Scene`) holds everything both renderers share: each frame it rebuilds positions in a single forward loop, interpolating length, angle and radius from the `prevIndex` row; new rows grow from zero; previous rows that nothing maps to are fading ghosts (shed branches). It also tapers each segment toward its thickest child (`tipRadius`), chooses palette indices per colour mode, lays out leaves (camera-independent: base point, direction, size 0…1), fits and eases the camera, and picks trees.
 
 **Per snapshot, not per frame (M15).** These depend only on the snapshot (and view settings), so they are computed when a snapshot is first drawn:
-- the pseudo-depth projections;
+- the draw order and its depth slices;
 - the colour indices;
-- the leaf layout: which leaves exist; each one's metamer and layer; its direction as a fixed rotation (a, b) of its shoot's direction; its size scale and colour.
+- the leaf layout: which leaves exist, in row order; each one's metamer, depth slice and far-to-near place; its direction as a fixed rotation (a, b) of its shoot's direction; its size scale and colour.
 
 A frame then interpolates positions, normalises each leafy shoot's direction, applies the rotations and sizes the leaves. Two geometries take turns as tween origin and target. `node src/web/render/scene.bench.ts` times a frame's Scene work ([M15 note](experiments/2026-10-27-m15-render.md)).
 
 **Adaptive quality** (`render/quality.ts`, M15). While the garden animates, every 60 frame intervals form a window:
-- If its 90th percentile is above 24 ms, the quality steps down one level: device pixel ratio 2 → 1.5 → 1, then `ViewOptions.lite` (no back layer of leaves).
+- If its 90th percentile is above 24 ms, the quality steps down one level: device pixel ratio 2 → 1.5 → 1.
 - Ten windows in a row under 18 ms step back up.
 - A change waits a second before frames count again.
 
@@ -236,7 +236,7 @@ The lab's Stats shows the level. `?bench` turns it off, and also measures the pa
 
 **Renderers** (`render/create.ts` picks one; `?renderer=canvas` forces the fallback):
 - `WebGL2Renderer` (default, M6b, ADR 0001; twgl.js). Its instance buffers grow by capacity and frames overwrite them with `bufferSubData` (M15). It draws one instanced quad per metamer shaded in the fragment shader as an uneven capsule (signed distance, antialiased by `0.5 − d/px`; stems under half a pixel draw at half a pixel with alpha scaled by their true coverage), one quad per leaf shaded as a vesica, instanced squares for buds and rectangles for walls, the shade overlay as an RGBA texture, sky and ground as full-screen gradients; premultiplied alpha. Instance data never depends on the camera (zoom-dependent minimum sizes are applied in the shaders), so frames where only the camera moves skip the rebuild and only change uniforms. Handles context loss by recreating its resources.
-- `Canvas2DRenderer` (fallback): segments grouped by (colour, width bucket), each group stroked as one path.
+- `Canvas2DRenderer` (fallback): in each of 8 depth slices, segments grouped by (colour, width bucket), each group stroked as one path, then the slice's leaves.
 
 Measured in headless Firefox (desktop GPU; phones are slower): a 10-tree stand of about 4k metamers draws in 2.3 ms of CPU per frame during growth playback with WebGL2 against 19 ms with Canvas 2D; 28k metamers in 5.8 ms; panning a paused 55k-metamer scene costs 0.35 ms.
 

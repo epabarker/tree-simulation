@@ -4,7 +4,8 @@
 //! and established where the ground light is at least Q_est with probability p_est [RNG:
 //! establishment], no live trunk within a cell; seed rain from beyond the world per species,
 //! anywhere on the ground [RNG: seedRain]. Seedlings start next season; live trees capped at
-//! maxTrees.
+//! maxTrees. With `band` (I3, the garden's one row) seedlings establish only within band/2 of the
+//! slab's middle in z: local seeds beyond it are lost, and seed rain lands inside it.
 //!
 //! Params: o4.*, r1.fRep and r1.maturity (the seed supply), c2.C.
 
@@ -43,6 +44,8 @@ pub fn stand_dynamics(world: &mut World) -> f64 {
     );
     let depth = crate::light::depth_of(params);
     let max_trees = params.o4.max_trees;
+    let band = params.o4.band;
+    let mid = depth / 2.0;
     for i in 0..world.trees.len() {
         let t = &world.trees[i];
         if !(t.alive && t.age > 0.0) {
@@ -90,6 +93,9 @@ pub fn stand_dynamics(world: &mut World) -> f64 {
             }
             if z < 0.0 || z >= depth {
                 continue; // beyond an open face
+            }
+            if band.is_some_and(|b| (z - mid).abs() > b / 2.0) {
+                continue; // outside the row's band
             }
             if live >= max_trees {
                 return recruits;
@@ -142,7 +148,11 @@ pub fn stand_dynamics(world: &mut World) -> f64 {
                 return recruits;
             }
             let x = uniform(seed, purpose::SEED_RAIN, key, 1.0, season, kk) * w;
-            let z = uniform(seed, purpose::SEED_RAIN, key, 3.0, season, kk) * depth;
+            let u = uniform(seed, purpose::SEED_RAIN, key, 3.0, season, kk);
+            let z = match band {
+                Some(b) => mid + (u - 0.5) * b.min(depth),
+                None => u * depth,
+            };
             let (q, _) = world.light.sample(x, 0.5, z);
             if c <= 0.0 || q / c < q_est {
                 continue;
@@ -236,6 +246,35 @@ pub(crate) mod tests {
         stand_dynamics(&mut open);
         assert!(open.trees[1..].iter().all(|t| t.root_x < 100.0));
         assert!(open.trees.len() < ring.trees.len());
+    }
+
+    #[test]
+    fn keeps_seedlings_to_the_band_around_the_slab_middle() {
+        let band = |patch: &str| {
+            let mut w = world(patch);
+            w.trees[0].seed_pool = 400.0;
+            stand_dynamics(&mut w);
+            let mid = crate::light::depth_of(w.params()) / 2.0;
+            let zs: Vec<f64> = w.trees[1..]
+                .iter()
+                .map(|t| (t.root_z - mid).abs())
+                .collect();
+            zs
+        };
+        let free = band(r#"{"o4":{"d":30}}"#);
+        assert!(free.iter().any(|&dz| dz > 5.0));
+        let kept = band(r#"{"o4":{"d":30,"band":10}}"#);
+        assert!(!kept.is_empty() && kept.len() < free.len());
+        assert!(kept.iter().all(|&dz| dz <= 5.0));
+        let mut rain = world(r#"{"o4":{"rain":40,"band":10}}"#);
+        stand_dynamics(&mut rain);
+        let mid = crate::light::depth_of(rain.params()) / 2.0;
+        assert!(rain.trees.len() > 10);
+        assert!(
+            rain.trees[1..]
+                .iter()
+                .all(|t| (t.root_z - mid).abs() <= 5.0)
+        );
     }
 
     #[test]

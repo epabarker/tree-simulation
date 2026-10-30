@@ -84,7 +84,7 @@ Code is in `rust/core/src/` (I1; the TypeScript files these rows named until the
 | R3 | Mechanics (ADR 0011) | §R3 | `r3.enabled`; `r3.posture` off = §8 "sag without posture"; `r3.sag` (`increment`, `creep`); `r3.girthGain` 0 = no stress wood | `principles/r3.rs` (pre-girth radius in `season.rs`; stress wood out of the pipe sums in `c6.rs`; `PaLevel.postureSetPoint`) | unit tests, `mechanics.test.ts` | R3 panel folder; colour: stress σ/σ_target; `weeping` and `troll` presets | ✅ M9 (breakage deferred) |
 | R4 | Dormancy, release, reiteration, bud bank (ADR 0012) | §R4 | `r4.enabled`; `r4.bank`; `r4.qRel` 99 = sugar route only | `principles/r4.rs` (bud fate in `season.rs` `grow_buds`; bank in `c5.rs` `remove_branches`; `paShift` in `c1.rs`, `c3.rs`, `r3.rs`) | unit tests, `release.test.ts`, `ablation.test.ts` | R4 panel folder; metrics `released`, `epicormic`, `aborted` | ✅ M10 |
 | R5 | Shade avoidance (ADR 0012) | §R5 | `r5.enabled`, `r5.signal` (`neighbours` by default since C1 round 2; `light` = own shade, the ablation) | `principles/r5.rs` (node shade in `season.rs` `sample_nodes`; λ in `c3.rs`) | unit tests, `release.test.ts` | R5 panel folder | ✅ M10 (no far-red field) |
-| O4 | Stand dynamics (ADR 0013) | §O4 | `o4.enabled`; needs `r1.fRep` > 0 | `principles/o4.rs` (seed pool in `r1.rs`; Phase 3 in `season.rs`); periodic sides in `light/sky_sweep.rs` | unit tests, `forest.test.ts`, `flora.test.ts` (seed rain into a clearing) | O4 panel folder (with seed rain); `forest`, `thinning` presets; metrics `seeds`, `woodVolume`, `rootX` | ✅ M11; seed rain `o4.rain` M25 (ADR 0018) |
+| O4 | Stand dynamics (ADR 0013) | §O4 | `o4.enabled`; needs `r1.fRep` > 0 | `principles/o4.rs` (seed pool in `r1.rs`; Phase 3 in `season.rs`); periodic sides in `light/sky_sweep.rs` | unit tests, `forest.test.ts`, `flora.test.ts` (seed rain into a clearing) | O4 panel folder (with seed rain); `forest`, `thinning` presets; metrics `seeds`, `woodVolume`, `rootX` | ✅ M11; seed rain `o4.rain` M25 (ADR 0018); establishment band `o4.band` I3 (the garden's one row, ADR 0025) |
 | O2 | Abrasion, crown shyness (ADR 0013) | §O2 | `o2.enabled` (off in every preset) | `principles/o2.rs` (owner grid in `season.rs`) | unit tests | O2 panel folder; metric `abraded` | ✅ M11 (no girth bonus, no wind events) |
 | O1, O3 | Optional | §O1, §O3 | — | — | — | — | ⏳ not planned |
 
@@ -155,6 +155,13 @@ No published value exists for these. Calibrate on *patterns*: several weak targe
 **C1 round 3, form steps 3–5** (same note):
 - the stand closes by 100 and then ages at O4's background rate, with no regeneration at τ 0; crowns release rather than widen;
 - 20-seed evidence at τ 0: floor at 100 20 of 20, H/D at 300 19, crown base 20, plateau (same trees) 17.
+
+**I3 steps 1–2, the renderer** ([note](experiments/2026-10-30-i3.md), [plan](plans/2026-10-30-i3.md)):
+- wood and leaves draw far to near in 64 depth slices (Canvas 2D 8), from the snapshot's `zOrder`; ADR 0008's pseudo-depth is removed;
+- the main thread's work per snapshot falls 55–60%; the slices cost 0.5–0.6 ms a frame;
+- the plate is capped at 160 cells and a young garden is framed at 65;
+- the garden plants one row at spacing 28, its recruits capped per width and kept to O4's `band` (the user's phone check);
+- the phone: draw p95 6.3 ms, frame p95 16.8 ms, worker 50 ms a season, 10.2k metamers. Steps 3–6 remain.
 - Scheduled since the M12 review:
   - Embedding in the personal website → M14 (ADR 0014).
   - **R1, R3, R4 and R5 for the species presets** (M8–M10 follow-ups: under R1 they reach their 160-cell top or grow far too slender; calibrate m_f as shade tolerance and L_h as species height) → M20.

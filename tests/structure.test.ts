@@ -80,6 +80,23 @@ describe("the 3D core's structure (I2)", () => {
     expect(hashWorld(c)).not.toBe(hashWorld(a));
   });
 
+  it("lists the snapshot's rows far to near (zOrder, I3): a permutation, z0 descending", () => {
+    const world = new World(presetParams("skyStand", 3));
+    world.run(10);
+    const s = world.snapshot(0, { junctions: false, field: false });
+    const n = s.metamerCount;
+    expect(n).toBeGreaterThan(100);
+    expect(s.zOrder).toHaveLength(n);
+    const seen = new Uint8Array(n);
+    for (let k = 0; k < n; k++) seen[s.zOrder[k] as number]++;
+    expect(seen.every((c) => c === 1)).toBe(true);
+    for (let k = 1; k < n; k++) {
+      const [a, b] = [s.zOrder[k - 1] as number, s.zOrder[k] as number];
+      const [za, zb] = [s.z0[a] as number, s.z0[b] as number];
+      expect(za > zb || (za === zb && a < b)).toBe(true);
+    }
+  });
+
   it("frees dead trees' rows without changing any live tree", () => {
     const kept = new World(presetParams("skyStand"));
     const freed = new World(presetParams("skyStand"));

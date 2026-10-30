@@ -414,6 +414,12 @@ export interface Params {
      * locally. 0 or absent: off, only parents in the world seed it (calibrate).
      */
     rain?: number;
+    /**
+     * The band of depth, in cells, that seedlings establish in, centred on the slab's middle (I3):
+     * the garden plants one row of trees, and its recruits stay about a crown's depth around it.
+     * Local seeds landing outside it are lost; seed rain lands inside it. Absent: anywhere.
+     */
+    band?: number;
   };
 
   /** R6 Short shoots (spec §R6, ADR 0006). Off = baseline: every live bud is one unit of leaf area. */

@@ -2,6 +2,23 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-30: I3 steps 1–2: the picture in depth, the plate, the garden's planting
+
+- **User:** [the I3 plan](plans/2026-10-30-i3.md) steps 1–2, measured before and after beside its §1 ([note](experiments/2026-10-30-i3.md)); stop on any reading outside a step's range. Three stops, each resolved by the user.
+- **Step 1:**
+  - the snapshot gains `zOrder` (rows far to near, sorted in Rust) and drops `ref*` (8% fewer bytes);
+  - the scene cuts the order into 64 depth slices, wood then leaves in each; WebGL2 draws ranges of its batches by re-pointing the instance attributes, Canvas 2D 8 slices;
+  - leaves are foreshortened by their shoot's in-plane share;
+  - ADR 0008's pseudo-depth is removed, with the `depth` and `lite` view options and adaptive quality's last level.
+- **Stop 1: the frame bench could not judge the hitch.** Under SwiftShader the GL shares the CPU with the worker, so the same build's worker time swung 40% at idle. Interleaved runs (ABAB, 12 of them) were recorded with that caveat, and the user moved acceptance to a Node instrument (`scene.bench.ts`, per snapshot).
+- **Stop 2: the first leaf layout took back 4 ms.** Its z-order walk scattered its reads. One pass (row-order layout, one counting sort by slice, scattered writes) brought the per-snapshot work 55–60% under "before" (forest at 40: 53 → 21 ms). The per-frame Scene work is +0.5–0.6 ms, accepted as the slices' price.
+- **Step 2:** `plateWidth` (now `src/web/plate.ts`) is capped at 160; the "world" frame's floor is `Scene.frameHeight` (65 cells); recruits scale with area.
+- **Stop 3: the plan's premise was wrong.** Recruits do not dominate a phone plate at 40; the planted trees do. The cut was 2% at 40 and 11–12% at 100.
+- **Phone check (user):** no visible lag in the garden; the lab stutters from season ≈ 75 (the full snapshot); leaves stable; tree shapes good, the first time on the phone. But too many trees: three rows projected 21 crowns onto one strip.
+- **User's decision:** the garden plants one row (`Planting`; spacing 28 from the user's readings), recruits per cell of width, kept to O4's new `band` option. The calibration's forest and the woods keep per-area planting. `garden.html` takes `?seed=`, `?renderer=canvas`, `?rows=`, `?spacing=` and `?recruits=`. ADR 0024's view line was amended (no *added* foreshortening cue), and ADR 0025 gained the planting line.
+- **Phone `?bench`** (seed 10, 40 seasons): draw p95 6.3 ms, frame p95 16.8 ms, worker 50.5 ms, 10.2k metamers.
+- **Goldens:** unchanged (`bench --compare` against 422d704 after each step).
+
 ## 2026-10-30: C1 round 3, form steps 3–5: closure, the τ 0.1 row, 20-seed evidence
 
 - **User:** steps 3 and 4 of [the form plan](plans/2026-10-30-form.md), stopping before step 4's knobs with step 3's readings; then step 5 with the user's criteria ([note](experiments/2026-10-30-c1-round3-form.md), [ADR 0027](decisions/0027-girth-in-3d.md)'s evidence section).

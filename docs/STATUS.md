@@ -1,6 +1,6 @@
 # Status
 
-_Last updated: 2026-10-30 (C1 round 3: form steps 1–2, girth in 3D and the crown base by leaf area)_
+_Last updated: 2026-10-30 (C1 round 3: form steps 3–5, closure and 20-seed evidence)_
 
 **3D port** on the branch `3d-port` (work branches open PRs into it). ADR 0024–0027 accepted. The live site stays on 0.14.0 (2D) until the bar below is met.
 
@@ -8,32 +8,33 @@ _Last updated: 2026-10-30 (C1 round 3: form steps 1–2, girth in 3D and the cro
 
 ## Works
 - **Core** (`rust/core`): C1–C6, R1–R6, O2, O4 in 3D; slab sweep in fixed lanes; checkpoints v2.
-- **Girth (ADR 0027):**
-  - scars record the pipe radius; r0 0.0025 and m_w 64 (÷ 8, × 64); σ_break 7000; windthrow's ramp from H/D 80;
-  - `forest` at 300 (3 seeds): H/D 70, height level at 77, 68k metamers per seed, windthrow 0–2 of 90;
-  - its lone tree: H/D 40–42, level at 87–89.
-- **Crown base by leaf area:** `leafBase`, `leafCrownRatio` (metrics 37 → 39): stand 0.44–0.64, lone tree 0.71–0.81.
+- **Girth (ADR 0027):** pipe-radius scars; r0 0.0025, m_w 64; σ_break 7000; windthrow from H/D 80.
+- **`forest`, 20-seed evidence (τ 0, 300 seasons):**
+  - floor at 100 in 2–10%: 20 of 20 (median 7.9%);
+  - stand H/D at 300 in 60–80: 19 of 20 (median 70.6);
+  - crown base (stand `leafCrownRatio` below the lone tree's at 150 and 300): 20 of 20;
+  - plateau (the same trees' gain over 250–300 < 2, tallest < 180): 17 of 20.
 - **Garden** (`mountGarden`) runs the 3D core through the 2D renderer, growing from seed.
-- **Headless:** `npm run sim`, `npm run bench`, `npm run evidence:2d`; round 3's harness in `docs/experiments/code/2026-10-30-form/`.
+- **Headless:** `npm run sim` (`--light` writes `light.csv` with `lad`, `ground.csv`, `buds.csv`), `npm run bench`; round 3's harness in `docs/experiments/code/2026-10-30-form/`.
 
 ## Next
-1. **The user** checks the look on the phone from PR's branch `claude/form-round3`.
-2. **Form step 3** ([plan](plans/2026-10-30-form.md) §4): canopy closure. `light.csv` gains `lad`, plus a `buds.csv`; `closure.py`, `budget.py`. Say whether R1 starvation or O4's background mortality opened the gaps: 35–36 of 90 planted trees die of O4 by 300, windthrow 0–2. Carry in why the stand's leaf crown ratio rises from 150 to 300 at τ 0.
-3. **Form step 4:** floor (τ 0) and crown lift with gap filling (C4 ξ, R4's release); planting density last. Then step 5, 20 seeds; step 6, apply.
-4. **I3:** depth-ordered wood and leaves (the mixed wood's green wall); plate cap ≈ 200; framing; 3D first paint; re-time the phone.
-5. **Species (track 3):** the 3D re-fit. Beech, hornbeam and now the fitted oak run to the top (oak pinned at 200 by season 150).
+1. **The user:** the τ 0.1 reading. Floor at 100/150/300: τ 0 7.7/9.9/12.2%, τ 0.1 11.6/13.9/14.8%, τ 0.2 14.5/15.8/14.8%. Seedlings to 20 cells by 300: 1, 79, 127. No preset's τ changed.
+2. **I3:** depth-ordered wood and leaves (the mixed wood's green wall); plate cap ≈ 200; framing under the 200 top; 3D first paint; drop unread snapshot columns; re-time the phone (`forest` 68k metamers per seed, down from 105k).
+3. **Species (track 3):** the 3D re-fit. First make `m27_adopt.py` reproduce `flora-fitted.ts` exactly. Beech, hornbeam and the fitted oak run to the top.
+4. **Then:** C3–C6 as hold-outs. C5 owns regeneration under the canopy (a floor that holds to 300) and storm severity (the worst storms take 10–40%). ADRs (first paint, R5's default); release; the site's PR.
 
 ## Known issues
-- **Uncalibrated:** floor 12–15% at τ 0 and τ 0.2; the stand's leaf crown ratio rises over time; storms' worst 10–40% loss (C5's).
-- **`flora-fitted.ts` ≠ `m27_adopt.py`'s output:** the adopt script emits phyllotaxis and E, which `flora.ts`'s `in3d` overlay applies at runtime. Make the script reproduce the file before the re-fit; this round hand-edited r0, m_w and σ_break.
+- **Regeneration:** `forest` (a light-demanding monoculture) cannot regenerate under its own floor at τ 0. Its floor rises from 7.9% at 100 to 10.4% at 150 and 9.7–15.8% at 300 as the stand ages.
+- **τ 0.2 (the garden's look):** floor ≈ 15% at every season; the faces add 3–7 points.
+- **`flora-fitted.ts` ≠ `m27_adopt.py`'s output** (`flora.ts`'s `in3d` overlay applies phyllotaxis and E at runtime); r0, m_w and σ_break were hand-edited.
 - **The garden's frame** fits half the 200 top (`WORLD_HEIGHT` 130 is stale): young gardens draw small.
 - **The preview deploy** (`preview-3d`) has the old `i2.ts`: redeploy only when asked.
 
 ## Notes for the next session
-- **Node:** this machine has 24. **Rust:** put `~/.cargo/bin` on PATH; wasm-bindgen-cli 0.2.129.
-- **`npm run golden:update` uses the built WASM:** run `npm run build:wasm` first, or it writes stale hashes.
-- **Species trees ignore world patches:** use `--species-patch` (`oakOpen`, the woods). `forest` plants no species.
-- **Bash reserves `GROUPS`:** the readers take `RUN_GROUPS`.
+- **Rust:** put `~/.cargo/bin` on PATH; wasm-bindgen-cli 0.2.129. **Node** 24 here.
+- **`npm run golden:update` uses the built WASM:** run `npm run build:wasm` first.
+- **Species trees ignore world patches:** use `--species-patch`. `forest` plants no species.
+- **A `forest` run writes ≈ 175 MB** (`metrics.csv` has every seedling). Bash reserves `GROUPS`: the readers take `RUN_GROUPS`.
 - **Full check under 12 parallel runs** times out three vitest files; rerun when idle.
 - **Site deploys:** a push to `main` is production; never merge `preview-3d`; tag pushes are the user's.
 - **Evidence tests** fail a world past 1.5M metamers (`METAMER_CAP`); free each world in loops.

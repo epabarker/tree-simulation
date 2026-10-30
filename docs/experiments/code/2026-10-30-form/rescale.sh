@@ -6,7 +6,7 @@
 #   base: the old girth scale (r0 0.02, m_w 1);
 #   k8:   the new defaults (r0 0.0025, m_w 64).
 # Each at τ 0.2 (the presets' faces) and τ 0 (faces [0, 0]), seeds 1–3, 300 seasons, snapshots
-# 150, 200, 300 with --light.
+# 150, 200, 300 with --light (SNAPS=100,150,200 adds 100: step 3).
 # forest/: `forest`.
 # lone/:   the stand's own lone tree (round 2's control, code/2026-11-01-c1-round2/height.sh):
 #   `forest`'s params, one tree on a 210-cell world with open sides and the woods' top, O4 off.
@@ -29,4 +29,4 @@ for v in base k8; do for t in t02 t0; do for s in 1 2 3; do
     [ -z "${ONLY:-}" ] || [ "$ONLY" = $g ] && echo "$g/$v-$t-s$s"
   done
 done; done; done | xargs -P "$J" -I{} sh -c \
-  "[ -f $out/{}/metrics.csv ] || $bin --preset forest --seasons 300 --snapshots 150,200 --light --params $out/{}.json --quiet --out $out/{}"
+  "[ -f $out/{}/metrics.csv ] || $bin --preset forest --seasons 300 --snapshots ${SNAPS:-150,200} --light --params $out/{}.json --quiet --out $out/{}"

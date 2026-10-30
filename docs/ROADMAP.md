@@ -101,7 +101,7 @@ No published value exists for these. Calibrate on *patterns*: several weak targe
 | `c5.T` shedding threshold | 0.1 | Light-demanding ≈ 0.1, shade-tolerant 0.02–0.05 (sapling survival at 10–15% vs 1–2% of full light). M4: ≥ 0.2 over-prunes | Species values at M7 |
 | `c5.Trel`, `c5.topQuantile` (+ floor `c5.T`) | sky presets 0.12, 0.9, T = 0.03 | Canopy unchanged, overtopped tree keeps 4× deeper crown ([M6d](experiments/2026-10-27-m6d-shedding-short-shoots.md)) | Settled for sky presets |
 | `r6.qMin`, `r6.leafArea` | 0.1, 2 (sky presets) | Short-shoot leaf share 0.50 stand, 0.58 open (target > 0.5) | Settled for sky presets |
-| `c6.r0` tip radius | 0.0025 cells (ADR 0027) | H/D stand-grown 60–80 (Watt et al. 2023). In 2D, 0.02 gave stand 62–72, open-grown 41–43. In 3D with pipe-radius scars, 0.0025 gives `forest` 70 and its lone tree 40–42 at 300 ([C1 round 3](experiments/2026-10-30-c1-round3-form.md)). Species r0 ÷ 8 pending the 3D re-fit | Re-opened: 3 seeds; 20-seed evidence at step 5 |
+| `c6.r0` tip radius | 0.0025 cells (ADR 0027) | H/D stand-grown 60–80 (Watt et al. 2023). In 2D, 0.02 gave stand 62–72, open-grown 41–43. In 3D with pipe-radius scars, 0.0025 gives `forest` 70 and its lone tree 40–42 at 300 ([C1 round 3](experiments/2026-10-30-c1-round3-form.md)). Species r0 ÷ 8 pending the 3D re-fit | 20-seed evidence: stand H/D at 300 in 60–80 in 19 of 20 (median 70.6). Species r0 pending the re-fit |
 | `c4` weights `wd, xi, eta, epsilon, sigma` | 1, 0.3, 0.15, 0.5, 20° | Qualitative only (Palubicki Fig. 12). Strong upward η (0.4) can starve a seedling whose buds bunch up. With R2, A_set and η come per pa ([M7](experiments/2026-10-27-m7-species.md): plagiotropic tiers need η ≈ 2 against ξ's upward pull) | Species rows qualitative; fit on Yun et al. 2025 branch angles later |
 | Species rows (`r2.levels`, k_ext, T, T_rel, r0) | see `presets.ts` | §9 silhouettes; conifer stand H/D 78 at r0 0.035 (Watt et al. 2023); birch stand crown lift 0.80 vs conifer 0.64 | Qualitative (M7) |
 | `r1.mw`, `r1.mf` | 64 (ADR 0027: m_w·r0² kept), 0.06 | Stem maintenance 5–13% of assimilation (Ryan et al. 1995): measured ≈ 10%, total M/P 19% at season 50. m_f sets Q_c = m_f/α ≈ 0.02; a species knob for shade tolerance | Settled for sky presets ([M8](experiments/2026-10-27-m8-carbon.md)) |
@@ -150,7 +150,11 @@ No published value exists for these. Calibrate on *patterns*: several weak targe
 - scars record the pipe radius, and r0 ÷ 8 with m_w × 64: stand H/D 70, lone tree 40–42, height level at 77 and 87–89;
 - σ_break 7000 and windthrow's ramp from H/D 80, after storms broke whole crowns at 4500;
 - the crown ratio by leaf area (`leafCrownRatio`) separates stand (0.44–0.64) from lone tree (0.71–0.81);
-- next: steps 3–4, closure and the floor at τ 0; the fitted oak now runs to the top as well (track 3).
+- the fitted oak now runs to the top as well (track 3).
+
+**C1 round 3, form steps 3–5** (same note):
+- the stand closes by 100 and then ages at O4's background rate, with no regeneration at τ 0; crowns release rather than widen;
+- 20-seed evidence at τ 0: floor at 100 20 of 20, H/D at 300 19, crown base 20, plateau (same trees) 17.
 - Scheduled since the M12 review:
   - Embedding in the personal website → M14 (ADR 0014).
   - **R1, R3, R4 and R5 for the species presets** (M8–M10 follow-ups: under R1 they reach their 160-cell top or grow far too slender; calibrate m_f as shade tolerance and L_h as species height) → M20.

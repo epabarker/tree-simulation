@@ -2,6 +2,8 @@
 
 Per run and snapshot season (45, 100), over the planted trees (the run's first `trees`):
 - floor: mean light on the ground row (light.csv, the field averaged over the slab's depth), of open sky;
+- floor under: the same under the crowns, ground columns with LAI ≥ 1 above them (ground.csv,
+  round 2), and crown cover, the share of the ground they make up;
 - height, crown ratio (crown length / height: 1 − bole/height), crown width (x) and depth (z) over
   height, H/D: medians;
 - metamers: the world's live metamers;
@@ -25,6 +27,7 @@ from collections import defaultdict
 from statistics import mean, median
 
 LEAF_AGE = 4
+SEASONS = tuple(int(x) for x in os.environ.get("SEASONS", "45,100").split(","))
 
 
 def rows(path):
@@ -42,6 +45,18 @@ def measure(run):
         for r in rows(os.path.join(run, "light.csv")):
             if r["row"] == "0":
                 floor[int(float(r["season"]))].append(1 - float(r["shade"]))
+    # The floor under the crowns (C1 round 2): ground columns with at least one unit of leaf area
+    # above them (ground.csv, written by the CLI's --light since round 2).
+    under = defaultdict(list)
+    covered = defaultdict(lambda: [0, 0])
+    if os.path.exists(os.path.join(run, "ground.csv")):
+        for r in rows(os.path.join(run, "ground.csv")):
+            s_ = int(float(r["season"]))
+            lai = float(r["lai"])
+            covered[s_][1] += 1
+            if lai >= 1:
+                under[s_].append(float(r["q"]))
+                covered[s_][0] += 1
     metrics = defaultdict(list)
     live = defaultdict(int)
     for r in rows(os.path.join(run, "metrics.csv")):
@@ -90,6 +105,8 @@ def measure(run):
             own += not rival
         out[s] = {
             "floor": round(mean(floor[s]), 4) if floor.get(s) else None,
+            "floorUnder": round(mean(under[s]), 4) if under.get(s) else None,
+            "crownCover": round(covered[s][0] / covered[s][1], 3) if covered[s][1] else None,
             "height": round(f("height"), 1),
             "crownRatio": round(f("crownRatio"), 2),
             "widthOverH": round(median(float(m["crownWidth"]) / float(m["height"]) for m in ms), 2),
@@ -112,15 +129,16 @@ def main(d):
         if os.path.isdir(run) and os.path.exists(os.path.join(run, "metamers.csv")):
             groups[name.rsplit("-s", 1)[0]].append(measure(run))
     for v, runs in groups.items():
-        for s in (45, 100):
+        for s in SEASONS:
             per = [r[s] for r in runs if s in r]
             if not per:
                 continue
             keys = per[0].keys()
-            agg = {
-                k: [p[k] for p in per] if k in ("metamers",) else round(mean(p[k] for p in per if p[k] is not None), 3)
-                for k in keys
-            }
+            def avg(k):
+                vals = [p[k] for p in per if p[k] is not None]
+                return round(mean(vals), 3) if vals else None
+
+            agg = {k: [p[k] for p in per] if k == "metamers" else avg(k) for k in keys}
             print(json.dumps({"variant": v, "season": s, "seeds": len(per), **agg}))
 
 

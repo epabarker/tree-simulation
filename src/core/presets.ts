@@ -4,7 +4,13 @@
  */
 
 import { FLORA, type FloraName } from "./flora.ts";
-import { defaultParams, mergeParams, type Params, type ParamsPatch } from "./params.ts";
+import {
+  defaultParams,
+  mergeParams,
+  type Params,
+  type ParamsPatch,
+  type TreeSpec,
+} from "./params.ts";
 
 export interface Preset {
   label: string;
@@ -82,18 +88,44 @@ const FOREST = {
 } satisfies ParamsPatch;
 
 /**
- * M19: the woodland the calibrated species (flora.ts) grow in, the forest's principles with R5
- * sensing its neighbours' shade rather than its own, so lone trees grow squat and stands slender.
+ * M19: the woodland the calibrated species (flora.ts) grow in, the forest's principles (R5 senses
+ * its neighbours' shade, as every preset's has since C1 round 2: lone trees grow squat).
  * Storms are the forest's: harder ones snapped the young woodland's tops (the succession note).
  */
 const WOODLAND = {
   ...FOREST,
-  r5: { enabled: true, signal: "neighbours" },
   species: FLORA,
 } satisfies ParamsPatch;
 
-/** A world of one calibrated species: `x` positions, all of `name`. */
-const flora = (name: FloraName, xs: number[]) => xs.map((x) => ({ x, species: name }));
+/** Spacing of a stand's trees, cells: the 2D stands' one tree every 21 cells, now per area. */
+const SPACING = 21;
+
+/**
+ * A stand that fills the slab's depth (C1 round 2; the user, 2026-10-31): trees per area, not in
+ * one row down the slab's middle. One row's `xs` is repeated in rows every ≈ SPACING cells across
+ * the depth, each row shifted a fraction of the spacing along x so the planting is staggered
+ * (wrapped on `width`). `spec(i, row)` gives tree i of a row its species. A lone tree and the
+ * hedgerow (one row between open faces) keep a single row.
+ */
+export function perArea(
+  xs: number[],
+  width: number,
+  spec: (i: number, row: number) => Omit<TreeSpec, "x" | "z"> = () => ({}),
+): TreeSpec[] {
+  const depth = defaultParams.world.depth ?? 64;
+  const rows = Math.max(1, Math.round(depth / SPACING));
+  return Array.from({ length: rows }, (_, r) =>
+    xs.map((x, i) => ({
+      ...spec(i, r),
+      x: (x + (r * SPACING) / rows) % width,
+      z: (depth * (r + 0.5)) / rows,
+    })),
+  ).flat();
+}
+
+/** A stand of one calibrated species, `xs` the positions of one row (perArea). */
+const flora = (name: FloraName, xs: number[], width: number) =>
+  perArea(xs, width, () => ({ species: name }));
 
 /**
  * The woods' world top, cells. In 3D the trees' height has not levelled off by season 150 (C1), and
@@ -103,7 +135,9 @@ const flora = (name: FloraName, xs: number[]) => xs.map((x) => ({ x, species: na
  */
 const TOP = 200;
 
-const RING: Params["world"] = { width: 210, height: TOP, walls: [], sides: "periodic" };
+const RING = { width: 210, height: TOP, walls: [], sides: "periodic" } satisfies Params["world"];
+/** One row of the ring's stand: a tree every 21 cells. */
+const RING_X = [10, 31, 52, 73, 94, 115, 136, 157, 178, 199];
 
 /**
  * The mixed wood's planting (M25), one tree every 21 cells: three birch and a goat willow
@@ -311,7 +345,7 @@ export const presets = {
       "Periodic sides and stand dynamics: seeds land, seedlings wait in the shade, and gaps refill when canopy trees die (O4).",
     patch: {
       world: RING,
-      trees: [10, 31, 52, 73, 94, 115, 136, 157, 178, 199].map((x) => ({ x })),
+      trees: perArea(RING_X, RING.width),
       ...FOREST,
     },
   },
@@ -321,7 +355,7 @@ export const presets = {
       "The forest grows around a solid region that casts no shade, as it grows around a page's text (ADR 0015).",
     patch: {
       world: { ...RING, obstacles: [{ x: 70, y: 32, width: 70, height: 22 }] },
-      trees: [10, 31, 52, 73, 94, 115, 136, 157, 178, 199].map((x) => ({ x })),
+      trees: perArea(RING_X, RING.width),
       ...FOREST,
     },
   },
@@ -332,7 +366,7 @@ export const presets = {
     // A specimen: no seedlings around it, and no storms, which throw tall trees by height alone.
     patch: {
       world: { width: 160, height: 120, walls: [] },
-      trees: flora("oak", [80]),
+      trees: [{ x: 80, species: "oak" }],
       ...WOODLAND,
       o2: { stormP: 0 },
       o4: { enabled: false },
@@ -348,6 +382,7 @@ export const presets = {
       trees: flora(
         "birch",
         STAND_X.map((t) => t.x),
+        230,
       ),
       ...WOODLAND,
     },
@@ -360,6 +395,7 @@ export const presets = {
       trees: flora(
         "oak",
         STAND_X.map((t) => t.x),
+        230,
       ),
       ...WOODLAND,
     },
@@ -373,6 +409,7 @@ export const presets = {
       trees: flora(
         "beech",
         STAND_X.map((t) => t.x),
+        230,
       ),
       ...WOODLAND,
     },
@@ -386,6 +423,7 @@ export const presets = {
       trees: flora(
         "fir",
         STAND_X.map((t) => t.x),
+        230,
       ),
       ...WOODLAND,
     },
@@ -400,6 +438,7 @@ export const presets = {
       trees: flora(
         "pine",
         STAND_X.map((t) => t.x),
+        230,
       ),
       ...WOODLAND,
     },
@@ -410,9 +449,9 @@ export const presets = {
       "Nine native species around a ring: birch and goat willow pioneer, rowan and field maple fill gaps, holly and hornbeam wait beneath, and beech and oak take the canopy.",
     patch: {
       world: RING,
-      trees: [10, 31, 52, 73, 94, 115, 136, 157, 178, 199].map((x, i) => ({
-        x,
-        species: MIXED[i] as string,
+      // Each row turns the mix by three, so no two of a kind stand side by side in depth either.
+      trees: perArea(RING_X, RING.width, (i, r) => ({
+        species: MIXED[(i + 3 * r) % MIXED.length] as string,
       })),
       ...WOODLAND,
     },
@@ -423,10 +462,10 @@ export const presets = {
       "Birch pioneers with a few oak and beech among them: beech grows up in their shade and takes the canopy, and storms reopen gaps for birch and oak.",
     patch: {
       world: RING,
-      trees: [10, 31, 52, 73, 94, 115, 136, 157, 178, 199].map((x, i) => ({
-        x,
-        species: i === 2 || i === 6 ? "oak" : i === 4 || i === 8 ? "beech" : "birch",
-      })),
+      trees: perArea(RING_X, RING.width, (i, r) => {
+        const k = (i + 3 * r) % 10;
+        return { species: k === 2 || k === 6 ? "oak" : k === 4 || k === 8 ? "beech" : "birch" };
+      }),
       ...WOODLAND,
     },
   },
@@ -466,9 +505,9 @@ export function forestParams(width = 210, seed?: number): Params {
   // A phone in portrait gets a narrow ring of two or three trees, drawn large (D1).
   const W = Math.round(Math.min(520, Math.max(54, width)));
   const n = Math.max(2, Math.round(W / 21));
-  const trees = Array.from({ length: n }, (_, k) => ({
-    x: ((k + 0.5) * W) / n,
-    species: MIXED[(k + base.seed) % MIXED.length] as string,
+  const xs = Array.from({ length: n }, (_, k) => ((k + 0.5) * W) / n);
+  const trees = perArea(xs, W, (k, r) => ({
+    species: MIXED[(k + 3 * r + base.seed) % MIXED.length] as string,
   }));
   return mergeParams(base, { world: { ...base.world, width: W }, trees });
 }

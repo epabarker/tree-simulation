@@ -2,6 +2,26 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-01: C1 round 2: height first, R5 on neighbours, the stand in depth
+
+- **User** (on round 1): height first, through R1, to 300 seasons; R5 on neighbours everywhere; the interior's stand planted per area, with the floor measured under the crowns; the crown base checked before adding anything. Accepted round 1, the pre-C1 fixes and ADR 0026 (PR #22).
+- **Height** ([note](experiments/2026-11-01-c1-round2.md)):
+  - with R5 on neighbours, R1 as it stands levels `forest` off at 82–83 and the lone tree at 86–87, flat from season 120 to 300 in every seed;
+  - every L_h, m_w and m_f variant also levels off, lower;
+  - **surprise: R5's own-shade signal, not R1, made round 1's poles climb.**
+  - The species' woods do not all level off: the beech wood runs to the top (1.3–2.6M metamers), and the mixed wood's beech and hornbeam reach 196–206. Beech's own L_h 30 slows it but does not stop it. Proposed: the species' R1 brought forward (C7–C8).
+- **Applied (goldens change):**
+  - `r5.signal` defaults to `"neighbours"` (`"light"` is the ablation; its unit test asks for it);
+  - `perArea` plants `forest`, `clearing`, the woods and `forestParams` in three staggered rows across the depth (30 trees on the ring, 9 on the phone's plate);
+  - goldens updated: skyTree, skyStand, obliqueSun, weeping, troll, thinning (R5), and forest and mixedWood (R5 and the planting). The rest are unchanged.
+- **Tools:** the CLI's `--light` writes `ground.csv` (the ground's light and the LAI above it), and `metamers.csv` gains `pSum` and `mSum` (each branch's R1 production and maintenance, from R1 on a copy). `c1.py` reads the floor under the crowns.
+- **The table in depth:**
+  - floor 16.7%, the same under the crowns as in the gaps: the slab's sky is all oblique, so the floor is the canopy's mean transmission;
+  - Q_ss 0.03 gives 11%, and empties the upper canopy;
+  - the crown base never lifts. Neither C5 threshold holds it: the lower branches get 0.37 light per metamer (T_rel·Q_top ≈ 0.12) and produce 3.9× their maintenance;
+  - H/D 6–18.
+- **Not proposed:** any R1, Q_ss, T_rel, k_ext or τ change. Round 3 asks what limits the stand's leaf area, and whether the sky needs a zenith band.
+
 ## 2026-10-31: Before C1, and C1's first round
 
 - **User:** after V and the phone's timings (no stand over 250 ms; hedgerow 219 ms in one lane, interior 145, garden 160 cells 163, 66 cells 67), ADR 0025 accepted. Asked for a pre-C1 checklist (canvas fallback, memory budget, the backlog's harness, the phone, threads, the world's top), then C1.

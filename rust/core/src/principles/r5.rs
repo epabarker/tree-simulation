@@ -118,7 +118,11 @@ mod tests {
 
     #[test]
     fn lengthens_a_shaded_buds_internodes() {
-        let p = Params::from_json(&preset("default", r#"{"r5":{"enabled":true,"eS":0.5}}"#));
+        // The shade rule itself (s = 1 − Q/C): the `light` signal, with no neighbours to scale it.
+        let p = Params::from_json(&preset(
+            "default",
+            r#"{"r5":{"enabled":true,"eS":0.5,"signal":"light"}}"#,
+        ));
         let mut t = Tree::new(0, 10.0, 0.5);
         plant_seedling(&mut t, &p, 0.0, 0.0);
         t.ensure_scratch();

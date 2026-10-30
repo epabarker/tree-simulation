@@ -83,7 +83,7 @@ Code is in `rust/core/src/` (I1; the TypeScript files these rows named until the
 | R1 | Carbon balance (ADR 0010, 0021) | §R1 | `r1.enabled`; `r1.Lh` = 0 and `r1.fRep` = 0 switch the plateau causes; `r1.hydraulic` (`exp`, `hyperbolic`, ADR 0021); `r1.shed` (`carbon`, `c5`) | `principles/r1.rs` (shedding test in `c5.rs`, deaths in `season.rs` Phase 3) | unit tests, `carbon.test.ts`, `ablation.test.ts` | R1 panel folder; metrics `production`, `maintenance`, `reserve`, `reproduction`, `starved` | ✅ M8; hyperbolic discount M27 |
 | R3 | Mechanics (ADR 0011) | §R3 | `r3.enabled`; `r3.posture` off = §8 "sag without posture"; `r3.sag` (`increment`, `creep`); `r3.girthGain` 0 = no stress wood | `principles/r3.rs` (pre-girth radius in `season.rs`; stress wood out of the pipe sums in `c6.rs`; `PaLevel.postureSetPoint`) | unit tests, `mechanics.test.ts` | R3 panel folder; colour: stress σ/σ_target; `weeping` and `troll` presets | ✅ M9 (breakage deferred) |
 | R4 | Dormancy, release, reiteration, bud bank (ADR 0012) | §R4 | `r4.enabled`; `r4.bank`; `r4.qRel` 99 = sugar route only | `principles/r4.rs` (bud fate in `season.rs` `grow_buds`; bank in `c5.rs` `remove_branches`; `paShift` in `c1.rs`, `c3.rs`, `r3.rs`) | unit tests, `release.test.ts`, `ablation.test.ts` | R4 panel folder; metrics `released`, `epicormic`, `aborted` | ✅ M10 |
-| R5 | Shade avoidance (ADR 0012) | §R5 | `r5.enabled` | `principles/r5.rs` (node shade in `season.rs` `sample_nodes`; λ in `c3.rs`) | unit tests, `release.test.ts` | R5 panel folder | ✅ M10 (no far-red field) |
+| R5 | Shade avoidance (ADR 0012) | §R5 | `r5.enabled`, `r5.signal` (`neighbours` by default since C1 round 2; `light` = own shade, the ablation) | `principles/r5.rs` (node shade in `season.rs` `sample_nodes`; λ in `c3.rs`) | unit tests, `release.test.ts` | R5 panel folder | ✅ M10 (no far-red field) |
 | O4 | Stand dynamics (ADR 0013) | §O4 | `o4.enabled`; needs `r1.fRep` > 0 | `principles/o4.rs` (seed pool in `r1.rs`; Phase 3 in `season.rs`); periodic sides in `light/sky_sweep.rs` | unit tests, `forest.test.ts`, `flora.test.ts` (seed rain into a clearing) | O4 panel folder (with seed rain); `forest`, `thinning` presets; metrics `seeds`, `woodVolume`, `rootX` | ✅ M11; seed rain `o4.rain` M25 (ADR 0018) |
 | O2 | Abrasion, crown shyness (ADR 0013) | §O2 | `o2.enabled` (off in every preset) | `principles/o2.rs` (owner grid in `season.rs`) | unit tests | O2 panel folder; metric `abraded` | ✅ M11 (no girth bonus, no wind events) |
 | O1, O3 | Optional | §O1, §O3 | — | — | — | — | ⏳ not planned |
@@ -135,7 +135,14 @@ No published value exists for these. Calibrate on *patterns*: several weak targe
 - the floor is held by R6's Q_ss, then by the gaps between crowns;
 - the crown base does not lift;
 - R5's own-shade signal makes 3D crowns poles;
-- the candidate (R5 on neighbours, Q_ss 0.03) awaits the user.
+- the user then chose R5 on neighbours (Q_ss unchanged).
+
+**C1 round 2** ([note](experiments/2026-11-01-c1-round2.md)):
+- R5 senses neighbours by default; the interior's stands are planted per area;
+- `forest` and the lone tree level off (82, 87) with R1 unchanged;
+- the beech wood and the mixed wood's beech and hornbeam still run to the top (species R1);
+- the floor stays at 17% even under the crowns (an all-oblique sky);
+- the crown base is not held by C5: the lower crown is well lit.
 - Scheduled since the M12 review:
   - Embedding in the personal website → M14 (ADR 0014).
   - **R1, R3, R4 and R5 for the species presets** (M8–M10 follow-ups: under R1 they reach their 160-cell top or grow far too slender; calibrate m_f as shade tolerance and L_h as species height) → M20.

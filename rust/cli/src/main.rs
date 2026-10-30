@@ -9,7 +9,8 @@
 //!   treesim --preset succession --checkpoint-at 60 --seasons 60 --out runs/c
 //!
 //! Writes to --out: run.json, metrics.csv, metamers.csv, form.csv, hash.txt; with --light,
-//! light.csv; with --checkpoint-at N, checkpoint-N.bin.gz. Presets come from rust/presets.json
+//! light.csv and ground.csv (the ground's light and the leaf area above it, per x and z); with
+//! --checkpoint-at N, checkpoint-N.bin.gz. Presets come from rust/presets.json
 //! (exported from the TypeScript presets). `npm run sim` (cli/run.ts) builds and runs it.
 
 use std::collections::HashSet;
@@ -246,7 +247,7 @@ fn main() {
 
     let mut metrics_lines = vec![format!("season,{}", METRIC_COLUMNS.join(","))];
     let mut metamer_lines = vec![
-        "season,tree,birthId,parentBirthId,order,axis,x0,y0,x1,y1,length,angle,radius,qSum,nSum,vIn,birthSeason,stressWood,z0,z1,hx,hy,hz"
+        "season,tree,birthId,parentBirthId,order,axis,x0,y0,x1,y1,length,angle,radius,qSum,nSum,vIn,birthSeason,stressWood,z0,z1,hx,hy,hz,pSum,mSum"
             .to_string(),
     ];
     let profile: Vec<String> = (0..PROFILE_BANDS).map(|k| format!("p{k}")).collect();
@@ -256,6 +257,7 @@ fn main() {
         profile.join(",")
     )];
     let mut light_lines = vec!["season,col,row,shade".to_string()];
+    let mut ground_lines = vec!["season,col,layer,q,lai".to_string()];
 
     let mut world = World::new(params);
     if a.bench {
@@ -298,6 +300,27 @@ fn main() {
             std::fs::write(out.join(name), gz.finish().unwrap()).unwrap();
         }
         if a.light && snap(season) {
+            // The ground in (x, z): its light (of C) and the leaf area in the column above it, so
+            // the floor can be read under the crowns as well as across the whole slab (C1).
+            if let tree_core::light::Light::Slab(slab) = &world.light {
+                let (w, h, d) = slab.sweep.dims();
+                let lad = slab.sweep.lad();
+                let c = world.params().c2.c;
+                for z in 0..d {
+                    for x in 0..w {
+                        let lai: f64 = (0..h).map(|y| lad[(y * d + z) * w + x] as f64).sum();
+                        let (q, _) = world.light.sample(x as f64 + 0.5, 0.5, z as f64 + 0.5);
+                        ground_lines.push(format!(
+                            "{},{},{},{},{}",
+                            num(season),
+                            x,
+                            z,
+                            num(q / c),
+                            num(lai)
+                        ));
+                    }
+                }
+            }
             let w = world.light.width() as usize;
             if let Some(field) = world.light.field(world.params().c2.c) {
                 for (c, &v) in field.iter().enumerate() {
@@ -320,6 +343,10 @@ fn main() {
                 if !tree.alive {
                     continue;
                 }
+                // Each branch's production and maintenance (R1, C5's carbon shedding), from R1's
+                // own pass on a copy of the tree as it stands now: the world is not touched.
+                let mut copy = tree.clone();
+                tree_core::principles::r1::carbon_balance(&mut copy, world.params_of(tree));
                 let c = &tree.m;
                 for i in 0..c.len() {
                     let p = c.parent[i];
@@ -353,6 +380,8 @@ fn main() {
                         c.hx[i],
                         c.hy[i],
                         c.hz[i],
+                        copy.p_sum[i],
+                        copy.m_sum[i],
                     ];
                     let cells: Vec<String> = row.iter().map(|&v| num(v)).collect();
                     metamer_lines.push(cells.join(","));
@@ -396,6 +425,7 @@ fn main() {
     write("hash.txt", format!("{hash}\n"));
     if a.light {
         write("light.csv", format!("{}\n", light_lines.join("\n")));
+        write("ground.csv", format!("{}\n", ground_lines.join("\n")));
     }
     if !a.quiet {
         println!(

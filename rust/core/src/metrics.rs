@@ -4,6 +4,7 @@
 
 use crate::math;
 use crate::principles::c3::is_live_bud;
+use crate::principles::r6::deposit_area;
 use crate::tree::{Tree, bud};
 use crate::world::World;
 
@@ -11,7 +12,7 @@ const PI: f64 = std::f64::consts::PI;
 
 /// metrics.csv's columns (METRIC_COLUMNS), in order. `alive` and `sown` are flags (1/0) and
 /// `species` a string; every other column is a number.
-pub const METRIC_COLUMNS: [&str; 37] = [
+pub const METRIC_COLUMNS: [&str; 39] = [
     "tree",
     "alive",
     "species",
@@ -49,11 +50,13 @@ pub const METRIC_COLUMNS: [&str; 37] = [
     "rootZ",
     "crownDepth",
     "centroidOffsetZ",
+    "leafBase",
+    "leafCrownRatio",
 ];
 
 /// The numeric fields of TreeMetrics, in this order (`sown` among them, as a flag), which the
 /// snapshot carries as a block: everything but `species`.
-pub const METRIC_NUMBERS: [&str; 37] = [
+pub const METRIC_NUMBERS: [&str; 39] = [
     "tree",
     "alive",
     "rootX",
@@ -91,11 +94,13 @@ pub const METRIC_NUMBERS: [&str; 37] = [
     "rootZ",
     "crownDepth",
     "centroidOffsetZ",
+    "leafBase",
+    "leafCrownRatio",
 ];
 
 pub struct TreeMetrics {
     /// By METRIC_NUMBERS.
-    pub values: [f64; 37],
+    pub values: [f64; 39],
     pub species: String,
 }
 
@@ -130,6 +135,46 @@ pub fn ground_light(world: &World, x0: f64, x1: f64, z0: f64, z1: f64) -> f64 {
         layer += 1.0;
     }
     sum / ((hi - lo + 1.0) * (far - near + 1.0) * c)
+}
+
+/// The crown's base by leaf area (C1 round 3, plan 2026-10-30-form §3): live buds' leaf area
+/// (R6's `deposit_area`; 1 per live bud without a world) in 1-cell bins of their metamer's tip
+/// height, walked up from the ground until CROWN_BASE_SHARE of it lies below; the height is
+/// interpolated within that bin. Unlike the lowest live first-order branch (`boleHeight`), one
+/// low twig does not hold it down. `height` when the tree carries no leaf.
+pub const CROWN_BASE_SHARE: f64 = 0.05;
+
+pub fn leaf_base(tree: &Tree, world: Option<&World>, height: f64) -> f64 {
+    let r6 = world.map(|w| &w.params_of(tree).r6);
+    let bins = math::max(0.0, height).floor() as usize + 1;
+    let mut area = vec![0.0; bins];
+    let mut total = 0.0;
+    for j in 0..tree.b.len() {
+        let s = tree.b.state[j];
+        if !is_live_bud(s) {
+            continue;
+        }
+        let leaf = r6.map_or(1.0, |r6| deposit_area(s, r6));
+        if leaf <= 0.0 {
+            continue;
+        }
+        let y = tree.tip_y(tree.b.metamer[j] as usize);
+        let k = (math::max(0.0, y).floor() as usize).min(bins - 1);
+        area[k] += leaf;
+        total += leaf;
+    }
+    if total <= 0.0 {
+        return height;
+    }
+    let target = CROWN_BASE_SHARE * total;
+    let mut below = 0.0;
+    for (k, &a) in area.iter().enumerate() {
+        if a > 0.0 && below + a >= target {
+            return math::min(height, k as f64 + (target - below) / a);
+        }
+        below += a;
+    }
+    height
 }
 
 pub fn tree_metrics(tree: &Tree, world: Option<&World>) -> TreeMetrics {
@@ -186,6 +231,7 @@ pub fn tree_metrics(tree: &Tree, world: Option<&World>) -> TreeMetrics {
     let n = nm as f64;
     let trunk = if nm > 0 { c.radius[0] } else { 0.0 };
     let bole_height = if bole.is_finite() { bole } else { height };
+    let leaf_base = leaf_base(tree, world, height);
     let ground = match world {
         Some(w) if nm > 0 => ground_light(w, min_x, max_x, min_z, max_z),
         _ => f64::NAN,
@@ -241,7 +287,49 @@ pub fn tree_metrics(tree: &Tree, world: Option<&World>) -> TreeMetrics {
             tree.root_z,
             if nm > 0 { max_z - min_z } else { 0.0 },
             if nm > 0 { sum_z / n - tree.root_z } else { 0.0 },
+            leaf_base,
+            if height > 0.0 {
+                (height - leaf_base) / height
+            } else {
+                0.0
+            },
         ],
         species: tree.species.clone(),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::testing::{RIGHT, bud, metamer};
+    use crate::tree::slot;
+
+    const UP: f64 = std::f64::consts::FRAC_PI_2;
+
+    #[test]
+    fn the_leaf_base_ignores_one_low_twig_that_sets_the_bole() {
+        // A 20-cell trunk; one twig with a single bud at height 2; six crown limbs at 14–19, each
+        // with eight buds.
+        let mut t = Tree::new(0, 10.0, 0.5);
+        let mut trunk = vec![metamer(&mut t, -1, slot::MAIN, UP, 1.0, 0.1, 0.0)];
+        for _ in 1..20 {
+            let p = *trunk.last().unwrap() as i32;
+            trunk.push(metamer(&mut t, p, slot::MAIN, UP, 1.0, 0.1, 0.0));
+        }
+        let twig = metamer(&mut t, trunk[1] as i32, RIGHT, 0.0, 1.0, 0.01, 0.0);
+        bud(&mut t, twig, slot::MAIN, 0.0, 1.0);
+        for &k in &trunk[13..19] {
+            let limb = metamer(&mut t, k as i32, RIGHT, 0.0, 1.0, 0.01, 0.0);
+            for s in 0..8 {
+                bud(&mut t, limb, s, 0.0, 1.0);
+            }
+        }
+        let m = tree_metrics(&t, None);
+        assert_eq!(m.get("height"), 20.0);
+        assert_eq!(m.get("boleHeight"), 2.0);
+        let base = m.get("leafBase");
+        assert!((14.0..15.0).contains(&base), "{base}");
+        assert!(m.get("leafCrownRatio") < m.get("crownRatio"));
+        assert!((m.get("leafCrownRatio") - (20.0 - base) / 20.0).abs() < 1e-12);
     }
 }

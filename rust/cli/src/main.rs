@@ -247,7 +247,7 @@ fn main() {
 
     let mut metrics_lines = vec![format!("season,{}", METRIC_COLUMNS.join(","))];
     let mut metamer_lines = vec![
-        "season,tree,birthId,parentBirthId,order,axis,x0,y0,x1,y1,length,angle,radius,qSum,nSum,vIn,birthSeason,stressWood,z0,z1,hx,hy,hz,pSum,mSum"
+        "season,tree,birthId,parentBirthId,order,axis,x0,y0,x1,y1,length,angle,radius,qSum,nSum,vIn,birthSeason,stressWood,z0,z1,hx,hy,hz,pSum,mSum,stress"
             .to_string(),
     ];
     let profile: Vec<String> = (0..PROFILE_BANDS).map(|k| format!("p{k}")).collect();
@@ -382,6 +382,8 @@ fn main() {
                         c.hz[i],
                         copy.p_sum[i],
                         copy.m_sum[i],
+                        // R3's σ/σ_target as of its last pass (0 where R3 has not run).
+                        tree.stress.get(i).copied().unwrap_or(0.0),
                     ];
                     let cells: Vec<String> = row.iter().map(|&v| num(v)).collect();
                     metamer_lines.push(cells.join(","));

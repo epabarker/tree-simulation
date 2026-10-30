@@ -255,6 +255,13 @@ export interface TreeMetrics {
   crownDepth: number;
   /** Mean tip z minus root z: positive means the crown leans back, away from the viewer. */
   centroidOffsetZ: number;
+  /**
+   * The crown's base by leaf area: the height below which 5% of the live buds' leaf area lies
+   * (C1 round 3). One low twig sets `boleHeight` but not this.
+   */
+  leafBase: number;
+  /** (height − leafBase)/height: the crown ratio by leaf area. */
+  leafCrownRatio: number;
 }
 
 export const METRIC_COLUMNS: readonly (keyof TreeMetrics)[] = [
@@ -295,6 +302,8 @@ export const METRIC_COLUMNS: readonly (keyof TreeMetrics)[] = [
   "rootZ",
   "crownDepth",
   "centroidOffsetZ",
+  "leafBase",
+  "leafCrownRatio",
 ];
 
 /** A change applied at the start of `season` (before that season runs). */

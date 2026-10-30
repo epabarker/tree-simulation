@@ -2,6 +2,23 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-30: C1 round 3, form steps 3–5: closure, the τ 0.1 row, 20-seed evidence
+
+- **User:** steps 3 and 4 of [the form plan](plans/2026-10-30-form.md), stopping before step 4's knobs with step 3's readings; then step 5 with the user's criteria ([note](experiments/2026-10-30-c1-round3-form.md), [ADR 0027](decisions/0027-girth-in-3d.md)'s evidence section).
+- **Tools:** the CLI's `light.csv` gains `lad` (leaf area density over depth), and `--light` writes `buds.csv` (every live bud). Readers: `closure.py`, `budget.py`, `locality.py`, `evidence.py`, `plateau.py`.
+- **Step 3 (measured):**
+  - planted survival follows O4's background mortality (0.002 a season) within 2 trees: 76, 67, 59, 51 of 90 at 100, 150, 200, 300, against 74, 67, 60, 49;
+  - at τ 0 the floor tracks the gap fraction (7.7% at 31% gaps, 12.2% at 50%); crowns are 1.36 × the spacing and cannot widen; 1 of about 850 seedlings reaches 20 cells by 300 (127 at τ 0.2);
+  - the leaf crown ratio's rise from 150 to 300 is release beside dead neighbours (leaf base 43 → 36 there, 45 → 42 elsewhere);
+  - the rescale cut buds by 35–43% and production by about 55%, fates unchanged.
+- **Surprise:** the floor reads the same under gaps and under LAI ≥ 6 (12% at 200 and 300: the plan's stop). Transport is local under the canopy (rows 40–60: dense columns 0.15, gaps 0.35 at row 50), but 35–40 rows of bare boles under an oblique sky average it at the ground. The stop rule now reads rows 40–60.
+- **User's decisions:**
+  - gap filling is not a target: step 4's ξ and release runs were skipped;
+  - in their slot, the τ 0.1 row: floor 11.6 / 13.9 / 14.8% at 100 / 150 / 300, 79 seedlings to 20 cells; no preset's τ changes;
+  - each measure at its season: floor at 100 (first chosen at 150; 20 seeds put that at median 10.4%, 8 of 20), H/D at 300, crown base at 150 and 300, plateau on the same trees (the stand median's gain counts deaths of short trees: 13 of 20). Denser planting declined (1.7 × metamers).
+- **Evidence** (20 seeds, τ 0): floor 20 of 20, stand H/D 19 (median 70.6), crown base 20, plateau 17. τ 0.2 reported: floor 0, H/D 18, crown base 20, plateau 16.
+- **Goldens:** unchanged (CLI outputs and docs only).
+
 ## 2026-10-30: C1 round 3, form steps 1–2: girth in 3D, the crown base by leaf area
 
 - **User:** implement [the form plan](plans/2026-10-30-form.md) step by step, stopping on any measurement outside a step's range. Two stops, each resolved by the user ([note](experiments/2026-10-30-c1-round3-form.md), [ADR 0027](decisions/0027-girth-in-3d.md)).

@@ -9,7 +9,8 @@
 //!   treesim --preset succession --checkpoint-at 60 --seasons 60 --out runs/c
 //!
 //! Writes to --out: run.json, metrics.csv, metamers.csv, form.csv, hash.txt; with --light,
-//! light.csv and ground.csv (the ground's light and the leaf area above it, per x and z); with
+//! light.csv (with lad, the leaf area density over depth), buds.csv (every live bud) and ground.csv
+//! (the ground's light and the leaf area above it, per x and z); with
 //! --checkpoint-at N, checkpoint-N.bin.gz. Presets come from rust/presets.json
 //! (exported from the TypeScript presets). `npm run sim` (cli/run.ts) builds and runs it.
 
@@ -256,7 +257,8 @@ fn main() {
         FORM_COLUMNS.join(","),
         profile.join(",")
     )];
-    let mut light_lines = vec!["season,col,row,shade".to_string()];
+    let mut light_lines = vec!["season,col,row,shade,lad".to_string()];
+    let mut bud_lines = vec!["season,tree,metamer,state,age,q,v,y,leaf".to_string()];
     let mut ground_lines = vec!["season,col,layer,q,lai".to_string()];
 
     let mut world = World::new(params);
@@ -322,9 +324,60 @@ fn main() {
                 }
             }
             let w = world.light.width() as usize;
+            // Leaf area density per (col, row), averaged over the depth (C1 round 3's closure).
+            let lad_mean: Vec<f64> = match &world.light {
+                tree_core::light::Light::Slab(slab) => {
+                    let (sw, sh, sd) = slab.sweep.dims();
+                    let lad = slab.sweep.lad();
+                    let mut m = vec![0.0; sw * sh];
+                    for row in 0..sh {
+                        for z in 0..sd {
+                            for col in 0..sw {
+                                m[row * sw + col] += lad[(row * sd + z) * sw + col] as f64;
+                            }
+                        }
+                    }
+                    m.iter().map(|v| v / sd as f64).collect()
+                }
+                _ => Vec::new(),
+            };
             if let Some(field) = world.light.field(world.params().c2.c) {
                 for (c, &v) in field.iter().enumerate() {
-                    light_lines.push(format!("{},{},{},{}", num(season), c % w, c / w, num(v)));
+                    let l = lad_mean.get(c).copied().unwrap_or(f64::NAN);
+                    light_lines.push(format!(
+                        "{},{},{},{},{}",
+                        num(season),
+                        c % w,
+                        c / w,
+                        num(v),
+                        num(l)
+                    ));
+                }
+            }
+            // Every live bud: its fate, age, light, vigour, height and leaf area (R6).
+            for tree in &world.trees {
+                if !tree.alive {
+                    continue;
+                }
+                let r6 = &world.params_of(tree).r6;
+                for j in 0..tree.b.len() {
+                    let st = tree.b.state[j];
+                    if !tree_core::principles::c3::is_live_bud(st) {
+                        continue;
+                    }
+                    let m = tree.b.metamer[j] as usize;
+                    bud_lines.push(format!(
+                        "{},{},{},{},{},{},{},{},{}",
+                        num(season),
+                        tree.id,
+                        m,
+                        st,
+                        tree.b.age[j],
+                        num(tree.b.q[j]),
+                        num(tree.b.v[j]),
+                        num(tree.tip_y(m)),
+                        num(tree_core::principles::r6::deposit_area(st, r6))
+                    ));
                 }
             }
         }
@@ -428,6 +481,7 @@ fn main() {
     if a.light {
         write("light.csv", format!("{}\n", light_lines.join("\n")));
         write("ground.csv", format!("{}\n", ground_lines.join("\n")));
+        write("buds.csv", format!("{}\n", bud_lines.join("\n")));
     }
     if !a.quiet {
         println!(

@@ -26,6 +26,20 @@ With the scar fixed, r0 sets H/D again. But mechanics then sets every twig's rad
    7000 is the trickle M16's visible test wants (a storm drops some limbs). Per storm at 7000 the median loss is 3–6% of the stand's metamers, the worst 10–40%. Storm severity is C5's calibration.
 4. **Windthrow's slenderness ramp starts at H/D 80**, the top of §10's stand-grown band: `clamp((H/D − 80)/30, 0, 2)` (`r3.rs`, `slenderness_risk`), zero to 80, 1 at 110, 2 from 140. THROW stays 0.06 (M16). This brings the code to §10; the spec does not change.
 
+## Evidence (20 seeds, 300 seasons, τ 0; [the note](../experiments/2026-10-30-c1-round3-form.md), step 5)
+Each measure is read at the season where it measures what it names (decided with the user, 2026-10-30):
+
+| measure | criterion | passing |
+|---|---|---|
+| floor | at 100 in 2–10% (median 7.9%) | 20 of 20 |
+| stand H/D | at 300 in 60–80 (median 70.6) | 19 of 20 |
+| crown base | stand `leafCrownRatio` below the lone tree's at 150 and 300 | 20 of 20 |
+| plateau | same trees' median gain over 250–300 < 2 cells, tallest < 180 | 17 of 20 |
+
+- **Why the floor is read at 100.** The stand closes by 100, then opens at O4's background rate with no regeneration at τ 0, so from 150 on the floor measures ageing (at 150: median 10.4%, 8 of 20 in the band). A floor that holds to 300 needs regeneration under the canopy: C5's.
+- **Why H/D is read at 300.** The trunk thickens after height levels off: 82 at 150, 70 at 300.
+- **Why the plateau is read on the same trees.** The stand median's gain (13 of 20) rises as short trees die, which measures composition, not growth. Trees climbing ≥ 10 cells beside gaps (0–3 a seed) are release.
+
 ## Consequences
 - **`forest` at 300 seasons** (k = 8, σ_break 7000, 3 seeds): stand H/D 70 at τ 0.2 and τ 0; height levels off at 77 (gain −0.1 and +1.1 cells over 250–300); windthrow 2 and 0 of 90 planted trees. With storms off: H/D 78 and 73, height 81–83.
 - **The stand's own lone tree** (`forest`'s params, open sides, O4 off): H/D 40–42 at 300 (open-grown 48 ± 8 in the species review); height levels off at 87–89.

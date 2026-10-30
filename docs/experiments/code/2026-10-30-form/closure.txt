@@ -1,0 +1,61 @@
+
+== forest k8, τ 0 ==
+season | floor | gaps: share, floor | canopy floor | LAI≥6: share, floor | LAI stand / crown | planted alive (O4 alone) | recruits (≥20) | crown width / spacing
+  100 | 0.077 | 31%, 0.08 | 0.08 | 47%, 0.08 | 6.2 / 8.91 | 76/90 (74) | 709 (0) | 29.3 / 21
+  150 | 0.099 | 37%, 0.11 | 0.09 | 42%, 0.09 | 5.4 / 8.52 | 67/90 (67) | 833 (0) | 28.9 / 21
+  200 | 0.113 | 45%, 0.11 | 0.12 | 36%, 0.12 | 4.7 / 8.45 | 59/90 (60) | 841 (0) | 28.7 / 21
+  300 | 0.122 | 50%, 0.12 | 0.12 | 31%, 0.12 | 4.1 / 8.18 | 51/90 (49) | 849 (1) | 28.5 / 21
+  light by row (100, 150, 200, 300): row 0: 0.08 0.10 0.11 0.12; row 10: 0.09 0.11 0.13 0.14; row 20: 0.10 0.12 0.14 0.16; row 30: 0.11 0.13 0.16 0.17; row 40: 0.13 0.16 0.19 0.20; row 50: 0.17 0.20 0.24 0.25; row 60: 0.29 0.33 0.38 0.37; row 70: 0.76 0.70 0.72 0.65; row 80: 1.00 0.97 0.95 0.89; row 90: 1.00 1.00 1.00 1.00
+  planted deaths by window and cause: ≤100 other 14, ≤150 other 8, ≤150 starved 1, ≤200 other 7, ≤200 starved 1, ≤300 other 7, ≤300 starved 1
+  leaf crown ratio, population median: 100: 0.41 (base 42, height 71) 150: 0.42 (base 43, height 75) 200: 0.46 (base 39, height 75) 300: 0.50 (base 39, height 77)
+  survivors 150 → 300, kept its neighbours (n 20): ratio 0.37 → 0.45; leaf base 45 → 42; height 75 → 76
+  survivors 150 → 300, lost a neighbour (n 31): ratio 0.42 → 0.53; leaf base 43 → 36; height 74 → 78
+
+== forest k8, τ 0.1 ==
+season | floor | gaps: share, floor | canopy floor | LAI≥6: share, floor | LAI stand / crown | planted alive (O4 alone) | recruits (≥20) | crown width / spacing
+  100 | 0.116 | 28%, 0.12 | 0.12 | 50%, 0.12 | 6.6 / 9.16 | 76/90 (74) | 824 (0) | 29.5 / 21
+  150 | 0.139 | 35%, 0.15 | 0.13 | 44%, 0.13 | 5.8 / 8.99 | 68/90 (67) | 832 (0) | 28.2 / 21
+  200 | 0.161 | 44%, 0.17 | 0.16 | 37%, 0.16 | 5.0 / 8.94 | 60/90 (60) | 840 (1) | 27.5 / 21
+  300 | 0.148 | 44%, 0.15 | 0.15 | 34%, 0.15 | 4.7 / 8.48 | 52/90 (49) | 848 (79) | 28.1 / 21
+  light by row (100, 150, 200, 300): row 0: 0.12 0.14 0.16 0.15; row 10: 0.12 0.15 0.18 0.17; row 20: 0.12 0.15 0.19 0.19; row 30: 0.12 0.16 0.20 0.21; row 40: 0.14 0.18 0.23 0.24; row 50: 0.18 0.22 0.29 0.29; row 60: 0.31 0.35 0.41 0.40; row 70: 0.73 0.67 0.71 0.63; row 80: 1.00 0.95 0.96 0.88; row 90: 1.00 1.00 1.00 0.99
+  planted deaths by window and cause: ≤100 other 14, ≤150 other 8, ≤200 other 7, ≤200 thrown 1, ≤300 other 7, ≤300 thrown 1
+  leaf crown ratio, population median: 100: 0.46 (base 38, height 71) 150: 0.50 (base 36, height 75) 200: 0.55 (base 32, height 75) 300: 0.57 (base 33, height 78)
+  survivors 150 → 300, kept its neighbours (n 19): ratio 0.53 → 0.57; leaf base 35 → 32; height 73 → 76
+  survivors 150 → 300, lost a neighbour (n 33): ratio 0.46 → 0.57; leaf base 36 → 33; height 75 → 78
+
+== forest k8, τ 0.2 ==
+season | floor | gaps: share, floor | canopy floor | LAI≥6: share, floor | LAI stand / crown | planted alive (O4 alone) | recruits (≥20) | crown width / spacing
+  100 | 0.145 | 22%, 0.15 | 0.14 | 55%, 0.14 | 7.2 / 9.23 | 76/90 (74) | 824 (0) | 30.4 / 21
+  150 | 0.158 | 28%, 0.16 | 0.16 | 49%, 0.16 | 6.6 / 9.13 | 68/90 (67) | 832 (2) | 28.2 / 21
+  200 | 0.161 | 32%, 0.16 | 0.16 | 45%, 0.16 | 6.1 / 9.00 | 60/90 (60) | 840 (14) | 28.0 / 21
+  300 | 0.148 | 31%, 0.15 | 0.15 | 43%, 0.15 | 5.8 / 8.42 | 53/90 (49) | 847 (127) | 27.4 / 21
+  light by row (100, 150, 200, 300): row 0: 0.15 0.16 0.16 0.15; row 10: 0.15 0.17 0.18 0.15; row 20: 0.14 0.17 0.20 0.19; row 30: 0.14 0.17 0.20 0.22; row 40: 0.15 0.19 0.23 0.25; row 50: 0.19 0.24 0.28 0.30; row 60: 0.31 0.36 0.40 0.40; row 70: 0.73 0.65 0.69 0.62; row 80: 0.99 0.91 0.93 0.83; row 90: 1.00 1.00 1.00 0.96
+  planted deaths by window and cause: ≤100 other 14, ≤150 other 8, ≤200 other 7, ≤200 thrown 1, ≤300 other 6, ≤300 thrown 1
+  leaf crown ratio, population median: 100: 0.56 (base 31, height 70) 150: 0.58 (base 32, height 76) 200: 0.60 (base 31, height 77) 300: 0.62 (base 31, height 78)
+  survivors 150 → 300, kept its neighbours (n 21): ratio 0.59 → 0.61; leaf base 28 → 31; height 70 → 77
+  survivors 150 → 300, lost a neighbour (n 32): ratio 0.57 → 0.64; leaf base 33 → 31; height 76 → 79
+
+== forest base, τ 0 ==
+season | floor | gaps: share, floor | canopy floor | LAI≥6: share, floor | LAI stand / crown | planted alive (O4 alone) | recruits (≥20) | crown width / spacing
+  100 | 0.059 | 32%, 0.05 | 0.06 | 54%, 0.06 | 9.2 / 13.45 | 76/90 (74) | 746 (0) | 22.9 / 21
+  150 | 0.088 | 41%, 0.10 | 0.08 | 46%, 0.08 | 7.8 / 13.15 | 68/90 (67) | 832 (0) | 22.4 / 21
+  200 | 0.100 | 49%, 0.10 | 0.10 | 40%, 0.10 | 7.0 / 13.67 | 61/90 (60) | 839 (0) | 22.2 / 21
+  300 | 0.112 | 56%, 0.12 | 0.11 | 34%, 0.11 | 6.0 / 13.78 | 54/90 (49) | 846 (0) | 21.7 / 21
+  light by row (100, 150, 200, 300): row 0: 0.06 0.09 0.10 0.11; row 10: 0.07 0.10 0.11 0.12; row 20: 0.07 0.10 0.12 0.14; row 30: 0.08 0.11 0.13 0.15; row 40: 0.09 0.13 0.15 0.17; row 50: 0.10 0.15 0.18 0.20; row 60: 0.13 0.18 0.22 0.25; row 70: 0.19 0.25 0.31 0.35; row 80: 0.92 0.88 0.88 0.84; row 90: 1.00 1.00 1.00 0.98
+  planted deaths by window and cause: ≤100 other 14, ≤150 other 8, ≤200 other 7, ≤300 other 7
+  leaf crown ratio, population median: 100: 0.27 (base 58, height 80) 150: 0.34 (base 53, height 81) 200: 0.42 (base 48, height 81) 300: 0.44 (base 46, height 82)
+  survivors 150 → 300, kept its neighbours (n 22): ratio 0.34 → 0.40; leaf base 52 → 48; height 81 → 81
+  survivors 150 → 300, lost a neighbour (n 32): ratio 0.37 → 0.46; leaf base 52 → 45; height 81 → 82
+base-t01: missing ([Errno 2] No such file or directory: 'runs/form3/forest/base-t01-s1/run.json')
+
+== forest base, τ 0.2 ==
+season | floor | gaps: share, floor | canopy floor | LAI≥6: share, floor | LAI stand / crown | planted alive (O4 alone) | recruits (≥20) | crown width / spacing
+  100 | 0.139 | 27%, 0.15 | 0.14 | 58%, 0.14 | 10.9 / 14.97 | 76/90 (74) | 824 (0) | 22.8 / 21
+  150 | 0.163 | 35%, 0.17 | 0.16 | 51%, 0.16 | 9.6 / 14.74 | 68/90 (67) | 832 (2) | 22.3 / 21
+  200 | 0.167 | 41%, 0.17 | 0.16 | 46%, 0.16 | 8.8 / 15.01 | 61/90 (60) | 839 (36) | 22.1 / 21
+  300 | 0.163 | 46%, 0.16 | 0.16 | 41%, 0.16 | 8.1 / 15.03 | 54/90 (49) | 846 (235) | 21.7 / 21
+  light by row (100, 150, 200, 300): row 0: 0.14 0.16 0.17 0.16; row 10: 0.14 0.17 0.17 0.17; row 20: 0.14 0.17 0.18 0.18; row 30: 0.13 0.17 0.19 0.20; row 40: 0.13 0.17 0.19 0.21; row 50: 0.14 0.18 0.21 0.24; row 60: 0.15 0.20 0.24 0.27; row 70: 0.21 0.27 0.32 0.35; row 80: 0.94 0.89 0.87 0.80; row 90: 1.00 0.99 0.99 0.95
+  planted deaths by window and cause: ≤100 other 14, ≤150 other 8, ≤200 other 7, ≤300 other 7
+  leaf crown ratio, population median: 100: 0.48 (base 42, height 81) 150: 0.53 (base 38, height 82) 200: 0.59 (base 36, height 82) 300: 0.59 (base 35, height 83)
+  survivors 150 → 300, kept its neighbours (n 22): ratio 0.53 → 0.57; leaf base 38 → 35; height 82 → 83
+  survivors 150 → 300, lost a neighbour (n 32): ratio 0.54 → 0.59; leaf base 37 → 34; height 81 → 83

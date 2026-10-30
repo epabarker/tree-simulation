@@ -135,7 +135,7 @@ const flora = (name: FloraName, xs: number[], width: number) =>
  * doubles every 15–20 seasons (the pre-C1 note). The light only marches up to the highest leafy
  * row, so headroom costs memory (W × D × 24 bytes a row), not time, until a tree grows into it.
  */
-const TOP = 200;
+export const TOP = 200;
 
 const RING = { width: 210, height: TOP, walls: [], sides: "periodic" } satisfies Params["world"];
 /** One row of the ring's stand: a tree every 21 cells. */

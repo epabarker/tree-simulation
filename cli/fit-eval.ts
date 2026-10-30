@@ -5,10 +5,12 @@
  * core, so no process starts and no CSV is written per candidate.
  *
  *   {"id": 1, "species": "birch", "assign": {"c3.alpha": 4.2}, "seeds": [1, 2],
- *    "trials": ["lone", "stand", "shade"], "roofs": [2.6, 4]}
+ *    "trials": ["lone", "stand", "shade"], "roofs": [2.6, 4], "standSeasons": 100}
  *     → {"id": 1, "lone": [traits per seed], "stand": [...], "shade": {"2.6": [alive per seed]},
- *        "light": {"2.6": light}, "ms": 812}      ("release" adds the felled-gap trial, M10;
- *                                                  "stand100" runs the stand on to season 100)
+ *        "survived": {"2.6": [seasons per seed]}, "light": {"2.6": light}, "ms": 812}
+ *   "release" adds the felled-gap trial (M10), "wood" the species' own wood's floor (the hold-out);
+ *   "stand100" is "stand" with standSeasons 100. `seeds` may instead give each trial its own,
+ *   {"lone": [1, 2, 3], "stand": [1, 2], "shade": [1, 2, 3]} (the least-squares fit's counts).
  *   {"id": 2, "describe": "birch", "paths": ["c3.alpha", "r2.levels.1.setPoint"]}
  *     → {"id": 2, "values": {"c3.alpha": 4, ...}}        (what the species grows by now)
  *   {"id": 3, "amend": "birch", "assign": {...}}
@@ -28,15 +30,19 @@ import {
   runRelease,
   runShade,
   runStand,
+  runWood,
 } from "./trials.ts";
+
+type Trial = "lone" | "stand" | "stand100" | "shade" | "release" | "wood";
 
 interface Request {
   id: number;
   species?: string;
   assign?: Record<string, unknown>;
-  seeds?: number[];
-  trials?: ("lone" | "stand" | "stand100" | "shade" | "release")[];
+  seeds?: number[] | Partial<Record<Trial, number[]>>;
+  trials?: Trial[];
   roofs?: number[];
+  standSeasons?: 60 | 100;
   describe?: string;
   paths?: string[];
   amend?: string;
@@ -58,24 +64,38 @@ function handle(req: Request): Record<string, unknown> {
   const species = req.species;
   if (!species) throw new Error("a request needs species, describe or amend");
   const assign = req.assign ?? {};
-  const seeds = req.seeds ?? [1];
+  const seedsOf = (trial: Trial): number[] => {
+    const seeds = req.seeds ?? [1];
+    if (Array.isArray(seeds)) return seeds;
+    return seeds[trial] ?? (trial === "stand100" ? seeds.stand : undefined) ?? [];
+  };
   const trials = req.trials ?? ["lone", "stand", "shade"];
   const t0 = performance.now();
   const out: Record<string, unknown> = { id: req.id };
-  if (trials.includes("lone")) out.lone = seeds.map((s) => runLone(species, s, assign));
-  if (trials.includes("stand")) out.stand = seeds.map((s) => runStand(species, s, assign));
-  // The stand run on to season 100: its traits at 60, and height100 (ADR 0021, 0022).
-  if (trials.includes("stand100")) out.stand = seeds.map((s) => runStand(species, s, assign, true));
-  if (trials.includes("release")) out.release = seeds.map((s) => runRelease(species, s, assign));
+  if (trials.includes("lone")) out.lone = seedsOf("lone").map((s) => runLone(species, s, assign));
+  // The stand at 60, or run on to season 100: its traits at 60, and height100 (ADR 0021, 0022).
+  for (const t of ["stand", "stand100"] as const) {
+    if (!trials.includes(t)) continue;
+    const seasons = t === "stand100" ? 100 : (req.standSeasons ?? 60);
+    out.stand = seedsOf(t).map((s) => runStand(species, s, assign, seasons));
+  }
+  if (trials.includes("release")) {
+    out.release = seedsOf("release").map((s) => runRelease(species, s, assign));
+  }
+  if (trials.includes("wood")) out.wood = seedsOf("wood").map((s) => runWood(species, s, assign));
   if (trials.includes("shade")) {
+    const seeds = seedsOf("shade");
     const shade: Record<string, boolean[]> = {};
+    const survived: Record<string, number[]> = {};
     const light: Record<string, number> = {};
     for (const roof of req.roofs ?? ROOFS) {
       const runs = seeds.map((s) => runShade(species, s, roof, assign));
       shade[String(roof)] = runs.map((r) => r.alive);
+      survived[String(roof)] = runs.map((r) => r.seasons);
       light[String(roof)] = runs.reduce((sum, r) => sum + r.light, 0) / runs.length;
     }
     out.shade = shade;
+    out.survived = survived;
     out.light = light;
   }
   out.ms = Math.round(performance.now() - t0);

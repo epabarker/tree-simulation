@@ -47,20 +47,14 @@ kind = "measured"
 source = "stand-grown H/D 60–80 (Watt et al. 2023)"
 
 [[trait]]
+# The leafy crown's share of the height (metrics' leafCrownRatio, cli/trials.ts): the branch
+# measure reads 0.99 in 3D whatever the crown does (species plan §0.4).
 name = "stand.crownRatio"
 target = 0.45
 band = 0.1
 weight = 0.5
 kind = "described"
 source = "light-demanding: the crown lifts in a stand (Kothari et al. 2025)"
-
-[[trait]]
-name = "stand.floor"
-target = 0.075
-band = 0.03
-weight = 0.5
-kind = "described"
-source = "7.5% (5–12%), estimated from Hagemeier & Leuschner 2019's five measured species: ln(floor %) = 4.92 − 1.08 × Niinemets & Valladares score, cross-checked by LAI and Beer–Lambert (user's research, analysis/fit/sources/floor_light_targets.csv); anchored near oak's measured 8.4% (same score)"
 
 [[trait]]
 name = "lone.widestAt"
@@ -169,9 +163,9 @@ path = "c5.Trel"
 lo = 0.005
 hi = 0.6
 [[param]]
-path = "c6.r0"
-lo = 0.015
-hi = 0.05
+path = "c6.r0"   # ADR 0027's 3D units: the 2D bounds 0.015–0.05 ÷ 8
+lo = 0.001875
+hi = 0.00625
 [[param]]
 path = "r1.Lh"
 lo = 10
@@ -207,5 +201,8 @@ log = true
 
 # Held out: never in the loss, checked after the fit (analysis/experiments/m27_holdout.py).
 [holdout]
+# The floor of the species' own wood planted per area at τ 0, at season 100 (m27_holdout.py): the
+# one-row stand trial lights its floor through the empty depth beside the row (species plan §0.3).
+floor = { target = 0.075, band = 0.03, kind = "described", source = "7.5% (5–12%), estimated from Hagemeier & Leuschner 2019's five measured species: ln(floor %) = 4.92 − 1.08 × Niinemets & Valladares score, cross-checked by LAI and Beer–Lambert (user's research, analysis/fit/sources/floor_light_targets.csv); anchored near oak's measured 8.4% (same score)" }
 survivalLight = [0.08, 0.14]   # lowest light all seedlings survive (oak's band: the same score; saplings estimated to need 11.4%)
 shadeScore = 2.73   # Niinemets & Valladares 2006, Appendix A

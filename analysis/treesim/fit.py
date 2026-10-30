@@ -166,9 +166,33 @@ def encode(spec: Spec, values: dict[str, float | None]) -> np.ndarray:
 # --- Traits and loss -------------------------------------------------------------------------
 
 
+def survival_light(reply: dict, k: int = 0) -> tuple[float, float]:
+    """Seed k's survival light in the shade house: (continuous, step).
+
+    The step is the lowest light the seedling lives to season 30 under (alive or dead is a step in
+    the parameters). The continuous one reads the seasons it lived under each roof (species plan
+    §2.2): on a log-light axis each roof owns the interval from its light up to the next brighter
+    roof's (the brightest's up to NO_SURVIVAL_LIGHT), and the survival light is the top minus the
+    intervals weighted by the share of the 30 seasons lived. A clean step at roof a gives roof a's
+    light, as the step statistic does; a seedling that dies late under the next darker roof moves it
+    toward that roof's light."""
+    roofs = sorted(reply["shade"], key=lambda r: reply["light"][r])
+    lights = [reply["light"][r] for r in roofs]
+    survived = reply.get("survived")
+    share = [
+        (survived[r][k] / 30 if survived else float(reply["shade"][r][k])) for r in roofs
+    ]
+    edges = [math.log(x) for x in lights] + [math.log(NO_SURVIVAL_LIGHT)]
+    log_light = edges[-1] - sum(f * (edges[i + 1] - edges[i]) for i, f in enumerate(share))
+    lit = [x for r, x in zip(roofs, lights) if reply["shade"][r][k]]
+    return math.exp(log_light), (min(lit) if lit else NO_SURVIVAL_LIGHT)
+
+
 def seed_traits(reply: dict) -> dict[str, float | None]:
     """Flat traits of one seed's reply, `trial.trait`, with derived ones: lone.earlyShare (H30/H60),
-    stand.lateShare (H100/H60) and shade.survivalLight (the lowest light the seedling survives)."""
+    stand.lateShare (H100/H60), and shade.survivalLight (the light the seedling survives down to,
+    from the seasons it lived under each roof; shade.survivalLightStep is the lowest light it lived
+    to season 30 under, the statistic before 3D)."""
     flat: dict[str, float | None] = {}
     for trial in TRIALS:
         for rec in reply.get(trial, []):
@@ -180,8 +204,7 @@ def seed_traits(reply: dict) -> dict[str, float | None]:
     s60, s100 = flat.get("stand.height"), flat.get("stand.height100")
     flat["stand.lateShare"] = s100 / s60 if s100 is not None and s60 else None
     if "shade" in reply:
-        lit = [reply["light"][roof] for roof, alive in reply["shade"].items() if alive[0]]
-        flat["shade.survivalLight"] = min(lit) if lit else NO_SURVIVAL_LIGHT
+        flat["shade.survivalLight"], flat["shade.survivalLightStep"] = survival_light(reply)
     return flat
 
 

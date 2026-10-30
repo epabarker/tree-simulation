@@ -4,12 +4,18 @@
  * the same worlds. They are M19's and M25's (docs/experiments/2026-10-28-m25-species.md): the
  * woodland's growth rules without recruitment or storms (`oakOpen`), and
  *
- * - lone: one tree on 160 × 160, open-grown, measured at seasons 30 and 60;
- * - stand: ten trees 21 cells apart on 230 × 160, interior trees 2–7 measured at season 60 (and,
+ * - lone: one tree on 160 wide, open-grown, measured at seasons 30 and 60;
+ * - stand: ten trees 21 cells apart on 230 wide, interior trees 2–7 measured at season 60 (and,
  *   when asked, again at season 100: how much height they gain late, against yield tables);
- * - shade: a seedling under a roof one cell thick across a 40-cell ring, alive at season 30;
+ * - shade: a seedling under a roof one cell thick across a 40-cell ring: the seasons it lives, up
+ *   to 30 (a continuous margin for the fit; the plan of 2026-10-30, §2.2);
+ * - wood: the species' own wood planted per area at τ 0, its floor at seasons 100 and 150 (the
+ *   hold-out's floor: a one-row stand cannot measure one, the species plan §0.3);
  * - release: the stand with its middle tree felled at season 40 (M10's test): the epicormic
  *   shoots on its two neighbours and how far their crowns lean into the gap over 10 seasons.
+ *
+ * The lone tree and the stand take the woods' top (200): in 3D beech reaches 151 cells by season
+ * 100, and a crown pinned at the top runs away (the species plan §0.2).
  *
  * A candidate is a set of dotted-path assignments to the species' patch ("r2.levels.1.setPoint"),
  * applied over its whole effective params, so a fit never has to restate a table it leaves alone.
@@ -23,7 +29,7 @@ import {
   type SpeciesPatch,
   speciesParams,
 } from "../src/core/params.ts";
-import { presetParams } from "../src/core/presets.ts";
+import { presetParams, TOP } from "../src/core/presets.ts";
 import { coreWasm, loadWorldsSync, RustWorld, type TreeView as Tree } from "../src/wasm/world.ts";
 
 loadWorldsSync(readFileSync(coreWasm));
@@ -31,8 +37,14 @@ loadWorldsSync(readFileSync(coreWasm));
 export const newWorld = (params: Params): RustWorld => RustWorld.create(params);
 
 export const STAND_ROOTS = [20, 41, 62, 83, 104, 125, 146, 167, 188, 209];
-/** Roof densities of the shade house, ≈ 61% to 2% of the open sky under the K = 7 sweep. */
-export const ROOFS = [1, 2, 2.6, 3.3, 4, 4.8, 5.6, 6.5];
+/**
+ * Roof densities of the shade house: on the ground under each, in the 3D slab between opaque faces,
+ * 30, 21.7, 15.8, 10.9, 7.1, 4.7, 2.9 and 1.8% of the open sky (the same for every seed and species;
+ * docs/experiments/code/2026-10-30-species-3d/roofs.ts).
+ */
+export const ROOFS = [1, 1.5, 2, 2.6, 3.3, 4, 4.8, 5.6];
+/** Seasons a shade-house seedling is followed: alive at 30 is survival (M19). */
+export const SHADE_SEASONS = 30;
 
 /** The woodland's growth rules (oakOpen's: no recruitment, no storms) with `patch` on top. */
 export function trialBase(seed: number, patch: Partial<Params>): Params {
@@ -41,15 +53,28 @@ export function trialBase(seed: number, patch: Partial<Params>): Params {
 
 export function loneParams(species: string, seed: number): Params {
   return trialBase(seed, {
-    world: { width: 160, height: 160, walls: [] },
+    world: { width: 160, height: TOP, walls: [] },
     trees: [{ x: 80, species }],
   });
 }
 
 export function standParams(species: string, seed: number): Params {
   return trialBase(seed, {
-    world: { width: 230, height: 160, walls: [] },
+    world: { width: 230, height: TOP, walls: [] },
     trees: STAND_ROOTS.map((x) => ({ x, species })),
+  });
+}
+
+/**
+ * The species' own wood: `beechWood`'s planting per area (the woodland's rules, recruitment and
+ * storms on) with every tree of `species`, between opaque faces (τ 0), where form's 20-seed floor
+ * was read (ADR 0027).
+ */
+export function woodParams(species: string, seed: number): Params {
+  const base = presetParams("beechWood", seed);
+  return mergeParams(base, {
+    world: { faces: [0, 0] },
+    trees: base.trees.map((t) => ({ ...t, species })),
   });
 }
 
@@ -60,6 +85,9 @@ export function shadeParams(species: string, seed: number, roof: number): Params
       height: 60,
       walls: [{ x: 0, y: 40, width: 40, height: 1, shade: roof }],
       sides: "periodic",
+      // Opaque faces: at the woods' τ 0.2 the sky beyond the faces lights the floor at ≈ 8% under
+      // any roof, so the house could not reach the 2% tolerant seedlings live at.
+      faces: [0, 0],
     },
     trees: [{ x: 20, species }],
   });
@@ -153,8 +181,10 @@ export function runLone(
   world.run(30);
   const m = world.metricsOf(tree);
   const f = world.formOf(tree);
+  const alive = tree.alive;
+  world.dispose();
   return {
-    alive: tree.alive,
+    alive,
     height30,
     height60: m.height,
     spread: m.height > 0 ? m.crownWidth / m.height : 0,
@@ -178,12 +208,20 @@ export interface StandTraits {
   alive: number;
   height: number;
   slenderness: number;
+  /**
+   * The leafy crown's share of the height (metrics' leafCrownRatio): the branch measure reads
+   * 0.99 whatever the crown does in 3D (form step 2), so the fit's target reads this one.
+   */
   crownRatio: number;
-  /** Light on the floor under the interior, a fraction of open sky. */
+  /** The branch measure (metrics' crownRatio), for the record. */
+  boleCrownRatio: number;
+  /** Light on the floor under the interior, a fraction of open sky (reported, not fitted). */
   floor: number;
   widestAt: number;
-  /** Mean interior height at season 100, when the stand is run on (`late`); else absent. */
+  /** Mean interior height at season 100, when the stand is run on to 100; else absent. */
   height100?: number;
+  /** Share of the interior trees alive at season 100, when run on; else absent. */
+  alive100?: number;
 }
 
 const mean = (xs: number[]): number =>
@@ -193,7 +231,7 @@ export function runStand(
   species: string,
   seed: number,
   assign: Record<string, unknown> = {},
-  late = false,
+  seasons: 60 | 100 = 60,
 ): StandTraits {
   const world = newWorld(withAssign(standParams(species, seed), species, assign));
   world.run(60);
@@ -204,30 +242,60 @@ export function runStand(
     alive: live.length / interior.length,
     height: mean(ms.map((m) => m.height)),
     slenderness: mean(ms.map((m) => m.slenderness)),
-    crownRatio: mean(ms.map((m) => m.crownRatio)),
+    crownRatio: mean(ms.map((m) => m.leafCrownRatio)),
+    boleCrownRatio: mean(ms.map((m) => m.crownRatio)),
     floor: world.groundLight(50, 180),
     widestAt: mean(live.map((t) => world.formOf(t).widestAt)),
   };
-  if (late) {
+  if (seasons === 100) {
     world.run(40);
     const still = interior.filter((t) => t.alive);
     traits.height100 = mean(still.map((t) => world.metricsOf(t).height));
+    traits.alive100 = still.length / interior.length;
   }
+  world.dispose();
   return traits;
 }
 
-/** Whether the seedling lives to season 30 under the roof, and the light it gets there. */
+/**
+ * The seedling under the roof: whether it lives to season 30, the seasons it lived (30 if it did),
+ * and the light on the ground in its first season. Seasons lived is the shade residual's
+ * continuous margin (the species plan §2.2): alive at 30 is a step in the parameters.
+ */
 export function runShade(
   species: string,
   seed: number,
   roof: number,
   assign: Record<string, unknown> = {},
-): { alive: boolean; light: number } {
+): { alive: boolean; seasons: number; light: number } {
   const world = newWorld(withAssign(shadeParams(species, seed, roof), species, assign));
   world.step();
   const light = world.groundLight(0, 6);
-  world.run(29);
-  return { alive: (world.trees[0] as Tree).alive, light };
+  const tree = (): Tree => world.trees[0] as Tree;
+  let seasons = 1;
+  while (seasons < SHADE_SEASONS && tree().alive) {
+    world.step();
+    seasons += 1;
+  }
+  const alive = tree().alive;
+  world.dispose();
+  return { alive, seasons: alive ? SHADE_SEASONS : seasons - 1, light };
+}
+
+/** The floor of the species' own wood (woodParams) at seasons 100 and 150, a fraction of open sky. */
+export function runWood(
+  species: string,
+  seed: number,
+  assign: Record<string, unknown> = {},
+): { floor100: number; floor150: number } {
+  const params = withAssign(woodParams(species, seed), species, assign);
+  const world = newWorld(params);
+  world.run(100);
+  const floor100 = world.groundLight(0, params.world.width);
+  world.run(50);
+  const floor150 = world.groundLight(0, params.world.width);
+  world.dispose();
+  return { floor100, floor150 };
 }
 
 /** Axes started in seasons [from, to] on trunk wood at least 10 seasons old: epicormic shoots (M10). */
@@ -265,8 +333,7 @@ export function runRelease(
     world.metricsOf(left).centroidOffset -
     (before[0] as number) -
     (world.metricsOf(right).centroidOffset - (before[1] as number));
-  return {
-    epicormic: [left, right].reduce((n, t) => n + epicormic(t, FELL, FELL + AFTER - 1), 0),
-    lean: shift / 2,
-  };
+  const shoots = [left, right].reduce((n, t) => n + epicormic(t, FELL, FELL + AFTER - 1), 0);
+  world.dispose();
+  return { epicormic: shoots, lean: shift / 2 };
 }

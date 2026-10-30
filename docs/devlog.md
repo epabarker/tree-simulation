@@ -2,6 +2,28 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-30: Species in 3D, steps 0–1, and the beech pilot (stopped)
+
+- **User:** [the species plan](plans/2026-10-30-species.md) steps 0–1 with the beech pilot, on the user's 12-core laptop (12 workers); stop on the plan's rules ([note](experiments/2026-10-30-species-3d.md)).
+- **Step 0 (gate passed):** `flora.ts`'s `in3d` moved into `m27_adopt.py` (`PHYLLOTAXIS`, E 4·10⁶); `FLORA = FITTED_FLORA`. The regenerated `flora-fitted.ts` differs only by the overlay's values; `rust/presets.json` is byte-identical; check green; goldens unchanged. Round 2's fits moved to `fits/round2/` (`m27_adopt.py --round`).
+- **Step 1:**
+  - trials at the woods' top (200); `runStand(…, 60 | 100)` with the leaf crown ratio (`boleCrownRatio` beside it); `runShade` reports seasons survived; a `wood` trial (own wood per area, τ 0, floor at 100 and 150); every trial frees its world;
+  - targets: `stand.floor` → `[holdout] floor`; `c6.r0` bounds ÷ 8 (the 2D bounds excluded every 3D r0);
+  - `shade.survivalLight` is now continuous (log-light intervals weighted by the seasons lived); the step statistic stays as `survivalLightStep`;
+  - `analysis/treesim/fit_lm.py` and `m27_fit.py --method lm`; `m27_holdout.py --round`, with the floor section, the mixed wood at 3 seeds every 50 seasons, and the tallest tree.
+- **Surprises:**
+  - the shade house between τ 0.2 faces floors at ≈ 8% under any roof. It now has opaque faces; roofs [1 … 5.6] give 30 → 1.8%;
+  - the plan's m_w = 64·(0.0025/r0)² would have cut beech's sapwood cost by a third at the start. m_w holds each species' own m_w·r0² instead;
+  - LM is a hand-written loop, not `least_squares`: r0's per-iteration update has no place in scipy's trust region.
+- **The pilot stopped on both rules.** Loss went 65.0 → 19.85 over 7 accepted iterations, then four rejected halvings. On fresh seeds the loss was start 71.3, fit 33.9, against round 2's 7.81.
+  - Heights at 60, lone H/D, earlyShare and survival light came into their bands.
+  - Stand H/D (41 against 70), lateShare, fork height and the leaf crown ratio stayed out.
+  - The r0 rule's premise fails: at thin tips the trunk is mostly stress wood, so no single r0 gives both slenderness targets.
+  - Realisation noise (≈ ±1–2 in loss under common seeds) matches a step's gain from iteration 4 on.
+  - The screening's 20% rule made 15 parameters active where 10 clear the noise.
+- **Timings (laptop, 12 workers):** one evaluation 11 s; screening 213 s; an iteration 194–258 s; the pilot 36 min.
+- **Goldens:** unchanged.
+
 ## 2026-10-30: I3 steps 1–2: the picture in depth, the plate, the garden's planting
 
 - **User:** [the I3 plan](plans/2026-10-30-i3.md) steps 1–2, measured before and after beside its §1 ([note](experiments/2026-10-30-i3.md)); stop on any reading outside a step's range. Three stops, each resolved by the user.

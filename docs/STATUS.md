@@ -18,13 +18,13 @@ _Last updated: 2026-11-01 (an independent review of the port; the path to a ship
 - **Headless:** `npm run sim`, `npm run bench`, `npm run evidence:2d` (≈ 4 h, 39 of 78); C1's harness in `docs/experiments/code/`.
 
 ## Next (I3 alongside C1 + C2, alternating sessions)
-1. **Form (C1 + C2):** r0 down and m_w up; the crown base by leaf area; stand LAI and the bud budget; then floor 2–10%, crown lift and H/D 60–80 together, ≥ 15 of 20 seeds.
+1. **Form (C1 + C2):** [plan](plans/2026-10-30-form.md): scars record the pipe radius, then r0 ÷ 8 and m_w × 64 (H/D 66 in a 3-seed test); the crown base by leaf area; canopy closure; then floor (read at τ 0), crown lift and H/D together, ≥ 15 of 20 seeds.
 2. **I3:** depth-ordered wood and leaves; plate cap ≈ 200; framing under the 200 top; 3D first paint (Q7); drop unread snapshot columns; re-time the phone.
 3. **Species (C7–C8):** prepare the 3D fit (warm start, short trials, native threads; throughput first). The fits run overnight on the user's 12-core machine.
 4. **Then:** C3–C6 as hold-outs; ADRs (first paint, R5's default); release; the site's PR.
 
 ## Known issues
-- **Uncalibrated:** floor 17%, crown ratio 0.99, H/D 6–18; beech and hornbeam run to the top.
+- **Uncalibrated:** floor 17% at τ 0.2 (half of it from the faces: 6–9% at τ 0), crown ratio 0.99, H/D 6–18 (scars carry stress wood into the trunk); beech and hornbeam run to the top.
 - **The garden's frame** fits half the 200 top (`WORLD_HEIGHT` 130 is stale): young gardens draw small.
 - **The preview deploy** (`preview-3d`) has the old `i2.ts`: redeploy only when asked.
 - Housekeeping list: the review's §6.

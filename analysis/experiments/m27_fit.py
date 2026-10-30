@@ -21,7 +21,7 @@ to commit; the log of every candidate goes to runs/m27-fit/<species>/log.parquet
 interrupted run where it stopped.
 
 `--method lm` (the species plan of 2026-10-30, §2; analysis/treesim/fit_lm.py) fits by least squares
-from `--start`'s fits as adopted (the hand overrides on top, r0 in ADR 0027's units) and writes
+then CMA-ES from `--start`'s fits as adopted (the hand overrides on top, r0 in ADR 0027's units) and writes
 docs/experiments/fits/<--out>/<species>.json, <species>-lm.csv (the loss per iteration) and
 <species>-jacobian.csv (the screening). With several species, each after the first starts from its
 own start shifted by the mean shift (in the unit cube, and r0's in log) of those already fitted,
@@ -120,8 +120,8 @@ def shifted(spec: Spec, a: dict, shifts: list[dict]) -> dict:
 
 
 def lm_start(spec: Spec, a: dict, shifts: list[dict], workers: int) -> dict:
-    """Own start, or shifted by the earlier species' fits where that start's loss is lower (stand to
-    60, the fit's seeds)."""
+    """Own start, or shifted by the earlier species' fits where that start's loss is lower (the
+    fit's seeds)."""
     if not shifts:
         return a
     b = shifted(spec, a, shifts)
@@ -129,8 +129,9 @@ def lm_start(spec: Spec, a: dict, shifts: list[dict], workers: int) -> dict:
     try:
         free = Spec(spec.species, [], [p for p in spec.params if p["path"] != "c6.r0"])
         prob = Problem(spec, pool, LMSettings(workers=workers), encode(free, a), (0, 1), a["c6.r0"])
-        ta, tb = prob.traits([(encode(free, a), a["c6.r0"]), (encode(free, b), b["c6.r0"])], 60)
-        la, lb = prob.trait_loss(ta, 60), prob.trait_loss(tb, 60)
+        xa, xb = encode(free, a), encode(free, b)
+        ta, tb = prob.traits([(xa, a["c6.r0"]), (xb, b["c6.r0"])])
+        la, lb = prob.objective(ta, xa), prob.objective(tb, xb)
     finally:
         pool.close()
     print(f"{spec.species}: own start loss {la:.2f}, shifted by {len(shifts)} species' fits {lb:.2f}", flush=True)
@@ -139,13 +140,16 @@ def lm_start(spec: Spec, a: dict, shifts: list[dict], workers: int) -> dict:
 
 def lm_report(spec: Spec, result: dict) -> None:
     fmt = lambda v: "—" if v is None else f"{v:.3g}"
-    print(f"\n{spec.species}: {result['evaluations']} evaluations in {result['seconds']} s"
+    print(f"\n{spec.species}: {result['evaluations']} evaluations in {result['seconds']} s "
+          f"({', '.join(f'{k} {v} s' for k, v in result['stageSeconds'].items())})"
           + (f"; stopped: {result['stopped']}" if result["stopped"] else ""))
-    print(f"loss on fresh seeds: start {result['start']['loss']:.2f}, fitted {result['fit']['loss']:.2f}")
-    print(f"{'trait':24} {'target':>8} {'band':>7} {'start':>8} {'fitted':>8} {'margin':>8}")
+    print(f"accepted: {result['accepted']} (measured targets in band on fresh seeds: {result['measuredInBand']}; "
+          f"outside: {', '.join(result['measuredOutside']) or 'none'}); fit from {result['fit']['from']}")
+    print(f"loss on fresh seeds (progress only): start {result['start']['loss']:.2f}, fitted {result['fit']['loss']:.2f}")
+    print(f"{'trait':24} {'kind':>9} {'target':>8} {'band':>7} {'start':>8} {'fitted':>8} {'margin':>8}")
     for m in result["margins"]:
-        print(f"{m['trait']:24} {m['target']:>8} {m['band']:>7} {fmt(m['start']):>8} {fmt(m['fit']):>8} "
-              f"{fmt(m['fitMargin']):>8}")
+        print(f"{m['trait']:24} {m['kind']:>9} {m['target']:>8} {m['band']:>7} {fmt(m['start']):>8} "
+              f"{fmt(m['fit']):>8} {fmt(m['fitMargin']):>8}")
     print(f"active: {', '.join(result['activeSet'])}")
     for p in spec.paths + ["r1.mw"]:
         print(f"{p:24} {fmt(result['start']['assign'].get(p)):>8} {fmt(result['fit']['assign'].get(p)):>8}")
@@ -157,7 +161,15 @@ if args.method == "lm":
     shifts: list[dict] = []
     for sp in species:
         if args.skip_done and (out / f"{sp}.json").exists():
-            print(f"skipped (done): {sp}")
+            # Its shift still carries to the species after it (the plan's transfer).
+            spec = load_spec(sp)
+            own = round2_start(sp, args.start)
+            done_fit = json.loads((out / f"{sp}.json").read_text())["fit"]["assign"]
+            free = Spec(sp, [], [p for p in spec.params if p["path"] != "c6.r0"])
+            d = dict(zip(free.paths, encode(free, done_fit) - encode(free, own)))
+            d["log r0"] = float(np.log(done_fit["c6.r0"] / own["c6.r0"]))
+            shifts.append(d)
+            print(f"skipped (done): {sp}; its shift carries on")
             continue
         print(f"\n=== {sp} (least squares) ===", flush=True)
         spec = load_spec(sp)

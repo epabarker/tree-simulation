@@ -6,6 +6,7 @@ import {
   ROOFS,
   runLone,
   runShade,
+  STAND_MEASURED,
   setPath,
   standParams,
   withAssign,
@@ -71,7 +72,13 @@ describe("species trials and amended patches (M27)", () => {
 
   it("grows the lone tree and the stand under the woods' top, and the wood per area at τ 0", () => {
     expect(loneParams("beech", 1).world.height).toBe(200);
-    expect(standParams("beech", 1).world.height).toBe(200);
+    const stand = standParams("beech", 1);
+    expect(stand.world).toMatchObject({ height: 200, width: 84, sides: "periodic", faces: [0, 0] });
+    // Three rows of four, 21 apart; the measured trees are the middle row, with a row either side.
+    expect(stand.trees.length).toBe(12);
+    const zs = [...new Set(stand.trees.map((t) => t.z))].sort((a, b) => (a ?? 0) - (b ?? 0));
+    expect(zs.length).toBe(3);
+    expect(STAND_MEASURED.every((k) => stand.trees[k]?.z === zs[1])).toBe(true);
     const wood = woodParams("hornbeam", 1);
     expect(wood.world.faces).toEqual([0, 0]);
     expect(wood.trees.length).toBeGreaterThan(10);

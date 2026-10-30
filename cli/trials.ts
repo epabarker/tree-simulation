@@ -5,14 +5,19 @@
  * woodland's growth rules without recruitment or storms (`oakOpen`), and
  *
  * - lone: one tree on 160 wide, open-grown, measured at seasons 30 and 60;
- * - stand: ten trees 21 cells apart on 230 wide, interior trees 2–7 measured at season 60 (and,
- *   when asked, again at season 100: how much height they gain late, against yield tables);
+ * - stand: a closed stand, three rows of four 21 cells apart on an 84-cell periodic ring between
+ *   opaque faces (τ 0), as the 20-seed evidence read H/D 70 (ADR 0027); the middle row's four
+ *   trees measured at season 60 (and, when asked, again at 100: how much height they gain late,
+ *   against yield tables). The one-row stand between τ 0.2 faces it replaces was a hedgerow, lit
+ *   from the faces and the empty depth: it grew edge trees, squat with late growth unchecked (the
+ *   species note of 2026-10-30, the beech pilot);
  * - shade: a seedling under a roof one cell thick across a 40-cell ring: the seasons it lives, up
  *   to 30 (a continuous margin for the fit; the plan of 2026-10-30, §2.2);
  * - wood: the species' own wood planted per area at τ 0, its floor at seasons 100 and 150 (the
  *   hold-out's floor: a one-row stand cannot measure one, the species plan §0.3);
- * - release: the stand with its middle tree felled at season 40 (M10's test): the epicormic
- *   shoots on its two neighbours and how far their crowns lean into the gap over 10 seasons.
+ * - release: the one-row stand (rowParams) with its middle tree felled at season 40 (M10's test,
+ *   held out): the epicormic shoots on its two neighbours and how far their crowns lean into the
+ *   gap over 10 seasons.
  *
  * The lone tree and the stand take the woods' top (200): in 3D beech reaches 151 cells by season
  * 100, and a crown pinned at the top runs away (the species plan §0.2).
@@ -29,7 +34,7 @@ import {
   type SpeciesPatch,
   speciesParams,
 } from "../src/core/params.ts";
-import { presetParams, TOP } from "../src/core/presets.ts";
+import { perArea, presetParams, TOP } from "../src/core/presets.ts";
 import { coreWasm, loadWorldsSync, RustWorld, type TreeView as Tree } from "../src/wasm/world.ts";
 
 loadWorldsSync(readFileSync(coreWasm));
@@ -58,10 +63,25 @@ export function loneParams(species: string, seed: number): Params {
   });
 }
 
-export function standParams(species: string, seed: number): Params {
+/** The one-row stand of M19–M27 (ten trees between τ 0.2 faces): now the release trial's. */
+export function rowParams(species: string, seed: number): Params {
   return trialBase(seed, {
     world: { width: 230, height: TOP, walls: [] },
     trees: STAND_ROOTS.map((x) => ({ x, species })),
+  });
+}
+
+/** The closed stand's ring, cells: four trees a row at the woods' spacing, 21. */
+export const STAND_WIDTH = 84;
+/** One row's x; perArea repeats it in three rows across the slab's depth (64), staggered. */
+export const STAND_ROW = [10.5, 31.5, 52.5, 73.5];
+/** The middle row's trees (perArea's rows are in order): the stand's measured trees. */
+export const STAND_MEASURED = [4, 5, 6, 7];
+
+export function standParams(species: string, seed: number): Params {
+  return trialBase(seed, {
+    world: { width: STAND_WIDTH, height: TOP, walls: [], sides: "periodic", faces: [0, 0] },
+    trees: perArea(STAND_ROW, STAND_WIDTH, () => ({ species })),
   });
 }
 
@@ -187,7 +207,9 @@ export function runLone(
     alive,
     height30,
     height60: m.height,
-    spread: m.height > 0 ? m.crownWidth / m.height : 0,
+    // The crown read in x and z (form.rs's profile reads both the same way): the larger extent,
+    // which the slab's depth does not cap.
+    spread: m.height > 0 ? Math.max(m.crownWidth, m.crownDepth) / m.height : 0,
     slenderness: m.slenderness,
     branchAngle: m.branchAngle,
     widestAt: f.widestAt,
@@ -204,7 +226,7 @@ export function runLone(
 }
 
 export interface StandTraits {
-  /** Share of the interior trees alive at season 60. */
+  /** Share of the middle row's trees alive at season 60. */
   alive: number;
   height: number;
   slenderness: number;
@@ -215,12 +237,12 @@ export interface StandTraits {
   crownRatio: number;
   /** The branch measure (metrics' crownRatio), for the record. */
   boleCrownRatio: number;
-  /** Light on the floor under the interior, a fraction of open sky (reported, not fitted). */
+  /** Light on the stand's floor, a fraction of open sky (reported, not fitted). */
   floor: number;
   widestAt: number;
-  /** Mean interior height at season 100, when the stand is run on to 100; else absent. */
+  /** The middle row's mean height at season 100, when the stand is run on to 100; else absent. */
   height100?: number;
-  /** Share of the interior trees alive at season 100, when run on; else absent. */
+  /** Share of the middle row's trees alive at season 100, when run on; else absent. */
   alive100?: number;
 }
 
@@ -235,7 +257,7 @@ export function runStand(
 ): StandTraits {
   const world = newWorld(withAssign(standParams(species, seed), species, assign));
   world.run(60);
-  const interior = world.trees.slice(2, -2);
+  const interior = STAND_MEASURED.map((k) => world.trees[k] as Tree);
   const live = interior.filter((t) => t.alive);
   const ms = live.map((t) => world.metricsOf(t));
   const traits: StandTraits = {
@@ -244,7 +266,7 @@ export function runStand(
     slenderness: mean(ms.map((m) => m.slenderness)),
     crownRatio: mean(ms.map((m) => m.leafCrownRatio)),
     boleCrownRatio: mean(ms.map((m) => m.crownRatio)),
-    floor: world.groundLight(50, 180),
+    floor: world.groundLight(0, STAND_WIDTH),
     widestAt: mean(live.map((t) => world.formOf(t).widestAt)),
   };
   if (seasons === 100) {
@@ -323,7 +345,7 @@ export function runRelease(
   seed: number,
   assign: Record<string, unknown> = {},
 ): { epicormic: number; lean: number } {
-  const world = newWorld(withAssign(standParams(species, seed), species, assign));
+  const world = newWorld(withAssign(rowParams(species, seed), species, assign));
   world.run(FELL);
   const [left, right] = [world.trees[4] as Tree, world.trees[6] as Tree];
   const before = [world.metricsOf(left).centroidOffset, world.metricsOf(right).centroidOffset];

@@ -31,6 +31,8 @@ where that start's loss is lower than its own: the plan's transfer.
 import argparse
 import json
 import os
+import sys
+import traceback
 
 import tomllib
 
@@ -155,37 +157,52 @@ def lm_report(spec: Spec, result: dict) -> None:
         print(f"{p:24} {fmt(result['start']['assign'].get(p)):>8} {fmt(result['fit']['assign'].get(p)):>8}")
 
 
+def shift_of(spec: Spec, own: dict, fitted: dict) -> dict:
+    """A fit's move from its own start: unit cube per path, r0 in log."""
+    free = Spec(spec.species, [], [p for p in spec.params if p["path"] != "c6.r0"])
+    d = dict(zip(free.paths, encode(free, fitted) - encode(free, own)))
+    d["log r0"] = float(np.log(fitted["c6.r0"] / own["c6.r0"]))
+    return d
+
+
 if args.method == "lm":
+    # An unattended run (step 2 runs overnight): the log is a file, so print line by line.
+    sys.stdout.reconfigure(line_buffering=True)
     out = REPO / "docs" / "experiments" / "fits" / args.out
     settings = LMSettings(workers=args.workers, **({"iterations": args.iterations} if args.iterations else {}))
+    # Every species already fitted in this round lends its shift to the ones that run, wherever it
+    # stands in the list (beech, fourth in GARDEN, is done before birch, the first, runs).
     shifts: list[dict] = []
+    done = [sp for sp in species if (out / f"{sp}.json").exists()] if args.skip_done else []
+    for sp in done:
+        fitted = json.loads((out / f"{sp}.json").read_text())["fit"]["assign"]
+        shifts.append(shift_of(load_spec(sp), round2_start(sp, args.start), fitted))
+    if done:
+        print(f"skipped (done): {', '.join(done)}; their shifts carry to the rest")
+    failed: list[str] = []
     for sp in species:
-        if args.skip_done and (out / f"{sp}.json").exists():
-            # Its shift still carries to the species after it (the plan's transfer).
+        if sp in done:
+            continue
+        print(f"\n=== {sp} (least squares) ===")
+        try:
             spec = load_spec(sp)
             own = round2_start(sp, args.start)
-            done_fit = json.loads((out / f"{sp}.json").read_text())["fit"]["assign"]
-            free = Spec(sp, [], [p for p in spec.params if p["path"] != "c6.r0"])
-            d = dict(zip(free.paths, encode(free, done_fit) - encode(free, own)))
-            d["log r0"] = float(np.log(done_fit["c6.r0"] / own["c6.r0"]))
-            shifts.append(d)
-            print(f"skipped (done): {sp}; its shift carries on")
-            continue
-        print(f"\n=== {sp} (least squares) ===", flush=True)
-        spec = load_spec(sp)
-        own = round2_start(sp, args.start)
-        start = lm_start(spec, own, shifts, args.workers)
-        active = args.active.split(",") if args.active else None
-        result = fit_lm(spec, settings, start, log=lambda s: print(s, flush=True), active=active)
-        result["startFrom"] = {"round": args.start, "shifted": start != own}
-        write_lm(result, out)
-        lm_report(spec, result)
-        free = Spec(sp, [], [p for p in spec.params if p["path"] != "c6.r0"])
-        d = dict(zip(free.paths, encode(free, result["fit"]["assign"]) - encode(free, own)))
-        d["log r0"] = float(np.log(result["fit"]["assign"]["c6.r0"] / own["c6.r0"]))
-        shifts.append(d)
-        print(f"wrote {out / (sp + '.json')}", flush=True)
-    raise SystemExit(0)
+            start = lm_start(spec, own, shifts, args.workers)
+            active = args.active.split(",") if args.active else None
+            result = fit_lm(spec, settings, start, log=print, active=active)
+            result["startFrom"] = {"round": args.start, "shifted": start != own}
+            write_lm(result, out)
+            lm_report(spec, result)
+            shifts.append(shift_of(spec, own, result["fit"]["assign"]))
+            print(f"wrote {out / (sp + '.json')}")
+        except Exception:
+            # One species failing must not stop the night's run: log it, and go on to the next.
+            # Nothing is written for it, so --skip-done runs it again on a restart.
+            failed.append(sp)
+            print(f"FAILED {sp}:\n{traceback.format_exc()}")
+    print(f"\nfinished: fitted {', '.join(s for s in species if s not in done and s not in failed) or 'none'}"
+          + (f"; failed {', '.join(failed)}" if failed else "") + (f"; skipped {', '.join(done)}" if done else ""))
+    raise SystemExit(1 if failed else 0)
 
 done, skipped = [], []
 for sp in species:

@@ -315,47 +315,10 @@ export const HAND_FLORA = {
 /**
  * The species the woodland presets grow (M27b, ADR 0023): the round-2 CMA-ES fits to literature
  * traits with hand adjustments (flora-fitted.ts, generated). They grow with the hyperbolic
- * hydraulic discount (ADR 0021) and a juvenile phase (ADR 0022), set in each patch.
+ * hydraulic discount (ADR 0021) and a juvenile phase (ADR 0022), set in each patch, and as they
+ * grow in 3D (ADR 0025): each species' phyllotaxis and wood's own E, which the generator
+ * (analysis/experiments/m27_adopt.py) writes into the file.
  */
-/**
- * I2 (ADR 0025): the fitted species as they grow in 3D. Two things the 2D fits could not hold:
- * - **Phyllotaxis**, a species trait the plane could not draw (2D's only planar sequence was
- *   distichous): every distichous row takes the species' own, whorls stay. Spiral alternate
- *   (2/5) in birch, oak, holly, rowan, goat willow and Scots pine's laterals; distichous in beech,
- *   hornbeam and silver fir's flat sprays; decussate in field maple.
- * - **Stiffness:** wood's own E (4·10⁶ in the model's units) for every species, where 2D had
- *   lowered it (1–2.5·10⁶) for limbs that carried less foliage than a real one (ADR 0011).
- *   Species' own stiffnesses are calibration's (C2).
- */
-const PHYLLOTAXIS: Record<keyof typeof FITTED_FLORA, PaLevel["generator"]> = {
-  birch: "spiral",
-  beech: "distichous",
-  oak: "spiral",
-  fir: "distichous",
-  hornbeam: "distichous",
-  maple: "opposite",
-  holly: "spiral",
-  rowan: "spiral",
-  willow: "spiral",
-  pine: "spiral",
-};
-
-function in3d<T extends SpeciesPatch>(name: keyof typeof FITTED_FLORA, sp: T): T {
-  const levels = sp.r2?.levels?.map((l) =>
-    l.generator === "distichous" ? { ...l, generator: PHYLLOTAXIS[name] } : l,
-  );
-  return {
-    ...sp,
-    ...(sp.r2 ? { r2: { ...sp.r2, ...(levels ? { levels } : {}) } } : {}),
-    ...(sp.r3 ? { r3: { ...sp.r3, E: 4e6 } } : {}),
-  };
-}
-
-export const FLORA = Object.fromEntries(
-  Object.entries(FITTED_FLORA).map(([name, sp]) => [
-    name,
-    in3d(name as keyof typeof FITTED_FLORA, sp),
-  ]),
-) as typeof FITTED_FLORA;
+export const FLORA = FITTED_FLORA;
 
 export type FloraName = keyof typeof FLORA;

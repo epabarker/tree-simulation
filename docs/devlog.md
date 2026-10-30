@@ -2,6 +2,17 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-01: an independent review of the 3D port
+
+- **User:** review the port's progress and what remains to finish it ([review](reviews/2026-11-01-3d-port-review-2.md), from the handover). Docs only; nothing re-run.
+- **Corrections to round 2** (derived from the code, for round 3 to measure):
+  - R1's sapwood cost is m_w·π·r0²·Σ(path to each live tip), linear in tips, so thick trunks don't raise it. H/D is C6's: lower r0 and raise m_w to keep m_w·r0².
+  - The slab's sky has a near-zenith band (72.5–90° at K 16). A 17% floor is k·LAI ≈ 1.8; 2–10% needs 2.3–3.9. The limiter is the canopy's leaf area.
+  - The woods run the fitted beech (hyperbolic L_h 108.9, m_f 0.077, Q_ss 0.0126), not `HAND_FLORA`'s: the fix is a 3D re-fit.
+  - Crown ratio uses the lowest live first-order branch, which one twig pins: redefine by leaf area.
+- **User's decisions:** done means a shippable bar (the mixed wood right in depth, within the phone's budget, floor, H/D and crown base as 20-seed evidence); I3 alongside a merged C1 + C2; the 3D species fits run overnight on the user's 12-core machine.
+- **Goldens:** unchanged.
+
 ## 2026-11-01: C1 round 2: height first, R5 on neighbours, the stand in depth
 
 - **User** (on round 1): height first, through R1, to 300 seasons; R5 on neighbours everywhere; the interior's stand planted per area, with the floor measured under the crowns; the crown base checked before adding anything. Accepted round 1, the pre-C1 fixes and ADR 0026 (PR #22).

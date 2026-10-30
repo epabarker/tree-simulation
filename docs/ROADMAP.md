@@ -143,6 +143,8 @@ No published value exists for these. Calibrate on *patterns*: several weak targe
 - the beech wood and the mixed wood's beech and hornbeam still run to the top (species R1);
 - the floor stays at 17% even under the crowns (an all-oblique sky);
 - the crown base is not held by C5: the lower crown is well lit.
+
+**Review** ([2026-11-01](reviews/2026-11-01-3d-port-review-2.md)): three of round 2's diagnoses corrected (sapwood cost, the zenith, the fitted beech); the path to a shippable 3D garden agreed: I3 alongside C1 + C2, then the species re-fit in 3D, with C3–C6 as hold-outs.
 - Scheduled since the M12 review:
   - Embedding in the personal website → M14 (ADR 0014).
   - **R1, R3, R4 and R5 for the species presets** (M8–M10 follow-ups: under R1 they reach their 160-cell top or grow far too slender; calibrate m_f as shade tolerance and L_h as species height) → M20.

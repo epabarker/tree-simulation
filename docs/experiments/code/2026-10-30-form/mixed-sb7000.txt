@@ -1,0 +1,9 @@
+beech     planted   9, alive   6, thrown   0 (0%), other deaths   3; thrown at H/D -, height -; survivors height 61, H/D 76
+birch     planted  27, alive   0, thrown   9 (33%), other deaths  18; thrown at H/D 128, height 99; survivors height -, H/D -
+holly     planted   9, alive   5, thrown   0 (0%), other deaths   4; thrown at H/D -, height -; survivors height 30, H/D 92
+hornbeam  planted   9, alive   3, thrown   0 (0%), other deaths   6; thrown at H/D -, height -; survivors height 170, H/D 31
+maple     planted   9, alive   4, thrown   0 (0%), other deaths   5; thrown at H/D -, height -; survivors height 44, H/D 56
+oak       planted   9, alive   7, thrown   1 (11%), other deaths   1; thrown at H/D 138, height 31; survivors height 174, H/D 65
+rowan     planted   9, alive   0, thrown   0 (0%), other deaths   9; thrown at H/D -, height -; survivors height -, H/D -
+willow    planted   9, alive   0, thrown   0 (0%), other deaths   9; thrown at H/D -, height -; survivors height -, H/D -
+all       planted 90, alive 25, thrown 10 (11%), other 55

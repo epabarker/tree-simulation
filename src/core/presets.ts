@@ -82,7 +82,9 @@ const FOREST = {
   ...SKY,
   r1: { enabled: true, fRep: 0.1, maturity: 40 },
   // M16: limbs rest on the ground; storms in 5% of seasons break exposed limbs and throw tall trees.
-  r3: { ...SKY.r3, ground: true, sigmaBreak: 4500 },
+  // σ_break 7000 ≈ 2.3 × σ_target (ADR 0027): with thin pipes stress wood holds every branch near
+  // σ_target, and a storm's load at the top is 2.5×, so 4500 broke whole crowns in every storm.
+  r3: { ...SKY.r3, ground: true, sigmaBreak: 7000 },
   o2: { stormP: 0.05, stormLoad: 1.5 },
   o4: { enabled: true },
 } satisfies ParamsPatch;

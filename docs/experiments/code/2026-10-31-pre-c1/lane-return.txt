@@ -1,0 +1,4 @@
+{"case":"forest s40","mbPerLane":18.3,"copyMs":"30.2","sumMs":"58.6"}
+{"case":"forest s100","mbPerLane":26.9,"copyMs":"68.0","sumMs":"50.5"}
+{"case":"garden 160","mbPerLane":18.8,"copyMs":"19.0","sumMs":"31.2"}
+{"case":"garden 66","mbPerLane":7.8,"copyMs":"10.2","sumMs":"13.6"}

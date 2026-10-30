@@ -11,6 +11,7 @@ export default defineConfig({
     root: fileURLToPath(new URL("../..", import.meta.url)),
     include: ["tests/evidence-2d/**/*.test.ts"],
     environment: "node",
-    testTimeout: 300_000,
+    // A 3D stand's season is ≈ 0.2 s natively and more in WASM: the 2D tests' 90 s does not fit.
+    testTimeout: 1_800_000,
   },
 });

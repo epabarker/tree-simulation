@@ -2751,7 +2751,7 @@
    "seed": 1,
    "world": {
     "width": 210,
-    "height": 130,
+    "height": 200,
     "depth": 64,
     "faces": [
      0.2,
@@ -2918,7 +2918,7 @@
    "seed": 1,
    "world": {
     "width": 210,
-    "height": 130,
+    "height": 200,
     "depth": 64,
     "faces": [
      0.2,
@@ -4266,7 +4266,7 @@
    "seed": 1,
    "world": {
     "width": 230,
-    "height": 130,
+    "height": 200,
     "depth": 64,
     "faces": [
      0.2,
@@ -5475,7 +5475,7 @@
    "seed": 1,
    "world": {
     "width": 230,
-    "height": 130,
+    "height": 200,
     "depth": 64,
     "faces": [
      0.2,
@@ -6684,7 +6684,7 @@
    "seed": 1,
    "world": {
     "width": 230,
-    "height": 130,
+    "height": 200,
     "depth": 64,
     "faces": [
      0.2,
@@ -7893,7 +7893,7 @@
    "seed": 1,
    "world": {
     "width": 230,
-    "height": 160,
+    "height": 200,
     "depth": 64,
     "faces": [
      0.2,
@@ -9102,7 +9102,7 @@
    "seed": 1,
    "world": {
     "width": 230,
-    "height": 160,
+    "height": 200,
     "depth": 64,
     "faces": [
      0.2,
@@ -10311,7 +10311,7 @@
    "seed": 1,
    "world": {
     "width": 210,
-    "height": 130,
+    "height": 200,
     "depth": 64,
     "faces": [
      0.2,
@@ -11521,7 +11521,7 @@
    "seed": 1,
    "world": {
     "width": 210,
-    "height": 130,
+    "height": 200,
     "depth": 64,
     "faces": [
      0.2,
@@ -12731,7 +12731,7 @@
    "seed": 1,
    "world": {
     "width": 210,
-    "height": 130,
+    "height": 200,
     "depth": 64,
     "faces": [
      0.2,

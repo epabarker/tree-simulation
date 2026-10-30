@@ -1,42 +1,41 @@
 # Status
 
-_Last updated: 2026-10-30 (3D port: I2 built, the trees grow in 3D; V and the phone's timings are the user's)_
+_Last updated: 2026-10-31 (before C1 done; C1 round 1 measured, its candidate awaits the user)_
 
-**3D port** (branch `claude/quirky-archimedes-x14c8k`, PRs into `claude/gallant-brown-5k4g33`). ADR 0024 (accepted), **ADR 0025 (I2's design, proposed)**. G2, G3, I1 accepted; parity is a proof at the tag `golden-2d-ts` (CI's `golden-2d` job). **I2** ([note](experiments/2026-10-30-i2-3d-growth.md)):
-- the trees grow in a slab, D = 64, K 16 rotating, τ per face (default interior 0.2), with every principle in 3D: frames, phyllotaxis, vector C4 and R3 (E = 4·10⁶), the bank in 3D, O4 on the ground;
-- 3D goldens (14 cases); the 2D-calibrated milestone tests are `tests/evidence-2d/`, calibration's backlog (47 of 90 pass in 3D);
-- m 25–83 with every principle (two to four times the prototype's; under its rules the core reproduces it); 1.5–2.2× per metamer;
-- `forest` at season 40 on the VM's browser: 191–235 ms in one lane, 130–185 with the light in four lanes.
+**3D port** (branch `claude/c1-calibration-ustbkz`, PRs into `claude/gallant-brown-5k4g33`). ADR 0024 and **0025 accepted** (V passed; the phone's seasons all under 250 ms in one lane). **ADR 0026 (memory budget, proposed).** The checklist before C1 is done ([note](experiments/2026-10-31-pre-c1.md)):
+- Canvas 2D paints 3D stands; memory ≈ 1 MB a cell of plate width; threads and worker lanes parked;
+- the backlog runs without traps: 39 of 78 pass;
+- the woods' top is 200, after a crown pinned at 130 ran away.
+
+C1 round 1 ([note](experiments/2026-10-31-c1-round1.md)):
+- the floor (15%) is held by R6's Q_ss, then by gaps between crowns;
+- the crown base never lifts;
+- R5's own-shade signal makes 3D crowns poles.
 
 ## Works
-- **Core** (`rust/core`, one build): C1–C6, R1–R6, O2, O4 in 3D; the slab sweep in fixed lanes (the same bits on 1 or 4 threads); checkpoints v2 (v1 loads as a planar forest); `geom.rs` for frames.
-- **Species** (`flora.ts` over `flora-fitted.ts`): the ten, with their botanical phyllotaxis and wood's E (an I2 overlay). Uncalibrated in 3D.
-- **Presets** as before, now 3D; `shadow` (C3 `none` under light) no longer regulates.
-- **Garden** (`mountGarden`, ADR 0014): the 3D core; no opening forests until I3 (Q7), so it grows from seed; pseudo-depth off, branches far to near. The live site stays on 0.14.0 (2D).
-- **Lab:** the World folder sets τ (the three looks); C1's phyllotaxis. **Headless:** `npm run sim`, `npm run bench`, `npm run evidence:2d`.
+- **Core** (`rust/core`, one build): C1–C6, R1–R6, O2, O4 in 3D; the slab sweep in fixed lanes; checkpoints v2; `geom.rs` for frames.
+- **Species** (`flora.ts` over `flora-fitted.ts`), uncalibrated in 3D. **Presets** in 3D; woods' top 200 (`TOP`).
+- **Garden** (`mountGarden`): the 3D core, growing from seed (no opening forests until I3). The live site stays on 0.14.0 (2D).
+- **Headless:** `npm run sim`, `npm run bench`, `npm run evidence:2d` (≈ 4 h); C1's harness `code/2026-10-31-c1/` (`runs.sh`, `c1.py`, `floor.ts`).
 
 ## Next
 1. **The user:**
-   - **V:** `https://preview-3d-edbarker-dev.edbarker.workers.dev/preview/i2/i2.html`, the 3D forest beside today's garden, best on the phone with "the planting alone";
-   - **timing:** the page's "Run" on phone and laptop (paste the JSON);
-   - accept or amend ADR 0025.
-2. **If V says go:** I3 (the 3D renderer: depth-ordered leaves and wood, GPU tween, threads behind COOP/COEP, checkpoints and first paint, Q7), then calibration C1–C8 under rotation, starting from the backlog in `tests/evidence-2d/` and the I2 note's findings:
-   - O4 fills plates with seedlings;
-   - trees reach the world's top;
-   - open looks pile foliage at their faces;
-   - slenderness is 12–20.
-3. **Possible:** WASM threads for the browser's lanes (needs nightly's build-std for atomics); the native `threads` path clones the sweep per lane (correct, not faster).
-
-## Open questions (ask when the milestone comes up)
-- V's verdict. First-paint policy for 3D (Q7), at I3. The interior's exact τ, at C1.
+   - accept C1's candidate (R5 on neighbours for `forest`/SKY, Q_ss 0.03)?
+   - fill the slab's depth with the stand's planting, or measure the floor under the crowns?
+   - accept or amend ADR 0026 (256 MB; the garden's plates above ≈ 200 cells break it).
+2. **C1 round 2:** canopy closure against the gaps, then the crown base under a closed canopy, then the interior's τ. Re-time the phone with the candidate's m (≈ 52). Evidence at 20 seeds.
+3. **Height's plateau** (C3 with C1): the mixed wood reaches the 200 top and runs away at season 388.
+4. **I3:** one lane; cap the plate or cut bytes a cell (ADR 0026); depth-ordered drawing; framing under the taller top; first paint (Q7).
 
 ## Known issues
-- The 3D model is uncalibrated (the I2 note's contradictions; `tests/evidence-2d/`). Some backlog tests share stands across tests or build too many 3D worlds for WASM's 4 GB.
-- A 3D world holds ≈ 70 MB (light field and owner grid); dispose worlds in tools and tests.
-- The renderer draws leaves after all wood (I3 orders them).
+- **Uncalibrated:** crown ratio 0.99 everywhere; H/D 11–30 (target 60–80, C2's girth); `shadow` and R1 off do not regulate (backlog).
+- **The garden's "world" frame** fits at least half the top: young gardens draw smaller under the 200 top.
+- **The preview deploy** (`preview-3d`) still has the old `i2.ts`: redeploy only when the user asks.
+- The renderer draws leaves after all wood (I3).
 
 ## Notes for the next session
-- **Node:** this container's default is 22; install 24 (`npm i node@24` in the scratchpad, `bin` first on PATH). Playwright runs under the system Node (`NODE_PATH=$(npm root -g)`). **Rust:** `cargo install wasm-bindgen-cli --version 0.2.129 --locked`. Tests compile optimised (`[profile.test]`); a 3D golden run is 12 s natively.
-- **Code that used the 2D core** runs at the tag `golden-2d-ts` (`--parity` there reproduces the TypeScript core). The tag's 2D CLI with `code/2026-10-30-i2/2d-bench-series.patch` gives 2D series for comparison.
-- **Site deploys:** a push to `main` goes to production; other branches get `<branch>-edbarker-dev.edbarker.workers.dev`; never merge `preview-3d` (now ≈ 360 MB of stands). Tag pushes are refused from cloud sessions: the user pushes tags.
-- **Golden-safe means bit-identical:** goldens and `npm run bench -- --compare runs/bench/<sha>.json`.
+- **Node:** this container's default is 22: `npm i node@24` in the scratchpad, its `bin` first on PATH. **Rust:** `cargo install wasm-bindgen-cli --version 0.2.129 --locked`.
+- **Evidence tests:** fail a world past 1.5M metamers (`METAMER_CAP`); free each world in loops.
+- **Laptop:** its local `claude/gallant-brown-5k4g33` has four unpushed 2D commits (ADR number clash "0024"). Left alone.
+- **Site deploys:** a push to `main` is production; never merge `preview-3d`; tag pushes are the user's.
+- **Golden-safe means bit-identical:** goldens and `npm run bench -- --compare`.

@@ -53,23 +53,37 @@ function lowerOverUpper(tree: Tree): number {
   return lower / upper;
 }
 
-const open = (preset: FixtureName, patch: ParamsPatch = {}) =>
-  SEEDS.map((seed) => grow(preset, seed, patch).trees[0] as Tree);
+/** What the tests read of a lone tree, measured once and its world freed (≈ 80 MB each in 3D). */
+type Lone = { angle: number; lowerOverUpper: number; spread: number };
+const open = (preset: FixtureName, patch: ParamsPatch = {}): Lone[] =>
+  SEEDS.map((seed) => {
+    const world = grow(preset, seed, patch);
+    const tree = world.trees[0] as Tree;
+    const m = treeMetrics(tree);
+    const lone = {
+      angle: branchAngle(tree),
+      lowerOverUpper: lowerOverUpper(tree),
+      spread: m.crownWidth / m.height,
+    };
+    world.dispose();
+    return lone;
+  });
 const conifers = open("conifer");
 const birches = open("birch");
 const tropicals = open("tropical");
 const interior = (preset: FixtureName): TreeMetrics[] =>
-  SEEDS.flatMap((seed) =>
-    grow(preset, seed)
-      .trees.slice(1, -1)
-      .map((t) => treeMetrics(t)),
-  );
+  SEEDS.flatMap((seed) => {
+    const world = grow(preset, seed);
+    const ms = world.trees.slice(1, -1).map((t) => treeMetrics(t));
+    world.dispose();
+    return ms;
+  });
 
 describe("M7: species from R2 tables (§9, ADR 0009; 5 seeds, 50 seasons)", () => {
   it("grows the conifer as a cone of near-horizontal tiers (Massart)", () => {
     for (const tree of conifers) {
-      expect(branchAngle(tree)).toBeGreaterThan(65);
-      expect(lowerOverUpper(tree)).toBeGreaterThan(1.2);
+      expect(tree.angle).toBeGreaterThan(65);
+      expect(tree.lowerOverUpper).toBeGreaterThan(1.2);
     }
   });
 
@@ -84,10 +98,9 @@ describe("M7: species from R2 tables (§9, ADR 0009; 5 seeds, 50 seasons)", () =
 
   it("grows the birch with steep fine branches and broadens it with age (ontogeny)", () => {
     for (const [i, birch] of birches.entries()) {
-      expect(branchAngle(birch)).toBeLessThan(branchAngle(conifers[i] as Tree) - 30);
+      expect(birch.angle).toBeLessThan((conifers[i] as Lone).angle - 30);
     }
-    const ratio = (trees: Tree[]) =>
-      median(trees.map((t) => treeMetrics(t)).map((m) => m.crownWidth / m.height));
+    const ratio = (trees: Lone[]) => median(trees.map((t) => t.spread));
     expect(ratio(birches)).toBeGreaterThan(1.2 * ratio(open("birch", { r2: { dLambda: 0 } })));
   });
 
@@ -100,8 +113,8 @@ describe("M7: species from R2 tables (§9, ADR 0009; 5 seeds, 50 seasons)", () =
 
   it("grows the tropical tree as a pagoda of flat tiers, widest at the base (Aubréville)", () => {
     for (const tree of tropicals) {
-      expect(branchAngle(tree)).toBeGreaterThan(60);
-      expect(lowerOverUpper(tree)).toBeGreaterThan(1);
+      expect(tree.angle).toBeGreaterThan(60);
+      expect(tree.lowerOverUpper).toBeGreaterThan(1);
     }
   });
 });

@@ -95,7 +95,15 @@ const WOODLAND = {
 /** A world of one calibrated species: `x` positions, all of `name`. */
 const flora = (name: FloraName, xs: number[]) => xs.map((x) => ({ x, species: name }));
 
-const RING: Params["world"] = { width: 210, height: 130, walls: [], sides: "periodic" };
+/**
+ * The woods' world top, cells. In 3D the trees' height has not levelled off by season 150 (C1), and
+ * a crown pinned at the top runs away: its top row sees the open sky however dense it grows, so it
+ * doubles every 15–20 seasons (the pre-C1 note). The light only marches up to the highest leafy
+ * row, so headroom costs memory (W × D × 24 bytes a row), not time, until a tree grows into it.
+ */
+const TOP = 200;
+
+const RING: Params["world"] = { width: 210, height: TOP, walls: [], sides: "periodic" };
 
 /**
  * The mixed wood's planting (M25), one tree every 21 cells: three birch and a goat willow
@@ -336,7 +344,7 @@ export const presets = {
     description:
       "Betula pendula: quick to grow, light-demanding, clean boles under a light canopy.",
     patch: {
-      world: { width: 230, height: 130, walls: [] },
+      world: { width: 230, height: TOP, walls: [] },
       trees: flora(
         "birch",
         STAND_X.map((t) => t.x),
@@ -348,7 +356,7 @@ export const presets = {
     label: "M19: an oak wood",
     description: "Quercus robur in a stand: tall and slender, with crowns lifted to the light.",
     patch: {
-      world: { width: 230, height: 130, walls: [] },
+      world: { width: 230, height: TOP, walls: [] },
       trees: flora(
         "oak",
         STAND_X.map((t) => t.x),
@@ -361,7 +369,7 @@ export const presets = {
     description:
       "Fagus sylvatica: deep, dense crowns over a dark floor, a few per cent of the sky.",
     patch: {
-      world: { width: 230, height: 130, walls: [] },
+      world: { width: 230, height: TOP, walls: [] },
       trees: flora(
         "beech",
         STAND_X.map((t) => t.x),
@@ -374,7 +382,7 @@ export const presets = {
     label: "M19: a silver fir wood",
     description: "Abies alba: tiered spires that keep their shaded branches (a lab species).",
     patch: {
-      world: { width: 230, height: 160, walls: [] },
+      world: { width: 230, height: TOP, walls: [] },
       trees: flora(
         "fir",
         STAND_X.map((t) => t.x),
@@ -388,7 +396,7 @@ export const presets = {
     description:
       "Pinus sylvestris: light-demanding whorled pines that shed their lower limbs, high crowns over a light floor (a lab species).",
     patch: {
-      world: { width: 230, height: 160, walls: [] },
+      world: { width: 230, height: TOP, walls: [] },
       trees: flora(
         "pine",
         STAND_X.map((t) => t.x),

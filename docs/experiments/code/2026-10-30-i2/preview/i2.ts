@@ -11,7 +11,10 @@
  * timed lanes; the four-lane season is the one-lane season with its light replaced by the
  * slowest lane plus the lanes' sum.
  */
+import type { Snapshot } from "../../../../../src/core/types.ts";
 import { createRenderer } from "../../../../../src/web/render/create.ts";
+import { LEAF_STYLES } from "../../../../../src/web/render/leaf-styles.ts";
+import type { ViewOptions } from "../../../../../src/web/render/scene.ts";
 import sceneTokens from "../../../../../src/web/render/scene.css?inline";
 import { coreWasm, loadWorlds, RustWorld } from "../../../../../src/wasm/world.ts";
 import { DEFAULTS, drawSlab } from "./slab-view.ts";
@@ -35,6 +38,29 @@ deep.scene.frame = "world";
 // biome-ignore lint: the 0.14.0 garden's own API, loaded from the site at run time
 let flat: any = null;
 let showing = "";
+/** The stand on show, kept so a resize can draw it again. */
+let shown: Snapshot | null = null;
+/** The garden's view (garden.ts), for the Canvas 2D fallback, which has no slab view. */
+const VIEW: ViewOptions = {
+  colorMode: "natural",
+  showLeaves: true,
+  depth: false,
+  leafAge: LEAF_STYLES.broadleaf.leafAge,
+  leafStyle: "broadleaf",
+  showBuds: false,
+  showShadow: false,
+  showGhosts: false,
+};
+
+/** Draws `s`: WebGL2 through the slab view, Canvas 2D as the garden draws (no depth order). */
+function paint(s: Snapshot): void {
+  deep.resize();
+  deep.scene.depth = false;
+  deep.scene.fit(true);
+  if (deep.kind === "webgl2") drawSlab(deep, s, { ...DEFAULTS, model: "open", D: 64, z: s.z0 });
+  else deep.draw(1, VIEW);
+}
+new ResizeObserver(() => shown && paint(shown)).observe($("deepCanvas"));
 
 async function show(): Promise<void> {
   const w = Number(sel("width").value);
@@ -57,9 +83,8 @@ async function show(): Promise<void> {
   deep.scene.clearHistory();
   deep.setSnapshot(s);
   deep.scene.clearHistory();
-  deep.scene.depth = false;
-  deep.scene.fit(true);
-  if (deep.kind === "webgl2") drawSlab(deep, s, { ...DEFAULTS, model: "open", D: 64, z: s.z0 });
+  shown = s;
+  paint(s);
   $("stats").textContent = `3D: ${s.metrics.filter((m) => m.alive).length} trees, ${s.metamerCount} metamers (renderer ${deep.kind})`;
   // Today's garden, opening still on the 2D forest of the same planting and season.
   try {

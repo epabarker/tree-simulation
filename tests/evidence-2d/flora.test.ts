@@ -24,6 +24,7 @@ function shadeHouse(species: FloraName, roof: number): { alive: number; light: n
     light += groundLight(world, 0, 6) / SEEDS.length;
     world.run(29);
     if (world.trees[0]?.alive) alive++;
+    world.dispose();
   }
   return { alive, light };
 }
@@ -36,6 +37,7 @@ function stand(species: FloraName) {
     world.run(60);
     for (const t of world.trees.slice(2, -2)) if (t.alive) ms.push(treeMetrics(t, world));
     floor.push(groundLight(world, 50, 180));
+    world.dispose();
   }
   return {
     slenderness: mean(ms.map((m) => m.slenderness)),
@@ -48,7 +50,9 @@ function lone(species: FloraName) {
   const ms = SEEDS.map((seed) => {
     const world = new World(loneParams(species, seed));
     world.run(60);
-    return treeMetrics(world.trees[0] as NonNullable<(typeof world.trees)[0]>, world);
+    const m = treeMetrics(world.trees[0] as NonNullable<(typeof world.trees)[0]>, world);
+    world.dispose();
+    return m;
   });
   return {
     spread: mean(ms.map((m) => m.crownWidth / m.height)),
@@ -113,6 +117,7 @@ describe("calibrated species (M19)", () => {
       birch[0].push(early.birch);
       birch[1].push(late.birch);
       beech.push(late.beech);
+      world.dispose();
     }
     // In some runs oak, not beech, takes a storm gap; across runs beech gains the canopy.
     // Storms keep some gaps for birch and oak, so beech holds about half the canopy, not all.
@@ -140,6 +145,7 @@ describe("calibrated species (M19)", () => {
           const p = c.parent[i] as number;
           if (c.order[i] === 1 && c.order[p] === 0 && c.radius[i] > 0.5 * c.radius[p]) n++;
         }
+        world.dispose();
         return sum + n;
       }, 0);
     // Measured: 30 big limbs with κ = 3 against 24 without acrotony.
@@ -162,6 +168,7 @@ describe("calibrated species (M19)", () => {
           trees++;
           if (!t.alive && t.broken === t.m.length) thrown++;
         }
+        world.dispose();
       }
       return thrown / trees;
     };
@@ -212,7 +219,9 @@ describe("the M25 species", () => {
     const height = (sp: FloraName) => {
       const world = grown(1, { trees: [{ x: 80, species: sp }] });
       world.run(60);
-      return treeMetrics(world.trees[0] as NonNullable<(typeof world.trees)[0]>, world).height;
+      const h = treeMetrics(world.trees[0] as NonNullable<(typeof world.trees)[0]>, world).height;
+      world.dispose();
+      return h;
     };
     expect(lone("willow").spread).toBeGreaterThan(1.2);
     const maple = lone("maple").spread;
@@ -251,11 +260,12 @@ describe("the M25 species", () => {
         world.trees.filter((t) => t.alive),
         ["holly", "hornbeam"],
       );
+      world.dispose();
     }
     expect(late).toBeLessThan(0.5 * early);
     expect(beech).toBeGreaterThan(hornbeam);
     expect(shadeBearers).toBeGreaterThanOrEqual(2 * SIX.length);
-  }, 90_000);
+  });
 
   it("brings goat willow back to a clearing only through seed rain (ADR 0018)", () => {
     // An old mixed wood, a 60-cell clearing felled at season 300, then 40 seasons. Measured
@@ -271,14 +281,13 @@ describe("the M25 species", () => {
         for (const t of world.trees)
           if (t.alive && t.rootX >= 60 && t.rootX < 120) world.removeTree(t.id);
         world.run(40);
-        return (
-          sum +
-          world.trees.filter(
-            (t) => t.alive && t.rootX >= 55 && t.rootX < 125 && t.species === "willow",
-          ).length
-        );
+        const n = world.trees.filter(
+          (t) => t.alive && t.rootX >= 55 && t.rootX < 125 && t.species === "willow",
+        ).length;
+        world.dispose();
+        return sum + n;
       }, 0);
     expect(willows(false)).toBe(0);
     expect(willows(true)).toBeGreaterThanOrEqual(4);
-  }, 120_000);
+  });
 });

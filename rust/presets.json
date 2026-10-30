@@ -3294,7 +3294,7 @@
    "seed": 1,
    "world": {
     "width": 160,
-    "height": 120,
+    "height": 200,
     "depth": 64,
     "faces": [
      0.2,

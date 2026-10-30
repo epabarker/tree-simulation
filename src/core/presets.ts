@@ -366,8 +366,9 @@ export const presets = {
     description:
       "Quercus robur alone in a field: wide-angled limbs, a broad decurrent crown and a squat trunk (Plate II).",
     // A specimen: no seedlings around it, and no storms, which throw tall trees by height alone.
+    // The woods' top (C1 round 3): at 120 the lone oak reached it and its crown was clipped flat.
     patch: {
-      world: { width: 160, height: 120, walls: [] },
+      world: { width: 160, height: TOP, walls: [] },
       trees: [{ x: 80, species: "oak" }],
       ...WOODLAND,
       o2: { stormP: 0 },

@@ -61,9 +61,9 @@ def stand(group, name):
         floor, lai, droop = [], [], []
         for r in runs:
             try:
-                lt = pl.read_csv(f"{r}/light.csv").filter((pl.col("season") == season) & (pl.col("row") == 0))
+                lt = pl.read_csv(f"{r}/light.csv", infer_schema_length=None).filter((pl.col("season") == season) & (pl.col("row") == 0))
                 floor.append(1 - lt["shade"].mean())
-                g = pl.read_csv(f"{r}/ground.csv").filter(pl.col("season") == season)
+                g = pl.read_csv(f"{r}/ground.csv", infer_schema_length=None).filter(pl.col("season") == season)
                 lai.append(g["lai"].mean())
             except (FileNotFoundError, TypeError):
                 pass

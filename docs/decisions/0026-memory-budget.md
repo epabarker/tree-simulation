@@ -1,6 +1,6 @@
 # 0026: A memory budget for the 3D core
 
-- **Status:** proposed (2026-10-31), for the user to accept or amend before I3.
+- **Status:** accepted (the user, 2026-10-31), at 256 MB.
 - **Date:** 2026-10-31
 - **Spec:** ADR 0014 (the garden on the home page), 0024 (the slab), 0025 (I2).
 - **Note:** [before C1](../experiments/2026-10-31-pre-c1.md) §1, §4.
@@ -15,13 +15,14 @@ It hardly depends on the trees. Phones kill tabs and workers that hold too much,
 
 ## Decision
 The garden's worker holds at most **256 MB** of the core's linear memory, all worlds and lanes included, over 200 seasons at the widest plate it serves. `memory.ts` (the note's code) measures it, by `wasmMemoryBytes()`.
-- **Pages** cap the plate, or the core cuts its bytes a cell, until the rule holds. The garden's plates above ≈ 200 cells do not hold it today: I3 must choose.
+- **Scope:** plates above ≈ 200 cells, the 520-cell panorama included, are out of scope for the garden. It serves plates up to ≈ 200 cells. Wider worlds remain for the lab and the CLI, which this budget does not bind.
+- **Pages** cap the plate until the rule holds; I3 puts the cap in `plateWidth`.
 - **Tools and tests** free each world as soon as they are done with it (`dispose`, idempotent). The tests fail a world that passes 1.5M live metamers rather than let it exhaust WASM's 4 GB.
 
 ## Consequences
-- I3 either caps the garden's plate or finds the ≈ 40 B a cell the note does not yet account for. Candidates:
+- I3 caps the garden's plate at ≈ 200 cells. Cutting the ≈ 40 B a cell the note does not yet account for would give headroom (for the specimen beside a 160-cell plate, 257 MB today). Candidates:
   - an accumulator freed between seasons;
   - rows allocated only up to the top;
   - half-precision V.
 - Worker lanes cost a sweep each, so they fit the budget only on narrow plates.
-- **Revisit** if a phone's measured limit is known to be higher, or if the garden's widest plate is dropped.
+- **Revisit** if a phone's measured limit is known to be higher, or if a wide plate is wanted back in the garden.

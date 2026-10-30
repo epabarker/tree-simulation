@@ -1,8 +1,8 @@
 # Status
 
-_Last updated: 2026-10-31 (before C1 done; C1 round 1 measured, its candidate awaits the user)_
+_Last updated: 2026-10-31 (before C1 and C1 round 1 accepted; round 2 starts with height)_
 
-**3D port** (branch `claude/c1-calibration-ustbkz`, PRs into `claude/gallant-brown-5k4g33`). ADR 0024 and **0025 accepted** (V passed; the phone's seasons all under 250 ms in one lane). **ADR 0026 (memory budget, proposed).** The checklist before C1 is done ([note](experiments/2026-10-31-pre-c1.md)):
+**3D port** (branch `claude/c1-calibration-ustbkz`, PRs into `claude/gallant-brown-5k4g33`). ADR 0024 and **0025 accepted** (V passed; the phone's seasons all under 250 ms in one lane). **ADR 0026 accepted** (256 MB; garden plates above ≈ 200 cells out of scope). The checklist before C1 is done ([note](experiments/2026-10-31-pre-c1.md)):
 - Canvas 2D paints 3D stands; memory ≈ 1 MB a cell of plate width; threads and worker lanes parked;
 - the backlog runs without traps: 39 of 78 pass;
 - the woods' top is 200, after a crown pinned at 130 ran away.
@@ -18,14 +18,13 @@ C1 round 1 ([note](experiments/2026-10-31-c1-round1.md)):
 - **Garden** (`mountGarden`): the 3D core, growing from seed (no opening forests until I3). The live site stays on 0.14.0 (2D).
 - **Headless:** `npm run sim`, `npm run bench`, `npm run evidence:2d` (≈ 4 h); C1's harness `code/2026-10-31-c1/` (`runs.sh`, `c1.py`, `floor.ts`).
 
-## Next
-1. **The user:**
-   - accept C1's candidate (R5 on neighbours for `forest`/SKY, Q_ss 0.03)?
-   - fill the slab's depth with the stand's planting, or measure the floor under the crowns?
-   - accept or amend ADR 0026 (256 MB; the garden's plates above ≈ 200 cells break it).
-2. **C1 round 2:** canopy closure against the gaps, then the crown base under a closed canopy, then the interior's τ. Re-time the phone with the candidate's m (≈ 52). Evidence at 20 seeds.
-3. **Height's plateau** (C3 with C1): the mixed wood reaches the 200 top and runs away at season 388.
-4. **I3:** one lane; cap the plate or cut bytes a cell (ADR 0026); depth-ordered drawing; framing under the taller top; first paint (Q7).
+## Next (the user's round 2 decisions, 2026-10-31)
+1. **Height first:** find the R1 setting (L_h, m_w, m_f or the pipe-area cost) at which a lone tree and `forest` level off on their own under the 200 top; height against season to 300, three seeds. No floor, crown or H/D number from a still-growing stand counts.
+2. **R5 senses neighbours in every preset.** Q_ss stays at 0.1 until height levels off.
+3. **The interior's stand fills the slab's depth** (planting per area); the floor is measured under the crowns. The lone tree and the hedgerow stay one row.
+4. **Crown base:** check whether it lifts once (1) and (3) hold, before adding anything; if not, name the C5 threshold holding it.
+5. Round 2 reports round 1's tables plus height against season, and proposes the forest and sky settings with their golden change in one PR.
+6. **I3:** one lane; cap the plate at ≈ 200 (ADR 0026); depth-ordered drawing; framing under the taller top; first paint (Q7).
 
 ## Known issues
 - **Uncalibrated:** crown ratio 0.99 everywhere; H/D 11–30 (target 60–80, C2's girth); `shadow` and R1 off do not regulate (backlog).

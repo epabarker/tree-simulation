@@ -1,6 +1,6 @@
 # Status
 
-_Last updated: 2026-10-30 (C1 round 3: form steps 1–2, girth in 3D and the crown base by leaf area)_
+_Last updated: 2026-10-30 (form steps 1–2 merged; the I3 plan written and its decisions taken)_
 
 **3D port** on the branch `3d-port` (work branches open PRs into it). ADR 0024–0027 accepted. The live site stays on 0.14.0 (2D) until the bar below is met.
 
@@ -20,7 +20,7 @@ _Last updated: 2026-10-30 (C1 round 3: form steps 1–2, girth in 3D and the cro
 1. **The user** checks the look on the phone from PR's branch `claude/form-round3`.
 2. **Form step 3** ([plan](plans/2026-10-30-form.md) §4): canopy closure. `light.csv` gains `lad`, plus a `buds.csv`; `closure.py`, `budget.py`. Say whether R1 starvation or O4's background mortality opened the gaps: 35–36 of 90 planted trees die of O4 by 300, windthrow 0–2. Carry in why the stand's leaf crown ratio rises from 150 to 300 at τ 0.
 3. **Form step 4:** floor (τ 0) and crown lift with gap filling (C4 ξ, R4's release); planting density last. Then step 5, 20 seeds; step 6, apply.
-4. **I3:** depth-ordered wood and leaves (the mixed wood's green wall); plate cap ≈ 200; framing; 3D first paint; re-time the phone.
+4. **I3** ([plan](plans/2026-10-30-i3.md), decided): wood and leaves in z-slices; the z order from Rust; plate cap 160; recruits per area; the live intro, a picture only for reduced motion (a 3D checkpoint is 4–14 MB); the frame under the 200 top; re-time the phone.
 5. **Species (track 3):** the 3D re-fit. Beech, hornbeam and now the fitted oak run to the top (oak pinned at 200 by season 150).
 
 ## Known issues

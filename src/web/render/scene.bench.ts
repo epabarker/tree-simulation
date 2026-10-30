@@ -18,7 +18,6 @@ function tweening(preset: PresetName, seasons: number): Scene {
   world.run(seasons - 1);
   const scene = new Scene();
   scene.setSize(1280, 800, 1);
-  scene.depth = true;
   scene.leafStyle = LEAF_STYLES.broadleaf;
   scene.setSnapshot(world.snapshot(0, lean));
   world.step();

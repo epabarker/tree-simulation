@@ -1,7 +1,8 @@
 /**
  * Canvas 2D renderer: the fallback when WebGL2 is unavailable, and the M0–M5 prototype renderer.
- * Segments are grouped by (colour, width) and each group is stroked as one path, which keeps
- * Canvas 2D usable into the tens of thousands of segments.
+ * Wood and leaves draw far to near in DEPTH_SLICES / CANVAS_SLICE_STEP slices of the slab (I3):
+ * within a slice the segments are grouped by (colour, width) and each group is stroked as one path,
+ * which keeps Canvas 2D usable into the tens of thousands of segments; then that slice's leaves.
  */
 
 import type { Snapshot } from "../../core/types.ts";
@@ -19,7 +20,15 @@ import {
 const OUTLINES: Float32Array[] = LEAF_SHAPES.map(leafOutline);
 
 import { MAX_DPR, type Renderer, type RendererOptions } from "./renderer.ts";
-import { type ColorMode, type Leaves, leafLength, Scene, type ViewOptions } from "./scene.ts";
+import {
+  CANVAS_SLICE_STEP,
+  type ColorMode,
+  DEPTH_SLICES,
+  type Leaves,
+  leafLength,
+  Scene,
+  type ViewOptions,
+} from "./scene.ts";
 import { RAMP_STEPS, readTheme, type Theme } from "./theme.ts";
 
 const WIDTH_BUCKETS = 48;
@@ -133,7 +142,6 @@ export class Canvas2DRenderer implements Renderer {
       ctx.restore();
     }
 
-    scene.depth = view.depth;
     scene.leafStyle = LEAF_STYLES[view.leafStyle];
     scene.computeGeometry(t);
     const leaves = view.showLeaves ? scene.leaves(view.leafAge, t) : null;
@@ -143,10 +151,15 @@ export class Canvas2DRenderer implements Renderer {
       setCull(offset);
       if (view.showGhosts && scene.physics) this.drawDebris();
       else if (view.showGhosts && scene.prev && t < 1) this.drawGhosts(1 - t);
-      // Back-layer leaves (pseudo-depth, ADR 0008) go behind the wood, the rest in front.
-      if (leaves && !view.lite) this.drawLeaves(leaves, 0, leaves.back);
-      this.drawSegments(s, view.colorMode);
-      if (leaves) this.drawLeaves(leaves, leaves.back, leaves.count);
+      const wood = scene.woodSlices(s);
+      for (let i = 0; i < DEPTH_SLICES; i += CANVAS_SLICE_STEP) {
+        const end = i + CANVAS_SLICE_STEP;
+        this.drawSegments(s, view.colorMode, wood[i] as number, wood[end] as number);
+        if (leaves)
+          this.drawLeaves(leaves, leaves.slices[i] as number, leaves.slices[end] as number);
+      }
+      // Falling and fallen leaves (M17) over everything.
+      if (leaves) this.drawLeaves(leaves, leaves.slices[DEPTH_SLICES] as number, leaves.count);
       if (view.showBuds) this.drawBuds(s, view.colorMode === "light");
     }
 
@@ -193,9 +206,11 @@ export class Canvas2DRenderer implements Renderer {
     ctx.fillRect(0, groundY, w, h - groundY);
   }
 
-  private drawSegments(s: Snapshot, mode: ColorMode): void {
+  /** The wood at `drawOrder(s)` positions [from, to): one depth slice's segments. */
+  private drawSegments(s: Snapshot, mode: ColorMode, from: number, to: number): void {
+    if (to <= from) return;
     const { ctx, scene } = this;
-    const n = s.metamerCount;
+    const n = to - from;
     const palette = scene.palette(mode, this.theme);
     const colors = scene.colorIndices(mode, palette.length);
     if (this.keys.length < n) {
@@ -203,19 +218,21 @@ export class Canvas2DRenderer implements Renderer {
       this.order = new Int32Array(n * 2);
     }
     const g = scene.geom;
+    const depthOrder = scene.drawOrder(s);
     const pxPerUnit = scene.camera.scale;
-    for (let j = 0; j < n; j++) {
+    for (let i = 0; i < n; i++) {
+      const j = depthOrder[from + i] as number;
       const widthPx = Math.max(0.6, 2 * g.radius[j] * pxPerUnit);
       const wb = Math.min(WIDTH_BUCKETS - 1, Math.max(0, Math.round(Math.log2(widthPx / 0.6) * 4)));
-      this.keys[j] = colors[j] * WIDTH_BUCKETS + wb;
+      this.keys[i] = colors[j] * WIDTH_BUCKETS + wb;
     }
-    // Counting sort of segments by (colour, width) key.
+    // Counting sort of the slice's segments by (colour, width) key.
     const nKeys = palette.length * WIDTH_BUCKETS;
     const start = new Int32Array(nKeys + 1);
-    for (let j = 0; j < n; j++) start[this.keys[j] + 1]++;
+    for (let i = 0; i < n; i++) start[this.keys[i] + 1]++;
     for (let k = 0; k < nKeys; k++) start[k + 1] += start[k];
     const fill = start.slice(0, nKeys);
-    for (let j = 0; j < n; j++) this.order[fill[this.keys[j]]++] = j;
+    for (let i = 0; i < n; i++) this.order[fill[this.keys[i]]++] = depthOrder[from + i] as number;
 
     const unitsPerPx = 1 / scene.camera.scale;
     ctx.lineCap = "round";

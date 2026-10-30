@@ -47,7 +47,7 @@ export interface Stats {
   /** Frames per second while animating, and CPU milliseconds per draw. */
   fps: number;
   drawMs: number;
-  /** The adaptive quality level in use: device pixel ratio, and "lite" without back leaves. */
+  /** The adaptive quality level in use: its device pixel ratio. */
   quality: string;
 }
 
@@ -314,8 +314,6 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
   const view = Object.assign(options.view ?? {}, {
     colorMode: "natural",
     showLeaves: true,
-    // ADR 0008's pseudo-depth squeeze is retired: the trees are 3D (I2); depth order is I3's.
-    depth: false,
     leafAge: LEAF_STYLES.broadleaf.leafAge,
     leafStyle: "broadleaf",
     showBuds: false,
@@ -334,17 +332,15 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
     quality: "",
   };
 
-  // Adaptive quality (render/quality.ts): fewer pixels, then fewer leaves, when frames run slow.
+  // Adaptive quality (render/quality.ts): fewer pixels when frames run slow.
   const adaptive = (options.adaptive ?? true) && !options.bench;
   const quality = governor(qualityLevels(window.devicePixelRatio, options.maxDpr ?? MAX_DPR));
-  const describeQuality = (level: QualityLevel): string =>
-    `dpr ${level.dpr}${level.lite ? ", lite" : ""}`;
+  const describeQuality = (level: QualityLevel): string => `dpr ${level.dpr}`;
   stats.quality = describeQuality(quality.levels[0] as QualityLevel);
   const judgeFrame = (dt: number, now: number): void => {
     const next = judge(quality, dt, now);
     if (next === null) return;
     const level = quality.levels[next] as QualityLevel;
-    view.lite = level.lite;
     renderer.setMaxDpr(level.dpr);
     stats.quality = describeQuality(level);
     dirty = true;

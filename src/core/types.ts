@@ -118,6 +118,8 @@ export interface Snapshot {
   season: number;
   width: number;
   height: number;
+  /** The slab's depth D in cells (I2): z0 runs over [0, D), the viewer at z = 0. */
+  depth: number;
   /** The world's sides wrap (a ring, M11): a view of the whole world can draw crowns across the seam. */
   periodic: boolean;
   /** The season just run was a storm (M16): the page shows a gale. */
@@ -134,13 +136,10 @@ export interface Snapshot {
   radius: F32;
   /** Depth of the base, cells from the front face (I2): draw far (large z) first. */
   z0: F32;
-  /** The 3D heading H (unit) and the frame's reference L. */
+  /** The 3D heading H (unit): its in-plane part foreshortens the shoot's leaves (I3). */
   dirX: F32;
   dirY: F32;
   dirZ: F32;
-  refX: F32;
-  refY: F32;
-  refZ: F32;
   tree: I32;
   birthId: I32;
   order: U8;
@@ -153,6 +152,8 @@ export interface Snapshot {
   /** Bending stress at the base over σ_target (R3; 0 when R3 is off). */
   stress: F32;
   prevIndex: I32;
+  /** Rows far to near (z0 descending, row ascending on ties): the order the page draws in (I3). */
+  zOrder: I32;
   budCount: number;
   /** Row of the metamer whose upper node holds the bud. */
   budMetamer: I32;

@@ -10,7 +10,6 @@ function grown(style: LeafStyleName): Scene {
   world.run(40);
   const scene = new Scene();
   scene.setSize(1000, 700, 1);
-  scene.depth = true;
   scene.leafStyle = LEAF_STYLES[style];
   scene.setSnapshot(world.snapshot(0, { junctions: false, field: false }));
   scene.computeGeometry(1);
@@ -102,7 +101,6 @@ describe("seasons (M17)", () => {
     world.run(12);
     const scene = new Scene();
     scene.setSize(1000, 700, 1);
-    scene.depth = true;
     scene.setSnapshot(world.snapshot(0, { junctions: false, field: false }));
     scene.computeGeometry(1);
     scene.seasons = true;

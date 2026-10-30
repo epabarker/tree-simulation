@@ -8,6 +8,10 @@
  *    profile along the leaf, or five lobes about a centre). Buds: squares. Walls: rectangles.
  *  - Shade overlay: a texture. Sky and ground: full-screen gradients.
  *
+ * Wood and leaves draw far to near in the Scene's depth slices (I3): per slice the wood's range of
+ * its batch, then the leaves'. WebGL2 has no base instance, so a range is drawn by pointing the
+ * batch's instance attributes at its first instance (`drawRange`).
+ *
  * Positions come from the shared Scene (the tween needs them on the CPU, and picking uses them).
  * Instance data never depends on the camera (zoom-dependent minimum sizes are applied in the
  * shaders), so when only the camera moves, a frame re-uses the uploaded buffers and changes only
@@ -32,7 +36,7 @@ import { BudState } from "../../core/types.ts";
 import { BUD_ACTIVE, BUD_DORMANT, parseColor, SEQUENTIAL, shadeImage } from "./colors.ts";
 import { LEAF_PALETTES, LEAF_STYLES } from "./leaf-styles.ts";
 import { MAX_DPR, type Renderer, type RendererOptions } from "./renderer.ts";
-import { LEAF_MIN_PX, type Leaves, Scene, type ViewOptions } from "./scene.ts";
+import { DEPTH_SLICES, LEAF_MIN_PX, type Leaves, Scene, type ViewOptions } from "./scene.ts";
 import { readTheme, type Theme } from "./theme.ts";
 
 // World → clip space: x_clip = (x − cx)·sx, y_clip = groundClip + y·sy, with u_view = (cx, sx, groundClip, sy).
@@ -274,6 +278,15 @@ interface Batch {
   streams: Map<string, { data: Floats | Bytes; size: number; gpuLength: number }>;
   /** Instances uploaded last time. */
   count: number;
+  /** Each instance attribute's location, buffer, type and bytes per instance, for `drawRange`. */
+  pointers: {
+    location: number;
+    buffer: WebGLBuffer;
+    size: number;
+    type: number;
+    normalize: boolean;
+    bytes: number;
+  }[];
 }
 
 function rgb(css: string): [number, number, number] {
@@ -292,8 +305,6 @@ export class WebGL2Renderer implements Renderer {
   private segments!: Batch;
   private ghostBatch!: Batch;
   private leafBatch!: Batch;
-  /** Back-layer leaves of the pseudo-depth view, drawn before the branches (ADR 0008). */
-  private leafBackBatch!: Batch;
   private budBatch!: Batch;
   private wallBatch!: Batch;
   private image!: Batch;
@@ -303,6 +314,8 @@ export class WebGL2Renderer implements Renderer {
   private hasShade = false;
   private shadeFor: Snapshot | null = null;
   private paletteCache = new Map<string, Bytes>();
+  /** Where each depth slice's leaves start in `leafBatch` (a copy of the scene's `Leaves.slices`). */
+  private leafSlices = new Int32Array(DEPTH_SLICES + 1);
   /** What the uploaded instance data was built from; if nothing differs it can be re-used. */
   private uploaded: { next: Snapshot | null; prev: Snapshot | null; key: string } = {
     next: null,
@@ -365,12 +378,28 @@ export class WebGL2Renderer implements Renderer {
       };
     }
     const buffers = createBufferInfoFromArrays(gl, arrays);
+    const pointers: Batch["pointers"] = [];
+    for (const [name, { size, bytes }] of Object.entries(attribs)) {
+      const location = gl.getAttribLocation(program.program, name);
+      const buffer = buffers.attribs?.[name]?.buffer;
+      if (location < 0 || !buffer) continue;
+      const type = bytes ? gl.UNSIGNED_BYTE : gl.FLOAT;
+      pointers.push({
+        location,
+        buffer,
+        size,
+        type,
+        normalize: !!bytes,
+        bytes: size * (bytes ? 1 : 4),
+      });
+    }
     return {
       program,
       buffers,
       vao: createVertexArrayInfo(gl, program, buffers),
       streams,
       count: 0,
+      pointers,
     };
   }
 
@@ -394,7 +423,6 @@ export class WebGL2Renderer implements Renderer {
       a_color: { size: 4, bytes: true },
     };
     this.leafBatch = this.batch(leafProgram, leafAttribs);
-    this.leafBackBatch = this.batch(leafProgram, leafAttribs);
     this.budBatch = this.batch(this.program(POINT_VS, FLAT_FS), {
       a_center: { size: 2 },
       a_color: { size: 4, bytes: true },
@@ -519,6 +547,22 @@ export class WebGL2Renderer implements Renderer {
     drawBufferInfo(gl, batch.vao, gl.TRIANGLE_STRIP, 4, 0, count);
   }
 
+  /**
+   * Instances [first, first + count) of `batch`, whose program is in use with its uniforms set:
+   * its instance attributes are pointed at `first` (and left there; `drawBatch`'s batches never
+   * take a range).
+   */
+  private drawRange(batch: Batch, first: number, count: number): void {
+    if (count <= 0) return;
+    const gl = this.gl;
+    gl.bindVertexArray(batch.vao.vertexArrayObject ?? null);
+    for (const p of batch.pointers) {
+      gl.bindBuffer(gl.ARRAY_BUFFER, p.buffer);
+      gl.vertexAttribPointer(p.location, p.size, p.type, p.normalize, 0, first * p.bytes);
+    }
+    gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, 4, count);
+  }
+
   draw(t: number, view: ViewOptions): void {
     if (this.lost) return;
     const { gl, scene, theme } = this;
@@ -546,7 +590,6 @@ export class WebGL2Renderer implements Renderer {
       t,
       view.colorMode,
       view.showLeaves ? view.leafAge : -1,
-      view.depth,
       view.leafStyle,
       view.showBuds,
       view.showObstacles,
@@ -557,14 +600,13 @@ export class WebGL2Renderer implements Renderer {
     ].join();
     const u = this.uploaded;
     if (u.next !== s || u.prev !== scene.prev || u.key !== key) {
-      scene.depth = view.depth;
       scene.leafStyle = LEAF_STYLES[view.leafStyle];
       scene.computeGeometry(t);
       this.buildSegments(s, view);
       if (ghosts) this.buildGhosts(1 - t);
       else this.ghostBatch.count = 0;
       if (view.showLeaves) this.buildLeaves(view.leafAge, t);
-      else this.leafBatch.count = this.leafBackBatch.count = 0;
+      else this.leafBatch.count = 0;
       if (view.showBuds) this.buildBuds(s, view.colorMode === "light");
       else this.budBatch.count = 0;
       this.buildWalls(s, view);
@@ -591,14 +633,55 @@ export class WebGL2Renderer implements Renderer {
     for (const offset of scene.wrapOffsets()) {
       const shifted = { ...uniforms, u_view: [cx - offset, ...uniforms.u_view.slice(1)] };
       this.drawBatch(this.ghostBatch, this.ghostBatch.count, shifted);
-      if (!view.lite) this.drawBatch(this.leafBackBatch, this.leafBackBatch.count, shifted);
-      this.drawBatch(this.segments, this.segments.count, shifted);
-      this.drawBatch(this.leafBatch, this.leafBatch.count, shifted);
+      this.drawSlices(s, shifted);
       this.drawBatch(this.budBatch, this.budBatch.count, shifted);
     }
 
     // Ground last, so stubs of shoots that turned downward stay underground.
     this.drawBackdrop(1, theme.ground, theme.groundDeep, groundFromBottom);
+  }
+
+  /**
+   * The wood and the crowns' leaves far to near, slice by slice (wood, then that slice's leaves),
+   * then the falling leaves over everything. Each program's uniforms are set once.
+   */
+  private drawSlices(s: Snapshot, uniforms: Record<string, unknown>): void {
+    const gl = this.gl;
+    const wood = this.segments;
+    const leaf = this.leafBatch;
+    const woodAt = this.scene.woodSlices(s);
+    const leafAt = this.leafSlices;
+    const leafCount = leaf.count;
+    for (const b of leafCount > 0 ? [wood, leaf] : [wood]) {
+      gl.useProgram(b.program.program);
+      setUniforms(b.program, uniforms);
+    }
+    let program: Batch | null = leafCount > 0 ? leaf : wood;
+    const use = (b: Batch) => {
+      if (program === b) return;
+      gl.useProgram(b.program.program);
+      program = b;
+    };
+    for (let i = 0; i < DEPTH_SLICES; i++) {
+      const w0 = woodAt[i] as number;
+      const w1 = Math.min(woodAt[i + 1] as number, wood.count);
+      if (w1 > w0) {
+        use(wood);
+        this.drawRange(wood, w0, w1 - w0);
+      }
+      if (leafCount === 0) continue;
+      const l0 = leafAt[i] as number;
+      const l1 = leafAt[i + 1] as number;
+      if (l1 > l0) {
+        use(leaf);
+        this.drawRange(leaf, l0, l1 - l0);
+      }
+    }
+    if (leafCount > (leafAt[DEPTH_SLICES] as number)) {
+      use(leaf);
+      const from = leafAt[DEPTH_SLICES] as number;
+      this.drawRange(leaf, from, leafCount - from);
+    }
   }
 
   private drawBackdrop(mode: number, top: string, bottom: string, groundFromBottom: number): void {
@@ -722,8 +805,8 @@ export class WebGL2Renderer implements Renderer {
     // One summer and one autumn ramp per palette; each leaf takes its species' (M19).
     const palette = LEAF_PALETTES.map((p) => this.paletteBytes(this.theme.leaf[p], 0.92));
     const autumn = LEAF_PALETTES.map((p) => this.paletteBytes(this.theme.autumn[p], 0.92));
-    this.fillLeaves(this.leafBackBatch, leaves, 0, leaves.back, palette, autumn);
-    this.fillLeaves(this.leafBatch, leaves, leaves.back, leaves.count, palette, autumn);
+    this.fillLeaves(this.leafBatch, leaves, 0, leaves.count, palette, autumn);
+    this.leafSlices.set(leaves.slices);
   }
 
   /** Uploads leaves [from, to) of the frame's leaf list into `batch`. */

@@ -48,8 +48,6 @@ const view: ViewOptions & { preset: PresetName } = {
   preset: startPreset,
   colorMode: "natural",
   showLeaves: true,
-  // ADR 0008's pseudo-depth squeeze is retired: the trees are 3D (I2); depth order is I3's.
-  depth: false,
   leafAge: LEAF_STYLES[leafStyleOf(startPreset)].leafAge,
   leafStyle: leafStyleOf(startPreset),
   showBuds: false,

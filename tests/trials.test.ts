@@ -1,5 +1,16 @@
 import { describe, expect, it } from "vitest";
-import { amendSpecies, getPath, loneParams, runLone, setPath, withAssign } from "../cli/trials.ts";
+import {
+  amendSpecies,
+  getPath,
+  loneParams,
+  ROOFS,
+  runLone,
+  runShade,
+  setPath,
+  standParams,
+  withAssign,
+  woodParams,
+} from "../cli/trials.ts";
 import { FLORA } from "../src/core/flora.ts";
 import { speciesParams } from "../src/core/params.ts";
 import { hashWorld, World } from "./world.ts";
@@ -56,5 +67,27 @@ describe("species trials and amended patches (M27)", () => {
     expect(t.height60).toBeGreaterThan(t.height30);
     expect(t.spread).toBeGreaterThan(0);
     expect(t.forkHeight).toBeGreaterThan(0);
+  });
+
+  it("grows the lone tree and the stand under the woods' top, and the wood per area at τ 0", () => {
+    expect(loneParams("beech", 1).world.height).toBe(200);
+    expect(standParams("beech", 1).world.height).toBe(200);
+    const wood = woodParams("hornbeam", 1);
+    expect(wood.world.faces).toEqual([0, 0]);
+    expect(wood.trees.length).toBeGreaterThan(10);
+    expect(wood.trees.every((t) => t.species === "hornbeam")).toBe(true);
+    expect(new Set(wood.trees.map((t) => t.z)).size).toBeGreaterThan(1);
+  });
+
+  it("counts the seasons a shade-house seedling lives, 30 if it survives", () => {
+    const bright = runShade("beech", 1, ROOFS[0] as number);
+    expect(bright).toMatchObject({ alive: true, seasons: 30 });
+    expect(bright.light).toBeGreaterThan(0.25);
+    // Under a roof far darker than the house's darkest, beech starves before 30.
+    const dark = runShade("beech", 1, 12);
+    expect(dark.alive).toBe(false);
+    expect(dark.seasons).toBeGreaterThan(0);
+    expect(dark.seasons).toBeLessThan(30);
+    expect(dark.light).toBeLessThan(0.02);
   });
 });

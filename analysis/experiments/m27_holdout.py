@@ -1,24 +1,29 @@
 """M27: the hold-out checks of the fitted species (ADR 0020), none of which the fit saw.
 
-    uv run --project analysis python analysis/experiments/m27_holdout.py            # after the fits
+    uv run --project analysis python analysis/experiments/m27_holdout.py --round round3   # 3D fits
     uv run --project analysis python analysis/experiments/m27_holdout.py --smoke    # on the smoke fits
 
-Reads docs/experiments/fits/<species>.json for every species fitted so far and compares the
-hand-tuned and fitted patches on:
+Reads docs/experiments/fits/<round>/<species>.json for every species fitted so far and compares
+the patches the woods grow now ("hand": FLORA, round 2 as adopted) and the fitted ones on:
+
+0. the floor of each species' own wood, planted per area between opaque faces (τ 0), at season 100
+   (and 150, for the record), 3 seeds, against the targets' [holdout] floor: a one-row stand trial
+   lights its floor through the empty depth beside the row (the species plan of 2026-10-30, §0.3);
 
 1. shade tolerance: the lowest light at which every seedling lives in the shade house, against
    the species' band, and its Spearman correlation over all ten species with Niinemets &
    Valladares's tolerance scores (2006; fitted patches where there are fits, hand-tuned otherwise);
 2. the §10 allometries: Δ, the length–diameter and leaf–section slopes (M26);
 3. release: epicormic shoots and lean into a felled neighbour's gap (M10);
-4. the mixed wood (`mixedWood`, 400 seasons, 6 seeds) with every fitted patch swapped in at once:
-   birch leads early and fades, beech ends with the most canopy trees (M25);
+4. the mixed wood (`mixedWood`, 400 seasons, 3 seeds) with every fitted patch swapped in at once:
+   birch leads early and fades, beech ends with the most canopy trees (M25); canopy trees per
+   species every 50 seasons, and the tallest tree against the top (200);
 5. the lab species, which the mixed wood leaves out: fitted fir and pine in their own woods
    (`firWood`, `pineWood`, 200 seasons), against the hand-tuned ones;
-6. plausibility: each fitted parameter against its bounds, and how far the restarts agree.
+6. plausibility: each fitted parameter against its bounds, and how far the restarts agree (CMA-ES).
 
-Writes docs/experiments/fits/holdout.json, figures under docs/experiments/figures/ and lab links.
-Needs Node 24 first on PATH. A few minutes on 12 cores (a 400-season mixed wood takes ≈ 3.5 s).
+Writes docs/experiments/fits/<round>/holdout.json, figures under docs/experiments/figures/ and lab
+links. Needs Node 24 first on PATH. `--only floor` runs section 0 alone.
 """
 
 import argparse
@@ -35,19 +40,22 @@ from treesim.fit import SPECIES, Pool, load_spec
 parser = argparse.ArgumentParser()
 parser.add_argument("--smoke", action="store_true")
 parser.add_argument("--workers", type=int, default=os.cpu_count() or 4)
+parser.add_argument("--round", default="round3", help="the fits' folder under docs/experiments/fits/")
+parser.add_argument("--only", choices=["floor"], help="run one section")
 args = parser.parse_args()
 
 #: Lab species: not planted in the mixed wood, checked in their own woods instead.
 LAB = ["fir", "pine"]
 #: Species with a `<species>Wood` preset of their own.
 WOODS = ["birch", "oak", "beech", "fir", "pine"]
-FITS = REPO / ("runs/m27-fit-smoke" if args.smoke else "docs/experiments/fits")
-OUT = REPO / ("runs/m27-holdout-smoke" if args.smoke else "docs/experiments/fits")
+FITS = REPO / ("runs/m27-fit-smoke" if args.smoke else f"docs/experiments/fits/{args.round}")
+OUT = REPO / ("runs/m27-holdout-smoke" if args.smoke else f"docs/experiments/fits/{args.round}")
 FIGURES = REPO / ("runs/m27-holdout-smoke" if args.smoke else "docs/experiments/figures")
 RUNS = "runs/m27-holdout-smoke" if args.smoke else "runs/m27-holdout"
-NOTE = "2026-10-28-m27"
+NOTE = f"2026-10-30-species-{args.round}"
 SEEDS = [1, 2] if args.smoke else [1, 2, 3, 4, 5]
-WOOD_SEEDS = [1] if args.smoke else [1, 2, 3, 4, 5, 6]
+WOOD_SEEDS = [1] if args.smoke else [1, 2, 3]
+FLOOR_SEEDS = [1] if args.smoke else [1, 2, 3]
 WOOD_SEASONS = 100 if args.smoke else 400
 LAB_SEASONS = 60 if args.smoke else 200
 OUT.mkdir(parents=True, exist_ok=True)
@@ -68,6 +76,31 @@ patch = {sp: fits[sp]["fit"]["patch"] for sp in FITTED}
 specs = {sp: load_spec(sp) for sp in SPECIES}
 
 pool = Pool(args.workers)
+
+
+# 0. The floor of each species' own wood ----------------------------------------------------------
+def wood_floor(species: str, a: dict) -> dict:
+    replies = pool.map([{"species": species, "assign": a, "seeds": [s], "trials": ["wood"]} for s in FLOOR_SEEDS])
+    rec = [r["wood"][0] for r in replies]
+    return {k: float(np.mean([x[k] for x in rec])) for k in ("floor100", "floor150")}
+
+
+floor_rows = []
+for sp in FITTED:
+    target = specs[sp].holdout.get("floor")
+    for which, a in [("hand", {}), ("fitted", assign[sp])]:
+        f = wood_floor(sp, a)
+        inside = None if target is None else abs(f["floor100"] - target["target"]) <= target["band"]
+        floor_rows.append({"species": sp, "patch": which, **f,
+                           "target": target and target["target"], "band": target and target["band"], "in band": inside})
+print("0. the floor of each species' own wood at 100 (150), τ 0, per area, mean of seeds", FLOOR_SEEDS)
+for r in floor_rows:
+    print(f"   {r['species']:9} {r['patch']:7} {100 * r['floor100']:5.1f}% ({100 * r['floor150']:4.1f}%)  "
+          f"target {100 * r['target']:.1f} ± {100 * r['band']:.1f}%  {'in band' if r['in band'] else 'OUT'}")
+if args.only == "floor":
+    pool.close()
+    (OUT / "holdout-floor.json").write_text(json.dumps(floor_rows, indent=2) + "\n")
+    raise SystemExit(0)
 
 
 def ask_all(species: str, a: dict, trials: list[str], seeds: list[int]) -> list[dict]:
@@ -146,8 +179,17 @@ if wood_fitted:
     runs += [Run(f"{wood}/fitted_s{s}", "mixedWood", s, WOOD_SEASONS, swapped) for s in WOOD_SEEDS]
 run_many(runs, workers=args.workers)
 canopy = canopy_counts(wood, WOOD_SEEDS)
-checkpoints = [s for s in [50, 100, 200, 300, 400] if s <= WOOD_SEASONS]
+checkpoints = [s for s in range(50, 401, 50) if s <= WOOD_SEASONS]
 wood_table = canopy.filter(pl.col("season").is_in(checkpoints))
+# The tallest tree of each run against the woods' top (200): beech, hornbeam and oak levelling off
+# below it is the 3D re-fit's bar (the species plan §2.5).
+tallest = (
+    load_runs(REPO / wood).with_columns(pl.col("run").str.extract(r"^(\w+?)_").alias("patch"))
+    .filter(pl.col("alive"), pl.col("season").is_in(checkpoints))
+    .group_by("patch", "run", "season").agg(pl.col("height").max().alias("tallest"))
+    .group_by("patch", "season").agg(pl.col("tallest").mean().alias("mean"), pl.col("tallest").max().alias("max"))
+    .sort("patch", "season")
+)
 
 # 5. The lab species in their own woods ----------------------------------------------------------------
 lab_fitted = [sp for sp in FITTED if sp in LAB]
@@ -181,11 +223,11 @@ lab_table = pl.DataFrame(lab_rows) if lab_rows else pl.DataFrame()
 # 6. Plausibility ---------------------------------------------------------------------------------
 plausibility = []
 for sp in FITTED:
-    ends = fits[sp]["restarts"]
+    ends = fits[sp].get("restarts", [])
     for p in specs[sp].params:
         path, lo, hi = p["path"], p["lo"], p["hi"]
         fitted = assign[sp][path]
-        hand = fits[sp]["hand"]["values"].get(path)
+        hand = (fits[sp]["hand"]["values"] if "hand" in fits[sp] else fits[sp]["start"]["assign"]).get(path)
         at_bound = min(fitted - lo, hi - fitted) < 0.02 * (hi - lo)
         spread = float(np.std([e["mean"][path] for e in ends]) / (hi - lo)) if len(ends) > 1 else float("nan")
         plausibility.append({
@@ -199,9 +241,9 @@ cols = min(5, len(FITTED))
 rows = -(-len(FITTED) // cols)
 progress = pl.concat([
     pl.read_csv(fit_file(sp, f"{sp}-progress.csv")).with_columns(pl.lit(sp).alias("species"))
-    for sp in FITTED
-])
-fig = (
+    for sp in FITTED if fit_file(sp, f"{sp}-progress.csv").exists()
+]) if any(fit_file(sp, f"{sp}-progress.csv").exists() for sp in FITTED) else None
+fig = None if progress is None else (
     ggplot(progress, aes("generation", "best", colour="factor(restart)"))
     + geom_line()
     + facet_wrap("species", ncol=cols, scales="free_y")
@@ -209,7 +251,8 @@ fig = (
     + theme_minimal()
     + theme(figure_size=(2.6 * cols + 1, 2.6 * rows + 0.6))
 )
-fig.save(FIGURES / f"{NOTE}-progress.png", dpi=100, verbose=False)
+if fig is not None:
+    fig.save(FIGURES / f"{NOTE}-progress.png", dpi=100, verbose=False)
 
 fig = (
     ggplot(canopy, aes("season", "trees", colour="species", linetype="patch"))
@@ -273,12 +316,14 @@ if wood_fitted:
 
 summary = {
     "fitted": FITTED,
+    "floor": floor_rows,
     "shade": shade,
     "shadeBand": band,
     "shadeInBand": in_band,
     "shadeSpearman": rho,
     "allometry": allometry,
     "wood": wood_table.to_dicts(),
+    "tallest": tallest.to_dicts(),
     "labWoods": lab_rows,
     "plausibility": plausibility,
     "links": links,
@@ -296,6 +341,8 @@ with pl.Config(tbl_cols=20, tbl_width_chars=200, tbl_rows=200):
     print(pl.DataFrame([{"tree": k, **v} for k, v in allometry.items()]))
     print(f"4. canopy trees per run in the mixed wood (fitted: {', '.join(wood_fitted) or 'none'})")
     print(wood_table.pivot("species", index=["patch", "season"], values="trees").fill_null(0))
+    print("   the tallest tree per run (mean and max over seeds; the top is 200)")
+    print(tallest)
     if lab_rows:
         print("5. the lab species in their own woods (per run)")
         print(lab_table)

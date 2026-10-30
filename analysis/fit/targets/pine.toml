@@ -47,20 +47,14 @@ kind = "measured"
 source = "stand-grown H/D 60–80 (Watt et al. 2023)"
 
 [[trait]]
+# The leafy crown's share of the height (metrics' leafCrownRatio, cli/trials.ts): the branch
+# measure reads 0.99 in 3D whatever the crown does (species plan §0.4).
 name = "stand.crownRatio"
 target = 0.35
 band = 0.1
 weight = 0.5
 kind = "described"
 source = "a high crown on a clean bole in a stand (M25; Kothari et al. 2025)"
-
-[[trait]]
-name = "stand.floor"
-target = 0.17
-band = 0.06
-weight = 0.5
-kind = "described"
-source = "all-day relative light under pine 1.15 times that under birch (12.8% against 11.1%; Dobrowolska 2008), applied to birch's 14.8% (Hagemeier & Leuschner 2019); 2–59% across stand ages (Walter & Himmler 1996)"
 
 [[trait]]
 name = "lone.widestAt"
@@ -168,9 +162,9 @@ path = "c5.Trel"
 lo = 0.005
 hi = 0.6
 [[param]]
-path = "c6.r0"
-lo = 0.015
-hi = 0.05
+path = "c6.r0"   # ADR 0027's 3D units: the 2D bounds 0.015–0.05 ÷ 8
+lo = 0.001875
+hi = 0.00625
 [[param]]
 path = "r1.Lh"
 lo = 10
@@ -206,5 +200,8 @@ log = true
 
 # Held out: never in the loss, checked after the fit (analysis/experiments/m27_holdout.py).
 [holdout]
+# The floor of the species' own wood planted per area at τ 0, at season 100 (m27_holdout.py): the
+# one-row stand trial lights its floor through the empty depth beside the row (species plan §0.3).
+floor = { target = 0.17, band = 0.06, kind = "described", source = "all-day relative light under pine 1.15 times that under birch (12.8% against 11.1%; Dobrowolska 2008), applied to birch's 14.8% (Hagemeier & Leuschner 2019); 2–59% across stand ages (Walter & Himmler 1996)" }
 survivalLight = [0.2, 0.3]   # lowest light all seedlings survive (less tolerant than birch, whose saplings need 21%)
 shadeScore = 1.67   # Niinemets & Valladares 2006, Appendix A

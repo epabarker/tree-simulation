@@ -18,7 +18,7 @@ _Last updated: 2026-10-30 (I3 steps 1–2: the picture in depth, the plate, the 
 1. **I3 step 3:** profile the snapshot's `tree_metrics` (a lean cadence for the garden if it dominates).
 2. **I3 step 4:** foliage coverage in `?bench`; leaf opacity and `LEAF_MIN_PX` judged on the phone. Judge the garden at season 100 (needs a faster way there: a dev `?intro=`).
 3. **I3 steps 5–6:** time `growStill` on the phone (reduced motion); ADR 0028 on first paint; a Canvas 2D `?bench` on the phone's plate.
-4. **Species (track 3):** make `m27_adopt.py` reproduce `flora-fitted.ts`, then the 3D re-fit.
+4. **Species** ([plan](plans/2026-10-30-species.md), decided): a least-squares re-fit from the round-2 fits (a 3D candidate-seed costs 30–55 s, 20–33× 2D's; LM ≈ 3 h for the garden's eight on 12 cores); r0 with m_w derived; floor to the hold-out in own woods at τ 0; first `m27_adopt.py` reproduces `flora-fitted.ts`; pilot beech on the VM.
 5. **Then:** C3–C6 as hold-outs; release; the site's PR.
 
 ## Open questions (user)

@@ -101,17 +101,17 @@ No published value exists for these. Calibrate on *patterns*: several weak targe
 | `c5.T` shedding threshold | 0.1 | Light-demanding ≈ 0.1, shade-tolerant 0.02–0.05 (sapling survival at 10–15% vs 1–2% of full light). M4: ≥ 0.2 over-prunes | Species values at M7 |
 | `c5.Trel`, `c5.topQuantile` (+ floor `c5.T`) | sky presets 0.12, 0.9, T = 0.03 | Canopy unchanged, overtopped tree keeps 4× deeper crown ([M6d](experiments/2026-10-27-m6d-shedding-short-shoots.md)) | Settled for sky presets |
 | `r6.qMin`, `r6.leafArea` | 0.1, 2 (sky presets) | Short-shoot leaf share 0.50 stand, 0.58 open (target > 0.5) | Settled for sky presets |
-| `c6.r0` tip radius | 0.02 cells | H/D stand-grown 60–80 (Watt et al. 2023). Measured at 0.02: interior stand 62–72, edge 54–57, open-grown 41–43 | Settled (M6c) |
+| `c6.r0` tip radius | 0.0025 cells (ADR 0027) | H/D stand-grown 60–80 (Watt et al. 2023). In 2D, 0.02 gave stand 62–72, open-grown 41–43. In 3D with pipe-radius scars, 0.0025 gives `forest` 70 and its lone tree 40–42 at 300 ([C1 round 3](experiments/2026-10-30-c1-round3-form.md)). Species r0 ÷ 8 pending the 3D re-fit | Re-opened: 3 seeds; 20-seed evidence at step 5 |
 | `c4` weights `wd, xi, eta, epsilon, sigma` | 1, 0.3, 0.15, 0.5, 20° | Qualitative only (Palubicki Fig. 12). Strong upward η (0.4) can starve a seedling whose buds bunch up. With R2, A_set and η come per pa ([M7](experiments/2026-10-27-m7-species.md): plagiotropic tiers need η ≈ 2 against ξ's upward pull) | Species rows qualitative; fit on Yun et al. 2025 branch angles later |
 | Species rows (`r2.levels`, k_ext, T, T_rel, r0) | see `presets.ts` | §9 silhouettes; conifer stand H/D 78 at r0 0.035 (Watt et al. 2023); birch stand crown lift 0.80 vs conifer 0.64 | Qualitative (M7) |
-| `r1.mw`, `r1.mf` | 1, 0.06 | Stem maintenance 5–13% of assimilation (Ryan et al. 1995): measured ≈ 10%, total M/P 19% at season 50. m_f sets Q_c = m_f/α ≈ 0.02; a species knob for shade tolerance | Settled for sky presets ([M8](experiments/2026-10-27-m8-carbon.md)) |
+| `r1.mw`, `r1.mf` | 64 (ADR 0027: m_w·r0² kept), 0.06 | Stem maintenance 5–13% of assimilation (Ryan et al. 1995): measured ≈ 10%, total M/P 19% at season 50. m_f sets Q_c = m_f/α ≈ 0.02; a species knob for shade tolerance | Settled for sky presets ([M8](experiments/2026-10-27-m8-carbon.md)) |
 | `r1.Lh`, `c3.alpha` with R1 | 60, 3 | Stand plateau ≈ 78 cells (top 110); open-grown 89 at season 100. α 2 under R1 leaves trees forking low (crown base 10) | Settled for sky presets; species need their own (follow-up) |
 | `r1.fRep`, `r1.maturity` | 0, 70 | Becker et al. 2000. At 0.6 it slows growth but does not stop it within 100 seasons | Switch, off |
 | `r3.E`, `r3.phi`, `r3.leafMass` | 10⁶, 1, 0.002 | Wood E ≈ 4·10⁶ in cell units (10 GPa); a 2D limb carries less foliage than its 3D counterpart, so the effective E is lower. Open-grown limbs droop 22° with tips up 15°; E 2·10⁶ removes the droop ([M9](experiments/2026-10-27-m9-mechanics.md)) | Settled for sky presets |
 | `r3.betaG`, `r3.gamma`, `r3.c` | 0.1, 0.2, 0.05 | Bastien et al. 2013's β, γ (Tsugawa et al. 2023 fit them in a mutant). c sets droop: 0.02 doubles it, 0.2 removes it and narrows the crown | Settled for sky presets; `weeping`, `troll` use c 0.3, 0.15 and β_g 0.2 |
 | `r4.qRel`, `r4.vBreak`, `r4.vCont`, `r4.delta`, `r4.lDorm` | 0.1, 2, 1, 0.02, 40 | Bole light rises from 0.01–0.04 to 0.10–0.20 after a neighbour falls; Q_rel 0.1 sits between. 0.15 halves the flush. The sugar route alone never releases a bole bud ([M10](experiments/2026-10-27-m10-release-shade.md)) | Settled for sky presets |
 | `r5.eS`, `r5.dLambda`, `r5.dB`, `r5.dA` | 0.1, 0.02, 1, 0.5 | Stand H/D 60–80 (Watt et al. 2023), open-grown squat (MacFarlane et al. 2017): measured 72 and 47. δλ carries the effect; 0.04 overshoots to 87 | Settled for sky presets; a far-red field would spare open-grown trees |
-| `r3.sigmaBreak` | 0 (off) | No break at 4000–9000 in 100 seasons: stress wood holds σ ≤ σ_target. Needs wind (O2) | Off |
+| `r3.sigmaBreak` | 0 (off); 7000 in the forest presets and species (ADR 0027) | No break at 4000–9000 in 100 seasons: stress wood holds σ ≤ σ_target. Needs wind (O2). In 3D at r0 0.0025, 4500 broke whole crowns in every storm; at 7000 the median storm takes 3–6% of the stand's metamers (the worst 10–40%). Windthrow's slenderness ramp starts at H/D 80 (§10) | 3 seeds; storm severity is C5's |
 | `o4.cSeed`, `d`, `qEst`, `pEst`, `m0`; `r1.fRep`, `maturity` (forest) | 5, 20, 0.1, 0.3, 0.002; 0.1, 40 | Qualitative: a persistent canopy of 7–8 trees per 210 cells with an understory that turns over, gaps refilled 3× faster than closed canopy ([M11](experiments/2026-10-27-m11-stand-dynamics.md)) | Qualitative |
 | `o2.sway`, `maxSway`, `pAbr` | 0.0005, 3, 0.5 | Crowns already keep gaps through light; abrasion removes the last contacts (3 seeds). Off in presets | Off |
 | `r3.sigmaTarget`, `r3.girthGain` | 3000 (≈ 7.5 MPa), 0.3 | Δ > 2 at heavy, wide junctions (Minamino & Tateno 2014) while Δ ≈ 2 overall (Yang et al. 2024): measured 2.08 at 84 reinforced junctions, 2.00 elsewhere. 1500 spreads stress wood to parents and pulls Δ back to 2 | Settled for sky presets |
@@ -145,6 +145,12 @@ No published value exists for these. Calibrate on *patterns*: several weak targe
 - the crown base is not held by C5: the lower crown is well lit.
 
 **Review** ([2026-11-01](reviews/2026-11-01-3d-port-review-2.md)): three of round 2's diagnoses corrected (sapwood cost, the zenith, the fitted beech); the path to a shippable 3D garden agreed: I3 alongside C1 + C2, then the species re-fit in 3D, with C3–C6 as hold-outs.
+
+**C1 round 3, form steps 1–2** ([note](experiments/2026-10-30-c1-round3-form.md), ADR 0027):
+- scars record the pipe radius, and r0 ÷ 8 with m_w × 64: stand H/D 70, lone tree 40–42, height level at 77 and 87–89;
+- σ_break 7000 and windthrow's ramp from H/D 80, after storms broke whole crowns at 4500;
+- the crown ratio by leaf area (`leafCrownRatio`) separates stand (0.44–0.64) from lone tree (0.71–0.81);
+- next: steps 3–4, closure and the floor at τ 0; the fitted oak now runs to the top as well (track 3).
 - Scheduled since the M12 review:
   - Embedding in the personal website → M14 (ADR 0014).
   - **R1, R3, R4 and R5 for the species presets** (M8–M10 follow-ups: under R1 they reach their 160-cell top or grow far too slender; calibrate m_f as shade tolerance and L_h as species height) → M20.

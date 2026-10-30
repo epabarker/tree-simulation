@@ -123,7 +123,7 @@ const SECTIONS: SectionSpec[] = [
     toggle: true,
     fields: [
       { key: "n", label: "n pipe exponent", min: 1.5, max: 3.5, step: 0.05 },
-      { key: "r0", label: "r0 tip radius", min: 0.005, max: 0.3, step: 0.005 },
+      { key: "r0", label: "r0 tip radius", min: 0.0005, max: 0.04, step: 0.0005 },
     ],
   },
   {
@@ -131,7 +131,7 @@ const SECTIONS: SectionSpec[] = [
     title: "R1 Carbon balance",
     toggle: true,
     fields: [
-      { key: "mw", label: "m_w sapwood cost", min: 0, max: 5, step: 0.05 },
+      { key: "mw", label: "m_w sapwood cost", min: 0, max: 320, step: 1 },
       { key: "mf", label: "m_f foliage cost", min: 0, max: 0.4, step: 0.005 },
       { key: "Lh", label: "L_h path length (0 = off)", min: 0, max: 200, step: 5 },
       { key: "fRep", label: "f_rep reproduction", min: 0, max: 0.9, step: 0.05 },

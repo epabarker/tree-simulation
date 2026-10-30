@@ -213,7 +213,7 @@ impl SnapshotBuilder {
             }
             self.species.push(m.species);
         }
-        debug_assert_eq!(METRIC_NUMBERS.len(), 37);
+        debug_assert_eq!(METRIC_NUMBERS.len(), 39);
         put_i32(&mut v, &parent);
         for a in [&x0, &y0, &angle, &length, &radius] {
             put_f32(&mut v, a);

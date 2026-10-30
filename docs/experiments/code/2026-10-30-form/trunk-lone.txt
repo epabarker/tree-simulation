@@ -1,0 +1,20 @@
+lone/base-t02
+  s150: metamers/seed 20,871; planted alive 3/3; height 85.4 (tallest 85.4); H/D 7.6; trunk r 5.593; crown width 45.5; crown ratio 0.99 (by leaf 0.72); limb droop 0.0; floor 0.475; LAI 1.60
+  s300: metamers/seed 21,107; planted alive 3/3; height 86.4 (tallest 86.4); H/D 5.8; trunk r 7.422; crown width 42.3; crown ratio 0.99 (by leaf 0.75); limb droop 0.0; floor 0.480; LAI 1.28
+  plateau: median height 250 85.4 → 300 86.4 (gain +1.0)
+  planted deaths by 300: {'thrown': 0, 'starved': 0, 'other': 0}
+lone/base-t0
+  s150: metamers/seed 17,499; planted alive 3/3; height 82.6 (tallest 83.0); H/D 7.5; trunk r 5.550; crown width 43.7; crown ratio 0.99 (by leaf 0.62); limb droop 0.0; floor 0.378; LAI 1.41
+  s300: metamers/seed 17,617; planted alive 3/3; height 83.0 (tallest 83.0); H/D 5.6; trunk r 7.386; crown width 40.6; crown ratio 0.99 (by leaf 0.66); limb droop 0.0; floor 0.384; LAI 1.18
+  plateau: median height 250 83.0 → 300 83.0 (gain -0.0)
+  planted deaths by 300: {'thrown': 0, 'starved': 0, 'other': 0}
+lone/k8-t02
+  s150: metamers/seed 18,390; planted alive 3/3; height 83.2 (tallest 88.3); H/D 46.1; trunk r 0.902; crown width 49.9; crown ratio 0.99 (by leaf 0.77); limb droop 0.2; floor 0.464; LAI 1.68
+  s300: metamers/seed 17,793; planted alive 3/3; height 88.8 (tallest 94.9); H/D 40.5; trunk r 1.096; crown width 46.7; crown ratio 0.99 (by leaf 0.78); limb droop 0.0; floor 0.464; LAI 1.28
+  plateau: median height 250 90.9 → 300 88.8 (gain -2.2)
+  planted deaths by 300: {'thrown': 0, 'starved': 0, 'other': 0}
+lone/k8-t0
+  s150: metamers/seed 15,035; planted alive 3/3; height 82.2 (tallest 83.6); H/D 48.2; trunk r 0.853; crown width 48.3; crown ratio 0.99 (by leaf 0.72); limb droop 3.0; floor 0.368; LAI 1.42
+  s300: metamers/seed 14,079; planted alive 3/3; height 87.4 (tallest 93.8); H/D 42.4; trunk r 1.030; crown width 45.2; crown ratio 0.99 (by leaf 0.75); limb droop 3.7; floor 0.365; LAI 1.04
+  plateau: median height 250 87.3 → 300 87.4 (gain +0.1)
+  planted deaths by 300: {'thrown': 0, 'starved': 0, 'other': 0}

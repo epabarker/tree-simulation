@@ -27,6 +27,14 @@ use crate::tree::{Tree, ensure, slot};
 const PI: f64 = std::f64::consts::PI;
 /// Windthrow: a storm's chance of throwing a 25 m tree, per unit of storm load (M16).
 const THROW: f64 = 0.06;
+/// Windthrow's slenderness ramp (ADR 0027): no risk up to H/D 80, the top of stand-grown trees'
+/// band (spec §10: 60–80, risky above 80, slender above 100); 1 at 110, 2 from 140.
+const SAFE_SLENDERNESS: f64 = 80.0;
+
+/// The slenderness factor of a storm's chance of throwing a tree of height/diameter `hd`.
+pub fn slenderness_risk(hd: f64) -> f64 {
+    math::min(2.0, math::max(0.0, (hd - SAFE_SLENDERNESS) / 30.0))
+}
 /// Largest sag a metamer takes in one season, radians.
 pub const MAX_SAG: f64 = 0.2;
 
@@ -154,7 +162,7 @@ pub fn update_mechanics(tree: &mut Tree, params: &Params, storm: bool, season: f
             any_break = true;
         }
         if p < 0 && storm_load > 0.0 && r3.sigma_break > 0.0 {
-            let slender = math::min(2.0, math::max(0.0, (height / (2.0 * r_new) - 40.0) / 30.0));
+            let slender = slenderness_risk(height / (2.0 * r_new));
             let chance =
                 THROW * storm_load * math::pow(math::min(1.0, height / 100.0), 2.0) * slender;
             if uniform(params.seed, purpose::WIND, tree.id as f64, 1.0, season, 0.0) < chance {
@@ -302,6 +310,16 @@ mod tests {
 
     fn bend(t: &Tree, i: usize) -> f64 {
         norm([t.m.mx[i], t.m.my[i], t.m.mz[i]])
+    }
+
+    #[test]
+    fn windthrow_spares_a_stand_grown_stem_and_ramps_past_h_d_80() {
+        assert_eq!(slenderness_risk(10.0), 0.0);
+        assert_eq!(slenderness_risk(78.0), 0.0);
+        assert_eq!(slenderness_risk(80.0), 0.0);
+        assert!((slenderness_risk(110.0) - 1.0).abs() < 1e-12);
+        assert_eq!(slenderness_risk(140.0), 2.0);
+        assert_eq!(slenderness_risk(400.0), 2.0);
     }
 
     #[test]

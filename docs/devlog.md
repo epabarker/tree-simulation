@@ -2,6 +2,26 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-30: C1 round 3, form steps 1–2: girth in 3D, the crown base by leaf area
+
+- **User:** implement [the form plan](plans/2026-10-30-form.md) step by step, stopping on any measurement outside a step's range. Two stops, each resolved by the user ([note](experiments/2026-10-30-c1-round3-form.md), [ADR 0027](decisions/0027-girth-in-3d.md)).
+- **Step 1, applied:**
+  - a shed branch's scar records its pipe radius, `radius − stressWood` (`c5.rs`);
+  - r0 ÷ 8 and m_w × 64 everywhere (world, fitted and hand species, fixtures), keeping m_w·r0²;
+  - lab sliders widened.
+- **Stop 1: storms broke the crowns.** With thin pipes, stress wood holds every branch near σ_target. σ_break was 1.5× that, and a storm loads the top 2.5×. At k8 every storm broke 82–95% of the stand's metamers, and stand H/D at 300 was 35–40. With storms off the rescale is sound: H/D 78 and 73, height level at 81–83. The plan's lower plateau (67) was storm damage.
+- **Stop 2: windthrow.** σ_break 9000 stopped breakage, but windthrow then threw 46 of 90 planted trees: its slenderness ramp started at H/D 40. It had been dormant in 3D because H/D was 10.
+- **The user's fixes:**
+  - the windthrow ramp starts at H/D 80, spec §10's band (`slenderness_risk`, with a test);
+  - σ_break 7000, chosen by sweep: the median storm takes 3–6% of the stand's metamers, the worst 10–40%; 6000 broke the crowns, 8000 broke nothing.
+- **Result** (`forest`, 3 seeds, 300 seasons): H/D 70 at both τ, height level at 77, windthrow 0–2 of 90, 68k metamers per seed (105k before).
+- **The lone tree:** `forest`'s own, with H/D 40–42, levels off at 87–89. Its first reading used `oakOpen`, a different model, pinned at its top (120). At the woods' top (200, now the preset's) the fitted oak climbs ≈ 1.4 cells a season and is pinned by 150: track 3's.
+- **The mixed wood:** windthrow 11%, nine birch at H/D ≈ 128.
+- **Step 2:** `leafBase` and `leafCrownRatio` (5% of live buds' leaf area; metrics 37 → 39). The stand reads 0.44–0.64, the lone tree 0.71–0.81, where the branch measure reads 0.99 for both. The stop rule doesn't trip. The stand's ratio still rises 150 → 300: carried into step 3.
+- **Tools:** `metamers.csv` gains R3's `stress`. Scripts and outputs in `experiments/code/2026-10-30-form/`.
+- **Surprise:** `flora-fitted.ts` no longer matches what `m27_adopt.py` generates (phyllotaxis and E), so this round edited it by hand. The script must reproduce the file before track 3 regenerates.
+- **Goldens** (intended): all 14 for the rescale (radius is in the hashed tables; the scar fix alone moved the 7 presets with R3); then `forest` for σ_break 7000. Moving `oakOpen`'s top changed no golden: at season 15 the tree is far below either top.
+
 ## 2026-11-01: an independent review of the 3D port
 
 - **User:** review the port's progress and what remains to finish it ([review](reviews/2026-11-01-3d-port-review-2.md), from the handover). Docs only; nothing re-run.

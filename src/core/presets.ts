@@ -82,7 +82,9 @@ const FOREST = {
   ...SKY,
   r1: { enabled: true, fRep: 0.1, maturity: 40 },
   // M16: limbs rest on the ground; storms in 5% of seasons break exposed limbs and throw tall trees.
-  r3: { ...SKY.r3, ground: true, sigmaBreak: 4500 },
+  // σ_break 7000 ≈ 2.3 × σ_target (ADR 0027): with thin pipes stress wood holds every branch near
+  // σ_target, and a storm's load at the top is 2.5×, so 4500 broke whole crowns in every storm.
+  r3: { ...SKY.r3, ground: true, sigmaBreak: 7000 },
   o2: { stormP: 0.05, stormLoad: 1.5 },
   o4: { enabled: true },
 } satisfies ParamsPatch;
@@ -364,8 +366,9 @@ export const presets = {
     description:
       "Quercus robur alone in a field: wide-angled limbs, a broad decurrent crown and a squat trunk (Plate II).",
     // A specimen: no seedlings around it, and no storms, which throw tall trees by height alone.
+    // The woods' top (C1 round 3): at 120 the lone oak reached it and its crown was clipped flat.
     patch: {
-      world: { width: 160, height: 120, walls: [] },
+      world: { width: 160, height: TOP, walls: [] },
       trees: [{ x: 80, species: "oak" }],
       ...WOODLAND,
       o2: { stormP: 0 },

@@ -1,6 +1,6 @@
 //! C5. Self-pruning (spec §C5; c5-shedding.ts). A lateral whose light per metamer Q_b/n_b falls
-//! below max(T, T_rel·Q_top), once g seasons old, is shed with its subtree and buds; its base
-//! radius stays as a scar (C6). With R1's `carbon` mode the test is P_b < M_b (or dim against the
+//! below max(T, T_rel·Q_top), once g seasons old, is shed with its subtree and buds; its base's
+//! pipe radius (r − stressWood) stays as a scar (C6). With R1's `carbon` mode the test is P_b < M_b (or dim against the
 //! crown top). `remove_branches` is shared with R3 breakage and obstacle clearance; with R4's bud
 //! bank each removed branch leaves a dormant bud in its slot.
 //!
@@ -88,7 +88,10 @@ pub fn remove_branches(
             if p >= 0 && dead[p as usize] != 0 {
                 dead[i] = 1;
             } else if dead[i] != 0 && p >= 0 {
-                let r = math::pow(c.radius[i], n);
+                // The scar is the pipe part only: R3's stress wood is local to its metamer (§R3,
+                // ADR 0027), as in C6's sums. A full-radius scar carries every twig's mechanical
+                // girth into the trunk, and H/D no longer depends on r0.
+                let r = math::pow(c.radius[i] - c.stress_wood[i], n);
                 c.scar_sum_n[p as usize] += r;
                 if bank {
                     roots.push(i);
@@ -246,6 +249,23 @@ pub(crate) mod tests {
         let before = t.m.radius[0];
         update_girth(&mut t, &p);
         assert!(close(t.m.radius[0], before, 1e-12));
+    }
+
+    #[test]
+    fn a_shed_laterals_scar_is_its_pipe_radius_without_stress_wood() {
+        let p = params("{}");
+        let mut t = small_tree(&p);
+        t.m.q_sum[2] = 0.05;
+        t.m.n_sum[2] = 2;
+        t.m.q_sum[1] = 1.0;
+        t.m.n_sum[1] = 1;
+        update_girth(&mut t, &p);
+        let pipe_r = t.m.radius[2];
+        t.m.stress_wood[2] = 0.5;
+        t.m.radius[2] += 0.5;
+        let nm = t.m.len();
+        assert_eq!(shed_branches(&mut t, &p, 5.0, nm), 2.0);
+        assert!(close(t.m.scar_sum_n[0], pipe_r.powf(p.c6.n), 1e-12));
     }
 
     #[test]

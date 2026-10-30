@@ -34,8 +34,9 @@ const CONIFER = {
   c2: { enabled: true, model: "slab", kExt: 0.6 },
   c5: { enabled: true, T: 0.02, Trel: 0.12 },
   // Whorls carry few tips, so the pipe model gives a thin trunk; a thicker tip radius brings
-  // stand H/D to ≈ 78 (stand-grown conifers 60–80, Watt et al. 2023; M7 note).
-  c6: { enabled: true, r0: 0.035 },
+  // stand H/D to ≈ 78 (stand-grown conifers 60–80, Watt et al. 2023; M7 note). In 3D every r0
+  // is ÷ 8 with m_w × 64 (ADR 0027).
+  c6: { enabled: true, r0: 0.004375 },
   r2: {
     enabled: true,
     levels: [
@@ -94,7 +95,7 @@ const TROPICAL = {
  */
 const WEEPING = {
   ...SKY,
-  c6: { enabled: true, r0: 0.03 },
+  c6: { enabled: true, r0: 0.00375 },
   r3: { enabled: true, E: 2e6, c: 0.3, betaG: 0.2 },
   r2: {
     enabled: true,

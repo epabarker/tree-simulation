@@ -16,6 +16,11 @@ from treesim import REPO
 from treesim.fit import SPECIES, Pool
 
 FITS = REPO / "docs" / "experiments" / "fits"
+# ADR 0027: in 3D, r0 ÷ 8 and m_w × 64, which keeps R1's sapwood cost m_w·r0² (exact in binary; the
+# fitted r0 rounded to four significant figures). The species' r0 awaits the 3D re-fit.
+GIRTH_SCALE = 8
+# ADR 0027: R3's σ_break, 4500 → 7000 with the rescale (storms broke whole crowns at 4500).
+SIGMA_BREAK = 7000
 overrides = tomllib.loads((REPO / "analysis" / "fit" / "hand-overrides.toml").read_text())
 
 pool = Pool(1)
@@ -23,6 +28,9 @@ patches = {}
 try:
     for sp in SPECIES:
         assign = {**json.loads((FITS / f"{sp}.json").read_text())["fit"]["assign"], **overrides.get(sp, {})}
+        assign["c6.r0"] = float(f"{assign['c6.r0'] / GIRTH_SCALE:.4g}")
+        assign["r1.mw"] = GIRTH_SCALE**2
+        assign["r3.sigmaBreak"] = SIGMA_BREAK
         patches[sp] = pool.ask({"amend": sp, "assign": assign})["patch"]
 finally:
     pool.close()

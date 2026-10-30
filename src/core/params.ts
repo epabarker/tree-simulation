@@ -184,9 +184,10 @@ export interface Params {
     /** Pipe exponent n (Palubicki: 2–3; empirical 1.8–2.3). */
     n: number;
     /**
-     * Tip radius r0 in cells. 0.02 gives stand-grown height/diameter ≈ 56–75 and open-grown ≈ 41,
-     * matching real slenderness (stand-grown 60–80, Watt et al. 2023); radius scales linearly with
-     * r0 under the pipe rule (literature review 2026-10-27 §4, M6c).
+     * Tip radius r0 in cells. 0.0025 (ADR 0027): in 3D the trunk's pipe sum is mostly scars, and
+     * with scars of the pipe radius stand-grown H/D lands near 65 (stand-grown 60–80, Watt et al.
+     * 2023). Radius scales linearly with r0 under the pipe rule; m_w·r0² is kept, so R1's sapwood
+     * cost is unchanged (×8 down, ×64 up: exact in binary).
      */
     r0: number;
   };
@@ -198,7 +199,10 @@ export interface Params {
    */
   r1: {
     enabled: boolean;
-    /** m_w: maintenance per unit of sapwood volume per season (calibrate). */
+    /**
+     * m_w: maintenance per unit of sapwood volume per season. 64 with r0 0.0025 (ADR 0027) is the
+     * cost m_w 1 had at r0 0.02: the cost is m_w·π·r0²·Σ path length to the live tips (n = 2).
+     */
     mw: number;
     /** m_f: foliage maintenance per unit of leaf area per season; Q_c = m_f/α is the compensation light. */
     mf: number;
@@ -476,12 +480,12 @@ export const defaultParams: Params = {
   c3: { mode: "none", lambda: 0.5, alpha: 2 },
   c4: { enabled: false, wd: 1, xi: 0.3, eta: 0.15, setPoint: 0, epsilon: 0.5, sigma: 20 },
   c5: { enabled: false, T: 0.1, g: 3, Trel: 0, topQuantile: 0.9 }, // T, Trel: calibrate
-  c6: { enabled: false, n: 2, r0: 0.02 },
+  c6: { enabled: false, n: 2, r0: 0.0025 },
   // M8 calibration (docs/experiments/2026-10-27-m8-carbon.md). With R1 on, the sky presets
   // also raise c3.alpha to 3, since costs and the L_h discount take ≈ 40% of the resource.
   r1: {
     enabled: false,
-    mw: 1, // stem maintenance ≈ 5–13% of production (Ryan et al. 1995)
+    mw: 64, // stem maintenance ≈ 5–13% of production (Ryan et al. 1995); ADR 0027's scale
     mf: 0.06, // Q_c = m_f/α ≈ 0.02–0.03 of open sky
     Lh: 60, // the plateau cause: stand trees level off at ≈ 78 cells
     hydraulic: "exp",

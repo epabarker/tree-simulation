@@ -1,0 +1,8 @@
+lone3/k8-t02
+  s150: metamers/seed 37,511; planted alive 3/3; height 202.7 (tallest 206.4); H/D 51.9; trunk r 1.940; crown width 141.5; crown ratio 1.00 (by leaf 0.85); limb droop 0.4; floor 0.347; LAI 3.82
+  s300: metamers/seed 42,231; planted alive 3/3; height 205.5 (tallest 207.0); H/D 41.0; trunk r 2.503; crown width 151.7; crown ratio 1.00 (by leaf 0.85); limb droop 0.2; floor 0.368; LAI 3.60
+  plateau: median height 250 205.6 → 300 205.5 (gain -0.1)
+lone3/k8-t0
+  s150: metamers/seed 18,543; planted alive 3/3; height 200.8 (tallest 204.2); H/D 53.1; trunk r 1.891; crown width 128.7; crown ratio 0.99 (by leaf 0.85); limb droop 0.8; floor 0.276; LAI 1.79
+  s300: metamers/seed 18,370; planted alive 3/3; height 203.2 (tallest 207.5); H/D 43.7; trunk r 2.373; crown width 145.7; crown ratio 0.99 (by leaf 0.85); limb droop 0.3; floor 0.301; LAI 1.47
+  plateau: median height 250 203.1 → 300 203.2 (gain +0.1)

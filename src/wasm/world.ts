@@ -88,6 +88,8 @@ const METRIC_NUMBERS = [
   "rootZ",
   "crownDepth",
   "centroidOffsetZ",
+  "leafBase",
+  "leafCrownRatio",
 ] as const;
 const FLAGS = new Set(["alive", "sown"]);
 

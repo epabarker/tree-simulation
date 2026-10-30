@@ -28,6 +28,7 @@ d = sys.argv[1] if len(sys.argv) > 1 else "runs/form3"
 SEEDS = (1, 2, 3)
 SEASONS = (100, 150, 200, 300)
 TALL = 20
+TAU = {"t0": "0", "t01": "0.1", "t02": "0.2"}  # t01: tau.sh's row (k8 only)
 
 
 def csv(path):
@@ -131,13 +132,13 @@ def f(xs, p=1):
 
 
 for v in ("k8", "base"):
-    for tau in ("t0", "t02"):
+    for tau in ("t0", "t01", "t02"):
         try:
             out, deaths, rise = read_variant(v, tau)
         except FileNotFoundError as e:
             print(f"{v}-{tau}: missing ({e})")
             continue
-        print(f"\n== forest {v}, τ {'0' if tau == 't0' else '0.2'} ==")
+        print(f"\n== forest {v}, τ {TAU[tau]} ==")
         print("season | floor | gaps: share, floor | canopy floor | LAI≥6: share, floor | LAI stand / crown | planted alive (O4 alone) | recruits (≥20) | crown width / spacing")
         for s in SEASONS:
             o = out[s]

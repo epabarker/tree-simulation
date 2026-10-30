@@ -59,11 +59,11 @@
   "c6": {
    "enabled": false,
    "n": 2,
-   "r0": 0.02
+   "r0": 0.0025
   },
   "r1": {
    "enabled": false,
-   "mw": 1,
+   "mw": 64,
    "mf": 0.06,
    "Lh": 60,
    "hydraulic": "exp",
@@ -199,11 +199,11 @@
    "c6": {
     "enabled": false,
     "n": 2,
-    "r0": 0.02
+    "r0": 0.0025
    },
    "r1": {
     "enabled": false,
-    "mw": 1,
+    "mw": 64,
     "mf": 0.06,
     "Lh": 60,
     "hydraulic": "exp",
@@ -338,11 +338,11 @@
    "c6": {
     "enabled": false,
     "n": 2,
-    "r0": 0.02
+    "r0": 0.0025
    },
    "r1": {
     "enabled": false,
-    "mw": 1,
+    "mw": 64,
     "mf": 0.06,
     "Lh": 60,
     "hydraulic": "exp",
@@ -477,11 +477,11 @@
    "c6": {
     "enabled": false,
     "n": 2,
-    "r0": 0.02
+    "r0": 0.0025
    },
    "r1": {
     "enabled": false,
-    "mw": 1,
+    "mw": 64,
     "mf": 0.06,
     "Lh": 60,
     "hydraulic": "exp",
@@ -616,11 +616,11 @@
    "c6": {
     "enabled": false,
     "n": 2,
-    "r0": 0.02
+    "r0": 0.0025
    },
    "r1": {
     "enabled": false,
-    "mw": 1,
+    "mw": 64,
     "mf": 0.06,
     "Lh": 60,
     "hydraulic": "exp",
@@ -755,11 +755,11 @@
    "c6": {
     "enabled": false,
     "n": 2,
-    "r0": 0.02
+    "r0": 0.0025
    },
    "r1": {
     "enabled": false,
-    "mw": 1,
+    "mw": 64,
     "mf": 0.06,
     "Lh": 60,
     "hydraulic": "exp",
@@ -894,11 +894,11 @@
    "c6": {
     "enabled": false,
     "n": 2,
-    "r0": 0.02
+    "r0": 0.0025
    },
    "r1": {
     "enabled": false,
-    "mw": 1,
+    "mw": 64,
     "mf": 0.06,
     "Lh": 60,
     "hydraulic": "exp",
@@ -1041,11 +1041,11 @@
    "c6": {
     "enabled": false,
     "n": 2,
-    "r0": 0.02
+    "r0": 0.0025
    },
    "r1": {
     "enabled": false,
-    "mw": 1,
+    "mw": 64,
     "mf": 0.06,
     "Lh": 60,
     "hydraulic": "exp",
@@ -1180,11 +1180,11 @@
    "c6": {
     "enabled": true,
     "n": 2,
-    "r0": 0.02
+    "r0": 0.0025
    },
    "r1": {
     "enabled": false,
-    "mw": 1,
+    "mw": 64,
     "mf": 0.06,
     "Lh": 60,
     "hydraulic": "exp",
@@ -1322,11 +1322,11 @@
    "c6": {
     "enabled": true,
     "n": 2,
-    "r0": 0.02
+    "r0": 0.0025
    },
    "r1": {
     "enabled": false,
-    "mw": 1,
+    "mw": 64,
     "mf": 0.06,
     "Lh": 60,
     "hydraulic": "exp",
@@ -1468,11 +1468,11 @@
    "c6": {
     "enabled": true,
     "n": 2,
-    "r0": 0.02
+    "r0": 0.0025
    },
    "r1": {
     "enabled": false,
-    "mw": 1,
+    "mw": 64,
     "mf": 0.06,
     "Lh": 60,
     "hydraulic": "exp",
@@ -1616,11 +1616,11 @@
    "c6": {
     "enabled": true,
     "n": 2,
-    "r0": 0.02
+    "r0": 0.0025
    },
    "r1": {
     "enabled": false,
-    "mw": 1,
+    "mw": 64,
     "mf": 0.06,
     "Lh": 60,
     "hydraulic": "exp",
@@ -1782,11 +1782,11 @@
    "c6": {
     "enabled": true,
     "n": 2,
-    "r0": 0.02
+    "r0": 0.0025
    },
    "r1": {
     "enabled": false,
-    "mw": 1,
+    "mw": 64,
     "mf": 0.06,
     "Lh": 60,
     "hydraulic": "exp",
@@ -1928,11 +1928,11 @@
    "c6": {
     "enabled": true,
     "n": 2,
-    "r0": 0.02
+    "r0": 0.0025
    },
    "r1": {
     "enabled": true,
-    "mw": 1,
+    "mw": 64,
     "mf": 0.06,
     "Lh": 60,
     "hydraulic": "exp",
@@ -2094,11 +2094,11 @@
    "c6": {
     "enabled": true,
     "n": 2,
-    "r0": 0.02
+    "r0": 0.0025
    },
    "r1": {
     "enabled": true,
-    "mw": 1,
+    "mw": 64,
     "mf": 0.06,
     "Lh": 60,
     "hydraulic": "exp",
@@ -2242,11 +2242,11 @@
    "c6": {
     "enabled": true,
     "n": 2,
-    "r0": 0.02
+    "r0": 0.0025
    },
    "r1": {
     "enabled": true,
-    "mw": 1,
+    "mw": 64,
     "mf": 0.06,
     "Lh": 60,
     "hydraulic": "exp",
@@ -2381,11 +2381,11 @@
    "c6": {
     "enabled": true,
     "n": 2,
-    "r0": 0.02
+    "r0": 0.0025
    },
    "r1": {
     "enabled": true,
-    "mw": 1,
+    "mw": 64,
     "mf": 0.06,
     "Lh": 60,
     "hydraulic": "exp",
@@ -2547,11 +2547,11 @@
    "c6": {
     "enabled": true,
     "n": 2,
-    "r0": 0.02
+    "r0": 0.0025
    },
    "r1": {
     "enabled": true,
-    "mw": 1,
+    "mw": 64,
     "mf": 0.06,
     "Lh": 60,
     "hydraulic": "exp",
@@ -2686,11 +2686,11 @@
    "c6": {
     "enabled": true,
     "n": 2,
-    "r0": 0.02
+    "r0": 0.0025
    },
    "r1": {
     "enabled": true,
-    "mw": 1,
+    "mw": 64,
     "mf": 0.06,
     "Lh": 60,
     "hydraulic": "exp",
@@ -2943,11 +2943,11 @@
    "c6": {
     "enabled": true,
     "n": 2,
-    "r0": 0.02
+    "r0": 0.0025
    },
    "r1": {
     "enabled": true,
-    "mw": 1,
+    "mw": 64,
     "mf": 0.06,
     "Lh": 60,
     "hydraulic": "exp",
@@ -3209,11 +3209,11 @@
    "c6": {
     "enabled": true,
     "n": 2,
-    "r0": 0.02
+    "r0": 0.0025
    },
    "r1": {
     "enabled": true,
-    "mw": 1,
+    "mw": 64,
     "mf": 0.06,
     "Lh": 60,
     "hydraulic": "exp",
@@ -3350,11 +3350,11 @@
    "c6": {
     "enabled": true,
     "n": 2,
-    "r0": 0.02
+    "r0": 0.0025
    },
    "r1": {
     "enabled": true,
-    "mw": 1,
+    "mw": 64,
     "mf": 0.06,
     "Lh": 60,
     "hydraulic": "exp",
@@ -3450,11 +3450,11 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.04419
+      "r0": 0.005524
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.08117,
       "Lh": 46.51,
       "hydraulic": "hyperbolic",
@@ -3550,7 +3550,7 @@
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.07697,
       "Lh": 108.9,
       "hydraulic": "hyperbolic",
@@ -3636,7 +3636,7 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.02477
+      "r0": 0.003096
      }
     },
     "oak": {
@@ -3657,7 +3657,7 @@
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.05542,
       "Lh": 41.02,
       "hydraulic": "hyperbolic",
@@ -3737,7 +3737,7 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.02259
+      "r0": 0.002824
      }
     },
     "fir": {
@@ -3754,11 +3754,11 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.02426
+      "r0": 0.003033
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.05291,
       "Lh": 21.74,
       "hydraulic": "hyperbolic",
@@ -3854,7 +3854,7 @@
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.0817,
       "Lh": 92.4,
       "hydraulic": "hyperbolic",
@@ -3940,7 +3940,7 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.02491
+      "r0": 0.003114
      }
     },
     "maple": {
@@ -3962,11 +3962,11 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.02059
+      "r0": 0.002574
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.02623,
       "Lh": 12.69,
       "hydraulic": "hyperbolic",
@@ -4063,11 +4063,11 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.02349
+      "r0": 0.002936
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.025,
       "Lh": 13.77,
       "hydraulic": "hyperbolic",
@@ -4167,11 +4167,11 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.02805
+      "r0": 0.003506
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.06847,
       "Lh": 27.15,
       "hydraulic": "hyperbolic",
@@ -4271,11 +4271,11 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.01955
+      "r0": 0.002444
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.05797,
       "Lh": 15.99,
       "hydraulic": "hyperbolic",
@@ -4376,11 +4376,11 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.03063
+      "r0": 0.003829
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.07191,
       "Lh": 30,
       "hydraulic": "hyperbolic",
@@ -4669,11 +4669,11 @@
    "c6": {
     "enabled": true,
     "n": 2,
-    "r0": 0.02
+    "r0": 0.0025
    },
    "r1": {
     "enabled": true,
-    "mw": 1,
+    "mw": 64,
     "mf": 0.06,
     "Lh": 60,
     "hydraulic": "exp",
@@ -4769,11 +4769,11 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.04419
+      "r0": 0.005524
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.08117,
       "Lh": 46.51,
       "hydraulic": "hyperbolic",
@@ -4869,7 +4869,7 @@
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.07697,
       "Lh": 108.9,
       "hydraulic": "hyperbolic",
@@ -4955,7 +4955,7 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.02477
+      "r0": 0.003096
      }
     },
     "oak": {
@@ -4976,7 +4976,7 @@
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.05542,
       "Lh": 41.02,
       "hydraulic": "hyperbolic",
@@ -5056,7 +5056,7 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.02259
+      "r0": 0.002824
      }
     },
     "fir": {
@@ -5073,11 +5073,11 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.02426
+      "r0": 0.003033
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.05291,
       "Lh": 21.74,
       "hydraulic": "hyperbolic",
@@ -5173,7 +5173,7 @@
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.0817,
       "Lh": 92.4,
       "hydraulic": "hyperbolic",
@@ -5259,7 +5259,7 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.02491
+      "r0": 0.003114
      }
     },
     "maple": {
@@ -5281,11 +5281,11 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.02059
+      "r0": 0.002574
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.02623,
       "Lh": 12.69,
       "hydraulic": "hyperbolic",
@@ -5382,11 +5382,11 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.02349
+      "r0": 0.002936
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.025,
       "Lh": 13.77,
       "hydraulic": "hyperbolic",
@@ -5486,11 +5486,11 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.02805
+      "r0": 0.003506
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.06847,
       "Lh": 27.15,
       "hydraulic": "hyperbolic",
@@ -5590,11 +5590,11 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.01955
+      "r0": 0.002444
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.05797,
       "Lh": 15.99,
       "hydraulic": "hyperbolic",
@@ -5695,11 +5695,11 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.03063
+      "r0": 0.003829
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.07191,
       "Lh": 30,
       "hydraulic": "hyperbolic",
@@ -5988,11 +5988,11 @@
    "c6": {
     "enabled": true,
     "n": 2,
-    "r0": 0.02
+    "r0": 0.0025
    },
    "r1": {
     "enabled": true,
-    "mw": 1,
+    "mw": 64,
     "mf": 0.06,
     "Lh": 60,
     "hydraulic": "exp",
@@ -6088,11 +6088,11 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.04419
+      "r0": 0.005524
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.08117,
       "Lh": 46.51,
       "hydraulic": "hyperbolic",
@@ -6188,7 +6188,7 @@
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.07697,
       "Lh": 108.9,
       "hydraulic": "hyperbolic",
@@ -6274,7 +6274,7 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.02477
+      "r0": 0.003096
      }
     },
     "oak": {
@@ -6295,7 +6295,7 @@
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.05542,
       "Lh": 41.02,
       "hydraulic": "hyperbolic",
@@ -6375,7 +6375,7 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.02259
+      "r0": 0.002824
      }
     },
     "fir": {
@@ -6392,11 +6392,11 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.02426
+      "r0": 0.003033
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.05291,
       "Lh": 21.74,
       "hydraulic": "hyperbolic",
@@ -6492,7 +6492,7 @@
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.0817,
       "Lh": 92.4,
       "hydraulic": "hyperbolic",
@@ -6578,7 +6578,7 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.02491
+      "r0": 0.003114
      }
     },
     "maple": {
@@ -6600,11 +6600,11 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.02059
+      "r0": 0.002574
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.02623,
       "Lh": 12.69,
       "hydraulic": "hyperbolic",
@@ -6701,11 +6701,11 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.02349
+      "r0": 0.002936
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.025,
       "Lh": 13.77,
       "hydraulic": "hyperbolic",
@@ -6805,11 +6805,11 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.02805
+      "r0": 0.003506
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.06847,
       "Lh": 27.15,
       "hydraulic": "hyperbolic",
@@ -6909,11 +6909,11 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.01955
+      "r0": 0.002444
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.05797,
       "Lh": 15.99,
       "hydraulic": "hyperbolic",
@@ -7014,11 +7014,11 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.03063
+      "r0": 0.003829
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.07191,
       "Lh": 30,
       "hydraulic": "hyperbolic",
@@ -7307,11 +7307,11 @@
    "c6": {
     "enabled": true,
     "n": 2,
-    "r0": 0.02
+    "r0": 0.0025
    },
    "r1": {
     "enabled": true,
-    "mw": 1,
+    "mw": 64,
     "mf": 0.06,
     "Lh": 60,
     "hydraulic": "exp",
@@ -7407,11 +7407,11 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.04419
+      "r0": 0.005524
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.08117,
       "Lh": 46.51,
       "hydraulic": "hyperbolic",
@@ -7507,7 +7507,7 @@
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.07697,
       "Lh": 108.9,
       "hydraulic": "hyperbolic",
@@ -7593,7 +7593,7 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.02477
+      "r0": 0.003096
      }
     },
     "oak": {
@@ -7614,7 +7614,7 @@
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.05542,
       "Lh": 41.02,
       "hydraulic": "hyperbolic",
@@ -7694,7 +7694,7 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.02259
+      "r0": 0.002824
      }
     },
     "fir": {
@@ -7711,11 +7711,11 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.02426
+      "r0": 0.003033
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.05291,
       "Lh": 21.74,
       "hydraulic": "hyperbolic",
@@ -7811,7 +7811,7 @@
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.0817,
       "Lh": 92.4,
       "hydraulic": "hyperbolic",
@@ -7897,7 +7897,7 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.02491
+      "r0": 0.003114
      }
     },
     "maple": {
@@ -7919,11 +7919,11 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.02059
+      "r0": 0.002574
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.02623,
       "Lh": 12.69,
       "hydraulic": "hyperbolic",
@@ -8020,11 +8020,11 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.02349
+      "r0": 0.002936
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.025,
       "Lh": 13.77,
       "hydraulic": "hyperbolic",
@@ -8124,11 +8124,11 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.02805
+      "r0": 0.003506
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.06847,
       "Lh": 27.15,
       "hydraulic": "hyperbolic",
@@ -8228,11 +8228,11 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.01955
+      "r0": 0.002444
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.05797,
       "Lh": 15.99,
       "hydraulic": "hyperbolic",
@@ -8333,11 +8333,11 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.03063
+      "r0": 0.003829
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.07191,
       "Lh": 30,
       "hydraulic": "hyperbolic",
@@ -8626,11 +8626,11 @@
    "c6": {
     "enabled": true,
     "n": 2,
-    "r0": 0.02
+    "r0": 0.0025
    },
    "r1": {
     "enabled": true,
-    "mw": 1,
+    "mw": 64,
     "mf": 0.06,
     "Lh": 60,
     "hydraulic": "exp",
@@ -8726,11 +8726,11 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.04419
+      "r0": 0.005524
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.08117,
       "Lh": 46.51,
       "hydraulic": "hyperbolic",
@@ -8826,7 +8826,7 @@
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.07697,
       "Lh": 108.9,
       "hydraulic": "hyperbolic",
@@ -8912,7 +8912,7 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.02477
+      "r0": 0.003096
      }
     },
     "oak": {
@@ -8933,7 +8933,7 @@
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.05542,
       "Lh": 41.02,
       "hydraulic": "hyperbolic",
@@ -9013,7 +9013,7 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.02259
+      "r0": 0.002824
      }
     },
     "fir": {
@@ -9030,11 +9030,11 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.02426
+      "r0": 0.003033
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.05291,
       "Lh": 21.74,
       "hydraulic": "hyperbolic",
@@ -9130,7 +9130,7 @@
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.0817,
       "Lh": 92.4,
       "hydraulic": "hyperbolic",
@@ -9216,7 +9216,7 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.02491
+      "r0": 0.003114
      }
     },
     "maple": {
@@ -9238,11 +9238,11 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.02059
+      "r0": 0.002574
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.02623,
       "Lh": 12.69,
       "hydraulic": "hyperbolic",
@@ -9339,11 +9339,11 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.02349
+      "r0": 0.002936
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.025,
       "Lh": 13.77,
       "hydraulic": "hyperbolic",
@@ -9443,11 +9443,11 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.02805
+      "r0": 0.003506
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.06847,
       "Lh": 27.15,
       "hydraulic": "hyperbolic",
@@ -9547,11 +9547,11 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.01955
+      "r0": 0.002444
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.05797,
       "Lh": 15.99,
       "hydraulic": "hyperbolic",
@@ -9652,11 +9652,11 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.03063
+      "r0": 0.003829
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.07191,
       "Lh": 30,
       "hydraulic": "hyperbolic",
@@ -9945,11 +9945,11 @@
    "c6": {
     "enabled": true,
     "n": 2,
-    "r0": 0.02
+    "r0": 0.0025
    },
    "r1": {
     "enabled": true,
-    "mw": 1,
+    "mw": 64,
     "mf": 0.06,
     "Lh": 60,
     "hydraulic": "exp",
@@ -10045,11 +10045,11 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.04419
+      "r0": 0.005524
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.08117,
       "Lh": 46.51,
       "hydraulic": "hyperbolic",
@@ -10145,7 +10145,7 @@
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.07697,
       "Lh": 108.9,
       "hydraulic": "hyperbolic",
@@ -10231,7 +10231,7 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.02477
+      "r0": 0.003096
      }
     },
     "oak": {
@@ -10252,7 +10252,7 @@
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.05542,
       "Lh": 41.02,
       "hydraulic": "hyperbolic",
@@ -10332,7 +10332,7 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.02259
+      "r0": 0.002824
      }
     },
     "fir": {
@@ -10349,11 +10349,11 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.02426
+      "r0": 0.003033
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.05291,
       "Lh": 21.74,
       "hydraulic": "hyperbolic",
@@ -10449,7 +10449,7 @@
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.0817,
       "Lh": 92.4,
       "hydraulic": "hyperbolic",
@@ -10535,7 +10535,7 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.02491
+      "r0": 0.003114
      }
     },
     "maple": {
@@ -10557,11 +10557,11 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.02059
+      "r0": 0.002574
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.02623,
       "Lh": 12.69,
       "hydraulic": "hyperbolic",
@@ -10658,11 +10658,11 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.02349
+      "r0": 0.002936
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.025,
       "Lh": 13.77,
       "hydraulic": "hyperbolic",
@@ -10762,11 +10762,11 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.02805
+      "r0": 0.003506
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.06847,
       "Lh": 27.15,
       "hydraulic": "hyperbolic",
@@ -10866,11 +10866,11 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.01955
+      "r0": 0.002444
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.05797,
       "Lh": 15.99,
       "hydraulic": "hyperbolic",
@@ -10971,11 +10971,11 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.03063
+      "r0": 0.003829
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.07191,
       "Lh": 30,
       "hydraulic": "hyperbolic",
@@ -11265,11 +11265,11 @@
    "c6": {
     "enabled": true,
     "n": 2,
-    "r0": 0.02
+    "r0": 0.0025
    },
    "r1": {
     "enabled": true,
-    "mw": 1,
+    "mw": 64,
     "mf": 0.06,
     "Lh": 60,
     "hydraulic": "exp",
@@ -11365,11 +11365,11 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.04419
+      "r0": 0.005524
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.08117,
       "Lh": 46.51,
       "hydraulic": "hyperbolic",
@@ -11465,7 +11465,7 @@
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.07697,
       "Lh": 108.9,
       "hydraulic": "hyperbolic",
@@ -11551,7 +11551,7 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.02477
+      "r0": 0.003096
      }
     },
     "oak": {
@@ -11572,7 +11572,7 @@
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.05542,
       "Lh": 41.02,
       "hydraulic": "hyperbolic",
@@ -11652,7 +11652,7 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.02259
+      "r0": 0.002824
      }
     },
     "fir": {
@@ -11669,11 +11669,11 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.02426
+      "r0": 0.003033
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.05291,
       "Lh": 21.74,
       "hydraulic": "hyperbolic",
@@ -11769,7 +11769,7 @@
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.0817,
       "Lh": 92.4,
       "hydraulic": "hyperbolic",
@@ -11855,7 +11855,7 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.02491
+      "r0": 0.003114
      }
     },
     "maple": {
@@ -11877,11 +11877,11 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.02059
+      "r0": 0.002574
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.02623,
       "Lh": 12.69,
       "hydraulic": "hyperbolic",
@@ -11978,11 +11978,11 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.02349
+      "r0": 0.002936
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.025,
       "Lh": 13.77,
       "hydraulic": "hyperbolic",
@@ -12082,11 +12082,11 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.02805
+      "r0": 0.003506
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.06847,
       "Lh": 27.15,
       "hydraulic": "hyperbolic",
@@ -12186,11 +12186,11 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.01955
+      "r0": 0.002444
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.05797,
       "Lh": 15.99,
       "hydraulic": "hyperbolic",
@@ -12291,11 +12291,11 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.03063
+      "r0": 0.003829
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.07191,
       "Lh": 30,
       "hydraulic": "hyperbolic",
@@ -12585,11 +12585,11 @@
    "c6": {
     "enabled": true,
     "n": 2,
-    "r0": 0.02
+    "r0": 0.0025
    },
    "r1": {
     "enabled": true,
-    "mw": 1,
+    "mw": 64,
     "mf": 0.06,
     "Lh": 60,
     "hydraulic": "exp",
@@ -12685,11 +12685,11 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.04419
+      "r0": 0.005524
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.08117,
       "Lh": 46.51,
       "hydraulic": "hyperbolic",
@@ -12785,7 +12785,7 @@
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.07697,
       "Lh": 108.9,
       "hydraulic": "hyperbolic",
@@ -12871,7 +12871,7 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.02477
+      "r0": 0.003096
      }
     },
     "oak": {
@@ -12892,7 +12892,7 @@
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.05542,
       "Lh": 41.02,
       "hydraulic": "hyperbolic",
@@ -12972,7 +12972,7 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.02259
+      "r0": 0.002824
      }
     },
     "fir": {
@@ -12989,11 +12989,11 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.02426
+      "r0": 0.003033
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.05291,
       "Lh": 21.74,
       "hydraulic": "hyperbolic",
@@ -13089,7 +13089,7 @@
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.0817,
       "Lh": 92.4,
       "hydraulic": "hyperbolic",
@@ -13175,7 +13175,7 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.02491
+      "r0": 0.003114
      }
     },
     "maple": {
@@ -13197,11 +13197,11 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.02059
+      "r0": 0.002574
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.02623,
       "Lh": 12.69,
       "hydraulic": "hyperbolic",
@@ -13298,11 +13298,11 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.02349
+      "r0": 0.002936
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.025,
       "Lh": 13.77,
       "hydraulic": "hyperbolic",
@@ -13402,11 +13402,11 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.02805
+      "r0": 0.003506
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.06847,
       "Lh": 27.15,
       "hydraulic": "hyperbolic",
@@ -13506,11 +13506,11 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.01955
+      "r0": 0.002444
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.05797,
       "Lh": 15.99,
       "hydraulic": "hyperbolic",
@@ -13611,11 +13611,11 @@
      "c6": {
       "enabled": true,
       "n": 2,
-      "r0": 0.03063
+      "r0": 0.003829
      },
      "r1": {
       "enabled": true,
-      "mw": 1,
+      "mw": 64,
       "mf": 0.07191,
       "Lh": 30,
       "hydraulic": "hyperbolic",
@@ -13935,11 +13935,11 @@
    "c6": {
     "enabled": true,
     "n": 2,
-    "r0": 0.02
+    "r0": 0.0025
    },
    "r1": {
     "enabled": true,
-    "mw": 1,
+    "mw": 64,
     "mf": 0.06,
     "Lh": 60,
     "hydraulic": "exp",
@@ -14076,11 +14076,11 @@
    "c6": {
     "enabled": true,
     "n": 2,
-    "r0": 0.035
+    "r0": 0.004375
    },
    "r1": {
     "enabled": false,
-    "mw": 1,
+    "mw": 64,
     "mf": 0.06,
     "Lh": 60,
     "hydraulic": "exp",
@@ -14270,11 +14270,11 @@
    "c6": {
     "enabled": true,
     "n": 2,
-    "r0": 0.035
+    "r0": 0.004375
    },
    "r1": {
     "enabled": false,
-    "mw": 1,
+    "mw": 64,
     "mf": 0.06,
     "Lh": 60,
     "hydraulic": "exp",
@@ -14437,11 +14437,11 @@
    "c6": {
     "enabled": true,
     "n": 2,
-    "r0": 0.02
+    "r0": 0.0025
    },
    "r1": {
     "enabled": false,
-    "mw": 1,
+    "mw": 64,
     "mf": 0.06,
     "Lh": 60,
     "hydraulic": "exp",
@@ -14631,11 +14631,11 @@
    "c6": {
     "enabled": true,
     "n": 2,
-    "r0": 0.02
+    "r0": 0.0025
    },
    "r1": {
     "enabled": false,
-    "mw": 1,
+    "mw": 64,
     "mf": 0.06,
     "Lh": 60,
     "hydraulic": "exp",
@@ -14798,11 +14798,11 @@
    "c6": {
     "enabled": true,
     "n": 2,
-    "r0": 0.02
+    "r0": 0.0025
    },
    "r1": {
     "enabled": false,
-    "mw": 1,
+    "mw": 64,
     "mf": 0.06,
     "Lh": 60,
     "hydraulic": "exp",
@@ -14956,11 +14956,11 @@
    "c6": {
     "enabled": true,
     "n": 2,
-    "r0": 0.03
+    "r0": 0.00375
    },
    "r1": {
     "enabled": true,
-    "mw": 1,
+    "mw": 64,
     "mf": 0.06,
     "Lh": 60,
     "hydraulic": "exp",
@@ -15125,11 +15125,11 @@
    "c6": {
     "enabled": true,
     "n": 2,
-    "r0": 0.02
+    "r0": 0.0025
    },
    "r1": {
     "enabled": true,
-    "mw": 1,
+    "mw": 64,
     "mf": 0.06,
     "Lh": 60,
     "hydraulic": "exp",

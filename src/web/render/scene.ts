@@ -119,8 +119,9 @@ export interface Geometry {
  * Leaves to draw this frame: base point, unit direction, size (0 → 1 as a leaf unfolds or falls)
  * and palette index. The drawn length is `leafLength(scale) · size`; the zoom-dependent minimum
  * is applied at draw time, so these arrays do not change when only the camera moves. The crowns'
- * leaves come far to near: depth slice i holds leaves [slices[i], slices[i + 1]). Leaves from
- * slices[DEPTH_SLICES] to `count` are falling or fallen, drawn after everything.
+ * leaves come far to near: depth slice i holds leaves [slices[i], slices[i + 1]); a leaf of size 0
+ * is not drawn this frame. Leaves from slices[DEPTH_SLICES] to `count` are falling or fallen, drawn
+ * after everything.
  */
 export interface Leaves {
   count: number;
@@ -287,8 +288,9 @@ export class Scene {
    * Which leaves this snapshot carries, and everything about them that does not move during a
    * tween (M15): the metamer each sits on, its direction as a fixed rotation (a, b) of that
    * shoot's direction, a size scale and a colour. Rosettes keep a constant size; shoot leaves
-   * grow in and fade with their metamer. Leaves come far to near, as their metamers do in
-   * `drawOrder`, and `slice` is each one's depth slice.
+   * grow in and fade with their metamer. The layout is in row order (its reads of the snapshot run
+   * in order); `at` is each leaf's place in the frame's far-to-near list, by one counting sort on
+   * its depth slice, and `slices` where each slice starts there (I3).
    */
   private layout = {
     for: null as Snapshot | null,
@@ -296,6 +298,8 @@ export class Scene {
     style: null as LeafStyle | null,
     count: 0,
     slice: new Uint8Array(0),
+    at: new Int32Array(0),
+    slices: new Int32Array(DEPTH_SLICES + 1),
     metamer: new Int32Array(0),
     a: new Float32Array(0),
     b: new Float32Array(0),
@@ -870,7 +874,9 @@ export class Scene {
    * young metamer carries one leaf on alternating sides (two, one each side, for styles with
    * `xray` 2) and a rosette two, far to near with their metamers (`Leaves.slices`). The layout is
    * worked out once per snapshot (`layoutLeaves`); a frame only places each leaf on its shoot and
-   * sizes it.
+   * sizes it, walking the layout in row order and writing each leaf to its far-to-near place. A
+   * leaf not drawn this frame (another tree's on a solo plate, or one shrunk away) keeps its
+   * place with size 0, so the slice table holds for the whole snapshot.
    */
   leaves(leafAge: number, t: number): Leaves {
     const s = this.next;
@@ -897,11 +903,10 @@ export class Scene {
     const shapes = L.styles.map((st) => LEAF_SHAPES.indexOf(st.shape));
     if (this.seasons && tau < this.lastTau) this.fallen.count = 0; // a new year: last year's litter is gone
     const g = this.geom;
-    let k = 0;
-    let slice = 0;
+    out.slices.set(L.slices);
     for (let i = 0; i < L.count; i++) {
-      // Leaves come far to near: each slice starts where the first leaf of a nearer one lands.
-      while (slice < (L.slice[i] as number)) out.slices[++slice] = k;
+      const k = L.at[i] as number;
+      out.size[k] = 0;
       const j = L.metamer[i];
       if (this.solo >= 0 && s.tree[j] !== this.solo) continue;
       let size = ROSETTE_SIZE;
@@ -959,9 +964,8 @@ export class Scene {
       out.palette[k] = palettes[kind] as number;
       out.shape[k] = shapes[kind] as number;
       out.aspect[k] = style.aspect;
-      k++;
     }
-    while (slice < DEPTH_SLICES) out.slices[++slice] = k;
+    let k = L.count;
     if (this.seasons) k = this.driftLeaves(out, k);
     this.lastTau = tau;
     out.count = k;
@@ -1039,18 +1043,28 @@ export class Scene {
     const style = this.leafStyle;
     if (L.for === s && L.leafAge === leafAge && L.style === style) return L;
     const n = s.metamerCount;
-    // Each tree is drawn as its species (M19): the style its species names, else the view's.
+    // Each tree is drawn as its species (M19): the style its species names, else the view's,
+    // resolved once per tree into arrays indexed by tree id.
     const styles: LeafStyle[] = [style];
-    const kindOf = new Map<number, number>();
-    const keepOf = new Map<number, number>();
+    let maxTree = 0;
+    for (const m of s.metrics) maxTree = Math.max(maxTree, m.tree);
+    if (n > 0) maxTree = Math.max(maxTree, s.tree[n - 1] as number); // rows come in tree-id order
+    const kindOf = new Uint8Array(maxTree + 1);
+    const keepOf = new Uint8Array(maxTree + 1);
     for (const m of s.metrics) {
       const name = m.species ? s.species[m.species]?.leaf : undefined;
       const own: LeafStyle = name && isLeafStyleName(name) ? LEAF_STYLES[name] : style;
       let kind = styles.indexOf(own);
       if (kind < 0) kind = styles.push(own) - 1;
-      kindOf.set(m.tree, kind);
-      keepOf.set(m.tree, own.marcescent !== undefined && m.height < own.marcescent ? 1 : 0);
+      kindOf[m.tree] = kind;
+      keepOf[m.tree] = own.marcescent !== undefined && m.height < own.marcescent ? 1 : 0;
     }
+    // Per kind: the leaf's turn from its shoot, its length relative to the view's style (the
+    // renderers draw at the latter), and whether it carries a leaf each side.
+    const along = styles.map((st) => Math.cos(st.spread));
+    const across = styles.map((st) => Math.sin(st.spread));
+    const lengthOf = styles.map((st) => st.length / style.length);
+    const pairOf = styles.map((st) => st.xray === 2);
     const cap = 2 * (n + s.budCount);
     if (L.metamer.length < cap) {
       L.metamer = new Int32Array(2 * cap);
@@ -1062,6 +1076,7 @@ export class Scene {
       L.kind = new Uint8Array(2 * cap);
       L.keep = new Uint8Array(2 * cap);
       L.slice = new Uint8Array(2 * cap);
+      L.at = new Int32Array(2 * cap);
     }
     L.styles = styles;
     let maxLight = 0;
@@ -1071,56 +1086,49 @@ export class Scene {
     const shade = (light: number, tree: number, id: number) =>
       Math.floor((maxLight > 0 ? Math.sqrt(Math.min(1, light / maxLight)) : 0) * (RAMP_STEPS - 1)) +
       jitter(tree, id);
-    // The short shoots (R6) on each metamer, so its rosettes are laid out beside its own leaves.
-    const rosetteStart = new Int32Array(n + 1);
-    for (let i = 0; i < s.budCount; i++)
-      if (s.budState[i] === BudState.shortShoot) rosetteStart[(s.budMetamer[i] as number) + 1]++;
-    for (let j = 0; j < n; j++) rosetteStart[j + 1] += rosetteStart[j] as number;
-    const rosettes = new Int32Array(rosetteStart[n] as number);
-    const fill = rosetteStart.slice(0, n);
-    for (let i = 0; i < s.budCount; i++)
-      if (s.budState[i] === BudState.shortShoot) rosettes[fill[s.budMetamer[i] as number]++] = i;
     let k = 0;
     // One leaf turned `side` · spread from shoot j. Its drawn length is foreshortened by the
-    // shoot's share in the picture's plane, hypot(Hx, Hy): the orthographic view of a leaf on a
+    // shoot's share in the picture's plane, √(Hx² + Hy²): the orthographic view of a leaf on a
     // shoot that points at the viewer is short (I3), as the shoot itself is.
-    const push = (j: number, side: number, color: number, rosette: number, slice: number) => {
+    const push = (j: number, side: number, color: number, rosette: number) => {
       const tree = s.tree[j] as number;
-      const kind = kindOf.get(tree) ?? 0;
-      const own = styles[kind] as LeafStyle;
+      const kind = kindOf[tree] as number;
+      const hx = s.dirX[j] as number;
+      const hy = s.dirY[j] as number;
       L.metamer[k] = j;
-      L.a[k] = Math.cos(own.spread);
-      L.b[k] = side * Math.sin(own.spread);
+      L.a[k] = along[kind] as number;
+      L.b[k] = side * (across[kind] as number);
       L.color[k] = Math.max(0, Math.min(RAMP_STEPS - 1, color));
       L.rosette[k] = rosette;
       L.kind[k] = kind;
-      L.keep[k] = keepOf.get(tree) ?? 0;
-      // A species' leaf length relative to the view's style (the renderers draw at the latter).
-      L.scale[k] =
-        Math.hypot(s.dirX[j] as number, s.dirY[j] as number) * (own.length / style.length);
-      L.slice[k] = slice;
+      L.keep[k] = keepOf[tree] as number;
+      L.scale[k] = Math.sqrt(hx * hx + hy * hy) * (lengthOf[kind] as number);
+      L.slice[k] = depthSlice(s.z0[j] as number, s.depth);
       k++;
     };
-    const order = this.drawOrder(s);
-    for (let o = 0; o < n; o++) {
-      const j = order[o] as number;
-      const slice = depthSlice(s.z0[j] as number, s.depth);
-      if (s.age[j] <= leafAge + 1) {
-        const c = shade(s.light[j], s.tree[j], s.birthId[j]);
-        const side = s.birthId[j] & 1 ? 1 : -1;
-        push(j, side, c, 0, slice);
-        if ((styles[kindOf.get(s.tree[j] as number) ?? 0] as LeafStyle).xray === 2)
-          push(j, -side, c, 0, slice);
-      } else {
-        // Short-shoot rosettes on wood older than the leafy shoots (R6).
-        for (let r = rosetteStart[j] as number; r < (rosetteStart[j + 1] as number); r++) {
-          const i = rosettes[r] as number;
-          const c = shade(s.budQ[i], s.tree[j], s.birthId[j] ^ 0x5bd1);
-          push(j, 1, c, 1, slice);
-          push(j, -1, c, 1, slice);
-        }
-      }
+    for (let j = 0; j < n; j++) {
+      if (s.age[j] > leafAge + 1) continue;
+      const c = shade(s.light[j], s.tree[j], s.birthId[j]);
+      const side = s.birthId[j] & 1 ? 1 : -1;
+      push(j, side, c, 0);
+      if (pairOf[kindOf[s.tree[j] as number] as number]) push(j, -side, c, 0);
     }
+    // Short-shoot rosettes on wood older than the leafy shoots (R6).
+    for (let i = 0; i < s.budCount; i++) {
+      if (s.budState[i] !== BudState.shortShoot) continue;
+      const j = s.budMetamer[i];
+      if (s.age[j] <= leafAge + 1) continue;
+      const c = shade(s.budQ[i], s.tree[j], s.birthId[j] ^ 0x5bd1);
+      push(j, 1, c, 1);
+      push(j, -1, c, 1);
+    }
+    // One counting sort by slice: each leaf's place in the far-to-near list, and the slice table.
+    const starts = L.slices;
+    starts.fill(0);
+    for (let i = 0; i < k; i++) starts[(L.slice[i] as number) + 1]++;
+    for (let i = 0; i < DEPTH_SLICES; i++) starts[i + 1] += starts[i] as number;
+    const next = starts.slice(0, DEPTH_SLICES);
+    for (let i = 0; i < k; i++) L.at[i] = next[L.slice[i] as number]++;
     L.count = k;
     L.for = s;
     L.leafAge = leafAge;

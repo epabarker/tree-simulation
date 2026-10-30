@@ -286,6 +286,7 @@ export class Canvas2DRenderer implements Renderer {
         for (let k = from; k < to; k++) {
           if (leaves.palette[k] !== p) continue;
           if (leaves.color[k] !== c || (leaves.turn[k] as number) > 0.5 !== turned) continue;
+          if (leaves.size[k] <= 0) continue; // not drawn this frame (Scene.leaves)
           const bx = leaves.x[k];
           const by = leaves.y[k];
           if (bx + full < x0 || bx - full > x1 || by + full < y0 || by - full > y1) continue;

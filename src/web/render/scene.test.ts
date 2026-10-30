@@ -84,11 +84,14 @@ describe("Scene (shared by the WebGL2 and Canvas 2D renderers)", () => {
     const leaves = scene.leaves(3, 1);
     const { young, rosettes } = leafSites(scene, 3);
     expect(rosettes).toBeGreaterThan(0); // skyTree has R6 on (M6d)
-    expect(leaves.count).toBe(young + 2 * rosettes);
+    // Leaves aging out this season keep their place in the list at size 0 (Scene.leaves).
+    let drawn = 0;
     for (let k = 0; k < leaves.count; k++) {
-      expect(leaves.size[k]).toBeGreaterThan(0);
+      expect(leaves.size[k]).toBeGreaterThanOrEqual(0);
       expect(leaves.size[k]).toBeLessThanOrEqual(1);
+      if (leaves.size[k] > 0) drawn++;
     }
+    expect(drawn).toBe(young + 2 * rosettes);
   });
 
   it("lays the leaves out far to near, each slice after the farther ones", () => {
@@ -160,7 +163,10 @@ describe("Leaf styles (page only, per species)", () => {
     scene.leafStyle = LEAF_STYLES.needle;
     const { young, rosettes } = leafSites(scene, 3);
     scene.computeGeometry(1);
-    expect(scene.leaves(3, 1).count).toBe(2 * young + 2 * rosettes);
+    const leaves = scene.leaves(3, 1);
+    let drawn = 0;
+    for (let k = 0; k < leaves.count; k++) if (leaves.size[k] > 0) drawn++;
+    expect(drawn).toBe(2 * young + 2 * rosettes);
     scene.leafStyle = LEAF_STYLES.broadleaf;
   });
 

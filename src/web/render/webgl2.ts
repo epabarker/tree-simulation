@@ -114,6 +114,11 @@ out vec2 v_size;
 flat out float v_shape;
 out vec4 v_color;
 void main() {
+  // A leaf not drawn this frame keeps its place at size 0 (Scene.leaves): put it outside the clip.
+  if (a_grow <= 0.0) {
+    gl_Position = vec4(2.0, 2.0, 2.0, 1.0);
+    return;
+  }
   float len = max(u_leaf.x, u_leaf.z * u_px) * a_grow;
   float wid = min(max(len * a_shape.y, u_px), 0.9 * len);
   float along = mix(-u_px, len + u_px, a_corner.y * 0.5 + 0.5);

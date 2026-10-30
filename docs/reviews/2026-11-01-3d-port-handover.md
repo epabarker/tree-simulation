@@ -1,7 +1,7 @@
 # 3D port: handover for an independent review (2026-11-01)
 
 **For:** an agent asked to review the 3D port so far and recommend next steps.
-**State:** `claude/gallant-brown-5k4g33` at 2e92488 (PR #22 merged): the pre-C1 checklist, and C1 calibration rounds 1 and 2.
+**State:** the branch `3d-port` (renamed from `claude/gallant-brown-5k4g33`) at 2e92488 (PR #22 merged): the pre-C1 checklist, and C1 calibration rounds 1 and 2.
 **Written by:** the agent that did I2's follow-up, the pre-C1 work and C1 rounds 1–2. Treat its conclusions as claims to check, not settled facts. "Where to push back" lists what deserves the hardest look.
 
 ## How to use this document

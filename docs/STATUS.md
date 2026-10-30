@@ -1,6 +1,6 @@
 # Status
 
-_Last updated: 2026-10-30 (C1 round 3: form steps 3–5, closure and 20-seed evidence)_
+_Last updated: 2026-10-30 (form steps 3–5 merged, 20-seed evidence; the I3 plan written and decided)_
 
 **3D port** on the branch `3d-port` (work branches open PRs into it). ADR 0024–0027 accepted. The live site stays on 0.14.0 (2D) until the bar below is met.
 
@@ -18,8 +18,8 @@ _Last updated: 2026-10-30 (C1 round 3: form steps 3–5, closure and 20-seed evi
 - **Headless:** `npm run sim` (`--light` writes `light.csv` with `lad`, `ground.csv`, `buds.csv`), `npm run bench`; round 3's harness in `docs/experiments/code/2026-10-30-form/`.
 
 ## Next
-1. **The user:** the τ 0.1 reading. Floor at 100/150/300: τ 0 7.7/9.9/12.2%, τ 0.1 11.6/13.9/14.8%, τ 0.2 14.5/15.8/14.8%. Seedlings to 20 cells by 300: 1, 79, 127. No preset's τ changed.
-2. **I3:** depth-ordered wood and leaves (the mixed wood's green wall); plate cap ≈ 200; framing under the 200 top; 3D first paint; drop unread snapshot columns; re-time the phone (`forest` 68k metamers per seed, down from 105k).
+1. **I3** ([plan](plans/2026-10-30-i3.md), decided; steps 1–2 first): wood and leaves in z-slices, the z order from Rust; plate cap 160; recruits per area; the live intro, a picture only for reduced motion (a 3D checkpoint is 4–14 MB); the frame under the 200 top; re-time the phone.
+2. **τ** (user): 0.2 stays until I3 step 4, when 0.1 and 0.2 are seen side by side in depth. Floor at 100/150/300: τ 0 7.7/9.9/12.2%, τ 0.1 11.6/13.9/14.8%, τ 0.2 14.5/15.8/14.8%; seedlings to 20 cells by 300: 1, 79, 127.
 3. **Species (track 3):** the 3D re-fit. First make `m27_adopt.py` reproduce `flora-fitted.ts` exactly. Beech, hornbeam and the fitted oak run to the top.
 4. **Then:** C3–C6 as hold-outs. C5 owns regeneration under the canopy (a floor that holds to 300) and storm severity (the worst storms take 10–40%). ADRs (first paint, R5's default); release; the site's PR.
 

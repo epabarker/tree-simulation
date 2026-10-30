@@ -509,8 +509,11 @@ export interface Planting {
   recruits: number;
 }
 
-/** The garden's planting: one row, as the 2D garden had, each tree a 3D crown (I3). */
-export const GARDEN_PLANTING: Planting = { rows: 1, spacing: SPACING, recruits: 1 };
+/**
+ * The garden's planting: one row, as the 2D garden had, each tree a 3D crown, a tree every 28
+ * cells (the user's phone check, I3: 21 read as cluttered; a second row at 24 mildly so).
+ */
+export const GARDEN_PLANTING: Planting = { rows: 1, spacing: 28, recruits: 1 };
 
 /**
  * The `mixedWood` woodland (M25) on a ring `width` cells wide: about as wide as the host is wide

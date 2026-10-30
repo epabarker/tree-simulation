@@ -22,12 +22,13 @@ describe("the garden's plate (I3)", () => {
     expect(plateWidth(1200, 624)).toBe(PLATE_MAX); // the site's wide plate: 175 cells before the cap
   });
 
-  it("plants one row down the slab's middle, a tree every 21 cells, recruits kept to its band", () => {
+  it("plants one row down the slab's middle, a tree every 28 cells, recruits kept to its band", () => {
     const p = forestParams(66, 1);
     const D = p.world.depth ?? 64;
-    expect(p.trees).toHaveLength(3);
+    expect(p.trees).toHaveLength(2);
+    expect(forestParams(160, 1).trees).toHaveLength(6);
     expect(p.trees.every((t) => t.z === D / 2)).toBe(true);
-    expect(p.o4.band).toBe(21);
+    expect(p.o4.band).toBe(28);
     // Recruits per cell of width: the ring's 300 on 210 cells.
     expect(forestParams(210, 1).o4.maxTrees).toBe(300);
     expect(p.o4.maxTrees).toBe(94);

@@ -45,7 +45,7 @@
   - the interior's exact τ is settled at C1, with the full model grown in 3D.
 - **The fade** (Q falling to 0 over the last cells before each face) is settled at I2, which grows D = 64 with and without it. It matters only where a face is open.
 
-**The view:** the garden's orthographic frontal illustration, (x, y) drawn in z order. No perspective, foreshortening cue, depth darkening or second rank is in scope.
+**The view:** the garden's orthographic frontal illustration, (x, y) drawn in z order. No perspective, no added foreshortening cue (ADR 0008's squeeze), no depth darkening and no second rank are in scope; the orthographic projection's own foreshortening of wood and leaves is the picture ([port review](../reviews/2026-10-29-3d-port-review.md), decision 2: "a branch pointing at the viewer draws short"; amended at I3, 2026-10-30).
 
 **The light:** the row-marched Beer–Lambert sweep at K = 16 with rotation, in Float32, with τ at the faces. It is chosen over the pyramid for its sky, which is what gives the faces' light, and for the M6–M27 calibrations.
 - **Transport (G3; confirmed by the user):** G is carried down the rows by whole-cell shifts, the cumulative shift round(y·s), not read bilinearly. Each row's segment is averaged over its box. Bilinear stays a switch, and is the 2D sweep's read. The field is mirror-symmetric to Float32 rounding. Its seams at the face-entry rows are the exact trace's too, and rotation averages them (G3 note §4).

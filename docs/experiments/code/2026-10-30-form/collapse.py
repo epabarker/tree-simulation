@@ -2,9 +2,12 @@
 
     uv run --project analysis python docs/experiments/code/2026-10-30-form/collapse.py runs/form
 """
-import sys, polars as pl
+import os
+import sys
+
+import polars as pl
 d=sys.argv[1]
-for v in ("base-t02","k8-t02","k8-t0"):
+for v in os.environ.get("VARIANTS", "base-t02,k8-t02,k8-t0").split(","):
     print(v)
     for s in (1,2,3):
         m=pl.read_csv(f"{d}/forest/{v}-s{s}/metrics.csv",infer_schema_length=0).with_columns(pl.exclude("species").cast(pl.Float64))
@@ -22,3 +25,10 @@ for v in ("base-t02","k8-t02","k8-t0"):
         b=g.filter((pl.col("season")>=140)&(pl.col("season")<=210)).select("season","broken","h").rows()
         big=[(int(x),int(y)) for x,y,_ in b if y>200]
         print("   seasons with >200 broken:",big[:15])
+        # Each season with breakage: the share of the live planted trees' metamers it broke.
+        sh=p.filter(pl.col("alive")==1).group_by("season").agg(
+            pl.col("broken").sum().alias("b"),(pl.col("metamers")+pl.col("broken")).sum().alias("n")
+        ).filter(pl.col("b")>0).with_columns(share=pl.col("b")/pl.col("n")).sort("season")
+        xs=sorted(sh["share"].to_list())
+        if xs:
+            print(f"   breakage seasons {len(xs)}: median share {xs[len(xs)//2]:.2%}, max {xs[-1]:.1%}, over 10%: {sum(x>0.1 for x in xs)}")

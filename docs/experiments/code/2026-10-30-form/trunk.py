@@ -14,6 +14,7 @@ Per group (forest, lone), variant (base, k8) and τ (t02, t0), over seeds 1–3,
     uv run --project analysis python docs/experiments/code/2026-10-30-form/trunk.py runs/form
 """
 
+import os
 import sys
 from statistics import median
 
@@ -22,6 +23,9 @@ import polars as pl
 d = sys.argv[1] if len(sys.argv) > 1 else "runs/form"
 SEEDS = (1, 2, 3)
 SEASONS = (150, 200, 300)
+# Which runs: GROUPS (forest,lone) and VARIANTS (base,k8; storms.sh's nostorm,sb9000 are forest's).
+GROUPS = os.environ.get("GROUPS", "forest,lone").split(",")
+VARIANTS = os.environ.get("VARIANTS", "base,k8").split(",")
 
 
 def planted(run):
@@ -51,6 +55,8 @@ def stand(group, name):
             "trunk": med(pl_rows["trunkRadius"].to_list()),
             "cw": med(pl_rows["crownWidth"].to_list()),
             "cr": med(pl_rows["crownRatio"].to_list()),
+            # The crown ratio by leaf area (step 2), in runs made since it exists.
+            "lcr": med(pl_rows["leafCrownRatio"].to_list()) if "leafCrownRatio" in pl_rows.columns else float("nan"),
         }
         floor, lai, droop = [], [], []
         for r in runs:
@@ -124,8 +130,8 @@ def trunk(group, name, season=300):
     return med(split), med(kids), med(sw_share), by_order
 
 
-for group in ("forest", "lone"):
-    for v in ("base", "k8"):
+for group in GROUPS:
+    for v in VARIANTS:
         for tau in ("t02", "t0"):
             name = f"{v}-{tau}"
             try:
@@ -139,7 +145,7 @@ for group in ("forest", "lone"):
                 print(
                     f"  s{season}: metamers/seed {o['metamers']:,.0f}; planted alive {o['alive']}/{st['planted']}; "
                     f"height {o['height']:.1f} (tallest {o['tallest']:.1f}); H/D {o['hd']:.1f}; trunk r {o['trunk']:.3f}; "
-                    f"crown width {o['cw']:.1f}; crown ratio {o['cr']:.2f}; limb droop {o['droop']:.1f}; "
+                    f"crown width {o['cw']:.1f}; crown ratio {o['cr']:.2f} (by leaf {o['lcr']:.2f}); limb droop {o['droop']:.1f}; "
                     f"floor {o['floor']:.3f}; LAI {o['lai']:.2f}"
                 )
             gain = st[300]["height"] - st[250]["height"]

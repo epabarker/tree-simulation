@@ -23,8 +23,8 @@ import polars as pl
 d = sys.argv[1] if len(sys.argv) > 1 else "runs/form"
 SEEDS = (1, 2, 3)
 SEASONS = (150, 200, 300)
-# Which runs: GROUPS (forest,lone) and VARIANTS (base,k8; storms.sh's nostorm,sb9000 are forest's).
-GROUPS = os.environ.get("GROUPS", "forest,lone").split(",")
+# Which runs: RUN_GROUPS (forest,lone; bash reserves GROUPS) and VARIANTS (base,k8; storms.sh's nostorm,sb9000 are forest's).
+GROUPS = os.environ.get("RUN_GROUPS", "forest,lone").split(",")
 VARIANTS = os.environ.get("VARIANTS", "base,k8").split(",")
 
 

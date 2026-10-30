@@ -352,10 +352,12 @@ export interface Params {
     /** δ_A: A_set·(1 − δ_A·s): shade makes shoots more upright (Roychoudhry et al. 2017) (calibrate). */
     dA: number;
     /**
-     * What the shade signal s reads (M19). "light" (default): 1 − Q/C, own foliage included, so a
-     * lone tree avoids its own shade and grows tall. "neighbours": that shade scaled by the share
-     * of the foliage above the node that belongs to other trees (O2's owner grid), standing in for
-     * the low R:FR of neighbours' light, so a lone tree grows squat (MacFarlane et al. 2017).
+     * What the shade signal s reads (M19). "neighbours" (default since C1 round 2): 1 − Q/C scaled
+     * by the share of the foliage above the node that belongs to other trees (O2's owner grid),
+     * standing in for the low R:FR of neighbours' light, so a lone tree grows squat (MacFarlane et
+     * al. 2017). "light": 1 − Q/C, own foliage included, so a tree avoids its own shade: the 2D
+     * presets' signal, kept as an ablation. A 3D crown shades its own interior far more than a
+     * planar one did, and under "light" a lone tree grew a pole (the C1 round 1 note).
      */
     signal?: "light" | "neighbours";
   };
@@ -521,7 +523,7 @@ export const defaultParams: Params = {
     juvenile: 1,
     bank: true,
   },
-  r5: { enabled: false, eS: 0.1, dLambda: 0.02, dB: 1, dA: 0.5 },
+  r5: { enabled: false, eS: 0.1, dLambda: 0.02, dB: 1, dA: 0.5, signal: "neighbours" },
   r6: { enabled: false, qMin: 0.2, leafArea: 1 }, // calibrate (M6d)
   // M11 calibration (docs/experiments/2026-10-27-m11-stand-dynamics.md).
   o2: { enabled: false, sway: 0.0005, maxSway: 3, pAbr: 0.5, stormP: 0, stormLoad: 1.5 },

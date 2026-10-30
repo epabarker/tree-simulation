@@ -6,7 +6,7 @@
 import { readFileSync } from "node:fs";
 import { afterEach, expect } from "vitest";
 import type { Params } from "../src/core/params.ts";
-import { BudState, type TreeMetrics } from "../src/core/types.ts";
+import { BudState, type RunEvent, type TreeMetrics } from "../src/core/types.ts";
 import { coreWasm, loadWorldsSync, RustWorld, type TreeView } from "../src/wasm/world.ts";
 
 loadWorldsSync(readFileSync(coreWasm));
@@ -20,11 +20,44 @@ afterEach(() => {
   for (const w of made.splice(0)) w.dispose();
 });
 
-/** `new World(params)`: a Rust world. */
+/**
+ * Live metamers past which a world is reported as unregulated. WASM's 4 GB runs out near 3.6M (an
+ * unregulated tree doubles each season), and its trap leaves the world borrowed, so every later
+ * call into the module fails too: the guard turns that into one failed assertion.
+ */
+export const METAMER_CAP = 1_500_000;
+
+/** `new World(params)`: a Rust world, its growth guarded by METAMER_CAP. */
 export class World extends RustWorld {
   constructor(params: Params) {
     super(RustWorld.create(params).core());
     if (expect.getState().currentTestName) made.push(this);
+  }
+
+  override step(seasons = 1, discard = false): void {
+    for (let k = 0; k < seasons; k++) {
+      super.step(1, discard);
+      this.guard();
+    }
+  }
+
+  override run(seasons: number, events: readonly RunEvent[] = []): void {
+    // A replay applies its events by season inside one call; it replays a run that was guarded.
+    if (events.length > 0) {
+      super.run(seasons, events);
+      return;
+    }
+    for (let k = 0; k < seasons; k++) {
+      super.run(1);
+      this.guard();
+    }
+  }
+
+  private guard(): void {
+    let n = 0;
+    for (const t of this.trees) n += t.m.length;
+    if (n > METAMER_CAP)
+      throw new Error(`unregulated growth: ${n} live metamers at season ${this.season}`);
   }
 }
 

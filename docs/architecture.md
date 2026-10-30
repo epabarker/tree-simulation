@@ -248,8 +248,8 @@ Measured in headless Firefox (desktop GPU; phones are slower): a 10-tree stand o
 |---|---|
 | `run.json` | `meta` (preset, seasons, git commit, hash, ms), `params`, `events`, `seasons` |
 | `metrics.csv` | One row per tree per season after the season ran. Columns: `season` + `METRIC_COLUMNS` (`types.ts`; `rust/core/src/metrics.rs`) |
-| `metamers.csv` | Every metamer at each `--snapshots` season and at the final season. Columns: `season,tree,birthId,parentBirthId,order,axis,x0,y0,x1,y1,length,angle,radius,qSum,nSum,vIn,birthSeason,stressWood` |
+| `metamers.csv` | Every metamer at each `--snapshots` season and at the final season. Columns: `season,tree,birthId,parentBirthId,order,axis,x0,y0,x1,y1,length,angle,radius,qSum,nSum,vIn,birthSeason,stressWood,z0,z1,hx,hy,hz,pSum,mSum`; `pSum` and `mSum` are each branch's R1 production and maintenance, from R1's pass on a copy of the tree at the snapshot |
 | `hash.txt` | State hash (same function as the golden tests) |
-| `light.csv` | With `--light` only: the light model's per-cell shade (1 − Q/C for the sky sweep) at the same seasons as `metamers.csv`, i.e. the start-of-season field those seasons' buds saw. Columns: `season,col,row,shade`, row 0 at the ground |
+| `light.csv` | With `--light` only: the light model's per-cell shade (1 − Q/C for the sky sweep) at the same seasons as `metamers.csv`, i.e. the start-of-season field those seasons' buds saw. Columns: `season,col,row,shade`, row 0 at the ground. Beside it, `ground.csv`: `season,col,layer,q,lai`, the ground's light (of C) per x and z and the leaf area in the column above |
 
 The analysis reads these with `analysis/treesim_io.py`.

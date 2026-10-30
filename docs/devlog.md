@@ -2,6 +2,49 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-01: C1 round 2: height first, R5 on neighbours, the stand in depth
+
+- **User** (on round 1): height first, through R1, to 300 seasons; R5 on neighbours everywhere; the interior's stand planted per area, with the floor measured under the crowns; the crown base checked before adding anything. Accepted round 1, the pre-C1 fixes and ADR 0026 (PR #22).
+- **Height** ([note](experiments/2026-11-01-c1-round2.md)):
+  - with R5 on neighbours, R1 as it stands levels `forest` off at 82–83 and the lone tree at 86–87, flat from season 120 to 300 in every seed;
+  - every L_h, m_w and m_f variant also levels off, lower;
+  - **surprise: R5's own-shade signal, not R1, made round 1's poles climb.**
+  - The species' woods do not all level off: the beech wood runs to the top (1.3–2.6M metamers), and the mixed wood's beech and hornbeam reach 196–206. Beech's own L_h 30 slows it but does not stop it. Proposed: the species' R1 brought forward (C7–C8).
+- **Applied (goldens change):**
+  - `r5.signal` defaults to `"neighbours"` (`"light"` is the ablation; its unit test asks for it);
+  - `perArea` plants `forest`, `clearing`, the woods and `forestParams` in three staggered rows across the depth (30 trees on the ring, 9 on the phone's plate);
+  - goldens updated: skyTree, skyStand, obliqueSun, weeping, troll, thinning (R5), and forest and mixedWood (R5 and the planting). The rest are unchanged.
+- **Tools:** the CLI's `--light` writes `ground.csv` (the ground's light and the LAI above it), and `metamers.csv` gains `pSum` and `mSum` (each branch's R1 production and maintenance, from R1 on a copy). `c1.py` reads the floor under the crowns.
+- **The table in depth:**
+  - floor 16.7%, the same under the crowns as in the gaps: the slab's sky is all oblique, so the floor is the canopy's mean transmission;
+  - Q_ss 0.03 gives 11%, and empties the upper canopy;
+  - the crown base never lifts. Neither C5 threshold holds it: the lower branches get 0.37 light per metamer (T_rel·Q_top ≈ 0.12) and produce 3.9× their maintenance;
+  - H/D 6–18.
+- **Not proposed:** any R1, Q_ss, T_rel, k_ext or τ change. Round 3 asks what limits the stand's leaf area, and whether the sky needs a zenith band.
+
+## 2026-10-31: Before C1, and C1's first round
+
+- **User:** after V and the phone's timings (no stand over 250 ms; hedgerow 219 ms in one lane, interior 145, garden 160 cells 163, 66 cells 67), ADR 0025 accepted. Asked for a pre-C1 checklist (canvas fallback, memory budget, the backlog's harness, the phone, threads, the world's top), then C1.
+- **Before C1** ([note](experiments/2026-10-31-pre-c1.md)):
+  - **The preview's Canvas 2D** never drew, nor redrew on resize: fixed in `i2.ts`. The preview deploy is not rebuilt. `canvas2d.test.ts` shows Canvas 2D paints a grown 3D stand across the canvas.
+  - **Memory:** ≈ 1 MB a cell of plate width over 200 seasons. Garden 66: 70 MB; 160: 165 MB (257 with the specimen); 520: 553 MB. ADR 0026 (proposed): 256 MB for the worker. `wasmMemoryBytes()`; `dispose` is idempotent.
+  - **The backlog's "harness" failures were traps, not shared stands:**
+    - an unregulated world (`shadow`, R1 off) exhausts WASM's 4 GB, and the trap leaves its borrow flag set, so every later call fails;
+    - `tests/world.ts` now fails a world past 1.5M live metamers;
+    - loops free each seed's world;
+    - the 2D-era per-test timeouts are gone (30 min for the backlog).
+
+    39 of 78 pass and none trap (I2's "47 of 90" miscounted: 35 of 78).
+  - **Threads** need nightly (build-std with atomics) and cross-origin isolation: parked. **Worker lanes'** return trip (24–118 ms) costs what they save: one lane is the production path for I3.
+  - **Surprise: a crown pinned at the world's top runs away.** The garden's beech at 160 cells doubled every 15–20 seasons from season 120 (293k metamers by 200; the whole garden 1.3M with recruits; the 320-cell garden ran out of memory). The top row sees open sky however dense it gets. The woods' top is now 200 (`TOP` in `presets.ts`). That costs no light time until used, and +24 B a cell a row at birth. **Goldens unchanged.** The mixed wood still reaches 200 and runs away at season 388: height has no plateau in 3D yet.
+- **C1, round 1** ([note](experiments/2026-10-31-c1-round1.md)), `forest` and a lone tree, 3 seeds, 18 knobs:
+  - **Floor:** 14–16% at the default, set by R6's Q_ss (0.2 → 23%, 0.03 → 11%); k_ext, τ, T_rel, the sky's exponent and planting in rows barely move it. Below Q_ss ≈ 0.05 it levels off near 10%: the light comes obliquely through gaps (30–35% of the ground has no leaf above it). τ 0.2 caps the dark end at 6–8% under any canopy.
+  - **Crown base** never lifts (crown ratio 0.99): the first branches pay their carbon in the side light.
+  - **Surprise: R5's own-shade signal makes poles in 3D.** The lone tree is 122 tall at season 100 with a crown 0.27 × height wide. Sensing neighbours only gives 0.51 × height and 85 tall; the stand reaches 81 (2D plateau 78) with crowns 0.46 × height deep.
+  - **Candidate, not applied** (it changes every golden; crown base and H/D still off): R5 on neighbours, Q_ss 0.03. Floor 10.4%, crowns broad, own tops kept, ≈ 1.7× the metamers (m ≈ 52).
+  - **The order:** C1 before I3 is the user's choice, allowed by ADR 0024; coverage is with today's leaf drawing.
+- **Not carried over:** the laptop's four unpushed commits on its local `claude/gallant-brown-5k4g33` (7734dab, 511d87a, 30e65fd, 6780988: 2D realism work the 3D port supersedes; their ADR "0024" collides with 0024-3d-slab-port). Left alone.
+
 ## 2026-10-30: I2, the trees grow in 3D
 
 - **User:** I2 as specified: 3D topology and directions, C4 as a vector sum, R3 with vector moments and E restored, R4's bank in 3D, the slab light at D = 64 with K = 16 rotating, τ as a world parameter. Also z and frames in the formats, the 2D goldens archived and new ones seeded. Deliverables: V on the preview, m and cost against the prototype, the phone's season in one lane and four, and the prototype's contradictions.

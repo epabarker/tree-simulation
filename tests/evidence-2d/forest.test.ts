@@ -57,7 +57,7 @@ describe("M11: stand dynamics without edges (§O4, §O2, ADR 0013)", () => {
     expect(median(dense.map((r) => r.peakCv))).toBeGreaterThan(
       1.5 * median(sparse.map((r) => r.peakCv)),
     );
-  }, 90_000);
+  });
 
   it("refills a felled canopy tree's gap from seed", () => {
     const FELL = 60;
@@ -68,15 +68,18 @@ describe("M11: stand dynamics without edges (§O4, §O2, ADR 0013)", () => {
         world.step();
       }
       const x4 = (world.trees[4] as Tree).rootX;
-      return world.trees.filter((t) => t.id >= 10 && t.alive && Math.abs(t.rootX - x4) <= 12)
-        .length;
+      const n = world.trees.filter(
+        (t) => t.id >= 10 && t.alive && Math.abs(t.rootX - x4) <= 12,
+      ).length;
+      world.dispose();
+      return n;
     };
     const felled = [1, 2, 3, 4, 5].map((s) => recruitsNear(s, true));
     const kept = [1, 2, 3, 4, 5].map((s) => recruitsNear(s, false));
     // Measured: 17 recruits near the felled tree against 4 near the same tree when kept.
     const sum = (xs: number[]) => xs.reduce((a, b) => a + b, 0);
     expect(sum(felled)).toBeGreaterThan(sum(kept));
-  }, 90_000);
+  });
 
   it("removes the open-edge effect: edge trees no longer lean out (periodic sides)", () => {
     // Outward lean of the two end trees: the left one leaning left and the right one right count

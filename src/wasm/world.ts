@@ -44,6 +44,11 @@ function memory(): { buffer: ArrayBufferLike } {
   return loaded.memory;
 }
 
+/** The core's linear memory, bytes. It grows and never shrinks: its peak is the memory budget's. */
+export function wasmMemoryBytes(): number {
+  return memory().buffer.byteLength;
+}
+
 /** METRIC_NUMBERS (rust/core/src/metrics.rs): TreeMetrics' fields but species, in order. */
 const METRIC_NUMBERS = [
   "tree",
@@ -318,6 +323,7 @@ export class RustWorld {
   private readonly inner: Pkg["World"]["prototype"];
   private paramsAt = -1;
   private cached: Params | null = null;
+  private disposed = false;
 
   protected constructor(core: Pkg["World"]["prototype"]) {
     this.inner = core;
@@ -537,7 +543,10 @@ export class RustWorld {
     return s;
   }
 
+  /** Frees the core's memory; later calls throw. Idempotent, so a tool may free early. */
   dispose(): void {
+    if (this.disposed) return;
+    this.disposed = true;
     this.inner.free();
   }
 }

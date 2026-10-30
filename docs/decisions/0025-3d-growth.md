@@ -1,6 +1,6 @@
 # 0025: How the trees grow in 3D (I2)
 
-- **Status:** proposed with I2 (2026-10-30), for the user to accept with V.
+- **Status:** accepted (the user, 2026-10-31, after V); proposed with I2 (2026-10-30).
 - **Date:** 2026-10-30
 - **Spec:** §5 (topology), §C1.4–C1.5 (phyllotaxis), §C2.8, §C4, §R3, §R4, §O2, §O4; ADR 0004, 0009, 0011, 0012, 0013, 0024.
 - **Note:** [I2](../experiments/2026-10-30-i2-3d-growth.md).

@@ -103,7 +103,7 @@ describe("§8 ablations (M22)", () => {
     expect(withR1.some((r) => r.seedling)).toBe(false);
     expect(thinningDeaths(off)).toEqual([0, 0, 0]);
     expect(mean(thinningDeaths({}))).toBeGreaterThan(20);
-  }, 120_000);
+  });
 
   it("R6 off: foliage only on the young shoots, none on older wood", () => {
     // Foliage as the page draws it: shoots up to 5 seasons old, and short shoots on older wood.

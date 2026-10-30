@@ -2,7 +2,9 @@
 seed at 150, 200, 300, the stand (planted trees' median) against the lone tree, at τ 0.2 and τ 0.
 Stop if the lone tree's is below the stand's at 300 in every seed at τ 0.
 
-    uv run --project analysis python docs/experiments/code/2026-10-30-form/leaf.py runs/form sb7000 lone2/k8
+    uv run --project analysis python docs/experiments/code/2026-10-30-form/leaf.py runs/form sb7000 lone/k8
+
+(The lone tree is rescale.sh's, the stand's own params; `oak200/k8` reads the fitted oak instead.)
 """
 
 import json

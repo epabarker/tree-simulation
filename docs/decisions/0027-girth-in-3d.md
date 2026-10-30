@@ -23,12 +23,13 @@ With the scar fixed, r0 sets H/D again. But mechanics then sets every twig's rad
    | 7000 | 3.1–6.0% (max 28–40%) | 2–8 of 11–19 per seed |
    | 8000 | none broke | – |
 
-   7000 is the trickle M16's visible test wants (a storm drops some limbs).
+   7000 is the trickle M16's visible test wants (a storm drops some limbs). Per storm at 7000 the median loss is 3–6% of the stand's metamers, the worst 10–40%. Storm severity is C5's calibration.
 4. **Windthrow's slenderness ramp starts at H/D 80**, the top of §10's stand-grown band: `clamp((H/D − 80)/30, 0, 2)` (`r3.rs`, `slenderness_risk`), zero to 80, 1 at 110, 2 from 140. THROW stays 0.06 (M16). This brings the code to §10; the spec does not change.
 
 ## Consequences
 - **`forest` at 300 seasons** (k = 8, σ_break 7000, 3 seeds): stand H/D 70 at τ 0.2 and τ 0; height levels off at 77 (gain −0.1 and +1.1 cells over 250–300); windthrow 2 and 0 of 90 planted trees. With storms off: H/D 78 and 73, height 81–83.
-- **The lone oak** (no storms): H/D 37–38 at 300 (open-grown 48 ± 8 in the species review), falling as the trunk thickens.
+- **The stand's own lone tree** (`forest`'s params, open sides, O4 off): H/D 40–42 at 300 (open-grown 48 ± 8 in the species review); height levels off at 87–89.
+- **`oakOpen`'s top is the woods' (200)**: at 120 the fitted oak was clipped flat. It is still pinned at 200 by season 150, which is track 3's re-fit.
 - **Metamers:** `forest` 68k per seed at 300 (τ 0.2), against 105k before. Crowns are sparser with thin twigs, and the picture changes.
 - **The mixed wood** (3 seeds, 300 seasons): windthrow takes 11% of planted trees, nine of them birch at a median H/D of 128. Reported, not limited: the species' heights are track 3's re-fit.
 - **The species' r0** are the 2D fits ÷ 8, pending the 3D re-fit (track 3). `analysis/experiments/m27_adopt.py` applies this ADR's scale and σ_break, but regenerating `flora-fitted.ts` also brings unrelated drift (phyllotaxis generators, E), so the file was edited by hand.

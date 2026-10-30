@@ -1,3 +1,4 @@
+# The first rescale.sh: its "lone" rows are oakOpen (the fitted oak) at its old top 120, clipped; the generic lone tree is trunk-lone.txt.
 
 forest/base-t02
   s150: metamers/seed 122,098; planted alive 68/90; height 81.4 (tallest 91.8); H/D 11.9; trunk r 3.439; crown width 22.3; crown ratio 0.99; limb droop 0.0; floor 0.164; LAI 9.53

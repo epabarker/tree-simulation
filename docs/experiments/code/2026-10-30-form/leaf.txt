@@ -1,10 +1,10 @@
 τ 0.2
-  seed 1: 150: stand 0.58 (branch 0.98, base 24 of 68), lone 0.76 (branch 0.99); 200: stand 0.58 (branch 0.98, base 24 of 73), lone 0.76 (branch 0.99); 300: stand 0.61 (branch 0.98, base 26 of 71), lone 0.76 (branch 0.99); leaf ≤ branch in 100.0% of stand rows
-  seed 2: 150: stand 0.58 (branch 0.98, base 32 of 75), lone 0.76 (branch 0.99); 200: stand 0.61 (branch 0.99, base 29 of 77), lone 0.75 (branch 0.99); 300: stand 0.64 (branch 0.99, base 30 of 78), lone 0.76 (branch 0.99); leaf ≤ branch in 100.0% of stand rows
-  seed 3: 150: stand 0.56 (branch 0.99, base 33 of 82), lone 0.77 (branch 0.99); 200: stand 0.58 (branch 0.99, base 33 of 84), lone 0.77 (branch 0.99); 300: stand 0.58 (branch 0.99, base 33 of 85), lone 0.77 (branch 0.99); leaf ≤ branch in 100.0% of stand rows
+  seed 1: 150: stand 0.58 (branch 0.98, base 24 of 68), lone 0.73 (branch 0.99); 200: stand 0.58 (branch 0.98, base 24 of 73), lone 0.77 (branch 0.99); 300: stand 0.61 (branch 0.98, base 26 of 71), lone 0.78 (branch 0.99); leaf ≤ branch in 100.0% of stand rows
+  seed 2: 150: stand 0.58 (branch 0.98, base 32 of 75), lone 0.77 (branch 0.99); 200: stand 0.61 (branch 0.99, base 29 of 77), lone 0.77 (branch 0.99); 300: stand 0.64 (branch 0.99, base 30 of 78), lone 0.78 (branch 0.99); leaf ≤ branch in 100.0% of stand rows
+  seed 3: 150: stand 0.56 (branch 0.99, base 33 of 82), lone 0.80 (branch 0.99); 200: stand 0.58 (branch 0.99, base 33 of 84), lone 0.80 (branch 0.99); 300: stand 0.58 (branch 0.99, base 33 of 85), lone 0.81 (branch 0.99); leaf ≤ branch in 100.0% of stand rows
   lone below stand at 300 in 0 of 3 seeds
 τ 0
-  seed 1: 150: stand 0.45 (branch 0.99, base 35 of 67), lone 0.73 (branch 0.98); 200: stand 0.49 (branch 0.99, base 33 of 67), lone 0.72 (branch 0.98); 300: stand 0.56 (branch 0.99, base 34 of 74), lone 0.72 (branch 0.98); leaf ≤ branch in 96.6% of stand rows
-  seed 2: 150: stand 0.35 (branch 0.99, base 46 of 75), lone 0.75 (branch 0.99); 200: stand 0.41 (branch 0.99, base 42 of 75), lone 0.74 (branch 0.98); 300: stand 0.44 (branch 0.99, base 42 of 76), lone 0.74 (branch 0.98); leaf ≤ branch in 100.0% of stand rows
-  seed 3: 150: stand 0.43 (branch 0.99, base 44 of 81), lone 0.75 (branch 0.98); 200: stand 0.48 (branch 0.99, base 42 of 80), lone 0.74 (branch 0.98); 300: stand 0.52 (branch 0.99, base 39 of 86), lone 0.72 (branch 0.98); leaf ≤ branch in 100.0% of stand rows
+  seed 1: 150: stand 0.45 (branch 0.99, base 35 of 67), lone 0.66 (branch 0.99); 200: stand 0.49 (branch 0.99, base 33 of 67), lone 0.69 (branch 0.99); 300: stand 0.56 (branch 0.99, base 34 of 74), lone 0.71 (branch 0.99); leaf ≤ branch in 96.6% of stand rows
+  seed 2: 150: stand 0.35 (branch 0.99, base 46 of 75), lone 0.72 (branch 0.99); 200: stand 0.41 (branch 0.99, base 42 of 75), lone 0.73 (branch 0.99); 300: stand 0.44 (branch 0.99, base 42 of 76), lone 0.75 (branch 0.99); leaf ≤ branch in 100.0% of stand rows
+  seed 3: 150: stand 0.43 (branch 0.99, base 44 of 81), lone 0.73 (branch 0.99); 200: stand 0.48 (branch 0.99, base 42 of 80), lone 0.77 (branch 0.99); 300: stand 0.52 (branch 0.99, base 39 of 86), lone 0.79 (branch 0.99); leaf ≤ branch in 100.0% of stand rows
   lone below stand at 300 in 0 of 3 seeds

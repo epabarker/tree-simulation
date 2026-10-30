@@ -265,6 +265,9 @@ pub struct O4 {
     pub m0: f64,
     pub max_trees: f64,
     pub rain: Option<f64>,
+    /// The band of depth seedlings establish in, cells, centred on the slab's middle (the
+    /// garden's one row, I3); None: anywhere.
+    pub band: Option<f64>,
 }
 
 #[derive(Clone, Debug)]
@@ -521,6 +524,7 @@ impl Params {
                 m0: num(o4, "m0"),
                 max_trees: num(o4, "maxTrees"),
                 rain: opt(o4, "rain"),
+                band: opt(o4, "band"),
             },
             r6: {
                 let g = group(v, "r6");

@@ -499,27 +499,52 @@ export function isPresetName(name: string): name is PresetName {
 }
 
 /**
- * The `mixedWood` woodland (M25) on a ring `width` cells wide, with a tree every ≈ 21 cells: about
- * as wide as the host is wide relative to the world's height, so a phone gets a narrower forest.
- * The seed turns the planting pattern (`MIXED`), so each forest starts from a different mix.
- * Recruits (O4's `maxTrees`) scale with the ground's area, 300 on the ring's 210 × 64 (I3): 300 on
- * every plate put a seedling every 14 cells² on a phone's. `mixedWood` itself keeps 300.
+ * How the garden plants its ring (I3; the picture sets it, not the calibration): `rows` rows of
+ * trees across the slab's depth, a tree every `spacing` cells along each, and the recruits capped
+ * at `recruits` × the ring's density per cell of width (300 on 210 cells) per row.
  */
-export function forestParams(width = 210, seed?: number): Params {
+export interface Planting {
+  rows: number;
+  spacing: number;
+  recruits: number;
+}
+
+/** The garden's planting: one row, as the 2D garden had, each tree a 3D crown (I3). */
+export const GARDEN_PLANTING: Planting = { rows: 1, spacing: SPACING, recruits: 1 };
+
+/**
+ * The `mixedWood` woodland (M25) on a ring `width` cells wide: about as wide as the host is wide
+ * relative to the world's height, so a phone gets a narrower forest. The seed turns the planting
+ * pattern (`MIXED`), so each forest starts from a different mix.
+ *
+ * The garden plants one row down the slab's middle (I3, the user's phone check): round 2's three
+ * staggered rows (`perArea`) projected 21 crowns plus recruits onto one strip where the 2D garden
+ * had 7, and no tree read as in front of another. Its recruits follow the row: capped per cell of
+ * width, and established only in a band about a crown's depth (`spacing` per row) around it
+ * (O4's `band`), so the depth does not fill with seedlings. The calibration's forest and the
+ * woods keep round 2's planting per area; `mixedWood` itself keeps 300 trees.
+ */
+export function forestParams(width = 210, seed?: number, planting: Partial<Planting> = {}): Params {
+  const { rows, spacing, recruits } = { ...GARDEN_PLANTING, ...planting };
   const base = presetParams("mixedWood", seed);
   // A phone in portrait gets a narrow ring of two or three trees, drawn large (D1).
   const W = Math.round(Math.min(520, Math.max(54, width)));
-  const n = Math.max(2, Math.round(W / 21));
-  const xs = Array.from({ length: n }, (_, k) => ((k + 0.5) * W) / n);
-  const trees = perArea(xs, W, (k, r) => ({
-    species: MIXED[(k + 3 * r + base.seed) % MIXED.length] as string,
-  }));
   const D = base.world.depth ?? 64;
-  const maxTrees = Math.max(20, Math.round((300 * W * D) / (RING.width * 64)));
+  const n = Math.max(2, Math.round(W / spacing));
+  const R = Math.max(1, Math.round(rows));
+  const trees = Array.from({ length: R }, (_, r) =>
+    Array.from({ length: n }, (_, k) => ({
+      species: MIXED[(k + 3 * r + base.seed) % MIXED.length] as string,
+      // Rows after the first shift along x a fraction of the spacing, staggered as perArea's.
+      x: (((k + 0.5) * W) / n + (r * spacing) / R) % W,
+      z: (D * (r + 0.5)) / R,
+    })),
+  ).flat();
+  const maxTrees = Math.max(20, Math.round(((300 * W) / RING.width) * R * recruits));
   return mergeParams(base, {
     world: { ...base.world, width: W },
     trees,
-    o4: { ...base.o4, maxTrees },
+    o4: { ...base.o4, maxTrees, band: Math.min(D, R * spacing) },
   });
 }
 

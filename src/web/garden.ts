@@ -14,6 +14,7 @@
 
 import * as Comlink from "comlink";
 import type { Obstacle, Params, ParamsPatch } from "../core/params.ts";
+import type { Planting } from "../core/presets.ts";
 import { forestParams, specimenParams } from "../core/presets.ts";
 import type { RunRecord, Snapshot, SnapshotOptions, TreeMetrics } from "../core/types.ts";
 import type { SimApi } from "../worker/api.ts";
@@ -84,6 +85,8 @@ export interface GardenOptions {
   params?: Params;
   /** Seed of the default run (ignored with `params`). Default: a new one per visit. */
   seed?: number;
+  /** How the default run is planted (ignored with `params`): `forestParams`' Planting (I3). */
+  planting?: Partial<Planting>;
   /** View settings; an object passed here is used (and filled in) by reference. */
   view?: Partial<ViewOptions>;
   /** WebGL2 with a Canvas 2D fallback, or Canvas 2D only. */
@@ -298,7 +301,11 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
   const rect = renderer.canvas.getBoundingClientRect();
   const params =
     options.params ??
-    forestParams(plateWidth(rect.width, rect.height), options.seed ?? dailySeed(options.seeds));
+    forestParams(
+      plateWidth(rect.width, rect.height),
+      options.seed ?? dailySeed(options.seeds),
+      options.planting,
+    );
 
   const view = Object.assign(options.view ?? {}, {
     colorMode: "natural",
@@ -785,7 +792,7 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
       const s = await sim.restore(Comlink.transfer(bytes, [bytes]));
       if (mine !== generation || destroyed) return true;
       // The run it came from, for obstacle events and for sharing (?forest=seed regrows it).
-      current = forestParams(at.width, at.seed);
+      current = forestParams(at.width, at.seed, options.planting);
       seedNow = at.seed;
       sentObstacles = JSON.stringify(current.world.obstacles ?? []);
       inFlight = false;

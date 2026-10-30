@@ -142,8 +142,6 @@ export interface LeafStyle {
   cm: number;
   /** Angle between a leaf and its shoot, radians. */
   spread: number;
-  /** Leaves per young metamer in the pseudo-depth view, spaced evenly around the shoot. */
-  cluster: number;
   /** Leaves per young metamer in the x-ray view: 1 alternates sides, 2 takes both. */
   xray: 1 | 2;
   palette: LeafPalette;
@@ -176,7 +174,6 @@ export const LEAF_STYLES = {
     shape: "lens",
     cm: 8,
     spread: 0.95,
-    cluster: 5,
     xray: 1,
     palette: "broadleaf",
     leafAge: 5,
@@ -189,7 +186,6 @@ export const LEAF_STYLES = {
     shape: "needle",
     cm: 2.5,
     spread: 1.25,
-    cluster: 8,
     xray: 2,
     palette: "needle",
     leafAge: 8,
@@ -202,7 +198,6 @@ export const LEAF_STYLES = {
     shape: "deltoid",
     cm: 5,
     spread: 1.05,
-    cluster: 8,
     xray: 1,
     palette: "birch",
     leafAge: 4,
@@ -217,7 +212,6 @@ export const LEAF_STYLES = {
     shape: "lobed",
     cm: 10,
     spread: 0.9,
-    cluster: 6,
     xray: 1,
     palette: "oak",
     leafAge: 5,
@@ -232,7 +226,6 @@ export const LEAF_STYLES = {
     shape: "ovate",
     cm: 8,
     spread: 1,
-    cluster: 7,
     xray: 1,
     palette: "beech",
     leafAge: 5,
@@ -248,7 +241,6 @@ export const LEAF_STYLES = {
     shape: "ovate",
     cm: 7,
     spread: 1,
-    cluster: 7,
     xray: 1,
     palette: "hornbeam",
     leafAge: 5,
@@ -264,7 +256,6 @@ export const LEAF_STYLES = {
     shape: "palmate",
     cm: 6,
     spread: 1,
-    cluster: 6,
     xray: 1,
     palette: "maple",
     leafAge: 5,
@@ -279,7 +270,6 @@ export const LEAF_STYLES = {
     shape: "spiny",
     cm: 7,
     spread: 1.05,
-    cluster: 6,
     xray: 1,
     palette: "holly",
     leafAge: 6,
@@ -292,7 +282,6 @@ export const LEAF_STYLES = {
     shape: "pinnate",
     cm: 18,
     spread: 0.85,
-    cluster: 4,
     xray: 1,
     palette: "rowan",
     leafAge: 4,
@@ -307,7 +296,6 @@ export const LEAF_STYLES = {
     shape: "lens",
     cm: 8,
     spread: 0.95,
-    cluster: 6,
     xray: 1,
     palette: "willow",
     leafAge: 4,
@@ -322,7 +310,6 @@ export const LEAF_STYLES = {
     shape: "needle",
     cm: 5,
     spread: 0.9,
-    cluster: 7,
     xray: 2,
     palette: "pine",
     leafAge: 3,
@@ -335,7 +322,6 @@ export const LEAF_STYLES = {
     shape: "lens",
     cm: 20,
     spread: 0.8,
-    cluster: 4,
     xray: 2,
     palette: "tropical",
     leafAge: 3,

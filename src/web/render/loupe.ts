@@ -138,7 +138,7 @@ export function createLoupe(
       scene.tau = main.tau;
       // Falling wood is the main view's: in the glass, shed branches fade where they were.
       scene.physics = false;
-      renderer.draw(t, { ...view, lite: false, showShadow: false });
+      renderer.draw(t, { ...view, showShadow: false });
     },
     destroy() {
       glass.remove();

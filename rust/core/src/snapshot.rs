@@ -3,16 +3,16 @@
 //! metamers, trees in id order, each tree's rows parent-before-child; `prev_index` maps each
 //! metamer to its row in the previous snapshot (−1 if new), merged by birth id tree by tree.
 //!
-//! In 3D (I2) a metamer's segment runs from (x0, y0, z0) along its heading (dirX, dirY, dirZ); its
-//! frame's reference is (refX, refY, refZ). `angle` and `length` are the segment as drawn in the
-//! picture's plane (projected along z), so a renderer that draws (x, y) can rebuild positions
-//! from them exactly as before.
+//! In 3D (I2) a metamer's segment runs from (x0, y0, z0) along its heading (dirX, dirY, dirZ).
+//! `angle` and `length` are the segment as drawn in the picture's plane (projected along z), so a
+//! renderer that draws (x, y) can rebuild positions from them exactly as before. `zOrder` lists the
+//! rows far to near (z0 descending, row ascending on ties), the order the page draws in (I3), so
+//! the main thread never sorts.
 //!
 //! Layout (each array starts on an 8-byte boundary, in this order; `src/wasm/world.ts` reads it):
 //! metrics f64[trees × METRIC_NUMBERS], parent i32[nm], x0 f32, y0 f32, angle f32, length f32,
-//! radius f32, z0 f32, dirX f32, dirY f32, dirZ f32, refX f32, refY f32, refZ f32, tree i32,
-//! birthId i32, order u8, light f32, resource f32, age f32, stress f32, prevIndex i32,
-//! budMetamer i32[nb], budState u8[nb], budQ f32[nb], junctions f32[nj], shadow f32[W·H or 0].
+//! radius f32, z0 f32, dirX f32, dirY f32, dirZ f32, tree i32, birthId i32, order u8, light f32,
+//! resource f32, age f32, stress f32, prevIndex i32, zOrder i32[nm], budMetamer i32[nb], budState u8[nb], budQ f32[nb], junctions f32[nj], shadow f32[W·H or 0].
 
 use crate::math;
 use crate::metrics::{METRIC_NUMBERS, tree_metrics};
@@ -80,8 +80,8 @@ impl SnapshotBuilder {
             vec![0f32; nm],
             vec![0f32; nm],
         );
-        // z0, the heading, the reference.
-        let mut depth: [Vec<f32>; 7] = std::array::from_fn(|_| vec![0f32; nm]);
+        // z0 and the heading.
+        let mut depth: [Vec<f32>; 4] = std::array::from_fn(|_| vec![0f32; nm]);
         let (mut tree_of, mut birth) = (vec![0i32; nm], vec![0i32; nm]);
         let mut order = vec![0u8; nm];
         let (mut light, mut resource, mut age, mut stress) = (
@@ -112,17 +112,9 @@ impl SnapshotBuilder {
                 y0[j] = c.base_y[i] as f32;
                 angle[j] = math::atan2(c.hy[i], c.hx[i]) as f32;
                 length[j] = (c.length[i] * math::hypot(c.hx[i], c.hy[i])) as f32;
-                for (k, v) in [
-                    c.base_z[i],
-                    c.hx[i],
-                    c.hy[i],
-                    c.hz[i],
-                    c.lx[i],
-                    c.ly[i],
-                    c.lz[i],
-                ]
-                .into_iter()
-                .enumerate()
+                for (k, v) in [c.base_z[i], c.hx[i], c.hy[i], c.hz[i]]
+                    .into_iter()
+                    .enumerate()
                 {
                     depth[k][j] = v as f32;
                 }
@@ -192,6 +184,11 @@ impl SnapshotBuilder {
             }
             i = e;
         }
+        // Far to near: the viewer faces z = 0. Ties keep row order, so the order is a function of
+        // the snapshot alone (sort_unstable is then deterministic).
+        let z = &depth[0];
+        let mut z_order: Vec<i32> = (0..nm as i32).collect();
+        z_order.sort_unstable_by(|&a, &b| z[b as usize].total_cmp(&z[a as usize]).then(a.cmp(&b)));
         self.prev_tree = tree_of.clone();
         self.prev_birth = birth.clone();
 
@@ -229,6 +226,7 @@ impl SnapshotBuilder {
             put_f32(&mut v, a);
         }
         put_i32(&mut v, &prev_index);
+        put_i32(&mut v, &z_order);
         put_i32(&mut v, &bud_m);
         v.extend_from_slice(&bud_s);
         pad8(&mut v);

@@ -84,6 +84,16 @@
             ...(firstSeed > 0 ? { seeds: [firstSeed] } : {}),
           }
         : undefined;
+      // `?seed=10` grows that seed's forest (the bench's pinned runs; I3); `?renderer=canvas` forces
+      // the Canvas 2D fallback.
+      const seed = query.has("seed") ? Number(query.get("seed")) : undefined;
+      const renderer = query.get("renderer") === "canvas" ? "canvas2d" : "auto";
+      // `?rows=1&spacing=28&recruits=1`: the garden's planting (forestParams' Planting, I3).
+      const planting = Object.fromEntries(
+        ["rows", "spacing", "recruits"]
+          .filter((k) => query.has(k))
+          .map((k) => [k, Number(query.get(k))]),
+      );
       // Exposed for poking at from the console (and headless checks); a host page needn't.
       window.garden = mountGarden(document.getElementById("garden"), {
         headroom: 140,
@@ -91,6 +101,9 @@
         specimen: "oak",
         focus: specimen ? "specimen" : "forest",
         first,
+        seed,
+        renderer,
+        planting,
       });
     </script>
   </body>

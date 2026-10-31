@@ -170,9 +170,9 @@ path = "c5.Trel"
 lo = 0.005
 hi = 0.6
 [[param]]
-path = "c6.r0"   # ADR 0027's 3D units: the 2D bounds 0.015–0.05 ÷ 8
-lo = 0.001875
-hi = 0.00625
+path = "c6.r0"   # ADR 0027's 3D units: the 2D bounds 0.015–0.05 ÷ 8; the top doubled for birch
+lo = 0.001875     # alone (2026-10-31): its 2D fit was near the old top, and round 3 ended on it
+hi = 0.0125
 [[param]]
 path = "r1.Lh"
 lo = 10

@@ -57,19 +57,18 @@
     "workers": 12,
     "rng_seed": 2026
   },
-  "seconds": 3876,
+  "seconds": 4016,
   "stageSeconds": {
-    "screening": 115,
-    "lm": 1116,
-    "cma": 2486,
-    "verification": 159
+    "screening": 109,
+    "lm": 908,
+    "cma": 2839,
+    "verification": 161
   },
-  "evaluations": 336,
-  "stopped": "CMA-ES's best not improved for 15 generations; measured outside: lone.earlyShare, shade.survivalLight",
+  "evaluations": 357,
+  "stopped": "CMA-ES's best not improved for 15 generations; measured outside: shade.survivalLight",
   "accepted": false,
-  "measuredInBand": "3 of 5",
+  "measuredInBand": "4 of 5",
   "measuredOutside": [
-    "stand.slenderness",
     "shade.survivalLight"
   ],
   "start": {
@@ -97,33 +96,33 @@
     },
     "loss": 34.240842215796086,
     "traits": {
-      "lone.height30": 76.25982636455728,
-      "lone.branchAngle": 64.51909744992392,
       "lone.widestAt": 0.16666666666666666,
-      "lone.leafStemSlope": 0.7033329444622204,
-      "lone.height60": 98.54347522913287,
-      "lone.alive": 1.0,
       "lone.forkHeight": 0.9917220768238454,
       "lone.slenderness": 73.70354271081565,
-      "stand.lateShare": 1.0793897793090483,
-      "lone.crownFullness": 0.7492269039771086,
-      "lone.spread": 0.5668197739413552,
-      "lone.leaderDominance": 2.3258890111019155,
-      "lone.branchAngle2": 76.36039438189398,
       "lone.earlyShare": 0.773869877873151,
-      "lone.ldSlope": 0.9843214252528844,
-      "lone.junctionDelta": 1.7518400195213417,
+      "lone.spread": 0.5668197739413552,
+      "stand.lateShare": 1.0793897793090483,
+      "lone.branchAngle2": 76.36039438189398,
+      "lone.crownFullness": 0.7492269039771086,
+      "lone.alive": 1.0,
       "lone.limbDroop": 8.511481396191439,
+      "lone.ldSlope": 0.9843214252528844,
+      "lone.leafStemSlope": 0.7033329444622204,
+      "lone.branchAngle": 64.51909744992392,
+      "lone.height60": 98.54347522913287,
+      "lone.leaderDominance": 2.3258890111019155,
+      "lone.height30": 76.25982636455728,
       "lone.profileCentre": 0.43099723902876513,
-      "stand.floor": 0.13959787855909897,
-      "stand.alive": 1.0,
+      "lone.junctionDelta": 1.7518400195213417,
       "stand.crownRatio": 0.3286530521027513,
+      "stand.widestAt": 0.2833333333333334,
+      "stand.alive100": 1.0,
+      "stand.height": 89.81141088493634,
+      "stand.floor": 0.13959787855909897,
       "stand.boleCrownRatio": 0.36437541392431944,
       "stand.slenderness": 105.380286455141,
-      "stand.alive100": 1.0,
+      "stand.alive": 1.0,
       "stand.height100": 96.9409758243847,
-      "stand.height": 89.81141088493634,
-      "stand.widestAt": 0.2833333333333334,
       "shade.survivalLight": 0.08594545652494669,
       "shade.survivalLightStep": 0.10909190028905869
     }
@@ -131,80 +130,80 @@
   "lm": {
     "assign": {
       "r1.hydraulic": "hyperbolic",
-      "c3.alpha": 4.68,
-      "r2.levels.0.lambda": 0.5953,
-      "r2.levels.1.lambda": 0.4922,
-      "r2.levels.1.setPoint": 81.28,
-      "r2.levels.1.branchAngle": 30.34,
-      "r2.levels.1.eta": 0.05,
-      "r2.levels.2.setPoint": 154.5,
-      "r2.aC": 6.16,
-      "r2.dLambda": 0.0925,
-      "r2.kappa": 0.0,
-      "c5.Trel": 0.4782,
-      "r1.Lh": 38.97,
-      "r1.mf": 0.1168,
-      "r3.c": 0.12,
+      "c3.alpha": 2.804,
+      "r2.levels.0.lambda": 0.5995,
+      "r2.levels.1.lambda": 0.4943,
+      "r2.levels.1.setPoint": 44.85,
+      "r2.levels.1.branchAngle": 35.93,
+      "r2.levels.1.eta": 0.647,
+      "r2.levels.2.setPoint": 158.4,
+      "r2.aC": 14.57,
+      "r2.dLambda": 0.08396,
+      "r2.kappa": 0.6307,
+      "c5.Trel": 0.3129,
+      "r1.Lh": 38.35,
+      "r1.mf": 0.1219,
+      "r3.c": 0.08679,
       "r6.qMin": 0.2,
-      "r6.leafArea": 2.151,
-      "r2.hJ": 7.78,
-      "c6.r0": 0.00625,
-      "r1.mw": 82.01
+      "r6.leafArea": 2.691,
+      "r2.hJ": 32.08,
+      "c6.r0": 0.0104,
+      "r1.mw": 29.62
     },
-    "loss": 11.894290263946731
+    "loss": 2.902163501645942
   },
   "fit": {
     "assign": {
       "r1.hydraulic": "hyperbolic",
-      "c3.alpha": 4.68,
-      "r2.levels.0.lambda": 0.5953,
-      "r2.levels.1.lambda": 0.4922,
-      "r2.levels.1.setPoint": 81.28,
-      "r2.levels.1.branchAngle": 30.34,
-      "r2.levels.1.eta": 0.05,
-      "r2.levels.2.setPoint": 154.5,
-      "r2.aC": 6.16,
-      "r2.dLambda": 0.0925,
-      "r2.kappa": 0.0,
-      "c5.Trel": 0.4782,
-      "r1.Lh": 38.97,
-      "r1.mf": 0.1168,
-      "r3.c": 0.12,
-      "r6.qMin": 0.2,
-      "r6.leafArea": 2.151,
-      "r2.hJ": 7.78,
-      "c6.r0": 0.00625,
-      "r1.mw": 82.01
+      "c3.alpha": 2.853,
+      "r2.levels.0.lambda": 0.5951,
+      "r2.levels.1.lambda": 0.4952,
+      "r2.levels.1.setPoint": 47.27,
+      "r2.levels.1.branchAngle": 33.16,
+      "r2.levels.1.eta": 0.6069,
+      "r2.levels.2.setPoint": 147.2,
+      "r2.aC": 14.69,
+      "r2.dLambda": 0.08045,
+      "r2.kappa": 0.5681,
+      "c5.Trel": 0.2033,
+      "r1.Lh": 42.44,
+      "r1.mf": 0.1358,
+      "r3.c": 0.09122,
+      "r6.qMin": 0.1995,
+      "r6.leafArea": 2.722,
+      "r2.hJ": 31.78,
+      "c6.r0": 0.009968,
+      "r1.mw": 32.24
     },
-    "loss": 15.894434442097566,
+    "loss": 3.5763159129839046,
     "traits": {
-      "lone.height30": 71.65268653365035,
-      "lone.branchAngle": 50.74627019809764,
-      "lone.widestAt": 0.049999999999999996,
-      "lone.leafStemSlope": 0.6247159934227371,
-      "lone.height60": 94.98233953298033,
+      "lone.widestAt": 0.15,
+      "lone.forkHeight": 0.9806242010815822,
+      "lone.slenderness": 50.72090265203991,
+      "lone.earlyShare": 0.6872165227883417,
+      "lone.spread": 0.4807553909471686,
+      "stand.lateShare": 1.158492060402011,
+      "lone.branchAngle2": 71.52355317588817,
+      "lone.crownFullness": 0.750112260516969,
       "lone.alive": 1.0,
-      "lone.forkHeight": 0.959646084810445,
-      "lone.slenderness": 51.1863796793509,
-      "stand.lateShare": 1.254902635384106,
-      "lone.crownFullness": 0.5327516963145346,
-      "lone.spread": 0.8334969088223998,
-      "lone.leaderDominance": 2.6342699413024686,
-      "lone.branchAngle2": 75.31135732306657,
-      "lone.earlyShare": 0.7543822949874031,
-      "lone.ldSlope": 0.9777731817577427,
-      "lone.junctionDelta": 1.7801823955079303,
-      "lone.limbDroop": 19.941683200319126,
-      "lone.profileCentre": 0.39107206447165654,
-      "stand.floor": 0.13583841259875615,
-      "stand.alive": 1.0,
-      "stand.crownRatio": 0.2899959143935163,
-      "stand.boleCrownRatio": 0.3454367164295249,
-      "stand.slenderness": 86.88552027315312,
+      "lone.limbDroop": 17.43590559774748,
+      "lone.ldSlope": 0.9083401116491169,
+      "lone.leafStemSlope": 0.652511008096756,
+      "lone.branchAngle": 48.1432966077845,
+      "lone.height60": 102.25836858734569,
+      "lone.leaderDominance": 2.7222260561940312,
+      "lone.height30": 70.27149907848256,
+      "lone.profileCentre": 0.43355020461842053,
+      "lone.junctionDelta": 1.8565439273406978,
+      "stand.crownRatio": 0.3933120646436577,
+      "stand.widestAt": 0.5416666666666666,
       "stand.alive100": 1.0,
-      "stand.height100": 116.59982602027456,
-      "stand.height": 92.91666504986692,
-      "stand.widestAt": 0.2708333333333333,
+      "stand.height": 91.6103582338102,
+      "stand.floor": 0.15151252683372043,
+      "stand.boleCrownRatio": 0.5565715818948793,
+      "stand.slenderness": 70.18994564500868,
+      "stand.alive": 1.0,
+      "stand.height100": 106.12660673579445,
       "shade.survivalLight": 0.15605818770420665,
       "shade.survivalLightStep": 0.21712612779811025
     },
@@ -215,25 +214,25 @@
       "c3": {
         "mode": "bh",
         "lambda": 0.5,
-        "alpha": 4.68
+        "alpha": 2.853
       },
       "c5": {
         "enabled": true,
         "T": 0.1,
         "g": 3,
-        "Trel": 0.4782,
+        "Trel": 0.2033,
         "topQuantile": 0.9
       },
       "c6": {
         "enabled": true,
         "n": 2,
-        "r0": 0.00625
+        "r0": 0.009968
       },
       "r1": {
         "enabled": true,
-        "mw": 82.01,
-        "mf": 0.1168,
-        "Lh": 38.97,
+        "mw": 32.24,
+        "mf": 0.1358,
+        "Lh": 42.44,
         "hydraulic": "hyperbolic",
         "sr": 0.1,
         "fRep": 0.1,
@@ -247,7 +246,7 @@
         "enabled": true,
         "levels": [
           {
-            "lambda": 0.5953,
+            "lambda": 0.5951,
             "setPoint": 0,
             "eta": 0.3,
             "branchAngle": 45,
@@ -256,10 +255,10 @@
             "pTerm": 0
           },
           {
-            "lambda": 0.4922,
-            "setPoint": 81.28,
-            "eta": 0.05,
-            "branchAngle": 30.34,
+            "lambda": 0.4952,
+            "setPoint": 47.27,
+            "eta": 0.6069,
+            "branchAngle": 33.16,
             "generator": "spiral",
             "tierEvery": 0,
             "pTerm": 0,
@@ -267,7 +266,7 @@
           },
           {
             "lambda": 0.5,
-            "setPoint": 154.5,
+            "setPoint": 147.2,
             "eta": 0.25,
             "branchAngle": 40,
             "generator": "spiral",
@@ -275,11 +274,11 @@
             "pTerm": 0
           }
         ],
-        "aC": 6.16,
-        "dLambda": 0.0925,
+        "aC": 14.69,
+        "dLambda": 0.08045,
         "ramp": 20,
-        "kappa": 0,
-        "hJ": 7.78
+        "kappa": 0.5681,
+        "hJ": 31.78
       },
       "r3": {
         "enabled": true,
@@ -291,7 +290,7 @@
         "posture": true,
         "betaG": 0.1,
         "gamma": 0.2,
-        "c": 0.12,
+        "c": 0.09122,
         "sigmaTarget": 3000,
         "girthGain": 0.3,
         "sigmaBreak": 7000,
@@ -302,8 +301,8 @@
       },
       "r6": {
         "enabled": true,
-        "qMin": 0.2,
-        "leafArea": 2.151
+        "qMin": 0.1995,
+        "leafArea": 2.722
       },
       "o4": {
         "cSeed": 2,
@@ -314,38 +313,38 @@
         "rain": 0.2
       }
     },
-    "from": "lm"
+    "from": "cma 5"
   },
   "selection": [
     {
       "candidate": "lm",
-      "inBand": 3,
-      "loss": 15.250949867992395
+      "inBand": 4,
+      "loss": 3.1647694178131145
     },
     {
       "candidate": "cma 1",
-      "inBand": 2,
-      "loss": 17.469697046951243
+      "inBand": 4,
+      "loss": 3.499264958901047
     },
     {
       "candidate": "cma 2",
-      "inBand": 3,
-      "loss": 15.967031398262467
+      "inBand": 4,
+      "loss": 2.9382499429420545
     },
     {
       "candidate": "cma 3",
-      "inBand": 1,
-      "loss": 25.7038263093525
+      "inBand": 4,
+      "loss": 3.4113025742690604
     },
     {
       "candidate": "cma 4",
-      "inBand": 3,
-      "loss": 19.112402714312672
+      "inBand": 4,
+      "loss": 4.270469779633956
     },
     {
       "candidate": "cma 5",
-      "inBand": 2,
-      "loss": 30.258028992775294
+      "inBand": 4,
+      "loss": 2.6269130320703193
     }
   ],
   "margins": [
@@ -357,8 +356,8 @@
       "weight": 1,
       "start": 89.81141088493634,
       "startMargin": 14.811410884936336,
-      "fit": 92.91666504986692,
-      "fitMargin": 17.91666504986692
+      "fit": 91.6103582338102,
+      "fitMargin": 16.610358233810203
     },
     {
       "trait": "lone.earlyShare",
@@ -368,8 +367,8 @@
       "weight": 1,
       "start": 0.773869877873151,
       "startMargin": 0.026130122126848995,
-      "fit": 0.7543822949874031,
-      "fitMargin": 0.04561770501259692
+      "fit": 0.6872165227883417,
+      "fitMargin": 0.047216522788341694
     },
     {
       "trait": "lone.spread",
@@ -379,8 +378,8 @@
       "weight": 0.5,
       "start": 0.5668197739413552,
       "startMargin": 0.0031802260586448194,
-      "fit": 0.8334969088223998,
-      "fitMargin": -0.2634969088223998
+      "fit": 0.4807553909471686,
+      "fitMargin": 0.08924460905283138
     },
     {
       "trait": "lone.slenderness",
@@ -390,8 +389,8 @@
       "weight": 1,
       "start": 73.70354271081565,
       "startMargin": -17.703542710815654,
-      "fit": 51.1863796793509,
-      "fitMargin": 4.8136203206491
+      "fit": 50.72090265203991,
+      "fitMargin": 5.279097347960089
     },
     {
       "trait": "stand.slenderness",
@@ -401,8 +400,8 @@
       "weight": 1,
       "start": 105.380286455141,
       "startMargin": -25.380286455141004,
-      "fit": 86.88552027315312,
-      "fitMargin": -6.885520273153119
+      "fit": 70.18994564500868,
+      "fitMargin": 9.810054354991323
     },
     {
       "trait": "stand.crownRatio",
@@ -412,8 +411,8 @@
       "weight": 0.5,
       "start": 0.3286530521027513,
       "startMargin": 0.04865305210275131,
-      "fit": 0.2899959143935163,
-      "fitMargin": 0.009995914393516298
+      "fit": 0.3933120646436577,
+      "fitMargin": 0.08668793535634231
     },
     {
       "trait": "lone.widestAt",
@@ -423,8 +422,8 @@
       "weight": 0.5,
       "start": 0.16666666666666666,
       "startMargin": -0.08333333333333337,
-      "fit": 0.049999999999999996,
-      "fitMargin": -0.20000000000000004
+      "fit": 0.15,
+      "fitMargin": -0.1
     },
     {
       "trait": "lone.crownFullness",
@@ -434,8 +433,8 @@
       "weight": 0.5,
       "start": 0.7492269039771086,
       "startMargin": 0.0507730960228914,
-      "fit": 0.5327516963145346,
-      "fitMargin": -0.06724830368546539
+      "fit": 0.750112260516969,
+      "fitMargin": 0.04988773948303096
     },
     {
       "trait": "lone.forkHeight",
@@ -445,8 +444,8 @@
       "weight": 0.5,
       "start": 0.9917220768238454,
       "startMargin": 0.008277923176154639,
-      "fit": 0.959646084810445,
-      "fitMargin": 0.04035391518955503
+      "fit": 0.9806242010815822,
+      "fitMargin": 0.019375798918417814
     },
     {
       "trait": "lone.leaderDominance",
@@ -456,8 +455,8 @@
       "weight": 0.5,
       "start": 2.3258890111019155,
       "startMargin": 0.3258890111019155,
-      "fit": 2.6342699413024686,
-      "fitMargin": 0.6342699413024686
+      "fit": 2.7222260561940312,
+      "fitMargin": 0.7222260561940312
     },
     {
       "trait": "lone.branchAngle",
@@ -467,8 +466,8 @@
       "weight": 0.5,
       "start": 64.51909744992392,
       "startMargin": -9.519097449923919,
-      "fit": 50.74627019809764,
-      "fitMargin": 4.2537298019023595
+      "fit": 48.1432966077845,
+      "fitMargin": 6.8567033922155005
     },
     {
       "trait": "lone.limbDroop",
@@ -478,8 +477,8 @@
       "weight": 0.25,
       "start": 8.511481396191439,
       "startMargin": 3.5114813961914386,
-      "fit": 19.941683200319126,
-      "fitMargin": 5.058316799680874
+      "fit": 17.43590559774748,
+      "fitMargin": 7.564094402252518
     },
     {
       "trait": "stand.lateShare",
@@ -489,8 +488,8 @@
       "weight": 0.5,
       "start": 1.0793897793090483,
       "startMargin": 0.03938977930904823,
-      "fit": 1.254902635384106,
-      "fitMargin": -0.05490263538410585
+      "fit": 1.158492060402011,
+      "fitMargin": 0.04150793959798908
     },
     {
       "trait": "shade.survivalLight",
@@ -1209,35 +1208,35 @@
       "r6.leafArea",
       "r2.hJ"
     ],
-    "seconds": 115,
+    "seconds": 109,
     "traits": {
-      "lone.height30": 76.0041674170331,
-      "lone.branchAngle": 64.66190091380538,
       "lone.widestAt": 0.25,
-      "lone.leafStemSlope": 0.6854949335940277,
-      "lone.height60": 98.07248142973215,
-      "lone.alive": 1.0,
       "lone.forkHeight": 1.0,
       "lone.slenderness": 76.17782716733018,
-      "stand.lateShare": 1.0793127809885559,
-      "lone.crownFullness": 0.7345752300981594,
-      "lone.spread": 0.5601535057299549,
-      "lone.leaderDominance": 2.4152970818144373,
-      "lone.branchAngle2": 77.72956984115686,
       "lone.earlyShare": 0.7749795488909828,
-      "lone.ldSlope": 0.9895830732958326,
-      "lone.junctionDelta": 1.7574635992301124,
+      "lone.spread": 0.5601535057299549,
+      "stand.lateShare": 1.0793127809885559,
+      "lone.branchAngle2": 77.72956984115686,
+      "lone.crownFullness": 0.7345752300981594,
+      "lone.alive": 1.0,
       "lone.limbDroop": 7.574773639333992,
+      "lone.ldSlope": 0.9895830732958326,
+      "lone.leafStemSlope": 0.6854949335940277,
+      "lone.branchAngle": 64.66190091380538,
+      "lone.height60": 98.07248142973215,
+      "lone.leaderDominance": 2.4152970818144373,
+      "lone.height30": 76.0041674170331,
       "lone.profileCentre": 0.41995469748564873,
-      "stand.floor": 0.1414333623187401,
-      "stand.alive": 1.0,
+      "lone.junctionDelta": 1.7574635992301124,
       "stand.crownRatio": 0.32942936262730255,
+      "stand.widestAt": 0.225,
+      "stand.alive100": 1.0,
+      "stand.height": 89.75848085115435,
+      "stand.floor": 0.1414333623187401,
       "stand.boleCrownRatio": 0.3444771006308204,
       "stand.slenderness": 105.83336546377099,
-      "stand.alive100": 1.0,
+      "stand.alive": 1.0,
       "stand.height100": 96.87747558476744,
-      "stand.height": 89.75848085115435,
-      "stand.widestAt": 0.225,
       "shade.survivalLight": 0.08594545652494669,
       "shade.survivalLightStep": 0.10909190028905869
     }
@@ -1270,333 +1269,370 @@
       "step": 0.0,
       "r0": 0.007075,
       "inBand": 2,
-      "seconds": 127,
+      "seconds": 120,
       "evaluations": 39
     },
     {
       "stage": "lm",
       "iteration": 1,
-      "loss": 27.47659411478125,
+      "loss": 6.717254793783848,
       "accepted": true,
       "step": 0.25,
-      "r0": 0.00625,
-      "inBand": 2,
-      "seconds": 302,
+      "r0": 0.010880021749749162,
+      "inBand": 4,
+      "seconds": 299,
       "evaluations": 58
     },
     {
       "stage": "lm",
       "iteration": 2,
-      "loss": 13.501787368757737,
-      "accepted": true,
+      "loss": 7.303989649664047,
+      "accepted": false,
       "step": 0.25,
-      "r0": 0.00625,
-      "inBand": 2,
-      "seconds": 476,
+      "r0": 0.010584957937598635,
+      "inBand": 4,
+      "seconds": 471,
       "evaluations": 77
     },
     {
       "stage": "lm",
-      "iteration": 3,
-      "loss": 15.312886206125981,
-      "accepted": false,
-      "step": 0.25,
-      "r0": 0.00625,
-      "inBand": 2,
-      "seconds": 646,
-      "evaluations": 96
+      "iteration": 2,
+      "loss": 6.571807383350661,
+      "accepted": true,
+      "step": 0.125,
+      "r0": 0.010731475787665609,
+      "inBand": 4,
+      "seconds": 482,
+      "evaluations": 78
     },
     {
       "stage": "lm",
       "iteration": 3,
-      "loss": 14.30477471600013,
-      "accepted": false,
-      "step": 0.125,
-      "r0": 0.00625,
-      "inBand": 2,
-      "seconds": 658,
+      "loss": 3.7024449212872055,
+      "accepted": true,
+      "step": 0.25,
+      "r0": 0.010426663490669985,
+      "inBand": 4,
+      "seconds": 652,
       "evaluations": 97
     },
     {
       "stage": "lm",
-      "iteration": 3,
-      "loss": 12.597730922259268,
-      "accepted": true,
-      "step": 0.0625,
-      "r0": 0.00625,
-      "inBand": 2,
-      "seconds": 669,
-      "evaluations": 98
+      "iteration": 4,
+      "loss": 4.257645432642834,
+      "accepted": false,
+      "step": 0.25,
+      "r0": 0.010370570782009576,
+      "inBand": 4,
+      "seconds": 812,
+      "evaluations": 116
     },
     {
       "stage": "lm",
       "iteration": 4,
-      "loss": 11.904151267602723,
+      "loss": 2.902163501645942,
       "accepted": true,
-      "step": 0.24999999999999997,
-      "r0": 0.00625,
-      "inBand": 3,
-      "seconds": 845,
+      "step": 0.125,
+      "r0": 0.010398579314030744,
+      "inBand": 4,
+      "seconds": 823,
       "evaluations": 117
     },
     {
       "stage": "lm",
       "iteration": 5,
-      "loss": 11.894290263946731,
-      "accepted": true,
-      "step": 0.22157411000349506,
-      "r0": 0.00625,
-      "inBand": 3,
-      "seconds": 1023,
+      "loss": 3.7191766181004455,
+      "accepted": false,
+      "step": 0.21117043402412017,
+      "r0": 0.010419000344963897,
+      "inBand": 4,
+      "seconds": 983,
       "evaluations": 136
     },
     {
       "stage": "lm",
-      "iteration": 6,
-      "loss": 12.967561684322952,
+      "iteration": 5,
+      "loss": 3.0577206550587985,
       "accepted": false,
-      "step": 0.12162127910827032,
-      "r0": 0.00625,
-      "inBand": 3,
-      "seconds": 1197,
-      "evaluations": 155
+      "step": 0.12098221808890508,
+      "r0": 0.010408784821487124,
+      "inBand": 4,
+      "seconds": 994,
+      "evaluations": 137
     },
     {
       "stage": "lm",
-      "iteration": 6,
-      "loss": 13.688207448614044,
+      "iteration": 5,
+      "loss": 3.2234975850718963,
       "accepted": false,
-      "step": 0.12162127910827032,
-      "r0": 0.00625,
-      "inBand": 3,
-      "seconds": 1208,
-      "evaluations": 156
+      "step": 0.06049110904445254,
+      "r0": 0.010403680816370388,
+      "inBand": 4,
+      "seconds": 1005,
+      "evaluations": 138
     },
     {
       "stage": "lm",
-      "iteration": 6,
-      "loss": 14.791227297089558,
+      "iteration": 5,
+      "loss": 3.0342932125568782,
       "accepted": false,
-      "step": 0.0625,
-      "r0": 0.00625,
-      "inBand": 3,
-      "seconds": 1220,
-      "evaluations": 157
-    },
-    {
-      "stage": "lm",
-      "iteration": 6,
-      "loss": 15.863218707752173,
-      "accepted": false,
-      "step": 0.03125,
-      "r0": 0.00625,
-      "inBand": 3,
-      "seconds": 1231,
-      "evaluations": 158
+      "step": 0.030245554522226215,
+      "r0": 0.010401129752430146,
+      "inBand": 4,
+      "seconds": 1016,
+      "evaluations": 139
     },
     {
       "stage": "cma",
       "iteration": 0,
-      "loss": 16.916930704446763,
-      "median": 20.279150835926174,
+      "loss": 2.6629795369465907,
+      "median": 3.6376057166058904,
       "accepted": true,
       "step": 0.0,
-      "r0": 0.006167318975540231,
-      "inBand": 3,
-      "seconds": 1374,
-      "evaluations": 168
+      "r0": 0.009541880423823352,
+      "inBand": 4,
+      "seconds": 1150,
+      "evaluations": 149
     },
     {
       "stage": "cma",
       "iteration": 1,
-      "loss": 15.240605710134382,
-      "median": 59.282863485802054,
+      "loss": 2.9868455731155397,
+      "median": 3.501765022207482,
       "accepted": true,
       "step": 0.0,
-      "r0": 0.00625,
-      "inBand": 2,
-      "seconds": 1505,
-      "evaluations": 178
+      "r0": 0.009875400913372358,
+      "inBand": 4,
+      "seconds": 1288,
+      "evaluations": 159
     },
     {
       "stage": "cma",
       "iteration": 2,
-      "loss": 23.986672501395926,
-      "median": 121.55793688398087,
+      "loss": 2.5733921592499462,
+      "median": 3.6021124736767707,
       "accepted": true,
       "step": 0.0,
-      "r0": 0.005631786973764018,
-      "inBand": 2,
-      "seconds": 1630,
-      "evaluations": 188
+      "r0": 0.00953320460947843,
+      "inBand": 4,
+      "seconds": 1423,
+      "evaluations": 169
     },
     {
       "stage": "cma",
       "iteration": 3,
-      "loss": 43.04512909002908,
-      "median": 96.04683087984351,
+      "loss": 2.979251260708437,
+      "median": 3.938989729517571,
       "accepted": true,
       "step": 0.0,
-      "r0": 0.001875,
-      "inBand": 2,
-      "seconds": 1784,
-      "evaluations": 198
+      "r0": 0.010239434833012291,
+      "inBand": 4,
+      "seconds": 1558,
+      "evaluations": 179
     },
     {
       "stage": "cma",
       "iteration": 4,
-      "loss": 22.141062924059014,
-      "median": 81.50921237417651,
+      "loss": 2.7641677826782516,
+      "median": 3.337704223788978,
       "accepted": true,
       "step": 0.0,
-      "r0": 0.00625,
-      "inBand": 1,
-      "seconds": 1947,
-      "evaluations": 208
+      "r0": 0.009579927206647113,
+      "inBand": 4,
+      "seconds": 1694,
+      "evaluations": 189
     },
     {
       "stage": "cma",
       "iteration": 5,
-      "loss": 26.15042656461307,
-      "median": 91.57169688253151,
+      "loss": 2.2926928694174653,
+      "median": 4.091671703778866,
       "accepted": true,
       "step": 0.0,
-      "r0": 0.001875,
-      "inBand": 2,
-      "seconds": 2105,
-      "evaluations": 218
+      "r0": 0.010268339688530982,
+      "inBand": 4,
+      "seconds": 1830,
+      "evaluations": 199
     },
     {
       "stage": "cma",
       "iteration": 6,
-      "loss": 56.399416841376244,
-      "median": 142.8583068004758,
+      "loss": 2.2907211715426965,
+      "median": 3.6360122084210578,
       "accepted": true,
       "step": 0.0,
-      "r0": 0.001875,
-      "inBand": 2,
-      "seconds": 2241,
-      "evaluations": 228
+      "r0": 0.010020681253391861,
+      "inBand": 4,
+      "seconds": 1966,
+      "evaluations": 209
     },
     {
       "stage": "cma",
       "iteration": 7,
-      "loss": 41.5084869219715,
-      "median": 68.31433657953221,
+      "loss": 3.222272828082022,
+      "median": 3.476634721409922,
       "accepted": true,
       "step": 0.0,
-      "r0": 0.00625,
-      "inBand": 1,
-      "seconds": 2373,
-      "evaluations": 238
+      "r0": 0.009866365400735964,
+      "inBand": 4,
+      "seconds": 2101,
+      "evaluations": 219
     },
     {
       "stage": "cma",
       "iteration": 8,
-      "loss": 43.34321697083068,
-      "median": 67.81738478283093,
+      "loss": 2.647635123404822,
+      "median": 3.563009248625472,
       "accepted": true,
       "step": 0.0,
-      "r0": 0.00625,
-      "inBand": 3,
-      "seconds": 2523,
-      "evaluations": 248
+      "r0": 0.00976580826905731,
+      "inBand": 4,
+      "seconds": 2236,
+      "evaluations": 229
     },
     {
       "stage": "cma",
       "iteration": 9,
-      "loss": 31.46035037248247,
-      "median": 88.52310466011983,
+      "loss": 2.5733519784119494,
+      "median": 3.69941335840859,
       "accepted": true,
       "step": 0.0,
-      "r0": 0.001875,
-      "inBand": 2,
-      "seconds": 2652,
-      "evaluations": 258
+      "r0": 0.010180858394129562,
+      "inBand": 4,
+      "seconds": 2372,
+      "evaluations": 239
     },
     {
       "stage": "cma",
       "iteration": 10,
-      "loss": 47.99503187200943,
-      "median": 112.45122161809843,
+      "loss": 2.7151335008401754,
+      "median": 3.149892573452332,
       "accepted": true,
       "step": 0.0,
-      "r0": 0.00625,
-      "inBand": 1,
-      "seconds": 2818,
-      "evaluations": 268
+      "r0": 0.009473140652327806,
+      "inBand": 4,
+      "seconds": 2507,
+      "evaluations": 249
     },
     {
       "stage": "cma",
       "iteration": 11,
-      "loss": 64.29041684557404,
-      "median": 116.91083592510833,
+      "loss": 2.6436946363409697,
+      "median": 3.240056343559366,
       "accepted": true,
       "step": 0.0,
-      "r0": 0.001875,
-      "inBand": 2,
-      "seconds": 2964,
-      "evaluations": 278
+      "r0": 0.009608514490031408,
+      "inBand": 4,
+      "seconds": 2642,
+      "evaluations": 259
     },
     {
       "stage": "cma",
       "iteration": 12,
-      "loss": 34.879720545744966,
-      "median": 116.07634429085519,
+      "loss": 2.788506527506299,
+      "median": 3.5880139338228805,
       "accepted": true,
       "step": 0.0,
-      "r0": 0.00625,
-      "inBand": 2,
-      "seconds": 3106,
-      "evaluations": 288
+      "r0": 0.00981015435535042,
+      "inBand": 4,
+      "seconds": 2776,
+      "evaluations": 269
     },
     {
       "stage": "cma",
       "iteration": 13,
-      "loss": 29.763402250416007,
-      "median": 130.47856918144203,
+      "loss": 2.522622369386411,
+      "median": 3.5307115603684256,
       "accepted": true,
       "step": 0.0,
-      "r0": 0.00625,
-      "inBand": 3,
-      "seconds": 3251,
-      "evaluations": 298
+      "r0": 0.009967848688834737,
+      "inBand": 4,
+      "seconds": 2912,
+      "evaluations": 279
     },
     {
       "stage": "cma",
       "iteration": 14,
-      "loss": 41.50645432140349,
-      "median": 107.86254648514705,
+      "loss": 3.0342155217964355,
+      "median": 3.570930093319804,
       "accepted": true,
       "step": 0.0,
-      "r0": 0.00625,
-      "inBand": 1,
-      "seconds": 3391,
-      "evaluations": 308
+      "r0": 0.00961925445187916,
+      "inBand": 4,
+      "seconds": 3047,
+      "evaluations": 289
     },
     {
       "stage": "cma",
       "iteration": 15,
-      "loss": 64.23201747087738,
-      "median": 104.91812096597585,
+      "loss": 2.295034480074214,
+      "median": 3.320569665775702,
       "accepted": true,
       "step": 0.0,
-      "r0": 0.001875,
-      "inBand": 0,
-      "seconds": 3566,
-      "evaluations": 318
+      "r0": 0.010018948305563345,
+      "inBand": 4,
+      "seconds": 3181,
+      "evaluations": 299
     },
     {
       "stage": "cma",
       "iteration": 16,
-      "loss": 42.42416812730178,
-      "median": 153.25469087118762,
+      "loss": 2.741063151948665,
+      "median": 3.2359383717281536,
       "accepted": true,
       "step": 0.0,
-      "r0": 0.00625,
-      "inBand": 3,
-      "seconds": 3717,
-      "evaluations": 328
+      "r0": 0.009772501914676998,
+      "inBand": 4,
+      "seconds": 3316,
+      "evaluations": 309
+    },
+    {
+      "stage": "cma",
+      "iteration": 17,
+      "loss": 2.6516215178391436,
+      "median": 3.4655136539529354,
+      "accepted": true,
+      "step": 0.0,
+      "r0": 0.009519638229628535,
+      "inBand": 4,
+      "seconds": 3450,
+      "evaluations": 319
+    },
+    {
+      "stage": "cma",
+      "iteration": 18,
+      "loss": 2.5163760967472073,
+      "median": 3.4061824514843484,
+      "accepted": true,
+      "step": 0.0,
+      "r0": 0.009934489397330463,
+      "inBand": 4,
+      "seconds": 3586,
+      "evaluations": 329
+    },
+    {
+      "stage": "cma",
+      "iteration": 19,
+      "loss": 2.855406453872995,
+      "median": 3.369520118554422,
+      "accepted": true,
+      "step": 0.0,
+      "r0": 0.009158128170307738,
+      "inBand": 4,
+      "seconds": 3721,
+      "evaluations": 339
+    },
+    {
+      "stage": "cma",
+      "iteration": 20,
+      "loss": 2.9886158353627175,
+      "median": 3.642539255440793,
+      "accepted": true,
+      "step": 0.0,
+      "r0": 0.009535413736657153,
+      "inBand": 4,
+      "seconds": 3855,
+      "evaluations": 349
     }
   ],
   "startFrom": {

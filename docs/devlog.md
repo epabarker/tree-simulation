@@ -2,6 +2,15 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-31: Species steps 2–3: the seven fitted overnight, birch re-fitted, the hold-out stopped for a review of the targets
+
+- **Step 2** (the user's laptop, 12 workers, 7 h 53 min): willow, rowan, holly and maple pass on fresh seeds; birch, oak and hornbeam do not ([note](experiments/2026-10-30-species-3d.md)). Oak and hornbeam miss only the stand's late share, both high; they go to the hold-out as fitted (the user). κ and `r2.levels.1.eta` low recur (a finding about 3D crowns, not bounds to tighten); `r2.aC` at its bound is beech's alone.
+- **Birch** (the user): `c6.r0`'s top doubled to 0.0125 for birch alone. Re-fitted: r0 0.00997, stand H/D 70.2 (was 86.9), loss 15.9 → 3.6, 4 of 5 measured in band. It misses survival light by 0.004, which the shade house cannot resolve: the seedlings die at season 4 under every roof at light ≤ 0.158 and live at ≥ 0.217, and the band's bottom (0.16) falls between.
+- **Hold-out** (`m27_holdout.py`): batched across species, the continuous survival order, the tallest per species against the top, `--origin` for dev-server links. **Stopped by the user** during the mixed woods, to review how targets are defined. Only the floors survive: **every own wood's floor is 7–20%**, so the shade-tolerant woods are 5–9× too bright (beech 7.3% against 1.5%), round 2 and round 3 alike.
+- **Surprises:** the floor hardly depends on the species; `lone.slenderness` (48) and `stand.slenderness` (70) are the same target for all ten species; the shade house's death timer (season 4 below the cut) makes survival light a step for birch.
+- **Gotcha:** `m27_holdout.py`'s native runs need `~/.cargo/bin` on PATH; its sections print only at the end.
+- **Goldens:** unchanged (nothing adopted).
+
 ## 2026-10-30: Species step 1 revised: the closed stand, 3D form metrics, LM then CMA-ES; beech passes
 
 - **User:** the first pilot's failure was the stand trial's, a hedgerow lit from its faces and empty depth. The user asked for:

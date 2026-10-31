@@ -211,6 +211,10 @@ path = "r2.levels.1.setPoint"
 lo = 20
 hi = 90
 [[formRange]]
+path = "r2.levels.1.postureSetPoint"
+lo = 20
+hi = 90
+[[formRange]]
 path = "r2.levels.1.branchAngle"
 lo = 25
 hi = 70
@@ -247,6 +251,8 @@ hi = 4
 "r2.levels.0.lambda" = 0.5882
 "r2.levels.1.lambda" = 0.4923
 "r2.levels.1.setPoint" = 74.94
+# R3's posture set point (ADR 0011), the tenth form knob (2026-10-31): it holds the limbs.
+"r2.levels.1.postureSetPoint" = 70
 "r2.levels.1.branchAngle" = 42.94
 "r2.levels.1.eta" = 0.2434
 "r2.levels.2.setPoint" = 144.8

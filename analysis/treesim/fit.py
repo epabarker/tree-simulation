@@ -2,7 +2,7 @@
 
 A candidate is a set of dotted-path assignments to the species' patch (src/core/trials.ts), plus the
 targets file's fixed assignments (the hyperbolic hydraulic discount, ADR 0021) and its `[form]`: the
-nine form parameters, set by hand from the form sheet and applied like `[fixed]` (ADR 0029). Each is grown in the
+ten form parameters, set by hand from the form sheet and applied like `[fixed]` (ADR 0029). Each is grown in the
 standard trials by a pool of long-lived evaluators (`node cli/fit-eval.ts`, one per worker), and
 scored against the targets in analysis/fit/targets/<species>.toml:
 

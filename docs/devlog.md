@@ -2,6 +2,13 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-31: Species round 5: the form grids and the posture knob
+
+- **The grids:** `form-grid.py`, the user's three knobs per species (4 × 4 × 3, beech's and hornbeam's ranges theirs after their look at those sheets), seed 1, sheets at 60 and 100 (`figures/2026-10-31-form-grid-*`), with the cells nearest the review's named cells marked. `form-sweep.py`'s `run_cell` takes a seed for the picks' regrow.
+- **The posture set point is the tenth form knob** (ADR 0029 amended, `[form]` and `[[formRange]]` in the eight targets files, the gallery's pins): birch sets 70; the others leave it unset and follow `levels.1.setPoint`. Its sweep (birch, oak, 20–90) moves the limbs (elev 69° → 3°) but not the outline.
+- **Surprise:** beech's grid holds no dome. It runs from spires through tiered cones to stacked level tables, so the question moves to the core (the level-0 distichous generator). Notes in the [species note](experiments/2026-10-30-species-3d.md): `levels.2.setPoint` ≥ 80 is a core behaviour; the posture, not the growth set point, holds the limbs; the profile does not tell a spruce from a dome (also in the review's "could not settle" list).
+- No golden moved (Python and docs only). No fit started.
+
 ## 2026-10-31: Species round 5 built: form by hand, physiology by fit (ADR 0029 proposed)
 
 - **Plan:** [round 5](plans/2026-10-31-species-round5.md) §3.1–3.4. The user changed §3.2: a one-knob-at-a-time sweep comes first, and the three-knob grid follows once the user has named the knobs per species. No fit started.

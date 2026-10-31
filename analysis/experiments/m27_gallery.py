@@ -30,10 +30,11 @@ from treesim.gallery import SHAPE, distance, entries, evaluate, hand_form, neare
 
 GARDEN = ["birch", "oak", "willow", "beech", "hornbeam", "rowan", "holly", "maple"]
 FITS = REPO / "docs" / "experiments" / "fits"
-#: Every parameter a gallery entry pins: the nine form knobs, the nine fitted physiology knobs, R1's
-#: sapwood cost (derived from r0 in the fits) and the hydraulic discount's form.
-PINNED = ["r2.levels.0.lambda", "r2.levels.1.lambda", "r2.levels.1.setPoint", "r2.levels.1.branchAngle",
-          "r2.levels.1.eta", "r2.levels.2.setPoint", "r2.aC", "r2.dLambda", "r2.kappa",
+#: Every parameter a gallery entry pins: the ten form knobs (an unset posture set point is left
+#: out), the nine fitted physiology knobs, R1's sapwood cost (derived from r0 in the fits) and the
+#: hydraulic discount's form.
+PINNED = ["r2.levels.0.lambda", "r2.levels.1.lambda", "r2.levels.1.setPoint", "r2.levels.1.postureSetPoint",
+          "r2.levels.1.branchAngle", "r2.levels.1.eta", "r2.levels.2.setPoint", "r2.aC", "r2.dLambda", "r2.kappa",
           "c3.alpha", "c5.Trel", "c6.r0", "r1.Lh", "r1.mf", "r3.c", "r6.qMin", "r6.leafArea", "r2.hJ",
           "r1.mw", "r1.hydraulic"]
 INIT = [

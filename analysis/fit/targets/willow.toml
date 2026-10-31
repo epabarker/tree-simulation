@@ -194,6 +194,10 @@ path = "r2.levels.1.setPoint"
 lo = 20
 hi = 90
 [[formRange]]
+path = "r2.levels.1.postureSetPoint"
+lo = 20
+hi = 90
+[[formRange]]
 path = "r2.levels.1.branchAngle"
 lo = 25
 hi = 70
@@ -230,6 +234,8 @@ hi = 4
 "r2.levels.0.lambda" = 0.5167
 "r2.levels.1.lambda" = 0.5132
 "r2.levels.1.setPoint" = 38.78
+# "r2.levels.1.postureSetPoint": unset in FLORA, so the limbs straighten toward
+# levels.1.setPoint (R3, ADR 0011); a pick sets it here.
 "r2.levels.1.branchAngle" = 48.99
 "r2.levels.1.eta" = 0.1194
 "r2.levels.2.setPoint" = 54.03

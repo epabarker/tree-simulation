@@ -25,7 +25,8 @@ then CMA-ES from `--start`'s fits as adopted (the hand overrides on top, r0 in A
 docs/experiments/fits/<--out>/<species>.json, <species>-lm.csv (the loss per iteration) and
 <species>-jacobian.csv (the screening). With several species, each after the first starts from its
 own start shifted by the mean shift (in the unit cube, and r0's in log) of those already fitted,
-where that start's loss is lower than its own: the plan's transfer. With --smoke it runs one LM
+where that start's loss is lower than its own: the plan's transfer. `--shift-from round3` adds an
+earlier round's shifts (each species shifted by the others' moves from their own starts, never its own). With --smoke it runs one LM
 iteration and two CMA-ES generations on one seed a trial and writes under runs/m27-fit-smoke/lm/.
 """
 
@@ -52,6 +53,8 @@ parser.add_argument("--species", required=True,
                     help=f"one of {', '.join(SPECIES)}, a comma list, all, or garden (the mixed wood's eight)")
 parser.add_argument("--method", choices=["cmaes", "lm"], default="cmaes")
 parser.add_argument("--out", default="round3", help="lm: the results' folder under docs/experiments/fits/")
+parser.add_argument("--shift-from", help="lm: also transfer the mean shift of this earlier round's fits (each species "
+                    "from the others', not its own), e.g. round3")
 parser.add_argument("--active", help="lm: comma list of parameters to move, instead of the screening's active set")
 parser.add_argument("--iterations", type=int, help="lm: overrides the 10 iterations")
 parser.add_argument("--workers", type=int, default=os.cpu_count() or 4)
@@ -191,6 +194,16 @@ if args.method == "lm":
         shifts.append(shift_of(load_spec(sp), round2_start(sp, args.start), fitted))
     if done:
         print(f"skipped (done): {', '.join(done)}; their shifts carry to the rest")
+    # An earlier round's shifts (round 4 from round 3's): each species' move from its own start, held
+    # by species so that no species is shifted by its own earlier fit.
+    earlier: dict[str, dict] = {}
+    if args.shift_from:
+        for sp in SPECIES:
+            path = REPO / "docs" / "experiments" / "fits" / args.shift_from / f"{sp}.json"
+            if path.exists():
+                r = json.loads(path.read_text())
+                earlier[sp] = shift_of(load_spec(sp), r["start"]["assign"], r["fit"]["assign"])
+        print(f"{args.shift_from}'s shifts: {', '.join(earlier)}")
     failed: list[str] = []
     for sp in species:
         if sp in done:
@@ -199,7 +212,7 @@ if args.method == "lm":
         try:
             spec = load_spec(sp)
             own = round2_start(sp, args.start)
-            start = lm_start(spec, own, shifts, args.workers)
+            start = lm_start(spec, own, shifts + [d for k, d in earlier.items() if k != sp], args.workers)
             active = args.active.split(",") if args.active else None
             result = fit_lm(spec, settings, start, log=print, active=active)
             result["startFrom"] = {"round": args.start, "shifted": start != own}

@@ -1,0 +1,2966 @@
+{
+  "fitted": [
+    "birch",
+    "beech",
+    "oak",
+    "hornbeam",
+    "maple",
+    "holly",
+    "rowan",
+    "willow"
+  ],
+  "floor": [],
+  "shade": {
+    "birch (hand)": 0.1582738768775016,
+    "beech (hand)": 0.02913173270020967,
+    "oak (hand)": 0.10909190028905869,
+    "fir (hand)": 0.02913173270020967,
+    "hornbeam (hand)": 0.02913173270020967,
+    "maple (hand)": 0.07121304085012525,
+    "holly (hand)": 0.01823982328850044,
+    "rowan (hand)": 0.07121304085012525,
+    "willow (hand)": 0.10909190028905869,
+    "pine (hand)": 0.1852331607369706,
+    "birch (fitted)": 0.1852331607369706,
+    "beech (fitted)": 0.02913173270020967,
+    "oak (fitted)": 0.1582738768775016,
+    "hornbeam (fitted)": 0.02913173270020967,
+    "maple (fitted)": 0.07121304085012525,
+    "holly (fitted)": 0.1582738768775016,
+    "rowan (fitted)": 0.046786722290562466,
+    "willow (fitted)": 0.10909190028905869
+  },
+  "shadeBand": {
+    "birch": [
+      0.15,
+      0.25
+    ],
+    "beech": [
+      0.025,
+      0.045
+    ],
+    "oak": [
+      0.08,
+      0.14
+    ],
+    "hornbeam": [
+      0.025,
+      0.045
+    ],
+    "maple": [
+      0.05,
+      0.1
+    ],
+    "holly": [
+      0.02,
+      0.05
+    ],
+    "rowan": [
+      0.08,
+      0.14
+    ],
+    "willow": [
+      0.12,
+      0.2
+    ]
+  },
+  "shadeInBand": {
+    "birch": true,
+    "beech": true,
+    "oak": false,
+    "hornbeam": true,
+    "maple": true,
+    "holly": false,
+    "rowan": false,
+    "willow": false
+  },
+  "shadeSpearman": {
+    "hand": -0.9075630385563792,
+    "fitted": -0.8581718527846035,
+    "hand (continuous)": -0.8841627783127011,
+    "fitted (continuous)": -0.8231860349807907
+  },
+  "shadeContinuous": {
+    "birch (hand)": 0.15827387687750158,
+    "beech (hand)": 0.023470074032621163,
+    "oak (hand)": 0.10909190028905866,
+    "fir (hand)": 0.02913173270020967,
+    "hornbeam (hand)": 0.02568144166820219,
+    "maple (hand)": 0.07121304085012524,
+    "holly (hand)": 0.018239823288500434,
+    "rowan (hand)": 0.07121304085012524,
+    "willow (hand)": 0.10909190028905866,
+    "pine (hand)": 0.18523316073697063,
+    "birch (fitted)": 0.18523316073697063,
+    "beech (fitted)": 0.027107056694832477,
+    "oak (fitted)": 0.15827387687750158,
+    "hornbeam (fitted)": 0.02614811509788901,
+    "maple (fitted)": 0.07121304085012524,
+    "holly (fitted)": 0.15827387687750158,
+    "rowan (fitted)": 0.04678672229056247,
+    "willow (fitted)": 0.10909190028905866
+  },
+  "shadeOrder": [
+    "hornbeam",
+    "beech",
+    "fir",
+    "rowan",
+    "maple",
+    "willow",
+    "oak",
+    "holly",
+    "birch",
+    "pine"
+  ],
+  "allometry": {
+    "birch (hand)": {
+      "junctionDelta": 1.7996621146653466,
+      "ldSlope": 0.9471944574418146,
+      "leafStemSlope": 0.8149826165293352,
+      "epicormic": 0.4,
+      "lean": 0.6796239824198679
+    },
+    "birch (fitted)": {
+      "junctionDelta": 1.842118957161429,
+      "ldSlope": 0.9214878790192286,
+      "leafStemSlope": 0.6436788669405344,
+      "epicormic": 3.8,
+      "lean": 0.6838477164812474
+    },
+    "beech (hand)": {
+      "junctionDelta": 1.6790530030573065,
+      "ldSlope": 0.9023613637800846,
+      "leafStemSlope": 0.8241807341690712,
+      "epicormic": 3.0,
+      "lean": 1.8324171888779077
+    },
+    "beech (fitted)": {
+      "junctionDelta": 1.6825127364088617,
+      "ldSlope": 0.9280997804886822,
+      "leafStemSlope": 0.7971098385879971,
+      "epicormic": 2.2,
+      "lean": 2.1403199924076075
+    },
+    "oak (hand)": {
+      "junctionDelta": 1.5884344549390004,
+      "ldSlope": 1.0398298218388782,
+      "leafStemSlope": 0.666219829192285,
+      "epicormic": 6.4,
+      "lean": 0.7418182577044803
+    },
+    "oak (fitted)": {
+      "junctionDelta": 1.5855827296817564,
+      "ldSlope": 0.8828463496740999,
+      "leafStemSlope": 0.6398606739449801,
+      "epicormic": 14.4,
+      "lean": 1.1429099463276144
+    },
+    "hornbeam (hand)": {
+      "junctionDelta": 1.7654761867336002,
+      "ldSlope": 0.9156938824690346,
+      "leafStemSlope": 0.8286772942033497,
+      "epicormic": 1.2,
+      "lean": 3.486939639290341
+    },
+    "hornbeam (fitted)": {
+      "junctionDelta": 1.754107711625887,
+      "ldSlope": 0.4513622575206028,
+      "leafStemSlope": 0.8040129819769686,
+      "epicormic": 3.0,
+      "lean": 2.3969196699064526
+    },
+    "maple (hand)": {
+      "junctionDelta": 1.7576291288209878,
+      "ldSlope": 0.9390625197778212,
+      "leafStemSlope": 0.7524695378203707,
+      "epicormic": 12.0,
+      "lean": 1.5748560401406777
+    },
+    "maple (fitted)": {
+      "junctionDelta": 1.7319272211152796,
+      "ldSlope": 0.9224490021552888,
+      "leafStemSlope": 0.7622369993761983,
+      "epicormic": 10.8,
+      "lean": 1.856185167305925
+    },
+    "holly (hand)": {
+      "junctionDelta": 1.6786713146571157,
+      "ldSlope": 0.8633393513626818,
+      "leafStemSlope": 0.8412466395933621,
+      "epicormic": 0.0,
+      "lean": 0.4314968812584851
+    },
+    "holly (fitted)": {
+      "junctionDelta": 1.6959427074934552,
+      "ldSlope": 0.8302399307830471,
+      "leafStemSlope": 0.6464455527998665,
+      "epicormic": 0.0,
+      "lean": 0.12241024542095857
+    },
+    "rowan (hand)": {
+      "junctionDelta": 1.7191501942866436,
+      "ldSlope": 0.8659751399754614,
+      "leafStemSlope": 0.8559749848315363,
+      "epicormic": 1.0,
+      "lean": 0.5384314387070589
+    },
+    "rowan (fitted)": {
+      "junctionDelta": 1.7205222186122837,
+      "ldSlope": 0.8930894458388019,
+      "leafStemSlope": 0.8040835623023342,
+      "epicormic": 0.2,
+      "lean": 0.7009808753248123
+    },
+    "willow (hand)": {
+      "junctionDelta": 1.762000551349779,
+      "ldSlope": 0.9477224367430159,
+      "leafStemSlope": 0.8195376981593658,
+      "epicormic": 0.0,
+      "lean": 0.637684062092724
+    },
+    "willow (fitted)": {
+      "junctionDelta": 1.7212864430670747,
+      "ldSlope": 0.9727998374108299,
+      "leafStemSlope": 0.8108839657109468,
+      "epicormic": 0.2,
+      "lean": 0.4885335441283942
+    }
+  },
+  "wood": [
+    {
+      "patch": "fitted",
+      "season": 50,
+      "species": "birch",
+      "trees": 5.333333333333333
+    },
+    {
+      "patch": "fitted",
+      "season": 50,
+      "species": "hornbeam",
+      "trees": 2.6666666666666665
+    },
+    {
+      "patch": "fitted",
+      "season": 50,
+      "species": "maple",
+      "trees": 2.6666666666666665
+    },
+    {
+      "patch": "fitted",
+      "season": 50,
+      "species": "oak",
+      "trees": 3.0
+    },
+    {
+      "patch": "fitted",
+      "season": 50,
+      "species": "rowan",
+      "trees": 2.0
+    },
+    {
+      "patch": "fitted",
+      "season": 50,
+      "species": "willow",
+      "trees": 1.6666666666666665
+    },
+    {
+      "patch": "fitted",
+      "season": 100,
+      "species": "beech",
+      "trees": 0.3333333333333333
+    },
+    {
+      "patch": "fitted",
+      "season": 100,
+      "species": "birch",
+      "trees": 1.0
+    },
+    {
+      "patch": "fitted",
+      "season": 100,
+      "species": "hornbeam",
+      "trees": 3.333333333333333
+    },
+    {
+      "patch": "fitted",
+      "season": 100,
+      "species": "maple",
+      "trees": 2.0
+    },
+    {
+      "patch": "fitted",
+      "season": 100,
+      "species": "oak",
+      "trees": 2.6666666666666665
+    },
+    {
+      "patch": "fitted",
+      "season": 100,
+      "species": "rowan",
+      "trees": 1.3333333333333333
+    },
+    {
+      "patch": "fitted",
+      "season": 100,
+      "species": "willow",
+      "trees": 0.6666666666666666
+    },
+    {
+      "patch": "fitted",
+      "season": 150,
+      "species": "beech",
+      "trees": 0.6666666666666666
+    },
+    {
+      "patch": "fitted",
+      "season": 150,
+      "species": "birch",
+      "trees": 0.3333333333333333
+    },
+    {
+      "patch": "fitted",
+      "season": 150,
+      "species": "hornbeam",
+      "trees": 8.666666666666666
+    },
+    {
+      "patch": "fitted",
+      "season": 150,
+      "species": "maple",
+      "trees": 1.6666666666666665
+    },
+    {
+      "patch": "fitted",
+      "season": 150,
+      "species": "oak",
+      "trees": 2.6666666666666665
+    },
+    {
+      "patch": "fitted",
+      "season": 150,
+      "species": "rowan",
+      "trees": 0.3333333333333333
+    },
+    {
+      "patch": "fitted",
+      "season": 150,
+      "species": "willow",
+      "trees": 0.3333333333333333
+    },
+    {
+      "patch": "fitted",
+      "season": 200,
+      "species": "beech",
+      "trees": 1.3333333333333333
+    },
+    {
+      "patch": "fitted",
+      "season": 200,
+      "species": "hornbeam",
+      "trees": 12.333333333333332
+    },
+    {
+      "patch": "fitted",
+      "season": 200,
+      "species": "maple",
+      "trees": 1.6666666666666665
+    },
+    {
+      "patch": "fitted",
+      "season": 200,
+      "species": "oak",
+      "trees": 2.0
+    },
+    {
+      "patch": "fitted",
+      "season": 200,
+      "species": "rowan",
+      "trees": 0.3333333333333333
+    },
+    {
+      "patch": "fitted",
+      "season": 250,
+      "species": "beech",
+      "trees": 1.6666666666666665
+    },
+    {
+      "patch": "fitted",
+      "season": 250,
+      "species": "hornbeam",
+      "trees": 16.333333333333332
+    },
+    {
+      "patch": "fitted",
+      "season": 250,
+      "species": "maple",
+      "trees": 1.3333333333333333
+    },
+    {
+      "patch": "fitted",
+      "season": 250,
+      "species": "oak",
+      "trees": 1.6666666666666665
+    },
+    {
+      "patch": "fitted",
+      "season": 250,
+      "species": "rowan",
+      "trees": 0.3333333333333333
+    },
+    {
+      "patch": "fitted",
+      "season": 300,
+      "species": "beech",
+      "trees": 1.6666666666666665
+    },
+    {
+      "patch": "fitted",
+      "season": 300,
+      "species": "hornbeam",
+      "trees": 16.666666666666664
+    },
+    {
+      "patch": "fitted",
+      "season": 300,
+      "species": "maple",
+      "trees": 1.6666666666666665
+    },
+    {
+      "patch": "fitted",
+      "season": 300,
+      "species": "oak",
+      "trees": 1.3333333333333333
+    },
+    {
+      "patch": "fitted",
+      "season": 350,
+      "species": "beech",
+      "trees": 1.6666666666666665
+    },
+    {
+      "patch": "fitted",
+      "season": 350,
+      "species": "hornbeam",
+      "trees": 14.333333333333332
+    },
+    {
+      "patch": "fitted",
+      "season": 350,
+      "species": "maple",
+      "trees": 2.0
+    },
+    {
+      "patch": "fitted",
+      "season": 350,
+      "species": "oak",
+      "trees": 1.0
+    },
+    {
+      "patch": "fitted",
+      "season": 400,
+      "species": "beech",
+      "trees": 1.6666666666666665
+    },
+    {
+      "patch": "fitted",
+      "season": 400,
+      "species": "hornbeam",
+      "trees": 17.0
+    },
+    {
+      "patch": "fitted",
+      "season": 400,
+      "species": "maple",
+      "trees": 1.3333333333333333
+    },
+    {
+      "patch": "fitted",
+      "season": 400,
+      "species": "oak",
+      "trees": 1.0
+    },
+    {
+      "patch": "hand",
+      "season": 50,
+      "species": "beech",
+      "trees": 0.6666666666666666
+    },
+    {
+      "patch": "hand",
+      "season": 50,
+      "species": "birch",
+      "trees": 5.333333333333333
+    },
+    {
+      "patch": "hand",
+      "season": 50,
+      "species": "holly",
+      "trees": 1.3333333333333333
+    },
+    {
+      "patch": "hand",
+      "season": 50,
+      "species": "hornbeam",
+      "trees": 2.6666666666666665
+    },
+    {
+      "patch": "hand",
+      "season": 50,
+      "species": "maple",
+      "trees": 2.6666666666666665
+    },
+    {
+      "patch": "hand",
+      "season": 50,
+      "species": "oak",
+      "trees": 2.6666666666666665
+    },
+    {
+      "patch": "hand",
+      "season": 50,
+      "species": "rowan",
+      "trees": 2.6666666666666665
+    },
+    {
+      "patch": "hand",
+      "season": 50,
+      "species": "willow",
+      "trees": 2.0
+    },
+    {
+      "patch": "hand",
+      "season": 100,
+      "species": "beech",
+      "trees": 1.6666666666666665
+    },
+    {
+      "patch": "hand",
+      "season": 100,
+      "species": "birch",
+      "trees": 2.6666666666666665
+    },
+    {
+      "patch": "hand",
+      "season": 100,
+      "species": "holly",
+      "trees": 1.3333333333333333
+    },
+    {
+      "patch": "hand",
+      "season": 100,
+      "species": "hornbeam",
+      "trees": 2.333333333333333
+    },
+    {
+      "patch": "hand",
+      "season": 100,
+      "species": "maple",
+      "trees": 2.0
+    },
+    {
+      "patch": "hand",
+      "season": 100,
+      "species": "oak",
+      "trees": 2.333333333333333
+    },
+    {
+      "patch": "hand",
+      "season": 100,
+      "species": "rowan",
+      "trees": 2.0
+    },
+    {
+      "patch": "hand",
+      "season": 100,
+      "species": "willow",
+      "trees": 1.0
+    },
+    {
+      "patch": "hand",
+      "season": 150,
+      "species": "beech",
+      "trees": 2.0
+    },
+    {
+      "patch": "hand",
+      "season": 150,
+      "species": "birch",
+      "trees": 1.0
+    },
+    {
+      "patch": "hand",
+      "season": 150,
+      "species": "holly",
+      "trees": 1.0
+    },
+    {
+      "patch": "hand",
+      "season": 150,
+      "species": "hornbeam",
+      "trees": 4.333333333333333
+    },
+    {
+      "patch": "hand",
+      "season": 150,
+      "species": "maple",
+      "trees": 1.6666666666666665
+    },
+    {
+      "patch": "hand",
+      "season": 150,
+      "species": "oak",
+      "trees": 2.333333333333333
+    },
+    {
+      "patch": "hand",
+      "season": 150,
+      "species": "rowan",
+      "trees": 1.0
+    },
+    {
+      "patch": "hand",
+      "season": 150,
+      "species": "willow",
+      "trees": 0.3333333333333333
+    },
+    {
+      "patch": "hand",
+      "season": 200,
+      "species": "beech",
+      "trees": 2.333333333333333
+    },
+    {
+      "patch": "hand",
+      "season": 200,
+      "species": "holly",
+      "trees": 1.0
+    },
+    {
+      "patch": "hand",
+      "season": 200,
+      "species": "hornbeam",
+      "trees": 6.666666666666666
+    },
+    {
+      "patch": "hand",
+      "season": 200,
+      "species": "maple",
+      "trees": 1.3333333333333333
+    },
+    {
+      "patch": "hand",
+      "season": 200,
+      "species": "oak",
+      "trees": 2.333333333333333
+    },
+    {
+      "patch": "hand",
+      "season": 200,
+      "species": "rowan",
+      "trees": 1.0
+    },
+    {
+      "patch": "hand",
+      "season": 250,
+      "species": "beech",
+      "trees": 2.333333333333333
+    },
+    {
+      "patch": "hand",
+      "season": 250,
+      "species": "holly",
+      "trees": 1.0
+    },
+    {
+      "patch": "hand",
+      "season": 250,
+      "species": "hornbeam",
+      "trees": 9.666666666666666
+    },
+    {
+      "patch": "hand",
+      "season": 250,
+      "species": "maple",
+      "trees": 1.3333333333333333
+    },
+    {
+      "patch": "hand",
+      "season": 250,
+      "species": "oak",
+      "trees": 2.333333333333333
+    },
+    {
+      "patch": "hand",
+      "season": 250,
+      "species": "rowan",
+      "trees": 0.3333333333333333
+    },
+    {
+      "patch": "hand",
+      "season": 300,
+      "species": "beech",
+      "trees": 2.333333333333333
+    },
+    {
+      "patch": "hand",
+      "season": 300,
+      "species": "holly",
+      "trees": 0.6666666666666666
+    },
+    {
+      "patch": "hand",
+      "season": 300,
+      "species": "hornbeam",
+      "trees": 9.333333333333332
+    },
+    {
+      "patch": "hand",
+      "season": 300,
+      "species": "maple",
+      "trees": 2.0
+    },
+    {
+      "patch": "hand",
+      "season": 300,
+      "species": "oak",
+      "trees": 2.333333333333333
+    },
+    {
+      "patch": "hand",
+      "season": 350,
+      "species": "beech",
+      "trees": 2.6666666666666665
+    },
+    {
+      "patch": "hand",
+      "season": 350,
+      "species": "holly",
+      "trees": 1.3333333333333333
+    },
+    {
+      "patch": "hand",
+      "season": 350,
+      "species": "hornbeam",
+      "trees": 11.333333333333332
+    },
+    {
+      "patch": "hand",
+      "season": 350,
+      "species": "maple",
+      "trees": 2.333333333333333
+    },
+    {
+      "patch": "hand",
+      "season": 350,
+      "species": "oak",
+      "trees": 2.0
+    },
+    {
+      "patch": "hand",
+      "season": 400,
+      "species": "beech",
+      "trees": 3.333333333333333
+    },
+    {
+      "patch": "hand",
+      "season": 400,
+      "species": "holly",
+      "trees": 0.6666666666666666
+    },
+    {
+      "patch": "hand",
+      "season": 400,
+      "species": "hornbeam",
+      "trees": 12.333333333333332
+    },
+    {
+      "patch": "hand",
+      "season": 400,
+      "species": "maple",
+      "trees": 2.333333333333333
+    },
+    {
+      "patch": "hand",
+      "season": 400,
+      "species": "oak",
+      "trees": 1.6666666666666665
+    }
+  ],
+  "tallest": [
+    {
+      "patch": "fitted",
+      "season": 50,
+      "mean": 82.60279566666667,
+      "max": 87.441674
+    },
+    {
+      "patch": "fitted",
+      "season": 100,
+      "mean": 117.95834,
+      "max": 123.17062
+    },
+    {
+      "patch": "fitted",
+      "season": 150,
+      "mean": 145.53934666666666,
+      "max": 151.24767
+    },
+    {
+      "patch": "fitted",
+      "season": 200,
+      "mean": 142.48450666666668,
+      "max": 148.5957
+    },
+    {
+      "patch": "fitted",
+      "season": 250,
+      "mean": 147.04710333333333,
+      "max": 161.11844
+    },
+    {
+      "patch": "fitted",
+      "season": 300,
+      "mean": 138.47246866666669,
+      "max": 160.08426
+    },
+    {
+      "patch": "fitted",
+      "season": 350,
+      "mean": 153.03167333333332,
+      "max": 176.4778
+    },
+    {
+      "patch": "fitted",
+      "season": 400,
+      "mean": 152.44134333333332,
+      "max": 164.34948
+    },
+    {
+      "patch": "hand",
+      "season": 50,
+      "mean": 102.41273166666667,
+      "max": 109.89279
+    },
+    {
+      "patch": "hand",
+      "season": 100,
+      "mean": 132.47321,
+      "max": 144.80095
+    },
+    {
+      "patch": "hand",
+      "season": 150,
+      "mean": 171.21923666666666,
+      "max": 183.28142
+    },
+    {
+      "patch": "hand",
+      "season": 200,
+      "mean": 170.07977666666667,
+      "max": 195.29937
+    },
+    {
+      "patch": "hand",
+      "season": 250,
+      "mean": 176.40057666666667,
+      "max": 182.3138
+    },
+    {
+      "patch": "hand",
+      "season": 300,
+      "mean": 190.15454,
+      "max": 202.33384
+    },
+    {
+      "patch": "hand",
+      "season": 350,
+      "mean": 187.00163666666666,
+      "max": 201.73315
+    },
+    {
+      "patch": "hand",
+      "season": 400,
+      "mean": 189.15103666666664,
+      "max": 201.56911
+    }
+  ],
+  "tallestBySpecies": [
+    {
+      "patch": "fitted",
+      "season": 50,
+      "species": "beech",
+      "max": 26.381999
+    },
+    {
+      "patch": "fitted",
+      "season": 50,
+      "species": "birch",
+      "max": 87.441674
+    },
+    {
+      "patch": "fitted",
+      "season": 50,
+      "species": "holly",
+      "max": 20.539219
+    },
+    {
+      "patch": "fitted",
+      "season": 50,
+      "species": "hornbeam",
+      "max": 80.58716
+    },
+    {
+      "patch": "fitted",
+      "season": 50,
+      "species": "maple",
+      "max": 47.036542
+    },
+    {
+      "patch": "fitted",
+      "season": 50,
+      "species": "oak",
+      "max": 76.089297
+    },
+    {
+      "patch": "fitted",
+      "season": 50,
+      "species": "rowan",
+      "max": 61.832493
+    },
+    {
+      "patch": "fitted",
+      "season": 50,
+      "species": "willow",
+      "max": 34.856407
+    },
+    {
+      "patch": "fitted",
+      "season": 100,
+      "species": "beech",
+      "max": 36.273934
+    },
+    {
+      "patch": "fitted",
+      "season": 100,
+      "species": "birch",
+      "max": 96.824509
+    },
+    {
+      "patch": "fitted",
+      "season": 100,
+      "species": "hornbeam",
+      "max": 123.17062
+    },
+    {
+      "patch": "fitted",
+      "season": 100,
+      "species": "maple",
+      "max": 43.864264
+    },
+    {
+      "patch": "fitted",
+      "season": 100,
+      "species": "oak",
+      "max": 107.91053
+    },
+    {
+      "patch": "fitted",
+      "season": 100,
+      "species": "rowan",
+      "max": 62.580241
+    },
+    {
+      "patch": "fitted",
+      "season": 100,
+      "species": "willow",
+      "max": 32.470315
+    },
+    {
+      "patch": "fitted",
+      "season": 150,
+      "species": "beech",
+      "max": 40.101724
+    },
+    {
+      "patch": "fitted",
+      "season": 150,
+      "species": "birch",
+      "max": 77.12034
+    },
+    {
+      "patch": "fitted",
+      "season": 150,
+      "species": "hornbeam",
+      "max": 151.24767
+    },
+    {
+      "patch": "fitted",
+      "season": 150,
+      "species": "maple",
+      "max": 43.887255
+    },
+    {
+      "patch": "fitted",
+      "season": 150,
+      "species": "oak",
+      "max": 116.25549
+    },
+    {
+      "patch": "fitted",
+      "season": 150,
+      "species": "rowan",
+      "max": 46.705006
+    },
+    {
+      "patch": "fitted",
+      "season": 150,
+      "species": "willow",
+      "max": 31.583044
+    },
+    {
+      "patch": "fitted",
+      "season": 200,
+      "species": "beech",
+      "max": 53.702619
+    },
+    {
+      "patch": "fitted",
+      "season": 200,
+      "species": "hornbeam",
+      "max": 148.5957
+    },
+    {
+      "patch": "fitted",
+      "season": 200,
+      "species": "maple",
+      "max": 43.878722
+    },
+    {
+      "patch": "fitted",
+      "season": 200,
+      "species": "oak",
+      "max": 110.64099
+    },
+    {
+      "patch": "fitted",
+      "season": 200,
+      "species": "rowan",
+      "max": 46.704824
+    },
+    {
+      "patch": "fitted",
+      "season": 250,
+      "species": "beech",
+      "max": 63.979267
+    },
+    {
+      "patch": "fitted",
+      "season": 250,
+      "species": "hornbeam",
+      "max": 161.11844
+    },
+    {
+      "patch": "fitted",
+      "season": 250,
+      "species": "maple",
+      "max": 43.893892
+    },
+    {
+      "patch": "fitted",
+      "season": 250,
+      "species": "oak",
+      "max": 110.08942
+    },
+    {
+      "patch": "fitted",
+      "season": 250,
+      "species": "rowan",
+      "max": 46.705553
+    },
+    {
+      "patch": "fitted",
+      "season": 300,
+      "species": "beech",
+      "max": 80.261669
+    },
+    {
+      "patch": "fitted",
+      "season": 300,
+      "species": "hornbeam",
+      "max": 160.08426
+    },
+    {
+      "patch": "fitted",
+      "season": 300,
+      "species": "maple",
+      "max": 44.333341
+    },
+    {
+      "patch": "fitted",
+      "season": 300,
+      "species": "oak",
+      "max": 114.52696
+    },
+    {
+      "patch": "fitted",
+      "season": 300,
+      "species": "rowan",
+      "max": 17.137565
+    },
+    {
+      "patch": "fitted",
+      "season": 350,
+      "species": "beech",
+      "max": 94.486905
+    },
+    {
+      "patch": "fitted",
+      "season": 350,
+      "species": "hornbeam",
+      "max": 176.4778
+    },
+    {
+      "patch": "fitted",
+      "season": 350,
+      "species": "maple",
+      "max": 43.895827
+    },
+    {
+      "patch": "fitted",
+      "season": 350,
+      "species": "oak",
+      "max": 121.37859
+    },
+    {
+      "patch": "fitted",
+      "season": 350,
+      "species": "rowan",
+      "max": 16.526737
+    },
+    {
+      "patch": "fitted",
+      "season": 400,
+      "species": "beech",
+      "max": 109.19705
+    },
+    {
+      "patch": "fitted",
+      "season": 400,
+      "species": "hornbeam",
+      "max": 164.34948
+    },
+    {
+      "patch": "fitted",
+      "season": 400,
+      "species": "maple",
+      "max": 43.89254
+    },
+    {
+      "patch": "fitted",
+      "season": 400,
+      "species": "oak",
+      "max": 134.10261
+    },
+    {
+      "patch": "fitted",
+      "season": 400,
+      "species": "rowan",
+      "max": 16.526737
+    },
+    {
+      "patch": "hand",
+      "season": 50,
+      "species": "beech",
+      "max": 40.343373
+    },
+    {
+      "patch": "hand",
+      "season": 50,
+      "species": "birch",
+      "max": 109.89279
+    },
+    {
+      "patch": "hand",
+      "season": 50,
+      "species": "holly",
+      "max": 34.39198
+    },
+    {
+      "patch": "hand",
+      "season": 50,
+      "species": "hornbeam",
+      "max": 81.197178
+    },
+    {
+      "patch": "hand",
+      "season": 50,
+      "species": "maple",
+      "max": 46.515521
+    },
+    {
+      "patch": "hand",
+      "season": 50,
+      "species": "oak",
+      "max": 79.259348
+    },
+    {
+      "patch": "hand",
+      "season": 50,
+      "species": "rowan",
+      "max": 57.549204
+    },
+    {
+      "patch": "hand",
+      "season": 50,
+      "species": "willow",
+      "max": 41.142527
+    },
+    {
+      "patch": "hand",
+      "season": 100,
+      "species": "beech",
+      "max": 53.482909
+    },
+    {
+      "patch": "hand",
+      "season": 100,
+      "species": "birch",
+      "max": 117.17959
+    },
+    {
+      "patch": "hand",
+      "season": 100,
+      "species": "holly",
+      "max": 34.608843
+    },
+    {
+      "patch": "hand",
+      "season": 100,
+      "species": "hornbeam",
+      "max": 126.48759
+    },
+    {
+      "patch": "hand",
+      "season": 100,
+      "species": "maple",
+      "max": 46.579309
+    },
+    {
+      "patch": "hand",
+      "season": 100,
+      "species": "oak",
+      "max": 144.80095
+    },
+    {
+      "patch": "hand",
+      "season": 100,
+      "species": "rowan",
+      "max": 57.553814
+    },
+    {
+      "patch": "hand",
+      "season": 100,
+      "species": "willow",
+      "max": 40.123151
+    },
+    {
+      "patch": "hand",
+      "season": 150,
+      "species": "beech",
+      "max": 55.302037
+    },
+    {
+      "patch": "hand",
+      "season": 150,
+      "species": "birch",
+      "max": 114.92877
+    },
+    {
+      "patch": "hand",
+      "season": 150,
+      "species": "holly",
+      "max": 34.726013
+    },
+    {
+      "patch": "hand",
+      "season": 150,
+      "species": "hornbeam",
+      "max": 162.84755
+    },
+    {
+      "patch": "hand",
+      "season": 150,
+      "species": "maple",
+      "max": 44.477353
+    },
+    {
+      "patch": "hand",
+      "season": 150,
+      "species": "oak",
+      "max": 183.28142
+    },
+    {
+      "patch": "hand",
+      "season": 150,
+      "species": "rowan",
+      "max": 56.151516
+    },
+    {
+      "patch": "hand",
+      "season": 150,
+      "species": "willow",
+      "max": 37.282444
+    },
+    {
+      "patch": "hand",
+      "season": 200,
+      "species": "beech",
+      "max": 57.262179
+    },
+    {
+      "patch": "hand",
+      "season": 200,
+      "species": "holly",
+      "max": 34.480877
+    },
+    {
+      "patch": "hand",
+      "season": 200,
+      "species": "hornbeam",
+      "max": 161.73499
+    },
+    {
+      "patch": "hand",
+      "season": 200,
+      "species": "maple",
+      "max": 44.255056
+    },
+    {
+      "patch": "hand",
+      "season": 200,
+      "species": "oak",
+      "max": 195.29937
+    },
+    {
+      "patch": "hand",
+      "season": 200,
+      "species": "rowan",
+      "max": 56.151516
+    },
+    {
+      "patch": "hand",
+      "season": 200,
+      "species": "willow",
+      "max": 18.685504
+    },
+    {
+      "patch": "hand",
+      "season": 250,
+      "species": "beech",
+      "max": 65.890248
+    },
+    {
+      "patch": "hand",
+      "season": 250,
+      "species": "holly",
+      "max": 34.476319
+    },
+    {
+      "patch": "hand",
+      "season": 250,
+      "species": "hornbeam",
+      "max": 182.3138
+    },
+    {
+      "patch": "hand",
+      "season": 250,
+      "species": "maple",
+      "max": 44.819077
+    },
+    {
+      "patch": "hand",
+      "season": 250,
+      "species": "oak",
+      "max": 180.95196
+    },
+    {
+      "patch": "hand",
+      "season": 250,
+      "species": "rowan",
+      "max": 56.151516
+    },
+    {
+      "patch": "hand",
+      "season": 300,
+      "species": "beech",
+      "max": 84.001446
+    },
+    {
+      "patch": "hand",
+      "season": 300,
+      "species": "holly",
+      "max": 34.472104
+    },
+    {
+      "patch": "hand",
+      "season": 300,
+      "species": "hornbeam",
+      "max": 183.93657
+    },
+    {
+      "patch": "hand",
+      "season": 300,
+      "species": "maple",
+      "max": 47.2491
+    },
+    {
+      "patch": "hand",
+      "season": 300,
+      "species": "oak",
+      "max": 202.33384
+    },
+    {
+      "patch": "hand",
+      "season": 300,
+      "species": "rowan",
+      "max": 11.65609
+    },
+    {
+      "patch": "hand",
+      "season": 350,
+      "species": "beech",
+      "max": 97.533485
+    },
+    {
+      "patch": "hand",
+      "season": 350,
+      "species": "holly",
+      "max": 34.476492
+    },
+    {
+      "patch": "hand",
+      "season": 350,
+      "species": "hornbeam",
+      "max": 168.67375
+    },
+    {
+      "patch": "hand",
+      "season": 350,
+      "species": "maple",
+      "max": 47.293911
+    },
+    {
+      "patch": "hand",
+      "season": 350,
+      "species": "oak",
+      "max": 201.73315
+    },
+    {
+      "patch": "hand",
+      "season": 350,
+      "species": "rowan",
+      "max": 11.692848
+    },
+    {
+      "patch": "hand",
+      "season": 400,
+      "species": "beech",
+      "max": 121.40223
+    },
+    {
+      "patch": "hand",
+      "season": 400,
+      "species": "holly",
+      "max": 34.48195
+    },
+    {
+      "patch": "hand",
+      "season": 400,
+      "species": "hornbeam",
+      "max": 164.88436
+    },
+    {
+      "patch": "hand",
+      "season": 400,
+      "species": "maple",
+      "max": 47.360532
+    },
+    {
+      "patch": "hand",
+      "season": 400,
+      "species": "oak",
+      "max": 201.56911
+    },
+    {
+      "patch": "hand",
+      "season": 400,
+      "species": "rowan",
+      "max": 6.6470824
+    }
+  ],
+  "atTop": [],
+  "labWoods": [],
+  "plausibility": [
+    {
+      "species": "birch",
+      "param": "c3.alpha",
+      "hand": 3.067,
+      "fitted": 2.853,
+      "lo": 2.5,
+      "hi": 6,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "birch",
+      "param": "r2.levels.0.lambda",
+      "hand": 0.5862,
+      "fitted": 0.5951,
+      "lo": 0.5,
+      "hi": 0.6,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "birch",
+      "param": "r2.levels.1.lambda",
+      "hand": 0.5071,
+      "fitted": 0.4952,
+      "lo": 0.48,
+      "hi": 0.58,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "birch",
+      "param": "r2.levels.1.setPoint",
+      "hand": 78.23,
+      "fitted": 47.27,
+      "lo": 20,
+      "hi": 90,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "birch",
+      "param": "r2.levels.1.branchAngle",
+      "hand": 50.35,
+      "fitted": 33.16,
+      "lo": 25,
+      "hi": 70,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "birch",
+      "param": "r2.levels.1.eta",
+      "hand": 0.5025,
+      "fitted": 0.6069,
+      "lo": 0.05,
+      "hi": 1,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "birch",
+      "param": "r2.levels.2.setPoint",
+      "hand": 136.2,
+      "fitted": 147.2,
+      "lo": 40,
+      "hi": 160,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "birch",
+      "param": "r2.aC",
+      "hand": 10.48,
+      "fitted": 14.69,
+      "lo": 0,
+      "hi": 40,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "birch",
+      "param": "r2.dLambda",
+      "hand": 0.08019,
+      "fitted": 0.0804,
+      "lo": 0,
+      "hi": 0.12,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "birch",
+      "param": "r2.kappa",
+      "hand": 0.2426,
+      "fitted": 0.5681,
+      "lo": 0,
+      "hi": 4,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "birch",
+      "param": "c5.Trel",
+      "hand": 0.5622,
+      "fitted": 0.2033,
+      "lo": 0.005,
+      "hi": 0.6,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "birch",
+      "param": "c6.r0",
+      "hand": 0.007075,
+      "fitted": 0.01,
+      "lo": 0.001875,
+      "hi": 0.0125,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "birch",
+      "param": "r1.Lh",
+      "hand": 36.61,
+      "fitted": 42.44,
+      "lo": 10,
+      "hi": 200,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "birch",
+      "param": "r1.mf",
+      "hand": 0.1064,
+      "fitted": 0.1358,
+      "lo": 0.02,
+      "hi": 0.15,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "birch",
+      "param": "r3.c",
+      "hand": 0.08963,
+      "fitted": 0.0912,
+      "lo": 0.01,
+      "hi": 0.3,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "birch",
+      "param": "r6.qMin",
+      "hand": 0.1227,
+      "fitted": 0.1995,
+      "lo": 0.01,
+      "hi": 0.2,
+      "at bound": true,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "birch",
+      "param": "r6.leafArea",
+      "hand": 2.452,
+      "fitted": 2.722,
+      "lo": 1,
+      "hi": 3,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "birch",
+      "param": "r2.hJ",
+      "hand": 10.14,
+      "fitted": 31.78,
+      "lo": 2,
+      "hi": 150,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "beech",
+      "param": "c3.alpha",
+      "hand": 2.959,
+      "fitted": 3.083,
+      "lo": 2.5,
+      "hi": 6,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "beech",
+      "param": "r2.levels.0.lambda",
+      "hand": 0.5308,
+      "fitted": 0.5288,
+      "lo": 0.5,
+      "hi": 0.6,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "beech",
+      "param": "r2.levels.1.lambda",
+      "hand": 0.5124,
+      "fitted": 0.5272,
+      "lo": 0.48,
+      "hi": 0.58,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "beech",
+      "param": "r2.levels.1.setPoint",
+      "hand": 34.32,
+      "fitted": 37.61,
+      "lo": 20,
+      "hi": 90,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "beech",
+      "param": "r2.levels.1.branchAngle",
+      "hand": 50.07,
+      "fitted": 57.48,
+      "lo": 25,
+      "hi": 70,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "beech",
+      "param": "r2.levels.1.eta",
+      "hand": 0.5696,
+      "fitted": 1.176,
+      "lo": 0.05,
+      "hi": 1,
+      "at bound": true,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "beech",
+      "param": "r2.levels.2.setPoint",
+      "hand": 94.59,
+      "fitted": 86.03,
+      "lo": 40,
+      "hi": 160,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "beech",
+      "param": "r2.aC",
+      "hand": 14.44,
+      "fitted": 0.5967,
+      "lo": 0,
+      "hi": 40,
+      "at bound": true,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "beech",
+      "param": "r2.dLambda",
+      "hand": 0.01384,
+      "fitted": 0.0159,
+      "lo": 0,
+      "hi": 0.12,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "beech",
+      "param": "r2.kappa",
+      "hand": 0.4314,
+      "fitted": 0.1195,
+      "lo": 0,
+      "hi": 4,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "beech",
+      "param": "c5.Trel",
+      "hand": 0.04538,
+      "fitted": 0.2532,
+      "lo": 0.005,
+      "hi": 0.6,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "beech",
+      "param": "c6.r0",
+      "hand": 0.003096,
+      "fitted": 0.004,
+      "lo": 0.001875,
+      "hi": 0.00625,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "beech",
+      "param": "r1.Lh",
+      "hand": 108.9,
+      "fitted": 85.72,
+      "lo": 10,
+      "hi": 200,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "beech",
+      "param": "r1.mf",
+      "hand": 0.07697,
+      "fitted": 0.1022,
+      "lo": 0.02,
+      "hi": 0.15,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "beech",
+      "param": "r3.c",
+      "hand": 0.04879,
+      "fitted": 0.0364,
+      "lo": 0.01,
+      "hi": 0.3,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "beech",
+      "param": "r6.qMin",
+      "hand": 0.01257,
+      "fitted": 0.0107,
+      "lo": 0.01,
+      "hi": 0.2,
+      "at bound": true,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "beech",
+      "param": "r6.leafArea",
+      "hand": 2.474,
+      "fitted": 2.487,
+      "lo": 1,
+      "hi": 3,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "beech",
+      "param": "r2.hJ",
+      "hand": 44.95,
+      "fitted": 42.15,
+      "lo": 2,
+      "hi": 150,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "oak",
+      "param": "c3.alpha",
+      "hand": 4.085,
+      "fitted": 4.932,
+      "lo": 2.5,
+      "hi": 6,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "oak",
+      "param": "r2.levels.0.lambda",
+      "hand": 0.5657,
+      "fitted": 0.5718,
+      "lo": 0.5,
+      "hi": 0.6,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "oak",
+      "param": "r2.levels.1.lambda",
+      "hand": 0.568,
+      "fitted": 0.5772,
+      "lo": 0.48,
+      "hi": 0.58,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "oak",
+      "param": "r2.levels.1.setPoint",
+      "hand": 63.43,
+      "fitted": 66.09,
+      "lo": 20,
+      "hi": 90,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "oak",
+      "param": "r2.levels.1.branchAngle",
+      "hand": 54.34,
+      "fitted": 55.01,
+      "lo": 25,
+      "hi": 70,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "oak",
+      "param": "r2.levels.1.eta",
+      "hand": 0.09847,
+      "fitted": 0.0829,
+      "lo": 0.05,
+      "hi": 1,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "oak",
+      "param": "r2.levels.2.setPoint",
+      "hand": 50.2,
+      "fitted": 45.6,
+      "lo": 40,
+      "hi": 160,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "oak",
+      "param": "r2.aC",
+      "hand": 0.0,
+      "fitted": 1.915,
+      "lo": 0,
+      "hi": 40,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "oak",
+      "param": "r2.dLambda",
+      "hand": 0.12,
+      "fitted": 0.108,
+      "lo": 0,
+      "hi": 0.12,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "oak",
+      "param": "r2.kappa",
+      "hand": 0.3156,
+      "fitted": 0.4125,
+      "lo": 0,
+      "hi": 4,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "oak",
+      "param": "c5.Trel",
+      "hand": 0.2386,
+      "fitted": 0.2433,
+      "lo": 0.005,
+      "hi": 0.6,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "oak",
+      "param": "c6.r0",
+      "hand": 0.003399,
+      "fitted": 0.002,
+      "lo": 0.001875,
+      "hi": 0.00625,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "oak",
+      "param": "r1.Lh",
+      "hand": 33.31,
+      "fitted": 33.9,
+      "lo": 10,
+      "hi": 200,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "oak",
+      "param": "r1.mf",
+      "hand": 0.08585,
+      "fitted": 0.0901,
+      "lo": 0.02,
+      "hi": 0.15,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "oak",
+      "param": "r3.c",
+      "hand": 0.161,
+      "fitted": 0.0922,
+      "lo": 0.01,
+      "hi": 0.3,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "oak",
+      "param": "r6.qMin",
+      "hand": 0.1234,
+      "fitted": 0.1564,
+      "lo": 0.01,
+      "hi": 0.2,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "oak",
+      "param": "r6.leafArea",
+      "hand": 1.409,
+      "fitted": 1.453,
+      "lo": 1,
+      "hi": 3,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "oak",
+      "param": "r2.hJ",
+      "hand": 18.64,
+      "fitted": 10.16,
+      "lo": 2,
+      "hi": 150,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "hornbeam",
+      "param": "c3.alpha",
+      "hand": 3.888,
+      "fitted": 3.833,
+      "lo": 2.5,
+      "hi": 6,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "hornbeam",
+      "param": "r2.levels.0.lambda",
+      "hand": 0.5841,
+      "fitted": 0.5831,
+      "lo": 0.5,
+      "hi": 0.6,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "hornbeam",
+      "param": "r2.levels.1.lambda",
+      "hand": 0.5094,
+      "fitted": 0.5037,
+      "lo": 0.48,
+      "hi": 0.58,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "hornbeam",
+      "param": "r2.levels.1.setPoint",
+      "hand": 46.22,
+      "fitted": 40.44,
+      "lo": 20,
+      "hi": 90,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "hornbeam",
+      "param": "r2.levels.1.branchAngle",
+      "hand": 35.61,
+      "fitted": 39.49,
+      "lo": 25,
+      "hi": 70,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "hornbeam",
+      "param": "r2.levels.1.eta",
+      "hand": 0.154,
+      "fitted": 0.0838,
+      "lo": 0.05,
+      "hi": 1,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "hornbeam",
+      "param": "r2.levels.2.setPoint",
+      "hand": 43.59,
+      "fitted": 45.26,
+      "lo": 40,
+      "hi": 160,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "hornbeam",
+      "param": "r2.aC",
+      "hand": 0.0,
+      "fitted": 1.96,
+      "lo": 0,
+      "hi": 40,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "hornbeam",
+      "param": "r2.dLambda",
+      "hand": 0.08367,
+      "fitted": 0.09,
+      "lo": 0,
+      "hi": 0.12,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "hornbeam",
+      "param": "r2.kappa",
+      "hand": 0.0,
+      "fitted": 0.062,
+      "lo": 0,
+      "hi": 4,
+      "at bound": true,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "hornbeam",
+      "param": "c5.Trel",
+      "hand": 0.3172,
+      "fitted": 0.404,
+      "lo": 0.005,
+      "hi": 0.6,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "hornbeam",
+      "param": "c6.r0",
+      "hand": 0.003304,
+      "fitted": 0.0032,
+      "lo": 0.001875,
+      "hi": 0.00625,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "hornbeam",
+      "param": "r1.Lh",
+      "hand": 73.13,
+      "fitted": 56.98,
+      "lo": 10,
+      "hi": 200,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "hornbeam",
+      "param": "r1.mf",
+      "hand": 0.112,
+      "fitted": 0.1166,
+      "lo": 0.02,
+      "hi": 0.15,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "hornbeam",
+      "param": "r3.c",
+      "hand": 0.04041,
+      "fitted": 0.0389,
+      "lo": 0.01,
+      "hi": 0.3,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "hornbeam",
+      "param": "r6.qMin",
+      "hand": 0.01456,
+      "fitted": 0.0166,
+      "lo": 0.01,
+      "hi": 0.2,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "hornbeam",
+      "param": "r6.leafArea",
+      "hand": 2.172,
+      "fitted": 2.55,
+      "lo": 1,
+      "hi": 3,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "hornbeam",
+      "param": "r2.hJ",
+      "hand": 6.608,
+      "fitted": 9.142,
+      "lo": 2,
+      "hi": 150,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "maple",
+      "param": "c3.alpha",
+      "hand": 3.779,
+      "fitted": 3.75,
+      "lo": 2.5,
+      "hi": 6,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "maple",
+      "param": "r2.levels.0.lambda",
+      "hand": 0.5547,
+      "fitted": 0.5502,
+      "lo": 0.5,
+      "hi": 0.6,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "maple",
+      "param": "r2.levels.1.lambda",
+      "hand": 0.5039,
+      "fitted": 0.5046,
+      "lo": 0.48,
+      "hi": 0.58,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "maple",
+      "param": "r2.levels.1.setPoint",
+      "hand": 51.12,
+      "fitted": 51.74,
+      "lo": 20,
+      "hi": 90,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "maple",
+      "param": "r2.levels.1.branchAngle",
+      "hand": 44.65,
+      "fitted": 44.26,
+      "lo": 25,
+      "hi": 70,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "maple",
+      "param": "r2.levels.1.eta",
+      "hand": 0.1405,
+      "fitted": 0.1643,
+      "lo": 0.05,
+      "hi": 1,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "maple",
+      "param": "r2.levels.2.setPoint",
+      "hand": 45.87,
+      "fitted": 47.72,
+      "lo": 40,
+      "hi": 160,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "maple",
+      "param": "r2.aC",
+      "hand": 7.176,
+      "fitted": 5.806,
+      "lo": 0,
+      "hi": 40,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "maple",
+      "param": "r2.dLambda",
+      "hand": 0.07811,
+      "fitted": 0.0783,
+      "lo": 0,
+      "hi": 0.12,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "maple",
+      "param": "r2.kappa",
+      "hand": 1.708,
+      "fitted": 1.615,
+      "lo": 0,
+      "hi": 4,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "maple",
+      "param": "c5.Trel",
+      "hand": 0.1218,
+      "fitted": 0.1496,
+      "lo": 0.005,
+      "hi": 0.6,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "maple",
+      "param": "c6.r0",
+      "hand": 0.002574,
+      "fitted": 0.0031,
+      "lo": 0.001875,
+      "hi": 0.00625,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "maple",
+      "param": "r1.Lh",
+      "hand": 12.69,
+      "fitted": 13.68,
+      "lo": 10,
+      "hi": 200,
+      "at bound": true,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "maple",
+      "param": "r1.mf",
+      "hand": 0.02623,
+      "fitted": 0.0303,
+      "lo": 0.02,
+      "hi": 0.15,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "maple",
+      "param": "r3.c",
+      "hand": 0.1173,
+      "fitted": 0.0992,
+      "lo": 0.01,
+      "hi": 0.3,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "maple",
+      "param": "r6.qMin",
+      "hand": 0.06993,
+      "fitted": 0.0606,
+      "lo": 0.01,
+      "hi": 0.2,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "maple",
+      "param": "r6.leafArea",
+      "hand": 2.845,
+      "fitted": 2.862,
+      "lo": 1,
+      "hi": 3,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "maple",
+      "param": "r2.hJ",
+      "hand": 16.71,
+      "fitted": 14.24,
+      "lo": 2,
+      "hi": 150,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "holly",
+      "param": "c3.alpha",
+      "hand": 2.583,
+      "fitted": 2.12,
+      "lo": 1.8,
+      "hi": 4.5,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "holly",
+      "param": "r2.levels.0.lambda",
+      "hand": 0.5469,
+      "fitted": 0.5302,
+      "lo": 0.5,
+      "hi": 0.6,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "holly",
+      "param": "r2.levels.1.lambda",
+      "hand": 0.5199,
+      "fitted": 0.4904,
+      "lo": 0.48,
+      "hi": 0.58,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "holly",
+      "param": "r2.levels.1.setPoint",
+      "hand": 62.09,
+      "fitted": 59.56,
+      "lo": 20,
+      "hi": 90,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "holly",
+      "param": "r2.levels.1.branchAngle",
+      "hand": 59.22,
+      "fitted": 76.54,
+      "lo": 35,
+      "hi": 80,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "holly",
+      "param": "r2.levels.1.eta",
+      "hand": 0.5767,
+      "fitted": 0.052,
+      "lo": 0.05,
+      "hi": 1,
+      "at bound": true,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "holly",
+      "param": "r2.levels.2.setPoint",
+      "hand": 126.3,
+      "fitted": 128.4,
+      "lo": 40,
+      "hi": 160,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "holly",
+      "param": "r2.aC",
+      "hand": 5.092,
+      "fitted": 12.03,
+      "lo": 0,
+      "hi": 40,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "holly",
+      "param": "r2.dLambda",
+      "hand": 0.02888,
+      "fitted": 0.0229,
+      "lo": 0,
+      "hi": 0.12,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "holly",
+      "param": "r2.kappa",
+      "hand": 0.9578,
+      "fitted": 0.0314,
+      "lo": 0,
+      "hi": 4,
+      "at bound": true,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "holly",
+      "param": "c5.Trel",
+      "hand": 0.05735,
+      "fitted": 0.178,
+      "lo": 0.005,
+      "hi": 0.6,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "holly",
+      "param": "c6.r0",
+      "hand": 0.002936,
+      "fitted": 0.006,
+      "lo": 0.001875,
+      "hi": 0.00625,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "holly",
+      "param": "r1.Lh",
+      "hand": 13.77,
+      "fitted": 17.99,
+      "lo": 10,
+      "hi": 200,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "holly",
+      "param": "r1.mf",
+      "hand": 0.025,
+      "fitted": 0.0714,
+      "lo": 0.02,
+      "hi": 0.15,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "holly",
+      "param": "r3.c",
+      "hand": 0.2068,
+      "fitted": 0.2716,
+      "lo": 0.01,
+      "hi": 0.3,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "holly",
+      "param": "r6.qMin",
+      "hand": 0.013,
+      "fitted": 0.1674,
+      "lo": 0.01,
+      "hi": 0.2,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "holly",
+      "param": "r6.leafArea",
+      "hand": 2.609,
+      "fitted": 2.412,
+      "lo": 1,
+      "hi": 3,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "holly",
+      "param": "r2.hJ",
+      "hand": 20.0,
+      "fitted": 36.1,
+      "lo": 2,
+      "hi": 150,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "rowan",
+      "param": "c3.alpha",
+      "hand": 4.046,
+      "fitted": 5.98,
+      "lo": 2.5,
+      "hi": 6,
+      "at bound": true,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "rowan",
+      "param": "r2.levels.0.lambda",
+      "hand": 0.5375,
+      "fitted": 0.5436,
+      "lo": 0.5,
+      "hi": 0.6,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "rowan",
+      "param": "r2.levels.1.lambda",
+      "hand": 0.4992,
+      "fitted": 0.4909,
+      "lo": 0.48,
+      "hi": 0.58,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "rowan",
+      "param": "r2.levels.1.setPoint",
+      "hand": 34.55,
+      "fitted": 39.12,
+      "lo": 20,
+      "hi": 90,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "rowan",
+      "param": "r2.levels.1.branchAngle",
+      "hand": 30.48,
+      "fitted": 28.38,
+      "lo": 20,
+      "hi": 60,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "rowan",
+      "param": "r2.levels.1.eta",
+      "hand": 0.172,
+      "fitted": 0.3158,
+      "lo": 0.05,
+      "hi": 1,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "rowan",
+      "param": "r2.levels.2.setPoint",
+      "hand": 58.17,
+      "fitted": 54.22,
+      "lo": 40,
+      "hi": 160,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "rowan",
+      "param": "r2.aC",
+      "hand": 13.67,
+      "fitted": 14.34,
+      "lo": 0,
+      "hi": 40,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "rowan",
+      "param": "r2.dLambda",
+      "hand": 0.03368,
+      "fitted": 0.0303,
+      "lo": 0,
+      "hi": 0.12,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "rowan",
+      "param": "r2.kappa",
+      "hand": 1.094,
+      "fitted": 1.088,
+      "lo": 0,
+      "hi": 4,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "rowan",
+      "param": "c5.Trel",
+      "hand": 0.4494,
+      "fitted": 0.3777,
+      "lo": 0.005,
+      "hi": 0.6,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "rowan",
+      "param": "c6.r0",
+      "hand": 0.003691,
+      "fitted": 0.0026,
+      "lo": 0.001875,
+      "hi": 0.00625,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "rowan",
+      "param": "r1.Lh",
+      "hand": 20.44,
+      "fitted": 14.21,
+      "lo": 10,
+      "hi": 200,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "rowan",
+      "param": "r1.mf",
+      "hand": 0.0997,
+      "fitted": 0.0901,
+      "lo": 0.02,
+      "hi": 0.15,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "rowan",
+      "param": "r3.c",
+      "hand": 0.01893,
+      "fitted": 0.0221,
+      "lo": 0.01,
+      "hi": 0.3,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "rowan",
+      "param": "r6.qMin",
+      "hand": 0.07143,
+      "fitted": 0.0506,
+      "lo": 0.01,
+      "hi": 0.2,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "rowan",
+      "param": "r6.leafArea",
+      "hand": 2.166,
+      "fitted": 2.043,
+      "lo": 1,
+      "hi": 3,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "rowan",
+      "param": "r2.hJ",
+      "hand": 13.23,
+      "fitted": 21.57,
+      "lo": 2,
+      "hi": 150,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "willow",
+      "param": "c3.alpha",
+      "hand": 5.516,
+      "fitted": 4.897,
+      "lo": 3,
+      "hi": 7,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "willow",
+      "param": "r2.levels.0.lambda",
+      "hand": 0.5213,
+      "fitted": 0.5189,
+      "lo": 0.5,
+      "hi": 0.6,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "willow",
+      "param": "r2.levels.1.lambda",
+      "hand": 0.5236,
+      "fitted": 0.5167,
+      "lo": 0.48,
+      "hi": 0.58,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "willow",
+      "param": "r2.levels.1.setPoint",
+      "hand": 44.48,
+      "fitted": 51.62,
+      "lo": 20,
+      "hi": 90,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "willow",
+      "param": "r2.levels.1.branchAngle",
+      "hand": 46.62,
+      "fitted": 48.64,
+      "lo": 25,
+      "hi": 70,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "willow",
+      "param": "r2.levels.1.eta",
+      "hand": 0.07341,
+      "fitted": 0.0725,
+      "lo": 0.05,
+      "hi": 1,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "willow",
+      "param": "r2.levels.2.setPoint",
+      "hand": 53.07,
+      "fitted": 56.63,
+      "lo": 40,
+      "hi": 160,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "willow",
+      "param": "r2.aC",
+      "hand": 0.0,
+      "fitted": 2.99,
+      "lo": 0,
+      "hi": 40,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "willow",
+      "param": "r2.dLambda",
+      "hand": 0.02724,
+      "fitted": 0.0348,
+      "lo": 0,
+      "hi": 0.12,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "willow",
+      "param": "r2.kappa",
+      "hand": 1.219,
+      "fitted": 1.263,
+      "lo": 0,
+      "hi": 4,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "willow",
+      "param": "c5.Trel",
+      "hand": 0.3687,
+      "fitted": 0.3766,
+      "lo": 0.005,
+      "hi": 0.6,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "willow",
+      "param": "c6.r0",
+      "hand": 0.002474,
+      "fitted": 0.003,
+      "lo": 0.001875,
+      "hi": 0.00625,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "willow",
+      "param": "r1.Lh",
+      "hand": 13.06,
+      "fitted": 11.51,
+      "lo": 10,
+      "hi": 200,
+      "at bound": true,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "willow",
+      "param": "r1.mf",
+      "hand": 0.08982,
+      "fitted": 0.0837,
+      "lo": 0.02,
+      "hi": 0.15,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "willow",
+      "param": "r3.c",
+      "hand": 0.08119,
+      "fitted": 0.0669,
+      "lo": 0.01,
+      "hi": 0.3,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "willow",
+      "param": "r6.qMin",
+      "hand": 0.1157,
+      "fitted": 0.1091,
+      "lo": 0.01,
+      "hi": 0.2,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "willow",
+      "param": "r6.leafArea",
+      "hand": 1.786,
+      "fitted": 1.658,
+      "lo": 1,
+      "hi": 3,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    },
+    {
+      "species": "willow",
+      "param": "r2.hJ",
+      "hand": 4.654,
+      "fitted": 7.191,
+      "lo": 2,
+      "hi": 150,
+      "at bound": false,
+      "restart spread (of range)": NaN
+    }
+  ],
+  "links": {
+    "birch": "http://192.168.178.130:5173/?preset=birchWood&seed=1&p=eyJzcGVjaWVzIjp7ImJpcmNoIjp7ImNvbW1vbiI6IlNpbHZlciBiaXJjaCIsImxhdGluIjoiQmV0dWxhIHBlbmR1bGEiLCJsZWFmIjoic21hbGwiLCJjMyI6eyJtb2RlIjoiYmgiLCJsYW1iZGEiOjAuNSwiYWxwaGEiOjIuODUzfSwiYzUiOnsiZW5hYmxlZCI6dHJ1ZSwiVCI6MC4xLCJnIjozLCJUcmVsIjowLjIwMzMsInRvcFF1YW50aWxlIjowLjl9LCJjNiI6eyJlbmFibGVkIjp0cnVlLCJuIjoyLCJyMCI6MC4wMDk5Njh9LCJyMSI6eyJlbmFibGVkIjp0cnVlLCJtdyI6MzIuMjQsIm1mIjowLjEzNTgsIkxoIjo0Mi40NCwiaHlkcmF1bGljIjoiaHlwZXJib2xpYyIsInNyIjowLjEsImZSZXAiOjAuMSwibWF0dXJpdHkiOjQwLCJrU3RhcnZlIjozLCJyZXNlcnZlMCI6Miwic3RvcmUiOjIsInNoZWQiOiJjYXJib24ifSwicjIiOnsiZW5hYmxlZCI6dHJ1ZSwibGV2ZWxzIjpbeyJsYW1iZGEiOjAuNTk1MSwic2V0UG9pbnQiOjAsImV0YSI6MC4zLCJicmFuY2hBbmdsZSI6NDUsImdlbmVyYXRvciI6InNwaXJhbCIsInRpZXJFdmVyeSI6MCwicFRlcm0iOjB9LHsibGFtYmRhIjowLjQ5NTIsInNldFBvaW50Ijo0Ny4yNywiZXRhIjowLjYwNjksImJyYW5jaEFuZ2xlIjozMy4xNiwiZ2VuZXJhdG9yIjoic3BpcmFsIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MCwicG9zdHVyZVNldFBvaW50Ijo3MH0seyJsYW1iZGEiOjAuNSwic2V0UG9pbnQiOjE0Ny4yLCJldGEiOjAuMjUsImJyYW5jaEFuZ2xlIjo0MCwiZ2VuZXJhdG9yIjoic3BpcmFsIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MH1dLCJhQyI6MTQuNjksImRMYW1iZGEiOjAuMDgwNDUsInJhbXAiOjIwLCJrYXBwYSI6MC41NjgxLCJoSiI6MzEuNzh9LCJyMyI6eyJlbmFibGVkIjp0cnVlLCJyaG8iOjEsImxlYWZNYXNzIjowLjAwMSwiRSI6NDAwMDAwMCwic2FnIjoiaW5jcmVtZW50IiwicGhpIjowLjUsInBvc3R1cmUiOnRydWUsImJldGFHIjowLjEsImdhbW1hIjowLjIsImMiOjAuMDkxMjIsInNpZ21hVGFyZ2V0IjozMDAwLCJnaXJ0aEdhaW4iOjAuMywic2lnbWFCcmVhayI6NzAwMCwiZ3JvdW5kIjp0cnVlfSwicjQiOnsicVJlbCI6MC4zfSwicjYiOnsiZW5hYmxlZCI6dHJ1ZSwicU1pbiI6MC4xOTk1LCJsZWFmQXJlYSI6Mi43MjJ9LCJvNCI6eyJjU2VlZCI6MiwiZCI6NDAsInFFc3QiOjAuMjUsInBFc3QiOjAuMywibTAiOjAuMDA4LCJyYWluIjowLjJ9fX19",
+    "birch (open)": "http://192.168.178.130:5173/?preset=oakOpen&seed=1&p=eyJ0cmVlcyI6W3sieCI6ODAsInNwZWNpZXMiOiJiaXJjaCJ9XSwic3BlY2llcyI6eyJiaXJjaCI6eyJjb21tb24iOiJTaWx2ZXIgYmlyY2giLCJsYXRpbiI6IkJldHVsYSBwZW5kdWxhIiwibGVhZiI6InNtYWxsIiwiYzMiOnsibW9kZSI6ImJoIiwibGFtYmRhIjowLjUsImFscGhhIjoyLjg1M30sImM1Ijp7ImVuYWJsZWQiOnRydWUsIlQiOjAuMSwiZyI6MywiVHJlbCI6MC4yMDMzLCJ0b3BRdWFudGlsZSI6MC45fSwiYzYiOnsiZW5hYmxlZCI6dHJ1ZSwibiI6MiwicjAiOjAuMDA5OTY4fSwicjEiOnsiZW5hYmxlZCI6dHJ1ZSwibXciOjMyLjI0LCJtZiI6MC4xMzU4LCJMaCI6NDIuNDQsImh5ZHJhdWxpYyI6Imh5cGVyYm9saWMiLCJzciI6MC4xLCJmUmVwIjowLjEsIm1hdHVyaXR5Ijo0MCwia1N0YXJ2ZSI6MywicmVzZXJ2ZTAiOjIsInN0b3JlIjoyLCJzaGVkIjoiY2FyYm9uIn0sInIyIjp7ImVuYWJsZWQiOnRydWUsImxldmVscyI6W3sibGFtYmRhIjowLjU5NTEsInNldFBvaW50IjowLCJldGEiOjAuMywiYnJhbmNoQW5nbGUiOjQ1LCJnZW5lcmF0b3IiOiJzcGlyYWwiLCJ0aWVyRXZlcnkiOjAsInBUZXJtIjowfSx7ImxhbWJkYSI6MC40OTUyLCJzZXRQb2ludCI6NDcuMjcsImV0YSI6MC42MDY5LCJicmFuY2hBbmdsZSI6MzMuMTYsImdlbmVyYXRvciI6InNwaXJhbCIsInRpZXJFdmVyeSI6MCwicFRlcm0iOjAsInBvc3R1cmVTZXRQb2ludCI6NzB9LHsibGFtYmRhIjowLjUsInNldFBvaW50IjoxNDcuMiwiZXRhIjowLjI1LCJicmFuY2hBbmdsZSI6NDAsImdlbmVyYXRvciI6InNwaXJhbCIsInRpZXJFdmVyeSI6MCwicFRlcm0iOjB9XSwiYUMiOjE0LjY5LCJkTGFtYmRhIjowLjA4MDQ1LCJyYW1wIjoyMCwia2FwcGEiOjAuNTY4MSwiaEoiOjMxLjc4fSwicjMiOnsiZW5hYmxlZCI6dHJ1ZSwicmhvIjoxLCJsZWFmTWFzcyI6MC4wMDEsIkUiOjQwMDAwMDAsInNhZyI6ImluY3JlbWVudCIsInBoaSI6MC41LCJwb3N0dXJlIjp0cnVlLCJiZXRhRyI6MC4xLCJnYW1tYSI6MC4yLCJjIjowLjA5MTIyLCJzaWdtYVRhcmdldCI6MzAwMCwiZ2lydGhHYWluIjowLjMsInNpZ21hQnJlYWsiOjcwMDAsImdyb3VuZCI6dHJ1ZX0sInI0Ijp7InFSZWwiOjAuM30sInI2Ijp7ImVuYWJsZWQiOnRydWUsInFNaW4iOjAuMTk5NSwibGVhZkFyZWEiOjIuNzIyfSwibzQiOnsiY1NlZWQiOjIsImQiOjQwLCJxRXN0IjowLjI1LCJwRXN0IjowLjMsIm0wIjowLjAwOCwicmFpbiI6MC4yfX19fQ",
+    "beech": "http://192.168.178.130:5173/?preset=beechWood&seed=1&p=eyJzcGVjaWVzIjp7ImJlZWNoIjp7ImNvbW1vbiI6IkJlZWNoIiwibGF0aW4iOiJGYWd1cyBzeWx2YXRpY2EiLCJsZWFmIjoiYmVlY2giLCJjNSI6eyJlbmFibGVkIjp0cnVlLCJUIjowLjAxLCJnIjozLCJUcmVsIjowLjI1MzIsInRvcFF1YW50aWxlIjowLjl9LCJyMSI6eyJlbmFibGVkIjp0cnVlLCJtdyI6MzkuMDIsIm1mIjowLjEwMjIsIkxoIjo4NS43MiwiaHlkcmF1bGljIjoiaHlwZXJib2xpYyIsInNyIjowLjEsImZSZXAiOjAuMSwibWF0dXJpdHkiOjQwLCJrU3RhcnZlIjozLCJyZXNlcnZlMCI6Miwic3RvcmUiOjIsInNoZWQiOiJjYXJib24ifSwicjIiOnsiZW5hYmxlZCI6dHJ1ZSwibGV2ZWxzIjpbeyJsYW1iZGEiOjAuNTI4OCwic2V0UG9pbnQiOjQwLCJldGEiOjAuNCwiYnJhbmNoQW5nbGUiOjQ1LCJnZW5lcmF0b3IiOiJkaXN0aWNob3VzIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MCwicG9zdHVyZVNldFBvaW50IjowfSx7ImxhbWJkYSI6MC41MjcyLCJzZXRQb2ludCI6MzcuNjEsImV0YSI6MS4xNzYsImJyYW5jaEFuZ2xlIjo1Ny40OCwiZ2VuZXJhdG9yIjoiZGlzdGljaG91cyIsInRpZXJFdmVyeSI6MCwicFRlcm0iOjB9LHsibGFtYmRhIjowLjUsInNldFBvaW50Ijo4Ni4wMywiZXRhIjowLjQsImJyYW5jaEFuZ2xlIjo0NSwiZ2VuZXJhdG9yIjoiZGlzdGljaG91cyIsInRpZXJFdmVyeSI6MCwicFRlcm0iOjB9XSwiYUMiOjAuNTk2NywiZExhbWJkYSI6MC4wMTU5MSwicmFtcCI6MSwia2FwcGEiOjAuMTE5NSwiaEoiOjQyLjE1fSwicjMiOnsiZW5hYmxlZCI6dHJ1ZSwicmhvIjoxLCJsZWFmTWFzcyI6MC4wMDIsIkUiOjQwMDAwMDAsInNhZyI6ImluY3JlbWVudCIsInBoaSI6MSwicG9zdHVyZSI6dHJ1ZSwiYmV0YUciOjAuMiwiZ2FtbWEiOjAuMiwiYyI6MC4wMzYzOCwic2lnbWFUYXJnZXQiOjMwMDAsImdpcnRoR2FpbiI6MC4zLCJzaWdtYUJyZWFrIjo3MDAwLCJncm91bmQiOnRydWV9LCJyNiI6eyJlbmFibGVkIjp0cnVlLCJxTWluIjowLjAxMDcxLCJsZWFmQXJlYSI6Mi40ODd9LCJvNCI6eyJjU2VlZCI6MTAsImQiOjEyLCJxRXN0IjowLjAzLCJwRXN0IjowLjMsIm0wIjowLjAwMn0sImMzIjp7Im1vZGUiOiJiaCIsImxhbWJkYSI6MC41LCJhbHBoYSI6My4wODN9LCJjNiI6eyJlbmFibGVkIjp0cnVlLCJuIjoyLCJyMCI6MC4wMDM5NjV9fX19",
+    "beech (open)": "http://192.168.178.130:5173/?preset=oakOpen&seed=1&p=eyJ0cmVlcyI6W3sieCI6ODAsInNwZWNpZXMiOiJiZWVjaCJ9XSwic3BlY2llcyI6eyJiZWVjaCI6eyJjb21tb24iOiJCZWVjaCIsImxhdGluIjoiRmFndXMgc3lsdmF0aWNhIiwibGVhZiI6ImJlZWNoIiwiYzUiOnsiZW5hYmxlZCI6dHJ1ZSwiVCI6MC4wMSwiZyI6MywiVHJlbCI6MC4yNTMyLCJ0b3BRdWFudGlsZSI6MC45fSwicjEiOnsiZW5hYmxlZCI6dHJ1ZSwibXciOjM5LjAyLCJtZiI6MC4xMDIyLCJMaCI6ODUuNzIsImh5ZHJhdWxpYyI6Imh5cGVyYm9saWMiLCJzciI6MC4xLCJmUmVwIjowLjEsIm1hdHVyaXR5Ijo0MCwia1N0YXJ2ZSI6MywicmVzZXJ2ZTAiOjIsInN0b3JlIjoyLCJzaGVkIjoiY2FyYm9uIn0sInIyIjp7ImVuYWJsZWQiOnRydWUsImxldmVscyI6W3sibGFtYmRhIjowLjUyODgsInNldFBvaW50Ijo0MCwiZXRhIjowLjQsImJyYW5jaEFuZ2xlIjo0NSwiZ2VuZXJhdG9yIjoiZGlzdGljaG91cyIsInRpZXJFdmVyeSI6MCwicFRlcm0iOjAsInBvc3R1cmVTZXRQb2ludCI6MH0seyJsYW1iZGEiOjAuNTI3Miwic2V0UG9pbnQiOjM3LjYxLCJldGEiOjEuMTc2LCJicmFuY2hBbmdsZSI6NTcuNDgsImdlbmVyYXRvciI6ImRpc3RpY2hvdXMiLCJ0aWVyRXZlcnkiOjAsInBUZXJtIjowfSx7ImxhbWJkYSI6MC41LCJzZXRQb2ludCI6ODYuMDMsImV0YSI6MC40LCJicmFuY2hBbmdsZSI6NDUsImdlbmVyYXRvciI6ImRpc3RpY2hvdXMiLCJ0aWVyRXZlcnkiOjAsInBUZXJtIjowfV0sImFDIjowLjU5NjcsImRMYW1iZGEiOjAuMDE1OTEsInJhbXAiOjEsImthcHBhIjowLjExOTUsImhKIjo0Mi4xNX0sInIzIjp7ImVuYWJsZWQiOnRydWUsInJobyI6MSwibGVhZk1hc3MiOjAuMDAyLCJFIjo0MDAwMDAwLCJzYWciOiJpbmNyZW1lbnQiLCJwaGkiOjEsInBvc3R1cmUiOnRydWUsImJldGFHIjowLjIsImdhbW1hIjowLjIsImMiOjAuMDM2MzgsInNpZ21hVGFyZ2V0IjozMDAwLCJnaXJ0aEdhaW4iOjAuMywic2lnbWFCcmVhayI6NzAwMCwiZ3JvdW5kIjp0cnVlfSwicjYiOnsiZW5hYmxlZCI6dHJ1ZSwicU1pbiI6MC4wMTA3MSwibGVhZkFyZWEiOjIuNDg3fSwibzQiOnsiY1NlZWQiOjEwLCJkIjoxMiwicUVzdCI6MC4wMywicEVzdCI6MC4zLCJtMCI6MC4wMDJ9LCJjMyI6eyJtb2RlIjoiYmgiLCJsYW1iZGEiOjAuNSwiYWxwaGEiOjMuMDgzfSwiYzYiOnsiZW5hYmxlZCI6dHJ1ZSwibiI6MiwicjAiOjAuMDAzOTY1fX19fQ",
+    "oak": "http://192.168.178.130:5173/?preset=oakWood&seed=1&p=eyJzcGVjaWVzIjp7Im9hayI6eyJjb21tb24iOiJQZWR1bmN1bGF0ZSBvYWsiLCJsYXRpbiI6IlF1ZXJjdXMgcm9idXIiLCJsZWFmIjoib2FrIiwiYzMiOnsibW9kZSI6ImJoIiwibGFtYmRhIjowLjUsImFscGhhIjo0LjkzMn0sImM1Ijp7ImVuYWJsZWQiOnRydWUsIlQiOjAuMDUsImciOjMsIlRyZWwiOjAuMjQzMywidG9wUXVhbnRpbGUiOjAuOX0sInIxIjp7ImVuYWJsZWQiOnRydWUsIm13IjoxODEsIm1mIjowLjA5MDEsIkxoIjozMy45LCJoeWRyYXVsaWMiOiJoeXBlcmJvbGljIiwic3IiOjAuMSwiZlJlcCI6MC4xLCJtYXR1cml0eSI6NDAsImtTdGFydmUiOjMsInJlc2VydmUwIjoyLCJzdG9yZSI6Miwic2hlZCI6ImNhcmJvbiJ9LCJyMiI6eyJlbmFibGVkIjp0cnVlLCJsZXZlbHMiOlt7ImxhbWJkYSI6MC41NzE4LCJzZXRQb2ludCI6MCwiZXRhIjowLjI1LCJicmFuY2hBbmdsZSI6NDUsImdlbmVyYXRvciI6InNwaXJhbCIsInRpZXJFdmVyeSI6MCwicFRlcm0iOjB9LHsibGFtYmRhIjowLjU3NzIsInNldFBvaW50Ijo2Ni4wOSwiZXRhIjowLjA4Mjg2LCJicmFuY2hBbmdsZSI6NTUuMDEsImdlbmVyYXRvciI6InNwaXJhbCIsInRpZXJFdmVyeSI6MCwicFRlcm0iOjB9LHsibGFtYmRhIjowLjUsInNldFBvaW50Ijo0NS42LCJldGEiOjAuMiwiYnJhbmNoQW5nbGUiOjUwLCJnZW5lcmF0b3IiOiJzcGlyYWwiLCJ0aWVyRXZlcnkiOjAsInBUZXJtIjowfV0sImFDIjoxLjkxNSwiZExhbWJkYSI6MC4xMDgsInJhbXAiOjE1LCJrYXBwYSI6MC40MTI1LCJoSiI6MTAuMTZ9LCJyMyI6eyJlbmFibGVkIjp0cnVlLCJyaG8iOjEsImxlYWZNYXNzIjowLjAwMiwiRSI6NDAwMDAwMCwic2FnIjoiaW5jcmVtZW50IiwicGhpIjoxLCJwb3N0dXJlIjp0cnVlLCJiZXRhRyI6MC4yLCJnYW1tYSI6MC4yLCJjIjowLjA5MjI1LCJzaWdtYVRhcmdldCI6MzAwMCwiZ2lydGhHYWluIjowLjMsInNpZ21hQnJlYWsiOjcwMDAsImdyb3VuZCI6dHJ1ZX0sInI2Ijp7ImVuYWJsZWQiOnRydWUsInFNaW4iOjAuMTU2NCwibGVhZkFyZWEiOjEuNDUzfSwibzQiOnsiY1NlZWQiOjEwLCJkIjoyNSwicUVzdCI6MC4xLCJwRXN0IjowLjMsIm0wIjowLjAwMn0sImM2Ijp7ImVuYWJsZWQiOnRydWUsIm4iOjIsInIwIjowLjAwMjAyMX19fX0",
+    "oak (open)": "http://192.168.178.130:5173/?preset=oakOpen&seed=1&p=eyJ0cmVlcyI6W3sieCI6ODAsInNwZWNpZXMiOiJvYWsifV0sInNwZWNpZXMiOnsib2FrIjp7ImNvbW1vbiI6IlBlZHVuY3VsYXRlIG9hayIsImxhdGluIjoiUXVlcmN1cyByb2J1ciIsImxlYWYiOiJvYWsiLCJjMyI6eyJtb2RlIjoiYmgiLCJsYW1iZGEiOjAuNSwiYWxwaGEiOjQuOTMyfSwiYzUiOnsiZW5hYmxlZCI6dHJ1ZSwiVCI6MC4wNSwiZyI6MywiVHJlbCI6MC4yNDMzLCJ0b3BRdWFudGlsZSI6MC45fSwicjEiOnsiZW5hYmxlZCI6dHJ1ZSwibXciOjE4MSwibWYiOjAuMDkwMSwiTGgiOjMzLjksImh5ZHJhdWxpYyI6Imh5cGVyYm9saWMiLCJzciI6MC4xLCJmUmVwIjowLjEsIm1hdHVyaXR5Ijo0MCwia1N0YXJ2ZSI6MywicmVzZXJ2ZTAiOjIsInN0b3JlIjoyLCJzaGVkIjoiY2FyYm9uIn0sInIyIjp7ImVuYWJsZWQiOnRydWUsImxldmVscyI6W3sibGFtYmRhIjowLjU3MTgsInNldFBvaW50IjowLCJldGEiOjAuMjUsImJyYW5jaEFuZ2xlIjo0NSwiZ2VuZXJhdG9yIjoic3BpcmFsIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MH0seyJsYW1iZGEiOjAuNTc3Miwic2V0UG9pbnQiOjY2LjA5LCJldGEiOjAuMDgyODYsImJyYW5jaEFuZ2xlIjo1NS4wMSwiZ2VuZXJhdG9yIjoic3BpcmFsIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MH0seyJsYW1iZGEiOjAuNSwic2V0UG9pbnQiOjQ1LjYsImV0YSI6MC4yLCJicmFuY2hBbmdsZSI6NTAsImdlbmVyYXRvciI6InNwaXJhbCIsInRpZXJFdmVyeSI6MCwicFRlcm0iOjB9XSwiYUMiOjEuOTE1LCJkTGFtYmRhIjowLjEwOCwicmFtcCI6MTUsImthcHBhIjowLjQxMjUsImhKIjoxMC4xNn0sInIzIjp7ImVuYWJsZWQiOnRydWUsInJobyI6MSwibGVhZk1hc3MiOjAuMDAyLCJFIjo0MDAwMDAwLCJzYWciOiJpbmNyZW1lbnQiLCJwaGkiOjEsInBvc3R1cmUiOnRydWUsImJldGFHIjowLjIsImdhbW1hIjowLjIsImMiOjAuMDkyMjUsInNpZ21hVGFyZ2V0IjozMDAwLCJnaXJ0aEdhaW4iOjAuMywic2lnbWFCcmVhayI6NzAwMCwiZ3JvdW5kIjp0cnVlfSwicjYiOnsiZW5hYmxlZCI6dHJ1ZSwicU1pbiI6MC4xNTY0LCJsZWFmQXJlYSI6MS40NTN9LCJvNCI6eyJjU2VlZCI6MTAsImQiOjI1LCJxRXN0IjowLjEsInBFc3QiOjAuMywibTAiOjAuMDAyfSwiYzYiOnsiZW5hYmxlZCI6dHJ1ZSwibiI6MiwicjAiOjAuMDAyMDIxfX19fQ",
+    "hornbeam": "http://192.168.178.130:5173/?preset=mixedWood&seed=1&p=eyJzcGVjaWVzIjp7Imhvcm5iZWFtIjp7ImNvbW1vbiI6Ikhvcm5iZWFtIiwibGF0aW4iOiJDYXJwaW51cyBiZXR1bHVzIiwibGVhZiI6Imhvcm5iZWFtIiwiYzUiOnsiZW5hYmxlZCI6dHJ1ZSwiVCI6MC4wMSwiZyI6MywiVHJlbCI6MC40MDQsInRvcFF1YW50aWxlIjowLjl9LCJyMSI6eyJlbmFibGVkIjp0cnVlLCJtdyI6NjkuMjIsIm1mIjowLjExNjYsIkxoIjo1Ni45OCwiaHlkcmF1bGljIjoiaHlwZXJib2xpYyIsInNyIjowLjEsImZSZXAiOjAuMSwibWF0dXJpdHkiOjQwLCJrU3RhcnZlIjozLCJyZXNlcnZlMCI6Miwic3RvcmUiOjIsInNoZWQiOiJjYXJib24ifSwicjIiOnsiZW5hYmxlZCI6dHJ1ZSwibGV2ZWxzIjpbeyJsYW1iZGEiOjAuNTgzMSwic2V0UG9pbnQiOjMwLCJldGEiOjAuNCwiYnJhbmNoQW5nbGUiOjQ1LCJnZW5lcmF0b3IiOiJkaXN0aWNob3VzIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MCwicG9zdHVyZVNldFBvaW50IjowfSx7ImxhbWJkYSI6MC41MDM3LCJzZXRQb2ludCI6NDAuNDQsImV0YSI6MC4wODM3NywiYnJhbmNoQW5nbGUiOjM5LjQ5LCJnZW5lcmF0b3IiOiJkaXN0aWNob3VzIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MH0seyJsYW1iZGEiOjAuNSwic2V0UG9pbnQiOjQ1LjI2LCJldGEiOjAuNCwiYnJhbmNoQW5nbGUiOjQ1LCJnZW5lcmF0b3IiOiJkaXN0aWNob3VzIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MH1dLCJhQyI6MS45NiwiZExhbWJkYSI6MC4wODk5NiwicmFtcCI6MjAsImthcHBhIjowLjA2MTk5LCJoSiI6OS4xNDJ9LCJyMyI6eyJlbmFibGVkIjp0cnVlLCJyaG8iOjEsImxlYWZNYXNzIjowLjAwMiwiRSI6NDAwMDAwMCwic2FnIjoiaW5jcmVtZW50IiwicGhpIjoxLCJwb3N0dXJlIjp0cnVlLCJiZXRhRyI6MC4yLCJnYW1tYSI6MC4yLCJjIjowLjAzODg4LCJzaWdtYVRhcmdldCI6MzAwMCwiZ2lydGhHYWluIjowLjMsInNpZ21hQnJlYWsiOjcwMDAsImdyb3VuZCI6dHJ1ZX0sInI2Ijp7ImVuYWJsZWQiOnRydWUsInFNaW4iOjAuMDE2NTcsImxlYWZBcmVhIjoyLjU1fSwibzQiOnsiY1NlZWQiOjUsImQiOjIwLCJxRXN0IjowLjA0LCJwRXN0IjowLjMsIm0wIjowLjAwM30sImMzIjp7Im1vZGUiOiJiaCIsImxhbWJkYSI6MC41LCJhbHBoYSI6My44MzN9LCJjNiI6eyJlbmFibGVkIjp0cnVlLCJuIjoyLCJyMCI6MC4wMDMxNzd9fX19",
+    "hornbeam (open)": "http://192.168.178.130:5173/?preset=oakOpen&seed=1&p=eyJ0cmVlcyI6W3sieCI6ODAsInNwZWNpZXMiOiJob3JuYmVhbSJ9XSwic3BlY2llcyI6eyJob3JuYmVhbSI6eyJjb21tb24iOiJIb3JuYmVhbSIsImxhdGluIjoiQ2FycGludXMgYmV0dWx1cyIsImxlYWYiOiJob3JuYmVhbSIsImM1Ijp7ImVuYWJsZWQiOnRydWUsIlQiOjAuMDEsImciOjMsIlRyZWwiOjAuNDA0LCJ0b3BRdWFudGlsZSI6MC45fSwicjEiOnsiZW5hYmxlZCI6dHJ1ZSwibXciOjY5LjIyLCJtZiI6MC4xMTY2LCJMaCI6NTYuOTgsImh5ZHJhdWxpYyI6Imh5cGVyYm9saWMiLCJzciI6MC4xLCJmUmVwIjowLjEsIm1hdHVyaXR5Ijo0MCwia1N0YXJ2ZSI6MywicmVzZXJ2ZTAiOjIsInN0b3JlIjoyLCJzaGVkIjoiY2FyYm9uIn0sInIyIjp7ImVuYWJsZWQiOnRydWUsImxldmVscyI6W3sibGFtYmRhIjowLjU4MzEsInNldFBvaW50IjozMCwiZXRhIjowLjQsImJyYW5jaEFuZ2xlIjo0NSwiZ2VuZXJhdG9yIjoiZGlzdGljaG91cyIsInRpZXJFdmVyeSI6MCwicFRlcm0iOjAsInBvc3R1cmVTZXRQb2ludCI6MH0seyJsYW1iZGEiOjAuNTAzNywic2V0UG9pbnQiOjQwLjQ0LCJldGEiOjAuMDgzNzcsImJyYW5jaEFuZ2xlIjozOS40OSwiZ2VuZXJhdG9yIjoiZGlzdGljaG91cyIsInRpZXJFdmVyeSI6MCwicFRlcm0iOjB9LHsibGFtYmRhIjowLjUsInNldFBvaW50Ijo0NS4yNiwiZXRhIjowLjQsImJyYW5jaEFuZ2xlIjo0NSwiZ2VuZXJhdG9yIjoiZGlzdGljaG91cyIsInRpZXJFdmVyeSI6MCwicFRlcm0iOjB9XSwiYUMiOjEuOTYsImRMYW1iZGEiOjAuMDg5OTYsInJhbXAiOjIwLCJrYXBwYSI6MC4wNjE5OSwiaEoiOjkuMTQyfSwicjMiOnsiZW5hYmxlZCI6dHJ1ZSwicmhvIjoxLCJsZWFmTWFzcyI6MC4wMDIsIkUiOjQwMDAwMDAsInNhZyI6ImluY3JlbWVudCIsInBoaSI6MSwicG9zdHVyZSI6dHJ1ZSwiYmV0YUciOjAuMiwiZ2FtbWEiOjAuMiwiYyI6MC4wMzg4OCwic2lnbWFUYXJnZXQiOjMwMDAsImdpcnRoR2FpbiI6MC4zLCJzaWdtYUJyZWFrIjo3MDAwLCJncm91bmQiOnRydWV9LCJyNiI6eyJlbmFibGVkIjp0cnVlLCJxTWluIjowLjAxNjU3LCJsZWFmQXJlYSI6Mi41NX0sIm80Ijp7ImNTZWVkIjo1LCJkIjoyMCwicUVzdCI6MC4wNCwicEVzdCI6MC4zLCJtMCI6MC4wMDN9LCJjMyI6eyJtb2RlIjoiYmgiLCJsYW1iZGEiOjAuNSwiYWxwaGEiOjMuODMzfSwiYzYiOnsiZW5hYmxlZCI6dHJ1ZSwibiI6MiwicjAiOjAuMDAzMTc3fX19fQ",
+    "maple": "http://192.168.178.130:5173/?preset=mixedWood&seed=1&p=eyJzcGVjaWVzIjp7Im1hcGxlIjp7ImNvbW1vbiI6IkZpZWxkIG1hcGxlIiwibGF0aW4iOiJBY2VyIGNhbXBlc3RyZSIsImxlYWYiOiJtYXBsZSIsImMzIjp7Im1vZGUiOiJiaCIsImxhbWJkYSI6MC41LCJhbHBoYSI6My43NX0sImM1Ijp7ImVuYWJsZWQiOnRydWUsIlQiOjAuMDIsImciOjMsIlRyZWwiOjAuMTQ5NiwidG9wUXVhbnRpbGUiOjAuOX0sImM2Ijp7ImVuYWJsZWQiOnRydWUsIm4iOjIsInIwIjowLjAwMzA3M30sInIxIjp7ImVuYWJsZWQiOnRydWUsIm13Ijo0NC45LCJtZiI6MC4wMzAyNiwiTGgiOjEzLjY4LCJoeWRyYXVsaWMiOiJoeXBlcmJvbGljIiwic3IiOjAuMSwiZlJlcCI6MC4xLCJtYXR1cml0eSI6MzAsImtTdGFydmUiOjMsInJlc2VydmUwIjoyLCJzdG9yZSI6Miwic2hlZCI6ImNhcmJvbiJ9LCJyMiI6eyJlbmFibGVkIjp0cnVlLCJsZXZlbHMiOlt7ImxhbWJkYSI6MC41NTAyLCJzZXRQb2ludCI6MCwiZXRhIjowLjI1LCJicmFuY2hBbmdsZSI6NDUsImdlbmVyYXRvciI6Im9wcG9zaXRlIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MH0seyJsYW1iZGEiOjAuNTA0Niwic2V0UG9pbnQiOjUxLjc0LCJldGEiOjAuMTY0MywiYnJhbmNoQW5nbGUiOjQ0LjI2LCJnZW5lcmF0b3IiOiJvcHBvc2l0ZSIsInRpZXJFdmVyeSI6MCwicFRlcm0iOjB9LHsibGFtYmRhIjowLjUsInNldFBvaW50Ijo0Ny43MiwiZXRhIjowLjI1LCJicmFuY2hBbmdsZSI6NDUsImdlbmVyYXRvciI6Im9wcG9zaXRlIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MH1dLCJhQyI6NS44MDYsImRMYW1iZGEiOjAuMDc4MzIsInJhbXAiOjE1LCJrYXBwYSI6MS42MTUsImhKIjoxNC4yNH0sInIzIjp7ImVuYWJsZWQiOnRydWUsInJobyI6MSwibGVhZk1hc3MiOjAuMDAyLCJFIjo0MDAwMDAwLCJzYWciOiJpbmNyZW1lbnQiLCJwaGkiOjEsInBvc3R1cmUiOnRydWUsImJldGFHIjowLjIsImdhbW1hIjowLjIsImMiOjAuMDk5Miwic2lnbWFUYXJnZXQiOjMwMDAsImdpcnRoR2FpbiI6MC4zLCJzaWdtYUJyZWFrIjo3MDAwLCJncm91bmQiOnRydWV9LCJyNiI6eyJlbmFibGVkIjp0cnVlLCJxTWluIjowLjA2MDU5LCJsZWFmQXJlYSI6Mi44NjJ9LCJvNCI6eyJjU2VlZCI6NSwiZCI6MjUsInFFc3QiOjAuMDUsInBFc3QiOjAuMywibTAiOjAuMDA0fX19fQ",
+    "maple (open)": "http://192.168.178.130:5173/?preset=oakOpen&seed=1&p=eyJ0cmVlcyI6W3sieCI6ODAsInNwZWNpZXMiOiJtYXBsZSJ9XSwic3BlY2llcyI6eyJtYXBsZSI6eyJjb21tb24iOiJGaWVsZCBtYXBsZSIsImxhdGluIjoiQWNlciBjYW1wZXN0cmUiLCJsZWFmIjoibWFwbGUiLCJjMyI6eyJtb2RlIjoiYmgiLCJsYW1iZGEiOjAuNSwiYWxwaGEiOjMuNzV9LCJjNSI6eyJlbmFibGVkIjp0cnVlLCJUIjowLjAyLCJnIjozLCJUcmVsIjowLjE0OTYsInRvcFF1YW50aWxlIjowLjl9LCJjNiI6eyJlbmFibGVkIjp0cnVlLCJuIjoyLCJyMCI6MC4wMDMwNzN9LCJyMSI6eyJlbmFibGVkIjp0cnVlLCJtdyI6NDQuOSwibWYiOjAuMDMwMjYsIkxoIjoxMy42OCwiaHlkcmF1bGljIjoiaHlwZXJib2xpYyIsInNyIjowLjEsImZSZXAiOjAuMSwibWF0dXJpdHkiOjMwLCJrU3RhcnZlIjozLCJyZXNlcnZlMCI6Miwic3RvcmUiOjIsInNoZWQiOiJjYXJib24ifSwicjIiOnsiZW5hYmxlZCI6dHJ1ZSwibGV2ZWxzIjpbeyJsYW1iZGEiOjAuNTUwMiwic2V0UG9pbnQiOjAsImV0YSI6MC4yNSwiYnJhbmNoQW5nbGUiOjQ1LCJnZW5lcmF0b3IiOiJvcHBvc2l0ZSIsInRpZXJFdmVyeSI6MCwicFRlcm0iOjB9LHsibGFtYmRhIjowLjUwNDYsInNldFBvaW50Ijo1MS43NCwiZXRhIjowLjE2NDMsImJyYW5jaEFuZ2xlIjo0NC4yNiwiZ2VuZXJhdG9yIjoib3Bwb3NpdGUiLCJ0aWVyRXZlcnkiOjAsInBUZXJtIjowfSx7ImxhbWJkYSI6MC41LCJzZXRQb2ludCI6NDcuNzIsImV0YSI6MC4yNSwiYnJhbmNoQW5nbGUiOjQ1LCJnZW5lcmF0b3IiOiJvcHBvc2l0ZSIsInRpZXJFdmVyeSI6MCwicFRlcm0iOjB9XSwiYUMiOjUuODA2LCJkTGFtYmRhIjowLjA3ODMyLCJyYW1wIjoxNSwia2FwcGEiOjEuNjE1LCJoSiI6MTQuMjR9LCJyMyI6eyJlbmFibGVkIjp0cnVlLCJyaG8iOjEsImxlYWZNYXNzIjowLjAwMiwiRSI6NDAwMDAwMCwic2FnIjoiaW5jcmVtZW50IiwicGhpIjoxLCJwb3N0dXJlIjp0cnVlLCJiZXRhRyI6MC4yLCJnYW1tYSI6MC4yLCJjIjowLjA5OTIsInNpZ21hVGFyZ2V0IjozMDAwLCJnaXJ0aEdhaW4iOjAuMywic2lnbWFCcmVhayI6NzAwMCwiZ3JvdW5kIjp0cnVlfSwicjYiOnsiZW5hYmxlZCI6dHJ1ZSwicU1pbiI6MC4wNjA1OSwibGVhZkFyZWEiOjIuODYyfSwibzQiOnsiY1NlZWQiOjUsImQiOjI1LCJxRXN0IjowLjA1LCJwRXN0IjowLjMsIm0wIjowLjAwNH19fX0",
+    "holly": "http://192.168.178.130:5173/?preset=mixedWood&seed=1&p=eyJzcGVjaWVzIjp7ImhvbGx5Ijp7ImNvbW1vbiI6IkhvbGx5IiwibGF0aW4iOiJJbGV4IGFxdWlmb2xpdW0iLCJsZWFmIjoiaG9sbHkiLCJjMyI6eyJtb2RlIjoiYmgiLCJsYW1iZGEiOjAuNSwiYWxwaGEiOjIuMTJ9LCJjNSI6eyJlbmFibGVkIjp0cnVlLCJUIjowLjAxLCJnIjozLCJUcmVsIjowLjE3OCwidG9wUXVhbnRpbGUiOjAuOX0sImM2Ijp7ImVuYWJsZWQiOnRydWUsIm4iOjIsInIwIjowLjAwNn0sInIxIjp7ImVuYWJsZWQiOnRydWUsIm13IjoxNS4zMiwibWYiOjAuMDcxMzcsIkxoIjoxNy45OSwiaHlkcmF1bGljIjoiaHlwZXJib2xpYyIsInNyIjowLjEsImZSZXAiOjAuMSwibWF0dXJpdHkiOjMwLCJrU3RhcnZlIjozLCJyZXNlcnZlMCI6Miwic3RvcmUiOjIsInNoZWQiOiJjYXJib24ifSwicjIiOnsiZW5hYmxlZCI6dHJ1ZSwibGV2ZWxzIjpbeyJsYW1iZGEiOjAuNTMwMiwic2V0UG9pbnQiOjAsImV0YSI6MC40LCJicmFuY2hBbmdsZSI6NDUsImdlbmVyYXRvciI6InNwaXJhbCIsInRpZXJFdmVyeSI6MCwicFRlcm0iOjB9LHsibGFtYmRhIjowLjQ5MDQsInNldFBvaW50Ijo1OS41NiwiZXRhIjowLjA1MTk3LCJicmFuY2hBbmdsZSI6NzYuNTQsImdlbmVyYXRvciI6InNwaXJhbCIsInRpZXJFdmVyeSI6MCwicFRlcm0iOjB9LHsibGFtYmRhIjowLjUsInNldFBvaW50IjoxMjguNCwiZXRhIjowLjI1LCJicmFuY2hBbmdsZSI6NDUsImdlbmVyYXRvciI6InNwaXJhbCIsInRpZXJFdmVyeSI6MCwicFRlcm0iOjB9XSwiYUMiOjEyLjAzLCJkTGFtYmRhIjowLjAyMjkyLCJyYW1wIjoxLCJrYXBwYSI6MC4wMzEzOSwiaEoiOjM2LjF9LCJyMyI6eyJlbmFibGVkIjp0cnVlLCJyaG8iOjEsImxlYWZNYXNzIjowLjAwMiwiRSI6NDAwMDAwMCwic2FnIjoiaW5jcmVtZW50IiwicGhpIjoxLCJwb3N0dXJlIjp0cnVlLCJiZXRhRyI6MC4yLCJnYW1tYSI6MC4yLCJjIjowLjI3MTYsInNpZ21hVGFyZ2V0IjozMDAwLCJnaXJ0aEdhaW4iOjAuMywic2lnbWFCcmVhayI6NzAwMCwiZ3JvdW5kIjp0cnVlfSwicjYiOnsiZW5hYmxlZCI6dHJ1ZSwicU1pbiI6MC4xNjc0LCJsZWFmQXJlYSI6Mi40MTJ9LCJvNCI6eyJlbmFibGVkIjpmYWxzZSwiY1NlZWQiOjgsImQiOjQwLCJxRXN0IjowLjAxLCJwRXN0IjowLjMsIm0wIjowLjAwMywibWF4VHJlZXMiOjMwMCwicmFpbiI6MH19fX0",
+    "holly (open)": "http://192.168.178.130:5173/?preset=oakOpen&seed=1&p=eyJ0cmVlcyI6W3sieCI6ODAsInNwZWNpZXMiOiJob2xseSJ9XSwic3BlY2llcyI6eyJob2xseSI6eyJjb21tb24iOiJIb2xseSIsImxhdGluIjoiSWxleCBhcXVpZm9saXVtIiwibGVhZiI6ImhvbGx5IiwiYzMiOnsibW9kZSI6ImJoIiwibGFtYmRhIjowLjUsImFscGhhIjoyLjEyfSwiYzUiOnsiZW5hYmxlZCI6dHJ1ZSwiVCI6MC4wMSwiZyI6MywiVHJlbCI6MC4xNzgsInRvcFF1YW50aWxlIjowLjl9LCJjNiI6eyJlbmFibGVkIjp0cnVlLCJuIjoyLCJyMCI6MC4wMDZ9LCJyMSI6eyJlbmFibGVkIjp0cnVlLCJtdyI6MTUuMzIsIm1mIjowLjA3MTM3LCJMaCI6MTcuOTksImh5ZHJhdWxpYyI6Imh5cGVyYm9saWMiLCJzciI6MC4xLCJmUmVwIjowLjEsIm1hdHVyaXR5IjozMCwia1N0YXJ2ZSI6MywicmVzZXJ2ZTAiOjIsInN0b3JlIjoyLCJzaGVkIjoiY2FyYm9uIn0sInIyIjp7ImVuYWJsZWQiOnRydWUsImxldmVscyI6W3sibGFtYmRhIjowLjUzMDIsInNldFBvaW50IjowLCJldGEiOjAuNCwiYnJhbmNoQW5nbGUiOjQ1LCJnZW5lcmF0b3IiOiJzcGlyYWwiLCJ0aWVyRXZlcnkiOjAsInBUZXJtIjowfSx7ImxhbWJkYSI6MC40OTA0LCJzZXRQb2ludCI6NTkuNTYsImV0YSI6MC4wNTE5NywiYnJhbmNoQW5nbGUiOjc2LjU0LCJnZW5lcmF0b3IiOiJzcGlyYWwiLCJ0aWVyRXZlcnkiOjAsInBUZXJtIjowfSx7ImxhbWJkYSI6MC41LCJzZXRQb2ludCI6MTI4LjQsImV0YSI6MC4yNSwiYnJhbmNoQW5nbGUiOjQ1LCJnZW5lcmF0b3IiOiJzcGlyYWwiLCJ0aWVyRXZlcnkiOjAsInBUZXJtIjowfV0sImFDIjoxMi4wMywiZExhbWJkYSI6MC4wMjI5MiwicmFtcCI6MSwia2FwcGEiOjAuMDMxMzksImhKIjozNi4xfSwicjMiOnsiZW5hYmxlZCI6dHJ1ZSwicmhvIjoxLCJsZWFmTWFzcyI6MC4wMDIsIkUiOjQwMDAwMDAsInNhZyI6ImluY3JlbWVudCIsInBoaSI6MSwicG9zdHVyZSI6dHJ1ZSwiYmV0YUciOjAuMiwiZ2FtbWEiOjAuMiwiYyI6MC4yNzE2LCJzaWdtYVRhcmdldCI6MzAwMCwiZ2lydGhHYWluIjowLjMsInNpZ21hQnJlYWsiOjcwMDAsImdyb3VuZCI6dHJ1ZX0sInI2Ijp7ImVuYWJsZWQiOnRydWUsInFNaW4iOjAuMTY3NCwibGVhZkFyZWEiOjIuNDEyfSwibzQiOnsiZW5hYmxlZCI6ZmFsc2UsImNTZWVkIjo4LCJkIjo0MCwicUVzdCI6MC4wMSwicEVzdCI6MC4zLCJtMCI6MC4wMDMsIm1heFRyZWVzIjozMDAsInJhaW4iOjB9fX19",
+    "rowan": "http://192.168.178.130:5173/?preset=mixedWood&seed=1&p=eyJzcGVjaWVzIjp7InJvd2FuIjp7ImNvbW1vbiI6IlJvd2FuIiwibGF0aW4iOiJTb3JidXMgYXVjdXBhcmlhIiwibGVhZiI6InJvd2FuIiwiYzMiOnsibW9kZSI6ImJoIiwibGFtYmRhIjowLjUsImFscGhhIjo1Ljk4fSwiYzUiOnsiZW5hYmxlZCI6dHJ1ZSwiVCI6MC4wNSwiZyI6MywiVHJlbCI6MC4zNzc3LCJ0b3BRdWFudGlsZSI6MC45fSwiYzYiOnsiZW5hYmxlZCI6dHJ1ZSwibiI6MiwicjAiOjAuMDAyNTgzfSwicjEiOnsiZW5hYmxlZCI6dHJ1ZSwibXciOjEzMC43LCJtZiI6MC4wOTAxMiwiTGgiOjE0LjIxLCJoeWRyYXVsaWMiOiJoeXBlcmJvbGljIiwic3IiOjAuMSwiZlJlcCI6MC4xLCJtYXR1cml0eSI6MjUsImtTdGFydmUiOjMsInJlc2VydmUwIjoyLCJzdG9yZSI6Miwic2hlZCI6ImNhcmJvbiJ9LCJyMiI6eyJlbmFibGVkIjp0cnVlLCJsZXZlbHMiOlt7ImxhbWJkYSI6MC41NDM2LCJzZXRQb2ludCI6MCwiZXRhIjowLjMsImJyYW5jaEFuZ2xlIjo0NSwiZ2VuZXJhdG9yIjoic3BpcmFsIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MH0seyJsYW1iZGEiOjAuNDkwOSwic2V0UG9pbnQiOjM5LjEyLCJldGEiOjAuMzE1OCwiYnJhbmNoQW5nbGUiOjI4LjM4LCJnZW5lcmF0b3IiOiJzcGlyYWwiLCJ0aWVyRXZlcnkiOjAsInBUZXJtIjowfSx7ImxhbWJkYSI6MC41LCJzZXRQb2ludCI6NTQuMjIsImV0YSI6MC4yNSwiYnJhbmNoQW5nbGUiOjQwLCJnZW5lcmF0b3IiOiJzcGlyYWwiLCJ0aWVyRXZlcnkiOjAsInBUZXJtIjowfV0sImFDIjoxNC4zNCwiZExhbWJkYSI6MC4wMzAyNywicmFtcCI6MjAsImthcHBhIjoxLjA4OCwiaEoiOjIxLjU3fSwicjQiOnsicVJlbCI6MC4yNX0sInI2Ijp7ImVuYWJsZWQiOnRydWUsInFNaW4iOjAuMDUwNjMsImxlYWZBcmVhIjoyLjA0M30sIm80Ijp7ImNTZWVkIjozLCJkIjo1MCwicUVzdCI6MC4wNiwicEVzdCI6MC4zLCJtMCI6MC4wMDZ9LCJyMyI6eyJlbmFibGVkIjp0cnVlLCJyaG8iOjEsImxlYWZNYXNzIjowLjAwMiwiRSI6NDAwMDAwMCwic2FnIjoiaW5jcmVtZW50IiwicGhpIjoxLCJwb3N0dXJlIjp0cnVlLCJiZXRhRyI6MC4xLCJnYW1tYSI6MC4yLCJjIjowLjAyMjEzLCJzaWdtYVRhcmdldCI6MzAwMCwiZ2lydGhHYWluIjowLjMsInNpZ21hQnJlYWsiOjcwMDAsImdyb3VuZCI6dHJ1ZX19fX0",
+    "rowan (open)": "http://192.168.178.130:5173/?preset=oakOpen&seed=1&p=eyJ0cmVlcyI6W3sieCI6ODAsInNwZWNpZXMiOiJyb3dhbiJ9XSwic3BlY2llcyI6eyJyb3dhbiI6eyJjb21tb24iOiJSb3dhbiIsImxhdGluIjoiU29yYnVzIGF1Y3VwYXJpYSIsImxlYWYiOiJyb3dhbiIsImMzIjp7Im1vZGUiOiJiaCIsImxhbWJkYSI6MC41LCJhbHBoYSI6NS45OH0sImM1Ijp7ImVuYWJsZWQiOnRydWUsIlQiOjAuMDUsImciOjMsIlRyZWwiOjAuMzc3NywidG9wUXVhbnRpbGUiOjAuOX0sImM2Ijp7ImVuYWJsZWQiOnRydWUsIm4iOjIsInIwIjowLjAwMjU4M30sInIxIjp7ImVuYWJsZWQiOnRydWUsIm13IjoxMzAuNywibWYiOjAuMDkwMTIsIkxoIjoxNC4yMSwiaHlkcmF1bGljIjoiaHlwZXJib2xpYyIsInNyIjowLjEsImZSZXAiOjAuMSwibWF0dXJpdHkiOjI1LCJrU3RhcnZlIjozLCJyZXNlcnZlMCI6Miwic3RvcmUiOjIsInNoZWQiOiJjYXJib24ifSwicjIiOnsiZW5hYmxlZCI6dHJ1ZSwibGV2ZWxzIjpbeyJsYW1iZGEiOjAuNTQzNiwic2V0UG9pbnQiOjAsImV0YSI6MC4zLCJicmFuY2hBbmdsZSI6NDUsImdlbmVyYXRvciI6InNwaXJhbCIsInRpZXJFdmVyeSI6MCwicFRlcm0iOjB9LHsibGFtYmRhIjowLjQ5MDksInNldFBvaW50IjozOS4xMiwiZXRhIjowLjMxNTgsImJyYW5jaEFuZ2xlIjoyOC4zOCwiZ2VuZXJhdG9yIjoic3BpcmFsIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MH0seyJsYW1iZGEiOjAuNSwic2V0UG9pbnQiOjU0LjIyLCJldGEiOjAuMjUsImJyYW5jaEFuZ2xlIjo0MCwiZ2VuZXJhdG9yIjoic3BpcmFsIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MH1dLCJhQyI6MTQuMzQsImRMYW1iZGEiOjAuMDMwMjcsInJhbXAiOjIwLCJrYXBwYSI6MS4wODgsImhKIjoyMS41N30sInI0Ijp7InFSZWwiOjAuMjV9LCJyNiI6eyJlbmFibGVkIjp0cnVlLCJxTWluIjowLjA1MDYzLCJsZWFmQXJlYSI6Mi4wNDN9LCJvNCI6eyJjU2VlZCI6MywiZCI6NTAsInFFc3QiOjAuMDYsInBFc3QiOjAuMywibTAiOjAuMDA2fSwicjMiOnsiZW5hYmxlZCI6dHJ1ZSwicmhvIjoxLCJsZWFmTWFzcyI6MC4wMDIsIkUiOjQwMDAwMDAsInNhZyI6ImluY3JlbWVudCIsInBoaSI6MSwicG9zdHVyZSI6dHJ1ZSwiYmV0YUciOjAuMSwiZ2FtbWEiOjAuMiwiYyI6MC4wMjIxMywic2lnbWFUYXJnZXQiOjMwMDAsImdpcnRoR2FpbiI6MC4zLCJzaWdtYUJyZWFrIjo3MDAwLCJncm91bmQiOnRydWV9fX19",
+    "willow": "http://192.168.178.130:5173/?preset=mixedWood&seed=1&p=eyJzcGVjaWVzIjp7IndpbGxvdyI6eyJjb21tb24iOiJHb2F0IHdpbGxvdyIsImxhdGluIjoiU2FsaXggY2FwcmVhIiwibGVhZiI6IndpbGxvdyIsImMzIjp7Im1vZGUiOiJiaCIsImxhbWJkYSI6MC41LCJhbHBoYSI6NC44OTd9LCJjNSI6eyJlbmFibGVkIjp0cnVlLCJUIjowLjEsImciOjMsIlRyZWwiOjAuMzc2NiwidG9wUXVhbnRpbGUiOjAuOX0sImM2Ijp7ImVuYWJsZWQiOnRydWUsIm4iOjIsInIwIjowLjAwMjk4Nn0sInIxIjp7ImVuYWJsZWQiOnRydWUsIm13Ijo0My45MywibWYiOjAuMDgzNjYsIkxoIjoxMS41MSwiaHlkcmF1bGljIjoiaHlwZXJib2xpYyIsInNyIjowLjEsImZSZXAiOjAuMSwibWF0dXJpdHkiOjIwLCJrU3RhcnZlIjozLCJyZXNlcnZlMCI6Miwic3RvcmUiOjIsInNoZWQiOiJjYXJib24ifSwicjIiOnsiZW5hYmxlZCI6dHJ1ZSwibGV2ZWxzIjpbeyJsYW1iZGEiOjAuNTE4OSwic2V0UG9pbnQiOjAsImV0YSI6MC4yNSwiYnJhbmNoQW5nbGUiOjQ1LCJnZW5lcmF0b3IiOiJzcGlyYWwiLCJ0aWVyRXZlcnkiOjAsInBUZXJtIjowfSx7ImxhbWJkYSI6MC41MTY3LCJzZXRQb2ludCI6NTEuNjIsImV0YSI6MC4wNzI1MiwiYnJhbmNoQW5nbGUiOjQ4LjY0LCJnZW5lcmF0b3IiOiJzcGlyYWwiLCJ0aWVyRXZlcnkiOjAsInBUZXJtIjowfSx7ImxhbWJkYSI6MC40OSwic2V0UG9pbnQiOjU2LjYzLCJldGEiOjAuMiwiYnJhbmNoQW5nbGUiOjQ1LCJnZW5lcmF0b3IiOiJzcGlyYWwiLCJ0aWVyRXZlcnkiOjAsInBUZXJtIjowfV0sImFDIjoyLjk5LCJkTGFtYmRhIjowLjAzNDgzLCJyYW1wIjoxMCwia2FwcGEiOjEuMjYzLCJoSiI6Ny4xOTF9LCJyNCI6eyJxUmVsIjowLjN9LCJyNiI6eyJlbmFibGVkIjp0cnVlLCJxTWluIjowLjEwOTEsImxlYWZBcmVhIjoxLjY1OH0sIm80Ijp7ImNTZWVkIjoxLjUsImQiOjYwLCJxRXN0IjowLjMsInBFc3QiOjAuMywibTAiOjAuMDEyLCJyYWluIjoxfSwicjMiOnsiZW5hYmxlZCI6dHJ1ZSwicmhvIjoxLCJsZWFmTWFzcyI6MC4wMDIsIkUiOjQwMDAwMDAsInNhZyI6ImluY3JlbWVudCIsInBoaSI6MSwicG9zdHVyZSI6dHJ1ZSwiYmV0YUciOjAuMSwiZ2FtbWEiOjAuMiwiYyI6MC4wNjY5NSwic2lnbWFUYXJnZXQiOjMwMDAsImdpcnRoR2FpbiI6MC4zLCJzaWdtYUJyZWFrIjo3MDAwLCJncm91bmQiOnRydWV9fX19",
+    "willow (open)": "http://192.168.178.130:5173/?preset=oakOpen&seed=1&p=eyJ0cmVlcyI6W3sieCI6ODAsInNwZWNpZXMiOiJ3aWxsb3cifV0sInNwZWNpZXMiOnsid2lsbG93Ijp7ImNvbW1vbiI6IkdvYXQgd2lsbG93IiwibGF0aW4iOiJTYWxpeCBjYXByZWEiLCJsZWFmIjoid2lsbG93IiwiYzMiOnsibW9kZSI6ImJoIiwibGFtYmRhIjowLjUsImFscGhhIjo0Ljg5N30sImM1Ijp7ImVuYWJsZWQiOnRydWUsIlQiOjAuMSwiZyI6MywiVHJlbCI6MC4zNzY2LCJ0b3BRdWFudGlsZSI6MC45fSwiYzYiOnsiZW5hYmxlZCI6dHJ1ZSwibiI6MiwicjAiOjAuMDAyOTg2fSwicjEiOnsiZW5hYmxlZCI6dHJ1ZSwibXciOjQzLjkzLCJtZiI6MC4wODM2NiwiTGgiOjExLjUxLCJoeWRyYXVsaWMiOiJoeXBlcmJvbGljIiwic3IiOjAuMSwiZlJlcCI6MC4xLCJtYXR1cml0eSI6MjAsImtTdGFydmUiOjMsInJlc2VydmUwIjoyLCJzdG9yZSI6Miwic2hlZCI6ImNhcmJvbiJ9LCJyMiI6eyJlbmFibGVkIjp0cnVlLCJsZXZlbHMiOlt7ImxhbWJkYSI6MC41MTg5LCJzZXRQb2ludCI6MCwiZXRhIjowLjI1LCJicmFuY2hBbmdsZSI6NDUsImdlbmVyYXRvciI6InNwaXJhbCIsInRpZXJFdmVyeSI6MCwicFRlcm0iOjB9LHsibGFtYmRhIjowLjUxNjcsInNldFBvaW50Ijo1MS42MiwiZXRhIjowLjA3MjUyLCJicmFuY2hBbmdsZSI6NDguNjQsImdlbmVyYXRvciI6InNwaXJhbCIsInRpZXJFdmVyeSI6MCwicFRlcm0iOjB9LHsibGFtYmRhIjowLjQ5LCJzZXRQb2ludCI6NTYuNjMsImV0YSI6MC4yLCJicmFuY2hBbmdsZSI6NDUsImdlbmVyYXRvciI6InNwaXJhbCIsInRpZXJFdmVyeSI6MCwicFRlcm0iOjB9XSwiYUMiOjIuOTksImRMYW1iZGEiOjAuMDM0ODMsInJhbXAiOjEwLCJrYXBwYSI6MS4yNjMsImhKIjo3LjE5MX0sInI0Ijp7InFSZWwiOjAuM30sInI2Ijp7ImVuYWJsZWQiOnRydWUsInFNaW4iOjAuMTA5MSwibGVhZkFyZWEiOjEuNjU4fSwibzQiOnsiY1NlZWQiOjEuNSwiZCI6NjAsInFFc3QiOjAuMywicEVzdCI6MC4zLCJtMCI6MC4wMTIsInJhaW4iOjF9LCJyMyI6eyJlbmFibGVkIjp0cnVlLCJyaG8iOjEsImxlYWZNYXNzIjowLjAwMiwiRSI6NDAwMDAwMCwic2FnIjoiaW5jcmVtZW50IiwicGhpIjoxLCJwb3N0dXJlIjp0cnVlLCJiZXRhRyI6MC4xLCJnYW1tYSI6MC4yLCJjIjowLjA2Njk1LCJzaWdtYVRhcmdldCI6MzAwMCwiZ2lydGhHYWluIjowLjMsInNpZ21hQnJlYWsiOjcwMDAsImdyb3VuZCI6dHJ1ZX19fX0",
+    "mixed wood (all fitted)": "http://192.168.178.130:5173/?preset=mixedWood&seed=1&p=eyJzcGVjaWVzIjp7ImJpcmNoIjp7ImNvbW1vbiI6IlNpbHZlciBiaXJjaCIsImxhdGluIjoiQmV0dWxhIHBlbmR1bGEiLCJsZWFmIjoic21hbGwiLCJjMyI6eyJtb2RlIjoiYmgiLCJsYW1iZGEiOjAuNSwiYWxwaGEiOjIuODUzfSwiYzUiOnsiZW5hYmxlZCI6dHJ1ZSwiVCI6MC4xLCJnIjozLCJUcmVsIjowLjIwMzMsInRvcFF1YW50aWxlIjowLjl9LCJjNiI6eyJlbmFibGVkIjp0cnVlLCJuIjoyLCJyMCI6MC4wMDk5Njh9LCJyMSI6eyJlbmFibGVkIjp0cnVlLCJtdyI6MzIuMjQsIm1mIjowLjEzNTgsIkxoIjo0Mi40NCwiaHlkcmF1bGljIjoiaHlwZXJib2xpYyIsInNyIjowLjEsImZSZXAiOjAuMSwibWF0dXJpdHkiOjQwLCJrU3RhcnZlIjozLCJyZXNlcnZlMCI6Miwic3RvcmUiOjIsInNoZWQiOiJjYXJib24ifSwicjIiOnsiZW5hYmxlZCI6dHJ1ZSwibGV2ZWxzIjpbeyJsYW1iZGEiOjAuNTk1MSwic2V0UG9pbnQiOjAsImV0YSI6MC4zLCJicmFuY2hBbmdsZSI6NDUsImdlbmVyYXRvciI6InNwaXJhbCIsInRpZXJFdmVyeSI6MCwicFRlcm0iOjB9LHsibGFtYmRhIjowLjQ5NTIsInNldFBvaW50Ijo0Ny4yNywiZXRhIjowLjYwNjksImJyYW5jaEFuZ2xlIjozMy4xNiwiZ2VuZXJhdG9yIjoic3BpcmFsIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MCwicG9zdHVyZVNldFBvaW50Ijo3MH0seyJsYW1iZGEiOjAuNSwic2V0UG9pbnQiOjE0Ny4yLCJldGEiOjAuMjUsImJyYW5jaEFuZ2xlIjo0MCwiZ2VuZXJhdG9yIjoic3BpcmFsIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MH1dLCJhQyI6MTQuNjksImRMYW1iZGEiOjAuMDgwNDUsInJhbXAiOjIwLCJrYXBwYSI6MC41NjgxLCJoSiI6MzEuNzh9LCJyMyI6eyJlbmFibGVkIjp0cnVlLCJyaG8iOjEsImxlYWZNYXNzIjowLjAwMSwiRSI6NDAwMDAwMCwic2FnIjoiaW5jcmVtZW50IiwicGhpIjowLjUsInBvc3R1cmUiOnRydWUsImJldGFHIjowLjEsImdhbW1hIjowLjIsImMiOjAuMDkxMjIsInNpZ21hVGFyZ2V0IjozMDAwLCJnaXJ0aEdhaW4iOjAuMywic2lnbWFCcmVhayI6NzAwMCwiZ3JvdW5kIjp0cnVlfSwicjQiOnsicVJlbCI6MC4zfSwicjYiOnsiZW5hYmxlZCI6dHJ1ZSwicU1pbiI6MC4xOTk1LCJsZWFmQXJlYSI6Mi43MjJ9LCJvNCI6eyJjU2VlZCI6MiwiZCI6NDAsInFFc3QiOjAuMjUsInBFc3QiOjAuMywibTAiOjAuMDA4LCJyYWluIjowLjJ9fSwiYmVlY2giOnsiY29tbW9uIjoiQmVlY2giLCJsYXRpbiI6IkZhZ3VzIHN5bHZhdGljYSIsImxlYWYiOiJiZWVjaCIsImM1Ijp7ImVuYWJsZWQiOnRydWUsIlQiOjAuMDEsImciOjMsIlRyZWwiOjAuMjUzMiwidG9wUXVhbnRpbGUiOjAuOX0sInIxIjp7ImVuYWJsZWQiOnRydWUsIm13IjozOS4wMiwibWYiOjAuMTAyMiwiTGgiOjg1LjcyLCJoeWRyYXVsaWMiOiJoeXBlcmJvbGljIiwic3IiOjAuMSwiZlJlcCI6MC4xLCJtYXR1cml0eSI6NDAsImtTdGFydmUiOjMsInJlc2VydmUwIjoyLCJzdG9yZSI6Miwic2hlZCI6ImNhcmJvbiJ9LCJyMiI6eyJlbmFibGVkIjp0cnVlLCJsZXZlbHMiOlt7ImxhbWJkYSI6MC41Mjg4LCJzZXRQb2ludCI6NDAsImV0YSI6MC40LCJicmFuY2hBbmdsZSI6NDUsImdlbmVyYXRvciI6ImRpc3RpY2hvdXMiLCJ0aWVyRXZlcnkiOjAsInBUZXJtIjowLCJwb3N0dXJlU2V0UG9pbnQiOjB9LHsibGFtYmRhIjowLjUyNzIsInNldFBvaW50IjozNy42MSwiZXRhIjoxLjE3NiwiYnJhbmNoQW5nbGUiOjU3LjQ4LCJnZW5lcmF0b3IiOiJkaXN0aWNob3VzIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MH0seyJsYW1iZGEiOjAuNSwic2V0UG9pbnQiOjg2LjAzLCJldGEiOjAuNCwiYnJhbmNoQW5nbGUiOjQ1LCJnZW5lcmF0b3IiOiJkaXN0aWNob3VzIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MH1dLCJhQyI6MC41OTY3LCJkTGFtYmRhIjowLjAxNTkxLCJyYW1wIjoxLCJrYXBwYSI6MC4xMTk1LCJoSiI6NDIuMTV9LCJyMyI6eyJlbmFibGVkIjp0cnVlLCJyaG8iOjEsImxlYWZNYXNzIjowLjAwMiwiRSI6NDAwMDAwMCwic2FnIjoiaW5jcmVtZW50IiwicGhpIjoxLCJwb3N0dXJlIjp0cnVlLCJiZXRhRyI6MC4yLCJnYW1tYSI6MC4yLCJjIjowLjAzNjM4LCJzaWdtYVRhcmdldCI6MzAwMCwiZ2lydGhHYWluIjowLjMsInNpZ21hQnJlYWsiOjcwMDAsImdyb3VuZCI6dHJ1ZX0sInI2Ijp7ImVuYWJsZWQiOnRydWUsInFNaW4iOjAuMDEwNzEsImxlYWZBcmVhIjoyLjQ4N30sIm80Ijp7ImNTZWVkIjoxMCwiZCI6MTIsInFFc3QiOjAuMDMsInBFc3QiOjAuMywibTAiOjAuMDAyfSwiYzMiOnsibW9kZSI6ImJoIiwibGFtYmRhIjowLjUsImFscGhhIjozLjA4M30sImM2Ijp7ImVuYWJsZWQiOnRydWUsIm4iOjIsInIwIjowLjAwMzk2NX19LCJvYWsiOnsiY29tbW9uIjoiUGVkdW5jdWxhdGUgb2FrIiwibGF0aW4iOiJRdWVyY3VzIHJvYnVyIiwibGVhZiI6Im9hayIsImMzIjp7Im1vZGUiOiJiaCIsImxhbWJkYSI6MC41LCJhbHBoYSI6NC45MzJ9LCJjNSI6eyJlbmFibGVkIjp0cnVlLCJUIjowLjA1LCJnIjozLCJUcmVsIjowLjI0MzMsInRvcFF1YW50aWxlIjowLjl9LCJyMSI6eyJlbmFibGVkIjp0cnVlLCJtdyI6MTgxLCJtZiI6MC4wOTAxLCJMaCI6MzMuOSwiaHlkcmF1bGljIjoiaHlwZXJib2xpYyIsInNyIjowLjEsImZSZXAiOjAuMSwibWF0dXJpdHkiOjQwLCJrU3RhcnZlIjozLCJyZXNlcnZlMCI6Miwic3RvcmUiOjIsInNoZWQiOiJjYXJib24ifSwicjIiOnsiZW5hYmxlZCI6dHJ1ZSwibGV2ZWxzIjpbeyJsYW1iZGEiOjAuNTcxOCwic2V0UG9pbnQiOjAsImV0YSI6MC4yNSwiYnJhbmNoQW5nbGUiOjQ1LCJnZW5lcmF0b3IiOiJzcGlyYWwiLCJ0aWVyRXZlcnkiOjAsInBUZXJtIjowfSx7ImxhbWJkYSI6MC41NzcyLCJzZXRQb2ludCI6NjYuMDksImV0YSI6MC4wODI4NiwiYnJhbmNoQW5nbGUiOjU1LjAxLCJnZW5lcmF0b3IiOiJzcGlyYWwiLCJ0aWVyRXZlcnkiOjAsInBUZXJtIjowfSx7ImxhbWJkYSI6MC41LCJzZXRQb2ludCI6NDUuNiwiZXRhIjowLjIsImJyYW5jaEFuZ2xlIjo1MCwiZ2VuZXJhdG9yIjoic3BpcmFsIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MH1dLCJhQyI6MS45MTUsImRMYW1iZGEiOjAuMTA4LCJyYW1wIjoxNSwia2FwcGEiOjAuNDEyNSwiaEoiOjEwLjE2fSwicjMiOnsiZW5hYmxlZCI6dHJ1ZSwicmhvIjoxLCJsZWFmTWFzcyI6MC4wMDIsIkUiOjQwMDAwMDAsInNhZyI6ImluY3JlbWVudCIsInBoaSI6MSwicG9zdHVyZSI6dHJ1ZSwiYmV0YUciOjAuMiwiZ2FtbWEiOjAuMiwiYyI6MC4wOTIyNSwic2lnbWFUYXJnZXQiOjMwMDAsImdpcnRoR2FpbiI6MC4zLCJzaWdtYUJyZWFrIjo3MDAwLCJncm91bmQiOnRydWV9LCJyNiI6eyJlbmFibGVkIjp0cnVlLCJxTWluIjowLjE1NjQsImxlYWZBcmVhIjoxLjQ1M30sIm80Ijp7ImNTZWVkIjoxMCwiZCI6MjUsInFFc3QiOjAuMSwicEVzdCI6MC4zLCJtMCI6MC4wMDJ9LCJjNiI6eyJlbmFibGVkIjp0cnVlLCJuIjoyLCJyMCI6MC4wMDIwMjF9fSwiaG9ybmJlYW0iOnsiY29tbW9uIjoiSG9ybmJlYW0iLCJsYXRpbiI6IkNhcnBpbnVzIGJldHVsdXMiLCJsZWFmIjoiaG9ybmJlYW0iLCJjNSI6eyJlbmFibGVkIjp0cnVlLCJUIjowLjAxLCJnIjozLCJUcmVsIjowLjQwNCwidG9wUXVhbnRpbGUiOjAuOX0sInIxIjp7ImVuYWJsZWQiOnRydWUsIm13Ijo2OS4yMiwibWYiOjAuMTE2NiwiTGgiOjU2Ljk4LCJoeWRyYXVsaWMiOiJoeXBlcmJvbGljIiwic3IiOjAuMSwiZlJlcCI6MC4xLCJtYXR1cml0eSI6NDAsImtTdGFydmUiOjMsInJlc2VydmUwIjoyLCJzdG9yZSI6Miwic2hlZCI6ImNhcmJvbiJ9LCJyMiI6eyJlbmFibGVkIjp0cnVlLCJsZXZlbHMiOlt7ImxhbWJkYSI6MC41ODMxLCJzZXRQb2ludCI6MzAsImV0YSI6MC40LCJicmFuY2hBbmdsZSI6NDUsImdlbmVyYXRvciI6ImRpc3RpY2hvdXMiLCJ0aWVyRXZlcnkiOjAsInBUZXJtIjowLCJwb3N0dXJlU2V0UG9pbnQiOjB9LHsibGFtYmRhIjowLjUwMzcsInNldFBvaW50Ijo0MC40NCwiZXRhIjowLjA4Mzc3LCJicmFuY2hBbmdsZSI6MzkuNDksImdlbmVyYXRvciI6ImRpc3RpY2hvdXMiLCJ0aWVyRXZlcnkiOjAsInBUZXJtIjowfSx7ImxhbWJkYSI6MC41LCJzZXRQb2ludCI6NDUuMjYsImV0YSI6MC40LCJicmFuY2hBbmdsZSI6NDUsImdlbmVyYXRvciI6ImRpc3RpY2hvdXMiLCJ0aWVyRXZlcnkiOjAsInBUZXJtIjowfV0sImFDIjoxLjk2LCJkTGFtYmRhIjowLjA4OTk2LCJyYW1wIjoyMCwia2FwcGEiOjAuMDYxOTksImhKIjo5LjE0Mn0sInIzIjp7ImVuYWJsZWQiOnRydWUsInJobyI6MSwibGVhZk1hc3MiOjAuMDAyLCJFIjo0MDAwMDAwLCJzYWciOiJpbmNyZW1lbnQiLCJwaGkiOjEsInBvc3R1cmUiOnRydWUsImJldGFHIjowLjIsImdhbW1hIjowLjIsImMiOjAuMDM4ODgsInNpZ21hVGFyZ2V0IjozMDAwLCJnaXJ0aEdhaW4iOjAuMywic2lnbWFCcmVhayI6NzAwMCwiZ3JvdW5kIjp0cnVlfSwicjYiOnsiZW5hYmxlZCI6dHJ1ZSwicU1pbiI6MC4wMTY1NywibGVhZkFyZWEiOjIuNTV9LCJvNCI6eyJjU2VlZCI6NSwiZCI6MjAsInFFc3QiOjAuMDQsInBFc3QiOjAuMywibTAiOjAuMDAzfSwiYzMiOnsibW9kZSI6ImJoIiwibGFtYmRhIjowLjUsImFscGhhIjozLjgzM30sImM2Ijp7ImVuYWJsZWQiOnRydWUsIm4iOjIsInIwIjowLjAwMzE3N319LCJtYXBsZSI6eyJjb21tb24iOiJGaWVsZCBtYXBsZSIsImxhdGluIjoiQWNlciBjYW1wZXN0cmUiLCJsZWFmIjoibWFwbGUiLCJjMyI6eyJtb2RlIjoiYmgiLCJsYW1iZGEiOjAuNSwiYWxwaGEiOjMuNzV9LCJjNSI6eyJlbmFibGVkIjp0cnVlLCJUIjowLjAyLCJnIjozLCJUcmVsIjowLjE0OTYsInRvcFF1YW50aWxlIjowLjl9LCJjNiI6eyJlbmFibGVkIjp0cnVlLCJuIjoyLCJyMCI6MC4wMDMwNzN9LCJyMSI6eyJlbmFibGVkIjp0cnVlLCJtdyI6NDQuOSwibWYiOjAuMDMwMjYsIkxoIjoxMy42OCwiaHlkcmF1bGljIjoiaHlwZXJib2xpYyIsInNyIjowLjEsImZSZXAiOjAuMSwibWF0dXJpdHkiOjMwLCJrU3RhcnZlIjozLCJyZXNlcnZlMCI6Miwic3RvcmUiOjIsInNoZWQiOiJjYXJib24ifSwicjIiOnsiZW5hYmxlZCI6dHJ1ZSwibGV2ZWxzIjpbeyJsYW1iZGEiOjAuNTUwMiwic2V0UG9pbnQiOjAsImV0YSI6MC4yNSwiYnJhbmNoQW5nbGUiOjQ1LCJnZW5lcmF0b3IiOiJvcHBvc2l0ZSIsInRpZXJFdmVyeSI6MCwicFRlcm0iOjB9LHsibGFtYmRhIjowLjUwNDYsInNldFBvaW50Ijo1MS43NCwiZXRhIjowLjE2NDMsImJyYW5jaEFuZ2xlIjo0NC4yNiwiZ2VuZXJhdG9yIjoib3Bwb3NpdGUiLCJ0aWVyRXZlcnkiOjAsInBUZXJtIjowfSx7ImxhbWJkYSI6MC41LCJzZXRQb2ludCI6NDcuNzIsImV0YSI6MC4yNSwiYnJhbmNoQW5nbGUiOjQ1LCJnZW5lcmF0b3IiOiJvcHBvc2l0ZSIsInRpZXJFdmVyeSI6MCwicFRlcm0iOjB9XSwiYUMiOjUuODA2LCJkTGFtYmRhIjowLjA3ODMyLCJyYW1wIjoxNSwia2FwcGEiOjEuNjE1LCJoSiI6MTQuMjR9LCJyMyI6eyJlbmFibGVkIjp0cnVlLCJyaG8iOjEsImxlYWZNYXNzIjowLjAwMiwiRSI6NDAwMDAwMCwic2FnIjoiaW5jcmVtZW50IiwicGhpIjoxLCJwb3N0dXJlIjp0cnVlLCJiZXRhRyI6MC4yLCJnYW1tYSI6MC4yLCJjIjowLjA5OTIsInNpZ21hVGFyZ2V0IjozMDAwLCJnaXJ0aEdhaW4iOjAuMywic2lnbWFCcmVhayI6NzAwMCwiZ3JvdW5kIjp0cnVlfSwicjYiOnsiZW5hYmxlZCI6dHJ1ZSwicU1pbiI6MC4wNjA1OSwibGVhZkFyZWEiOjIuODYyfSwibzQiOnsiY1NlZWQiOjUsImQiOjI1LCJxRXN0IjowLjA1LCJwRXN0IjowLjMsIm0wIjowLjAwNH19LCJob2xseSI6eyJjb21tb24iOiJIb2xseSIsImxhdGluIjoiSWxleCBhcXVpZm9saXVtIiwibGVhZiI6ImhvbGx5IiwiYzMiOnsibW9kZSI6ImJoIiwibGFtYmRhIjowLjUsImFscGhhIjoyLjEyfSwiYzUiOnsiZW5hYmxlZCI6dHJ1ZSwiVCI6MC4wMSwiZyI6MywiVHJlbCI6MC4xNzgsInRvcFF1YW50aWxlIjowLjl9LCJjNiI6eyJlbmFibGVkIjp0cnVlLCJuIjoyLCJyMCI6MC4wMDZ9LCJyMSI6eyJlbmFibGVkIjp0cnVlLCJtdyI6MTUuMzIsIm1mIjowLjA3MTM3LCJMaCI6MTcuOTksImh5ZHJhdWxpYyI6Imh5cGVyYm9saWMiLCJzciI6MC4xLCJmUmVwIjowLjEsIm1hdHVyaXR5IjozMCwia1N0YXJ2ZSI6MywicmVzZXJ2ZTAiOjIsInN0b3JlIjoyLCJzaGVkIjoiY2FyYm9uIn0sInIyIjp7ImVuYWJsZWQiOnRydWUsImxldmVscyI6W3sibGFtYmRhIjowLjUzMDIsInNldFBvaW50IjowLCJldGEiOjAuNCwiYnJhbmNoQW5nbGUiOjQ1LCJnZW5lcmF0b3IiOiJzcGlyYWwiLCJ0aWVyRXZlcnkiOjAsInBUZXJtIjowfSx7ImxhbWJkYSI6MC40OTA0LCJzZXRQb2ludCI6NTkuNTYsImV0YSI6MC4wNTE5NywiYnJhbmNoQW5nbGUiOjc2LjU0LCJnZW5lcmF0b3IiOiJzcGlyYWwiLCJ0aWVyRXZlcnkiOjAsInBUZXJtIjowfSx7ImxhbWJkYSI6MC41LCJzZXRQb2ludCI6MTI4LjQsImV0YSI6MC4yNSwiYnJhbmNoQW5nbGUiOjQ1LCJnZW5lcmF0b3IiOiJzcGlyYWwiLCJ0aWVyRXZlcnkiOjAsInBUZXJtIjowfV0sImFDIjoxMi4wMywiZExhbWJkYSI6MC4wMjI5MiwicmFtcCI6MSwia2FwcGEiOjAuMDMxMzksImhKIjozNi4xfSwicjMiOnsiZW5hYmxlZCI6dHJ1ZSwicmhvIjoxLCJsZWFmTWFzcyI6MC4wMDIsIkUiOjQwMDAwMDAsInNhZyI6ImluY3JlbWVudCIsInBoaSI6MSwicG9zdHVyZSI6dHJ1ZSwiYmV0YUciOjAuMiwiZ2FtbWEiOjAuMiwiYyI6MC4yNzE2LCJzaWdtYVRhcmdldCI6MzAwMCwiZ2lydGhHYWluIjowLjMsInNpZ21hQnJlYWsiOjcwMDAsImdyb3VuZCI6dHJ1ZX0sInI2Ijp7ImVuYWJsZWQiOnRydWUsInFNaW4iOjAuMTY3NCwibGVhZkFyZWEiOjIuNDEyfSwibzQiOnsiZW5hYmxlZCI6ZmFsc2UsImNTZWVkIjo4LCJkIjo0MCwicUVzdCI6MC4wMSwicEVzdCI6MC4zLCJtMCI6MC4wMDMsIm1heFRyZWVzIjozMDAsInJhaW4iOjB9fSwicm93YW4iOnsiY29tbW9uIjoiUm93YW4iLCJsYXRpbiI6IlNvcmJ1cyBhdWN1cGFyaWEiLCJsZWFmIjoicm93YW4iLCJjMyI6eyJtb2RlIjoiYmgiLCJsYW1iZGEiOjAuNSwiYWxwaGEiOjUuOTh9LCJjNSI6eyJlbmFibGVkIjp0cnVlLCJUIjowLjA1LCJnIjozLCJUcmVsIjowLjM3NzcsInRvcFF1YW50aWxlIjowLjl9LCJjNiI6eyJlbmFibGVkIjp0cnVlLCJuIjoyLCJyMCI6MC4wMDI1ODN9LCJyMSI6eyJlbmFibGVkIjp0cnVlLCJtdyI6MTMwLjcsIm1mIjowLjA5MDEyLCJMaCI6MTQuMjEsImh5ZHJhdWxpYyI6Imh5cGVyYm9saWMiLCJzciI6MC4xLCJmUmVwIjowLjEsIm1hdHVyaXR5IjoyNSwia1N0YXJ2ZSI6MywicmVzZXJ2ZTAiOjIsInN0b3JlIjoyLCJzaGVkIjoiY2FyYm9uIn0sInIyIjp7ImVuYWJsZWQiOnRydWUsImxldmVscyI6W3sibGFtYmRhIjowLjU0MzYsInNldFBvaW50IjowLCJldGEiOjAuMywiYnJhbmNoQW5nbGUiOjQ1LCJnZW5lcmF0b3IiOiJzcGlyYWwiLCJ0aWVyRXZlcnkiOjAsInBUZXJtIjowfSx7ImxhbWJkYSI6MC40OTA5LCJzZXRQb2ludCI6MzkuMTIsImV0YSI6MC4zMTU4LCJicmFuY2hBbmdsZSI6MjguMzgsImdlbmVyYXRvciI6InNwaXJhbCIsInRpZXJFdmVyeSI6MCwicFRlcm0iOjB9LHsibGFtYmRhIjowLjUsInNldFBvaW50Ijo1NC4yMiwiZXRhIjowLjI1LCJicmFuY2hBbmdsZSI6NDAsImdlbmVyYXRvciI6InNwaXJhbCIsInRpZXJFdmVyeSI6MCwicFRlcm0iOjB9XSwiYUMiOjE0LjM0LCJkTGFtYmRhIjowLjAzMDI3LCJyYW1wIjoyMCwia2FwcGEiOjEuMDg4LCJoSiI6MjEuNTd9LCJyNCI6eyJxUmVsIjowLjI1fSwicjYiOnsiZW5hYmxlZCI6dHJ1ZSwicU1pbiI6MC4wNTA2MywibGVhZkFyZWEiOjIuMDQzfSwibzQiOnsiY1NlZWQiOjMsImQiOjUwLCJxRXN0IjowLjA2LCJwRXN0IjowLjMsIm0wIjowLjAwNn0sInIzIjp7ImVuYWJsZWQiOnRydWUsInJobyI6MSwibGVhZk1hc3MiOjAuMDAyLCJFIjo0MDAwMDAwLCJzYWciOiJpbmNyZW1lbnQiLCJwaGkiOjEsInBvc3R1cmUiOnRydWUsImJldGFHIjowLjEsImdhbW1hIjowLjIsImMiOjAuMDIyMTMsInNpZ21hVGFyZ2V0IjozMDAwLCJnaXJ0aEdhaW4iOjAuMywic2lnbWFCcmVhayI6NzAwMCwiZ3JvdW5kIjp0cnVlfX0sIndpbGxvdyI6eyJjb21tb24iOiJHb2F0IHdpbGxvdyIsImxhdGluIjoiU2FsaXggY2FwcmVhIiwibGVhZiI6IndpbGxvdyIsImMzIjp7Im1vZGUiOiJiaCIsImxhbWJkYSI6MC41LCJhbHBoYSI6NC44OTd9LCJjNSI6eyJlbmFibGVkIjp0cnVlLCJUIjowLjEsImciOjMsIlRyZWwiOjAuMzc2NiwidG9wUXVhbnRpbGUiOjAuOX0sImM2Ijp7ImVuYWJsZWQiOnRydWUsIm4iOjIsInIwIjowLjAwMjk4Nn0sInIxIjp7ImVuYWJsZWQiOnRydWUsIm13Ijo0My45MywibWYiOjAuMDgzNjYsIkxoIjoxMS41MSwiaHlkcmF1bGljIjoiaHlwZXJib2xpYyIsInNyIjowLjEsImZSZXAiOjAuMSwibWF0dXJpdHkiOjIwLCJrU3RhcnZlIjozLCJyZXNlcnZlMCI6Miwic3RvcmUiOjIsInNoZWQiOiJjYXJib24ifSwicjIiOnsiZW5hYmxlZCI6dHJ1ZSwibGV2ZWxzIjpbeyJsYW1iZGEiOjAuNTE4OSwic2V0UG9pbnQiOjAsImV0YSI6MC4yNSwiYnJhbmNoQW5nbGUiOjQ1LCJnZW5lcmF0b3IiOiJzcGlyYWwiLCJ0aWVyRXZlcnkiOjAsInBUZXJtIjowfSx7ImxhbWJkYSI6MC41MTY3LCJzZXRQb2ludCI6NTEuNjIsImV0YSI6MC4wNzI1MiwiYnJhbmNoQW5nbGUiOjQ4LjY0LCJnZW5lcmF0b3IiOiJzcGlyYWwiLCJ0aWVyRXZlcnkiOjAsInBUZXJtIjowfSx7ImxhbWJkYSI6MC40OSwic2V0UG9pbnQiOjU2LjYzLCJldGEiOjAuMiwiYnJhbmNoQW5nbGUiOjQ1LCJnZW5lcmF0b3IiOiJzcGlyYWwiLCJ0aWVyRXZlcnkiOjAsInBUZXJtIjowfV0sImFDIjoyLjk5LCJkTGFtYmRhIjowLjAzNDgzLCJyYW1wIjoxMCwia2FwcGEiOjEuMjYzLCJoSiI6Ny4xOTF9LCJyNCI6eyJxUmVsIjowLjN9LCJyNiI6eyJlbmFibGVkIjp0cnVlLCJxTWluIjowLjEwOTEsImxlYWZBcmVhIjoxLjY1OH0sIm80Ijp7ImNTZWVkIjoxLjUsImQiOjYwLCJxRXN0IjowLjMsInBFc3QiOjAuMywibTAiOjAuMDEyLCJyYWluIjoxfSwicjMiOnsiZW5hYmxlZCI6dHJ1ZSwicmhvIjoxLCJsZWFmTWFzcyI6MC4wMDIsIkUiOjQwMDAwMDAsInNhZyI6ImluY3JlbWVudCIsInBoaSI6MSwicG9zdHVyZSI6dHJ1ZSwiYmV0YUciOjAuMSwiZ2FtbWEiOjAuMiwiYyI6MC4wNjY5NSwic2lnbWFUYXJnZXQiOjMwMDAsImdpcnRoR2FpbiI6MC4zLCJzaWdtYUJyZWFrIjo3MDAwLCJncm91bmQiOnRydWV9fX19",
+    "mixed wood (all fitted, \u03c4 0.2)": "http://192.168.178.130:5173/?preset=mixedWood&seed=1&p=eyJ3b3JsZCI6eyJmYWNlcyI6WzAuMiwwLjJdfSwic3BlY2llcyI6eyJiaXJjaCI6eyJjb21tb24iOiJTaWx2ZXIgYmlyY2giLCJsYXRpbiI6IkJldHVsYSBwZW5kdWxhIiwibGVhZiI6InNtYWxsIiwiYzMiOnsibW9kZSI6ImJoIiwibGFtYmRhIjowLjUsImFscGhhIjoyLjg1M30sImM1Ijp7ImVuYWJsZWQiOnRydWUsIlQiOjAuMSwiZyI6MywiVHJlbCI6MC4yMDMzLCJ0b3BRdWFudGlsZSI6MC45fSwiYzYiOnsiZW5hYmxlZCI6dHJ1ZSwibiI6MiwicjAiOjAuMDA5OTY4fSwicjEiOnsiZW5hYmxlZCI6dHJ1ZSwibXciOjMyLjI0LCJtZiI6MC4xMzU4LCJMaCI6NDIuNDQsImh5ZHJhdWxpYyI6Imh5cGVyYm9saWMiLCJzciI6MC4xLCJmUmVwIjowLjEsIm1hdHVyaXR5Ijo0MCwia1N0YXJ2ZSI6MywicmVzZXJ2ZTAiOjIsInN0b3JlIjoyLCJzaGVkIjoiY2FyYm9uIn0sInIyIjp7ImVuYWJsZWQiOnRydWUsImxldmVscyI6W3sibGFtYmRhIjowLjU5NTEsInNldFBvaW50IjowLCJldGEiOjAuMywiYnJhbmNoQW5nbGUiOjQ1LCJnZW5lcmF0b3IiOiJzcGlyYWwiLCJ0aWVyRXZlcnkiOjAsInBUZXJtIjowfSx7ImxhbWJkYSI6MC40OTUyLCJzZXRQb2ludCI6NDcuMjcsImV0YSI6MC42MDY5LCJicmFuY2hBbmdsZSI6MzMuMTYsImdlbmVyYXRvciI6InNwaXJhbCIsInRpZXJFdmVyeSI6MCwicFRlcm0iOjAsInBvc3R1cmVTZXRQb2ludCI6NzB9LHsibGFtYmRhIjowLjUsInNldFBvaW50IjoxNDcuMiwiZXRhIjowLjI1LCJicmFuY2hBbmdsZSI6NDAsImdlbmVyYXRvciI6InNwaXJhbCIsInRpZXJFdmVyeSI6MCwicFRlcm0iOjB9XSwiYUMiOjE0LjY5LCJkTGFtYmRhIjowLjA4MDQ1LCJyYW1wIjoyMCwia2FwcGEiOjAuNTY4MSwiaEoiOjMxLjc4fSwicjMiOnsiZW5hYmxlZCI6dHJ1ZSwicmhvIjoxLCJsZWFmTWFzcyI6MC4wMDEsIkUiOjQwMDAwMDAsInNhZyI6ImluY3JlbWVudCIsInBoaSI6MC41LCJwb3N0dXJlIjp0cnVlLCJiZXRhRyI6MC4xLCJnYW1tYSI6MC4yLCJjIjowLjA5MTIyLCJzaWdtYVRhcmdldCI6MzAwMCwiZ2lydGhHYWluIjowLjMsInNpZ21hQnJlYWsiOjcwMDAsImdyb3VuZCI6dHJ1ZX0sInI0Ijp7InFSZWwiOjAuM30sInI2Ijp7ImVuYWJsZWQiOnRydWUsInFNaW4iOjAuMTk5NSwibGVhZkFyZWEiOjIuNzIyfSwibzQiOnsiY1NlZWQiOjIsImQiOjQwLCJxRXN0IjowLjI1LCJwRXN0IjowLjMsIm0wIjowLjAwOCwicmFpbiI6MC4yfX0sImJlZWNoIjp7ImNvbW1vbiI6IkJlZWNoIiwibGF0aW4iOiJGYWd1cyBzeWx2YXRpY2EiLCJsZWFmIjoiYmVlY2giLCJjNSI6eyJlbmFibGVkIjp0cnVlLCJUIjowLjAxLCJnIjozLCJUcmVsIjowLjI1MzIsInRvcFF1YW50aWxlIjowLjl9LCJyMSI6eyJlbmFibGVkIjp0cnVlLCJtdyI6MzkuMDIsIm1mIjowLjEwMjIsIkxoIjo4NS43MiwiaHlkcmF1bGljIjoiaHlwZXJib2xpYyIsInNyIjowLjEsImZSZXAiOjAuMSwibWF0dXJpdHkiOjQwLCJrU3RhcnZlIjozLCJyZXNlcnZlMCI6Miwic3RvcmUiOjIsInNoZWQiOiJjYXJib24ifSwicjIiOnsiZW5hYmxlZCI6dHJ1ZSwibGV2ZWxzIjpbeyJsYW1iZGEiOjAuNTI4OCwic2V0UG9pbnQiOjQwLCJldGEiOjAuNCwiYnJhbmNoQW5nbGUiOjQ1LCJnZW5lcmF0b3IiOiJkaXN0aWNob3VzIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MCwicG9zdHVyZVNldFBvaW50IjowfSx7ImxhbWJkYSI6MC41MjcyLCJzZXRQb2ludCI6MzcuNjEsImV0YSI6MS4xNzYsImJyYW5jaEFuZ2xlIjo1Ny40OCwiZ2VuZXJhdG9yIjoiZGlzdGljaG91cyIsInRpZXJFdmVyeSI6MCwicFRlcm0iOjB9LHsibGFtYmRhIjowLjUsInNldFBvaW50Ijo4Ni4wMywiZXRhIjowLjQsImJyYW5jaEFuZ2xlIjo0NSwiZ2VuZXJhdG9yIjoiZGlzdGljaG91cyIsInRpZXJFdmVyeSI6MCwicFRlcm0iOjB9XSwiYUMiOjAuNTk2NywiZExhbWJkYSI6MC4wMTU5MSwicmFtcCI6MSwia2FwcGEiOjAuMTE5NSwiaEoiOjQyLjE1fSwicjMiOnsiZW5hYmxlZCI6dHJ1ZSwicmhvIjoxLCJsZWFmTWFzcyI6MC4wMDIsIkUiOjQwMDAwMDAsInNhZyI6ImluY3JlbWVudCIsInBoaSI6MSwicG9zdHVyZSI6dHJ1ZSwiYmV0YUciOjAuMiwiZ2FtbWEiOjAuMiwiYyI6MC4wMzYzOCwic2lnbWFUYXJnZXQiOjMwMDAsImdpcnRoR2FpbiI6MC4zLCJzaWdtYUJyZWFrIjo3MDAwLCJncm91bmQiOnRydWV9LCJyNiI6eyJlbmFibGVkIjp0cnVlLCJxTWluIjowLjAxMDcxLCJsZWFmQXJlYSI6Mi40ODd9LCJvNCI6eyJjU2VlZCI6MTAsImQiOjEyLCJxRXN0IjowLjAzLCJwRXN0IjowLjMsIm0wIjowLjAwMn0sImMzIjp7Im1vZGUiOiJiaCIsImxhbWJkYSI6MC41LCJhbHBoYSI6My4wODN9LCJjNiI6eyJlbmFibGVkIjp0cnVlLCJuIjoyLCJyMCI6MC4wMDM5NjV9fSwib2FrIjp7ImNvbW1vbiI6IlBlZHVuY3VsYXRlIG9hayIsImxhdGluIjoiUXVlcmN1cyByb2J1ciIsImxlYWYiOiJvYWsiLCJjMyI6eyJtb2RlIjoiYmgiLCJsYW1iZGEiOjAuNSwiYWxwaGEiOjQuOTMyfSwiYzUiOnsiZW5hYmxlZCI6dHJ1ZSwiVCI6MC4wNSwiZyI6MywiVHJlbCI6MC4yNDMzLCJ0b3BRdWFudGlsZSI6MC45fSwicjEiOnsiZW5hYmxlZCI6dHJ1ZSwibXciOjE4MSwibWYiOjAuMDkwMSwiTGgiOjMzLjksImh5ZHJhdWxpYyI6Imh5cGVyYm9saWMiLCJzciI6MC4xLCJmUmVwIjowLjEsIm1hdHVyaXR5Ijo0MCwia1N0YXJ2ZSI6MywicmVzZXJ2ZTAiOjIsInN0b3JlIjoyLCJzaGVkIjoiY2FyYm9uIn0sInIyIjp7ImVuYWJsZWQiOnRydWUsImxldmVscyI6W3sibGFtYmRhIjowLjU3MTgsInNldFBvaW50IjowLCJldGEiOjAuMjUsImJyYW5jaEFuZ2xlIjo0NSwiZ2VuZXJhdG9yIjoic3BpcmFsIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MH0seyJsYW1iZGEiOjAuNTc3Miwic2V0UG9pbnQiOjY2LjA5LCJldGEiOjAuMDgyODYsImJyYW5jaEFuZ2xlIjo1NS4wMSwiZ2VuZXJhdG9yIjoic3BpcmFsIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MH0seyJsYW1iZGEiOjAuNSwic2V0UG9pbnQiOjQ1LjYsImV0YSI6MC4yLCJicmFuY2hBbmdsZSI6NTAsImdlbmVyYXRvciI6InNwaXJhbCIsInRpZXJFdmVyeSI6MCwicFRlcm0iOjB9XSwiYUMiOjEuOTE1LCJkTGFtYmRhIjowLjEwOCwicmFtcCI6MTUsImthcHBhIjowLjQxMjUsImhKIjoxMC4xNn0sInIzIjp7ImVuYWJsZWQiOnRydWUsInJobyI6MSwibGVhZk1hc3MiOjAuMDAyLCJFIjo0MDAwMDAwLCJzYWciOiJpbmNyZW1lbnQiLCJwaGkiOjEsInBvc3R1cmUiOnRydWUsImJldGFHIjowLjIsImdhbW1hIjowLjIsImMiOjAuMDkyMjUsInNpZ21hVGFyZ2V0IjozMDAwLCJnaXJ0aEdhaW4iOjAuMywic2lnbWFCcmVhayI6NzAwMCwiZ3JvdW5kIjp0cnVlfSwicjYiOnsiZW5hYmxlZCI6dHJ1ZSwicU1pbiI6MC4xNTY0LCJsZWFmQXJlYSI6MS40NTN9LCJvNCI6eyJjU2VlZCI6MTAsImQiOjI1LCJxRXN0IjowLjEsInBFc3QiOjAuMywibTAiOjAuMDAyfSwiYzYiOnsiZW5hYmxlZCI6dHJ1ZSwibiI6MiwicjAiOjAuMDAyMDIxfX0sImhvcm5iZWFtIjp7ImNvbW1vbiI6Ikhvcm5iZWFtIiwibGF0aW4iOiJDYXJwaW51cyBiZXR1bHVzIiwibGVhZiI6Imhvcm5iZWFtIiwiYzUiOnsiZW5hYmxlZCI6dHJ1ZSwiVCI6MC4wMSwiZyI6MywiVHJlbCI6MC40MDQsInRvcFF1YW50aWxlIjowLjl9LCJyMSI6eyJlbmFibGVkIjp0cnVlLCJtdyI6NjkuMjIsIm1mIjowLjExNjYsIkxoIjo1Ni45OCwiaHlkcmF1bGljIjoiaHlwZXJib2xpYyIsInNyIjowLjEsImZSZXAiOjAuMSwibWF0dXJpdHkiOjQwLCJrU3RhcnZlIjozLCJyZXNlcnZlMCI6Miwic3RvcmUiOjIsInNoZWQiOiJjYXJib24ifSwicjIiOnsiZW5hYmxlZCI6dHJ1ZSwibGV2ZWxzIjpbeyJsYW1iZGEiOjAuNTgzMSwic2V0UG9pbnQiOjMwLCJldGEiOjAuNCwiYnJhbmNoQW5nbGUiOjQ1LCJnZW5lcmF0b3IiOiJkaXN0aWNob3VzIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MCwicG9zdHVyZVNldFBvaW50IjowfSx7ImxhbWJkYSI6MC41MDM3LCJzZXRQb2ludCI6NDAuNDQsImV0YSI6MC4wODM3NywiYnJhbmNoQW5nbGUiOjM5LjQ5LCJnZW5lcmF0b3IiOiJkaXN0aWNob3VzIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MH0seyJsYW1iZGEiOjAuNSwic2V0UG9pbnQiOjQ1LjI2LCJldGEiOjAuNCwiYnJhbmNoQW5nbGUiOjQ1LCJnZW5lcmF0b3IiOiJkaXN0aWNob3VzIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MH1dLCJhQyI6MS45NiwiZExhbWJkYSI6MC4wODk5NiwicmFtcCI6MjAsImthcHBhIjowLjA2MTk5LCJoSiI6OS4xNDJ9LCJyMyI6eyJlbmFibGVkIjp0cnVlLCJyaG8iOjEsImxlYWZNYXNzIjowLjAwMiwiRSI6NDAwMDAwMCwic2FnIjoiaW5jcmVtZW50IiwicGhpIjoxLCJwb3N0dXJlIjp0cnVlLCJiZXRhRyI6MC4yLCJnYW1tYSI6MC4yLCJjIjowLjAzODg4LCJzaWdtYVRhcmdldCI6MzAwMCwiZ2lydGhHYWluIjowLjMsInNpZ21hQnJlYWsiOjcwMDAsImdyb3VuZCI6dHJ1ZX0sInI2Ijp7ImVuYWJsZWQiOnRydWUsInFNaW4iOjAuMDE2NTcsImxlYWZBcmVhIjoyLjU1fSwibzQiOnsiY1NlZWQiOjUsImQiOjIwLCJxRXN0IjowLjA0LCJwRXN0IjowLjMsIm0wIjowLjAwM30sImMzIjp7Im1vZGUiOiJiaCIsImxhbWJkYSI6MC41LCJhbHBoYSI6My44MzN9LCJjNiI6eyJlbmFibGVkIjp0cnVlLCJuIjoyLCJyMCI6MC4wMDMxNzd9fSwibWFwbGUiOnsiY29tbW9uIjoiRmllbGQgbWFwbGUiLCJsYXRpbiI6IkFjZXIgY2FtcGVzdHJlIiwibGVhZiI6Im1hcGxlIiwiYzMiOnsibW9kZSI6ImJoIiwibGFtYmRhIjowLjUsImFscGhhIjozLjc1fSwiYzUiOnsiZW5hYmxlZCI6dHJ1ZSwiVCI6MC4wMiwiZyI6MywiVHJlbCI6MC4xNDk2LCJ0b3BRdWFudGlsZSI6MC45fSwiYzYiOnsiZW5hYmxlZCI6dHJ1ZSwibiI6MiwicjAiOjAuMDAzMDczfSwicjEiOnsiZW5hYmxlZCI6dHJ1ZSwibXciOjQ0LjksIm1mIjowLjAzMDI2LCJMaCI6MTMuNjgsImh5ZHJhdWxpYyI6Imh5cGVyYm9saWMiLCJzciI6MC4xLCJmUmVwIjowLjEsIm1hdHVyaXR5IjozMCwia1N0YXJ2ZSI6MywicmVzZXJ2ZTAiOjIsInN0b3JlIjoyLCJzaGVkIjoiY2FyYm9uIn0sInIyIjp7ImVuYWJsZWQiOnRydWUsImxldmVscyI6W3sibGFtYmRhIjowLjU1MDIsInNldFBvaW50IjowLCJldGEiOjAuMjUsImJyYW5jaEFuZ2xlIjo0NSwiZ2VuZXJhdG9yIjoib3Bwb3NpdGUiLCJ0aWVyRXZlcnkiOjAsInBUZXJtIjowfSx7ImxhbWJkYSI6MC41MDQ2LCJzZXRQb2ludCI6NTEuNzQsImV0YSI6MC4xNjQzLCJicmFuY2hBbmdsZSI6NDQuMjYsImdlbmVyYXRvciI6Im9wcG9zaXRlIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MH0seyJsYW1iZGEiOjAuNSwic2V0UG9pbnQiOjQ3LjcyLCJldGEiOjAuMjUsImJyYW5jaEFuZ2xlIjo0NSwiZ2VuZXJhdG9yIjoib3Bwb3NpdGUiLCJ0aWVyRXZlcnkiOjAsInBUZXJtIjowfV0sImFDIjo1LjgwNiwiZExhbWJkYSI6MC4wNzgzMiwicmFtcCI6MTUsImthcHBhIjoxLjYxNSwiaEoiOjE0LjI0fSwicjMiOnsiZW5hYmxlZCI6dHJ1ZSwicmhvIjoxLCJsZWFmTWFzcyI6MC4wMDIsIkUiOjQwMDAwMDAsInNhZyI6ImluY3JlbWVudCIsInBoaSI6MSwicG9zdHVyZSI6dHJ1ZSwiYmV0YUciOjAuMiwiZ2FtbWEiOjAuMiwiYyI6MC4wOTkyLCJzaWdtYVRhcmdldCI6MzAwMCwiZ2lydGhHYWluIjowLjMsInNpZ21hQnJlYWsiOjcwMDAsImdyb3VuZCI6dHJ1ZX0sInI2Ijp7ImVuYWJsZWQiOnRydWUsInFNaW4iOjAuMDYwNTksImxlYWZBcmVhIjoyLjg2Mn0sIm80Ijp7ImNTZWVkIjo1LCJkIjoyNSwicUVzdCI6MC4wNSwicEVzdCI6MC4zLCJtMCI6MC4wMDR9fSwiaG9sbHkiOnsiY29tbW9uIjoiSG9sbHkiLCJsYXRpbiI6IklsZXggYXF1aWZvbGl1bSIsImxlYWYiOiJob2xseSIsImMzIjp7Im1vZGUiOiJiaCIsImxhbWJkYSI6MC41LCJhbHBoYSI6Mi4xMn0sImM1Ijp7ImVuYWJsZWQiOnRydWUsIlQiOjAuMDEsImciOjMsIlRyZWwiOjAuMTc4LCJ0b3BRdWFudGlsZSI6MC45fSwiYzYiOnsiZW5hYmxlZCI6dHJ1ZSwibiI6MiwicjAiOjAuMDA2fSwicjEiOnsiZW5hYmxlZCI6dHJ1ZSwibXciOjE1LjMyLCJtZiI6MC4wNzEzNywiTGgiOjE3Ljk5LCJoeWRyYXVsaWMiOiJoeXBlcmJvbGljIiwic3IiOjAuMSwiZlJlcCI6MC4xLCJtYXR1cml0eSI6MzAsImtTdGFydmUiOjMsInJlc2VydmUwIjoyLCJzdG9yZSI6Miwic2hlZCI6ImNhcmJvbiJ9LCJyMiI6eyJlbmFibGVkIjp0cnVlLCJsZXZlbHMiOlt7ImxhbWJkYSI6MC41MzAyLCJzZXRQb2ludCI6MCwiZXRhIjowLjQsImJyYW5jaEFuZ2xlIjo0NSwiZ2VuZXJhdG9yIjoic3BpcmFsIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MH0seyJsYW1iZGEiOjAuNDkwNCwic2V0UG9pbnQiOjU5LjU2LCJldGEiOjAuMDUxOTcsImJyYW5jaEFuZ2xlIjo3Ni41NCwiZ2VuZXJhdG9yIjoic3BpcmFsIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MH0seyJsYW1iZGEiOjAuNSwic2V0UG9pbnQiOjEyOC40LCJldGEiOjAuMjUsImJyYW5jaEFuZ2xlIjo0NSwiZ2VuZXJhdG9yIjoic3BpcmFsIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MH1dLCJhQyI6MTIuMDMsImRMYW1iZGEiOjAuMDIyOTIsInJhbXAiOjEsImthcHBhIjowLjAzMTM5LCJoSiI6MzYuMX0sInIzIjp7ImVuYWJsZWQiOnRydWUsInJobyI6MSwibGVhZk1hc3MiOjAuMDAyLCJFIjo0MDAwMDAwLCJzYWciOiJpbmNyZW1lbnQiLCJwaGkiOjEsInBvc3R1cmUiOnRydWUsImJldGFHIjowLjIsImdhbW1hIjowLjIsImMiOjAuMjcxNiwic2lnbWFUYXJnZXQiOjMwMDAsImdpcnRoR2FpbiI6MC4zLCJzaWdtYUJyZWFrIjo3MDAwLCJncm91bmQiOnRydWV9LCJyNiI6eyJlbmFibGVkIjp0cnVlLCJxTWluIjowLjE2NzQsImxlYWZBcmVhIjoyLjQxMn0sIm80Ijp7ImVuYWJsZWQiOmZhbHNlLCJjU2VlZCI6OCwiZCI6NDAsInFFc3QiOjAuMDEsInBFc3QiOjAuMywibTAiOjAuMDAzLCJtYXhUcmVlcyI6MzAwLCJyYWluIjowfX0sInJvd2FuIjp7ImNvbW1vbiI6IlJvd2FuIiwibGF0aW4iOiJTb3JidXMgYXVjdXBhcmlhIiwibGVhZiI6InJvd2FuIiwiYzMiOnsibW9kZSI6ImJoIiwibGFtYmRhIjowLjUsImFscGhhIjo1Ljk4fSwiYzUiOnsiZW5hYmxlZCI6dHJ1ZSwiVCI6MC4wNSwiZyI6MywiVHJlbCI6MC4zNzc3LCJ0b3BRdWFudGlsZSI6MC45fSwiYzYiOnsiZW5hYmxlZCI6dHJ1ZSwibiI6MiwicjAiOjAuMDAyNTgzfSwicjEiOnsiZW5hYmxlZCI6dHJ1ZSwibXciOjEzMC43LCJtZiI6MC4wOTAxMiwiTGgiOjE0LjIxLCJoeWRyYXVsaWMiOiJoeXBlcmJvbGljIiwic3IiOjAuMSwiZlJlcCI6MC4xLCJtYXR1cml0eSI6MjUsImtTdGFydmUiOjMsInJlc2VydmUwIjoyLCJzdG9yZSI6Miwic2hlZCI6ImNhcmJvbiJ9LCJyMiI6eyJlbmFibGVkIjp0cnVlLCJsZXZlbHMiOlt7ImxhbWJkYSI6MC41NDM2LCJzZXRQb2ludCI6MCwiZXRhIjowLjMsImJyYW5jaEFuZ2xlIjo0NSwiZ2VuZXJhdG9yIjoic3BpcmFsIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MH0seyJsYW1iZGEiOjAuNDkwOSwic2V0UG9pbnQiOjM5LjEyLCJldGEiOjAuMzE1OCwiYnJhbmNoQW5nbGUiOjI4LjM4LCJnZW5lcmF0b3IiOiJzcGlyYWwiLCJ0aWVyRXZlcnkiOjAsInBUZXJtIjowfSx7ImxhbWJkYSI6MC41LCJzZXRQb2ludCI6NTQuMjIsImV0YSI6MC4yNSwiYnJhbmNoQW5nbGUiOjQwLCJnZW5lcmF0b3IiOiJzcGlyYWwiLCJ0aWVyRXZlcnkiOjAsInBUZXJtIjowfV0sImFDIjoxNC4zNCwiZExhbWJkYSI6MC4wMzAyNywicmFtcCI6MjAsImthcHBhIjoxLjA4OCwiaEoiOjIxLjU3fSwicjQiOnsicVJlbCI6MC4yNX0sInI2Ijp7ImVuYWJsZWQiOnRydWUsInFNaW4iOjAuMDUwNjMsImxlYWZBcmVhIjoyLjA0M30sIm80Ijp7ImNTZWVkIjozLCJkIjo1MCwicUVzdCI6MC4wNiwicEVzdCI6MC4zLCJtMCI6MC4wMDZ9LCJyMyI6eyJlbmFibGVkIjp0cnVlLCJyaG8iOjEsImxlYWZNYXNzIjowLjAwMiwiRSI6NDAwMDAwMCwic2FnIjoiaW5jcmVtZW50IiwicGhpIjoxLCJwb3N0dXJlIjp0cnVlLCJiZXRhRyI6MC4xLCJnYW1tYSI6MC4yLCJjIjowLjAyMjEzLCJzaWdtYVRhcmdldCI6MzAwMCwiZ2lydGhHYWluIjowLjMsInNpZ21hQnJlYWsiOjcwMDAsImdyb3VuZCI6dHJ1ZX19LCJ3aWxsb3ciOnsiY29tbW9uIjoiR29hdCB3aWxsb3ciLCJsYXRpbiI6IlNhbGl4IGNhcHJlYSIsImxlYWYiOiJ3aWxsb3ciLCJjMyI6eyJtb2RlIjoiYmgiLCJsYW1iZGEiOjAuNSwiYWxwaGEiOjQuODk3fSwiYzUiOnsiZW5hYmxlZCI6dHJ1ZSwiVCI6MC4xLCJnIjozLCJUcmVsIjowLjM3NjYsInRvcFF1YW50aWxlIjowLjl9LCJjNiI6eyJlbmFibGVkIjp0cnVlLCJuIjoyLCJyMCI6MC4wMDI5ODZ9LCJyMSI6eyJlbmFibGVkIjp0cnVlLCJtdyI6NDMuOTMsIm1mIjowLjA4MzY2LCJMaCI6MTEuNTEsImh5ZHJhdWxpYyI6Imh5cGVyYm9saWMiLCJzciI6MC4xLCJmUmVwIjowLjEsIm1hdHVyaXR5IjoyMCwia1N0YXJ2ZSI6MywicmVzZXJ2ZTAiOjIsInN0b3JlIjoyLCJzaGVkIjoiY2FyYm9uIn0sInIyIjp7ImVuYWJsZWQiOnRydWUsImxldmVscyI6W3sibGFtYmRhIjowLjUxODksInNldFBvaW50IjowLCJldGEiOjAuMjUsImJyYW5jaEFuZ2xlIjo0NSwiZ2VuZXJhdG9yIjoic3BpcmFsIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MH0seyJsYW1iZGEiOjAuNTE2Nywic2V0UG9pbnQiOjUxLjYyLCJldGEiOjAuMDcyNTIsImJyYW5jaEFuZ2xlIjo0OC42NCwiZ2VuZXJhdG9yIjoic3BpcmFsIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MH0seyJsYW1iZGEiOjAuNDksInNldFBvaW50Ijo1Ni42MywiZXRhIjowLjIsImJyYW5jaEFuZ2xlIjo0NSwiZ2VuZXJhdG9yIjoic3BpcmFsIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MH1dLCJhQyI6Mi45OSwiZExhbWJkYSI6MC4wMzQ4MywicmFtcCI6MTAsImthcHBhIjoxLjI2MywiaEoiOjcuMTkxfSwicjQiOnsicVJlbCI6MC4zfSwicjYiOnsiZW5hYmxlZCI6dHJ1ZSwicU1pbiI6MC4xMDkxLCJsZWFmQXJlYSI6MS42NTh9LCJvNCI6eyJjU2VlZCI6MS41LCJkIjo2MCwicUVzdCI6MC4zLCJwRXN0IjowLjMsIm0wIjowLjAxMiwicmFpbiI6MX0sInIzIjp7ImVuYWJsZWQiOnRydWUsInJobyI6MSwibGVhZk1hc3MiOjAuMDAyLCJFIjo0MDAwMDAwLCJzYWciOiJpbmNyZW1lbnQiLCJwaGkiOjEsInBvc3R1cmUiOnRydWUsImJldGFHIjowLjEsImdhbW1hIjowLjIsImMiOjAuMDY2OTUsInNpZ21hVGFyZ2V0IjozMDAwLCJnaXJ0aEdhaW4iOjAuMywic2lnbWFCcmVhayI6NzAwMCwiZ3JvdW5kIjp0cnVlfX19fQ",
+    "mixed wood (all fitted, \u03c4 0.1)": "http://192.168.178.130:5173/?preset=mixedWood&seed=1&p=eyJ3b3JsZCI6eyJmYWNlcyI6WzAuMSwwLjFdfSwic3BlY2llcyI6eyJiaXJjaCI6eyJjb21tb24iOiJTaWx2ZXIgYmlyY2giLCJsYXRpbiI6IkJldHVsYSBwZW5kdWxhIiwibGVhZiI6InNtYWxsIiwiYzMiOnsibW9kZSI6ImJoIiwibGFtYmRhIjowLjUsImFscGhhIjoyLjg1M30sImM1Ijp7ImVuYWJsZWQiOnRydWUsIlQiOjAuMSwiZyI6MywiVHJlbCI6MC4yMDMzLCJ0b3BRdWFudGlsZSI6MC45fSwiYzYiOnsiZW5hYmxlZCI6dHJ1ZSwibiI6MiwicjAiOjAuMDA5OTY4fSwicjEiOnsiZW5hYmxlZCI6dHJ1ZSwibXciOjMyLjI0LCJtZiI6MC4xMzU4LCJMaCI6NDIuNDQsImh5ZHJhdWxpYyI6Imh5cGVyYm9saWMiLCJzciI6MC4xLCJmUmVwIjowLjEsIm1hdHVyaXR5Ijo0MCwia1N0YXJ2ZSI6MywicmVzZXJ2ZTAiOjIsInN0b3JlIjoyLCJzaGVkIjoiY2FyYm9uIn0sInIyIjp7ImVuYWJsZWQiOnRydWUsImxldmVscyI6W3sibGFtYmRhIjowLjU5NTEsInNldFBvaW50IjowLCJldGEiOjAuMywiYnJhbmNoQW5nbGUiOjQ1LCJnZW5lcmF0b3IiOiJzcGlyYWwiLCJ0aWVyRXZlcnkiOjAsInBUZXJtIjowfSx7ImxhbWJkYSI6MC40OTUyLCJzZXRQb2ludCI6NDcuMjcsImV0YSI6MC42MDY5LCJicmFuY2hBbmdsZSI6MzMuMTYsImdlbmVyYXRvciI6InNwaXJhbCIsInRpZXJFdmVyeSI6MCwicFRlcm0iOjAsInBvc3R1cmVTZXRQb2ludCI6NzB9LHsibGFtYmRhIjowLjUsInNldFBvaW50IjoxNDcuMiwiZXRhIjowLjI1LCJicmFuY2hBbmdsZSI6NDAsImdlbmVyYXRvciI6InNwaXJhbCIsInRpZXJFdmVyeSI6MCwicFRlcm0iOjB9XSwiYUMiOjE0LjY5LCJkTGFtYmRhIjowLjA4MDQ1LCJyYW1wIjoyMCwia2FwcGEiOjAuNTY4MSwiaEoiOjMxLjc4fSwicjMiOnsiZW5hYmxlZCI6dHJ1ZSwicmhvIjoxLCJsZWFmTWFzcyI6MC4wMDEsIkUiOjQwMDAwMDAsInNhZyI6ImluY3JlbWVudCIsInBoaSI6MC41LCJwb3N0dXJlIjp0cnVlLCJiZXRhRyI6MC4xLCJnYW1tYSI6MC4yLCJjIjowLjA5MTIyLCJzaWdtYVRhcmdldCI6MzAwMCwiZ2lydGhHYWluIjowLjMsInNpZ21hQnJlYWsiOjcwMDAsImdyb3VuZCI6dHJ1ZX0sInI0Ijp7InFSZWwiOjAuM30sInI2Ijp7ImVuYWJsZWQiOnRydWUsInFNaW4iOjAuMTk5NSwibGVhZkFyZWEiOjIuNzIyfSwibzQiOnsiY1NlZWQiOjIsImQiOjQwLCJxRXN0IjowLjI1LCJwRXN0IjowLjMsIm0wIjowLjAwOCwicmFpbiI6MC4yfX0sImJlZWNoIjp7ImNvbW1vbiI6IkJlZWNoIiwibGF0aW4iOiJGYWd1cyBzeWx2YXRpY2EiLCJsZWFmIjoiYmVlY2giLCJjNSI6eyJlbmFibGVkIjp0cnVlLCJUIjowLjAxLCJnIjozLCJUcmVsIjowLjI1MzIsInRvcFF1YW50aWxlIjowLjl9LCJyMSI6eyJlbmFibGVkIjp0cnVlLCJtdyI6MzkuMDIsIm1mIjowLjEwMjIsIkxoIjo4NS43MiwiaHlkcmF1bGljIjoiaHlwZXJib2xpYyIsInNyIjowLjEsImZSZXAiOjAuMSwibWF0dXJpdHkiOjQwLCJrU3RhcnZlIjozLCJyZXNlcnZlMCI6Miwic3RvcmUiOjIsInNoZWQiOiJjYXJib24ifSwicjIiOnsiZW5hYmxlZCI6dHJ1ZSwibGV2ZWxzIjpbeyJsYW1iZGEiOjAuNTI4OCwic2V0UG9pbnQiOjQwLCJldGEiOjAuNCwiYnJhbmNoQW5nbGUiOjQ1LCJnZW5lcmF0b3IiOiJkaXN0aWNob3VzIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MCwicG9zdHVyZVNldFBvaW50IjowfSx7ImxhbWJkYSI6MC41MjcyLCJzZXRQb2ludCI6MzcuNjEsImV0YSI6MS4xNzYsImJyYW5jaEFuZ2xlIjo1Ny40OCwiZ2VuZXJhdG9yIjoiZGlzdGljaG91cyIsInRpZXJFdmVyeSI6MCwicFRlcm0iOjB9LHsibGFtYmRhIjowLjUsInNldFBvaW50Ijo4Ni4wMywiZXRhIjowLjQsImJyYW5jaEFuZ2xlIjo0NSwiZ2VuZXJhdG9yIjoiZGlzdGljaG91cyIsInRpZXJFdmVyeSI6MCwicFRlcm0iOjB9XSwiYUMiOjAuNTk2NywiZExhbWJkYSI6MC4wMTU5MSwicmFtcCI6MSwia2FwcGEiOjAuMTE5NSwiaEoiOjQyLjE1fSwicjMiOnsiZW5hYmxlZCI6dHJ1ZSwicmhvIjoxLCJsZWFmTWFzcyI6MC4wMDIsIkUiOjQwMDAwMDAsInNhZyI6ImluY3JlbWVudCIsInBoaSI6MSwicG9zdHVyZSI6dHJ1ZSwiYmV0YUciOjAuMiwiZ2FtbWEiOjAuMiwiYyI6MC4wMzYzOCwic2lnbWFUYXJnZXQiOjMwMDAsImdpcnRoR2FpbiI6MC4zLCJzaWdtYUJyZWFrIjo3MDAwLCJncm91bmQiOnRydWV9LCJyNiI6eyJlbmFibGVkIjp0cnVlLCJxTWluIjowLjAxMDcxLCJsZWFmQXJlYSI6Mi40ODd9LCJvNCI6eyJjU2VlZCI6MTAsImQiOjEyLCJxRXN0IjowLjAzLCJwRXN0IjowLjMsIm0wIjowLjAwMn0sImMzIjp7Im1vZGUiOiJiaCIsImxhbWJkYSI6MC41LCJhbHBoYSI6My4wODN9LCJjNiI6eyJlbmFibGVkIjp0cnVlLCJuIjoyLCJyMCI6MC4wMDM5NjV9fSwib2FrIjp7ImNvbW1vbiI6IlBlZHVuY3VsYXRlIG9hayIsImxhdGluIjoiUXVlcmN1cyByb2J1ciIsImxlYWYiOiJvYWsiLCJjMyI6eyJtb2RlIjoiYmgiLCJsYW1iZGEiOjAuNSwiYWxwaGEiOjQuOTMyfSwiYzUiOnsiZW5hYmxlZCI6dHJ1ZSwiVCI6MC4wNSwiZyI6MywiVHJlbCI6MC4yNDMzLCJ0b3BRdWFudGlsZSI6MC45fSwicjEiOnsiZW5hYmxlZCI6dHJ1ZSwibXciOjE4MSwibWYiOjAuMDkwMSwiTGgiOjMzLjksImh5ZHJhdWxpYyI6Imh5cGVyYm9saWMiLCJzciI6MC4xLCJmUmVwIjowLjEsIm1hdHVyaXR5Ijo0MCwia1N0YXJ2ZSI6MywicmVzZXJ2ZTAiOjIsInN0b3JlIjoyLCJzaGVkIjoiY2FyYm9uIn0sInIyIjp7ImVuYWJsZWQiOnRydWUsImxldmVscyI6W3sibGFtYmRhIjowLjU3MTgsInNldFBvaW50IjowLCJldGEiOjAuMjUsImJyYW5jaEFuZ2xlIjo0NSwiZ2VuZXJhdG9yIjoic3BpcmFsIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MH0seyJsYW1iZGEiOjAuNTc3Miwic2V0UG9pbnQiOjY2LjA5LCJldGEiOjAuMDgyODYsImJyYW5jaEFuZ2xlIjo1NS4wMSwiZ2VuZXJhdG9yIjoic3BpcmFsIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MH0seyJsYW1iZGEiOjAuNSwic2V0UG9pbnQiOjQ1LjYsImV0YSI6MC4yLCJicmFuY2hBbmdsZSI6NTAsImdlbmVyYXRvciI6InNwaXJhbCIsInRpZXJFdmVyeSI6MCwicFRlcm0iOjB9XSwiYUMiOjEuOTE1LCJkTGFtYmRhIjowLjEwOCwicmFtcCI6MTUsImthcHBhIjowLjQxMjUsImhKIjoxMC4xNn0sInIzIjp7ImVuYWJsZWQiOnRydWUsInJobyI6MSwibGVhZk1hc3MiOjAuMDAyLCJFIjo0MDAwMDAwLCJzYWciOiJpbmNyZW1lbnQiLCJwaGkiOjEsInBvc3R1cmUiOnRydWUsImJldGFHIjowLjIsImdhbW1hIjowLjIsImMiOjAuMDkyMjUsInNpZ21hVGFyZ2V0IjozMDAwLCJnaXJ0aEdhaW4iOjAuMywic2lnbWFCcmVhayI6NzAwMCwiZ3JvdW5kIjp0cnVlfSwicjYiOnsiZW5hYmxlZCI6dHJ1ZSwicU1pbiI6MC4xNTY0LCJsZWFmQXJlYSI6MS40NTN9LCJvNCI6eyJjU2VlZCI6MTAsImQiOjI1LCJxRXN0IjowLjEsInBFc3QiOjAuMywibTAiOjAuMDAyfSwiYzYiOnsiZW5hYmxlZCI6dHJ1ZSwibiI6MiwicjAiOjAuMDAyMDIxfX0sImhvcm5iZWFtIjp7ImNvbW1vbiI6Ikhvcm5iZWFtIiwibGF0aW4iOiJDYXJwaW51cyBiZXR1bHVzIiwibGVhZiI6Imhvcm5iZWFtIiwiYzUiOnsiZW5hYmxlZCI6dHJ1ZSwiVCI6MC4wMSwiZyI6MywiVHJlbCI6MC40MDQsInRvcFF1YW50aWxlIjowLjl9LCJyMSI6eyJlbmFibGVkIjp0cnVlLCJtdyI6NjkuMjIsIm1mIjowLjExNjYsIkxoIjo1Ni45OCwiaHlkcmF1bGljIjoiaHlwZXJib2xpYyIsInNyIjowLjEsImZSZXAiOjAuMSwibWF0dXJpdHkiOjQwLCJrU3RhcnZlIjozLCJyZXNlcnZlMCI6Miwic3RvcmUiOjIsInNoZWQiOiJjYXJib24ifSwicjIiOnsiZW5hYmxlZCI6dHJ1ZSwibGV2ZWxzIjpbeyJsYW1iZGEiOjAuNTgzMSwic2V0UG9pbnQiOjMwLCJldGEiOjAuNCwiYnJhbmNoQW5nbGUiOjQ1LCJnZW5lcmF0b3IiOiJkaXN0aWNob3VzIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MCwicG9zdHVyZVNldFBvaW50IjowfSx7ImxhbWJkYSI6MC41MDM3LCJzZXRQb2ludCI6NDAuNDQsImV0YSI6MC4wODM3NywiYnJhbmNoQW5nbGUiOjM5LjQ5LCJnZW5lcmF0b3IiOiJkaXN0aWNob3VzIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MH0seyJsYW1iZGEiOjAuNSwic2V0UG9pbnQiOjQ1LjI2LCJldGEiOjAuNCwiYnJhbmNoQW5nbGUiOjQ1LCJnZW5lcmF0b3IiOiJkaXN0aWNob3VzIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MH1dLCJhQyI6MS45NiwiZExhbWJkYSI6MC4wODk5NiwicmFtcCI6MjAsImthcHBhIjowLjA2MTk5LCJoSiI6OS4xNDJ9LCJyMyI6eyJlbmFibGVkIjp0cnVlLCJyaG8iOjEsImxlYWZNYXNzIjowLjAwMiwiRSI6NDAwMDAwMCwic2FnIjoiaW5jcmVtZW50IiwicGhpIjoxLCJwb3N0dXJlIjp0cnVlLCJiZXRhRyI6MC4yLCJnYW1tYSI6MC4yLCJjIjowLjAzODg4LCJzaWdtYVRhcmdldCI6MzAwMCwiZ2lydGhHYWluIjowLjMsInNpZ21hQnJlYWsiOjcwMDAsImdyb3VuZCI6dHJ1ZX0sInI2Ijp7ImVuYWJsZWQiOnRydWUsInFNaW4iOjAuMDE2NTcsImxlYWZBcmVhIjoyLjU1fSwibzQiOnsiY1NlZWQiOjUsImQiOjIwLCJxRXN0IjowLjA0LCJwRXN0IjowLjMsIm0wIjowLjAwM30sImMzIjp7Im1vZGUiOiJiaCIsImxhbWJkYSI6MC41LCJhbHBoYSI6My44MzN9LCJjNiI6eyJlbmFibGVkIjp0cnVlLCJuIjoyLCJyMCI6MC4wMDMxNzd9fSwibWFwbGUiOnsiY29tbW9uIjoiRmllbGQgbWFwbGUiLCJsYXRpbiI6IkFjZXIgY2FtcGVzdHJlIiwibGVhZiI6Im1hcGxlIiwiYzMiOnsibW9kZSI6ImJoIiwibGFtYmRhIjowLjUsImFscGhhIjozLjc1fSwiYzUiOnsiZW5hYmxlZCI6dHJ1ZSwiVCI6MC4wMiwiZyI6MywiVHJlbCI6MC4xNDk2LCJ0b3BRdWFudGlsZSI6MC45fSwiYzYiOnsiZW5hYmxlZCI6dHJ1ZSwibiI6MiwicjAiOjAuMDAzMDczfSwicjEiOnsiZW5hYmxlZCI6dHJ1ZSwibXciOjQ0LjksIm1mIjowLjAzMDI2LCJMaCI6MTMuNjgsImh5ZHJhdWxpYyI6Imh5cGVyYm9saWMiLCJzciI6MC4xLCJmUmVwIjowLjEsIm1hdHVyaXR5IjozMCwia1N0YXJ2ZSI6MywicmVzZXJ2ZTAiOjIsInN0b3JlIjoyLCJzaGVkIjoiY2FyYm9uIn0sInIyIjp7ImVuYWJsZWQiOnRydWUsImxldmVscyI6W3sibGFtYmRhIjowLjU1MDIsInNldFBvaW50IjowLCJldGEiOjAuMjUsImJyYW5jaEFuZ2xlIjo0NSwiZ2VuZXJhdG9yIjoib3Bwb3NpdGUiLCJ0aWVyRXZlcnkiOjAsInBUZXJtIjowfSx7ImxhbWJkYSI6MC41MDQ2LCJzZXRQb2ludCI6NTEuNzQsImV0YSI6MC4xNjQzLCJicmFuY2hBbmdsZSI6NDQuMjYsImdlbmVyYXRvciI6Im9wcG9zaXRlIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MH0seyJsYW1iZGEiOjAuNSwic2V0UG9pbnQiOjQ3LjcyLCJldGEiOjAuMjUsImJyYW5jaEFuZ2xlIjo0NSwiZ2VuZXJhdG9yIjoib3Bwb3NpdGUiLCJ0aWVyRXZlcnkiOjAsInBUZXJtIjowfV0sImFDIjo1LjgwNiwiZExhbWJkYSI6MC4wNzgzMiwicmFtcCI6MTUsImthcHBhIjoxLjYxNSwiaEoiOjE0LjI0fSwicjMiOnsiZW5hYmxlZCI6dHJ1ZSwicmhvIjoxLCJsZWFmTWFzcyI6MC4wMDIsIkUiOjQwMDAwMDAsInNhZyI6ImluY3JlbWVudCIsInBoaSI6MSwicG9zdHVyZSI6dHJ1ZSwiYmV0YUciOjAuMiwiZ2FtbWEiOjAuMiwiYyI6MC4wOTkyLCJzaWdtYVRhcmdldCI6MzAwMCwiZ2lydGhHYWluIjowLjMsInNpZ21hQnJlYWsiOjcwMDAsImdyb3VuZCI6dHJ1ZX0sInI2Ijp7ImVuYWJsZWQiOnRydWUsInFNaW4iOjAuMDYwNTksImxlYWZBcmVhIjoyLjg2Mn0sIm80Ijp7ImNTZWVkIjo1LCJkIjoyNSwicUVzdCI6MC4wNSwicEVzdCI6MC4zLCJtMCI6MC4wMDR9fSwiaG9sbHkiOnsiY29tbW9uIjoiSG9sbHkiLCJsYXRpbiI6IklsZXggYXF1aWZvbGl1bSIsImxlYWYiOiJob2xseSIsImMzIjp7Im1vZGUiOiJiaCIsImxhbWJkYSI6MC41LCJhbHBoYSI6Mi4xMn0sImM1Ijp7ImVuYWJsZWQiOnRydWUsIlQiOjAuMDEsImciOjMsIlRyZWwiOjAuMTc4LCJ0b3BRdWFudGlsZSI6MC45fSwiYzYiOnsiZW5hYmxlZCI6dHJ1ZSwibiI6MiwicjAiOjAuMDA2fSwicjEiOnsiZW5hYmxlZCI6dHJ1ZSwibXciOjE1LjMyLCJtZiI6MC4wNzEzNywiTGgiOjE3Ljk5LCJoeWRyYXVsaWMiOiJoeXBlcmJvbGljIiwic3IiOjAuMSwiZlJlcCI6MC4xLCJtYXR1cml0eSI6MzAsImtTdGFydmUiOjMsInJlc2VydmUwIjoyLCJzdG9yZSI6Miwic2hlZCI6ImNhcmJvbiJ9LCJyMiI6eyJlbmFibGVkIjp0cnVlLCJsZXZlbHMiOlt7ImxhbWJkYSI6MC41MzAyLCJzZXRQb2ludCI6MCwiZXRhIjowLjQsImJyYW5jaEFuZ2xlIjo0NSwiZ2VuZXJhdG9yIjoic3BpcmFsIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MH0seyJsYW1iZGEiOjAuNDkwNCwic2V0UG9pbnQiOjU5LjU2LCJldGEiOjAuMDUxOTcsImJyYW5jaEFuZ2xlIjo3Ni41NCwiZ2VuZXJhdG9yIjoic3BpcmFsIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MH0seyJsYW1iZGEiOjAuNSwic2V0UG9pbnQiOjEyOC40LCJldGEiOjAuMjUsImJyYW5jaEFuZ2xlIjo0NSwiZ2VuZXJhdG9yIjoic3BpcmFsIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MH1dLCJhQyI6MTIuMDMsImRMYW1iZGEiOjAuMDIyOTIsInJhbXAiOjEsImthcHBhIjowLjAzMTM5LCJoSiI6MzYuMX0sInIzIjp7ImVuYWJsZWQiOnRydWUsInJobyI6MSwibGVhZk1hc3MiOjAuMDAyLCJFIjo0MDAwMDAwLCJzYWciOiJpbmNyZW1lbnQiLCJwaGkiOjEsInBvc3R1cmUiOnRydWUsImJldGFHIjowLjIsImdhbW1hIjowLjIsImMiOjAuMjcxNiwic2lnbWFUYXJnZXQiOjMwMDAsImdpcnRoR2FpbiI6MC4zLCJzaWdtYUJyZWFrIjo3MDAwLCJncm91bmQiOnRydWV9LCJyNiI6eyJlbmFibGVkIjp0cnVlLCJxTWluIjowLjE2NzQsImxlYWZBcmVhIjoyLjQxMn0sIm80Ijp7ImVuYWJsZWQiOmZhbHNlLCJjU2VlZCI6OCwiZCI6NDAsInFFc3QiOjAuMDEsInBFc3QiOjAuMywibTAiOjAuMDAzLCJtYXhUcmVlcyI6MzAwLCJyYWluIjowfX0sInJvd2FuIjp7ImNvbW1vbiI6IlJvd2FuIiwibGF0aW4iOiJTb3JidXMgYXVjdXBhcmlhIiwibGVhZiI6InJvd2FuIiwiYzMiOnsibW9kZSI6ImJoIiwibGFtYmRhIjowLjUsImFscGhhIjo1Ljk4fSwiYzUiOnsiZW5hYmxlZCI6dHJ1ZSwiVCI6MC4wNSwiZyI6MywiVHJlbCI6MC4zNzc3LCJ0b3BRdWFudGlsZSI6MC45fSwiYzYiOnsiZW5hYmxlZCI6dHJ1ZSwibiI6MiwicjAiOjAuMDAyNTgzfSwicjEiOnsiZW5hYmxlZCI6dHJ1ZSwibXciOjEzMC43LCJtZiI6MC4wOTAxMiwiTGgiOjE0LjIxLCJoeWRyYXVsaWMiOiJoeXBlcmJvbGljIiwic3IiOjAuMSwiZlJlcCI6MC4xLCJtYXR1cml0eSI6MjUsImtTdGFydmUiOjMsInJlc2VydmUwIjoyLCJzdG9yZSI6Miwic2hlZCI6ImNhcmJvbiJ9LCJyMiI6eyJlbmFibGVkIjp0cnVlLCJsZXZlbHMiOlt7ImxhbWJkYSI6MC41NDM2LCJzZXRQb2ludCI6MCwiZXRhIjowLjMsImJyYW5jaEFuZ2xlIjo0NSwiZ2VuZXJhdG9yIjoic3BpcmFsIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MH0seyJsYW1iZGEiOjAuNDkwOSwic2V0UG9pbnQiOjM5LjEyLCJldGEiOjAuMzE1OCwiYnJhbmNoQW5nbGUiOjI4LjM4LCJnZW5lcmF0b3IiOiJzcGlyYWwiLCJ0aWVyRXZlcnkiOjAsInBUZXJtIjowfSx7ImxhbWJkYSI6MC41LCJzZXRQb2ludCI6NTQuMjIsImV0YSI6MC4yNSwiYnJhbmNoQW5nbGUiOjQwLCJnZW5lcmF0b3IiOiJzcGlyYWwiLCJ0aWVyRXZlcnkiOjAsInBUZXJtIjowfV0sImFDIjoxNC4zNCwiZExhbWJkYSI6MC4wMzAyNywicmFtcCI6MjAsImthcHBhIjoxLjA4OCwiaEoiOjIxLjU3fSwicjQiOnsicVJlbCI6MC4yNX0sInI2Ijp7ImVuYWJsZWQiOnRydWUsInFNaW4iOjAuMDUwNjMsImxlYWZBcmVhIjoyLjA0M30sIm80Ijp7ImNTZWVkIjozLCJkIjo1MCwicUVzdCI6MC4wNiwicEVzdCI6MC4zLCJtMCI6MC4wMDZ9LCJyMyI6eyJlbmFibGVkIjp0cnVlLCJyaG8iOjEsImxlYWZNYXNzIjowLjAwMiwiRSI6NDAwMDAwMCwic2FnIjoiaW5jcmVtZW50IiwicGhpIjoxLCJwb3N0dXJlIjp0cnVlLCJiZXRhRyI6MC4xLCJnYW1tYSI6MC4yLCJjIjowLjAyMjEzLCJzaWdtYVRhcmdldCI6MzAwMCwiZ2lydGhHYWluIjowLjMsInNpZ21hQnJlYWsiOjcwMDAsImdyb3VuZCI6dHJ1ZX19LCJ3aWxsb3ciOnsiY29tbW9uIjoiR29hdCB3aWxsb3ciLCJsYXRpbiI6IlNhbGl4IGNhcHJlYSIsImxlYWYiOiJ3aWxsb3ciLCJjMyI6eyJtb2RlIjoiYmgiLCJsYW1iZGEiOjAuNSwiYWxwaGEiOjQuODk3fSwiYzUiOnsiZW5hYmxlZCI6dHJ1ZSwiVCI6MC4xLCJnIjozLCJUcmVsIjowLjM3NjYsInRvcFF1YW50aWxlIjowLjl9LCJjNiI6eyJlbmFibGVkIjp0cnVlLCJuIjoyLCJyMCI6MC4wMDI5ODZ9LCJyMSI6eyJlbmFibGVkIjp0cnVlLCJtdyI6NDMuOTMsIm1mIjowLjA4MzY2LCJMaCI6MTEuNTEsImh5ZHJhdWxpYyI6Imh5cGVyYm9saWMiLCJzciI6MC4xLCJmUmVwIjowLjEsIm1hdHVyaXR5IjoyMCwia1N0YXJ2ZSI6MywicmVzZXJ2ZTAiOjIsInN0b3JlIjoyLCJzaGVkIjoiY2FyYm9uIn0sInIyIjp7ImVuYWJsZWQiOnRydWUsImxldmVscyI6W3sibGFtYmRhIjowLjUxODksInNldFBvaW50IjowLCJldGEiOjAuMjUsImJyYW5jaEFuZ2xlIjo0NSwiZ2VuZXJhdG9yIjoic3BpcmFsIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MH0seyJsYW1iZGEiOjAuNTE2Nywic2V0UG9pbnQiOjUxLjYyLCJldGEiOjAuMDcyNTIsImJyYW5jaEFuZ2xlIjo0OC42NCwiZ2VuZXJhdG9yIjoic3BpcmFsIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MH0seyJsYW1iZGEiOjAuNDksInNldFBvaW50Ijo1Ni42MywiZXRhIjowLjIsImJyYW5jaEFuZ2xlIjo0NSwiZ2VuZXJhdG9yIjoic3BpcmFsIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MH1dLCJhQyI6Mi45OSwiZExhbWJkYSI6MC4wMzQ4MywicmFtcCI6MTAsImthcHBhIjoxLjI2MywiaEoiOjcuMTkxfSwicjQiOnsicVJlbCI6MC4zfSwicjYiOnsiZW5hYmxlZCI6dHJ1ZSwicU1pbiI6MC4xMDkxLCJsZWFmQXJlYSI6MS42NTh9LCJvNCI6eyJjU2VlZCI6MS41LCJkIjo2MCwicUVzdCI6MC4zLCJwRXN0IjowLjMsIm0wIjowLjAxMiwicmFpbiI6MX0sInIzIjp7ImVuYWJsZWQiOnRydWUsInJobyI6MSwibGVhZk1hc3MiOjAuMDAyLCJFIjo0MDAwMDAwLCJzYWciOiJpbmNyZW1lbnQiLCJwaGkiOjEsInBvc3R1cmUiOnRydWUsImJldGFHIjowLjEsImdhbW1hIjowLjIsImMiOjAuMDY2OTUsInNpZ21hVGFyZ2V0IjozMDAwLCJnaXJ0aEdhaW4iOjAuMywic2lnbWFCcmVhayI6NzAwMCwiZ3JvdW5kIjp0cnVlfX19fQ"
+  }
+}

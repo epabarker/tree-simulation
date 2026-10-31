@@ -1,9 +1,9 @@
 // Species round 4, step B.6 (the audit's route A): a line-up panel per species. For each, round 2's
-// patch (as adopted, FITTED_FLORA) and a round's fit: the lone trial's tree (cli/trials.ts's
+// patch (as adopted, FITTED_FLORA) and one or more rounds' fits (a comma list, oldest first): the lone trial's tree (cli/trials.ts's
 // loneParams, seed 1) at 60 and 100 and the closed stand (standParams, seed 1) at 100, as lab links
 // that play to that season and hold the plate (`&bench&seasons=N`), with the traits each shows.
 // Generalises 2026-10-30-species-3d/lone-links.ts and lone-traits.ts. Writes <out>/panel.json.
-//   node docs/experiments/code/2026-10-31-species-round4/panel-links.ts http://localhost:5173/ round3 <out> [species,…]
+//   node docs/experiments/code/2026-10-31-species-round4/panel-links.ts http://localhost:5173/ round3,round4 <out> [species,…]
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import {
   loneParams,
@@ -15,7 +15,7 @@ import { FITTED_FLORA } from "../../../../src/core/flora-fitted.ts";
 import type { Params } from "../../../../src/core/params.ts";
 import { encodePatch } from "../../../../src/web/ui/share.ts";
 
-const [origin = "http://localhost:5173/", round = "round3", out = "runs/panel"] = process.argv.slice(2);
+const [origin = "http://localhost:5173/", rounds = "round3", out = "runs/panel"] = process.argv.slice(2);
 const GARDEN = ["birch", "oak", "willow", "beech", "hornbeam", "rowan", "holly", "maple"];
 const species = process.argv[5]?.split(",") ?? GARDEN;
 
@@ -33,13 +33,13 @@ const mean = (xs: number[]) => xs.reduce((s, x) => s + x, 0) / xs.length;
 
 const panel: Record<string, unknown> = {};
 for (const sp of species) {
-  const fit = JSON.parse(readFileSync(`docs/experiments/fits/${round}/${sp}.json`, "utf8")).fit;
-  const rounds = {
-    "round 2": { patch: (FITTED_FLORA as Record<string, unknown>)[sp], assign: undefined },
-    [round.replace("round", "round ")]: { patch: fit.patch, assign: fit.assign },
-  };
+  const patches: Record<string, unknown> = { "round 2": (FITTED_FLORA as Record<string, unknown>)[sp] };
+  for (const round of rounds.split(",")) {
+    const fit = JSON.parse(readFileSync(`docs/experiments/fits/${round}/${sp}.json`, "utf8")).fit;
+    patches[round.replace("round", "round ")] = fit.patch;
+  }
   const entry: Record<string, unknown> = {};
-  for (const [name, { patch }] of Object.entries(rounds)) {
+  for (const [name, patch] of Object.entries(patches)) {
     // The patch as the species' whole entry: the lab's links carry it the same way.
     const asPatch = (p: Params): Params => ({ ...p, species: { ...p.species, [sp]: patch as never } });
     const lone = asPatch(loneParams(sp, 1));

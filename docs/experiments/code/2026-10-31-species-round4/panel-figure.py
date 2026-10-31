@@ -1,11 +1,11 @@
 """Species round 4, step B.6 (the audit's route A): one line-up panel per species. Round 2 (as adopted)
-beside a round's fit: the lone tree at 60 and 100 and the closed stand at 100, every picture at one
+above each later round's fit in panel.json, one row a round: the lone tree at 60 and 100 and the closed stand at 100, every picture at one
 scale (cells), with the traits under each. Generalises 2026-10-30-species-3d/lone-figure.py.
 
 The pictures are panel-shots.mjs's screenshots of the lab's plate (panel-links.ts's links). Each is
 rescaled to one scale: its tallest tree's height in pixels (the ground line to the highest pixel
 that differs from the sky beside it) against that tree's height in cells (panel.json).
-    uv run --project analysis python docs/experiments/code/2026-10-31-species-round4/panel-figure.py runs/panel round3 docs/experiments/figures
+    uv run --project analysis python docs/experiments/code/2026-10-31-species-round4/panel-figure.py runs/panel docs/experiments/figures [suffix]
 """
 
 import json
@@ -16,9 +16,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image
 
-shots, rnd, out = Path(sys.argv[1]), sys.argv[2], Path(sys.argv[3])
+shots, out = Path(sys.argv[1]), Path(sys.argv[2])
+#: Appended to the file name: "-round4" keeps a three-round panel beside round 3's.
+suffix = sys.argv[3] if len(sys.argv) > 3 else ""
 panel = json.loads((shots / "panel.json").read_text())
-fitted = rnd.replace("round", "round ")
 #: The window each picture is cut to, cells: 160 wide around the trunk (the lone world's width; the
 #: stand's 84-cell ring shown whole), 215 tall from the ground. The woods' top is 200.
 WIDE, TALL = 160, 215
@@ -28,12 +29,16 @@ TEXT = 60
 
 def rows(img: np.ndarray) -> tuple[int, int, np.ndarray]:
     """(top, ground, mask): the highest row with a tree pixel, the ground line's row, and the tree
-    pixels. The sky is a vertical gradient, so a pixel is the tree's where it differs from the plate's
-    left-edge pixel in its row; the ground is the first row (from the top) whose left edge is brown."""
+    pixels. The sky is a vertical gradient, lighter than any wood or leaf, so a row's sky is its
+    brightest pixel and a pixel is the tree's where it differs from it; the ground is the first row
+    (from the top) that is brown nearly all the way across. (Read from one edge column, a stand that
+    reaches the plate's edge put a trunk there and its crop zoomed into the foliage: rowan's.)"""
     a = img.astype(int)
     r, g, b = a[..., 0], a[..., 1], a[..., 2]
-    ground = next(y for y in range(TEXT, a.shape[0]) if r[y, 3] > g[y, 3] + 8 and g[y, 3] >= b[y, 3])
-    sky = a[:, 3:4, :]
+    brown = (r > g + 8) & (g >= b)
+    ground = next(y for y in range(TEXT, a.shape[0]) if brown[y].mean() > 0.9)
+    lum = a.sum(axis=2)
+    sky = a[np.arange(a.shape[0]), lum.argmax(axis=1)][:, None, :]
     mask = np.abs(a - sky).sum(axis=2) > 60
     mask[:TEXT] = False
     mask[ground:] = False
@@ -67,8 +72,10 @@ def label(view: str, t: dict) -> str:
 out.mkdir(parents=True, exist_ok=True)
 VIEWS = ["lone 60", "lone 100", "stand 100"]
 for sp, rounds in panel.items():
-    fig, axes = plt.subplots(2, 3, figsize=(12, 15), gridspec_kw={"wspace": 0.05, "hspace": 0.32})
-    for i, name in enumerate(["round 2", fitted]):
+    names = list(rounds)
+    fig, axes = plt.subplots(len(names), 3, figsize=(12, 7.5 * len(names)), squeeze=False,
+                             gridspec_kw={"wspace": 0.05, "hspace": 0.32})
+    for i, name in enumerate(names):
         for j, view in enumerate(VIEWS):
             ax = axes[i, j]
             t = rounds[name]["traits"][view]
@@ -80,8 +87,8 @@ for sp, rounds in panel.items():
             ax.set_title(f"{name}: {view.replace(' ', ' at ')}", fontsize=12)
             ax.set_xlabel(label(view, t), fontsize=10)
     fig.suptitle(f"{sp}: lone tree (seed 1) and closed stand (seed 1, all three rows), one scale "
-                 f"({WIDE} × {TALL} cells); round 2 as adopted above, {fitted}'s fit below", fontsize=12, y=0.93)
-    path = out / f"2026-10-31-species-panel-{sp}.png"
+                 f"({WIDE} × {TALL} cells); {', '.join(names)}, top to bottom", fontsize=12, y=0.93)
+    path = out / f"2026-10-31-species-panel-{sp}{suffix}.png"
     fig.savefig(path, dpi=80, bbox_inches="tight")
     plt.close(fig)
     # 128 colours: a quarter of the bytes, small enough to commit.

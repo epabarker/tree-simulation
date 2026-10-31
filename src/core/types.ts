@@ -263,6 +263,14 @@ export interface TreeMetrics {
   leafBase: number;
   /** (height − leafBase)/height: the crown ratio by leaf area. */
   leafCrownRatio: number;
+  /**
+   * The crown's base by limbs: first-order limbs in order of where they leave the trunk, the base of
+   * the one at which those from the bottom up first hold 5% of the leaf area (the field's live
+   * crown base; ADR 0028).
+   */
+  limbBase: number;
+  /** (height − limbBase)/height: the crown ratio by limbs. */
+  limbCrownRatio: number;
 }
 
 export const METRIC_COLUMNS: readonly (keyof TreeMetrics)[] = [
@@ -305,6 +313,8 @@ export const METRIC_COLUMNS: readonly (keyof TreeMetrics)[] = [
   "centroidOffsetZ",
   "leafBase",
   "leafCrownRatio",
+  "limbBase",
+  "limbCrownRatio",
 ];
 
 /** A change applied at the start of `season` (before that season runs). */

@@ -23,7 +23,8 @@ the patches the woods grow now ("hand": FLORA, round 2 as adopted) and the fitte
 6. plausibility: each fitted parameter against its bounds, and how far the restarts agree (CMA-ES).
 
 Writes docs/experiments/fits/<round>/holdout.json, figures under docs/experiments/figures/ and lab
-links. Needs Node 24 first on PATH. `--only floor` runs section 0 alone.
+links. Needs Node 24 first on PATH. `--only floor` runs section 0 alone; `--skip floor` runs the rest
+and keeps the floors from an earlier `--only floor` (holdout-floor.json) in the summary.
 """
 
 import argparse
@@ -42,6 +43,7 @@ parser.add_argument("--smoke", action="store_true")
 parser.add_argument("--workers", type=int, default=os.cpu_count() or 4)
 parser.add_argument("--round", default="round3", help="the fits' folder under docs/experiments/fits/")
 parser.add_argument("--only", choices=["floor"], help="run one section")
+parser.add_argument("--skip", choices=["floor"], help="skip one section (its earlier result is kept)")
 parser.add_argument("--origin", default="http://localhost:5173/", help="the lab the links open (the dev server)")
 args = parser.parse_args()
 
@@ -95,25 +97,30 @@ def batched(cases: list[tuple], trials: list[str], seeds: list[int]) -> dict[tup
     return out
 
 
-floor_replies = batched([(sp, w, a) for sp in FITTED for w, a in [("hand", {}), ("fitted", assign[sp])]],
-                        ["wood"], FLOOR_SEEDS)
-floor_rows = []
-for sp in FITTED:
-    target = specs[sp].holdout.get("floor")
-    for which, a in [("hand", {}), ("fitted", assign[sp])]:
-        rec = [r["wood"][0] for r in floor_replies[(sp, which)]]
-        f = {k: float(np.mean([x[k] for x in rec])) for k in ("floor100", "floor150")}
-        inside = None if target is None else abs(f["floor100"] - target["target"]) <= target["band"]
-        floor_rows.append({"species": sp, "patch": which, **f,
-                           "target": target and target["target"], "band": target and target["band"], "in band": inside})
-print("0. the floor of each species' own wood at 100 (150), τ 0, per area, mean of seeds", FLOOR_SEEDS)
-for r in floor_rows:
-    print(f"   {r['species']:9} {r['patch']:7} {100 * r['floor100']:5.1f}% ({100 * r['floor150']:4.1f}%)  "
-          f"target {100 * r['target']:.1f} ± {100 * r['band']:.1f}%  {'in band' if r['in band'] else 'OUT'}")
-if args.only == "floor":
-    pool.close()
-    (OUT / "holdout-floor.json").write_text(json.dumps(floor_rows, indent=2) + "\n")
-    raise SystemExit(0)
+if args.skip == "floor":
+    saved = OUT / "holdout-floor.json"
+    floor_rows = json.loads(saved.read_text()) if saved.exists() else []
+    print(f"0. the floors: skipped ({'kept from ' + saved.name if floor_rows else 'none on disk'})")
+else:
+    floor_replies = batched([(sp, w, a) for sp in FITTED for w, a in [("hand", {}), ("fitted", assign[sp])]],
+                            ["wood"], FLOOR_SEEDS)
+    floor_rows = []
+    for sp in FITTED:
+        target = specs[sp].holdout.get("floor")
+        for which, a in [("hand", {}), ("fitted", assign[sp])]:
+            rec = [r["wood"][0] for r in floor_replies[(sp, which)]]
+            f = {k: float(np.mean([x[k] for x in rec])) for k in ("floor100", "floor150")}
+            inside = None if target is None else abs(f["floor100"] - target["target"]) <= target["band"]
+            floor_rows.append({"species": sp, "patch": which, **f,
+                               "target": target and target["target"], "band": target and target["band"], "in band": inside})
+    print("0. the floor of each species' own wood at 100 (150), τ 0, per area, mean of seeds", FLOOR_SEEDS)
+    for r in floor_rows:
+        print(f"   {r['species']:9} {r['patch']:7} {100 * r['floor100']:5.1f}% ({100 * r['floor150']:4.1f}%)  "
+              f"target {100 * r['target']:.1f} ± {100 * r['band']:.1f}%  {'in band' if r['in band'] else 'OUT'}")
+    if args.only == "floor":
+        pool.close()
+        (OUT / "holdout-floor.json").write_text(json.dumps(floor_rows, indent=2) + "\n")
+        raise SystemExit(0)
 
 
 # 1. Shade tolerance -----------------------------------------------------------------------------

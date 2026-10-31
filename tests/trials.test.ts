@@ -97,4 +97,36 @@ describe("species trials and amended patches (M27)", () => {
     expect(dark.seasons).toBeLessThan(30);
     expect(dark.light).toBeLessThan(0.02);
   });
+
+  it("starves a seedling in the dark in the same 4 seasons whatever the species or candidate", () => {
+    // fit.py's STARVE_SEASONS: the survival light credits only seasons past it, which is clean only
+    // if no species or fitted parameter moves it (reserve0 and kStarve are world defaults).
+    const extremes: Record<string, unknown>[] = [
+      {},
+      {
+        "r1.mf": 0.02,
+        "r1.Lh": 10,
+        "r6.leafArea": 1,
+        "r6.qMin": 0.01,
+        "c6.r0": 0.001875,
+        "r1.mw": 300,
+      },
+      {
+        "r1.mf": 0.15,
+        "r1.Lh": 200,
+        "r6.leafArea": 3,
+        "r6.qMin": 0.2,
+        "c6.r0": 0.0125,
+        "r1.mw": 2,
+      },
+    ];
+    for (const species of Object.keys(FLORA)) {
+      for (const assign of extremes) {
+        expect(
+          runShade(species, 1, 1000, assign).seasons,
+          `${species} ${JSON.stringify(assign)}`,
+        ).toBe(4);
+      }
+    }
+  });
 });

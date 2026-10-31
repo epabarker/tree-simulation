@@ -7,6 +7,10 @@ scored against the targets in analysis/fit/targets/<species>.toml:
 
     loss = Σ weight · ((seed-mean trait − target) / band)²  + penalties for dead trees
 
+A profile trait (`profile = [t0 … t9]` and one `band` in place of `target`: the crown's width in ten
+height bands, species plan of 2026-10-31, step B.3) adds weight/10 · ((p_k − t_k) / band)² per band,
+so the vector weighs as one trait.
+
 The search runs in [0, 1]^n (log scale where a parameter asks for it). Every candidate of a
 generation sees the same seeds (common random numbers), drawn afresh each generation so no fit
 learns one seed's quirks. Restarts: some from today's values, some from random points. At the end
@@ -35,6 +39,12 @@ TRIALS = ["lone", "stand"]
 #: Light a seedling that dies under every roof of the shade house is taken to need: above the
 #: lightest roof (≈ 61%), so the loss still ranks how far a candidate is from surviving.
 NO_SURVIVAL_LIGHT = 0.7
+#: Seasons a seedling lives in the dark: under an opaque roof it bears no leaf, burns its reserve
+#: and starves (R1's reserve0 and kStarve, world defaults the fit never moves), dying in season 5
+#: for every species, at round 2's patches and round 3's fits alike (measured:
+#: docs/experiments/code/2026-10-31-species-round4/starve-s0.txt; tests/trials.test.ts asserts it).
+#: The survival light credits only the seasons past it: those are the part that varies with light.
+STARVE_SEASONS = 4
 #: Loss added for each lone tree that dies, and for each fifth of a stand's interior lost.
 DEATH_PENALTY = 25.0
 #: Loss for a trait that could not be measured (a tree with no limbs to measure, say).
@@ -173,14 +183,17 @@ def survival_light(reply: dict, k: int = 0) -> tuple[float, float]:
     the parameters). The continuous one reads the seasons it lived under each roof (species plan
     §2.2): on a log-light axis each roof owns the interval from its light up to the next brighter
     roof's (the brightest's up to NO_SURVIVAL_LIGHT), and the survival light is the top minus the
-    intervals weighted by the share of the 30 seasons lived. A clean step at roof a gives roof a's
-    light, as the step statistic does; a seedling that dies late under the next darker roof moves it
-    toward that roof's light."""
+    intervals weighted by the share of the 30 seasons lived past STARVE_SEASONS (round 4: the
+    seasons a leafless seedling takes to starve are the same under every roof below the cut, and
+    crediting them read birch 25% too tolerant). A clean step at roof a gives roof a's light, as
+    the step statistic does; a seedling that dies late under the next darker roof moves it toward
+    that roof's light."""
     roofs = sorted(reply["shade"], key=lambda r: reply["light"][r])
     lights = [reply["light"][r] for r in roofs]
     survived = reply.get("survived")
     share = [
-        (survived[r][k] / 30 if survived else float(reply["shade"][r][k])) for r in roofs
+        (max(0, survived[r][k] - STARVE_SEASONS) / (30 - STARVE_SEASONS) if survived else float(reply["shade"][r][k]))
+        for r in roofs
     ]
     edges = [math.log(x) for x in lights] + [math.log(NO_SURVIVAL_LIGHT)]
     log_light = edges[-1] - sum(f * (edges[i + 1] - edges[i]) for i, f in enumerate(share))
@@ -189,7 +202,8 @@ def survival_light(reply: dict, k: int = 0) -> tuple[float, float]:
 
 
 def seed_traits(reply: dict) -> dict[str, float | None]:
-    """Flat traits of one seed's reply, `trial.trait`, with derived ones: lone.earlyShare (H30/H60),
+    """Flat traits of one seed's reply, `trial.trait` (a vector's entries `trial.trait.k`, as
+    lone.profile.0 … lone.profile.9), with derived ones: lone.earlyShare (H30/H60),
     stand.lateShare (H100/H60), and shade.survivalLight (the light the seedling survives down to,
     from the seasons it lived under each roof; shade.survivalLightStep is the lowest light it lived
     to season 30 under, the statistic before 3D)."""
@@ -197,6 +211,10 @@ def seed_traits(reply: dict) -> dict[str, float | None]:
     for trial in TRIALS:
         for rec in reply.get(trial, []):
             for k, v in rec.items():
+                if isinstance(v, list):
+                    for i, x in enumerate(v):
+                        flat[f"{trial}.{k}.{i}"] = None if x is None else float(x)
+                    continue
                 # Booleans (alive) count as 0 or 1; null is a trait that could not be measured.
                 flat[f"{trial}.{k}"] = None if v is None else float(v)
     h30, h60 = flat.get("lone.height30"), flat.get("lone.height60")
@@ -217,14 +235,38 @@ def mean_traits(per_seed: list[dict[str, float | None]]) -> dict[str, float | No
     return out
 
 
+def targets_of(t: dict) -> list[float]:
+    """A trait's targets: one, or a profile's ten."""
+    return list(t["profile"]) if "profile" in t else [t["target"]]
+
+
+def value_of(t: dict, traits: dict) -> float | list[float] | None:
+    """The trait's seed-mean value: a number, a profile's list of band values, or None where any of
+    it could not be measured."""
+    if "profile" not in t:
+        return traits.get(t["name"])
+    vs = [traits.get(f"{t['name']}.{k}") for k in range(len(t["profile"]))]
+    return None if any(v is None for v in vs) else vs
+
+
+def scaled(t: dict, traits: dict) -> list[float] | None:
+    """(value − target)/band for each of the trait's terms (one, or a profile's ten); None if missing."""
+    v = value_of(t, traits)
+    if v is None:
+        return None
+    vs = v if isinstance(v, list) else [v]
+    return [(x - g) / t["band"] for x, g in zip(vs, targets_of(t))]
+
+
 def loss(spec: Spec, traits: dict[str, float | None]) -> float:
     total = 0.0
     for t in spec.traits:
-        v = traits.get(t["name"])
-        if v is None:
+        z = scaled(t, traits)
+        if z is None:
             total += t["weight"] * MISSING_PENALTY
         else:
-            total += t["weight"] * ((v - t["target"]) / t["band"]) ** 2
+            # A profile's bands share the trait's weight.
+            total += t["weight"] * float(np.mean(np.square(z)))
     lone_alive = traits.get("lone.alive")
     if lone_alive is not None:
         total += DEATH_PENALTY * (1 - lone_alive)

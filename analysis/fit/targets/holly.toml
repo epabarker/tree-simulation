@@ -7,6 +7,8 @@
 species = "holly"
 
 [[trait]]
+# Scale: 1 cell ≈ 0.25 m is uncertain by ±20% (traits note); the two shares are scale-free and
+# carry the growth information.
 name = "stand.height"
 target = 41
 band = 12
@@ -15,6 +17,9 @@ kind = "described"
 source = "≈ 10 m at 60 years on the same fitted curve (open or edge growth); field guides 10–15 m mature"
 
 [[trait]]
+# Lone against stand: a lone tree scored against yield-table top heights (closed stands): assumes
+# open-grown trees follow a similar curve, though open-grown height curves run lower and flatter
+# (audit §1.4).
 name = "lone.earlyShare"
 target = 0.63
 band = 0.1
@@ -31,46 +36,44 @@ kind = "described"
 source = "a narrow cone (field guides; M25)"
 
 [[trait]]
+# Replaces lone.widestAt and lone.crownFullness (round 4): one vector a tiered crown
+# cannot satisfy, each band ±0.1, the ten sharing the trait's weight.
+name = "lone.profile"
+profile = [0.39, 1, 0.93, 0.83, 0.72, 0.6, 0.48, 0.35, 0.21, 0.07]
+band = 0.1
+weight = 0.5
+kind = "described"
+source = "the crown's width in ten bands, base to top, over its widest: widest at 0.15 of the crown, as full as 0.55 (1 − |u|^q, q = p/(1 − p); the round-4 plan, step C.5). A cone: widest near the base; a cone fills a little over half its box (a triangle is 0.5)"
+
+[[trait]]
 name = "lone.slenderness"
 target = 48
 band = 8
-weight = 1
-kind = "measured"
-source = "open-grown trees are squat, H/D ≈ 40–55 (MacFarlane et al. 2017)"
+weight = 0.5
+kind = "described"
+source = "open-grown trees are squat, H/D ≈ 40–55 (MacFarlane et al. 2017): a generic range, no species number found; half weight"
 
 [[trait]]
+# Stand density: read in the closed stand at spacing 21 ≈ 5.25 m, ≈ 360 stems/ha: sparser than a
+# yield-table stand at 60 (420–1000/ha), which lowers H/D and raises crown ratio against the
+# tables (audit §1.4).
 name = "stand.slenderness"
 target = 70
 band = 10
-weight = 1
-kind = "measured"
-source = "stand-grown H/D 60–80 (Watt et al. 2023)"
+weight = 0.5
+kind = "described"
+source = "no species-specific stand H/D found: the generic stand range 60–80 (Watt et al. 2023, conifer stands), half weight, so acceptance no longer rests on it"
 
 [[trait]]
-# The leafy crown's share of the height (metrics' leafCrownRatio, cli/trials.ts): the branch
-# measure reads 0.99 in 3D whatever the crown does (species plan §0.4).
+# The crown's share of the height to its base by limbs: where the first-order limbs, from the
+# bottom up, first hold 5% of the leaf area (metrics' limbCrownRatio, cli/trials.ts): the field's
+# live crown base (round 4, ADR 0028).
 name = "stand.crownRatio"
 target = 0.75
 band = 0.1
 weight = 0.5
 kind = "described"
 source = "keeps its shaded lower limbs: a crown most of the stem long (M25)"
-
-[[trait]]
-name = "lone.widestAt"
-target = 0.15
-band = 0.1
-weight = 0.5
-kind = "described"
-source = "a cone: widest near the base"
-
-[[trait]]
-name = "lone.crownFullness"
-target = 0.55
-band = 0.1
-weight = 0.5
-kind = "described"
-source = "a cone fills a little over half its box (a triangle is 0.5)"
 
 [[trait]]
 name = "lone.forkHeight"
@@ -105,6 +108,7 @@ kind = "described"
 source = "lower limbs sweep down a little"
 
 [[trait]]
+# Scale-free: the ratio carries the growth curve whatever the cell's size.
 name = "stand.lateShare"
 target = 1.22
 band = 0.1
@@ -140,7 +144,7 @@ hi = 80
 [[param]]
 path = "r2.levels.1.eta"
 lo = 0.05
-hi = 1.5
+hi = 1
 log = true
 [[param]]
 path = "r2.levels.2.setPoint"

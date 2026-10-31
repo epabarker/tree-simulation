@@ -7,6 +7,8 @@
 species = "fir"
 
 [[trait]]
+# Scale: 1 cell ≈ 0.25 m is uncertain by ±20% (traits note); the two shares are scale-free and
+# carry the growth information.
 name = "stand.height"
 target = 80
 band = 14
@@ -15,6 +17,9 @@ kind = "measured"
 source = "silver fir top height 17.6–23.0 m at 60 years for site index 28–34 m (Tirol fir tables, 2004, from the Baden-Württemberg fir yield table)"
 
 [[trait]]
+# Lone against stand: a lone tree scored against yield-table top heights (closed stands): assumes
+# open-grown trees follow a similar curve, though open-grown height curves run lower and flatter
+# (audit §1.4).
 name = "lone.earlyShare"
 target = 0.42
 band = 0.06
@@ -29,6 +34,16 @@ band = 0.12
 weight = 0.5
 kind = "described"
 source = "a narrow cone (field guides; M19 note)"
+
+[[trait]]
+# Replaces lone.widestAt and lone.crownFullness (round 4): one vector a tiered crown
+# cannot satisfy, each band ±0.1, the ten sharing the trait's weight.
+name = "lone.profile"
+profile = [1, 0.89, 0.79, 0.68, 0.58, 0.47, 0.37, 0.26, 0.16, 0.05]
+band = 0.1
+weight = 0.5
+kind = "described"
+source = "the crown's width in ten bands, base to top, over its widest: widest at 0.05 of the crown, as full as 0.5 (1 − |u|^q, q = p/(1 − p); the round-4 plan, step C.5). A cone, widest at the base (Massart's model)"
 
 [[trait]]
 name = "lone.slenderness"
@@ -47,30 +62,15 @@ kind = "measured"
 source = "stand-grown H/D 60–80 (Watt et al. 2023)"
 
 [[trait]]
-# The leafy crown's share of the height (metrics' leafCrownRatio, cli/trials.ts): the branch
-# measure reads 0.99 in 3D whatever the crown does (species plan §0.4).
+# The crown's share of the height to its base by limbs: where the first-order limbs, from the
+# bottom up, first hold 5% of the leaf area (metrics' limbCrownRatio, cli/trials.ts): the field's
+# live crown base (round 4, ADR 0028).
 name = "stand.crownRatio"
 target = 0.6
 band = 0.1
 weight = 0.5
 kind = "described"
 source = "a shade-tolerant conifer keeps a deep crown in a stand, roughly 0.5–0.7 (M19 note)"
-
-[[trait]]
-name = "lone.widestAt"
-target = 0.1
-band = 0.1
-weight = 0.5
-kind = "described"
-source = "a cone: widest at the base"
-
-[[trait]]
-name = "lone.crownFullness"
-target = 0.55
-band = 0.1
-weight = 0.5
-kind = "described"
-source = "a triangle fills half its box (0.5); a cone a little more"
 
 [[trait]]
 name = "lone.forkHeight"
@@ -105,6 +105,7 @@ kind = "described"
 source = "level tiers"
 
 [[trait]]
+# Scale-free: the ratio carries the growth curve whatever the cell's size.
 name = "stand.lateShare"
 target = 1.53
 band = 0.08

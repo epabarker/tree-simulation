@@ -55,7 +55,10 @@ from treesim.fit import (
     encode,
     loss,
     mean_traits,
+    scaled,
     seed_traits,
+    targets_of,
+    value_of,
 )
 
 #: ADR 0027's m_w: with the species' r0 at the start, R1's sapwood cost m_w·π·r0²·path, held.
@@ -131,11 +134,14 @@ class Problem:
 
     def traits(self, points: list[tuple[np.ndarray, float]], seeds: dict | None = None) -> list[dict]:
         """Seed-mean traits of each point, every (point, trial, seed) a request of the pool."""
+        return self.traits_of([self.assign(x, r0) for x, r0 in points], seeds)
+
+    def traits_of(self, assigns: list[dict], seeds: dict | None = None) -> list[dict]:
+        """Seed-mean traits of each set of assignments (a results file's, as written)."""
         seeds = seeds or self.settings.seeds
         trials = ["lone", "stand"] + (["shade"] if self.shade else [])
         requests = []
-        for i, (x, r0) in enumerate(points):
-            a = self.assign(x, r0)
+        for i, a in enumerate(assigns):
             for t in trials:
                 for s in seeds[t]:
                     requests.append((COST[t], i, t, {"species": self.spec.species, "assign": a,
@@ -146,9 +152,9 @@ class Problem:
         for k, reply in zip(order, replies):
             _, i, t, _ = requests[k]
             by.setdefault((i, t), []).append(seed_traits(reply))
-        self.evaluations += len(points)
+        self.evaluations += len(assigns)
         out = []
-        for i in range(len(points)):
+        for i in range(len(assigns)):
             merged: dict = {}
             for t in trials:
                 # Each trial's own traits only: a stand reply derives lone.earlyShare as None.
@@ -157,19 +163,26 @@ class Problem:
         return out
 
     def names(self) -> list[str]:
-        return [t["name"] for t in self.spec.traits] + ["dead.lone", "dead.stand"] + \
-            [f"tikhonov:{p}" for p in self.paths]
+        out = []
+        for t in self.spec.traits:
+            out += [f"{t['name']}.{k}" for k in range(len(t["profile"]))] if "profile" in t else [t["name"]]
+        return out + ["dead.lone", "dead.stand"] + [f"tikhonov:{p}" for p in self.paths]
 
     @property
     def n_traits(self) -> int:
-        return len(self.spec.traits) + 2
+        return sum(len(targets_of(t)) for t in self.spec.traits) + 2
 
     def residuals(self, traits: dict, x: np.ndarray) -> np.ndarray:
         r = []
         for t in self.spec.traits:
-            v = traits.get(t["name"])
-            r.append(math.sqrt(t["weight"] * MISSING_PENALTY) if v is None
-                     else math.sqrt(t["weight"]) * (v - t["target"]) / t["band"])
+            # A profile's ten bands share the trait's weight: √(w/10) each, so the vector weighs
+            # as one trait in r·r (and a missing one as one missing trait).
+            n = len(targets_of(t))
+            z = scaled(t, traits)
+            if z is None:
+                r += [math.sqrt(t["weight"] * MISSING_PENALTY / n)] * n
+            else:
+                r += [math.sqrt(t["weight"] / n) * v for v in z]
         lone, standing = traits.get("lone.alive"), traits.get("stand.alive")
         r.append(math.sqrt(DEATH_PENALTY) * (1 - lone) if lone is not None else 0.0)
         r.append(math.sqrt(5 * DEATH_PENALTY) * max(0.0, 0.8 - standing) if standing is not None else 0.0)
@@ -207,8 +220,9 @@ def in_band(spec: Spec, traits: dict, kind: str = "measured") -> tuple[int, int,
         if t["kind"] != kind:
             continue
         n += 1
-        v = traits.get(t["name"])
-        if v is None or abs(v - t["target"]) > t["band"]:
+        z = scaled(t, traits)
+        # A profile is in band when every band is.
+        if z is None or max(abs(v) for v in z) > 1:
             outside.append(t["name"])
     return n - len(outside), n, outside
 
@@ -458,14 +472,16 @@ def fit_lm(spec: Spec, settings: LMSettings, start: dict, log=print, active: lis
 
 
 def margins(spec: Spec, start: dict, fit: dict) -> list[dict]:
-    """Each trait's distance to its band's edge (positive inside the band), start and fit."""
+    """Each trait's distance to its band's edge (positive inside the band), start and fit; a profile's
+    is its worst band's."""
     out = []
     for t in spec.traits:
-        row = {"trait": t["name"], "kind": t["kind"], "target": t["target"], "band": t["band"], "weight": t["weight"]}
+        target = t["profile"] if "profile" in t else t["target"]
+        row = {"trait": t["name"], "kind": t["kind"], "target": target, "band": t["band"], "weight": t["weight"]}
         for k, traits in (("start", start), ("fit", fit)):
-            v = traits.get(t["name"])
+            v, z = value_of(t, traits), scaled(t, traits)
             row[k] = v
-            row[f"{k}Margin"] = None if v is None else t["band"] - abs(v - t["target"])
+            row[f"{k}Margin"] = None if z is None else t["band"] * (1 - max(abs(u) for u in z))
         out.append(row)
     return out
 

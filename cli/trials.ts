@@ -44,10 +44,11 @@ export const newWorld = (params: Params): RustWorld => RustWorld.create(params);
 export const STAND_ROOTS = [20, 41, 62, 83, 104, 125, 146, 167, 188, 209];
 /**
  * Roof densities of the shade house: on the ground under each, in the 3D slab between opaque faces,
- * 30, 21.7, 15.8, 10.9, 7.1, 4.7, 2.9 and 1.8% of the open sky (the same for every seed and species;
- * docs/experiments/code/2026-10-30-species-3d/roofs.ts).
+ * 30, 26.3, 21.7, 18.5, 15.8, 10.9, 7.1, 4.7, 2.9 and 1.8% of the open sky (the same for every seed
+ * and species; docs/experiments/code/2026-10-30-species-3d/roofs.ts). 1.2 and 1.75 split the
+ * intolerant end, where birch's cut fell between two roofs (species plan 2026-10-31, step B.4).
  */
-export const ROOFS = [1, 1.5, 2, 2.6, 3.3, 4, 4.8, 5.6];
+export const ROOFS = [1, 1.2, 1.5, 1.75, 2, 2.6, 3.3, 4, 4.8, 5.6];
 /** Seasons a shade-house seedling is followed: alive at 30 is survival (M19). */
 export const SHADE_SEASONS = 30;
 
@@ -187,6 +188,8 @@ export interface LoneTraits {
   junctionDelta: number;
   ldSlope: number;
   leafStemSlope: number;
+  /** The crown's width in ten height bands, base to top, over its widest (form.rs's profile). */
+  profile: number[];
 }
 
 export function runLone(
@@ -222,6 +225,7 @@ export function runLone(
     junctionDelta: f.junctionDelta,
     ldSlope: f.ldSlope,
     leafStemSlope: f.leafStemSlope,
+    profile: f.profile,
   };
 }
 
@@ -231,12 +235,17 @@ export interface StandTraits {
   height: number;
   slenderness: number;
   /**
-   * The leafy crown's share of the height (metrics' leafCrownRatio): the branch measure reads
-   * 0.99 whatever the crown does in 3D (form step 2), so the fit's target reads this one.
+   * The crown's share of the height to its base by limbs (metrics' limbCrownRatio: where the
+   * first-order limbs, from the bottom up, first hold 5% of the leaf area): the field's live crown
+   * base, which the targets' sources mean (ADR 0028).
    */
   crownRatio: number;
-  /** The branch measure (metrics' crownRatio), for the record. */
+  /** The leafy crown's share (metrics' leafCrownRatio, round 3's measure), for the record. */
+  leafCrownRatio: number;
+  /** The branch measure (metrics' crownRatio: one twig sets it, 0.99 in 3D), for the record. */
   boleCrownRatio: number;
+  /** Leaf area index over the whole ring at 60 (the floor's cause: exp(−K·LAI)). */
+  lai: number;
   /** Light on the stand's floor, a fraction of open sky (reported, not fitted). */
   floor: number;
   widestAt: number;
@@ -244,6 +253,8 @@ export interface StandTraits {
   height100?: number;
   /** Share of the middle row's trees alive at season 100, when run on; else absent. */
   alive100?: number;
+  /** The leaf area index at season 100, when run on; else absent. */
+  lai100?: number;
 }
 
 const mean = (xs: number[]): number =>
@@ -264,9 +275,11 @@ export function runStand(
     alive: live.length / interior.length,
     height: mean(ms.map((m) => m.height)),
     slenderness: mean(ms.map((m) => m.slenderness)),
-    crownRatio: mean(ms.map((m) => m.leafCrownRatio)),
+    crownRatio: mean(ms.map((m) => m.limbCrownRatio)),
+    leafCrownRatio: mean(ms.map((m) => m.leafCrownRatio)),
     boleCrownRatio: mean(ms.map((m) => m.crownRatio)),
     floor: world.groundLight(0, STAND_WIDTH),
+    lai: world.lai(0, STAND_WIDTH),
     widestAt: mean(live.map((t) => world.formOf(t).widestAt)),
   };
   if (seasons === 100) {
@@ -274,6 +287,7 @@ export function runStand(
     const still = interior.filter((t) => t.alive);
     traits.height100 = mean(still.map((t) => world.metricsOf(t).height));
     traits.alive100 = still.length / interior.length;
+    traits.lai100 = world.lai(0, STAND_WIDTH);
   }
   world.dispose();
   return traits;

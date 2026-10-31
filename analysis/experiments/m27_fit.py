@@ -25,7 +25,8 @@ then CMA-ES from `--start`'s fits as adopted (the hand overrides on top, r0 in A
 docs/experiments/fits/<--out>/<species>.json, <species>-lm.csv (the loss per iteration) and
 <species>-jacobian.csv (the screening). With several species, each after the first starts from its
 own start shifted by the mean shift (in the unit cube, and r0's in log) of those already fitted,
-where that start's loss is lower than its own: the plan's transfer.
+where that start's loss is lower than its own: the plan's transfer. With --smoke it runs one LM
+iteration and two CMA-ES generations on one seed a trial and writes under runs/m27-fit-smoke/lm/.
 """
 
 import argparse
@@ -38,7 +39,7 @@ import tomllib
 
 import numpy as np
 from treesim import REPO
-from treesim.fit import SPECIES, FitSettings, Pool, Spec, decode, encode, fit, load_spec, write_results
+from treesim.fit import SPECIES, FitSettings, Pool, Spec, decode, encode, fit, load_spec, value_of, write_results
 from treesim.fit_lm import LMSettings, Problem, fit_lm, write_lm
 
 #: The garden's eight (`MIXED`), fitted first in 3D; fir and pine are the lab's.
@@ -77,19 +78,27 @@ else:
 log_root = REPO / "runs" / ("m27-fit-smoke" if args.smoke else "m27-fit")
 
 
+def fmt(v) -> str:
+    """A trait's value or target for the reports: a profile's bands joined by '/'."""
+    if v is None:
+        return "—"
+    if isinstance(v, list):
+        return "/".join(f"{x:.2f}" for x in v)
+    return v if isinstance(v, str) else f"{v:.3g}"
+
+
 def out_dir(sp: str):
     return log_root / sp if args.smoke else REPO / "docs" / "experiments" / "fits"
 
 
 def report(spec, result: dict, path) -> None:
-    fmt = lambda v: "—" if v is None else f"{v:.3g}"
     print(f"\n{spec.species}: {result['candidates']} candidates in {result['seconds']} s")
     print(f"loss: hand-tuned {result['hand']['loss']:.2f}, fitted {result['fit']['loss']:.2f}")
     print(f"{'trait':24} {'target':>8} {'hand':>8} {'fitted':>8}")
     for t in spec.traits:
-        h = result["hand"]["traits"].get(t["name"])
-        f = result["fit"]["traits"].get(t["name"])
-        print(f"{t['name']:24} {t['target']:>8} {fmt(h):>8} {fmt(f):>8}")
+        h = value_of(t, result["hand"]["traits"])
+        f = value_of(t, result["fit"]["traits"])
+        print(f"{t['name']:24} {fmt(t.get('profile', t.get('target'))):>8} {fmt(h):>8} {fmt(f):>8}")
     print(f"{'param':24} {'hand':>8} {'fitted':>8}")
     for p in spec.paths:
         h = result["hand"]["values"].get(p)
@@ -141,7 +150,6 @@ def lm_start(spec: Spec, a: dict, shifts: list[dict], workers: int) -> dict:
 
 
 def lm_report(spec: Spec, result: dict) -> None:
-    fmt = lambda v: "—" if v is None else f"{v:.3g}"
     print(f"\n{spec.species}: {result['evaluations']} evaluations in {result['seconds']} s "
           f"({', '.join(f'{k} {v} s' for k, v in result['stageSeconds'].items())})"
           + (f"; stopped: {result['stopped']}" if result["stopped"] else ""))
@@ -150,7 +158,7 @@ def lm_report(spec: Spec, result: dict) -> None:
     print(f"loss on fresh seeds (progress only): start {result['start']['loss']:.2f}, fitted {result['fit']['loss']:.2f}")
     print(f"{'trait':24} {'kind':>9} {'target':>8} {'band':>7} {'start':>8} {'fitted':>8} {'margin':>8}")
     for m in result["margins"]:
-        print(f"{m['trait']:24} {m['kind']:>9} {m['target']:>8} {m['band']:>7} {fmt(m['start']):>8} "
+        print(f"{m['trait']:24} {m['kind']:>9} {fmt(m['target']):>8} {m['band']:>7} {fmt(m['start']):>8} "
               f"{fmt(m['fit']):>8} {fmt(m['fitMargin']):>8}")
     print(f"active: {', '.join(result['activeSet'])}")
     for p in spec.paths + ["r1.mw"]:
@@ -168,8 +176,12 @@ def shift_of(spec: Spec, own: dict, fitted: dict) -> dict:
 if args.method == "lm":
     # An unattended run (step 2 runs overnight): the log is a file, so print line by line.
     sys.stdout.reconfigure(line_buffering=True)
-    out = REPO / "docs" / "experiments" / "fits" / args.out
-    settings = LMSettings(workers=args.workers, **({"iterations": args.iterations} if args.iterations else {}))
+    out = log_root / "lm" if args.smoke else REPO / "docs" / "experiments" / "fits" / args.out
+    one = {"lone": [1], "stand": [1], "shade": [1]}
+    smoke = {"seeds": one, "noise_seeds": [1, 2], "select_seeds": [501], "verify_seeds": [1001], "iterations": 1,
+             "max_rejections": 0, "popsize": 4, "cma_seeds": 1, "generations": 2, "finalists": 1}
+    settings = LMSettings(workers=args.workers, **(smoke if args.smoke else {}),
+                          **({"iterations": args.iterations} if args.iterations else {}))
     # Every species already fitted in this round lends its shift to the ones that run, wherever it
     # stands in the list (beech, fourth in GARDEN, is done before birch, the first, runs).
     shifts: list[dict] = []

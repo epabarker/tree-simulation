@@ -2,6 +2,13 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-31: Species round 5: the shed branches decomposed; R1's light response; R4's abort age
+
+- **Shed branches** (`rust/core/examples/shed_log.rs`, hornbeam at ramp 25): 26,316 by season 100, almost all one leafy short shoot shed for P < M; sapwood is under 1% of M_b, so the test is α·Q·d(L) < m_f, a compensation light of 0.04–0.08 that rises with path length.
+- **R1's light response** (ADR 0030, proposed): `r1.response` "saturating" with `r1.qHalf` (default linear, goldens unchanged, two unit tests). It rounds the lone hornbeam at 60 but drives it to the ceiling by 100, makes the stand's crown shallower (limb crown ratio 0.39 → 0.33), and loosens forest's plateau (1 of 3 seeds pass against 3 of 3).
+- **R4's abort age** (proposed, `r4-dormant-age.patch`, not applied): age counts dormant seasons only; a unit test; 10 of 14 goldens move; birch keeps its crown to 100.
+- No fit.
+
 ## 2026-10-31: Species round 5: the picks in [form], the cap is shedding, birch's aborts
 
 - **The picks** (`form-picks.py`, `[form]` with dated comments): the review's nearest-brief cell for six species, hornbeam the user's, beech round 2's. None changes kind on seeds 1–3. The lab panel, round `form` (`figures/2026-10-31-panel-form-*`).

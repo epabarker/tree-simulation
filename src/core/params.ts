@@ -227,6 +227,13 @@ export interface Params {
     store: number;
     /** Branch shedding: 'c5' keeps C5's light rule; 'carbon' sheds branches whose P_b < M_b. */
     shed: "c5" | "carbon";
+    /**
+     * Production's light response f(Q) (ADR 0030): 'linear' (absent: the default), f = Q;
+     * 'saturating', f = Q·(1 + qHalf)/(Q + qHalf), the same at Q = 1 and more in shade.
+     */
+    response?: "linear" | "saturating";
+    /** q_half: the saturating response's half-saturation light, of open sky. */
+    qHalf?: number;
   };
 
   /**

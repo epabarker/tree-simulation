@@ -163,6 +163,10 @@ pub struct R1 {
     pub store: f64,
     /// `r1.shed === "carbon"`.
     pub shed_carbon: bool,
+    /// `r1.response === "saturating"` (ADR 0030); absent, the linear response.
+    pub saturating: bool,
+    /// q_half: the saturating response's half-saturation light (read only when `saturating`).
+    pub q_half: f64,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -437,6 +441,8 @@ impl Params {
                 reserve0: num(r1, "reserve0"),
                 store: num(r1, "store"),
                 shed_carbon: text(r1, "shed") == "carbon",
+                saturating: text(r1, "response") == "saturating",
+                q_half: num(r1, "qHalf"),
             },
             r2: R2 {
                 enabled: flag(r2, "enabled"),

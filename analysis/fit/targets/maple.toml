@@ -7,6 +7,8 @@
 species = "maple"
 
 [[trait]]
+# Scale: 1 cell ≈ 0.25 m is uncertain by ±20% (traits note); the two shares are scale-free and
+# carry the growth information.
 name = "stand.height"
 target = 64
 band = 11
@@ -15,6 +17,9 @@ kind = "measured"
 source = "German national forest inventory (BWI 2012, 782 trees): mean height 16.1 m at mean age 63 (Bavarian LWF report, LWF Wissen 77)"
 
 [[trait]]
+# Lone against stand: a lone tree scored against yield-table top heights (closed stands): assumes
+# open-grown trees follow a similar curve, though open-grown height curves run lower and flatter
+# (audit §1.4).
 name = "lone.earlyShare"
 target = 0.7
 band = 0.08
@@ -24,31 +29,45 @@ source = "height at 30 over height at 60: maples grow fast young and lose growth
 
 [[trait]]
 name = "lone.spread"
-target = 1
-band = 0.25
+target = 0.7
+band = 0.2
 weight = 0.5
 kind = "described"
-source = "a low, rounded crown about as wide as it is tall (field guides; M25)"
+source = "open-grown W/H at about 60 years, by proxy: sycamore 0.40 (Pretzsch et al. 2015's envelope, a lower bound), urban sycamore 0.55 and Norway maple 0.65 (Franceschi et al. 2022 Table 1 means); field maple itself not found. Re-centred at the trial's age as hornbeam (round 4)"
+
+[[trait]]
+# Replaces lone.widestAt and lone.crownFullness (round 4): one vector a tiered crown
+# cannot satisfy, each band ±0.1, the ten sharing the trait's weight.
+name = "lone.profile"
+profile = [0.26, 0.65, 0.88, 0.98, 1, 0.99, 0.93, 0.79, 0.56, 0.22]
+band = 0.1
+weight = 0.5
+kind = "described"
+source = "the crown's width in ten bands, base to top, over its widest: widest at 0.45 of the crown, as full as 0.72 (1 − |u|^q, q = p/(1 − p); the round-4 plan, step C.5). Norway maple, the nearest species classified, is spherical (44%) or ovoid (38%) (Franceschi et al. 2022 Table 5): widest near the middle"
 
 [[trait]]
 name = "lone.slenderness"
 target = 48
 band = 8
-weight = 1
-kind = "measured"
-source = "open-grown trees are squat, H/D ≈ 40–55 (MacFarlane et al. 2017)"
+weight = 0.5
+kind = "described"
+source = "open-grown trees are squat, H/D ≈ 40–55 (MacFarlane et al. 2017): a generic range, no species number found; half weight. Proxies: sycamore 57–52 at d 40–50 cm (Pretzsch et al. 2015's envelope), urban sycamore 41 (Franceschi et al. 2022)"
 
 [[trait]]
+# Stand density: read in the closed stand at spacing 21 ≈ 5.25 m, ≈ 360 stems/ha: sparser than a
+# yield-table stand at 60 (420–1000/ha), which lowers H/D and raises crown ratio against the
+# tables (audit §1.4).
 name = "stand.slenderness"
-target = 70
-band = 10
-weight = 1
+target = 68
+band = 12
+weight = 0.5
 kind = "measured"
-source = "stand-grown H/D 60–80 (Watt et al. 2023)"
+source = "field maple H/D 65 in the German national inventory (BWI 2012 mean: d 24.7 cm, h 16.1 m, age 63) and 64–73 for canopy maples in mixed stands (Klemmt et al. 2015, LWF Wissen 77, Tables 1 and 3): an inventory mix of positions, half weight"
 
 [[trait]]
-# The leafy crown's share of the height (metrics' leafCrownRatio, cli/trials.ts): the branch
-# measure reads 0.99 in 3D whatever the crown does (species plan §0.4).
+# The crown's share of the height to its base by limbs: where the first-order limbs, from the
+# bottom up, first hold 5% of the leaf area (metrics' limbCrownRatio, cli/trials.ts): the field's
+# live crown base (round 4, ADR 0028).
 name = "stand.crownRatio"
 target = 0.5
 band = 0.1
@@ -57,20 +76,14 @@ kind = "described"
 source = "mid-tolerant: a crown between birch's and beech's in depth (Kothari et al. 2025)"
 
 [[trait]]
-name = "lone.widestAt"
-target = 0.45
-band = 0.15
+# Leaf area index over the closed stand's ring at 60 (cli/trials.ts): leaf area per cell of
+# ground.
+name = "stand.lai"
+target = 4
+band = 1.5
 weight = 0.5
 kind = "described"
-source = "a rounded crown, widest about its middle"
-
-[[trait]]
-name = "lone.crownFullness"
-target = 0.72
-band = 0.1
-weight = 0.5
-kind = "described"
-source = "a full, rounded crown (an ellipse is 0.79)"
+source = "a sycamore stand's maximum LAI 4.0 (Černý et al. 2020, J. For. Res. 31:827, read from the abstract): a proxy species and one stand, half weight. Field maple not found"
 
 [[trait]]
 name = "lone.forkHeight"
@@ -105,6 +118,7 @@ kind = "described"
 source = "limbs that arch a little at the tips"
 
 [[trait]]
+# Scale-free: the ratio carries the growth curve whatever the cell's size.
 name = "stand.lateShare"
 target = 1.3
 band = 0.1
@@ -139,7 +153,7 @@ hi = 70
 [[param]]
 path = "r2.levels.1.eta"
 lo = 0.05
-hi = 1.5
+hi = 1
 log = true
 [[param]]
 path = "r2.levels.2.setPoint"

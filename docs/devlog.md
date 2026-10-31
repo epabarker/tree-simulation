@@ -2,6 +2,26 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-31: Species round 4: the harness, the targets re-sourced, ADR 0028; round 3 re-scored
+
+- **Plan:** [round 4](plans/2026-10-31-species-round4.md) steps B–D, after the [targets audit](reviews/2026-10-31-species-target-audit.md). Steps A (the hold-out) and E (the re-fit) are the user's.
+- **Harness:** stand LAI (`metrics::lai`); the limb crown base (`limbBase`, `limbCrownRatio`, metrics.csv 39 → 41) as `stand.crownRatio`; the profile trait kind (ten bands, one trait's weight); roofs 1.2 and 1.75 (26.3%, 18.5%); `m27_rescore.py`; `m27_holdout.py --skip floor`; `m27_fit.py --method lm --smoke`; line-up panels (`code/2026-10-31-species-round4/panel-*`).
+- **Targets** (ADR 0028): per-species stand H/D (birch 95, oak 75, beech 82, hornbeam 86, maple 68; the generic 70 described for the rest); `lone.spread` at the trial's age (beech 0.6, oak 0.75, hornbeam and maple 0.7); lone H/D described except beech's 48; the limb crown ratio measured for beech (0.57) and oak (0.42, half weight) from Pretzsch 2019; LAI measured for birch, oak, hornbeam, beech (Hagemeier & Leuschner 2019); `lone.profile` replaces `widestAt` and `crownFullness`; η ≤ 1.0 for the eight broadleaves; beech's acceptance withdrawn.
+- **The user's calls during the work:**
+  - Pretzsch 2015's "open-grown" relations are envelopes of forest-plot trees, so lone traits stay described;
+  - spread is set at 60 years, not parkland age;
+  - LAI is kept, though it does not deliver the floor;
+  - survival light credits only seasons past the 4-season starvation timer (birch had read 25% too tolerant);
+  - the limb base is cumulative from below (the per-limb rule read 0 on a 126-limb crown).
+- **Surprises:**
+  - beech's short stand crown is the model, not the definition;
+  - round 3's beech and hornbeam stands already have LAI in band, with floors of 4–7%;
+  - Hein & Spiecker 2008, which round 3's beech spread cited, is ash and sycamore;
+  - the profile shows oak, hornbeam and maple as vases;
+  - rowan and holly are left with no measured target.
+- **Re-score of round 3:** beech 6 of 8, birch 4 of 5, oak 4 of 7, hornbeam 4 of 6, willow 3 of 3, maple 2 of 2, rowan and holly 0 of 0 ([note](experiments/2026-10-30-species-3d.md), "Round 4").
+- **Goldens:** unchanged (`bench --compare`: the same hash in all seven cases).
+
 ## 2026-10-31: Species steps 2–3: the seven fitted overnight, birch re-fitted, the hold-out stopped for a review of the targets
 
 - **Step 2** (the user's laptop, 12 workers, 7 h 53 min): willow, rowan, holly and maple pass on fresh seeds; birch, oak and hornbeam do not ([note](experiments/2026-10-30-species-3d.md)). Oak and hornbeam miss only the stand's late share, both high; they go to the hold-out as fitted (the user). κ and `r2.levels.1.eta` low recur (a finding about 3D crowns, not bounds to tighten); `r2.aC` at its bound is beech's alone.

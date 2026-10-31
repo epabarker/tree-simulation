@@ -7,6 +7,8 @@
 species = "beech"
 
 [[trait]]
+# Scale: 1 cell ≈ 0.25 m is uncertain by ±20% (traits note); the two shares are scale-free and
+# carry the growth information.
 name = "stand.height"
 target = 84
 band = 18
@@ -15,6 +17,9 @@ kind = "measured"
 source = "dominant height ≈ 20–22 m at 60 years, site index ≈ 27–33 m at 100 (beech site-index curves: Nord-Larsen et al. 2009; Bončina et al. 2021; Stajić et al. 2021)"
 
 [[trait]]
+# Lone against stand: a lone tree scored against yield-table top heights (closed stands): assumes
+# open-grown trees follow a similar curve, though open-grown height curves run lower and flatter
+# (audit §1.4).
 name = "lone.earlyShare"
 target = 0.5
 band = 0.08
@@ -24,11 +29,21 @@ source = "height at 30 over height at 60: beech grows slowly when young, its hei
 
 [[trait]]
 name = "lone.spread"
-target = 0.9
+target = 0.6
 band = 0.2
 weight = 0.5
 kind = "described"
-source = "an open-grown crown about as wide as it is long (Hein et al. 2008); a broad dome"
+source = "open-grown W/H at about 60 years and 0.5 m DBH: Hemery et al. 2005 (read second-hand, with the sim's lone height) 0.35–0.38; Pretzsch et al. 2015's envelope 0.51–0.52 (with the sim's height); parkland trees of 120+ years reach 0.9–1.3. (Round 3's 0.9 cited Hein et al. 2008, which is open-grown ash and sycamore, Hein & Spiecker 2008, Agroforestry Systems 73:205.) The band's top, 0.8, leaves room for the wider reading. W/H is read against the sim's own lone height: a lone beech at 100 cells (25 m) at 60 is tall for an open-grown tree, so the lower edge is not pushed down further. The lone tree's spread at 100 (unfitted) is the parkland check on the panel"
+
+[[trait]]
+# Replaces lone.widestAt and lone.crownFullness (round 4): one vector a tiered crown
+# cannot satisfy, each band ±0.1, the ten sharing the trait's weight.
+name = "lone.profile"
+profile = [0.33, 0.76, 0.95, 1, 1, 0.98, 0.93, 0.8, 0.58, 0.23]
+band = 0.1
+weight = 0.5
+kind = "described"
+source = "the crown's width in ten bands, base to top, over its widest: widest at 0.4 of the crown, as full as 0.75 (1 − |u|^q, q = p/(1 − p); the round-4 plan, step C.5). A broad dome, widest in its lower middle, not at the base (M26 note); a full, rounded dome (an ellipse is 0.79)"
 
 [[trait]]
 name = "lone.slenderness"
@@ -36,41 +51,39 @@ target = 48
 band = 8
 weight = 1
 kind = "measured"
-source = "open-grown trees are squat, H/D ≈ 40–55 (MacFarlane et al. 2017)"
+source = "open-grown H/D 51, 48, 47 at d 25, 40, 50 cm (Pretzsch et al. 2015 (UFUG 14:466), computed from its 95%-quantile crown radius and 5%-quantile height on mostly forest-plot trees: an envelope, not a solitary tree's mean); agrees with the generic 40–55 (MacFarlane et al. 2017), so measured"
 
 [[trait]]
+# Stand density: read in the closed stand at spacing 21 ≈ 5.25 m, ≈ 360 stems/ha: sparser than a
+# yield-table stand at 60 (420–1000/ha), which lowers H/D and raises crown ratio against the
+# tables (audit §1.4).
 name = "stand.slenderness"
-target = 70
-band = 10
+target = 82
+band = 12
 weight = 1
 kind = "measured"
-source = "stand-grown H/D 60–80 (Watt et al. 2023)"
+source = "stand H/D at 60, yield classes 0–1: 78–83 by top height over Weise's diameter, 107–108 for the mean tree (NW-FVA yield tables, Albert et al. 2021, the et.nwfva data); 59–82 at 100, 68 in 100-year stands (Hagemeier & Leuschner 2019)"
 
 [[trait]]
-# The leafy crown's share of the height (metrics' leafCrownRatio, cli/trials.ts): the branch
-# measure reads 0.99 in 3D whatever the crown does (species plan §0.4).
+# The crown's share of the height to its base by limbs: where the first-order limbs, from the
+# bottom up, first hold 5% of the leaf area (metrics' limbCrownRatio, cli/trials.ts): the field's
+# live crown base (round 4, ADR 0028).
 name = "stand.crownRatio"
-target = 0.55
-band = 0.1
-weight = 0.5
-kind = "described"
-source = "shade-tolerant species keep deep crowns in stands (Kothari et al. 2025; Dieler et al. 2013)"
+target = 0.57
+band = 0.08
+weight = 1
+kind = "measured"
+source = "stand crown ratio 0.66, 0.63, 0.60 at h 20, 25, 30 m (Pretzsch 2019 (Forests 10:810), Table 1 model 3: crown base against height at the 25% quantile in monocultures (the lowest live branch), CR computed at h 20–30 m); the median crown is ≈ 0.05 shorter than the 25% quantile's"
 
 [[trait]]
-name = "lone.widestAt"
-target = 0.4
-band = 0.15
-weight = 0.5
-kind = "described"
-source = "a broad dome, widest in its lower middle, not at the base (M26 note)"
-
-[[trait]]
-name = "lone.crownFullness"
-target = 0.75
-band = 0.1
-weight = 0.5
-kind = "described"
-source = "a full, rounded dome (an ellipse is 0.79)"
+# Leaf area index over the closed stand's ring at 60 (cli/trials.ts): leaf area per cell of
+# ground.
+name = "stand.lai"
+target = 8.4
+band = 1.5
+weight = 1
+kind = "measured"
+source = "stand LAI 8.4 (K_PAR 0.51; Hagemeier & Leuschner 2019 (Forests 10:925), Table 5: litter-trap LAI, mean of two stands); litter-trap maxima of 4.5–5.1 in Czech beech (Černý et al. 2020) show the method's spread. The floor it implies, ≈ 1.4%, is held out"
 
 [[trait]]
 name = "lone.forkHeight"
@@ -105,6 +118,7 @@ kind = "described"
 source = "level limbs that arch a little at the tips"
 
 [[trait]]
+# Scale-free: the ratio carries the growth curve whatever the cell's size.
 name = "stand.lateShare"
 target = 1.43
 band = 0.06
@@ -147,7 +161,7 @@ hi = 70
 [[param]]
 path = "r2.levels.1.eta"
 lo = 0.05
-hi = 1.5
+hi = 1
 log = true
 [[param]]
 path = "r2.levels.2.setPoint"

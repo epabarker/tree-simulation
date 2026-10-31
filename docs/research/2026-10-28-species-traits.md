@@ -158,6 +158,37 @@ Every hand-tuned value lies inside its bounds.
 - **Fir's H30/H60** goes to half weight (a mountain table).
 - **`r2.hJ`,** the juvenile height (ADR 0022), is free on 2–150 cells, log scale, for every species.
 
+## Round 4: re-sourced for 3D (2026-10-31)
+
+From the [targets audit](../reviews/2026-10-31-species-target-audit.md) and the [round-4 plan](../plans/2026-10-31-species-round4.md), step C. The targets files hold each number with its source line; this section says what was read and how. "Read": in the source's text or tables; "computed": by us from coefficients or columns read there; "second-hand": an abstract or a co-author's table. ADR 0028 records the decisions.
+
+**Stand H/D (`stand.slenderness`), per species** (was 70 ± 10 for all ten). Top height over a top diameter as the target (the closed stand's trees, at ≈ 360 stems/ha, are nearer the dominant collective than the mean tree), the mean tree's ratio as the band's top:
+
+| species | target | kind | read |
+|---|---|---|---|
+| birch | 95 ± 12 | measured | 105 at 45 and 100 at 67 years (Hagemeier & Leuschner 2019, Table 2); ≈ 100 in Moravian stands (Martiník & Mauer 2012) |
+| oak | 75 ± 10 | measured | NW-FVA (Albert et al. 2021, the et.nwfva data) at 60, classes 1–2: H100/Dw 74–76, Hg/Dg 85–88 (computed) |
+| beech | 82 ± 12 | measured | NW-FVA at 60, classes 0–1: H100/Dw 78–83, Hg/Dg 107–108 (computed) |
+| hornbeam | 86 ± 12 | measured | Lockow 2009 at 60, SI 25–27: HO/DO 84–87, HDG/DG 106–113 (computed from the repo's CSV) |
+| maple | 68 ± 12 | measured, ½ | the German inventory's mean 65 and canopy maples 64–73 (Klemmt et al. 2015, LWF Wissen 77) |
+| rowan, holly, willow | 70 ± 10 | described, ½ | nothing found: the generic range stays, at half weight |
+
+The audit's 80–110 for birch is confirmed: round 3's birch "failed" at 86.9 against a target that was not birch's, and was "fixed" toward it.
+
+**Lone H/D and W/H (`lone.slenderness`, `lone.spread`).** The plan's source, Pretzsch et al. 2015 (UFUG 14:466; read in full), fits crown radius at the 95% quantile and height at the 5% quantile, on different trees and mostly on forest plots: an envelope, not a solitary tree's mean. It covers birch, beech, hornbeam, oak, rowan and sycamore of the garden's species (not holly, willow or field maple), and its Q. robur height relation is unusable (≈ 6 m at d 25 cm). So, the user's decision of 2026-10-31: both traits stay **described at half weight**, moved per species where the envelope moves them, with its W/H as a lower bound; beech's lone H/D 48 becomes measured, since the envelope (51, 48, 47 at d 25, 40, 50 cm) and the generic 40–55 agree. Hein & Spiecker 2008, which round 3's beech spread leaned on, is open-grown ash and sycamore (Agroforestry Systems 73:205; closed access), not beech. No directly measured open-grown beech or oak allometry was reached (Hasenauer 1997 is paywalled and its equations not reproduced where we could read them).
+
+**`lone.spread` is set at the trial's age.** At about 60 years and 0.5 m DBH (the lone beech and oak at 60), Hemery et al. 2005's open-grown crown diameters (second-hand) give W/H 0.35–0.38 for beech and 0.43 for oak with the sim's heights, and the envelope 0.51–0.52; the 0.9 and 1.3 of round 3 are parkland trees of 120 years and more. Round 4: beech 0.6 ± 0.2, oak 0.75 ± 0.25, hornbeam 0.7 ± 0.2, maple 0.7 ± 0.2 (proxies: sycamore 0.40 in the envelope, urban sycamore 0.55 and Norway maple 0.65, Franceschi et al. 2022), birch 0.55 ± 0.12 and rowan 0.4 ± 0.12 (the envelope); willow and holly unchanged. W/H is read against the sim's own lone height, which is tall for an open-grown tree at 60; the lone tree's spread at 100, unfitted, is the parkland check on the panel.
+
+**Stand crown ratio** (`stand.crownRatio`, now the limb measure: where the first-order limbs, from the bottom up, first hold 5% of the leaf area). Pretzsch 2019 (Forests 10:810, read in full), Table 1 model 3, crown base against height at the 25% quantile in monocultures, gives CR 0.66, 0.63, 0.60 for beech and 0.47, 0.45, 0.44 for sessile oak at h 20, 25, 30 m (computed); the median crown is ≈ 0.05 shorter. Beech 0.57 ± 0.08 (measured), oak 0.42 ± 0.08 (measured, half weight: sessile for pedunculate). Schmucker et al. 2022 was not read (a bot check), and its abstract reports crown projection area and height, not crown length; Dieler & Pretzsch 2013 was not reached. The rest stay described.
+
+**Stand LAI** (`stand.lai`, new, read in the closed stand at 60). Hagemeier & Leuschner 2019 (Forests 10:925, Table 5, read): birch 4.6, sessile oak 5.5, hornbeam 8.3, beech 8.4, with K_PAR 0.37, 0.48, 0.51, 0.51; exp(−K·LAI) gives their measured floors (18, 7.1, 1.45, 1.38%). Measured, ± 1.5, weight 1. Maple 4.0 ± 1.5, described at half weight (a sycamore stand's maximum, Černý et al. 2020, from the abstract; a proxy and one stand). Willow, rowan, holly: none found. **The floor stays a hold-out, and it will not follow from LAI in this model:** round 3's closed stands already read beech LAI 8.3–9.1 and hornbeam ≈ 8.0 with floors of 4–7% (`code/2026-10-31-species-round4/crown-base.txt`). The effective extinction through the slab at a given LAI is ≈ 0.35, not 0.5 (C1 round 3: the floor tracked the gap fraction, not the LAI above it), and the shortfall is the sky's oblique rays through gaps (C2), which no species parameter closes.
+
+**The crown profile** (`lone.profile`, replacing `lone.widestAt` and `lone.crownFullness`): ten band widths, base to top, over the widest, from a two-parameter shape 1 − |u|^q (u the distance from the widest point c over the distance to the nearer end; q = p/(1 − p), so the mean width is the fullness p), with c and p the old described targets; band ± 0.1, the ten sharing weight 0.5, described. Franceschi et al. 2022 (Forests 13:748, read) classified shapes for five urban species only; of the garden's, none (Norway maple, the nearest, is spherical 44%, ovoid 38%, half-ellipsoid 15%), so maple keeps widest at 0.45. No source gives where an open-grown crown is widest for any species. Fir and pine: a cone (c 0.05, p 0.5).
+
+**Kept, with their caveats in the files:** `stand.height` (the cell's scale, ±20%); `lone.earlyShare` (a lone tree against yield-table top heights) and `stand.lateShare` (scale-free); the stand density (≈ 360 stems/ha against 420–1000 in the tables at 60) beside every stand trait; the `[holdout]` floors; `shade.survivalLight`.
+
+**What this leaves for acceptance:** rowan and holly now have no measured target (their two were the generic H/D), maple two (one at half weight), willow three. For them acceptance rests on the line-up panel (ADR 0028).
+
 ## Held out (never in the loss)
 - **Shade survival:** the lowest light at which every seedling lives through 30 seasons. Birch 15–25%, beech 2.5–4.5% (saplings' minimum light demand, Hagemeier & Leuschner 2019; revised from 10–15% and 1–3%), in the order of Niinemets & Valladares's tolerance scores (2.03 and 4.56; M25 note).
 - **The mixed wood:** birch leads for about a century and fades; beech ends with the most canopy trees (M25 note).
@@ -166,5 +197,7 @@ Every hand-tuned value lies inside its bounds.
 
 ## Gaps
 - **Branch angles:** no per-species numbers for birch's or beech's first-order angles came back. Yun et al. 2025 (literature review) is the lead to follow.
-- **Crown shape:** taken from descriptions. Open-grown profiles from terrestrial laser scans (Bayer et al. 2013 for beech) would make the shape targets measured.
+- **Crown shape:** taken from descriptions. Open-grown profiles from terrestrial laser scans (Bayer et al. 2013 for beech) would make the shape targets measured. Round 4 defers the audit's routes C (QSMs from the Wytham Woods and Weiser et al. 2022 scans: the stand shape targets) and D (traced photographs or airborne lidar of parkland trees: the lone profile) to after shipping (ADR 0028).
+- **Open-grown allometry for beech and oak at the trial's age:** Hasenauer 1997's equations, or a solitary-tree study measured directly; Hein & Spiecker 2008 (sycamore, maple's proxy) if its full text is to hand.
+- **Stand H/D, LAI and crown ratio** for rowan, holly and willow: none found in round 4; Hynynen et al. 2010 (Finnish birch models) and Schmucker et al. 2022 were not reached.
 - **Still estimates for the eight newer species:** floor light for fir, maple, holly, rowan, willow and pine; growth curves for maple, holly and rowan. The next to find: holly's growth (Peterken & Tubbs 1965; Peterken 1966), Hale et al. 2009's pine curve, and any quantum-sensor light measured under fir.

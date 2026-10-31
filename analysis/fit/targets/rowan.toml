@@ -7,6 +7,8 @@
 species = "rowan"
 
 [[trait]]
+# Scale: 1 cell ≈ 0.25 m is uncertain by ±20% (traits note); the two shares are scale-free and
+# carry the growth information.
 name = "stand.height"
 target = 60
 band = 14
@@ -15,6 +17,9 @@ kind = "described"
 source = "≈ 15 m at 60 years: the same fitted curve gives 15.5 m forest top height; field guides 10–15 m mature"
 
 [[trait]]
+# Lone against stand: a lone tree scored against yield-table top heights (closed stands): assumes
+# open-grown trees follow a similar curve, though open-grown height curves run lower and flatter
+# (audit §1.4).
 name = "lone.earlyShare"
 target = 0.74
 band = 0.08
@@ -24,53 +29,51 @@ source = "height at 30 over height at 60: 0.735 on a Chapman–Richards curve fi
 
 [[trait]]
 name = "lone.spread"
-target = 0.6
-band = 0.15
+target = 0.4
+band = 0.12
 weight = 0.5
 kind = "described"
-source = "an open, oval crown, taller than wide (field guides)"
+source = "open-grown W/H 0.39 at d 25 cm (Pretzsch et al. 2015 (UFUG 14:466), computed from its 95%-quantile crown radius and 5%-quantile height on mostly forest-plot trees: an envelope, not a solitary tree's mean, a lower bound); a narrow, upright crown"
+
+[[trait]]
+# Replaces lone.widestAt and lone.crownFullness (round 4): one vector a tiered crown
+# cannot satisfy, each band ±0.1, the ten sharing the trait's weight.
+name = "lone.profile"
+profile = [0.2, 0.54, 0.78, 0.93, 1, 1, 0.93, 0.78, 0.54, 0.2]
+band = 0.1
+weight = 0.5
+kind = "described"
+source = "the crown's width in ten bands, base to top, over its widest: widest at 0.5 of the crown, as full as 0.68 (1 − |u|^q, q = p/(1 − p); the round-4 plan, step C.5). An oval crown, widest about its middle; an open oval"
 
 [[trait]]
 name = "lone.slenderness"
-target = 48
-band = 8
-weight = 1
-kind = "measured"
-source = "open-grown trees are squat, H/D ≈ 40–55 (MacFarlane et al. 2017)"
+target = 60
+band = 10
+weight = 0.5
+kind = "described"
+source = "H/D 64 at d 25 cm (Pretzsch et al. 2015 (UFUG 14:466), computed from its 95%-quantile crown radius and 5%-quantile height on mostly forest-plot trees: an envelope, not a solitary tree's mean; forest-plot trees, d ≤ 25.5 cm): half weight"
 
 [[trait]]
+# Stand density: read in the closed stand at spacing 21 ≈ 5.25 m, ≈ 360 stems/ha: sparser than a
+# yield-table stand at 60 (420–1000/ha), which lowers H/D and raises crown ratio against the
+# tables (audit §1.4).
 name = "stand.slenderness"
 target = 70
 band = 10
-weight = 1
-kind = "measured"
-source = "stand-grown H/D 60–80 (Watt et al. 2023)"
+weight = 0.5
+kind = "described"
+source = "no species-specific stand H/D found: the generic stand range 60–80 (Watt et al. 2023, conifer stands), half weight, so acceptance no longer rests on it"
 
 [[trait]]
-# The leafy crown's share of the height (metrics' leafCrownRatio, cli/trials.ts): the branch
-# measure reads 0.99 in 3D whatever the crown does (species plan §0.4).
+# The crown's share of the height to its base by limbs: where the first-order limbs, from the
+# bottom up, first hold 5% of the leaf area (metrics' limbCrownRatio, cli/trials.ts): the field's
+# live crown base (round 4, ADR 0028).
 name = "stand.crownRatio"
 target = 0.45
 band = 0.1
 weight = 0.5
 kind = "described"
 source = "light-demanding: the crown lifts in a stand (Kothari et al. 2025)"
-
-[[trait]]
-name = "lone.widestAt"
-target = 0.5
-band = 0.15
-weight = 0.5
-kind = "described"
-source = "an oval crown, widest about its middle"
-
-[[trait]]
-name = "lone.crownFullness"
-target = 0.68
-band = 0.1
-weight = 0.5
-kind = "described"
-source = "an open oval"
 
 [[trait]]
 name = "lone.forkHeight"
@@ -105,6 +108,7 @@ kind = "described"
 source = "steep limbs that hold their angle"
 
 [[trait]]
+# Scale-free: the ratio carries the growth curve whatever the cell's size.
 name = "stand.lateShare"
 target = 1.09
 band = 0.08
@@ -140,7 +144,7 @@ hi = 60
 [[param]]
 path = "r2.levels.1.eta"
 lo = 0.05
-hi = 1.5
+hi = 1
 log = true
 [[param]]
 path = "r2.levels.2.setPoint"

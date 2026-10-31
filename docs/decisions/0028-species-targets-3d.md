@@ -1,0 +1,44 @@
+# 0028: Species targets for 3D: a crown profile, stand LAI, per-species H/D, the limb crown base, η ≤ 1.0 for broadleaves
+
+- **Status:** accepted (the user, 2026-10-31: the round-4 plan's four decisions, and the three of the targets work recorded below).
+- **Date:** 2026-10-31
+- **Amends:** ADR 0020 (fitting species: the targets' kinds, the bounds, the acceptance rule).
+- **Plan, review and note:** [the round-4 plan](../plans/2026-10-31-species-round4.md); [the targets audit](../reviews/2026-10-31-species-target-audit.md) and [the hand-off](../reviews/2026-10-31-species-handoff.md); [the traits note](../research/2026-10-28-species-traits.md), "Round 4"; [the species note](../experiments/2026-10-30-species-3d.md), "Round 4".
+
+## Context
+Round 3 fitted the eight garden species on the 3D core, and five passed the rule "every measured target in band on fresh seeds". The lone beech among them reads as a young conifer: widest at the base, tiered, pointed (η 1.18, `r2.aC` at its floor). Tiers were the cheapest way to raise `lone.spread` to the described 0.9 and lower H/D, and nothing in the loss penalised them. The audit found the same weakness behind the other misses:
+- the shape targets were described scalars a wrong architecture could satisfy;
+- both H/D targets were one number for ten species;
+- `stand.crownRatio` read the leaf base, while its sources mean the lowest live primary limb;
+- nothing the fit sees constrains leaf area, so the own-wood floors were 7–20% for every species.
+
+## Decision
+1. **A profile trait kind.** A `[[trait]]` may give `profile = [t0 … t9]` and one `band` instead of `target`. It contributes weight/10 · ((p_k − t_k)/band)² per band to the loss, √(w/10)·(p_k − t_k)/band per band to the least-squares residuals, so the vector weighs as one trait. It is in band when every band is, and its margin is the worst band's (`fit.py`, `fit_lm.py`). `lone.profile` (the lone tree's ten band widths at 60, base to top, over the widest: form.rs's profile) replaces `lone.widestAt` and `lone.crownFullness`, which stay reported. Its targets come from a two-parameter shape, 1 − |u|^q, with the widest point and the fullness of the old targets; band 0.1, weight 0.5, described. Fir and pine: a cone. A tiered crown's bands are not a dome's.
+2. **Stand LAI is a measured target; the floor stays a hold-out.** `stand.lai` is the closed stand's leaf area per cell of ground at 60 (`metrics::lai`, the CLI's ground.csv sum). Hagemeier & Leuschner 2019 give birch 4.6, oak 5.5, hornbeam 8.3 and beech 8.4, each ± 1.5 at weight 1; maple 4.0 is described at half weight (a sycamore proxy). In this model LAI does not deliver the floor: round 3's beech and hornbeam stands read LAI in band with floors of 4–7%. The effective extinction through the slab is ≈ 0.35 at a given LAI, not 0.5, and the shortfall is the sky's oblique rays through gaps (C2), which no species parameter closes. So round 4's own-wood floors will still fail for beech, hornbeam and holly. That is expected and is no ground to reject a fit; the floors are reported.
+3. **Per-species H/D.** `stand.slenderness` comes from yield tables and stand measurements per species:
+
+   | species | target | kind |
+   |---|---|---|
+   | birch | 95 ± 12 | measured |
+   | oak | 75 ± 10 | measured |
+   | beech | 82 ± 12 | measured |
+   | hornbeam | 86 ± 12 | measured |
+   | maple | 68 ± 12 | measured, half weight |
+
+   Where none was found (rowan, holly, willow), the generic 70 ± 10 stays, described at half weight, so acceptance no longer rests on it. Pretzsch et al. 2015's "open-grown" relations are quantile envelopes of forest-plot trees (crown radius at 95%, height at 5%, on different trees), not solitary means. So `lone.slenderness` and `lone.spread` stay described at half weight, moved per species where those relations move them, with Pretzsch's W/H as a lower bound. Beech's lone H/D 48 is measured: the envelope and the generic range agree. `lone.spread` is set at the trial's age, 60 years and ≈ 0.5 m DBH: beech 0.6 ± 0.2, oak 0.75 ± 0.25, hornbeam and maple 0.7 ± 0.2, against round 3's parkland values of 0.9 and 1.3 for trees twice that age. With the profile carrying the dome and η capped, spread no longer has to carry the shape alone.
+4. **The limb crown base.** `stand.crownRatio` reads `limbCrownRatio` (`metrics.rs`). Its base comes from the first-order limbs taken in order of where they leave the trunk: it is the base of the limb at which those from the bottom up first hold 5% of the tree's leaf area (the same 5% as `leaf_base`). It reads where limbs attach, as the field's live crown base does, where `leaf_base` reads where their leaves hang. The plan's rule, the lowest limb holding 5% on its own, read a crown ratio of 0 on a crown of many limbs. The round-2 lone beech at 100 has 126 leafy limbs, none above 4.4%. So the measure is cumulative (the user, 2026-10-31, after the panel showed it). `leafCrownRatio` and the branch measure are reported beside it. Beech 0.57 ± 0.08 is measured, and oak 0.42 ± 0.08 is measured at half weight (sessile oak), both from Pretzsch 2019's monoculture crown-base allometry; the rest stay described. On round 3's beech stand both forms barely move between a 1%, 2% and 5% threshold. Its low limbs are gone: the 0.315 against 0.55 was the model, not the definition.
+5. **η ≤ 1.0 for broadleaves.** `r2.levels.1.eta`'s top drops from 1.5 to 1.0 for the eight broadleaves; fir and pine keep 1.5–2. This amends ADR 0020's bounds, against its rule that a bound hit is a finding and not a bound to tighten. The reason: with η near 1 and a set point near 90° first-order limbs become flat tiers, the box let the fit buy width with them, and the panel showed it.
+6. **The acceptance rule extended.** A fit is accepted when its measured targets are in band on fresh seeds **and** the species reads as itself on its line-up panel: lone at 60 and 100, the closed stand at 100, at one scale, beside round 2, judged by the user's eye. The panel is `code/2026-10-31-species-round4/panel-*.{ts,mjs,py}`. Rowan and holly now have no measured target, maple two and willow three. For them the panel carries the decision.
+7. **Beech's round-3 acceptance is withdrawn.** It re-fits in round 4 with the others.
+8. **The shade house** gains roofs 1.2 and 1.75 (26.3% and 18.5%), splitting the intolerant end. Round 3's birch cut fell between 15.8% and 21.7%: below it the bud is under R6's Q_ss, so it bears no leaf, its reserve drains, and `kStarve` kills it at season 4. With the new roofs its cut is in (15.8, 18.5]%, inside the band.
+9. **The survival light credits only the seasons past the starvation timer** (the user, 2026-10-31). A leafless seedling lives 4 seasons in the dark: R1's reserve0 and kStarve are world defaults. That holds for every species at round 2's patches and round 3's fits, and for the fitted parameters at their bounds (`tests/trials.test.ts`). Crediting those 4/30 under every roof below the cut read birch 25% too tolerant: 0.136 against the step's 0.185. The correction is largest for the light-demanders, birch and oak, and least for beech and hornbeam, whose cuts sit at the darkest roofs. `survival_light` now credits max(0, s − 4)/26 (`fit.py`, STARVE_SEASONS; `analysis/tests/test_fit.py`). Round-3 survival lights quoted before 2026-10-31 used the old measure.
+
+## Consequences
+- The targets files hold every number with its source line. The traits note's "Round 4" section says how each was read.
+- `metrics.csv` gains `limbBase` and `limbCrownRatio` (columns 39 → 41). The trials report `stand.lai`, `lai100`, `leafCrownRatio` and `lone.profile`. No golden moves: `npm run bench -- --compare` gave the same hash for all seven cases.
+- The shade house costs a quarter more (10 roofs, was 8).
+- `m27_rescore.py` scores a round's fits against the targets as they stand, with no search. Its table for round 3 is in the species note.
+- **Deferred to after shipping, recorded as the way to make the shape targets measured:**
+  - **Route C:** QSMs from the Wytham Woods and Weiser et al. 2022 scans, read with form.rs's definitions, for the stand shape targets of beech, oak, hornbeam and pine.
+  - **Route D:** traced photographs or airborne lidar of parkland trees, for the lone profile.
+- **After round 4, one measurement for C2:** the closed stand's floor against its LAI across species, the model's effective k beside Hagemeier & Leuschner's K_PAR. It decides whether the fix is a per-species `c2.kExt`, the sky's low-elevation weighting or leaf clumping. That decision is the user's, not the fit's.

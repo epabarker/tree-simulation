@@ -6,8 +6,8 @@ use tree_core::checkpoint::{load_world, save_world};
 use tree_core::form::form_metrics;
 use tree_core::hash::hash_world;
 use tree_core::json::{self, Value};
-use tree_core::metrics::ground_light;
 use tree_core::metrics::tree_metrics;
+use tree_core::metrics::{ground_light, lai};
 use tree_core::snapshot::SnapshotBuilder;
 use tree_core::tree::{Col, NUMBERS};
 use tree_core::world::World as Core;
@@ -203,6 +203,11 @@ impl World {
     /// groundLight).
     pub fn ground_light(&self, x0: f64, x1: f64) -> f64 {
         ground_light(&self.core, x0, x1, 0.0, self.core.light.depth())
+    }
+
+    /// Leaf area index over columns [x0, x1], through the whole depth (metrics' `lai`).
+    pub fn lai(&self, x0: f64, x1: f64) -> f64 {
+        lai(&self.core.light, x0, x1, 0.0, self.core.light.depth())
     }
 
     /// Q and V (x, y, z) of this season's light field at (x, y, z).

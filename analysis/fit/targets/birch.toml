@@ -7,6 +7,8 @@
 species = "birch"
 
 [[trait]]
+# Scale: 1 cell ≈ 0.25 m is uncertain by ±20% (traits note); the two shares are scale-free and
+# carry the growth information.
 name = "stand.height"
 target = 95
 band = 20
@@ -15,6 +17,9 @@ kind = "measured"
 source = "dominant height ≈ 22–26 m at 60 years on fertile sites (birch yield tables and site-index curves: Lee et al. 2024; Jansen et al. 2018)"
 
 [[trait]]
+# Lone against stand: a lone tree scored against yield-table top heights (closed stands): assumes
+# open-grown trees follow a similar curve, though open-grown height curves run lower and flatter
+# (audit §1.4).
 name = "lone.earlyShare"
 target = 0.72
 band = 0.08
@@ -24,31 +29,45 @@ source = "height at 30 over height at 60: birch's height growth culminates early
 
 [[trait]]
 name = "lone.spread"
-target = 0.45
+target = 0.55
 band = 0.12
 weight = 0.5
 kind = "described"
-source = "a narrow, open crown (M19 note; field guides)"
+source = "open-grown W/H 0.52, 0.55, 0.56 at d 25, 40, 50 cm (Pretzsch et al. 2015 (UFUG 14:466), computed from its 95%-quantile crown radius and 5%-quantile height on mostly forest-plot trees: an envelope, not a solitary tree's mean, a lower bound); a narrow crown"
+
+[[trait]]
+# Replaces lone.widestAt and lone.crownFullness (round 4): one vector a tiered crown
+# cannot satisfy, each band ±0.1, the ten sharing the trait's weight.
+name = "lone.profile"
+profile = [0.27, 0.67, 0.9, 1, 1, 0.96, 0.87, 0.72, 0.49, 0.18]
+band = 0.1
+weight = 0.5
+kind = "described"
+source = "the crown's width in ten bands, base to top, over its widest: widest at 0.4 of the crown, as full as 0.7 (1 − |u|^q, q = p/(1 − p); the round-4 plan, step C.5). An ovoid crown, widest below the middle (field guides); an ovoid outline (an ellipse is 0.79), not an hourglass (M26 note)"
 
 [[trait]]
 name = "lone.slenderness"
-target = 48
+target = 40
 band = 8
-weight = 1
-kind = "measured"
-source = "open-grown trees are squat, H/D ≈ 40–55 (MacFarlane et al. 2017)"
+weight = 0.5
+kind = "described"
+source = "open-grown H/D 47, 38, 34 at d 25, 40, 50 cm (Pretzsch et al. 2015 (UFUG 14:466), computed from its 95%-quantile crown radius and 5%-quantile height on mostly forest-plot trees: an envelope, not a solitary tree's mean; n 26, d ≤ 39 cm); the generic 40–55 (MacFarlane et al. 2017) above it. Half weight"
 
 [[trait]]
+# Stand density: read in the closed stand at spacing 21 ≈ 5.25 m, ≈ 360 stems/ha: sparser than a
+# yield-table stand at 60 (420–1000/ha), which lowers H/D and raises crown ratio against the
+# tables (audit §1.4).
 name = "stand.slenderness"
-target = 70
-band = 10
+target = 95
+band = 12
 weight = 1
 kind = "measured"
-source = "stand-grown H/D 60–80 (Watt et al. 2023)"
+source = "stand H/D 105 at 45 years and 100 at 67 (Hagemeier & Leuschner 2019 Table 2, mean height over mean dbh); ≈ 100 in Moravian birch stands (Martiník & Mauer 2012, J. For. Sci. 58:181); birch stands are slender, H/D 80–110"
 
 [[trait]]
-# The leafy crown's share of the height (metrics' leafCrownRatio, cli/trials.ts): the branch
-# measure reads 0.99 in 3D whatever the crown does (species plan §0.4).
+# The crown's share of the height to its base by limbs: where the first-order limbs, from the
+# bottom up, first hold 5% of the leaf area (metrics' limbCrownRatio, cli/trials.ts): the field's
+# live crown base (round 4, ADR 0028).
 name = "stand.crownRatio"
 target = 0.38
 band = 0.1
@@ -57,20 +76,14 @@ kind = "described"
 source = "light-demanding species lift their crowns fast in stands (Kothari et al. 2025; M19 note)"
 
 [[trait]]
-name = "lone.widestAt"
-target = 0.4
-band = 0.15
-weight = 0.5
-kind = "described"
-source = "an ovoid crown, widest below the middle (field guides)"
-
-[[trait]]
-name = "lone.crownFullness"
-target = 0.7
-band = 0.1
-weight = 0.5
-kind = "described"
-source = "an ovoid outline (an ellipse is 0.79), not an hourglass (M26 note)"
+# Leaf area index over the closed stand's ring at 60 (cli/trials.ts): leaf area per cell of
+# ground.
+name = "stand.lai"
+target = 4.6
+band = 1.5
+weight = 1
+kind = "measured"
+source = "stand LAI 4.6 (K_PAR 0.37; Hagemeier & Leuschner 2019 (Forests 10:925), Table 5: litter-trap LAI, mean of two stands); the floor it implies, exp(−K·LAI) ≈ 18%, is held out (the model's effective extinction through the slab is lower: the C2 question after round 4)"
 
 [[trait]]
 name = "lone.forkHeight"
@@ -105,6 +118,7 @@ kind = "described"
 source = "limbs arch, twigs hang (Betula pendula)"
 
 [[trait]]
+# Scale-free: the ratio carries the growth curve whatever the cell's size.
 name = "stand.lateShare"
 target = 1.12
 band = 0.08
@@ -147,7 +161,7 @@ hi = 70
 [[param]]
 path = "r2.levels.1.eta"
 lo = 0.05
-hi = 1.5
+hi = 1
 log = true
 [[param]]
 path = "r2.levels.2.setPoint"

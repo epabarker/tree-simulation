@@ -90,6 +90,8 @@ const METRIC_NUMBERS = [
   "centroidOffsetZ",
   "leafBase",
   "leafCrownRatio",
+  "limbBase",
+  "limbCrownRatio",
 ] as const;
 const FLAGS = new Set(["alive", "sown"]);
 
@@ -440,6 +442,11 @@ export class RustWorld {
   /** Mean light on the ground over columns [x0, x1] through the slab's depth, as a fraction of open sky. */
   groundLight(x0: number, x1: number): number {
     return this.inner.ground_light(x0, x1);
+  }
+
+  /** Leaf area index over columns [x0, x1] through the slab's depth: leaf area per ground cell. */
+  lai(x0: number, x1: number): number {
+    return this.inner.lai(x0, x1);
   }
 
   /** {q, vx, vy, vz} of this season's light field at (x, y, z). */

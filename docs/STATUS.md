@@ -1,6 +1,6 @@
 # Status
 
-_Last updated: 2026-10-31 (round 5: the eight form grids and the birch/oak posture sweep drawn; beech's grid has no dome. Picks wait on the user)_
+_Last updated: 2026-10-31 (round 5: the dome sweep rounds no top, beech stops on form; birch is not starving; hornbeam's provisional pick holds its kind on seeds 1–3. Other picks wait on the user)_
 
 **3D port** on the branch `3d-port` (work branches open PRs into it). ADR 0024–0028 accepted, 0029 proposed. The live site stays on 0.14.0 (2D) until the bar below is met.
 
@@ -17,14 +17,16 @@ _Last updated: 2026-10-31 (round 5: the eight form grids and the birch/oak postu
 - **Gallery** (`analysis/fit/gallery/`): round 2's spindles (beech, birch), round 3's beech cone, oak and hornbeam parasols, round 4's birch pagoda; `m27_gallery.py`. Oak and hornbeam pass the check; beech's cone sits within the noise of its round-2 form (1.17 against 0.77).
 
 ## Next
-1. **The user:** pick a grid cell per species (beech: none is a dome, so beech goes to the core: its level-0 distichous generator).
-2. **The picks:** regrow at seeds 1–3 (which change kind); the lab panel, round `form`, lone at 60 and 100 and the stand at 100; then `[form]` with dated comments naming the cell.
+1. **The user:** picks for birch, willow, rowan, holly, oak and maple (`form-picks.py`'s `PICKS`). Hornbeam's provisional pick (aC 15, dΛ 0.08, λ0 0.56) holds its kind on seeds 1–3; beech stays at round 2's, flagged.
+2. **The picks:** `form-picks.py` at seeds 1–3; the lab panel, round `form`, lone at 60 and 100 and the stand at 100; then `[form]` with dated comments naming the cell.
 3. **The gallery check** on six seeds passes for the picks and the user judges the panel. Only then the pilot (beech, `m27_fit.py … --pilot`), the eight overnight, the hold-out, adoption (its own ADR).
 4. **I3 steps 3–6** and C2's floor against LAI, as before; then C3–C6 as hold-outs; release; the site's PR.
 
 ## Open questions (user)
 - **ADR 0029** to accept.
 - **`levels.2.setPoint` ≥ 80** collapses every broadleaf (parasol, mound, column): a C3/R3 question after shipping.
+- **Flat caps and no dome** (beech, hornbeam, oak, maple): no form knob nor ramp, pTerm, generator or twig set point rounds a top. A core question; `r2.ramp` is live as a proportion knob (user's call to add it).
+- **Birch's unspent reserve:** ≈ 5200 held while the crown shrinks from 60 to 100 (not starving); why it is not spent is open.
 - **`limbElevation` reads back the set point** for most species (oak 31° = 90 − 58.6 in every row but setPoint's): little information beyond the knob itself.
 - At 100 most beech sweep cells reach the woods' top (200): the flat tops there are the ceiling.
 

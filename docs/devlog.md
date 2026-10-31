@@ -2,6 +2,13 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-31: Species round 5: the dome sweep, birch's vigour, the picks at three seeds
+
+- **The dome sweep** (`dome-sweep.py`; beech, hornbeam, oak, maple): `r2.ramp`, `levels.0.pTerm`, `levels.0.generator` and the twig set point, one at a time. Nothing rounds a top; the flat cap is in every cell. `r2.ramp` is live where Δλ is large (it moves fork height and breadth) and dead for beech. Beech stops on form.
+- **Birch is not starving** (`birch-vigour.py`): production exceeds maintenance, the reserve holds near 5200 (oak's near 0), and the crown shrinks 60 → 100 (live buds −36%).
+- **The picks at seeds 1–3** (`form-picks.py`): hornbeam's provisional pick keeps its kind; beech drawn at round 2's, flagged. `form-grid.py`'s drawing is now `draw_cells`, shared by the three scripts (it redraws the old sheets byte for byte).
+- No fit, no `[form]` change, no golden moved.
+
 ## 2026-10-31: Species round 5: the form grids and the posture knob
 
 - **The grids:** `form-grid.py`, the user's three knobs per species (4 × 4 × 3, beech's and hornbeam's ranges theirs after their look at those sheets), seed 1, sheets at 60 and 100 (`figures/2026-10-31-form-grid-*`), with the cells nearest the review's named cells marked. `form-sweep.py`'s `run_cell` takes a seed for the picks' regrow.

@@ -120,30 +120,38 @@ def key(ix: tuple) -> str:
 
 def draw_sheet(species: str, season: int, knobs, hand: dict, marked: dict, brief: dict, cells: Path,
                kind: str, command: str) -> Path:
-    rows_ix = layout(knobs)
-    data = {key(ix): np.load(cells / f"{key(ix)}.npz") for row in rows_ix for ix in row}
+    rows = [[(key(ix), "  ".join(f"{SHORT[p]} {vs[i]:g}" for (p, vs), i in zip(knobs, ix, strict=True)),
+              marked.get(ix)) for ix in row] for row in layout(knobs)]
+    span = " × ".join(f"{SHORT[p]} {vs[0]:g}–{vs[-1]:g} ({len(vs)})" for p, vs in knobs)
+    what = "the posture sweep" if kind == "posture" else "the three-knob grid"
+    head = (f"{species}: {what} at season {season} (lone tree, seed 1; {span}; the rest at round 2's)",
+            "red: nearest a sweep cell the review named nearest the brief")
+    ref = "round 2's:\n" + "\n".join(f"{SHORT[p]} {hand[p] if hand[p] is not None else '= sp1'}" for p, _ in knobs)
+    out = FIGURES / f"2026-10-31-form-{kind}-{species}-{season}.png"
+    return draw_cells(season, rows, head, ref, brief, cells, command, out)
+
+
+def draw_cells(season: int, rows: list[list[tuple[str, str, list[str] | None]]], head: tuple[str, str],
+               ref: str, brief: dict, cells: Path, command: str, out: Path) -> Path:
+    """The sheet: rows of (npz key, title, red label or None), the round-2 cell ("hand") at the right
+    of the first row with `ref` under it; every cell at one scale, as the form sweep's."""
+    data = {k: np.load(cells / f"{k}.npz") for row in rows for k, _, _ in row}
     data["hand"] = np.load(cells / "hand.npz")
     segs = [d[f"seg{season}"] for d in data.values() if len(d[f"seg{season}"])]
     tall = max([60.0] + [math.ceil(float(np.max(s[:, [1, 3]])) / 20) * 20 + 5 for s in segs])
     half = max([30.0] + [float(np.max(np.abs(s[:, [0, 2]] - WIDTH / 2))) + 4 for s in segs])
-    cols, rows = len(rows_ix[0]) + 1, len(rows_ix)
+    cols, nrows = max(len(row) for row in rows) + 1, len(rows)
     cell_w = 2.3
     cell_h = cell_w * tall / (2 * half)
-    head = 1.1
-    fig = plt.figure(figsize=(cols * cell_w, rows * (cell_h + 0.95) + head), dpi=160)
-    top = 1 - head / fig.get_figheight()
-    row_h = (top - 0.005) / rows
+    head_in = 1.1
+    fig = plt.figure(figsize=(cols * cell_w, nrows * (cell_h + 0.95) + head_in), dpi=160)
+    top = 1 - head_in / fig.get_figheight()
+    row_h = (top - 0.005) / nrows
     tree_h = row_h * cell_h / (cell_h + 0.95)
     scale = tree_h * fig.get_figheight() * 72 / tall
     brief_text = "  ·  ".join(f"{k} {v['target']}±{v['band']}" for k, v in brief.items() if "target" in v)
-    span = " × ".join(f"{SHORT[p]} {vs[0]:g}–{vs[-1]:g} ({len(vs)})" for p, vs in knobs)
-    what = "the posture sweep" if kind == "posture" else "the three-knob grid"
-    fig.suptitle(
-        f"{species}: {what} at season {season} (lone tree, seed 1; {span}; the rest at round 2's)\n"
-        f"brief (described): {brief_text or 'none'}\n"
-        f"red: nearest a sweep cell the review named nearest the brief\n{command}",
-        fontsize=8.5, y=0.999, va="top",
-    )
+    fig.suptitle(f"{head[0]}\nbrief (described): {brief_text or 'none'}\n{head[1]}\n{command}",
+                 fontsize=8.5, y=0.999, va="top")
 
     def cell(r: int, c: int, name: str, title: str, label: str | None) -> None:
         d = data[name]
@@ -177,21 +185,17 @@ def draw_sheet(species: str, season: int, knobs, hand: dict, marked: dict, brief
         fig.text(left + 0.38 / cols, y0 + 0.62 * (row_h - tree_h), text, fontsize=6.5, va="center",
                  family="monospace", color="#c33" if hot else "black")
 
-    for r, row in enumerate(rows_ix):
-        for c, ix in enumerate(row):
-            title = "  ".join(f"{SHORT[p]} {vs[i]:g}" for (p, vs), i in zip(knobs, ix, strict=True))
-            cell(r, c, key(ix), title, marked.get(ix))
+    for r, row in enumerate(rows):
+        for c, (k, title, label) in enumerate(row):
+            cell(r, c, k, title, label)
     cell(0, cols - 1, "hand", "round 2 (adopted)", None)
     fig.text((cols - 1) / cols + 0.01, top - 1.15 * row_h,
-             "round 2's:\n" + "\n".join(f"{SHORT[p]} {hand[p] if hand[p] is not None else '= sp1'}"
-                                        for p, _ in knobs)
-             + "\n\nprofile: base to top;\ngrey, the brief's.", fontsize=7, va="top", family="monospace")
+             ref + "\n\nprofile: base to top;\ngrey, the brief's.", fontsize=7, va="top", family="monospace")
     full = cells / f"sheet-{season}.png"
     fig.savefig(full)
     plt.close(fig)
     im = Image.open(full).convert("RGB")
     im = im.resize((im.width // 2, im.height // 2), Image.LANCZOS)
-    out = FIGURES / f"2026-10-31-form-{kind}-{species}-{season}.png"
     im.quantize(colors=64, method=Image.Quantize.MEDIANCUT).save(out, optimize=True)
     return out
 

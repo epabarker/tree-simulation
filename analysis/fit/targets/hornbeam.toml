@@ -27,21 +27,19 @@ weight = 1
 kind = "measured"
 source = "height at 30 over height at 60: 0.665–0.673 for site index 25–27 m, 0.60–0.68 over all classes (Lockow & Lockow 2009 hornbeam yield table (NE German lowlands; stand age volume-weighted))"
 
-[[trait]]
+[[report]]
 name = "lone.spread"
 target = 0.7
 band = 0.2
-weight = 0.5
 kind = "described"
 source = "open-grown W/H at about 60 years: 0.57, 0.53 at d 25, 40 cm (Pretzsch et al. 2015 (UFUG 14:466), computed from its 95%-quantile crown radius and 5%-quantile height on mostly forest-plot trees: an envelope, not a solitary tree's mean, a lower bound); a broad dome in parkland at twice the age. Re-centred at the trial's age as beech and oak (round 4)"
 
-[[trait]]
+[[report]]
 # Replaces lone.widestAt and lone.crownFullness (round 4): one vector a tiered crown
 # cannot satisfy, each band ±0.1, the ten sharing the trait's weight.
 name = "lone.profile"
 profile = [0.26, 0.65, 0.88, 0.98, 1, 0.99, 0.93, 0.79, 0.56, 0.22]
 band = 0.1
-weight = 0.5
 kind = "described"
 source = "the crown's width in ten bands, base to top, over its widest: widest at 0.45 of the crown, as full as 0.72 (1 − |u|^q, q = p/(1 − p); the round-4 plan, step C.5). A rounded crown, widest about its middle; a full, rounded crown (an ellipse is 0.79)"
 
@@ -85,35 +83,31 @@ weight = 1
 kind = "measured"
 source = "stand LAI 8.3 (K_PAR 0.51; Hagemeier & Leuschner 2019 (Forests 10:925), Table 5: litter-trap LAI, mean of two stands; stands 68–77% hornbeam); the floor it implies, ≈ 1.5%, is held out"
 
-[[trait]]
+[[report]]
 name = "lone.forkHeight"
 target = 0.4
 band = 0.2
-weight = 0.5
 kind = "described"
 source = "rounded and forking low: open-grown trunks divide into several stems"
 
-[[trait]]
+[[report]]
 name = "lone.leaderDominance"
 target = 1.6
 band = 0.6
-weight = 0.5
 kind = "described"
 source = "weaker apical control than beech (M25)"
 
-[[trait]]
+[[report]]
 name = "lone.branchAngle"
 target = 50
 band = 10
-weight = 0.5
 kind = "described"
 source = "fine, ascending limbs (field guides)"
 
-[[trait]]
+[[report]]
 name = "lone.limbDroop"
 target = 10
 band = 10
-weight = 0.25
 kind = "described"
 source = "limbs that arch a little at the tips"
 
@@ -134,6 +128,29 @@ weight = 1
 kind = "measured"
 source = "lowest light the seedling survives: hornbeam saplings need 3.3% of PAR (Hagemeier & Leuschner 2019); fitted, not held out (ADR 0020 addendum)"
 
+[[report]]
+# Round 5 (ADR 0029): the length-weighted median elevation of the first-order limbs' segments
+# (form.rs's limbElevation), read along the limbs: a limb that rises and then arches out level reads
+# level, where a chord would read it ascending. No described value: the sheet and the panel judge it.
+name = "lone.limbElevation"
+kind = "described"
+
+[[report]]
+# The profile's summaries (form.rs), reported beside the profile itself.
+name = "lone.widestAt"
+kind = "described"
+
+[[report]]
+name = "lone.crownFullness"
+kind = "described"
+
+[[report]]
+# The stand's limb crown ratio at 100 beside the scored one at 60: a low T_rel can hold the crown
+# at 60 and strip it by 100 (the round-5 plan, §2).
+name = "stand.crownRatio100"
+kind = "measured"
+
+# Round 5 (ADR 0029): the physiology only; the nine form parameters are [form], by hand.
 # Free parameters: dotted paths into the species' patch, with bounds (literature review §4,
 # ROADMAP calibration table). log = true searches the bound's log scale. L_h spans 10–200 for
 # every species: the hyperbolic discount needs larger values than the exponential (ADR 0021).
@@ -142,43 +159,6 @@ source = "lowest light the seedling survives: hornbeam saplings need 3.3% of PAR
 path = "c3.alpha"
 lo = 2.5
 hi = 6
-[[param]]
-path = "r2.levels.0.lambda"
-lo = 0.5
-hi = 0.6
-[[param]]
-path = "r2.levels.1.lambda"
-lo = 0.48
-hi = 0.58
-[[param]]
-path = "r2.levels.1.setPoint"
-lo = 20
-hi = 90
-[[param]]
-path = "r2.levels.1.branchAngle"
-lo = 25
-hi = 70
-[[param]]
-path = "r2.levels.1.eta"
-lo = 0.05
-hi = 1
-log = true
-[[param]]
-path = "r2.levels.2.setPoint"
-lo = 40
-hi = 160
-[[param]]
-path = "r2.aC"
-lo = 0
-hi = 40
-[[param]]
-path = "r2.dLambda"
-lo = 0
-hi = 0.12
-[[param]]
-path = "r2.kappa"
-lo = 0
-hi = 4
 [[param]]
 path = "c5.Trel"
 lo = 0.005
@@ -216,9 +196,63 @@ lo = 2
 hi = 150
 log = true
 
+# The form parameters' ranges (round 4's search bounds): the span the form sheet sweeps, never
+# searched (ADR 0029).
+[[formRange]]
+path = "r2.levels.0.lambda"
+lo = 0.5
+hi = 0.6
+[[formRange]]
+path = "r2.levels.1.lambda"
+lo = 0.48
+hi = 0.58
+[[formRange]]
+path = "r2.levels.1.setPoint"
+lo = 20
+hi = 90
+[[formRange]]
+path = "r2.levels.1.branchAngle"
+lo = 25
+hi = 70
+[[formRange]]
+path = "r2.levels.1.eta"
+lo = 0.05
+hi = 1
+log = true
+[[formRange]]
+path = "r2.levels.2.setPoint"
+lo = 40
+hi = 160
+[[formRange]]
+path = "r2.aC"
+lo = 0
+hi = 40
+[[formRange]]
+path = "r2.dLambda"
+lo = 0
+hi = 0.12
+[[formRange]]
+path = "r2.kappa"
+lo = 0
+hi = 4
+
 # Assignments every candidate carries unchanged (analysis/treesim/fit.py).
 [fixed]
 "r1.hydraulic" = "hyperbolic"   # 1/(1 + L_path/L_h): height keeps rising slowly (ADR 0021)
+
+# The form, by hand (ADR 0029), applied to every candidate like [fixed]. Round 2's adopted
+# values (FLORA) as of 2026-10-31, the form sheet's reference cell: the user's picks from the
+# sheet replace them, each with a dated comment.
+[form]
+"r2.levels.0.lambda" = 0.5801
+"r2.levels.1.lambda" = 0.5007
+"r2.levels.1.setPoint" = 38.73
+"r2.levels.1.branchAngle" = 37.48
+"r2.levels.1.eta" = 0.2513
+"r2.levels.2.setPoint" = 43.66
+"r2.aC" = 1.844
+"r2.dLambda" = 0.07876
+"r2.kappa" = 0.2731
 
 # Held out: never in the loss, checked after the fit (analysis/experiments/m27_holdout.py).
 [holdout]

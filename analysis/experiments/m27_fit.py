@@ -8,6 +8,8 @@
         --start round1 --restarts 2,0 --generations 50 --seeds 3     # a later round, from round 1's fits
     uv run --project analysis python analysis/experiments/m27_fit.py --method lm --start round2 \
         --species garden --workers 12                                # 3D: least squares (fit_lm.py)
+    uv run --project analysis python analysis/experiments/m27_fit.py --method lm --start round2 \
+        --species beech --out round5-pilot --pilot                   # round 5's pilot: LM, then the panel
 
 Needs Node 24 first on PATH. The full budget takes about 20–40 minutes per species on a 12-core
 laptop (up to 30,000 tree-runs of ≈ 0.6 s; see the handoff in docs/STATUS.md); `--budget quick`
@@ -28,13 +30,23 @@ own start shifted by the mean shift (in the unit cube, and r0's in log) of those
 where that start's loss is lower than its own: the plan's transfer. `--shift-from round3` adds an
 earlier round's shifts (each species shifted by the others' moves from their own starts, never its own). With --smoke it runs one LM
 iteration and two CMA-ES generations on one seed a trial and writes under runs/m27-fit-smoke/lm/.
+
+Round 5 (ADR 0029): the targets' `[form]` is held and only the physiology is fitted; the reported
+shape is printed under its own heading, the step log goes to <species>-steps.csv, and the gallery
+check's verdict is the results file's `shapeFlag`. `--pilot` (one species) stops after LM, verifies
+the LM point, and then draws its line-up panel beside round 2's (the round-4 pipeline in
+docs/experiments/code/2026-10-31-species-round4/): panel-links.ts always; the screenshots and the
+figure when `--panel-origin` serves the lab (`npm run dev`) and NODE_PATH holds puppeteer-core, else
+it prints those two commands. Nothing runs overnight before the user has judged that panel.
 """
 
 import argparse
 import json
 import os
+import subprocess
 import sys
 import traceback
+import urllib.request
 
 import tomllib
 
@@ -66,9 +78,13 @@ parser.add_argument("--start", default="hand",
                     help="warm restarts start from the hand-tuned values (hand) or an earlier round's fits, e.g. round1")
 parser.add_argument("--skip-done", action="store_true", help="skip species that already have a results file")
 parser.add_argument("--smoke", action="store_true", help="2 generations, 2 seeds, 1 restart; writes under runs/ only")
+parser.add_argument("--pilot", action="store_true", help="lm, one species: stop after LM, then draw its panel (round 5)")
+parser.add_argument("--panel-origin", default="http://localhost:5173/", help="--pilot: the lab's dev server")
 args = parser.parse_args()
 
 species = {"all": SPECIES, "garden": GARDEN}.get(args.species, args.species.split(","))
+if args.pilot and (args.method != "lm" or len(species) != 1):
+    parser.error("--pilot needs --method lm and one species")
 overrides = {k: v for k, v in {"generations": args.generations, "seeds": args.seeds}.items() if v is not None}
 if args.restarts:
     warm, rand = (int(n) for n in args.restarts.split(","))
@@ -163,6 +179,18 @@ def lm_report(spec: Spec, result: dict) -> None:
     for m in result["margins"]:
         print(f"{m['trait']:24} {m['kind']:>9} {fmt(m['target']):>8} {m['band']:>7} {fmt(m['start']):>8} "
               f"{fmt(m['fit']):>8} {fmt(m['fitMargin']):>8}")
+    if result.get("reported"):
+        print("reported (never scored; the description where there is one):")
+        print(f"{'trait':24} {'described':>10} {'hand':>8} {'start':>8} {'fitted':>8}")
+        for r in result["reported"]:
+            print(f"{r['trait']:24} {fmt(r['target']):>10} {fmt(r.get('hand')):>8} {fmt(r.get('start')):>8} "
+                  f"{fmt(r.get('fit')):>8}")
+    flag = result.get("shapeFlag") or {}
+    for k in ("lm", "fit"):
+        if k in flag:
+            g = flag[k]
+            print(f"gallery: {k} nearest {g['nearest']} at {g['distance']:.2f}, the hand form at {g['hand']:.2f}"
+                  + (" — FLAGGED" if g["flag"] else ""))
     print(f"active: {', '.join(result['activeSet'])}")
     for p in spec.paths + ["r1.mw"]:
         print(f"{p:24} {fmt(result['start']['assign'].get(p)):>8} {fmt(result['fit']['assign'].get(p)):>8}")
@@ -176,6 +204,37 @@ def shift_of(spec: Spec, own: dict, fitted: dict) -> dict:
     return d
 
 
+def pilot_panel(sp: str, out) -> None:
+    """The pilot's panel beside round 2's: the round-4 pipeline (panel-links.ts → panel-shots.mjs →
+    panel-figure.py), its rounds folder the pilot's."""
+    code = "docs/experiments/code/2026-10-31-species-round4"
+    if args.smoke:
+        print("smoke: the pilot's panel is skipped (panel-links.ts reads docs/experiments/fits/<round>/)")
+        return
+    shots = f"runs/panel-{out.name}"
+    rnd = out.relative_to(REPO / "docs" / "experiments" / "fits")
+    subprocess.run(["node", f"{code}/panel-links.ts", args.panel_origin, str(rnd), shots, sp], cwd=REPO, check=True)
+    commands = [
+        f"NODE_PATH=<scratch>/node_modules node {code}/panel-shots.mjs {shots} {sp}",
+        f"uv run --project analysis python {code}/panel-figure.py {shots} docs/experiments/figures -{out.name}",
+    ]
+    try:
+        urllib.request.urlopen(args.panel_origin, timeout=5)
+        served = True
+    except OSError:
+        served = False
+    if not served or not os.environ.get("NODE_PATH"):
+        print("the panel's screenshots need the lab served (npm run dev) and NODE_PATH with puppeteer-core; then:")
+        for c in commands:
+            print("  " + c)
+        return
+    subprocess.run(["node", f"{code}/panel-shots.mjs", shots, sp], cwd=REPO, check=True)
+    subprocess.run([sys.executable, f"{code}/panel-figure.py", shots, "docs/experiments/figures", f"-{out.name}"],
+                   cwd=REPO, check=True)
+    print(f"the pilot's panel: docs/experiments/figures/2026-10-31-species-panel-{sp}-{out.name}.png; the user "
+          "judges it before any overnight run")
+
+
 if args.method == "lm":
     # An unattended run (step 2 runs overnight): the log is a file, so print line by line.
     sys.stdout.reconfigure(line_buffering=True)
@@ -184,7 +243,8 @@ if args.method == "lm":
     smoke = {"seeds": one, "noise_seeds": [1, 2], "select_seeds": [501], "verify_seeds": [1001], "iterations": 1,
              "max_rejections": 0, "popsize": 4, "cma_seeds": 1, "generations": 2, "finalists": 1}
     settings = LMSettings(workers=args.workers, **(smoke if args.smoke else {}),
-                          **({"iterations": args.iterations} if args.iterations else {}))
+                          **({"iterations": args.iterations} if args.iterations else {}),
+                          **({"finisher": False} if args.pilot else {}))
     # Every species already fitted in this round lends its shift to the ones that run, wherever it
     # stands in the list (beech, fourth in GARDEN, is done before birch, the first, runs).
     shifts: list[dict] = []
@@ -225,6 +285,8 @@ if args.method == "lm":
             # Nothing is written for it, so --skip-done runs it again on a restart.
             failed.append(sp)
             print(f"FAILED {sp}:\n{traceback.format_exc()}")
+    if args.pilot and not failed:
+        pilot_panel(species[0], out)
     print(f"\nfinished: fitted {', '.join(s for s in species if s not in done and s not in failed) or 'none'}"
           + (f"; failed {', '.join(failed)}" if failed else "") + (f"; skipped {', '.join(done)}" if done else ""))
     raise SystemExit(1 if failed else 0)

@@ -4,7 +4,8 @@
  * the same worlds. They are M19's and M25's (docs/experiments/2026-10-28-m25-species.md): the
  * woodland's growth rules without recruitment or storms (`oakOpen`), and
  *
- * - lone: one tree on 160 wide, open-grown, measured at seasons 30 and 60;
+ * - lone: one tree on 160 wide, open-grown, measured at seasons 30 and 60 (and, when asked, its
+ *   shape again at 100: reported, not fitted);
  * - stand: a closed stand, three rows of four 21 cells apart on an 84-cell periodic ring between
  *   opaque faces (τ 0), as the 20-seed evidence read H/D 70 (ADR 0027); the middle row's four
  *   trees measured at season 60 (and, when asked, again at 100: how much height they gain late,
@@ -171,10 +172,8 @@ export function withAssign(
   };
 }
 
-export interface LoneTraits {
-  alive: boolean;
-  height30: number;
-  height60: number;
+/** The lone tree's shape, read at one season (reported beside a fit, never scored: ADR 0029). */
+export interface LoneShape {
   spread: number;
   slenderness: number;
   branchAngle: number;
@@ -185,31 +184,32 @@ export interface LoneTraits {
   leaderDominance: number;
   branchAngle2: number;
   limbDroop: number;
-  junctionDelta: number;
-  ldSlope: number;
-  leafStemSlope: number;
+  /** The length-weighted median elevation of the first-order limbs' segments, degrees (form.rs). */
+  limbElevation: number;
   /** The crown's width in ten height bands, base to top, over its widest (form.rs's profile). */
   profile: number[];
 }
 
-export function runLone(
-  species: string,
-  seed: number,
-  assign: Record<string, unknown> = {},
-): LoneTraits {
-  const world = newWorld(withAssign(loneParams(species, seed), species, assign));
-  world.run(30);
-  const tree = world.trees[0] as Tree;
-  const height30 = world.metricsOf(tree).height;
-  world.run(30);
+/** The reported shape at season 100, each name with `100` appended (lone.spread100, …). */
+export type LoneShape100 = { [K in keyof LoneShape as `${K}100`]: LoneShape[K] };
+
+export interface LoneTraits extends LoneShape, Partial<LoneShape100> {
+  alive: boolean;
+  height30: number;
+  height60: number;
+  junctionDelta: number;
+  ldSlope: number;
+  leafStemSlope: number;
+  /** The lone tree's height at season 100, when run on to 100; else absent. */
+  height100?: number;
+  /** Whether it is alive at 100, when run on; else absent. */
+  alive100?: boolean;
+}
+
+function loneShape(world: RustWorld, tree: Tree): LoneShape {
   const m = world.metricsOf(tree);
   const f = world.formOf(tree);
-  const alive = tree.alive;
-  world.dispose();
   return {
-    alive,
-    height30,
-    height60: m.height,
     // The crown read in x and z (form.rs's profile reads both the same way): the larger extent,
     // which the slab's depth does not cap.
     spread: m.height > 0 ? Math.max(m.crownWidth, m.crownDepth) / m.height : 0,
@@ -222,11 +222,48 @@ export function runLone(
     leaderDominance: f.leaderDominance,
     branchAngle2: f.branchAngle2,
     limbDroop: f.limbDroop,
+    limbElevation: f.limbElevation,
+    profile: f.profile,
+  };
+}
+
+/**
+ * The lone tree at 30 and 60, and, when asked, run on to 100: its shape there as `…100` (the
+ * round-5 plan, §3.1: a crown can pass at 60 and turn at 100, as round 4's birch did).
+ */
+export function runLone(
+  species: string,
+  seed: number,
+  assign: Record<string, unknown> = {},
+  seasons: 60 | 100 = 60,
+): LoneTraits {
+  const world = newWorld(withAssign(loneParams(species, seed), species, assign));
+  world.run(30);
+  const tree = world.trees[0] as Tree;
+  const height30 = world.metricsOf(tree).height;
+  world.run(30);
+  const m = world.metricsOf(tree);
+  const f = world.formOf(tree);
+  const traits: LoneTraits = {
+    alive: tree.alive,
+    height30,
+    height60: m.height,
+    ...loneShape(world, tree),
     junctionDelta: f.junctionDelta,
     ldSlope: f.ldSlope,
     leafStemSlope: f.leafStemSlope,
-    profile: f.profile,
   };
+  if (seasons === 100) {
+    world.run(40);
+    const t = world.trees[0] as Tree;
+    traits.alive100 = t.alive;
+    traits.height100 = world.metricsOf(t).height;
+    for (const [k, v] of Object.entries(loneShape(world, t))) {
+      (traits as unknown as Record<string, unknown>)[`${k}100`] = v;
+    }
+  }
+  world.dispose();
+  return traits;
 }
 
 export interface StandTraits {
@@ -255,6 +292,8 @@ export interface StandTraits {
   alive100?: number;
   /** The leaf area index at season 100, when run on; else absent. */
   lai100?: number;
+  /** The limb crown ratio at season 100, when run on; else absent (reported, not scored). */
+  crownRatio100?: number;
 }
 
 const mean = (xs: number[]): number =>
@@ -286,6 +325,7 @@ export function runStand(
     world.run(40);
     const still = interior.filter((t) => t.alive);
     traits.height100 = mean(still.map((t) => world.metricsOf(t).height));
+    traits.crownRatio100 = mean(still.map((t) => world.metricsOf(t).limbCrownRatio));
     traits.alive100 = still.length / interior.length;
     traits.lai100 = world.lai(0, STAND_WIDTH);
   }

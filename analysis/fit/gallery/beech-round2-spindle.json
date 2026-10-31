@@ -1,0 +1,28 @@
+{
+  "species": "beech",
+  "verdict": "round 2 as adopted: a narrow spindle, widest at the base, where beech is a broad dome (the line-up panels, 2026-10-31)",
+  "date": "2026-10-31",
+  "source": "FITTED_FLORA (round 2 as adopted, src/core/flora-fitted.ts)",
+  "assign": {
+    "r2.levels.0.lambda": 0.5308,
+    "r2.levels.1.lambda": 0.5124,
+    "r2.levels.1.setPoint": 34.32,
+    "r2.levels.1.branchAngle": 50.07,
+    "r2.levels.1.eta": 0.5696,
+    "r2.levels.2.setPoint": 94.59,
+    "r2.aC": 14.44,
+    "r2.dLambda": 0.01384,
+    "r2.kappa": 0.4314,
+    "c3.alpha": 2.959,
+    "c5.Trel": 0.04538,
+    "c6.r0": 0.003096,
+    "r1.Lh": 108.9,
+    "r1.mf": 0.07697,
+    "r3.c": 0.04879,
+    "r6.qMin": 0.01257,
+    "r6.leafArea": 2.474,
+    "r2.hJ": 44.95,
+    "r1.mw": 64,
+    "r1.hydraulic": "hyperbolic"
+  }
+}

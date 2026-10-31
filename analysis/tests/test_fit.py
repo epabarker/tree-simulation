@@ -41,3 +41,40 @@ def test_a_profile_trait_weighs_as_one_and_flattens_from_the_reply():
     assert all(math.isclose(z, -1.0) for z in scaled(t, traits))
     # Every band one band out costs what one scalar trait one band out does: weight × 1².
     assert math.isclose(loss(Spec("x", [t], []), traits), 0.5)
+
+
+def test_the_form_rides_on_every_candidate_like_fixed_and_is_never_searched():
+    from treesim.fit import decode, load_spec
+
+    spec = load_spec("beech")
+    a = decode(spec, [0.5] * len(spec.params))
+    assert a["r2.kappa"] == spec.form["r2.kappa"] and a["r1.hydraulic"] == "hyperbolic"
+    assert not any(p["path"].startswith("r2.levels") for p in spec.params)
+    assert "lone.profile" not in [t["name"] for t in spec.traits]
+
+
+def test_reports_are_read_at_60_and_100_and_never_scored():
+    from treesim.fit import report_names
+
+    r = [{"name": "lone.spread", "target": 0.6, "band": 0.2, "kind": "described"},
+         {"name": "lone.profile", "profile": [1.0] * 10, "band": 0.1, "kind": "described"},
+         {"name": "stand.crownRatio100", "kind": "measured"}]
+    spec = Spec("x", [], [], reports=r)
+    names = report_names(spec)
+    assert "lone.spread" in names and "lone.spread100" in names and "lone.profile100.9" in names
+    assert "stand.crownRatio100" in names and "stand.crownRatio100100" not in names
+    # Far off every report, and the loss does not see it.
+    assert loss(spec, {"lone.spread": 9.0, "lone.spread100": 9.0}) == 0.0
+
+
+def test_the_gallery_distance_weighs_the_profile_as_one_and_separates_beyond_the_noise():
+    from treesim.gallery import SCALES, distance, noise
+
+    a = {"spread": 0.6, **{f"profile.{k}": 0.5 for k in range(10)}}
+    b = {"spread": 0.8, **{f"profile.{k}": 0.6 for k in range(10)}}
+    # spread one scale apart (0.2), every band one scale apart (0.1): RMS 1.
+    assert math.isclose(distance(a, b, SCALES), 1.0)
+    assert distance(a, a, SCALES) == 0.0
+    sd = {"spread": 0.2 * math.sqrt(1.5), **{f"profile.{k}": 0.1 * math.sqrt(1.5) for k in range(10)}}
+    # Seed sd √1.5 scales on both sides, three seeds: the difference's noise is one scale.
+    assert math.isclose(noise(sd, sd, 3, SCALES), 1.0)

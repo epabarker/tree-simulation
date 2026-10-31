@@ -2,6 +2,22 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-31: Species round 5 built: form by hand, physiology by fit (ADR 0029 proposed)
+
+- **Plan:** [round 5](plans/2026-10-31-species-round5.md) §3.1–3.4. The user changed §3.2: a one-knob-at-a-time sweep comes first, and the three-knob grid follows once the user has named the knobs per species. No fit started.
+- **Round 4 stopped** after birch: 5 of 5 measured in band, but at 100 a flat-topped pagoda (not accepted). Birch is the gallery's specimen ([note](experiments/2026-10-30-species-3d.md), "Round 4: birch").
+- **§3.1:** `limbElevation` (form.rs, `FORM_COLUMNS` 11 → 12, a unit test on hand-built limbs); the lone trial run on to 100 (`lone100`, the reported set as `…100`); the stand's `crownRatio100`. The lone trial to 100 takes 2.0–2.6× its time to 60.
+- **The form sweep:** `form-sweep.py`, eight species × nine knobs × four values plus the round-2 reference cell, natively at seed 1, two sheets a species (`figures/2026-10-31-form-sweep-*`).
+- **§3.3:** the gallery (six rejects) and `m27_gallery.py` (`gallery-check.txt`).
+- **§3.4:** the targets files' `[form]`, `[[formRange]]` and `[[report]]`; the LM step log; `shapeFlag`; `m27_fit.py --pilot`; the panel's round `form`. Python tests 4 → 7. ADR 0029 drafted.
+- **Surprises:**
+  - `limbElevation` mostly reads back the level-1 set point (oak 31° = 90 − 58.6 in every row but the set point's);
+  - birch's limbs are held at 20° by `postureSetPoint` 70, a form parameter outside the nine, so its set-point row does not move them;
+  - oak's and hornbeam's round-2 crowns are broad, not spindles, so they stay out of the gallery;
+  - beech's round 2 and round 3's cone are 1.2 standardised units apart, within the noise of three seeds;
+  - most beech sweep cells reach the woods' top by 100.
+- **Goldens:** unchanged (`bench --compare` against 1f41990: the same hash in all seven cases).
+
 ## 2026-10-31: Species round 4: the harness, the targets re-sourced, ADR 0028; round 3 re-scored
 
 - **Plan:** [round 4](plans/2026-10-31-species-round4.md) steps B–D, after the [targets audit](reviews/2026-10-31-species-target-audit.md). Steps A (the hold-out) and E (the re-fit) are the user's.

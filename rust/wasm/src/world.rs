@@ -246,7 +246,7 @@ impl World {
         cols[col].bytes()
     }
 
-    /// Tree `i`'s crown form (form.rs): FORM_COLUMNS' eleven values, then the profile's bands.
+    /// Tree `i`'s crown form (form.rs): FORM_COLUMNS' twelve values, then the profile's bands.
     pub fn tree_form(&self, i: usize) -> Vec<f64> {
         let t = &self.core.trees[i];
         let f = form_metrics(t, self.core.params_of(t));

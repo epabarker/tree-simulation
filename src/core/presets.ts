@@ -80,7 +80,10 @@ export const PRE_R4 = { r4: { enabled: false }, r5: { enabled: false } } satisfi
  */
 const FOREST = {
   ...SKY,
-  r1: { enabled: true, fRep: 0.1, maturity: 40 },
+  // ADR 0032: the acclimated leaf cost (one global c), and T_rel scaled as hornbeam's from its
+  // fitted 0.194 to the light of its lowest shade leaves, 0.025: 0.12 × 0.025/0.194.
+  c5: { ...SKY.c5, Trel: 0.0155 },
+  r1: { enabled: true, fRep: 0.1, maturity: 40, leafCost: "acclimated", leafCostShade: 0.3 },
   // M16: limbs rest on the ground; storms in 5% of seasons break exposed limbs and throw tall trees.
   // σ_break 7000 ≈ 2.3 × σ_target (ADR 0027): with thin pipes stress wood holds every branch near
   // σ_target, and a storm's load at the top is 2.5×, so 4500 broke whole crowns in every storm.

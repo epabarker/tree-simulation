@@ -13,7 +13,7 @@ export const FITTED_FLORA = {
     latin: "Betula pendula",
     leaf: "small",
     c3: { mode: "bh", lambda: 0.5, alpha: 2.943 },
-    c5: { enabled: true, T: 0.1, g: 3, Trel: 0.3544, topQuantile: 0.9 },
+    c5: { enabled: true, T: 0.1, g: 3, Trel: 0.21, topQuantile: 0.9 },
     c6: { enabled: true, n: 2, r0: 0.005524 },
     r1: {
       enabled: true,
@@ -28,6 +28,8 @@ export const FITTED_FLORA = {
       reserve0: 2,
       store: 2,
       shed: "carbon",
+      leafCost: "acclimated",
+      leafCostShade: 0.3,
     },
     r2: {
       enabled: true,
@@ -91,7 +93,7 @@ export const FITTED_FLORA = {
     common: "Beech",
     latin: "Fagus sylvatica",
     leaf: "beech",
-    c5: { enabled: true, T: 0.01, g: 3, Trel: 0.04538, topQuantile: 0.9 },
+    c5: { enabled: true, T: 0.01, g: 3, Trel: 0.008, topQuantile: 0.9 },
     r1: {
       enabled: true,
       mw: 64,
@@ -105,6 +107,8 @@ export const FITTED_FLORA = {
       reserve0: 2,
       store: 2,
       shed: "carbon",
+      leafCost: "acclimated",
+      leafCostShade: 0.3,
     },
     r2: {
       enabled: true,
@@ -170,7 +174,7 @@ export const FITTED_FLORA = {
     latin: "Quercus robur",
     leaf: "oak",
     c3: { mode: "bh", lambda: 0.5, alpha: 3.155 },
-    c5: { enabled: true, T: 0.05, g: 3, Trel: 0.07283, topQuantile: 0.9 },
+    c5: { enabled: true, T: 0.05, g: 3, Trel: 0.063, topQuantile: 0.9 },
     r1: {
       enabled: true,
       mw: 64,
@@ -184,6 +188,8 @@ export const FITTED_FLORA = {
       reserve0: 2,
       store: 2,
       shed: "carbon",
+      leafCost: "acclimated",
+      leafCostShade: 0.3,
     },
     r2: {
       enabled: true,
@@ -246,7 +252,7 @@ export const FITTED_FLORA = {
     common: "Silver fir",
     latin: "Abies alba",
     leaf: "needle",
-    c5: { enabled: true, T: 0.02, g: 3, Trel: 0.1318, topQuantile: 0.9 },
+    c5: { enabled: true, T: 0.02, g: 3, Trel: 0.0091, topQuantile: 0.9 },
     c6: { enabled: true, n: 2, r0: 0.003033 },
     r1: {
       enabled: true,
@@ -261,6 +267,8 @@ export const FITTED_FLORA = {
       reserve0: 2,
       store: 2,
       shed: "carbon",
+      leafCost: "acclimated",
+      leafCostShade: 0.3,
     },
     r2: {
       enabled: true,
@@ -323,7 +331,7 @@ export const FITTED_FLORA = {
     common: "Hornbeam",
     latin: "Carpinus betulus",
     leaf: "hornbeam",
-    c5: { enabled: true, T: 0.01, g: 3, Trel: 0.1479, topQuantile: 0.9 },
+    c5: { enabled: true, T: 0.01, g: 3, Trel: 0.025, topQuantile: 0.9 },
     r1: {
       enabled: true,
       mw: 64,
@@ -337,6 +345,8 @@ export const FITTED_FLORA = {
       reserve0: 2,
       store: 2,
       shed: "carbon",
+      leafCost: "acclimated",
+      leafCostShade: 0.3,
     },
     r2: {
       enabled: true,
@@ -402,7 +412,7 @@ export const FITTED_FLORA = {
     latin: "Acer campestre",
     leaf: "maple",
     c3: { mode: "bh", lambda: 0.5, alpha: 3.779 },
-    c5: { enabled: true, T: 0.02, g: 3, Trel: 0.1218, topQuantile: 0.9 },
+    c5: { enabled: true, T: 0.02, g: 3, Trel: 0.044, topQuantile: 0.9 },
     c6: { enabled: true, n: 2, r0: 0.002574 },
     r1: {
       enabled: true,
@@ -417,6 +427,8 @@ export const FITTED_FLORA = {
       reserve0: 2,
       store: 2,
       shed: "carbon",
+      leafCost: "acclimated",
+      leafCostShade: 0.3,
     },
     r2: {
       enabled: true,
@@ -479,7 +491,7 @@ export const FITTED_FLORA = {
     latin: "Ilex aquifolium",
     leaf: "holly",
     c3: { mode: "bh", lambda: 0.5, alpha: 2.583 },
-    c5: { enabled: true, T: 0.01, g: 3, Trel: 0.05735, topQuantile: 0.9 },
+    c5: { enabled: true, T: 0.01, g: 3, Trel: 0.021, topQuantile: 0.9 },
     c6: { enabled: true, n: 2, r0: 0.002936 },
     r1: {
       enabled: true,
@@ -494,6 +506,8 @@ export const FITTED_FLORA = {
       reserve0: 2,
       store: 2,
       shed: "carbon",
+      leafCost: "acclimated",
+      leafCostShade: 0.3,
     },
     r2: {
       enabled: true,
@@ -565,7 +579,7 @@ export const FITTED_FLORA = {
     latin: "Sorbus aucuparia",
     leaf: "rowan",
     c3: { mode: "bh", lambda: 0.5, alpha: 2.98 },
-    c5: { enabled: true, T: 0.05, g: 3, Trel: 0.2627, topQuantile: 0.9 },
+    c5: { enabled: true, T: 0.05, g: 3, Trel: 0.072, topQuantile: 0.9 },
     c6: { enabled: true, n: 2, r0: 0.003506 },
     r1: {
       enabled: true,
@@ -580,6 +594,8 @@ export const FITTED_FLORA = {
       reserve0: 2,
       store: 2,
       shed: "carbon",
+      leafCost: "acclimated",
+      leafCostShade: 0.3,
     },
     r2: {
       enabled: true,
@@ -643,7 +659,7 @@ export const FITTED_FLORA = {
     latin: "Salix caprea",
     leaf: "willow",
     c3: { mode: "bh", lambda: 0.5, alpha: 4.13 },
-    c5: { enabled: true, T: 0.1, g: 3, Trel: 0.2013, topQuantile: 0.9 },
+    c5: { enabled: true, T: 0.1, g: 3, Trel: 0.14, topQuantile: 0.9 },
     c6: { enabled: true, n: 2, r0: 0.002444 },
     r1: {
       enabled: true,
@@ -658,6 +674,8 @@ export const FITTED_FLORA = {
       reserve0: 2,
       store: 2,
       shed: "carbon",
+      leafCost: "acclimated",
+      leafCostShade: 0.3,
     },
     r2: {
       enabled: true,
@@ -721,7 +739,7 @@ export const FITTED_FLORA = {
     latin: "Pinus sylvestris",
     leaf: "pine",
     c3: { mode: "bh", lambda: 0.5, alpha: 3.048 },
-    c5: { enabled: true, T: 0.1, g: 3, Trel: 0.3777, topQuantile: 0.9 },
+    c5: { enabled: true, T: 0.1, g: 3, Trel: 0.23, topQuantile: 0.9 },
     c6: { enabled: true, n: 2, r0: 0.003829 },
     r1: {
       enabled: true,
@@ -736,6 +754,8 @@ export const FITTED_FLORA = {
       reserve0: 2,
       store: 2,
       shed: "carbon",
+      leafCost: "acclimated",
+      leafCostShade: 0.3,
     },
     r2: {
       enabled: true,

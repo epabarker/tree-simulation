@@ -159,10 +159,6 @@ path = "r2.kappa"
 lo = 0
 hi = 4
 [[param]]
-path = "c5.Trel"
-lo = 0.005
-hi = 0.6
-[[param]]
 path = "c6.r0"   # ADR 0027's 3D units: the 2D bounds 0.015–0.05 ÷ 8
 lo = 0.001875
 hi = 0.00625
@@ -198,6 +194,12 @@ log = true
 # Assignments every candidate carries unchanged (analysis/treesim/fit.py).
 [fixed]
 "r1.hydraulic" = "hyperbolic"   # 1/(1 + L_path/L_h): height keeps rising slowly (ADR 0021)
+# ADR 0032: T_rel fixed from the lowest shade leaves' light (Hagemeier & Leuschner 2019, % of
+# incident PAR; estimated: 23% by the score regression; ln(%) = 5.00 − 1.108 × shadeScore over birch, oak, hornbeam, beech),
+# and the acclimated leaf cost with one global c. Not fitted.
+"c5.Trel" = 0.23
+"r1.leafCost" = "acclimated"
+"r1.leafCostShade" = 0.3
 
 # Held out: never in the loss, checked after the fit (analysis/experiments/m27_holdout.py).
 [holdout]

@@ -1,8 +1,8 @@
 # Status
 
-_Last updated: 2026-11-01 (ADR 0029 and 0031 accepted; ADR 0032 next: acclimated leaf cost and fixed T_rel, then the phone's budget)_
+_Last updated: 2026-11-01 (ADR 0032 accepted and applied: acclimated leaf cost c 0.3, T_rel fixed per species; goldens moved. Next: the phone's budget)_
 
-**3D port** on the branch `3d-port` (work branches open PRs into it). ADR 0024–0029 and 0031 accepted, 0030 rejected. The live site stays on 0.14.0 (2D) until the bar below is met.
+**3D port** on the branch `3d-port` (work branches open PRs into it). ADR 0024–0029, 0031 and 0032 accepted, 0030 rejected. The live site stays on 0.14.0 (2D) until the bar below is met.
 
 **Done means** (user): the mixed wood looks right in the garden in depth, within budget on the phone, with floor, H/D and crown base as 20-seed evidence. C3–C6 follow after shipping.
 
@@ -12,7 +12,7 @@ _Last updated: 2026-11-01 (ADR 0029 and 0031 accepted; ADR 0032 next: acclimated
 - **`forest`, 20-seed evidence (τ 0):** floor at 100 20 of 20; H/D at 300 19 of 20; crown base 20 of 20; plateau 17 of 20.
 - **Renderer (I3 steps 1–2):** 64 depth slices from `zOrder`; phone (seed 10, 40 seasons): draw p95 6.3 ms, frame p95 16.8 ms, worker 50 ms.
 - **Species harness (rounds 4–5):** closed stand (LAI, limb crown ratio, at 60 and 100); shade house 10 roofs; `lone100` (the reported shape at 100); `limbElevation` (form.rs); `m27_rescore.py`; line-up panels (`code/2026-10-31-species-round4/panel-*`, round `form`).
-- **Round 5 (ADR 0029, accepted):** targets files hold `[form]` (the picks, dated 2026-10-31), `[[formRange]]`, `[[report]]` (shape, never scored); the fit is nine physiology knobs. `fit_lm.py` logs the shape at every accepted step (`<sp>-steps.csv`) and flags a fit nearer a gallery reject than the hand form (`shapeFlag`); `m27_fit.py --pilot` stops after LM and draws the panel.
+- **Round 5 (ADR 0029, accepted):** targets files hold `[form]` (the picks, dated 2026-10-31), `[[formRange]]`, `[[report]]` (shape, never scored); the fit is eight physiology knobs (T_rel fixed, ADR 0032). `fit_lm.py` logs the shape at every accepted step (`<sp>-steps.csv`) and flags a fit nearer a gallery reject than the hand form (`shapeFlag`); `m27_fit.py --pilot` stops after LM and draws the panel.
 - **Form sweep and grids** (`code/2026-10-31-species-round5/form-{sweep,grid}.py`): one knob at a time, then the user's 4 × 4 × 3 grids and the posture sweep (birch, oak), seed 1; `figures/2026-10-31-form-{sweep,grid,posture}-<sp>-{60,100}.png`. `postureSetPoint` is the tenth form knob (ADR 0029, `[form]`).
 - **Gallery** (`analysis/fit/gallery/`): round 2's spindles (beech, birch), round 3's beech cone, oak and hornbeam parasols, round 4's birch pagoda; `m27_gallery.py`. Oak and hornbeam pass the check; beech's cone sits within the noise of its round-2 form (1.17 against 0.77).
 

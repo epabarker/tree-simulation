@@ -2,6 +2,12 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-01: ADR 0032: the acclimated leaf cost and T_rel fixed per species (goldens updated)
+
+- **The model's configuration** (ADR 0032, the user): R1's leaf cost acclimated with one global c = 0.3, and C5's T_rel fixed per species from Hagemeier & Leuschner's lowest shade leaves (birch 0.21, oak 0.063, hornbeam 0.025, beech 0.008 measured; willow 0.14, rowan 0.072, maple 0.044, holly 0.021, fir 0.0091, pine 0.23 estimated by the tolerance-score regression). FITTED_FLORA regenerated (`m27_adopt.py`; only those lines change); T_rel leaves the targets files' `[[param]]` for `[fixed]`; `forest` takes c 0.3 and T_rel 0.0155.
+- **Goldens updated, for that reason:** forest, mixedWood and oakOpen (the presets on FOREST and the species). The rest are unchanged.
+- **Why:** the stand, not the lone tree. Hornbeam's closed stand under it had LAI 9.2–9.6 (measured 8.3 ± 1.5) and a 1% floor (measured 1.3%), and forest's plateau held on 3 of 3 seeds. Metamers rise 40–70%: the phone's budget is checked next.
+
 ## 2026-11-01: ADR 0029 and ADR 0031 accepted
 
 - **ADR 0029** (form by hand, physiology by fit) accepted.

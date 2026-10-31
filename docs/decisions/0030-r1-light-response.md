@@ -1,6 +1,6 @@
 # 0030: R1's light response, linear or saturating (an ablation)
 
-- **Status:** proposed (2026-10-31; built as an ablation, default linear, goldens unchanged; the user decides whether any species or preset uses it).
+- **Status:** rejected (2026-10-31, the user): `r1.response` stays in the core as an ablation (default linear, goldens unchanged); no species or preset uses it.
 - **Date:** 2026-10-31
 - **Amends:** spec §R1 (P = α·Σ a·Q·d(L_path)), ADR 0010, ADR 0021.
 - **Note:** [the species note](../experiments/2026-10-30-species-3d.md), round 5: "The cap", "The shed branches, decomposed", "R1's light response".
@@ -17,3 +17,14 @@ The flat caps on hornbeam, oak and maple are R1's carbon shedding: with no shedd
 - The compensation light falls: at q_half 0.2, a leaf at Q 0.04 earns 0.2 rather than 0.04 per unit of α.
 - C5's relative-light test (T_rel·Q_top) is unchanged, so a twig can still be shed for being dim relative to the crown top.
 - Fitted species carry α, m_f and Q_ss calibrated against the linear response; a species switched to the saturating form would need its physiology refitted.
+
+## Why rejected (2026-10-31)
+The test (`code/2026-10-31-species-round5/response.py`; the species note, "R1's light response"): the lone hornbeam at ramp 25, the closed hornbeam stand at 100, and `forest` at τ 0 to 300 on seeds 1–3.
+
+| response | dome (lone hornbeam) | stand crown (limb crown ratio at 100) | plateau (`forest`, seeds 1–3) |
+|---|---|---|---|
+| linear | no: the flat cap (top fifth 41% of the leaf at 60) | 0.39 | holds on 3 of 3 (median height 74–86 at 300) |
+| saturating, q_half 0.2 | at 60 (top fifth 17%); at 100 flattened against the woods' top (H 205) | 0.33 | holds on 1 of 3 (117–125) |
+| saturating, q_half 0.5 | at 60, broad; at the woods' top by 100 (H 190) | 0.34 | holds on 1 of 3 (106–118) |
+
+It rounds the lone crown only by raising production below full sun everywhere: the tree also grows taller and runs into the ceiling. The stand's crown gets shallower, not deeper, and the plateau holds on one seed in three where linear holds on all three.

@@ -479,7 +479,11 @@ pub fn grow_buds(tree: &mut Tree, params: &Params, season: f64) {
             grow_shoot(tree, i, n, length, params, season, &mut direct, pa_shift);
         } else {
             tree.b.state[i] = resting_state(tree.b.q[i], &params.r6);
-            tree.b.age[i] = store_i32(age + 1.0);
+            // R4's age counts the seasons a bud rests dormant (§R4: dormant buds have a finite
+            // lifespan): a leafy short shoot (R6) does not age toward L_dorm or a higher break.
+            if tree.b.state[i] == bud::DORMANT {
+                tree.b.age[i] = store_i32(age + 1.0);
+            }
             if aborts(tree.b.state[i], tree.b.age[i] as f64, r4) {
                 tree.b.state[i] = bud::GONE;
                 tree.aborted += 1.0;

@@ -1,6 +1,7 @@
 //! R4. Dormancy, release and reiteration (spec §R4, ADR 0012; r4-dormancy.ts). An active bud
 //! keeps growing while v ≥ v_cont; a dormant one needs v ≥ v_break·(1 + δ·age)·(1 + δ_b·s), or is
-//! released by its own light Q ≥ Q_rel·(1 + δ·age); one older than L_dorm aborts. A released bud
+//! released by its own light Q ≥ Q_rel·(1 + δ·age); one older than L_dorm aborts. Age is the
+//! seasons a bud has rested dormant: a leafy short shoot (R6) does not age. A released bud
 //! reiterates: its shoot takes a younger physiological age.
 //!
 //! Params: r4.enabled, r4.vBreak, r4.qRel, r4.vCont, r4.delta (δ), r4.lDorm, r4.juvenile,
@@ -33,7 +34,7 @@ pub fn light_releases(q: f64, age: f64, params: &Params) -> bool {
     r4.enabled && q >= r4.q_rel * (1.0 + r4.delta * age)
 }
 
-/// A resting dormant bud older than L_dorm aborts.
+/// A resting dormant bud older than L_dorm (seasons rested dormant) aborts.
 pub fn aborts(state: u8, age: f64, r4: &R4) -> bool {
     r4.enabled && state == bud::DORMANT && age > r4.l_dorm
 }
@@ -116,6 +117,29 @@ mod tests {
         assert!(!aborts(bud::DORMANT, 10.0, &r4));
         assert!(aborts(bud::DORMANT, 11.0, &r4));
         assert!(!aborts(bud::SHORT_SHOOT, 50.0, &r4));
+    }
+
+    #[test]
+    fn a_short_shoot_does_not_age_toward_l_dorm() {
+        // Q_rel 2: no light release, so the bud only rests.
+        let p = params(r#"{"r4":{"lDorm":10,"qRel":2},"r6":{"enabled":true,"qMin":0.2}}"#);
+        let mut t = seedling(&p, 0.5);
+        // Thirty leafy seasons: a short shoot, still age 0 (it used to reach 30 and abort at its
+        // first dark season).
+        for s in 0..30 {
+            grow_buds(&mut t, &p, s as f64);
+            assert_eq!(t.b.state[1], bud::SHORT_SHOOT);
+        }
+        assert_eq!(t.b.age[1], 0);
+        // Then shaded below Q_ss: dormant, and it aborts after L_dorm dormant seasons, not before.
+        t.b.q[1] = 0.05;
+        for s in 30..40 {
+            grow_buds(&mut t, &p, s as f64);
+            assert_eq!(t.b.state[1], bud::DORMANT, "season {s}");
+        }
+        assert_eq!(t.b.age[1], 10);
+        grow_buds(&mut t, &p, 40.0);
+        assert_eq!(t.b.state[1], bud::GONE);
     }
 
     #[test]

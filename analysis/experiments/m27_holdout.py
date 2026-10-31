@@ -35,17 +35,23 @@ import numpy as np
 import polars as pl
 from plotnine import aes, facet_wrap, geom_line, geom_path, ggplot, labs, scale_linetype_manual, theme, theme_minimal
 from treesim import REPO, Run, load_runs, run_many
-from treesim.fit import SPECIES, Pool, load_spec
+from treesim.fit import SPECIES, Pool, load_spec, survival_light as seed_survival
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--smoke", action="store_true")
 parser.add_argument("--workers", type=int, default=os.cpu_count() or 4)
 parser.add_argument("--round", default="round3", help="the fits' folder under docs/experiments/fits/")
 parser.add_argument("--only", choices=["floor"], help="run one section")
+parser.add_argument("--origin", default="http://localhost:5173/", help="the lab the links open (the dev server)")
 args = parser.parse_args()
 
 #: Lab species: not planted in the mixed wood, checked in their own woods instead.
 LAB = ["fir", "pine"]
+#: The woods' top (presets.ts TOP): a tree within 5% of it has reached it.
+TOP = 200
+AT_TOP = 0.95 * TOP
+#: The stop that matters (species plan, step 3): a late-successional species reaching the top.
+STOPPERS = ["oak", "hornbeam", "beech"]
 #: Species with a `<species>Wood` preset of their own.
 WOODS = ["birch", "oak", "beech", "fir", "pine"]
 FITS = REPO / ("runs/m27-fit-smoke" if args.smoke else f"docs/experiments/fits/{args.round}")
@@ -79,17 +85,24 @@ pool = Pool(args.workers)
 
 
 # 0. The floor of each species' own wood ----------------------------------------------------------
-def wood_floor(species: str, a: dict) -> dict:
-    replies = pool.map([{"species": species, "assign": a, "seeds": [s], "trials": ["wood"]} for s in FLOOR_SEEDS])
-    rec = [r["wood"][0] for r in replies]
-    return {k: float(np.mean([x[k] for x in rec])) for k in ("floor100", "floor150")}
+def batched(cases: list[tuple], trials: list[str], seeds: list[int]) -> dict[tuple, list[dict]]:
+    """Every (species, assign) case's replies, one per seed, in one batch for the whole pool."""
+    keys = [(case, s) for case in cases for s in seeds]
+    replies = pool.map([{"species": sp, "assign": a, "seeds": [s], "trials": trials} for ((sp, _, a), s) in keys])
+    out: dict[tuple, list[dict]] = {}
+    for ((sp, which, _), _s), r in zip(keys, replies):
+        out.setdefault((sp, which), []).append(r)
+    return out
 
 
+floor_replies = batched([(sp, w, a) for sp in FITTED for w, a in [("hand", {}), ("fitted", assign[sp])]],
+                        ["wood"], FLOOR_SEEDS)
 floor_rows = []
 for sp in FITTED:
     target = specs[sp].holdout.get("floor")
     for which, a in [("hand", {}), ("fitted", assign[sp])]:
-        f = wood_floor(sp, a)
+        rec = [r["wood"][0] for r in floor_replies[(sp, which)]]
+        f = {k: float(np.mean([x[k] for x in rec])) for k in ("floor100", "floor150")}
         inside = None if target is None else abs(f["floor100"] - target["target"]) <= target["band"]
         floor_rows.append({"species": sp, "patch": which, **f,
                            "target": target and target["target"], "band": target and target["band"], "in band": inside})
@@ -103,17 +116,21 @@ if args.only == "floor":
     raise SystemExit(0)
 
 
-def ask_all(species: str, a: dict, trials: list[str], seeds: list[int]) -> list[dict]:
-    return pool.map([{"species": species, "assign": a, "seeds": [s], "trials": trials} for s in seeds])
-
-
 # 1. Shade tolerance -----------------------------------------------------------------------------
 def survival_light(species: str, a: dict) -> float | None:
-    replies = ask_all(species, a, ["shade"], SEEDS)
+    replies = shade_replies[(species, "fitted" if a else "hand")]
     roofs = replies[0]["shade"].keys()
     lit = {r: float(np.mean([rep["light"][r] for rep in replies])) for r in roofs}
     ok = [lit[r] for r in roofs if all(rep["shade"][r][0] for rep in replies)]
+    # The fit's measure (species plan §2.2): seasons lived under each roof on a log-light axis,
+    # the geometric mean over seeds. It ranks the ten without the step's ties.
+    continuous[(species, bool(a))] = float(np.exp(np.mean([np.log(seed_survival(rep)[0]) for rep in replies])))
     return min(ok) if ok else None
+
+
+continuous: dict[tuple[str, bool], float] = {}
+shade_replies = batched([(sp, "hand", {}) for sp in SPECIES] + [(sp, "fitted", assign[sp]) for sp in FITTED],
+                        ["shade"], SEEDS)
 
 
 def spearman(xs: list[float], ys: list[float]) -> float:
@@ -138,13 +155,26 @@ rho = {
         [score[sp] for sp in SPECIES],
         [light_or_top(fitted_light.get(sp, hand_light[sp])) for sp in SPECIES],
     ),
+    "hand (continuous)": spearman([score[sp] for sp in SPECIES], [continuous[(sp, False)] for sp in SPECIES]),
+    "fitted (continuous)": spearman(
+        [score[sp] for sp in SPECIES],
+        [continuous[(sp, sp in FITTED)] for sp in SPECIES],
+    ),
 }
+# Fitted where fitted (fir and pine at their 3D values, FLORA's), most tolerant first.
+order = sorted(SPECIES, key=lambda sp: continuous[(sp, sp in FITTED)])
 
 
 # 2–3. Allometry and release ----------------------------------------------------------------------
+cases = [(sp, w, a) for sp in FITTED for w, a in [("hand", {}), ("fitted", assign[sp])]]
+lone_replies = batched(cases, ["lone"], SEEDS)
+release_replies = batched(cases, ["release"], SEEDS)
+
+
 def summarise(species: str, a: dict) -> dict:
-    lone = [r["lone"][0] for r in ask_all(species, a, ["lone"], SEEDS)]
-    rel = [r["release"][0] for r in ask_all(species, a, ["release"], SEEDS)]
+    which = "fitted" if a else "hand"
+    lone = [r["lone"][0] for r in lone_replies[(species, which)]]
+    rel = [r["release"][0] for r in release_replies[(species, which)]]
     med = lambda k: float(np.nanmedian([np.nan if x[k] is None else x[k] for x in lone]))
     return {
         "junctionDelta": med("junctionDelta"),
@@ -189,6 +219,17 @@ tallest = (
     .group_by("patch", "run", "season").agg(pl.col("height").max().alias("tallest"))
     .group_by("patch", "season").agg(pl.col("tallest").mean().alias("mean"), pl.col("tallest").max().alias("max"))
     .sort("patch", "season")
+)
+
+tallest_species = (
+    load_runs(REPO / wood).with_columns(pl.col("run").str.extract(r"^(\w+?)_").alias("patch"))
+    .filter(pl.col("alive"), pl.col("season").is_in(checkpoints))
+    .group_by("patch", "run", "season", "species").agg(pl.col("height").max().alias("tallest"))
+    .group_by("patch", "season", "species").agg(pl.col("tallest").max().alias("max"))
+    .sort("patch", "season", "species")
+)
+at_top = tallest_species.filter(
+    pl.col("patch") == "fitted", pl.col("species").is_in(STOPPERS), pl.col("max") >= AT_TOP
 )
 
 # 5. The lab species in their own woods ----------------------------------------------------------------
@@ -302,7 +343,7 @@ fig.save(FIGURES / f"{NOTE}-profiles.png", dpi=100, verbose=False)
 # the mixed wood where it has none; alone in the open; and the mixed wood with every fit at once.
 def lab_link(preset: str, p: dict) -> str:
     enc = base64.urlsafe_b64encode(json.dumps(p, separators=(",", ":")).encode()).decode().rstrip("=")
-    return f"https://epabarker.github.io/tree-simulation/?preset={preset}&seed=1&p={enc}"
+    return f"{args.origin}?preset={preset}&seed=1&p={enc}"
 
 
 links = {}
@@ -312,7 +353,12 @@ for sp in FITTED:
         "oakOpen", {"trees": [{"x": 80, "species": sp}], "species": {sp: patch[sp]}}
     )
 if wood_fitted:
-    links["mixed wood (all fitted)"] = lab_link("mixedWood", {"species": {sp: patch[sp] for sp in wood_fitted}})
+    every = {sp: patch[sp] for sp in wood_fitted}
+    links["mixed wood (all fitted)"] = lab_link("mixedWood", {"species": every})
+    for tau in (0.2, 0.1):
+        links[f"mixed wood (all fitted, τ {tau})"] = lab_link(
+            "mixedWood", {"world": {"faces": [tau, tau]}, "species": every}
+        )
 
 summary = {
     "fitted": FITTED,
@@ -321,9 +367,13 @@ summary = {
     "shadeBand": band,
     "shadeInBand": in_band,
     "shadeSpearman": rho,
+    "shadeContinuous": {f"{sp} ({'fitted' if f else 'hand'})": v for (sp, f), v in continuous.items()},
+    "shadeOrder": order,
     "allometry": allometry,
     "wood": wood_table.to_dicts(),
     "tallest": tallest.to_dicts(),
+    "tallestBySpecies": tallest_species.to_dicts(),
+    "atTop": at_top.to_dicts(),
     "labWoods": lab_rows,
     "plausibility": plausibility,
     "links": links,
@@ -337,12 +387,21 @@ with pl.Config(tbl_cols=20, tbl_width_chars=200, tbl_rows=200):
     print("   bands:", band)
     print("   in band:", in_band)
     print(f"   Spearman ρ against tolerance scores: hand {rho['hand']:.2f}, fitted {rho['fitted']:.2f} (expect ≈ −1)")
+    print(f"   continuous: hand {rho['hand (continuous)']:.2f}, fitted {rho['fitted (continuous)']:.2f}")
+    for sp in order:
+        f = sp in FITTED
+        print(f"   {sp:9} {'fitted' if f else 'hand  '} {100 * continuous[(sp, f)]:5.1f}%  score {score[sp]}")
     print("2–3. allometry and release (medians / means over seeds)")
     print(pl.DataFrame([{"tree": k, **v} for k, v in allometry.items()]))
     print(f"4. canopy trees per run in the mixed wood (fitted: {', '.join(wood_fitted) or 'none'})")
     print(wood_table.pivot("species", index=["patch", "season"], values="trees").fill_null(0))
     print("   the tallest tree per run (mean and max over seeds; the top is 200)")
     print(tallest)
+    print("   the tallest tree of each species (max over seeds)")
+    print(tallest_species.pivot("species", index=["patch", "season"], values="max"))
+    print(f"   STOP: {', '.join(STOPPERS)} at the top (≥ {AT_TOP:.0f}):" if at_top.height else "   none of oak, hornbeam, beech at the top")
+    if at_top.height:
+        print(at_top)
     if lab_rows:
         print("5. the lab species in their own woods (per run)")
         print(lab_table)

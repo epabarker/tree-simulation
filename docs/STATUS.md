@@ -1,6 +1,6 @@
 # Status
 
-_Last updated: 2026-10-30 (species step 1 revised: closed stand, 3D form metrics, LM then CMA-ES; beech passes)_
+_Last updated: 2026-10-31 (species steps 2–3: all eight fitted; the hold-out stopped for a review of the targets)_
 
 **3D port** on the branch `3d-port` (work branches open PRs into it). ADR 0024–0027 accepted. The live site stays on 0.14.0 (2D) until the bar below is met.
 
@@ -12,19 +12,19 @@ _Last updated: 2026-10-30 (species step 1 revised: closed stand, 3D form metrics
 - **`forest`, 20-seed evidence (τ 0):** floor at 100 20 of 20; H/D at 300 19 of 20; crown base 20 of 20; plateau 17 of 20.
 - **Renderer (I3 steps 1–2):** wood and leaves far to near in 64 depth slices from the snapshot's `zOrder`; per-snapshot work −55–60%; the slices cost 0.5–0.6 ms a frame.
 - **Garden:** one row at spacing 28; plate ≤ 160 cells, framed at 65 when young. Phone (seed 10, 40 seasons): draw p95 6.3 ms, frame p95 16.8 ms, worker 50 ms, 10.2k metamers.
-- **Species harness (3D):** closed stand (3 rows of 4, τ 0, ≈ 6 s to 100); form metrics read x and z, fork = radius and climb; shade house with opaque faces; `fit_lm.py` = screening, LM, CMA-ES finisher, selection, fresh-seed verification. Fits: `fits/round2/` (2D), `round3/` (3D), `round3-hedgerow/` (pilot 1). **Beech fitted** (not adopted): 6 of 6 measured in band on fresh seeds; 1 h 50 min.
+- **Species harness (3D):** closed stand (3 rows of 4, τ 0, ≈ 6 s to 100); form metrics read x and z, fork = radius and climb; shade house with opaque faces; `fit_lm.py` = screening, LM, CMA-ES finisher, selection, fresh-seed verification. Fits: `fits/round2/` (2D), `round3/` (3D, the eight garden species, none adopted), `round3-hedgerow/` (pilot 1). Accepted on fresh seeds: beech, willow, rowan, holly, maple; birch (survival light −0.004), oak and hornbeam (late share high) not.
 - **Headless:** `npm run sim`, `npm run bench`; `scene.bench.ts` times per frame and per snapshot; I3's harness in `docs/experiments/code/2026-10-30-i3*/`.
 
 ## Next
 1. **I3 step 3:** profile the snapshot's `tree_metrics` (a lean cadence for the garden if it dominates).
 2. **I3 step 4:** foliage coverage in `?bench`; leaf opacity and `LEAF_MIN_PX` judged on the phone. Judge the garden at season 100 (needs a faster way there: a dev `?intro=`).
 3. **I3 steps 5–6:** time `growStill` on the phone (reduced motion); ADR 0028 on first paint; a Canvas 2D `?bench` on the phone's plate.
-4. **Species step 2 (user's laptop, overnight ≈ 10–12 h):** `m27_fit.py --method lm --start round2 --species garden --skip-done --workers 12`; then step 3, the hold-out ([note](experiments/2026-10-30-species-3d.md)).
+4. **Species: the user is reviewing how targets are defined** (another agent). Then re-run the hold-out (`m27_holdout.py --round round3`, `~/.cargo/bin` on PATH): the floors are 5–9× too bright in tolerant woods ([note](experiments/2026-10-30-species-3d.md)).
 5. **Then:** C3–C6 as hold-outs; release; the site's PR.
 
 ## Open questions (user)
-- **Beech's stand leaf crown ratio** (described) reads 0.315 against 0.55 in the closed stand; `r2.aC` sits at its bound (0).
-- **The noise test makes every parameter active** (seed noise ≈ 0.05 band on most traits; `widestAt` is a band index).
+- **Beech's stand leaf crown ratio** 0.315 against 0.55 (judged on the phone at adoption). **Birch's survival light** is a step the shade house cannot resolve.
+- **The own woods' floors** (7–20% for every species) and the identical H/D targets for all ten: part of the targets review.
 - Two trees very close together at spacing 21 (a recruit beside a planted trunk): watch for it at 28.
 - The τ 0.1 reading (form note): no preset's τ changed.
 

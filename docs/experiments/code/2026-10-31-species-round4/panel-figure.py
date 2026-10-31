@@ -28,12 +28,16 @@ TEXT = 60
 
 def rows(img: np.ndarray) -> tuple[int, int, np.ndarray]:
     """(top, ground, mask): the highest row with a tree pixel, the ground line's row, and the tree
-    pixels. The sky is a vertical gradient, so a pixel is the tree's where it differs from the plate's
-    left-edge pixel in its row; the ground is the first row (from the top) whose left edge is brown."""
+    pixels. The sky is a vertical gradient, lighter than any wood or leaf, so a row's sky is its
+    brightest pixel and a pixel is the tree's where it differs from it; the ground is the first row
+    (from the top) that is brown nearly all the way across. (Read from one edge column, a stand that
+    reaches the plate's edge put a trunk there and its crop zoomed into the foliage: rowan's.)"""
     a = img.astype(int)
     r, g, b = a[..., 0], a[..., 1], a[..., 2]
-    ground = next(y for y in range(TEXT, a.shape[0]) if r[y, 3] > g[y, 3] + 8 and g[y, 3] >= b[y, 3])
-    sky = a[:, 3:4, :]
+    brown = (r > g + 8) & (g >= b)
+    ground = next(y for y in range(TEXT, a.shape[0]) if brown[y].mean() > 0.9)
+    lum = a.sum(axis=2)
+    sky = a[np.arange(a.shape[0]), lum.argmax(axis=1)][:, None, :]
     mask = np.abs(a - sky).sum(axis=2) > 60
     mask[:TEXT] = False
     mask[ground:] = False

@@ -2,6 +2,33 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-30: Species step 1 revised: the closed stand, 3D form metrics, LM then CMA-ES; beech passes
+
+- **User:** the first pilot's failure was the stand trial's, a hedgerow lit from its faces and empty depth. The user asked for:
+  - a closed stand;
+  - form metrics checked on 3D crowns;
+  - LM, then a CMA-ES finisher from the LM point, with a noise-tested active set;
+  - acceptance by measured targets on fresh seeds; the round-2 loss comparison dropped.
+
+  The four deviations of the first round stand ([note](experiments/2026-10-30-species-3d.md), plan §0.8–9 and §2).
+- **The trial:** three rows of four on an 84-cell periodic ring between opaque faces; the middle row is measured at 60 and 100. It takes ≈ 6 s to 100, against 45 s. Release keeps the one-row stand (`rowParams`).
+- **Form (`form.rs`):**
+  - the profile's band width is max(x, z extent), because the slab caps z at its 64-cell depth;
+  - a fork needs a lateral of ≥ 0.7 of the trunk's radius that also climbs ≥ 0.7 of the trunk's climb above the node. Beech's basal limb read as a fork at 0.014; now 0.98;
+  - `lone.spread` takes max(crownWidth, crownDepth).
+  - New unit tests: a crown spreading in z, and a thick basal limb that is not a fork.
+- **The search (`fit_lm.py`):** screening against seed noise (seeds 1–4); LM descent; CMA-ES from the LM point (covariance (JᵀJ)⁻¹, population 10, 4 seeds, 30 generations, patience 15); selection on seeds 501–506; verification on 1001–1006. With `--skip-done`, a done species' shift still carries on.
+- **Beech pilot: accepted.**
+  - All 6 measured targets are in band on fresh seeds: stand height 85, lateShare 1.45, earlyShare 0.51, H/D lone 52 and stand 64, survival light 2.6%.
+  - Loss 72.5 → 4.8.
+  - Only the stand's leaf crown ratio (described) is outside: 0.315 against 0.55.
+  - `r2.aC` went to its lower bound.
+  - Time: 1 h 50 min on 12 workers (screening 3.4 min, LM 19.5, CMA-ES 84, verification 3.5).
+- **Surprises:**
+  - the noise test activates all 17 parameters (seed noise ≈ 0.05 band on most traits);
+  - LM's best point (4.20) was a lucky realisation (9.4 on selection seeds); CMA-ES's fresh seeds corrected for it.
+- **Goldens:** unchanged (the form metrics are not hashed; no preset changed).
+
 ## 2026-10-30: Species in 3D, steps 0–1, and the beech pilot (stopped)
 
 - **User:** [the species plan](plans/2026-10-30-species.md) steps 0–1 with the beech pilot, on the user's 12-core laptop (12 workers); stop on the plan's rules ([note](experiments/2026-10-30-species-3d.md)).

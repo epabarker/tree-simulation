@@ -108,6 +108,11 @@ pub fn limb_shapes(tree: &Tree) -> Vec<(f64, f64)> {
 }
 
 /// The crown's width in `bands` height bands from the crown base to the top, over the widest.
+///
+/// A band's width is the larger of its tips' extents in x and in z: a 3D crown is read in both
+/// horizontal axes (the species plan of 2026-10-30, step 1b), and the larger is not capped by the
+/// slab's depth (a lone beech's band extents in z saturate at 52–66 against a depth of 64 by season
+/// 60, where its x extents run to 93).
 pub fn crown_profile(tree: &Tree, bands: usize) -> Vec<f64> {
     let nm = tree.m.len();
     let c = &tree.m;
@@ -128,6 +133,8 @@ pub fn crown_profile(tree: &Tree, bands: usize) -> Vec<f64> {
     }
     let mut lo = vec![f64::INFINITY; bands];
     let mut hi = vec![f64::NEG_INFINITY; bands];
+    let mut near = vec![f64::INFINITY; bands];
+    let mut far = vec![f64::NEG_INFINITY; bands];
     let span = height - bole;
     let mut i = 0;
     while i < nm && span > 0.0 {
@@ -144,13 +151,26 @@ pub fn crown_profile(tree: &Tree, bands: usize) -> Vec<f64> {
             if x > hi[k] {
                 hi[k] = x;
             }
+            let z = tree.tip_z(i);
+            if z < near[k] {
+                near[k] = z;
+            }
+            if z > far[k] {
+                far[k] = z;
+            }
         }
         i += 1;
     }
     let mut widths = Vec::with_capacity(bands);
     let mut widest = 0.0;
     for k in 0..bands {
-        let w = if hi[k] > lo[k] { hi[k] - lo[k] } else { 0.0 };
+        let wx = if hi[k] > lo[k] { hi[k] - lo[k] } else { 0.0 };
+        let wz = if far[k] > near[k] {
+            far[k] - near[k]
+        } else {
+            0.0
+        };
+        let w = math::max(wx, wz);
         widths.push(w);
         if w > widest {
             widest = w;
@@ -179,6 +199,8 @@ pub fn form_metrics(tree: &Tree, params: &Params) -> FormMetrics {
     }
 
     let mut count = vec![0i32; nm];
+    // The highest tip in each metamer's subtree: a fork's lateral climbs with the trunk.
+    let mut top: Vec<f64> = (0..nm).map(|i| tree.tip_y(i)).collect();
     let mut leaf = vec![0.0f64; nm];
     let mut dist = vec![0.0f64; nm];
     let mut reach = vec![0.0f64; nm];
@@ -203,6 +225,7 @@ pub fn form_metrics(tree: &Tree, params: &Params) -> FormMetrics {
         }
         let p = p as usize;
         count[p] += count[i];
+        top[p] = math::max(top[p], top[i]);
         leaf[p] += leaf[i];
         if reach[i] > reach[p] {
             reach[p] = reach[i];
@@ -239,6 +262,28 @@ pub fn form_metrics(tree: &Tree, params: &Params) -> FormMetrics {
     if !bole.is_finite() {
         bole = height;
     }
+    // A true division of the trunk (the species plan, step 1b): a lateral of at least FORK_RATIO of
+    // the continuing trunk's radius that also climbs at least FORK_RATIO of the height the trunk
+    // climbs above the node. In 3D a basal limb of a lone beech reaches 0.74 of the trunk's radius
+    // and spreads sideways while the leader runs on unbroken to the top: by radius alone the tree
+    // read as forked at 0.014 of its height.
+    let mut divides = vec![false; nm];
+    for i in 0..nm {
+        let p = c.parent[i];
+        if p < 0 || c.slot[i] == slot::MAIN || count[i] < MIN_SUBTREE {
+            continue;
+        }
+        let p = p as usize;
+        let next = main_child[p];
+        if next < 0 {
+            continue;
+        }
+        let nx = next as usize;
+        let y = tree.tip_y(p);
+        if c.radius[i] >= FORK_RATIO * c.radius[nx] && top[i] - y >= FORK_RATIO * (top[nx] - y) {
+            divides[p] = true;
+        }
+    }
 
     let mut fork_height = 1.0;
     let mut dominance = Vec::new();
@@ -254,14 +299,11 @@ pub fn form_metrics(tree: &Tree, params: &Params) -> FormMetrics {
             break;
         }
         let nx = next as usize;
-        if thickest[iu] > 0.0 {
-            let ratio = thickest[iu] / c.radius[nx];
-            if ratio >= FORK_RATIO && fork_height == 1.0 && height > 0.0 {
-                fork_height = y / height;
-            }
-            if y >= bole {
-                dominance.push(c.radius[nx] / thickest[iu]);
-            }
+        if divides[iu] && fork_height == 1.0 && height > 0.0 {
+            fork_height = y / height;
+        }
+        if thickest[iu] > 0.0 && y >= bole {
+            dominance.push(c.radius[nx] / thickest[iu]);
         }
         i = next;
     }
@@ -385,6 +427,61 @@ mod tests {
         let prof = crown_profile(&crown(20, |k| 20.0 - k as f64), PROFILE_BANDS);
         assert_eq!(prof.iter().cloned().fold(0.0, f64::max), 1.0);
         assert!(prof.iter().all(|&w| (0.0..=1.0).contains(&w)));
+    }
+
+    /// A metamer from `parent` heading `h` (unit), its reference any unit vector ⟂ h.
+    fn heading(t: &mut Tree, parent: usize, s: u8, h: [f64; 3], len: f64) -> usize {
+        let l = if h[1].abs() < 0.9 {
+            [0.0, 1.0, 0.0]
+        } else {
+            [1.0, 0.0, 0.0]
+        };
+        let l = {
+            let d = l[0] * h[0] + l[1] * h[1] + l[2] * h[2];
+            let v = [l[0] - d * h[0], l[1] - d * h[1], l[2] - d * h[2]];
+            let n = (v[0] * v[0] + v[1] * v[1] + v[2] * v[2]).sqrt();
+            [v[0] / n, v[1] / n, v[2] / n]
+        };
+        crate::principles::c1::add_metamer(t, parent as i32, s, h, l, 0.0, len, 0.1, 0.0)
+    }
+
+    #[test]
+    fn reads_a_crown_that_spreads_in_depth() {
+        // The cone of `crown`, its laterals turned from ±x to ±z: the same profile, read in z.
+        let mut t = Tree::new(0, 50.0, 0.5);
+        let mut trunk = Vec::new();
+        for k in 0..20 {
+            let parent = if k == 0 { -1 } else { trunk[k - 1] as i32 };
+            trunk.push(metamer(&mut t, parent, slot::MAIN, UP, 1.0, 1.0, 0.0));
+        }
+        for k in 0..19 {
+            let l = 20.0 - (k + 1) as f64;
+            heading(&mut t, trunk[k], LEFT, [0.0, 0.0, -1.0], l);
+            heading(&mut t, trunk[k], RIGHT, [0.0, 0.0, 1.0], l);
+        }
+        let deep = crown_profile(&t, PROFILE_BANDS);
+        let flat = crown_profile(&crown(20, |k| 20.0 - k as f64), PROFILE_BANDS);
+        for (a, b) in deep.iter().zip(&flat) {
+            assert!((a - b).abs() < 1e-9, "{deep:?} against {flat:?}");
+        }
+        assert!(get(&form_metrics(&t, &params()), "widestAt") < 0.2);
+    }
+
+    #[test]
+    fn a_thick_basal_limb_that_spreads_sideways_is_not_a_fork() {
+        // A lateral at node 1 as thick as a fork's (0.8 of the trunk), running out level for 12
+        // metamers while the trunk climbs 20: the leader keeps its lead.
+        let mut t = Tree::new(0, 50.0, 0.5);
+        let mut m: i32 = -1;
+        for k in 0..20 {
+            m = metamer(&mut t, m, slot::MAIN, UP, 1.0, 1.0, 0.0) as i32;
+            if k == 1 {
+                chain(&mut t, m as usize, RIGHT, 0.1, 12, 0.8);
+            }
+        }
+        let f = form_metrics(&t, &params());
+        assert_eq!(get(&f, "forkHeight"), 1.0);
+        assert!((get(&f, "leaderDominance") - 1.0 / 0.8).abs() < 1e-9);
     }
 
     fn forked(r: f64) -> Tree {

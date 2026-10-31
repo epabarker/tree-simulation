@@ -167,6 +167,7 @@ No published value exists for these. Calibrate on *patterns*: several weak targe
 - step 0 ✅: `m27_adopt.py` writes the 3D overlay (phyllotaxis, wood's E); `rust/presets.json` byte-identical; round 2's fits in `fits/round2/`;
 - step 1 built: the trials at the woods' top, the leaf crown ratio, seasons survived in a shade house with opaque faces (roofs 30–1.8%), the floor in own woods (hold-out), `fit_lm.py` (least squares, r0 by its own rule);
 - **the beech pilot stopped** on both rules: four consecutive rejected steps, and loss 33.9 on fresh seeds against round 2's 7.81. One r0 cannot give stand H/D 70 and lone 48 (the stand read 41, the lone 45); realisation noise ≈ ±1–2 in loss. Step 2 waits on the user.
+- step 1 revised (the user): the closed stand trial, form metrics read 3D crowns (profile in x and z, fork by radius and climb), LM then CMA-ES with a noise-tested active set, acceptance by measured targets on fresh seeds. **Beech passes**: 6 of 6 measured in band on 6 fresh seeds (1 h 50 min on 12 workers). Step 2, the garden's other seven, is the user's overnight run.
 - Scheduled since the M12 review:
   - Embedding in the personal website → M14 (ADR 0014).
   - **R1, R3, R4 and R5 for the species presets** (M8–M10 follow-ups: under R1 they reach their 160-cell top or grow far too slender; calibrate m_f as shade tolerance and L_h as species height) → M20.

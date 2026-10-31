@@ -1,0 +1,558 @@
+skipped (done): beech; their shifts carry to the rest
+
+=== birch (least squares) ===
+birch: own start loss 120.57, shifted by 1 species' fits 32.27
+screening: 38 evaluations in 115 s; active (17): c3.alpha, r2.levels.0.lambda, r2.levels.1.lambda, r2.levels.1.setPoint, r2.levels.1.branchAngle, r2.levels.1.eta, r2.levels.2.setPoint, r2.aC, r2.dLambda, r2.kappa, c5.Trel, r1.Lh, r1.mf, r3.c, r6.qMin, r6.leafArea, r2.hJ
+LM start: loss 35.86, r0 0.007075
+LM 1: accepted loss 27.48 (current 27.48), step 0.250, r0 0.00625, measured in band 2, 176 s
+LM 2: accepted loss 13.50 (current 13.50), step 0.250, r0 0.00625, measured in band 2, 174 s
+LM 3: rejected loss 15.31 (current 13.50), step 0.250, r0 0.00625, measured in band 2, 170 s
+LM 3: rejected loss 14.30 (current 13.50), step 0.125, r0 0.00625, measured in band 2, 182 s
+LM 3: accepted loss 12.60 (current 12.60), step 0.062, r0 0.00625, measured in band 2, 193 s
+LM 4: accepted loss 11.90 (current 11.90), step 0.250, r0 0.00625, measured in band 3, 176 s
+LM 5: accepted loss 11.89 (current 11.89), step 0.222, r0 0.00625, measured in band 3, 178 s
+LM 6: rejected loss 12.97 (current 11.89), step 0.122, r0 0.00625, measured in band 3, 173 s
+LM 6: rejected loss 13.69 (current 11.89), step 0.122, r0 0.00625, measured in band 3, 185 s
+LM 6: rejected loss 14.79 (current 11.89), step 0.062, r0 0.00625, measured in band 3, 196 s
+LM 6: rejected loss 15.86 (current 11.89), step 0.031, r0 0.00625, measured in band 3, 208 s
+LM ends: 4 consecutive rejected steps
+CMA-ES: σ 0.120; initial sd by (JᵀJ)⁻¹ (unit cube) c3.alpha 0.083, r2.levels.0.lambda 0.096, r2.levels.1.lambda 0.104, r2.levels.1.setPoint 0.083, r2.levels.1.branchAngle 0.036, r2.levels.1.eta 0.085, r2.levels.2.setPoint 0.093, r2.aC 0.026, r2.dLambda 0.076, r2.kappa 0.033, c5.Trel 0.082, r1.Lh 0.089, r1.mf 0.066, r3.c 0.031, r6.qMin 0.001, r6.leafArea 0.074, r2.hJ 0.120, c6.r0 0.098
+CMA 0: best 16.92, median 20.28, run best 16.92, measured in band 3/5, 143 s
+CMA 1: best 15.24, median 59.28, run best 15.24, measured in band 2/5, 131 s
+CMA 2: best 23.99, median 121.56, run best 15.24, measured in band 2/5, 125 s
+CMA 3: best 43.05, median 96.05, run best 15.24, measured in band 2/5, 154 s
+CMA 4: best 22.14, median 81.51, run best 15.24, measured in band 1/5, 163 s
+CMA 5: best 26.15, median 91.57, run best 15.24, measured in band 2/5, 157 s
+CMA 6: best 56.40, median 142.86, run best 15.24, measured in band 2/5, 136 s
+CMA 7: best 41.51, median 68.31, run best 15.24, measured in band 1/5, 132 s
+CMA 8: best 43.34, median 67.82, run best 15.24, measured in band 3/5, 150 s
+CMA 9: best 31.46, median 88.52, run best 15.24, measured in band 2/5, 128 s
+CMA 10: best 48.00, median 112.45, run best 15.24, measured in band 1/5, 166 s
+CMA 11: best 64.29, median 116.91, run best 15.24, measured in band 2/5, 146 s
+CMA 12: best 34.88, median 116.08, run best 15.24, measured in band 2/5, 142 s
+CMA 13: best 29.76, median 130.48, run best 15.24, measured in band 3/5, 145 s
+CMA 14: best 41.51, median 107.86, run best 15.24, measured in band 1/5, 140 s
+CMA 15: best 64.23, median 104.92, run best 15.24, measured in band 0/5, 175 s
+CMA 16: best 42.42, median 153.25, run best 15.24, measured in band 3/5, 151 s
+selection: lm 3 in band, loss 15.25; cma 1 2 in band, loss 17.47; cma 2 3 in band, loss 15.97; cma 3 1 in band, loss 25.70; cma 4 3 in band, loss 19.11; cma 5 2 in band, loss 30.26
+
+birch: 336 evaluations in 3876 s (screening 115 s, lm 1116 s, cma 2486 s, verification 159 s); stopped: CMA-ES's best not improved for 15 generations; measured outside: lone.earlyShare, shade.survivalLight
+accepted: False (measured targets in band on fresh seeds: 3 of 5; outside: stand.slenderness, shade.survivalLight); fit from lm
+loss on fresh seeds (progress only): start 34.24, fitted 15.89
+trait                         kind   target    band    start   fitted   margin
+stand.height              measured       95      20     89.8     92.9     17.9
+lone.earlyShare           measured     0.72    0.08    0.774    0.754   0.0456
+lone.spread              described     0.45    0.12    0.567    0.833   -0.263
+lone.slenderness          measured       48       8     73.7     51.2     4.81
+stand.slenderness         measured       70      10      105     86.9    -6.89
+stand.crownRatio         described     0.38     0.1    0.329     0.29     0.01
+lone.widestAt            described      0.4    0.15    0.167     0.05     -0.2
+lone.crownFullness       described      0.7     0.1    0.749    0.533  -0.0672
+lone.forkHeight          described      0.9     0.1    0.992     0.96   0.0404
+lone.leaderDominance     described      3.0     1.0     2.33     2.63    0.634
+lone.branchAngle         described       45      10     64.5     50.7     4.25
+lone.limbDroop           described       15      10     8.51     19.9     5.06
+stand.lateShare          described     1.12    0.08     1.08     1.25  -0.0549
+shade.survivalLight       measured     0.21    0.05   0.0859    0.156 -0.00394
+active: c3.alpha, r2.levels.0.lambda, r2.levels.1.lambda, r2.levels.1.setPoint, r2.levels.1.branchAngle, r2.levels.1.eta, r2.levels.2.setPoint, r2.aC, r2.dLambda, r2.kappa, c5.Trel, r1.Lh, r1.mf, r3.c, r6.qMin, r6.leafArea, r2.hJ
+c3.alpha                     3.07     4.68
+r2.levels.0.lambda          0.586    0.595
+r2.levels.1.lambda          0.507    0.492
+r2.levels.1.setPoint         78.2     81.3
+r2.levels.1.branchAngle      50.4     30.3
+r2.levels.1.eta             0.502     0.05
+r2.levels.2.setPoint          136      154
+r2.aC                        10.5     6.16
+r2.dLambda                 0.0802   0.0925
+r2.kappa                    0.243        0
+c5.Trel                     0.562    0.478
+c6.r0                     0.00707  0.00625
+r1.Lh                        36.6       39
+r1.mf                       0.106    0.117
+r3.c                       0.0896     0.12
+r6.qMin                     0.123      0.2
+r6.leafArea                  2.45     2.15
+r2.hJ                        10.1     7.78
+r1.mw                          64       82
+wrote /home/edbarker/Documents/Projects/tree-simulation/docs/experiments/fits/round3/birch.json
+
+=== oak (least squares) ===
+oak: own start loss 26.33, shifted by 2 species' fits 15.73
+screening: 38 evaluations in 167 s; active (17): c3.alpha, r2.levels.0.lambda, r2.levels.1.lambda, r2.levels.1.setPoint, r2.levels.1.branchAngle, r2.levels.1.eta, r2.levels.2.setPoint, r2.aC, r2.dLambda, r2.kappa, c5.Trel, r1.Lh, r1.mf, r3.c, r6.qMin, r6.leafArea, r2.hJ
+LM start: loss 541.38, r0 0.003399
+LM 1: accepted loss 13.06 (current 13.06), step 0.038, r0 0.002373, measured in band 2, 187 s
+LM 2: accepted loss 10.64 (current 10.64), step 0.147, r0 0.001884, measured in band 3, 183 s
+LM 3: rejected loss 28.50 (current 10.64), step 0.190, r0 0.001875, measured in band 3, 187 s
+LM 3: accepted loss 5.68 (current 5.68), step 0.095, r0 0.00188, measured in band 6, 201 s
+LM 4: rejected loss 23.77 (current 5.68), step 0.183, r0 0.001875, measured in band 2, 200 s
+LM 4: rejected loss 11.32 (current 5.68), step 0.116, r0 0.001877, measured in band 5, 214 s
+LM 4: rejected loss 17.40 (current 5.68), step 0.058, r0 0.001878, measured in band 4, 227 s
+LM 4: rejected loss 10.42 (current 5.68), step 0.029, r0 0.001879, measured in band 5, 241 s
+LM ends: 4 consecutive rejected steps
+CMA-ES: σ 0.120; initial sd by (JᵀJ)⁻¹ (unit cube) c3.alpha 0.053, r2.levels.0.lambda 0.083, r2.levels.1.lambda 0.049, r2.levels.1.setPoint 0.042, r2.levels.1.branchAngle 0.069, r2.levels.1.eta 0.027, r2.levels.2.setPoint 0.029, r2.aC 0.073, r2.dLambda 0.017, r2.kappa 0.031, c5.Trel 0.069, r1.Lh 0.075, r1.mf 0.057, r3.c 0.074, r6.qMin 0.001, r6.leafArea 0.046, r2.hJ 0.039, c6.r0 0.120
+CMA 0: best 7.53, median 10.33, run best 7.53, measured in band 4/6, 161 s
+CMA 1: best 7.28, median 20.53, run best 7.28, measured in band 5/6, 163 s
+CMA 2: best 7.54, median 11.09, run best 7.28, measured in band 5/6, 164 s
+CMA 3: best 4.79, median 11.62, run best 4.79, measured in band 5/6, 165 s
+CMA 4: best 4.92, median 14.41, run best 4.79, measured in band 6/6, 160 s
+CMA 5: best 5.14, median 12.46, run best 4.79, measured in band 6/6, 159 s
+CMA 6: best 5.86, median 18.25, run best 4.79, measured in band 6/6, 160 s
+CMA 7: best 4.93, median 9.05, run best 4.79, measured in band 6/6, 161 s
+CMA 8: best 4.66, median 15.48, run best 4.66, measured in band 6/6, 161 s
+CMA 9: best 3.39, median 11.78, run best 3.39, measured in band 6/6, 162 s
+CMA 10: best 5.16, median 8.01, run best 3.39, measured in band 5/6, 163 s
+CMA 11: best 4.33, median 7.60, run best 3.39, measured in band 6/6, 160 s
+CMA 12: best 5.60, median 9.14, run best 3.39, measured in band 5/6, 158 s
+CMA 13: best 4.74, median 7.77, run best 3.39, measured in band 5/6, 160 s
+CMA 14: best 6.25, median 8.30, run best 3.39, measured in band 4/6, 156 s
+CMA 15: best 6.62, median 10.88, run best 3.39, measured in band 5/6, 158 s
+CMA 16: best 5.31, median 9.60, run best 3.39, measured in band 6/6, 161 s
+CMA 17: best 4.45, median 9.83, run best 3.39, measured in band 6/6, 161 s
+CMA 18: best 6.30, median 8.26, run best 3.39, measured in band 5/6, 161 s
+CMA 19: best 4.54, median 9.91, run best 3.39, measured in band 5/6, 160 s
+CMA 20: best 5.32, median 8.15, run best 3.39, measured in band 5/6, 160 s
+CMA 21: best 5.01, median 9.13, run best 3.39, measured in band 5/6, 161 s
+CMA 22: best 3.93, median 10.57, run best 3.39, measured in band 6/6, 160 s
+CMA 23: best 6.08, median 9.86, run best 3.39, measured in band 6/6, 158 s
+CMA 24: best 5.72, median 12.21, run best 3.39, measured in band 6/6, 159 s
+selection: lm 5 in band, loss 8.65; cma 1 6 in band, loss 4.47; cma 2 3 in band, loss 10.44; cma 3 5 in band, loss 6.96; cma 4 4 in band, loss 6.92; cma 5 4 in band, loss 10.13
+
+oak: 377 evaluations in 5198 s (screening 167 s, lm 827 s, cma 4011 s, verification 193 s)
+accepted: False (measured targets in band on fresh seeds: 5 of 6; outside: stand.lateShare); fit from cma 1
+loss on fresh seeds (progress only): start 16.27, fitted 13.92
+trait                         kind   target    band    start   fitted   margin
+stand.height              measured       78      13     53.2       72     7.03
+lone.earlyShare           measured     0.62    0.05    0.571    0.607   0.0372
+lone.spread              described      1.3     0.3     1.41     1.47     0.13
+lone.slenderness          measured       48       8     37.4     44.9     4.95
+stand.slenderness         measured       70      10     55.7     79.3    0.667
+stand.crownRatio         described      0.4     0.1    0.554    0.414   0.0858
+lone.widestAt            described      0.5    0.15    0.833    0.783   -0.133
+lone.crownFullness       described     0.72     0.1    0.703    0.739   0.0809
+lone.forkHeight          described      0.3    0.15   0.0251   0.0247   -0.125
+lone.leaderDominance     described      1.3     0.5    0.785     1.02    0.218
+lone.branchAngle         described       55      10       51     56.9     8.06
+lone.limbDroop           described        5      10     1.86     3.77     8.77
+stand.lateShare           measured     1.31    0.06     1.37     1.49   -0.118
+shade.survivalLight       measured    0.114    0.03   0.0859    0.119   0.0253
+active: c3.alpha, r2.levels.0.lambda, r2.levels.1.lambda, r2.levels.1.setPoint, r2.levels.1.branchAngle, r2.levels.1.eta, r2.levels.2.setPoint, r2.aC, r2.dLambda, r2.kappa, c5.Trel, r1.Lh, r1.mf, r3.c, r6.qMin, r6.leafArea, r2.hJ
+c3.alpha                     4.08     4.93
+r2.levels.0.lambda          0.566    0.572
+r2.levels.1.lambda          0.568    0.577
+r2.levels.1.setPoint         63.4     66.1
+r2.levels.1.branchAngle      54.3       55
+r2.levels.1.eta            0.0985   0.0829
+r2.levels.2.setPoint         50.2     45.6
+r2.aC                           0     1.92
+r2.dLambda                   0.12    0.108
+r2.kappa                    0.316    0.412
+c5.Trel                     0.239    0.243
+c6.r0                      0.0034  0.00202
+r1.Lh                        33.3     33.9
+r1.mf                      0.0858   0.0901
+r3.c                        0.161   0.0922
+r6.qMin                     0.123    0.156
+r6.leafArea                  1.41     1.45
+r2.hJ                        18.6     10.2
+r1.mw                          64      181
+wrote /home/edbarker/Documents/Projects/tree-simulation/docs/experiments/fits/round3/oak.json
+
+=== willow (least squares) ===
+willow: own start loss 4.71, shifted by 3 species' fits 3.09
+screening: 38 evaluations in 122 s; active (17): c3.alpha, r2.levels.0.lambda, r2.levels.1.lambda, r2.levels.1.setPoint, r2.levels.1.branchAngle, r2.levels.1.eta, r2.levels.2.setPoint, r2.aC, r2.dLambda, r2.kappa, c5.Trel, r1.Lh, r1.mf, r3.c, r6.qMin, r6.leafArea, r2.hJ
+LM start: loss 5.89, r0 0.002474
+LM 1: accepted loss 2.70 (current 2.70), step 0.113, r0 0.002926, measured in band 5, 136 s
+LM 2: rejected loss 7.41 (current 2.70), step 0.111, r0 0.002998, measured in band 3, 131 s
+LM 2: rejected loss 3.16 (current 2.70), step 0.056, r0 0.002962, measured in band 5, 141 s
+LM 2: accepted loss 2.64 (current 2.64), step 0.028, r0 0.002944, measured in band 5, 150 s
+LM 3: rejected loss 5.37 (current 2.64), step 0.131, r0 0.002836, measured in band 3, 132 s
+LM 3: rejected loss 4.32 (current 2.64), step 0.065, r0 0.00289, measured in band 4, 141 s
+LM 3: rejected loss 3.47 (current 2.64), step 0.033, r0 0.002916, measured in band 4, 150 s
+LM 3: rejected loss 2.94 (current 2.64), step 0.016, r0 0.00293, measured in band 5, 159 s
+LM ends: 4 consecutive rejected steps
+CMA-ES: σ 0.120; initial sd by (JᵀJ)⁻¹ (unit cube) c3.alpha 0.039, r2.levels.0.lambda 0.060, r2.levels.1.lambda 0.077, r2.levels.1.setPoint 0.041, r2.levels.1.branchAngle 0.053, r2.levels.1.eta 0.060, r2.levels.2.setPoint 0.022, r2.aC 0.044, r2.dLambda 0.061, r2.kappa 0.066, c5.Trel 0.078, r1.Lh 0.030, r1.mf 0.084, r3.c 0.060, r6.qMin 0.074, r6.leafArea 0.056, r2.hJ 0.042, c6.r0 0.120
+CMA 0: best 1.74, median 4.53, run best 1.74, measured in band 5/5, 106 s
+CMA 1: best 1.99, median 2.88, run best 1.74, measured in band 4/5, 109 s
+CMA 2: best 2.16, median 3.07, run best 1.74, measured in band 5/5, 100 s
+CMA 3: best 2.68, median 3.24, run best 1.74, measured in band 5/5, 101 s
+CMA 4: best 1.50, median 4.44, run best 1.50, measured in band 5/5, 98 s
+CMA 5: best 1.83, median 4.38, run best 1.50, measured in band 5/5, 99 s
+CMA 6: best 1.53, median 2.82, run best 1.50, measured in band 5/5, 101 s
+CMA 7: best 1.52, median 2.95, run best 1.50, measured in band 5/5, 102 s
+CMA 8: best 2.13, median 3.34, run best 1.50, measured in band 5/5, 100 s
+CMA 9: best 2.28, median 2.95, run best 1.50, measured in band 5/5, 101 s
+CMA 10: best 1.80, median 2.67, run best 1.50, measured in band 5/5, 105 s
+CMA 11: best 1.28, median 3.15, run best 1.28, measured in band 5/5, 104 s
+CMA 12: best 1.64, median 3.28, run best 1.28, measured in band 5/5, 106 s
+CMA 13: best 1.27, median 2.81, run best 1.27, measured in band 5/5, 104 s
+CMA 14: best 1.87, median 3.38, run best 1.27, measured in band 5/5, 101 s
+CMA 15: best 1.29, median 2.61, run best 1.27, measured in band 5/5, 104 s
+CMA 16: best 1.79, median 3.05, run best 1.27, measured in band 5/5, 105 s
+CMA 17: best 1.85, median 2.94, run best 1.27, measured in band 5/5, 103 s
+CMA 18: best 1.60, median 3.08, run best 1.27, measured in band 5/5, 104 s
+CMA 19: best 1.53, median 2.78, run best 1.27, measured in band 5/5, 104 s
+CMA 20: best 2.16, median 3.42, run best 1.27, measured in band 5/5, 100 s
+CMA 21: best 1.84, median 3.13, run best 1.27, measured in band 5/5, 102 s
+CMA 22: best 1.01, median 1.82, run best 1.01, measured in band 5/5, 100 s
+CMA 23: best 1.99, median 2.82, run best 1.01, measured in band 5/5, 102 s
+CMA 24: best 1.30, median 2.61, run best 1.01, measured in band 5/5, 102 s
+CMA 25: best 1.29, median 2.37, run best 1.01, measured in band 5/5, 101 s
+CMA 26: best 0.91, median 2.26, run best 0.91, measured in band 5/5, 102 s
+CMA 27: best 0.96, median 1.76, run best 0.91, measured in band 5/5, 100 s
+CMA 28: best 1.41, median 2.39, run best 0.91, measured in band 5/5, 99 s
+CMA 29: best 1.82, median 2.95, run best 0.91, measured in band 5/5, 102 s
+selection: lm 5 in band, loss 2.51; cma 1 5 in band, loss 2.11; cma 2 5 in band, loss 2.75; cma 3 5 in band, loss 2.59; cma 4 5 in band, loss 1.56; cma 5 4 in band, loss 4.02
+
+willow: 409 evaluations in 3770 s (screening 122 s, lm 455 s, cma 3067 s, verification 125 s)
+accepted: True (measured targets in band on fresh seeds: 5 of 5; outside: none); fit from cma 4
+loss on fresh seeds (progress only): start 4.57, fitted 2.58
+trait                         kind   target    band    start   fitted   margin
+stand.height              measured       52      14     60.5       50       12
+lone.earlyShare           measured     0.73    0.06    0.748    0.713   0.0428
+lone.spread              described      1.6     0.4     1.27     1.39    0.195
+lone.slenderness          measured       48       8       46     42.2     2.16
+stand.slenderness         measured       70      10     81.1     65.5     5.46
+stand.crownRatio         described     0.45    0.12    0.294    0.386   0.0558
+lone.widestAt            described      0.5    0.15    0.717     0.65 -2.78e-17
+lone.crownFullness       described     0.72     0.1    0.641    0.662   0.0422
+lone.forkHeight          described     0.15    0.15    0.142   0.0727   0.0727
+lone.leaderDominance     described      1.1     0.4    0.966    0.784   0.0836
+lone.branchAngle         described       45      10     46.9     52.2     2.77
+lone.limbDroop           described       10      10     3.46     4.65     4.65
+stand.lateShare           measured     1.08    0.06     1.11     1.07   0.0487
+active: c3.alpha, r2.levels.0.lambda, r2.levels.1.lambda, r2.levels.1.setPoint, r2.levels.1.branchAngle, r2.levels.1.eta, r2.levels.2.setPoint, r2.aC, r2.dLambda, r2.kappa, c5.Trel, r1.Lh, r1.mf, r3.c, r6.qMin, r6.leafArea, r2.hJ
+c3.alpha                     5.52      4.9
+r2.levels.0.lambda          0.521    0.519
+r2.levels.1.lambda          0.524    0.517
+r2.levels.1.setPoint         44.5     51.6
+r2.levels.1.branchAngle      46.6     48.6
+r2.levels.1.eta            0.0734   0.0725
+r2.levels.2.setPoint         53.1     56.6
+r2.aC                           0     2.99
+r2.dLambda                 0.0272   0.0348
+r2.kappa                     1.22     1.26
+c5.Trel                     0.369    0.377
+c6.r0                     0.00247  0.00299
+r1.Lh                        13.1     11.5
+r1.mf                      0.0898   0.0837
+r3.c                       0.0812   0.0669
+r6.qMin                     0.116    0.109
+r6.leafArea                  1.79     1.66
+r2.hJ                        4.65     7.19
+r1.mw                          64     43.9
+wrote /home/edbarker/Documents/Projects/tree-simulation/docs/experiments/fits/round3/willow.json
+
+=== hornbeam (least squares) ===
+hornbeam: own start loss 22.04, shifted by 4 species' fits 12.36
+screening: 38 evaluations in 195 s; active (17): c3.alpha, r2.levels.0.lambda, r2.levels.1.lambda, r2.levels.1.setPoint, r2.levels.1.branchAngle, r2.levels.1.eta, r2.levels.2.setPoint, r2.aC, r2.dLambda, r2.kappa, c5.Trel, r1.Lh, r1.mf, r3.c, r6.qMin, r6.leafArea, r2.hJ
+LM start: loss 9.84, r0 0.003304
+LM 1: rejected loss 11.75 (current 9.84), step 0.101, r0 0.003785, measured in band 5, 258 s
+LM 1: accepted loss 6.92 (current 6.92), step 0.051, r0 0.003537, measured in band 5, 272 s
+LM 2: rejected loss 14.60 (current 6.92), step 0.143, r0 0.00401, measured in band 5, 221 s
+LM 2: rejected loss 18.12 (current 6.92), step 0.072, r0 0.003766, measured in band 5, 235 s
+LM 2: rejected loss 7.85 (current 6.92), step 0.036, r0 0.003649, measured in band 5, 250 s
+LM 2: rejected loss 7.94 (current 6.92), step 0.018, r0 0.003592, measured in band 5, 264 s
+LM ends: 4 consecutive rejected steps
+CMA-ES: σ 0.120; initial sd by (JᵀJ)⁻¹ (unit cube) c3.alpha 0.025, r2.levels.0.lambda 0.030, r2.levels.1.lambda 0.042, r2.levels.1.setPoint 0.101, r2.levels.1.branchAngle 0.120, r2.levels.1.eta 0.108, r2.levels.2.setPoint 0.037, r2.aC 0.031, r2.dLambda 0.076, r2.kappa 0.025, c5.Trel 0.088, r1.Lh 0.039, r1.mf 0.028, r3.c 0.056, r6.qMin 0.067, r6.leafArea 0.108, r2.hJ 0.034, c6.r0 0.060
+CMA 0: best 7.71, median 11.74, run best 7.71, measured in band 5/6, 177 s
+CMA 1: best 6.64, median 13.92, run best 6.64, measured in band 6/6, 178 s
+CMA 2: best 7.38, median 13.76, run best 6.64, measured in band 6/6, 173 s
+CMA 3: best 5.85, median 12.94, run best 5.85, measured in band 6/6, 171 s
+CMA 4: best 7.93, median 11.35, run best 5.85, measured in band 5/6, 172 s
+CMA 5: best 6.81, median 10.01, run best 5.85, measured in band 6/6, 174 s
+CMA 6: best 4.67, median 8.36, run best 4.67, measured in band 6/6, 174 s
+CMA 7: best 7.48, median 10.00, run best 4.67, measured in band 5/6, 173 s
+CMA 8: best 6.25, median 13.60, run best 4.67, measured in band 6/6, 172 s
+CMA 9: best 6.58, median 10.39, run best 4.67, measured in band 6/6, 174 s
+CMA 10: best 7.05, median 12.78, run best 4.67, measured in band 6/6, 173 s
+CMA 11: best 8.01, median 11.46, run best 4.67, measured in band 6/6, 171 s
+CMA 12: best 6.40, median 11.62, run best 4.67, measured in band 6/6, 171 s
+CMA 13: best 7.26, median 14.35, run best 4.67, measured in band 6/6, 171 s
+CMA 14: best 6.87, median 13.76, run best 4.67, measured in band 5/6, 172 s
+CMA 15: best 6.55, median 11.75, run best 4.67, measured in band 6/6, 175 s
+CMA 16: best 6.09, median 17.72, run best 4.67, measured in band 6/6, 174 s
+CMA 17: best 6.31, median 10.99, run best 4.67, measured in band 6/6, 174 s
+CMA 18: best 7.23, median 15.29, run best 4.67, measured in band 5/6, 172 s
+CMA 19: best 4.82, median 11.36, run best 4.67, measured in band 6/6, 173 s
+CMA 20: best 6.44, median 10.85, run best 4.67, measured in band 6/6, 171 s
+CMA 21: best 8.13, median 15.20, run best 4.67, measured in band 6/6, 173 s
+selection: lm 4 in band, loss 11.93; cma 1 5 in band, loss 9.95; cma 2 6 in band, loss 7.78; cma 3 6 in band, loss 9.29; cma 4 5 in band, loss 10.43; cma 5 5 in band, loss 10.86
+
+hornbeam: 309 evaluations in 4769 s (screening 195 s, lm 554 s, cma 3810 s, verification 210 s)
+accepted: False (measured targets in band on fresh seeds: 5 of 6; outside: stand.lateShare); fit from cma 2
+loss on fresh seeds (progress only): start 18.86, fitted 14.53
+trait                         kind   target    band    start   fitted   margin
+stand.height              measured       84      13     96.6       89        8
+lone.earlyShare           measured     0.67    0.05    0.653    0.663   0.0429
+lone.spread              described        1    0.25      1.2     1.27  -0.0214
+lone.slenderness          measured       48       8     54.8     49.8     6.22
+stand.slenderness         measured       70      10     77.2     73.4     6.57
+stand.crownRatio         described     0.55     0.1    0.305    0.346   -0.104
+lone.widestAt            described     0.45    0.15      0.6     0.65    -0.05
+lone.crownFullness       described     0.72     0.1    0.714    0.684   0.0639
+lone.forkHeight          described      0.4     0.2    0.123    0.124  -0.0759
+lone.leaderDominance     described      1.6     0.6     1.21     1.16    0.158
+lone.branchAngle         described       50      10     42.3     42.1      2.1
+lone.limbDroop           described       10      10     16.9     11.5     8.48
+stand.lateShare           measured     1.23    0.05     1.39     1.37  -0.0854
+shade.survivalLight       measured    0.033    0.01   0.0245   0.0249  0.00192
+active: c3.alpha, r2.levels.0.lambda, r2.levels.1.lambda, r2.levels.1.setPoint, r2.levels.1.branchAngle, r2.levels.1.eta, r2.levels.2.setPoint, r2.aC, r2.dLambda, r2.kappa, c5.Trel, r1.Lh, r1.mf, r3.c, r6.qMin, r6.leafArea, r2.hJ
+c3.alpha                     3.89     3.83
+r2.levels.0.lambda          0.584    0.583
+r2.levels.1.lambda          0.509    0.504
+r2.levels.1.setPoint         46.2     40.4
+r2.levels.1.branchAngle      35.6     39.5
+r2.levels.1.eta             0.154   0.0838
+r2.levels.2.setPoint         43.6     45.3
+r2.aC                           0     1.96
+r2.dLambda                 0.0837     0.09
+r2.kappa                        0    0.062
+c5.Trel                     0.317    0.404
+c6.r0                      0.0033  0.00318
+r1.Lh                        73.1       57
+r1.mf                       0.112    0.117
+r3.c                       0.0404   0.0389
+r6.qMin                    0.0146   0.0166
+r6.leafArea                  2.17     2.55
+r2.hJ                        6.61     9.14
+r1.mw                          64     69.2
+wrote /home/edbarker/Documents/Projects/tree-simulation/docs/experiments/fits/round3/hornbeam.json
+
+=== rowan (least squares) ===
+rowan: own start loss 8.69, shifted by 5 species' fits 7.13
+screening: 38 evaluations in 122 s; active (17): c3.alpha, r2.levels.0.lambda, r2.levels.1.lambda, r2.levels.1.setPoint, r2.levels.1.branchAngle, r2.levels.1.eta, r2.levels.2.setPoint, r2.aC, r2.dLambda, r2.kappa, c5.Trel, r1.Lh, r1.mf, r3.c, r6.qMin, r6.leafArea, r2.hJ
+LM start: loss 8.61, r0 0.003691
+LM 1: accepted loss 5.96 (current 5.96), step 0.170, r0 0.003123, measured in band 1, 141 s
+LM 2: accepted loss 4.59 (current 4.59), step 0.250, r0 0.002709, measured in band 2, 134 s
+LM 3: rejected loss 5.18 (current 4.59), step 0.245, r0 0.002662, measured in band 1, 135 s
+LM 3: rejected loss 4.87 (current 4.59), step 0.122, r0 0.002685, measured in band 2, 145 s
+LM 3: accepted loss 4.33 (current 4.33), step 0.062, r0 0.002697, measured in band 2, 155 s
+LM 4: rejected loss 7.60 (current 4.33), step 0.250, r0 0.002596, measured in band 1, 136 s
+LM 4: rejected loss 7.12 (current 4.33), step 0.125, r0 0.002646, measured in band 1, 145 s
+LM 4: rejected loss 5.90 (current 4.33), step 0.062, r0 0.002672, measured in band 2, 154 s
+LM 4: rejected loss 4.63 (current 4.33), step 0.031, r0 0.002684, measured in band 2, 164 s
+LM ends: 4 consecutive rejected steps
+CMA-ES: σ 0.120; initial sd by (JᵀJ)⁻¹ (unit cube) c3.alpha 0.120, r2.levels.0.lambda 0.071, r2.levels.1.lambda 0.082, r2.levels.1.setPoint 0.091, r2.levels.1.branchAngle 0.062, r2.levels.1.eta 0.082, r2.levels.2.setPoint 0.109, r2.aC 0.085, r2.dLambda 0.040, r2.kappa 0.099, c5.Trel 0.062, r1.Lh 0.058, r1.mf 0.052, r3.c 0.025, r6.qMin 0.089, r6.leafArea 0.072, r2.hJ 0.054, c6.r0 0.069
+CMA 0: best 4.67, median 5.88, run best 4.67, measured in band 2/2, 113 s
+CMA 1: best 3.94, median 4.48, run best 3.94, measured in band 2/2, 120 s
+CMA 2: best 3.56, median 5.11, run best 3.56, measured in band 2/2, 122 s
+CMA 3: best 4.03, median 5.03, run best 3.56, measured in band 2/2, 122 s
+CMA 4: best 3.96, median 5.28, run best 3.56, measured in band 2/2, 120 s
+CMA 5: best 4.10, median 4.81, run best 3.56, measured in band 2/2, 119 s
+CMA 6: best 4.30, median 5.45, run best 3.56, measured in band 2/2, 126 s
+CMA 7: best 3.59, median 5.22, run best 3.56, measured in band 2/2, 121 s
+CMA 8: best 4.31, median 5.23, run best 3.56, measured in band 1/2, 122 s
+CMA 9: best 3.29, median 4.94, run best 3.29, measured in band 2/2, 121 s
+CMA 10: best 3.61, median 4.68, run best 3.29, measured in band 2/2, 122 s
+CMA 11: best 4.04, median 4.67, run best 3.29, measured in band 2/2, 120 s
+CMA 12: best 3.74, median 4.67, run best 3.29, measured in band 2/2, 116 s
+CMA 13: best 4.28, median 4.99, run best 3.29, measured in band 2/2, 114 s
+CMA 14: best 4.02, median 4.87, run best 3.29, measured in band 2/2, 118 s
+CMA 15: best 4.18, median 5.07, run best 3.29, measured in band 1/2, 118 s
+CMA 16: best 4.43, median 4.92, run best 3.29, measured in band 1/2, 116 s
+CMA 17: best 4.44, median 5.17, run best 3.29, measured in band 2/2, 117 s
+CMA 18: best 4.08, median 4.93, run best 3.29, measured in band 2/2, 119 s
+CMA 19: best 3.97, median 5.09, run best 3.29, measured in band 1/2, 118 s
+CMA 20: best 3.73, median 5.43, run best 3.29, measured in band 2/2, 117 s
+CMA 21: best 3.93, median 4.40, run best 3.29, measured in band 2/2, 119 s
+CMA 22: best 4.18, median 5.44, run best 3.29, measured in band 1/2, 115 s
+CMA 23: best 3.67, median 5.15, run best 3.29, measured in band 2/2, 114 s
+CMA 24: best 4.20, median 4.65, run best 3.29, measured in band 2/2, 118 s
+selection: lm 2 in band, loss 4.63; cma 1 2 in band, loss 3.97; cma 2 2 in band, loss 4.05; cma 3 2 in band, loss 3.69; cma 4 2 in band, loss 3.88; cma 5 2 in band, loss 4.59
+
+rowan: 378 evaluations in 3835 s (screening 122 s, lm 604 s, cma 2965 s, verification 145 s)
+accepted: True (measured targets in band on fresh seeds: 2 of 2; outside: none); fit from cma 3
+loss on fresh seeds (progress only): start 7.47, fitted 4.84
+trait                         kind   target    band    start   fitted   margin
+stand.height             described       60      14     68.5     76.5    -2.45
+lone.earlyShare          described     0.74    0.08    0.803    0.725   0.0655
+lone.spread              described      0.6    0.15    0.907    0.731   0.0185
+lone.slenderness          measured       48       8     47.6     50.1     5.92
+stand.slenderness         measured       70      10     56.4     63.9     3.85
+stand.crownRatio         described     0.45     0.1    0.373    0.435   0.0854
+lone.widestAt            described      0.5    0.15      0.3     0.25     -0.1
+lone.crownFullness       described     0.68     0.1    0.685    0.786 -0.00578
+lone.forkHeight          described      0.6     0.2    0.782    0.794  0.00635
+lone.leaderDominance     described        2     0.8     1.83     1.98    0.776
+lone.branchAngle         described       35       8     42.6       41     2.01
+lone.limbDroop           described        5      10       24     19.8     -4.8
+stand.lateShare          described     1.09    0.08     1.06     1.07   0.0565
+active: c3.alpha, r2.levels.0.lambda, r2.levels.1.lambda, r2.levels.1.setPoint, r2.levels.1.branchAngle, r2.levels.1.eta, r2.levels.2.setPoint, r2.aC, r2.dLambda, r2.kappa, c5.Trel, r1.Lh, r1.mf, r3.c, r6.qMin, r6.leafArea, r2.hJ
+c3.alpha                     4.05     5.98
+r2.levels.0.lambda          0.537    0.544
+r2.levels.1.lambda          0.499    0.491
+r2.levels.1.setPoint         34.5     39.1
+r2.levels.1.branchAngle      30.5     28.4
+r2.levels.1.eta             0.172    0.316
+r2.levels.2.setPoint         58.2     54.2
+r2.aC                        13.7     14.3
+r2.dLambda                 0.0337   0.0303
+r2.kappa                     1.09     1.09
+c5.Trel                     0.449    0.378
+c6.r0                     0.00369  0.00258
+r1.Lh                        20.4     14.2
+r1.mf                      0.0997   0.0901
+r3.c                       0.0189   0.0221
+r6.qMin                    0.0714   0.0506
+r6.leafArea                  2.17     2.04
+r2.hJ                        13.2     21.6
+r1.mw                          64      131
+wrote /home/edbarker/Documents/Projects/tree-simulation/docs/experiments/fits/round3/rowan.json
+
+=== holly (least squares) ===
+holly: own start loss 37.22, shifted by 6 species' fits 84.60
+screening: 38 evaluations in 116 s; active (17): c3.alpha, r2.levels.0.lambda, r2.levels.1.lambda, r2.levels.1.setPoint, r2.levels.1.branchAngle, r2.levels.1.eta, r2.levels.2.setPoint, r2.aC, r2.dLambda, r2.kappa, c5.Trel, r1.Lh, r1.mf, r3.c, r6.qMin, r6.leafArea, r2.hJ
+LM start: loss 37.22, r0 0.002936
+LM 1: accepted loss 36.14 (current 36.14), step 0.250, r0 0.004676, measured in band 0, 130 s
+LM 2: accepted loss 27.69 (current 27.69), step 0.250, r0 0.00625, measured in band 0, 122 s
+LM 3: accepted loss 13.94 (current 13.94), step 0.250, r0 0.00625, measured in band 0, 124 s
+LM 4: rejected loss 22.50 (current 13.94), step 0.250, r0 0.00625, measured in band 0, 113 s
+LM 4: rejected loss 18.29 (current 13.94), step 0.125, r0 0.00625, measured in band 0, 120 s
+LM 4: rejected loss 14.11 (current 13.94), step 0.062, r0 0.00625, measured in band 0, 128 s
+LM 4: rejected loss 14.49 (current 13.94), step 0.031, r0 0.00625, measured in band 0, 136 s
+LM ends: 4 consecutive rejected steps
+CMA-ES: σ 0.120; initial sd by (JᵀJ)⁻¹ (unit cube) c3.alpha 0.109, r2.levels.0.lambda 0.055, r2.levels.1.lambda 0.076, r2.levels.1.setPoint 0.019, r2.levels.1.branchAngle 0.120, r2.levels.1.eta 0.109, r2.levels.2.setPoint 0.108, r2.aC 0.107, r2.dLambda 0.015, r2.kappa 0.086, c5.Trel 0.074, r1.Lh 0.059, r1.mf 0.096, r3.c 0.081, r6.qMin 0.102, r6.leafArea 0.093, r2.hJ 0.104, c6.r0 0.050
+CMA 0: best 7.37, median 12.52, run best 7.37, measured in band 1/2, 96 s
+CMA 1: best 6.36, median 11.43, run best 6.36, measured in band 2/2, 98 s
+CMA 2: best 4.88, median 6.31, run best 4.88, measured in band 2/2, 94 s
+CMA 3: best 4.92, median 6.16, run best 4.88, measured in band 2/2, 94 s
+CMA 4: best 5.17, median 6.20, run best 4.88, measured in band 2/2, 92 s
+CMA 5: best 4.96, median 6.70, run best 4.88, measured in band 2/2, 94 s
+CMA 6: best 4.77, median 6.90, run best 4.77, measured in band 2/2, 95 s
+CMA 7: best 5.91, median 8.55, run best 4.77, measured in band 1/2, 96 s
+CMA 8: best 4.92, median 7.51, run best 4.77, measured in band 2/2, 98 s
+CMA 9: best 4.92, median 7.01, run best 4.77, measured in band 2/2, 96 s
+CMA 10: best 4.25, median 6.72, run best 4.25, measured in band 2/2, 94 s
+CMA 11: best 4.88, median 6.64, run best 4.25, measured in band 2/2, 94 s
+CMA 12: best 5.12, median 6.31, run best 4.25, measured in band 2/2, 94 s
+CMA 13: best 5.02, median 6.54, run best 4.25, measured in band 2/2, 94 s
+CMA 14: best 4.25, median 6.06, run best 4.25, measured in band 2/2, 94 s
+CMA 15: best 4.71, median 5.45, run best 4.25, measured in band 2/2, 91 s
+CMA 16: best 4.64, median 5.94, run best 4.25, measured in band 2/2, 94 s
+CMA 17: best 5.27, median 6.15, run best 4.25, measured in band 2/2, 95 s
+CMA 18: best 4.46, median 6.26, run best 4.25, measured in band 2/2, 93 s
+CMA 19: best 4.83, median 5.79, run best 4.25, measured in band 2/2, 95 s
+CMA 20: best 4.49, median 5.71, run best 4.25, measured in band 2/2, 94 s
+CMA 21: best 4.63, median 5.20, run best 4.25, measured in band 2/2, 93 s
+CMA 22: best 4.40, median 5.34, run best 4.25, measured in band 2/2, 93 s
+CMA 23: best 4.41, median 5.29, run best 4.25, measured in band 2/2, 94 s
+CMA 24: best 4.50, median 5.32, run best 4.25, measured in band 2/2, 94 s
+CMA 25: best 4.39, median 5.47, run best 4.25, measured in band 2/2, 94 s
+selection: lm 0 in band, loss 18.16; cma 1 2 in band, loss 4.66; cma 2 2 in band, loss 4.47; cma 3 2 in band, loss 5.01; cma 4 2 in band, loss 4.62; cma 5 2 in band, loss 4.73
+
+holly: 386 evaluations in 3205 s (screening 116 s, lm 521 s, cma 2454 s, verification 114 s)
+accepted: True (measured targets in band on fresh seeds: 2 of 2; outside: none); fit from cma 2
+loss on fresh seeds (progress only): start 41.01, fitted 4.47
+trait                         kind   target    band    start   fitted   margin
+stand.height             described       41      12     65.7     52.4    0.648
+lone.earlyShare          described     0.63     0.1    0.561    0.624   0.0938
+lone.spread              described      0.5    0.15    0.659    0.739  -0.0888
+lone.slenderness          measured       48       8     82.2     47.6     7.59
+stand.slenderness         measured       70      10      109     70.6     9.44
+stand.crownRatio         described     0.75     0.1    0.707     0.79   0.0601
+lone.widestAt            described     0.15     0.1      0.2   0.0833   0.0333
+lone.crownFullness       described     0.55     0.1     0.71    0.621   0.0295
+lone.forkHeight          described      0.9     0.1        1        1 2.78e-17
+lone.leaderDominance     described        3       1     1.24      1.3   -0.697
+lone.branchAngle         described       60      10     62.5       61     9.05
+lone.limbDroop           described       10      10     1.67    0.492    0.492
+stand.lateShare          described     1.22     0.1     1.34      1.2   0.0769
+active: c3.alpha, r2.levels.0.lambda, r2.levels.1.lambda, r2.levels.1.setPoint, r2.levels.1.branchAngle, r2.levels.1.eta, r2.levels.2.setPoint, r2.aC, r2.dLambda, r2.kappa, c5.Trel, r1.Lh, r1.mf, r3.c, r6.qMin, r6.leafArea, r2.hJ
+c3.alpha                     2.58     2.12
+r2.levels.0.lambda          0.547     0.53
+r2.levels.1.lambda           0.52     0.49
+r2.levels.1.setPoint         62.1     59.6
+r2.levels.1.branchAngle      59.2     76.5
+r2.levels.1.eta             0.577    0.052
+r2.levels.2.setPoint          126      128
+r2.aC                        5.09       12
+r2.dLambda                 0.0289   0.0229
+r2.kappa                    0.958   0.0314
+c5.Trel                    0.0573    0.178
+c6.r0                     0.00294    0.006
+r1.Lh                        13.8       18
+r1.mf                       0.025   0.0714
+r3.c                        0.207    0.272
+r6.qMin                     0.013    0.167
+r6.leafArea                  2.61     2.41
+r2.hJ                          20     36.1
+r1.mw                          64     15.3
+wrote /home/edbarker/Documents/Projects/tree-simulation/docs/experiments/fits/round3/holly.json
+
+=== maple (least squares) ===
+maple: own start loss 6.86, shifted by 7 species' fits 10.56
+screening: 38 evaluations in 133 s; active (17): c3.alpha, r2.levels.0.lambda, r2.levels.1.lambda, r2.levels.1.setPoint, r2.levels.1.branchAngle, r2.levels.1.eta, r2.levels.2.setPoint, r2.aC, r2.dLambda, r2.kappa, c5.Trel, r1.Lh, r1.mf, r3.c, r6.qMin, r6.leafArea, r2.hJ
+LM start: loss 6.86, r0 0.002574
+LM 1: rejected loss 14.66 (current 6.86), step 0.151, r0 0.00285, measured in band 0, 147 s
+LM 1: rejected loss 10.52 (current 6.86), step 0.076, r0 0.002709, measured in band 3, 159 s
+LM 1: rejected loss 9.79 (current 6.86), step 0.038, r0 0.00264, measured in band 2, 170 s
+LM 1: rejected loss 8.41 (current 6.86), step 0.019, r0 0.002607, measured in band 3, 181 s
+LM ends: 4 consecutive rejected steps
+CMA-ES: σ 0.120; initial sd by (JᵀJ)⁻¹ (unit cube) c3.alpha 0.025, r2.levels.0.lambda 0.036, r2.levels.1.lambda 0.012, r2.levels.1.setPoint 0.022, r2.levels.1.branchAngle 0.037, r2.levels.1.eta 0.030, r2.levels.2.setPoint 0.015, r2.aC 0.023, r2.dLambda 0.034, r2.kappa 0.049, c5.Trel 0.058, r1.Lh 0.030, r1.mf 0.045, r3.c 0.049, r6.qMin 0.042, r6.leafArea 0.040, r2.hJ 0.033, c6.r0 0.120
+CMA 0: best 5.94, median 10.34, run best 5.94, measured in band 3/3, 125 s
+CMA 1: best 5.43, median 9.01, run best 5.43, measured in band 3/3, 125 s
+CMA 2: best 7.12, median 8.71, run best 5.43, measured in band 3/3, 125 s
+CMA 3: best 5.78, median 9.08, run best 5.43, measured in band 3/3, 126 s
+CMA 4: best 6.84, median 8.20, run best 5.43, measured in band 3/3, 126 s
+CMA 5: best 7.33, median 8.27, run best 5.43, measured in band 3/3, 126 s
+CMA 6: best 6.71, median 7.86, run best 5.43, measured in band 3/3, 124 s
+CMA 7: best 5.54, median 8.51, run best 5.43, measured in band 3/3, 127 s
+CMA 8: best 5.62, median 7.81, run best 5.43, measured in band 3/3, 126 s
+CMA 9: best 3.88, median 8.48, run best 3.88, measured in band 3/3, 124 s
+CMA 10: best 6.60, median 7.54, run best 3.88, measured in band 3/3, 125 s
+CMA 11: best 6.42, median 8.92, run best 3.88, measured in band 3/3, 125 s
+CMA 12: best 6.33, median 8.12, run best 3.88, measured in band 3/3, 125 s
+CMA 13: best 5.70, median 8.55, run best 3.88, measured in band 3/3, 125 s
+CMA 14: best 4.70, median 7.03, run best 3.88, measured in band 3/3, 126 s
+CMA 15: best 5.38, median 7.73, run best 3.88, measured in band 3/3, 126 s
+CMA 16: best 5.95, median 7.22, run best 3.88, measured in band 3/3, 129 s
+CMA 17: best 6.74, median 7.85, run best 3.88, measured in band 2/3, 127 s
+CMA 18: best 6.06, median 7.78, run best 3.88, measured in band 3/3, 127 s
+CMA 19: best 5.71, median 6.80, run best 3.88, measured in band 3/3, 128 s
+CMA 20: best 5.95, median 7.51, run best 3.88, measured in band 3/3, 127 s
+CMA 21: best 6.45, median 7.60, run best 3.88, measured in band 2/3, 129 s
+CMA 22: best 4.95, median 7.70, run best 3.88, measured in band 3/3, 129 s
+CMA 23: best 6.89, median 7.67, run best 3.88, measured in band 3/3, 129 s
+CMA 24: best 5.54, median 6.97, run best 3.88, measured in band 3/3, 129 s
+selection: lm 2 in band, loss 9.89; cma 1 3 in band, loss 6.47; cma 2 3 in band, loss 7.30; cma 3 3 in band, loss 6.59; cma 4 3 in band, loss 8.24; cma 5 3 in band, loss 7.52
+
+maple: 319 evaluations in 3634 s (screening 133 s, lm 192 s, cma 3160 s, verification 150 s)
+accepted: True (measured targets in band on fresh seeds: 3 of 3; outside: none); fit from cma 1
+loss on fresh seeds (progress only): start 10.39, fitted 7.08
+trait                         kind   target    band    start   fitted   margin
+stand.height              measured       64      11     65.1     64.7     10.3
+lone.earlyShare          described      0.7    0.08    0.727    0.706   0.0736
+lone.spread              described        1    0.25     1.01     1.15    0.098
+lone.slenderness          measured       48       8     52.2     48.4     7.64
+stand.slenderness         measured       70      10     82.7     75.9      4.1
+stand.crownRatio         described      0.5     0.1    0.291    0.339  -0.0612
+lone.widestAt            described     0.45    0.15    0.833    0.817   -0.217
+lone.crownFullness       described     0.72     0.1    0.705    0.698   0.0781
+lone.forkHeight          described     0.35     0.2    0.265    0.226   0.0765
+lone.leaderDominance     described      1.6     0.6     1.64     1.34    0.341
+lone.branchAngle         described       45      10       48     49.1     5.92
+lone.limbDroop           described       10      10     1.31     1.48     1.48
+stand.lateShare          described      1.3     0.1     1.07     1.12  -0.0834
+active: c3.alpha, r2.levels.0.lambda, r2.levels.1.lambda, r2.levels.1.setPoint, r2.levels.1.branchAngle, r2.levels.1.eta, r2.levels.2.setPoint, r2.aC, r2.dLambda, r2.kappa, c5.Trel, r1.Lh, r1.mf, r3.c, r6.qMin, r6.leafArea, r2.hJ
+c3.alpha                     3.78     3.75
+r2.levels.0.lambda          0.555     0.55
+r2.levels.1.lambda          0.504    0.505
+r2.levels.1.setPoint         51.1     51.7
+r2.levels.1.branchAngle      44.6     44.3
+r2.levels.1.eta             0.141    0.164
+r2.levels.2.setPoint         45.9     47.7
+r2.aC                        7.18     5.81
+r2.dLambda                 0.0781   0.0783
+r2.kappa                     1.71     1.61
+c5.Trel                     0.122     0.15
+c6.r0                     0.00257  0.00307
+r1.Lh                        12.7     13.7
+r1.mf                      0.0262   0.0303
+r3.c                        0.117   0.0992
+r6.qMin                    0.0699   0.0606
+r6.leafArea                  2.85     2.86
+r2.hJ                        16.7     14.2
+r1.mw                          64     44.9
+wrote /home/edbarker/Documents/Projects/tree-simulation/docs/experiments/fits/round3/maple.json
+
+finished: fitted birch, oak, willow, hornbeam, rowan, holly, maple; skipped beech

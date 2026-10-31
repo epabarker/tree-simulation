@@ -27,12 +27,27 @@ _spec.loader.exec_module(grid)
 sweep, REPO, FIGURES, Evaluator = grid.sweep, grid.REPO, grid.FIGURES, grid.Evaluator
 
 SEEDS = (1, 2, 3)
-#: The user's picks (2026-10-31): grid cell → assignments over round 2's form, and a flag.
-#: Beech stays at round 2's form (the grids hold no dome; the next question is the core).
+#: The picks (2026-10-31): grid cell → assignments over round 2's form, and a flag. Hornbeam's is
+#: the user's; beech stays at round 2's form (the grids hold no dome; the next question is the
+#: core). The other six are the grid cell nearest the sweep cell the review named nearest the
+#: brief (form-grid.py's red mark; for oak and rowan, which have two, the one the review calls the
+#: best outline / inside the brief's W/H band), picked for the user.
 PICKS = {
     "beech": ({}, "round 2's form, flagged: no dome in the grids or the dome sweep"),
     "hornbeam": ({"r2.aC": 15, "r2.dLambda": 0.08, "r2.levels.0.lambda": 0.56},
-                 "provisional: aC 15 / dΛ 0.08 / λ0 0.56"),
+                 "the user's, provisional, flagged: flat cap"),
+    "birch": ({"r2.levels.0.lambda": 0.5633, "r2.levels.1.lambda": 0.49, "r2.levels.1.postureSetPoint": 75},
+              "grid cell 1-0-2 (λ0 0.567 in the sweep)"),
+    "willow": ({"r2.levels.1.lambda": 0.48, "r2.levels.1.setPoint": 60, "r2.levels.2.setPoint": 54},
+               "grid cell 0-0-0 (λ1 0.48 in the sweep)"),
+    "rowan": ({"r2.aC": 20, "r2.dLambda": 0, "r2.levels.1.setPoint": 27.5},
+              "grid cell 0-0-1 (dΛ 0 in the sweep)"),
+    "holly": ({"r2.levels.0.lambda": 0.5467, "r2.dLambda": 0.03, "r2.levels.1.setPoint": 62},
+              "grid cell 2-2-2 (round 2 in the sweep)"),
+    "oak": ({"r2.aC": 20, "r2.dLambda": 0.08, "r2.kappa": 0.75},
+            "grid cell 0-2-1 (dΛ 0.08 in the sweep), provisional"),
+    "maple": ({"r2.aC": 15, "r2.dLambda": 0.08, "r2.levels.0.lambda": 0.55},
+              "grid cell 2-3-0 (aC 13.3 in the sweep), flagged: flat top (no knob in the dome sweep rounds it)"),
 }
 
 

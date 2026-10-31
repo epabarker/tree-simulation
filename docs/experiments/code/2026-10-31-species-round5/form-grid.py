@@ -132,7 +132,8 @@ def draw_sheet(species: str, season: int, knobs, hand: dict, marked: dict, brief
 
 
 def draw_cells(season: int, rows: list[list[tuple[str, str, list[str] | None]]], head: tuple[str, str],
-               ref: str, brief: dict, cells: Path, command: str, out: Path) -> Path:
+               ref: str, brief: dict, cells: Path, command: str, out: Path,
+               ref_title: str = "round 2 (adopted)") -> Path:
     """The sheet: rows of (npz key, title, red label or None), the round-2 cell ("hand") at the right
     of the first row with `ref` under it; every cell at one scale, as the form sweep's."""
     data = {k: np.load(cells / f"{k}.npz") for row in rows for k, _, _ in row}
@@ -188,7 +189,7 @@ def draw_cells(season: int, rows: list[list[tuple[str, str, list[str] | None]]],
     for r, row in enumerate(rows):
         for c, (k, title, label) in enumerate(row):
             cell(r, c, k, title, label)
-    cell(0, cols - 1, "hand", "round 2 (adopted)", None)
+    cell(0, cols - 1, "hand", ref_title, None)
     fig.text((cols - 1) / cols + 0.01, top - 1.15 * row_h,
              ref + "\n\nprofile: base to top;\ngrey, the brief's.", fontsize=7, va="top", family="monospace")
     full = cells / f"sheet-{season}.png"

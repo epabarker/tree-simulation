@@ -240,7 +240,9 @@ hi = 4
 # values (FLORA) as of 2026-10-31, the form sheet's reference cell: the user's picks from the
 # sheet replace them, each with a dated comment.
 [form]
-"r2.levels.0.lambda" = 0.5547
+# 2026-10-31 pick: grid cell 2-3-0 (aC 13.3 in the sweep), the review's nearest-brief cell,
+# picked for the user; flagged: flat top (no knob in the dome sweep rounds it). The lines marked "pick"; the rest are round 2's.
+"r2.levels.0.lambda" = 0.55  # pick, 2026-10-31
 "r2.levels.1.lambda" = 0.5039
 "r2.levels.1.setPoint" = 51.12
 # "r2.levels.1.postureSetPoint": unset in FLORA, so the limbs straighten toward
@@ -248,8 +250,8 @@ hi = 4
 "r2.levels.1.branchAngle" = 44.65
 "r2.levels.1.eta" = 0.1405
 "r2.levels.2.setPoint" = 45.87
-"r2.aC" = 7.176
-"r2.dLambda" = 0.07811
+"r2.aC" = 15  # pick, 2026-10-31
+"r2.dLambda" = 0.08  # pick, 2026-10-31
 "r2.kappa" = 1.708
 
 # Held out: never in the loss, checked after the fit (analysis/experiments/m27_holdout.py).

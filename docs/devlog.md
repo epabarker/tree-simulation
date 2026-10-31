@@ -2,6 +2,14 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-31: Species round 5: the picks in [form], the cap is shedding, birch's aborts
+
+- **The picks** (`form-picks.py`, `[form]` with dated comments): the review's nearest-brief cell for six species, hornbeam the user's, beech round 2's. None changes kind on seeds 1–3. The lab panel, round `form` (`figures/2026-10-31-panel-form-*`).
+- **The cap** (`cap.py`, hornbeam at ramp 25): leaf, buds, light and aborts in ten height bands. Q_ss, k_ext and L_h leave the cap; C5 off is the same run (R1's `shed` "carbon" sheds regardless of C5); no shedding at all gives a dense rounded crown. The closed stand's lid is light-limited (Q 0.03–0.07, 15–80% of buds aborting per decade below 0.7 H): a different cap.
+- **Birch** (`cap.py --birch`): 87% of the buds aborted 60–100 were short shoots past l_dorm with light above Q_ss the season before. R4 counts resting age, short-shoot seasons included.
+- **`treesim`'s buds.csv** gains each bud's `birthId` (CLI only; the core and goldens untouched).
+- No fit.
+
 ## 2026-10-31: Species round 5: the dome sweep, birch's vigour, the picks at three seeds
 
 - **The dome sweep** (`dome-sweep.py`; beech, hornbeam, oak, maple): `r2.ramp`, `levels.0.pTerm`, `levels.0.generator` and the twig set point, one at a time. Nothing rounds a top; the flat cap is in every cell. `r2.ramp` is live where Δλ is large (it moves fork height and breadth) and dead for beech. Beech stops on form.

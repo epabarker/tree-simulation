@@ -9,8 +9,8 @@
 //!   treesim --preset succession --checkpoint-at 60 --seasons 60 --out runs/c
 //!
 //! Writes to --out: run.json, metrics.csv, metamers.csv, form.csv, hash.txt; with --light,
-//! light.csv (with lad, the leaf area density over depth), buds.csv (every live bud) and ground.csv
-//! (the ground's light and the leaf area above it, per x and z); with
+//! light.csv (with lad, the leaf area density over depth), buds.csv (every live bud, with its
+//! birthId) and ground.csv (the ground's light and the leaf area above it, per x and z); with
 //! --checkpoint-at N, checkpoint-N.bin.gz. Presets come from rust/presets.json
 //! (exported from the TypeScript presets). `npm run sim` (cli/run.ts) builds and runs it.
 
@@ -258,7 +258,7 @@ fn main() {
         profile.join(",")
     )];
     let mut light_lines = vec!["season,col,row,shade,lad".to_string()];
-    let mut bud_lines = vec!["season,tree,metamer,state,age,q,v,y,leaf".to_string()];
+    let mut bud_lines = vec!["season,tree,metamer,state,age,q,v,y,leaf,birthId".to_string()];
     let mut ground_lines = vec!["season,col,layer,q,lai".to_string()];
 
     let mut world = World::new(params);
@@ -367,7 +367,7 @@ fn main() {
                     }
                     let m = tree.b.metamer[j] as usize;
                     bud_lines.push(format!(
-                        "{},{},{},{},{},{},{},{},{}",
+                        "{},{},{},{},{},{},{},{},{},{}",
                         num(season),
                         tree.id,
                         m,
@@ -376,7 +376,8 @@ fn main() {
                         num(tree.b.q[j]),
                         num(tree.b.v[j]),
                         num(tree.tip_y(m)),
-                        num(tree_core::principles::r6::deposit_area(st, r6))
+                        num(tree_core::principles::r6::deposit_area(st, r6)),
+                        tree.b.birth_id[j]
                     ));
                 }
             }

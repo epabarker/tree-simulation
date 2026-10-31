@@ -78,13 +78,15 @@ def knob_values(p: dict) -> list[float]:
     return [float(f"{v:.4g}") for v in vs]
 
 
-def run_cell(species: str, patch: dict, out: Path, seed: int = 1) -> None:
-    """One lone tree to 100 at `seed` (the sweep's is 1), reduced to out (.npz); its raw files deleted."""
+def run_cell(species: str, patch: dict, out: Path, seed: int = 1, top: dict | None = None) -> None:
+    """One lone tree to 100 at `seed` (the sweep's is 1), reduced to out (.npz); its raw files deleted.
+    `top` patches the world's params beside the species' (k_ext is the light's, not a species')."""
     raw = out.with_suffix("")
     params = {
         "world": {"width": WIDTH, "height": TOP, "walls": []},
         "trees": [{"x": WIDTH / 2, "species": species}],
         "species": {species: patch},
+        **(top or {}),
     }
     raw.mkdir(parents=True, exist_ok=True)
     subprocess.run(

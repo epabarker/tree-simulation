@@ -248,6 +248,8 @@ hi = 4
 # values (FLORA) as of 2026-10-31, the form sheet's reference cell: the user's picks from the
 # sheet replace them, each with a dated comment.
 [form]
+# 2026-10-31: beech stays at round 2's form, flagged: no dome in the grids or the dome sweep
+# (the next question is the core: its level-0 distichous generator).
 "r2.levels.0.lambda" = 0.5308
 "r2.levels.1.lambda" = 0.5124
 "r2.levels.1.setPoint" = 34.32

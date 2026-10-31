@@ -1,8 +1,8 @@
 # Status
 
-_Last updated: 2026-10-31 (round 5: both shedding rules relaxed at once still give no dome; ADR 0031 stands as the limitation, ready to accept; round 5 proceeds on the picks)_
+_Last updated: 2026-11-01 (ADR 0029 and 0031 accepted; ADR 0032 next: acclimated leaf cost and fixed T_rel, then the phone's budget)_
 
-**3D port** on the branch `3d-port` (work branches open PRs into it). ADR 0024–0028 accepted, 0029 proposed. The live site stays on 0.14.0 (2D) until the bar below is met.
+**3D port** on the branch `3d-port` (work branches open PRs into it). ADR 0024–0029 and 0031 accepted, 0030 rejected. The live site stays on 0.14.0 (2D) until the bar below is met.
 
 **Done means** (user): the mixed wood looks right in the garden in depth, within budget on the phone, with floor, H/D and crown base as 20-seed evidence. C3–C6 follow after shipping.
 
@@ -12,7 +12,7 @@ _Last updated: 2026-10-31 (round 5: both shedding rules relaxed at once still gi
 - **`forest`, 20-seed evidence (τ 0):** floor at 100 20 of 20; H/D at 300 19 of 20; crown base 20 of 20; plateau 17 of 20.
 - **Renderer (I3 steps 1–2):** 64 depth slices from `zOrder`; phone (seed 10, 40 seasons): draw p95 6.3 ms, frame p95 16.8 ms, worker 50 ms.
 - **Species harness (rounds 4–5):** closed stand (LAI, limb crown ratio, at 60 and 100); shade house 10 roofs; `lone100` (the reported shape at 100); `limbElevation` (form.rs); `m27_rescore.py`; line-up panels (`code/2026-10-31-species-round4/panel-*`, round `form`).
-- **Round 5 (ADR 0029, proposed):** targets files hold `[form]` (round 2's values as placeholders), `[[formRange]]`, `[[report]]` (shape, never scored); the fit is nine physiology knobs. `fit_lm.py` logs the shape at every accepted step (`<sp>-steps.csv`) and flags a fit nearer a gallery reject than the hand form (`shapeFlag`); `m27_fit.py --pilot` stops after LM and draws the panel.
+- **Round 5 (ADR 0029, accepted):** targets files hold `[form]` (the picks, dated 2026-10-31), `[[formRange]]`, `[[report]]` (shape, never scored); the fit is nine physiology knobs. `fit_lm.py` logs the shape at every accepted step (`<sp>-steps.csv`) and flags a fit nearer a gallery reject than the hand form (`shapeFlag`); `m27_fit.py --pilot` stops after LM and draws the panel.
 - **Form sweep and grids** (`code/2026-10-31-species-round5/form-{sweep,grid}.py`): one knob at a time, then the user's 4 × 4 × 3 grids and the posture sweep (birch, oak), seed 1; `figures/2026-10-31-form-{sweep,grid,posture}-<sp>-{60,100}.png`. `postureSetPoint` is the tenth form knob (ADR 0029, `[form]`).
 - **Gallery** (`analysis/fit/gallery/`): round 2's spindles (beech, birch), round 3's beech cone, oak and hornbeam parasols, round 4's birch pagoda; `m27_gallery.py`. Oak and hornbeam pass the check; beech's cone sits within the noise of its round-2 form (1.17 against 0.77).
 
@@ -23,10 +23,9 @@ _Last updated: 2026-10-31 (round 5: both shedding rules relaxed at once still gi
 4. **I3 steps 3–6** and C2's floor against LAI, as before; then C3–C6 as hold-outs; release; the site's PR.
 
 ## Open questions (user)
-- **ADR 0029** and **ADR 0031** (the cap and lid as a limitation) to accept. ADR 0030 rejected.
 - **`levels.2.setPoint` ≥ 80** collapses every broadleaf (parasol, mound, column): a C3/R3 question after shipping.
 - **Birch's pick stops growing after 60** (H 113 → 112, stand crown ratio 0.17): the form or the fit?
-- **The cap is a limitation** (ADR 0031): no candidate, alone or both rules relaxed together, rounds a crown or deepens the stand; each costs metamers (up to +72% lone). Ablations kept, off.
+- **The flat top** (ADR 0031, accepted): in growth, not pruning; the fix is R2's reiteration (Troll's model), after shipping.
 - **Hornbeam pilot** (`fits/round5-pilot`): under the new stand-at-100 penalty it loses to its start (24.7 vs 8.3); a re-run of the pilot is next.
 - **`limbElevation` reads back the set point** for most species (oak 31° = 90 − 58.6 in every row but setPoint's): little information beyond the knob itself.
 - At 100 most beech sweep cells reach the woods' top (200): the flat tops there are the ceiling.

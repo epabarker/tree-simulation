@@ -1,6 +1,6 @@
 # 0031: The flat cap and the stand's lid are a limitation of the shedding rules; round 5 proceeds on the picks
 
-- **Status:** proposed (2026-10-31, drafted for the user).
+- **Status:** accepted (the user, 2026-11-01) as a limitation on the open-grown crown's top, with Decision 4.
 - **Date:** 2026-10-31
 - **Related:** ADR 0029 (form by hand), ADR 0030 (rejected), spec §R1, §C5, §R4.
 - **Note:** [the species note](../experiments/2026-10-30-species-3d.md), round 5, from "The cap: hornbeam at ramp 25" to "Both shedding rules relaxed at once". Code and outputs in `experiments/code/2026-10-31-species-round5/`.
@@ -27,9 +27,10 @@ Also found on the way: R4 aged leafy short shoots toward L_dorm (fixed and adopt
 ## Decision
 1. **The cap is the shedding rules together**: R1's P < M at foliage cost and C5's relative-light test, Q_b/n_b < T_rel·Q_top. Each relaxation tried, of the response, the cost, or the patience, hands the same dim interior twigs to the other rule. Relaxing both at once, the leaf cost and T_rel at the measured shade tolerance, fills the crown but does not round it, and the stand's crown does not deepen. Only removing shedding altogether rounds the lone crown, and that was not tested in the stand or forest. No candidate, alone or both together, meets all three tests (dome, stand crown, plateau). Every relaxation costs metamers: up to 72% more on a lone tree, a direct cost on the phone.
 2. **This is recorded as a limitation of the core.** Broadleaf crowns are flat-topped, and beech has no dome. Round 5 proceeds on the current picks (`[form]`, dated 2026-10-31) with the physiology fit and the harness as they stand.
-3. **The ablations stay, all off by default, goldens unchanged:** `r1.response` (ADR 0030), `r1.kShed`, `r1.leafCost`/`r1.leafCostShade`. They are for the next attempt, not for any species.
+3. **The ablations stay, all off by default, goldens unchanged:** `r1.response` (ADR 0030), `r1.kShed`, `r1.leafCost`/`r1.leafCostShade`. They are for the next attempt, not for any species. (ADR 0032 later adopts `r1.leafCost` acclimated, for the stand's sake.)
+4. **The flat top is in growth, not in pruning** (the user, 2026-11-01). Shedding off rounds the lone crown; both rules at biological values fill the crown but leave the top flat. So the fix is architectural: **Troll's model's reiteration**, ascending co-dominant limbs that arch at the tips. That is an R2 feature for after shipping. The dome is not diagnosed further.
 
 ## Consequences
 - The garden's broadleaves read as flat-topped crowns. The species briefs' "dome" and "egg" are reported (ADR 0029), not met.
-- The next attempt, after shipping, would need to change what the crown's outer shell does, not how fast its interior is pruned. Every pruning relaxation here thickens the interior and leaves the top flat. None of the six diagnostics needs rerunning.
+- The next attempt, after shipping, is R2's reiteration (Troll's model): what the crown's outer shell does, not how fast its interior is pruned. Every pruning relaxation here thickens the interior and leaves the top flat. None of the six diagnostics needs rerunning.
 - The stand's lid is light recession under neighbours. It was never the lone cap, and it moves only with how much light reaches the lower crown.

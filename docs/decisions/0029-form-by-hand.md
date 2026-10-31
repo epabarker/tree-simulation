@@ -1,6 +1,6 @@
 # 0029: Form by hand, physiology by fit
 
-- **Status:** proposed (drafted 2026-10-31 from the round-5 plan's §4; the user accepts).
+- **Status:** accepted (the user, 2026-11-01; drafted 2026-10-31 from the round-5 plan's §4).
 - **Date:** 2026-10-31
 - **Amends:** ADR 0020 (fitting species: what is fitted), ADR 0028 (the profile trait leaves the loss and stays reported).
 - **Plan and note:** [the round-5 plan](../plans/2026-10-31-species-round5.md); [the species note](../experiments/2026-10-30-species-3d.md), "Round 4: birch, and why the round stopped" and "Round 5".

@@ -2,6 +2,11 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-01: ADR 0029 and ADR 0031 accepted
+
+- **ADR 0029** (form by hand, physiology by fit) accepted.
+- **ADR 0031** accepted as a limitation on the open-grown crown's top, with an addition: the flat top is in growth, not pruning, so the fix is architectural, Troll's model's reiteration (ascending co-dominant limbs that arch at the tips), an R2 feature for after shipping. The dome is not diagnosed further.
+
 ## 2026-10-31: Both shedding rules relaxed at once: still no dome
 
 - **`both.py`:** acclimated leaf cost (c 0.3) with T_rel at the measured shade tolerance (hornbeam 0.025, beech 0.008; forest 0.0155). Hornbeam fills inside (top fifth 33% against 38%) but stays flat-topped; its stand's crowns do not deepen and its floor darkens to 1%; forest's plateau holds; beech stays a spire. Metamers +13–72% throughout.

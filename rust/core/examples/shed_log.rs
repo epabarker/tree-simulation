@@ -82,8 +82,14 @@ fn log_sheds(world: &World, i: usize) -> Vec<i32> {
         let n_b = c.n_sum[k] as f64;
         let light = if n_b > 0.0 { c.q_sum[k] / n_b } else { 0.0 };
         let (low_p, low_q) = if carbon {
+            // shed_branches counts this season's deficit before it tests (r1.kShed).
+            let run = if tree.p_sum[k] < tree.m_sum[k] {
+                tree.deficit.get(k).copied().unwrap_or(0.0) + 1.0
+            } else {
+                0.0
+            };
             (
-                tree.p_sum[k] < tree.m_sum[k],
+                run >= params.r1.k_shed,
                 light < params.c5.t_rel * tree.q_top,
             )
         } else {

@@ -4,9 +4,9 @@
 //! ablation of ADR 0030); M = m_w·Σ π r_live² l +
 //! m_f·Σ a. A surplus N = P − M feeds the reserve (s_r), reproduction above the maturity height
 //! (f_rep) and v_base; a deficit draws the reserve, and k_starve seasons empty kill the tree.
-//! P_b and M_b per branch feed C5's `carbon` shedding.
+//! P_b and M_b per branch feed C5's `carbon` shedding, after `r1.kShed` deficit seasons in a row.
 //!
-//! Params: r1.* (r1.response, r1.qHalf), c3.alpha (α), c6.n, c6.r0, r6 leaf areas.
+//! Params: r1.* (r1.response, r1.qHalf, r1.kShed), c3.alpha (α), c6.n, c6.r0, r6 leaf areas.
 
 use super::c3::is_live_bud;
 use super::r6::deposit_area;

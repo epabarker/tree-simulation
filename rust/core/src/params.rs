@@ -167,6 +167,8 @@ pub struct R1 {
     pub saturating: bool,
     /// q_half: the saturating response's half-saturation light (read only when `saturating`).
     pub q_half: f64,
+    /// k_shed: consecutive seasons of P_b < M_b before carbon shedding takes a branch (absent: 1).
+    pub k_shed: f64,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -443,6 +445,7 @@ impl Params {
                 shed_carbon: text(r1, "shed") == "carbon",
                 saturating: text(r1, "response") == "saturating",
                 q_half: num(r1, "qHalf"),
+                k_shed: opt(r1, "kShed").unwrap_or(1.0),
             },
             r2: R2 {
                 enabled: flag(r2, "enabled"),

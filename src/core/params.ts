@@ -234,6 +234,8 @@ export interface Params {
     response?: "linear" | "saturating";
     /** q_half: the saturating response's half-saturation light, of open sky. */
     qHalf?: number;
+    /** k_shed: with shed 'carbon', consecutive seasons of P_b < M_b before a branch is shed (absent: 1). */
+    kShed?: number;
   };
 
   /**

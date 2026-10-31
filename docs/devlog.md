@@ -2,6 +2,18 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-31: The hornbeam pilot; the cap on the fitted tree; R1's k_shed (proposed)
+
+- **Pilot** (`fits/round5-pilot/hornbeam.json`): one accepted LM step; not accepted (5 of 6 measured, `stand.lateShare` 1.35 against 1.23). α 2.81 → 2.50, m_f 0.0817 → 0.0822, L_h 92 → 125, m_f/α 0.029 → 0.033. Its closed stand's middle row is dead by 100, which the loss (stand scored at 60) cannot see. `panel-figure.py` now labels an all-dead middle row instead of failing.
+- **The cap persists on the fitted hornbeam** (top fifth 38% of the leaf); the shed branches are still single twigs at foliage cost.
+- **`r1.kShed`** (default 1, goldens unchanged, one unit test; `Tree::deficit` kept beside the table, out of the hash and checkpoints): at 3 the twigs are shed by T_rel·Q_top instead, the cap gets stronger (45%), the plateau holds on 3 of 3 seeds and forest keeps nearly twice the metamers at 300. Proposed, not adopted.
+
+## 2026-10-31: R4's abort age counts dormant seasons (goldens updated); ADR 0030 rejected
+
+- **R4** (spec §R4, "dormant buds have a finite lifespan"): a resting bud now ages only in the seasons it rests dormant (`season.rs`). A leafy short shoot (R6) no longer ages toward L_dorm, nor raises its break and light-release thresholds through δ·age. Before, a short shoot older than L_dorm was aborted at its first dark season: 87% of the lone birch's aborts between 60 and 100. One unit test, `a_short_shoot_does_not_age_toward_l_dorm`.
+- **Goldens updated, for that reason:** the ten presets that run R4 with short shoots (skyTree, skyStand, obliqueSun, conifer, weeping, troll, forest, thinning, mixedWood, oakOpen); explosion, bh, wall and pair are unchanged. The species' round-2 fits and the 20-seed evidence predate it.
+- **ADR 0030 rejected** (the user): the saturating response rounds the lone hornbeam only by raising production below full sun everywhere; the stand's crown gets shallower and forest's plateau holds on 1 of 3 seeds. `r1.response` stays as an ablation.
+
 ## 2026-10-31: Species round 5: the shed branches decomposed; R1's light response; R4's abort age
 
 - **Shed branches** (`rust/core/examples/shed_log.rs`, hornbeam at ramp 25): 26,316 by season 100, almost all one leafy short shoot shed for P < M; sapwood is under 1% of M_b, so the test is α·Q·d(L) < m_f, a compensation light of 0.04–0.08 that rises with path length.

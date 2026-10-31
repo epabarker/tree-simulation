@@ -1,6 +1,6 @@
 # Status
 
-_Last updated: 2026-10-31 (round 5: shed twigs are P < M on foliage cost; R1's saturating response (ADR 0030, ablation) rounds the lone crown but loosens the plateau; R4 dormant-age fix proposed, not applied. No fit)_
+_Last updated: 2026-10-31 (round 5: R4 counts dormant seasons (goldens updated); ADR 0030 rejected; hornbeam pilot not accepted (lateShare), its stand's middle row dies by 100; the cap survives the fit and k_shed 3)_
 
 **3D port** on the branch `3d-port` (work branches open PRs into it). ADR 0024–0028 accepted, 0029 proposed. The live site stays on 0.14.0 (2D) until the bar below is met.
 
@@ -23,11 +23,11 @@ _Last updated: 2026-10-31 (round 5: shed twigs are P < M on foliage cost; R1's s
 4. **I3 steps 3–6** and C2's floor against LAI, as before; then C3–C6 as hold-outs; release; the site's PR.
 
 ## Open questions (user)
-- **ADR 0029** to accept; **ADR 0030** (R1's light response, an ablation) to accept or drop.
+- **ADR 0029** to accept. ADR 0030 rejected.
 - **`levels.2.setPoint` ≥ 80** collapses every broadleaf (parasol, mound, column): a C3/R3 question after shipping.
-- **The cap is R1's carbon shedding** (`cap.py`): hornbeam with no shedding is a dense rounded crown (W/H 0.72, fork 0.32); C5 off alone changes nothing (`r1.shed` "carbon" sheds anyway). The stand's lid is light-limited, a different cap. T_rel and the P < M test on lone trees?
 - **Birch's pick stops growing after 60** (H 113 → 112, stand crown ratio 0.17): the form or the fit?
-- **R4's dormant-age fix** (`code/2026-10-31-species-round5/r4-dormant-age.patch`, not applied): birch keeps its crown (buds at 100 10.4k vs 6.3k); 10 of 14 goldens move. Apply?
+- **The cap is both shedding rules** (P < M and T_rel·Q_top): `r1.kShed` 3 (proposed, default 1) hands the twigs to T_rel; plateau holds, forest keeps its wood. Next: relax both, or refit T_rel with k_shed?
+- **Hornbeam pilot** (`fits/round5-pilot`): 5 of 6 measured in band (lateShare out); the stand's middle row is dead at 100, unseen by a loss scored at 60.
 - **`limbElevation` reads back the set point** for most species (oak 31° = 90 − 58.6 in every row but setPoint's): little information beyond the knob itself.
 - At 100 most beech sweep cells reach the woods' top (200): the flat tops there are the ceiling.
 

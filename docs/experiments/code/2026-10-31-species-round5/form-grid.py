@@ -133,15 +133,17 @@ def draw_sheet(species: str, season: int, knobs, hand: dict, marked: dict, brief
 
 def draw_cells(season: int, rows: list[list[tuple[str, str, list[str] | None]]], head: tuple[str, str],
                ref: str, brief: dict, cells: Path, command: str, out: Path,
-               ref_title: str = "round 2 (adopted)") -> Path:
+               ref_title: str | None = "round 2 (adopted)") -> Path:
     """The sheet: rows of (npz key, title, red label or None), the round-2 cell ("hand") at the right
-    of the first row with `ref` under it; every cell at one scale, as the form sweep's."""
+    of the first row with `ref` under it (none when `ref_title` is None); every cell at one scale, as
+    the form sweep's."""
     data = {k: np.load(cells / f"{k}.npz") for row in rows for k, _, _ in row}
-    data["hand"] = np.load(cells / "hand.npz")
+    if ref_title is not None:
+        data["hand"] = np.load(cells / "hand.npz")
     segs = [d[f"seg{season}"] for d in data.values() if len(d[f"seg{season}"])]
     tall = max([60.0] + [math.ceil(float(np.max(s[:, [1, 3]])) / 20) * 20 + 5 for s in segs])
     half = max([30.0] + [float(np.max(np.abs(s[:, [0, 2]] - WIDTH / 2))) + 4 for s in segs])
-    cols, nrows = max(len(row) for row in rows) + 1, len(rows)
+    cols, nrows = max(len(row) for row in rows) + (ref_title is not None), len(rows)
     cell_w = 2.3
     cell_h = cell_w * tall / (2 * half)
     head_in = 1.1
@@ -189,9 +191,10 @@ def draw_cells(season: int, rows: list[list[tuple[str, str, list[str] | None]]],
     for r, row in enumerate(rows):
         for c, (k, title, label) in enumerate(row):
             cell(r, c, k, title, label)
-    cell(0, cols - 1, "hand", ref_title, None)
-    fig.text((cols - 1) / cols + 0.01, top - 1.15 * row_h,
-             ref + "\n\nprofile: base to top;\ngrey, the brief's.", fontsize=7, va="top", family="monospace")
+    if ref_title is not None:
+        cell(0, cols - 1, "hand", ref_title, None)
+        fig.text((cols - 1) / cols + 0.01, top - 1.15 * row_h,
+                 ref + "\n\nprofile: base to top;\ngrey, the brief's.", fontsize=7, va="top", family="monospace")
     full = cells / f"sheet-{season}.png"
     fig.savefig(full)
     plt.close(fig)

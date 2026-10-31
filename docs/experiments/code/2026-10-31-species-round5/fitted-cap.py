@@ -97,13 +97,11 @@ def main() -> None:
         print(f"| {label[0]} | {g.height} | {g['metamers'].sum()} | {med('metamers'):.0f} | {med('pB'):.3f} | {med('mSap'):.3f} | "
               f"{med('mLeaf'):.3f} | {med('PoverM'):.2f} | {med('sapShare'):.1%} | {med('leafArea'):.2f} | {med('budQ'):.3f} | "
               f"{med('lightPerMetamer'):.3f} | {med('qTopThreshold'):.3f} | {med('pathLen'):.0f} |")
-    (cells / "hand.npz").unlink(missing_ok=True)
-    (cells / "hand.npz").symlink_to(cells / f"{args.name}.npz")
     for s in sweep.SEASONS:
         print(grid.draw_cells(s, [[(args.name, args.name, None)]], (f"{sp}, {args.name}, season {s} (lone tree, seed 1)",
                               f"assign {args.assign}"), args.name, {}, cells,
                               f"fitted-cap.py {args.results} --name {args.name}",
-                              FIGURES / f"2026-10-31-fitted-cap-{args.name}-{s}.png", ref_title=args.name))
+                              FIGURES / f"2026-10-31-fitted-cap-{args.name}-{s}.png", ref_title=None))
 
 
 if __name__ == "__main__":

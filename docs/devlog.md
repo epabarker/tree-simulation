@@ -2,6 +2,11 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-31: Both shedding rules relaxed at once: still no dome
+
+- **`both.py`:** acclimated leaf cost (c 0.3) with T_rel at the measured shade tolerance (hornbeam 0.025, beech 0.008; forest 0.0155). Hornbeam fills inside (top fifth 33% against 38%) but stays flat-topped; its stand's crowns do not deepen and its floor darkens to 1%; forest's plateau holds; beech stays a spire. Metamers +13–72% throughout.
+- **ADR 0031** updated with it as the sixth diagnostic: the limitation stands.
+
 ## 2026-10-31: Stand deaths at 100 penalised; the acclimated leaf cost; ADR 0031 drafted
 
 - **Harness:** `fit.loss` and `fit_lm`'s residuals penalise `stand.alive100` as `stand.alive` (one pytest). The hornbeam pilot re-scored on fresh seeds: its stand keeps 67% at 100 against the start's 79%, and its loss is 24.7 against 8.3.

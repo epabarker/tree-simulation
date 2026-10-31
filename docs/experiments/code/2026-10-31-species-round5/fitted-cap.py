@@ -69,14 +69,15 @@ def main() -> None:
     d = np.load(cells / f"{args.name}.npz")
     b, m, mt = cap.load(raw, [0])
     print(f"# {sp}, {args.name} ({args.results}; assign {args.assign}): lone, seed 1\n")
-    print("| season | W/H | fork | dominance | H | top fifth's leaf share | profile (base → top) |")
-    print("|---|---|---|---|---|---|---|")
+    print("| season | W/H | fork | dominance | H | metamers | top fifth's leaf share | profile (base → top) |")
+    print("|---|---|---|---|---|---|---|---|")
     tables = {}
     for s in cap.READ:
         t = cap.band_table(b, m, mt, s, l_dorm)
         tables[s] = t
         _, wh, fork, dom, h = d[f"shape{s}"]
-        print(f"| {s} | {wh:.2f} | {fork:.2f} | {dom:.1f} | {h:.0f} | {t.filter(pl.col('band') >= 8)['leafShare'].sum():.2f} | "
+        n = int(mt.filter(pl.col("season") == s)["metamers"][0])
+        print(f"| {s} | {wh:.2f} | {fork:.2f} | {dom:.1f} | {h:.0f} | {n} | {t.filter(pl.col('band') >= 8)['leafShare'].sum():.2f} | "
               f"{' '.join(f'{x:.2f}' for x in d[f'profile{s}'])} |")
     for s, t in tables.items():
         print(f"\n## at {s}: {cap.check(mt, int(t['aborted10'].sum()), range(s - 9, s + 1))}\n")

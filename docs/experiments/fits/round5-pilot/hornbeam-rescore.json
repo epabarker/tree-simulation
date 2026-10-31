@@ -1,0 +1,472 @@
+{
+  "species": "hornbeam",
+  "round": "round5-pilot",
+  "seeds": [
+    1001,
+    1002,
+    1003,
+    1004,
+    1005,
+    1006
+  ],
+  "measuredInBand": "5 of 6",
+  "measuredOutside": [
+    "stand.lateShare"
+  ],
+  "before": {
+    "measuredInBand": "5 of 6",
+    "measuredOutside": [
+      "stand.lateShare"
+    ]
+  },
+  "margins": [
+    {
+      "trait": "stand.height",
+      "kind": "measured",
+      "target": 84,
+      "band": 13,
+      "weight": 1,
+      "start": 107.5922797995505,
+      "startMargin": -10.592279799550496,
+      "fit": 96.37736542282487,
+      "fitMargin": 0.6226345771751342
+    },
+    {
+      "trait": "lone.earlyShare",
+      "kind": "measured",
+      "target": 0.67,
+      "band": 0.05,
+      "weight": 1,
+      "start": 0.7064201997248442,
+      "startMargin": 0.013579800275155885,
+      "fit": 0.6691332619461173,
+      "fitMargin": 0.04913326194611729
+    },
+    {
+      "trait": "lone.slenderness",
+      "kind": "described",
+      "target": 58,
+      "band": 10,
+      "weight": 0.5,
+      "start": 61.858147364503104,
+      "startMargin": 6.141852635496896,
+      "fit": 59.246394637733516,
+      "fitMargin": 8.753605362266484
+    },
+    {
+      "trait": "stand.slenderness",
+      "kind": "measured",
+      "target": 86,
+      "band": 12,
+      "weight": 1,
+      "start": 92.20849544628834,
+      "startMargin": 5.791504553711661,
+      "fit": 85.03525707490236,
+      "fitMargin": 11.035257074902361
+    },
+    {
+      "trait": "stand.crownRatio",
+      "kind": "described",
+      "target": 0.55,
+      "band": 0.1,
+      "weight": 0.5,
+      "start": 0.3518548936246148,
+      "startMargin": -0.09814510637538523,
+      "fit": 0.3868266811641994,
+      "fitMargin": -0.06317331883580067
+    },
+    {
+      "trait": "stand.lai",
+      "kind": "measured",
+      "target": 8.3,
+      "band": 1.5,
+      "weight": 1,
+      "start": 7.515310143261026,
+      "startMargin": 0.7153101432610249,
+      "fit": 8.390405459942977,
+      "fitMargin": 1.4095945400570233
+    },
+    {
+      "trait": "stand.lateShare",
+      "kind": "measured",
+      "target": 1.23,
+      "band": 0.05,
+      "weight": 1,
+      "start": 1.2574790360481007,
+      "startMargin": 0.022520963951899245,
+      "fit": 1.34598470443214,
+      "fitMargin": -0.06598470443214004
+    },
+    {
+      "trait": "shade.survivalLight",
+      "kind": "measured",
+      "target": 0.033,
+      "band": 0.01,
+      "weight": 1,
+      "start": 0.02568144166820219,
+      "startMargin": 0.002681441668202189,
+      "fit": 0.026623268740360983,
+      "fitMargin": 0.003623268740360981
+    }
+  ],
+  "reported": [
+    {
+      "trait": "lone.spread",
+      "kind": "described",
+      "target": 0.7,
+      "band": 0.2,
+      "start": 0.7950682941508324,
+      "fit": 0.9464012890964398
+    },
+    {
+      "trait": "lone.spread100",
+      "kind": "described",
+      "target": 0.7,
+      "band": 0.2,
+      "start": 0.8119308274990579,
+      "fit": 0.9823651527550822
+    },
+    {
+      "trait": "lone.profile",
+      "kind": "described",
+      "target": [
+        0.26,
+        0.65,
+        0.88,
+        0.98,
+        1,
+        0.99,
+        0.93,
+        0.79,
+        0.56,
+        0.22
+      ],
+      "band": 0.1,
+      "start": [
+        0.24155080078751442,
+        0.46981766140006703,
+        0.7287269349092121,
+        0.8435993469453239,
+        0.9009115175876814,
+        0.9356949707378847,
+        0.9159431976535597,
+        0.886652536758878,
+        0.8636292648738486,
+        0.7299500774929685
+      ],
+      "fit": [
+        0.2727379470762367,
+        0.5320473272210174,
+        0.7276660076637108,
+        0.7937471303752028,
+        0.8862650772716801,
+        0.9156923766941237,
+        0.9544845631266807,
+        0.9402073874111231,
+        0.8810530493819667,
+        0.7401236705470137
+      ]
+    },
+    {
+      "trait": "lone.profile100",
+      "kind": "described",
+      "target": [
+        0.26,
+        0.65,
+        0.88,
+        0.98,
+        1,
+        0.99,
+        0.93,
+        0.79,
+        0.56,
+        0.22
+      ],
+      "band": 0.1,
+      "start": [
+        0.23787412774180935,
+        0.4597185843315206,
+        0.6528936351263301,
+        0.7529648163048396,
+        0.818401349236054,
+        0.8592806838990912,
+        0.9046634471370151,
+        0.8628433237576454,
+        0.9068998795647354,
+        0.8620952287621114
+      ],
+      "fit": [
+        0.2662541818207927,
+        0.4814953193030869,
+        0.5999376230284367,
+        0.7423737927898725,
+        0.7795682213986944,
+        0.8568162943468277,
+        0.9451094295717098,
+        0.9789227193713828,
+        0.9598609317038593,
+        0.8506284065564839
+      ]
+    },
+    {
+      "trait": "lone.forkHeight",
+      "kind": "described",
+      "target": 0.4,
+      "band": 0.2,
+      "start": 0.4204911460916789,
+      "fit": 0.33386522665250623
+    },
+    {
+      "trait": "lone.forkHeight100",
+      "kind": "described",
+      "target": 0.4,
+      "band": 0.2,
+      "start": 0.3571387215811073,
+      "fit": 0.26387803090171397
+    },
+    {
+      "trait": "lone.leaderDominance",
+      "kind": "described",
+      "target": 1.6,
+      "band": 0.6,
+      "start": 1.8221312626630841,
+      "fit": 1.5983832234614896
+    },
+    {
+      "trait": "lone.leaderDominance100",
+      "kind": "described",
+      "target": 1.6,
+      "band": 0.6,
+      "start": 3.049468487595916,
+      "fit": 2.6665274968774653
+    },
+    {
+      "trait": "lone.branchAngle",
+      "kind": "described",
+      "target": 50,
+      "band": 10,
+      "start": 39.08069423756295,
+      "fit": 38.52938347026892
+    },
+    {
+      "trait": "lone.branchAngle100",
+      "kind": "described",
+      "target": 50,
+      "band": 10,
+      "start": 38.84126482435496,
+      "fit": 38.33735411276767
+    },
+    {
+      "trait": "lone.limbDroop",
+      "kind": "described",
+      "target": 10,
+      "band": 10,
+      "start": 6.947911194622987,
+      "fit": 8.24776108144078
+    },
+    {
+      "trait": "lone.limbDroop100",
+      "kind": "described",
+      "target": 10,
+      "band": 10,
+      "start": 6.9763693840808045,
+      "fit": 8.249176118319406
+    },
+    {
+      "trait": "lone.limbElevation",
+      "kind": "described",
+      "target": null,
+      "band": null,
+      "start": 50.91603543997667,
+      "fit": 49.500895115290355
+    },
+    {
+      "trait": "lone.limbElevation100",
+      "kind": "described",
+      "target": null,
+      "band": null,
+      "start": 51.048562069317846,
+      "fit": 49.896137739612385
+    },
+    {
+      "trait": "lone.widestAt",
+      "kind": "described",
+      "target": null,
+      "band": null,
+      "start": 0.5833333333333334,
+      "fit": 0.6333333333333334
+    },
+    {
+      "trait": "lone.widestAt100",
+      "kind": "described",
+      "target": null,
+      "band": null,
+      "start": 0.75,
+      "fit": 0.7999999999999999
+    },
+    {
+      "trait": "lone.crownFullness",
+      "kind": "described",
+      "target": null,
+      "band": null,
+      "start": 0.7516476309146939,
+      "fit": 0.7644024536768756
+    },
+    {
+      "trait": "lone.crownFullness100",
+      "kind": "described",
+      "target": null,
+      "band": null,
+      "start": 0.7317635075861153,
+      "fit": 0.7460966919891145
+    },
+    {
+      "trait": "stand.crownRatio100",
+      "kind": "measured",
+      "target": null,
+      "band": null,
+      "start": 0.45662657189136685,
+      "fit": 0.4982647939041624
+    }
+  ],
+  "start": {
+    "assign": {
+      "r1.hydraulic": "hyperbolic",
+      "r2.levels.0.lambda": 0.56,
+      "r2.levels.1.lambda": 0.5007,
+      "r2.levels.1.setPoint": 38.73,
+      "r2.levels.1.branchAngle": 37.48,
+      "r2.levels.1.eta": 0.2513,
+      "r2.levels.2.setPoint": 43.66,
+      "r2.aC": 15,
+      "r2.dLambda": 0.08,
+      "r2.kappa": 0.2731,
+      "c3.alpha": 2.811,
+      "c5.Trel": 0.1479,
+      "r1.Lh": 92.4,
+      "r1.mf": 0.0817,
+      "r3.c": 0.05918,
+      "r6.qMin": 0.01255,
+      "r6.leafArea": 2.327,
+      "r2.hJ": 8.832,
+      "c6.r0": 0.003114,
+      "r1.mw": 64.0
+    },
+    "traits": {
+      "lone.height30": 78.33567814540756,
+      "lone.branchAngle": 39.08069423756295,
+      "lone.profile.2": 0.7287269349092121,
+      "lone.profile.8": 0.8636292648738486,
+      "lone.earlyShare": 0.7064201997248442,
+      "lone.profile.7": 0.886652536758878,
+      "lone.profile.5": 0.9356949707378847,
+      "lone.widestAt": 0.5833333333333334,
+      "lone.leafStemSlope": 0.8066216101679659,
+      "lone.profileCentre": 0.5545561375423798,
+      "lone.profile.3": 0.8435993469453239,
+      "lone.alive": 1.0,
+      "lone.profile.4": 0.9009115175876814,
+      "lone.height60": 110.9175524870001,
+      "lone.profile.6": 0.9159431976535597,
+      "stand.lateShare": 1.2574790360481007,
+      "lone.limbElevation": 50.91603543997667,
+      "lone.profile.0": 0.24155080078751442,
+      "lone.junctionDelta": 1.7664115734491908,
+      "lone.spread": 0.7950682941508324,
+      "lone.profile.1": 0.46981766140006703,
+      "lone.forkHeight": 0.4204911460916789,
+      "lone.limbDroop": 6.947911194622987,
+      "lone.branchAngle2": 50.06167168698739,
+      "lone.crownFullness": 0.7516476309146939,
+      "lone.slenderness": 61.858147364503104,
+      "lone.ldSlope": 0.9903738079253932,
+      "lone.profile.9": 0.7299500774929685,
+      "lone.leaderDominance": 1.8221312626630841,
+      "stand.leafCrownRatio": 0.26329607513894504,
+      "stand.boleCrownRatio": 0.777968670459625,
+      "stand.floor": 0.05812401647740938,
+      "stand.alive": 1.0,
+      "stand.crownRatio": 0.3518548936246148,
+      "stand.height100": 135.2972630100402,
+      "stand.lai100": 5.620785683467393,
+      "stand.crownRatio100": 0.45662657189136685,
+      "stand.slenderness": 92.20849544628834,
+      "stand.widestAt": 0.8791666666666668,
+      "stand.height": 107.5922797995505,
+      "stand.lai": 7.515310143261026,
+      "stand.alive100": 0.7916666666666666,
+      "shade.survivalLightStep": 0.029131732700209665,
+      "shade.survivalLight": 0.02568144166820219
+    }
+  },
+  "fit": {
+    "assign": {
+      "r1.hydraulic": "hyperbolic",
+      "r2.levels.0.lambda": 0.56,
+      "r2.levels.1.lambda": 0.5007,
+      "r2.levels.1.setPoint": 38.73,
+      "r2.levels.1.branchAngle": 37.48,
+      "r2.levels.1.eta": 0.2513,
+      "r2.levels.2.setPoint": 43.66,
+      "r2.aC": 15,
+      "r2.dLambda": 0.08,
+      "r2.kappa": 0.2731,
+      "c3.alpha": 2.5,
+      "c5.Trel": 0.194,
+      "r1.Lh": 124.8,
+      "r1.mf": 0.08224,
+      "r3.c": 0.05174,
+      "r6.qMin": 0.01138,
+      "r6.leafArea": 2.313,
+      "r2.hJ": 25.99,
+      "c6.r0": 0.003135,
+      "r1.mw": 63.15
+    },
+    "traits": {
+      "lone.height30": 66.45350963167218,
+      "lone.branchAngle": 38.52938347026892,
+      "lone.profile.2": 0.7276660076637108,
+      "lone.profile.8": 0.8810530493819667,
+      "lone.earlyShare": 0.6691332619461173,
+      "lone.profile.7": 0.9402073874111231,
+      "lone.profile.5": 0.9156923766941237,
+      "lone.widestAt": 0.6333333333333334,
+      "lone.leafStemSlope": 0.8304329531769907,
+      "lone.profileCentre": 0.5538937124452897,
+      "lone.profile.3": 0.7937471303752028,
+      "lone.alive": 1.0,
+      "lone.profile.4": 0.8862650772716801,
+      "lone.height60": 99.33363038372629,
+      "lone.profile.6": 0.9544845631266807,
+      "stand.lateShare": 1.34598470443214,
+      "lone.limbElevation": 49.500895115290355,
+      "lone.profile.0": 0.2727379470762367,
+      "lone.junctionDelta": 1.7651372049024516,
+      "lone.spread": 0.9464012890964398,
+      "lone.profile.1": 0.5320473272210174,
+      "lone.forkHeight": 0.33386522665250623,
+      "lone.limbDroop": 8.24776108144078,
+      "lone.branchAngle2": 51.61387406160159,
+      "lone.crownFullness": 0.7644024536768756,
+      "lone.slenderness": 59.246394637733516,
+      "lone.ldSlope": 0.9300631632686645,
+      "lone.profile.9": 0.7401236705470137,
+      "lone.leaderDominance": 1.5983832234614896,
+      "stand.leafCrownRatio": 0.29002898292222884,
+      "stand.boleCrownRatio": 0.5927705641640691,
+      "stand.floor": 0.03817609214149896,
+      "stand.alive": 1.0,
+      "stand.crownRatio": 0.3868266811641994,
+      "stand.height100": 129.5428484830576,
+      "stand.lai100": 6.619860372439558,
+      "stand.crownRatio100": 0.4982647939041624,
+      "stand.slenderness": 85.03525707490236,
+      "stand.widestAt": 0.8416666666666668,
+      "stand.height": 96.37736542282487,
+      "stand.lai": 8.390405459942977,
+      "stand.alive100": 0.6666666666666666,
+      "shade.survivalLightStep": 0.029131732700209665,
+      "shade.survivalLight": 0.026623268740360983
+    }
+  }
+}

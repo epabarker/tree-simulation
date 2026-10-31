@@ -2,6 +2,12 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-10-31: Stand deaths at 100 penalised; the acclimated leaf cost; ADR 0031 drafted
+
+- **Harness:** `fit.loss` and `fit_lm`'s residuals penalise `stand.alive100` as `stand.alive` (one pytest). The hornbeam pilot re-scored on fresh seeds: its stand keeps 67% at 100 against the start's 79%, and its loss is 24.7 against 8.3.
+- **`r1.leafCost`** "acclimated" with `r1.leafCostShade` (default flat, goldens unchanged, two unit tests): m_f·(c + (1 − c)·Q) cuts the compensation light by up to two-thirds, but the shed twigs pass to C5's T_rel test and the cap stays (top fifth 44–46%). The plateau holds; the stand is mixed.
+- **ADR 0031** (proposed): the cap is the shedding rules together; no single-principle candidate met dome, stand crown and plateau; recorded as a limitation, ablations kept off, round 5 proceeds on the picks.
+
 ## 2026-10-31: The hornbeam pilot; the cap on the fitted tree; R1's k_shed (proposed)
 
 - **Pilot** (`fits/round5-pilot/hornbeam.json`): one accepted LM step; not accepted (5 of 6 measured, `stand.lateShare` 1.35 against 1.23). α 2.81 → 2.50, m_f 0.0817 → 0.0822, L_h 92 → 125, m_f/α 0.029 → 0.033. Its closed stand's middle row is dead by 100, which the loss (stand scored at 60) cannot see. `panel-figure.py` now labels an all-dead middle row instead of failing.

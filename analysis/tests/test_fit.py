@@ -78,3 +78,15 @@ def test_the_gallery_distance_weighs_the_profile_as_one_and_separates_beyond_the
     sd = {"spread": 0.2 * math.sqrt(1.5), **{f"profile.{k}": 0.1 * math.sqrt(1.5) for k in range(10)}}
     # Seed sd √1.5 scales on both sides, three seeds: the difference's noise is one scale.
     assert math.isclose(noise(sd, sd, 3, SCALES), 1.0)
+
+
+def test_a_stand_that_dies_after_60_is_penalised_at_100_as_at_60():
+    from treesim.fit import DEATH_PENALTY
+
+    spec = Spec("x", [], [])
+    alive = seed_traits({"stand": [{"alive": True, "alive100": True}]})
+    dead_late = seed_traits({"stand": [{"alive": True, "alive100": False}]})
+    dead_early = seed_traits({"stand": [{"alive": False}]})
+    assert loss(spec, alive) == 0.0
+    assert math.isclose(loss(spec, dead_late), DEATH_PENALTY * 5 * 0.8)
+    assert math.isclose(loss(spec, dead_late), loss(spec, dead_early))

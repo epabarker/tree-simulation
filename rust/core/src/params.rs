@@ -169,6 +169,10 @@ pub struct R1 {
     pub q_half: f64,
     /// k_shed: consecutive seasons of P_b < M_b before carbon shedding takes a branch (absent: 1).
     pub k_shed: f64,
+    /// `r1.leafCost === "acclimated"`: foliage maintenance falls with the leaf's light.
+    pub leaf_acclimated: bool,
+    /// c: the acclimated cost's share at Q = 0, m_f·(c + (1 − c)·Q) (read only when acclimated).
+    pub leaf_cost_shade: f64,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -446,6 +450,8 @@ impl Params {
                 saturating: text(r1, "response") == "saturating",
                 q_half: num(r1, "qHalf"),
                 k_shed: opt(r1, "kShed").unwrap_or(1.0),
+                leaf_acclimated: text(r1, "leafCost") == "acclimated",
+                leaf_cost_shade: num(r1, "leafCostShade"),
             },
             r2: R2 {
                 enabled: flag(r2, "enabled"),

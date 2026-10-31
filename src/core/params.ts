@@ -236,6 +236,13 @@ export interface Params {
     qHalf?: number;
     /** k_shed: with shed 'carbon', consecutive seasons of P_b < M_b before a branch is shed (absent: 1). */
     kShed?: number;
+    /**
+     * Foliage maintenance: 'flat' (absent: the default), m_f per unit of leaf area; 'acclimated',
+     * m_f·(c + (1 − c)·Q), a shade leaf cheaper to keep. c is leafCostShade.
+     */
+    leafCost?: "flat" | "acclimated";
+    /** c: the acclimated leaf's cost at Q = 0, as a share of m_f. */
+    leafCostShade?: number;
   };
 
   /**

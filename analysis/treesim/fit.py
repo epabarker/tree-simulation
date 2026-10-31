@@ -292,9 +292,12 @@ def loss(spec: Spec, traits: dict[str, float | None]) -> float:
     lone_alive = traits.get("lone.alive")
     if lone_alive is not None:
         total += DEATH_PENALTY * (1 - lone_alive)
-    stand_alive = traits.get("stand.alive")
-    if stand_alive is not None:
-        total += DEATH_PENALTY * 5 * max(0.0, 0.8 - stand_alive)
+    # The stand's survival at 60, and at 100 where the stand runs on (stand.lateShare): a stand
+    # whose measured row dies after 60 is penalised as one that dies before it.
+    for key in ("stand.alive", "stand.alive100"):
+        stand_alive = traits.get(key)
+        if stand_alive is not None:
+            total += DEATH_PENALTY * 5 * max(0.0, 0.8 - stand_alive)
     return total
 
 

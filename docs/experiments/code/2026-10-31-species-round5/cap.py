@@ -51,12 +51,13 @@ STAND_WIDTH, STAND_ROW, MEASURED = 84, [10.5, 31.5, 52.5, 73.5], [4, 5, 6, 7]
 STAND_TREES = [{"x": (x + r * 7) % STAND_WIDTH, "z": 64 * (r + 0.5) / 3} for r in range(3) for x in STAND_ROW]
 
 
-def grow(name: str, species: str, patch: dict, world: dict, trees: list, top: dict | None = None) -> Path:
+def grow(name: str, species: str, patch: dict, world: dict, trees: list, top: dict | None = None,
+         seed: int = 1) -> Path:
     raw = OUT / name
     raw.mkdir(parents=True, exist_ok=True)
     params = {"world": {"height": sweep.TOP, "walls": [], **world},
               "trees": [{**t, "species": species} for t in trees], "species": {species: patch}, **(top or {})}
-    subprocess.run([str(sweep.TREESIM), "--preset", "oakOpen", "--params", "-", "--seed", "1", "--seasons", "100",
+    subprocess.run([str(sweep.TREESIM), "--preset", "oakOpen", "--params", "-", "--seed", str(seed), "--seasons", "100",
                     "--snapshots", ",".join(map(str, SNAPS)), "--light", "--quiet", "--out", str(raw)],
                    input=json.dumps(params), text=True, check=True)
     return raw

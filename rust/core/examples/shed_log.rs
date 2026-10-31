@@ -3,8 +3,8 @@
 //! Replays a run's params (a treesim run.json) phase by phase, as `season::run_season` does, and
 //! after each tree's allocation (this season's light, P_b and M_b; `r1::carbon_balance`) applies
 //! `c5::shed_branches`'s test to find the laterals it will shed. For each shed branch (a lateral
-//! that qualifies and whose parent does not), one CSV row: P_b, M_b's sapwood part (M_b − m_f·a_b),
-//! its foliage part (m_f·a_b), the leaf area a_b and mean light of its live buds, C5's light per
+//! that qualifies and whose parent does not), one CSV row: P_b, M_b's sapwood part (M_b minus the
+//! foliage part), its foliage part (m_f·Σ a·g(Q), `r1::leaf_cost`), the leaf area a_b and mean light of its live buds, C5's light per
 //! metamer (Q_b/n_b), the path length to its base and its size. After the shed phase each logged
 //! branch is checked gone. One lone tree: no seedlings are due after season 0.
 //!
@@ -15,6 +15,7 @@ use std::fs;
 
 use tree_core::json;
 use tree_core::principles::c3::is_live_bud;
+use tree_core::principles::r1::leaf_cost;
 use tree_core::principles::r6::deposit_area;
 use tree_core::season::{
     live_trees, phase_allocate, phase_commit, phase_deaths, phase_girth, phase_grow, phase_light,
@@ -115,6 +116,7 @@ fn log_sheds(world: &World, i: usize) -> Vec<i32> {
             size[root[k] as usize] += 1;
         }
     }
+    let mut cost = vec![0.0; nm];
     let b = &tree.b;
     for j in 0..b.len() {
         let m = b.metamer[j] as usize;
@@ -122,7 +124,9 @@ fn log_sheds(world: &World, i: usize) -> Vec<i32> {
             continue;
         }
         let r = root[m] as usize;
-        leaf[r] += deposit_area(b.state[j], &params.r6);
+        let a = deposit_area(b.state[j], &params.r6);
+        leaf[r] += a;
+        cost[r] += a * leaf_cost(b.q[j], &params.r1);
         q[r] += b.q[j];
         buds[r] += 1.0;
     }
@@ -131,7 +135,7 @@ fn log_sheds(world: &World, i: usize) -> Vec<i32> {
         if root[k] != k as i64 {
             continue;
         }
-        let m_leaf = params.r1.mf * leaf[k];
+        let m_leaf = params.r1.mf * cost[k];
         let n_b = c.n_sum[k] as f64;
         println!(
             "{},{},{},{},{},{},{},{},{},{},{},{},{},{}",

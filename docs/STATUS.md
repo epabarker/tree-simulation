@@ -1,6 +1,6 @@
 # Status
 
-_Last updated: 2026-10-31 (round 5: R4 counts dormant seasons (goldens updated); ADR 0030 rejected; hornbeam pilot not accepted (lateShare), its stand's middle row dies by 100; the cap survives the fit and k_shed 3)_
+_Last updated: 2026-10-31 (round 5: the cap is the shedding rules together, no single candidate fixes it (ADR 0031 proposed); the harness penalises stand deaths at 100; round 5 proceeds on the picks)_
 
 **3D port** on the branch `3d-port` (work branches open PRs into it). ADR 0024–0028 accepted, 0029 proposed. The live site stays on 0.14.0 (2D) until the bar below is met.
 
@@ -23,11 +23,11 @@ _Last updated: 2026-10-31 (round 5: R4 counts dormant seasons (goldens updated);
 4. **I3 steps 3–6** and C2's floor against LAI, as before; then C3–C6 as hold-outs; release; the site's PR.
 
 ## Open questions (user)
-- **ADR 0029** to accept. ADR 0030 rejected.
+- **ADR 0029** and **ADR 0031** (the cap and lid as a limitation) to accept. ADR 0030 rejected.
 - **`levels.2.setPoint` ≥ 80** collapses every broadleaf (parasol, mound, column): a C3/R3 question after shipping.
 - **Birch's pick stops growing after 60** (H 113 → 112, stand crown ratio 0.17): the form or the fit?
-- **The cap is both shedding rules** (P < M and T_rel·Q_top): `r1.kShed` 3 (proposed, default 1) hands the twigs to T_rel; plateau holds, forest keeps its wood. Next: relax both, or refit T_rel with k_shed?
-- **Hornbeam pilot** (`fits/round5-pilot`): 5 of 6 measured in band (lateShare out); the stand's middle row is dead at 100, unseen by a loss scored at 60.
+- **The cap is both shedding rules** (ADR 0031): saturating response, kShed and acclimated leaf cost each hand the twigs to T_rel. Ablations kept, off.
+- **Hornbeam pilot** (`fits/round5-pilot`): under the new stand-at-100 penalty it loses to its start (24.7 vs 8.3); a re-run of the pilot is next.
 - **`limbElevation` reads back the set point** for most species (oak 31° = 90 − 58.6 in every row but setPoint's): little information beyond the knob itself.
 - At 100 most beech sweep cells reach the woods' top (200): the flat tops there are the ceiling.
 

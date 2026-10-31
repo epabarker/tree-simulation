@@ -197,7 +197,7 @@ class Problem:
 
     @property
     def n_traits(self) -> int:
-        return sum(len(targets_of(t)) for t in self.spec.traits) + 2
+        return sum(len(targets_of(t)) for t in self.spec.traits) + 3
 
     def residuals(self, traits: dict, x: np.ndarray) -> np.ndarray:
         r = []
@@ -210,9 +210,12 @@ class Problem:
                 r += [math.sqrt(t["weight"] * MISSING_PENALTY / n)] * n
             else:
                 r += [math.sqrt(t["weight"] / n) * v for v in z]
-        lone, standing = traits.get("lone.alive"), traits.get("stand.alive")
+        lone = traits.get("lone.alive")
         r.append(math.sqrt(DEATH_PENALTY) * (1 - lone) if lone is not None else 0.0)
-        r.append(math.sqrt(5 * DEATH_PENALTY) * max(0.0, 0.8 - standing) if standing is not None else 0.0)
+        # The stand's survival at 60 and at 100 (where it runs on), as fit.loss.
+        for key in ("stand.alive", "stand.alive100"):
+            standing = traits.get(key)
+            r.append(math.sqrt(5 * DEATH_PENALTY) * max(0.0, 0.8 - standing) if standing is not None else 0.0)
         r.extend(self.settings.tikhonov * (x - self.x0))
         return np.array(r)
 

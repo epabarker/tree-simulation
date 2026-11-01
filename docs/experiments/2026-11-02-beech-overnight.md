@@ -78,8 +78,29 @@ The previous tests had one namer each, and round 2's namer named the hornbeam de
 - **Almost nothing is recognisable in this drawing.** Today's beech, the birch and the fir all read as Norway spruce; the oak as hazel or elm. Only the hornbeam is named itself more often than not on its lone panels. Form drawn in uniform dots is a weak instrument for every species, not only beech.
 - **The namers agree on 41 of 72 panels.**
 
+## 3b. Three namers, the real renderer (the laptop, `claude/blind-v2`)
+
+The user started a session on the laptop that ran the same protocol in the lab's WebGL2 renderer on the GPU, with track C's per-species bark and foliage merged in (renderer only; no core change): 54 plates, leaf-on, the same six sources, lone at 60 and 100 (240 wide) and the stand at 100, seeds 1–3, three fresh namers each with its own shuffled folder. [Its note](https://github.com/epabarker/tree-simulation/blob/claude/blind-v2/docs/experiments/2026-11-02-blind-test-v2.md); key and replies in `code/2026-11-02-blind-test-v2/` on that branch. The tally below was recounted here from its key and replies and agrees with its note.
+
+| source (3 plates a cell, one per seed) | lone 60 | lone 100 | stand 100 |
+|---|---|---|---|
+| beech, the round's rules (branch) | **beech** 3 / 3 / 3 | **beech** 3 / 3 / 3 | lime 3 / **beech** 3 / aspen 2, alder 1 |
+| beech, today | lime 3 / **beech** 3 / alder 3 | **beech** 3 / **beech** 3 / poplar 3 | lime 3 / **beech** 3 / alder 3 |
+| hornbeam | hornbeam ×3 for each namer | hornbeam ×3 for each namer | beech 3 / oak 3 / hornbeam 3 |
+| oak | hawthorn, all 27 plates | | |
+| birch | birch, all 27 plates | | |
+| silver fir | holly, yew or alder, all 27 plates | | |
+
+(Namers 1 / 2 / 3.)
+
+- **In the garden's renderer the round's lone beech reads as beech:** 18 of 18 lone plates, all three namers, where today's is beech on 9 of 18. The form changes; the bark and foliage are the same in both; so the round's form is worth something once it is drawn as visitors see it.
+- **The stand is what fails:** both beeches' stands are named beech by one namer only, on every seed. The others say lime, alder or aspen (no longer birch, as in the dot drawings).
+- **The renderer's cues dominate:** every namer gave all three seeds of a cell the same name, birch passes on everything (its white bark), oak reads as hawthorn on all 27 plates and fir as holly or yew. Leaf style and bark colour, not form, decide most names.
+- **Against §3:** the same sources drawn in the harness's uniform dots were named almost nothing correctly. The drawing, not the growth model, was most of what the earlier blind tests measured.
+- **The plates were drawn with own-crown pruning on** (the branch's beech). §2b's case against it is the garden; whether the lone tree reads as well without it is untested in the renderer.
+
 ## 4. What this says for the open decisions
 
 1. **Own-crown pruning (ADR 0043):** reject it. In the open, the limbs it clears are well lit, so clearing them overrides the measurement (§1). In the garden, it strips any side-shaded beech to a pole with a cap (§2b). Without it, both gates give garden beeches clothed crowns.
 2. **The vigour gate's units:** with own-crown pruning gone, the unit-free gate at k 20 is the better of the two on the evidence here: the closed stand's whole guard on 11 of 20 seeds against 8, the same lone tree for every seed, and clothed garden crowns. Its 20-seed stand and lone runs above included own-crown pruning, so they need repeating without it before anything is proposed.
-3. **Round 2:** the hornbeam is not a lead (§3). The next instrument should draw species as visitors see them (the garden's renderer, track C's bark and foliage); the laptop's GPU can render it. In this drawing no species reads well, so improving beech's form alone may not move a namer.
+3. **Round 2:** the hornbeam is not a lead (§3, §3b). The instrument is now the garden's renderer with three namers (§3b); in it the round's lone beech already passes, and what fails is the stand (thin poles under small high crowns, read as lime, alder or aspen) and two decoys that read wrong whatever their form (oak as hawthorn, fir as holly or yew: leaf style and colour). A round 2 on the beech stand, and the oak's and fir's leaf styles in the renderer, would follow the evidence.

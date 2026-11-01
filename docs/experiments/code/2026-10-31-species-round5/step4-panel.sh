@@ -5,8 +5,9 @@ set -euo pipefail
 cd "$(dirname "$0")/../../../.."
 export PATH="$HOME/.cargo/bin:$PATH"
 origin=${1:-http://localhost:5174/}
+tag=${2:--form-adr32}   # the figures' suffix and runs/panel<tag>
 uv run --project analysis python analysis/experiments/m27_gallery.py --form-patches runs/form --workers 4
-node docs/experiments/code/2026-10-31-species-round4/panel-links.ts "$origin" form runs/panel-form-adr32
-node docs/experiments/code/2026-10-31-species-round4/panel-shots.mjs runs/panel-form-adr32
-uv run --project analysis python docs/experiments/code/2026-10-31-species-round4/panel-figure.py runs/panel-form-adr32 docs/experiments/figures -form-adr32
+node docs/experiments/code/2026-10-31-species-round4/panel-links.ts "$origin" form runs/panel$tag
+node docs/experiments/code/2026-10-31-species-round4/panel-shots.mjs runs/panel$tag
+uv run --project analysis python docs/experiments/code/2026-10-31-species-round4/panel-figure.py runs/panel$tag docs/experiments/figures $tag
 echo "== done $(date +%T)"

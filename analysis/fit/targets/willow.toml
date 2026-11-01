@@ -233,17 +233,17 @@ hi = 4
 # values (FLORA) as of 2026-10-31, the form sheet's reference cell: the user's picks from the
 # sheet replace them, each with a dated comment.
 [form]
-# 2026-11-01 pick: grid cell 0-2-2 of the ADR 0032 grid (form-grid.py --tag=-adr32), provisional, picked by the agent
-# under repick.py (2026-11-01): the guard (lone W/H 0.3-2.5, H < 190, stand limb crown ratio >= 0.2), then LAI in band, floor nearest, alive >= 0.8; crown and outline break ties.
+# 2026-11-01 pick: round 2's form (FITTED_FLORA's knobs), provisional, chosen by the user
+# under repick.py (2026-11-01): the guard (lone W/H 0.3-2.5, H < 190, stand limb crown ratio >= 0.2), then LAI in band, floor nearest, alive >= 0.8; crown and outline break ties; the user's choice (2026-11-01), round 2: the lab panel (2026-11-01): 0-2-2 was a mound of hanging twigs with a spire; round 2's V-fan is the goat willow, and its W/H 1.47 is in band.
 # The lines marked "pick"; the rest are round 2's.
 "r2.levels.0.lambda" = 0.5167
-"r2.levels.1.lambda" = 0.48  # pick, 2026-11-01, provisional
-"r2.levels.1.setPoint" = 80  # pick, 2026-11-01, provisional
+"r2.levels.1.lambda" = 0.5132  # pick, 2026-11-01, provisional
+"r2.levels.1.setPoint" = 38.78  # pick, 2026-11-01, provisional
 # "r2.levels.1.postureSetPoint": unset in FLORA, so the limbs straighten toward
 # levels.1.setPoint (R3, ADR 0011); a pick sets it here.
 "r2.levels.1.branchAngle" = 48.99
 "r2.levels.1.eta" = 0.1194
-"r2.levels.2.setPoint" = 120  # pick, 2026-11-01, provisional
+"r2.levels.2.setPoint" = 54.03  # pick, 2026-11-01, provisional
 "r2.aC" = 3.012
 "r2.dLambda" = 0.02422
 "r2.kappa" = 1.62

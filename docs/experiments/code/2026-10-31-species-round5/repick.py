@@ -72,6 +72,7 @@ def main() -> None:
     ap.add_argument("--tag", default="-adr32")
     ap.add_argument("--workers", type=int, default=12)
     ap.add_argument("--pick", help="a named candidate (the user's choice) in place of the rule's")
+    ap.add_argument("--why", help="--pick: the user's reason, dated, for the [form] comment")
     args = ap.parse_args()
     sp = args.species
     cells = REPO / "runs" / f"form-grid{args.tag}" / sp
@@ -137,6 +138,8 @@ def main() -> None:
         print(f"(the rule's pick would be {pick['cell']}; taking {args.pick}, the user's choice)")
         pick, flagged = forced.row(0, named=True), False
         rule += f"; the user's choice (2026-11-01), {'round 2' if args.pick == 'round2' else 'cell ' + args.pick}"
+        if args.why:
+            rule += f": {args.why}"
     (cells / "pick.json").write_text(json.dumps(
         {"species": sp, "cell": pick["cell"], "assign": cands[pick["cell"]], "flagged": flagged,
          "rule": rule,

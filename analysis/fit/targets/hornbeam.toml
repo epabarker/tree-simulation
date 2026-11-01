@@ -250,9 +250,10 @@ hi = 4
 # values (FLORA) as of 2026-10-31, the form sheet's reference cell: the user's picks from the
 # sheet replace them, each with a dated comment.
 [form]
-# 2026-10-31 pick: the user's, provisional, flagged (flat cap); aC 15 lies between the grid's 13
-# and 17. The lines marked "pick"; the rest are round 2's.
-"r2.levels.0.lambda" = 0.56  # pick, 2026-10-31
+# 2026-11-01 pick: grid cell 1-0-1 of the ADR 0032 grid (form-grid.py --tag=-adr32), provisional, picked overnight by the agent
+# by grid-stand.py's rule (stand alive >= 0.8 at 100, the deepest living crown, then the lone outline).
+# The lines marked "pick"; the rest are round 2's.
+"r2.levels.0.lambda" = 0.58  # pick, 2026-11-01, provisional
 "r2.levels.1.lambda" = 0.5007
 "r2.levels.1.setPoint" = 38.73
 # "r2.levels.1.postureSetPoint": unset in FLORA, so the limbs straighten toward
@@ -260,8 +261,8 @@ hi = 4
 "r2.levels.1.branchAngle" = 37.48
 "r2.levels.1.eta" = 0.2513
 "r2.levels.2.setPoint" = 43.66
-"r2.aC" = 15  # pick, 2026-10-31
-"r2.dLambda" = 0.08  # pick, 2026-10-31
+"r2.aC" = 17  # pick, 2026-11-01, provisional
+"r2.dLambda" = 0.04  # pick, 2026-11-01, provisional
 "r2.kappa" = 0.2731
 
 # Held out: never in the loss, checked after the fit (analysis/experiments/m27_holdout.py).

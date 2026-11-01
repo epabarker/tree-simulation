@@ -58,7 +58,10 @@ parser.add_argument("--fit", help="a results file whose fit is checked against t
 parser.add_argument("--workers", type=int, default=os.cpu_count() or 4)
 parser.add_argument("--init", action="store_true", help="write the first gallery entries and stop")
 parser.add_argument("--form-patches", help="write each species' hand form as a patch into this folder and stop")
+parser.add_argument("--seeds", type=int, default=3, help="fresh seeds 1001… (the gallery's default 3; six for the round's check)")
 args = parser.parse_args()
+# The fresh seeds the check reads, in place (gallery.evaluate and noise read the module's list).
+SEEDS[:] = list(range(1001, 1001 + args.seeds))
 
 pool = Pool(args.workers)
 try:

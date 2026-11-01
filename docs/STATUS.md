@@ -1,6 +1,6 @@
 # Status
 
-_Last updated: 2026-11-01 (ADR 0032 accepted and applied: acclimated leaf cost c 0.3, T_rel fixed per species; goldens moved. Next: the phone's budget)_
+_Last updated: 2026-11-01, overnight (ADR 0032's budget holds on the phone; the form re-run under it, picks provisional by the stand-first rule; see code/2026-10-31-species-round5/overnight.md)_
 
 **3D port** on the branch `3d-port` (work branches open PRs into it). ADR 0024–0029, 0031 and 0032 accepted, 0030 rejected. The live site stays on 0.14.0 (2D) until the bar below is met.
 

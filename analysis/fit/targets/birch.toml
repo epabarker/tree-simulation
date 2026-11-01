@@ -250,13 +250,14 @@ hi = 4
 # values (FLORA) as of 2026-10-31, the form sheet's reference cell: the user's picks from the
 # sheet replace them, each with a dated comment.
 [form]
-# 2026-10-31 pick: grid cell 1-0-2 (λ0 0.567 in the sweep), the review's nearest-brief
-# cell, picked for the user. The lines marked "pick"; the rest are round 2's.
-"r2.levels.0.lambda" = 0.5633  # pick, 2026-10-31
-"r2.levels.1.lambda" = 0.49  # pick, 2026-10-31
+# 2026-11-01 pick: grid cell 3-3-0 of the ADR 0032 grid (form-grid.py --tag=-adr32), provisional, picked overnight by the agent
+# by grid-stand.py's rule (stand alive >= 0.8 at 100, the deepest living crown, then the lone outline).
+# The lines marked "pick"; the rest are round 2's.
+"r2.levels.0.lambda" = 0.59  # pick, 2026-11-01, provisional
+"r2.levels.1.lambda" = 0.55  # pick, 2026-11-01, provisional
 "r2.levels.1.setPoint" = 74.94
 # R3's posture set point (ADR 0011), the tenth form knob (2026-10-31): it holds the limbs.
-"r2.levels.1.postureSetPoint" = 75  # pick, 2026-10-31
+"r2.levels.1.postureSetPoint" = 50  # pick, 2026-11-01, provisional
 "r2.levels.1.branchAngle" = 42.94
 "r2.levels.1.eta" = 0.2434
 "r2.levels.2.setPoint" = 144.8

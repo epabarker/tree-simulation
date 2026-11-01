@@ -47,6 +47,8 @@ sys.path.insert(0, str(REPO / "analysis"))
 from treesim.fit import Evaluator  # noqa: E402
 
 POSTURE = "r2.levels.1.postureSetPoint"
+#: `--tag` (e.g. "-adr32"): a re-run under a later configuration, beside the first in runs/ and figures/.
+TAG = ""
 
 #: The grids as the user set them (2026-10-31): (path, lo, hi, steps), first × second × third.
 #: Beech is not the review's grid: the user read aC 27–40, kappa 1.3–2.7 and dLambda 0 as spruces;
@@ -127,7 +129,7 @@ def draw_sheet(species: str, season: int, knobs, hand: dict, marked: dict, brief
     head = (f"{species}: {what} at season {season} (lone tree, seed 1; {span}; the rest at round 2's)",
             "red: nearest a sweep cell the review named nearest the brief")
     ref = "round 2's:\n" + "\n".join(f"{SHORT[p]} {hand[p] if hand[p] is not None else '= sp1'}" for p, _ in knobs)
-    out = FIGURES / f"2026-10-31-form-{kind}-{species}-{season}.png"
+    out = FIGURES / f"2026-10-31-form-{kind}{TAG}-{species}-{season}.png"
     return draw_cells(season, rows, head, ref, brief, cells, command, out)
 
 
@@ -210,13 +212,16 @@ def main() -> None:
     ap.add_argument("--posture", action="store_true", help="the posture sweep instead of the grid")
     ap.add_argument("--workers", type=int, default=12)
     ap.add_argument("--redraw", action="store_true")
+    ap.add_argument("--tag", default="", help='a re-run\'s suffix, e.g. "-adr32"')
     args = ap.parse_args()
+    global TAG
+    TAG = args.tag
     sp, kind = args.species, "posture" if args.posture else "grid"
     knobs = [(p, values(lo, hi, n)) for p, lo, hi, n in (POSTURE_SWEEP if args.posture else GRIDS[sp])]
     spec = tomllib.loads((REPO / "analysis" / "fit" / "targets" / f"{sp}.toml").read_text())
     brief = {t["name"]: t for t in [*spec["trait"], *spec.get("report", [])]
              if t["kind"] == "described" and t["name"].startswith("lone.")}
-    cells = REPO / "runs" / f"form-{kind}" / sp
+    cells = REPO / "runs" / f"form-{kind}{TAG}" / sp
     cells.mkdir(parents=True, exist_ok=True)
     fixed = spec.get("fixed", {})
     ev = Evaluator()
@@ -239,7 +244,7 @@ def main() -> None:
             list(pool.map(lambda kv: sweep.run_cell(sp, kv[1], cells / f"{kv[0]}.npz"), jobs.items()))
         (cells / "grid.json").write_text(json.dumps({"knobs": knobs, "hand": hand}, indent=1))
     command = (f"uv run --project analysis python docs/experiments/code/2026-10-31-species-round5/"
-               f"form-grid.py {sp}{' --posture' if args.posture else ''}")
+               f"form-grid.py {sp}{' --posture' if args.posture else ''}{f' --tag={TAG}' if TAG else ''}")
     for s in sweep.SEASONS:
         print(draw_sheet(sp, s, knobs, hand, marked, brief, cells, kind, command))
 

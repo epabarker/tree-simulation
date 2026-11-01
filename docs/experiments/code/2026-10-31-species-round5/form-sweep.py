@@ -65,6 +65,8 @@ TREESIM = REPO / "rust" / "target" / "native" / "release" / "treesim"
 FIGURES = REPO / "docs" / "experiments" / "figures"
 #: Wood and leaf colours: the scene's light-theme bark and leaf (src/web/render/scene.css).
 WOOD, LEAF, BRIEF = "#5b4636", "#4f7a3a", "#9a9a9a"
+#: `--tag` (e.g. "-adr32"): a re-run under a later configuration, beside the first in runs/ and figures/.
+TAG = ""
 
 
 def knob_values(p: dict) -> list[float]:
@@ -213,7 +215,7 @@ def draw_sheet(species: str, season: int, grid: dict, hand: dict, brief: dict, c
     plt.close(fig)
     im = Image.open(full).convert("RGB")
     im = im.resize((im.width // 2, im.height // 2), Image.LANCZOS)
-    out = FIGURES / f"2026-10-31-form-sweep-{species}-{season}.png"
+    out = FIGURES / f"2026-10-31-form-sweep{TAG}-{species}-{season}.png"
     im.quantize(colors=64, method=Image.Quantize.MEDIANCUT).save(out, optimize=True)
     return out
 
@@ -227,13 +229,16 @@ def main() -> None:
     ap.add_argument("species")
     ap.add_argument("--workers", type=int, default=12)
     ap.add_argument("--redraw", action="store_true")
+    ap.add_argument("--tag", default="", help='a re-run\'s suffix, e.g. "-adr32"')
     args = ap.parse_args()
+    global TAG
+    TAG = args.tag
     sp = args.species
     spec = tomllib.loads((REPO / "analysis" / "fit" / "targets" / f"{sp}.toml").read_text())
     bounds = {p["path"]: p for p in spec["formRange"]}
     grid = {path: knob_values(bounds[path]) for path in FORM}
     brief = {t["name"]: t for t in spec["trait"] if t["kind"] == "described" and t["name"].startswith("lone.")}
-    cells = REPO / "runs" / "form-sweep" / sp
+    cells = REPO / "runs" / f"form-sweep{TAG}" / sp
     cells.mkdir(parents=True, exist_ok=True)
     ev = Evaluator()
     try:
@@ -253,7 +258,7 @@ def main() -> None:
             list(pool.map(lambda kv: run_cell(sp, kv[1], cells / f"{kv[0]}.npz"), jobs.items()))
         (cells / "grid.json").write_text(json.dumps({"grid": grid, "hand": hand}, indent=1))
     command = (f"uv run --project analysis python docs/experiments/code/2026-10-31-species-round5/"
-               f"form-sweep.py {sp}")
+               f"form-sweep.py {sp}{f' --tag={TAG}' if TAG else ''}")
     for s in SEASONS:
         print(draw_sheet(sp, s, grid, hand, brief, cells, command))
 

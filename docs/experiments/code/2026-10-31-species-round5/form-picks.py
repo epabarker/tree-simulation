@@ -14,6 +14,7 @@ runs/form-picks/<species>/sheet-<season>.png).
 from __future__ import annotations
 
 import argparse
+import json
 import importlib.util
 import subprocess
 import tomllib
@@ -56,13 +57,21 @@ def main() -> None:
     ap.add_argument("species", choices=sorted(PICKS))
     ap.add_argument("--workers", type=int, default=14)
     ap.add_argument("--redraw", action="store_true")
+    ap.add_argument("--from-grid", metavar="TAG", help="the pick in runs/form-grid<TAG>/<species>/pick.json "
+                    "(grid-stand.py), regrown under runs/form-picks<TAG>/; beech stays at round 2's")
     args = ap.parse_args()
     sp = args.species
     pick, flag = PICKS[sp]
+    tag = args.from_grid or ""
+    if args.from_grid and sp != "beech":
+        chosen = json.loads((REPO / "runs" / f"form-grid{tag}" / sp / "pick.json").read_text())
+        pick = chosen["assign"]
+        flag = (f"provisional, picked overnight by the agent: grid cell {chosen['cell']}"
+                + (" (no cell kept its stand ≥ 0.8)" if chosen["flagged"] else ""))
     spec = tomllib.loads((REPO / "analysis" / "fit" / "targets" / f"{sp}.toml").read_text())
     brief = {t["name"]: t for t in [*spec["trait"], *spec.get("report", [])]
              if t["kind"] == "described" and t["name"].startswith("lone.")}
-    cells = REPO / "runs" / "form-picks" / sp
+    cells = REPO / "runs" / f"form-picks{tag}" / sp
     cells.mkdir(parents=True, exist_ok=True)
     fixed = spec.get("fixed", {})
     ev = Evaluator()
@@ -88,7 +97,7 @@ def main() -> None:
     command = f"uv run --project analysis python docs/experiments/code/2026-10-31-species-round5/form-picks.py {sp}"
     for s in sweep.SEASONS:
         head = (f"{sp}: the form pick at seeds 1–3, season {s} (lone tree; round 2's form below)", flag)
-        out = FIGURES / f"2026-10-31-form-picks-{sp}-{s}.png"
+        out = FIGURES / f"2026-10-31-form-picks{tag}-{sp}-{s}.png"
         print(grid.draw_cells(s, rows, head, ref, brief, cells, command, out))
 
 

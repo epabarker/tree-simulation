@@ -804,4 +804,95 @@ crown, without moving the stand's floor or LAI, is within the brief.
 
 ## Repair
 
+### Repair round 1 (repair worker, 2026-11-01)
+
+**What the candidate's plates are.** They are twigs, not limbs. In the lone tree at 100, every
+axis of order ≥ 2 (pa 2, set point 94.6°) lies at 93–97° (median), at every height and every wood
+age. The trunk's own limbs (pa 1) stand at 34–40° but are short. The crown's width is therefore
+level pa-2 fans reaching up to 80 cells out from a narrow, steep scaffold.
+
+What did not work:
+- **Lowering pa 2's set point everywhere** (existing knobs, `repair-e1`/`e2`: 40° plus a curve)
+  turned the lone tree into a 160-cell vase and broke the stand: LAI 9.7–10.2, floor 2.4–3.2%,
+  9/12 alive.
+- **Shoot vigour** cannot tell the lone tree from the stand: pa-2 v/full has a median of 0.40 in
+  both.
+- **Light** tells the upper crown from the lower one, but ungated it raised stand LAI to 9–10
+  (`repair-l1`…`l4`). Only the tree's vigour gate tells lone from stand.
+
+**What changed.** Two generic rules, both default off and both gated by the vigour gate the
+candidate already uses (`r2.vigourTreeLo/Hi` 3000–10000). The stand's hashes are bit-identical
+to the candidate's, and only beech entries in `rust/presets.json` change.
+
+1. **Light orthotropy** (`r2.lightSetPoint` 35, `lightLo` 0.2, `lightHi` 0.8, `lightOver` 3).
+   - Where: R2 `light_set_point`, applied in growth (`season.rs` `grow_buds`) and in posture
+     (`r3.rs` `update_mechanics`).
+   - Rule: wood of pa ≥ 1 moves from its level's set point toward 35° by
+     u = g·clamp((Q − 0.2)/0.6)·min(1, (age + 1)/3). Q is the bud's light in growth, and C5's
+     light per metamer of the subtree in posture.
+   - Basis:
+     - Nicolini & Caraglio 1994 [r]: vertical laterals are more frequent in full light.
+     - Nicolini 2000 [s]: axes are plagiotropic under cover and orthotropic in vigorous trees.
+     - Troll [r] (Hallé et al. 1978): the proximal part of a plagiotropic axis straightens
+       secondarily.
+   - Effect: the young shoot spreads near level, and its base rises as it ages. In the lit upper
+     crown, old wood sits at 64° against 72–80° for young wood. The shaded lower crown stays near
+     level (80–85°). The candidate was 93–97° everywhere.
+2. **Own-crown pruning** (`c5.Tvig` 0.25, C5 `shed_branches`).
+   - Rule: a vigorous tree also sheds a lateral whose light per metamer is below g·Tvig·Q_top.
+   - Basis: relative-light shedding and branch autonomy (Takenaka 1994; Sprugel, Hinckley &
+     Schaap 1991; [u], cited from memory, not on the card). The photograph note has the
+     open-grown trunk bare for its lowest 1/8–1/6.
+   - Effect (this is the user's observation): leaf below H/6 falls from 6–19% to 4–7%, and the
+     lowest leaf rises from 0.01–0.05 H to 0.06–0.10 H. Without it (`repair-q9a`), the crown is a
+     dense block down to the ground and the scaffold is hidden.
+
+**Sheet:** `repair-round1/sheet.png`, with `metrics.json` beside it. It renders
+`runs/fresh-look/repair-round1` from beech's patch, with no `--assign`, at `--lone-width 240`.
+The candidate at the same width is `runs/fresh-look/repair-cand240`.
+
+| seeds 1/2/3 | candidate (width 240) | **repair** | guard / target |
+|---|---|---|---|
+| lone 60: H, W/H | 78/72/71, 1.65/1.93/1.68 | **94/101/94, 1.27/1.19/1.40** | checklist 0.6–1.0, photo 1.3–1.5 |
+| lone 100: H, W/H | 96/96/99, 1.83/2.13/1.75 | **139/143/133, 1.18/1.14/1.27** | as above |
+| lone 100: forkHeight, leaderDominance | 0.39/0.21/0.24, 3.6/3.4/4.1 | 0.34/0.36/0.18, 3.0/3.4/2.4 | |
+| stand 100: alive, floor, LAI, H/D | 12/12/11, 4.4/4.5/4.8%, 8.5/7.4/7.1, 88/85/101 | **identical** | ≥ 10, 3–5%, ≈ 7, 70–110 |
+| stand limb crown ratio | 0.23/0.26/0.27 | identical | not lowered |
+
+**What the sheet shows.**
+- At 100, the lone tree is a dense, rounded mass on a short trunk on seeds 2–3, and lumpier on
+  seed 1.
+- The cedar plates and the white bands between them are mostly gone.
+- Leaf-off, a short trunk divides into several limbs that rise and then spread.
+
+**What I tried and rejected:**
+- `repair-g2`: an erect set point of 0° with no age ramp gives vertical brooms 170 cells tall.
+- `repair-q5`, `repair-q7`, `repair-q10`: Tvig 0.30–0.35 opens the crowns into see-through
+  umbrellas. Tvig is a cliff between 0.25 and 0.30.
+
+**Cost.** One O(n) light array per tree per season in R3, with no checkpoint, RNG or hash change.
+TypeScript gains five optional fields. The lone tree to 100 natively with CSV output takes 21.7 s,
+against 25.3 s with the rules off (fewer metamers after pruning). The stand's cost is unchanged.
+
+**Checks.** All pass: `rust:check` (132 unit tests, two of them new), `build:wasm`, golden.test.ts
+(14 of 14) and lint and typecheck. With the rules off, the lone run's hash equals the candidate's.
+
+**Commit:** `77b28e6`.
+
+**Still open:**
+- **The outline.** It is a rounded block more than a dome highest in the middle: lumpy on seed 1
+  at 100, and at 60 still blocky with faint horizontal banding. Tiers are reduced, not gone.
+- **Height.** The tree is now too tall: 133–143 cells at 100 (33–36 m, against ≈ 20 m
+  open-grown). That is the price of erect lit wood.
+- **W/H.** At 1.1–1.4 it is at the low end of the photograph's 1.3–1.5 and above the checklist's
+  0.6–1.0.
+- **The young skirt** still shows at 60, leaf-off.
+- **Hornbeam risk.** The leaf-off now matches the namer's hornbeam description ("a short trunk
+  dividing into many steeply ascending limbs"). Only the broader leaf-on mass separates it. No
+  blind test was run.
+- **The stand is untouched.** Its cue 3 (fragmented crowns), its cue 4 (no sprays) and seed 1's
+  LAI of 8.5 are the candidate's.
+- **The gate.** It is in absolute units, so beeches at the garden's edges get an untested partial
+  response. I have not looked at the garden plate.
+
 <!-- repair -->

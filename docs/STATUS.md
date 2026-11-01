@@ -1,6 +1,6 @@
 # Status
 
-_Last updated: 2026-11-01, overnight (ADR 0032's budget holds on the phone; the form re-run under it, picks provisional by the stand-first rule; see code/2026-10-31-species-round5/overnight.md)_
+_Last updated: 2026-11-01 02:30 (overnight: budget holds; form re-run under ADR 0032 with provisional stand-first picks; hornbeam pilot failed (1 of 6), no overnight fit. Read code/2026-10-31-species-round5/overnight.md)_
 
 **3D port** on the branch `3d-port` (work branches open PRs into it). ADR 0024–0029, 0031 and 0032 accepted, 0030 rejected. The live site stays on 0.14.0 (2D) until the bar below is met.
 
@@ -17,10 +17,9 @@ _Last updated: 2026-11-01, overnight (ADR 0032's budget holds on the phone; the 
 - **Gallery** (`analysis/fit/gallery/`): round 2's spindles (beech, birch), round 3's beech cone, oak and hornbeam parasols, round 4's birch pagoda; `m27_gallery.py`. Oak and hornbeam pass the check; beech's cone sits within the noise of its round-2 form (1.17 against 0.77).
 
 ## Next
-1. **The user:** judge the lab panel (round `form`, `figures/2026-10-31-panel-form-*`) and the picks (`[form]`, dated; hornbeam, oak provisional; beech, maple flagged).
-2. **The gallery check** on six seeds passes for the picks. Only then the pilot (beech, `m27_fit.py … --pilot`), the eight overnight, the hold-out, adoption (its own ADR).
-3. **The shedding question** (below) before or after the pilot: the user's call.
-4. **I3 steps 3–6** and C2's floor against LAI, as before; then C3–C6 as hold-outs; release; the site's PR.
+1. **The user:** read `overnight.md`, then the stand panels at 100 (`figures/2026-10-31-species-panel-<sp>-form-adr32.png`). Re-pick hornbeam and maple (the rule's columns halve their stands' LAI); the best-outline alternatives are in the log.
+2. **A new hornbeam pilot** on the re-picked form, under the stand-death penalty; accept by measured targets in band and stand alive ≥ 0.8 at 60 and 100. Then the overnight for the eight (`--out round5`), verification, panels, the gallery check at six seeds (`m27_gallery.py --seeds 6`).
+3. **I3 steps 3–6** and C2's floor against LAI; then C3–C6 as hold-outs; release; the site's PR. R2's reiteration after shipping (ADR 0031).
 
 ## Open questions (user)
 - **`levels.2.setPoint` ≥ 80** collapses every broadleaf (parasol, mound, column): a C3/R3 question after shipping.

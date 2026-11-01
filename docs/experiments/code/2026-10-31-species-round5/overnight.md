@@ -68,3 +68,20 @@ The 160-cell plate with the specimen is over 256 MB both before and after. Per t
 | beech | 194, 0.55 (round 2's, unchanged) | 178, 0.36 | 6.9 | 4.5% |
 
 **The flag for the morning: the rule's hornbeam and maple picks undo ADR 0032's reason.** Their columns reach the woods' top and halve the stand's LAI (hornbeam 8.6 → 4.4 against a measured 8.3 ± 1.5; maple 12.7 → 5.3). The floor brightens 2.3× (hornbeam 2.2% → 5.2% against the measured 1.3%). Round 2's form under ADR 0032 was closer on both. Oak's pick also reaches the top at 100 with half the LAI. These are provisional and one edit each; the best-outline cells are in the table above. I did not override the rule overnight.
+
+## Step 5: the hornbeam pilot under the stand-death penalty: FAILS the rule. Stopped; no overnight
+
+`m27_fit.py --method lm --start round2 --species hornbeam --out round5-pilot2 --pilot`, 02:15–02:29, with the step-4 `[form]` (the column, cell 1-0-1) and ADR 0032 (log `pilot2-hornbeam.txt`; results `fits/round5-pilot2/hornbeam.json`; panel `figures/2026-10-31-species-panel-hornbeam-round5-pilot2.png`).
+- **LM:** start loss 52.0. LM 1 accepted (14.1, 3 measured in band), then four rejected steps. Not every step was rejected, so that stop rule did not fire.
+- **Verification on fresh seeds 1001–1006: 1 of 6 measured in band.** Outside: stand.height (125 against 84 ± 13; start 158), lone.earlyShare (0.59 against 0.67 ± 0.05), stand.slenderness (110 against 86 ± 12), stand.lai (6.2 against 8.3 ± 1.5), shade.survivalLight (0.018 against 0.033 ± 0.01).
+- **Stand alive** 1.0 at 60 and 1.0 at 100: that part of the rule passes.
+- **Physiology moved hard:** α 2.81 → 2.50, L_h 92 → 45, m_f 0.082 → 0.114, r3.c 0.059 → 0.132, h_J 8.8 → 4.1. The fitted lone tree is a pole (W/H 0.21 at 100, H 199); its stand has LAI 3.6 and a 9.3% floor (panel, seed 1).
+- **Gallery:** the fit's nearest reject is round 3's parasol at 3.62; the hand form is 0.68 from it.
+
+**Decision: by your rule the pilot fails (1 of 6 in band), so the overnight for the eight was not started.** The cause looks like step 4's pick, not the fit. The stand-first rule chose a column whose stand starts at height 158 against a target of 84, and the physiology cannot bring that back without breaking the rest. For the morning, a re-pick of hornbeam's `[form]` before any new pilot: round 2's form, or the best-outline cell 0-1-1. Under ADR 0032, round 2's form had LAI 8.6 and a 2.2% floor (the step-4 panel). I did not re-pick or re-run overnight: that is a choice the plan does not cover.
+
+## Where things stand (02:30)
+- Pushed: step 3 (48043c2), step 4 (d3e805b), step 5 (this commit).
+- Nothing adopted into `flora-fitted.ts`. No principle, bound, target or golden changed after ADR 0032.
+- `[form]` holds the overnight picks, all flagged provisional. Hornbeam's and maple's are columns, which the panels show.
+- Disk: 618 GB free.

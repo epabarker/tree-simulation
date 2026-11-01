@@ -46,3 +46,14 @@
 "r2.vigourLambda" = 0.03
 "r2.vigourTreeLo" = 3000
 "r2.vigourTreeHi" = 10000
+# Repair round 1 (2026-11-01): the candidate's lone tree was a cedar of flat plates, because every
+# twig (pa 2, set point 94.6°) grew and held level in the open. Light orthotropy: lit wood of a
+# vigorous tree is held erect (35°), shaded wood level, by its light (0.2–0.8) and over its first
+# 3 seasons, so the young shoot spreads level and its older base rises (rise, then arch); the
+# vigour gate (3000–10000) keeps the stand as it was. Own-crown pruning (Tvig 0.25, the same gate)
+# clears the sapling's lowest limbs under the young dome. notes.md, Repair.
+"r2.lightSetPoint" = 35
+"r2.lightLo" = 0.2
+"r2.lightHi" = 0.8
+"r2.lightOver" = 3
+"c5.Tvig" = 0.25

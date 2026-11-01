@@ -20,8 +20,8 @@ use crate::principles::o4::stand_dynamics;
 use crate::principles::obstacles::clear_obstacles;
 use crate::principles::r1::{carbon_balance, starved_to_death};
 use crate::principles::r2::{
-    aged_offset, arm_set_point, curve_offset, curved, direction_params, pendulous_set_point,
-    relay_depth, relay_nodes, relay_on, relay_shift, vigour_forks,
+    aged_offset, arm_set_point, curve_offset, curved, direction_params, light_set_point,
+    pendulous_set_point, relay_depth, relay_nodes, relay_on, relay_shift, vigour_forks,
 };
 use crate::principles::r3::update_mechanics;
 use crate::principles::r4::{aborts, growth_threshold, light_releases, released_shift};
@@ -523,6 +523,9 @@ pub fn grow_buds(tree: &mut Tree, params: &Params, season: f64) {
                     });
                     dir.set_point = h;
                 }
+                // Light orthotropy: a lateral in full light grows erect, one in shade level.
+                dir.set_point =
+                    light_set_point(dir.set_point, pa, tree.b.q[b], 0.0, tree.v_base, &params.r2);
                 let bend = curve_offset(trunk, pa, node, params)
                     + aged_offset(trunk, pa, 0.0, tree.age, params);
                 dir.set_point = curved(dir.set_point, bend);

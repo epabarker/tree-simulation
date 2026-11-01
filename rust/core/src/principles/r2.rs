@@ -60,11 +60,19 @@
 //! crown spreads its resource over many limbs, so its weak wood loses apical control and its top
 //! divides into near-equal limbs (the dome); a stand member never opens the gate.
 //!
+//! Light orthotropy (fresh-look beech, repair): wood of pa ≥ 1 on a vigorous tree (the vigour
+//! gate g) takes a set point, in growth (C4) and posture (R3), moved from its level's toward
+//! `lightSetPoint` by its light and, over `lightOver` seasons, by its age: lit wood rises, shaded
+//! wood stays level (Nicolini & Caraglio 1994 [r]; Nicolini 2000 [s]). This season's shoot spreads
+//! near its level's angle and its base rises as it ages (Troll's secondary straightening of the
+//! proximal part of plagiotropic axes, Hallé et al. 1978), so a lit limb rises, then arches; the
+//! lower crown's shaded sprays stay level. A stand member never opens the gate.
+//!
 //! Params: r2.enabled, r2.levels (curve, curveLength, pendulous, pendulousRadius, kappa,
 //! lateralEvery), r2.aC, r2.dLambda, r2.ramp, r2.kappa, r2.relay,
 //! r2.relayAge, r2.relayPTerm, r2.relayCrowd, r2.forkAt, r2.forkAngle, r2.vigourShare,
-//! r2.vigourLambda, r2.vigourTreeLo, r2.vigourTreeHi; c1.branchAngle, c3.lambda, c4.setPoint,
-//! c4.eta when off.
+//! r2.vigourLambda, r2.vigourTreeLo, r2.vigourTreeHi, r2.lightSetPoint, r2.lightLo, r2.lightHi,
+//! r2.lightOver; c1.branchAngle, c3.lambda, c4.setPoint, c4.eta when off.
 
 use crate::math;
 use crate::params::{C4, Generator, PaLevel, Params, Phyllotaxis, R2};
@@ -222,6 +230,48 @@ pub fn vigour_gate(v_base: f64, r2: &R2) -> f64 {
             (v_base - r2.vigour_tree_lo) / (r2.vigour_tree_hi - r2.vigour_tree_lo),
         ),
     )
+}
+
+/// Light orthotropy (fresh-look beech, repair): the set point (degrees from vertical), in growth
+/// and posture, of wood of physiological age `pa`, light `q` and age `wood_age` seasons, moved
+/// from its level's own `set_point` toward r2.lightSetPoint by
+/// u = g·clamp((q − lightLo) / (lightHi − lightLo))·min(1, (wood_age + 1) / lightOver), g the
+/// tree's vigour gate (`vigour_gate`, 1 when r2.vigourTreeLo/Hi are unset). Beech's laterals are
+/// plagiotropic under cover and erect in full light on a vigorous tree (Nicolini & Caraglio 1994
+/// [r]: vertical laterals 0.18–0.45 in full light against 0.03–0.1 in shade; Nicolini 2000 [s]:
+/// the axes of trees "very young or under dense cover" are plagiotropic with a flat crown, those
+/// of vigorous trees orthotropic), and a plagiotropic axis straightens at its base as it ages
+/// (Troll's model, Hallé et al. 1978). So the lit crown of an open-grown tree builds limbs that
+/// rise, then arch out at their young tips, and its shaded lower crown level sprays. The trunk
+/// and its relays (pa 0) are untouched; `set_point` is returned unchanged when off.
+pub fn light_set_point(
+    set_point: f64,
+    pa: f64,
+    q: f64,
+    wood_age: f64,
+    v_base: f64,
+    r2: &R2,
+) -> f64 {
+    let Some(erect) = r2.light_set_point else {
+        return set_point;
+    };
+    if !r2.enabled || pa < 1.0 {
+        return set_point;
+    }
+    let span = r2.light_hi - r2.light_lo;
+    let lit = if span > 0.0 {
+        math::max(0.0, math::min(1.0, (q - r2.light_lo) / span))
+    } else if q >= r2.light_hi {
+        1.0
+    } else {
+        0.0
+    };
+    let aged = math::min(
+        1.0,
+        (math::max(0.0, wood_age) + 1.0) / math::max(1.0, r2.light_over),
+    );
+    let u = lit * aged * vigour_gate(v_base, r2);
+    set_point + u * (erect - set_point)
 }
 
 /// How many nodes under an ended apex relay on an axis of physiological age `pa`: the level's
@@ -937,6 +987,28 @@ mod tests {
         assert_eq!(arm_set_point(&t, false, 1.0, base, &p), None); // a limb keeps its level
         let off = with_r2(&[r#"{}"#, r#"{}"#], r#""relay":2"#);
         assert_eq!(arm_set_point(&t, false, 0.0, base, &off), None);
+    }
+
+    #[test]
+    fn lit_wood_of_a_vigorous_tree_rises_and_shaded_wood_stays_level() {
+        let rows = [r#"{}"#, r#"{}"#, r#"{"setPoint":95}"#];
+        let p = with_r2(
+            &rows,
+            r#""lightSetPoint":35,"lightLo":0.2,"lightHi":0.8,"lightOver":3,"vigourTreeLo":3000,"vigourTreeHi":10000"#,
+        );
+        let r2 = &p.r2;
+        let open = 20000.0;
+        // Old wood in full light takes the erect set point; in shade, its level's.
+        assert!((light_set_point(95.0, 2.0, 0.9, 5.0, open, r2) - 35.0).abs() < 1e-12);
+        assert_eq!(light_set_point(95.0, 2.0, 0.1, 5.0, open, r2), 95.0);
+        assert!((light_set_point(95.0, 2.0, 0.5, 5.0, open, r2) - 65.0).abs() < 1e-12); // halfway
+        // This season's shoot only a third of the way (lightOver 3): it spreads, its base rises.
+        assert!((light_set_point(95.0, 2.0, 0.9, 0.0, open, r2) - 75.0).abs() < 1e-12);
+        // A stand member (v_base below the gate), the trunk's level, and the rule off: unchanged.
+        assert_eq!(light_set_point(95.0, 2.0, 0.9, 5.0, 2000.0, r2), 95.0);
+        assert_eq!(light_set_point(0.0, 0.0, 0.9, 5.0, open, r2), 0.0);
+        let off = with_r2(&rows, "");
+        assert_eq!(light_set_point(95.0, 2.0, 0.9, 5.0, open, &off.r2), 95.0);
     }
 
     #[test]

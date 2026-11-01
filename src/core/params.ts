@@ -176,6 +176,13 @@ export interface Params {
     Trel: number;
     /** Quantile of the tree's live-bud Q that stands for the light at its crown top. */
     topQuantile: number;
+    /**
+     * Own-crown pruning (fresh-look beech, repair): a vigorous tree (R2's vigour gate g by its
+     * production, r2.vigourTreeLo/Hi) also sheds a lateral whose Q_b/n_b < g·Tvig·Q_top, so an
+     * open-grown crown clears its first limbs under itself (branch autonomy; Sprugel et al. 1991).
+     * A stand member never opens the gate. 0 or absent: off.
+     */
+    Tvig?: number;
   };
 
   /** C6 Pipe-model girth with memory. */
@@ -365,6 +372,21 @@ export interface Params {
     vigourTreeLo?: number;
     /** With the vigour drop: the tree resource v_base from which it acts fully. */
     vigourTreeHi?: number;
+    /**
+     * Light orthotropy (fresh-look beech, repair): wood of pa ≥ 1 takes a set point (growth and
+     * posture) moved from its level's toward lightSetPoint (degrees from vertical) by
+     * u = g·clamp((Q − lightLo) / (lightHi − lightLo))·min(1, (woodAge + 1) / lightOver), Q the
+     * bud's light in growth and the subtree's light per metamer in posture, g the vigour gate
+     * (vigourTreeLo/Hi; 1 when unset). Lit wood of a vigorous tree rises, shaded wood stays level
+     * (Nicolini & Caraglio 1994; Nicolini 2000). Absent: off.
+     */
+    lightSetPoint?: number;
+    /** With light orthotropy: the light at and below which wood keeps its level's set point. */
+    lightLo?: number;
+    /** With light orthotropy: the light from which it takes lightSetPoint (absent: 1). */
+    lightHi?: number;
+    /** With light orthotropy: the wood age, seasons, at which it acts fully (absent: 1). */
+    lightOver?: number;
   };
 
   /**

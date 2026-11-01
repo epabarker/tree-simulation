@@ -8,12 +8,15 @@
 //! with `r3.ground` limbs rest on the ground. E is wood's own, ≈ 4·10⁶ in these units (ADR
 //! 0011: 2D had lowered it to 10⁶ because a planar limb carried less foliage than a real one).
 //!
-//! Params: r3.*, o2.stormLoad, r2 posture set-points, c4.setPoint, r6 leaf areas.
+//! Params: r3.*, o2.stormLoad, r2 posture set-points (and R2's light orthotropy: r2.lightSetPoint,
+//! r2.lightLo, r2.lightHi, r2.lightOver), c4.setPoint, r6 leaf areas.
 
 use super::c3::is_live_bud;
 use super::c4::{horizontal_heading, set_point_direction};
 use super::c5::remove_branches;
-use super::r2::{aged_offset, arm_set_point, curve_offset, hangs, pa_level, pendulous_set_point};
+use super::r2::{
+    aged_offset, arm_set_point, curve_offset, hangs, light_set_point, pa_level, pendulous_set_point,
+};
 use super::r6::deposit_area;
 use crate::geom::{
     IDENTITY, M3, V3, add, angle_between, apply, compose, cross, norm, normalize_or, reject,
@@ -116,6 +119,25 @@ pub fn update_mechanics(tree: &mut Tree, params: &Params, storm: bool, season: f
     // Each metamer's own turn (sag and posture) as a rotation vector, from the start-of-pass
     // geometry.
     let mut turn: Vec<V3> = vec![[0.0; 3]; nm];
+    // R2's light orthotropy: each metamer's light, C5's (its subtree's light per metamer); wood
+    // grown this season (not yet counted) takes its parent's.
+    let light: Vec<f64> = if params.r2.light_set_point.is_some() {
+        let mut light = vec![0.0; nm];
+        for i in 0..nm {
+            let n = tree.m.n_sum[i] as f64;
+            let p = tree.m.parent[i];
+            light[i] = if n > 0.0 {
+                tree.m.q_sum[i] / n
+            } else if p >= 0 {
+                light[p as usize]
+            } else {
+                0.0
+            };
+        }
+        light
+    } else {
+        Vec::new()
+    };
     for i in (0..nm).rev() {
         let r = tree.m.radius[i];
         let l = tree.m.length[i];
@@ -209,6 +231,13 @@ pub fn update_mechanics(tree: &mut Tree, params: &Params, storm: bool, season: f
             let base = match arm_set_point(tree, trunk, pa, i, params) {
                 Some(a) => a * DEG,
                 None => posture_set_point(pa, params),
+            };
+            // R2's light orthotropy: lit wood of a vigorous tree is held erect, shaded wood level
+            // (the light is C5's, per metamer of the subtree).
+            let base = if params.r2.light_set_point.is_some() {
+                light_set_point(base / DEG, pa, light[i], wood_age, tree.v_base, &params.r2) * DEG
+            } else {
+                base
             };
             let set_point = if bend == 0.0 {
                 base

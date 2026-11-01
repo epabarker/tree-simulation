@@ -139,6 +139,10 @@ pub struct C5 {
     pub g: f64,
     pub t_rel: f64,
     pub top_quantile: f64,
+    /// Own-crown pruning (fresh-look beech, repair): a lateral whose light per metamer is below
+    /// g·Tvig·Q_top is shed too, g the tree's vigour gate (r2.vigourTreeLo/Hi; 1 when unset).
+    /// 0 or absent: off.
+    pub t_vig: f64,
 }
 
 #[derive(Clone, Debug)]
@@ -256,6 +260,17 @@ pub struct R2 {
     /// `vigour_tree_hi` ≤ `vigour_tree_lo` (both absent).
     pub vigour_tree_lo: f64,
     pub vigour_tree_hi: f64,
+    /// Light orthotropy (fresh-look beech, repair): a new shoot of pa ≥ 1 takes a growth set
+    /// point moved from its level's toward this one (degrees from vertical) by its bud's light,
+    /// fully at `light_hi` and above, not at all at `light_lo` and below (Nicolini & Caraglio
+    /// 1994: vertical laterals are more frequent in full light; Nicolini 2000: axes under cover
+    /// are plagiotropic). Absent: off.
+    pub light_set_point: Option<f64>,
+    pub light_lo: f64,
+    pub light_hi: f64,
+    /// Light orthotropy's wood-age ramp: wood straightens fully at this age, seasons (absent: 1,
+    /// so even this season's shoot does).
+    pub light_over: f64,
 }
 
 #[derive(Clone, Debug)]
@@ -470,6 +485,7 @@ impl Params {
                     g: num(g, "g"),
                     t_rel: num(g, "Trel"),
                     top_quantile: num(g, "topQuantile"),
+                    t_vig: opt(g, "Tvig").unwrap_or(0.0),
                 }
             },
             c6: {
@@ -550,6 +566,10 @@ impl Params {
                 vigour_lambda: opt(r2, "vigourLambda").unwrap_or(0.0),
                 vigour_tree_lo: opt(r2, "vigourTreeLo").unwrap_or(0.0),
                 vigour_tree_hi: opt(r2, "vigourTreeHi").unwrap_or(0.0),
+                light_set_point: opt(r2, "lightSetPoint"),
+                light_lo: opt(r2, "lightLo").unwrap_or(0.0),
+                light_hi: opt(r2, "lightHi").unwrap_or(1.0),
+                light_over: opt(r2, "lightOver").unwrap_or(1.0),
             },
             r3: R3 {
                 enabled: flag(r3, "enabled"),

@@ -16,9 +16,8 @@ ledger=docs/experiments/code/2026-11-01-fresh-look-beech
 rm -rf "$dest"
 mkdir -p "$dest"
 # The code and its build config, without node_modules, runs, dist or the git history.
-rsync -a --exclude node_modules --exclude runs --exclude dist --exclude dist-garden --exclude .git \
-  --exclude 'rust/target' --exclude 'src/wasm/pkg' --exclude 'analysis/.venv' \
-  "$repo/" "$dest/"
+(cd "$repo" && tar -c --exclude=./node_modules --exclude=./runs --exclude=./dist --exclude=./dist-garden \
+  --exclude=./.git --exclude=./rust/target --exclude=./src/wasm/pkg --exclude=./analysis/.venv .) | tar -x -C "$dest"
 
 # History out.
 rm -rf "$dest/docs/decisions" "$dest/docs/experiments" "$dest/docs/plans" "$dest/docs/reviews" \

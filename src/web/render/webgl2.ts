@@ -36,7 +36,14 @@ import { BudState } from "../../core/types.ts";
 import { BUD_ACTIVE, BUD_DORMANT, parseColor, SEQUENTIAL, shadeImage } from "./colors.ts";
 import { LEAF_PALETTES, LEAF_STYLES } from "./leaf-styles.ts";
 import { MAX_DPR, type Renderer, type RendererOptions } from "./renderer.ts";
-import { DEPTH_SLICES, LEAF_MIN_PX, type Leaves, Scene, type ViewOptions } from "./scene.ts";
+import {
+  DEPTH_SLICES,
+  LEAF_MIN_PX,
+  LEAF_OPACITY,
+  type Leaves,
+  Scene,
+  type ViewOptions,
+} from "./scene.ts";
 import { readTheme, type Theme } from "./theme.ts";
 
 // World → clip space: x_clip = (x − cx)·sx, y_clip = groundClip + y·sy, with u_view = (cx, sx, groundClip, sy).
@@ -639,6 +646,7 @@ export class WebGL2Renderer implements Renderer {
       view.colorMode,
       view.showLeaves ? view.leafAge : -1,
       view.leafStyle,
+      view.leafOpacity,
       view.showBuds,
       view.showObstacles,
       scene.solo,
@@ -653,7 +661,7 @@ export class WebGL2Renderer implements Renderer {
       this.buildSegments(s, view);
       if (ghosts) this.buildGhosts(1 - t);
       else this.ghostBatch.count = 0;
-      if (view.showLeaves) this.buildLeaves(view.leafAge, t);
+      if (view.showLeaves) this.buildLeaves(view.leafAge, t, view.leafOpacity ?? LEAF_OPACITY);
       else this.leafBatch.count = 0;
       if (view.showBuds) this.buildBuds(s, view.colorMode === "light");
       else this.budBatch.count = 0;
@@ -664,7 +672,7 @@ export class WebGL2Renderer implements Renderer {
     const uniforms = {
       u_view: [cx, (2 * scale) / w, 1 - (2 * groundY) / h, (2 * scale) / h],
       u_px: 1 / scale,
-      u_leaf: [scene.leafStyle.length, scene.leafStyle.aspect, LEAF_MIN_PX],
+      u_leaf: [scene.leafStyle.length, scene.leafStyle.aspect, view.leafMinPx ?? LEAF_MIN_PX],
       u_point: [BUD_SIDE_PX, BUD_MIN_SIDE],
     };
     if (view.showShadow) this.uploadShade(s);
@@ -871,11 +879,11 @@ export class WebGL2Renderer implements Renderer {
     this.upload(batch, n);
   }
 
-  private buildLeaves(leafAge: number, t: number): void {
+  private buildLeaves(leafAge: number, t: number, opacity: number): void {
     const leaves = this.scene.leaves(leafAge, t);
     // One summer and one autumn ramp per palette; each leaf takes its species' (M19).
-    const palette = LEAF_PALETTES.map((p) => this.paletteBytes(this.theme.leaf[p], 0.92));
-    const autumn = LEAF_PALETTES.map((p) => this.paletteBytes(this.theme.autumn[p], 0.92));
+    const palette = LEAF_PALETTES.map((p) => this.paletteBytes(this.theme.leaf[p], opacity));
+    const autumn = LEAF_PALETTES.map((p) => this.paletteBytes(this.theme.autumn[p], opacity));
     this.fillLeaves(this.leafBatch, leaves, 0, leaves.count, palette, autumn);
     this.leafSlices.set(leaves.slices);
   }

@@ -54,6 +54,9 @@ const view: ViewOptions & { preset: PresetName } = {
   showShadow: false,
   showGhosts: true,
   showObstacles: true,
+  // `&leafOpacity=0.8&leafMinPx=2`: I3's foliage knobs (the View panel has them too).
+  ...(query.has("leafOpacity") ? { leafOpacity: Number(query.get("leafOpacity")) } : {}),
+  ...(query.has("leafMinPx") ? { leafMinPx: Number(query.get("leafMinPx")) } : {}),
 };
 
 const hud = element("hud");

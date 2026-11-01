@@ -19,6 +19,7 @@ import { forestParams, specimenParams } from "../core/presets.ts";
 import type { RunRecord, Snapshot, SnapshotOptions, TreeMetrics } from "../core/types.ts";
 import type { SimApi } from "../worker/api.ts";
 import { PLATE_HEIGHT, plateWidth } from "./plate.ts";
+import { type Coverage, measureCoverage } from "./render/coverage.ts";
 import { createRenderer } from "./render/create.ts";
 import { attachInput } from "./render/input.ts";
 import {
@@ -71,6 +72,11 @@ export interface BenchResult {
   /** Worker time per season, simulation plus snapshot. */
   workerMean: number;
   workerMax: number;
+  /** I3 step 4: how much of the canopy the leaves cover at the end of the run (render/coverage.ts). */
+  coverage: Coverage;
+  /** The foliage knobs it was measured at. */
+  leafOpacity?: number;
+  leafMinPx?: number;
 }
 
 /** Seasons per second: `intro` until the world reaches `introSeasons`, then `ambient`. */
@@ -226,6 +232,11 @@ export interface Garden {
   leafStudy(tree: number): { path: string; cm: number; common?: string; latin?: string } | null;
   /** Seed of the specimen's own world (option `specimen`) while it is shown, else 0. */
   readonly specimenSeed: number;
+  /**
+   * The foliage coverage of a frame drawn now (I3 step 4, render/coverage.ts): set
+   * `view.leafOpacity` or `view.leafMinPx`, then measure.
+   */
+  coverage(): Coverage;
   /** Each live tree's crown top and trunk base in canvas pixels, for labels (Scene.anchors). */
   anchors(): { tree: number; x: number; y: number; baseX: number; baseY: number }[];
   /** The latest metrics of a live tree, or undefined. */
@@ -634,6 +645,9 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
       longFrames: samples.frame.filter((dt) => dt > 33).length,
       workerMean: round(w.reduce((a, b) => a + b, 0) / Math.max(1, w.length)),
       workerMax: round(Math.max(0, ...w)),
+      coverage: measureCoverage(renderer, view),
+      leafOpacity: view.leafOpacity,
+      leafMinPx: view.leafMinPx,
     };
   }
 
@@ -830,6 +844,7 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
     renderer,
     scene,
     view,
+    coverage: () => measureCoverage(renderer, view),
     playback,
     stats,
     ready,

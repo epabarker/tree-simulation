@@ -95,6 +95,12 @@ export interface ViewOptions {
   showGhosts: boolean;
   /** Outline obstacles (ADR 0015): the lab shows them; a host page's content covers them. */
   showObstacles?: boolean;
+  /**
+   * I3's two foliage knobs (plan §2.5, step 4): the cards' opacity (LEAF_OPACITY) and the least
+   * length a card draws on screen in CSS pixels (LEAF_MIN_PX). Nothing else thins or hides leaves.
+   */
+  leafOpacity?: number;
+  leafMinPx?: number;
 }
 
 export interface Camera {
@@ -153,10 +159,16 @@ export const LEAF_LENGTH = LEAF_STYLES.broadleaf.length;
 export const LEAF_ASPECT = LEAF_STYLES.broadleaf.aspect;
 /** Leaves never draw shorter than this on screen, so zoomed-out crowns still read as foliage. */
 export const LEAF_MIN_PX = 3.5;
+/** A leaf card's opacity: overlapping cards build up depth, and a single card lets a little through. */
+export const LEAF_OPACITY = 0.92;
 
 /** Length of a full-size leaf of `length` world units at `scale` CSS pixels per world unit. */
-export function leafLength(scale: number, length: number = LEAF_LENGTH): number {
-  return Math.max(length, LEAF_MIN_PX / scale);
+export function leafLength(
+  scale: number,
+  length: number = LEAF_LENGTH,
+  minPx: number = LEAF_MIN_PX,
+): number {
+  return Math.max(length, minPx / scale);
 }
 /**
  * Slices of the slab's depth the picture is drawn in, far to near (I3). Within a slice wood draws

@@ -203,9 +203,10 @@ path = "r2.levels.1.lambda"
 lo = 0.48
 hi = 0.58
 [[formRange]]
+# Pinned at the atlas pick (2026-11-01, was 20-90): the sweep cannot move it.
 path = "r2.levels.1.setPoint"
-lo = 20
-hi = 90
+lo = 35
+hi = 35
 [[formRange]]
 path = "r2.levels.1.postureSetPoint"
 lo = 20
@@ -255,7 +256,7 @@ hi = 4
 # The lines marked "pick"; the rest are round 2's.
 "r2.levels.0.lambda" = 0.5631
 "r2.levels.1.lambda" = 0.5607
-"r2.levels.1.setPoint" = 58.61
+"r2.levels.1.setPoint" = 35  # atlas pick (2026-11-01; was 58.61): 2026-11-01-atlas-combined-oak-{60,100}.png, the agedSetPoint 85 column
 # "r2.levels.1.postureSetPoint": unset in FLORA, so the limbs straighten toward
 # levels.1.setPoint (R3, ADR 0011); a pick sets it here.
 "r2.levels.1.branchAngle" = 56.94
@@ -264,6 +265,11 @@ hi = 4
 "r2.aC" = 20  # pick, 2026-11-01, provisional
 "r2.dLambda" = 0.1  # pick, 2026-11-01, provisional
 "r2.kappa" = 0  # pick, 2026-11-01, provisional
+# The atlas's authored form (track B, 2026-11-01; docs/experiments/code/2026-11-01-atlas/picks.toml).
+# Accepted by the user (2026-11-01): posture by age, limbs steep when young levelling with their wood's
+# age; no relay, no elbows. Sheets in docs/experiments/figures/, seeds 1-3; each rule is off by default in the core.
+"r2.levels.1.agedSetPoint" = 85  # ADR 0038; 2026-11-01-atlas-combined-oak-{60,100}.png, the agedSetPoint 85 column
+"r2.levels.1.agedOver" = 50  # 2026-11-01-atlas-combined-oak-{60,100}.png, the agedSetPoint 85 column
 
 # Held out: never in the loss, checked after the fit (analysis/experiments/m27_holdout.py).
 [holdout]

@@ -203,9 +203,10 @@ path = "r2.levels.1.lambda"
 lo = 0.48
 hi = 0.58
 [[formRange]]
+# Pinned at the atlas pick (2026-11-01, was 20-90): the sweep cannot move it.
 path = "r2.levels.1.setPoint"
-lo = 20
-hi = 90
+lo = 28
+hi = 28
 [[formRange]]
 path = "r2.levels.1.postureSetPoint"
 lo = 20
@@ -254,7 +255,7 @@ hi = 4
 # (the next question is the core: its level-0 distichous generator).
 "r2.levels.0.lambda" = 0.5308
 "r2.levels.1.lambda" = 0.5124
-"r2.levels.1.setPoint" = 34.32
+"r2.levels.1.setPoint" = 28  # atlas pick (2026-11-01; was round 2's 34.32): 2026-11-01-atlas-combined-beech-aged-60.png, the agedOver 50 column
 # "r2.levels.1.postureSetPoint": unset in FLORA, so the limbs straighten toward
 # levels.1.setPoint (R3, ADR 0011); a pick sets it here.
 "r2.levels.1.branchAngle" = 50.07
@@ -263,6 +264,16 @@ hi = 4
 "r2.aC" = 14.44
 "r2.dLambda" = 0.01384
 "r2.kappa" = 0.4314
+# The atlas's authored form (track B, 2026-11-01; docs/experiments/code/2026-11-01-atlas/picks.toml).
+# Accepted by the user: "beech's direction (relay + trunk curvature + posture by age)". Sheets in
+# docs/experiments/figures/, seeds 1-3; each rule is off by default in the core (ADRs 0033-0038).
+"r2.relay" = 2  # ADR 0033; 2026-11-01-atlas-relay-{60,100}.png, the relayPTerm row
+"r2.relayAge" = 20  # 2026-11-01-atlas-relay-{60,100}.png
+"r2.relayPTerm" = 0.6  # 2026-11-01-atlas-relay-{60,100}.png, the relayPTerm row
+"r2.levels.0.curve" = 45  # ADR 0034; 2026-11-01-atlas-curve-{60,100}.png, the levels.0.curve row; atlas-combined-beech-60.png's middle column
+"r2.levels.0.curveLength" = 30  # 2026-11-01-atlas-curve-{60,100}.png
+"r2.levels.1.agedSetPoint" = 80  # ADR 0038; 2026-11-01-atlas-combined-beech-aged-60.png, the agedOver 50 column; atlas-aged-{60,100}.png
+"r2.levels.1.agedOver" = 50  # 2026-11-01-atlas-combined-beech-aged-60.png, the agedOver 50 column
 
 # Held out: never in the loss, checked after the fit (analysis/experiments/m27_holdout.py).
 [holdout]

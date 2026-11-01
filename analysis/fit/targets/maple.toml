@@ -256,6 +256,14 @@ hi = 4
 "r2.aC" = 5  # pick, 2026-11-01, provisional
 "r2.dLambda" = 0.04  # pick, 2026-11-01, provisional
 "r2.kappa" = 1.708
+# The atlas's authored form (track B, 2026-11-01; docs/experiments/code/2026-11-01-atlas/picks.toml).
+# Accepted by the user (2026-11-01): the relay from age 10, its relays curving 30 over 30 (a lower fork,
+# a rounder, broader head). Sheets in docs/experiments/figures/, seeds 1-3; each rule is off by default in the core.
+"r2.relay" = 2  # ADR 0033; 2026-11-01-atlas-combined-maple-{60,100}.png, the relayAge 10 column
+"r2.relayAge" = 10  # 2026-11-01-atlas-combined-maple-{60,100}.png, the relayAge 10 column
+"r2.relayPTerm" = 0.6  # 2026-11-01-atlas-combined-maple-{60,100}.png
+"r2.levels.0.curve" = 30  # ADR 0034; 2026-11-01-atlas-combined-maple-{60,100}.png
+"r2.levels.0.curveLength" = 30  # 2026-11-01-atlas-combined-maple-{60,100}.png
 
 # Held out: never in the loss, checked after the fit (analysis/experiments/m27_holdout.py).
 [holdout]

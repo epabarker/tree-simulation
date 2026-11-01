@@ -247,6 +247,12 @@ hi = 4
 "r2.aC" = 3.012
 "r2.dLambda" = 0.02422
 "r2.kappa" = 1.62
+# The atlas's authored form (track B, 2026-11-01; docs/experiments/code/2026-11-01-atlas/picks.toml).
+# Accepted by the user (2026-11-01): pendulous twigs on willow's own twig set point (54.03, unchanged),
+# twig laterals every second node. Sheets in docs/experiments/figures/, seeds 1-3; each rule is off by default in the core.
+"r2.levels.2.pendulous" = 140  # ADR 0035; 2026-11-01-atlas-combined-willow-{60,100}.png, the lateralEvery 2 column
+"r2.levels.2.pendulousRadius" = 0.01  # 2026-11-01-atlas-combined-willow-{60,100}.png
+"r2.levels.2.lateralEvery" = 2  # ADR 0036; 2026-11-01-atlas-combined-willow-{60,100}.png, the lateralEvery 2 column
 
 # Held out: never in the loss, checked after the fit (analysis/experiments/m27_holdout.py).
 [holdout]

@@ -220,9 +220,10 @@ lo = 0.05
 hi = 1
 log = true
 [[formRange]]
+# Pinned at the atlas pick (2026-11-01, was 40-160): the sweep cannot move it.
 path = "r2.levels.2.setPoint"
-lo = 40
-hi = 160
+lo = 45
+hi = 45
 [[formRange]]
 path = "r2.aC"
 lo = 0
@@ -260,10 +261,19 @@ hi = 4
 "r2.levels.1.postureSetPoint" = 50  # pick, 2026-11-01, provisional
 "r2.levels.1.branchAngle" = 42.94
 "r2.levels.1.eta" = 0.2434
-"r2.levels.2.setPoint" = 144.8
+"r2.levels.2.setPoint" = 45  # atlas pick (2026-11-01; was round 2's 144.8): atlas-pendulous-*.png, only the thin axes hang
 "r2.aC" = 24.32
 "r2.dLambda" = 0.07812
 "r2.kappa" = 0.5545
+# The atlas's authored form (track B, 2026-11-01; docs/experiments/code/2026-11-01-atlas/picks.toml).
+# Accepted by the user: "birch's direction with levels.2.lateralEvery 3 (4 noted as the sparser
+# alternative)". Sheets in docs/experiments/figures/, seeds 1-3; each rule is off by default in the core.
+"r2.levels.2.pendulous" = 140  # ADR 0035; 2026-11-01-atlas-pendulous-*.png
+"r2.levels.2.pendulousRadius" = 0.01  # 2026-11-01-atlas-pendulous-*.png
+# 2 in place of the accepted 3 (the user, 2026-11-01): under 3 the fit pinned r0 at its top (0.0125) from LM 6
+# on, loss floor 12.3 with 1 target in band (5.1 with 4 under the old form): fewer tips per limb, so a thinner
+# trunk (r0 √tips) and less leaf area. 2 keeps most of the texture with about half the tip deficit.
+"r2.levels.2.lateralEvery" = 2  # ADR 0036; 2026-11-01-atlas-combined-birch-{60,100}.png, the lateralEvery 2 column; atlas-twigs-{60,100}.png
 
 # Held out: never in the loss, checked after the fit (analysis/experiments/m27_holdout.py).
 [holdout]

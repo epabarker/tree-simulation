@@ -135,17 +135,18 @@ describe("seasons (M17)", () => {
     const autumn = play(scene, 0.4, 0.6);
     const turned = (k: number) => (autumn.turn[k] as number) > 0.5;
     expect(share(autumn, "birch", turned)).toBeGreaterThan(share(autumn, "oak", turned) + 0.2);
-    // In winter the young beech still holds its leaves, turned; birch and oak stand bare.
+    // In winter the young beech and the young oak still hold their leaves, turned (marcescence;
+    // oak's since track C); birch stands bare.
     const winter = play(scene, 0.6, 0.95);
     const p = (name: string) => LEAF_PALETTES.indexOf(name as (typeof LEAF_PALETTES)[number]);
-    let beech = 0;
-    let others = 0;
+    const held = { beech: 0, oak: 0, birch: 0 };
     for (let k = 0; k < winter.count - scene.fallenLeaves; k++) {
       if ((winter.size[k] as number) <= 0) continue;
-      if (winter.palette[k] === p("beech")) beech++;
-      else others++;
+      for (const name of ["beech", "oak", "birch"] as const)
+        if (winter.palette[k] === p(name)) held[name]++;
     }
-    expect(beech).toBeGreaterThan(50);
-    expect(others).toBe(0);
+    expect(held.beech).toBeGreaterThan(50);
+    expect(held.oak).toBeGreaterThan(50);
+    expect(held.birch).toBe(0);
   });
 });

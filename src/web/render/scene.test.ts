@@ -170,6 +170,33 @@ describe("Leaf styles (page only, per species)", () => {
     scene.leafStyle = LEAF_STYLES.broadleaf;
   });
 
+  it("clumps the cards per species without adding or removing one (track C)", () => {
+    scene.computeGeometry(1);
+    const count = (style: (typeof LEAF_STYLES)[keyof typeof LEAF_STYLES]) => {
+      scene.leafStyle = style;
+      const l = scene.leaves(3, 1);
+      let drawn = 0;
+      for (let k = 0; k < l.count; k++) if (l.size[k] > 0) drawn++;
+      return { drawn, l };
+    };
+    const { young, rosettes } = leafSites(scene, 3);
+    for (const style of Object.values(LEAF_STYLES)) {
+      const per = style.xray === 2 ? 2 : 1;
+      expect(count(style).drawn).toBe(per * young + 2 * rosettes);
+    }
+    // Birch's cards hang: on average they point downward; oak's gather off their own tips.
+    const birch = count(LEAF_STYLES.small).l;
+    let uy = 0;
+    let n = 0;
+    for (let k = 0; k < birch.count; k++) {
+      if (birch.size[k] <= 0) continue;
+      uy += birch.uy[k] as number;
+      n++;
+    }
+    expect(uy / n).toBeLessThan(-0.2);
+    scene.leafStyle = LEAF_STYLES.broadleaf;
+  });
+
   it("names a known style for every preset that asks for one", () => {
     for (const preset of Object.values(presets) as { leaf?: string }[]) {
       if (preset.leaf !== undefined) expect(isLeafStyleName(preset.leaf)).toBe(true);

@@ -320,6 +320,13 @@ export class Scene {
     /** The style each leaf is drawn in (an index into `styles`), and whether it stays on in winter. */
     kind: new Uint8Array(0),
     keep: new Uint8Array(0),
+    /**
+     * Clumping (LeafClump): the metamer whose tip the card is drawn toward, the share of the way it
+     * goes, and the share of its own metamer it sits back from the tip.
+     */
+    end: new Int32Array(0),
+    pull: new Float32Array(0),
+    back: new Float32Array(0),
     styles: [] as LeafStyle[],
   };
   private leafList: Leaves = {
@@ -1006,6 +1013,8 @@ export class Scene {
     const tau = this.tau;
     const palettes = L.styles.map((st) => LEAF_PALETTES.indexOf(st.palette));
     const shapes = L.styles.map((st) => LEAF_SHAPES.indexOf(st.shape));
+    const hangOf = L.styles.map((st) => st.clump?.hang ?? 0);
+    const levelOf = L.styles.map((st) => st.clump?.level ?? 0);
     if (this.seasons && tau < this.lastTau) this.fallen.count = 0; // a new year: last year's litter is gone
     const g = this.geom;
     out.slices.set(L.slices);
@@ -1047,6 +1056,20 @@ export class Scene {
         dx = 1; // atan2(0, 0) = 0: a shoot of no length points along +x
         dy = 0;
       }
+      // Where the card sits (LeafClump): back along its metamer, then drawn toward its shoot's tip.
+      let px = g.tipX[j] as number;
+      let py = g.tipY[j] as number;
+      const back = L.back[i] as number;
+      if (back > 0) {
+        px -= (px - g.baseX[j]) * back;
+        py -= (py - g.baseY[j]) * back;
+      }
+      const e = L.end[i] as number;
+      if (e !== j) {
+        const pull = L.pull[i] as number;
+        px += (g.tipX[e] - px) * pull;
+        py += (g.tipY[e] - py) * pull;
+      }
       let a = L.a[i] as number;
       let b = L.b[i] as number;
       if (this.wind) {
@@ -1059,10 +1082,27 @@ export class Scene {
         b += a * f;
         a = na;
       }
-      out.x[k] = g.tipX[j];
-      out.y[k] = g.tipY[j];
-      out.ux[k] = a * dx - b * dy;
-      out.uy[k] = a * dy + b * dx;
+      let ux = a * dx - b * dy;
+      let uy = a * dy + b * dx;
+      // Hanging strings and level sprays (LeafClump): the card turns toward down, or toward level.
+      const hang = hangOf[kind] as number;
+      const level = levelOf[kind] as number;
+      if (hang > 0 || level > 0) {
+        ux = (1 - hang - level) * ux + level * (ux < 0 ? -1 : 1);
+        uy = (1 - hang - level) * uy - hang;
+        const n = Math.sqrt(ux * ux + uy * uy);
+        if (n > 1e-6) {
+          ux /= n;
+          uy /= n;
+        } else {
+          ux = 0;
+          uy = -1;
+        }
+      }
+      out.x[k] = px;
+      out.y[k] = py;
+      out.ux[k] = ux;
+      out.uy[k] = uy;
       out.size[k] = size * L.scale[i];
       out.color[k] = L.color[i];
       out.turn[k] = turn;
@@ -1151,12 +1191,23 @@ export class Scene {
     // Each tree is drawn as its species (M19), resolved once per tree into arrays by tree id.
     const { styles, kindOf } = this.treeStyles(s);
     const keepOf = new Uint8Array(kindOf.length);
+    // Marcescence by height on the tree (`marcescentBelow`): leaves on wood below this keep on.
+    const keepBelow = new Float32Array(kindOf.length);
     for (const m of s.metrics) {
       const own = styles[kindOf[m.tree] as number] as LeafStyle;
       keepOf[m.tree] = own.marcescent !== undefined && m.height < own.marcescent ? 1 : 0;
+      keepBelow[m.tree] = (own.marcescentBelow ?? 0) * m.height;
     }
+    // Each metamer's continuation (its child of the same order, the axis going on), for `gather`.
+    const cont = new Int32Array(n).fill(-1);
+    for (let j = 0; j < n; j++) {
+      const p = s.parent[j] as number;
+      if (p >= 0 && cont[p] < 0 && s.order[j] === s.order[p]) cont[p] = j;
+    }
+    const clumpOf = styles.map((st) => st.clump ?? {});
     // Per kind: the leaf's turn from its shoot, its length relative to the view's style (the
     // renderers draw at the latter), and whether it carries a leaf each side.
+    const spreadOf = styles.map((st) => st.spread);
     const along = styles.map((st) => Math.cos(st.spread));
     const across = styles.map((st) => Math.sin(st.spread));
     const lengthOf = styles.map((st) => st.length / style.length);
@@ -1173,6 +1224,9 @@ export class Scene {
       L.keep = new Uint8Array(2 * cap);
       L.slice = new Uint8Array(2 * cap);
       L.at = new Int32Array(2 * cap);
+      L.end = new Int32Array(2 * cap);
+      L.pull = new Float32Array(2 * cap);
+      L.back = new Float32Array(2 * cap);
     }
     L.styles = styles;
     let maxLight = 0;
@@ -1191,14 +1245,33 @@ export class Scene {
       const kind = kindOf[tree] as number;
       const hx = s.dirX[j] as number;
       const hy = s.dirY[j] as number;
+      const c = clumpOf[kind] as NonNullable<LeafStyle["clump"]>;
+      // The page's own variation per card (never the model's): its fan, its place, its size.
+      const id = s.birthId[j] as number;
+      const salt = (side > 0 ? 11 : 17) + 5 * rosette;
       L.metamer[k] = j;
-      L.a[k] = along[kind] as number;
-      L.b[k] = side * (across[kind] as number);
+      if (c.fan) {
+        const angle = side * (spreadOf[kind] as number) + c.fan * (2 * hash01(tree, id, salt) - 1);
+        L.a[k] = Math.cos(angle);
+        L.b[k] = Math.sin(angle);
+      } else {
+        L.a[k] = along[kind] as number;
+        L.b[k] = side * (across[kind] as number);
+      }
       L.color[k] = Math.max(0, Math.min(RAMP_STEPS - 1, color));
       L.rosette[k] = rosette;
       L.kind[k] = kind;
-      L.keep[k] = keepOf[tree] as number;
-      L.scale[k] = Math.sqrt(hx * hx + hy * hy) * (lengthOf[kind] as number);
+      const below = keepBelow[tree] as number;
+      L.keep[k] = keepOf[tree] || (below > 0 && (s.y0[j] as number) < below) ? 1 : 0;
+      const vary = c.vary ? 1 + c.vary * (2 * hash01(tree, id, salt + 1) - 1) : 1;
+      L.scale[k] = Math.sqrt(hx * hx + hy * hy) * (lengthOf[kind] as number) * vary;
+      // A rosette sits on its short shoot; a shoot's cards spread back and gather toward its tip.
+      let end = j;
+      if (!rosette && c.gather)
+        for (let r = c.reach ?? 2; r > 0 && cont[end] >= 0; r--) end = cont[end];
+      L.end[k] = end;
+      L.pull[k] = end !== j ? (c.gather ?? 0) : 0;
+      L.back[k] = !rosette && c.along ? c.along * hash01(tree, id, salt + 2) : 0;
       L.slice[k] = depthSlice(s.z0[j] as number, s.depth);
       k++;
     };

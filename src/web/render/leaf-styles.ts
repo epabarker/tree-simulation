@@ -134,6 +134,28 @@ export const LEAF_PALETTES: readonly LeafPalette[] = [
   "pine",
 ];
 
+/**
+ * How a species' leaf cards gather along a shoot and at its end (track C, after the species cards'
+ * clumping row: oak's clots at the shoot tips, rowan's rosettes, pine's tufts, birch's hanging
+ * strings, beech's flat sprays). It moves and turns the cards a young metamer carries; it never adds
+ * or removes one (ADR 0024: one card per leafy bud), and the light model never sees it.
+ */
+export interface LeafClump {
+  /** Each card moves this share of the way from its metamer's tip to its shoot's tip, up to `reach` metamers on. */
+  gather?: number;
+  reach?: number;
+  /** Cards spread back along their metamer: a card sits up to this share of the way down from its tip. */
+  along?: number;
+  /** A card's angle to its shoot varies by up to ± this many radians: a rosette's or a clot's fan. */
+  fan?: number;
+  /** Pull of each card toward hanging straight down (birch's strings), 0 → 1. */
+  hang?: number;
+  /** Pull of each card toward level, either side of its shoot (beech's flat sprays), 0 → 1. */
+  level?: number;
+  /** Cards vary in size by up to ± this share: the texture of a crown of leaves of many ages. */
+  vary?: number;
+}
+
 export interface LeafStyle {
   /** Full leaf length in world units (one unit = one internode), and width over length. */
   length: number;
@@ -166,6 +188,13 @@ export interface LeafStyle {
    * the leaves stay on.
    */
   marcescent?: number;
+  /**
+   * Marcescence on the lower crown of older trees as well (oak: "young trees, coppice and low
+   * epicormic branches", BSBI): leaves on wood below this share of the tree's height stay on.
+   */
+  marcescentBelow?: number;
+  /** How the cards gather on a shoot (`LeafClump`); unset, one at each young metamer's tip. */
+  clump?: LeafClump;
   /** The species' wood (bark-styles.ts); unset, the view's single `--bark-young → --bark-old` ramp. */
   bark?: BarkPalette;
 }
@@ -194,6 +223,7 @@ export const LEAF_STYLES = {
     palette: "needle",
     leafAge: 8,
     deciduous: false,
+    clump: { along: 0.6, vary: 0.2 },
     bark: "fir",
   },
   /** Birch: small, triangular, toothed leaves; the first to flush and the first to turn yellow. */
@@ -209,9 +239,13 @@ export const LEAF_STYLES = {
     deciduous: true,
     flush: 0,
     turn: -0.03,
+    clump: { along: 0.8, hang: 0.55, fan: 0.3, vary: 0.3 },
     bark: "birch",
   },
-  /** Oak: lobed, dark leaves that flush late and turn russet late in autumn. */
+  /**
+   * Oak: lobed, dark leaves that flush late and turn russet late in autumn, clotted at the shoot tips
+   * where its buds crowd; young oaks and the lower crown keep them brown through the winter.
+   */
   oak: {
     length: 0.85,
     aspect: 0.55,
@@ -224,6 +258,9 @@ export const LEAF_STYLES = {
     deciduous: true,
     flush: 0.06,
     turn: 0.04,
+    marcescent: 20,
+    marcescentBelow: 0.3,
+    clump: { gather: 0.95, reach: 4, fan: 1, vary: 0.35 },
     bark: "oak",
   },
   /** Beech: dense, oval, wavy-edged leaves that turn copper; young beeches keep them all winter. */
@@ -240,6 +277,7 @@ export const LEAF_STYLES = {
     flush: 0.03,
     turn: 0.01,
     marcescent: 30,
+    clump: { along: 0.6, level: 0.65, vary: 0.25 },
     bark: "beech",
   },
   /** Hornbeam: oval, pleated, doubly toothed leaves that turn yellow; young trees keep them in winter. */
@@ -256,6 +294,7 @@ export const LEAF_STYLES = {
     flush: 0.02,
     turn: 0.02,
     marcescent: 25,
+    clump: { along: 0.7, level: 0.35, vary: 0.25 },
     bark: "hornbeam",
   },
   /** Field maple: small five-lobed leaves, as wide as long, that turn butter-yellow. */
@@ -271,6 +310,7 @@ export const LEAF_STYLES = {
     deciduous: true,
     flush: 0.02,
     turn: 0,
+    clump: { along: 0.7, fan: 0.3, vary: 0.3 },
     bark: "maple",
   },
   /** Holly: dark, glossy, spiny evergreen leaves kept for several years. */
@@ -284,6 +324,7 @@ export const LEAF_STYLES = {
     palette: "holly",
     leafAge: 6,
     deciduous: false,
+    clump: { along: 0.6, fan: 0.35, vary: 0.2 },
     bark: "holly",
   },
   /** Rowan: long compound leaves of paired leaflets; early to flush, early to turn scarlet. */
@@ -299,6 +340,7 @@ export const LEAF_STYLES = {
     deciduous: true,
     flush: 0.01,
     turn: -0.02,
+    clump: { gather: 0.95, reach: 3, fan: 1.3, vary: 0.25 },
     bark: "rowan",
   },
   /** Goat willow: broad, oval, grey-green leaves (not a narrow willow leaf) that turn dull yellow. */
@@ -314,6 +356,7 @@ export const LEAF_STYLES = {
     deciduous: true,
     flush: 0.01,
     turn: 0.02,
+    clump: { along: 0.7, fan: 0.25, vary: 0.3 },
     bark: "willow",
   },
   /** Scots pine: paired, blue-green needles, longer than a fir's, kept about three years. */
@@ -327,6 +370,7 @@ export const LEAF_STYLES = {
     palette: "pine",
     leafAge: 3,
     deciduous: false,
+    clump: { gather: 0.85, reach: 4, fan: 0.9, vary: 0.2 },
     bark: "pine",
   },
   /** Terminalia-like: large, glossy leaves crowded at the shoot tips. */

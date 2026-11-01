@@ -1,0 +1,506 @@
+{
+ "tree-aij.png": {
+  "leaves": true,
+  "season": 100,
+  "seed": 3,
+  "source": "hornbeam",
+  "trial": "lone"
+ },
+ "tree-aol.png": {
+  "leaves": true,
+  "season": 100,
+  "seed": 1,
+  "source": "beech-today",
+  "trial": "stand"
+ },
+ "tree-ask.png": {
+  "leaves": true,
+  "season": 100,
+  "seed": 1,
+  "source": "fir",
+  "trial": "lone"
+ },
+ "tree-ayp.png": {
+  "leaves": false,
+  "season": 100,
+  "seed": 2,
+  "source": "birch",
+  "trial": "lone"
+ },
+ "tree-bim.png": {
+  "leaves": true,
+  "season": 60,
+  "seed": 2,
+  "source": "birch",
+  "trial": "lone"
+ },
+ "tree-bxq.png": {
+  "leaves": true,
+  "season": 100,
+  "seed": 1,
+  "source": "birch",
+  "trial": "stand"
+ },
+ "tree-ccs.png": {
+  "leaves": true,
+  "season": 100,
+  "seed": 2,
+  "source": "birch",
+  "trial": "lone"
+ },
+ "tree-cdu.png": {
+  "leaves": true,
+  "season": 60,
+  "seed": 1,
+  "source": "beech-today",
+  "trial": "lone"
+ },
+ "tree-cfi.png": {
+  "leaves": false,
+  "season": 100,
+  "seed": 3,
+  "source": "hornbeam",
+  "trial": "lone"
+ },
+ "tree-cho.png": {
+  "leaves": true,
+  "season": 100,
+  "seed": 2,
+  "source": "hornbeam",
+  "trial": "stand"
+ },
+ "tree-cqy.png": {
+  "leaves": true,
+  "season": 100,
+  "seed": 1,
+  "source": "beech-today",
+  "trial": "lone"
+ },
+ "tree-djs.png": {
+  "leaves": true,
+  "season": 100,
+  "seed": 3,
+  "source": "beech-today",
+  "trial": "lone"
+ },
+ "tree-dnb.png": {
+  "leaves": false,
+  "season": 100,
+  "seed": 1,
+  "source": "beech-repair",
+  "trial": "lone"
+ },
+ "tree-ejr.png": {
+  "leaves": true,
+  "season": 100,
+  "seed": 3,
+  "source": "oak",
+  "trial": "lone"
+ },
+ "tree-ffk.png": {
+  "leaves": true,
+  "season": 60,
+  "seed": 2,
+  "source": "oak",
+  "trial": "lone"
+ },
+ "tree-ffx.png": {
+  "leaves": false,
+  "season": 100,
+  "seed": 2,
+  "source": "oak",
+  "trial": "lone"
+ },
+ "tree-fvw.png": {
+  "leaves": true,
+  "season": 60,
+  "seed": 2,
+  "source": "hornbeam",
+  "trial": "lone"
+ },
+ "tree-fxi.png": {
+  "leaves": true,
+  "season": 100,
+  "seed": 1,
+  "source": "hornbeam",
+  "trial": "lone"
+ },
+ "tree-fyw.png": {
+  "leaves": true,
+  "season": 60,
+  "seed": 1,
+  "source": "fir",
+  "trial": "lone"
+ },
+ "tree-grv.png": {
+  "leaves": false,
+  "season": 100,
+  "seed": 3,
+  "source": "beech-repair",
+  "trial": "lone"
+ },
+ "tree-gsw.png": {
+  "leaves": false,
+  "season": 100,
+  "seed": 3,
+  "source": "fir",
+  "trial": "lone"
+ },
+ "tree-hac.png": {
+  "leaves": true,
+  "season": 100,
+  "seed": 3,
+  "source": "birch",
+  "trial": "stand"
+ },
+ "tree-iop.png": {
+  "leaves": true,
+  "season": 60,
+  "seed": 1,
+  "source": "oak",
+  "trial": "lone"
+ },
+ "tree-jpt.png": {
+  "leaves": true,
+  "season": 100,
+  "seed": 3,
+  "source": "oak",
+  "trial": "stand"
+ },
+ "tree-jwg.png": {
+  "leaves": true,
+  "season": 100,
+  "seed": 3,
+  "source": "fir",
+  "trial": "lone"
+ },
+ "tree-kdp.png": {
+  "leaves": false,
+  "season": 100,
+  "seed": 1,
+  "source": "hornbeam",
+  "trial": "lone"
+ },
+ "tree-ksv.png": {
+  "leaves": true,
+  "season": 60,
+  "seed": 3,
+  "source": "birch",
+  "trial": "lone"
+ },
+ "tree-lkq.png": {
+  "leaves": true,
+  "season": 100,
+  "seed": 2,
+  "source": "hornbeam",
+  "trial": "lone"
+ },
+ "tree-lkv.png": {
+  "leaves": true,
+  "season": 60,
+  "seed": 3,
+  "source": "oak",
+  "trial": "lone"
+ },
+ "tree-mdm.png": {
+  "leaves": true,
+  "season": 100,
+  "seed": 3,
+  "source": "birch",
+  "trial": "lone"
+ },
+ "tree-mqg.png": {
+  "leaves": true,
+  "season": 100,
+  "seed": 2,
+  "source": "fir",
+  "trial": "lone"
+ },
+ "tree-mqz.png": {
+  "leaves": true,
+  "season": 100,
+  "seed": 3,
+  "source": "fir",
+  "trial": "stand"
+ },
+ "tree-nem.png": {
+  "leaves": false,
+  "season": 100,
+  "seed": 2,
+  "source": "hornbeam",
+  "trial": "lone"
+ },
+ "tree-nii.png": {
+  "leaves": true,
+  "season": 60,
+  "seed": 3,
+  "source": "hornbeam",
+  "trial": "lone"
+ },
+ "tree-nqy.png": {
+  "leaves": true,
+  "season": 60,
+  "seed": 3,
+  "source": "fir",
+  "trial": "lone"
+ },
+ "tree-nux.png": {
+  "leaves": true,
+  "season": 100,
+  "seed": 2,
+  "source": "beech-today",
+  "trial": "lone"
+ },
+ "tree-oli.png": {
+  "leaves": true,
+  "season": 60,
+  "seed": 2,
+  "source": "fir",
+  "trial": "lone"
+ },
+ "tree-omb.png": {
+  "leaves": true,
+  "season": 100,
+  "seed": 2,
+  "source": "oak",
+  "trial": "stand"
+ },
+ "tree-pdv.png": {
+  "leaves": true,
+  "season": 100,
+  "seed": 2,
+  "source": "fir",
+  "trial": "stand"
+ },
+ "tree-poo.png": {
+  "leaves": false,
+  "season": 100,
+  "seed": 1,
+  "source": "birch",
+  "trial": "lone"
+ },
+ "tree-qbu.png": {
+  "leaves": true,
+  "season": 100,
+  "seed": 3,
+  "source": "beech-repair",
+  "trial": "stand"
+ },
+ "tree-qpc.png": {
+  "leaves": true,
+  "season": 100,
+  "seed": 1,
+  "source": "oak",
+  "trial": "lone"
+ },
+ "tree-qrn.png": {
+  "leaves": false,
+  "season": 100,
+  "seed": 3,
+  "source": "beech-today",
+  "trial": "lone"
+ },
+ "tree-qzt.png": {
+  "leaves": true,
+  "season": 60,
+  "seed": 3,
+  "source": "beech-today",
+  "trial": "lone"
+ },
+ "tree-scm.png": {
+  "leaves": true,
+  "season": 60,
+  "seed": 1,
+  "source": "beech-repair",
+  "trial": "lone"
+ },
+ "tree-skz.png": {
+  "leaves": true,
+  "season": 100,
+  "seed": 3,
+  "source": "beech-repair",
+  "trial": "lone"
+ },
+ "tree-src.png": {
+  "leaves": true,
+  "season": 60,
+  "seed": 2,
+  "source": "beech-today",
+  "trial": "lone"
+ },
+ "tree-swu.png": {
+  "leaves": true,
+  "season": 100,
+  "seed": 1,
+  "source": "fir",
+  "trial": "stand"
+ },
+ "tree-szo.png": {
+  "leaves": true,
+  "season": 60,
+  "seed": 3,
+  "source": "beech-repair",
+  "trial": "lone"
+ },
+ "tree-teh.png": {
+  "leaves": true,
+  "season": 100,
+  "seed": 1,
+  "source": "oak",
+  "trial": "stand"
+ },
+ "tree-tog.png": {
+  "leaves": true,
+  "season": 100,
+  "seed": 2,
+  "source": "beech-repair",
+  "trial": "lone"
+ },
+ "tree-tzl.png": {
+  "leaves": false,
+  "season": 100,
+  "seed": 1,
+  "source": "fir",
+  "trial": "lone"
+ },
+ "tree-umw.png": {
+  "leaves": false,
+  "season": 100,
+  "seed": 3,
+  "source": "birch",
+  "trial": "lone"
+ },
+ "tree-uuf.png": {
+  "leaves": true,
+  "season": 100,
+  "seed": 1,
+  "source": "beech-repair",
+  "trial": "lone"
+ },
+ "tree-uus.png": {
+  "leaves": true,
+  "season": 60,
+  "seed": 1,
+  "source": "hornbeam",
+  "trial": "lone"
+ },
+ "tree-vhv.png": {
+  "leaves": true,
+  "season": 100,
+  "seed": 2,
+  "source": "beech-today",
+  "trial": "stand"
+ },
+ "tree-vnl.png": {
+  "leaves": true,
+  "season": 60,
+  "seed": 1,
+  "source": "birch",
+  "trial": "lone"
+ },
+ "tree-vra.png": {
+  "leaves": false,
+  "season": 100,
+  "seed": 1,
+  "source": "beech-today",
+  "trial": "lone"
+ },
+ "tree-wap.png": {
+  "leaves": true,
+  "season": 100,
+  "seed": 1,
+  "source": "hornbeam",
+  "trial": "stand"
+ },
+ "tree-wey.png": {
+  "leaves": true,
+  "season": 100,
+  "seed": 3,
+  "source": "hornbeam",
+  "trial": "stand"
+ },
+ "tree-wnr.png": {
+  "leaves": true,
+  "season": 100,
+  "seed": 1,
+  "source": "birch",
+  "trial": "lone"
+ },
+ "tree-wrn.png": {
+  "leaves": true,
+  "season": 100,
+  "seed": 2,
+  "source": "beech-repair",
+  "trial": "stand"
+ },
+ "tree-wuk.png": {
+  "leaves": false,
+  "season": 100,
+  "seed": 2,
+  "source": "fir",
+  "trial": "lone"
+ },
+ "tree-xgj.png": {
+  "leaves": true,
+  "season": 100,
+  "seed": 2,
+  "source": "birch",
+  "trial": "stand"
+ },
+ "tree-xnq.png": {
+  "leaves": false,
+  "season": 100,
+  "seed": 3,
+  "source": "oak",
+  "trial": "lone"
+ },
+ "tree-ycd.png": {
+  "leaves": false,
+  "season": 100,
+  "seed": 1,
+  "source": "oak",
+  "trial": "lone"
+ },
+ "tree-ymq.png": {
+  "leaves": true,
+  "season": 60,
+  "seed": 2,
+  "source": "beech-repair",
+  "trial": "lone"
+ },
+ "tree-ytd.png": {
+  "leaves": false,
+  "season": 100,
+  "seed": 2,
+  "source": "beech-today",
+  "trial": "lone"
+ },
+ "tree-yug.png": {
+  "leaves": true,
+  "season": 100,
+  "seed": 1,
+  "source": "beech-repair",
+  "trial": "stand"
+ },
+ "tree-zdj.png": {
+  "leaves": true,
+  "season": 100,
+  "seed": 3,
+  "source": "beech-today",
+  "trial": "stand"
+ },
+ "tree-ztf.png": {
+  "leaves": false,
+  "season": 100,
+  "seed": 2,
+  "source": "beech-repair",
+  "trial": "lone"
+ },
+ "tree-zyw.png": {
+  "leaves": true,
+  "season": 100,
+  "seed": 2,
+  "source": "oak",
+  "trial": "lone"
+ }
+}

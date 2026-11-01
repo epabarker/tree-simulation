@@ -38,6 +38,7 @@ A review of the round on `claude/fresh-look-beech` (head 83f15cb before this rev
 - `e6c5524`: two tests. A leader grown at full vigour ends and its top laterals leave at `forkAngle`, and below the threshold it grows on; the relay gate's s̄ is 0 for a tree alone and positive for the middle of three.
 - `cddca9b`: ADRs 0039–0043, proposed, one per rule; the code comments point at them and mark the two unread citations.
 - `f0ed127`: the `beechOpen` preset and two golden cases (§6).
+- **Checks, after the fixes:** the full `npm run check` in one go (Rust fmt, clippy, 134 tests with and without threads, the 16 goldens natively and in WASM, lint, typecheck, 83 vitest tests) and the Python tests (8) pass. The round had run `check`'s parts but not the whole, nor the Python tests.
 
 ## 5. Botany
 

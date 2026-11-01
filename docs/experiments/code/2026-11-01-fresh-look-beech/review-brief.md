@@ -1,5 +1,7 @@
 # Review brief: the fresh-look beech round (for an independent reviewer)
 
+**Reviewed 2026-11-01:** [the review](../../2026-11-01-fresh-look-beech-review.md) (what was reproduced, where this brief is wrong, 20-seed evidence, the garden, ADRs 0039–0043).
+
 You are reviewing one round of work on a tree-growth simulator. You did not do it. Judge the work and
 the claims made about it; do not take the summaries below as true without checking them against the
 repository. Where this brief and the code disagree, the code wins: say so.

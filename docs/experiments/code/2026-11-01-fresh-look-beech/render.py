@@ -249,7 +249,11 @@ def main() -> None:
     ap.add_argument("--label", default=None)
     ap.add_argument("--workers", type=int, default=2)
     ap.add_argument("--no-run", action="store_true")
+    ap.add_argument("--lone-width", type=int, default=160,
+                    help="the lone world's width (default 160, the species harness's); wider lets a broad crown clear the sides")
     a = ap.parse_args()
+    LONE = globals()
+    LONE["LONE_W"] = a.lone_width
     seeds = [int(s) for s in a.seeds.split(",")]
     out = Path(a.out)
     assigns = json.loads(Path(a.assign).read_text()) if a.assign else None

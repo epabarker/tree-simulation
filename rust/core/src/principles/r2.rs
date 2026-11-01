@@ -18,7 +18,13 @@
 //! arches over (beech's fan, oak's spread), a negative curve sweeps up. The trunk (order 0) is
 //! exempt: it is the one axis that stays straight; a relay (order ≥ 1 at pa 0) curves.
 //!
-//! Params: r2.enabled, r2.levels (curve, curveLength), r2.aC, r2.dLambda, r2.ramp, r2.kappa, r2.relay,
+//! Pendulous twigs (ADR 0035, proposed): a level's `pendulous` set point is taken, in growth and
+//! posture, by its thin axes: fully at pipe radius ≤ `pendulousRadius`, fading to the level's
+//! own set point at twice it. Twigs hang (birch's curtains, the willow's) without taking the
+//! scaffold with them, which one set point per level cannot do (≥ 80 for level 2 collapses
+//! every broadleaf: the form-sweep review). The trunk (order 0) never hangs.
+//!
+//! Params: r2.enabled, r2.levels (curve, curveLength, pendulous, pendulousRadius), r2.aC, r2.dLambda, r2.ramp, r2.kappa, r2.relay,
 //! r2.relayAge, r2.relayPTerm; c1.branchAngle, c3.lambda, c4.setPoint, c4.eta when off.
 
 use crate::math;
@@ -213,6 +219,38 @@ pub fn curved(set_point: f64, offset: f64) -> f64 {
         return set_point;
     }
     math::max(0.0, math::min(180.0, set_point + offset))
+}
+
+/// True if axes of physiological age `pa` have a pendulous set point.
+pub fn hangs(pa: f64, params: &Params) -> bool {
+    pa_level(pa, &params.r2).is_some_and(|l| l.pendulous.is_some())
+}
+
+/// A set point (degrees) of an axis of branching order `order` and physiological age `pa`,
+/// moved toward its level's pendulous set point by the thinness of wood of radius `radius`.
+pub fn pendulous_set_point(
+    set_point: f64,
+    order: f64,
+    pa: f64,
+    radius: f64,
+    params: &Params,
+) -> f64 {
+    if order <= 0.0 {
+        return set_point;
+    }
+    let Some(level) = pa_level(pa, &params.r2) else {
+        return set_point;
+    };
+    let Some(hang) = level.pendulous else {
+        return set_point;
+    };
+    let r_t = level.pendulous_radius.unwrap_or(0.01);
+    let w = if r_t > 0.0 {
+        math::max(0.0, math::min(1.0, (2.0 * r_t - radius) / r_t))
+    } else {
+        0.0
+    };
+    set_point + w * (hang - set_point)
 }
 
 /// Acrotony weights exp(κ(pos − 1)) per metamer in `tree.scratch_f` (first nm entries), pos its
@@ -495,5 +533,48 @@ mod tests {
         );
         assert!(curved[0] < curved[1] && curved[1] < curved[2], "{curved:?}");
         assert!(curved[2] > 90.0, "{curved:?}");
+    }
+
+    #[test]
+    fn hangs_thin_axes_and_lets_thick_ones_rise_to_the_level() {
+        let p = with_r2(
+            &[
+                r#"{"pendulous":150}"#,
+                r#"{"setPoint":40,"pendulous":150,"pendulousRadius":0.01}"#,
+            ],
+            "",
+        );
+        assert_eq!(pendulous_set_point(0.0, 0.0, 0.0, 0.0, &p), 0.0); // the trunk never hangs
+        assert_eq!(pendulous_set_point(40.0, 1.0, 1.0, 0.005, &p), 150.0); // thin: hangs fully
+        assert_eq!(pendulous_set_point(40.0, 1.0, 1.0, 0.01, &p), 150.0);
+        assert!((pendulous_set_point(40.0, 1.0, 1.0, 0.015, &p) - 95.0).abs() < 1e-9);
+        assert_eq!(pendulous_set_point(40.0, 1.0, 1.0, 0.03, &p), 40.0); // a limb: its level's
+        assert!(hangs(1.0, &p));
+        let off = with_r2(&[r#"{}"#, r#"{"setPoint":40}"#], "");
+        assert!(!hangs(1.0, &off));
+        assert_eq!(pendulous_set_point(40.0, 1.0, 1.0, 0.0, &off), 40.0);
+    }
+
+    #[test]
+    fn a_new_twig_grows_down_where_its_level_hangs() {
+        use crate::geom::{UP, angle_between};
+        use crate::testing::{LEFT, bud, metamer};
+        use std::f64::consts::FRAC_PI_2;
+        let last_angle = |row: &str| {
+            let mut p = with_r2(&[r#"{}"#, row], "");
+            p.c4.enabled = true;
+            (p.c4.wd, p.c4.xi, p.c4.epsilon, p.c4.sigma) = (0.2, 0.0, 0.0, 0.0);
+            let mut t = Tree::new(0, 10.0, 0.5);
+            let m = metamer(&mut t, -1, slot::MAIN, FRAC_PI_2, 1.0, 0.02, 0.0);
+            let b = bud(&mut t, m, LEFT, FRAC_PI_2 + 0.785, 1.0);
+            t.ensure_scratch();
+            t.b.v[b] = 3.0;
+            crate::season::grow_buds(&mut t, &p, 1.0);
+            angle_between(t.heading(t.m.len() - 1), UP).to_degrees()
+        };
+        let level = last_angle(r#"{"setPoint":45,"eta":1}"#);
+        let hung = last_angle(r#"{"setPoint":45,"eta":1,"pendulous":160}"#);
+        assert!((level - 45.0).abs() < 2.0, "{level}");
+        assert!(hung > 120.0, "{hung}");
     }
 }

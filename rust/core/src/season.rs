@@ -20,7 +20,7 @@ use crate::principles::o4::stand_dynamics;
 use crate::principles::obstacles::clear_obstacles;
 use crate::principles::r1::{carbon_balance, starved_to_death};
 use crate::principles::r2::{
-    curve_offset, curved, direction_params, relay_depth, relay_on, relay_shift,
+    curve_offset, curved, direction_params, pendulous_set_point, relay_depth, relay_on, relay_shift,
 };
 use crate::principles::r3::update_mechanics;
 use crate::principles::r4::{aborts, growth_threshold, light_releases, released_shift};
@@ -480,6 +480,13 @@ pub fn grow_buds(tree: &mut Tree, params: &Params, season: f64) {
             } else {
                 0.0
             };
+            // R2's pendulous twigs (ADR 0035): a continuation is as thick as its host; a new axis
+            // as thin as can be.
+            let girth_of_host = if tree.b.slot[i] == slot::MAIN {
+                tree.m.radius[host]
+            } else {
+                0.0
+            };
             let length = shoot_length * elongation(shade, r5);
             let mut direct = |tree: &Tree, prev: V3, b: usize, id: f64| -> V3 {
                 if !c4.enabled {
@@ -493,6 +500,8 @@ pub fn grow_buds(tree: &mut Tree, params: &Params, season: f64) {
                     * uniform(seed, purpose::DIRECTION_NOISE, tid, id, season, 2.0);
                 let mut dir = direction_params(params, pa);
                 dir.set_point = curved(dir.set_point, curve_offset(bud_order, pa, node, params));
+                dir.set_point =
+                    pendulous_set_point(dir.set_point, bud_order, pa, girth_of_host, params);
                 node += 1.0;
                 if upright != 1.0 {
                     dir.set_point *= upright;

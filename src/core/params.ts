@@ -498,6 +498,17 @@ export interface PaLevel {
   curve?: number;
   /** With curve: the nodes (≈ cells) over which the curve accrues; absent, 20. */
   curveLength?: number;
+  /**
+   * Pendulous twigs (ADR 0035, proposed; §9's weeping and birch rows): the set point, degrees from
+   * vertical (> 90 hangs), that a thin axis of this level takes in growth and posture instead of
+   * its own: fully at pipe radius ≤ pendulousRadius, fading back to setPoint at twice it. Twigs
+   * hang; an axis that thickens into a limb rises to the level's angle. The trunk never hangs. A
+   * new lateral axis is as thin as can be; a continuation shoot is weighed by the metamer it
+   * grows from. Absent: off.
+   */
+  pendulous?: number;
+  /** With pendulous: the radius (cells) up to which an axis hangs fully; absent, 0.01. */
+  pendulousRadius?: number;
 }
 
 export const defaultParams: Params = {

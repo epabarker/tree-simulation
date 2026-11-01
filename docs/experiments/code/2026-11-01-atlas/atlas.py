@@ -72,6 +72,19 @@ RULES: dict[str, dict] = {
              {"r2.relay": 2, "r2.relayAge": 20, "r2.relayPTerm": 0.6, "r2.levels.0.curveLength": 30}),
         ],
     },
+    # ADR 0035: pendulous twigs. Centre: level 2's growth set point at 45 (so nothing hangs by it,
+    # unlike birch's 145 today), its thin axes hanging at 140 up to radius 0.01. The third row hangs
+    # level 1's thin ends as well (the scaffold's own set point unchanged).
+    "pendulous": {
+        "adr": "0035",
+        "base": {"r2.levels.2.setPoint": 45, "r2.levels.2.pendulous": 140,
+                 "r2.levels.2.pendulousRadius": 0.01},
+        "rows": [
+            ("r2.levels.2.pendulous", [100, 120, 140, 170]),
+            ("r2.levels.2.pendulousRadius", [0.005, 0.01, 0.02, 0.04]),
+            ("r2.levels.1.pendulous", [100, 120, 140, 170], {"r2.levels.1.pendulousRadius": 0.01}),
+        ],
+    },
 }
 
 

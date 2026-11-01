@@ -203,6 +203,10 @@ pub struct PaLevel {
     /// nodes of the axis. Absent or 0: off.
     pub curve: Option<f64>,
     pub curve_length: Option<f64>,
+    /// Pendulous twigs (ADR 0035): the set point (degrees) a thin axis of this level hangs at,
+    /// fully at radius ≤ `pendulous_radius`, fading to the level's own at twice it. Absent: off.
+    pub pendulous: Option<f64>,
+    pub pendulous_radius: Option<f64>,
 }
 
 #[derive(Clone, Debug)]
@@ -489,6 +493,8 @@ impl Params {
                         whorl: opt(l, "whorl"),
                         curve: opt(l, "curve"),
                         curve_length: opt(l, "curveLength"),
+                        pendulous: opt(l, "pendulous"),
+                        pendulous_radius: opt(l, "pendulousRadius"),
                     })
                     .collect(),
                 a_c: num(r2, "aC"),

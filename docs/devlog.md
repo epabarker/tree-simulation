@@ -2,6 +2,11 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-01: Track B (vocabulary): pendulous twigs (ADR 0035, proposed)
+
+- **`r2.levels[i].pendulous`, `pendulousRadius`** (r2.rs, season.rs, r3.rs): a level's thin axes take a hanging set point in growth and posture, blended back to the level's own by girth. Off by default; presets and goldens unchanged.
+- **The sheet** (`atlas.py pendulous`): at radius ≤ 0.01 the twigs hang without the collapse that `levels.2.setPoint` ≥ 80 caused; at 0.02–0.04 oak collapses again. The hanging is faint at the atlas's scale: birch's curtains need long thin shoots as well (twig density and length, next).
+
 ## 2026-11-01: Track B (vocabulary): curvature along the limb (ADR 0034, proposed)
 
 - **`r2.levels[i].curve`, `curveLength`** (r2.rs, season.rs, r3.rs): a level's growth and posture set points move by curve·min(1, node/curveLength) along each non-trunk axis. Off by default; presets and goldens unchanged.

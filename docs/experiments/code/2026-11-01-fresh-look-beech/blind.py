@@ -48,9 +48,11 @@ def main() -> None:
         label, folder = src.split("=", 1)
         for seed in [int(s) for s in a.seeds.split(",")]:
             for trial, season, leaves in VIEWS:
-                m, b, *_ = render.load(Path(folder) / f"{trial}-{seed}", season)
-                width = render.LONE_W if trial == "lone" else render.STAND_W
-                fig, ax = plt.subplots(figsize=(3.2 * width / render.LONE_W + 0.4, 4.2))
+                run = Path(folder) / f"{trial}-{seed}"
+                m, b, *_ = render.load(run, season)
+                # The world's own width (a run may use render.py's --lone-width), so no panel is cropped.
+                width = json.loads((run / "run.json").read_text())["params"]["world"]["width"]
+                fig, ax = plt.subplots(figsize=(3.2 * width / 160 + 0.4, 4.2))
                 render.draw(ax, m, b, width, leaves)
                 while True:
                     name = "".join(rng.choice(string.ascii_lowercase) for _ in range(3))

@@ -519,7 +519,8 @@ pub fn grow_buds(tree: &mut Tree, params: &Params, season: f64) {
                         None
                     };
                     let h = born.unwrap_or_else(|| {
-                        math::acos(math::max(-1.0, math::min(1.0, tree.b.hy[b]))).to_degrees()
+                        math::acos(math::max(-1.0, math::min(1.0, tree.b.hy[b])))
+                            * (180.0 / std::f64::consts::PI)
                     });
                     dir.set_point = h;
                 }

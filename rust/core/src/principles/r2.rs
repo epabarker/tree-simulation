@@ -193,7 +193,8 @@ pub fn arm_set_point(tree: &Tree, trunk: bool, pa: f64, m: usize, params: &Param
     let ids = &tree.m.birth_id[..n];
     let first = ids.binary_search(&axis).ok()?;
     let h = tree.heading(first);
-    Some(math::acos(math::max(-1.0, math::min(1.0, h[1]))).to_degrees())
+    // Degrees as form.rs takes them: one multiplication, the same bits as std's to_degrees.
+    Some(math::acos(math::max(-1.0, math::min(1.0, h[1]))) * (180.0 / std::f64::consts::PI))
 }
 
 /// True if the vigour drop (fresh-look beech) is on: λ falls in weak wood of a vigorous tree.

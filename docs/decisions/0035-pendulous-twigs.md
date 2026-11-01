@@ -1,6 +1,6 @@
 # 0035: Pendulous twigs: thin axes hang, limbs keep their level's angle
 
-- **Status:** accepted for beech/birch as authored in `docs/experiments/code/2026-11-01-atlas/picks.toml` (the user, 2026-11-01); off by default; adoption into the species patches is track D's at the next fit.
+- **Status:** accepted for birch and willow, the species that use it, in `docs/experiments/code/2026-11-01-atlas/picks.toml` (the user, 2026-11-01); off by default; adoption into the species patches is track D's at the next fit.
 - **Date:** 2026-11-01
 - **Related:** spec §C4.4 (A_set > 90° pendulous), §R3.4 (posture), §9 (weeping willow: "pendulous higher-order axes"; birch: "pendulous old twigs"); ADR 0009, ADR 0011, ADR 0029, ADR 0034. The form-sweep review: `levels.2.setPoint` ≥ 80 collapses every broadleaf (STATUS, open question). Track A's identity card ranks "pendulous twigs that do not take the limbs with them" second.
 - **Sheet:** `docs/experiments/figures/2026-11-01-atlas-pendulous-{60,100}.png`, from `uv run --project analysis python docs/experiments/code/2026-11-01-atlas/atlas.py pendulous`.

@@ -1,6 +1,6 @@
 # 0033: The sympodial relay: laterals under an ended leader take the trunk's level
 
-- **Status:** accepted for beech/birch as authored in `docs/experiments/code/2026-11-01-atlas/picks.toml` (the user, 2026-11-01); off by default; adoption into the species patches is track D's at the next fit.
+- **Status:** accepted for beech and maple, the species that use it, in `docs/experiments/code/2026-11-01-atlas/picks.toml` (the user, 2026-11-01); off by default; adoption into the species patches is track D's at the next fit.
 - **Date:** 2026-11-01
 - **Related:** spec §R2.4 ("Sympodial: terminal bud terminates with p_term(pa); distal laterals take over"), §R4.4 (the per-axis shift), §9 (beech, Troll); ADR 0009 (the pa table), ADR 0012 (R4's shift), ADR 0029 (form by hand), ADR 0031 (the flat top: "the fix is R2's reiteration").
 - **Sheet:** `docs/experiments/figures/2026-11-01-atlas-relay-{60,100}.png`, from `uv run --project analysis python docs/experiments/code/2026-11-01-atlas/atlas.py relay`.

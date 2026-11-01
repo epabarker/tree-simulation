@@ -39,16 +39,17 @@
 # levels.2.lateralEvery row). The sparser alternative, noted by the user: 4.
 "r2.levels.2.lateralEvery" = 3
 
-# The six below: proposed, awaiting the user's judgement (track B, 2026-11-01). Each from its
+# The six below: judged by the user on 2026-11-01 (oak, maple, willow accepted; hornbeam, rowan,
+# holly hold today's [form]). Each from its
 # combined sheet, 2026-11-01-atlas-combined-<species>-{60,100}.png (seeds 1-3, "today (off)" first,
 # the knob across), chosen from track A's identity cards (docs/research/2026-11-01-species-identity.md
 # on claude/research) and the atlas. "look for" says what the user should judge on the sheet.
 
 [oak]
-# Proposed, awaiting the user's judgement. Posture by age (ADR 0038): limbs steep when young (35,
+# Accepted (the user, 2026-11-01). Posture by age (ADR 0038): limbs steep when young (35,
 # against 58.61 in [form]), levelling to 85 with their wood's age over 50 seasons; no relay, no elbows
 # (ADR 0037 stays proposed). Sheet: atlas-combined-oak-{60,100}.png, the agedSetPoint 85 column.
-# Look for: long, near-level low limbs under a broad crown (W/H 1.39-1.61 at 60 against 1.14-1.33
+# Seen: long, near-level low limbs under a broad crown (W/H 1.39-1.61 at 60 against 1.14-1.33
 # today; elev 31 -> 20), track A's "massive lower branches"; 100 levels them further (stiff limbs at
 # the base). Still fine-twigged; the heavy girth hierarchy is not a form knob.
 "r2.levels.1.setPoint" = 35
@@ -56,19 +57,13 @@
 "r2.levels.1.agedOver" = 50
 
 [hornbeam]
-# Proposed, awaiting the user's judgement, weakly. Beech's direction, smaller: the relay (ADR 0033)
-# later, and the relays' curve 30 over 30 (ADR 0034). Sheet: atlas-combined-hornbeam-{60,100}.png,
-# the levels.0.curve 30 column. Look for: whether anything rounds the flat cap (ADR 0031). The fork
-# drops (0.73 -> 0.54 at 60), but the cap stays across all three curves and seeds, within seed noise of
-# today: holding today's form is as defensible.
-"r2.relay" = 2
-"r2.relayAge" = 25
-"r2.relayPTerm" = 0.6
-"r2.levels.0.curve" = 30
-"r2.levels.0.curveLength" = 30
+# Today's [form], no new rule (the user, 2026-11-01). Tried: the relay (ADR 0033, relay 2 / relayAge
+# 25 / relayPTerm 0.6) with the relays curving 20-40 (ADR 0034), atlas-combined-hornbeam-{60,100}.png.
+# The reason: the relay leaves the flat cap (ADR 0031) in every column and seed; it lowers the fork
+# (0.73 -> 0.54) but the crown is within seed noise of today's.
 
 [maple]
-# Proposed, awaiting the user's judgement. The relay from age 10 (ADR 0033), its relays curving 30
+# Accepted (the user, 2026-11-01). The relay from age 10 (ADR 0033), its relays curving 30
 # over 30 (ADR 0034). Sheet: atlas-combined-maple-{60,100}.png, the relayAge 10 column. Look for: a
 # lower fork and a rounder, broader head (fork 0.68 -> 0.33, W/H 0.62-0.68 -> 0.69-0.75 at 60;
 # 0.50 -> 0.56-0.61 at 100), track A's Rauh "low dome". relayAge 5 forks at the base (0.13), a bush.
@@ -79,7 +74,7 @@
 "r2.levels.0.curveLength" = 30
 
 [willow]
-# Proposed, awaiting the user's judgement. Pendulous twigs (ADR 0035) on willow's own twig set point
+# Accepted (the user, 2026-11-01). Pendulous twigs (ADR 0035) on willow's own twig set point
 # (54.03 in [form], unchanged), twig laterals every second node (ADR 0036). Sheet:
 # atlas-combined-willow-{60,100}.png, the lateralEvery 2 column. Look for: a broader, low, bushy crown
 # (W/H 1.60-1.82 at 60 and 1.59-1.87 at 100, H 71-86, against the brief's broad and low W/H 1.6).
@@ -90,16 +85,12 @@
 "r2.levels.2.lateralEvery" = 2
 
 [rowan]
-# Proposed: no change. Posture by age kept steep (from today's 28 toward 30-50 over 50 seasons;
-# atlas-combined-rowan-{60,100}.png) moves nothing visible (elev 49 -> 47-48, W/H within seed noise):
-# rowan's limbs are held by its own set point and eta already. Look for: that the three columns read
-# as today's; if so, today's [form].
+# Today's [form], no new rule (the user, 2026-11-01). Tried: posture by age kept steep (from 28 toward
+# 30-50 over 50 seasons, ADR 0038), atlas-combined-rowan-{60,100}.png. The reason: it moves nothing
+# visible (elev 49 -> 47-48, W/H within seed noise); rowan's own set point and eta already hold its
+# steep limbs.
 
 [holly]
-# Proposed, awaiting the user's judgement. Posture by age (ADR 0038): the old limbs level from
-# today's 62 toward 80 over 50 seasons. Sheet: atlas-combined-holly-{60,100}.png, the agedSetPoint 80
-# column. Look for: the dense pyramid kept (fork 0.98-1.00) with its lower limbs flatter (elev 28 ->
-# 20), track A's "level to slightly ascending"; the outline barely moves, so "no change" is the
-# alternative.
-"r2.levels.1.agedSetPoint" = 80
-"r2.levels.1.agedOver" = 50
+# Today's [form], no new rule (the user, 2026-11-01). Tried: posture by age levelling the old limbs
+# toward 70-90 over 50 seasons (ADR 0038), atlas-combined-holly-{60,100}.png. The reason: the dense
+# pyramid's outline barely moves (lower limbs flatter, elev 28 -> 17-24); not worth a new rule.

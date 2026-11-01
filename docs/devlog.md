@@ -2,6 +2,10 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-01: Track B (vocabulary): the six judged; picks.toml final
+
+- **The user's decisions:** oak accepted (posture by age, 35 → 85 by wood over 50); maple accepted (relay from age 10, relays curving 30); willow accepted (pendulous twigs, twig laterals every second node). Hornbeam (the relay leaves the flat cap), rowan and holly keep today's [form]. `picks.toml` final for all eight; ADRs 0033–0036 and 0038 accepted for the species that use them.
+
 ## 2026-11-01: Track B (vocabulary): combined sheets for the other six; picks.toml covers all eight
 
 - **`atlas.py combined --species <sp>`** for hornbeam, oak (a second proposal, replacing the first oak sheet), maple, willow, rowan and holly, at 60 and 100 (all below the ceiling), seeds 1–3, "today (off)" first.

@@ -1273,7 +1273,8 @@ export class Scene {
       L.color[k] = Math.max(0, Math.min(RAMP_STEPS - 1, color));
       L.rosette[k] = rosette;
       L.kind[k] = kind;
-      const below = keepBelow[tree] as number;
+      // A ragged edge, not a line: each card's own height limit varies from 0.5 to 1.5 of it.
+      const below = (keepBelow[tree] as number) * (0.5 + hash01(tree, id, salt + 3));
       L.keep[k] = keepOf[tree] || (below > 0 && (s.y0[j] as number) < below) ? 1 : 0;
       const vary = c.vary ? 1 + c.vary * (2 * hash01(tree, id, salt + 1) - 1) : 1;
       L.scale[k] = Math.sqrt(hx * hx + hy * hy) * (lengthOf[kind] as number) * vary;

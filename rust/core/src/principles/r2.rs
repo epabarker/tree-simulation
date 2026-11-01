@@ -24,6 +24,11 @@
 //! scaffold with them, which one set point per level cannot do (≥ 80 for level 2 collapses
 //! every broadleaf: the form-sweep review). The trunk (order 0) never hangs.
 //!
+//! Elbows (ADR 0037, proposed): a level's own `relay` extends the relay past the trunk. When a
+//! limb's terminal ends (its row's p_term), the laterals on its top nodes continue it at the
+//! limb's level; each starts at its bud's branch angle, so the limb kinks at every takeover and
+//! zig-zags (oak's elbows; a lost tip replaced by a subapical bud, Hallé et al. 1978).
+//!
 //! Twig density (ADR 0036, proposed): a level's own `kappa` (acrotony at its nodes, in place of
 //! r2.kappa) and `lateralEvery` (laterals only at every k-th node of its axes) set how many fine
 //! shoots a limb carries and where along it.
@@ -115,7 +120,21 @@ pub fn laterals(order: f64, axis_node: f64, last_of_shoot: bool, params: &Params
 
 /// True if the relay is on: some laterals under an ended pa-0 apex take pa 0.
 pub fn relay_on(params: &Params) -> bool {
-    params.r2.enabled && !params.r2.levels.is_empty() && params.r2.relay >= 1.0
+    let r2 = &params.r2;
+    r2.enabled
+        && !r2.levels.is_empty()
+        && (r2.relay >= 1.0 || r2.levels.iter().any(|l| l.relay.unwrap_or(0.0) >= 1.0))
+}
+
+/// How many nodes under an ended apex relay on an axis of physiological age `pa`: the level's
+/// own `relay` (ADR 0037), else r2.relay for pa 0 (ADR 0033), else none.
+pub fn relay_nodes(pa: f64, params: &Params) -> f64 {
+    let own = pa_level(pa, &params.r2).and_then(|l| l.relay);
+    match own {
+        Some(n) => n,
+        None if pa == 0.0 => params.r2.relay,
+        None => 0.0,
+    }
 }
 
 /// The probability that a shoot of physiological age `order` ends in its terminal bud, on a tree
@@ -177,21 +196,22 @@ pub fn relay_depth(tree: &Tree, nm: usize, nb: usize) -> Vec<f64> {
     depth
 }
 
-/// The paShift that makes bud `b`'s shoot a relay, pa 0, if it is a lateral on one of the top
-/// `relay` nodes below an ended apex of a pa-0 axis (`depth` from `relay_depth`); else None.
+/// The paShift that makes bud `b`'s shoot a relay at its axis's physiological age, if it is a
+/// lateral on one of the top `relay_nodes` nodes below its axis's ended apex (`depth` from
+/// `relay_depth`); else None.
 pub fn relay_shift(tree: &Tree, b: usize, depth: &[f64], params: &Params) -> Option<f64> {
     if tree.b.slot[b] == slot::MAIN {
         return None;
     }
     let h = tree.b.metamer[b] as usize;
-    if h >= depth.len() || depth[h] >= params.r2.relay {
+    if h >= depth.len() || !depth[h].is_finite() {
         return None;
     }
     let host_pa = tree.m.order[h] as f64 - tree.m.pa_shift[h] as f64;
-    if host_pa != 0.0 {
+    if depth[h] >= relay_nodes(host_pa, params) {
         return None;
     }
-    Some(tree.b.order[b] as f64)
+    Some(tree.b.order[b] as f64 - host_pa)
 }
 
 /// C4 params for shoots of physiological age `order`: A_set and η from the pa table.
@@ -648,5 +668,25 @@ mod tests {
         let (_, w) = shoot(&with_r2(&[r#"{"kappa":0}"#], r#""kappa":3"#));
         assert!(w.iter().all(|&x| x == 1.0), "{w:?}");
         assert!(!shoot(&with_r2(&[r#"{}"#], "")).0);
+    }
+
+    #[test]
+    fn a_limb_level_relays_its_own_ended_axes_into_elbows() {
+        let p = with_r2(&[r#"{}"#, r#"{"relay":1}"#, r#"{}"#], "");
+        assert!(relay_on(&p));
+        let (t, laterals, twig) = ended_trunk();
+        let depth = relay_depth(&t, t.m.len(), t.b.len());
+        // The limb (order 1, pa 1) ended: its top lateral (order 2) continues it at pa 1.
+        assert_eq!(relay_shift(&t, twig, &depth, &p), Some(1.0));
+        // The trunk has no relay of its own and r2.relay is absent: its laterals stay limbs.
+        assert!(
+            laterals
+                .iter()
+                .all(|&b| relay_shift(&t, b, &depth, &p).is_none())
+        );
+        // A level's own relay overrides r2.relay for pa 0.
+        let q = with_r2(&[r#"{"relay":0}"#, r#"{}"#], r#""relay":3"#);
+        assert_eq!(relay_nodes(0.0, &q), 0.0);
+        assert_eq!(relay_nodes(0.0, &with_r2(&[r#"{}"#], r#""relay":3"#)), 3.0);
     }
 }

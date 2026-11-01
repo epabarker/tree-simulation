@@ -101,6 +101,17 @@ RULES: dict[str, dict] = {
             ("r2.levels.2.lateralEvery", [1, 2, 3, 4]),
         ],
     },
+    # ADR 0037: elbows. Centre: limbs (level 1) end with p 0.3 a shoot and the top lateral takes
+    # over. The kink's size is the angle the lateral left at: level 2's branch angle (third row).
+    "elbows": {
+        "adr": "0037",
+        "base": {"r2.levels.1.pTerm": 0.3, "r2.levels.1.relay": 1},
+        "rows": [
+            ("r2.levels.1.pTerm", [0.1, 0.3, 0.6, 1.0]),
+            ("r2.levels.1.relay", [1, 2, 3, 4]),
+            ("r2.levels.2.branchAngle", [20, 35, 50, 65]),
+        ],
+    },
 }
 
 

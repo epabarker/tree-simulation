@@ -520,6 +520,13 @@ export interface PaLevel {
    * axis (sparse, fine shoots: birch's), not for "whorled" (tierEvery). Absent or ≤ 1: every node.
    */
   lateralEvery?: number;
+  /**
+   * Elbows (ADR 0037, proposed): when an axis of this level ends (pTerm), the laterals on its top
+   * `relay` nodes continue it at this level, each from its own bud's angle: a sympodial limb with
+   * a kink at every takeover (oak's elbowed, sinuous limbs). Generalises r2.relay (ADR 0033) past
+   * the trunk; for level 0 it overrides r2.relay. Absent: 0 (off) for levels ≥ 1.
+   */
+  relay?: number;
 }
 
 export const defaultParams: Params = {

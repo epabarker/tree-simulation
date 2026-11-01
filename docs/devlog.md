@@ -2,6 +2,11 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-01: Track B (vocabulary): elbows (ADR 0037, proposed)
+
+- **`r2.levels[i].relay`** (r2.rs): an ended axis of any level is continued by its top laterals at that level, so the limb kinks at each takeover (the relay of ADR 0033, past the trunk). Off by default; presets and goldens unchanged.
+- **The sheet** (`atlas.py elbows`): the kinks don't read at the atlas's scale (the set point straightens them). A high limb pTerm narrows and densifies oak; birch at pTerm 1 gets a sinuous top.
+
 ## 2026-11-01: Track B (vocabulary): the combined sheets; birch's spike explained
 
 - **Combined sheets** (`atlas.py combined --species <sp>`): beech (relay + curvature) at 60, birch (pendulous + twig spacing) and oak (curvature + per-level κ) at 60 and 100, seeds 1–3 down the rows, "today (off)" first. Beech loses the spire on every seed (fork 0.93–1.00 → 0.26–0.38, a multi-stemmed, rounded, irregular top); `levels.0.curve` 30–60 moves it less than the seed does.

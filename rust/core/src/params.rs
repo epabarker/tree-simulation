@@ -211,6 +211,9 @@ pub struct PaLevel {
     /// every k-th node (absent or ≤ 1: every node; not for whorled, which has tier_every).
     pub kappa: Option<f64>,
     pub lateral_every: Option<f64>,
+    /// Elbows (ADR 0037): when this level's axis ends (p_term), the laterals on its top `relay`
+    /// nodes continue it at this level (absent: 0, or r2.relay for pa 0).
+    pub relay: Option<f64>,
 }
 
 #[derive(Clone, Debug)]
@@ -501,6 +504,7 @@ impl Params {
                         pendulous_radius: opt(l, "pendulousRadius"),
                         kappa: opt(l, "kappa"),
                         lateral_every: opt(l, "lateralEvery"),
+                        relay: opt(l, "relay"),
                     })
                     .collect(),
                 a_c: num(r2, "aC"),

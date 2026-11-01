@@ -28,6 +28,15 @@ closed-form update that puts the measured slenderness (∝ 1/r0 at a given shape
 Jacobian carries an r0 column for the finisher's covariance only. In CMA-ES r0 is searched on its log
 scale like the rest.
 
+**Form by hand (round 5, ADR 0029).** The targets file's `[form]` rides on every candidate like
+`[fixed]`; the free parameters are the physiology. Its `[[report]]` traits are read, never scored: at
+the start (the hand form) and at every accepted LM step the lone tree is also run on to 100
+(`lone100`, the LM's lone seeds), and the step log (`<species>-steps.csv`) carries the physiology
+and the reported shape at 60 and 100 beside the hand form's, so drift shows at the second step.
+After the fit the LM point and the final point are checked against the gallery
+(`treesim.gallery.shape_flag`): one nearer a reject than the hand form is flagged (`shapeFlag`).
+`finisher=False` (`m27_fit.py --pilot`) stops after LM: the LM point is selected and verified.
+
 The stand is the closed one (`cli/trials.ts`: three rows of four between opaque faces), cheap enough
 to run to season 100 throughout, so `stand.lateShare` is in every residual vector.
 
@@ -41,11 +50,12 @@ from __future__ import annotations
 import json
 import math
 import time
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 
 import numpy as np
 from cmaes import CMA
 
+from treesim.gallery import shape_flag
 from treesim.fit import (
     DEATH_PENALTY,
     MISSING_PENALTY,
@@ -55,6 +65,7 @@ from treesim.fit import (
     encode,
     loss,
     mean_traits,
+    report_names,
     scaled,
     seed_traits,
     targets_of,
@@ -95,6 +106,8 @@ class LMSettings:
     #: The largest initial standard deviation of any direction, unit cube.
     cma_sigma: float = 0.12
     finalists: int = 5
+    #: False stops after LM (the pilot, round 5 §3.4): no CMA-ES, the LM point verified.
+    finisher: bool = True
     workers: int = 12
     rng_seed: int = 2026
 
@@ -105,8 +118,7 @@ class Problem:
     def __init__(self, spec: Spec, pool: Pool, settings: LMSettings, x0: np.ndarray, r0_bounds: tuple[float, float],
                  r0_start: float):
         self.full = spec
-        self.spec = Spec(spec.species, spec.traits, [p for p in spec.params if p["path"] != "c6.r0"],
-                         spec.holdout, spec.fixed)
+        self.spec = replace(spec, params=[p for p in spec.params if p["path"] != "c6.r0"])
         self.pool = pool
         self.settings = settings
         self.x0 = x0
@@ -162,6 +174,21 @@ class Problem:
             out.append(merged)
         return out
 
+    def report(self, assigns: list[dict], seeds: list[int] | None = None) -> list[dict]:
+        """The reported shape (ADR 0029) of each set of assignments: the lone tree run on to 100 on
+        `seeds` (the LM's lone seeds), its traits at 60 and 100 that the spec reports."""
+        seeds = seeds or self.settings.seeds["lone"]
+        requests = [{"species": self.spec.species, "assign": a, "seeds": [s], "trials": ["lone100"]}
+                    for a in assigns for s in seeds]
+        replies = self.pool.map(requests)
+        n = len(seeds)
+        names = report_names(self.spec)
+        out = []
+        for i in range(len(assigns)):
+            m = mean_traits([seed_traits(r) for r in replies[i * n:(i + 1) * n]])
+            out.append({k: m.get(k) for k in names if k.startswith("lone.")})
+        return out
+
     def names(self) -> list[str]:
         out = []
         for t in self.spec.traits:
@@ -170,7 +197,7 @@ class Problem:
 
     @property
     def n_traits(self) -> int:
-        return sum(len(targets_of(t)) for t in self.spec.traits) + 2
+        return sum(len(targets_of(t)) for t in self.spec.traits) + 3
 
     def residuals(self, traits: dict, x: np.ndarray) -> np.ndarray:
         r = []
@@ -183,9 +210,12 @@ class Problem:
                 r += [math.sqrt(t["weight"] * MISSING_PENALTY / n)] * n
             else:
                 r += [math.sqrt(t["weight"] / n) * v for v in z]
-        lone, standing = traits.get("lone.alive"), traits.get("stand.alive")
+        lone = traits.get("lone.alive")
         r.append(math.sqrt(DEATH_PENALTY) * (1 - lone) if lone is not None else 0.0)
-        r.append(math.sqrt(5 * DEATH_PENALTY) * max(0.0, 0.8 - standing) if standing is not None else 0.0)
+        # The stand's survival at 60 and at 100 (where it runs on), as fit.loss.
+        for key in ("stand.alive", "stand.alive100"):
+            standing = traits.get(key)
+            r.append(math.sqrt(5 * DEATH_PENALTY) * max(0.0, 0.8 - standing) if standing is not None else 0.0)
         r.extend(self.settings.tikhonov * (x - self.x0))
         return np.array(r)
 
@@ -277,14 +307,48 @@ def solve_step(jac: np.ndarray, r: np.ndarray, mu: float, max_step: float) -> np
     return delta * (max_step / big) if big > max_step else delta
 
 
-def descend(prob: Problem, x0: np.ndarray, r0: float, act: list[int], rows: list[dict], t_start: float, log):
+#: The reported observables the step log prints (all are written to the CSV).
+SHOWN = ["lone.spread", "lone.spread100", "lone.limbElevation", "lone.limbElevation100", "lone.widestAt",
+         "lone.widestAt100", "lone.forkHeight100", "lone.leaderDominance100", "stand.crownRatio100"]
+
+
+def step_row(prob: Problem, label, loss_value: float | None, assign: dict, traits: dict, shape: dict) -> dict:
+    """A step log row: the physiology, then every reported trait (60 from the step's own traits, 100
+    from its lone100 run)."""
+    names = report_names(prob.spec)
+    row = {"step": str(label), "loss": loss_value, **{p: assign.get(p) for p in prob.paths + ["c6.r0", "r1.mw"]}}
+    for k in names:
+        row[f"report:{k}"] = shape.get(k, traits.get(k))
+    return row
+
+
+def show(row: dict, hand: dict) -> str:
+    def f(v):
+        return "—" if v is None else f"{v:.3g}"
+    return "; ".join(f"{k.removeprefix('lone.')} {f(row.get('report:' + k))} ({f(hand.get('report:' + k))})"
+                     for k in SHOWN if "report:" + k in row)
+
+
+def descend(prob: Problem, x0: np.ndarray, r0: float, act: list[int], rows: list[dict], t_start: float, log,
+            steps: list[dict] | None = None):
     """LM over the active set from (x0, r0). Returns the point, its traits, and the last Jacobian
-    over the active set and r0 (trait rows and the Tikhonov rows), for the finisher's covariance."""
+    over the active set and r0 (trait rows and the Tikhonov rows), for the finisher's covariance.
+    `steps` (round 5) gets the step log: its first row the hand form's, then the start, then each
+    accepted step, with the reported shape."""
     s = prob.settings
     x = x0.copy()
     traits = prob.traits([(x, r0)])[0]
     res = prob.residuals(traits, x)
     current = float(res @ res)
+    logging = steps is not None and bool(prob.spec.reports)
+    if logging:
+        hand_assign = {**prob.spec.fixed, **prob.spec.form}
+        hand_traits = prob.traits_of([hand_assign])[0]
+        start_assign = prob.assign(x, r0)
+        hand_shape, start_shape = prob.report([hand_assign, start_assign])
+        steps.append(step_row(prob, "hand", None, {}, hand_traits, hand_shape))
+        steps.append(step_row(prob, 0, current, start_assign, traits, start_shape))
+        log(f"shape at the start (hand form in brackets): {show(steps[-1], steps[0])}")
     mu, rejections, iteration = 1e-2, 0, 0
     jac_full = None
     log(f"LM start: loss {current:.2f}, r0 {r0:.4g}")
@@ -331,6 +395,9 @@ def descend(prob: Problem, x0: np.ndarray, r0: float, act: list[int], rows: list
                 x, r0, traits, current = trial, r0_trial, t_traits, t_loss
                 res = prob.residuals(traits, x)
                 mu, rejections = mu / 3, 0
+                if logging:
+                    a = prob.assign(x, r0)
+                    steps.append(step_row(prob, iteration, current, a, traits, prob.report([a])[0]))
             else:
                 rejections += 1
                 mu *= 2
@@ -342,6 +409,8 @@ def descend(prob: Problem, x0: np.ndarray, r0: float, act: list[int], rows: list
                 f"(current {current:.2f}), step {step:.3f}, r0 {r0_trial:.4g}, measured in band {inside}, "
                 f"{time.time() - t_it:.0f} s")
             if accepted:
+                if logging:
+                    log(f"LM {iteration} shape (hand form in brackets): {show(steps[-1], steps[0])}")
                 break
             if rejections > s.max_rejections:
                 stop = True
@@ -404,8 +473,11 @@ def finish(prob: Problem, x: np.ndarray, r0: float, act: list[int], jac: np.ndar
     return bests, stop
 
 
-def fit_lm(spec: Spec, settings: LMSettings, start: dict, log=print, active: list[str] | None = None) -> dict:
-    """Fits `spec` from `start` (the assignments of the point to start from, r0 included)."""
+def fit_lm(spec: Spec, settings: LMSettings, start: dict, log=print, active: list[str] | None = None,
+           force: list[str] | None = None) -> dict:
+    """Fits `spec` from `start` (the assignments of the point to start from, r0 included). `active`
+    replaces the screening's active set; `force` adds to it (a knob whose screening step cannot reach
+    the trait it moves, e.g. Q_ss's 0.08 on its log scale against the seedling's roof)."""
     s = settings
     pool = Pool(s.workers)
     t_start = time.time()
@@ -413,19 +485,23 @@ def fit_lm(spec: Spec, settings: LMSettings, start: dict, log=print, active: lis
     stages: dict[str, float] = {}
     try:
         r0_param = next(p for p in spec.params if p["path"] == "c6.r0")
-        free = Spec(spec.species, spec.traits, [p for p in spec.params if p["path"] != "c6.r0"])
+        free = replace(spec, params=[p for p in spec.params if p["path"] != "c6.r0"])
         x0 = encode(free, start)
         r0_start = float(start["c6.r0"])
         prob = Problem(spec, pool, s, x0, (r0_param["lo"], r0_param["hi"]), r0_start)
         screening = screen(prob, x0, r0_start, log)
         stages["screening"] = time.time() - t_start
-        act = [prob.paths.index(p) for p in (active or screening["active"])]
+        chosen = set(active or screening["active"]) | set(force or [])
+        act = [j for j, p in enumerate(prob.paths) if p in chosen]
+        if force:
+            log(f"forced active: {', '.join(force)}; the set ({len(act)}): {', '.join(prob.paths[j] for j in act)}")
 
         t = time.time()
-        x_lm, r0_lm, lm_traits, lm_loss, jac = descend(prob, x0, r0_start, act, rows, t_start, log)
+        steps: list[dict] = []
+        x_lm, r0_lm, lm_traits, lm_loss, jac = descend(prob, x0, r0_start, act, rows, t_start, log, steps)
         stages["lm"] = time.time() - t
         t = time.time()
-        bests, stop = finish(prob, x_lm, r0_lm, act, jac, rows, t_start, log)
+        bests, stop = finish(prob, x_lm, r0_lm, act, jac, rows, t_start, log) if s.finisher else ([], None)
         stages["cma"] = time.time() - t
 
         # Selection on seeds of its own, then verification on fresh ones.
@@ -442,8 +518,19 @@ def fit_lm(spec: Spec, settings: LMSettings, start: dict, log=print, active: lis
         log("selection: " + "; ".join(f"{c['candidate']} {c['inBand']} in band, loss {c['loss']:.2f}" for c in selection))
         fresh = {"lone": s.verify_seeds, "stand": s.verify_seeds, "shade": s.verify_seeds}
         start_v, fit_v = prob.traits([(x0, r0_start), (x, r0)], fresh)
-        stages["verification"] = time.time() - t
         assign = prob.assign(x, r0)
+        hand_assign = {**spec.fixed, **spec.form}
+        shapes = {}
+        if spec.reports:
+            # The reported shape on the fresh seeds: 60 from the verification's own traits, 100 from
+            # the lone tree run on; the hand form's beside them.
+            hand_v = prob.traits_of([hand_assign], fresh)[0]
+            hs, ss, fs = prob.report([hand_assign, prob.assign(x0, r0_start), assign], s.verify_seeds)
+            shapes = {"hand": {**hand_v, **hs}, "start": {**start_v, **ss}, "fit": {**fit_v, **fs}}
+        stages["verification"] = time.time() - t
+        t = time.time()
+        flag = shape_flag(pool, spec, {"lm": prob.assign(x_lm, r0_lm), "fit": assign}, log)
+        stages["gallery"] = time.time() - t
         patch = pool.ask({"amend": spec.species, "assign": assign})["patch"]
         inside, n, outside = in_band(spec, fit_v)
         return {
@@ -463,6 +550,9 @@ def fit_lm(spec: Spec, settings: LMSettings, start: dict, log=print, active: lis
                     "from": selection[win]["candidate"]},
             "selection": selection,
             "margins": margins(spec, start_v, fit_v),
+            "reported": reported(spec, shapes) if shapes else [],
+            "shapeFlag": flag,
+            "steps": steps,
             "screening": screening,
             "activeSet": [prob.paths[j] for j in act],
             "iterations": rows,
@@ -486,6 +576,21 @@ def margins(spec: Spec, start: dict, fit: dict) -> list[dict]:
     return out
 
 
+def reported(spec: Spec, shapes: dict[str, dict]) -> list[dict]:
+    """Each reported trait (ADR 0029) at 60 and 100 for the hand form, the start and the fit, with its
+    description where it has one: written, never scored."""
+    out = []
+    for r in spec.reports:
+        for suffix in ("", "100") if r["name"].startswith("lone.") else ("",):
+            name = r["name"] + suffix
+            row = {"trait": name, "kind": r.get("kind"), "target": r.get("profile", r.get("target")),
+                   "band": r.get("band")}
+            for k, traits in shapes.items():
+                row[k] = value_of({**r, "name": name}, traits)
+            out.append(row)
+    return out
+
+
 def write_lm(result: dict, out_dir) -> None:
     """The results file (`fit.py`'s shape, with the screening), the loss per iteration and
     generation, and the screening's moves against the seed noise, as CSVs beside it."""
@@ -495,6 +600,9 @@ def write_lm(result: dict, out_dir) -> None:
     sp = result["species"]
     (out_dir / f"{sp}.json").write_text(json.dumps(result, indent=2, default=float) + "\n")
     pl.DataFrame(result["iterations"], infer_schema_length=None).write_csv(out_dir / f"{sp}-lm.csv")
+    if result.get("steps"):
+        pl.DataFrame(result["steps"], infer_schema_length=None).write_csv(out_dir / f"{sp}-steps.csv",
+                                                                         float_precision=4)
     sc = result["screening"]
     rows = [{"residual": n, "centre": c, "noise": z, **dict(zip(sc["paths"], row))}
             for n, c, z, row in zip(sc["names"], sc["centre"], sc["noise"], sc["moved"])]

@@ -1,0 +1,69 @@
+diff --git a/rust/core/src/principles/r4.rs b/rust/core/src/principles/r4.rs
+index ceb661e..9a5e9fb 100644
+--- a/rust/core/src/principles/r4.rs
++++ b/rust/core/src/principles/r4.rs
+@@ -1,6 +1,7 @@
+ //! R4. Dormancy, release and reiteration (spec §R4, ADR 0012; r4-dormancy.ts). An active bud
+ //! keeps growing while v ≥ v_cont; a dormant one needs v ≥ v_break·(1 + δ·age)·(1 + δ_b·s), or is
+-//! released by its own light Q ≥ Q_rel·(1 + δ·age); one older than L_dorm aborts. A released bud
++//! released by its own light Q ≥ Q_rel·(1 + δ·age); one older than L_dorm aborts. Age is the
++//! seasons a bud has rested dormant: a leafy short shoot (R6) does not age. A released bud
+ //! reiterates: its shoot takes a younger physiological age.
+ //!
+ //! Params: r4.enabled, r4.vBreak, r4.qRel, r4.vCont, r4.delta (δ), r4.lDorm, r4.juvenile,
+@@ -33,7 +34,7 @@ pub fn light_releases(q: f64, age: f64, params: &Params) -> bool {
+     r4.enabled && q >= r4.q_rel * (1.0 + r4.delta * age)
+ }
+ 
+-/// A resting dormant bud older than L_dorm aborts.
++/// A resting dormant bud older than L_dorm (seasons rested dormant) aborts.
+ pub fn aborts(state: u8, age: f64, r4: &R4) -> bool {
+     r4.enabled && state == bud::DORMANT && age > r4.l_dorm
+ }
+@@ -118,6 +119,29 @@ mod tests {
+         assert!(!aborts(bud::SHORT_SHOOT, 50.0, &r4));
+     }
+ 
++    #[test]
++    fn a_short_shoot_does_not_age_toward_l_dorm() {
++        // Q_rel 2: no light release, so the bud only rests.
++        let p = params(r#"{"r4":{"lDorm":10,"qRel":2},"r6":{"enabled":true,"qMin":0.2}}"#);
++        let mut t = seedling(&p, 0.5);
++        // Thirty leafy seasons: a short shoot, still age 0 (it used to reach 30 and abort at its
++        // first dark season).
++        for s in 0..30 {
++            grow_buds(&mut t, &p, s as f64);
++            assert_eq!(t.b.state[1], bud::SHORT_SHOOT);
++        }
++        assert_eq!(t.b.age[1], 0);
++        // Then shaded below Q_ss: dormant, and it aborts after L_dorm dormant seasons, not before.
++        t.b.q[1] = 0.05;
++        for s in 30..40 {
++            grow_buds(&mut t, &p, s as f64);
++            assert_eq!(t.b.state[1], bud::DORMANT, "season {s}");
++        }
++        assert_eq!(t.b.age[1], 10);
++        grow_buds(&mut t, &p, 40.0);
++        assert_eq!(t.b.state[1], bud::GONE);
++    }
++
+     #[test]
+     fn pays_a_light_released_shoot_from_the_reserve_and_reiterates_it() {
+         let p = params(r#"{"r1":{"enabled":true},"r4":{"qRel":0.1,"juvenile":1}}"#);
+diff --git a/rust/core/src/season.rs b/rust/core/src/season.rs
+index 452f6e2..4079fb0 100644
+--- a/rust/core/src/season.rs
++++ b/rust/core/src/season.rs
+@@ -479,7 +479,11 @@ pub fn grow_buds(tree: &mut Tree, params: &Params, season: f64) {
+             grow_shoot(tree, i, n, length, params, season, &mut direct, pa_shift);
+         } else {
+             tree.b.state[i] = resting_state(tree.b.q[i], &params.r6);
+-            tree.b.age[i] = store_i32(age + 1.0);
++            // R4's age counts the seasons a bud rests dormant (§R4: dormant buds have a finite
++            // lifespan): a leafy short shoot (R6) does not age toward L_dorm or a higher break.
++            if tree.b.state[i] == bud::DORMANT {
++                tree.b.age[i] = store_i32(age + 1.0);
++            }
+             if aborts(tree.b.state[i], tree.b.age[i] as f64, r4) {
+                 tree.b.state[i] = bud::GONE;
+                 tree.aborted += 1.0;

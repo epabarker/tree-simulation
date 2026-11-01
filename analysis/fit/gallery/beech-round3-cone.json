@@ -1,0 +1,28 @@
+{
+  "species": "beech",
+  "verdict": "not accepted: at 60 a tiered cone, widest at the base and pointed, with an overhanging top; at 100 a dome reached through tiers; the stand's crown 0.30 visibly short",
+  "date": "2026-10-31",
+  "source": "docs/experiments/fits/round3/beech.json (fit.assign)",
+  "assign": {
+    "r2.levels.0.lambda": 0.5288,
+    "r2.levels.1.lambda": 0.5272,
+    "r2.levels.1.setPoint": 37.61,
+    "r2.levels.1.branchAngle": 57.48,
+    "r2.levels.1.eta": 1.176,
+    "r2.levels.2.setPoint": 86.03,
+    "r2.aC": 0.5967,
+    "r2.dLambda": 0.01591,
+    "r2.kappa": 0.1195,
+    "c3.alpha": 3.083,
+    "c5.Trel": 0.2532,
+    "c6.r0": 0.003965,
+    "r1.Lh": 85.72,
+    "r1.mf": 0.1022,
+    "r3.c": 0.03638,
+    "r6.qMin": 0.01071,
+    "r6.leafArea": 2.487,
+    "r2.hJ": 42.15,
+    "r1.mw": 39.02,
+    "r1.hydraulic": "hyperbolic"
+  }
+}

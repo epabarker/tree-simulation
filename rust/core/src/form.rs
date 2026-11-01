@@ -16,7 +16,7 @@ const MIN_LIMB: usize = 10;
 const PI: f64 = std::f64::consts::PI;
 
 /// form.csv's columns (FORM_COLUMNS), then p0…p9.
-pub const FORM_COLUMNS: [&str; 11] = [
+pub const FORM_COLUMNS: [&str; 12] = [
     "widestAt",
     "profileCentre",
     "crownFullness",
@@ -28,11 +28,12 @@ pub const FORM_COLUMNS: [&str; 11] = [
     "junctionDelta",
     "ldSlope",
     "leafStemSlope",
+    "limbElevation",
 ];
 
 pub struct FormMetrics {
     /// In FORM_COLUMNS order.
-    pub values: [f64; 11],
+    pub values: [f64; 12],
     pub profile: Vec<f64>,
 }
 
@@ -105,6 +106,41 @@ pub fn limb_shapes(tree: &Tree) -> Vec<(f64, f64)> {
             (e[0] - low, e[e.len() - 1] - low)
         })
         .collect()
+}
+
+/// The length-weighted median elevation of the first-order limbs' segments, degrees (NaN with no
+/// limbs): how the limbs run, read along them. A base-to-tip chord would read a limb that rises
+/// and then arches out level as ascending (the round-5 plan, §3.1).
+pub fn limb_elevation(tree: &Tree) -> f64 {
+    let c = &tree.m;
+    let mut segs: Vec<(f64, f64)> = (0..c.len())
+        .filter(|&i| c.order[i] == 1 && c.length[i] > 0.0)
+        .map(|i| (elevation(c, i), c.length[i]))
+        .collect();
+    weighted_median(&mut segs)
+}
+
+/// The median of `(value, weight)` pairs by weight: the value at which the weight sorted below
+/// first reaches half the total, the mean of the two values where it meets half exactly (as
+/// `median` does for an even count). NaN of none.
+pub fn weighted_median(xs: &mut [(f64, f64)]) -> f64 {
+    let total: f64 = xs.iter().map(|x| x.1).sum();
+    if xs.is_empty() || total <= 0.0 {
+        return f64::NAN;
+    }
+    xs.sort_by(|a, b| a.0.partial_cmp(&b.0).unwrap_or(std::cmp::Ordering::Equal));
+    let half = total / 2.0;
+    let mut below = 0.0;
+    for k in 0..xs.len() {
+        below += xs[k].1;
+        if (below - half).abs() <= 1e-9 * total && k + 1 < xs.len() {
+            return (xs[k].0 + xs[k + 1].0) / 2.0;
+        }
+        if below > half {
+            return xs[k].0;
+        }
+    }
+    xs[xs.len() - 1].0
 }
 
 /// The crown's width in `bands` height bands from the crown base to the top, over the widest.
@@ -359,6 +395,7 @@ pub fn form_metrics(tree: &Tree, params: &Params) -> FormMetrics {
             median(&deltas),
             ols_slope(&log_d, &log_l),
             ols_slope(&log_a, &log_leaf),
+            limb_elevation(tree),
         ],
         profile,
     }
@@ -555,6 +592,41 @@ mod tests {
         let f = form_metrics(&t, &p);
         assert!((get(&f, "leafStemSlope") - 1.0).abs() < 1e-9);
         assert!((get(&f, "junctionDelta") - p.c6.n).abs() < 1e-6);
+    }
+
+    /// A trunk with one first-order limb from its second node: `rise` metamers at `up` radians
+    /// above the horizontal, then `run` level ones.
+    fn limb(rise: usize, up: f64, run: usize) -> Tree {
+        let mut t = Tree::new(0, 50.0, 0.5);
+        let mut m: i32 = -1;
+        for k in 0..20 {
+            m = metamer(&mut t, m, slot::MAIN, UP, 1.0, 1.0, 0.0) as i32;
+            if k == 1 {
+                let mut l = m;
+                let mut s = RIGHT;
+                for j in 0..rise + run {
+                    let a = if j < rise { up } else { 0.0 };
+                    l = metamer(&mut t, l, s, a, 1.0, 0.2, 0.0) as i32;
+                    s = slot::MAIN;
+                }
+            }
+        }
+        t
+    }
+
+    #[test]
+    fn reads_a_limbs_elevation_along_it_not_by_its_chord() {
+        let deg = PI / 180.0;
+        assert!(limb_elevation(&limb(0, 0.0, 12)).abs() < 1e-9);
+        assert!((limb_elevation(&limb(12, 45.0 * deg, 0)) - 45.0).abs() < 1e-9);
+        // Half its length at 60°, half level: between the two.
+        let half = limb_elevation(&limb(6, 60.0 * deg, 6));
+        assert!((half - 30.0).abs() < 1e-9, "{half}");
+        // Mostly level: level, where the chord reads atan(4 sin 60° / (4 cos 60° + 8)) ≈ 19°.
+        assert!(limb_elevation(&limb(4, 60.0 * deg, 8)).abs() < 1e-9);
+        assert!(limb_elevation(&Tree::new(0, 50.0, 0.5)).is_nan());
+        let f = form_metrics(&limb(12, 45.0 * deg, 0), &params());
+        assert!((get(&f, "limbElevation") - 45.0).abs() < 1e-9);
     }
 
     #[test]

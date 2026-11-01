@@ -2,6 +2,91 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-01: the form re-pick, the third hornbeam pilot, the round-5 overnight started
+
+- **The re-pick** (`repick.py`, the user's rule): stand LAI in band, then the floor nearest the measured, then alive ≥ 0.8 at 100, behind a guard (lone W/H 0.3–2.5, H < 190, stand limb crown ratio ≥ 0.2). It replaces the overnight's stand-first rule, which picked columns. The picks: hornbeam 2-3-2, birch 3-3-2, oak 0-3-0 (flagged), willow 0-2-2; maple 0-0-0, rowan and holly round 2's (the user's). The stands were replayed with the ground written; every hash matched.
+- **Hornbeam's third pilot:** start loss 15.4, LM 7.2; 4 of 6 measured in band after LM alone; stand alive; gallery 0.47 from the hand form. The user judged it a pass as a pilot. The plan's §3.4 and ADR 0029 now say the full acceptance rule applies after CMA-ES and verification, not at the end of LM.
+- **`m27_fit.py --active`** now adds to the screening's set, and `--active-for` limits it to named species; the old replace-the-set meaning is `--only-active`. Why: r6.qMin and r1.mf read inactive for birch, oak, beech and hornbeam, because the screening's 0.08 step on Q_ss's log scale cannot reach the roof above the seedling's cut.
+
+## 2026-11-01: ADR 0032: the acclimated leaf cost and T_rel fixed per species (goldens updated)
+
+- **The model's configuration** (ADR 0032, the user): R1's leaf cost acclimated with one global c = 0.3, and C5's T_rel fixed per species from Hagemeier & Leuschner's lowest shade leaves (birch 0.21, oak 0.063, hornbeam 0.025, beech 0.008 measured; willow 0.14, rowan 0.072, maple 0.044, holly 0.021, fir 0.0091, pine 0.23 estimated by the tolerance-score regression). FITTED_FLORA regenerated (`m27_adopt.py`; only those lines change); T_rel leaves the targets files' `[[param]]` for `[fixed]`; `forest` takes c 0.3 and T_rel 0.0155.
+- **Goldens updated, for that reason:** forest, mixedWood and oakOpen (the presets on FOREST and the species). The rest are unchanged.
+- **Why:** the stand, not the lone tree. Hornbeam's closed stand under it had LAI 9.2–9.6 (measured 8.3 ± 1.5) and a 1% floor (measured 1.3%), and forest's plateau held on 3 of 3 seeds. Metamers rise 40–70%: the phone's budget is checked next.
+
+## 2026-11-01: ADR 0029 and ADR 0031 accepted
+
+- **ADR 0029** (form by hand, physiology by fit) accepted.
+- **ADR 0031** accepted as a limitation on the open-grown crown's top, with an addition: the flat top is in growth, not pruning, so the fix is architectural, Troll's model's reiteration (ascending co-dominant limbs that arch at the tips), an R2 feature for after shipping. The dome is not diagnosed further.
+
+## 2026-10-31: Both shedding rules relaxed at once: still no dome
+
+- **`both.py`:** acclimated leaf cost (c 0.3) with T_rel at the measured shade tolerance (hornbeam 0.025, beech 0.008; forest 0.0155). Hornbeam fills inside (top fifth 33% against 38%) but stays flat-topped; its stand's crowns do not deepen and its floor darkens to 1%; forest's plateau holds; beech stays a spire. Metamers +13–72% throughout.
+- **ADR 0031** updated with it as the sixth diagnostic: the limitation stands.
+
+## 2026-10-31: Stand deaths at 100 penalised; the acclimated leaf cost; ADR 0031 drafted
+
+- **Harness:** `fit.loss` and `fit_lm`'s residuals penalise `stand.alive100` as `stand.alive` (one pytest). The hornbeam pilot re-scored on fresh seeds: its stand keeps 67% at 100 against the start's 79%, and its loss is 24.7 against 8.3.
+- **`r1.leafCost`** "acclimated" with `r1.leafCostShade` (default flat, goldens unchanged, two unit tests): m_f·(c + (1 − c)·Q) cuts the compensation light by up to two-thirds, but the shed twigs pass to C5's T_rel test and the cap stays (top fifth 44–46%). The plateau holds; the stand is mixed.
+- **ADR 0031** (proposed): the cap is the shedding rules together; no single-principle candidate met dome, stand crown and plateau; recorded as a limitation, ablations kept off, round 5 proceeds on the picks.
+
+## 2026-10-31: The hornbeam pilot; the cap on the fitted tree; R1's k_shed (proposed)
+
+- **Pilot** (`fits/round5-pilot/hornbeam.json`): one accepted LM step; not accepted (5 of 6 measured, `stand.lateShare` 1.35 against 1.23). α 2.81 → 2.50, m_f 0.0817 → 0.0822, L_h 92 → 125, m_f/α 0.029 → 0.033. Its closed stand's middle row is dead by 100, which the loss (stand scored at 60) cannot see. `panel-figure.py` now labels an all-dead middle row instead of failing.
+- **The cap persists on the fitted hornbeam** (top fifth 38% of the leaf); the shed branches are still single twigs at foliage cost.
+- **`r1.kShed`** (default 1, goldens unchanged, one unit test; `Tree::deficit` kept beside the table, out of the hash and checkpoints): at 3 the twigs are shed by T_rel·Q_top instead, the cap gets stronger (45%), the plateau holds on 3 of 3 seeds and forest keeps nearly twice the metamers at 300. Proposed, not adopted.
+
+## 2026-10-31: R4's abort age counts dormant seasons (goldens updated); ADR 0030 rejected
+
+- **R4** (spec §R4, "dormant buds have a finite lifespan"): a resting bud now ages only in the seasons it rests dormant (`season.rs`). A leafy short shoot (R6) no longer ages toward L_dorm, nor raises its break and light-release thresholds through δ·age. Before, a short shoot older than L_dorm was aborted at its first dark season: 87% of the lone birch's aborts between 60 and 100. One unit test, `a_short_shoot_does_not_age_toward_l_dorm`.
+- **Goldens updated, for that reason:** the ten presets that run R4 with short shoots (skyTree, skyStand, obliqueSun, conifer, weeping, troll, forest, thinning, mixedWood, oakOpen); explosion, bh, wall and pair are unchanged. The species' round-2 fits and the 20-seed evidence predate it.
+- **ADR 0030 rejected** (the user): the saturating response rounds the lone hornbeam only by raising production below full sun everywhere; the stand's crown gets shallower and forest's plateau holds on 1 of 3 seeds. `r1.response` stays as an ablation.
+
+## 2026-10-31: Species round 5: the shed branches decomposed; R1's light response; R4's abort age
+
+- **Shed branches** (`rust/core/examples/shed_log.rs`, hornbeam at ramp 25): 26,316 by season 100, almost all one leafy short shoot shed for P < M; sapwood is under 1% of M_b, so the test is α·Q·d(L) < m_f, a compensation light of 0.04–0.08 that rises with path length.
+- **R1's light response** (ADR 0030, proposed): `r1.response` "saturating" with `r1.qHalf` (default linear, goldens unchanged, two unit tests). It rounds the lone hornbeam at 60 but drives it to the ceiling by 100, makes the stand's crown shallower (limb crown ratio 0.39 → 0.33), and loosens forest's plateau (1 of 3 seeds pass against 3 of 3).
+- **R4's abort age** (proposed, `r4-dormant-age.patch`, not applied): age counts dormant seasons only; a unit test; 10 of 14 goldens move; birch keeps its crown to 100.
+- No fit.
+
+## 2026-10-31: Species round 5: the picks in [form], the cap is shedding, birch's aborts
+
+- **The picks** (`form-picks.py`, `[form]` with dated comments): the review's nearest-brief cell for six species, hornbeam the user's, beech round 2's. None changes kind on seeds 1–3. The lab panel, round `form` (`figures/2026-10-31-panel-form-*`).
+- **The cap** (`cap.py`, hornbeam at ramp 25): leaf, buds, light and aborts in ten height bands. Q_ss, k_ext and L_h leave the cap; C5 off is the same run (R1's `shed` "carbon" sheds regardless of C5); no shedding at all gives a dense rounded crown. The closed stand's lid is light-limited (Q 0.03–0.07, 15–80% of buds aborting per decade below 0.7 H): a different cap.
+- **Birch** (`cap.py --birch`): 87% of the buds aborted 60–100 were short shoots past l_dorm with light above Q_ss the season before. R4 counts resting age, short-shoot seasons included.
+- **`treesim`'s buds.csv** gains each bud's `birthId` (CLI only; the core and goldens untouched).
+- No fit.
+
+## 2026-10-31: Species round 5: the dome sweep, birch's vigour, the picks at three seeds
+
+- **The dome sweep** (`dome-sweep.py`; beech, hornbeam, oak, maple): `r2.ramp`, `levels.0.pTerm`, `levels.0.generator` and the twig set point, one at a time. Nothing rounds a top; the flat cap is in every cell. `r2.ramp` is live where Δλ is large (it moves fork height and breadth) and dead for beech. Beech stops on form.
+- **Birch is not starving** (`birch-vigour.py`): production exceeds maintenance, the reserve holds near 5200 (oak's near 0), and the crown shrinks 60 → 100 (live buds −36%).
+- **The picks at seeds 1–3** (`form-picks.py`): hornbeam's provisional pick keeps its kind; beech drawn at round 2's, flagged. `form-grid.py`'s drawing is now `draw_cells`, shared by the three scripts (it redraws the old sheets byte for byte).
+- No fit, no `[form]` change, no golden moved.
+
+## 2026-10-31: Species round 5: the form grids and the posture knob
+
+- **The grids:** `form-grid.py`, the user's three knobs per species (4 × 4 × 3, beech's and hornbeam's ranges theirs after their look at those sheets), seed 1, sheets at 60 and 100 (`figures/2026-10-31-form-grid-*`), with the cells nearest the review's named cells marked. `form-sweep.py`'s `run_cell` takes a seed for the picks' regrow.
+- **The posture set point is the tenth form knob** (ADR 0029 amended, `[form]` and `[[formRange]]` in the eight targets files, the gallery's pins): birch sets 70; the others leave it unset and follow `levels.1.setPoint`. Its sweep (birch, oak, 20–90) moves the limbs (elev 69° → 3°) but not the outline.
+- **Surprise:** beech's grid holds no dome. It runs from spires through tiered cones to stacked level tables, so the question moves to the core (the level-0 distichous generator). Notes in the [species note](experiments/2026-10-30-species-3d.md): `levels.2.setPoint` ≥ 80 is a core behaviour; the posture, not the growth set point, holds the limbs; the profile does not tell a spruce from a dome (also in the review's "could not settle" list).
+- No golden moved (Python and docs only). No fit started.
+
+## 2026-10-31: Species round 5 built: form by hand, physiology by fit (ADR 0029 proposed)
+
+- **Plan:** [round 5](plans/2026-10-31-species-round5.md) §3.1–3.4. The user changed §3.2: a one-knob-at-a-time sweep comes first, and the three-knob grid follows once the user has named the knobs per species. No fit started.
+- **Round 4 stopped** after birch: 5 of 5 measured in band, but at 100 a flat-topped pagoda (not accepted). Birch is the gallery's specimen ([note](experiments/2026-10-30-species-3d.md), "Round 4: birch").
+- **§3.1:** `limbElevation` (form.rs, `FORM_COLUMNS` 11 → 12, a unit test on hand-built limbs); the lone trial run on to 100 (`lone100`, the reported set as `…100`); the stand's `crownRatio100`. The lone trial to 100 takes 2.0–2.6× its time to 60.
+- **The form sweep:** `form-sweep.py`, eight species × nine knobs × four values plus the round-2 reference cell, natively at seed 1, two sheets a species (`figures/2026-10-31-form-sweep-*`).
+- **§3.3:** the gallery (six rejects) and `m27_gallery.py` (`gallery-check.txt`).
+- **§3.4:** the targets files' `[form]`, `[[formRange]]` and `[[report]]`; the LM step log; `shapeFlag`; `m27_fit.py --pilot`; the panel's round `form`. Python tests 4 → 7. ADR 0029 drafted.
+- **Surprises:**
+  - `limbElevation` mostly reads back the level-1 set point (oak 31° = 90 − 58.6 in every row but the set point's);
+  - birch's limbs are held at 20° by `postureSetPoint` 70, a form parameter outside the nine, so its set-point row does not move them;
+  - oak's and hornbeam's round-2 crowns are broad, not spindles, so they stay out of the gallery;
+  - beech's round 2 and round 3's cone are 1.2 standardised units apart, within the noise of three seeds;
+  - most beech sweep cells reach the woods' top by 100.
+- **Goldens:** unchanged (`bench --compare` against 1f41990: the same hash in all seven cases).
+
 ## 2026-10-31: Species round 4: the harness, the targets re-sourced, ADR 0028; round 3 re-scored
 
 - **Plan:** [round 4](plans/2026-10-31-species-round4.md) steps B–D, after the [targets audit](reviews/2026-10-31-species-target-audit.md). Steps A (the hold-out) and E (the re-fit) are the user's.

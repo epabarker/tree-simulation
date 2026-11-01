@@ -65,6 +65,9 @@ def label(view: str, t: dict) -> str:
     if view.startswith("lone"):
         return (f"height {t['height']:.0f} · H/D {t['hd']:.0f}\nW/H {t['spread']:.2f} · widest at {t['widestAt']:.2f}\n"
                 f"limb crown ratio {t['limbCrownRatio']:.2f}")
+    if t["height"] is None:
+        # Every measured tree dead by the season (panel-links.ts writes null).
+        return f"middle row: all dead\nLAI {t['lai']:.1f} · floor {100 * t['floor']:.1f}%"
     return (f"middle row: height {t['height']:.0f} · H/D {t['hd']:.0f}\ncrown ratio {t['limbCrownRatio']:.2f} limb, "
             f"{t['leafCrownRatio']:.2f} leaf\nLAI {t['lai']:.1f} · floor {100 * t['floor']:.1f}%")
 

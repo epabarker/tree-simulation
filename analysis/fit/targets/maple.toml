@@ -27,21 +27,19 @@ weight = 0.5
 kind = "described"
 source = "height at 30 over height at 60: maples grow fast young and lose growth early; height growth largely done by about 25 years (EUFORGEN Austria; waldwissen.net)"
 
-[[trait]]
+[[report]]
 name = "lone.spread"
 target = 0.7
 band = 0.2
-weight = 0.5
 kind = "described"
 source = "open-grown W/H at about 60 years, by proxy: sycamore 0.40 (Pretzsch et al. 2015's envelope, a lower bound), urban sycamore 0.55 and Norway maple 0.65 (Franceschi et al. 2022 Table 1 means); field maple itself not found. Re-centred at the trial's age as hornbeam (round 4)"
 
-[[trait]]
+[[report]]
 # Replaces lone.widestAt and lone.crownFullness (round 4): one vector a tiered crown
 # cannot satisfy, each band ±0.1, the ten sharing the trait's weight.
 name = "lone.profile"
 profile = [0.26, 0.65, 0.88, 0.98, 1, 0.99, 0.93, 0.79, 0.56, 0.22]
 band = 0.1
-weight = 0.5
 kind = "described"
 source = "the crown's width in ten bands, base to top, over its widest: widest at 0.45 of the crown, as full as 0.72 (1 − |u|^q, q = p/(1 − p); the round-4 plan, step C.5). Norway maple, the nearest species classified, is spherical (44%) or ovoid (38%) (Franceschi et al. 2022 Table 5): widest near the middle"
 
@@ -85,35 +83,31 @@ weight = 0.5
 kind = "described"
 source = "a sycamore stand's maximum LAI 4.0 (Černý et al. 2020, J. For. Res. 31:827, read from the abstract): a proxy species and one stand, half weight. Field maple not found"
 
-[[trait]]
+[[report]]
 name = "lone.forkHeight"
 target = 0.35
 band = 0.2
-weight = 0.5
 kind = "described"
 source = "rounded and forking low: decurrent (M25)"
 
-[[trait]]
+[[report]]
 name = "lone.leaderDominance"
 target = 1.6
 band = 0.6
-weight = 0.5
 kind = "described"
 source = "weak apical control once the crown forms"
 
-[[trait]]
+[[report]]
 name = "lone.branchAngle"
 target = 45
 band = 10
-weight = 0.5
 kind = "described"
 source = "ascending limbs on stiff wood (M25)"
 
-[[trait]]
+[[report]]
 name = "lone.limbDroop"
 target = 10
 band = 10
-weight = 0.25
 kind = "described"
 source = "limbs that arch a little at the tips"
 
@@ -126,6 +120,29 @@ weight = 0.5
 kind = "described"
 source = "stand height at 100 over height at 60: canopy maples reach 24.6–26.4 m at 88–102 years against a mean of 16.1 m at 63 across the inventory (LWF Wissen 77); an estimate"
 
+[[report]]
+# Round 5 (ADR 0029): the length-weighted median elevation of the first-order limbs' segments
+# (form.rs's limbElevation), read along the limbs: a limb that rises and then arches out level reads
+# level, where a chord would read it ascending. No described value: the sheet and the panel judge it.
+name = "lone.limbElevation"
+kind = "described"
+
+[[report]]
+# The profile's summaries (form.rs), reported beside the profile itself.
+name = "lone.widestAt"
+kind = "described"
+
+[[report]]
+name = "lone.crownFullness"
+kind = "described"
+
+[[report]]
+# The stand's limb crown ratio at 100 beside the scored one at 60: a low T_rel can hold the crown
+# at 60 and strip it by 100 (the round-5 plan, §2).
+name = "stand.crownRatio100"
+kind = "measured"
+
+# Round 5 (ADR 0029): the physiology only; the nine form parameters are [form], by hand.
 # Free parameters: dotted paths into the species' patch, with bounds (literature review §4,
 # ROADMAP calibration table). log = true searches the bound's log scale. L_h spans 10–200 for
 # every species: the hyperbolic discount needs larger values than the exponential (ADR 0021).
@@ -134,47 +151,6 @@ source = "stand height at 100 over height at 60: canopy maples reach 24.6–26.4
 path = "c3.alpha"
 lo = 2.5
 hi = 6
-[[param]]
-path = "r2.levels.0.lambda"
-lo = 0.5
-hi = 0.6
-[[param]]
-path = "r2.levels.1.lambda"
-lo = 0.48
-hi = 0.58
-[[param]]
-path = "r2.levels.1.setPoint"
-lo = 20
-hi = 90
-[[param]]
-path = "r2.levels.1.branchAngle"
-lo = 25
-hi = 70
-[[param]]
-path = "r2.levels.1.eta"
-lo = 0.05
-hi = 1
-log = true
-[[param]]
-path = "r2.levels.2.setPoint"
-lo = 40
-hi = 160
-[[param]]
-path = "r2.aC"
-lo = 0
-hi = 40
-[[param]]
-path = "r2.dLambda"
-lo = 0
-hi = 0.12
-[[param]]
-path = "r2.kappa"
-lo = 0
-hi = 4
-[[param]]
-path = "c5.Trel"
-lo = 0.005
-hi = 0.6
 [[param]]
 path = "c6.r0"   # ADR 0027's 3D units: the 2D bounds 0.015–0.05 ÷ 8
 lo = 0.001875
@@ -208,9 +184,78 @@ lo = 2
 hi = 150
 log = true
 
+# The form parameters' ranges (round 4's search bounds): the span the form sheet sweeps, never
+# searched (ADR 0029).
+[[formRange]]
+path = "r2.levels.0.lambda"
+lo = 0.5
+hi = 0.6
+[[formRange]]
+path = "r2.levels.1.lambda"
+lo = 0.48
+hi = 0.58
+[[formRange]]
+path = "r2.levels.1.setPoint"
+lo = 20
+hi = 90
+[[formRange]]
+path = "r2.levels.1.postureSetPoint"
+lo = 20
+hi = 90
+[[formRange]]
+path = "r2.levels.1.branchAngle"
+lo = 25
+hi = 70
+[[formRange]]
+path = "r2.levels.1.eta"
+lo = 0.05
+hi = 1
+log = true
+[[formRange]]
+path = "r2.levels.2.setPoint"
+lo = 40
+hi = 160
+[[formRange]]
+path = "r2.aC"
+lo = 0
+hi = 40
+[[formRange]]
+path = "r2.dLambda"
+lo = 0
+hi = 0.12
+[[formRange]]
+path = "r2.kappa"
+lo = 0
+hi = 4
+
 # Assignments every candidate carries unchanged (analysis/treesim/fit.py).
 [fixed]
 "r1.hydraulic" = "hyperbolic"   # 1/(1 + L_path/L_h): height keeps rising slowly (ADR 0021)
+# ADR 0032: T_rel fixed from the lowest shade leaves' light (Hagemeier & Leuschner 2019, % of
+# incident PAR; estimated: 4.4% by the score regression; ln(%) = 5.00 − 1.108 × shadeScore over birch, oak, hornbeam, beech),
+# and the acclimated leaf cost with one global c. Not fitted.
+"c5.Trel" = 0.044
+"r1.leafCost" = "acclimated"
+"r1.leafCostShade" = 0.3
+
+# The form, by hand (ADR 0029), applied to every candidate like [fixed]. Round 2's adopted
+# values (FLORA) as of 2026-10-31, the form sheet's reference cell: the user's picks from the
+# sheet replace them, each with a dated comment.
+[form]
+# 2026-11-01 pick: grid cell 0-0-0 of the ADR 0032 grid (form-grid.py --tag=-adr32), provisional, chosen by the user
+# under repick.py (2026-11-01): the guard (lone W/H 0.3-2.5, H < 190, stand limb crown ratio >= 0.2), then LAI in band, floor nearest, alive >= 0.8; crown and outline break ties; the user's choice (2026-11-01), cell 0-0-0.
+# The lines marked "pick"; the rest are round 2's.
+"r2.levels.0.lambda" = 0.55  # pick, 2026-11-01, provisional
+"r2.levels.1.lambda" = 0.5039
+"r2.levels.1.setPoint" = 51.12
+# "r2.levels.1.postureSetPoint": unset in FLORA, so the limbs straighten toward
+# levels.1.setPoint (R3, ADR 0011); a pick sets it here.
+"r2.levels.1.branchAngle" = 44.65
+"r2.levels.1.eta" = 0.1405
+"r2.levels.2.setPoint" = 45.87
+"r2.aC" = 5  # pick, 2026-11-01, provisional
+"r2.dLambda" = 0.04  # pick, 2026-11-01, provisional
+"r2.kappa" = 1.708
 
 # Held out: never in the loss, checked after the fit (analysis/experiments/m27_holdout.py).
 [holdout]

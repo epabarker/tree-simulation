@@ -49,6 +49,13 @@ PHYLLOTAXIS = {
 # (1–2.5·10⁶) for limbs that carried less foliage than a real one (ADR 0011). Species' own
 # stiffnesses are calibration's (C2).
 WOOD_E = 4_000_000
+# ADR 0032: C5's T_rel fixed per species from the light of the lowest shade leaves (Hagemeier &
+# Leuschner 2019, as a fraction of incident PAR: birch, sessile oak, hornbeam and beech measured;
+# the rest estimated from Niinemets & Valladares's shade-tolerance score by ln(%) = 5.00 − 1.108 ×
+# score over those four, r = −0.96), and R1's acclimated leaf cost with one global c.
+TREL = {"birch": 0.21, "oak": 0.063, "hornbeam": 0.025, "beech": 0.008, "willow": 0.14, "rowan": 0.072,
+        "holly": 0.021, "maple": 0.044, "fir": 0.0091, "pine": 0.23}
+LEAF_COST_SHADE = 0.3
 
 
 def in3d(sp: str, patch: dict) -> dict:
@@ -72,6 +79,9 @@ try:
         assign["c6.r0"] = float(f"{assign['c6.r0'] / GIRTH_SCALE:.4g}")
         assign["r1.mw"] = GIRTH_SCALE**2
         assign["r3.sigmaBreak"] = SIGMA_BREAK
+        assign["c5.Trel"] = TREL[sp]
+        assign["r1.leafCost"] = "acclimated"
+        assign["r1.leafCostShade"] = LEAF_COST_SHADE
         patches[sp] = in3d(sp, pool.ask({"amend": sp, "assign": assign})["patch"])
 finally:
     pool.close()

@@ -35,6 +35,17 @@ pub fn shed_branches(tree: &mut Tree, params: &Params, season: f64, evaluated: u
     let g = params.c5.g;
     let t = math::max(params.c5.t, params.c5.t_rel * tree.q_top);
     let carbon = params.r1.enabled && params.r1.shed_carbon;
+    if carbon {
+        // R1's k_shed: a branch must run a deficit this many seasons in a row (1: this season).
+        ensure(&mut tree.deficit, nm);
+        for i in 0..evaluated {
+            tree.deficit[i] = if tree.p_sum[i] < tree.m_sum[i] {
+                tree.deficit[i] + 1.0
+            } else {
+                0.0
+            };
+        }
+    }
     let mut dead = std::mem::take(&mut tree.scratch_u);
     ensure(&mut dead, nm.max(tree.b.len()));
     dead[..nm].fill(0);
@@ -50,7 +61,7 @@ pub fn shed_branches(tree: &mut Tree, params: &Params, season: f64, evaluated: u
         let n_b = c.n_sum[i] as f64;
         let light = if n_b > 0.0 { c.q_sum[i] / n_b } else { 0.0 };
         let shed = if carbon {
-            tree.p_sum[i] < tree.m_sum[i] || light < params.c5.t_rel * tree.q_top
+            tree.deficit[i] >= params.r1.k_shed || light < params.c5.t_rel * tree.q_top
         } else {
             n_b > 0.0 && light < t
         };
@@ -139,6 +150,17 @@ pub fn remove_branches(
                 arr[old_to_new[i] as usize] = arr[i];
             }
         }
+    }
+    // R1's deficit counts are per row: they follow the rows, and the freed tail is cleared so
+    // rows grown later start at 0.
+    if !tree.deficit.is_empty() {
+        ensure(&mut tree.deficit, nm);
+        for i in 0..nm {
+            if keep[i] != 0 {
+                tree.deficit[old_to_new[i] as usize] = tree.deficit[i];
+            }
+        }
+        tree.deficit.truncate(tree.m.len());
     }
     // R4's bud bank: a dormant bud where each branch was, at its azimuth around the parent as
     // the parent now lies.
@@ -297,6 +319,44 @@ pub(crate) mod tests {
         t.b.state[9] = bud::GONE; // consumed buds do not count
         assert!(close(crown_top_light(&t, 0.9), 0.9, 1e-12));
         assert!(close(crown_top_light(&t, 0.5), 0.5, 1e-12));
+    }
+
+    #[test]
+    fn carbon_shedding_waits_k_shed_seasons_of_deficit() {
+        let carbon = |k: &str| {
+            params(&format!(
+                r#"{{"r1":{{"enabled":true,"shed":"carbon"{k}}},"c5":{{"Trel":0}}}}"#
+            ))
+        };
+        // The lateral (row 2) runs P < M; the rest pay their way. Light never sheds (T_rel 0).
+        let deficit = |t: &mut Tree| {
+            t.p_sum = vec![10.0, 10.0, 1.0, 1.0];
+            t.m_sum = vec![1.0, 1.0, 2.0, 2.0];
+        };
+        let p1 = carbon("");
+        assert_eq!(p1.r1.k_shed, 1.0);
+        let mut t = small_tree(&p1);
+        deficit(&mut t);
+        assert_eq!(shed_branches(&mut t, &p1, 5.0, 4), 2.0); // at once, as before k_shed
+
+        let p3 = carbon(r#","kShed":3"#);
+        let mut t = small_tree(&p3);
+        for season in [5.0, 6.0] {
+            deficit(&mut t);
+            assert_eq!(shed_branches(&mut t, &p3, season, 4), 0.0);
+        }
+        // A season in surplus resets the count: two more deficits are still not enough.
+        t.p_sum[2] = 3.0;
+        t.p_sum[3] = 3.0;
+        assert_eq!(shed_branches(&mut t, &p3, 7.0, 4), 0.0);
+        assert_eq!(t.deficit[2], 0.0);
+        for season in [8.0, 9.0] {
+            deficit(&mut t);
+            assert_eq!(shed_branches(&mut t, &p3, season, 4), 0.0);
+        }
+        deficit(&mut t);
+        assert_eq!(shed_branches(&mut t, &p3, 10.0, 4), 2.0); // the third in a row
+        assert_eq!(t.deficit.len(), t.m.len()); // the counts followed the rows
     }
 
     #[test]

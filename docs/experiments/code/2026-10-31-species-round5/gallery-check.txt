@@ -1,0 +1,102 @@
+
+== birch: the lone tree, seeds 1001–1003 (hand: [form] from the targets file) ==
+observable                     hand   round2-spindle    round4-pagoda
+spread                        0.408            0.408            0.675
+widestAt                      0.117            0.117            0.383
+crownFullness                  0.75             0.75            0.798
+forkHeight                    0.977            0.977            0.918
+leaderDominance                2.67             2.67             2.08
+branchAngle                    57.7             57.7             51.5
+limbDroop                      13.7             13.7             18.5
+limbElevation                    21               21             21.2
+profile (×10)      10/10/9/9/8/8/7/7/5/4 10/10/9/9/8/8/7/7/5/4 5/9/10/10/9/8/8/8/7/5
+spread100                     0.342            0.342            0.935
+widestAt100                   0.117            0.117            0.717
+crownFullness100              0.758            0.758            0.745
+forkHeight100                 0.991            0.991            0.803
+leaderDominance100             2.34             2.34             2.23
+branchAngle100                 59.3             59.3             51.9
+limbDroop100                   13.2             13.2             17.5
+limbElevation100               21.1             21.1               21
+profile100 (×10)   10/10/9/8/8/7/7/7/6/3 10/10/9/8/8/7/7/7/6/3 3/6/8/7/7/9/9/9/8/7
+
+the hand form against each reject (RMS standardised distance; noise of the difference; separated when the distance > 2 × noise):
+  round2-spindle       distance 0.00, noise 0.22: COINCIDES
+  round4-pagoda        distance 2.24, noise 0.39: separated
+  check: fails: the panel decides between the coinciding ones
+
+== oak: the lone tree, seeds 1001–1003 (hand: [form] from the targets file) ==
+observable                     hand   round3-parasol
+spread                         1.07             1.42
+widestAt                       0.65            0.783
+crownFullness                 0.747            0.746
+forkHeight                   0.0576           0.0247
+leaderDominance                1.35                1
+branchAngle                    56.8             55.9
+limbDroop                      1.16             3.82
+limbElevation                  31.4               24
+profile (×10)      2/5/7/8/9/10/9/9/9/7 2/5/6/8/8/9/10/10/9/8
+spread100                     0.822             1.23
+widestAt100                   0.517            0.717
+crownFullness100              0.773            0.746
+forkHeight100                0.0374           0.0212
+leaderDominance100             1.48            0.966
+branchAngle100                 55.5             60.3
+limbDroop100                   1.39             3.36
+limbElevation100               31.4             23.9
+profile100 (×10)   3/6/8/9/10/10/9/9/7/6 3/5/6/7/8/9/9/10/9/8
+
+the hand form against each reject (RMS standardised distance; noise of the difference; separated when the distance > 2 × noise):
+  round3-parasol       distance 0.94, noise 0.41: separated
+  check: passes
+
+== beech: the lone tree, seeds 1001–1003 (hand: [form] from the targets file) ==
+observable                     hand   round2-spindle      round3-cone
+spread                        0.549            0.549            0.936
+widestAt                       0.15             0.15            0.283
+crownFullness                 0.678            0.678            0.698
+forkHeight                    0.989            0.989            0.822
+leaderDominance                1.81             1.81             1.74
+branchAngle                    43.8             43.8             51.6
+limbDroop                      6.34             6.34              8.6
+limbElevation                  50.1             50.1             43.4
+profile (×10)      10/9/8/9/8/7/6/5/3/2 10/9/8/9/8/7/6/5/3/2 8/9/8/8/8/8/8/6/4/3
+spread100                     0.417            0.417            0.783
+widestAt100                   0.117            0.117            0.217
+crownFullness100              0.718            0.718             0.71
+forkHeight100                 0.951            0.951            0.652
+leaderDominance100             3.89             3.89             1.84
+branchAngle100                 44.6             44.6             51.1
+limbDroop100                   7.41             7.41             7.58
+limbElevation100               51.9             51.9               44
+profile100 (×10)   10/9/9/8/7/6/6/6/6/5 10/9/9/8/7/6/6/6/6/5 8/8/7/7/8/8/7/6/7/6
+
+the hand form against each reject (RMS standardised distance; noise of the difference; separated when the distance > 2 × noise):
+  round2-spindle       distance 0.00, noise 0.52: COINCIDES
+  round3-cone          distance 1.17, noise 0.77: COINCIDES
+  check: fails: the panel decides between the coinciding ones
+
+== hornbeam: the lone tree, seeds 1001–1003 (hand: [form] from the targets file) ==
+observable                     hand   round3-parasol
+spread                         1.04             1.32
+widestAt                      0.717            0.683
+crownFullness                 0.724            0.665
+forkHeight                    0.215            0.152
+leaderDominance                1.34             1.18
+branchAngle                    38.7               42
+limbDroop                      5.01             10.4
+limbElevation                  51.1             45.5
+profile (×10)      2/4/6/7/9/9/10/10/9/6 2/3/5/7/8/9/10/10/8/7
+spread100                      1.02             1.26
+widestAt100                    0.75            0.683
+crownFullness100              0.716             0.68
+forkHeight100                 0.156           0.0371
+leaderDominance100             1.99             1.35
+branchAngle100                 38.9             40.9
+limbDroop100                   4.85             9.77
+limbElevation100               50.9             47.6
+profile100 (×10)   2/4/5/7/8/9/10/10/10/7 2/3/5/6/7/9/10/10/8/8
+
+the hand form against each reject (RMS standardised distance; noise of the difference; separated when the distance > 2 × noise):
+  round3-parasol       distance 0.69, noise 0.34: separated
+  check: passes

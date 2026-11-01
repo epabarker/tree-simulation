@@ -1,0 +1,28 @@
+{
+  "species": "hornbeam",
+  "verdict": "not accepted: at 60 a parasol fanning from a short trunk; at 100 still an umbrella where it should be a dense egg; the stand a thin lid of leaf",
+  "date": "2026-10-31",
+  "source": "docs/experiments/fits/round3/hornbeam.json (fit.assign)",
+  "assign": {
+    "r2.levels.0.lambda": 0.5831,
+    "r2.levels.1.lambda": 0.5037,
+    "r2.levels.1.setPoint": 40.44,
+    "r2.levels.1.branchAngle": 39.49,
+    "r2.levels.1.eta": 0.08377,
+    "r2.levels.2.setPoint": 45.26,
+    "r2.aC": 1.96,
+    "r2.dLambda": 0.08996,
+    "r2.kappa": 0.06199,
+    "c3.alpha": 3.833,
+    "c5.Trel": 0.404,
+    "c6.r0": 0.003177,
+    "r1.Lh": 56.98,
+    "r1.mf": 0.1166,
+    "r3.c": 0.03888,
+    "r6.qMin": 0.01657,
+    "r6.leafArea": 2.55,
+    "r2.hJ": 9.142,
+    "r1.mw": 69.22,
+    "r1.hydraulic": "hyperbolic"
+  }
+}

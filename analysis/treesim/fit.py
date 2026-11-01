@@ -1,7 +1,8 @@
 """Fit a species' patch to literature traits by CMA-ES (M27, ADR 0020).
 
 A candidate is a set of dotted-path assignments to the species' patch (src/core/trials.ts), plus the
-targets file's fixed assignments (the hyperbolic hydraulic discount, ADR 0021). Each is grown in the
+targets file's fixed assignments (the hyperbolic hydraulic discount, ADR 0021) and its `[form]`: the
+ten form parameters, set by hand from the form sheet and applied like `[fixed]` (ADR 0029). Each is grown in the
 standard trials by a pool of long-lived evaluators (`node cli/fit-eval.ts`, one per worker), and
 scored against the targets in analysis/fit/targets/<species>.toml:
 
@@ -10,6 +11,10 @@ scored against the targets in analysis/fit/targets/<species>.toml:
 A profile trait (`profile = [t0 … t9]` and one `band` in place of `target`: the crown's width in ten
 height bands, species plan of 2026-10-31, step B.3) adds weight/10 · ((p_k − t_k) / band)² per band,
 so the vector weighs as one trait.
+
+`[[report]]` traits (the crown's shape: ADR 0029) are read from the same replies and written beside
+the fit, never scored. Each is reported at 60 and, where the lone tree is run on (`lone100`), at 100
+as `<name>100`; a report's target, band or profile is the description it is judged against by eye.
 
 The search runs in [0, 1]^n (log scale where a parameter asks for it). Every candidate of a
 generation sees the same seeds (common random numbers), drawn afresh each generation so no fit
@@ -59,6 +64,10 @@ class Spec:
     holdout: dict = field(default_factory=dict)
     #: Assignments every candidate carries unchanged, e.g. {"r1.hydraulic": "hyperbolic"} (ADR 0021).
     fixed: dict = field(default_factory=dict)
+    #: The form parameters, by hand (ADR 0029): applied to every candidate like `fixed`.
+    form: dict = field(default_factory=dict)
+    #: Traits read and written, never scored (ADR 0029): the crown's shape.
+    reports: list[dict] = field(default_factory=list)
 
     @property
     def paths(self) -> list[str]:
@@ -77,7 +86,20 @@ class Spec:
 
 def load_spec(species: str) -> Spec:
     data = tomllib.loads((TARGETS / f"{species}.toml").read_text())
-    return Spec(data["species"], data["trait"], data["param"], data.get("holdout", {}), data.get("fixed", {}))
+    return Spec(data["species"], data["trait"], data["param"], data.get("holdout", {}), data.get("fixed", {}),
+                data.get("form", {}), data.get("report", []))
+
+
+def report_names(spec: Spec, seasons: tuple[str, ...] = ("", "100")) -> list[str]:
+    """The flat trait names a spec's reports read: each at 60 (its name) and, for the lone tree, at 100
+    (`<name>100`); a profile's ten bands as `<name>.k`. The stand's are read where the stand runs
+    (stand.crownRatio100 is its own report)."""
+    out = []
+    for r in spec.reports:
+        for suffix in seasons if r["name"].startswith("lone.") else ("",):
+            name = r["name"] + suffix
+            out += [f"{name}.{k}" for k in range(10)] if "profile" in r else [name]
+    return out
 
 
 class Evaluator:
@@ -146,9 +168,9 @@ class Pool:
 
 
 def decode(spec: Spec, x: np.ndarray) -> dict:
-    """Unit-cube point → the candidate's assignments: the fixed ones, then the free parameters to 4
-    significant figures (short patches and links)."""
-    out = dict(spec.fixed)
+    """Unit-cube point → the candidate's assignments: the fixed ones and the form, then the free
+    parameters to 4 significant figures (short patches and links)."""
+    out = {**spec.fixed, **spec.form}
     for p, u in zip(spec.params, np.clip(x, 0, 1)):
         lo, hi = p["lo"], p["hi"]
         if p.get("log"):
@@ -270,9 +292,12 @@ def loss(spec: Spec, traits: dict[str, float | None]) -> float:
     lone_alive = traits.get("lone.alive")
     if lone_alive is not None:
         total += DEATH_PENALTY * (1 - lone_alive)
-    stand_alive = traits.get("stand.alive")
-    if stand_alive is not None:
-        total += DEATH_PENALTY * 5 * max(0.0, 0.8 - stand_alive)
+    # The stand's survival at 60, and at 100 where the stand runs on (stand.lateShare): a stand
+    # whose measured row dies after 60 is penalised as one that dies before it.
+    for key in ("stand.alive", "stand.alive100"):
+        stand_alive = traits.get(key)
+        if stand_alive is not None:
+            total += DEATH_PENALTY * 5 * max(0.0, 0.8 - stand_alive)
     return total
 
 
@@ -378,7 +403,7 @@ def fit(spec: Spec, settings: FitSettings, log=print, start: dict | None = None)
         ranked = sorted(rows, key=lambda row: row["loss"])
         finalists: list[dict] = []
         for row in ranked:
-            a = {**spec.fixed, **{p: row[p] for p in spec.paths}}
+            a = {**spec.fixed, **spec.form, **{p: row[p] for p in spec.paths}}
             if a not in finalists:
                 finalists.append(a)
             if len(finalists) >= settings.finalists:

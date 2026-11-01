@@ -1,0 +1,6 @@
+birch, lone, round 2 (l_dorm 40, Q_ss 0.144): aborted 61–100: 3648 (aborted found 3648, metrics' aborted 3779, released 2250)
+  light in the last season below 0.144: 466 (12.8%)
+  light in the last season below 0.1995: 1584 (43.4%)
+  their state the season before: {2: 466, 5: 3182}
+  their light: median 0.211, 90th percentile 0.314, max 0.567; their height over H: median 0.35
+  every live bud 60–100 for comparison: median Q 0.267, below 0.144: 14.1%

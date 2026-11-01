@@ -1,0 +1,28 @@
+{
+  "species": "birch",
+  "verdict": "not accepted: met its five measured targets as a tiered cone at 60 and a flat-topped pagoda of level limbs at 100 (setPoint 83\u00b0, \u03ba 1.86)",
+  "date": "2026-10-31",
+  "source": "docs/experiments/fits/round4/birch.json (fit.assign)",
+  "assign": {
+    "r2.levels.0.lambda": 0.5858,
+    "r2.levels.1.lambda": 0.5242,
+    "r2.levels.1.setPoint": 83.26,
+    "r2.levels.1.branchAngle": 44.81,
+    "r2.levels.1.eta": 0.06167,
+    "r2.levels.2.setPoint": 83.4,
+    "r2.aC": 27.07,
+    "r2.dLambda": 0.09896,
+    "r2.kappa": 1.858,
+    "c3.alpha": 3.069,
+    "c5.Trel": 0.3344,
+    "c6.r0": 0.009325,
+    "r1.Lh": 36.38,
+    "r1.mf": 0.1238,
+    "r3.c": 0.05735,
+    "r6.qMin": 0.1984,
+    "r6.leafArea": 2.765,
+    "r2.hJ": 25.39,
+    "r1.mw": 25.26,
+    "r1.hydraulic": "hyperbolic"
+  }
+}

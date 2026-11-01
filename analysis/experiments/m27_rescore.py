@@ -19,7 +19,7 @@ import os
 
 from treesim import REPO
 from treesim.fit import Pool, load_spec
-from treesim.fit_lm import LMSettings, Problem, in_band, margins
+from treesim.fit_lm import LMSettings, Problem, in_band, margins, reported
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--round", default="round3", help="the fits' folder under docs/experiments/fits/")
@@ -45,21 +45,31 @@ try:
         prob = Problem(spec, pool, LMSettings(workers=args.workers), None, (0, 1), start["c6.r0"])
         start_t, fit_t = prob.traits_of([start, fitted], fresh)
         m = margins(spec, start_t, fit_t)
+        # The reported shape (ADR 0029), at 60 and, on the lone tree run on, at 100: never scored.
+        rep = []
+        if spec.reports:
+            s100, f100 = prob.report([start, fitted], SEEDS)
+            rep = reported(spec, {"start": {**start_t, **s100}, "fit": {**fit_t, **f100}})
         inside, n, outside = in_band(spec, fit_t)
         was = result.get("measuredInBand", "—")
         out = {"species": sp, "round": args.round, "seeds": SEEDS, "measuredInBand": f"{inside} of {n}",
                "measuredOutside": outside, "before": {"measuredInBand": was,
                                                       "measuredOutside": result.get("measuredOutside")},
-               "margins": m, "start": {"assign": start, "traits": start_t}, "fit": {"assign": fitted, "traits": fit_t}}
+               "margins": m, "reported": rep, "start": {"assign": start, "traits": start_t}, "fit": {"assign": fitted, "traits": fit_t}}
         (FITS / f"{sp}-rescore.json").write_text(json.dumps(out, indent=2, default=float) + "\n")
-        rows.append((sp, was, f"{inside} of {n}", outside, m))
+        rows.append((sp, was, f"{inside} of {n}", outside, m, rep))
         print(f"{sp}: measured in band {was} → {inside} of {n} (outside: {', '.join(outside) or 'none'})", flush=True)
 finally:
     pool.close()
 
 print(f"\nmargins at the {args.round} fits on seeds {SEEDS[0]}–{SEEDS[-1]} (in bands: + inside, − outside; start → fit; * measured)")
-for sp, was, now, outside, m in rows:
+val = lambda v: "—" if v is None else ("/".join(f"{x:.2f}" for x in v) if isinstance(v, list) else f"{v:.3g}")
+for sp, was, now, outside, m, rep in rows:
     print(f"\n{sp}: {was} → {now}")
     for r in m:
         star = "*" if r["kind"] == "measured" else " "
         print(f"  {star} {r['trait']:24} {fmt(r['startMargin'], r['band']):>6} → {fmt(r['fitMargin'], r['band']):>6}")
+    if rep:
+        print("  reported (never scored): start → fit [described]")
+        for r in rep:
+            print(f"    {r['trait']:24} {val(r['start']):>8} → {val(r['fit']):>8}  [{val(r['target'])}]")

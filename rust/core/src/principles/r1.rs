@@ -1,10 +1,13 @@
-//! R1. Carbon balance with the cost of size (spec §R1, ADR 0010, ADR 0021; r1-carbon.ts).
-//! P = α·Σ a·Q·d(L_path) over live buds, d = exp(−L/L_h) or 1/(1 + L/L_h); M = m_w·Σ π r_live² l +
-//! m_f·Σ a. A surplus N = P − M feeds the reserve (s_r), reproduction above the maturity height
+//! R1. Carbon balance with the cost of size (spec §R1, ADR 0010, ADR 0021, ADR 0030; r1-carbon.ts).
+//! P = α·Σ a·f(Q)·d(L_path) over live buds, d = exp(−L/L_h) or 1/(1 + L/L_h), f(Q) = Q (linear, the
+//! default) or Q·(1 + q_half)/(Q + q_half) (saturating: the same at Q = 1, more at low light, an
+//! ablation of ADR 0030); M = m_w·Σ π r_live² l +
+//! m_f·Σ a·g(Q), g = 1 (flat, the default) or c + (1 − c)·Q (acclimated: a shade leaf is cheaper
+//! to keep, an ablation). A surplus N = P − M feeds the reserve (s_r), reproduction above the maturity height
 //! (f_rep) and v_base; a deficit draws the reserve, and k_starve seasons empty kill the tree.
-//! P_b and M_b per branch feed C5's `carbon` shedding.
+//! P_b and M_b per branch feed C5's `carbon` shedding, after `r1.kShed` deficit seasons in a row.
 //!
-//! Params: r1.*, c3.alpha (α), c6.n, c6.r0, r6 leaf areas.
+//! Params: r1.* (r1.response, r1.qHalf, r1.kShed, r1.leafCost, r1.leafCostShade), c3.alpha (α), c6.n, c6.r0, r6 leaf areas.
 
 use super::c3::is_live_bud;
 use super::r6::deposit_area;
@@ -59,8 +62,8 @@ pub fn carbon_balance(tree: &mut Tree, params: &Params) {
             math::exp(-path_len[m] / r1.lh)
         };
         let leaf = deposit_area(b.state[j], &params.r6);
-        p_sum[m] += alpha * leaf * b.q[j] * discount;
-        m_sum[m] += r1.mf * leaf;
+        p_sum[m] += alpha * leaf * light_response(b.q[j], r1) * discount;
+        m_sum[m] += r1.mf * leaf * leaf_cost(b.q[j], r1);
     }
 
     // Basipetal: live pipes, their sapwood cost, and subtree sums.
@@ -121,6 +124,28 @@ pub fn carbon_balance(tree: &mut Tree, params: &Params) {
         } else {
             tree.starved = 0.0;
         }
+    }
+}
+
+/// f(Q), production per unit of leaf area and α: Q, or with `r1.response` "saturating" a
+/// rectangular hyperbola scaled to meet the line at Q = 1 (ADR 0030). A shaded leaf then earns more
+/// against its fixed cost m_f than the line gives it; an open-sky leaf the same.
+pub fn light_response(q: f64, r1: &R1) -> f64 {
+    if r1.saturating && q > 0.0 {
+        q * (1.0 + r1.q_half) / (q + r1.q_half)
+    } else {
+        q
+    }
+}
+
+/// g(Q), foliage maintenance per unit of leaf area and m_f: 1, or with `r1.leafCost`
+/// "acclimated" c + (1 − c)·Q, so a leaf in shade costs a share c of what one in open sky does
+/// (shade leaves are thinner, with less protein to maintain). The same at Q = 1.
+pub fn leaf_cost(q: f64, r1: &R1) -> f64 {
+    if r1.leaf_acclimated {
+        r1.leaf_cost_shade + (1.0 - r1.leaf_cost_shade) * q
+    } else {
+        1.0
     }
 }
 
@@ -188,6 +213,67 @@ mod tests {
             t.production,
             (p.c3.alpha * buds * 0.5) / (1.0 + l / 10.0)
         ));
+    }
+
+    #[test]
+    fn the_linear_response_is_q_and_is_the_default() {
+        let p = params(r#"{"mw":0,"mf":0,"Lh":0}"#, "{}");
+        assert!(!p.r1.saturating);
+        for q in [0.0, 0.05, 0.3, 1.0] {
+            assert!(close(light_response(q, &p.r1), q));
+        }
+        let mut t = seedling(&p, 0.3);
+        carbon_balance(&mut t, &p);
+        assert!(close(t.production, p.c3.alpha * t.b.len() as f64 * 0.3));
+    }
+
+    #[test]
+    fn the_saturating_response_meets_the_line_at_one_and_lifts_low_light() {
+        let p = params(
+            r#"{"mw":0,"mf":0,"Lh":0,"response":"saturating","qHalf":0.2}"#,
+            "{}",
+        );
+        let r1 = &p.r1;
+        assert!(close(light_response(1.0, r1), 1.0));
+        assert!(close(light_response(0.1, r1), 0.1 * 1.2 / 0.3));
+        assert!(close(light_response(0.0, r1), 0.0));
+        // Increasing, concave, above the line below Q = 1 and below it above.
+        let qs = [0.02, 0.05, 0.1, 0.2, 0.5, 0.9];
+        for w in qs.windows(2) {
+            assert!(light_response(w[1], r1) > light_response(w[0], r1));
+            assert!(light_response(w[0], r1) > w[0]);
+        }
+        assert!(light_response(1.5, r1) < 1.5);
+        let mut t = seedling(&p, 0.1);
+        carbon_balance(&mut t, &p);
+        assert!(close(t.production, p.c3.alpha * t.b.len() as f64 * 0.4));
+    }
+
+    #[test]
+    fn a_flat_leaf_cost_is_m_f_per_unit_area_and_is_the_default() {
+        let p = params(r#"{"mw":0,"mf":0.05,"Lh":0}"#, "{}");
+        assert!(!p.r1.leaf_acclimated);
+        assert!(close(leaf_cost(0.1, &p.r1), 1.0));
+        let mut t = seedling(&p, 0.1);
+        carbon_balance(&mut t, &p);
+        assert!(close(t.maintenance, 0.05 * t.b.len() as f64));
+    }
+
+    #[test]
+    fn an_acclimated_leaf_costs_c_in_the_dark_and_m_f_in_open_sky() {
+        let p = params(
+            r#"{"mw":0,"mf":0.05,"Lh":0,"leafCost":"acclimated","leafCostShade":0.3}"#,
+            "{}",
+        );
+        let r1 = &p.r1;
+        assert!(close(leaf_cost(0.0, r1), 0.3));
+        assert!(close(leaf_cost(1.0, r1), 1.0));
+        assert!(close(leaf_cost(0.5, r1), 0.65));
+        let mut t = seedling(&p, 0.1);
+        carbon_balance(&mut t, &p);
+        assert!(close(t.maintenance, 0.05 * t.b.len() as f64 * 0.37));
+        // P is untouched: the compensation light falls from m_f/α to m_f·c/(α − m_f·(1 − c)).
+        assert!(close(t.production, p.c3.alpha * t.b.len() as f64 * 0.1));
     }
 
     #[test]

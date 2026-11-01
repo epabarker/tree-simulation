@@ -227,6 +227,22 @@ export interface Params {
     store: number;
     /** Branch shedding: 'c5' keeps C5's light rule; 'carbon' sheds branches whose P_b < M_b. */
     shed: "c5" | "carbon";
+    /**
+     * Production's light response f(Q) (ADR 0030): 'linear' (absent: the default), f = Q;
+     * 'saturating', f = Q·(1 + qHalf)/(Q + qHalf), the same at Q = 1 and more in shade.
+     */
+    response?: "linear" | "saturating";
+    /** q_half: the saturating response's half-saturation light, of open sky. */
+    qHalf?: number;
+    /** k_shed: with shed 'carbon', consecutive seasons of P_b < M_b before a branch is shed (absent: 1). */
+    kShed?: number;
+    /**
+     * Foliage maintenance: 'flat' (absent: the default), m_f per unit of leaf area; 'acclimated',
+     * m_f·(c + (1 − c)·Q), a shade leaf cheaper to keep. c is leafCostShade.
+     */
+    leafCost?: "flat" | "acclimated";
+    /** c: the acclimated leaf's cost at Q = 0, as a share of m_f. */
+    leafCostShade?: number;
   };
 
   /**

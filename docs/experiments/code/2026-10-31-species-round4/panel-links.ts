@@ -3,6 +3,7 @@
 // loneParams, seed 1) at 60 and 100 and the closed stand (standParams, seed 1) at 100, as lab links
 // that play to that season and hold the plate (`&bench&seasons=N`), with the traits each shows.
 // Generalises 2026-10-30-species-3d/lone-links.ts and lone-traits.ts. Writes <out>/panel.json.
+// The round "form" is round 5's hand form (runs/form/<species>.json, from m27_gallery.py --form-patches).
 //   node docs/experiments/code/2026-10-31-species-round4/panel-links.ts http://localhost:5173/ round3,round4 <out> [species,…]
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import {
@@ -35,7 +36,11 @@ const panel: Record<string, unknown> = {};
 for (const sp of species) {
   const patches: Record<string, unknown> = { "round 2": (FITTED_FLORA as Record<string, unknown>)[sp] };
   for (const round of rounds.split(",")) {
-    const fit = JSON.parse(readFileSync(`docs/experiments/fits/${round}/${sp}.json`, "utf8")).fit;
+    // "form" (round 5, ADR 0029): the targets file's hand form, physiology at round 2's, as
+    // m27_gallery.py --form-patches runs/form writes it; anything else, a round's fits.
+    const file =
+      round === "form" ? `runs/form/${sp}.json` : `docs/experiments/fits/${round}/${sp}.json`;
+    const fit = JSON.parse(readFileSync(file, "utf8")).fit;
     patches[round.replace("round", "round ")] = fit.patch;
   }
   const entry: Record<string, unknown> = {};

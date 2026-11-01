@@ -311,6 +311,7 @@ export const FORM_COLUMNS = [
   "junctionDelta",
   "ldSlope",
   "leafStemSlope",
+  "limbElevation",
 ] as const;
 /** Crown-form bands in `profile`. */
 export const PROFILE_BANDS = 10;

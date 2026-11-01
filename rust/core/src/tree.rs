@@ -326,6 +326,10 @@ pub struct Tree {
     pub load_s: Vec<f64>,
     pub stress: Vec<f64>,
     pub node_shade: Vec<f64>,
+    /// Consecutive seasons each metamer's subtree has run P_b < M_b (R1's `kShed`). Kept beside
+    /// the table, not in it, so the state hash and checkpoints are unchanged; a restored
+    /// checkpoint starts it at 0.
+    pub deficit: Vec<f64>,
     pub released: f64,
     pub epicormic: f64,
     pub aborted: f64,
@@ -390,6 +394,7 @@ impl Tree {
             &mut self.load_s,
             &mut self.stress,
             &mut self.node_shade,
+            &mut self.deficit,
         ] {
             *v = Vec::new();
         }

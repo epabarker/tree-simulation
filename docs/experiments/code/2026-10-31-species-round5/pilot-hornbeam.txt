@@ -1,0 +1,92 @@
+
+=== hornbeam (least squares) ===
+screening: 20 evaluations in 130 s; active (8): c3.alpha, c5.Trel, r1.Lh, r1.mf, r3.c, r6.qMin, r6.leafArea, r2.hJ
+shape at the start (hand form in brackets): spread 0.815 (0.815); spread100 0.881 (0.881); limbElevation 50.9 (50.9); limbElevation100 51.1 (51.1); widestAt 0.717 (0.717); widestAt100 0.85 (0.85); forkHeight100 0.331 (0.331); leaderDominance100 3.06 (3.06); stand.crownRatio100 0.511 (0.511)
+LM start: loss 7.96, r0 0.003114
+LM 1: accepted loss 5.79 (current 5.79), step 0.250, r0 0.003135, measured in band 5, 172 s
+LM 1 shape (hand form in brackets): spread 0.939 (0.815); spread100 0.995 (0.881); limbElevation 49.6 (50.9); limbElevation100 50.1 (51.1); widestAt 0.55 (0.717); widestAt100 0.85 (0.85); forkHeight100 0.293 (0.331); leaderDominance100 2.75 (3.06); stand.crownRatio100 0.536 (0.511)
+LM 2: rejected loss 30.97 (current 5.79), step 0.204, r0 0.003382, measured in band 5, 136 s
+LM 2: rejected loss 17.53 (current 5.79), step 0.102, r0 0.003256, measured in band 5, 153 s
+LM 2: rejected loss 26.67 (current 5.79), step 0.051, r0 0.003195, measured in band 5, 172 s
+LM 2: rejected loss 6.79 (current 5.79), step 0.025, r0 0.003165, measured in band 5, 190 s
+LM ends: 4 consecutive rejected steps
+selection: lm 5 in band, loss 9.64
+gallery: lm nearest round3-parasol at 1.06, the hand form at 0.58
+gallery: fit nearest round3-parasol at 1.06, the hand form at 0.58
+
+hornbeam: 49 evaluations in 811 s (screening 130 s, lm 427 s, cma 0 s, verification 211 s, gallery 43 s)
+accepted: False (measured targets in band on fresh seeds: 5 of 6; outside: stand.lateShare); fit from lm
+loss on fresh seeds (progress only): start 7.24, fitted 8.04
+trait                         kind   target    band    start   fitted   margin
+stand.height              measured       84      13      108     96.4    0.623
+lone.earlyShare           measured     0.67    0.05    0.706    0.669   0.0491
+lone.slenderness         described       58      10     61.9     59.2     8.75
+stand.slenderness         measured       86      12     92.2       85       11
+stand.crownRatio         described     0.55     0.1    0.352    0.387  -0.0632
+stand.lai                 measured      8.3     1.5     7.52     8.39     1.41
+stand.lateShare           measured     1.23    0.05     1.26     1.35   -0.066
+shade.survivalLight       measured    0.033    0.01   0.0257   0.0266  0.00362
+reported (never scored; the description where there is one):
+trait                     described     hand    start   fitted
+lone.spread                     0.7    0.795    0.795    0.946
+lone.spread100                  0.7    0.812    0.812    0.982
+lone.profile             0.26/0.65/0.88/0.98/1.00/0.99/0.93/0.79/0.56/0.22 0.24/0.47/0.73/0.84/0.90/0.94/0.92/0.89/0.86/0.73 0.24/0.47/0.73/0.84/0.90/0.94/0.92/0.89/0.86/0.73 0.27/0.53/0.73/0.79/0.89/0.92/0.95/0.94/0.88/0.74
+lone.profile100          0.26/0.65/0.88/0.98/1.00/0.99/0.93/0.79/0.56/0.22 0.24/0.46/0.65/0.75/0.82/0.86/0.90/0.86/0.91/0.86 0.24/0.46/0.65/0.75/0.82/0.86/0.90/0.86/0.91/0.86 0.27/0.48/0.60/0.74/0.78/0.86/0.95/0.98/0.96/0.85
+lone.forkHeight                 0.4     0.42     0.42    0.334
+lone.forkHeight100              0.4    0.357    0.357    0.264
+lone.leaderDominance            1.6     1.82     1.82      1.6
+lone.leaderDominance100         1.6     3.05     3.05     2.67
+lone.branchAngle                 50     39.1     39.1     38.5
+lone.branchAngle100              50     38.8     38.8     38.3
+lone.limbDroop                   10     6.95     6.95     8.25
+lone.limbDroop100                10     6.98     6.98     8.25
+lone.limbElevation                —     50.9     50.9     49.5
+lone.limbElevation100             —       51       51     49.9
+lone.widestAt                     —    0.583    0.583    0.633
+lone.widestAt100                  —     0.75     0.75      0.8
+lone.crownFullness                —    0.752    0.752    0.764
+lone.crownFullness100             —    0.732    0.732    0.746
+stand.crownRatio100               —    0.457    0.457    0.498
+gallery: lm nearest round3-parasol at 1.06, the hand form at 0.58
+gallery: fit nearest round3-parasol at 1.06, the hand form at 0.58
+active: c3.alpha, c5.Trel, r1.Lh, r1.mf, r3.c, r6.qMin, r6.leafArea, r2.hJ
+c3.alpha                     2.81      2.5
+c5.Trel                     0.148    0.194
+c6.r0                     0.00311  0.00314
+r1.Lh                        92.4      125
+r1.mf                      0.0817   0.0822
+r3.c                       0.0592   0.0517
+r6.qMin                    0.0126   0.0114
+r6.leafArea                  2.33     2.31
+r2.hJ                        8.83       26
+r1.mw                          64     63.1
+wrote /home/edbarker/Documents/Projects/tree-simulation/docs/experiments/fits/round5-pilot/hornbeam.json
+hornbeam {"round 2":{"lone 60":{"height":100.01303916863128,"hd":48.14669355139823,"spread":1.1388745443337838,"widestAt":0.75,"limbCrownRatio":0.9449540643986254},"lone 100":{"height":141.13734954259505,"hd":54.418037696624296,"spread":1.0213166933577242,"widestAt":0.85,"limbCrownRatio":0.960958732661977},"stand 100":{"height":140.89610091690255,"hd":90.42709818647295,"limbCrownRatio":0.5995701587771497,"leafCrownRatio":0.36411918239416624,"lai":6.073878673348753,"top":145.44347217232541,"floor":0.0355280325801932}},"round 5-pilot":{"lone 60":{"height":100.34835169503559,"hd":60.083510556615515,"spread":0.9066911271970811,"widestAt":0.65,"limbCrownRatio":0.9425106365222085},"lone 100":{"height":141.15881094263509,"hd":57.43425844703134,"spread":0.9799464003952199,"widestAt":0.85,"limbCrownRatio":0.9384367480526559},"stand 100":{"height":null,"hd":null,"limbCrownRatio":null,"leafCrownRatio":null,"lai":6.960840495170227,"top":140.38181317128138,"floor":0.03177587269274791}}}
+wrote runs/panel-round5-pilot/panel.json
+shot runs/panel-round5-pilot/hornbeam-round2-lone60.png
+shot runs/panel-round5-pilot/hornbeam-round2-lone100.png
+shot runs/panel-round5-pilot/hornbeam-round2-stand100.png
+shot runs/panel-round5-pilot/hornbeam-round5-pilot-lone60.png
+shot runs/panel-round5-pilot/hornbeam-round5-pilot-lone100.png
+shot runs/panel-round5-pilot/hornbeam-round5-pilot-stand100.png
+Traceback (most recent call last):
+  File "/home/edbarker/Documents/Projects/tree-simulation/docs/experiments/code/2026-10-31-species-round4/panel-figure.py", line 88, in <module>
+    ax.set_xlabel(label(view, t), fontsize=10)
+                  ~~~~~^^^^^^^^^
+  File "/home/edbarker/Documents/Projects/tree-simulation/docs/experiments/code/2026-10-31-species-round4/panel-figure.py", line 68, in label
+    return (f"middle row: height {t['height']:.0f} · H/D {t['hd']:.0f}\ncrown ratio {t['limbCrownRatio']:.2f} limb, "
+                                 ^^^^^^^^^^^^^^^^^
+TypeError: unsupported format string passed to NoneType.__format__
+Traceback (most recent call last):
+  File "/home/edbarker/Documents/Projects/tree-simulation/analysis/experiments/m27_fit.py", line 289, in <module>
+    pilot_panel(species[0], out)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/home/edbarker/Documents/Projects/tree-simulation/analysis/experiments/m27_fit.py", line 232, in pilot_panel
+    subprocess.run([sys.executable, f"{code}/panel-figure.py", shots, "docs/experiments/figures", f"-{out.name}"],
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                   cwd=REPO, check=True)
+                   ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib64/python3.14/subprocess.py", line 578, in run
+    raise CalledProcessError(retcode, process.args,
+                             output=stdout, stderr=stderr)
+subprocess.CalledProcessError: Command '['/home/edbarker/Documents/Projects/tree-simulation/analysis/.venv/bin/python', 'docs/experiments/code/2026-10-31-species-round4/panel-figure.py', 'runs/panel-round5-pilot', 'docs/experiments/figures', '-round5-pilot']' returned non-zero exit status 1.

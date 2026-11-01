@@ -2,6 +2,15 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-01: A review of the fresh-look beech round (branch claude/fresh-look-beech)
+
+- **Reproduced:** the repair's sheet and metrics from the brief's command, all 63 numbers equal to `repair-round1/metrics.json`; the stand equal to the solver's; every changed `rust/presets.json` entry inside a beech patch. [Review note](experiments/2026-11-01-fresh-look-beech-review.md).
+- **Fixed:** `to_degrees` from std in two core paths, replaced by the core's own multiply (bit-identical: the repair's seed-1 hashes unchanged). Tests for the fork's action in growth and the relay gate's signal.
+- **ADRs 0039–0043, proposed,** for the round's five rules. 0043 (own-crown pruning, `c5.Tvig`) is a C5 shedding change against ADR 0032, for the user's decision. Sprugel et al. 1991 and Takenaka 1994 exist but could not be read here; their claimed content is marked unverified.
+- **A preset, `beechOpen`:** oakOpen's lone specimen with a beech, 240 wide (the repair's world). No other preset changed.
+- **Goldens (intended, new cases only):** `beechOpen:seed1:s40` and `beechWood:seed1:s30`. The round's goldens stopped at 15 seasons, before any of its rules acts; these two run long enough. `golden-coverage.py` shows each case's hash moves when a rule is switched off: the lone case exercises four rules (all but the relay gate, which is identically nil alone), the wood four (all but own-crown pruning); together all five. The 14 existing hashes are unchanged.
+- **Surprise:** in `beechWood` the vigour gate opens by season 30 (the drop and light orthotropy change its hash), and in the round's closed stand the largest v_base reaches 2,400–3,000 against the gate's 3,000 (20 seeds), not the "≤ 2,000" the round reported.
+
 ## 2026-11-01: Track B (vocabulary): the six judged; picks.toml final
 
 - **The user's decisions:** oak accepted (posture by age, 35 → 85 by wood over 50); maple accepted (relay from age 10, relays curving 30); willow accepted (pendulous twigs, twig laterals every second node). Hornbeam (the relay leaves the flat cap), rowan and holly keep today's [form]. `picks.toml` final for all eight; ADRs 0033–0036 and 0038 accepted for the species that use them.

@@ -3,13 +3,22 @@
 //! lateral generator and p_term (sympodial growth); ontogeny lowers λ from age a_c; acrotony κ
 //! weights each node's laterals by their place in the season's shoot.
 //!
-//! Params: r2.enabled, r2.levels, r2.aC, r2.dLambda, r2.ramp, r2.kappa; c1.branchAngle,
-//! c3.lambda, c4.setPoint, c4.eta when off.
+//! The relay (§R2.4's "distal laterals take over"; ADR 0033, proposed): when a pa-0 axis's
+//! terminal bud has ended (by its row's p_term, or from tree age `relayAge` by `relayPTerm`), the
+//! lateral buds on the top `relay` nodes below the ended apex grow as pa 0 themselves: their
+//! shoots take the trunk's row (λ, set point, generator, p_term) and pass it to their subtree
+//! through R4's per-axis shift. The crown becomes several ascending co-dominant limbs, each a
+//! trunk that may in turn end and relay (Troll's and Leeuwenberg's sympodial models; Hallé et al.
+//! 1978), instead of one leader whose laterals stay limbs. Without it a lateral under an ended
+//! apex stays pa 1, and a trunk that stops is a table (ADR 0031).
+//!
+//! Params: r2.enabled, r2.levels, r2.aC, r2.dLambda, r2.ramp, r2.kappa, r2.relay,
+//! r2.relayAge, r2.relayPTerm; c1.branchAngle, c3.lambda, c4.setPoint, c4.eta when off.
 
 use crate::math;
 use crate::params::{C4, Generator, PaLevel, Params, Phyllotaxis, R2};
 use crate::rng::{purpose, uniform};
-use crate::tree::{Tree, ensure};
+use crate::tree::{Tree, bud, ensure, slot};
 
 /// The table row for an axis of order `order`, or None when R2 is off (or the order is
 /// negative, where JavaScript's `levels[-1]` is undefined).
@@ -79,12 +88,37 @@ pub fn laterals(order: f64, axis_node: f64, last_of_shoot: bool, params: &Params
     }
 }
 
-/// True if the terminal bud ending a shoot at metamer `birth_id` terminates (sympodial growth).
-pub fn terminates(order: f64, tree_id: f64, birth_id: f64, season: f64, params: &Params) -> bool {
+/// True if the relay is on: some laterals under an ended pa-0 apex take pa 0.
+pub fn relay_on(params: &Params) -> bool {
+    params.r2.enabled && !params.r2.levels.is_empty() && params.r2.relay >= 1.0
+}
+
+/// The probability that a shoot of physiological age `order` ends in its terminal bud, on a tree
+/// of age `tree_age`: the row's p_term, and with the relay on, at least `relayPTerm` for pa 0 from
+/// `relayAge` on (the leader stops after an age, Troll's and Leeuwenberg's modules).
+pub fn p_term_at(order: f64, tree_age: f64, params: &Params) -> f64 {
     let Some(level) = pa_level(order, &params.r2) else {
-        return false;
+        return 0.0;
     };
-    if level.p_term <= 0.0 {
+    let r2 = &params.r2;
+    if relay_on(params) && order == 0.0 && tree_age >= r2.relay_age {
+        return math::max(level.p_term, r2.relay_p_term);
+    }
+    level.p_term
+}
+
+/// True if the terminal bud ending a shoot at metamer `birth_id` terminates (sympodial growth),
+/// on a tree of age `tree_age`.
+pub fn terminates(
+    order: f64,
+    tree_id: f64,
+    birth_id: f64,
+    season: f64,
+    tree_age: f64,
+    params: &Params,
+) -> bool {
+    let p_term = p_term_at(order, tree_age, params);
+    if p_term <= 0.0 {
         return false;
     }
     uniform(
@@ -94,7 +128,45 @@ pub fn terminates(order: f64, tree_id: f64, birth_id: f64, season: f64, params: 
         birth_id,
         season,
         0.0,
-    ) < level.p_term
+    ) < p_term
+}
+
+/// For each of the first `nm` metamers, how many nodes it sits below an ended apex on its own axis
+/// (0: it carries the ended terminal bud), or infinity; read from the buds that existed when the
+/// season's growth began (the first `nb`). One reverse pass: a node has one main child.
+pub fn relay_depth(tree: &Tree, nm: usize, nb: usize) -> Vec<f64> {
+    let mut depth = vec![f64::INFINITY; nm];
+    for j in 0..nb {
+        let m = tree.b.metamer[j];
+        if tree.b.slot[j] == slot::MAIN && tree.b.state[j] == bud::TERMINATED && m >= 0 {
+            depth[m as usize] = 0.0;
+        }
+    }
+    for i in (1..nm).rev() {
+        let p = tree.m.parent[i];
+        if tree.m.slot[i] == slot::MAIN && p >= 0 {
+            let p = p as usize;
+            depth[p] = math::min(depth[p], depth[i] + 1.0);
+        }
+    }
+    depth
+}
+
+/// The paShift that makes bud `b`'s shoot a relay, pa 0, if it is a lateral on one of the top
+/// `relay` nodes below an ended apex of a pa-0 axis (`depth` from `relay_depth`); else None.
+pub fn relay_shift(tree: &Tree, b: usize, depth: &[f64], params: &Params) -> Option<f64> {
+    if tree.b.slot[b] == slot::MAIN {
+        return None;
+    }
+    let h = tree.b.metamer[b] as usize;
+    if h >= depth.len() || depth[h] >= params.r2.relay {
+        return None;
+    }
+    let host_pa = tree.m.order[h] as f64 - tree.m.pa_shift[h] as f64;
+    if host_pa != 0.0 {
+        return None;
+    }
+    Some(tree.b.order[b] as f64)
 }
 
 /// C4 params for shoots of physiological age `order`: A_set and η from the pa table.
@@ -221,11 +293,11 @@ mod tests {
             "",
         );
         let ids: Vec<f64> = (0..2000).map(|i| i as f64).collect();
-        assert!(!ids.iter().any(|&id| terminates(0.0, 0.0, id, 3.0, &p)));
-        assert!(ids.iter().all(|&id| terminates(1.0, 0.0, id, 3.0, &p)));
+        assert!(!ids.iter().any(|&id| terminates(0.0, 0.0, id, 3.0, 0.0, &p)));
+        assert!(ids.iter().all(|&id| terminates(1.0, 0.0, id, 3.0, 0.0, &p)));
         let half = ids
             .iter()
-            .filter(|&&id| terminates(2.0, 0.0, id, 3.0, &p))
+            .filter(|&&id| terminates(2.0, 0.0, id, 3.0, 0.0, &p))
             .count() as f64
             / ids.len() as f64;
         assert!(half > 0.45 && half < 0.55, "{half}");
@@ -243,5 +315,109 @@ mod tests {
         assert_eq!(direction_params(&p, 4.0).set_point, 85.0);
         let off = Params::from_json(&preset("default", "{}"));
         assert_eq!(direction_params(&off, 3.0).set_point, off.c4.set_point);
+    }
+
+    #[test]
+    fn ends_the_leader_from_relay_age_with_relay_p_term() {
+        let rows = [r#"{"pTerm":0}"#, r#"{"pTerm":0.2}"#];
+        let p = with_r2(&rows, r#""relay":2,"relayAge":30,"relayPTerm":0.7"#);
+        assert_eq!(p_term_at(0.0, 29.0, &p), 0.0);
+        assert_eq!(p_term_at(0.0, 30.0, &p), 0.7);
+        assert_eq!(p_term_at(1.0, 30.0, &p), 0.2); // only pa 0 relays
+        let off = with_r2(&rows, r#""relayAge":30,"relayPTerm":0.7"#); // relay absent: off
+        assert_eq!(p_term_at(0.0, 50.0, &off), 0.0);
+        let ids: Vec<f64> = (0..2000).map(|i| i as f64).collect();
+        let ended = ids
+            .iter()
+            .filter(|&&id| terminates(0.0, 0.0, id, 3.0, 40.0, &p))
+            .count() as f64
+            / ids.len() as f64;
+        assert!(ended > 0.65 && ended < 0.75, "{ended}");
+    }
+
+    /// A vertical trunk of four metamers, each with a lateral bud (slot 1), the top one with an
+    /// ended terminal bud; and a pa-1 limb on the base with the same.
+    fn ended_trunk() -> (Tree, Vec<usize>, usize) {
+        use crate::testing::{LEFT, bud, metamer};
+        use std::f64::consts::FRAC_PI_2;
+        let mut t = Tree::new(0, 10.0, 0.5);
+        let mut laterals = Vec::new();
+        let mut parent = -1;
+        for _ in 0..4 {
+            let m = metamer(&mut t, parent, slot::MAIN, FRAC_PI_2, 1.0, 0.02, 0.0);
+            laterals.push(bud(&mut t, m, LEFT, 2.0, 1.0));
+            parent = m as i32;
+        }
+        let apex = bud(&mut t, parent as usize, slot::MAIN, FRAC_PI_2, 0.0);
+        t.b.state[apex] = bud::TERMINATED;
+        let limb = metamer(&mut t, 0, LEFT, 2.5, 1.0, 0.02, 0.0);
+        let twig = bud(&mut t, limb, LEFT, 2.5, 2.0);
+        let end = bud(&mut t, limb, slot::MAIN, 2.5, 1.0);
+        t.b.state[end] = bud::TERMINATED;
+        (t, laterals, twig)
+    }
+
+    #[test]
+    fn relays_the_laterals_on_the_top_nodes_under_an_ended_leader() {
+        let p = with_r2(&[r#"{}"#, r#"{}"#, r#"{}"#], r#""relay":2"#);
+        let (t, laterals, twig) = ended_trunk();
+        let depth = relay_depth(&t, t.m.len(), t.b.len());
+        assert_eq!(&depth[..4], &[3.0, 2.0, 1.0, 0.0]);
+        assert_eq!(depth[4], 0.0); // the limb's own ended apex
+        let shifts: Vec<Option<f64>> = laterals
+            .iter()
+            .map(|&b| relay_shift(&t, b, &depth, &p))
+            .collect();
+        // The top two nodes' laterals take pa 0 (shift = order 1); the lower two stay limbs.
+        assert_eq!(shifts, vec![None, None, Some(1.0), Some(1.0)]);
+        // A pa-1 limb whose apex ended does not relay: only the trunk's row is passed on.
+        assert_eq!(relay_shift(&t, twig, &depth, &p), None);
+        assert!(!relay_on(&with_r2(&[r#"{}"#], "")));
+    }
+
+    #[test]
+    fn a_relay_shoot_grows_as_pa_0_and_passes_it_to_its_subtree() {
+        let p = with_r2(
+            &[r#"{"generator":"opposite"}"#, r#"{"generator":"none"}"#],
+            r#""relay":1"#,
+        );
+        let (mut t, laterals, _) = ended_trunk();
+        t.ensure_scratch();
+        for j in 0..t.b.len() {
+            t.b.v[j] = 0.0;
+        }
+        let (top, low) = (laterals[3], laterals[0]);
+        t.b.v[top] = 2.0;
+        t.b.v[low] = 2.0;
+        let nm = t.m.len();
+        crate::season::grow_buds(&mut t, &p, 1.0);
+        // Two shoots of two metamers: the low one first (bud order), then the relay.
+        let (low_shoot, relay) = (nm, nm + 2);
+        assert_eq!(t.m.order[relay], 1);
+        assert_eq!(t.m.pa_shift[relay], 1); // pa 0
+        assert_eq!(t.m.pa_shift[relay + 1], 1); // inherited along the shoot
+        assert_eq!(t.m.pa_shift[low_shoot], 0); // pa 1: a limb
+        // pa 0's opposite generator on the relay, pa 1's none on the limb.
+        let on = |m: usize| {
+            (0..t.b.len())
+                .filter(|&j| t.b.metamer[j] as usize == m && t.b.slot[j] != slot::MAIN)
+                .count()
+        };
+        assert_eq!(on(relay), 2);
+        assert_eq!(on(low_shoot), 0);
+        // Off, the same bud grows a limb.
+        let off = with_r2(
+            &[r#"{"generator":"opposite"}"#, r#"{"generator":"none"}"#],
+            "",
+        );
+        let (mut t, laterals, _) = ended_trunk();
+        t.ensure_scratch();
+        for j in 0..t.b.len() {
+            t.b.v[j] = 0.0;
+        }
+        t.b.v[laterals[3]] = 2.0;
+        let nm = t.m.len();
+        crate::season::grow_buds(&mut t, &off, 1.0);
+        assert_eq!(t.m.pa_shift[nm], 0);
     }
 }

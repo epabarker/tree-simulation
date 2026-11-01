@@ -323,6 +323,20 @@ export interface Params {
      * 0 or absent: off (the full cap from the first season).
      */
     hJ?: number;
+    /**
+     * The sympodial relay (§R2.4 "distal laterals take over", Troll's and Leeuwenberg's models;
+     * ADR 0033, proposed): when the terminal bud of a pa-0 axis has ended, the laterals on the top
+     * `relay` nodes below it grow as pa 0 (the trunk's row), so the crown divides into several
+     * ascending co-dominant limbs. 0 or absent: off.
+     */
+    relay?: number;
+    /** With the relay: from this tree age (seasons), a pa-0 terminal ends with `relayPTerm`. */
+    relayAge?: number;
+    /**
+     * With the relay: the probability that a pa-0 shoot's terminal ends from `relayAge` on (the
+     * larger of it and the row's pTerm). 0 or absent: only the row's pTerm ends it.
+     */
+    relayPTerm?: number;
   };
 
   /**

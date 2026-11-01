@@ -2,6 +2,11 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-01: Track B (vocabulary): the sympodial relay (ADR 0033, proposed)
+
+- **`r2.relay`, `r2.relayAge`, `r2.relayPTerm`** (r2.rs, season.rs): laterals on the top nodes under an ended pa-0 apex grow as pa 0 (spec §R2.4's "distal laterals take over"), and the leader may end from an age. Off by default; presets and goldens unchanged.
+- **The form atlas** (`docs/experiments/code/2026-11-01-atlas/atlas.py`): a sheet per rule, beech, oak and birch at 60 and 100. The relay's sheet: beech splits into ascending co-dominant stems (a rounder top at 60 with a high relay p_term, a column of stems by 100); oak barely moves; birch fuller. The stems do not arch: curvature along the limb is next.
+
 ## 2026-11-01: the form re-pick, the third hornbeam pilot, the round-5 overnight started
 
 - **The re-pick** (`repick.py`, the user's rule): stand LAI in band, then the floor nearest the measured, then alive ≥ 0.8 at 100, behind a guard (lone W/H 0.3–2.5, H < 190, stand limb crown ratio ≥ 0.2). It replaces the overnight's stand-first rule, which picked columns. The picks: hornbeam 2-3-2, birch 3-3-2, oak 0-3-0 (flagged), willow 0-2-2; maple 0-0-0, rowan and holly round 2's (the user's). The stands were replayed with the ground written; every hash matched.

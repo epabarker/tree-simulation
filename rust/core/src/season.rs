@@ -19,7 +19,7 @@ use crate::principles::o2::{EMPTY, Grid, abrade, tag_owner};
 use crate::principles::o4::stand_dynamics;
 use crate::principles::obstacles::clear_obstacles;
 use crate::principles::r1::{carbon_balance, starved_to_death};
-use crate::principles::r2::direction_params;
+use crate::principles::r2::{direction_params, relay_depth, relay_on, relay_shift};
 use crate::principles::r3::update_mechanics;
 use crate::principles::r4::{aborts, growth_threshold, light_releases, released_shift};
 use crate::principles::r5::{elongation, neighbour_share, set_point_scale, shade_of};
@@ -406,6 +406,12 @@ pub fn grow_buds(tree: &mut Tree, params: &Params, season: f64) {
         }
         cap = juvenile_cap(height, params);
     }
+    // R2's relay (ADR 0033): the nodes under an ended pa-0 apex, as the season began.
+    let depth = if relay_on(params) {
+        relay_depth(tree, tree.m.len(), count)
+    } else {
+        Vec::new()
+    };
     let mut shoot_length = 0.0;
     for i in 0..count {
         if !is_live_bud(tree.b.state[i]) {
@@ -450,11 +456,20 @@ pub fn grow_buds(tree: &mut Tree, params: &Params, season: f64) {
             let reiterates = released && r4.enabled;
             let bud_order = tree.b.order[i] as f64;
             let host_shift = tree.m.pa_shift[host] as f64;
-            let shift = if reiterates {
+            let mut shift = if reiterates {
                 released_shift(bud_order, host_shift, r4)
             } else {
                 host_shift
             };
+            // A relay takes pa 0 (its shift is its order), a reiteration at most as young.
+            let relay = if depth.is_empty() {
+                None
+            } else {
+                relay_shift(tree, i, &depth, params)
+            };
+            if let Some(r) = relay {
+                shift = math::max(shift, r);
+            }
             let pa = bud_order - shift;
             let upright = set_point_scale(shade, r5);
             let length = shoot_length * elongation(shade, r5);
@@ -475,7 +490,11 @@ pub fn grow_buds(tree: &mut Tree, params: &Params, season: f64) {
                 let v = [tree.b.vx[b], tree.b.vy[b], tree.b.vz[b]];
                 shoot_direction(prev, tree.bud_reference(b), v, noise, around, &dir)
             };
-            let pa_shift = if reiterates { shift } else { -1.0 };
+            let pa_shift = if reiterates || relay.is_some() {
+                shift
+            } else {
+                -1.0
+            };
             grow_shoot(tree, i, n, length, params, season, &mut direct, pa_shift);
         } else {
             tree.b.state[i] = resting_state(tree.b.q[i], &params.r6);

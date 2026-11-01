@@ -210,6 +210,12 @@ pub struct R2 {
     pub ramp: f64,
     pub kappa: Option<f64>,
     pub h_j: Option<f64>,
+    /// The sympodial relay (ADR 0033): laterals on the top `relay` nodes below a pa-0 axis's
+    /// ended apex take pa 0. 0 or absent: off.
+    pub relay: f64,
+    /// From this tree age (seasons) a pa-0 terminal ends with probability `relay_p_term`.
+    pub relay_age: f64,
+    pub relay_p_term: f64,
 }
 
 #[derive(Clone, Debug)]
@@ -484,6 +490,9 @@ impl Params {
                 ramp: num(r2, "ramp"),
                 kappa: opt(r2, "kappa"),
                 h_j: opt(r2, "hJ"),
+                relay: opt(r2, "relay").unwrap_or(0.0),
+                relay_age: opt(r2, "relayAge").unwrap_or(0.0),
+                relay_p_term: opt(r2, "relayPTerm").unwrap_or(0.0),
             },
             r3: R3 {
                 enabled: flag(r3, "enabled"),

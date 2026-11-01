@@ -2,6 +2,52 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-01: Track B (vocabulary): fix A for the relay's order; the authored picks; ADRs accepted for beech and birch
+
+- **Fix A** (the user's choice, ADR 0033): a relay is stored at the order of the axis it replaces, so orders no longer climb along a relay chain (the u8 limit). The form offsets exempt the trunk's own axis rather than order 0; C5's bud bank takes the order by slot. Goldens unchanged. The accepted beech and birch sheets are bit-identical before and after; only `limbElevation` reads 0–6° higher on beech (trunk relays' laterals count as limbs).
+- **`docs/experiments/code/2026-11-01-atlas/picks.toml`:** the authored form for beech (relay, relay curvature, posture by age) and birch (pendulous twigs, twig laterals every third node); oak and the other five hold today's [form]. Track D copies them into [form] after its fit.
+- **ADRs 0033–0036 and 0038** accepted for beech and birch as authored; 0037 (elbows) stays proposed, with oak waiting for the elbows to persist.
+
+## 2026-11-01: Track B (vocabulary): beech and fir with posture by age; the u8 order fix proposed
+
+- **`atlas.py combined --species beech-aged`** (relay, relay curvature 45, limbs set point 28 levelling to 80 with wood age over 30/50/80): the broadest beech yet (W/H 0.77–1.04 at 60) with a rounded top. The tiers partly break up into irregular masses, but some level plates remain. **`fir-aged`** (limbs 60 → 110): little change in the outline.
+- **ADR 0033:** two fixes for the u8 order limit proposed, not applied. A: a relay keeps the order of the axis it replaces (no schema change; form metrics read relays as trunk). B: store pa, with a checkpoint version (every golden changes).
+
+## 2026-11-01: Track B (vocabulary): posture by age (ADR 0038, proposed)
+
+- **`r2.levels[i].agedSetPoint`, `agedOver`, `agedBy`** (r2.rs, season.rs, r3.rs): a level's growth and posture set points move with the wood's age (gravimorphism) or the tree's (phase change). Off by default; presets and goldens unchanged.
+- **The sheet** (`atlas.py aged`): the strongest form knob so far. Limb elevation spans 69° to −27°; birch at 100–130 becomes a fir-like cone of descending lower limbs.
+
+## 2026-11-01: Track B (vocabulary): elbows (ADR 0037, proposed)
+
+- **`r2.levels[i].relay`** (r2.rs): an ended axis of any level is continued by its top laterals at that level, so the limb kinks at each takeover (the relay of ADR 0033, past the trunk). Off by default; presets and goldens unchanged.
+- **The sheet** (`atlas.py elbows`): the kinks don't read at the atlas's scale (the set point straightens them). A high limb pTerm narrows and densifies oak; birch at pTerm 1 gets a sinuous top.
+
+## 2026-11-01: Track B (vocabulary): the combined sheets; birch's spike explained
+
+- **Combined sheets** (`atlas.py combined --species <sp>`): beech (relay + curvature) at 60, birch (pendulous + twig spacing) and oak (curvature + per-level κ) at 60 and 100, seeds 1–3 down the rows, "today (off)" first. Beech loses the spire on every seed (fork 0.93–1.00 → 0.26–0.38, a multi-stemmed, rounded, irregular top); `levels.0.curve` 30–60 moves it less than the seed does.
+- **Birch's spike at `relayPTerm` 1** (ADR 0033): a sympodial leader, orders 40–52 through the top 30 cells, renewed each season; it keeps the height the monopodial leader loses. Not a bug. It exposes a limit: order is a u8 and overflows after ≈ 255 relays (forest's 300 seasons), to fix before adoption.
+
+## 2026-11-01: Track B (vocabulary): twig density (ADR 0036, proposed)
+
+- **`r2.levels[i].kappa`, `lateralEvery`** (r2.rs): acrotony per level, and laterals only at every k-th node. Off by default; presets and goldens unchanged.
+- **The sheet** (`atlas.py twigs`): `levels.2.lateralEvery` 3–4 makes birch's crown open, lacy and fine (long thin twig axes), the nearest to its texture on any sheet; per-level κ tufts and broadens the limbs.
+
+## 2026-11-01: Track B (vocabulary): pendulous twigs (ADR 0035, proposed)
+
+- **`r2.levels[i].pendulous`, `pendulousRadius`** (r2.rs, season.rs, r3.rs): a level's thin axes take a hanging set point in growth and posture, blended back to the level's own by girth. Off by default; presets and goldens unchanged.
+- **The sheet** (`atlas.py pendulous`): at radius ≤ 0.01 the twigs hang without the collapse that `levels.2.setPoint` ≥ 80 caused; at 0.02–0.04 oak collapses again. The hanging is faint at the atlas's scale: birch's curtains need long thin shoots as well (twig density and length, next).
+
+## 2026-11-01: Track B (vocabulary): curvature along the limb (ADR 0034, proposed)
+
+- **`r2.levels[i].curve`, `curveLength`** (r2.rs, season.rs, r3.rs): a level's growth and posture set points move by curve·min(1, node/curveLength) along each non-trunk axis. Off by default; presets and goldens unchanged.
+- **The sheet** (`atlas.py curve`): limbs lower and their tips arch; oak gets a fringe of hanging limb ends; with the relay, beech's top broadens and rounds at 60. No species changes kind on curvature alone. Track A's identity card ranks curvature first and pendulous twigs second; that is this track's order.
+
+## 2026-11-01: Track B (vocabulary): the sympodial relay (ADR 0033, proposed)
+
+- **`r2.relay`, `r2.relayAge`, `r2.relayPTerm`** (r2.rs, season.rs): laterals on the top nodes under an ended pa-0 apex grow as pa 0 (spec §R2.4's "distal laterals take over"), and the leader may end from an age. Off by default; presets and goldens unchanged.
+- **The form atlas** (`docs/experiments/code/2026-11-01-atlas/atlas.py`): a sheet per rule, beech, oak and birch at 60 and 100. The relay's sheet: beech splits into ascending co-dominant stems (a rounder top at 60 with a high relay p_term, a column of stems by 100); oak barely moves; birch fuller. The stems do not arch: curvature along the limb is next.
+
 ## 2026-11-01: the form re-pick, the third hornbeam pilot, the round-5 overnight started
 
 - **The re-pick** (`repick.py`, the user's rule): stand LAI in band, then the floor nearest the measured, then alive ≥ 0.8 at 100, behind a guard (lone W/H 0.3–2.5, H < 190, stand limb crown ratio ≥ 0.2). It replaces the overnight's stand-first rule, which picked columns. The picks: hornbeam 2-3-2, birch 3-3-2, oak 0-3-0 (flagged), willow 0-2-2; maple 0-0-0, rowan and holly round 2's (the user's). The stands were replayed with the ground written; every hash matched.

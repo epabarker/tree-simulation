@@ -323,6 +323,20 @@ export interface Params {
      * 0 or absent: off (the full cap from the first season).
      */
     hJ?: number;
+    /**
+     * The sympodial relay (§R2.4 "distal laterals take over", Troll's and Leeuwenberg's models;
+     * ADR 0033, proposed): when the terminal bud of a pa-0 axis has ended, the laterals on the top
+     * `relay` nodes below it grow as pa 0 (the trunk's row), so the crown divides into several
+     * ascending co-dominant limbs. 0 or absent: off.
+     */
+    relay?: number;
+    /** With the relay: from this tree age (seasons), a pa-0 terminal ends with `relayPTerm`. */
+    relayAge?: number;
+    /**
+     * With the relay: the probability that a pa-0 shoot's terminal ends from `relayAge` on (the
+     * larger of it and the row's pTerm). 0 or absent: only the row's pTerm ends it.
+     */
+    relayPTerm?: number;
   };
 
   /**
@@ -475,6 +489,56 @@ export interface PaLevel {
    * (Troll's model: shoots grow plagiotropic, the trunk straightens to 0 later; ADR 0011).
    */
   postureSetPoint?: number;
+  /**
+   * Curvature along the limb (ADR 0034, proposed; Weber & Penn 1995's nCurve): degrees added to
+   * this level's set points (growth and posture) at node k of an axis, curve·min(1, k/curveLength),
+   * so a limb bends progressively along its length: positive arches out and down (beech, oak),
+   * negative sweeps up (ash). The trunk itself (order 0) never curves; a relay does. Absent or 0: off.
+   */
+  curve?: number;
+  /** With curve: the nodes (≈ cells) over which the curve accrues; absent, 20. */
+  curveLength?: number;
+  /**
+   * Pendulous twigs (ADR 0035, proposed; §9's weeping and birch rows): the set point, degrees from
+   * vertical (> 90 hangs), that a thin axis of this level takes in growth and posture instead of
+   * its own: fully at pipe radius ≤ pendulousRadius, fading back to setPoint at twice it. Twigs
+   * hang; an axis that thickens into a limb rises to the level's angle. The trunk never hangs. A
+   * new lateral axis is as thin as can be; a continuation shoot is weighed by the metamer it
+   * grows from. Absent: off.
+   */
+  pendulous?: number;
+  /** With pendulous: the radius (cells) up to which an axis hangs fully; absent, 0.01. */
+  pendulousRadius?: number;
+  /**
+   * Twig density (ADR 0036, proposed): acrotony κ at this level's nodes, in place of r2.kappa;
+   * high κ gathers a limb's shoots at its shoot ends (tufts), low spreads them along it. Absent:
+   * r2.kappa.
+   */
+  kappa?: number;
+  /**
+   * Twig density (ADR 0036, proposed): this level forms laterals only at every k-th node of an
+   * axis (sparse, fine shoots: birch's), not for "whorled" (tierEvery). Absent or ≤ 1: every node.
+   */
+  lateralEvery?: number;
+  /**
+   * Elbows (ADR 0037, proposed): when an axis of this level ends (pTerm), the laterals on its top
+   * `relay` nodes continue it at this level, each from its own bud's angle: a sympodial limb with
+   * a kink at every takeover (oak's elbowed, sinuous limbs). Generalises r2.relay (ADR 0033) past
+   * the trunk; for level 0 it overrides r2.relay. Absent: 0 (off) for levels ≥ 1.
+   */
+  relay?: number;
+  /**
+   * Posture by age (ADR 0038, proposed): the set point, degrees, that this level's axes move toward
+   * with age, linearly over `agedOver` seasons, in growth and posture. By the wood's own age
+   * (gravimorphism: a fir limb erect, then level, then descending, with its young tips still up), or
+   * with agedBy "tree" by the tree's age (a phase change at maturity: Makowski et al. 2019). The
+   * trunk itself never moves. Absent: off.
+   */
+  agedSetPoint?: number;
+  /** With agedSetPoint: the seasons over which the set point moves; absent, 50. */
+  agedOver?: number;
+  /** With agedSetPoint: "wood" (the default), the metamer's own age, or "tree", the tree's. */
+  agedBy?: "wood" | "tree";
 }
 
 export const defaultParams: Params = {

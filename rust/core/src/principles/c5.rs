@@ -127,7 +127,17 @@ pub fn remove_branches(
         .iter()
         .map(|&i| {
             let c = &tree.m;
-            (c.parent[i], c.slot[i], c.order[i], c.azimuth[i])
+            // The bud's order by its slot (the parent's, one more for a lateral), not the shed
+            // shoot's: a relay is stored at its parent axis's order (ADR 0033, fix A). The same
+            // value for every other shoot.
+            let p = c.parent[i];
+            let order = if p < 0 {
+                c.order[i]
+            } else {
+                let up = (c.slot[i] != slot::MAIN) as u8;
+                c.order[p as usize].wrapping_add(up)
+            };
+            (p, c.slot[i], order, c.azimuth[i])
         })
         .collect();
     let keep: Vec<u8> = (0..nm).map(|i| if dead[i] != 0 { 0 } else { 1 }).collect();

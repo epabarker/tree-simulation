@@ -161,7 +161,7 @@ pub fn form_terminal_bud(tree: &mut Tree, m: usize, params: &Params, season: f64
     let i = add_bud(tree, m, slot::MAIN, h, l, 0.0, order);
     let pa = order - tree.m.pa_shift[m] as f64;
     let birth = tree.m.birth_id[m] as f64;
-    if terminates(pa, tree.id as f64, birth, season, params) {
+    if terminates(pa, tree.id as f64, birth, season, tree.age, params) {
         tree.b.state[i] = bud::TERMINATED;
     }
 }
@@ -216,7 +216,8 @@ pub fn juvenile_cap(height: f64, params: &Params) -> f64 {
 /// Grows a shoot of `n` metamers of length `length` from `bud_` (§C1, §C3.4). `direct(tree,
 /// prev, bud, birth id)` gives each new metamer's heading from the previous one; the reference is
 /// carried along by parallel transport. `pa_shift ≥ 0` sets the shoot's reiteration shift (R4);
-/// otherwise it inherits its parent's.
+/// otherwise it inherits its parent's. `first_order ≥ 0` stores the shoot at that branching order
+/// (a relay, ADR 0033: the order of the axis it replaces); otherwise its slot's.
 #[allow(clippy::too_many_arguments)]
 pub fn grow_shoot(
     tree: &mut Tree,
@@ -227,6 +228,7 @@ pub fn grow_shoot(
     season: f64,
     direct: &mut dyn FnMut(&Tree, V3, usize, f64) -> V3,
     pa_shift: f64,
+    first_order: f64,
 ) {
     let mut parent = tree.b.metamer[bud_];
     let mut slot_ = tree.b.slot[bud_];
@@ -270,6 +272,9 @@ pub fn grow_shoot(
         );
         if j == 0.0 && pa_shift >= 0.0 {
             tree.m.pa_shift[m] = store_u8(pa_shift);
+        }
+        if j == 0.0 && first_order >= 0.0 {
+            tree.m.order[m] = store_u8(first_order);
         }
         form_axillary_buds(tree, m, params, j == n - 1.0);
         if j == n - 1.0 {
@@ -393,7 +398,7 @@ mod tests {
         let turn = 10f64.to_radians();
         let mut direct =
             |_: &Tree, prev: V3, _: usize, _: f64| crate::geom::rotate(prev, [1.0, 0.0, 0.0], turn);
-        grow_shoot(&mut t, terminal, 3.0, 1.0, &p, 1.0, &mut direct, -1.0);
+        grow_shoot(&mut t, terminal, 3.0, 1.0, &p, 1.0, &mut direct, -1.0, -1.0);
         for i in 1..t.m.len() {
             let (h, l) = (t.heading(i), t.reference(i));
             assert!(close(norm(h), 1.0) && close(norm(l), 1.0) && dot(h, l).abs() < 1e-12);

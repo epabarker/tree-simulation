@@ -3,13 +3,49 @@
 //! lateral generator and p_term (sympodial growth); ontogeny lowers λ from age a_c; acrotony κ
 //! weights each node's laterals by their place in the season's shoot.
 //!
-//! Params: r2.enabled, r2.levels, r2.aC, r2.dLambda, r2.ramp, r2.kappa; c1.branchAngle,
-//! c3.lambda, c4.setPoint, c4.eta when off.
+//! The relay (§R2.4's "distal laterals take over"; ADR 0033, proposed): when a pa-0 axis's
+//! terminal bud has ended (by its row's p_term, or from tree age `relayAge` by `relayPTerm`), the
+//! lateral buds on the top `relay` nodes below the ended apex grow as pa 0 themselves: their
+//! shoots take the trunk's row (λ, set point, generator, p_term) and pass it to their subtree
+//! through R4's per-axis shift. The crown becomes several ascending co-dominant limbs, each a
+//! trunk that may in turn end and relay (Troll's and Leeuwenberg's sympodial models; Hallé et al.
+//! 1978), instead of one leader whose laterals stay limbs. Without it a lateral under an ended
+//! apex stays pa 1, and a trunk that stops is a table (ADR 0031).
+//!
+//! Curvature along the limb (ADR 0034, proposed; Weber & Penn 1995's nCurve): a level's `curve`
+//! adds curve·min(1, k/curveLength) degrees to its set points (C4's growth, R3's posture) at node
+//! k of an axis, so the limb bends as it lengthens instead of holding one angle: an ascending limb
+//! arches over (beech's fan, oak's spread), a negative curve sweeps up. The trunk (order 0) is
+//! exempt: it is the one axis that stays straight; a relay (its own axis at pa 0) curves.
+//!
+//! Pendulous twigs (ADR 0035, proposed): a level's `pendulous` set point is taken, in growth and
+//! posture, by its thin axes: fully at pipe radius ≤ `pendulousRadius`, fading to the level's
+//! own set point at twice it. Twigs hang (birch's curtains, the willow's) without taking the
+//! scaffold with them, which one set point per level cannot do (≥ 80 for level 2 collapses
+//! every broadleaf: the form-sweep review). The trunk (order 0) never hangs.
+//!
+//! Elbows (ADR 0037, proposed): a level's own `relay` extends the relay past the trunk. When a
+//! limb's terminal ends (its row's p_term), the laterals on its top nodes continue it at the
+//! limb's level; each starts at its bud's branch angle, so the limb kinks at every takeover and
+//! zig-zags (oak's elbows; a lost tip replaced by a subapical bud, Hallé et al. 1978).
+//!
+//! Posture by age (ADR 0038, proposed): a level's `agedSetPoint` is where its set points (growth
+//! and posture) move with age, over `agedOver` seasons: by the wood's own age (gravimorphism, old
+//! wood descends while young tips stay up) or, with `agedBy` "tree", by the tree's (a phase
+//! change at maturity). The trunk itself (order 0) is exempt.
+//!
+//! Twig density (ADR 0036, proposed): a level's own `kappa` (acrotony at its nodes, in place of
+//! r2.kappa) and `lateralEvery` (laterals only at every k-th node of its axes) set how many fine
+//! shoots a limb carries and where along it.
+//!
+//! Params: r2.enabled, r2.levels (curve, curveLength, pendulous, pendulousRadius, kappa,
+//! lateralEvery), r2.aC, r2.dLambda, r2.ramp, r2.kappa, r2.relay,
+//! r2.relayAge, r2.relayPTerm; c1.branchAngle, c3.lambda, c4.setPoint, c4.eta when off.
 
 use crate::math;
 use crate::params::{C4, Generator, PaLevel, Params, Phyllotaxis, R2};
 use crate::rng::{purpose, uniform};
-use crate::tree::{Tree, ensure};
+use crate::tree::{Tree, bud, ensure, slot};
 
 /// The table row for an axis of order `order`, or None when R2 is off (or the order is
 /// negative, where JavaScript's `levels[-1]` is undefined).
@@ -56,6 +92,14 @@ pub fn laterals(order: f64, axis_node: f64, last_of_shoot: bool, params: &Params
             Phyllotaxis::Distichous => (1, pi),
         };
     };
+    // Twig density (ADR 0036): laterals only at every k-th node.
+    if let Some(every) = level.lateral_every
+        && every > 1.0
+        && level.generator != Generator::Whorled
+        && (axis_node + 1.0) % every.floor() != 0.0
+    {
+        return (0, 0.0);
+    }
     match level.generator {
         // An unknown generator falls through to distichous, as the TypeScript switch did.
         Generator::Distichous | Generator::Unknown => (1, pi),
@@ -79,12 +123,51 @@ pub fn laterals(order: f64, axis_node: f64, last_of_shoot: bool, params: &Params
     }
 }
 
-/// True if the terminal bud ending a shoot at metamer `birth_id` terminates (sympodial growth).
-pub fn terminates(order: f64, tree_id: f64, birth_id: f64, season: f64, params: &Params) -> bool {
+/// True if the relay is on: some laterals under an ended pa-0 apex take pa 0.
+pub fn relay_on(params: &Params) -> bool {
+    let r2 = &params.r2;
+    r2.enabled
+        && !r2.levels.is_empty()
+        && (r2.relay >= 1.0 || r2.levels.iter().any(|l| l.relay.unwrap_or(0.0) >= 1.0))
+}
+
+/// How many nodes under an ended apex relay on an axis of physiological age `pa`: the level's
+/// own `relay` (ADR 0037), else r2.relay for pa 0 (ADR 0033), else none.
+pub fn relay_nodes(pa: f64, params: &Params) -> f64 {
+    let own = pa_level(pa, &params.r2).and_then(|l| l.relay);
+    match own {
+        Some(n) => n,
+        None if pa == 0.0 => params.r2.relay,
+        None => 0.0,
+    }
+}
+
+/// The probability that a shoot of physiological age `order` ends in its terminal bud, on a tree
+/// of age `tree_age`: the row's p_term, and with the relay on, at least `relayPTerm` for pa 0 from
+/// `relayAge` on (the leader stops after an age, Troll's and Leeuwenberg's modules).
+pub fn p_term_at(order: f64, tree_age: f64, params: &Params) -> f64 {
     let Some(level) = pa_level(order, &params.r2) else {
-        return false;
+        return 0.0;
     };
-    if level.p_term <= 0.0 {
+    let r2 = &params.r2;
+    if relay_on(params) && order == 0.0 && tree_age >= r2.relay_age {
+        return math::max(level.p_term, r2.relay_p_term);
+    }
+    level.p_term
+}
+
+/// True if the terminal bud ending a shoot at metamer `birth_id` terminates (sympodial growth),
+/// on a tree of age `tree_age`.
+pub fn terminates(
+    order: f64,
+    tree_id: f64,
+    birth_id: f64,
+    season: f64,
+    tree_age: f64,
+    params: &Params,
+) -> bool {
+    let p_term = p_term_at(order, tree_age, params);
+    if p_term <= 0.0 {
         return false;
     }
     uniform(
@@ -94,7 +177,48 @@ pub fn terminates(order: f64, tree_id: f64, birth_id: f64, season: f64, params: 
         birth_id,
         season,
         0.0,
-    ) < level.p_term
+    ) < p_term
+}
+
+/// For each of the first `nm` metamers, how many nodes it sits below an ended apex on its own axis
+/// (0: it carries the ended terminal bud), or infinity; read from the buds that existed when the
+/// season's growth began (the first `nb`). One reverse pass: a node has one main child.
+pub fn relay_depth(tree: &Tree, nm: usize, nb: usize) -> Vec<f64> {
+    let mut depth = vec![f64::INFINITY; nm];
+    for j in 0..nb {
+        let m = tree.b.metamer[j];
+        if tree.b.slot[j] == slot::MAIN && tree.b.state[j] == bud::TERMINATED && m >= 0 {
+            depth[m as usize] = 0.0;
+        }
+    }
+    for i in (1..nm).rev() {
+        let p = tree.m.parent[i];
+        if tree.m.slot[i] == slot::MAIN && p >= 0 {
+            let p = p as usize;
+            depth[p] = math::min(depth[p], depth[i] + 1.0);
+        }
+    }
+    depth
+}
+
+/// The paShift, against the bud's own order, that makes bud `b`'s shoot a relay at its axis's
+/// physiological age, if it is a lateral on one of the top `relay_nodes` nodes below its axis's
+/// ended apex (`depth` from `relay_depth`); else None. The shoot itself is stored at the order of
+/// the axis it replaces, one less, with one less shift (ADR 0033, fix A), so orders do not climb
+/// along a chain of relays.
+pub fn relay_shift(tree: &Tree, b: usize, depth: &[f64], params: &Params) -> Option<f64> {
+    if tree.b.slot[b] == slot::MAIN {
+        return None;
+    }
+    let h = tree.b.metamer[b] as usize;
+    if h >= depth.len() || !depth[h].is_finite() {
+        return None;
+    }
+    let host_pa = tree.m.order[h] as f64 - tree.m.pa_shift[h] as f64;
+    if depth[h] >= relay_nodes(host_pa, params) {
+        return None;
+    }
+    Some(tree.b.order[b] as f64 - host_pa)
 }
 
 /// C4 params for shoots of physiological age `order`: A_set and η from the pa table.
@@ -112,6 +236,86 @@ pub fn direction_params(params: &Params, order: f64) -> C4 {
     }
 }
 
+/// The curve's offset to the set points, degrees, at node `axis_node` of an axis of physiological
+/// age `pa` (0 on the trunk's own axis, `trunk`, and when off).
+pub fn curve_offset(trunk: bool, pa: f64, axis_node: f64, params: &Params) -> f64 {
+    if trunk {
+        return 0.0;
+    }
+    let Some(level) = pa_level(pa, &params.r2) else {
+        return 0.0;
+    };
+    let curve = level.curve.unwrap_or(0.0);
+    if curve == 0.0 {
+        return 0.0;
+    }
+    let length = math::max(1.0, level.curve_length.unwrap_or(20.0));
+    curve * math::min(1.0, math::max(0.0, axis_node) / length)
+}
+
+/// The offset, degrees, posture by age adds to the set points of an axis of physiological age
+/// `pa`, for wood `wood_age` seasons old on a tree `tree_age` old (0 when off and on the trunk's
+/// own axis, `trunk`).
+pub fn aged_offset(trunk: bool, pa: f64, wood_age: f64, tree_age: f64, params: &Params) -> f64 {
+    if trunk {
+        return 0.0;
+    }
+    let Some(level) = pa_level(pa, &params.r2) else {
+        return 0.0;
+    };
+    let Some(aged) = level.aged_set_point else {
+        return 0.0;
+    };
+    let age = if level.aged_by_tree {
+        tree_age
+    } else {
+        wood_age
+    };
+    let over = math::max(1.0, level.aged_over.unwrap_or(50.0));
+    (aged - level.set_point) * math::min(1.0, math::max(0.0, age) / over)
+}
+
+/// A set point (degrees) moved by the curve's offset, kept within [0°, 180°].
+pub fn curved(set_point: f64, offset: f64) -> f64 {
+    if offset == 0.0 {
+        return set_point;
+    }
+    math::max(0.0, math::min(180.0, set_point + offset))
+}
+
+/// True if axes of physiological age `pa` have a pendulous set point.
+pub fn hangs(pa: f64, params: &Params) -> bool {
+    pa_level(pa, &params.r2).is_some_and(|l| l.pendulous.is_some())
+}
+
+/// A set point (degrees) of an axis of physiological age `pa` (`trunk`: the trunk's own axis,
+/// which never hangs), moved toward its level's pendulous set point by the thinness of wood of
+/// radius `radius`.
+pub fn pendulous_set_point(
+    set_point: f64,
+    trunk: bool,
+    pa: f64,
+    radius: f64,
+    params: &Params,
+) -> f64 {
+    if trunk {
+        return set_point;
+    }
+    let Some(level) = pa_level(pa, &params.r2) else {
+        return set_point;
+    };
+    let Some(hang) = level.pendulous else {
+        return set_point;
+    };
+    let r_t = level.pendulous_radius.unwrap_or(0.01);
+    let w = if r_t > 0.0 {
+        math::max(0.0, math::min(1.0, (2.0 * r_t - radius) / r_t))
+    } else {
+        0.0
+    };
+    set_point + w * (hang - set_point)
+}
+
 /// Acrotony weights exp(κ(pos − 1)) per metamer in `tree.scratch_f` (first nm entries), pos its
 /// node's place in the shoot it grew with. False when κ is 0 (no weights).
 pub fn acrotony_weights(tree: &mut Tree, params: &Params) -> bool {
@@ -120,7 +324,9 @@ pub fn acrotony_weights(tree: &mut Tree, params: &Params) -> bool {
     } else {
         0.0
     };
-    if kappa == 0.0 {
+    // Twig density (ADR 0036): a level may carry its own κ.
+    let per_level = params.r2.enabled && params.r2.levels.iter().any(|l| l.kappa.is_some());
+    if kappa == 0.0 && !per_level {
         return false;
     }
     let nm = tree.m.len();
@@ -142,7 +348,15 @@ pub fn acrotony_weights(tree: &mut Tree, params: &Params) -> bool {
     for i in 0..nm {
         let last = w[nm + i];
         let pos = if last > 0.0 { w[i] / last } else { 1.0 };
-        w[i] = math::exp(kappa * (pos - 1.0));
+        let k = if per_level {
+            let pa = tree.m.order[i] as f64 - tree.m.pa_shift[i] as f64;
+            pa_level(pa, &params.r2)
+                .and_then(|l| l.kappa)
+                .unwrap_or(kappa)
+        } else {
+            kappa
+        };
+        w[i] = math::exp(k * (pos - 1.0));
     }
     true
 }
@@ -221,11 +435,11 @@ mod tests {
             "",
         );
         let ids: Vec<f64> = (0..2000).map(|i| i as f64).collect();
-        assert!(!ids.iter().any(|&id| terminates(0.0, 0.0, id, 3.0, &p)));
-        assert!(ids.iter().all(|&id| terminates(1.0, 0.0, id, 3.0, &p)));
+        assert!(!ids.iter().any(|&id| terminates(0.0, 0.0, id, 3.0, 0.0, &p)));
+        assert!(ids.iter().all(|&id| terminates(1.0, 0.0, id, 3.0, 0.0, &p)));
         let half = ids
             .iter()
-            .filter(|&&id| terminates(2.0, 0.0, id, 3.0, &p))
+            .filter(|&&id| terminates(2.0, 0.0, id, 3.0, 0.0, &p))
             .count() as f64
             / ids.len() as f64;
         assert!(half > 0.45 && half < 0.55, "{half}");
@@ -243,5 +457,323 @@ mod tests {
         assert_eq!(direction_params(&p, 4.0).set_point, 85.0);
         let off = Params::from_json(&preset("default", "{}"));
         assert_eq!(direction_params(&off, 3.0).set_point, off.c4.set_point);
+    }
+
+    #[test]
+    fn ends_the_leader_from_relay_age_with_relay_p_term() {
+        let rows = [r#"{"pTerm":0}"#, r#"{"pTerm":0.2}"#];
+        let p = with_r2(&rows, r#""relay":2,"relayAge":30,"relayPTerm":0.7"#);
+        assert_eq!(p_term_at(0.0, 29.0, &p), 0.0);
+        assert_eq!(p_term_at(0.0, 30.0, &p), 0.7);
+        assert_eq!(p_term_at(1.0, 30.0, &p), 0.2); // only pa 0 relays
+        let off = with_r2(&rows, r#""relayAge":30,"relayPTerm":0.7"#); // relay absent: off
+        assert_eq!(p_term_at(0.0, 50.0, &off), 0.0);
+        let ids: Vec<f64> = (0..2000).map(|i| i as f64).collect();
+        let ended = ids
+            .iter()
+            .filter(|&&id| terminates(0.0, 0.0, id, 3.0, 40.0, &p))
+            .count() as f64
+            / ids.len() as f64;
+        assert!(ended > 0.65 && ended < 0.75, "{ended}");
+    }
+
+    /// A vertical trunk of four metamers, each with a lateral bud (slot 1), the top one with an
+    /// ended terminal bud; and a pa-1 limb on the base with the same.
+    fn ended_trunk() -> (Tree, Vec<usize>, usize) {
+        use crate::testing::{LEFT, bud, metamer};
+        use std::f64::consts::FRAC_PI_2;
+        let mut t = Tree::new(0, 10.0, 0.5);
+        let mut laterals = Vec::new();
+        let mut parent = -1;
+        for _ in 0..4 {
+            let m = metamer(&mut t, parent, slot::MAIN, FRAC_PI_2, 1.0, 0.02, 0.0);
+            laterals.push(bud(&mut t, m, LEFT, 2.0, 1.0));
+            parent = m as i32;
+        }
+        let apex = bud(&mut t, parent as usize, slot::MAIN, FRAC_PI_2, 0.0);
+        t.b.state[apex] = bud::TERMINATED;
+        let limb = metamer(&mut t, 0, LEFT, 2.5, 1.0, 0.02, 0.0);
+        let twig = bud(&mut t, limb, LEFT, 2.5, 2.0);
+        let end = bud(&mut t, limb, slot::MAIN, 2.5, 1.0);
+        t.b.state[end] = bud::TERMINATED;
+        (t, laterals, twig)
+    }
+
+    #[test]
+    fn relays_the_laterals_on_the_top_nodes_under_an_ended_leader() {
+        let p = with_r2(&[r#"{}"#, r#"{}"#, r#"{}"#], r#""relay":2"#);
+        let (t, laterals, twig) = ended_trunk();
+        let depth = relay_depth(&t, t.m.len(), t.b.len());
+        assert_eq!(&depth[..4], &[3.0, 2.0, 1.0, 0.0]);
+        assert_eq!(depth[4], 0.0); // the limb's own ended apex
+        let shifts: Vec<Option<f64>> = laterals
+            .iter()
+            .map(|&b| relay_shift(&t, b, &depth, &p))
+            .collect();
+        // The top two nodes' laterals take pa 0 (shift = order 1); the lower two stay limbs.
+        assert_eq!(shifts, vec![None, None, Some(1.0), Some(1.0)]);
+        // A pa-1 limb whose apex ended does not relay: only the trunk's row is passed on.
+        assert_eq!(relay_shift(&t, twig, &depth, &p), None);
+        assert!(!relay_on(&with_r2(&[r#"{}"#], "")));
+    }
+
+    #[test]
+    fn a_relay_shoot_grows_as_pa_0_and_passes_it_to_its_subtree() {
+        let p = with_r2(
+            &[r#"{"generator":"opposite"}"#, r#"{"generator":"none"}"#],
+            r#""relay":1"#,
+        );
+        let (mut t, laterals, _) = ended_trunk();
+        t.ensure_scratch();
+        for j in 0..t.b.len() {
+            t.b.v[j] = 0.0;
+        }
+        let (top, low) = (laterals[3], laterals[0]);
+        t.b.v[top] = 2.0;
+        t.b.v[low] = 2.0;
+        let nm = t.m.len();
+        crate::season::grow_buds(&mut t, &p, 1.0);
+        // Two shoots of two metamers: the low one first (bud order), then the relay.
+        let (low_shoot, relay) = (nm, nm + 2);
+        // Fix A: the relay is stored at the order of the axis it replaces, 0, with shift 0: pa 0.
+        assert_eq!(t.m.order[relay], 0);
+        assert_eq!(t.m.pa_shift[relay], 0);
+        assert_eq!((t.m.order[relay + 1], t.m.pa_shift[relay + 1]), (0, 0)); // along the shoot
+        assert_ne!(t.m.axis[relay], t.m.axis[0]); // its own axis, not the trunk's
+        // Its laterals are order 1, as any lateral of the trunk's order is.
+        let lat =
+            (0..t.b.len()).find(|&j| t.b.metamer[j] as usize == relay && t.b.slot[j] != slot::MAIN);
+        assert_eq!(t.b.order[lat.unwrap()], 1);
+        assert_eq!(t.m.pa_shift[low_shoot], 0); // pa 1: a limb
+        // pa 0's opposite generator on the relay, pa 1's none on the limb.
+        let on = |m: usize| {
+            (0..t.b.len())
+                .filter(|&j| t.b.metamer[j] as usize == m && t.b.slot[j] != slot::MAIN)
+                .count()
+        };
+        assert_eq!(on(relay), 2);
+        assert_eq!(on(low_shoot), 0);
+        // Off, the same bud grows a limb.
+        let off = with_r2(
+            &[r#"{"generator":"opposite"}"#, r#"{"generator":"none"}"#],
+            "",
+        );
+        let (mut t, laterals, _) = ended_trunk();
+        t.ensure_scratch();
+        for j in 0..t.b.len() {
+            t.b.v[j] = 0.0;
+        }
+        t.b.v[laterals[3]] = 2.0;
+        let nm = t.m.len();
+        crate::season::grow_buds(&mut t, &off, 1.0);
+        assert_eq!(t.m.pa_shift[nm], 0);
+    }
+
+    #[test]
+    fn curves_a_limbs_set_point_along_its_length_but_never_the_trunks() {
+        let p = with_r2(&[r#"{"curve":30}"#, r#"{"curve":-40,"curveLength":4}"#], "");
+        assert_eq!(curve_offset(true, 0.0, 50.0, &p), 0.0); // the trunk stays straight
+        assert_eq!(curve_offset(false, 0.0, 10.0, &p), 15.0); // a relay: default length 20
+        assert_eq!(curve_offset(false, 1.0, 0.0, &p), 0.0);
+        assert_eq!(curve_offset(false, 1.0, 2.0, &p), -20.0);
+        assert_eq!(curve_offset(false, 1.0, 9.0, &p), -40.0); // held past curveLength
+        assert_eq!(curved(30.0, -40.0), 0.0);
+        assert_eq!(curved(160.0, 40.0), 180.0);
+        let off = with_r2(&[r#"{}"#, r#"{}"#], "");
+        assert_eq!(curve_offset(false, 1.0, 9.0, &off), 0.0);
+    }
+
+    #[test]
+    fn a_curved_limb_bends_further_from_vertical_node_by_node() {
+        use crate::geom::{UP, angle_between};
+        use crate::testing::{LEFT, bud, metamer};
+        use std::f64::consts::FRAC_PI_2;
+        let angles = |curve: &str| {
+            let row = format!(r#"{{"setPoint":45,"eta":1{curve}}}"#);
+            let mut p = with_r2(&[r#"{}"#, &row], "");
+            p.c4.enabled = true;
+            (p.c4.wd, p.c4.xi, p.c4.epsilon, p.c4.sigma) = (0.2, 0.0, 0.0, 0.0);
+            let mut t = Tree::new(0, 10.0, 0.5);
+            let m = metamer(&mut t, -1, slot::MAIN, FRAC_PI_2, 1.0, 0.02, 0.0);
+            let b = bud(&mut t, m, LEFT, FRAC_PI_2 + 0.785, 1.0);
+            t.ensure_scratch();
+            t.b.v[b] = 3.0;
+            crate::season::grow_buds(&mut t, &p, 1.0);
+            (1..t.m.len())
+                .map(|i| angle_between(t.heading(i), UP).to_degrees())
+                .collect::<Vec<f64>>()
+        };
+        let straight = angles("");
+        let curved = angles(r#","curve":90,"curveLength":2"#);
+        assert_eq!(straight.len(), 3);
+        assert!(
+            straight.iter().all(|a| (a - 45.0).abs() < 2.0),
+            "{straight:?}"
+        );
+        assert!(curved[0] < curved[1] && curved[1] < curved[2], "{curved:?}");
+        assert!(curved[2] > 90.0, "{curved:?}");
+    }
+
+    #[test]
+    fn hangs_thin_axes_and_lets_thick_ones_rise_to_the_level() {
+        let p = with_r2(
+            &[
+                r#"{"pendulous":150}"#,
+                r#"{"setPoint":40,"pendulous":150,"pendulousRadius":0.01}"#,
+            ],
+            "",
+        );
+        assert_eq!(pendulous_set_point(0.0, true, 0.0, 0.0, &p), 0.0); // the trunk never hangs
+        assert_eq!(pendulous_set_point(40.0, false, 1.0, 0.005, &p), 150.0); // thin: hangs fully
+        assert_eq!(pendulous_set_point(40.0, false, 1.0, 0.01, &p), 150.0);
+        assert!((pendulous_set_point(40.0, false, 1.0, 0.015, &p) - 95.0).abs() < 1e-9);
+        assert_eq!(pendulous_set_point(40.0, false, 1.0, 0.03, &p), 40.0); // a limb: its level's
+        assert!(hangs(1.0, &p));
+        let off = with_r2(&[r#"{}"#, r#"{"setPoint":40}"#], "");
+        assert!(!hangs(1.0, &off));
+        assert_eq!(pendulous_set_point(40.0, false, 1.0, 0.0, &off), 40.0);
+    }
+
+    #[test]
+    fn a_new_twig_grows_down_where_its_level_hangs() {
+        use crate::geom::{UP, angle_between};
+        use crate::testing::{LEFT, bud, metamer};
+        use std::f64::consts::FRAC_PI_2;
+        let last_angle = |row: &str| {
+            let mut p = with_r2(&[r#"{}"#, row], "");
+            p.c4.enabled = true;
+            (p.c4.wd, p.c4.xi, p.c4.epsilon, p.c4.sigma) = (0.2, 0.0, 0.0, 0.0);
+            let mut t = Tree::new(0, 10.0, 0.5);
+            let m = metamer(&mut t, -1, slot::MAIN, FRAC_PI_2, 1.0, 0.02, 0.0);
+            let b = bud(&mut t, m, LEFT, FRAC_PI_2 + 0.785, 1.0);
+            t.ensure_scratch();
+            t.b.v[b] = 3.0;
+            crate::season::grow_buds(&mut t, &p, 1.0);
+            angle_between(t.heading(t.m.len() - 1), UP).to_degrees()
+        };
+        let level = last_angle(r#"{"setPoint":45,"eta":1}"#);
+        let hung = last_angle(r#"{"setPoint":45,"eta":1,"pendulous":160}"#);
+        assert!((level - 45.0).abs() < 2.0, "{level}");
+        assert!(hung > 120.0, "{hung}");
+    }
+
+    #[test]
+    fn spaces_laterals_every_k_nodes_where_the_level_says() {
+        let p = with_r2(
+            &[
+                r#"{"generator":"spiral","lateralEvery":3}"#,
+                r#"{"generator":"opposite","lateralEvery":2}"#,
+            ],
+            "",
+        );
+        let count = |pa: f64, k: f64| laterals(pa, k, false, &p).0;
+        let trunk: Vec<u8> = (0..6).map(|k| count(0.0, k as f64)).collect();
+        assert_eq!(trunk, vec![0, 0, 1, 0, 0, 1]);
+        let limb: Vec<u8> = (0..4).map(|k| count(1.0, k as f64)).collect();
+        assert_eq!(limb, vec![0, 2, 0, 2]);
+        let every = with_r2(&[r#"{"generator":"spiral","lateralEvery":1}"#], "");
+        assert_eq!(laterals(0.0, 0.0, false, &every).0, 1);
+    }
+
+    #[test]
+    fn gives_a_level_its_own_acrotony() {
+        use std::f64::consts::FRAC_PI_2;
+        let shoot = |p: &Params| {
+            let mut t = Tree::new(0, 10.0, 0.5);
+            let mut parent = -1;
+            for _ in 0..3 {
+                parent =
+                    crate::testing::metamer(&mut t, parent, slot::MAIN, FRAC_PI_2, 1.0, 0.02, 0.0)
+                        as i32;
+            }
+            let on = acrotony_weights(&mut t, p);
+            (
+                on,
+                if on {
+                    t.scratch_f[..3].to_vec()
+                } else {
+                    Vec::new()
+                },
+            )
+        };
+        let (on, w) = shoot(&with_r2(&[r#"{"kappa":2}"#], ""));
+        assert!(on);
+        let want = [(-2.0f64).exp(), (-1.0f64).exp(), 1.0];
+        assert!((0..3).all(|k| (w[k] - want[k]).abs() < 1e-12), "{w:?}");
+        // A level's κ overrides the tree's; absent everywhere and κ 0: no weights.
+        let (_, w) = shoot(&with_r2(&[r#"{"kappa":0}"#], r#""kappa":3"#));
+        assert!(w.iter().all(|&x| x == 1.0), "{w:?}");
+        assert!(!shoot(&with_r2(&[r#"{}"#], "")).0);
+    }
+
+    #[test]
+    fn a_limb_level_relays_its_own_ended_axes_into_elbows() {
+        let p = with_r2(&[r#"{}"#, r#"{"relay":1}"#, r#"{}"#], "");
+        assert!(relay_on(&p));
+        let (t, laterals, twig) = ended_trunk();
+        let depth = relay_depth(&t, t.m.len(), t.b.len());
+        // The limb (order 1, pa 1) ended: its top lateral (order 2) continues it at pa 1.
+        assert_eq!(relay_shift(&t, twig, &depth, &p), Some(1.0));
+        // The trunk has no relay of its own and r2.relay is absent: its laterals stay limbs.
+        assert!(
+            laterals
+                .iter()
+                .all(|&b| relay_shift(&t, b, &depth, &p).is_none())
+        );
+        // A level's own relay overrides r2.relay for pa 0.
+        let q = with_r2(&[r#"{"relay":0}"#, r#"{}"#], r#""relay":3"#);
+        assert_eq!(relay_nodes(0.0, &q), 0.0);
+        assert_eq!(relay_nodes(0.0, &with_r2(&[r#"{}"#], r#""relay":3"#)), 3.0);
+    }
+
+    #[test]
+    fn moves_a_levels_set_point_with_the_woods_age_or_the_trees() {
+        let p = with_r2(
+            &[
+                r#"{"agedSetPoint":90}"#,
+                r#"{"setPoint":30,"agedSetPoint":110,"agedOver":40}"#,
+                r#"{"setPoint":60,"agedSetPoint":20,"agedOver":10,"agedBy":"tree"}"#,
+            ],
+            "",
+        );
+        assert_eq!(aged_offset(true, 0.0, 99.0, 99.0, &p), 0.0); // the trunk itself never moves
+        assert_eq!(aged_offset(false, 0.0, 25.0, 0.0, &p), 45.0); // a relay: default over 50
+        assert_eq!(aged_offset(false, 1.0, 0.0, 99.0, &p), 0.0); // new wood: erect still
+        assert_eq!(aged_offset(false, 1.0, 20.0, 0.0, &p), 40.0);
+        assert_eq!(aged_offset(false, 1.0, 400.0, 0.0, &p), 80.0); // held at the aged set point
+        assert_eq!(aged_offset(false, 2.0, 0.0, 5.0, &p), -20.0); // by the tree's age
+        assert_eq!(aged_offset(false, 2.0, 50.0, 0.0, &p), 0.0);
+        let off = with_r2(&[r#"{}"#, r#"{}"#], "");
+        assert_eq!(aged_offset(false, 1.0, 50.0, 50.0, &off), 0.0);
+    }
+
+    #[test]
+    fn a_chain_of_relays_keeps_the_trunks_order() {
+        // Every pa-0 shoot ends (relayPTerm 1 from age 0) and its top lateral relays: thirty
+        // seasons of relays on one axis, all at order 0 (before fix A they climbed one a season).
+        let p = with_r2(
+            &[r#"{"generator":"spiral"}"#, r#"{"generator":"none"}"#],
+            r#""relay":1,"relayAge":0,"relayPTerm":1"#,
+        );
+        let mut t = Tree::new(0, 10.0, 0.5);
+        crate::principles::c1::plant_seedling(&mut t, &p, 0.0, 0.0);
+        for season in 1..30 {
+            t.ensure_scratch();
+            for j in 0..t.b.len() {
+                t.b.v[j] = 1.0;
+            }
+            crate::season::grow_buds(&mut t, &p, season as f64);
+            t.age += 1.0;
+        }
+        let pa0 = (0..t.m.len())
+            .filter(|&i| t.m.order[i] == t.m.pa_shift[i])
+            .count();
+        assert!(pa0 > 20, "{pa0}");
+        assert!((0..t.m.len()).all(|i| t.m.order[i] <= 1), "orders climbed");
+        let axes: std::collections::BTreeSet<i32> = (0..t.m.len())
+            .filter(|&i| t.m.order[i] == 0)
+            .map(|i| t.m.axis[i])
+            .collect();
+        assert!(axes.len() > 5, "{axes:?}"); // many relay axes, all order 0
     }
 }

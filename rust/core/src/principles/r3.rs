@@ -13,7 +13,7 @@
 use super::c3::is_live_bud;
 use super::c4::{horizontal_heading, set_point_direction};
 use super::c5::remove_branches;
-use super::r2::pa_level;
+use super::r2::{aged_offset, curve_offset, hangs, pa_level, pendulous_set_point};
 use super::r6::deposit_area;
 use crate::geom::{
     IDENTITY, M3, V3, add, angle_between, apply, compose, cross, norm, normalize_or, reject,
@@ -200,7 +200,24 @@ pub fn update_mechanics(tree: &mut Tree, params: &Params, storm: bool, season: f
             };
             let dr = (r_new - before) / r_new;
             let pa = tree.m.order[i] as f64 - tree.m.pa_shift[i] as f64;
-            post = posture_turn(h, lref, posture_set_point(pa, params), prev, dr, r3);
+            let trunk = tree.m.axis[i] == tree.m.axis[0];
+            let wood_age = season - tree.m.birth_season[i] as f64;
+            let bend = (curve_offset(trunk, pa, tree.m.axis_node[i] as f64, params)
+                + aged_offset(trunk, pa, wood_age, tree.age, params))
+                * DEG;
+            let set_point = if bend == 0.0 {
+                posture_set_point(pa, params)
+            } else {
+                math::max(0.0, math::min(PI, posture_set_point(pa, params) + bend))
+            };
+            // R2's pendulous twigs (ADR 0035): a thin axis hangs (degrees there and back only when on,
+            // so the set point is bit-for-bit the same without it).
+            let set_point = if hangs(pa, params) {
+                pendulous_set_point(set_point / DEG, trunk, pa, r_new, params) * DEG
+            } else {
+                set_point
+            };
+            post = posture_turn(h, lref, set_point, prev, dr, r3);
         }
         turn[i] = add(sag, post);
     }

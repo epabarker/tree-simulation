@@ -19,13 +19,16 @@ use crate::principles::o2::{EMPTY, Grid, abrade, tag_owner};
 use crate::principles::o4::stand_dynamics;
 use crate::principles::obstacles::clear_obstacles;
 use crate::principles::r1::{carbon_balance, starved_to_death};
-use crate::principles::r2::direction_params;
+use crate::principles::r2::{
+    aged_offset, curve_offset, curved, direction_params, pendulous_set_point, relay_depth,
+    relay_on, relay_shift,
+};
 use crate::principles::r3::update_mechanics;
 use crate::principles::r4::{aborts, growth_threshold, light_releases, released_shift};
 use crate::principles::r5::{elongation, neighbour_share, set_point_scale, shade_of};
 use crate::principles::r6::{deposit_area, resting_state};
 use crate::rng::{normal, purpose, uniform};
-use crate::tree::{Tree, bud, store_i32};
+use crate::tree::{Tree, bud, slot, store_i32};
 use crate::world::World;
 
 /// The phases as they end within a season (`PHASES` in season.ts; `npm run bench` times them).
@@ -406,6 +409,12 @@ pub fn grow_buds(tree: &mut Tree, params: &Params, season: f64) {
         }
         cap = juvenile_cap(height, params);
     }
+    // R2's relay (ADR 0033): the nodes under an ended pa-0 apex, as the season began.
+    let depth = if relay_on(params) {
+        relay_depth(tree, tree.m.len(), count)
+    } else {
+        Vec::new()
+    };
     let mut shoot_length = 0.0;
     for i in 0..count {
         if !is_live_bud(tree.b.state[i]) {
@@ -450,13 +459,37 @@ pub fn grow_buds(tree: &mut Tree, params: &Params, season: f64) {
             let reiterates = released && r4.enabled;
             let bud_order = tree.b.order[i] as f64;
             let host_shift = tree.m.pa_shift[host] as f64;
-            let shift = if reiterates {
+            let mut shift = if reiterates {
                 released_shift(bud_order, host_shift, r4)
             } else {
                 host_shift
             };
+            // A relay takes pa 0 (its shift is its order), a reiteration at most as young.
+            let relay = if depth.is_empty() {
+                None
+            } else {
+                relay_shift(tree, i, &depth, params)
+            };
+            if let Some(r) = relay {
+                shift = math::max(shift, r);
+            }
             let pa = bud_order - shift;
+            // The trunk's own axis is exempt from the form offsets (ADR 0034, 0035, 0038).
+            let trunk = tree.b.slot[i] == slot::MAIN && tree.m.axis[host] == tree.m.axis[0];
             let upright = set_point_scale(shade, r5);
+            // R2's curve (ADR 0034): the node along its own axis each new metamer will take.
+            let mut node = if tree.b.slot[i] == slot::MAIN {
+                tree.m.axis_node[host] as f64 + 1.0
+            } else {
+                0.0
+            };
+            // R2's pendulous twigs (ADR 0035): a continuation is as thick as its host; a new axis
+            // as thin as can be.
+            let girth_of_host = if tree.b.slot[i] == slot::MAIN {
+                tree.m.radius[host]
+            } else {
+                0.0
+            };
             let length = shoot_length * elongation(shade, r5);
             let mut direct = |tree: &Tree, prev: V3, b: usize, id: f64| -> V3 {
                 if !c4.enabled {
@@ -469,14 +502,38 @@ pub fn grow_buds(tree: &mut Tree, params: &Params, season: f64) {
                     * std::f64::consts::PI
                     * uniform(seed, purpose::DIRECTION_NOISE, tid, id, season, 2.0);
                 let mut dir = direction_params(params, pa);
+                let bend = curve_offset(trunk, pa, node, params)
+                    + aged_offset(trunk, pa, 0.0, tree.age, params);
+                dir.set_point = curved(dir.set_point, bend);
+                dir.set_point =
+                    pendulous_set_point(dir.set_point, trunk, pa, girth_of_host, params);
+                node += 1.0;
                 if upright != 1.0 {
                     dir.set_point *= upright;
                 }
                 let v = [tree.b.vx[b], tree.b.vy[b], tree.b.vz[b]];
                 shoot_direction(prev, tree.bud_reference(b), v, noise, around, &dir)
             };
-            let pa_shift = if reiterates { shift } else { -1.0 };
-            grow_shoot(tree, i, n, length, params, season, &mut direct, pa_shift);
+            // A relay is stored at the order of the axis it replaces (ADR 0033, fix A): one less
+            // order, one less shift, the same pa.
+            let (pa_shift, first_order) = if relay.is_some() {
+                (shift - 1.0, bud_order - 1.0)
+            } else if reiterates {
+                (shift, -1.0)
+            } else {
+                (-1.0, -1.0)
+            };
+            grow_shoot(
+                tree,
+                i,
+                n,
+                length,
+                params,
+                season,
+                &mut direct,
+                pa_shift,
+                first_order,
+            );
         } else {
             tree.b.state[i] = resting_state(tree.b.q[i], &params.r6);
             // R4's age counts the seasons a bud rests dormant (§R4: dormant buds have a finite

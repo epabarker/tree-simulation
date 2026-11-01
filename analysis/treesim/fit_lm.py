@@ -473,8 +473,11 @@ def finish(prob: Problem, x: np.ndarray, r0: float, act: list[int], jac: np.ndar
     return bests, stop
 
 
-def fit_lm(spec: Spec, settings: LMSettings, start: dict, log=print, active: list[str] | None = None) -> dict:
-    """Fits `spec` from `start` (the assignments of the point to start from, r0 included)."""
+def fit_lm(spec: Spec, settings: LMSettings, start: dict, log=print, active: list[str] | None = None,
+           force: list[str] | None = None) -> dict:
+    """Fits `spec` from `start` (the assignments of the point to start from, r0 included). `active`
+    replaces the screening's active set; `force` adds to it (a knob whose screening step cannot reach
+    the trait it moves, e.g. Q_ss's 0.08 on its log scale against the seedling's roof)."""
     s = settings
     pool = Pool(s.workers)
     t_start = time.time()
@@ -488,7 +491,10 @@ def fit_lm(spec: Spec, settings: LMSettings, start: dict, log=print, active: lis
         prob = Problem(spec, pool, s, x0, (r0_param["lo"], r0_param["hi"]), r0_start)
         screening = screen(prob, x0, r0_start, log)
         stages["screening"] = time.time() - t_start
-        act = [prob.paths.index(p) for p in (active or screening["active"])]
+        chosen = set(active or screening["active"]) | set(force or [])
+        act = [j for j, p in enumerate(prob.paths) if p in chosen]
+        if force:
+            log(f"forced active: {', '.join(force)}; the set ({len(act)}): {', '.join(prob.paths[j] for j in act)}")
 
         t = time.time()
         steps: list[dict] = []

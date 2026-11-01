@@ -242,10 +242,10 @@ hi = 4
 # values (FLORA) as of 2026-10-31, the form sheet's reference cell: the user's picks from the
 # sheet replace them, each with a dated comment.
 [form]
-# 2026-11-01 pick: grid cell 1-0-2 of the ADR 0032 grid (form-grid.py --tag=-adr32), provisional, picked overnight by the agent
-# by grid-stand.py's rule (stand alive >= 0.8 at 100, the deepest living crown, then the lone outline).
+# 2026-11-01 pick: grid cell 0-0-0 of the ADR 0032 grid (form-grid.py --tag=-adr32), provisional, chosen by the user
+# under repick.py (2026-11-01): the guard (lone W/H 0.3-2.5, H < 190, stand limb crown ratio >= 0.2), then LAI in band, floor nearest, alive >= 0.8; crown and outline break ties; the user's choice (2026-11-01), cell 0-0-0.
 # The lines marked "pick"; the rest are round 2's.
-"r2.levels.0.lambda" = 0.6  # pick, 2026-11-01, provisional
+"r2.levels.0.lambda" = 0.55  # pick, 2026-11-01, provisional
 "r2.levels.1.lambda" = 0.5039
 "r2.levels.1.setPoint" = 51.12
 # "r2.levels.1.postureSetPoint": unset in FLORA, so the limbs straighten toward
@@ -253,7 +253,7 @@ hi = 4
 "r2.levels.1.branchAngle" = 44.65
 "r2.levels.1.eta" = 0.1405
 "r2.levels.2.setPoint" = 45.87
-"r2.aC" = 10  # pick, 2026-11-01, provisional
+"r2.aC" = 5  # pick, 2026-11-01, provisional
 "r2.dLambda" = 0.04  # pick, 2026-11-01, provisional
 "r2.kappa" = 1.708
 

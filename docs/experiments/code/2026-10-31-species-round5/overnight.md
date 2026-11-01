@@ -85,3 +85,51 @@ The 160-cell plate with the specimen is over 256 MB both before and after. Per t
 - Nothing adopted into `flora-fitted.ts`. No principle, bound, target or golden changed after ADR 0032.
 - `[form]` holds the overnight picks, all flagged provisional. Hornbeam's and maple's are columns, which the panels show.
 - Disk: 618 GB free.
+
+## Morning (2026-11-01): the re-pick and the third hornbeam pilot: FAILS the rule. Stopped; no overnight
+
+**The re-pick** (the user's rule, then the user's guard; `repick.py`, the species note's "form re-pick under ADR 0032"):
+- hornbeam 2-3-2, birch 3-3-2, oak 0-3-0 (flagged: no candidate in the LAI band), willow 0-2-2, by the rule;
+- maple 0-0-0, rowan and holly round 2's, by the user's choice;
+- beech round 2's.
+
+All seven `[form]`s carry the rule and the guard in their comment. Every replayed stand's hash matched its stored run. Hornbeam's picks regrown at seeds 1–3: `figures/2026-10-31-form-picks-adr32-hornbeam-{60,100}.png`. The other species were not regrown (the pilot failed first).
+
+**The pilot.** `m27_fit.py --method lm --start round2 --species hornbeam --out round5-pilot3 --pilot`, on cell 2-3-2; log `pilot3-hornbeam.txt`, 1,189 s.
+- **LM:** start loss 15.4; three accepted steps (9.62, 9.09, 7.23), then four rejected; the selection is LM's (loss 8.03, 4 in band).
+- **On fresh seeds: 4 of 6 measured in band.** Stand alive 1.0 at 60 and 100.
+- **The fit:**
+  - stand LAI 8.06;
+  - lone W/H 0.53 / 0.58 (60 / 100);
+  - gallery: nearest reject round 3's parasol at 2.30, the hand form at 0.47 (no shape flag).
+- **Margins on fresh seeds:**
+
+| trait | kind | target ± band | start | fitted | margin |
+|---|---|---|---|---|---|
+| stand.height | measured | 84 ± 13 | 129 | 114 | **−16.7** |
+| lone.earlyShare | measured | 0.67 ± 0.05 | 0.628 | 0.643 | 0.023 |
+| stand.slenderness | measured | 86 ± 12 | 86.1 | 82.7 | 8.67 |
+| stand.lai | measured | 8.3 ± 1.5 | 8.43 | 8.06 | 1.26 |
+| stand.lateShare | measured | 1.23 ± 0.05 | 1.19 | 1.26 | 0.022 |
+| shade.survivalLight | measured | 0.033 ± 0.01 | 0.0182 | 0.0182 | **−0.0048** |
+| lone.slenderness | described | 58 ± 10 | 59.1 | 67.6 | 0.35 |
+| stand.crownRatio | described | 0.55 ± 0.1 | 0.36 | 0.527 | 0.077 |
+
+- **Physiology:**
+
+| knob | from | to |
+|---|---|---|
+| α | 2.81 | 2.53 |
+| L_h | 92 | 52 |
+| r3.c | 0.059 | 0.105 |
+| h_J | 8.8 | 18.7 |
+| leafArea | 2.33 | 2.65 |
+
+  m_f, qMin, r0 and m_w hardly move.
+- **The panel's traits** (seed 1, `runs/panel-round5-pilot3/panel.json`; screenshots not taken):
+  - stand at 100: H 124, LAI 5.8, floor 6.4%;
+  - lone at 100: H 165.
+
+**Decision: fails by the rule (4 of 6); the overnight for the eight was not started.** Both misses are as last night's but closer:
+- **stand.height:** its margin is −16.7 (last night 125 against 84). The stand still starts at 129.
+- **shade.survivalLight:** 0.018 against 0.033 ± 0.01. No active knob moves it (qMin stays 0.0124).

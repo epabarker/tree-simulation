@@ -67,7 +67,9 @@ parser.add_argument("--method", choices=["cmaes", "lm"], default="cmaes")
 parser.add_argument("--out", default="round3", help="lm: the results' folder under docs/experiments/fits/")
 parser.add_argument("--shift-from", help="lm: also transfer the mean shift of this earlier round's fits (each species "
                     "from the others', not its own), e.g. round3")
-parser.add_argument("--active", help="lm: comma list of parameters to move, instead of the screening's active set")
+parser.add_argument("--active", help="lm: comma list of parameters added to the screening's active set (forced active)")
+parser.add_argument("--active-for", help="--active: only for these species (a comma list; default every species)")
+parser.add_argument("--only-active", help="lm: comma list of parameters to move, instead of the screening's active set")
 parser.add_argument("--iterations", type=int, help="lm: overrides the 10 iterations")
 parser.add_argument("--workers", type=int, default=os.cpu_count() or 4)
 parser.add_argument("--budget", choices=["full", "quick"], default="full")
@@ -273,8 +275,10 @@ if args.method == "lm":
             spec = load_spec(sp)
             own = round2_start(sp, args.start)
             start = lm_start(spec, own, shifts + [d for k, d in earlier.items() if k != sp], args.workers)
-            active = args.active.split(",") if args.active else None
-            result = fit_lm(spec, settings, start, log=print, active=active)
+            active = args.only_active.split(",") if args.only_active else None
+            force = (args.active.split(",") if args.active and (not args.active_for or sp in args.active_for.split(","))
+                     else None)
+            result = fit_lm(spec, settings, start, log=print, active=active, force=force)
             result["startFrom"] = {"round": args.start, "shifted": start != own}
             write_lm(result, out)
             lm_report(spec, result)

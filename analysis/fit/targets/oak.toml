@@ -250,8 +250,8 @@ hi = 4
 # values (FLORA) as of 2026-10-31, the form sheet's reference cell: the user's picks from the
 # sheet replace them, each with a dated comment.
 [form]
-# 2026-11-01 pick: grid cell 0-3-2 of the ADR 0032 grid (form-grid.py --tag=-adr32), provisional, picked overnight by the agent
-# by grid-stand.py's rule (stand alive >= 0.8 at 100, the deepest living crown, then the lone outline).
+# 2026-11-01 pick: grid cell 0-3-0 of the ADR 0032 grid (form-grid.py --tag=-adr32), provisional, picked by the agent
+# under repick.py (2026-11-01): the guard (lone W/H 0.3-2.5, H < 190, stand limb crown ratio >= 0.2), then LAI in band, floor nearest, alive >= 0.8; crown and outline break ties; FLAGGED: no candidate in the LAI band.
 # The lines marked "pick"; the rest are round 2's.
 "r2.levels.0.lambda" = 0.5631
 "r2.levels.1.lambda" = 0.5607
@@ -263,7 +263,7 @@ hi = 4
 "r2.levels.2.setPoint" = 49.63
 "r2.aC" = 20  # pick, 2026-11-01, provisional
 "r2.dLambda" = 0.1  # pick, 2026-11-01, provisional
-"r2.kappa" = 1.5  # pick, 2026-11-01, provisional
+"r2.kappa" = 0  # pick, 2026-11-01, provisional
 
 # Held out: never in the loss, checked after the fit (analysis/experiments/m27_holdout.py).
 [holdout]

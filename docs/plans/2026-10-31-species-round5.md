@@ -51,7 +51,7 @@ The Tikhonov term stays on the nine physiology knobs. Bounds unchanged.
 ### 3.4 The driver (the agent)
 - `fit.py`: `[form]` applied to every candidate like `[fixed]`; `[[report]]` traits evaluated and written, not scored; `m27_rescore.py` and `margins` show them under a "reported" heading.
 - `fit_lm.py`: at every accepted step, log the physiology knobs and the reported shape at 60 and 100 beside the hand form's, so drift shows at iteration 2.
-- `m27_fit.py --pilot`: one species to the end of LM, then its panel (the round-4 pipeline), then stop. The overnight runs only after the user has judged the pilot's panel.
+- `m27_fit.py --pilot`: one species to the end of LM, then its panel (the round-4 pipeline), then stop. The overnight runs only after the user has judged the pilot's panel. A pilot is judged as a pilot: stand alive, loss falling, shape held (the gallery check), and the measured targets after LM alone as a reading, not a gate. The full acceptance rule (measured targets in band on fresh seeds, stand alive ≥ 0.8 at 60 and 100) applies after CMA-ES and verification (the user, 2026-11-01).
 
 ### 3.5 Round 5 (the laptop)
 1. Sheets for the eight; the user's picks into `[form]`.

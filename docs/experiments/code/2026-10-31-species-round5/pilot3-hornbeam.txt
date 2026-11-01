@@ -1,0 +1,77 @@
+
+=== hornbeam (least squares) ===
+screening: 18 evaluations in 131 s; active (7): c3.alpha, r1.Lh, r1.mf, r3.c, r6.qMin, r6.leafArea, r2.hJ
+shape at the start (hand form in brackets): spread 0.644 (0.644); spread100 0.776 (0.776); limbElevation 49.1 (49.1); limbElevation100 49.5 (49.5); widestAt 0.55 (0.55); widestAt100 0.75 (0.75); forkHeight100 0.505 (0.505); leaderDominance100 5.28 (5.28); stand.crownRatio100 0.353 (0.353)
+LM start: loss 15.41, r0 0.003114
+LM 1: accepted loss 9.62 (current 9.62), step 0.171, r0 0.003143, measured in band 4, 181 s
+LM 1 shape (hand form in brackets): spread 0.498 (0.644); spread100 0.585 (0.776); limbElevation 50.6 (49.1); limbElevation100 50.6 (49.5); widestAt 0.683 (0.55); widestAt100 0.817 (0.75); forkHeight100 0.5 (0.505); leaderDominance100 5.72 (5.28); stand.crownRatio100 0.42 (0.353)
+LM 2: rejected loss 9.70 (current 9.62), step 0.250, r0 0.003117, measured in band 2, 143 s
+LM 2: rejected loss 27.09 (current 9.62), step 0.125, r0 0.00313, measured in band 3, 162 s
+LM 2: accepted loss 9.09 (current 9.09), step 0.062, r0 0.003136, measured in band 4, 190 s
+LM 2 shape (hand form in brackets): spread 0.494 (0.644); spread100 0.633 (0.776); limbElevation 51.2 (49.1); limbElevation100 51.2 (49.5); widestAt 0.483 (0.55); widestAt100 0.817 (0.75); forkHeight100 0.663 (0.505); leaderDominance100 6.47 (5.28); stand.crownRatio100 0.445 (0.353)
+LM 3: rejected loss 12.16 (current 9.09), step 0.220, r0 0.003102, measured in band 2, 123 s
+LM 3: rejected loss 9.97 (current 9.09), step 0.110, r0 0.003119, measured in band 3, 131 s
+LM 3: accepted loss 7.23 (current 7.23), step 0.055, r0 0.003128, measured in band 3, 164 s
+LM 3 shape (hand form in brackets): spread 0.547 (0.644); spread100 0.594 (0.776); limbElevation 50.9 (49.1); limbElevation100 51 (49.5); widestAt 0.65 (0.55); widestAt100 0.717 (0.75); forkHeight100 0.54 (0.505); leaderDominance100 4.91 (5.28); stand.crownRatio100 0.475 (0.353)
+LM 4: rejected loss 11.19 (current 7.23), step 0.186, r0 0.003155, measured in band 1, 122 s
+LM 4: rejected loss 7.88 (current 7.23), step 0.093, r0 0.003141, measured in band 3, 130 s
+LM 4: rejected loss 8.70 (current 7.23), step 0.047, r0 0.003134, measured in band 3, 145 s
+LM 4: rejected loss 9.39 (current 7.23), step 0.023, r0 0.003131, measured in band 3, 163 s
+LM ends: 4 consecutive rejected steps
+selection: lm 4 in band, loss 8.03
+gallery: lm nearest round3-parasol at 2.30, the hand form at 0.47
+gallery: fit nearest round3-parasol at 2.30, the hand form at 0.47
+
+hornbeam: 67 evaluations in 1189 s (screening 131 s, lm 771 s, cma 0 s, verification 240 s, gallery 46 s)
+accepted: False (measured targets in band on fresh seeds: 4 of 6; outside: stand.height, shade.survivalLight); fit from lm
+loss on fresh seeds (progress only): start 17.10, fitted 8.60
+trait                         kind   target    band    start   fitted   margin
+stand.height              measured       84      13      129      114    -16.7
+lone.earlyShare           measured     0.67    0.05    0.628    0.643   0.0228
+lone.slenderness         described       58      10     59.1     67.6    0.354
+stand.slenderness         measured       86      12     86.1     82.7     8.67
+stand.crownRatio         described     0.55     0.1     0.36    0.527   0.0771
+stand.lai                 measured      8.3     1.5     8.43     8.06     1.26
+stand.lateShare           measured     1.23    0.05     1.19     1.26    0.022
+shade.survivalLight       measured    0.033    0.01   0.0182   0.0182 -0.00476
+reported (never scored; the description where there is one):
+trait                     described     hand    start   fitted
+lone.spread                     0.7    0.609    0.609    0.534
+lone.spread100                  0.7    0.716    0.716     0.58
+lone.profile             0.26/0.65/0.88/0.98/1.00/0.99/0.93/0.79/0.56/0.22 0.33/0.56/0.72/0.89/0.91/0.94/0.89/0.92/0.87/0.68 0.33/0.56/0.72/0.89/0.91/0.94/0.89/0.92/0.87/0.68 0.38/0.54/0.74/0.85/0.89/0.90/0.91/0.88/0.87/0.76
+lone.profile100          0.26/0.65/0.88/0.98/1.00/0.99/0.93/0.79/0.56/0.22 0.26/0.46/0.65/0.76/0.80/0.82/0.94/0.92/0.94/0.80 0.26/0.46/0.65/0.76/0.80/0.82/0.94/0.92/0.94/0.80 0.30/0.49/0.67/0.74/0.83/0.89/0.87/0.93/0.88/0.79
+lone.forkHeight                 0.4    0.709    0.709    0.656
+lone.forkHeight100              0.4    0.499    0.499    0.552
+lone.leaderDominance            1.6     2.82     2.82     3.18
+lone.leaderDominance100         1.6     4.25     4.25     5.07
+lone.branchAngle                 50     39.6     39.6     39.5
+lone.branchAngle100              50     38.9     38.9     38.9
+lone.limbDroop                   10     10.3     10.3     7.25
+lone.limbDroop100                10     10.1     10.1      6.9
+lone.limbElevation                —     49.3     49.3     50.7
+lone.limbElevation100             —     49.7     49.7     50.9
+lone.widestAt                     —    0.567    0.567      0.6
+lone.widestAt100                  —    0.767    0.767     0.65
+lone.crownFullness                —    0.772    0.772    0.772
+lone.crownFullness100             —    0.736    0.736    0.739
+stand.crownRatio100               —      0.4      0.4    0.451
+gallery: lm nearest round3-parasol at 2.30, the hand form at 0.47
+gallery: fit nearest round3-parasol at 2.30, the hand form at 0.47
+active: c3.alpha, r1.Lh, r1.mf, r3.c, r6.qMin, r6.leafArea, r2.hJ
+c3.alpha                     2.81     2.53
+c6.r0                     0.00311  0.00313
+r1.Lh                        92.4       52
+r1.mf                      0.0817   0.0825
+r3.c                       0.0592    0.105
+r6.qMin                    0.0126   0.0124
+r6.leafArea                  2.33     2.65
+r2.hJ                        8.83     18.7
+r1.mw                          64     63.4
+wrote /home/edbarker/Documents/Projects/tree-simulation/docs/experiments/fits/round5-pilot3/hornbeam.json
+hornbeam {"round 2":{"lone 60":{"height":107.01720863159112,"hd":56.020947082881264,"spread":1.1020024076354176,"widestAt":0.65,"limbCrownRatio":0.9485729792234667},"lone 100":{"height":149.61619328338568,"hd":54.85532302777823,"spread":1.0644116385650675,"widestAt":0.75,"limbCrownRatio":0.9487318726521845},"stand 100":{"height":147.2165077108273,"hd":63.630595693528456,"limbCrownRatio":0.6075173842634458,"leafCrownRatio":0.26216534087852833,"lai":8.551184936603974,"top":149.27647316822882,"floor":0.021676951543872544}},"round 5-pilot3":{"lone 60":{"height":116.22672601837748,"hd":55.64820756490049,"spread":0.6282582327470867,"widestAt":0.65,"limbCrownRatio":0.9470442171684829},"lone 100":{"height":164.83900318983507,"hd":65.23188926976367,"spread":0.5729252908957027,"widestAt":0.85,"limbCrownRatio":0.9527701297686598},"stand 100":{"height":123.86461667756603,"hd":80.40971872042402,"limbCrownRatio":0.4769081635861879,"leafCrownRatio":0.5579615264467376,"lai":5.760849091623511,"top":157.5409793704649,"floor":0.06399776808883442}}}
+wrote runs/panel-round5-pilot3/panel.json
+the panel's screenshots need the lab served (npm run dev) and NODE_PATH with puppeteer-core; then:
+  NODE_PATH=<scratch>/node_modules node docs/experiments/code/2026-10-31-species-round4/panel-shots.mjs runs/panel-round5-pilot3 hornbeam
+  uv run --project analysis python docs/experiments/code/2026-10-31-species-round4/panel-figure.py runs/panel-round5-pilot3 docs/experiments/figures -round5-pilot3
+
+finished: fitted hornbeam

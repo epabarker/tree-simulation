@@ -2,6 +2,12 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-01: the form re-pick, the third hornbeam pilot, the round-5 overnight started
+
+- **The re-pick** (`repick.py`, the user's rule): stand LAI in band, then the floor nearest the measured, then alive ≥ 0.8 at 100, behind a guard (lone W/H 0.3–2.5, H < 190, stand limb crown ratio ≥ 0.2). It replaces the overnight's stand-first rule, which picked columns. The picks: hornbeam 2-3-2, birch 3-3-2, oak 0-3-0 (flagged), willow 0-2-2; maple 0-0-0, rowan and holly round 2's (the user's). The stands were replayed with the ground written; every hash matched.
+- **Hornbeam's third pilot:** start loss 15.4, LM 7.2; 4 of 6 measured in band after LM alone; stand alive; gallery 0.47 from the hand form. The user judged it a pass as a pilot. The plan's §3.4 and ADR 0029 now say the full acceptance rule applies after CMA-ES and verification, not at the end of LM.
+- **`m27_fit.py --active`** now adds to the screening's set, and `--active-for` limits it to named species; the old replace-the-set meaning is `--only-active`. Why: r6.qMin and r1.mf read inactive for birch, oak, beech and hornbeam, because the screening's 0.08 step on Q_ss's log scale cannot reach the roof above the seedling's cut.
+
 ## 2026-11-01: ADR 0032: the acclimated leaf cost and T_rel fixed per species (goldens updated)
 
 - **The model's configuration** (ADR 0032, the user): R1's leaf cost acclimated with one global c = 0.3, and C5's T_rel fixed per species from Hagemeier & Leuschner's lowest shade leaves (birch 0.21, oak 0.063, hornbeam 0.025, beech 0.008 measured; willow 0.14, rowan 0.072, maple 0.044, holly 0.021, fir 0.0091, pine 0.23 estimated by the tolerance-score regression). FITTED_FLORA regenerated (`m27_adopt.py`; only those lines change); T_rel leaves the targets files' `[[param]]` for `[fixed]`; `forest` takes c 0.3 and T_rel 0.0155.

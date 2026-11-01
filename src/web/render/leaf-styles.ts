@@ -12,6 +12,8 @@
  * the renderers keep a minimum on-screen size scaled the same way.
  */
 
+import type { BarkPalette } from "./bark-styles.ts";
+
 /**
  * Leaf outlines, drawn by both renderers from the same width profile (`leafProfile`): the leaf's
  * half-width at a point a fraction t of the way from its base to its tip, as a share of its
@@ -164,6 +166,8 @@ export interface LeafStyle {
    * the leaves stay on.
    */
   marcescent?: number;
+  /** The species' wood (bark-styles.ts); unset, the view's single `--bark-young → --bark-old` ramp. */
+  bark?: BarkPalette;
 }
 
 export const LEAF_STYLES = {
@@ -190,6 +194,7 @@ export const LEAF_STYLES = {
     palette: "needle",
     leafAge: 8,
     deciduous: false,
+    bark: "fir",
   },
   /** Birch: small, triangular, toothed leaves; the first to flush and the first to turn yellow. */
   small: {
@@ -204,6 +209,7 @@ export const LEAF_STYLES = {
     deciduous: true,
     flush: 0,
     turn: -0.03,
+    bark: "birch",
   },
   /** Oak: lobed, dark leaves that flush late and turn russet late in autumn. */
   oak: {
@@ -218,6 +224,7 @@ export const LEAF_STYLES = {
     deciduous: true,
     flush: 0.06,
     turn: 0.04,
+    bark: "oak",
   },
   /** Beech: dense, oval, wavy-edged leaves that turn copper; young beeches keep them all winter. */
   beech: {
@@ -233,6 +240,7 @@ export const LEAF_STYLES = {
     flush: 0.03,
     turn: 0.01,
     marcescent: 30,
+    bark: "beech",
   },
   /** Hornbeam: oval, pleated, doubly toothed leaves that turn yellow; young trees keep them in winter. */
   hornbeam: {
@@ -248,6 +256,7 @@ export const LEAF_STYLES = {
     flush: 0.02,
     turn: 0.02,
     marcescent: 25,
+    bark: "hornbeam",
   },
   /** Field maple: small five-lobed leaves, as wide as long, that turn butter-yellow. */
   maple: {
@@ -262,6 +271,7 @@ export const LEAF_STYLES = {
     deciduous: true,
     flush: 0.02,
     turn: 0,
+    bark: "maple",
   },
   /** Holly: dark, glossy, spiny evergreen leaves kept for several years. */
   holly: {
@@ -274,6 +284,7 @@ export const LEAF_STYLES = {
     palette: "holly",
     leafAge: 6,
     deciduous: false,
+    bark: "holly",
   },
   /** Rowan: long compound leaves of paired leaflets; early to flush, early to turn scarlet. */
   rowan: {
@@ -288,6 +299,7 @@ export const LEAF_STYLES = {
     deciduous: true,
     flush: 0.01,
     turn: -0.02,
+    bark: "rowan",
   },
   /** Goat willow: broad, oval, grey-green leaves (not a narrow willow leaf) that turn dull yellow. */
   willow: {
@@ -302,6 +314,7 @@ export const LEAF_STYLES = {
     deciduous: true,
     flush: 0.01,
     turn: 0.02,
+    bark: "willow",
   },
   /** Scots pine: paired, blue-green needles, longer than a fir's, kept about three years. */
   pine: {
@@ -314,6 +327,7 @@ export const LEAF_STYLES = {
     palette: "pine",
     leafAge: 3,
     deciduous: false,
+    bark: "pine",
   },
   /** Terminalia-like: large, glossy leaves crowded at the shoot tips. */
   large: {

@@ -4,6 +4,7 @@
  * colour scheme changes.
  */
 
+import { BARK_PALETTES, BARK_STEPS, type BarkPalette } from "./bark-styles.ts";
 import { LEAF_PALETTES, type LeafPalette } from "./leaf-styles.ts";
 
 export interface Theme {
@@ -15,8 +16,13 @@ export interface Theme {
   ghost: string;
   /** `--ground-hatch: 1` draws the ground as ink hatching (an engraved plate) instead of a fill. */
   groundHatch: boolean;
-  /** Young twig → old bark. */
+  /** Young twig → old bark: the wood of trees whose style names no species bark. */
   bark: string[];
+  /**
+   * Each species' wood (bark-styles.ts), BARK_STEPS colours: twig → bark by age over the first
+   * half, bark → old bark by girth over the second.
+   */
+  barkBy: Record<BarkPalette, string[]>;
   /** Deep shade → full sun, one ramp per leaf palette (leaf-styles.ts). */
   leaf: Record<LeafPalette, string[]>;
   /** The same in autumn colour (M17): shaded leaves turn darker, sunlit ones brighter. */
@@ -75,6 +81,7 @@ export function readTheme(el: Element): Theme {
     ghost: v("--ghost", "#9a8f80"),
     groundHatch: style.getPropertyValue("--ground-hatch").trim() === "1",
     bark: ramp(v("--bark-young", "#8c7b4f"), v("--bark-old", "#4c3d31")),
+    barkBy: barkRamps(v),
     leaf: leafRamps(v),
     autumn: autumnRamps(v),
   };
@@ -126,6 +133,34 @@ function leafRamps(v: (name: string, fallback: string) => string): Record<LeafPa
   for (const p of LEAF_PALETTES) {
     const [token, shade, sun] = LEAF_FALLBACK[p];
     out[p] = ramp(v(`${token}-shade`, shade), v(`${token}-sun`, sun));
+  }
+  return out;
+}
+
+/** Fallbacks for each species' wood: `--<palette>-bark-twig`, `--<palette>-bark`, `-bark-old`. */
+const BARK_FALLBACK: Record<BarkPalette, [string, string, string]> = {
+  birch: ["#6b3f2c", "#e9e6de", "#2f2b28"],
+  oak: ["#7a6a4a", "#7d7365", "#4e463d"],
+  beech: ["#6e5a3e", "#a9a8a0", "#94938c"],
+  hornbeam: ["#6d5d48", "#8e9090", "#717474"],
+  maple: ["#7a5a3a", "#8f8170", "#6a5d50"],
+  holly: ["#4e6a3a", "#9fa39a", "#81857d"],
+  rowan: ["#6a5444", "#8d8a84", "#6e6b66"],
+  willow: ["#7d7660", "#7a6e5e", "#554b40"],
+  pine: ["#7c6a55", "#b9714b", "#5e4e42"],
+  fir: ["#7a6a54", "#8e8a82", "#6e6a64"],
+};
+
+function barkRamps(v: (name: string, fallback: string) => string): Record<BarkPalette, string[]> {
+  const out = {} as Record<BarkPalette, string[]>;
+  const half = BARK_STEPS / 2;
+  for (const p of BARK_PALETTES) {
+    const [twig, bark, old] = BARK_FALLBACK[p];
+    const b = v(`--${p}-bark`, bark);
+    out[p] = [
+      ...ramp(v(`--${p}-bark-twig`, twig), b, half),
+      ...ramp(b, v(`--${p}-bark-old`, old), half),
+    ];
   }
   return out;
 }

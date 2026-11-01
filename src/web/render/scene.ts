@@ -17,6 +17,7 @@
 
 import type { Snapshot } from "../../core/types.ts";
 import { BudState } from "../../core/types.ts";
+import { BARK_PALETTES, BARK_STEPS, BARK_STYLES, barkStep, fissureOpen } from "./bark-styles.ts";
 import { CATEGORICAL, SEQUENTIAL } from "./colors.ts";
 import {
   isLeafStyleName,
@@ -288,7 +289,12 @@ export class Scene {
   /** CSS pixels kept free above the crowns when fitting. */
   headroom = HEADER_MARGIN;
   private colors = new Uint16Array(0);
-  private colorsFor = { s: null as Snapshot | null, mode: "", steps: 0 };
+  private colorsFor = {
+    s: null as Snapshot | null,
+    mode: "",
+    steps: 0,
+    style: null as LeafStyle | null,
+  };
   /**
    * Which leaves this snapshot carries, and everything about them that does not move during a
    * tween (M15): the metamer each sits on, its direction as a fixed rotation (a, b) of that
@@ -828,22 +834,80 @@ export class Scene {
 
   /** The palette a colour mode draws with. */
   palette(mode: ColorMode, theme: Theme): string[] {
-    if (mode === "natural") return theme.bark;
+    if (mode === "natural") {
+      // The view's ramp, then each species' (bark-styles.ts): `colorIndices` points into both.
+      if (this.naturalFor !== theme) {
+        this.natural = [...theme.bark, ...BARK_PALETTES.flatMap((p) => theme.barkBy[p])];
+        this.naturalFor = theme;
+      }
+      return this.natural;
+    }
     if (mode === "light" || mode === "resource" || mode === "age" || mode === "stress") {
       return SEQUENTIAL;
     }
     return CATEGORICAL;
   }
 
+  private natural: string[] = [];
+  private naturalFor: Theme | null = null;
+
+  /**
+   * Each tree's drawing style (M19: each tree is drawn as its species): `styles[kindOf[tree]]`,
+   * the style its species names, else the view's (`styles[0]`). Once per snapshot and view style.
+   */
+  treeStyles(s: Snapshot): { styles: LeafStyle[]; kindOf: Uint8Array } {
+    const c = this.stylesFor;
+    if (c.s === s && c.style === this.leafStyle) return c;
+    const style = this.leafStyle;
+    const styles: LeafStyle[] = [style];
+    let maxTree = 0;
+    for (const m of s.metrics) maxTree = Math.max(maxTree, m.tree);
+    const n = s.metamerCount;
+    if (n > 0) maxTree = Math.max(maxTree, s.tree[n - 1] as number); // rows come in tree-id order
+    const kindOf = new Uint8Array(maxTree + 1);
+    for (const m of s.metrics) {
+      const name = m.species ? s.species[m.species]?.leaf : undefined;
+      const own: LeafStyle = name && isLeafStyleName(name) ? LEAF_STYLES[name] : style;
+      let kind = styles.indexOf(own);
+      if (kind < 0) kind = styles.push(own) - 1;
+      kindOf[m.tree] = kind;
+    }
+    this.stylesFor = { s, style, styles, kindOf };
+    return this.stylesFor;
+  }
+  private stylesFor = {
+    s: null as Snapshot | null,
+    style: null as LeafStyle | null,
+    styles: [] as LeafStyle[],
+    kindOf: new Uint8Array(0),
+  };
+
+  /**
+   * The bark texture of every metamer in the natural view, four bytes each: fissure depth, birch's
+   * marks, pine's plates (0–255, bark-styles.ts), and 0. Filled by `colorIndices("natural")`; zero
+   * for trees drawn in the view's own ramp.
+   */
+  bark = new Uint8Array(0);
+
   /** Palette index of every metamer for a colour mode and a palette of `steps` colours. */
   colorIndices(mode: ColorMode, steps: number): Uint16Array {
     const s = this.next;
     if (!s) return this.colors;
     const cached = this.colorsFor;
-    if (cached.s === s && cached.mode === mode && cached.steps === steps) return this.colors;
-    this.colorsFor = { s, mode, steps };
+    if (
+      cached.s === s &&
+      cached.mode === mode &&
+      cached.steps === steps &&
+      cached.style === this.leafStyle
+    )
+      return this.colors;
+    this.colorsFor = { s, mode, steps, style: this.leafStyle };
     const n = s.metamerCount;
     if (this.colors.length < n) this.colors = new Uint16Array(n * 2);
+    if (mode === "natural" && steps === RAMP_STEPS + BARK_PALETTES.length * BARK_STEPS) {
+      this.naturalIndices(s);
+      return this.colors;
+    }
     let field: Float32Array | null = null;
     if (mode === "light") field = s.light;
     else if (mode === "resource") field = s.resource;
@@ -869,6 +933,42 @@ export class Scene {
       }
     }
     return this.colors;
+  }
+
+  /**
+   * The natural view's colours (`palette("natural")`): a tree whose style names a bark (bark-styles.ts)
+   * takes its species' ramp, twig → bark by the metamer's age and bark → old bark by its girth, and
+   * the texture bytes in `bark`; any other tree, the view's ramp by age as a share of the oldest
+   * wood's (the M6 picture, unchanged).
+   */
+  private naturalIndices(s: Snapshot): void {
+    const n = s.metamerCount;
+    const { styles, kindOf } = this.treeStyles(s);
+    const barkOf = styles.map((st) => (st.bark ? BARK_PALETTES.indexOf(st.bark) : -1));
+    if (this.bark.length < 4 * n) this.bark = new Uint8Array(8 * n);
+    let max = 0;
+    for (let j = 0; j < n; j++) if (s.age[j] > max) max = s.age[j];
+    for (let j = 0; j < n; j++) {
+      const p = barkOf[kindOf[s.tree[j] as number] as number] as number;
+      const q = 4 * j;
+      if (p < 0) {
+        const u = max > 0 ? s.age[j] / max : 0;
+        this.colors[j] = Math.min(RAMP_STEPS - 1, Math.floor(u * RAMP_STEPS));
+        this.bark[q] = 0;
+        this.bark[q + 1] = 0;
+        this.bark[q + 2] = 0;
+        continue;
+      }
+      const style = BARK_STYLES[BARK_PALETTES[p] as (typeof BARK_PALETTES)[number]];
+      const age = s.age[j] as number;
+      const r = s.radius[j] as number;
+      this.colors[j] = RAMP_STEPS + p * BARK_STEPS + barkStep(style, age, r);
+      const mature = age >= style.mature ? 1 : age / style.mature;
+      const open = fissureOpen(style, r);
+      this.bark[q] = Math.round(255 * style.fissure * open);
+      this.bark[q + 1] = Math.round(255 * style.marks * mature);
+      this.bark[q + 2] = Math.round(255 * style.plates * open);
+    }
   }
 
   /**
@@ -1048,20 +1148,11 @@ export class Scene {
     const style = this.leafStyle;
     if (L.for === s && L.leafAge === leafAge && L.style === style) return L;
     const n = s.metamerCount;
-    // Each tree is drawn as its species (M19): the style its species names, else the view's,
-    // resolved once per tree into arrays indexed by tree id.
-    const styles: LeafStyle[] = [style];
-    let maxTree = 0;
-    for (const m of s.metrics) maxTree = Math.max(maxTree, m.tree);
-    if (n > 0) maxTree = Math.max(maxTree, s.tree[n - 1] as number); // rows come in tree-id order
-    const kindOf = new Uint8Array(maxTree + 1);
-    const keepOf = new Uint8Array(maxTree + 1);
+    // Each tree is drawn as its species (M19), resolved once per tree into arrays by tree id.
+    const { styles, kindOf } = this.treeStyles(s);
+    const keepOf = new Uint8Array(kindOf.length);
     for (const m of s.metrics) {
-      const name = m.species ? s.species[m.species]?.leaf : undefined;
-      const own: LeafStyle = name && isLeafStyleName(name) ? LEAF_STYLES[name] : style;
-      let kind = styles.indexOf(own);
-      if (kind < 0) kind = styles.push(own) - 1;
-      kindOf[m.tree] = kind;
+      const own = styles[kindOf[m.tree] as number] as LeafStyle;
       keepOf[m.tree] = own.marcescent !== undefined && m.height < own.marcescent ? 1 : 0;
     }
     // Per kind: the leaf's turn from its shoot, its length relative to the view's style (the

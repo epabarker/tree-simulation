@@ -40,6 +40,39 @@
     --pine-needle-sun: #6a8f6a;
     --ghost: #9a8f80;
     --wall: rgba(90, 90, 100, 0.35);
+    /* Species wood (render/bark-styles.ts): twig → bark by age, bark → old bark by girth. Birch
+       white with a black base, beech pale grey, oak grey-brown, pine orange above and grey-brown
+       plates below, holly grey over green shoots (the species cards, 2026-11-01). */
+    --birch-bark-twig: #6b3f2c;
+    --birch-bark: #e9e6de;
+    --birch-bark-old: #2f2b28;
+    --oak-bark-twig: #7a6a4a;
+    --oak-bark: #7d7365;
+    --oak-bark-old: #4e463d;
+    --beech-bark-twig: #6e5a3e;
+    --beech-bark: #a9a8a0;
+    --beech-bark-old: #94938c;
+    --hornbeam-bark-twig: #6d5d48;
+    --hornbeam-bark: #8e9090;
+    --hornbeam-bark-old: #717474;
+    --maple-bark-twig: #7a5a3a;
+    --maple-bark: #8f8170;
+    --maple-bark-old: #6a5d50;
+    --holly-bark-twig: #4e6a3a;
+    --holly-bark: #9fa39a;
+    --holly-bark-old: #81857d;
+    --rowan-bark-twig: #6a5444;
+    --rowan-bark: #8d8a84;
+    --rowan-bark-old: #6e6b66;
+    --willow-bark-twig: #7d7660;
+    --willow-bark: #7a6e5e;
+    --willow-bark-old: #554b40;
+    --pine-bark-twig: #7c6a55;
+    --pine-bark: #b9714b;
+    --pine-bark-old: #5e4e42;
+    --fir-bark-twig: #7a6a54;
+    --fir-bark: #8e8a82;
+    --fir-bark-old: #6e6a64;
     /* Autumn (M17): what each foliage turns to before it falls. */
     --leaf-autumn-shade: #8a3b16;
     --leaf-autumn-sun: #e3a43a;
@@ -99,6 +132,36 @@
       --pine-needle-sun: #5b7b5b;
       --ghost: #6f6a62;
       --wall: rgba(160, 160, 175, 0.25);
+      --birch-bark-twig: #8a5a44;
+      --birch-bark: #d6d2c8;
+      --birch-bark-old: #4a4440;
+      --oak-bark-twig: #9a8a66;
+      --oak-bark: #9a8f80;
+      --oak-bark-old: #6e6458;
+      --beech-bark-twig: #8c7856;
+      --beech-bark: #b4b3ab;
+      --beech-bark-old: #a09f98;
+      --hornbeam-bark-twig: #8c7b62;
+      --hornbeam-bark: #a4a6a6;
+      --hornbeam-bark-old: #8a8d8d;
+      --maple-bark-twig: #9a7856;
+      --maple-bark: #a8998a;
+      --maple-bark-old: #85786a;
+      --holly-bark-twig: #6a8a52;
+      --holly-bark: #b0b4ab;
+      --holly-bark-old: #959a91;
+      --rowan-bark-twig: #88705e;
+      --rowan-bark: #a5a29c;
+      --rowan-bark-old: #88857f;
+      --willow-bark-twig: #9a937a;
+      --willow-bark: #978a78;
+      --willow-bark-old: #73685b;
+      --pine-bark-twig: #a38c6e;
+      --pine-bark: #c98660;
+      --pine-bark-old: #7d6b5d;
+      --fir-bark-twig: #988670;
+      --fir-bark: #a8a49c;
+      --fir-bark-old: #88847e;
     }
   }
 
@@ -135,5 +198,35 @@
     --pine-needle-sun: #5b7b5b;
     --ghost: #6f6a62;
     --wall: rgba(160, 160, 175, 0.25);
+    --birch-bark-twig: #8a5a44;
+    --birch-bark: #d6d2c8;
+    --birch-bark-old: #4a4440;
+    --oak-bark-twig: #9a8a66;
+    --oak-bark: #9a8f80;
+    --oak-bark-old: #6e6458;
+    --beech-bark-twig: #8c7856;
+    --beech-bark: #b4b3ab;
+    --beech-bark-old: #a09f98;
+    --hornbeam-bark-twig: #8c7b62;
+    --hornbeam-bark: #a4a6a6;
+    --hornbeam-bark-old: #8a8d8d;
+    --maple-bark-twig: #9a7856;
+    --maple-bark: #a8998a;
+    --maple-bark-old: #85786a;
+    --holly-bark-twig: #6a8a52;
+    --holly-bark: #b0b4ab;
+    --holly-bark-old: #959a91;
+    --rowan-bark-twig: #88705e;
+    --rowan-bark: #a5a29c;
+    --rowan-bark-old: #88857f;
+    --willow-bark-twig: #9a937a;
+    --willow-bark: #978a78;
+    --willow-bark-old: #73685b;
+    --pine-bark-twig: #a38c6e;
+    --pine-bark: #c98660;
+    --pine-bark-old: #7d6b5d;
+    --fir-bark-twig: #988670;
+    --fir-bark: #a8a49c;
+    --fir-bark-old: #88847e;
   }
 }

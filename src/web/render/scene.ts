@@ -17,6 +17,7 @@
 
 import type { Snapshot } from "../../core/types.ts";
 import { BudState } from "../../core/types.ts";
+import { BARK_PALETTES, BARK_STEPS, BARK_STYLES, barkStep, fissureOpen } from "./bark-styles.ts";
 import { CATEGORICAL, SEQUENTIAL } from "./colors.ts";
 import {
   isLeafStyleName,
@@ -94,6 +95,12 @@ export interface ViewOptions {
   showGhosts: boolean;
   /** Outline obstacles (ADR 0015): the lab shows them; a host page's content covers them. */
   showObstacles?: boolean;
+  /**
+   * I3's two foliage knobs (plan §2.5, step 4): the cards' opacity (LEAF_OPACITY) and the least
+   * length a card draws on screen in CSS pixels (LEAF_MIN_PX). Nothing else thins or hides leaves.
+   */
+  leafOpacity?: number;
+  leafMinPx?: number;
 }
 
 export interface Camera {
@@ -152,10 +159,16 @@ export const LEAF_LENGTH = LEAF_STYLES.broadleaf.length;
 export const LEAF_ASPECT = LEAF_STYLES.broadleaf.aspect;
 /** Leaves never draw shorter than this on screen, so zoomed-out crowns still read as foliage. */
 export const LEAF_MIN_PX = 3.5;
+/** A leaf card's opacity: overlapping cards build up depth, and a single card lets a little through. */
+export const LEAF_OPACITY = 0.92;
 
 /** Length of a full-size leaf of `length` world units at `scale` CSS pixels per world unit. */
-export function leafLength(scale: number, length: number = LEAF_LENGTH): number {
-  return Math.max(length, LEAF_MIN_PX / scale);
+export function leafLength(
+  scale: number,
+  length: number = LEAF_LENGTH,
+  minPx: number = LEAF_MIN_PX,
+): number {
+  return Math.max(length, minPx / scale);
 }
 /**
  * Slices of the slab's depth the picture is drawn in, far to near (I3). Within a slice wood draws
@@ -288,7 +301,12 @@ export class Scene {
   /** CSS pixels kept free above the crowns when fitting. */
   headroom = HEADER_MARGIN;
   private colors = new Uint16Array(0);
-  private colorsFor = { s: null as Snapshot | null, mode: "", steps: 0 };
+  private colorsFor = {
+    s: null as Snapshot | null,
+    mode: "",
+    steps: 0,
+    style: null as LeafStyle | null,
+  };
   /**
    * Which leaves this snapshot carries, and everything about them that does not move during a
    * tween (M15): the metamer each sits on, its direction as a fixed rotation (a, b) of that
@@ -314,6 +332,13 @@ export class Scene {
     /** The style each leaf is drawn in (an index into `styles`), and whether it stays on in winter. */
     kind: new Uint8Array(0),
     keep: new Uint8Array(0),
+    /**
+     * Clumping (LeafClump): the metamer whose tip the card is drawn toward, the share of the way it
+     * goes, and the share of its own metamer it sits back from the tip.
+     */
+    end: new Int32Array(0),
+    pull: new Float32Array(0),
+    back: new Float32Array(0),
     styles: [] as LeafStyle[],
   };
   private leafList: Leaves = {
@@ -828,22 +853,80 @@ export class Scene {
 
   /** The palette a colour mode draws with. */
   palette(mode: ColorMode, theme: Theme): string[] {
-    if (mode === "natural") return theme.bark;
+    if (mode === "natural") {
+      // The view's ramp, then each species' (bark-styles.ts): `colorIndices` points into both.
+      if (this.naturalFor !== theme) {
+        this.natural = [...theme.bark, ...BARK_PALETTES.flatMap((p) => theme.barkBy[p])];
+        this.naturalFor = theme;
+      }
+      return this.natural;
+    }
     if (mode === "light" || mode === "resource" || mode === "age" || mode === "stress") {
       return SEQUENTIAL;
     }
     return CATEGORICAL;
   }
 
+  private natural: string[] = [];
+  private naturalFor: Theme | null = null;
+
+  /**
+   * Each tree's drawing style (M19: each tree is drawn as its species): `styles[kindOf[tree]]`,
+   * the style its species names, else the view's (`styles[0]`). Once per snapshot and view style.
+   */
+  treeStyles(s: Snapshot): { styles: LeafStyle[]; kindOf: Uint8Array } {
+    const c = this.stylesFor;
+    if (c.s === s && c.style === this.leafStyle) return c;
+    const style = this.leafStyle;
+    const styles: LeafStyle[] = [style];
+    let maxTree = 0;
+    for (const m of s.metrics) maxTree = Math.max(maxTree, m.tree);
+    const n = s.metamerCount;
+    if (n > 0) maxTree = Math.max(maxTree, s.tree[n - 1] as number); // rows come in tree-id order
+    const kindOf = new Uint8Array(maxTree + 1);
+    for (const m of s.metrics) {
+      const name = m.species ? s.species[m.species]?.leaf : undefined;
+      const own: LeafStyle = name && isLeafStyleName(name) ? LEAF_STYLES[name] : style;
+      let kind = styles.indexOf(own);
+      if (kind < 0) kind = styles.push(own) - 1;
+      kindOf[m.tree] = kind;
+    }
+    this.stylesFor = { s, style, styles, kindOf };
+    return this.stylesFor;
+  }
+  private stylesFor = {
+    s: null as Snapshot | null,
+    style: null as LeafStyle | null,
+    styles: [] as LeafStyle[],
+    kindOf: new Uint8Array(0),
+  };
+
+  /**
+   * The bark texture of every metamer in the natural view, four bytes each: fissure depth, birch's
+   * marks, pine's plates (0–255, bark-styles.ts), and 0. Filled by `colorIndices("natural")`; zero
+   * for trees drawn in the view's own ramp.
+   */
+  bark = new Uint8Array(0);
+
   /** Palette index of every metamer for a colour mode and a palette of `steps` colours. */
   colorIndices(mode: ColorMode, steps: number): Uint16Array {
     const s = this.next;
     if (!s) return this.colors;
     const cached = this.colorsFor;
-    if (cached.s === s && cached.mode === mode && cached.steps === steps) return this.colors;
-    this.colorsFor = { s, mode, steps };
+    if (
+      cached.s === s &&
+      cached.mode === mode &&
+      cached.steps === steps &&
+      cached.style === this.leafStyle
+    )
+      return this.colors;
+    this.colorsFor = { s, mode, steps, style: this.leafStyle };
     const n = s.metamerCount;
     if (this.colors.length < n) this.colors = new Uint16Array(n * 2);
+    if (mode === "natural" && steps === RAMP_STEPS + BARK_PALETTES.length * BARK_STEPS) {
+      this.naturalIndices(s);
+      return this.colors;
+    }
     let field: Float32Array | null = null;
     if (mode === "light") field = s.light;
     else if (mode === "resource") field = s.resource;
@@ -869,6 +952,42 @@ export class Scene {
       }
     }
     return this.colors;
+  }
+
+  /**
+   * The natural view's colours (`palette("natural")`): a tree whose style names a bark (bark-styles.ts)
+   * takes its species' ramp, twig → bark by the metamer's age and bark → old bark by its girth, and
+   * the texture bytes in `bark`; any other tree, the view's ramp by age as a share of the oldest
+   * wood's (the M6 picture, unchanged).
+   */
+  private naturalIndices(s: Snapshot): void {
+    const n = s.metamerCount;
+    const { styles, kindOf } = this.treeStyles(s);
+    const barkOf = styles.map((st) => (st.bark ? BARK_PALETTES.indexOf(st.bark) : -1));
+    if (this.bark.length < 4 * n) this.bark = new Uint8Array(8 * n);
+    let max = 0;
+    for (let j = 0; j < n; j++) if (s.age[j] > max) max = s.age[j];
+    for (let j = 0; j < n; j++) {
+      const p = barkOf[kindOf[s.tree[j] as number] as number] as number;
+      const q = 4 * j;
+      if (p < 0) {
+        const u = max > 0 ? s.age[j] / max : 0;
+        this.colors[j] = Math.min(RAMP_STEPS - 1, Math.floor(u * RAMP_STEPS));
+        this.bark[q] = 0;
+        this.bark[q + 1] = 0;
+        this.bark[q + 2] = 0;
+        continue;
+      }
+      const style = BARK_STYLES[BARK_PALETTES[p] as (typeof BARK_PALETTES)[number]];
+      const age = s.age[j] as number;
+      const r = s.radius[j] as number;
+      this.colors[j] = RAMP_STEPS + p * BARK_STEPS + barkStep(style, age, r);
+      const mature = age >= style.mature ? 1 : age / style.mature;
+      const open = fissureOpen(style, r);
+      this.bark[q] = Math.round(255 * style.fissure * open);
+      this.bark[q + 1] = Math.round(255 * style.marks * mature);
+      this.bark[q + 2] = Math.round(255 * style.plates * open);
+    }
   }
 
   /**
@@ -906,6 +1025,8 @@ export class Scene {
     const tau = this.tau;
     const palettes = L.styles.map((st) => LEAF_PALETTES.indexOf(st.palette));
     const shapes = L.styles.map((st) => LEAF_SHAPES.indexOf(st.shape));
+    const hangOf = L.styles.map((st) => st.clump?.hang ?? 0);
+    const levelOf = L.styles.map((st) => st.clump?.level ?? 0);
     if (this.seasons && tau < this.lastTau) this.fallen.count = 0; // a new year: last year's litter is gone
     const g = this.geom;
     out.slices.set(L.slices);
@@ -947,6 +1068,20 @@ export class Scene {
         dx = 1; // atan2(0, 0) = 0: a shoot of no length points along +x
         dy = 0;
       }
+      // Where the card sits (LeafClump): back along its metamer, then drawn toward its shoot's tip.
+      let px = g.tipX[j] as number;
+      let py = g.tipY[j] as number;
+      const back = L.back[i] as number;
+      if (back > 0) {
+        px -= (px - g.baseX[j]) * back;
+        py -= (py - g.baseY[j]) * back;
+      }
+      const e = L.end[i] as number;
+      if (e !== j) {
+        const pull = L.pull[i] as number;
+        px += (g.tipX[e] - px) * pull;
+        py += (g.tipY[e] - py) * pull;
+      }
       let a = L.a[i] as number;
       let b = L.b[i] as number;
       if (this.wind) {
@@ -959,10 +1094,27 @@ export class Scene {
         b += a * f;
         a = na;
       }
-      out.x[k] = g.tipX[j];
-      out.y[k] = g.tipY[j];
-      out.ux[k] = a * dx - b * dy;
-      out.uy[k] = a * dy + b * dx;
+      let ux = a * dx - b * dy;
+      let uy = a * dy + b * dx;
+      // Hanging strings and level sprays (LeafClump): the card turns toward down, or toward level.
+      const hang = hangOf[kind] as number;
+      const level = levelOf[kind] as number;
+      if (hang > 0 || level > 0) {
+        ux = (1 - hang - level) * ux + level * (ux < 0 ? -1 : 1);
+        uy = (1 - hang - level) * uy - hang;
+        const n = Math.sqrt(ux * ux + uy * uy);
+        if (n > 1e-6) {
+          ux /= n;
+          uy /= n;
+        } else {
+          ux = 0;
+          uy = -1;
+        }
+      }
+      out.x[k] = px;
+      out.y[k] = py;
+      out.ux[k] = ux;
+      out.uy[k] = uy;
       out.size[k] = size * L.scale[i];
       out.color[k] = L.color[i];
       out.turn[k] = turn;
@@ -1048,24 +1200,26 @@ export class Scene {
     const style = this.leafStyle;
     if (L.for === s && L.leafAge === leafAge && L.style === style) return L;
     const n = s.metamerCount;
-    // Each tree is drawn as its species (M19): the style its species names, else the view's,
-    // resolved once per tree into arrays indexed by tree id.
-    const styles: LeafStyle[] = [style];
-    let maxTree = 0;
-    for (const m of s.metrics) maxTree = Math.max(maxTree, m.tree);
-    if (n > 0) maxTree = Math.max(maxTree, s.tree[n - 1] as number); // rows come in tree-id order
-    const kindOf = new Uint8Array(maxTree + 1);
-    const keepOf = new Uint8Array(maxTree + 1);
+    // Each tree is drawn as its species (M19), resolved once per tree into arrays by tree id.
+    const { styles, kindOf } = this.treeStyles(s);
+    const keepOf = new Uint8Array(kindOf.length);
+    // Marcescence by height on the tree (`marcescentBelow`): leaves on wood below this keep on.
+    const keepBelow = new Float32Array(kindOf.length);
     for (const m of s.metrics) {
-      const name = m.species ? s.species[m.species]?.leaf : undefined;
-      const own: LeafStyle = name && isLeafStyleName(name) ? LEAF_STYLES[name] : style;
-      let kind = styles.indexOf(own);
-      if (kind < 0) kind = styles.push(own) - 1;
-      kindOf[m.tree] = kind;
+      const own = styles[kindOf[m.tree] as number] as LeafStyle;
       keepOf[m.tree] = own.marcescent !== undefined && m.height < own.marcescent ? 1 : 0;
+      keepBelow[m.tree] = (own.marcescentBelow ?? 0) * m.height;
     }
+    // Each metamer's continuation (its child of the same order, the axis going on), for `gather`.
+    const cont = new Int32Array(n).fill(-1);
+    for (let j = 0; j < n; j++) {
+      const p = s.parent[j] as number;
+      if (p >= 0 && cont[p] < 0 && s.order[j] === s.order[p]) cont[p] = j;
+    }
+    const clumpOf = styles.map((st) => st.clump ?? {});
     // Per kind: the leaf's turn from its shoot, its length relative to the view's style (the
     // renderers draw at the latter), and whether it carries a leaf each side.
+    const spreadOf = styles.map((st) => st.spread);
     const along = styles.map((st) => Math.cos(st.spread));
     const across = styles.map((st) => Math.sin(st.spread));
     const lengthOf = styles.map((st) => st.length / style.length);
@@ -1082,6 +1236,9 @@ export class Scene {
       L.keep = new Uint8Array(2 * cap);
       L.slice = new Uint8Array(2 * cap);
       L.at = new Int32Array(2 * cap);
+      L.end = new Int32Array(2 * cap);
+      L.pull = new Float32Array(2 * cap);
+      L.back = new Float32Array(2 * cap);
     }
     L.styles = styles;
     let maxLight = 0;
@@ -1100,14 +1257,34 @@ export class Scene {
       const kind = kindOf[tree] as number;
       const hx = s.dirX[j] as number;
       const hy = s.dirY[j] as number;
+      const c = clumpOf[kind] as NonNullable<LeafStyle["clump"]>;
+      // The page's own variation per card (never the model's): its fan, its place, its size.
+      const id = s.birthId[j] as number;
+      const salt = (side > 0 ? 11 : 17) + 5 * rosette;
       L.metamer[k] = j;
-      L.a[k] = along[kind] as number;
-      L.b[k] = side * (across[kind] as number);
+      if (c.fan) {
+        const angle = side * (spreadOf[kind] as number) + c.fan * (2 * hash01(tree, id, salt) - 1);
+        L.a[k] = Math.cos(angle);
+        L.b[k] = Math.sin(angle);
+      } else {
+        L.a[k] = along[kind] as number;
+        L.b[k] = side * (across[kind] as number);
+      }
       L.color[k] = Math.max(0, Math.min(RAMP_STEPS - 1, color));
       L.rosette[k] = rosette;
       L.kind[k] = kind;
-      L.keep[k] = keepOf[tree] as number;
-      L.scale[k] = Math.sqrt(hx * hx + hy * hy) * (lengthOf[kind] as number);
+      // A ragged edge, not a line: each card's own height limit varies from 0.5 to 1.5 of it.
+      const below = (keepBelow[tree] as number) * (0.5 + hash01(tree, id, salt + 3));
+      L.keep[k] = keepOf[tree] || (below > 0 && (s.y0[j] as number) < below) ? 1 : 0;
+      const vary = c.vary ? 1 + c.vary * (2 * hash01(tree, id, salt + 1) - 1) : 1;
+      L.scale[k] = Math.sqrt(hx * hx + hy * hy) * (lengthOf[kind] as number) * vary;
+      // A rosette sits on its short shoot; a shoot's cards spread back and gather toward its tip.
+      let end = j;
+      if (!rosette && c.gather)
+        for (let r = c.reach ?? 2; r > 0 && cont[end] >= 0; r--) end = cont[end];
+      L.end[k] = end;
+      L.pull[k] = end !== j ? (c.gather ?? 0) : 0;
+      L.back[k] = !rosette && c.along ? c.along * hash01(tree, id, salt + 2) : 0;
       L.slice[k] = depthSlice(s.z0[j] as number, s.depth);
       k++;
     };

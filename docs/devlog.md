@@ -72,6 +72,14 @@ Newest first. One entry per session or milestone: what changed, why, surprises, 
 - **`r2.relay`, `r2.relayAge`, `r2.relayPTerm`** (r2.rs, season.rs): laterals on the top nodes under an ended pa-0 apex grow as pa 0 (spec §R2.4's "distal laterals take over"), and the leader may end from an age. Off by default; presets and goldens unchanged.
 - **The form atlas** (`docs/experiments/code/2026-11-01-atlas/atlas.py`): a sheet per rule, beech, oak and birch at 60 and 100. The relay's sheet: beech splits into ascending co-dominant stems (a rounder top at 60 with a high relay p_term, a column of stems by 100); oak barely moves; birch fuller. The stems do not arch: curvature along the limb is next.
 
+## 2026-11-01: Track C (foliage): per-species bark, clumping, the coverage instrument, the specimen's memory
+
+- **Bark per species** (`render/bark-styles.ts`): three tokens per species in `scene.css` (twig, bark, old bark), with age moving a stem to bark and girth moving it to old bark. WebGL2 adds a girth-driven texture (fissures, birch's marks, pine's plates). Thresholds are set on the model's girths, about half a real stand's under ADR 0027. Surprise: pine's first try, on real girths, stayed orange to the ground in the stand; birch's lone trunk went black nearly to the crown.
+- **Clumping** (`LeafClump` in `LEAF_STYLES`): gather, spread back, fan, hang, level and size variation per species; never a card added or removed (ADR 0024). Oak is now marcescent (young trees, lower crown). The lab's `?bench` takes `&tau=`.
+- **I3 step 4:** `render/coverage.ts` (cells and leaf pixels); `leafOpacity` and `leafMinPx` as view options. **I3 step 3:** metrics are 18–30% of a 6–22 ms snapshot, so no lean cadence. **Step 5:** `growStill` takes 3.6 s (phone plate) and 5.5 s (laptop plate) headless. **Step 6:** Canvas 2D finishes the phone's intro.
+- **Memory:** the worker holds the forest as checkpoint bytes while the specimen grows, so the 160-cell plate with the specimen peaks at 218.7 MB, not 341.7 MB (ADR 0026's 256). The reloaded hash is unchanged.
+- Goldens unchanged. Note: [`2026-11-01-foliage.md`](experiments/2026-11-01-foliage.md).
+
 ## 2026-11-01: the form re-pick, the third hornbeam pilot, the round-5 overnight started
 
 - **The re-pick** (`repick.py`, the user's rule): stand LAI in band, then the floor nearest the measured, then alive ≥ 0.8 at 100, behind a guard (lone W/H 0.3–2.5, H < 190, stand limb crown ratio ≥ 0.2). It replaces the overnight's stand-first rule, which picked columns. The picks: hornbeam 2-3-2, birch 3-3-2, oak 0-3-0 (flagged), willow 0-2-2; maple 0-0-0, rowan and holly round 2's (the user's). The stands were replayed with the ground written; every hash matched.

@@ -24,6 +24,8 @@ import {
   CANVAS_SLICE_STEP,
   type ColorMode,
   DEPTH_SLICES,
+  LEAF_MIN_PX,
+  LEAF_OPACITY,
   type Leaves,
   leafLength,
   Scene,
@@ -85,8 +87,14 @@ export class Canvas2DRenderer implements Renderer {
     this.scene.setSize(rect.width, rect.height, dpr);
   }
 
+  /** This frame's foliage knobs (ViewOptions.leafOpacity, leafMinPx). */
+  private leafOpacity = LEAF_OPACITY;
+  private leafMinPx = LEAF_MIN_PX;
+
   draw(t: number, view: ViewOptions): void {
     const { ctx, scene } = this;
+    this.leafOpacity = view.leafOpacity ?? LEAF_OPACITY;
+    this.leafMinPx = view.leafMinPx ?? LEAF_MIN_PX;
     const s = scene.next;
     const { width: w, height: h, dpr } = scene;
     const { cx, scale } = scene.camera;
@@ -266,13 +274,13 @@ export class Canvas2DRenderer implements Renderer {
   private drawLeaves(leaves: Leaves, from: number, to: number): void {
     const { ctx } = this;
     const style = this.scene.leafStyle;
-    const full = leafLength(this.scene.camera.scale, style.length);
+    const full = leafLength(this.scene.camera.scale, style.length, this.leafMinPx);
     const { x0, x1, y0, y1 } = this.cull;
     // The palettes this frame's leaves use (each tree is drawn as its species, M19).
     const used = new Set<number>();
     for (let k = from; k < to; k++) used.add(leaves.palette[k] as number);
     ctx.save();
-    ctx.globalAlpha = 0.92;
+    ctx.globalAlpha = this.leafOpacity;
     // Leaves drawn in two passes per colour: green, then those past halfway to autumn (M17).
     for (const p of used) {
       const name = LEAF_PALETTES[p] as LeafPalette;

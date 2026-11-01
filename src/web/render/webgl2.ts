@@ -36,7 +36,14 @@ import { BudState } from "../../core/types.ts";
 import { BUD_ACTIVE, BUD_DORMANT, parseColor, SEQUENTIAL, shadeImage } from "./colors.ts";
 import { LEAF_PALETTES, LEAF_STYLES } from "./leaf-styles.ts";
 import { MAX_DPR, type Renderer, type RendererOptions } from "./renderer.ts";
-import { DEPTH_SLICES, LEAF_MIN_PX, type Leaves, Scene, type ViewOptions } from "./scene.ts";
+import {
+  DEPTH_SLICES,
+  LEAF_MIN_PX,
+  LEAF_OPACITY,
+  type Leaves,
+  Scene,
+  type ViewOptions,
+} from "./scene.ts";
 import { readTheme, type Theme } from "./theme.ts";
 
 // World → clip space: x_clip = (x − cx)·sx, y_clip = groundClip + y·sy, with u_view = (cx, sx, groundClip, sy).
@@ -53,10 +60,14 @@ in vec2 a_a;
 in vec2 a_b;
 in vec2 a_r;
 in vec4 a_color;
+in vec4 a_bark; // fissure depth, marks, plates (bark-styles.ts), 0
+in float a_s;   // path length from the tree's base to this segment's base, world units
 out vec2 v_p;
 out float v_h;
 out vec2 v_r;
 out vec4 v_color;
+out vec4 v_bark;
+out float v_s;
 void main() {
   vec2 d = a_b - a_a;
   float h = length(d);
@@ -72,6 +83,8 @@ void main() {
   v_h = h;
   v_r = r;
   v_color = vec4(a_color.rgb, a_color.a * coverage);
+  v_bark = a_bark;
+  v_s = a_s;
   gl_Position = toClip(a_a + dir * along + nrm * across);
 }`;
 
@@ -82,7 +95,40 @@ in vec2 v_p;
 in float v_h;
 in vec2 v_r;
 in vec4 v_color;
+in vec4 v_bark;
+in float v_s;
 out vec4 outColor;
+float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+// Bark (bark-styles.ts): how dark the bark is at local point p of a stem of radius r, 0 → 1.
+// The stem is read as a cylinder seen side on: across the drawn width, the arc length around it;
+// along it, the path length from the tree's base, so a pattern runs on unbroken from segment to
+// segment. Fissures wander up the stem; plates break them across; birch's marks are short dark
+// dashes. Each fades out where its spacing would be under a few pixels, so it never shimmers.
+float barkDark(vec2 p, float r) {
+  vec4 b = v_bark;
+  if (b.x + b.y + b.z <= 0.0) return 0.0;
+  float wide = smoothstep(1.5, 3.5, r / u_px);
+  if (wide <= 0.0) return 0.0;
+  float S = max(0.45, 0.6 * r);
+  float fine = smoothstep(2.5, 5.0, S / u_px);
+  float u = clamp(p.x / r, -0.999, 0.999);
+  float arc = asin(u) * r;
+  float y = v_s + p.y;
+  float fx = arc / S + 0.55 * sin(y / (2.3 * S)) + 0.2 * sin(y / (0.83 * S) + 1.7);
+  float col = floor(fx);
+  float d = abs(fract(fx) - 0.5) * 2.0;
+  // Each fissure narrows and breaks along its length, so it reads as bark, not stripes.
+  float run = 0.55 + 0.45 * sin(y / (1.9 * S) + 6.1 * hash(vec2(col, 3.0)));
+  float fissure = (1.0 - smoothstep(0.08, 0.3 * run + 0.05, d)) * b.x;
+  float py = y / (1.3 * S) + 0.5 * col;
+  float plate = (1.0 - smoothstep(0.05, 0.16, abs(fract(py) - 0.5) * 2.0)) * b.z;
+  float my = y / (0.55 * S);
+  float mx = arc / (0.9 * S) + 0.5 * floor(my);
+  float on = step(0.62, hash(vec2(floor(my), floor(mx))));
+  float dash = on * (1.0 - smoothstep(0.15, 0.4, abs(fract(my) - 0.5) * 2.0))
+    * (1.0 - smoothstep(0.55, 0.95, abs(fract(mx) - 0.5) * 2.0)) * b.y;
+  return wide * fine * max(max(fissure, plate), dash);
+}
 // Capsule from (0, 0) with radius r1 to (0, h) with radius r2 (I. Quilez, 2D distance functions).
 float sdUnevenCapsule(vec2 p, float r1, float r2, float h) {
   p.x = abs(p.x);
@@ -97,7 +143,9 @@ void main() {
   float d = sdUnevenCapsule(v_p, v_r.x, v_r.y, v_h);
   float alpha = clamp(0.5 - d / u_px, 0.0, 1.0) * v_color.a;
   if (alpha <= 0.0) discard;
-  outColor = vec4(v_color.rgb * alpha, alpha);
+  float r = mix(v_r.x, v_r.y, clamp(v_p.y / max(v_h, 1e-6), 0.0, 1.0));
+  vec3 rgb = v_color.rgb * (1.0 - 0.82 * clamp(barkDark(v_p, r), 0.0, 1.0));
+  outColor = vec4(rgb * alpha, alpha);
 }`;
 
 const LEAF_VS = /* glsl */ `#version 300 es
@@ -416,6 +464,8 @@ export class WebGL2Renderer implements Renderer {
       a_b: { size: 2 },
       a_r: { size: 2 },
       a_color: { size: 4, bytes: true },
+      a_bark: { size: 4, bytes: true },
+      a_s: { size: 1 },
     };
     this.segments = this.batch(segment, segmentAttribs);
     this.ghostBatch = this.batch(segment, segmentAttribs);
@@ -596,6 +646,7 @@ export class WebGL2Renderer implements Renderer {
       view.colorMode,
       view.showLeaves ? view.leafAge : -1,
       view.leafStyle,
+      view.leafOpacity,
       view.showBuds,
       view.showObstacles,
       scene.solo,
@@ -610,7 +661,7 @@ export class WebGL2Renderer implements Renderer {
       this.buildSegments(s, view);
       if (ghosts) this.buildGhosts(1 - t);
       else this.ghostBatch.count = 0;
-      if (view.showLeaves) this.buildLeaves(view.leafAge, t);
+      if (view.showLeaves) this.buildLeaves(view.leafAge, t, view.leafOpacity ?? LEAF_OPACITY);
       else this.leafBatch.count = 0;
       if (view.showBuds) this.buildBuds(s, view.colorMode === "light");
       else this.budBatch.count = 0;
@@ -621,7 +672,7 @@ export class WebGL2Renderer implements Renderer {
     const uniforms = {
       u_view: [cx, (2 * scale) / w, 1 - (2 * groundY) / h, (2 * scale) / h],
       u_px: 1 / scale,
-      u_leaf: [scene.leafStyle.length, scene.leafStyle.aspect, LEAF_MIN_PX],
+      u_leaf: [scene.leafStyle.length, scene.leafStyle.aspect, view.leafMinPx ?? LEAF_MIN_PX],
       u_point: [BUD_SIDE_PX, BUD_MIN_SIDE],
     };
     if (view.showShadow) this.uploadShade(s);
@@ -715,11 +766,20 @@ export class WebGL2Renderer implements Renderer {
     const b = this.stream<Floats>(batch, "a_b", n);
     const r = this.stream<Floats>(batch, "a_r", n);
     const color = this.stream<Bytes>(batch, "a_color", n);
+    const bark = this.stream<Bytes>(batch, "a_bark", n);
+    const along = this.stream<Floats>(batch, "a_s", n);
     const g = scene.geom;
+    // Each metamer's path length from its tree's base (rows are parent before child), so the bark's
+    // pattern runs on along an axis; and its texture, in the natural view only.
+    const path = this.pathLength(s, n);
+    const textured = view.colorMode === "natural";
+    const tex = scene.bark;
     // Far to near in z (I2), so nearer wood covers farther.
     const order = scene.drawOrder(s);
     for (let k = 0; k < n; k++) {
       const j = order[k] as number;
+      along[k] = path[j] as number;
+      for (let q = 0; q < 4; q++) bark[4 * k + q] = textured ? (tex[4 * j + q] as number) : 0;
       a[2 * k] = g.baseX[j];
       a[2 * k + 1] = g.baseY[j];
       b[2 * k] = g.tipX[j];
@@ -735,6 +795,20 @@ export class WebGL2Renderer implements Renderer {
         scene.solo >= 0 && s.tree[j] !== scene.solo ? 0 : (palette[c + 3] as number);
     }
     this.upload(batch, n);
+  }
+
+  private path = new Float32Array(0);
+  private pathFor: Snapshot | null = null;
+  private pathLength(s: Snapshot, n: number): Float32Array {
+    if (this.pathFor === s) return this.path;
+    this.pathFor = s;
+    if (this.path.length < n) this.path = new Float32Array(2 * n);
+    // The snapshot's lengths, not the frame's: the pattern stays put through a tween and the wind.
+    for (let j = 0; j < n; j++) {
+      const p = s.parent[j] as number;
+      this.path[j] = p >= 0 ? (this.path[p] as number) + (s.length[p] as number) : 0;
+    }
+    return this.path;
   }
 
   private buildGhosts(alpha: number): void {
@@ -805,11 +879,11 @@ export class WebGL2Renderer implements Renderer {
     this.upload(batch, n);
   }
 
-  private buildLeaves(leafAge: number, t: number): void {
+  private buildLeaves(leafAge: number, t: number, opacity: number): void {
     const leaves = this.scene.leaves(leafAge, t);
     // One summer and one autumn ramp per palette; each leaf takes its species' (M19).
-    const palette = LEAF_PALETTES.map((p) => this.paletteBytes(this.theme.leaf[p], 0.92));
-    const autumn = LEAF_PALETTES.map((p) => this.paletteBytes(this.theme.autumn[p], 0.92));
+    const palette = LEAF_PALETTES.map((p) => this.paletteBytes(this.theme.leaf[p], opacity));
+    const autumn = LEAF_PALETTES.map((p) => this.paletteBytes(this.theme.autumn[p], opacity));
     this.fillLeaves(this.leafBatch, leaves, 0, leaves.count, palette, autumn);
     this.leafSlices.set(leaves.slices);
   }

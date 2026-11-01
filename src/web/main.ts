@@ -54,6 +54,9 @@ const view: ViewOptions & { preset: PresetName } = {
   showShadow: false,
   showGhosts: true,
   showObstacles: true,
+  // `&leafOpacity=0.8&leafMinPx=2`: I3's foliage knobs (the View panel has them too).
+  ...(query.has("leafOpacity") ? { leafOpacity: Number(query.get("leafOpacity")) } : {}),
+  ...(query.has("leafMinPx") ? { leafMinPx: Number(query.get("leafMinPx")) } : {}),
 };
 
 const hud = element("hud");
@@ -82,7 +85,7 @@ const garden = mountGarden(element("stage"), {
   maxTweenMs: 450,
   reducedMotion: "pause",
   snapshot: FULL_SNAPSHOT,
-  // `?bench[&preset=forest][&seasons=60]`: play at the panel's speed, then report frame costs.
+  // `?bench[&preset=forest][&seasons=60][&tau=0.95]`: play at the panel's speed, then report frame costs.
   bench: query.has("bench")
     ? {
         seasons: Number(query.get("seasons") ?? 60),
@@ -91,6 +94,14 @@ const garden = mountGarden(element("stage"), {
           console.log("bench", JSON.stringify(result));
           hud.textContent = `bench: draw p95 ${result.drawP95} ms · frame p95 ${result.frameP95} ms · worker ${result.workerMean} ms`;
           panel.setPlaying(false);
+          // `&tau=0.95`: then hold the plate at that time of year (M17's seasons), e.g. winter's
+          // marcescent leaves, for a contact sheet.
+          const tau = query.get("tau");
+          if (tau !== null) {
+            garden.scene.seasons = true;
+            garden.scene.tau = Number(tau);
+            garden.redraw();
+          }
         },
       }
     : undefined,

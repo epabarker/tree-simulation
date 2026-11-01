@@ -11,6 +11,10 @@ elevation, W/H, fork height, leader dominance, height). The user judges each she
 is adopted until they do (ADR 0029).
 
     uv run --project analysis python docs/experiments/code/2026-11-01-atlas/atlas.py relay [--workers 4] [--redraw]
+    uv run --project analysis python docs/experiments/code/2026-11-01-atlas/atlas.py combined --species beech
+
+The combined sheets (COMBINED) put a species' rules together: one knob across, seeds 1–3 down,
+"today (off)" first, written to 2026-11-01-atlas-combined-<species>-<season>.png.
 
 writes docs/experiments/figures/2026-11-01-atlas-<rule>-<season>.png (half size, 64 colours; full
 resolution in runs/atlas/<rule>/sheet-<season>.png). --redraw draws from the npz files.
@@ -100,6 +104,33 @@ RULES: dict[str, dict] = {
 }
 
 
+#: The combined sheets (the overseer's brief, 2026-11-01): one species, the rules together, one knob
+#: across the columns and seeds 1–3 down the rows, "today (off)" first.
+COMBINED: dict[str, dict] = {
+    "beech": {
+        "base": {"r2.relay": 2, "r2.relayAge": 20, "r2.relayPTerm": 0.6, "r2.levels.0.curveLength": 30,
+                 "r2.levels.1.curve": 30, "r2.levels.1.curveLength": 30},
+        "knob": ("r2.levels.0.curve", [30, 45, 60]),
+        "note": "relay 2, relayAge 20, relayPTerm 0.6 (ADR 0033); relays curve over 30 nodes; limbs "
+                "(levels.1) curve 30 over 30 (ADR 0034: lowers them without changing the outline); "
+                "levels.1.lateralEvery 1 (beech is dense)",
+    },
+    "birch": {
+        "base": {"r2.levels.2.setPoint": 45, "r2.levels.2.pendulous": 140, "r2.levels.2.pendulousRadius": 0.01},
+        "knob": ("r2.levels.2.lateralEvery", [2, 3, 4]),
+        "note": "twigs (levels.2) hang at 140 up to radius 0.01 (ADR 0035), their own set point 45 in "
+                "place of today's 145 so only thin axes hang; twig laterals every k nodes (ADR 0036)",
+    },
+    "oak": {
+        "base": {"r2.levels.1.kappa": 3, "r2.levels.1.lateralEvery": 1, "r2.levels.1.curveLength": 30},
+        "knob": ("r2.levels.1.curve", [30, 45, 60]),
+        "note": "limbs (levels.1) with their own acrotony κ 3 and a lateral at every node (ADR 0036), "
+                "curving over 30 nodes (ADR 0034)",
+    },
+}
+SEEDS = (1, 2, 3)
+
+
 def species_base(sp: str) -> dict:
     """The species today: its targets file's `fixed` and `[form]` picks (read, never written)."""
     spec = tomllib.loads((REPO / "analysis" / "fit" / "targets" / f"{sp}.toml").read_text())
@@ -182,12 +213,112 @@ def draw_sheet(name: str, rule: dict, season: int, cells: Path, command: str) ->
     return out
 
 
+def combined_cells(sp: str) -> dict[str, tuple[int, dict]]:
+    """Cell key → (seed, assign) for species `sp`'s combined sheet."""
+    c = COMBINED[sp]
+    base = species_base(sp)
+    path, values = c["knob"]
+    out = {}
+    for seed in SEEDS:
+        out[f"s{seed}-off"] = (seed, base)
+        for k, v in enumerate(values):
+            out[f"s{seed}-{k}"] = (seed, {**base, **c["base"], path: v})
+    return out
+
+
+def draw_combined(sp: str, season: int, cells: Path, command: str) -> Path:
+    c = COMBINED[sp]
+    path, values = c["knob"]
+    data = {k.stem: np.load(k) for k in cells.glob("*.npz")}
+    segs = [d[f"seg{season}"] for d in data.values() if len(d[f"seg{season}"])]
+    tall = max(60.0, math.ceil(max(float(np.max(s[:, [1, 3]])) for s in segs) / 20) * 20 + 5)
+    half = max(30.0, max(float(np.max(np.abs(s[:, [0, 2]] - fs.WIDTH / 2))) for s in segs) + 4)
+    cols, rows = len(values) + 1, len(SEEDS)
+    cell_w = 3.0
+    cell_h = cell_w * tall / (2 * half)
+    text_h = 0.55
+    fig = plt.figure(figsize=(cols * cell_w, rows * (cell_h + text_h) + 1.1), dpi=160)
+    top = 1 - 1.1 / fig.get_figheight()
+    row_h = (top - 0.005) / rows
+    tree_h = row_h * cell_h / (cell_h + text_h)
+    scale = tree_h * fig.get_figheight() * 72 / tall
+    fig.suptitle(
+        f"{sp}, the new rules together, season {season}; lone tree, seeds {SEEDS[0]}–{SEEDS[-1]} down the rows. "
+        f"Left: {sp} today (rules off). Across: {path.removeprefix('r2.')}.\nAll other cells: "
+        f"{c['note']}.\n{command}",
+        fontsize=8, y=0.999, va="top", wrap=True,
+    )
+    for r, seed in enumerate(SEEDS):
+        for col in range(cols):
+            key = f"s{seed}-off" if col == 0 else f"s{seed}-{col - 1}"
+            title = (f"seed {seed}: today (off)" if col == 0
+                     else f"seed {seed}: {path.removeprefix('r2.')} = {values[col - 1]:g}")
+            d = data[key]
+            left = col / cols
+            y0 = top - (r + 1) * row_h
+            ax = fig.add_axes((left + 0.004, y0 + row_h - tree_h, 1 / cols - 0.008, tree_h))
+            fs.draw_tree(ax, d[f"seg{season}"], d[f"leaf{season}"], scale)
+            ax.set_xlim(fs.WIDTH / 2 - half, fs.WIDTH / 2 + half)
+            ax.set_ylim(0, tall)
+            ax.set_aspect("equal", adjustable="box")
+            ax.set_xticks([])
+            ax.set_yticks([])
+            ax.axhline(0, color="#8a7a60", lw=1)
+            for side in ax.spines.values():
+                side.set_color("#ccc")
+                side.set_linewidth(0.6)
+            ax.set_title(title, fontsize=8, pad=2)
+            elev, spread, fork, dom, h = d[f"shape{season}"]
+            fig.text(left + 0.5 / cols, y0 + 0.5 * (row_h - tree_h),
+                     f"elev {fs.fmt(elev, 0)}°  W/H {fs.fmt(spread, 2)}  H {fs.fmt(h, 0)}\n"
+                     f"fork {fs.fmt(fork, 2)}  dom {fs.fmt(dom, 1)}",
+                     fontsize=7, va="center", ha="center", family="monospace")
+    full = cells / f"sheet-{season}.png"
+    fig.savefig(full)
+    plt.close(fig)
+    im = Image.open(full).convert("RGB")
+    im = im.resize((im.width // 2, im.height // 2), Image.LANCZOS)
+    out = FIGURES / f"2026-11-01-atlas-combined-{sp}-{season}.png"
+    im.quantize(colors=64, method=Image.Quantize.MEDIANCUT).save(out, optimize=True)
+    return out
+
+
+def main_combined(sp: str, workers: int, redraw: bool, seasons: list[int]) -> None:
+    cells = REPO / "runs" / "atlas" / f"combined-{sp}"
+    cells.mkdir(parents=True, exist_ok=True)
+    jobs = {}
+    ev = Evaluator()
+    try:
+        for key, (seed, assign) in combined_cells(sp).items():
+            jobs[key] = (seed, ev.ask({"amend": sp, "assign": assign})["patch"])
+    finally:
+        ev.close()
+    if not redraw:
+        subprocess.run(["cargo", "build", "--release", "--quiet", "--locked", "-p", "treesim",
+                        "--target-dir", str(REPO / "rust" / "target" / "native")],
+                       cwd=REPO / "rust", check=True)
+        todo = {k: v for k, v in jobs.items() if not (cells / f"{k}.npz").exists()}
+        with ThreadPoolExecutor(workers) as pool:
+            list(pool.map(lambda kv: fs.run_cell(sp, kv[1][1], cells / f"{kv[0]}.npz", seed=kv[1][0]),
+                          todo.items()))
+        (cells / "jobs.json").write_text(json.dumps(jobs, indent=1))
+    command = (f"uv run --project analysis python docs/experiments/code/2026-11-01-atlas/atlas.py "
+               f"combined --species {sp}")
+    for s in seasons:
+        print(draw_combined(sp, s, cells, command))
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("rule", choices=sorted(RULES))
+    ap.add_argument("rule", choices=[*sorted(RULES), "combined"])
     ap.add_argument("--workers", type=int, default=4)
     ap.add_argument("--redraw", action="store_true")
+    ap.add_argument("--species", choices=sorted(COMBINED), help="combined: the species")
+    ap.add_argument("--seasons", default="60,100", help="combined: the seasons drawn")
     args = ap.parse_args()
+    if args.rule == "combined":
+        main_combined(args.species, args.workers, args.redraw, [int(s) for s in args.seasons.split(",")])
+        return
     rule = RULES[args.rule]
     cells = REPO / "runs" / "atlas" / args.rule
     cells.mkdir(parents=True, exist_ok=True)

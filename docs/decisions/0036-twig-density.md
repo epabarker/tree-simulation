@@ -22,3 +22,4 @@ How many fine shoots a limb carries, and where along it, is half of a crown's te
 ## Consequences
 - With `pendulous` (ADR 0035), long fine twig axes from `levels.2.lateralEvery` are what could hang as birch's curtains; the two should be judged together.
 - If accepted, the three join the form knobs (ADR 0029), re-authored per species from the atlas.
+- At adoption, whoever adopts updates `docs/architecture.md`'s season-loop mapping, the ROADMAP tracing row, STATUS and the lab panel (`src/web/ui/panel.ts`); a proposal leaves them alone.

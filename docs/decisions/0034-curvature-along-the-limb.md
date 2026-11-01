@@ -22,3 +22,4 @@ A level has one growth set point (C4) and one posture set point (R3), so every l
 ## Consequences
 - The vocabulary gains the arch at the limb's end. It does not on its own turn a cone or a vase into a dome. Beech's dome needs the relay plus `levels.0.curve`, under a lower height than the woods' top.
 - If accepted, `curve` and `curveLength` per level join the form knobs (ADR 0029).
+- At adoption, whoever adopts updates `docs/architecture.md`'s season-loop mapping, the ROADMAP tracing row, STATUS and the lab panel (`src/web/ui/panel.ts`); a proposal leaves them alone.

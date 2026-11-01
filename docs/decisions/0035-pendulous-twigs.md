@@ -20,5 +20,7 @@ The last row of the pa table serves every axis of order ≥ 2, the secondary sca
 - Birch's "today" has level 2 at 145, so it already hangs its twigs (and is a cone). Every other cell has level 2 at 45 and reads as a fuller column. Compare within the rows, not against "today".
 
 ## Consequences
+- **Not for judging yet.** The hang needs long thin shoots to read at phone scale: twig length from twig density (ADR 0036, `levels.2.lateralEvery`) and drawn twigs from track C. Until both are in, this sheet only shows that the crown no longer collapses; it is not a picture of a weeping birch.
 - `pendulous` replaces a high `levels.2.setPoint` as the way to hang twigs, keeping the scaffold. Whether the hang is visible depends on twig length and on the renderer (track C's drawn twig density).
 - If accepted, `pendulous` and `pendulousRadius` per level join the form knobs (ADR 0029).
+- At adoption, whoever adopts updates `docs/architecture.md`'s season-loop mapping, the ROADMAP tracing row, STATUS and the lab panel (`src/web/ui/panel.ts`); a proposal leaves them alone.

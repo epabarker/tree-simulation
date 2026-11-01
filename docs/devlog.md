@@ -2,6 +2,11 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-01: Track B (vocabulary): the combined sheets; birch's spike explained
+
+- **Combined sheets** (`atlas.py combined --species <sp>`): beech (relay + curvature) at 60, birch (pendulous + twig spacing) and oak (curvature + per-level κ) at 60 and 100, seeds 1–3 down the rows, "today (off)" first. Beech loses the spire on every seed (fork 0.93–1.00 → 0.26–0.38, a multi-stemmed, rounded, irregular top); `levels.0.curve` 30–60 moves it less than the seed does.
+- **Birch's spike at `relayPTerm` 1** (ADR 0033): a sympodial leader, orders 40–52 through the top 30 cells, renewed each season; it keeps the height the monopodial leader loses. Not a bug. It exposes a limit: order is a u8 and overflows after ≈ 255 relays (forest's 300 seasons), to fix before adoption.
+
 ## 2026-11-01: Track B (vocabulary): twig density (ADR 0036, proposed)
 
 - **`r2.levels[i].kappa`, `lateralEvery`** (r2.rs): acrotony per level, and laterals only at every k-th node. Off by default; presets and goldens unchanged.

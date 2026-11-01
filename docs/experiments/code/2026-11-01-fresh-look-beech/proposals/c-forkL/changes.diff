@@ -1,0 +1,169 @@
+--- a/rust/core/src/season.rs
++++ b/rust/core/src/season.rs
+@@ -10,7 +10,7 @@
+ use crate::light::{Light, depth_of};
+ use crate::math;
+ use crate::params::{DEG, Params};
+-use crate::principles::c1::{grow_shoot, juvenile_cap, shoot_size};
++use crate::principles::c1::{grow_shoot, juvenile_cap, lateral_frame, shoot_size};
+ use crate::principles::c3::{allocate, gather_light, is_live_bud};
+ use crate::principles::c4::shoot_direction;
+ use crate::principles::c5::{crown_top_light, shed_branches};
+@@ -21,7 +21,7 @@
+ use crate::principles::r1::{carbon_balance, starved_to_death};
+ use crate::principles::r2::{
+     aged_offset, curve_offset, curved, direction_params, pendulous_set_point, relay_depth,
+-    relay_on, relay_shift,
++    relay_nodes, relay_on, relay_shift, vigour_forks, arm_set_point,
+ };
+ use crate::principles::r3::update_mechanics;
+ use crate::principles::r4::{aborts, growth_threshold, light_releases, released_shift};
+@@ -502,6 +502,18 @@
+                     * std::f64::consts::PI
+                     * uniform(seed, purpose::DIRECTION_NOISE, tid, id, season, 2.0);
+                 let mut dir = direction_params(params, pa);
++                // The vigour fork's arms hold the angle they were born at (a new arm: its bud's).
++                if params.r2.fork_at > 0.0 && pa == 0.0 && !trunk {
++                    let born = if tree.b.slot[b] == slot::MAIN {
++                        arm_set_point(tree, trunk, pa, tree.b.metamer[b] as usize, params)
++                    } else {
++                        None
++                    };
++                    let h = born.unwrap_or_else(|| {
++                        math::acos(math::max(-1.0, math::min(1.0, tree.b.hy[b]))).to_degrees()
++                    });
++                    dir.set_point = h;
++                }
+                 let bend = curve_offset(trunk, pa, node, params)
+                     + aged_offset(trunk, pa, 0.0, tree.age, params);
+                 dir.set_point = curved(dir.set_point, bend);
+@@ -523,6 +535,8 @@
+             } else {
+                 (-1.0, -1.0)
+             };
++            let first_new_bud = tree.b.len();
++            let first_new_metamer = tree.m.len();
+             grow_shoot(
+                 tree,
+                 i,
+@@ -534,6 +548,25 @@
+                 pa_shift,
+                 first_order,
+             );
++            // The vigour fork: a pa-0 shoot grown at full vigour ends its apex; next season the
++            // relay makes the laterals on its top nodes co-dominant arms.
++            if vigour_forks(pa, v, cap, tree.age, params) {
++                let nodes = relay_nodes(0.0, params).floor() as usize;
++                let top = tree.m.len().saturating_sub(nodes).max(first_new_metamer);
++                for j in first_new_bud..tree.b.len() {
++                    let m = tree.b.metamer[j] as usize;
++                    if tree.b.slot[j] == slot::MAIN && tree.b.state[j] == bud::ACTIVE {
++                        tree.b.state[j] = bud::TERMINATED;
++                    } else if let Some(a) = params.r2.fork_angle
++                        && tree.b.slot[j] != slot::MAIN
++                        && m >= top
++                    {
++                        // The arms leave at the fork's own angle, not the laterals' β.
++                        let (h, l) = lateral_frame(tree, m, tree.b.azimuth[j], a * DEG);
++                        tree.set_bud_frame(j, h, l);
++                    }
++                }
++            }
+         } else {
+             tree.b.state[i] = resting_state(tree.b.q[i], &params.r6);
+             // R4's age counts the seasons a bud rests dormant (§R4: dormant buds have a finite
+--- a/rust/core/src/params.rs
++++ b/rust/core/src/params.rs
+@@ -236,6 +236,12 @@
+     /// From this tree age (seasons) a pa-0 terminal ends with probability `relay_p_term`.
+     pub relay_age: f64,
+     pub relay_p_term: f64,
++    /// The vigour fork (Nicolini & Caraglio 1994: beech forks where growth is fastest): a pa-0
++    /// shoot whose bud received v ≥ `forkAt`·c1.maxMetamersPerShoot ends its terminal bud, so the
++    /// relay (r2.relay nodes) turns the season's apex into co-dominant arms. 0 or absent: off.
++    pub fork_at: f64,
++    /// The fork arms' angle from the ended apex's heading, degrees (absent: the laterals' own β).
++    pub fork_angle: Option<f64>,
+ }
+ 
+ #[derive(Clone, Debug)]
+@@ -523,6 +529,8 @@
+                 relay: opt(r2, "relay").unwrap_or(0.0),
+                 relay_age: opt(r2, "relayAge").unwrap_or(0.0),
+                 relay_p_term: opt(r2, "relayPTerm").unwrap_or(0.0),
++                fork_at: opt(r2, "forkAt").unwrap_or(0.0),
++                fork_angle: opt(r2, "forkAngle"),
+             },
+             r3: R3 {
+                 enabled: flag(r3, "enabled"),
+--- a/rust/core/src/principles/r2.rs
++++ b/rust/core/src/principles/r2.rs
+@@ -131,6 +131,39 @@
+         && (r2.relay >= 1.0 || r2.levels.iter().any(|l| l.relay.unwrap_or(0.0) >= 1.0))
+ }
+ 
++/// The vigour fork (ADR proposal C): true if a shoot of physiological age `pa` grown from a bud
++/// that received `v` ends at its apex, because it grew as fast as a shoot can (v at or above
++/// `forkAt` times the full shoot, c1.maxMetamersPerShoot). Only pa 0 forks, and only with the
++/// relay on, which makes the ended apex's top laterals the co-dominant arms.
++pub fn vigour_forks(pa: f64, v: f64, cap: f64, tree_age: f64, params: &Params) -> bool {
++    let r2 = &params.r2;
++    let full = params.c1.max_metamers_per_shoot;
++    // Young trees keep a leader (Troll: "young trees may develop a leader"): no fork while the
++    // juvenile cap (r2.hJ) still holds the shoot below its full length, nor before r2.relayAge.
++    r2.fork_at > 0.0
++        && pa == 0.0
++        && relay_on(params)
++        && cap >= full
++        && tree_age >= r2.relay_age
++        && v >= r2.fork_at * full
++}
++
++/// With the vigour fork on, the set point (degrees) of a fork arm (a pa-0 axis that is not the
++/// trunk's own): the angle from vertical it was born at, which it holds (Troll: every axis is
++/// plagiotropic; only the trunk's base is straightened). None when off or on the trunk.
++pub fn arm_set_point(tree: &Tree, trunk: bool, pa: f64, m: usize, params: &Params) -> Option<f64> {
++    if params.r2.fork_at <= 0.0 || trunk || pa != 0.0 {
++        return None;
++    }
++    let axis = tree.m.axis[m];
++    let n = tree.m.len();
++    // birth_id ascends with the row: the axis's first metamer by binary search.
++    let ids = &tree.m.birth_id[..n];
++    let first = ids.binary_search(&axis).ok()?;
++    let h = tree.heading(first);
++    Some(math::acos(math::max(-1.0, math::min(1.0, h[1]))).to_degrees())
++}
++
+ /// How many nodes under an ended apex relay on an axis of physiological age `pa`: the level's
+ /// own `relay` (ADR 0037), else r2.relay for pa 0 (ADR 0033), else none.
+ pub fn relay_nodes(pa: f64, params: &Params) -> f64 {
+--- a/rust/core/src/principles/r3.rs
++++ b/rust/core/src/principles/r3.rs
+@@ -13,7 +13,7 @@
+ use super::c3::is_live_bud;
+ use super::c4::{horizontal_heading, set_point_direction};
+ use super::c5::remove_branches;
+-use super::r2::{aged_offset, curve_offset, hangs, pa_level, pendulous_set_point};
++use super::r2::{aged_offset, arm_set_point, curve_offset, hangs, pa_level, pendulous_set_point};
+ use super::r6::deposit_area;
+ use crate::geom::{
+     IDENTITY, M3, V3, add, angle_between, apply, compose, cross, norm, normalize_or, reject,
+@@ -205,10 +205,15 @@
+             let bend = (curve_offset(trunk, pa, tree.m.axis_node[i] as f64, params)
+                 + aged_offset(trunk, pa, wood_age, tree.age, params))
+                 * DEG;
++            // The vigour fork's arms hold their birth angle, not the trunk's vertical.
++            let base = match arm_set_point(tree, trunk, pa, i, params) {
++                Some(a) => a * DEG,
++                None => posture_set_point(pa, params),
++            };
+             let set_point = if bend == 0.0 {
+-                posture_set_point(pa, params)
++                base
+             } else {
+-                math::max(0.0, math::min(PI, posture_set_point(pa, params) + bend))
++                math::max(0.0, math::min(PI, base + bend))
+             };
+             // R2's pendulous twigs (ADR 0035): a thin axis hangs (degrees there and back only when on,
+             // so the set point is bit-for-bit the same without it).

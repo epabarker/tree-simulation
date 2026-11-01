@@ -9,6 +9,172 @@ rewrite this file or another role's section.
 Brief: the best fix inside the existing rule set and its fields, including rules that exist but
 are off.
 
+### A. Verdict in one paragraph
+
+No combination of existing fields alone keeps the stand while changing the lone tree, and I found
+why. Every rule that ends or reclines the leader (relay, relayPTerm, level-0 curve and agedSetPoint)
+fires by tree age or wood age, and the leader's light cannot tell a lone tree from a stand tree:
+I measured the top bud's Q at exactly 1.0 in both at ages 0–60 (stand seed 1), and R5's neighbour
+shade at the stand's crown-top relays is 0.000 at ages 20–50. So any setting that stops the lone
+tree's height also stops the stand's. Run a-c1: the lone tree is 91–134 cells tall, but the stand
+falls to H/D 46–60, floor 1.8–3.0% and LAI 10–11. One interaction fix makes the combination work:
+**the relay listens to R5's neighbour signal, read over the whole tree.** I also added a second,
+minor fix (R5 on the posture set point). With both, the lone tree is short, broad and multi-stemmed,
+with limbs that rise and then arch, and the stand holds. The outline is a **broad block or vase,
+not yet a dome** (see the last subsection).
+
+### A. Mechanism and botanical basis
+
+1. **The relay gate (r2.relayCrowd)**, the main change. A pa-0 apex ends with probability
+   relayPTerm·max(0, 1 − k·s̄). Here s̄ is the tree's mean R5 neighbour shade over its metamers:
+   the neighbour-weighted 1 − Q/C that R5 already computes in phase 2.
+   - A tree with no neighbours has s̄ = 0, so the gate does not touch the lone tree.
+   - In the stand, s̄ is 0.09 at 15, 0.20–0.28 at 20–25, 0.10–0.15 at 30–40 and 0.05–0.10 after
+     50 (measured). With k = 10, the leader keeps growing through the race for height, and the
+     relay opens late, on the dominant trees.
+   - Basis: the card's own fork evidence. Nicolini & Caraglio 1994 [r] find forks "at both extremes
+     of growth rate", while "the intermediate level keeps une structure aérienne bien
+     hiérarchisée".
+   - Basis: "Vertical lateral axes are more frequent in full light (0.18–0.45) than in shade
+     (0.03–0.1)" [r], and "young trees may develop a leader, aged crowns usually are polyarchic"
+     (Pfisterer, Troll [r]).
+   - Basis (physiology, not on the card): the shade-avoidance syndrome strengthens apical
+     dominance. R5 already encodes this locally as dLambda; the gate applies the same signal to
+     the leader's lifespan.
+   - Open-grown → fork early → polyarchic dome. Neighbours → hierarchical bole → crown ratio
+     about 0.5, polyarchic only when old.
+2. **R5 on posture (r5.posture)**, minor. R5's set-point scale (1 − dA·s) also multiplies R3's
+   posture set point, which is the gravitropic set-point angle, not only the growth target.
+   - Without it, R3 posture undoes R5 in the stand: old relay wood reclines toward agedSetPoint
+     under neighbours.
+   - It changes nothing in the lone tree (s = 0).
+   - Effect on seed 1 (a-c21 with it, a-c23 without): stand H/D 98 against 112, LAI 7.8 against
+     8.2.
+3. **The existing fields, combined** (relay plus level-0 curve plus level-0 agedSetPoint by wood).
+   They make the open-grown relays "rise and then arch over" (card, Scaffold [u]). The values
+   below matter because of **an interaction I found**: relayPTerm also ends every relay.
+   - With the picks' 0.6, each relay lives about 1.7 seasons. Its curve restarts at node 0, and
+     its young wood (high Δr/r) is straightened by posture toward 0°. The chain of short modules
+     becomes a vertical column, which is why the picks' lone tree still reaches 200 cells. Runs
+     a-c15 and a-c9 show the same.
+   - So relayPTerm must be low (0.08–0.15) for relays to live long enough to arch, and curveLength
+     short (10).
+   - Aging by tree (agedBy "tree") flattens everything into an umbrella or table (a-c1).
+   - Aging by wood (the default) keeps young tips up while old wood reclines. That is the arch.
+
+### A. Exactly what changes
+
+- `rust/core/src/params.rs`:
+  - `R2.relay_crowd: Option<f64>`, read from `r2.relayCrowd` (k; absent = off).
+  - `R5.posture: bool`, read from `r5.posture` (absent = false).
+- `rust/core/src/tree.rs`: `Tree.relay_crowd: f64`, the tree's s̄ this season (default 0, not
+  checkpointed, recomputed every season).
+- `rust/core/src/season.rs`:
+  - `phase_sample`, after `sample_nodes`: when `r2.relayCrowd` is set and R5 is on,
+    `tree.relay_crowd = mean(node_shade[..nm])`; otherwise 0.
+  - `phase_mechanics`: when `r5.posture`, call `sample_nodes` again so that `node_shade` lines up
+    with the rows after growth and shedding. C5 compacts the metamers but not `node_shade`, so the
+    phase-2 values are misaligned by mechanics time.
+- `rust/core/src/principles/r2.rs`: `p_term_at(order, age, crowd, params)` and
+  `terminates(…, crowd, params)`. The relay branch returns
+  `max(level.p_term, relayPTerm·max(0, 1 − k·crowd))`; there are 4 test call sites (`0.0` added).
+- `rust/core/src/principles/c1.rs`: `form_terminal_bud` passes `tree.relay_crowd`.
+- `rust/core/src/principles/r3.rs`: in the posture block, after the pendulous step,
+  `set_point *= set_point_scale(node_shade[i], r5)` when `r5.posture`.
+- Fields to add to the TypeScript and presets: `r2.relayCrowd?: number` beside `relay`, `relayAge`
+  and `relayPTerm` in `src/core/params.ts`, and `r5.posture?: boolean`. Both default off, so every
+  other species' golden is unchanged (the unit tests pass: 125 ok). `tests/golden.json` is absent
+  from this sandbox, so the golden test could not run here.
+- **Beech values** (the prototype `runs/fresh-look/a-relaygate/assigns.json`; leave the picks'
+  level-1 aged set point out):
+  `r2.relay 2, relayAge 15, relayPTerm 0.15, relayCrowd 10; r2.levels.0.curve 30, curveLength 10,
+  agedSetPoint 80, agedOver 30 (by wood); r5.posture true`.
+
+### A. Pseudocode (full diff: runs/fresh-look/a-relaygate/changes.diff)
+
+    phase_sample(tree):            # after sample_nodes (R5)
+      tree.relay_crowd = relayCrowd set && r5.enabled ? mean(tree.node_shade) : 0
+    p_term_at(pa, age, crowd):     # pa 0, relay on, age ≥ relayAge
+      gate = relayCrowd set ? max(0, 1 − relayCrowd·crowd) : 1
+      return max(level.pTerm, relayPTerm·gate)
+    phase_mechanics(tree):         # r5.posture only
+      sample_nodes(tree)           # realign node_shade after growth and shedding
+    R3 posture:  set_point *= (1 − r5.dA·node_shade[i])   # r5.posture only
+
+### A. Prototype sheet and metrics
+
+Sheet: `runs/fresh-look/a-relaygate/sheet.png` (metrics.json beside it). Screening runs a-c1 …
+a-c30 are in `runs/fresh-look/a-c*/`, and their assigns are in `runs/fresh-look/a-cand/`.
+
+| seed | lone 60 H, W/H | lone 100 H, W/H, fork | stand alive | H/D | floor | LAI | crown ratio (limb/leaf) |
+|---|---|---|---|---|---|---|---|
+| 1 | 102, 0.94 | 126, 1.10, 0.20 | 12/12 | 102 | 4.9% | 8.2 | 0.29 / 0.30 |
+| 2 | 120, 0.88 | 155, 0.98, 0.33 | 11/12 | 98 | 3.5% | 7.8 | 0.32 / 0.31 |
+| 3 | 116, 0.83 | 167, 0.87, 0.34 | 12/12 | 104 | 5.2% | 7.8 | 0.34 / 0.39 |
+| today | 145–147, 0.63–0.64 | 182–204, 0.47–0.63, ≈1.0 | 11–12 | 107–109 | 4.3–4.8% | 6.9–7.1 | 0.36–0.41 |
+| picks | 116–130, 0.73–0.99 | 202 (ceiling), 0.51–0.70 | 8–9 | 77–93 | 3.1–4.0% | 6.4–7.3 | 0.20–0.34 |
+
+- **Ecology guard:**
+  - alive passes (11–12).
+  - H/D passes (98–104, inside 70–110, better than today's 107–109).
+  - Floor is marginal on seed 3 (5.2% against "about 3–5%").
+  - LAI is 7.8–8.2: "near 7", but about 1 higher than today, because of more crown-top stems.
+- **Lone tree:**
+  - It is about 30% shorter than today, and it forks low (0.2–0.34 of the height against ≈1.0
+    today).
+  - W/H is 0.83–0.94 at 60 and 0.87–1.10 at 100, in the card's 0.6–1.0.
+  - Several limbs of similar size rise and then arch over (leaf-off columns).
+  - The pointed spruce top is gone.
+- **Stand:** straight clean boles, with polyarchic tops on the dominant trees.
+- **Best single tree:** seed 1 of a-c21 (relayAge 20, relayPTerm 0.08, curve 40/15,
+  agedSetPoint 100/25): 114 cells tall, W/H 1.15, at 100. Its seeds 2–3 kept the leader too long
+  (a-c23), so I chose the more reliable relayAge 15 / relayPTerm 0.15.
+
+### A. Cost
+
+- Measured natively (100 seasons, seed 2, including CSV output):
+  - Lone tree: today 163 ms/season; gate only 165; gate and r5.posture 193.
+  - Stand: 95, 96 and 110 ms/season.
+- The **gate costs nothing**: one mean over node_shade.
+- **r5.posture costs about 15–18%**, because it calls `sample_nodes` a second time each season.
+  Cheaper: carry `node_shade` through C5's `compact` (as `old_to_new` already does for the
+  metamers) and give new rows their parent's value; this would make it nearly free.
+- No renderer change.
+
+### A. Risks
+
+- **The gate is only as good as R5's neighbour signal:**
+  - It needs `r5.signal = "neighbours"`, which is the world default.
+  - A beech at a wood edge or in the mixed garden gets an s̄ between 0 and the stand's, so its
+    relay is partly gated. This is probably right (edge trees are lopsided and half-forked), but
+    it is untested.
+  - Any change to R5's dA or the neighbour window shifts the gate.
+- **k = 10 is stiff:** s̄ is 0.05–0.1 in an old stand, so the stand's relay opens only partly
+  after about 50. That is the source of the polyarchic tops and of LAI ≈ 8. k = 20 restores
+  today's stand (a-c22: H/D 117, floor 5.1%) at the cost of fewer forks in the stand.
+- **Shade-survival order:** relays in an understorey beech (high s̄) are suppressed, so it stays a
+  monopodial pole. This matches Nicolini's intermediate-vigour hierarchy, but suppressed-beech
+  survival was not re-measured.
+- **The shared relayPTerm is a compromise:** the same value sets when the trunk ends and how long
+  each relay lives. Seed-to-seed variance in fork height (0.2–0.5) comes from this.
+
+### A. What it does not fix
+
+- **Not a dome.** The outline is a broad block (seed 1), a sloped table (seed 2) or a vase with an
+  empty V in the middle (seed 3). It is not a rounded cap.
+  - In Troll's superposition, each new module rises from the top of the previous arch and refills
+    the centre. In the model, a relay takes over at the ended apex, at the outer tip of the arch,
+    so every generation steps outward.
+  - BH at pa 0 then lets one relay dominate (leaderDominance 5–7), which gives lopsided crowns.
+  - **Missing:** a takeover at the arch's highest point (the bend), not the tip, or some damping of
+    one relay's dominance over its siblings.
+- **Tiered skirt.** The lower crown is still built by the pa-1 limbs of the pre-relay trunk
+  (level 1 at 34°, level 2 at 94°), as level, layered plates. Below the forks, the 60-season tree
+  reads as a layered block.
+- **Thin stand lid.** Stand crown ratio is 0.29–0.34, against the card's 0.47–0.50. The gate keeps
+  today's thin lid; it does not deepen the crown.
+- **Not addressed:** foliage, bark and leaf cards (the renderer).
+
 <!-- proposal-a -->
 
 ## Proposal B: structural
@@ -16,12 +182,297 @@ are off.
 Brief: assume the parameters are not the bottleneck. Growth step, Troll's reiteration, the
 shedding rules' light response, the renderer's foliage and bark.
 
+### B: a vigour response (Troll's secondary straightening, gated by the tree's own vigour)
+
+Prototype: `runs/fresh-look/b-vigour/sheet.png` (seeds 1–3), with `metrics.json`, `assign.json`
+and `changes.diff` beside it. Exploratory runs are under `runs/fresh-look/b-work/` and `b-split2`.
+
+#### What the code does today, and why the lone beech becomes a cone
+- **The trunk cannot become plagiotropic.** Level 0 has `postureSetPoint: 0`, and the trunk's axis
+  is exempt from every form offset (curve, aged, pendulous; ADR 0034/0035/0038). So R3 straightens
+  the leader every season, whatever its vigour. Troll's trunk is the opposite: a plagiotropic axis
+  straightened only where it is vigorous, and lost in the crown with age.
+- **The open tree is no shorter than the stand tree.** Lone height at 100 is 182–204 cells and the
+  stand's is 178–183. No rule tells an open-grown crown from a stand crown. One signal does:
+  the tree's resource v_base is ≈ 17,000–19,000 for the lone tree and ≤ 1,650 for the stand's
+  dominants (`b-work/vbase.py`).
+- **Apical control is a cliff, not a knob** (diagnostic only, not proposed). Moving `r2.dLambda`
+  from 0.0138 to 0.05 (λ < 0.5 after age 15) turns the lone tower into a low mound (W/H 2.3, H 71
+  at 60). It also flattens the stand into a lid (floor 1.1%, LAI 11.7): `b-work/dl05`. The dome
+  sits between those two, and the change that gets there must spare the stand.
+- **Ruled out by prototype:**
+  - Weighting Borchert–Honda by hydraulic path (`b-split2`) gives a wider skirt, which reads more
+    like a spruce.
+  - Absolute-flow forks (`b-work/vr1`) act on the base, not the pointed top.
+  - Vigour posture alone (`b-work/vp1`) leans the whole tree, because the single leader stays the
+    leader.
+
+#### Mechanism and botanical basis
+Each node's vigour is the share of its tree's resource that flows through it:
+u = min(1, (vIn / v_base) / s). The tree's own vigour sets a gate,
+g = clamp((v_base − lo) / (hi − lo)). Then:
+1. **Weak wood forks.** At every node, λ falls by g·(1 − u)·dλ (C3). Card: "forks form at both
+   extremes of vigour" (Nicolini & Caraglio 1994 [r]); Troll, "aged crowns usually are
+   polyarchic" (Pfisterer [r]).
+2. **Only vigorous wood straightens.** R3's posture target moves by g from the level's own value
+   toward a blend. The blend runs from the level's growth set point (weak wood stays plagiotropic)
+   to `vigourSetPoint` (vigorous wood is orthotropic, 0°), by u. The trunk is included. Card: Troll,
+   "all axes develop plagiotropically" (Pfisterer [r]). Also from the card: vigorous trees have an
+   orthotropic axis and weak ones a plagiotropic axis with a flat crown (Nicolini 2000 [s]), and
+   vertical laterals are more frequent in full light (Nicolini & Caraglio [r]).
+
+Why it spares the stand: a stand member never reaches the gate, and its narrow crown passes most of
+its resource up the leader anyway. A big open crown spreads its resource over many limbs, so its top
+divides and its leader stops being special. The rule is generic: any species switches it on with
+its own lo/hi. The gate is tree-level, like C5's Q_top and R1's maturity height.
+
+#### Exactly what changes (the diff is in `runs/fresh-look/b-vigour/changes.diff`)
+- `rust/core/src/params.rs`:
+  - New `R2` fields, all off by default: `vigour_share` (`r2.vigourShare`, default 0 = off),
+    `vigour_lambda` (`r2.vigourLambda`, 0), `vigour_set_point` (`r2.vigourSetPoint`, 0°),
+    `vigour_tree_lo` and `vigour_tree_hi` (`r2.vigourTreeLo`/`vigourTreeHi`, 0/0 = no gate).
+  - `PaLevel.vigour_lambda` (`r2.levels[i].vigourLambda`, an optional override per level).
+- `rust/core/src/principles/r2.rs`: new functions `vigour_on`, `vigour(v_in, v_base, r2)`,
+  `vigour_gate(v_base, r2)` and `vigour_posture(pa, bend, u, params)`.
+- `rust/core/src/principles/c3.rs`, `allocate` (BH branch): after `shaded_lambda`,
+  `lambda -= drop·gate·(1 − vigour(v, v_base))`.
+- `rust/core/src/principles/r3.rs`, `update_mechanics`: the gate is computed once per tree, then
+  `set_point += gate·(vigour_posture(pa, bend, u) − set_point)` before the pendulous step.
+- Where the fields would live: R2's block in `src/core/params.ts` and types, and the beech values
+  in `flora-fitted.ts`, exported to `presets.json`. The TypeScript core needs the same four
+  functions only if it still runs R2/R3; the prototype touched no TypeScript.
+
+Pseudocode:
+
+    u(i)  = clamp(vIn[i] / v_base / vigourShare, 0, 1)
+    g     = clamp((v_base − vigourTreeLo) / (vigourTreeHi − vigourTreeLo), 0, 1)   // 1 if no gate
+    C3:   λ(i) = shaded_lambda(λ_level(pa, age), shade) − g · (1 − u(i)) · vigourLambda[pa]
+    R3:   A(i) = A_level(i);  A(i) += g · ( lerp(setPoint[pa] + bend, vigourSetPoint, u(i)) − A(i) )
+
+Prototype values: `{"r2.vigourShare":0.3,"r2.vigourLambda":0.03,"r2.vigourTreeLo":3000,"r2.vigourTreeHi":10000}`.
+
+#### Prototype metrics (seeds 1 / 2 / 3), against the baseline (`baseline/beech-today`)
+
+| | baseline | B |
+|---|---|---|
+| lone 60 height | 147 / 145 / 145 | 105 / 113 / 110 |
+| lone 60 W/H | 0.64 / 0.63 / 0.64 | 1.15 / 1.07 / 1.16 |
+| lone 60 leaderDominance | 2.24 / 1.83 / 2.08 | 1.77 / 2.10 / 1.86 |
+| lone 100 height | 194 / 182 / 204 | 146 / 155 / 147 |
+| lone 100 W/H | 0.55 / 0.63 / 0.47 | 1.11 / 1.04 / 1.11 |
+| lone 100 leaderDominance | 5.09 / 5.33 / 3.44 | 1.91 / 2.30 / 2.27 |
+| lone 100 forkHeight | 1.0 / 1 / 0.97 | 0.74 / 0.80 / 0.67 |
+| stand 100 alive, H/D, floor, LAI, crown ratio | 11, 12, 12; 107–109; 4.3–4.8%; 6.9–7.1; 0.36–0.41 | **identical to the baseline in every number** (the gate is never opened in the stand) |
+
+**Ecology guard: the alive count, floor, LAI and crown ratio pass**, unchanged from today's beech.
+**H/D, however, is 108 / 107 / 109, against a limit of 70–110.** That is today's beech, at the edge.
+
+What the sheet shows:
+- The lone tree stops being a tower. At 100 it is 25–30% shorter and about as broad as it is tall.
+- The top is blunt and rounded on all three seeds at 100, with no spire, and the leader is lost
+  near the top.
+- At 60 it is a broad, blunt-topped cone.
+- **It still reads tiered.** The level plates of the sagged limbs remain: at a glance it is closer
+  to a cedar of Lebanon than to a beech dome.
+- Cue 1 improves from "pointed cone" to "blunt layered mass"; cue 6 (W/H, low limbs) passes.
+
+Combination: on seed 1 only, B with the accepted picks and dλ 0.02 (`runs/fresh-look/b-work/g-l2-pk`)
+is the roundest lone tree I made: H 96/132, W/H 1.14/1.20, a rounded mass at 60. Its stand is the
+picks' stand (9/12), because the picks are not gated. If the solver keeps the picks, gate them by
+the same `vigour_gate`; that is untested.
+
+#### Cost
+- **Rule:** O(1) per node, inside passes that already exist (one division and a lerp in C3 and R3).
+  No new arrays, no checkpoint or hash change. Bundle: about 0.5 kB of TypeScript if ported.
+- **Indirect cost:** a broader lone crown has more metamers. Native lone runs took 44–58 s for 100
+  seasons against 25–42 s for `b-split2`, with two runs in parallel, so the timings are noisy. The
+  stand cost is unchanged.
+- **Not measured:** the phone budget, in the garden's worker.
+
+#### Risks
+- **The gate is in absolute resource units.** It must be re-set if α, R1's costs or the cell size
+  change. In the garden's mixed wood, an edge or gap tree with v_base between 3,000 and 10,000 gets
+  a partial response; the solver must check the plate.
+- **λ is a cliff.** dλ 0.03 at g = 1 is near it: 0.05 without the gate gave the mound.
+- **Tests and goldens:** the `golden` test cannot run in this sandbox (`tests/golden.json` is
+  absent), so the goldens are unverified here. The 125 unit tests pass. The default-off paths are
+  bit-identical by construction (`vigour_on` false gives gate 0, so no λ or set-point change).
+- **Not yet written:** tests for `vigour`, `vigour_gate` and `vigour_posture`, and an ADR.
+
+#### What it does not fix
+- **The tiers.** The limbs still sag to horizontal plates, because R3's posture authority
+  (c·Δr/r) loses to sag on big limbs. So there is no "rise then arch" yet (cue 2), and the plates
+  read cedar.
+- **The leaf-on picture.** The uniform leaf cards and the single bark ramp are untouched.
+- **The stand's H/D** (≈108) and the stand's look are exactly today's.
+
+Secondary recommendation (renderer): draw beech bark pale smooth grey per species, and draw foliage
+as level spray plates oriented by the shoot's plane rather than as round points. That would turn the
+remaining layering into the card's "level sprays" (cue 4) instead of conifer tiers.
+
 <!-- proposal-b -->
 
 ## Proposal C: botany first
 
 Brief: start from what makes a beech recognisable at 20 m in a frontal projection, decide which
 cues are even expressible in this model, and only then look at the code.
+
+### C: the vigour fork (excess vigour forks the apex; the arms stay plagiotropic)
+
+Sheet: `runs/fresh-look/c-forkL/sheet.png` (assigns `runs/fresh-look/c-forkL/assign.json`, diff
+`runs/fresh-look/c-forkL/changes.diff`). The other `c-fork*` folders are the iterations (A–K), kept
+as ablations.
+
+#### Cue-by-cue derivation (before the code), heaviest first
+
+| # | cue at 20 m, frontal, phone | expressible by local rules? | how a real beech makes it (card) |
+|---|---|---|---|
+| 1 | **outline a dome, no point, no regular tiers** | yes, emergent | apices advance at similar rates in all directions and height growth slows as the crown spreads: Troll, "aged crowns usually are polyarchic" [r, Pfisterer]; "forks form at both extremes of vigour", the intermediate stays "bien hiérarchisée" [r, Nicolini & Caraglio 1994] |
+| 2 | **trunk lost in a short zone into several near-equal limbs that rise, then arch** (the photo note calls this *the* cue) | yes | forks giving two near-equal axes (photo note §1), every axis plagiotropic, only the trunk's base straightened (Troll [r]); arching = curvature along the axis |
+| 3 | dense, opaque foliage | renderer + LAI; already fine on the lone tree | — |
+| 4 | level sprays | partly: `distichous` places buds, but the spray plane is not held level (Nicolini 2000's bilateral shoots [s]) | not pursued: on today's sheet the level plates are *too* legible, as tiers on one axis; the fault is their arrangement, not their absence |
+| 5 | smooth pale grey bark | renderer only (one bark ramp for all species) | "smooth, thin and grey" [r]; cheap, not a growth question |
+| 6 | open-grown proportion, low limbs kept | only partly; see "does not fix" | low limbs extend for a century in side light [u] |
+
+**Where the card and the model's vocabulary disagree** (found by instrumenting the run, a
+throw-away `eprintln` in `grow_buds`):
+
+- **Vigour has no outlet but height.** From season ~25 (height ≥ `hJ`) to ~80 the open-grown
+  leader's bud gets v ≈ 2.7–4.1 against a shoot cap of 3 (`c1.maxMetamersPerShoot`); it grows the
+  full 3 cells every year and the rest is thrown away. That is why the lone tree is 145 cells at 60
+  (36 m; an open beech is ≈ 20 m) and why no λ or set-point fit changed the kind of tree: a
+  saturated apex grows the same whatever the allocation. A real beech spends that vigour on
+  polycyclism and **forks** (Nicolini & Caraglio: polycyclic shoots 51% in light vs 14% in shade;
+  forks at the highest growth rates). The model has no "too vigorous → fork" rule.
+- **The model treats every co-dominant arm as a trunk.** Beech's pa-0 row has `setPoint` 40 but
+  `postureSetPoint` 0, so any relay (ADR 0033) is straightened to vertical: Troll's "all axes
+  plagiotropic" becomes "every arm orthotropic", and the picks' relays build a column of parallel
+  stems. The trunk's own base should be straightened; the arms should not.
+- **The stand is open-grown when young.** At 21-cell spacing the stand's leaders saturate exactly
+  like the lone tree's until ~season 25 (35 of 36 stand trees would fork at v ≥ 0.95·cap from season
+  25). Vigour separates them only at the high end: v ≥ 1.3·cap after the juvenile cap releases is
+  reached by all 3 lone leaders (season 26, height ≈ 47) and by 4 of 36 stand trees. That is
+  Nicolini's "très important" taken literally, and it is what keeps the stand.
+
+#### Mechanism and botanical basis
+
+A pa-0 shoot whose bud received v ≥ `forkAt`·`c1.maxMetamersPerShoot` (more vigour than the
+longest shoot can use) **ends its apex** (the terminal bud is set TERMINATED). The existing relay
+(ADR 0033, `r2.relay` = 2) then makes the laterals on the shoot's top two nodes pa-0 arms next
+season: with beech's distichous phyllotaxis, a fork of two near-equal arms on opposite sides. At
+fork time those two buds are re-aimed to `forkAngle` from the apex's heading. Every fork arm (a
+pa-0 axis that is not the trunk's own) then **holds the inclination of its own base** as its
+growth and posture set point (plus the ADR 0034 curve, so it rises then arches), instead of the
+trunk's vertical. Arms that are vigorous enough fork again; the vigour divides with each fork, so
+the forking stops by itself. Basis: Nicolini & Caraglio 1994 [r] (forks at the highest growth
+rate; vertical laterals more frequent in full light); Troll, *Fagus* type, "all axes develop
+plagiotropically ... aged crowns usually are polyarchic" [r, Pfisterer 2000]; "young trees may
+develop a leader" (hence no fork while `hJ`'s juvenile cap holds); photo note §1 (each fork two
+near-equal axes, the limb a chain of forks bending outward). Generic, not beech-only: any species
+with `forkAt` set forks where it is most vigorous. The low-vigour fork of deep shade is the same
+rule with a lower threshold; not prototyped (understorey only).
+
+#### Exactly what changes
+
+- `rust/core/src/params.rs`, `R2`: two optional fields, `fork_at` (`r2.forkAt`, absent → 0 = off)
+  and `fork_angle` (`r2.forkAngle`, degrees, absent → the laterals' own β).
+- `rust/core/src/principles/r2.rs`: `vigour_forks(pa, v, cap, tree_age, params)`: true iff
+  `forkAt > 0 && pa == 0 && relay_on && cap >= c1.maxMetamersPerShoot && tree_age >= r2.relayAge
+  && v >= forkAt·c1.maxMetamersPerShoot`. `arm_set_point(tree, trunk, pa, m, params)`: with the
+  fork on, for a non-trunk pa-0 metamer, the angle from vertical (degrees) of its axis's first
+  metamer (found by binary search on `birth_id`, which ascends); None otherwise.
+- `rust/core/src/season.rs`, `grow_buds`: (1) in the `direct` closure, after
+  `direction_params`, a non-trunk pa-0 shoot takes `arm_set_point` (a new arm from a lateral bud:
+  its bud's own inclination) as `dir.set_point`, before the curve/aged/pendulous offsets; (2) after
+  `grow_shoot`, if `vigour_forks`, the shoot's new main bud becomes TERMINATED and, with
+  `forkAngle`, the lateral buds on its top `relay_nodes(0)` metamers get
+  `lateral_frame(tree, m, azimuth, forkAngle)`.
+- `rust/core/src/principles/r3.rs`, `update_mechanics`: the posture set point of a metamer is
+  `arm_set_point` when Some, else `posture_set_point(pa)` as now; the curve/aged bend is added to
+  either.
+- Where the fields live for real: `src/core/params.ts`, R2, beside `relay`/`relayAge`/`relayPTerm`
+  (`forkAt?: number; forkAngle?: number`), exported to `rust/presets.json`; beech's values through
+  `analysis/fit/hand-overrides.toml` → `flora-fitted.ts`: `r2.relay 2, r2.relayAge 0,
+  r2.relayPTerm 0, r2.forkAt 1.3, r2.forkAngle 30, r2.levels.0.curve 30, r2.levels.0.curveLength
+  30` (the picks' age-driven relay is replaced by the vigour trigger; `relayAge` doubles as an
+  optional age gate). Default off: verified bit-identical state hashes against a pristine build
+  (beech lone and stand seed 3 to 100, the picks' lone seed 1 to 100, oakOpen seed 1 to 80). The
+  sandbox has no `tests/golden.json`, so the golden test itself was not run; the 125 unit tests
+  pass.
+
+Pseudocode (the diff is in `changes.diff`, ≈ 80 added lines):
+
+```
+grow_buds, per bud i with v ≥ threshold, pa = order − shift:
+  direct(): dir = direction_params(pa)
+            if forkAt > 0 and pa == 0 and not trunk:
+                dir.set_point = angle_from_vertical(first metamer of this axis)   # or the bud's own heading for a new arm
+            dir.set_point = curved(dir.set_point, curve + aged)   # as today
+  grow_shoot(...)
+  if forkAt > 0 and pa == 0 and relay_on and cap ≥ maxMetamers and age ≥ relayAge and v ≥ forkAt·maxMetamers:
+      new terminal bud → TERMINATED
+      for lateral buds on the shoot's top r2.relay metamers: re-aim to forkAngle from the parent heading
+update_mechanics, per metamer: set = arm_set_point(i) ?? posture_set_point(pa); set += curve + aged
+```
+
+#### Prototype and numbers (seeds 1/2/3)
+
+| | today | picks | **C (c-forkL)** |
+|---|---|---|---|
+| lone 60 height | 147/145/145 | 130/116/125 | **124/127/129** |
+| lone 60 W/H | 0.64/0.63/0.64 | 0.73/0.99/0.78 | **0.84/0.75/0.78** |
+| lone 60 forkHeight | 0.93/1/1 | 0.26/0.30/0.29 | 0.41/0.40/0.39 |
+| lone 100 height | 194/182/204 (ceiling) | 203/202/202 (ceiling) | **166/168/183** |
+| lone 100 W/H | 0.55/0.63/0.47 | 0.51/0.70/0.60 | **0.79/0.73/0.84** |
+| stand alive | 11/12/12 | 9/8/9 | **12/12/12** |
+| stand H/D | 108/107/109 | 77/93/85 | 110/93/94 |
+| stand crown ratio (limb / leaf) | 0.36–0.41 / 0.35–0.41 | 0.20–0.34 / 0.30–0.62 | 0.29–0.32 / 0.46–0.51 |
+| stand floor | 4.5/4.8/4.3% | 4.0/3.1/3.6% | 3.4/3.1/4.8% |
+| stand LAI | 6.9/7.1/7.0 | 6.4/7.3/7.3 | 7.7/**8.5**/7.2 |
+
+Ecology guard: alive, floor and H/D pass on all seeds (H/D 110 on seed 1 is at the edge); LAI 8.5
+on seed 2 is high against "about 7". By eye: no pointed top on any lone tree at 60 or 100; the
+upper crown is a broad, rounded head of forking arms that rise and arch (best: seed 3 at 100,
+seed 1 at 100 leaf-off); the stand keeps straight clean boles with a few forked tops, which is what
+photo note §3 shows. Ablations: forks with arms straightened to vertical (`c-forkA`) give a
+column; forks from the juvenile phase without the cap gate (`c-forkA`, `c-forkB`) collapse the
+stand (7–9 alive) and flatten the lone tree; an age gate instead of a high threshold (`c-forkF`,
+`c-forkH`) also keeps the stand but forks the lone tree 30–40 cells higher; `c-forkK` (forkAt 1.3,
+angle 35, curve 45) gives broader heads (W/H up to 1.05) but stand H/D 115 on two seeds.
+
+#### Cost
+
+No new state, no checkpoint or hash change, no RNG draw. Per season: one comparison per growing
+bud, a scan of the shoot's new buds on a fork, and a binary search per non-trunk pa-0 metamer in
+R3 (O(n log n), small n). Measured on this machine, 100 seasons with CSV output: lone 175 vs 177
+ms/season, stand 101 vs 101 ms/season (within noise); memory unchanged. Bundle: a few hundred
+bytes of wasm and two optional TS fields.
+
+#### Risks
+
+- The stand margin rests on one threshold. From the no-fork diagnostic, first forks: at `forkAt`
+  1.3 about 4 of 36 stand trees (near season 26), at 1.2 about 14, at 1.1 about 31; at ≤ 1.0 with
+  no age gate the stand breaks (`c-forkC`–`E`: 7–10 alive, floor 1.6–3.1%). Fit `forkAt` on more
+  seeds than 1–3 before shipping.
+- LAI rises (7.2–8.5): a polyarchic crown carries more leaf; watch the floor, which is now 3.1–4.8%.
+- `arm_set_point` reads the *current* inclination of the arm's base metamer, which posture and sag
+  also move; a stored birth angle (a per-axis column) would be stricter but changes checkpoints.
+- It reuses `relayAge` as an optional gate and needs `relay ≥ 1`; with the picks' `relayPTerm` also
+  set, both triggers act (not tested together).
+
+#### What it does not fix
+
+- **The lower half is still the juvenile layered cone**: short, level limbs in regular tiers under
+  the new head, so the lone tree reads as a broad head on a tiered column (clearest on seed 1 at 60
+  and 100), not a dome to the ground. The lower limbs never become scaffold because they are shaded by
+  the head and get the trunk's lateral share; that needs a lateral-vigour rule (gravimorphism or a
+  fork for limbs, pa 1 via ADR 0037's per-level relay, which I would try next) or side light, not
+  this rule. Cue 1 will likely score 1 at best on the lone tree until then.
+- **Height** is still ≈ 2× an open beech (166–183 cells at 100, ≈ 42–46 m): forking slows the
+  leader but the shoot cap, not R1's hydraulics, still sets the height growth of every saturated
+  apex. A decline of the cap (or of the threshold) with path length is the honest next step.
+- Level sprays (cue 4), bark (cue 5) and the stand's crown ratio (limb 0.29–0.32, below the card's
+  0.4–0.55) are untouched.
 
 <!-- proposal-c -->
 

@@ -16,6 +16,21 @@ ADR 0031's last diagnostic relaxed both shedding rules at biological values on t
 
 ## Consequences
 - **The lone tree's top is not the reason and is not changed by this:** the crown fills inside, the top stays flat (ADR 0031).
-- **Memory and the phone:** metamers +40–70%. The garden's budget (ADR 0026) is checked before anything else runs under this.
+- **Memory and the phone** (measured 2026-11-01; `experiments/code/2026-10-31-species-round5/budget/`; headless Firefox with software rendering, so draw times are relative, not the phone's): the phone's 66-cell plate decides, and **the budget holds**, with the worker far under 250 ms a season and memory far under 256 MB.
+
+| measure | before ADR 0032 (b99a153) | after (437a57d) |
+|---|---|---|
+| phone plate (66 cells), WASM memory at 200 seasons | 74.2 MB | 74.9 MB |
+| phone plate, live metamers at 200 | 18,440 | 20,713 |
+| garden ?bench, phone viewport (390 × 844, dpr 2), seed 10, 40 seasons: worker ms a season (mean / max) | 25.5 / 40 | 32.1 / 45 |
+| the same: draw p95 / frame p95 (ms); long frames | 5 / 17.3; 5 | 7 / 17.4; 62 |
+| the same: metamers on screen | 11,027 | 12,157 |
+| garden ?bench, 100 seasons: worker ms (mean / max) | 37.6 / 67 | 40.7 / 87 |
+| the same: draw p95 / frame p95; long frames | 5 / 17.3; 72 | 6 / 17.3; 91 |
+| the same: metamers on screen | 12,654 | 12,325 |
+| 160-cell plate + specimen (memory.ts), WASM memory at 200 | 312.5 MB | 342.5 MB |
+| the same: live metamers at 200 | 85,252 | 120,590 |
+
+  The 160-cell plate with the specimen was already over ADR 0026's 256 MB before this ADR, and is over by more after (+30 MB, +41% metamers). That is I3's open problem (STATUS, known issues).
 - The species' fitted physiology (round 2) predates it. The re-fits (round 5's pilot and the eight) fit eight knobs under it.
 - The six estimated T_rel values rest on one regression over four species; a measurement for any of them replaces its estimate.

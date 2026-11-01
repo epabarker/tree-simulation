@@ -31,6 +31,7 @@ _Last updated: 2026-11-01 (ADR 0032 accepted and applied: acclimated leaf cost c
 - At 100 most beech sweep cells reach the woods' top (200): the flat tops there are the ceiling.
 
 ## Known issues
+- **Memory, 160-cell plate + specimen** (ADR 0026's 256 MB): 312.5 MB before ADR 0032, 342.5 MB after, at 200 seasons. I3's open problem; the phone's 66-cell plate is 74.9 MB.
 - **Regeneration:** `forest` cannot regenerate under its own floor at τ 0 (C5's). **The lab stutters** from season ≈ 75 on the phone.
 - **The preview deploy** (`preview-3d`) has the old `i2.ts`: redeploy only when asked.
 

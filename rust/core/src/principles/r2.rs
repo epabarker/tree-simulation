@@ -934,6 +934,78 @@ mod tests {
             .collect();
         assert!(axes.len() > 5, "{axes:?}"); // many relay axes, all order 0
     }
+
+    #[test]
+    fn a_leader_grown_at_full_vigour_ends_and_its_top_laterals_leave_at_the_fork_angle() {
+        // The vigour fork in growth (season.rs grow_buds): a pa-0 shoot whose bud got v ≥ forkAt·
+        // full ends its apex, and the laterals on its top `relay` nodes are re-aimed to forkAngle
+        // from the shoot. Below the threshold the leader grows on (relayPTerm 0: no age relay).
+        let fork = |v: f64| {
+            let p = with_r2(
+                &[r#"{"generator":"spiral"}"#, r#"{"generator":"none"}"#],
+                r#""relay":2,"relayAge":0,"forkAt":1.3,"forkAngle":30"#,
+            );
+            let mut t = Tree::new(0, 10.0, 0.5);
+            crate::principles::c1::plant_seedling(&mut t, &p, 0.0, 0.0);
+            t.ensure_scratch();
+            let before = t.b.len();
+            for j in 0..before {
+                t.b.v[j] = v;
+            }
+            crate::season::grow_buds(&mut t, &p, 1.0);
+            let full = p.c1.max_metamers_per_shoot;
+            let apex = (before..t.b.len())
+                .find(|&j| t.b.slot[j] == slot::MAIN && t.m.order[t.b.metamer[j] as usize] == 0)
+                .expect("a new leader bud");
+            // The leader's shoot: this season's order-0 metamers (the seedling's lateral grows
+            // too, as order 1); its top two nodes (or as many as it has) carry the arms.
+            let leader: Vec<usize> = (0..t.m.len())
+                .filter(|&i| t.m.order[i] == 0 && t.m.birth_season[i] == 1)
+                .collect();
+            let top = &leader[leader.len().saturating_sub(2)..];
+            let arms: Vec<f64> = (before..t.b.len())
+                .filter(|&j| t.b.slot[j] != slot::MAIN && top.contains(&(t.b.metamer[j] as usize)))
+                .map(|j| math::acos(t.b.hy[j]) * (180.0 / std::f64::consts::PI))
+                .collect();
+            (t.b.state[apex], arms, 1.3 * full)
+        };
+        let (state, arms, threshold) = fork(5.0);
+        assert!(5.0 >= threshold);
+        assert_eq!(state, bud::TERMINATED);
+        assert!(!arms.is_empty());
+        for a in &arms {
+            assert!((a - 30.0).abs() < 1e-6, "an arm at {a}°");
+        }
+        let (state, _, threshold) = fork(1.0);
+        assert!(1.0 < threshold);
+        assert_ne!(state, bud::TERMINATED);
+    }
+
+    #[test]
+    fn the_relay_gates_signal_is_zero_alone_and_positive_among_neighbours() {
+        // phase_sample's s̄: the mean of R5's neighbour shade over the tree's metamers. A tree
+        // alone in the open reads 0; the middle of three trees 6 cells apart reads more.
+        use crate::world::World;
+        let world = |xs: &str| {
+            let p = crate::testing::preset(
+                "oakOpen",
+                &format!(r#"{{"trees":[{xs}],"species":{{"oak":{{"r2":{{"relayCrowd":10}}}}}}}}"#),
+            );
+            let mut w = World::new(p);
+            w.run(25, &[]);
+            w
+        };
+        let alone = world(r#"{"x":80,"species":"oak"}"#);
+        assert_eq!(alone.trees[0].relay_crowd, 0.0);
+        let row =
+            world(r#"{"x":74,"species":"oak"},{"x":80,"species":"oak"},{"x":86,"species":"oak"}"#);
+        assert!(
+            row.trees[1].relay_crowd > 0.0,
+            "{}",
+            row.trees[1].relay_crowd
+        );
+    }
+
     #[test]
     fn the_relay_gate_keeps_the_leader_of_a_tree_among_neighbours() {
         let rows = [r#"{"pTerm":0}"#, r#"{"pTerm":0.2}"#];

@@ -1,6 +1,6 @@
 # 0034: Curvature along the limb: a set point that changes with the node
 
-- **Status:** accepted for beech/birch as authored in `docs/experiments/code/2026-11-01-atlas/picks.toml` (the user, 2026-11-01); off by default; adoption into the species patches is track D's at the next fit.
+- **Status:** accepted for beech and maple, the species that use it, in `docs/experiments/code/2026-11-01-atlas/picks.toml` (the user, 2026-11-01); off by default; adoption into the species patches is track D's at the next fit.
 - **Date:** 2026-11-01
 - **Related:** spec §C4.4 (t(A_set) per physiological age), §R3.4 (posture set point per pa), §R2; ADR 0009, ADR 0011 (posture), ADR 0029 (form by hand), ADR 0033 (the relay). Track A's identity card (`docs/research/2026-11-01-species-identity.md`, on `claude/research`) ranks this the first missing feature at 20 m: birch's arch, beech's fan-and-arch, oak's spread, hornbeam's bow.
 - **Sheet:** `docs/experiments/figures/2026-11-01-atlas-curve-{60,100}.png`, from `uv run --project analysis python docs/experiments/code/2026-11-01-atlas/atlas.py curve`.

@@ -1,6 +1,6 @@
 # 0036: Twig density: per-level acrotony and lateral spacing as form knobs
 
-- **Status:** accepted for beech/birch as authored in `docs/experiments/code/2026-11-01-atlas/picks.toml` (the user, 2026-11-01); off by default; adoption into the species patches is track D's at the next fit.
+- **Status:** accepted for birch and willow, the species that use it, in `docs/experiments/code/2026-11-01-atlas/picks.toml` (the user, 2026-11-01); off by default; adoption into the species patches is track D's at the next fit.
 - **Date:** 2026-11-01
 - **Related:** spec §R2.4 (acrotony κ, the pa table), §C1.4 (phyllotaxis), §9 (birch: "fine sparse laterals"); ADR 0009, ADR 0025 (generators), ADR 0029 (form by hand), ADR 0035 (pendulous twigs, which need long thin shoots to show).
 - **Sheet:** `docs/experiments/figures/2026-11-01-atlas-twigs-{60,100}.png`, from `uv run --project analysis python docs/experiments/code/2026-11-01-atlas/atlas.py twigs`.

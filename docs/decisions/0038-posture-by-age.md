@@ -1,6 +1,6 @@
 # 0038: Posture by age: a level's set point moves with the wood's age or the tree's
 
-- **Status:** accepted for beech/birch as authored in `docs/experiments/code/2026-11-01-atlas/picks.toml` (the user, 2026-11-01); off by default; adoption into the species patches is track D's at the next fit.
+- **Status:** accepted for beech and oak, the species that use it, in `docs/experiments/code/2026-11-01-atlas/picks.toml` (the user, 2026-11-01); off by default; adoption into the species patches is track D's at the next fit.
 - **Date:** 2026-11-01
 - **Related:** spec §R2.4 (ontogeny: today only λ ages, by a_c and Δλ), §R3.4 (the posture set point per pa), §C4.4; ADR 0009, ADR 0011, ADR 0029, ADR 0034 (curvature, by position along the limb rather than by age). Track A's simulator survey (`docs/research/2026-11-01-simulators.md` on `claude/research`) ranks a phase change at maturity (Makowski et al. 2019's mature parameters) and gravimorphism (TreeSketch's epitony and hypotony) for this track; its fir card adds limbs that go erect, then level, then descending with age.
 - **Sheet:** `docs/experiments/figures/2026-11-01-atlas-aged-{60,100}.png`, from `uv run --project analysis python docs/experiments/code/2026-11-01-atlas/atlas.py aged`.

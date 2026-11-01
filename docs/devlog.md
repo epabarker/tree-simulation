@@ -2,6 +2,11 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-01: Track B (vocabulary): beech and fir with posture by age; the u8 order fix proposed
+
+- **`atlas.py combined --species beech-aged`** (relay, relay curvature 45, limbs set point 28 levelling to 80 with wood age over 30/50/80): the broadest beech yet (W/H 0.77–1.04 at 60) with a rounded top. The tiers partly break up into irregular masses, but some level plates remain. **`fir-aged`** (limbs 60 → 110): little change in the outline.
+- **ADR 0033:** two fixes for the u8 order limit proposed, not applied. A: a relay keeps the order of the axis it replaces (no schema change; form metrics read relays as trunk). B: store pa, with a checkpoint version (every golden changes).
+
 ## 2026-11-01: Track B (vocabulary): posture by age (ADR 0038, proposed)
 
 - **`r2.levels[i].agedSetPoint`, `agedOver`, `agedBy`** (r2.rs, season.rs, r3.rs): a level's growth and posture set points move with the wood's age (gravimorphism) or the tree's (phase change). Off by default; presets and goldens unchanged.

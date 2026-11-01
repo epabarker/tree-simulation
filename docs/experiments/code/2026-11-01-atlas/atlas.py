@@ -149,6 +149,27 @@ COMBINED: dict[str, dict] = {
         "note": "limbs (levels.1) with their own acrotony κ 3 and a lateral at every node (ADR 0036), "
                 "curving over 30 nodes (ADR 0034)",
     },
+    # Beech with posture by age (ADR 0038) on top of the relay and the relays' curvature: young
+    # limbs steep (set point 28), levelling toward 80 with their wood's age.
+    "beech-aged": {
+        "species": "beech",
+        "base": {"r2.relay": 2, "r2.relayAge": 20, "r2.relayPTerm": 0.6, "r2.levels.0.curve": 45,
+                 "r2.levels.0.curveLength": 30, "r2.levels.1.setPoint": 28,
+                 "r2.levels.1.agedSetPoint": 80},
+        "knob": ("r2.levels.1.agedOver", [30, 50, 80]),
+        "note": "relay 2, relayAge 20, relayPTerm 0.6 (ADR 0033); relays curve 45 over 30 nodes "
+                "(ADR 0034); limbs (levels.1) set point 28 when young, moving to 80 with their wood's "
+                "age over agedOver seasons (ADR 0038)",
+    },
+    # Fir (track A's card: limbs erect, then level, then descending with age): young limbs at 60,
+    # descending toward 110 with their wood's age; the monopodial trunk as it is (no relay).
+    "fir-aged": {
+        "species": "fir",
+        "base": {"r2.levels.1.setPoint": 60, "r2.levels.1.agedSetPoint": 110},
+        "knob": ("r2.levels.1.agedOver", [30, 50, 80]),
+        "note": "limbs (levels.1) set point 60 when young, moving to 110 with their wood's age over "
+                "agedOver seasons (ADR 0038); everything else fir's own",
+    },
 }
 SEEDS = (1, 2, 3)
 
@@ -237,10 +258,10 @@ def draw_sheet(name: str, rule: dict, season: int, cells: Path, command: str) ->
     return out
 
 
-def combined_cells(sp: str) -> dict[str, tuple[int, dict]]:
-    """Cell key → (seed, assign) for species `sp`'s combined sheet."""
-    c = COMBINED[sp]
-    base = species_base(sp)
+def combined_cells(name: str) -> dict[str, tuple[int, dict]]:
+    """Cell key → (seed, assign) for the combined sheet `name`."""
+    c = COMBINED[name]
+    base = species_base(c.get("species", name))
     path, values = c["knob"]
     out = {}
     for seed in SEEDS:
@@ -250,8 +271,9 @@ def combined_cells(sp: str) -> dict[str, tuple[int, dict]]:
     return out
 
 
-def draw_combined(sp: str, season: int, cells: Path, command: str) -> Path:
-    c = COMBINED[sp]
+def draw_combined(name: str, season: int, cells: Path, command: str) -> Path:
+    c = COMBINED[name]
+    sp = c.get("species", name)
     path, values = c["knob"]
     data = {k.stem: np.load(k) for k in cells.glob("*.npz")}
     segs = [d[f"seg{season}"] for d in data.values() if len(d[f"seg{season}"])]
@@ -302,18 +324,19 @@ def draw_combined(sp: str, season: int, cells: Path, command: str) -> Path:
     plt.close(fig)
     im = Image.open(full).convert("RGB")
     im = im.resize((im.width // 2, im.height // 2), Image.LANCZOS)
-    out = FIGURES / f"2026-11-01-atlas-combined-{sp}-{season}.png"
+    out = FIGURES / f"2026-11-01-atlas-combined-{name}-{season}.png"
     im.quantize(colors=64, method=Image.Quantize.MEDIANCUT).save(out, optimize=True)
     return out
 
 
-def main_combined(sp: str, workers: int, redraw: bool, seasons: list[int]) -> None:
-    cells = REPO / "runs" / "atlas" / f"combined-{sp}"
+def main_combined(name: str, workers: int, redraw: bool, seasons: list[int]) -> None:
+    sp = COMBINED[name].get("species", name)
+    cells = REPO / "runs" / "atlas" / f"combined-{name}"
     cells.mkdir(parents=True, exist_ok=True)
     jobs = {}
     ev = Evaluator()
     try:
-        for key, (seed, assign) in combined_cells(sp).items():
+        for key, (seed, assign) in combined_cells(name).items():
             jobs[key] = (seed, ev.ask({"amend": sp, "assign": assign})["patch"])
     finally:
         ev.close()
@@ -327,9 +350,9 @@ def main_combined(sp: str, workers: int, redraw: bool, seasons: list[int]) -> No
                           todo.items()))
         (cells / "jobs.json").write_text(json.dumps(jobs, indent=1))
     command = (f"uv run --project analysis python docs/experiments/code/2026-11-01-atlas/atlas.py "
-               f"combined --species {sp}")
+               f"combined --species {name}")
     for s in seasons:
-        print(draw_combined(sp, s, cells, command))
+        print(draw_combined(name, s, cells, command))
 
 
 def main() -> None:

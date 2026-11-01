@@ -2,6 +2,12 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-01: Track B (vocabulary): fix A for the relay's order; the authored picks; ADRs accepted for beech and birch
+
+- **Fix A** (the user's choice, ADR 0033): a relay is stored at the order of the axis it replaces, so orders no longer climb along a relay chain (the u8 limit). The form offsets exempt the trunk's own axis rather than order 0; C5's bud bank takes the order by slot. Goldens unchanged. The accepted beech and birch sheets are bit-identical before and after; only `limbElevation` reads 0–6° higher on beech (trunk relays' laterals count as limbs).
+- **`docs/experiments/code/2026-11-01-atlas/picks.toml`:** the authored form for beech (relay, relay curvature, posture by age) and birch (pendulous twigs, twig laterals every third node); oak and the other five hold today's [form]. Track D copies them into [form] after its fit.
+- **ADRs 0033–0036 and 0038** accepted for beech and birch as authored; 0037 (elbows) stays proposed, with oak waiting for the elbows to persist.
+
 ## 2026-11-01: Track B (vocabulary): beech and fir with posture by age; the u8 order fix proposed
 
 - **`atlas.py combined --species beech-aged`** (relay, relay curvature 45, limbs set point 28 levelling to 80 with wood age over 30/50/80): the broadest beech yet (W/H 0.77–1.04 at 60) with a rounded top. The tiers partly break up into irregular masses, but some level plates remain. **`fir-aged`** (limbs 60 → 110): little change in the outline.

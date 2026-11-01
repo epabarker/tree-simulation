@@ -1,6 +1,6 @@
 # 0033: The sympodial relay: laterals under an ended leader take the trunk's level
 
-- **Status:** proposed (track B, 2026-11-01). Off by default; no golden, preset or species changes.
+- **Status:** accepted for beech/birch as authored in `docs/experiments/code/2026-11-01-atlas/picks.toml` (the user, 2026-11-01); off by default; adoption into the species patches is track D's at the next fit.
 - **Date:** 2026-11-01
 - **Related:** spec §R2.4 ("Sympodial: terminal bud terminates with p_term(pa); distal laterals take over"), §R4.4 (the per-axis shift), §9 (beech, Troll); ADR 0009 (the pa table), ADR 0012 (R4's shift), ADR 0029 (form by hand), ADR 0031 (the flat top: "the fix is R2's reiteration").
 - **Sheet:** `docs/experiments/figures/2026-11-01-atlas-relay-{60,100}.png`, from `uv run --project analysis python docs/experiments/code/2026-11-01-atlas/atlas.py relay`.
@@ -8,7 +8,7 @@
 ## Context
 R2 lets a terminal bud end (p_term per level), but the spec's second half, "distal laterals take over", was never built: a lateral under an ended apex stays one level younger than the axis it replaces, so an ended trunk becomes a table of limbs, and the leader can only lapse by λ falling (dLambda). ADR 0031 placed the flat top in growth and named Troll's reiteration as the fix. Botanically, the crown of an old broadleaf is built by repeated relays: the leader's module ends (by flowering, abortion or loss of apical control) and one or more of the distal laterals become orthotropic and take its place, so the crown becomes several co-dominant ascending limbs, each repeating the trunk's architecture (Hallé et al. 1978 for Troll's and Leeuwenberg's sympodial models; Barthélémy & Caraglio 2007 for sequential reiteration). In beech and oak the dome of the mature crown is a set of such reiterated complexes, not one axis.
 
-## Decision (proposed)
+## Decision
 1. **The relay** (`r2.relay`, a count; 0 or absent is the ablation): when the terminal bud of a pa-0 axis has ended, the lateral buds on the top `relay` nodes below the ended apex grow as pa 0. Their shoots take the trunk's row (λ, set point, η, generator, p_term) and pass it to their subtree through R4's per-axis `paShift`; with R4's juvenile shift as well, the shoot takes the younger. Only the trunk's level relays.
 2. **The leader ends with age** (`r2.relayAge`, `r2.relayPTerm`): from tree age `relayAge` a pa-0 terminal ends with probability max(row p_term, `relayPTerm`), drawn from the existing sympodial-termination purpose (no new RNG purpose). Each relay is pa 0, so it may end and relay in turn.
 3. **No new column.** Which buds are relays is read at the start of each season's growth from the ended (TERMINATED) main buds that already persist in the bud table: one reverse pass gives each metamer its depth below an ended apex on its own axis. The checkpoint layout and the state hash are unchanged.
@@ -18,10 +18,10 @@ R2 lets a terminal bud end (p_term per level), but the spec's second half, "dist
 - **Oak:** almost no change. Oak's leader already lapses by dLambda (fork 0.04–0.34), so few pa-0 apices are left to relay.
 - **Birch:** a fuller, slightly broader crown with a lower fork (0.45–0.56) at the centre. `relayPTerm` 1 makes a tall spike at the top (H 169 → 203 at 100). **It is the relay working, not a bug.** The leader's path through the top 30 cells is a chain of relays of orders 40 to 52, a new pa-0 axis each season, kept vertical by level 0's set point 0. With the rule off, the monopodial leader through the same cells is order 0 and stalls (birch's "stops growing after 60", STATUS). A leader renewed every season by its most-lit lateral keeps the height growth the old leader loses. What the user sees is a straight sympodial leader, Leeuwenberg-like but with one winner.
 
-## The u8 order limit: two fixes, proposed, not applied
+## The u8 order limit: fix A applied (the user, 2026-11-01)
 Branching order is a u8 column (`Metamers.order`, `Buds.order`). A relay grows as a lateral, so its order is one more than the axis it replaces, and a chain of relays climbs one order per takeover (birch's spike reached 52 by season 100). Past 255, `store_u8` wraps, `order − paShift` goes wrong, and the relay's subtree reads the wrong row. Elbows (ADR 0037) relay limbs as well, so the limit comes sooner there.
 
-**Fix A, recommended: a relay keeps the order of the axis it replaces (substitution).** The relay's first metamer takes the host axis's order instead of order + 1, and its paShift is the host's (so pa is the host's pa, as now). Orders stop climbing along a relay chain; the laterals of a relay are one order up, as any lateral is.
+**Fix A, chosen and applied: a relay keeps the order of the axis it replaces (substitution).** The relay's first metamer takes the host axis's order instead of order + 1, and its paShift is the host's (so pa is the host's pa, as now). Orders stop climbing along a relay chain; the laterals of a relay are one order up, as any lateral is.
 - *Touches:* `c1::grow_shoot`/`add_metamer` (an order override for the shoot's first metamer, beside the existing paShift override), `season::grow_buds` (pass it for relays), `r2::relay_shift` (the shift becomes the host's), and the unit tests. About 20 lines, no schema change, no checkpoint version, goldens unchanged (the rule is off by default).
 - *Cost:* "order" no longer counts lateral branchings on a relayed subtree; it means "the axis this one replaces". A trunk relay is order 0, so `form.rs` and `metrics.rs`, which read order 0 as the trunk and order 1 on order 0 as a limb (forkHeight, leaderDominance, the limb crown ratio, epicormic counts), count relays as trunk. That is arguably right (a relay is a trunk in Troll's model), but forkHeight changes meaning: a crown split by relays reads as an unforked trunk. forkHeight should then be read off paShift or the relay itself, which is a change in `form.rs` at adoption.
 
@@ -29,11 +29,17 @@ Branching order is a u8 column (`Metamers.order`, `Buds.order`). A relay grows a
 - *Touches:* the metamer and bud schemas in `tree.rs` and `src/core/types.ts` (METAMER_SCHEMA, BUD_SCHEMA), `checkpoint.rs` (version 3, with a reader for version 2 that rebuilds pa from order − paShift), `snapshot.rs` and the page's `TreeView` reading of columns, and every `order − paShift` site (c1, c3, r2, r3, r4, season).
 - *Cost:* the state hash walks every column in schema order, so **every golden changes** (an intended change, `npm run golden:update`, recorded in the devlog), even with the rule off. Checkpoints of shipped forests need the v2 reader kept for good (AGENTS.md: "Checkpoints keep their bytes"). Snapshot size grows by one byte (pa) or three (i32 order) per metamer and bud, against ADR 0026's memory budget. About a day's work with track C's renderer reading the schema.
 
-A keeps the rule self-contained and free; B is the clean model, at the cost of every golden and a checkpoint version. Either is needed before any relay rule is adopted.
+A keeps the rule self-contained and free; B is the clean model, at the cost of every golden and a checkpoint version. **The user chose A.**
+
+**As applied.** `season::grow_buds` stores a relay's shoot at the bud's order − 1 with its shift − 1 (the same pa) through `c1::grow_shoot`'s new `first_order` argument; `r2::relay_shift` is unchanged. Three things follow:
+- The form offsets (curvature, pendulous, posture by age) exempt **the trunk's own axis** (`axis == axis[0]`), no longer order 0, since a trunk relay is now order 0 on its own axis and must still curve.
+- C5's bud bank (`c5.rs`) gives the banked bud its order by its slot (the parent's, one more for a lateral), not the shed shoot's; for every non-relay shoot this is the same value.
+- **Checked on the accepted sheets** (combined beech-aged and birch, nine cells each at 60): the trees are bit-identical before and after (the same segments). Only `limbElevation` reads differently (0–6° higher on beech), because the laterals of a trunk relay are now order 1 on order 0 and count as trunk limbs. **`forkHeight` does not change:** it walks the trunk's main-slot chain, which already ended where a relay took over. The unit test `a_chain_of_relays_keeps_the_trunks_order` grows thirty seasons of relays and finds every order ≤ 1.
 
 ## Consequences
-- **A limit to fix before adoption:** branching order is stored as a u8 (the checkpoint layout), and every relay is one order higher than the axis it replaces. A leader that relays every season (`relayPTerm` near 1) passes order 255 after about 255 seasons, and `order − paShift` then wraps. The lone and stand trials stop at 100, but `forest` runs to 300. Adoption needs either a cap on the relay's order or pa stored without order (a checkpoint version).
-- `rust/core/src/principles/c1.rs` changes by one argument: `form_terminal_bud` passes the tree's age to `r2::terminates`.
+- The u8 order limit is closed by fix A: a relay chain stays at its axis's order.
+- `rust/core/src/principles/c1.rs` changes: `form_terminal_bud` passes the tree's age to `r2::terminates`, and `grow_shoot` takes the relay's `first_order`; `c5.rs`'s bud bank takes the order by slot (above). The overseer agreed both.
+- Order means "the axis this one replaces" on a relayed subtree, so the form metrics that read order 1 on order 0 as a limb count a trunk relay's laterals as limbs (`limbElevation`, the limb crown ratio, `metrics.rs`'s limb sums).
 - At adoption, whoever adopts updates `docs/architecture.md`'s season-loop mapping, the ROADMAP tracing row, STATUS and the lab panel (`src/web/ui/panel.ts`); a proposal leaves them alone.
 - The vocabulary gains co-dominant ascending stems. A dome needs them to arch outward as well (rule 2), so the relay is judged again with curvature on.
 - If accepted, `relay`, `relayAge` and `relayPTerm` join the form knobs of ADR 0029 per species, re-authored from the atlas; physiology is re-fitted under them (track D).

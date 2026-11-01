@@ -200,10 +200,10 @@ pub fn update_mechanics(tree: &mut Tree, params: &Params, storm: bool, season: f
             };
             let dr = (r_new - before) / r_new;
             let pa = tree.m.order[i] as f64 - tree.m.pa_shift[i] as f64;
-            let order = tree.m.order[i] as f64;
+            let trunk = tree.m.axis[i] == tree.m.axis[0];
             let wood_age = season - tree.m.birth_season[i] as f64;
-            let bend = (curve_offset(order, pa, tree.m.axis_node[i] as f64, params)
-                + aged_offset(order, pa, wood_age, tree.age, params))
+            let bend = (curve_offset(trunk, pa, tree.m.axis_node[i] as f64, params)
+                + aged_offset(trunk, pa, wood_age, tree.age, params))
                 * DEG;
             let set_point = if bend == 0.0 {
                 posture_set_point(pa, params)
@@ -213,7 +213,7 @@ pub fn update_mechanics(tree: &mut Tree, params: &Params, storm: bool, season: f
             // R2's pendulous twigs (ADR 0035): a thin axis hangs (degrees there and back only when on,
             // so the set point is bit-for-bit the same without it).
             let set_point = if hangs(pa, params) {
-                pendulous_set_point(set_point / DEG, order, pa, r_new, params) * DEG
+                pendulous_set_point(set_point / DEG, trunk, pa, r_new, params) * DEG
             } else {
                 set_point
             };

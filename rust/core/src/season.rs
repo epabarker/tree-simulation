@@ -474,6 +474,8 @@ pub fn grow_buds(tree: &mut Tree, params: &Params, season: f64) {
                 shift = math::max(shift, r);
             }
             let pa = bud_order - shift;
+            // The trunk's own axis is exempt from the form offsets (ADR 0034, 0035, 0038).
+            let trunk = tree.b.slot[i] == slot::MAIN && tree.m.axis[host] == tree.m.axis[0];
             let upright = set_point_scale(shade, r5);
             // R2's curve (ADR 0034): the node along its own axis each new metamer will take.
             let mut node = if tree.b.slot[i] == slot::MAIN {
@@ -500,11 +502,11 @@ pub fn grow_buds(tree: &mut Tree, params: &Params, season: f64) {
                     * std::f64::consts::PI
                     * uniform(seed, purpose::DIRECTION_NOISE, tid, id, season, 2.0);
                 let mut dir = direction_params(params, pa);
-                let bend = curve_offset(bud_order, pa, node, params)
-                    + aged_offset(bud_order, pa, 0.0, tree.age, params);
+                let bend = curve_offset(trunk, pa, node, params)
+                    + aged_offset(trunk, pa, 0.0, tree.age, params);
                 dir.set_point = curved(dir.set_point, bend);
                 dir.set_point =
-                    pendulous_set_point(dir.set_point, bud_order, pa, girth_of_host, params);
+                    pendulous_set_point(dir.set_point, trunk, pa, girth_of_host, params);
                 node += 1.0;
                 if upright != 1.0 {
                     dir.set_point *= upright;
@@ -512,12 +514,26 @@ pub fn grow_buds(tree: &mut Tree, params: &Params, season: f64) {
                 let v = [tree.b.vx[b], tree.b.vy[b], tree.b.vz[b]];
                 shoot_direction(prev, tree.bud_reference(b), v, noise, around, &dir)
             };
-            let pa_shift = if reiterates || relay.is_some() {
-                shift
+            // A relay is stored at the order of the axis it replaces (ADR 0033, fix A): one less
+            // order, one less shift, the same pa.
+            let (pa_shift, first_order) = if relay.is_some() {
+                (shift - 1.0, bud_order - 1.0)
+            } else if reiterates {
+                (shift, -1.0)
             } else {
-                -1.0
+                (-1.0, -1.0)
             };
-            grow_shoot(tree, i, n, length, params, season, &mut direct, pa_shift);
+            grow_shoot(
+                tree,
+                i,
+                n,
+                length,
+                params,
+                season,
+                &mut direct,
+                pa_shift,
+                first_order,
+            );
         } else {
             tree.b.state[i] = resting_state(tree.b.q[i], &params.r6);
             // R4's age counts the seasons a bud rests dormant (§R4: dormant buds have a finite

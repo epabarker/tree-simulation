@@ -1,6 +1,6 @@
 # 0037: Elbows: a limb relays its own ended axis
 
-- **Status:** proposed (track B, 2026-11-01). Off by default; no golden, preset or species changes.
+- **Status:** proposed (track B, 2026-11-01). Off by default; no golden, preset or species changes. Oak holds at today's form until the elbows persist (the user, 2026-11-01).
 - **Date:** 2026-11-01
 - **Related:** spec §R2.4 (p_term, "distal laterals take over"); ADR 0033 (the relay, which this generalises past the trunk), ADR 0029. Track A's identity card (`claude/research`) ranks oak's elbowed sinuosity fourth among the missing features: "a subapical takeover at a lost tip, not random noise".
 - **Sheet:** `docs/experiments/figures/2026-11-01-atlas-elbows-{60,100}.png`, from `uv run --project analysis python docs/experiments/code/2026-11-01-atlas/atlas.py elbows`.
@@ -19,6 +19,5 @@ An oak limb is sinuous and elbowed because its tips are lost often (to frost, in
 - **Beech:** little change, except `levels.2.branchAngle` 20–35, which leans or throws the whole tree: seed-1 realisations, judged as noise until more seeds are drawn.
 
 ## Consequences
-- The mechanism is in place; making the elbows visible probably needs the relay to keep its kink, for example a lower η on a relay's first shoot, or a relay that takes the next level's set point for its first season. That is a follow-up if the user wants elbows.
-- Every limb relay adds one to the branching order, so ADR 0033's u8 limit applies faster here: at limb `pTerm` 1 the order passes 255 within about 250 seasons on the oldest limbs.
+- The mechanism is in place; making the elbows visible probably needs the relay to keep its kink, for example a lower η on a relay's first shoot, or a relay that takes the next level's set point for its first season. That is the follow-up before oak takes this rule (the user, 2026-11-01: oak holds at today's form until the elbows persist). A relay of a limb keeps the limb's order (ADR 0033, fix A).
 - At adoption, whoever adopts updates `docs/architecture.md`'s season-loop mapping, the ROADMAP tracing row, STATUS and the lab panel (`src/web/ui/panel.ts`); a proposal leaves them alone.

@@ -1,6 +1,6 @@
 # 0036: Twig density: per-level acrotony and lateral spacing as form knobs
 
-- **Status:** proposed (track B, 2026-11-01). Off by default; no golden, preset or species changes.
+- **Status:** accepted for beech/birch as authored in `docs/experiments/code/2026-11-01-atlas/picks.toml` (the user, 2026-11-01); off by default; adoption into the species patches is track D's at the next fit.
 - **Date:** 2026-11-01
 - **Related:** spec §R2.4 (acrotony κ, the pa table), §C1.4 (phyllotaxis), §9 (birch: "fine sparse laterals"); ADR 0009, ADR 0025 (generators), ADR 0029 (form by hand), ADR 0035 (pendulous twigs, which need long thin shoots to show).
 - **Sheet:** `docs/experiments/figures/2026-11-01-atlas-twigs-{60,100}.png`, from `uv run --project analysis python docs/experiments/code/2026-11-01-atlas/atlas.py twigs`.
@@ -8,7 +8,7 @@
 ## Context
 How many fine shoots a limb carries, and where along it, is half of a crown's texture at distance: oak's clots at the shoot ends, birch's fine sparse shoots, beech's dense tracery (track A's identity card). Today it is set by one tree-wide κ, the twig level's λ (`levels.2.lambda`, which exists but was never a form knob), and the generator, which puts a lateral at every node.
 
-## Decision (proposed)
+## Decision
 1. **`levels[i].kappa`:** acrotony at that level's nodes, in place of `r2.kappa` (absent: `r2.kappa`), so a limb's shoots can gather at its shoot ends (tufts) while the trunk's do not, or the reverse.
 2. **`levels[i].lateralEvery`:** that level's axes form laterals only at every k-th node (absent or ≤ 1: every node). Whorled levels keep `tierEvery`. The phyllotactic azimuths are unchanged; only the nodes without buds are skipped.
 3. **`levels.2.lambda` joins the form knobs** for the atlas.

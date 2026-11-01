@@ -1,6 +1,6 @@
 # 0034: Curvature along the limb: a set point that changes with the node
 
-- **Status:** proposed (track B, 2026-11-01). Off by default; no golden, preset or species changes.
+- **Status:** accepted for beech/birch as authored in `docs/experiments/code/2026-11-01-atlas/picks.toml` (the user, 2026-11-01); off by default; adoption into the species patches is track D's at the next fit.
 - **Date:** 2026-11-01
 - **Related:** spec §C4.4 (t(A_set) per physiological age), §R3.4 (posture set point per pa), §R2; ADR 0009, ADR 0011 (posture), ADR 0029 (form by hand), ADR 0033 (the relay). Track A's identity card (`docs/research/2026-11-01-species-identity.md`, on `claude/research`) ranks this the first missing feature at 20 m: birch's arch, beech's fan-and-arch, oak's spread, hornbeam's bow.
 - **Sheet:** `docs/experiments/figures/2026-11-01-atlas-curve-{60,100}.png`, from `uv run --project analysis python docs/experiments/code/2026-11-01-atlas/atlas.py curve`.
@@ -8,7 +8,7 @@
 ## Context
 A level has one growth set point (C4) and one posture set point (R3), so every limb of a level holds one angle along its whole length; the only bend is R3's sag under load. The form sweep found set point, posture and η move a limb's elevation but not the outline (`2026-10-31-form-sweep-review.md`). Trees whose limbs rise and then arch over, or level out and sweep up, carry an angle that changes along the limb: Weber & Penn (1995) give each level `nCurve`, the angle a stem turns over its length (and `nCurveBack` for an S). Botanically the arch is a gradient of gravitropic set point along the axis (the GSA of older, more distal parts differs; Roychoudhry et al. 2013) together with reaction-wood posture that holds it (Alméras & Fournier 2009).
 
-## Decision (proposed)
+## Decision
 1. **Per level, `curve` (degrees) and `curveLength` (nodes, default 20):** at node k of an axis (its `axisNode`) the level's set points are moved by curve·min(1, k/curveLength), clamped to 0–180°. Positive arches a limb out and down; negative sweeps it up. Absent or 0 is the ablation.
 2. **Both set points move:** C4's growth direction for new metamers and R3's posture target for old wood. If only growth moved, posture would straighten the arch back to the level's one angle within a few seasons.
 3. **The trunk (order 0) is exempt;** every other axis curves by its level, including a relay at pa 0 (ADR 0033), so relays can ascend and then arch.

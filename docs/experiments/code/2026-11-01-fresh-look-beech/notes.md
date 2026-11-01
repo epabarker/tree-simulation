@@ -626,6 +626,164 @@ every seed:
 
 ## Review
 
+### Review of solve round 1 (fresh reviewer, 2026-11-01)
+
+Scored from `solve-round1/sheet.png`, `solve-round1/metrics.json`, `baseline/beech-today-sheet.png`,
+the checklist and `references-beech.md` only, before reading this ledger. Scale: 0 absent,
+1 present but weak or inconsistent, 2 clear on 2 of 3 seeds. Each setting has five applicable cues
+(max 10); the checklist's "8 of 12" is read as 8 of the 10 available.
+
+#### Scores
+
+| # | cue | stand 100: cand. | lone 60: cand. | lone 100: cand. | stand 100: base | lone 60: base | lone 100: base |
+|---|---|---|---|---|---|---|---|
+| 1 | no tiers, no pointed top | 2 | 1 | 1 | 1 | 0 | 0 |
+| 2 | limbs rise then arch | 1 | 1 | 1 | 1 | 0 | 0 |
+| 3 | dense, opaque foliage | 1 | 2 | 2 | 2 | 2 | 2 |
+| 4 | level sprays | 1 | 2 | 2 | 0 | 1 | 1 |
+| 5 | stand proportion | 2 | — | — | 2 | — | — |
+| 6 | open-grown proportion | — | 1 | 1 | — | 1 | 0 |
+| | **total / 10** | **7** | **7** | **7** | **6** | **4** | **3** |
+| | **setting passes (≥ 8, no 0 on 1–3)** | no (own cues 1, 3, 5 ≥ 1: yes) | no | no | no | no (0 on 1, 2) | no (0 on 1, 2) |
+
+Why, candidate, one line per cue:
+
+1. **Lone:** no point anywhere and no cone, but the outline is a flat-topped table or stepped
+   mound built of separate stacked plates (seed 1 at 60 is a tier stack narrowing upward; seeds 1–2
+   at 100 have a flat lid on a skirt of tiers); only seed 3 at 100 approaches a dome. It reads as a
+   cedar of Lebanon more than a beech dome. **Stand:** crowns are rounded or irregular masses,
+   never pointed (2).
+2. **Lone, leaf-off:** a trunk runs well up into the crown (seed 1 at 100 most clearly), and the
+   main limbs leave near level and run straight out in plates; seeds 2–3 at 100 show a short fan of
+   steeper limbs from the trunk, but nothing rises steeply and then bends over along its length.
+   **Stand, leaf-off:** a few steep forks at the top (seed 1), but seed 3's trees are poles with a
+   central stem and short level laterals.
+3. **Lone:** each plate is opaque and the top is closed; white shows only between layers (2).
+   **Stand:** the canopy is fragmented, with large see-through holes in the crown band on seed 1
+   and an airy, speckled crown on seed 2; only seed 3 is a solid mass (1).
+4. **Lone:** level horizontal plates are the dominant feature on every seed (2; if anything
+   overstated, which is what produces cue 1's tiers). **Stand:** crowns are tufts and columns,
+   not plates (1).
+5. **Stand:** clean straight boles with the crown in roughly the top 40–50% on seeds 1–2
+   (crownRatio(leaf) 0.41, 0.45; seed 3 deeper at 0.57); limb crown ratio 0.23–0.27 is low, and
+   the boles are thin and some are crooked (2, marginally).
+6. **Lone:** broad and low branches kept, but far too squat: W/H 1.48 / 2.05 / 2.09 at 60 and
+   1.65 / 1.48 / 1.61 at 100, against 0.6–1.0 (at 100 it is near the photograph's 1.3–1.5; at 60
+   it is twice the band). Heights are only 71–81 at 60 and 99–111 at 100. Crowns are clipped by the
+   panel frame on most lone panels, so the sheet understates the width.
+
+Baseline, one line per cue:
+
+1. Lone: a pointed cone at 60 and a tall leaning spire at 100 (0, 0); stand: narrow ovals,
+   slightly pointed on seed 1 (1).
+2. Lone: one persistent leader to the tip with level laterals of decreasing length (0, 0);
+   stand: brooms with a persistent stem, a few forks near the top (1).
+3. Dense and opaque in every setting (2, 2, 2).
+4. Lone: a uniform mass with faint horizontal banding (1, 1); stand: brooms and tufts (0).
+5. Crown in the top 35–41% (crownRatio 0.35–0.41), clean straight boles (2).
+6. At 60 W/H 0.63–0.64, in the band at its lower edge but a narrow cone, not broad (1); at 100
+   W/H 0.47–0.63, a spire (0).
+
+**Change:** the candidate gains 3 at 60, 4 at 100 and 1 in the stand. It removes the cone and
+the leader, which is the decisive improvement, but no setting reaches 8. The stand trades
+opacity (cue 3, 2 → 1) for slightly better structure.
+
+#### Confusion test (candidate, at a glance)
+
+- **(a) Spruce or fir: yes, more beech.** Deciding feature: the outline. It is broad and blunt
+  with no spire and no leader to the tip. Caveat: the stacked level plates on a short central
+  trunk make it read as a **cedar of Lebanon**, a conifer, and the stand's seed 3 trees (a pole
+  with short level laterals) still read as spruce.
+- **(b) Hornbeam: yes, but weakly.** Deciding feature: proportion. Hornbeam is an upright oval,
+  taller than wide, with fine steep branches; this is a wide, low spread (W/H 1.5–2.1), nearer
+  beech's broad habit. But it wins only because neither shape matches it well.
+- **(c) Oak: no, ambiguous.** Deciding feature: limb angle. Here the limbs leave near level and
+  run out straight from a short, squat trunk into a crown much wider than high (leaf-off at 100,
+  seeds 1–2). That is the open-grown oak (or cedar) habit, not beech's steep-then-arching limbs.
+  Only the smooth, level foliage plates point to beech rather than oak's lumpy clumps.
+
+#### Ecology guard (stand at 100, `solve-round1/metrics.json`)
+
+| check | seed 1 | seed 2 | seed 3 | result |
+|---|---|---|---|---|
+| alive ≥ 10 of 12 | 12/12 | 12/12 | 11/12 | pass |
+| floor 3–5% | 4.4% | 4.5% | 4.8% | pass (seed 3 near the top) |
+| LAI about 7 | 8.5 | 7.4 | 7.1 | **marginal**: seed 1 is 21% high; mean 7.7 |
+| H/D 70–110 | 88 | 85 | 101 | pass |
+
+**Guard: pass, with LAI on seed 1 flagged.** I do not count 8.5 as a breach of "about 7", but
+the repair must not raise it, and a stricter reading (±1) would fail seed 1. Also noted, outside
+the guard: stand height fell from ≈ 178–183 (baseline) to ≈ 149–151.
+
+#### Repair instructions (cues scored 0 or 1), most important first
+
+1. **Cue 2, limbs rise then arch (1 in all three settings).** *What fails:* in the lone tree the
+   main limbs leave the trunk near level (or at a fixed moderate lean) and stay straight. There
+   is no steep departure that bends outward along the limb, and on seed 1 the trunk persists well
+   up into the crown. In the stand, seed 3 is a pole with level laterals. *Kind of change:* a
+   **growth rule** for a limb's posture along its length, so a limb's direction changes with its
+   age, load or position rather than holding the angle it was born with. A secondary part is a
+   **parameter of the new fork rule**: its arms' birth angle and the hold on it, which currently
+   lock the arms into straight, flat runs.
+2. **Cue 1, no tiers (1 in the lone tree at 60 and at 100).** *What fails:* the outline is a
+   flat lid over a stack of discrete level plates, with white bands between tiers and a stepped
+   profile narrowing upward at 60. It is a table or cedar, not a dome highest near the middle.
+   *Kind of change:* mostly the same **growth rule** as item 1. The plates are the limbs' own
+   level runs at intervals up the trunk, so limbs that rise first fill the middle and round the
+   top. If the layering persists after that, it is a **parameter of the new rules**: how often and
+   at what spacing the fork or relay places level arms, which now sets a regular vertical period.
+   The renderer is not the cause; leaf-off shows the same tiers.
+3. **Cue 6, open-grown proportion (1 at 60 and at 100).** *What fails:* W/H is 1.5–2.1 (2.0+ on
+   two seeds at 60) and heights are 71–81 at 60, so the tree is a squat mound or umbrella. Height
+   growth after the fork is too weak relative to lateral spread. *Kind of change:* a **parameter
+   of the new rules**: the strength of the vigour drop and fork, or when they set in, relative to
+   the tree's height growth, so the crown keeps gaining height through 60. Separately, the
+   **sheet's framing** clips the lone crowns at the panel edges. It should fit the whole tree so
+   that width can be judged by eye.
+4. **Cue 3, opacity in the stand (1).** *What fails:* stand crowns are fragmented, with
+   see-through holes in the crown band (seed 1) and an airy, speckled crown (seed 2); the baseline
+   was solid. *Kind of change:* a **parameter of the new rules** as they act in the stand. The
+   shade-gated relay and the vigour drop in weak wood appear to thin or shed stand crowns. This
+   should be fixed without raising seed 1's LAI further, and if crowns close up but LAI rises, the
+   guard decides.
+5. **Cue 4, level sprays in the stand (1).** *What fails:* stand crowns are tufts and narrow
+   columns; only the lone trees show plates. *Kind of change:* likely follows from item 1, a
+   **growth rule** for limb posture that also acts under the stand's steep set point. If it does
+   not, it is a **parameter** of how the new rules respond to neighbour shade.
+6. **Cue 2's stand component and cue 5's limb crown ratio (0.23–0.27).** These are not failures
+   of cue 5 as scored, but they are fragile. The repair should not lower the stand crown base
+   further.
+
+The repair round should hold the guard (alive, floor, H/D) and keep cue 3 at 2 in the lone tree.
+
+### Blind naming test, round 1 (orchestrator)
+
+48 unlabelled panels (seeds 1–3; lone at 60 leaf-on, lone at 100 leaf-on and leaf-off, stand at 100
+leaf-on), from four sources drawn identically: the candidate, today's beech, and two decoys (silver
+fir, hornbeam). The namer saw only the image folder. Answers: `blind-round1/answers.md`; key:
+`blind-round1/key.json`; images from `blind.py`.
+
+| source | lone 60 | lone 100 (on, off) | stand 100 |
+|---|---|---|---|
+| candidate | cedar of Lebanon ×3 | cedar of Lebanon ×6 (high) | silver birch ×3 |
+| today's beech | Norway spruce ×3 | Norway spruce / larch ×6 | silver birch ×3 |
+| decoy: fir | Norway spruce ×3 | Norway spruce / larch ×6 | Norway spruce ×3 |
+| decoy: hornbeam | hornbeam ×3 | hornbeam ×6 (second guess beech) | Scots pine ×3 (second guess beech) |
+
+**Beech named first on 0 of 12 candidate panels: fail.** The deciding feature on the candidate's lone
+panels: "very wide spreading crown of flat horizontal layered plates". The hornbeam, described as
+"one short trunk dividing into many steeply ascending limbs forming a fan", drew beech as the second
+guess on every lone panel. The stands of both beeches read as birch ("thin, wavy, slightly leaning
+stems with small crowns high up").
+
+**Harness note.** The lone world is 160 cells wide (the species harness's), so a crown of W/H 1.6 at
+height 100 meets the world's sides: the reviewer's "clipped at the panel edges" is the world, not only
+the framing. A repair that keeps W/H ≤ 1.4 avoids it; a wider lone world is a harness change for the
+next round.
+
+**Checklist threshold.** The checklist's "8 of 12" was a slip: each setting has five applicable cues
+(10 points). The reviewer's reading, 8 of 10, stands.
+
 <!-- review -->
 
 ## Repair

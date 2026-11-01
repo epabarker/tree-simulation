@@ -143,11 +143,15 @@ COMBINED: dict[str, dict] = {
         "note": "twigs (levels.2) hang at 140 up to radius 0.01 (ADR 0035), their own set point 45 in "
                 "place of today's 145 so only thin axes hang; twig laterals every k nodes (ADR 0036)",
     },
+    # Oak, second proposal (track A: "a broad, spreading head ... massive lower branches"; the trunk
+    # "tends to disappear in the crown"): posture by age, limbs steep when young (35, against 58.6
+    # in [form]) and levelling with their wood's age over 50 seasons. Elbows off. Replaces the first
+    # oak sheet (curvature + κ 3), which held at today's form.
     "oak": {
-        "base": {"r2.levels.1.kappa": 3, "r2.levels.1.lateralEvery": 1, "r2.levels.1.curveLength": 30},
-        "knob": ("r2.levels.1.curve", [30, 45, 60]),
-        "note": "limbs (levels.1) with their own acrotony κ 3 and a lateral at every node (ADR 0036), "
-                "curving over 30 nodes (ADR 0034)",
+        "base": {"r2.levels.1.setPoint": 35, "r2.levels.1.agedOver": 50},
+        "knob": ("r2.levels.1.agedSetPoint", [70, 85, 100]),
+        "note": "limbs (levels.1) set point 35 when young, moving to agedSetPoint with their wood's age "
+                "over 50 seasons (ADR 0038); no relay, no elbows",
     },
     # Beech with posture by age (ADR 0038) on top of the relay and the relays' curvature: young
     # limbs steep (set point 28), levelling toward 80 with their wood's age.
@@ -169,6 +173,44 @@ COMBINED: dict[str, dict] = {
         "knob": ("r2.levels.1.agedOver", [30, 50, 80]),
         "note": "limbs (levels.1) set point 60 when young, moving to 110 with their wood's age over "
                 "agedOver seasons (ADR 0038); everything else fir's own",
+    },
+    # Hornbeam (track A: Troll with beech; "irregular, ovoid or conic, becoming domed in old trees"):
+    # beech's direction, smaller: the relay later (25) and the relays' curve across, 20-40.
+    "hornbeam": {
+        "base": {"r2.relay": 2, "r2.relayAge": 25, "r2.relayPTerm": 0.6, "r2.levels.0.curveLength": 30},
+        "knob": ("r2.levels.0.curve", [20, 30, 40]),
+        "note": "relay 2, relayAge 25, relayPTerm 0.6 (ADR 0033); relays curve over 30 nodes (ADR 0034)",
+    },
+    # Field maple (track A: Rauh; "neatly shaped" open-grown, "a low dome"): the relay from early on,
+    # its age across, the relays curving 30 to round the top.
+    "maple": {
+        "base": {"r2.relay": 2, "r2.relayPTerm": 0.6, "r2.levels.0.curve": 30, "r2.levels.0.curveLength": 30},
+        "knob": ("r2.relayAge", [5, 10, 15]),
+        "note": "relay 2, relayPTerm 0.6 (ADR 0033); relays curve 30 over 30 nodes (ADR 0034)",
+    },
+    # Goat willow (track A: "a large, spreading, rounded shrub or small tree", "bushy"): birch's
+    # pendulous twigs on willow's own twig set point (54), the twig laterals' spacing across.
+    "willow": {
+        "base": {"r2.levels.2.pendulous": 140, "r2.levels.2.pendulousRadius": 0.01},
+        "knob": ("r2.levels.2.lateralEvery", [2, 3, 4]),
+        "note": "twigs (levels.2) hang at 140 up to radius 0.01 (ADR 0035), their own set point 54 as in "
+                "[form]; twig laterals every k nodes (ADR 0036)",
+    },
+    # Rowan (track A: "erect growth when young, becoming more spreading ... with age"; "branches stick
+    # out and are slanted upwards"): posture by age kept steep, from today's 28 to a little wider.
+    "rowan": {
+        "base": {"r2.levels.1.agedOver": 50},
+        "knob": ("r2.levels.1.agedSetPoint", [30, 40, 50]),
+        "note": "limbs (levels.1) from today's set point 28 toward agedSetPoint with their wood's age over "
+                "50 seasons (ADR 0038)",
+    },
+    # Holly (track A: Massart, "a dense pyramidal mass", "branches short, level to slightly ascending",
+    # "a narrow cone young, rounder old"): one proposal, posture by age levelling the old limbs.
+    "holly": {
+        "base": {"r2.levels.1.agedOver": 50},
+        "knob": ("r2.levels.1.agedSetPoint", [70, 80, 90]),
+        "note": "limbs (levels.1) from today's set point 62 toward agedSetPoint with their wood's age over "
+                "50 seasons (ADR 0038)",
     },
 }
 SEEDS = (1, 2, 3)

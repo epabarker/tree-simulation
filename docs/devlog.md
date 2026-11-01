@@ -2,6 +2,17 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-01: Track B (vocabulary): combined sheets for the other six; picks.toml covers all eight
+
+- **`atlas.py combined --species <sp>`** for hornbeam, oak (a second proposal, replacing the first oak sheet), maple, willow, rowan and holly, at 60 and 100 (all below the ceiling), seeds 1–3, "today (off)" first.
+- **Proposed, awaiting the user** (`picks.toml`):
+  - Oak: posture by age, limbs 35 → 85; long, near-level low limbs under a broad crown.
+  - Maple: relay from age 10; a lower fork and a rounder head.
+  - Willow: pendulous twigs with twig laterals every second node; broad and low.
+  - Holly: old limbs levelling toward 80.
+  - Hornbeam: a weak proposal (relay + curve 30); the flat cap stays.
+  - Rowan: no change; posture by age moved nothing.
+
 ## 2026-11-01: Track B (vocabulary): fix A for the relay's order; the authored picks; ADRs accepted for beech and birch
 
 - **Fix A** (the user's choice, ADR 0033): a relay is stored at the order of the axis it replaces, so orders no longer climb along a relay chain (the u8 limit). The form offsets exempt the trunk's own axis rather than order 0; C5's bud bank takes the order by slot. Goldens unchanged. The accepted beech and birch sheets are bit-identical before and after; only `limbElevation` reads 0–6° higher on beech (trunk relays' laterals count as limbs).

@@ -24,7 +24,12 @@
 //! scaffold with them, which one set point per level cannot do (≥ 80 for level 2 collapses
 //! every broadleaf: the form-sweep review). The trunk (order 0) never hangs.
 //!
-//! Params: r2.enabled, r2.levels (curve, curveLength, pendulous, pendulousRadius), r2.aC, r2.dLambda, r2.ramp, r2.kappa, r2.relay,
+//! Twig density (ADR 0036, proposed): a level's own `kappa` (acrotony at its nodes, in place of
+//! r2.kappa) and `lateralEvery` (laterals only at every k-th node of its axes) set how many fine
+//! shoots a limb carries and where along it.
+//!
+//! Params: r2.enabled, r2.levels (curve, curveLength, pendulous, pendulousRadius, kappa,
+//! lateralEvery), r2.aC, r2.dLambda, r2.ramp, r2.kappa, r2.relay,
 //! r2.relayAge, r2.relayPTerm; c1.branchAngle, c3.lambda, c4.setPoint, c4.eta when off.
 
 use crate::math;
@@ -77,6 +82,14 @@ pub fn laterals(order: f64, axis_node: f64, last_of_shoot: bool, params: &Params
             Phyllotaxis::Distichous => (1, pi),
         };
     };
+    // Twig density (ADR 0036): laterals only at every k-th node.
+    if let Some(every) = level.lateral_every
+        && every > 1.0
+        && level.generator != Generator::Whorled
+        && (axis_node + 1.0) % every.floor() != 0.0
+    {
+        return (0, 0.0);
+    }
     match level.generator {
         // An unknown generator falls through to distichous, as the TypeScript switch did.
         Generator::Distichous | Generator::Unknown => (1, pi),
@@ -261,7 +274,9 @@ pub fn acrotony_weights(tree: &mut Tree, params: &Params) -> bool {
     } else {
         0.0
     };
-    if kappa == 0.0 {
+    // Twig density (ADR 0036): a level may carry its own κ.
+    let per_level = params.r2.enabled && params.r2.levels.iter().any(|l| l.kappa.is_some());
+    if kappa == 0.0 && !per_level {
         return false;
     }
     let nm = tree.m.len();
@@ -283,7 +298,15 @@ pub fn acrotony_weights(tree: &mut Tree, params: &Params) -> bool {
     for i in 0..nm {
         let last = w[nm + i];
         let pos = if last > 0.0 { w[i] / last } else { 1.0 };
-        w[i] = math::exp(kappa * (pos - 1.0));
+        let k = if per_level {
+            let pa = tree.m.order[i] as f64 - tree.m.pa_shift[i] as f64;
+            pa_level(pa, &params.r2)
+                .and_then(|l| l.kappa)
+                .unwrap_or(kappa)
+        } else {
+            kappa
+        };
+        w[i] = math::exp(k * (pos - 1.0));
     }
     true
 }
@@ -576,5 +599,54 @@ mod tests {
         let hung = last_angle(r#"{"setPoint":45,"eta":1,"pendulous":160}"#);
         assert!((level - 45.0).abs() < 2.0, "{level}");
         assert!(hung > 120.0, "{hung}");
+    }
+
+    #[test]
+    fn spaces_laterals_every_k_nodes_where_the_level_says() {
+        let p = with_r2(
+            &[
+                r#"{"generator":"spiral","lateralEvery":3}"#,
+                r#"{"generator":"opposite","lateralEvery":2}"#,
+            ],
+            "",
+        );
+        let count = |pa: f64, k: f64| laterals(pa, k, false, &p).0;
+        let trunk: Vec<u8> = (0..6).map(|k| count(0.0, k as f64)).collect();
+        assert_eq!(trunk, vec![0, 0, 1, 0, 0, 1]);
+        let limb: Vec<u8> = (0..4).map(|k| count(1.0, k as f64)).collect();
+        assert_eq!(limb, vec![0, 2, 0, 2]);
+        let every = with_r2(&[r#"{"generator":"spiral","lateralEvery":1}"#], "");
+        assert_eq!(laterals(0.0, 0.0, false, &every).0, 1);
+    }
+
+    #[test]
+    fn gives_a_level_its_own_acrotony() {
+        use std::f64::consts::FRAC_PI_2;
+        let shoot = |p: &Params| {
+            let mut t = Tree::new(0, 10.0, 0.5);
+            let mut parent = -1;
+            for _ in 0..3 {
+                parent =
+                    crate::testing::metamer(&mut t, parent, slot::MAIN, FRAC_PI_2, 1.0, 0.02, 0.0)
+                        as i32;
+            }
+            let on = acrotony_weights(&mut t, p);
+            (
+                on,
+                if on {
+                    t.scratch_f[..3].to_vec()
+                } else {
+                    Vec::new()
+                },
+            )
+        };
+        let (on, w) = shoot(&with_r2(&[r#"{"kappa":2}"#], ""));
+        assert!(on);
+        let want = [(-2.0f64).exp(), (-1.0f64).exp(), 1.0];
+        assert!((0..3).all(|k| (w[k] - want[k]).abs() < 1e-12), "{w:?}");
+        // A level's κ overrides the tree's; absent everywhere and κ 0: no weights.
+        let (_, w) = shoot(&with_r2(&[r#"{"kappa":0}"#], r#""kappa":3"#));
+        assert!(w.iter().all(|&x| x == 1.0), "{w:?}");
+        assert!(!shoot(&with_r2(&[r#"{}"#], "")).0);
     }
 }

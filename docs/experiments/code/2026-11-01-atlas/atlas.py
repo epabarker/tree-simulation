@@ -85,6 +85,18 @@ RULES: dict[str, dict] = {
             ("r2.levels.1.pendulous", [100, 120, 140, 170], {"r2.levels.1.pendulousRadius": 0.01}),
         ],
     },
+    # ADR 0036: twig density. No centre: each row moves one knob from the species as it is. The
+    # twig level's λ exists (not a form knob until now); κ per level and lateralEvery are new.
+    "twigs": {
+        "adr": "0036",
+        "base": {},
+        "rows": [
+            ("r2.levels.2.lambda", [0.46, 0.49, 0.52, 0.55]),
+            ("r2.levels.1.kappa", [0, 1, 3, 6]),
+            ("r2.levels.1.lateralEvery", [1, 2, 3, 4]),
+            ("r2.levels.2.lateralEvery", [1, 2, 3, 4]),
+        ],
+    },
 }
 
 
@@ -122,7 +134,7 @@ def draw_sheet(name: str, rule: dict, season: int, cells: Path, command: str) ->
     row_h = (top - 0.005) / len(rows)
     tree_h = row_h * cell_h / (cell_h + text_h)
     scale = tree_h * fig.get_figheight() * 72 / tall
-    base_text = ", ".join(f"{k.removeprefix('r2.')} {v:g}" for k, v in rule["base"].items())
+    base_text = ", ".join(f"{k.removeprefix('r2.')} {v:g}" for k, v in rule["base"].items()) or "the species' own"
     fig.suptitle(
         f"The form atlas: {name} (ADR {rule['adr']}, proposed), season {season}; lone tree, seed 1. "
         f"Left: the species today, rule off. Each row one knob, the others at the centre ({base_text}).\n"

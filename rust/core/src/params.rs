@@ -207,6 +207,10 @@ pub struct PaLevel {
     /// fully at radius ≤ `pendulous_radius`, fading to the level's own at twice it. Absent: off.
     pub pendulous: Option<f64>,
     pub pendulous_radius: Option<f64>,
+    /// Twig density (ADR 0036): this level's acrotony κ (absent: r2.kappa), and laterals only at
+    /// every k-th node (absent or ≤ 1: every node; not for whorled, which has tier_every).
+    pub kappa: Option<f64>,
+    pub lateral_every: Option<f64>,
 }
 
 #[derive(Clone, Debug)]
@@ -495,6 +499,8 @@ impl Params {
                         curve_length: opt(l, "curveLength"),
                         pendulous: opt(l, "pendulous"),
                         pendulous_radius: opt(l, "pendulousRadius"),
+                        kappa: opt(l, "kappa"),
+                        lateral_every: opt(l, "lateralEvery"),
                     })
                     .collect(),
                 a_c: num(r2, "aC"),

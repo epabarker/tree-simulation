@@ -509,6 +509,17 @@ export interface PaLevel {
   pendulous?: number;
   /** With pendulous: the radius (cells) up to which an axis hangs fully; absent, 0.01. */
   pendulousRadius?: number;
+  /**
+   * Twig density (ADR 0036, proposed): acrotony κ at this level's nodes, in place of r2.kappa;
+   * high κ gathers a limb's shoots at its shoot ends (tufts), low spreads them along it. Absent:
+   * r2.kappa.
+   */
+  kappa?: number;
+  /**
+   * Twig density (ADR 0036, proposed): this level forms laterals only at every k-th node of an
+   * axis (sparse, fine shoots: birch's), not for "whorled" (tierEvery). Absent or ≤ 1: every node.
+   */
+  lateralEvery?: number;
 }
 
 export const defaultParams: Params = {

@@ -2,6 +2,11 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-01: Track B (vocabulary): twig density (ADR 0036, proposed)
+
+- **`r2.levels[i].kappa`, `lateralEvery`** (r2.rs): acrotony per level, and laterals only at every k-th node. Off by default; presets and goldens unchanged.
+- **The sheet** (`atlas.py twigs`): `levels.2.lateralEvery` 3–4 makes birch's crown open, lacy and fine (long thin twig axes), the nearest to its texture on any sheet; per-level κ tufts and broadens the limbs.
+
 ## 2026-11-01: Track B (vocabulary): pendulous twigs (ADR 0035, proposed)
 
 - **`r2.levels[i].pendulous`, `pendulousRadius`** (r2.rs, season.rs, r3.rs): a level's thin axes take a hanging set point in growth and posture, blended back to the level's own by girth. Off by default; presets and goldens unchanged.

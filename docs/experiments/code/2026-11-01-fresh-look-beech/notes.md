@@ -586,6 +586,7 @@ Heights in cells: 99–111 cells is 25–28 m, against an open-grown ≈ 20 m on
   optional fields.
 
 **Candidate:**
+- Commit: `2ba590b` on `claude/fresh-look-beech`, not pushed.
 - Sheet: `docs/experiments/code/2026-11-01-fresh-look-beech/solve-round1/sheet.png`, with
   `metrics.json` beside it. It is the render of `runs/fresh-look/solve-round1`, from beech's patch
   with no `--assign`.

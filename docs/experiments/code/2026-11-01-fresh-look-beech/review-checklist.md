@@ -2,8 +2,9 @@
 
 Scored by a fresh reviewer from the renders and this list only, with no account of what changed.
 Each cue is scored 0 (absent), 1 (present but weak or inconsistent across seeds), 2 (clear on 2 of
-3 seeds). A setting passes at 8 of 12 with no 0 on cues 1–3. The stand at 100 is scored first and
-weighs most; the lone tree at 60 and 100 after.
+3 seeds). A setting passes at 8 of 12 with no 0 on cues 1–3. The lone tree at 60 and at 100 is
+scored first and weighs most (the dome is the main judge); the stand at 100 after, and it must
+pass its own cues 1, 3 and 5 at 1 or better.
 
 | # | cue (from the identity card) | stand at 100 | lone at 60 | lone at 100 |
 |---|---|---|---|---|

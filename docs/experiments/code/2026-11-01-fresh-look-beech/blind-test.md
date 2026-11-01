@@ -17,8 +17,8 @@ The measure the project has lacked: can a viewer who was not told the species na
 
 ## Pass
 
-A species is done when the blind reviewer names it on 2 of 3 seeds in the stand at 100 and in the
-lone tree at 60, and the user agrees on the phone.
+A species is done when the blind reviewer names it on 2 of 3 seeds in the lone tree at 60 and at
+100, and on 2 of 3 in the stand at 100, and the user agrees on the phone.
 
 ## Notes
 

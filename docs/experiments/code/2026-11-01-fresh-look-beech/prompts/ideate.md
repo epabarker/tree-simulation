@@ -7,8 +7,8 @@ not read outside the sandbox, and do not rely on anything you think you know abo
 
 Your brief: {BRIEF}
 
-Develop one concrete proposal for making the beech read as a beech, as task.md defines it. Think
-about the stand at 100 first: it is what is judged. Prototype it: change the code in your sandbox
+Develop one concrete proposal for making the beech read as a beech, as task.md defines it. The
+lone dome at 60 and 100 is the main judge; the stand at 100 must still hold. Prototype it: change the code in your sandbox
 if your proposal needs a code change (rebuild with `cd rust && RUSTUP_TOOLCHAIN=stable cargo build
 --release -p treesim`; the binary at rust/target/release/treesim is a symlink to the shared one,
 so write your build to rust/target/release/treesim-{ROLE} and run the harness with

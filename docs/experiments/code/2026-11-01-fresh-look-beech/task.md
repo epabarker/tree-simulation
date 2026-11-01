@@ -26,9 +26,10 @@ photographic: a field-guide silhouette with its identifying features clear beats
 
 The settings that are judged, in priority order:
 
-1. **the closed stand at 100** (84 cells wide, periodic sides, opaque faces, 12 trees in three rows
-   of four; this is what the garden looks like inside);
-2. **the lone tree at 60 and at 100** (160 cells wide, one tree);
+1. **the lone tree at 60 and at 100** (160 cells wide, one tree): the dome is the main judge;
+2. **the closed stand at 100** (84 cells wide, periodic sides, opaque faces, 12 trees in three rows
+   of four; what the garden looks like inside): it must still read as a beech stand and must not
+   break, so a lone dome that kills or deforms the stand is not a solution;
 3. the garden plate at the phone viewport (not available in this harness; the solver checks it).
 
 Seeds 1–3 are the judging seeds. Seeds 1001–1006 are held out: never run them.

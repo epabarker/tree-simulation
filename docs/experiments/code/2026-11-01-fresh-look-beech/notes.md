@@ -478,6 +478,149 @@ bytes of wasm and two optional TS fields.
 
 ## Solver decision
 
+### Decision: combine one part from each proposal (A's gate, C's fork and arms, B's λ drop)
+
+The three proposals are complementary. Each fixes a different part of the problem, and each
+alone leaves a fault the others address:
+
+- A's relay gate ends the leader in the open only.
+- C's arm hold keeps the relays from standing up as trunks, and C's fork shapes the stand's tops.
+- B's λ drop makes the open-grown crown divide and spread.
+
+B's posture half makes things worse, so I dropped it, together with A's two extras.
+
+**What is in the candidate.** Three switchable R2 rules, all default off. The beech patch is
+`analysis/fit/hand-overrides.toml` [beech], regenerated into `flora-fitted.ts` and
+`rust/presets.json`.
+
+1. **The relay's neighbour gate (A).** The parameter is `r2.relayCrowd` = 10, with relay 2,
+   relayAge 15 and relayPTerm 0.15. The age relay's pTerm acts by max(0, 1 − k·s̄), where s̄ is
+   the tree's mean R5 neighbour shade.
+2. **The vigour fork and the arm hold (C).** The parameters are `r2.forkAt` 1.3 and `forkAngle`
+   30, with level-0 curve 30 over 30. With the fork on, every non-trunk pa-0 axis holds the
+   inclination of its base, plus the curve.
+3. **The vigour drop (B's λ part only).** The parameters are `r2.vigourShare` 0.3,
+   `vigourLambda` 0.03 and `vigourTreeLo`/`Hi` 3000/10000. λ falls by g·(1 − u)·0.03, where g is
+   the tree's own vigour gate.
+
+**Dropped:**
+- B's posture rule.
+- A's `r5.posture`, with its second `sample_nodes`, the 15–18% cost.
+- A's level-0 agedSetPoint.
+
+**Why each part earns its place (sheets under `runs/fresh-look/solve-*`, seeds 1–3):**
+
+- **B's λ drop is the part that makes the dome.** It is the only change between `solve-ac`
+  (A gate and C) and `solve-acbl` (the candidate).
+  - Without it, the lone tree at 100 is a tall block, wedge or column: H 124–175, W/H 0.68–1.11.
+  - With it, the lone tree at 100 is a broad rounded mass on a short trunk: H 99–111, W/H
+    1.48–1.65. Seeds 1 and 3 read as domes.
+  - It never touches the stand. The gate stays shut there (stand v_base ≤ 2,000; lone 4,400 by
+    season 15 and 10,000 by 30), so the stand numbers of `solve-ac` and the candidate are
+    identical.
+- **A's gate is what ends the leader in the open.** Without the age relay, B's λ drop weakens
+  the leader but never ends it (`solve-bc`, B and C: forkHeight 0.72–0.75, a blunt tiered cone).
+  Under B, the leader's v falls to 1–2.4, below any forkAt·cap, so C's fork never fires on the
+  lone tree. Ungated, the age relay kills the stand: the picks lose 3–4 of 12.
+- **C's fork is the stand's part.** It is bit-identical on the lone tree, as the lone panels of
+  `solve-agbl` and `solve-acbl` show, because it never fires there under B. Without it, the
+  stand fails the guard: floor 5.4% (seed 1) and 2.9% (seed 3), crown ratio 0.22 (`solve-agbl`).
+  With it, the stand's tops fork into the rounded broom of photo note §3.
+- **C's arm hold** keeps the gated relays from straightening into a column (A's finding with
+  posture 0 on pa 0).
+- **B's posture half was harmful.** With it (`solve-acb`, `solve-acb30`, `solve-acba*`), every
+  lone tree is a low table of horizontal plates, a cedar of Lebanon, never a dome.
+
+**Tried and rejected (prototype flags, removed from the code):**
+- **Gating C's fork by B's tree gate** (`solve-bc2`): the fork still never fired under B, and the
+  stand failed (floor 5.9%, H/D 113).
+- **An "arch relay"**, Troll's takeover at the arch's highest point (`solve-aarch`,
+  `solve-acba`, `solve-acba2`, `solve-aba2`). An arm's apex that has arched past 70–85° ends, and
+  its top laterals rise at 15–25°.
+  - Without B, the arms never arch: phototropism, C4's ξ·V, holds them at about 50° whatever the
+    set point. So the rule hardly fires.
+  - With B, it gave tables.
+- **λ = 0.5 at the fork nodes**, to damp one relay's dominance (`solve-acf`, `solve-cf`): no
+  visible gain, and the stand floor fell to 2.8%.
+- **vigourLambda 0.02** (`solve-acbl2`, `solve-acbl3`): more lopsided at 100.
+- **relayCrowd 20** (`solve-acbl4`): the lone tree is identical, and the stand is 12/12/12 with
+  LAI 8.2/8.0/7.4 and floor 3.3/3.2/4.8%. It was not clearly better, so A's k = 10 stays.
+
+**Against the checklist (my reading, for the reviewer to check):**
+- **Lone tree:** no pointed top and no cone on any seed at 60 or 100.
+  - At 100, seeds 1 and 3 are broad rounded domes. Seed 2 is a broad mass with a lumpy,
+    uneven top.
+  - The trunk divides low: forkHeight 0.21–0.54 at 100, against about 1.0 today.
+  - The foliage reads in level layers (cue 4), now on a dome rather than on a cone.
+- **Stand:** straight clean boles with forked, rounded tops.
+
+**Ecology guard** (stand at 100, seeds 1/2/3):
+
+| | today | **candidate** | guard |
+|---|---|---|---|
+| alive | 11 / 12 / 12 | **12 / 12 / 11** | ≥ 10 ✓ |
+| floor | 4.5 / 4.8 / 4.3% | **4.4 / 4.5 / 4.8%** | 3–5% ✓ |
+| LAI | 6.9 / 7.1 / 7.0 | **8.5 / 7.4 / 7.1** | about 7 (seed 1 high) |
+| H/D | 108 / 107 / 109 | **88 / 85 / 101** | 70–110 ✓ |
+| crown ratio, limb / leaf | 0.36–0.41 / 0.35–0.41 | 0.23 / 0.26 / 0.27 and 0.41 / 0.45 / 0.57 | card 0.47–0.50 |
+
+**Lone tree** (seeds 1/2/3):
+
+| | today | **candidate** |
+|---|---|---|
+| H at 60 | 147 / 145 / 145 | **81 / 73 / 71** |
+| W/H at 60 | 0.64 / 0.63 / 0.64 | **1.48 / 2.05 / 2.09** |
+| H at 100 | 194 / 182 / 204 | **99 / 111 / 102** |
+| W/H at 100 | 0.55 / 0.63 / 0.47 | **1.65 / 1.48 / 1.61** |
+| forkHeight at 100 | 1.0 / 1 / 0.97 | **0.54 / 0.21 / 0.27** |
+| leaderDominance at 100 | 5.1 / 5.3 / 3.4 | **4.35 / 4.82 / 2.62** |
+
+Heights in cells: 99–111 cells is 25–28 m, against an open-grown ≈ 20 m on the card.
+
+**Cost:**
+- Measured natively, 100 seasons, seed 2, CSV output included: lone 169 → 186 ms/season, from the
+  broader crown's extra metamers; stand 100 → 101 ms/season.
+- The rules add O(1) per node in C3 and in growth, a mean over node_shade, and a binary search
+  per arm metamer in R3.
+- No new state is checkpointed, there are no new RNG purposes, and TypeScript gains only seven
+  optional fields.
+
+**Candidate:**
+- Sheet: `docs/experiments/code/2026-11-01-fresh-look-beech/solve-round1/sheet.png`, with
+  `metrics.json` beside it. It is the render of `runs/fresh-look/solve-round1`, from beech's patch
+  with no `--assign`.
+- **Goldens:** `rust:check` passes, including the native golden. All 14 golden cases pass in WASM
+  (`tests/golden.test.ts`; `tests/golden-rust.test.ts` does not exist in this tree). **No golden
+  moves:**
+  - The cases with beech (`mixedWood:s15`, `oakOpen:s15`) stop at 15 seasons.
+  - At 15 seasons, beech has not reached relayAge 15 with a full-length shoot, nor a v_base past
+    the drop's gate.
+  - So the goldens do not exercise the change. A golden at 40–60 seasons with beech would.
+- **Checks:** lint and typecheck pass.
+
+**What the candidate does not yet do.** It is a dome only from about 80 seasons, and not on
+every seed:
+
+- **At 60 it is too flat.** On seeds 2 and 3 it is a low umbrella or mound (W/H 2.05–2.09, H
+  71–73), not a dome. At 100, W/H 1.5–1.65 is past the photo's 1.3–1.5 and the checklist's
+  0.6–1.0.
+- **The layers are still there.** The level plates are no longer stacked on a cone, but they
+  still read as layers, and a skirt of horizontal limbs remains under the dome (seeds 1–2 at 100,
+  leaf-off).
+- **The limbs lean rather than rise then arch.** Under C4's light term, an arm holds about 50°
+  whatever its set point, so the curve barely bends it. No local rule I tried could make an arm
+  arch over without B's posture, which flattened everything into tables.
+- **One relay can still dominate:** leaderDominance at 100 is 2.6–4.8, and seed 2's top is
+  lumpy and lopsided.
+- **The stand is not fully back to the card.**
+  - Its crown ratio (limb 0.23–0.27) is lower than today's 0.36–0.41, and further from the
+    card's 0.47–0.50.
+  - LAI is 8.5 on seed 1.
+- **The vigour drop's gate is in absolute resource units** (v_base 3,000–10,000, B's own risk).
+  It must move if α, R1's costs or the cell size change. A beech at a wood edge or in a gap of
+  the garden will get a partial response, and I have not looked at the garden plate.
+- **The fork threshold, the gate's k and the drop's gate rest on seeds 1–3 only.**
+
 <!-- solver -->
 
 ## Review

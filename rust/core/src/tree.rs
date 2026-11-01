@@ -336,6 +336,9 @@ pub struct Tree {
     pub broken: f64,
     /// Rows that took part in this season's passes (set before growth; C5 sheds among them).
     pub evaluated: usize,
+    /// R2's relay gate: the tree's mean R5 neighbour shade this season (set in phase 2; read
+    /// when a pa-0 terminal bud forms). Not checkpointed: recomputed every season.
+    pub relay_crowd: f64,
 }
 
 /// Grows a scratch array to at least `n` elements (contents beyond the rows a pass writes are

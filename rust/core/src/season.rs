@@ -10,7 +10,7 @@ use crate::geom::V3;
 use crate::light::{Light, depth_of};
 use crate::math;
 use crate::params::{DEG, Params};
-use crate::principles::c1::{grow_shoot, juvenile_cap, shoot_size};
+use crate::principles::c1::{grow_shoot, juvenile_cap, lateral_frame, shoot_size};
 use crate::principles::c3::{allocate, gather_light, is_live_bud};
 use crate::principles::c4::shoot_direction;
 use crate::principles::c5::{crown_top_light, shed_branches};
@@ -20,8 +20,8 @@ use crate::principles::o4::stand_dynamics;
 use crate::principles::obstacles::clear_obstacles;
 use crate::principles::r1::{carbon_balance, starved_to_death};
 use crate::principles::r2::{
-    aged_offset, curve_offset, curved, direction_params, pendulous_set_point, relay_depth,
-    relay_on, relay_shift,
+    aged_offset, arm_set_point, curve_offset, curved, direction_params, pendulous_set_point,
+    relay_depth, relay_nodes, relay_on, relay_shift, vigour_forks,
 };
 use crate::principles::r3::update_mechanics;
 use crate::principles::r4::{aborts, growth_threshold, light_releases, released_shift};
@@ -229,6 +229,15 @@ pub fn phase_sample(world: &mut World, i: usize) {
     if params.r5.enabled {
         sample_nodes(wp, params, light, owner, tree);
     }
+    // R2's relay gate (r2.relayCrowd): the tree's shade-avoidance state, the mean of R5's
+    // neighbour shade over its metamers (0 for a tree without neighbours).
+    tree.relay_crowd = if params.r2.relay_crowd.is_some() && params.r5.enabled {
+        let nm = tree.m.len();
+        let sum: f64 = tree.node_shade[..nm].iter().sum();
+        if nm > 0 { sum / nm as f64 } else { 0.0 }
+    } else {
+        0.0
+    };
     if (params.c5.enabled || carbon_shedding) && params.c5.t_rel > 0.0 {
         tree.q_top = crown_top_light(tree, params.c5.top_quantile);
     }
@@ -502,6 +511,18 @@ pub fn grow_buds(tree: &mut Tree, params: &Params, season: f64) {
                     * std::f64::consts::PI
                     * uniform(seed, purpose::DIRECTION_NOISE, tid, id, season, 2.0);
                 let mut dir = direction_params(params, pa);
+                // The vigour fork's arms hold the angle they were born at (a new arm: its bud's).
+                if params.r2.fork_at > 0.0 && pa == 0.0 && !trunk {
+                    let born = if tree.b.slot[b] == slot::MAIN {
+                        arm_set_point(tree, trunk, pa, tree.b.metamer[b] as usize, params)
+                    } else {
+                        None
+                    };
+                    let h = born.unwrap_or_else(|| {
+                        math::acos(math::max(-1.0, math::min(1.0, tree.b.hy[b]))).to_degrees()
+                    });
+                    dir.set_point = h;
+                }
                 let bend = curve_offset(trunk, pa, node, params)
                     + aged_offset(trunk, pa, 0.0, tree.age, params);
                 dir.set_point = curved(dir.set_point, bend);
@@ -523,6 +544,8 @@ pub fn grow_buds(tree: &mut Tree, params: &Params, season: f64) {
             } else {
                 (-1.0, -1.0)
             };
+            let first_new_bud = tree.b.len();
+            let first_new_metamer = tree.m.len();
             grow_shoot(
                 tree,
                 i,
@@ -534,6 +557,25 @@ pub fn grow_buds(tree: &mut Tree, params: &Params, season: f64) {
                 pa_shift,
                 first_order,
             );
+            // The vigour fork: a pa-0 shoot grown at full vigour ends its apex; next season the
+            // relay makes the laterals on its top nodes co-dominant arms.
+            if vigour_forks(pa, v, cap, tree.age, params) {
+                let nodes = relay_nodes(0.0, params).floor() as usize;
+                let top = tree.m.len().saturating_sub(nodes).max(first_new_metamer);
+                for j in first_new_bud..tree.b.len() {
+                    let m = tree.b.metamer[j] as usize;
+                    if tree.b.slot[j] == slot::MAIN && tree.b.state[j] == bud::ACTIVE {
+                        tree.b.state[j] = bud::TERMINATED;
+                    } else if let Some(a) = params.r2.fork_angle
+                        && tree.b.slot[j] != slot::MAIN
+                        && m >= top
+                    {
+                        // The arms leave at the fork's own angle, not the laterals' β.
+                        let (h, l) = lateral_frame(tree, m, tree.b.azimuth[j], a * DEG);
+                        tree.set_bud_frame(j, h, l);
+                    }
+                }
+            }
         } else {
             tree.b.state[i] = resting_state(tree.b.q[i], &params.r6);
             // R4's age counts the seasons a bud rests dormant (§R4: dormant buds have a finite

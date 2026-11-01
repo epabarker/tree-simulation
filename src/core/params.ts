@@ -337,6 +337,34 @@ export interface Params {
      * larger of it and the row's pTerm). 0 or absent: only the row's pTerm ends it.
      */
     relayPTerm?: number;
+    /**
+     * The relay's neighbour gate k (fresh-look beech): `relayPTerm` acts by max(0, 1 − k·s̄), s̄ the
+     * tree's mean R5 neighbour shade, so a leader among neighbours keeps growing and a free-standing
+     * one forks (Nicolini & Caraglio 1994). Needs R5's neighbour signal. Absent: off (age alone).
+     */
+    relayCrowd?: number;
+    /**
+     * The vigour fork (fresh-look beech): a pa-0 shoot grown from a bud given v ≥ forkAt times
+     * c1.maxMetamersPerShoot ends its apex, and the relay makes its top laterals co-dominant arms;
+     * every arm (a pa-0 axis not the trunk's) holds the inclination it was born at (Troll: all axes
+     * plagiotropic). Needs the relay. 0 or absent: off.
+     */
+    forkAt?: number;
+    /** With the vigour fork: the arms' angle from the ended apex, degrees. Absent: the laterals' β. */
+    forkAngle?: number;
+    /**
+     * The vigour drop (fresh-look beech): a node's vigour u = min(1, (v_in / v_base) / vigourShare);
+     * λ there falls by g·(1 − u)·vigourLambda, g the tree's gate by v_base between vigourTreeLo and
+     * vigourTreeHi (1 when unset). Weak wood of a vigorous, open-grown crown loses apical control.
+     * 0 or absent: off.
+     */
+    vigourShare?: number;
+    /** With the vigour drop: how far λ falls in the weakest wood. */
+    vigourLambda?: number;
+    /** With the vigour drop: the tree resource v_base below which it does not act. */
+    vigourTreeLo?: number;
+    /** With the vigour drop: the tree resource v_base from which it acts fully. */
+    vigourTreeHi?: number;
   };
 
   /**

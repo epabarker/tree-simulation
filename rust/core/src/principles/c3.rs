@@ -3,10 +3,12 @@
 //! flows into its parent's node. Acropetal: v_base = α·Q_base enters the root and splits at each
 //! node, main share v·λQ_m / (λQ_m + (1 − λ)Q_l).
 //!
-//! Params: c3.mode, c3.lambda (λ), c3.alpha (α); with R2 λ by pa and age and acrotony κ; with R5
-//! λ rises at shaded nodes; with R1, v_base is the tree's net production.
+//! Params: c3.mode, c3.lambda (λ), c3.alpha (α); with R2 λ by pa and age and acrotony κ, and λ
+//! falls in weak wood of a vigorous tree (R2's vigour drop: r2.vigourShare, r2.vigourLambda,
+//! r2.vigourTreeLo, r2.vigourTreeHi); with R5 λ rises at shaded nodes; with R1, v_base is the
+//! tree's net production.
 
-use super::r2::{acrotony_weights, lambda_at};
+use super::r2::{acrotony_weights, lambda_at, vigour, vigour_drop_on, vigour_gate};
 use super::r5::shaded_lambda;
 use super::r6::light_weight;
 use crate::params::{C3Mode, Params, R6};
@@ -100,6 +102,12 @@ pub fn allocate(tree: &mut Tree, params: &Params) {
                 tree.v_base = if nm > 0 { alpha * tree.q_base } else { 0.0 };
             }
             let acro = acrotony_weights(tree, params);
+            // R2's vigour drop: how far it acts on this tree (0 when off).
+            let gate = if vigour_drop_on(&params.r2) {
+                vigour_gate(tree.v_base, &params.r2)
+            } else {
+                0.0
+            };
             ensure(&mut tree.v_slot, SLOTS * nm);
             ensure(&mut tree.node_shade, nm);
             let age = tree.age;
@@ -123,7 +131,11 @@ pub fn allocate(tree: &mut Tree, params: &Params) {
                 let q_main = q_slot[at];
                 let q_lat: f64 = q_slot[at + 1..at + SLOTS].iter().sum();
                 let pa = m.order[i] as f64 - m.pa_shift[i] as f64;
-                let lambda = shaded_lambda(lambda_at(pa, age, params), shade[i], &params.r5);
+                let mut lambda = shaded_lambda(lambda_at(pa, age, params), shade[i], &params.r5);
+                if gate > 0.0 {
+                    lambda -=
+                        params.r2.vigour_lambda * gate * (1.0 - vigour(v, v_base, &params.r2));
+                }
                 let lateral = if acro { q_lat * w[i] } else { q_lat };
                 let v_main = bh_main_share(v, q_main, lateral, lambda);
                 let v_lat = if q_main + q_lat > 0.0 {
@@ -175,6 +187,7 @@ fn sum_resource_basipetally(tree: &mut Tree) {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::params::Params;
     use crate::testing::preset;
     use crate::world::World;
 
@@ -209,5 +222,50 @@ mod tests {
             checked += 1;
         }
         assert!(checked > 50);
+    }
+    #[test]
+    fn a_vigorous_tree_gives_its_weak_wood_less_apical_control() {
+        // R2's vigour drop: the same tree, allocated with and without it; the root carries the
+        // whole tree (u = 1) and splits as before, weaker nodes pass less to their main axis.
+        let levels = r#""levels":[{"lambda":0.6,"setPoint":0,"eta":0.15,"branchAngle":45,"generator":"spiral","tierEvery":0,"pTerm":0}]"#;
+        let off = preset("bh", &format!(r#"{{"r2":{{"enabled":true,{levels}}}}}"#));
+        let mut world = World::new(off.clone());
+        world.run(12, &[]);
+        let tree = world.trees[0].clone();
+        let off = Params::from_json(&off);
+        let on = Params::from_json(&preset(
+            "bh",
+            &format!(
+                r#"{{"r2":{{"enabled":true,{levels},"vigourShare":0.5,"vigourLambda":0.2}}}}"#
+            ),
+        ));
+        let gated = Params::from_json(&preset(
+            "bh",
+            &format!(
+                r#"{{"r2":{{"enabled":true,{levels},"vigourShare":0.5,"vigourLambda":0.2,"vigourTreeLo":1e9,"vigourTreeHi":2e9}}}}"#
+            ),
+        ));
+        let mut tree = tree;
+        gather_light(&mut tree, &off.r6);
+        let (mut a, mut b, mut c) = (tree.clone(), tree.clone(), tree);
+        allocate(&mut a, &off);
+        allocate(&mut b, &on);
+        allocate(&mut c, &gated);
+        let share = |t: &Tree, i: usize| t.v_slot[SLOTS * i] / t.m.v_in[i];
+        assert!(close(share(&a, 0), share(&b, 0)));
+        let mut weaker = 0;
+        for i in 0..a.m.len() {
+            let lateral: f64 = a.q_slot[SLOTS * i + 1..SLOTS * (i + 1)].iter().sum();
+            if a.m.v_in[i] <= 0.0 || a.q_slot[SLOTS * i] <= 0.0 || lateral <= 0.0 {
+                continue;
+            }
+            assert!(share(&b, i) <= share(&a, i) + 1e-12, "row {i}");
+            if share(&b, i) < share(&a, i) - 1e-9 {
+                weaker += 1;
+            }
+        }
+        assert!(weaker > 5, "{weaker}");
+        // A tree below the gate's lower bound allocates exactly as without the rule.
+        assert_eq!(&a.v_slot[..], &c.v_slot[..]);
     }
 }

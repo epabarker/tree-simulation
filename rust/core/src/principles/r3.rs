@@ -13,7 +13,7 @@
 use super::c3::is_live_bud;
 use super::c4::{horizontal_heading, set_point_direction};
 use super::c5::remove_branches;
-use super::r2::{aged_offset, curve_offset, hangs, pa_level, pendulous_set_point};
+use super::r2::{aged_offset, arm_set_point, curve_offset, hangs, pa_level, pendulous_set_point};
 use super::r6::deposit_area;
 use crate::geom::{
     IDENTITY, M3, V3, add, angle_between, apply, compose, cross, norm, normalize_or, reject,
@@ -205,10 +205,15 @@ pub fn update_mechanics(tree: &mut Tree, params: &Params, storm: bool, season: f
             let bend = (curve_offset(trunk, pa, tree.m.axis_node[i] as f64, params)
                 + aged_offset(trunk, pa, wood_age, tree.age, params))
                 * DEG;
+            // The vigour fork's arms hold their birth angle, not the trunk's vertical.
+            let base = match arm_set_point(tree, trunk, pa, i, params) {
+                Some(a) => a * DEG,
+                None => posture_set_point(pa, params),
+            };
             let set_point = if bend == 0.0 {
-                posture_set_point(pa, params)
+                base
             } else {
-                math::max(0.0, math::min(PI, posture_set_point(pa, params) + bend))
+                math::max(0.0, math::min(PI, base + bend))
             };
             // R2's pendulous twigs (ADR 0035): a thin axis hangs (degrees there and back only when on,
             // so the set point is bit-for-bit the same without it).

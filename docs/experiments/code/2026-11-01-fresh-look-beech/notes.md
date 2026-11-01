@@ -896,3 +896,28 @@ against 25.3 s with the rules off (fewer metamers after pruning). The stand's co
   response. I have not looked at the garden plate.
 
 <!-- repair -->
+
+### Blind naming test after the repair (orchestrator)
+
+A fresh namer, 48 new panels, every source in the same 240-wide lone world: the repair, and three
+decoys (silver fir, hornbeam, oak). Answers: `blind-round2/answers.md`; key: `blind-round2/key.json`.
+
+| source | lone 60 | lone 100 (on, off) | stand 100 |
+|---|---|---|---|
+| repair | oak ×3 | oak ×4, Scots pine ×2 (beech second on seed 3) | silver birch ×3 |
+| decoy: fir | Norway spruce ×3 | Norway spruce / larch / hemlock | Norway spruce ×3 |
+| decoy: hornbeam | **beech ×3** | **beech ×5**, hornbeam ×1 | Scots pine ×3 |
+| decoy: oak | hazel ×3 | hazel ×6 | elm ×3 |
+
+**Beech named first on 0 of 12 repair panels: fail, against the done criterion (2 of 3 seeds, lone and
+stand).** It moved from cedar of Lebanon (round 1, high confidence) to oak (medium/low): from a conifer
+to a broadleaf. The namer's deciding features: "broad spreading dome wider than tall, heavy limbs
+from a short trunk and horizontal lower layers"; leaf-off, "short trunk breaking into several heavy,
+crooked limbs". The stand still reads as birch.
+
+**The hornbeam decoy was named beech on 8 of 9 lone panels**, described as a flat-topped inverted-cone
+crown of steeply ascending limbs. The card puts beech and hornbeam in the same Hallé model (Troll,
+*Fagus* type). The oak decoy reads as hazel or elm. All calls were low or medium confidence; this is a
+form-only test drawn with the harness's dots, not the garden renderer.
+
+

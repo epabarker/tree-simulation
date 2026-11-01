@@ -784,6 +784,22 @@ next round.
 **Checklist threshold.** The checklist's "8 of 12" was a slip: each setting has five applicable cues
 (10 points). The reviewer's reading, 8 of 10, stands.
 
+### The user's judgement, round 1
+
+Go with one repair round on the reviewers' instructions. The user's own observation, from every
+sheet so far: **the lower branches consistently survive, and the lower trunk never becomes bare.**
+It may be solved by the repair, and it may be irrelevant to the aim, but it is recorded as the user's.
+
+Orchestrator's note on it, for the repair worker to weigh, not to follow: the photograph note
+(`references-beech.md`) has the open-grown beech's trunk clear for its lowest 1/8–1/6 before it divides
+into the scaffold, the released stand tree's bole clean for 40% of its height, and the lone tree's
+lowest limbs leaving from the division zone, not from a bole clothed to the ground. All three
+ideators reported the same remnant: "the tiered skirt grown before the trunk forks". The
+candidate's stand boles are already bare (limb crown ratio 0.23–0.27), so the observation bites on
+the lone tree and on trees at the garden's edges. Shedding (C5, R1) is physiology the brief holds
+fixed for the ecology; a change that clears the young tree's lower limbs under its own developing
+crown, without moving the stand's floor or LAI, is within the brief.
+
 <!-- review -->
 
 ## Repair

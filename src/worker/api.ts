@@ -17,7 +17,8 @@ export interface SimApi {
   /**
    * Puts the running world aside and starts `params` in its place, returning its season 0; with
    * null, drops that world and resumes the one put aside where it stood (M19: a page's specimen
-   * plate grows its own tree while the forest waits).
+   * plate grows its own tree while the forest waits). The world put aside is held as checkpoint
+   * bytes, not live, so the two never share the core's linear memory (ADR 0026).
    */
   swap(params: Params | null): Promise<Snapshot>;
   /** Runs `seasons` seasons and returns the snapshot after the last one. */

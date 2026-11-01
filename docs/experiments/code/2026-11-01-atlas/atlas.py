@@ -112,6 +112,17 @@ RULES: dict[str, dict] = {
             ("r2.levels.2.branchAngle", [20, 35, 50, 65]),
         ],
     },
+    # ADR 0038: posture by age. Centre: the limbs (level 1) descend toward 100° over 40 seasons of
+    # their wood's age. The third row moves the same set point by the tree's age (a phase change).
+    "aged": {
+        "adr": "0038",
+        "base": {"r2.levels.1.agedSetPoint": 100, "r2.levels.1.agedOver": 40},
+        "rows": [
+            ("r2.levels.1.agedSetPoint", [20, 60, 100, 130]),
+            ("r2.levels.1.agedOver", [10, 25, 40, 80]),
+            ("r2.levels.1.agedSetPoint", [20, 60, 100, 130], {"r2.levels.1.agedBy": "tree"}),
+        ],
+    },
 }
 
 
@@ -161,12 +172,13 @@ def cells_of(rule: dict) -> dict[str, tuple[str, dict]]:
 
 
 def draw_sheet(name: str, rule: dict, season: int, cells: Path, command: str) -> Path:
-    rows = [(sp, r, path, values) for sp in SPECIES for r, (path, values, *_) in enumerate(rule["rows"])]
+    rows = [(sp, r, path, values, extra[0] if extra else {})
+            for sp in SPECIES for r, (path, values, *extra) in enumerate(rule["rows"])]
     data = {k.stem: np.load(k) for k in cells.glob("*.npz")}
     segs = [d[f"seg{season}"] for d in data.values() if len(d[f"seg{season}"])]
     tall = max(60.0, math.ceil(max(float(np.max(s[:, [1, 3]])) for s in segs) / 20) * 20 + 5)
     half = max(30.0, max(float(np.max(np.abs(s[:, [0, 2]] - fs.WIDTH / 2))) for s in segs) + 4)
-    steps = max(len(v) for _, _, _, v in rows)
+    steps = max(len(v) for _, _, _, v, _ in rows)
     cols = steps + 1
     cell_w = 2.3
     cell_h = cell_w * tall / (2 * half)
@@ -209,11 +221,12 @@ def draw_sheet(name: str, rule: dict, season: int, cells: Path, command: str) ->
                  f"fork {fs.fmt(fork, 2)}  dom {fs.fmt(dom, 1)}",
                  fontsize=6.5, va="center", ha="center", family="monospace")
 
-    for r, (sp, k, path, values) in enumerate(rows):
+    for r, (sp, k, path, values, extra) in enumerate(rows):
         cell(r, 0, f"{sp}-off", f"{sp}: today (off)", False)
-        centre = rule["base"].get(path)
+        centre = None if extra else rule["base"].get(path)
+        by_tree = " (tree age)" if extra.get("r2.levels.1.agedBy") == "tree" else ""
         for c, v in enumerate(values):
-            cell(r, c + 1, f"{sp}-{k}-{c}", f"{sp}: {path.removeprefix('r2.')} = {v:g}", v == centre)
+            cell(r, c + 1, f"{sp}-{k}-{c}", f"{sp}: {path.removeprefix('r2.')} = {v:g}{by_tree}", v == centre)
     full = cells / f"sheet-{season}.png"
     fig.savefig(full)
     plt.close(fig)

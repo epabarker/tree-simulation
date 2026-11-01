@@ -527,6 +527,18 @@ export interface PaLevel {
    * the trunk; for level 0 it overrides r2.relay. Absent: 0 (off) for levels ≥ 1.
    */
   relay?: number;
+  /**
+   * Posture by age (ADR 0038, proposed): the set point, degrees, that this level's axes move toward
+   * with age, linearly over `agedOver` seasons, in growth and posture. By the wood's own age
+   * (gravimorphism: a fir limb erect, then level, then descending, with its young tips still up), or
+   * with agedBy "tree" by the tree's age (a phase change at maturity: Makowski et al. 2019). The
+   * trunk itself never moves. Absent: off.
+   */
+  agedSetPoint?: number;
+  /** With agedSetPoint: the seasons over which the set point moves; absent, 50. */
+  agedOver?: number;
+  /** With agedSetPoint: "wood" (the default), the metamer's own age, or "tree", the tree's. */
+  agedBy?: "wood" | "tree";
 }
 
 export const defaultParams: Params = {

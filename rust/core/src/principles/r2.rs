@@ -29,6 +29,11 @@
 //! limb's level; each starts at its bud's branch angle, so the limb kinks at every takeover and
 //! zig-zags (oak's elbows; a lost tip replaced by a subapical bud, Hallé et al. 1978).
 //!
+//! Posture by age (ADR 0038, proposed): a level's `agedSetPoint` is where its set points (growth
+//! and posture) move with age, over `agedOver` seasons: by the wood's own age (gravimorphism, old
+//! wood descends while young tips stay up) or, with `agedBy` "tree", by the tree's (a phase
+//! change at maturity). The trunk itself (order 0) is exempt.
+//!
 //! Twig density (ADR 0036, proposed): a level's own `kappa` (acrotony at its nodes, in place of
 //! r2.kappa) and `lateralEvery` (laterals only at every k-th node of its axes) set how many fine
 //! shoots a limb carries and where along it.
@@ -244,6 +249,28 @@ pub fn curve_offset(order: f64, pa: f64, axis_node: f64, params: &Params) -> f64
     }
     let length = math::max(1.0, level.curve_length.unwrap_or(20.0));
     curve * math::min(1.0, math::max(0.0, axis_node) / length)
+}
+
+/// The offset, degrees, posture by age adds to the set points of an axis of branching order
+/// `order` and physiological age `pa`, for wood `wood_age` seasons old on a tree `tree_age` old
+/// (0 when off and for the trunk itself).
+pub fn aged_offset(order: f64, pa: f64, wood_age: f64, tree_age: f64, params: &Params) -> f64 {
+    if order <= 0.0 {
+        return 0.0;
+    }
+    let Some(level) = pa_level(pa, &params.r2) else {
+        return 0.0;
+    };
+    let Some(aged) = level.aged_set_point else {
+        return 0.0;
+    };
+    let age = if level.aged_by_tree {
+        tree_age
+    } else {
+        wood_age
+    };
+    let over = math::max(1.0, level.aged_over.unwrap_or(50.0));
+    (aged - level.set_point) * math::min(1.0, math::max(0.0, age) / over)
 }
 
 /// A set point (degrees) moved by the curve's offset, kept within [0°, 180°].
@@ -688,5 +715,26 @@ mod tests {
         let q = with_r2(&[r#"{"relay":0}"#, r#"{}"#], r#""relay":3"#);
         assert_eq!(relay_nodes(0.0, &q), 0.0);
         assert_eq!(relay_nodes(0.0, &with_r2(&[r#"{}"#], r#""relay":3"#)), 3.0);
+    }
+
+    #[test]
+    fn moves_a_levels_set_point_with_the_woods_age_or_the_trees() {
+        let p = with_r2(
+            &[
+                r#"{"agedSetPoint":90}"#,
+                r#"{"setPoint":30,"agedSetPoint":110,"agedOver":40}"#,
+                r#"{"setPoint":60,"agedSetPoint":20,"agedOver":10,"agedBy":"tree"}"#,
+            ],
+            "",
+        );
+        assert_eq!(aged_offset(0.0, 0.0, 99.0, 99.0, &p), 0.0); // the trunk itself never moves
+        assert_eq!(aged_offset(1.0, 0.0, 25.0, 0.0, &p), 45.0); // a relay: default over 50
+        assert_eq!(aged_offset(1.0, 1.0, 0.0, 99.0, &p), 0.0); // new wood: erect still
+        assert_eq!(aged_offset(1.0, 1.0, 20.0, 0.0, &p), 40.0);
+        assert_eq!(aged_offset(1.0, 1.0, 400.0, 0.0, &p), 80.0); // held at the aged set point
+        assert_eq!(aged_offset(2.0, 2.0, 0.0, 5.0, &p), -20.0); // by the tree's age
+        assert_eq!(aged_offset(2.0, 2.0, 50.0, 0.0, &p), 0.0);
+        let off = with_r2(&[r#"{}"#, r#"{}"#], "");
+        assert_eq!(aged_offset(1.0, 1.0, 50.0, 50.0, &off), 0.0);
     }
 }

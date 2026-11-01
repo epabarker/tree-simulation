@@ -2,6 +2,11 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-01: Track B (vocabulary): posture by age (ADR 0038, proposed)
+
+- **`r2.levels[i].agedSetPoint`, `agedOver`, `agedBy`** (r2.rs, season.rs, r3.rs): a level's growth and posture set points move with the wood's age (gravimorphism) or the tree's (phase change). Off by default; presets and goldens unchanged.
+- **The sheet** (`atlas.py aged`): the strongest form knob so far. Limb elevation spans 69° to −27°; birch at 100–130 becomes a fir-like cone of descending lower limbs.
+
 ## 2026-11-01: Track B (vocabulary): elbows (ADR 0037, proposed)
 
 - **`r2.levels[i].relay`** (r2.rs): an ended axis of any level is continued by its top laterals at that level, so the limb kinks at each takeover (the relay of ADR 0033, past the trunk). Off by default; presets and goldens unchanged.

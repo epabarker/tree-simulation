@@ -214,6 +214,11 @@ pub struct PaLevel {
     /// Elbows (ADR 0037): when this level's axis ends (p_term), the laterals on its top `relay`
     /// nodes continue it at this level (absent: 0, or r2.relay for pa 0).
     pub relay: Option<f64>,
+    /// Posture by age (ADR 0038): the set point this level's axes move toward with age, over
+    /// `aged_over` seasons, by the wood's own age, or the tree's when `aged_by_tree`. Absent: off.
+    pub aged_set_point: Option<f64>,
+    pub aged_over: Option<f64>,
+    pub aged_by_tree: bool,
 }
 
 #[derive(Clone, Debug)]
@@ -505,6 +510,9 @@ impl Params {
                         kappa: opt(l, "kappa"),
                         lateral_every: opt(l, "lateralEvery"),
                         relay: opt(l, "relay"),
+                        aged_set_point: opt(l, "agedSetPoint"),
+                        aged_over: opt(l, "agedOver"),
+                        aged_by_tree: text(l, "agedBy") == "tree",
                     })
                     .collect(),
                 a_c: num(r2, "aC"),

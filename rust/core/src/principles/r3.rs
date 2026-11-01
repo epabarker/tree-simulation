@@ -13,7 +13,7 @@
 use super::c3::is_live_bud;
 use super::c4::{horizontal_heading, set_point_direction};
 use super::c5::remove_branches;
-use super::r2::{curve_offset, hangs, pa_level, pendulous_set_point};
+use super::r2::{aged_offset, curve_offset, hangs, pa_level, pendulous_set_point};
 use super::r6::deposit_area;
 use crate::geom::{
     IDENTITY, M3, V3, add, angle_between, apply, compose, cross, norm, normalize_or, reject,
@@ -201,7 +201,10 @@ pub fn update_mechanics(tree: &mut Tree, params: &Params, storm: bool, season: f
             let dr = (r_new - before) / r_new;
             let pa = tree.m.order[i] as f64 - tree.m.pa_shift[i] as f64;
             let order = tree.m.order[i] as f64;
-            let bend = curve_offset(order, pa, tree.m.axis_node[i] as f64, params) * DEG;
+            let wood_age = season - tree.m.birth_season[i] as f64;
+            let bend = (curve_offset(order, pa, tree.m.axis_node[i] as f64, params)
+                + aged_offset(order, pa, wood_age, tree.age, params))
+                * DEG;
             let set_point = if bend == 0.0 {
                 posture_set_point(pa, params)
             } else {

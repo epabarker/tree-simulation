@@ -1,0 +1,74 @@
+# Beech overnight: the lower limbs, a unit-free gate, three namers (2026-11-02)
+
+Three investigations the night after [the review of the fresh-look beech round](2026-11-01-fresh-look-beech-review.md), on `claude/beech-overnight` (from `claude/fresh-look-beech`). None decides anything: they inform the user's open decisions on own-crown pruning (ADR 0043), the vigour gate's units (ADR 0041–0043), and round 2. Scripts in `code/2026-11-01-fresh-look-beech/`.
+
+## 1. Why the lone beech's lower limbs survive
+
+`lower-limbs.py` reads every first-order limb leaving the trunk below H/6 in the 20-seed lone runs, against beech's two shedding tests: light per metamer below T_rel·Q_top (T_rel 0.008, ADR 0032), and R1's carbon test, production below upkeep.
+
+| lone beech | season | low limbs, 20 seeds | light ÷ T_rel·Q_top, median (min) | P/M, median (min) | light, median |
+|---|---|---|---|---|---|
+| today (the round's rules absent) | 60 | 326 | 80 (14) | 4.5 (1.5) | 0.17 |
+| today | 100 | 424 | 76 (20) | 3.9 (1.9) | 0.15 |
+| the repair | 60 | 155 | 71 (45) | 4.9 (3.2) | 0.24 |
+| the repair | 100 | 215 | 69 (41) | 4.7 (3.0) | 0.23 |
+
+- **No low limb is near either threshold.** The dimmest is 14 times above beech's measured shade limit, and every one produces at least 1.5 times its upkeep.
+- **They survive because they are well lit:** 15–24% of the open sky at the median. In the model's open world the sky reaches a lone tree's lower crown from the side.
+- **So no shedding parameter clears them honestly.** A light or carbon rule that clears them would have to shed wood that is as well lit as a mid-crown limb. That is what `c5.Tvig` 0.25 does, at 31 times the measured T_rel.
+- **What could make them dim** is the light model, not shedding: how much of the sky reaches low and sideways (C2's open question, ADR 0031–0032's notes). Whether real open-grown beeches clear their lower trunk by shade at all, rather than by browsing or limb drop, is a question for the sources, not answered here [u].
+
+## 2. A unit-free vigour gate (prototype, not proposed)
+
+`r2.vigourCrowd` = k makes the vigour gate clamp(1 − k·s̄), with s̄ the relay gate's signal (the tree's mean R5 neighbour shade), in place of the resource bounds 3,000–10,000. It drives the same three rules (the drop, light orthotropy, own-crown pruning). Absent, the core is bit-identical (goldens and the repair's hashes unchanged); a unit test covers it. Run on top of the repair's values, 20 seeds, and in the garden's worlds.
+
+| 20 seeds | today | repair | unit-free, k 10 | unit-free, k 20 |
+|---|---|---|---|---|
+| guard: all four (alive, floor, LAI 6–8, H/D) | 6 | 8 | 5 | **11** |
+| guard: floor 3–5% | 19 | 16 | 13 | 16 |
+| guard: LAI 6–8 | 20 | 11 | 10 | 13 |
+| guard: H/D 70–110 | 6 | 20 | 19 | 20 |
+| lone 100: W/H 1.3–1.5 (photograph) | 0 | 9 | 13 | 13 |
+| lone 60: W/H 1.3–1.5 | 0 | 8 | 1 | 1 |
+| lone height at 60 / 100, median | 145 / 203 | 94 / 137 | 86 / 127 | 86 / 127 |
+| stand height, median | 182 | 164 | 154 | 162 |
+| stand limb crown ratio, median | 0.345 | 0.27 | 0.245 | 0.25 |
+
+- **The lone tree is the same at k 10 and k 20,** since alone s̄ = 0 and the gate is fully open from the seedling. It is shorter and broader than the repair's: 127 cells at 100, W/H 1.44, too broad at 60 (1.61).
+- **The stand at k 20 passes the whole guard on 11 of 20 seeds,** the best of the four. At k 10 the gate opens in the young stand before the crowns meet, and the stand moves further.
+- **The garden is worse.** A garden row gives its beeches almost no neighbour shade, so the gate opens fully from the seedling. On the phone's plate both surviving beeches (seeds 12 and 13) become bare poles with a flat cap by 100, where the resource gate did that to one ([phone, k 20](figures/2026-11-01-fresh-look-beech-review-garden-phone-crowd20.png); [laptop, k 20](figures/2026-11-01-fresh-look-beech-review-garden-laptop-crowd20.png)).
+- **So units were not the garden's problem.** The pole with a cap appears wherever the gate is open on a tree whose lower crown is shaded from the side. §2b tests whether own-crown pruning is the cause.
+
+<!-- 2b -->
+
+## 3. Three namers, form-only
+
+The previous tests had one namer each, and round 2's namer named the hornbeam decoy beech on 8 of 9 lone panels where round 1's named it hornbeam 9 of 9. This test repeats the protocol (`blind-test.md`) with **three independent namers** on the same 72 panels: beech as repaired, beech today, and decoys hornbeam, oak, birch and silver fir. All are drawn by the round's harness (`blind.py`: one colour for every species, leaves as dots), seeds 1–3, lone at 60 and 100 (leaf-on and leaf-off) and the stand at 100. The key names the species. Answers and key: `code/2026-11-01-fresh-look-beech/blind-round3/`. The namers were fresh agents of one model given only the image folder: independent in context, not in kind.
+
+| source | first guesses, pooled over three namers (9 panels a cell, 3 per namer) |
+|---|---|
+| beech, repair: lone 60 | oak 8, cedar of Lebanon 1 |
+| beech, repair: lone 100 leaf-on | beech 3, cedar 2, oak 2, Scots pine 2 |
+| beech, repair: lone 100 leaf-off | oak 4, cedar 3, Scots pine 2 |
+| beech, repair: stand 100 | birch 6, Scots pine 3 |
+| beech, today: lone 60 / 100 | Norway spruce 26 of 27 |
+| beech, today: stand 100 | Scots pine 6, birch 3 |
+| hornbeam: lone 60 | field maple 7, hornbeam 2 |
+| hornbeam: lone 100 (on, off) | hornbeam 13, beech 3, oak 1, wych elm 1 |
+| hornbeam: stand 100 | Scots pine 9 |
+| oak: lone 60 / 100 | hazel 20, English elm 6, hawthorn 1 |
+| oak: stand 100 | hornbeam 6, ash 3 |
+| birch: lone 60 / 100 | Norway spruce 21, larch 6 |
+| birch: stand 100 | birch 5, ash 3, Scots pine 1 |
+| silver fir: all | Norway spruce 23, western hemlock 6, others 7 |
+
+- **The repaired beech is named beech on 1 of 12 panels by each namer** (3 of 36), all on the lone tree at 100, leaf-on. It fails the pass rule for every namer. It reads as oak, cedar or pine; its stand as birch or pine.
+- **The hornbeam lead does not reproduce.** With three namers the hornbeam is named beech on 3 of 27 lone panels, the same rate as the repaired beech, and hornbeam on 15. Round 2's 8 of 9 was one namer.
+- **Almost nothing is recognisable in this drawing.** Today's beech, the birch and the fir all read as Norway spruce; the oak as hazel or elm. Only the hornbeam is named itself more often than not on its lone panels. Form drawn in uniform dots is a weak instrument for every species, not only beech.
+- **The namers agree on 41 of 72 panels.**
+
+## 4. What this says for the open decisions
+
+1. **Own-crown pruning (ADR 0043):** the lower limbs it clears are well lit, so clearing them overrides the measurement (§1). Its garden effect is §2b.
+2. **The vigour gate's units:** a unit-free gate helps the closed stand (k 20) and harms the garden (§2). Neither gate makes the round's rules safe in a garden row.
+3. **Round 2:** the hornbeam is not a lead (§3). The next instrument should draw species as visitors see them (the garden's renderer, track C's bark and foliage); the laptop's GPU can render it. In this drawing no species reads well, so improving beech's form alone may not move a namer.

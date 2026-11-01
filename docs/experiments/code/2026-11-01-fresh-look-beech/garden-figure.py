@@ -35,7 +35,7 @@ def load(out: Path, season: int):
     return m, b, mt
 
 
-def figure(root: Path, stems: list[str], out: Path, title: str) -> None:
+def figure(root: Path, stems: list[str], out: Path, title: str, after: str | None = None) -> None:
     cols = [("before", 60), ("after", 60), ("before", 100), ("after", 100)]
     width = json.loads((root / f"{stems[0]}.json").read_text())["world"]["width"]
     w = 2.2 if width < 100 else 4.2
@@ -45,14 +45,15 @@ def figure(root: Path, stems: list[str], out: Path, title: str) -> None:
         planted = len(p["trees"])
         for c, (which, season) in enumerate(cols):
             ax = axes[r][c]
-            d = root / "off" / stem if which == "before" else root / stem
+            d = root / "off" / stem if which == "before" else (root / after / stem if after else root / stem)
             m, b, mt = load(d, season)
             render.draw(ax, m, b, p["world"]["width"], True)
             ax.set_ylim(-14, 150)
             beech = mt.filter((pl.col("species") == "beech") & (pl.col("alive") == 1) & (pl.col("tree") < planted))
             for row in beech.iter_rows(named=True):
                 g = min(1.0, max(0.0, (row["vBase"] - LO) / (HI - LO)))
-                ax.annotate(f"▲ beech, g {g:.2f}", (row["rootX"], -2), ha="center", va="top", fontsize=6, color="#7a2e00")
+                label = "▲ beech" if (after and which == "after") else f"▲ beech, g {g:.2f}"
+                ax.annotate(label, (row["rootX"], -2), ha="center", va="top", fontsize=6, color="#7a2e00")
             ax.set_title(f"{stem}: {which} at {season}", fontsize=7)
     fig.suptitle(title, fontsize=9)
     fig.savefig(out, dpi=90, bbox_inches="tight")
@@ -62,12 +63,16 @@ def figure(root: Path, stems: list[str], out: Path, title: str) -> None:
 
 def main() -> None:
     root, figs = Path(sys.argv[1]), Path(sys.argv[2])
+    # A third argument draws a garden-gate.py --variant run as "after" (e.g. crowd20).
+    after = sys.argv[3] if len(sys.argv) > 3 else None
+    tag = f"-{after}" if after else ""
+    what = f"the round's beech with the gate '{after}'" if after else "the round's beech"
     figure(root, ["garden-w54-s2", "garden-w54-s3", "garden-w54-s12", "garden-w54-s13"],
-           figs / "2026-11-01-fresh-look-beech-review-garden-phone.png",
-           "The garden's phone plate (54 cells): the round's beech before and after")
+           figs / f"2026-11-01-fresh-look-beech-review-garden-phone{tag}.png",
+           f"The garden's phone plate (54 cells): {what}, before and after", after)
     figure(root, ["garden-w146-s1", "garden-w146-s2", "garden-w146-s3", "garden-w146-s9", "garden-w146-s10"],
-           figs / "2026-11-01-fresh-look-beech-review-garden-laptop.png",
-           "The garden's laptop plate (146 cells): the round's beech before and after")
+           figs / f"2026-11-01-fresh-look-beech-review-garden-laptop{tag}.png",
+           f"The garden's laptop plate (146 cells): {what}, before and after", after)
 
 
 if __name__ == "__main__":

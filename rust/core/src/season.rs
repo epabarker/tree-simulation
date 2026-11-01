@@ -21,7 +21,7 @@ use crate::principles::obstacles::clear_obstacles;
 use crate::principles::r1::{carbon_balance, starved_to_death};
 use crate::principles::r2::{
     aged_offset, arm_set_point, curve_offset, curved, direction_params, light_set_point,
-    pendulous_set_point, relay_depth, relay_nodes, relay_on, relay_shift, vigour_forks,
+    pendulous_set_point, relay_depth, relay_nodes, relay_on, relay_shift, tree_gate, vigour_forks,
 };
 use crate::principles::r3::update_mechanics;
 use crate::principles::r4::{aborts, growth_threshold, light_releases, released_shift};
@@ -231,7 +231,9 @@ pub fn phase_sample(world: &mut World, i: usize) {
     }
     // R2's relay gate (r2.relayCrowd): the tree's shade-avoidance state, the mean of R5's
     // neighbour shade over its metamers (0 for a tree without neighbours).
-    tree.relay_crowd = if params.r2.relay_crowd.is_some() && params.r5.enabled {
+    tree.relay_crowd = if (params.r2.relay_crowd.is_some() || params.r2.vigour_crowd.is_some())
+        && params.r5.enabled
+    {
         let nm = tree.m.len();
         let sum: f64 = tree.node_shade[..nm].iter().sum();
         if nm > 0 { sum / nm as f64 } else { 0.0 }
@@ -525,8 +527,14 @@ pub fn grow_buds(tree: &mut Tree, params: &Params, season: f64) {
                     dir.set_point = h;
                 }
                 // Light orthotropy: a lateral in full light grows erect, one in shade level.
-                dir.set_point =
-                    light_set_point(dir.set_point, pa, tree.b.q[b], 0.0, tree.v_base, &params.r2);
+                dir.set_point = light_set_point(
+                    dir.set_point,
+                    pa,
+                    tree.b.q[b],
+                    0.0,
+                    tree_gate(tree.v_base, tree.relay_crowd, &params.r2),
+                    &params.r2,
+                );
                 let bend = curve_offset(trunk, pa, node, params)
                     + aged_offset(trunk, pa, 0.0, tree.age, params);
                 dir.set_point = curved(dir.set_point, bend);

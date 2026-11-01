@@ -98,6 +98,7 @@ def main() -> None:
     ap.add_argument("--label", required=True)
     ap.add_argument("--out", required=True)
     ap.add_argument("--off", action="store_true", help="every new rule off: beech before the round")
+    ap.add_argument("--assign", help="JSON of dotted assignments on top of beech's patch (a variant)")
     ap.add_argument("--seeds", default="1-20")
     ap.add_argument("--lone-width", type=int, default=240)
     ap.add_argument("--workers", type=int, default=4)
@@ -109,7 +110,8 @@ def main() -> None:
     render.LONE_W = a.lone_width
     out = Path(a.out)
     out.mkdir(parents=True, exist_ok=True)
-    patch = render.species_patch("beech", OFF if a.off else None, None)
+    assigns = OFF if a.off else (json.loads(a.assign) if a.assign else None)
+    patch = render.species_patch("beech", assigns, None)
     (out / "species-patch.json").write_text(json.dumps(patch, indent=1))
     if not a.no_run:
         jobs = [(t, s) for s in seeds for t in ("lone", "stand")]

@@ -39,13 +39,18 @@ def off_patch() -> str:
     return json.dumps({"beech": OFF})
 
 
-def run(params: Path, off: bool) -> Path:
-    out = params.with_suffix("") if not off else params.parent / "off" / params.stem
+def run(params: Path, off: bool, variant: str | None = None, vpatch: str | None = None) -> Path:
+    if variant:
+        out = params.parent / variant / params.stem
+    else:
+        out = params.with_suffix("") if not off else params.parent / "off" / params.stem
     if not (out / "buds.csv").exists():
         cmd = [str(TREESIM), "--preset", "mixedWood", "--params", str(params), "--seasons", "100",
                "--snapshots", SNAP, "--light", "--quiet", "--out", str(out)]
         if off:
             cmd += ["--species-patch", off_patch()]
+        elif vpatch:
+            cmd += ["--species-patch", vpatch]
         subprocess.run(cmd, check=True)
     return out
 
@@ -53,9 +58,12 @@ def run(params: Path, off: bool) -> Path:
 def main() -> None:
     root = Path(sys.argv[1])
     off = "--off" in sys.argv
+    # --variant NAME '{"beech": {...}}': the same worlds with a species patch, into NAME/.
+    variant = sys.argv[sys.argv.index("--variant") + 1] if "--variant" in sys.argv else None
+    vpatch = sys.argv[sys.argv.index("--variant") + 2] if variant else None
     files = sorted(root.glob("*.json"))
     with ThreadPoolExecutor(4) as ex:
-        outs = list(ex.map(lambda f: run(f, off), files))
+        outs = list(ex.map(lambda f: run(f, off, variant, vpatch), files))
     rows = []
     for f, out in zip(files, outs):
         p = json.loads(f.read_text())
@@ -81,7 +89,7 @@ def main() -> None:
                 "partial (0 < gate max < 1)": 0 < float(g.max()) < 1,
             })
     df = pl.DataFrame(rows)
-    df.write_csv(root / ("gate-off.csv" if off else "gate.csv"))
+    df.write_csv(root / ("gate-off.csv" if off else f"gate-{variant}.csv" if variant else "gate.csv"))
     with pl.Config(tbl_rows=200, tbl_cols=20, tbl_width_chars=220):
         print(df)
     s = df.group_by("planted").agg(

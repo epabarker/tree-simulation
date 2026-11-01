@@ -8,7 +8,7 @@
 //! r2.vigourTreeLo, r2.vigourTreeHi); with R5 λ rises at shaded nodes; with R1, v_base is the
 //! tree's net production.
 
-use super::r2::{acrotony_weights, lambda_at, vigour, vigour_drop_on, vigour_gate};
+use super::r2::{acrotony_weights, lambda_at, tree_gate, vigour, vigour_drop_on};
 use super::r5::shaded_lambda;
 use super::r6::light_weight;
 use crate::params::{C3Mode, Params, R6};
@@ -104,7 +104,7 @@ pub fn allocate(tree: &mut Tree, params: &Params) {
             let acro = acrotony_weights(tree, params);
             // R2's vigour drop: how far it acts on this tree (0 when off).
             let gate = if vigour_drop_on(&params.r2) {
-                vigour_gate(tree.v_base, &params.r2)
+                tree_gate(tree.v_base, tree.relay_crowd, &params.r2)
             } else {
                 0.0
             };

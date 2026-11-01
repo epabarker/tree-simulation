@@ -60,6 +60,18 @@ RULES: dict[str, dict] = {
             ("r2.relayPTerm", [0.1, 0.3, 0.6, 1.0]),
         ],
     },
+    # ADR 0034: curvature along the limb. Centre: the limbs (level 1) arch 30° over 30 nodes. The
+    # third row curves the relays (level 0) with the relay on (ADR 0033 at relay 2, pTerm 0.6).
+    "curve": {
+        "adr": "0034",
+        "base": {"r2.levels.1.curve": 30, "r2.levels.1.curveLength": 30},
+        "rows": [
+            ("r2.levels.1.curve", [-30, 15, 30, 60]),
+            ("r2.levels.1.curveLength", [10, 20, 40, 80]),
+            ("r2.levels.0.curve", [20, 40, 60, 90],
+             {"r2.relay": 2, "r2.relayAge": 20, "r2.relayPTerm": 0.6, "r2.levels.0.curveLength": 30}),
+        ],
+    },
 }
 
 
@@ -75,14 +87,14 @@ def cells_of(rule: dict) -> dict[str, tuple[str, dict]]:
     for sp in SPECIES:
         base = species_base(sp)
         out[f"{sp}-off"] = (sp, base)
-        for r, (path, values) in enumerate(rule["rows"]):
+        for r, (path, values, *extra) in enumerate(rule["rows"]):
             for c, v in enumerate(values):
-                out[f"{sp}-{r}-{c}"] = (sp, {**base, **rule["base"], path: v})
+                out[f"{sp}-{r}-{c}"] = (sp, {**base, **rule["base"], **(extra[0] if extra else {}), path: v})
     return out
 
 
 def draw_sheet(name: str, rule: dict, season: int, cells: Path, command: str) -> Path:
-    rows = [(sp, r, path, values) for sp in SPECIES for r, (path, values) in enumerate(rule["rows"])]
+    rows = [(sp, r, path, values) for sp in SPECIES for r, (path, values, *_) in enumerate(rule["rows"])]
     data = {k.stem: np.load(k) for k in cells.glob("*.npz")}
     segs = [d[f"seg{season}"] for d in data.values() if len(d[f"seg{season}"])]
     tall = max(60.0, math.ceil(max(float(np.max(s[:, [1, 3]])) for s in segs) / 20) * 20 + 5)

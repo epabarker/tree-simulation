@@ -489,6 +489,15 @@ export interface PaLevel {
    * (Troll's model: shoots grow plagiotropic, the trunk straightens to 0 later; ADR 0011).
    */
   postureSetPoint?: number;
+  /**
+   * Curvature along the limb (ADR 0034, proposed; Weber & Penn 1995's nCurve): degrees added to
+   * this level's set points (growth and posture) at node k of an axis, curve·min(1, k/curveLength),
+   * so a limb bends progressively along its length: positive arches out and down (beech, oak),
+   * negative sweeps up (ash). The trunk itself (order 0) never curves; a relay does. Absent or 0: off.
+   */
+  curve?: number;
+  /** With curve: the nodes (≈ cells) over which the curve accrues; absent, 20. */
+  curveLength?: number;
 }
 
 export const defaultParams: Params = {

@@ -12,7 +12,13 @@
 //! 1978), instead of one leader whose laterals stay limbs. Without it a lateral under an ended
 //! apex stays pa 1, and a trunk that stops is a table (ADR 0031).
 //!
-//! Params: r2.enabled, r2.levels, r2.aC, r2.dLambda, r2.ramp, r2.kappa, r2.relay,
+//! Curvature along the limb (ADR 0034, proposed; Weber & Penn 1995's nCurve): a level's `curve`
+//! adds curve·min(1, k/curveLength) degrees to its set points (C4's growth, R3's posture) at node
+//! k of an axis, so the limb bends as it lengthens instead of holding one angle: an ascending limb
+//! arches over (beech's fan, oak's spread), a negative curve sweeps up. The trunk (order 0) is
+//! exempt: it is the one axis that stays straight; a relay (order ≥ 1 at pa 0) curves.
+//!
+//! Params: r2.enabled, r2.levels (curve, curveLength), r2.aC, r2.dLambda, r2.ramp, r2.kappa, r2.relay,
 //! r2.relayAge, r2.relayPTerm; c1.branchAngle, c3.lambda, c4.setPoint, c4.eta when off.
 
 use crate::math;
@@ -182,6 +188,31 @@ pub fn direction_params(params: &Params, order: f64) -> C4 {
         eta: level.eta,
         ..c4
     }
+}
+
+/// The curve's offset to the set points, degrees, at node `axis_node` of an axis of branching
+/// order `order` and physiological age `pa` (0 for the trunk itself and when off).
+pub fn curve_offset(order: f64, pa: f64, axis_node: f64, params: &Params) -> f64 {
+    if order <= 0.0 {
+        return 0.0;
+    }
+    let Some(level) = pa_level(pa, &params.r2) else {
+        return 0.0;
+    };
+    let curve = level.curve.unwrap_or(0.0);
+    if curve == 0.0 {
+        return 0.0;
+    }
+    let length = math::max(1.0, level.curve_length.unwrap_or(20.0));
+    curve * math::min(1.0, math::max(0.0, axis_node) / length)
+}
+
+/// A set point (degrees) moved by the curve's offset, kept within [0°, 180°].
+pub fn curved(set_point: f64, offset: f64) -> f64 {
+    if offset == 0.0 {
+        return set_point;
+    }
+    math::max(0.0, math::min(180.0, set_point + offset))
 }
 
 /// Acrotony weights exp(κ(pos − 1)) per metamer in `tree.scratch_f` (first nm entries), pos its
@@ -419,5 +450,50 @@ mod tests {
         let nm = t.m.len();
         crate::season::grow_buds(&mut t, &off, 1.0);
         assert_eq!(t.m.pa_shift[nm], 0);
+    }
+
+    #[test]
+    fn curves_a_limbs_set_point_along_its_length_but_never_the_trunks() {
+        let p = with_r2(&[r#"{"curve":30}"#, r#"{"curve":-40,"curveLength":4}"#], "");
+        assert_eq!(curve_offset(0.0, 0.0, 50.0, &p), 0.0); // the trunk stays straight
+        assert_eq!(curve_offset(1.0, 0.0, 10.0, &p), 15.0); // a relay: default length 20
+        assert_eq!(curve_offset(1.0, 1.0, 0.0, &p), 0.0);
+        assert_eq!(curve_offset(1.0, 1.0, 2.0, &p), -20.0);
+        assert_eq!(curve_offset(2.0, 1.0, 9.0, &p), -40.0); // held past curveLength
+        assert_eq!(curved(30.0, -40.0), 0.0);
+        assert_eq!(curved(160.0, 40.0), 180.0);
+        let off = with_r2(&[r#"{}"#, r#"{}"#], "");
+        assert_eq!(curve_offset(1.0, 1.0, 9.0, &off), 0.0);
+    }
+
+    #[test]
+    fn a_curved_limb_bends_further_from_vertical_node_by_node() {
+        use crate::geom::{UP, angle_between};
+        use crate::testing::{LEFT, bud, metamer};
+        use std::f64::consts::FRAC_PI_2;
+        let angles = |curve: &str| {
+            let row = format!(r#"{{"setPoint":45,"eta":1{curve}}}"#);
+            let mut p = with_r2(&[r#"{}"#, &row], "");
+            p.c4.enabled = true;
+            (p.c4.wd, p.c4.xi, p.c4.epsilon, p.c4.sigma) = (0.2, 0.0, 0.0, 0.0);
+            let mut t = Tree::new(0, 10.0, 0.5);
+            let m = metamer(&mut t, -1, slot::MAIN, FRAC_PI_2, 1.0, 0.02, 0.0);
+            let b = bud(&mut t, m, LEFT, FRAC_PI_2 + 0.785, 1.0);
+            t.ensure_scratch();
+            t.b.v[b] = 3.0;
+            crate::season::grow_buds(&mut t, &p, 1.0);
+            (1..t.m.len())
+                .map(|i| angle_between(t.heading(i), UP).to_degrees())
+                .collect::<Vec<f64>>()
+        };
+        let straight = angles("");
+        let curved = angles(r#","curve":90,"curveLength":2"#);
+        assert_eq!(straight.len(), 3);
+        assert!(
+            straight.iter().all(|a| (a - 45.0).abs() < 2.0),
+            "{straight:?}"
+        );
+        assert!(curved[0] < curved[1] && curved[1] < curved[2], "{curved:?}");
+        assert!(curved[2] > 90.0, "{curved:?}");
     }
 }

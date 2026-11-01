@@ -19,13 +19,15 @@ use crate::principles::o2::{EMPTY, Grid, abrade, tag_owner};
 use crate::principles::o4::stand_dynamics;
 use crate::principles::obstacles::clear_obstacles;
 use crate::principles::r1::{carbon_balance, starved_to_death};
-use crate::principles::r2::{direction_params, relay_depth, relay_on, relay_shift};
+use crate::principles::r2::{
+    curve_offset, curved, direction_params, relay_depth, relay_on, relay_shift,
+};
 use crate::principles::r3::update_mechanics;
 use crate::principles::r4::{aborts, growth_threshold, light_releases, released_shift};
 use crate::principles::r5::{elongation, neighbour_share, set_point_scale, shade_of};
 use crate::principles::r6::{deposit_area, resting_state};
 use crate::rng::{normal, purpose, uniform};
-use crate::tree::{Tree, bud, store_i32};
+use crate::tree::{Tree, bud, slot, store_i32};
 use crate::world::World;
 
 /// The phases as they end within a season (`PHASES` in season.ts; `npm run bench` times them).
@@ -472,6 +474,12 @@ pub fn grow_buds(tree: &mut Tree, params: &Params, season: f64) {
             }
             let pa = bud_order - shift;
             let upright = set_point_scale(shade, r5);
+            // R2's curve (ADR 0034): the node along its own axis each new metamer will take.
+            let mut node = if tree.b.slot[i] == slot::MAIN {
+                tree.m.axis_node[host] as f64 + 1.0
+            } else {
+                0.0
+            };
             let length = shoot_length * elongation(shade, r5);
             let mut direct = |tree: &Tree, prev: V3, b: usize, id: f64| -> V3 {
                 if !c4.enabled {
@@ -484,6 +492,8 @@ pub fn grow_buds(tree: &mut Tree, params: &Params, season: f64) {
                     * std::f64::consts::PI
                     * uniform(seed, purpose::DIRECTION_NOISE, tid, id, season, 2.0);
                 let mut dir = direction_params(params, pa);
+                dir.set_point = curved(dir.set_point, curve_offset(bud_order, pa, node, params));
+                node += 1.0;
                 if upright != 1.0 {
                     dir.set_point *= upright;
                 }

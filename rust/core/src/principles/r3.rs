@@ -13,7 +13,7 @@
 use super::c3::is_live_bud;
 use super::c4::{horizontal_heading, set_point_direction};
 use super::c5::remove_branches;
-use super::r2::pa_level;
+use super::r2::{curve_offset, pa_level};
 use super::r6::deposit_area;
 use crate::geom::{
     IDENTITY, M3, V3, add, angle_between, apply, compose, cross, norm, normalize_or, reject,
@@ -200,7 +200,14 @@ pub fn update_mechanics(tree: &mut Tree, params: &Params, storm: bool, season: f
             };
             let dr = (r_new - before) / r_new;
             let pa = tree.m.order[i] as f64 - tree.m.pa_shift[i] as f64;
-            post = posture_turn(h, lref, posture_set_point(pa, params), prev, dr, r3);
+            let order = tree.m.order[i] as f64;
+            let bend = curve_offset(order, pa, tree.m.axis_node[i] as f64, params) * DEG;
+            let set_point = if bend == 0.0 {
+                posture_set_point(pa, params)
+            } else {
+                math::max(0.0, math::min(PI, posture_set_point(pa, params) + bend))
+            };
+            post = posture_turn(h, lref, set_point, prev, dr, r3);
         }
         turn[i] = add(sag, post);
     }

@@ -199,6 +199,10 @@ pub struct PaLevel {
     pub posture_set_point: Option<f64>,
     /// Laterals in a whorl ("whorled"); absent, 4.
     pub whorl: Option<f64>,
+    /// Curvature along the limb (ADR 0034): degrees added to the set points over `curve_length`
+    /// nodes of the axis. Absent or 0: off.
+    pub curve: Option<f64>,
+    pub curve_length: Option<f64>,
 }
 
 #[derive(Clone, Debug)]
@@ -483,6 +487,8 @@ impl Params {
                         p_term: num(l, "pTerm"),
                         posture_set_point: opt(l, "postureSetPoint"),
                         whorl: opt(l, "whorl"),
+                        curve: opt(l, "curve"),
+                        curve_length: opt(l, "curveLength"),
                     })
                     .collect(),
                 a_c: num(r2, "aC"),

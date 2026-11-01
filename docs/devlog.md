@@ -2,6 +2,11 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-01: Track B (vocabulary): curvature along the limb (ADR 0034, proposed)
+
+- **`r2.levels[i].curve`, `curveLength`** (r2.rs, season.rs, r3.rs): a level's growth and posture set points move by curve·min(1, node/curveLength) along each non-trunk axis. Off by default; presets and goldens unchanged.
+- **The sheet** (`atlas.py curve`): limbs lower and their tips arch; oak gets a fringe of hanging limb ends; with the relay, beech's top broadens and rounds at 60. No species changes kind on curvature alone. Track A's identity card ranks curvature first and pendulous twigs second; that is this track's order.
+
 ## 2026-11-01: Track B (vocabulary): the sympodial relay (ADR 0033, proposed)
 
 - **`r2.relay`, `r2.relayAge`, `r2.relayPTerm`** (r2.rs, season.rs): laterals on the top nodes under an ended pa-0 apex grow as pa 0 (spec §R2.4's "distal laterals take over"), and the leader may end from an age. Off by default; presets and goldens unchanged.

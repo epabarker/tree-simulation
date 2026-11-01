@@ -6,8 +6,8 @@
 // ("after") and one on claude/ship-week ("before"); the patch carries no species, so each server's
 // own beech is drawn.
 //   node docs/experiments/code/2026-11-01-fresh-look-beech/lab-shots.mjs <origin> <label> <out-dir> <seasons> <view>:<params.json> …
-// Under this review's software GL (SwiftShader) a 100-season shot did not finish in 15 minutes; on a
-// machine with a GPU it should take a minute or two.
+// Under this review's software GL (SwiftShader) a 100-season shot did not finish in 15 minutes; it
+// is untried on a machine with a GPU.
 //   view: phone (390 × 844) or laptop (1440 × 900); params from garden-params.ts. mixedWood itself: a
 //   params file written with kind "mixedWood".
 import { mkdirSync, readFileSync } from "node:fs";

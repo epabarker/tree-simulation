@@ -161,8 +161,12 @@ lo = 2.5
 hi = 6
 [[param]]
 path = "c6.r0"   # ADR 0027's 3D units: the 2D bounds 0.015–0.05 ÷ 8; the top doubled for birch
-lo = 0.001875     # alone (2026-10-31): its 2D fit was near the old top, and round 3 ended on it
-hi = 0.0125
+lo = 0.001875     # alone (2026-10-31): its 2D fit was near the old top, and round 3 ended on it.
+hi = 0.025        # Doubled again (2026-11-01, round 5, the user): the atlas form's sparse twigs
+                  # (levels.2.lateralEvery 2) leave fewer live tips, and the trunk is r0 √tips, so the
+                  # same H/D needs a larger r0; the fit pinned 0.0125 from LM 2 on. A bound by unit
+                  # conversion, not a measurement (ADR 0020: a bound hit is a finding). If r0 goes to
+                  # 0.025 too, look at r3.c and leaf area before widening again.
 [[param]]
 path = "r1.Lh"
 lo = 10

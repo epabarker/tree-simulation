@@ -37,9 +37,20 @@ Three investigations the night after [the review of the fresh-look beech round](
 - **The lone tree is the same at k 10 and k 20,** since alone s̄ = 0 and the gate is fully open from the seedling. It is shorter and broader than the repair's: 127 cells at 100, W/H 1.44, too broad at 60 (1.61).
 - **The stand at k 20 passes the whole guard on 11 of 20 seeds,** the best of the four. At k 10 the gate opens in the young stand before the crowns meet, and the stand moves further.
 - **The garden is worse.** A garden row gives its beeches almost no neighbour shade, so the gate opens fully from the seedling. On the phone's plate both surviving beeches (seeds 12 and 13) become bare poles with a flat cap by 100, where the resource gate did that to one ([phone, k 20](figures/2026-11-01-fresh-look-beech-review-garden-phone-crowd20.png); [laptop, k 20](figures/2026-11-01-fresh-look-beech-review-garden-laptop-crowd20.png)).
-- **So units were not the garden's problem.** The pole with a cap appears wherever the gate is open on a tree whose lower crown is shaded from the side. §2b tests whether own-crown pruning is the cause.
+- **So units were not the garden's problem.** The pole with a cap appears wherever the gate is open on a tree whose lower crown is shaded from the side. §2b shows the cause.
 
-<!-- 2b -->
+### 2b. The pole with a cap is own-crown pruning
+
+The same garden worlds with `c5.Tvig` 0, under the resource gate and under the unit-free gate (k 20), `garden-gate.py --variant notvig` and `crowd20-notvig`:
+
+| garden beech at 100, cells | rules off | repair | repair, Tvig 0 | k 20 | k 20, Tvig 0 |
+|---|---|---|---|---|---|
+| phone plate, seed 12 | 83 | 77 | 77 | 132 | 113 |
+| phone plate, seed 13 | 171 | 114 | 114 | 134 | 123 |
+
+- **Without own-crown pruning neither beech becomes a pole,** under either gate: the crown stays clothed down the stem, a broad head on a short clear trunk ([resource gate, Tvig 0](figures/2026-11-01-fresh-look-beech-review-garden-phone-notvig.png); [k 20, Tvig 0](figures/2026-11-01-fresh-look-beech-review-garden-phone-crowd20-notvig.png)).
+- **The mechanism:** in a garden row the neighbours shade a beech's lower crown from the side; with the gate open, own-crown pruning sheds everything below 25% of the top's light, and the tree is left a stem under a cap. In the open (§1) the same rule clears only the lowest limbs, because nothing shades the rest.
+- **The heights hardly move** without it; it is the lower crown, not the height, that the rule removes.
 
 ## 3. Three namers, form-only
 
@@ -69,6 +80,6 @@ The previous tests had one namer each, and round 2's namer named the hornbeam de
 
 ## 4. What this says for the open decisions
 
-1. **Own-crown pruning (ADR 0043):** the lower limbs it clears are well lit, so clearing them overrides the measurement (§1). Its garden effect is §2b.
-2. **The vigour gate's units:** a unit-free gate helps the closed stand (k 20) and harms the garden (§2). Neither gate makes the round's rules safe in a garden row.
+1. **Own-crown pruning (ADR 0043):** reject it. In the open, the limbs it clears are well lit, so clearing them overrides the measurement (§1). In the garden, it strips any side-shaded beech to a pole with a cap (§2b). Without it, both gates give garden beeches clothed crowns.
+2. **The vigour gate's units:** with own-crown pruning gone, the unit-free gate at k 20 is the better of the two on the evidence here: the closed stand's whole guard on 11 of 20 seeds against 8, the same lone tree for every seed, and clothed garden crowns. Its 20-seed stand and lone runs above included own-crown pruning, so they need repeating without it before anything is proposed.
 3. **Round 2:** the hornbeam is not a lead (§3). The next instrument should draw species as visitors see them (the garden's renderer, track C's bark and foliage); the laptop's GPU can render it. In this drawing no species reads well, so improving beech's form alone may not move a namer.

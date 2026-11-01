@@ -2,6 +2,10 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-02: The blind naming test, v2 (branch claude/blind-v2; measurement only)
+
+- **Three blind namers, the real renderer (track C's bark and foliage), named decoys**, 54 plates (beech branch and today; hornbeam, oak, birch, silver fir; lone 60, lone 100, stand 100; seeds 1–3). The branch's lone beech is beech for all three namers at 60 and 100; today's for 3 of 6 judgments. Both beech stands are beech to one namer only (lime, alder, aspen to the others). Birch passes for all; oak reads as hawthorn and fir as holly or yew on every plate. Every namer named all three seeds of a cell alike, so the seeds added no information. [Note](experiments/2026-11-02-blind-test-v2.md).
+
 ## 2026-11-01: A review of the fresh-look beech round (branch claude/fresh-look-beech)
 
 - **Reproduced:** the repair's sheet and metrics from the brief's command, all 63 numbers equal to `repair-round1/metrics.json`; the stand equal to the solver's; every changed `rust/presets.json` entry inside a beech patch. [Review note](experiments/2026-11-01-fresh-look-beech-review.md).

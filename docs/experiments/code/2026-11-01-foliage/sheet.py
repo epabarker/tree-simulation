@@ -48,7 +48,7 @@ def grid(rows, labels, path):
             sheet.paste(im, (x, y))
             x += w + pad
         y += h + pad
-    sheet.save(path, quality=86)
+    sheet.save(path, quality=80)
     print("wrote", path, sheet.size)
 
 
@@ -63,7 +63,7 @@ grid(phone, [f"lone 60 {before}", f"lone 60 {after}", f"stand 100 {before}", f"s
 laptop = []
 for sp in species:
     for v in ("lone60", "stand100"):
-        ims = [load(f"{t}-{sp}-{v}-laptop", 760) for t in (before, after)]
-        ims.append(load(f"{after}-{sp}-{v}-close", 760))
+        ims = [load(f"{t}-{sp}-{v}-laptop", 560) for t in (before, after)]
+        ims.append(load(f"{after}-{sp}-{v}-close", 560))
         laptop.append((f"{sp}\n{v}", ims))
 grid(laptop, [before, after, f"{after}, close"], f"{out}-laptop.jpg")

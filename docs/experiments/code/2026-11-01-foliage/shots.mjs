@@ -22,7 +22,7 @@ async function shoot(sp, view, url) {
   const context = await browser.newContext({ viewport: VIEWS.phone, deviceScaleFactor: 2 });
   const page = await context.newPage();
   const u = origin ? url.replace(/^https?:\/\/[^/]+\//, origin) : url;
-  await page.goto(u);
+  await page.goto(u, { timeout: 300_000 });
   const t0 = Date.now();
   await page.waitForFunction(() => window.bench !== undefined, null, { timeout: 1_800_000, polling: 1000 });
   for (const [v, size] of Object.entries(VIEWS)) {
@@ -40,11 +40,18 @@ async function shoot(sp, view, url) {
     const r = c.getBoundingClientRect();
     return { x: r.x, y: r.y, width: r.width, height: r.height };
   });
-  await page.mouse.move(box.x + box.width / 2, box.y + box.height - 140);
-  for (let i = 0; i < 6; i++) {
-    await page.mouse.wheel(0, -240);
-    await page.waitForTimeout(150);
-  }
+  // Software GL can stall on a wheel event; give up on the close look after two minutes.
+  const zoom = async () => {
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height - 140);
+    for (let i = 0; i < 6; i++) {
+      await page.mouse.wheel(0, -240);
+      await page.waitForTimeout(150);
+    }
+  };
+  await Promise.race([
+    zoom(),
+    new Promise((_, reject) => setTimeout(() => reject(new Error("zoom stalled")), 120_000)),
+  ]);
   await page.waitForTimeout(2500);
   await page.screenshot({ path: `${dir}/${tag}-${sp}-${view}-close.png`, clip: box, timeout: 300_000 });
   console.log(tag, sp, view, `${Math.round((Date.now() - t0) / 1000)} s`);

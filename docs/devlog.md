@@ -2,6 +2,31 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-02: The second judging pass: holly and rowan adopted, willow's pick withdrawn, maple to the form list; goldens updated
+
+- **The user's picks** on the real-renderer sheets ([judging pass](reviews/2026-11-02-judging-pass.md), second pass): holly fork40 (beech's fork rules from age 40: a bush, not a cypress), rowan kappa1 (level-1 λ 0.53, κ 1.0: an oval crown on a straight stem), birch yes, maple no (the picks barely moved its flat top), willow no (its pendulous pick made it "worse than before": a flat open fan).
+- **Adopted** in `hand-overrides.toml`: holly's fork, rowan's λ and κ. **Withdrawn:** willow's pick (its keys stripped from `flora-fitted.ts` by hand, since `m27_adopt.py` amends over the current entry and a removed override leaves its keys). Maple keeps its relay pick; its flat top is ADR 0031's, after shipping. Willow's form (a dense rounded bush) joins the after-shipping list.
+- **Goldens (intended):** `mixedWood:seed1:s15` afab738c → 6b76672e and `beechWood:seed1:s30` c3245824 → c036c7ff (holly, rowan and willow are in the woods). The other 14 unchanged.
+
+## 2026-11-02: The oak held (dLambda 0.04, the user's override); goldens updated
+
+- **The user chose "held"** for the oak after the garden sheets ([oak note](experiments/2026-11-02-oak-zigzag.md)): `r2.dLambda` 0.04 in `hand-overrides.toml` [oak], so λ stays at 0.52 and the stems are straight (1–2 kinks against 60–76). In the garden's four oak-bearing seeds the held oak stands to 100 (4 of 4, storms on) with the same peak slenderness as today's; the page's throw at seed 10 was one realisation. The lone oak is a cone until its form round (after shipping, with beech's rise-then-arch).
+- **Goldens (intended):** `oakOpen:seed1:s15` f2255ecd → 955e7b1e and `mixedWood:seed1:s15` 7222241d → afab738c (the oak's ramp ends at age 28, so only the cases with an oak past it move). `beechWood` and the other 13 are unchanged.
+
+## 2026-11-02: The judging pass; track B's accepted picks adopted at last (birch, oak, maple, willow); goldens updated
+
+- **The user's judging pass** on the phone, from track C's sheets, verbatim in [`reviews/2026-11-02-judging-pass.md`](reviews/2026-11-02-judging-pass.md): oak "no" (a hazel coppice: zigzag limbs from a low fork; the garden's trunks read as lightning bolts), the other seven "nearly", and the pale depth fade hiding trees (garden seed 3, the birch stand). The fade and birch's black trunk are track C's.
+- **Surprise: track B's picks had never reached the species.** The user accepted them on 2026-11-01 (ADR 0033–0036 and 0038 for the species that use them), but the adoption step (the tracks plan's day 2, track D's) never ran, so the garden the user judged lacked oak's posture by age, maple's relay, willow's pendulous twigs and birch's. Three of the "nearly"s point where the picks point.
+- **Adopted** as hand overrides (`analysis/fit/hand-overrides.toml`, from `code/2026-11-01-atlas/picks.toml`): birch (twig set point 45, pendulous 140 to radius 0.01, laterals every third node), oak (limbs 35 → 85 over 50 seasons of wood), maple (relay 2 from age 10 at p 0.6, relays curving 30 over 30), willow (pendulous twigs, laterals every second node). Hornbeam, rowan and holly keep today's form as the user decided; beech's fresh-look rules stand over its atlas pick. `m27_adopt.py --round round2` reproduces `flora-fitted.ts` exactly before the change, so the regeneration is clean: only the four species' entries move.
+- **Goldens (intended):** `mixedWood:seed1:s15` 2c9953a3 → 7222241d, `oakOpen:seed1:s15` 222430cd → f2255ecd, `beechWood:seed1:s30` 83ecccbb → c3245824: the woods and the oak carry the four species' new forms. `beechOpen` and the 12 others are unchanged.
+- **The oak's zigzag** ([`code/2026-11-02-overrides/oak-zigzag.py`](experiments/code/2026-11-02-overrides/oak-zigzag.py), seeds 4–6): oak's trunk ends at a third of its height (order-0 top / H 0.36) and the crown is laterals fanning from a fork at 0.04–0.06 H, under R2's ontogenetic drop (dLambda 0.1154 over ramp 15). Lowering it straightens the trunk (top / H 1.0 at 0.03) but gives a cone (0.06) or a spire (0.03), never a dome: the freed limbs are level or straight, the same rise-then-arch gap as beech's. The garden's bolts are the stand's trunks; their straightness under the same variants is measured next.
+
+## 2026-11-02: Round 2 merged (PRs #41–#43); the `forest` evidence re-run at shipping; the shipping order
+
+- **The user's look:** the beech on the phone passes. Round 2 is in `3d-port`: ADR 0039–0042 and 0044 for beech, the measured bark, the view options, the WASM gate at 200 kB.
+- **`forest`, 20 seeds, τ 0** ([note](experiments/2026-11-02-forest-evidence.md)): floor 20, H/D 20, crown base 20, plateau 19 of 20 (2026-10-30: 20, 19, 20, 17). The floor at 150 is in band on 19 of 20 (was 8) and release beside gaps fell from 13 trees to 5: the R4 fix and ADR 0032 settled the stand. τ 0.2 reported beside, as before.
+- **The shipping order (the user):** no round-5 fit; one judging pass over the other species on the phone with overrides for misses; I3 steps 3–6 on a fresh track C session; the release and the site's PR. The form gaps (the lone beech's arch, the stand's crown ratio, the lone oak's vase) wait for after the site is live.
+
 ## 2026-11-02: Beech round 2, Part 2: the lone tree's limbs, the latched lift (ADR 0045, proposed, evidence against), track C's blind test v3 (branch claude/c1-calibration-ustbkz; track C on claude/foliage)
 
 - **Why the lone beech reads as oak under a realistic bark** ([note, step 1b](experiments/2026-11-02-beech-round2-stand-diagnosis.md)): the first-order scaffold rises at 36°, but the old second-order wood is level (77°) because it is shaded (ADR 0042 re-reads the light every season), while the lit tips stand at 48°: upturned clumps on level plates.

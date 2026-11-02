@@ -7,8 +7,13 @@ its canvas at device pixel ratio 2 (MAX_DPR), which a phone at 3 only upsamples,
 screenshots are shrunk to 2/3 (the overlay's text loses a little, the trees nothing). Each species'
 sheet is its lone tree at 60 and 100 and its stand at 100, side by side at the plates' one scale.
 Each is saved as JPEG at quality 85, or lower in steps of 5 until it is under 1.5 MB (it prints the
-quality used). SUFFIX is added to every sheet's name (e.g. "-fixed" for the renders of round 2's
-birch fix); only the sheets whose renders are all present are drawn.
+quality used). Only the sheets whose renders are all present are drawn.
+
+Environment, for the sheets after the first:
+- SUFFIX is added to every sheet's name ("-fixed": round 2's birch fix; "-picked": the adopted picks).
+- TAG is the renders' tag (shots.mjs's TAG): `<species>-<TAG>-<trial>-s4.png`, `garden-<TAG>-s<seed>`.
+- GARDEN_ROWS ("label=tag:seed,…") draws the garden's rows from tagged renders instead of the seeds.
+- VARIANTS ("tag=label;…", with VSPECIES) draws one sheet, `<VSPECIES>-variants`: a row per variant.
 """
 
 import io
@@ -34,10 +39,10 @@ TRIALS = [
     ("lone100", "lone, 100 seasons"),
     ("stand100", "stand, 100 seasons"),
 ]
-GARDEN_SEEDS = [10, 2, 3]
 GARDEN_COLS = [("40", "40 seasons"), ("100", "100 seasons, leaf-on"), ("100-winter", "100 seasons, winter")]
 LIMIT = 1.5e6
 SUFFIX = os.environ.get("SUFFIX", "")
+TAG = f"-{os.environ['TAG']}" if os.environ.get("TAG") else ""
 CANVAS = 2 / 3  # MAX_DPR over the phone's 3
 
 
@@ -51,20 +56,33 @@ def save(sheet: Image.Image, out: Path) -> None:
             return
 
 
-def garden() -> None:
-    cols = [c for c in GARDEN_COLS if (renders / f"garden-s{GARDEN_SEEDS[0]}-{c[0]}.png").exists()]
-    w, h = (round(x * CANVAS) for x in Image.open(renders / f"garden-s{GARDEN_SEEDS[0]}-{cols[0][0]}.png").size)
+def garden_rows() -> list[tuple[str, str]]:
+    """(label, file stem) per row: the seeds 10, 2 and 3, or GARDEN_ROWS's tagged runs."""
+    rows = os.environ.get("GARDEN_ROWS")
+    if not rows:
+        return [(f"seed {s}", f"garden{TAG}-s{s}") for s in (10, 2, 3)]
+    out = []
+    for row in rows.split(","):
+        label, run = row.split("=")
+        tag, seed = run.split(":")
+        out.append((label, f"garden-{tag}-s{seed}"))
+    return out
+
+
+def garden(rows: list[tuple[str, str]]) -> None:
+    cols = [c for c in GARDEN_COLS if (renders / f"{rows[0][1]}-{c[0]}.png").exists()]
+    w, h = (round(x * CANVAS) for x in Image.open(renders / f"{rows[0][1]}-{cols[0][0]}.png").size)
     gap, left, top = 16, 200, 80
     font = ImageFont.load_default(size=40)
-    sheet = Image.new("RGB", (left + len(cols) * (w + gap), top + len(GARDEN_SEEDS) * (h + gap)), "white")
+    sheet = Image.new("RGB", (left + len(cols) * (w + gap), top + len(rows) * (h + gap)), "white")
     d = ImageDraw.Draw(sheet)
     for j, (_, label) in enumerate(cols):
         d.text((left + j * (w + gap) + 8, 20), label, fill="black", font=font)
-    for i, seed in enumerate(GARDEN_SEEDS):
+    for i, (label, stem) in enumerate(rows):
         y = top + i * (h + gap)
-        d.text((16, y + h // 2 - 20), f"seed {seed}", fill="black", font=font)
+        d.text((16, y + h // 2 - 20), label, fill="black", font=font)
         for j, (key, _) in enumerate(cols):
-            f = renders / f"garden-s{seed}-{key}.png"
+            f = renders / f"{stem}-{key}.png"
             if f.exists():
                 im = Image.open(f).convert("RGB").resize((w, h), Image.Resampling.LANCZOS)
                 sheet.paste(im, (left + j * (w + gap), y))
@@ -72,7 +90,7 @@ def garden() -> None:
 
 
 def species(sp: str, name: str) -> None:
-    plates = [(Image.open(renders / f"{sp}-{t}-s4.png").convert("RGB"), label) for t, label in TRIALS]
+    plates = [(Image.open(renders / f"{sp}{TAG}-{t}-s4.png").convert("RGB"), label) for t, label in TRIALS]
     gap, top = 16, 150
     h = max(im.height for im, _ in plates)
     sheet = Image.new("RGB", (sum(im.width for im, _ in plates) + gap * (len(plates) - 1), top + h), "white")
@@ -87,8 +105,37 @@ def species(sp: str, name: str) -> None:
     save(sheet, figures / f"2026-11-02-judging-{sp}{SUFFIX}.jpg")
 
 
-if (renders / f"garden-s{GARDEN_SEEDS[0]}-40.png").exists():
-    garden()
-for sp, name in SPECIES.items():
-    if all((renders / f"{sp}-{t}-s4.png").exists() for t, _ in TRIALS):
-        species(sp, name)
+def variants(sp: str, rows: list[tuple[str, str]]) -> None:
+    """One row per variant (tag, label) of species `sp`: lone 60, lone 100 and stand 100."""
+    grid = [[Image.open(renders / f"{sp}-{tag}-{t}-s4.png").convert("RGB") for t, _ in TRIALS] for tag, _ in rows]
+    gap, title, head, band = 16, 100, 60, 64
+    widths = [im.width for im in grid[0]]
+    h = max(im.height for row in grid for im in row)
+    W = sum(widths) + gap * (len(widths) - 1)
+    sheet = Image.new("RGB", (W, title + head + len(rows) * (band + h + gap)), "white")
+    d = ImageDraw.Draw(sheet)
+    d.text((16, 14), f"{SPECIES[sp]} · seed 4 · variants", fill="black", font=ImageFont.load_default(size=56))
+    font = ImageFont.load_default(size=36)
+    x = 0
+    for (_, label), w in zip(TRIALS, widths, strict=True):
+        d.text((x + 12, title + 8), label, fill="black", font=font)
+        x += w + gap
+    for i, ((_, label), row) in enumerate(zip(rows, grid, strict=True)):
+        y = title + head + i * (band + h + gap)
+        d.text((16, y + 12), label, fill="black", font=ImageFont.load_default(size=44))
+        x = 0
+        for im in row:
+            sheet.paste(im, (x, y + band))
+            x += im.width + gap
+    save(sheet, figures / f"2026-11-02-judging-{sp}-variants.jpg")
+
+
+if os.environ.get("VARIANTS"):
+    variants(os.environ["VSPECIES"], [tuple(v.split("=", 1)) for v in os.environ["VARIANTS"].split(";")])
+else:
+    rows = garden_rows()
+    if (renders / f"{rows[0][1]}-40.png").exists():
+        garden(rows)
+    for sp, name in SPECIES.items():
+        if all((renders / f"{sp}{TAG}-{t}-s4.png").exists() for t, _ in TRIALS):
+            species(sp, name)

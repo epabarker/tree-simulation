@@ -11,6 +11,12 @@
 // ROOT is the checkout whose rust/presets.json the served build was built from (default this one).
 // VIEW adds view options to every URL (e.g. "&woodContrast=0"); SPECIES (a comma list) and SEEDS
 // (garden seeds, a comma list) narrow a run, e.g. the fix's re-renders: SPECIES=birch, garden 10,2,3.
+// A variant: ASSIGN, a JSON object of dotted assignments over a species' entry ({"r2.dLambda": 0.04},
+// as v3 built today's beech), with SPECIES the species it applies to and TAG a name for its files
+// (oak-held-lone60-s4.png, garden-held-s10-40.png). The lab patches the entry in its `p`; the garden
+// takes no species patch, so the page reads its own params (`garden.record()`), assigns them over
+// the species' entry and restarts on them (`garden.restart`) at its first season; ASSIGN={} restarts
+// it on its own params unchanged, so a variant's rows and the plain rows are grown alike.
 // Needs playwright-core (PW_FROM: any scratch install) and Playwright's Chromium (CHROME overrides).
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { createRequire } from "node:module";
@@ -29,6 +35,19 @@ const SPECIES = (process.env.SPECIES ?? "birch,beech,oak,hornbeam,maple,willow,r
 const SEED = 4;
 const GARDEN_SEEDS = (process.env.SEEDS ?? "10,2,3").split(",").map(Number);
 const VIEW = process.env.VIEW ?? "";
+const ASSIGN = JSON.parse(process.env.ASSIGN ?? "null");
+const TAG = process.env.TAG ? `-${process.env.TAG}` : "";
+/** `entry` with each dotted key of ASSIGN set ("r2.levels.0.curve" walks into arrays too). */
+function assigned(entry, assign) {
+  const e = JSON.parse(JSON.stringify(entry));
+  for (const [path, value] of Object.entries(assign ?? {})) {
+    const keys = path.split(".");
+    let o = e;
+    for (const k of keys.slice(0, -1)) o = o[k];
+    o[keys.at(-1)] = value;
+  }
+  return e;
+}
 
 const STAND_W = 84;
 const DEPTH = 64;
@@ -52,7 +71,7 @@ function patchOf(species, trial) {
     ? { width: 240, height: 200, walls: [] }
     : { width: STAND_W, height: 200, walls: [], sides: "periodic", faces: [0, 0] };
   const trees = t.lone ? [{ x: 120, species }] : standTrees(species);
-  return { world, trees, species: { [species]: table[species] } };
+  return { world, trees, species: { [species]: assigned(table[species], ASSIGN) } };
 }
 const encode = (patch) => Buffer.from(JSON.stringify(patch)).toString("base64url");
 
@@ -79,7 +98,8 @@ async function bench(page, url, label, before) {
 }
 
 async function garden({ seed, seasons }) {
-  const files = seasons === 40 ? [`garden-s${seed}-40.png`] : [`garden-s${seed}-100.png`, `garden-s${seed}-100-winter.png`];
+  const name = `garden${TAG}-s${seed}`;
+  const files = seasons === 40 ? [`${name}-40.png`] : [`${name}-100.png`, `${name}-100-winter.png`];
   if (files.every((f) => existsSync(join(out, f)))) return;
   const ctx = await browser.newContext({
     viewport: { width: 390, height: 844 },
@@ -99,6 +119,23 @@ async function garden({ seed, seasons }) {
       // ambient rate (0.5 a second) and draws every season in summer.
       window.garden.setYearSeconds(0);
     });
+    if (ASSIGN) {
+      await page.evaluate(
+        async ([species, assign]) => {
+          const g = window.garden;
+          await g.ready;
+          const params = structuredClone((await g.record()).params);
+          for (const [path, value] of Object.entries(assign)) {
+            const keys = path.split(".");
+            let o = params.species[species];
+            for (const k of keys.slice(0, -1)) o = o[k];
+            o[keys.at(-1)] = value;
+          }
+          await g.restart(params);
+        },
+        [SPECIES[0], ASSIGN],
+      );
+    }
   });
   await page.evaluate(() => {
     document.querySelector(".overlay p").innerHTML = window.note;
@@ -121,7 +158,7 @@ async function garden({ seed, seasons }) {
 }
 
 async function lab({ species, trial }) {
-  const file = join(out, `${species}-${trial}-s${SEED}.png`);
+  const file = join(out, `${species}${TAG}-${trial}-s${SEED}.png`);
   if (existsSync(file)) return;
   const url = `${origin}/?preset=oakOpen&seed=${SEED}&p=${encode(patchOf(species, trial))}&bench&seasons=${TRIALS[trial].seasons}&frame=height${VIEW}`;
   const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 2 });

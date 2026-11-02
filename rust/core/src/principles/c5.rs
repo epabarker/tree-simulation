@@ -4,10 +4,20 @@
 //! crown top). `remove_branches` is shared with R3 breakage and obstacle clearance; with R4's bud
 //! bank each removed branch leaves a dormant bud in its slot.
 //!
-//! Params: c5.T, c5.g, c5.Trel, c5.topQuantile; c6.n; r1.shed; r4.bank.
+//! Own-crown pruning (ADR 0043, rejected 2026-11-02: off by default, no species sets it): with `Tvig`, a vigorous tree (R2's vigour gate g
+//! by its production v_base, r2.vigourTreeLo/Hi) also sheds a lateral whose light per metamer is
+//! below g·Tvig·Q_top. An open-grown crown shades its own first limbs as it spreads above them,
+//! and a branch's fate is set by its light relative to the rest of its crown (branch autonomy:
+//! Sprugel, Hinckley & Schaap 1991; Takenaka 1994: cited from memory, unread, ADR 0043), so the sapling's lowest limbs die under the
+//! young dome and the lower trunk clears (the photographs: the open-grown beech's trunk bare for
+//! its lowest 1/8–1/6). A stand member never opens the gate, so its shedding is C5's own.
+//!
+//! Params: c5.T, c5.g, c5.Trel, c5.topQuantile, c5.Tvig; c6.n; r1.shed; r4.bank;
+//! r2.vigourTreeLo, r2.vigourTreeHi.
 
 use super::c1::{add_bud, bud_frame};
 use super::c3::is_live_bud;
+use super::r2::vigour_gate;
 use crate::math;
 use crate::params::Params;
 use crate::tree::{Tree, bud, ensure, slot};
@@ -35,6 +45,12 @@ pub fn shed_branches(tree: &mut Tree, params: &Params, season: f64, evaluated: u
     let g = params.c5.g;
     let t = math::max(params.c5.t, params.c5.t_rel * tree.q_top);
     let carbon = params.r1.enabled && params.r1.shed_carbon;
+    // Own-crown pruning: the relative threshold a vigorous tree adds (0 when off).
+    let own = if params.c5.t_vig > 0.0 {
+        params.c5.t_vig * vigour_gate(tree.v_base, &params.r2) * tree.q_top
+    } else {
+        0.0
+    };
     if carbon {
         // R1's k_shed: a branch must run a deficit this many seasons in a row (1: this season).
         ensure(&mut tree.deficit, nm);
@@ -64,7 +80,7 @@ pub fn shed_branches(tree: &mut Tree, params: &Params, season: f64, evaluated: u
             tree.deficit[i] >= params.r1.k_shed || light < params.c5.t_rel * tree.q_top
         } else {
             n_b > 0.0 && light < t
-        };
+        } || (own > 0.0 && n_b > 0.0 && light < own);
         if shed {
             dead[i] = 1;
             any = true;
@@ -127,7 +143,17 @@ pub fn remove_branches(
         .iter()
         .map(|&i| {
             let c = &tree.m;
-            (c.parent[i], c.slot[i], c.order[i], c.azimuth[i])
+            // The bud's order by its slot (the parent's, one more for a lateral), not the shed
+            // shoot's: a relay is stored at its parent axis's order (ADR 0033, fix A). The same
+            // value for every other shoot.
+            let p = c.parent[i];
+            let order = if p < 0 {
+                c.order[i]
+            } else {
+                let up = (c.slot[i] != slot::MAIN) as u8;
+                c.order[p as usize].wrapping_add(up)
+            };
+            (p, c.slot[i], order, c.azimuth[i])
         })
         .collect();
     let keep: Vec<u8> = (0..nm).map(|i| if dead[i] != 0 { 0 } else { 1 }).collect();
@@ -305,6 +331,28 @@ pub(crate) mod tests {
         assert_eq!(dim_lateral(1.0, &relative), 2.0); // bright top: T_eff = 0.3 > 0.15, shed
         assert_eq!(dim_lateral(0.4, &relative), 0.0); // dim top: T_eff = 0.12 < 0.15, kept
         assert_eq!(dim_lateral(1.0, &params("{}")), 0.0); // T_rel = 0 ignores the top
+    }
+
+    #[test]
+    fn a_vigorous_tree_sheds_its_own_shaded_limbs_and_a_weak_one_keeps_them() {
+        // Own-crown pruning: light per metamer 0.15 passes T 0.1 and Trel 0, but not
+        // g·Tvig·Q_top = 0.25 on a tree whose v_base opens R2's vigour gate.
+        let own = params(
+            r#"{"c5":{"Tvig":0.25},"r2":{"enabled":true,"levels":[{}],"vigourTreeLo":3000,"vigourTreeHi":10000}}"#,
+        );
+        let dim_lateral = |v_base: f64, p: &Params| {
+            let mut t = small_tree(p);
+            t.m.q_sum[2] = 0.3;
+            t.m.n_sum[2] = 2;
+            t.q_top = 1.0;
+            t.v_base = v_base;
+            let nm = t.m.len();
+            shed_branches(&mut t, p, 5.0, nm)
+        };
+        assert_eq!(dim_lateral(20000.0, &own), 2.0); // open-grown: g = 1, threshold 0.25, shed
+        assert_eq!(dim_lateral(2000.0, &own), 0.0); // a stand member: g = 0, kept
+        assert_eq!(dim_lateral(6500.0, &own), 0.0); // g = 0.5: threshold 0.125 < 0.15, kept
+        assert_eq!(dim_lateral(20000.0, &params("{}")), 0.0); // off
     }
 
     #[test]

@@ -2,6 +2,17 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-02: The fresh-look beech decided: four rules accepted, own-crown pruning rejected (branch claude/beech-overnight)
+
+- **The user's decisions** on the review and the overnight note ([overnight §4](experiments/2026-11-02-beech-overnight.md)):
+  - ADRs 0039–0042 (relay gate, vigour fork and arm hold, vigour drop, light orthotropy) are accepted for beech, at the repair's values under the resource vigour gate;
+  - ADR 0043 (own-crown pruning, `c5.Tvig`) is rejected, so the C5 boundary question is moot;
+  - round 2 targets the beech stand and oak's and fir's look in the renderer ([brief](plans/2026-11-02-beech-round2.md)).
+- **Beech without `c5.Tvig`:** removed from `hand-overrides.toml` and `flora-fitted.ts`, and presets exported. Only beech's entries change. The code and its test stay, off by default, so the review's runs reproduce.
+- **The unit-free gate prototype is removed** from the core (`r2.vigourCrowd`, commit 219a002): it was no better once own-crown pruning was off (overnight §2c). The scripts' `--assign` and `--variant` options stay.
+- **Golden (intended):** `beechOpen:seed1:s40` befbed31 → 3525f9f7, because own-crown pruning acted on the lone beech and is now off. `beechWood:seed1:s30` is unchanged: under the resource gate it never acted in the wood. The other 14 are unchanged.
+- **Merging this branch into `3d-port` adopts the round's beech for the garden.** That merge is the user's.
+
 ## 2026-11-01: Track C (foliage): per-species bark, clumping, the coverage instrument, the specimen's memory
 
 - **Bark per species** (`render/bark-styles.ts`): three tokens per species in `scene.css` (twig, bark, old bark), with age moving a stem to bark and girth moving it to old bark. WebGL2 adds a girth-driven texture (fissures, birch's marks, pine's plates). Thresholds are set on the model's girths, about half a real stand's under ADR 0027. Surprise: pine's first try, on real girths, stayed orange to the ground in the stand; birch's lone trunk went black nearly to the crown.
@@ -9,6 +20,76 @@ Newest first. One entry per session or milestone: what changed, why, surprises, 
 - **I3 step 4:** `render/coverage.ts` (cells and leaf pixels); `leafOpacity` and `leafMinPx` as view options. **I3 step 3:** metrics are 18–30% of a 6–22 ms snapshot, so no lean cadence. **Step 5:** `growStill` takes 3.6 s (phone plate) and 5.5 s (laptop plate) headless. **Step 6:** Canvas 2D finishes the phone's intro.
 - **Memory:** the worker holds the forest as checkpoint bytes while the specimen grows, so the 160-cell plate with the specimen peaks at 218.7 MB, not 341.7 MB (ADR 0026's 256). The reloaded hash is unchanged.
 - Goldens unchanged. Note: [`2026-11-01-foliage.md`](experiments/2026-11-01-foliage.md).
+
+## 2026-11-01: A review of the fresh-look beech round (branch claude/fresh-look-beech)
+
+- **Reproduced:** the repair's sheet and metrics from the brief's command, all 63 numbers equal to `repair-round1/metrics.json`; the stand equal to the solver's; every changed `rust/presets.json` entry inside a beech patch. [Review note](experiments/2026-11-01-fresh-look-beech-review.md).
+- **Fixed:** `to_degrees` from std in two core paths, replaced by the core's own multiply (bit-identical: the repair's seed-1 hashes unchanged). Tests for the fork's action in growth and the relay gate's signal.
+- **ADRs 0039–0043, proposed,** for the round's five rules. 0043 (own-crown pruning, `c5.Tvig`) is a C5 shedding change against ADR 0032, for the user's decision. Sprugel et al. 1991 and Takenaka 1994 exist but could not be read here; their claimed content is marked unverified.
+- **A preset, `beechOpen`:** oakOpen's lone specimen with a beech, 240 wide (the repair's world). No other preset changed.
+- **Goldens (intended, new cases only):** `beechOpen:seed1:s40` and `beechWood:seed1:s30`. The round's goldens stopped at 15 seasons, before any of its rules acts; these two run long enough. `golden-coverage.py` shows each case's hash moves when a rule is switched off: the lone case exercises four rules (all but the relay gate, which is identically nil alone), the wood four (all but own-crown pruning); together all five. The 14 existing hashes are unchanged.
+- **Surprise:** in `beechWood` the vigour gate opens by season 30 (the drop and light orthotropy change its hash), and in the round's closed stand the largest v_base reaches 2,400–3,000 against the gate's 3,000 (20 seeds), not the "≤ 2,000" the round reported.
+
+## 2026-11-01: Track B (vocabulary): the six judged; picks.toml final
+
+- **The user's decisions:** oak accepted (posture by age, 35 → 85 by wood over 50); maple accepted (relay from age 10, relays curving 30); willow accepted (pendulous twigs, twig laterals every second node). Hornbeam (the relay leaves the flat cap), rowan and holly keep today's [form]. `picks.toml` final for all eight; ADRs 0033–0036 and 0038 accepted for the species that use them.
+
+## 2026-11-01: Track B (vocabulary): combined sheets for the other six; picks.toml covers all eight
+
+- **`atlas.py combined --species <sp>`** for hornbeam, oak (a second proposal, replacing the first oak sheet), maple, willow, rowan and holly, at 60 and 100 (all below the ceiling), seeds 1–3, "today (off)" first.
+- **Proposed, awaiting the user** (`picks.toml`):
+  - Oak: posture by age, limbs 35 → 85; long, near-level low limbs under a broad crown.
+  - Maple: relay from age 10; a lower fork and a rounder head.
+  - Willow: pendulous twigs with twig laterals every second node; broad and low.
+  - Holly: old limbs levelling toward 80.
+  - Hornbeam: a weak proposal (relay + curve 30); the flat cap stays.
+  - Rowan: no change; posture by age moved nothing.
+
+## 2026-11-01: Track B (vocabulary): fix A for the relay's order; the authored picks; ADRs accepted for beech and birch
+
+- **Fix A** (the user's choice, ADR 0033): a relay is stored at the order of the axis it replaces, so orders no longer climb along a relay chain (the u8 limit). The form offsets exempt the trunk's own axis rather than order 0; C5's bud bank takes the order by slot. Goldens unchanged. The accepted beech and birch sheets are bit-identical before and after; only `limbElevation` reads 0–6° higher on beech (trunk relays' laterals count as limbs).
+- **`docs/experiments/code/2026-11-01-atlas/picks.toml`:** the authored form for beech (relay, relay curvature, posture by age) and birch (pendulous twigs, twig laterals every third node); oak and the other five hold today's [form]. Track D copies them into [form] after its fit.
+- **ADRs 0033–0036 and 0038** accepted for beech and birch as authored; 0037 (elbows) stays proposed, with oak waiting for the elbows to persist.
+
+## 2026-11-01: Track B (vocabulary): beech and fir with posture by age; the u8 order fix proposed
+
+- **`atlas.py combined --species beech-aged`** (relay, relay curvature 45, limbs set point 28 levelling to 80 with wood age over 30/50/80): the broadest beech yet (W/H 0.77–1.04 at 60) with a rounded top. The tiers partly break up into irregular masses, but some level plates remain. **`fir-aged`** (limbs 60 → 110): little change in the outline.
+- **ADR 0033:** two fixes for the u8 order limit proposed, not applied. A: a relay keeps the order of the axis it replaces (no schema change; form metrics read relays as trunk). B: store pa, with a checkpoint version (every golden changes).
+
+## 2026-11-01: Track B (vocabulary): posture by age (ADR 0038, proposed)
+
+- **`r2.levels[i].agedSetPoint`, `agedOver`, `agedBy`** (r2.rs, season.rs, r3.rs): a level's growth and posture set points move with the wood's age (gravimorphism) or the tree's (phase change). Off by default; presets and goldens unchanged.
+- **The sheet** (`atlas.py aged`): the strongest form knob so far. Limb elevation spans 69° to −27°; birch at 100–130 becomes a fir-like cone of descending lower limbs.
+
+## 2026-11-01: Track B (vocabulary): elbows (ADR 0037, proposed)
+
+- **`r2.levels[i].relay`** (r2.rs): an ended axis of any level is continued by its top laterals at that level, so the limb kinks at each takeover (the relay of ADR 0033, past the trunk). Off by default; presets and goldens unchanged.
+- **The sheet** (`atlas.py elbows`): the kinks don't read at the atlas's scale (the set point straightens them). A high limb pTerm narrows and densifies oak; birch at pTerm 1 gets a sinuous top.
+
+## 2026-11-01: Track B (vocabulary): the combined sheets; birch's spike explained
+
+- **Combined sheets** (`atlas.py combined --species <sp>`): beech (relay + curvature) at 60, birch (pendulous + twig spacing) and oak (curvature + per-level κ) at 60 and 100, seeds 1–3 down the rows, "today (off)" first. Beech loses the spire on every seed (fork 0.93–1.00 → 0.26–0.38, a multi-stemmed, rounded, irregular top); `levels.0.curve` 30–60 moves it less than the seed does.
+- **Birch's spike at `relayPTerm` 1** (ADR 0033): a sympodial leader, orders 40–52 through the top 30 cells, renewed each season; it keeps the height the monopodial leader loses. Not a bug. It exposes a limit: order is a u8 and overflows after ≈ 255 relays (forest's 300 seasons), to fix before adoption.
+
+## 2026-11-01: Track B (vocabulary): twig density (ADR 0036, proposed)
+
+- **`r2.levels[i].kappa`, `lateralEvery`** (r2.rs): acrotony per level, and laterals only at every k-th node. Off by default; presets and goldens unchanged.
+- **The sheet** (`atlas.py twigs`): `levels.2.lateralEvery` 3–4 makes birch's crown open, lacy and fine (long thin twig axes), the nearest to its texture on any sheet; per-level κ tufts and broadens the limbs.
+
+## 2026-11-01: Track B (vocabulary): pendulous twigs (ADR 0035, proposed)
+
+- **`r2.levels[i].pendulous`, `pendulousRadius`** (r2.rs, season.rs, r3.rs): a level's thin axes take a hanging set point in growth and posture, blended back to the level's own by girth. Off by default; presets and goldens unchanged.
+- **The sheet** (`atlas.py pendulous`): at radius ≤ 0.01 the twigs hang without the collapse that `levels.2.setPoint` ≥ 80 caused; at 0.02–0.04 oak collapses again. The hanging is faint at the atlas's scale: birch's curtains need long thin shoots as well (twig density and length, next).
+
+## 2026-11-01: Track B (vocabulary): curvature along the limb (ADR 0034, proposed)
+
+- **`r2.levels[i].curve`, `curveLength`** (r2.rs, season.rs, r3.rs): a level's growth and posture set points move by curve·min(1, node/curveLength) along each non-trunk axis. Off by default; presets and goldens unchanged.
+- **The sheet** (`atlas.py curve`): limbs lower and their tips arch; oak gets a fringe of hanging limb ends; with the relay, beech's top broadens and rounds at 60. No species changes kind on curvature alone. Track A's identity card ranks curvature first and pendulous twigs second; that is this track's order.
+
+## 2026-11-01: Track B (vocabulary): the sympodial relay (ADR 0033, proposed)
+
+- **`r2.relay`, `r2.relayAge`, `r2.relayPTerm`** (r2.rs, season.rs): laterals on the top nodes under an ended pa-0 apex grow as pa 0 (spec §R2.4's "distal laterals take over"), and the leader may end from an age. Off by default; presets and goldens unchanged.
+- **The form atlas** (`docs/experiments/code/2026-11-01-atlas/atlas.py`): a sheet per rule, beech, oak and birch at 60 and 100. The relay's sheet: beech splits into ascending co-dominant stems (a rounder top at 60 with a high relay p_term, a column of stems by 100); oak barely moves; birch fuller. The stems do not arch: curvature along the limb is next.
 
 ## 2026-11-01: the form re-pick, the third hornbeam pilot, the round-5 overnight started
 

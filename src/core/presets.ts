@@ -378,6 +378,21 @@ export const presets = {
       o4: { enabled: false },
     },
   },
+  beechOpen: {
+    label: "A beech grown in the open",
+    description:
+      "Fagus sylvatica alone in a field: the fresh-look round's lone tree (ADR 0039–0043, proposed), in a world wide enough for its crown.",
+    // oakOpen's specimen with the beech: 240 wide, as the fresh-look round's repair measured it
+    // (160 clipped a broad crown at the world's sides). A golden case: the open-grown beech is
+    // where the round's vigour-gated rules act.
+    patch: {
+      world: { width: 240, height: TOP, walls: [] },
+      trees: [{ x: 120, species: "beech" }],
+      ...WOODLAND,
+      o2: { stormP: 0 },
+      o4: { enabled: false },
+    },
+  },
   birchWood: {
     leaf: "small",
     label: "M19: a birch wood",

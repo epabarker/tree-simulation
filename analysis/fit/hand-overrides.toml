@@ -25,3 +25,36 @@
 # The fit sees 100 seasons: with L_h 37 pine reached 39 m by season 150. L_h 30 gives 27.5 m at 100
 # (table 29 m), 34.5 m at 150 and 37.4 m at 200, Scots pine's range.
 "r1.Lh" = 30
+
+[beech]
+# Fresh look, beech (2026-11-01, solver round 1): the lone tree a polyarchic dome, the stand kept.
+# The relay (ADR 0033) ends the leader from 15, gated by R5's neighbour shade (k 10), so only an
+# open-grown tree forks low; the vigour fork (excess vigour ends the apex) forks the stand's tops;
+# every arm holds the angle it was born at and curves 30° over 30 nodes (ADR 0034), rising then
+# arching; the vigour drop lowers λ in weak wood of a tree whose v_base passes 3000–10000 (the
+# open-grown crown; a stand member stays near or below 3000: 2,409–3,020 at 20 seeds, review note
+# §2), so its top divides into near-equal limbs.
+# docs/experiments/code/2026-11-01-fresh-look-beech/notes.md, Solver decision.
+"r2.relay" = 2
+"r2.relayAge" = 15
+"r2.relayPTerm" = 0.15
+"r2.relayCrowd" = 10
+"r2.forkAt" = 1.3
+"r2.forkAngle" = 30
+"r2.levels.0.curve" = 30
+"r2.levels.0.curveLength" = 30
+"r2.vigourShare" = 0.3
+"r2.vigourLambda" = 0.03
+"r2.vigourTreeLo" = 3000
+"r2.vigourTreeHi" = 10000
+# Repair round 1 (2026-11-01): the candidate's lone tree was a cedar of flat plates, because every
+# twig (pa 2, set point 94.6°) grew and held level in the open. Light orthotropy: lit wood of a
+# vigorous tree is held erect (35°), shaded wood level, by its light (0.2–0.8) and over its first
+# 3 seasons, so the young shoot spreads level and its older base rises (rise, then arch); the
+# vigour gate (3000–10000) keeps the stand as it was. notes.md, Repair. Own-crown pruning (c5.Tvig
+# 0.25) was part of the repair and is rejected (ADR 0043, 2026-11-02): it made the garden's edge
+# beech a pole with a cap and did not clear the lower trunk (2026-11-02-beech-overnight.md).
+"r2.lightSetPoint" = 35
+"r2.lightLo" = 0.2
+"r2.lightHi" = 0.8
+"r2.lightOver" = 3

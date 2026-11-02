@@ -1,0 +1,156 @@
+{
+ "label": "today",
+ "seeds": "1–20",
+ "n": 20,
+ "lone width": 240,
+ "passes": {
+  "guard: alive ≥ 10 of 12": "20 of 20",
+  "guard: floor 3–5%": "19 of 20",
+  "guard: LAI 6–8": "20 of 20",
+  "guard: LAI 5.5–8.5": "20 of 20",
+  "guard: H/D 70–110": "6 of 20",
+  "guard: all four (alive, floor, LAI 6–8, H/D)": "6 of 20",
+  "gate shut in the stand (max v_base < 3000)": "20 of 20",
+  "lone 60: W/H 0.6–1.0 (checklist)": "9 of 20",
+  "lone 60: W/H 1.3–1.5 (photograph)": "0 of 20",
+  "lone 60: forkHeight ≤ 0.5": "0 of 20",
+  "lone 60: crown clears the sides": "20 of 20",
+  "lone 60: lowest leaf ≥ 0.06·H": "0 of 20",
+  "lone 60: leaf below H/6 ≤ 7%": "0 of 20",
+  "lone 100: W/H 0.6–1.0 (checklist)": "1 of 20",
+  "lone 100: W/H 1.3–1.5 (photograph)": "0 of 20",
+  "lone 100: forkHeight ≤ 0.5": "0 of 20",
+  "lone 100: crown clears the sides": "20 of 20",
+  "lone 100: lowest leaf ≥ 0.06·H": "0 of 20",
+  "lone 100: leaf below H/6 ≤ 7%": "0 of 20"
+ },
+ "median": {
+  "lone60 H": 144.503,
+  "lone60 W/H": 0.595,
+  "lone60 forkHeight": 1.0,
+  "lone60 leaderDominance": 2.009,
+  "lone60 limbCrownRatio": 0.986,
+  "lone60 lowest leaf / H": 0.0,
+  "lone60 leaf below H/6": 0.238,
+  "lone60 vBase": 12189.042,
+  "lone100 H": 203.47,
+  "lone100 W/H": 0.428,
+  "lone100 forkHeight": 0.949,
+  "lone100 leaderDominance": 3.839,
+  "lone100 limbCrownRatio": 0.987,
+  "lone100 lowest leaf / H": 0.0,
+  "lone100 leaf below H/6": 0.235,
+  "lone100 vBase": 12351.789,
+  "stand alive": 12.0,
+  "stand H/D": 112.0,
+  "stand crownRatio(limb)": 0.345,
+  "stand crownRatio(leaf)": 0.37,
+  "stand floor": 0.043,
+  "stand LAI": 7.45,
+  "stand max vBase (any tree, any season)": 2614.774,
+  "stand H": 182.25,
+  "stand n": 12.0
+ },
+ "range": {
+  "lone60 H": [
+   134.87,
+   146.762
+  ],
+  "lone60 W/H": [
+   0.547,
+   0.641
+  ],
+  "lone60 forkHeight": [
+   0.836,
+   1.0
+  ],
+  "lone60 leaderDominance": [
+   1.572,
+   2.209
+  ],
+  "lone60 limbCrownRatio": [
+   0.978,
+   0.986
+  ],
+  "lone60 lowest leaf / H": [
+   -0.0,
+   0.004
+  ],
+  "lone60 leaf below H/6": [
+   0.218,
+   0.272
+  ],
+  "lone60 vBase": [
+   11514.258,
+   13047.146
+  ],
+  "lone100 H": [
+   188.077,
+   207.938
+  ],
+  "lone100 W/H": [
+   0.393,
+   0.672
+  ],
+  "lone100 forkHeight": [
+   0.814,
+   0.971
+  ],
+  "lone100 leaderDominance": [
+   3.021,
+   6.39
+  ],
+  "lone100 limbCrownRatio": [
+   0.985,
+   0.99
+  ],
+  "lone100 lowest leaf / H": [
+   -0.0,
+   0.004
+  ],
+  "lone100 leaf below H/6": [
+   0.222,
+   0.261
+  ],
+  "lone100 vBase": [
+   10569.584,
+   13740.306
+  ],
+  "stand alive": [
+   11.0,
+   12.0
+  ],
+  "stand H/D": [
+   104.0,
+   123.0
+  ],
+  "stand crownRatio(limb)": [
+   0.27,
+   0.41
+  ],
+  "stand crownRatio(leaf)": [
+   0.31,
+   0.42
+  ],
+  "stand floor": [
+   0.032,
+   0.054
+  ],
+  "stand LAI": [
+   6.8,
+   8.0
+  ],
+  "stand max vBase (any tree, any season)": [
+   2409.071,
+   2946.223
+  ],
+  "stand H": [
+   174.0,
+   185.5
+  ],
+  "stand n": [
+   11.0,
+   12.0
+  ]
+ }
+}

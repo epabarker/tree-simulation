@@ -139,6 +139,10 @@ pub struct C5 {
     pub g: f64,
     pub t_rel: f64,
     pub top_quantile: f64,
+    /// Own-crown pruning (fresh-look beech, repair): a lateral whose light per metamer is below
+    /// g·Tvig·Q_top is shed too, g the tree's vigour gate (r2.vigourTreeLo/Hi; 1 when unset).
+    /// 0 or absent: off.
+    pub t_vig: f64,
 }
 
 #[derive(Clone, Debug)]
@@ -199,6 +203,26 @@ pub struct PaLevel {
     pub posture_set_point: Option<f64>,
     /// Laterals in a whorl ("whorled"); absent, 4.
     pub whorl: Option<f64>,
+    /// Curvature along the limb (ADR 0034): degrees added to the set points over `curve_length`
+    /// nodes of the axis. Absent or 0: off.
+    pub curve: Option<f64>,
+    pub curve_length: Option<f64>,
+    /// Pendulous twigs (ADR 0035): the set point (degrees) a thin axis of this level hangs at,
+    /// fully at radius ≤ `pendulous_radius`, fading to the level's own at twice it. Absent: off.
+    pub pendulous: Option<f64>,
+    pub pendulous_radius: Option<f64>,
+    /// Twig density (ADR 0036): this level's acrotony κ (absent: r2.kappa), and laterals only at
+    /// every k-th node (absent or ≤ 1: every node; not for whorled, which has tier_every).
+    pub kappa: Option<f64>,
+    pub lateral_every: Option<f64>,
+    /// Elbows (ADR 0037): when this level's axis ends (p_term), the laterals on its top `relay`
+    /// nodes continue it at this level (absent: 0, or r2.relay for pa 0).
+    pub relay: Option<f64>,
+    /// Posture by age (ADR 0038): the set point this level's axes move toward with age, over
+    /// `aged_over` seasons, by the wood's own age, or the tree's when `aged_by_tree`. Absent: off.
+    pub aged_set_point: Option<f64>,
+    pub aged_over: Option<f64>,
+    pub aged_by_tree: bool,
 }
 
 #[derive(Clone, Debug)]
@@ -210,6 +234,43 @@ pub struct R2 {
     pub ramp: f64,
     pub kappa: Option<f64>,
     pub h_j: Option<f64>,
+    /// The sympodial relay (ADR 0033): laterals on the top `relay` nodes below a pa-0 axis's
+    /// ended apex take pa 0. 0 or absent: off.
+    pub relay: f64,
+    /// From this tree age (seasons) a pa-0 terminal ends with probability `relay_p_term`.
+    pub relay_age: f64,
+    pub relay_p_term: f64,
+    /// The vigour fork (Nicolini & Caraglio 1994: beech forks where growth is fastest): a pa-0
+    /// shoot whose bud received v ≥ `forkAt`·c1.maxMetamersPerShoot ends its terminal bud, so the
+    /// relay (r2.relay nodes) turns the season's apex into co-dominant arms. 0 or absent: off.
+    pub fork_at: f64,
+    /// The fork arms' angle from the ended apex's heading, degrees (absent: the laterals' own β).
+    pub fork_angle: Option<f64>,
+    /// The relay's neighbour gate (fresh-look beech): a pa-0 apex ends by `relay_p_term`·max(0,
+    /// 1 − k·s̄), s̄ the tree's mean R5 neighbour shade over its metamers (0 alone in the open).
+    /// Absent: off, the relay fires by age alone.
+    pub relay_crowd: Option<f64>,
+    /// The vigour drop (fresh-look beech): the share s of the tree's resource v_base at which a
+    /// node is fully vigorous, u = min(1, (v_in / v_base) / s). 0 or absent: off.
+    pub vigour_share: f64,
+    /// λ falls by g·(1 − u)·vigourLambda at a node: weak wood loses apical control (absent: 0).
+    pub vigour_lambda: f64,
+    /// The tree's own vigour gate g = clamp((v_base − lo) / (hi − lo)), so a tree whose whole
+    /// production stays small (a stand member, a suppressed tree) is untouched; g = 1 when
+    /// `vigour_tree_hi` ≤ `vigour_tree_lo` (both absent).
+    pub vigour_tree_lo: f64,
+    pub vigour_tree_hi: f64,
+    /// Light orthotropy (fresh-look beech, repair): a new shoot of pa ≥ 1 takes a growth set
+    /// point moved from its level's toward this one (degrees from vertical) by its bud's light,
+    /// fully at `light_hi` and above, not at all at `light_lo` and below (Nicolini & Caraglio
+    /// 1994: vertical laterals are more frequent in full light; Nicolini 2000: axes under cover
+    /// are plagiotropic). Absent: off.
+    pub light_set_point: Option<f64>,
+    pub light_lo: f64,
+    pub light_hi: f64,
+    /// Light orthotropy's wood-age ramp: wood straightens fully at this age, seasons (absent: 1,
+    /// so even this season's shoot does).
+    pub light_over: f64,
 }
 
 #[derive(Clone, Debug)]
@@ -424,6 +485,7 @@ impl Params {
                     g: num(g, "g"),
                     t_rel: num(g, "Trel"),
                     top_quantile: num(g, "topQuantile"),
+                    t_vig: opt(g, "Tvig").unwrap_or(0.0),
                 }
             },
             c6: {
@@ -477,6 +539,16 @@ impl Params {
                         p_term: num(l, "pTerm"),
                         posture_set_point: opt(l, "postureSetPoint"),
                         whorl: opt(l, "whorl"),
+                        curve: opt(l, "curve"),
+                        curve_length: opt(l, "curveLength"),
+                        pendulous: opt(l, "pendulous"),
+                        pendulous_radius: opt(l, "pendulousRadius"),
+                        kappa: opt(l, "kappa"),
+                        lateral_every: opt(l, "lateralEvery"),
+                        relay: opt(l, "relay"),
+                        aged_set_point: opt(l, "agedSetPoint"),
+                        aged_over: opt(l, "agedOver"),
+                        aged_by_tree: text(l, "agedBy") == "tree",
                     })
                     .collect(),
                 a_c: num(r2, "aC"),
@@ -484,6 +556,20 @@ impl Params {
                 ramp: num(r2, "ramp"),
                 kappa: opt(r2, "kappa"),
                 h_j: opt(r2, "hJ"),
+                relay: opt(r2, "relay").unwrap_or(0.0),
+                relay_age: opt(r2, "relayAge").unwrap_or(0.0),
+                relay_p_term: opt(r2, "relayPTerm").unwrap_or(0.0),
+                fork_at: opt(r2, "forkAt").unwrap_or(0.0),
+                fork_angle: opt(r2, "forkAngle"),
+                relay_crowd: opt(r2, "relayCrowd"),
+                vigour_share: opt(r2, "vigourShare").unwrap_or(0.0),
+                vigour_lambda: opt(r2, "vigourLambda").unwrap_or(0.0),
+                vigour_tree_lo: opt(r2, "vigourTreeLo").unwrap_or(0.0),
+                vigour_tree_hi: opt(r2, "vigourTreeHi").unwrap_or(0.0),
+                light_set_point: opt(r2, "lightSetPoint"),
+                light_lo: opt(r2, "lightLo").unwrap_or(0.0),
+                light_hi: opt(r2, "lightHi").unwrap_or(1.0),
+                light_over: opt(r2, "lightOver").unwrap_or(1.0),
             },
             r3: R3 {
                 enabled: flag(r3, "enabled"),

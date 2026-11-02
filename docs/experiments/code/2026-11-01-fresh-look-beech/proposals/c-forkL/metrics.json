@@ -1,0 +1,83 @@
+{
+ "lone60-seed1": {
+  "height": 123.9,
+  "W/H": 0.84,
+  "H/D": 47.0,
+  "limbCrownRatio": 0.97,
+  "limbElevation": 44.0,
+  "forkHeight": 0.41,
+  "leaderDominance": 3.03
+ },
+ "lone100-seed1": {
+  "height": 166.2,
+  "W/H": 0.79,
+  "H/D": 26.0,
+  "limbCrownRatio": 0.97,
+  "limbElevation": 46.0,
+  "forkHeight": 0.31,
+  "leaderDominance": 6.34
+ },
+ "stand100-seed1": {
+  "alive": "12/12",
+  "height": 166.9,
+  "H/D": 110.0,
+  "crownRatio(limb)": 0.3,
+  "crownRatio(leaf)": 0.51,
+  "floor": "3.4%",
+  "LAI": 7.7
+ },
+ "lone60-seed2": {
+  "height": 126.9,
+  "W/H": 0.75,
+  "H/D": 50.0,
+  "limbCrownRatio": 0.98,
+  "limbElevation": 46.0,
+  "forkHeight": 0.4,
+  "leaderDominance": 2.53
+ },
+ "lone100-seed2": {
+  "height": 168.2,
+  "W/H": 0.73,
+  "H/D": 53.0,
+  "limbCrownRatio": 0.98,
+  "limbElevation": 48.0,
+  "forkHeight": 0.3,
+  "leaderDominance": 3.18
+ },
+ "stand100-seed2": {
+  "alive": "12/12",
+  "height": 149.6,
+  "H/D": 93.0,
+  "crownRatio(limb)": 0.29,
+  "crownRatio(leaf)": 0.46,
+  "floor": "3.1%",
+  "LAI": 8.5
+ },
+ "lone60-seed3": {
+  "height": 128.8,
+  "W/H": 0.78,
+  "H/D": 66.0,
+  "limbCrownRatio": 0.98,
+  "limbElevation": 41.0,
+  "forkHeight": 0.39,
+  "leaderDominance": 2.29
+ },
+ "lone100-seed3": {
+  "height": 182.5,
+  "W/H": 0.84,
+  "H/D": 46.0,
+  "limbCrownRatio": 0.98,
+  "limbElevation": 44.0,
+  "forkHeight": 0.28,
+  "leaderDominance": 4.64
+ },
+ "stand100-seed3": {
+  "alive": "12/12",
+  "height": 156.2,
+  "H/D": 94.0,
+  "crownRatio(limb)": 0.32,
+  "crownRatio(leaf)": 0.48,
+  "floor": "4.8%",
+  "LAI": 7.2
+ }
+}

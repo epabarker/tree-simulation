@@ -18,7 +18,7 @@
 import type { Snapshot } from "../../core/types.ts";
 import { BudState } from "../../core/types.ts";
 import { BARK_PALETTES, BARK_STEPS, BARK_STYLES, barkStep, fissureOpen } from "./bark-styles.ts";
-import { CATEGORICAL, SEQUENTIAL } from "./colors.ts";
+import { CATEGORICAL, keepContrast, SEQUENTIAL } from "./colors.ts";
 import {
   isLeafStyleName,
   LEAF_PALETTES,
@@ -122,6 +122,12 @@ export interface ViewOptions {
    * snapshot carries the field (the lab's does; the garden asks for none).
    */
   barkLight?: number;
+  /**
+   * The least ΔL* (CIE) wood keeps below a light sky (round 2's judging; WOOD_CONTRAST by default,
+   * 0 for the colours as the tokens give them): a paler bark draws darkened to that floor
+   * (`keepContrast`). Only pale wood moves, birch's white: every other bark is already darker.
+   */
+  woodContrast?: number;
 }
 
 export interface Camera {
@@ -182,6 +188,12 @@ export const LEAF_ASPECT = LEAF_STYLES.broadleaf.aspect;
 export const LEAF_MIN_PX = 3.5;
 /** A leaf card's opacity: overlapping cards build up depth, and a single card lets a little through. */
 export const LEAF_OPACITY = 0.92;
+/**
+ * The least ΔL* (CIE) wood keeps below a light sky's lower, palest tone (`ViewOptions.woodContrast`).
+ * Birch's white (L* 91) drew 3 below the sky (L* 95) and vanished in a stand; at 18 it draws a light
+ * grey (L* 77), as a white stem against a bright sky looks.
+ */
+export const WOOD_CONTRAST = 18;
 
 /** Length of a full-size leaf of `length` world units at `scale` CSS pixels per world unit. */
 export function leafLength(
@@ -265,6 +277,8 @@ export class Scene {
   girth = 1;
   /** How far shade darkens wood (0: not at all); renderers copy `ViewOptions.barkLight`. */
   barkLight = 0;
+  /** The least ΔL* wood keeps below a light sky; renderers copy `ViewOptions.woodContrast`. */
+  woodContrast = WOOD_CONTRAST;
   private woodLightFor = { s: null as Snapshot | null, k: 0 };
   private woodLightOf = new Float32Array(0);
   /**
@@ -896,9 +910,14 @@ export class Scene {
   palette(mode: ColorMode, theme: Theme): string[] {
     if (mode === "natural") {
       // The view's ramp, then each species' (bark-styles.ts): `colorIndices` points into both.
-      if (this.naturalFor !== theme) {
-        this.natural = [...theme.bark, ...BARK_PALETTES.flatMap((p) => theme.barkBy[p])];
+      // Each kept at least `woodContrast` below the sky's palest tone, where wood stands.
+      if (this.naturalFor !== theme || this.naturalContrast !== this.woodContrast) {
+        const dL = this.woodContrast;
+        this.natural = [...theme.bark, ...BARK_PALETTES.flatMap((p) => theme.barkBy[p])].map((c) =>
+          keepContrast(c, theme.skyBottom, dL),
+        );
         this.naturalFor = theme;
+        this.naturalContrast = dL;
       }
       return this.natural;
     }
@@ -910,6 +929,7 @@ export class Scene {
 
   private natural: string[] = [];
   private naturalFor: Theme | null = null;
+  private naturalContrast = 0;
 
   /**
    * Each tree's drawing style (M19: each tree is drawn as its species): `styles[kindOf[tree]]`,
@@ -1034,6 +1054,9 @@ export class Scene {
     if (this.bark.length < 4 * n) this.bark = new Uint8Array(8 * n);
     let max = 0;
     for (let j = 0; j < n; j++) if (s.age[j] > max) max = s.age[j];
+    // Each tree's height, for barks that age only low on the tree (`oldBelow`, birch's base).
+    const heightOf: number[] = [];
+    for (const m of s.metrics) heightOf[m.tree] = m.height;
     for (let j = 0; j < n; j++) {
       const p = barkOf[kindOf[s.tree[j] as number] as number] as number;
       const q = 4 * j;
@@ -1048,9 +1071,11 @@ export class Scene {
       const style = BARK_STYLES[BARK_PALETTES[p] as (typeof BARK_PALETTES)[number]];
       const age = s.age[j] as number;
       const r = s.radius[j] as number;
-      this.colors[j] = RAMP_STEPS + p * BARK_STEPS + barkStep(style, age, r);
+      const H = heightOf[s.tree[j] as number] ?? 0;
+      const h = H > 0 ? (s.y0[j] as number) / H : 0;
+      this.colors[j] = RAMP_STEPS + p * BARK_STEPS + barkStep(style, age, r, h);
       const mature = age >= style.mature ? 1 : age / style.mature;
-      const open = fissureOpen(style, r);
+      const open = fissureOpen(style, r, h);
       this.bark[q] = Math.round(255 * style.fissure * open);
       this.bark[q + 1] = Math.round(255 * style.marks * mature);
       this.bark[q + 2] = Math.round(255 * style.plates * open);

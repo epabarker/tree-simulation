@@ -49,12 +49,28 @@ export interface BarkStyle {
   marks: number;
   /** Pine's plates: fissures that also break across, into blocks. */
   plates: number;
+  /**
+   * Diameters (cm) over which a stem turns from twig to bark, as well as by age (unset: by age
+   * alone). Birch's twigs stay red-brown until they thicken, so its fine crown reads as the
+   * "purplish-brown haze" of the species card, and only its trunk and limbs white.
+   */
+  barkFrom?: number;
+  barkAt?: number;
+  /**
+   * The share of the tree's height below which bark turns old, fissures and plates open (unset:
+   * at any height): birch's bole is white, its base "becomes black and rugged" (RHS). They fade
+   * out between half this height and this height.
+   */
+  oldBelow?: number;
 }
 
 export const BARK_STYLES: Record<BarkPalette, BarkStyle> = {
   /**
    * Silver birch: red-brown twigs, white bark "interspersed with conspicuous black patches", and a
-   * base that "becomes black and rugged" (RHS) with dark diamond fissures.
+   * base that "becomes black and rugged" (RHS) with dark diamond fissures. Round 2's judging (the
+   * user, on a phone): by age alone its fine crown drew white and vanished into the sky, and by girth
+   * alone a lone birch's whole trunk turned black by 100. The twig colour now holds below 1.5–4 cm
+   * (≈ 3–7 cm real, at the model's ≈ 0.55 of a real girth), and the black stays in the lowest fifth.
    */
   birch: {
     mature: 8,
@@ -65,6 +81,9 @@ export const BARK_STYLES: Record<BarkPalette, BarkStyle> = {
     fissureAt: 30,
     marks: 0.8,
     plates: 0.4,
+    barkFrom: 1.5,
+    barkAt: 4,
+    oldBelow: 0.2,
   },
   /** Oak: grey-brown and deeply fissured, the fissures from early on. */
   oak: {
@@ -178,15 +197,31 @@ function smooth(a: number, b: number, x: number): number {
   return u * u * (3 - 2 * u);
 }
 
-/** A stem's step on its species' ramp (0 … BARK_STEPS − 1), from its age (seasons) and radius (cells). */
-export function barkStep(style: BarkStyle, age: number, radius: number): number {
+/** How far a stem whose base is at `h` of its tree's height (0 → 1) may age: 1 → 0 (`oldBelow`). */
+export function oldReach(style: BarkStyle, h: number): number {
+  const below = style.oldBelow;
+  return below === undefined ? 1 : 1 - smooth(0.5 * below, below, h);
+}
+
+/**
+ * A stem's step on its species' ramp (0 … BARK_STEPS − 1), from its age (seasons), its radius
+ * (cells) and its base's height over its tree's (0 → 1).
+ */
+export function barkStep(style: BarkStyle, age: number, radius: number, h = 0): number {
   const half = BARK_STEPS / 2;
-  if (age < style.mature) return Math.floor((age / style.mature) * half);
-  const t = smooth(style.oldFrom, style.oldAt, radius * 50);
+  const d = radius * 50;
+  const byGirth = style.barkAt === undefined ? 1 : smooth(style.barkFrom ?? 0, style.barkAt, d);
+  const young = Math.min(age / style.mature, byGirth);
+  if (young < 1) return Math.floor(young * half);
+  const t = smooth(style.oldFrom, style.oldAt, d) * oldReach(style, h);
   return Math.min(BARK_STEPS - 1, half + Math.floor(t * half));
 }
 
-/** How open a stem's fissures are, 0 → 1, from its radius (cells), before the style's depth. */
-export function fissureOpen(style: BarkStyle, radius: number): number {
-  return style.fissure > 0 ? smooth(style.fissureFrom, style.fissureAt, radius * 50) : 0;
+/**
+ * How open a stem's fissures are, 0 → 1, from its radius (cells) and its base's height over its
+ * tree's, before the style's depth.
+ */
+export function fissureOpen(style: BarkStyle, radius: number, h = 0): number {
+  if (style.fissure <= 0) return 0;
+  return smooth(style.fissureFrom, style.fissureAt, radius * 50) * oldReach(style, h);
 }

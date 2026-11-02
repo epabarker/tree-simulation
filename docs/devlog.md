@@ -2,6 +2,14 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-02: Track C: birch drawn as birch on the phone (the user's judging sheets), the contrast floor (branch claude/foliage)
+
+- **The user's judging pass** (the labelled sheets, `figures/2026-11-02-judging-*.jpg`): garden seed 3 "fades to mist" but for one black pole, the birch stand's stems "vanish", the lone birch at 100 has a black trunk.
+- **Not a depth fade.** The renderer has none: the 64 slices only order the drawing. The garden plants one row at mid-depth (z 32; recruits 18–46). The cause is birch's tone: by age alone everything older than 8 seasons drew white (#e9e6de, ΔL* 3 below the lower sky), 92–97% of it under 1 px wide. Measured (`code/2026-11-02-judging/pale.mjs`): birch's drawn wood averaged ΔL* 0–2 from the sky on garden seed 3 at 40, the stand and the lone tree at 100.
+- **Birch's bark** (`bark-styles.ts`, two new optional fields): twig → bark also by girth (`barkFrom` 1.5, `barkAt` 4 cm), so the fine crown keeps its red-brown (the species card's "purplish-brown haze"); and `oldBelow` 0.2, so the black, rugged bark and the fissures stay in the lowest fifth (RHS: "black and rugged at the base"). Every other species is unchanged.
+- **`woodContrast`** (`ViewOptions`, default WOOD_CONTRAST 18; `&woodContrast=0` in the lab and the garden for the tokens' colours): wood paler than 18 L* below the light sky's lower tone is darkened in linear light to that floor (`keepContrast`). Only birch's white moves (to L* 77); every other bark token is already ≥ 28 below. Dark theme untouched.
+- **After:** birch's wood averages ΔL* 16 on garden seed 3 at 40, 8 on the lone birch and 6 on the stand at 100 (the rest is sub-pixel coverage, unchanged). Garden seed 2 and the beech stand are unchanged (no birch; no token moves). Sheets `2026-11-02-judging-{garden,birch}-fixed.jpg`. Goldens unchanged; `npm run check` passes (95 tests).
+
 ## 2026-11-02: Beech round 2, Part 2: the lone tree's limbs, the latched lift (ADR 0045, proposed, evidence against), track C's blind test v3 (branch claude/c1-calibration-ustbkz; track C on claude/foliage)
 
 - **Why the lone beech reads as oak under a realistic bark** ([note, step 1b](experiments/2026-11-02-beech-round2-stand-diagnosis.md)): the first-order scaffold rises at 36°, but the old second-order wood is level (77°) because it is shaded (ADR 0042 re-reads the light every season), while the lit tips stand at 48°: upturned clumps on level plates.

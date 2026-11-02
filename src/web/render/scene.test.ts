@@ -3,10 +3,12 @@ import { productionWorld } from "../../../tests/production-world.ts";
 import { presetParams, presets } from "../../core/presets.ts";
 import { BudState } from "../../core/types.ts";
 import type { RustWorld, TreeView as Tree } from "../../wasm/world.ts";
-import { dimByte } from "./colors.ts";
+import { BARK_PALETTES } from "./bark-styles.ts";
+import { dimByte, keepContrast, lightness, parseColor } from "./colors.ts";
 import { FAR, NEAR, nearAndFar } from "./fixture.ts";
 import { isLeafStyleName, LEAF_STYLES } from "./leaf-styles.ts";
 import { DEPTH_SLICES, depthSlice, LEAF_LENGTH, Scene } from "./scene.ts";
+import type { Theme } from "./theme.ts";
 
 /** Young metamers (leafy shoots) and short shoots on older wood (rosettes) in a snapshot. */
 function leafSites(scene: Scene, leafAge: number): { young: number; rosettes: number } {
@@ -332,5 +334,34 @@ describe("clear boles (the lab's `&clearBole`, round 2)", () => {
     expect(dimByte(200, 1)).toBe(200);
     expect(dimByte(0x8f, 0.55)).toBeGreaterThanOrEqual(0x6b);
     expect(dimByte(0x8f, 0.55)).toBeLessThanOrEqual(0x77);
+  });
+
+  it("keeps pale wood a set ΔL* below a light sky, and leaves dark wood and dark skies alone", () => {
+    const sky = "#f4efe2";
+    const L = (css: string): number => {
+      const [r, g, b] = parseColor(css);
+      return lightness(r, g, b);
+    };
+    // Birch's white (L* 91) against the lower sky (L* 95) is taken to 18 below the sky.
+    const birch = keepContrast("#e9e6de", sky, 18);
+    expect(L(sky) - L(birch)).toBeGreaterThan(17.5);
+    expect(L(sky) - L(birch)).toBeLessThan(18.5);
+    // Beech's measured grey, oak's fissured brown: unchanged.
+    expect(keepContrast("#777a79", sky, 18)).toBe("#777a79");
+    expect(keepContrast("rgb(90, 70, 50)", sky, 18)).toBe("rgb(90, 70, 50)");
+    // Off, and against the dark theme's sky: unchanged.
+    expect(keepContrast("#e9e6de", sky, 0)).toBe("#e9e6de");
+    expect(keepContrast("#d6d2c8", "#1f2731", 18)).toBe("#d6d2c8");
+    // The scene's natural palette carries the floor, and 0 restores the tokens' colours.
+    const scene = new Scene();
+    const ramp = ["#6b3f2c", "#e9e6de", "#2f2b28"];
+    const theme = {
+      skyBottom: sky,
+      bark: ramp,
+      barkBy: Object.fromEntries(BARK_PALETTES.map((p) => [p, ramp])),
+    } as unknown as Theme;
+    expect(scene.palette("natural", theme).every((c) => L(sky) - L(c) >= 17.5)).toBe(true);
+    scene.woodContrast = 0;
+    expect(scene.palette("natural", theme).some((c) => L(sky) - L(c) < 10)).toBe(true);
   });
 });

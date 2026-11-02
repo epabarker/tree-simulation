@@ -9,6 +9,8 @@
 // eight garden species alone in beechOpen's world (240 wide) at 60 and 100, and as a closed stand
 // (84 wide, periodic, 12 trees) at 100, seed 4. Each species is its entry in rust/presets.json.
 // ROOT is the checkout whose rust/presets.json the served build was built from (default this one).
+// VIEW adds view options to every URL (e.g. "&woodContrast=0"); SPECIES (a comma list) and SEEDS
+// (garden seeds, a comma list) narrow a run, e.g. the fix's re-renders: SPECIES=birch, garden 10,2,3.
 // Needs playwright-core (PW_FROM: any scratch install) and Playwright's Chromium (CHROME overrides).
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { createRequire } from "node:module";
@@ -23,9 +25,10 @@ const table = JSON.parse(readFileSync(join(root, "rust/presets.json"), "utf8")).
 const [origin, out, mode, conc = "3"] = process.argv.slice(2);
 const exe = process.env.CHROME ?? `${process.env.HOME}/.cache/ms-playwright/chromium-1248/chrome-linux64/chrome`;
 
-const SPECIES = ["birch", "beech", "oak", "hornbeam", "maple", "willow", "rowan", "holly"];
+const SPECIES = (process.env.SPECIES ?? "birch,beech,oak,hornbeam,maple,willow,rowan,holly").split(",");
 const SEED = 4;
-const GARDEN_SEEDS = [10, 2, 3];
+const GARDEN_SEEDS = (process.env.SEEDS ?? "10,2,3").split(",").map(Number);
+const VIEW = process.env.VIEW ?? "";
 
 const STAND_W = 84;
 const DEPTH = 64;
@@ -87,7 +90,7 @@ async function garden({ seed, seasons }) {
   });
   const page = await ctx.newPage();
   const t = Date.now();
-  const url = `${origin}/garden.html?seed=${seed}&bench&seasons=${seasons}`;
+  const url = `${origin}/garden.html?seed=${seed}&bench&seasons=${seasons}${VIEW}`;
   const result = await bench(page, url, `garden ${seed} ${seasons}`, async () => {
     await page.waitForFunction(() => window.garden);
     await page.evaluate(() => {
@@ -120,7 +123,7 @@ async function garden({ seed, seasons }) {
 async function lab({ species, trial }) {
   const file = join(out, `${species}-${trial}-s${SEED}.png`);
   if (existsSync(file)) return;
-  const url = `${origin}/?preset=oakOpen&seed=${SEED}&p=${encode(patchOf(species, trial))}&bench&seasons=${TRIALS[trial].seasons}&frame=height`;
+  const url = `${origin}/?preset=oakOpen&seed=${SEED}&p=${encode(patchOf(species, trial))}&bench&seasons=${TRIALS[trial].seasons}&frame=height${VIEW}`;
   const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 2 });
   // The lab's charts row grows with the number of trees, which would shrink a stand's canvas and so
   // its scale; pin the canvas at the blind tests' 1120 × 654 for every trial.

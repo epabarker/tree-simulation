@@ -7,10 +7,12 @@ its canvas at device pixel ratio 2 (MAX_DPR), which a phone at 3 only upsamples,
 screenshots are shrunk to 2/3 (the overlay's text loses a little, the trees nothing). Each species'
 sheet is its lone tree at 60 and 100 and its stand at 100, side by side at the plates' one scale.
 Each is saved as JPEG at quality 85, or lower in steps of 5 until it is under 1.5 MB (it prints the
-quality used).
+quality used). SUFFIX is added to every sheet's name (e.g. "-fixed" for the renders of round 2's
+birch fix); only the sheets whose renders are all present are drawn.
 """
 
 import io
+import os
 import sys
 from pathlib import Path
 
@@ -35,6 +37,7 @@ TRIALS = [
 GARDEN_SEEDS = [10, 2, 3]
 GARDEN_COLS = [("40", "40 seasons"), ("100", "100 seasons, leaf-on"), ("100-winter", "100 seasons, winter")]
 LIMIT = 1.5e6
+SUFFIX = os.environ.get("SUFFIX", "")
 CANVAS = 2 / 3  # MAX_DPR over the phone's 3
 
 
@@ -65,7 +68,7 @@ def garden() -> None:
             if f.exists():
                 im = Image.open(f).convert("RGB").resize((w, h), Image.Resampling.LANCZOS)
                 sheet.paste(im, (left + j * (w + gap), y))
-    save(sheet, figures / "2026-11-02-judging-garden.jpg")
+    save(sheet, figures / f"2026-11-02-judging-garden{SUFFIX}.jpg")
 
 
 def species(sp: str, name: str) -> None:
@@ -81,7 +84,7 @@ def species(sp: str, name: str) -> None:
         d.text((x + 12, top - 52), label, fill="black", font=font)
         sheet.paste(im, (x, top))
         x += im.width + gap
-    save(sheet, figures / f"2026-11-02-judging-{sp}.jpg")
+    save(sheet, figures / f"2026-11-02-judging-{sp}{SUFFIX}.jpg")
 
 
 if (renders / f"garden-s{GARDEN_SEEDS[0]}-40.png").exists():

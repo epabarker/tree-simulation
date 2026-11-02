@@ -37,7 +37,8 @@ describe("bark styles (track C)", () => {
   it("moves a stem from twig to bark by age, then to old bark by girth", () => {
     for (const style of Object.values(BARK_STYLES)) {
       expect(barkStep(style, 0, 0.01)).toBe(0);
-      expect(barkStep(style, style.mature, 0.05)).toBe(BARK_STEPS / 2);
+      // A stem past both of its twig thresholds (birch's girth one is 4 cm: radius 0.08 cells).
+      expect(barkStep(style, style.mature, 0.1)).toBe(BARK_STEPS / 2);
       let last = 0;
       for (let r = 0; r <= 3; r += 0.05) {
         const k = barkStep(style, 100, r);
@@ -50,5 +51,18 @@ describe("bark styles (track C)", () => {
     // Birch's base turns black, beech stays smooth into old age.
     expect(fissureOpen(BARK_STYLES.birch, 1)).toBe(1);
     expect(fissureOpen(BARK_STYLES.beech, 2)).toBe(0);
+  });
+
+  it("keeps birch's thin wood red-brown however old, and its black bark low (round 2)", () => {
+    const birch = BARK_STYLES.birch;
+    // A 1 cm twig 30 seasons old keeps its twig colour; a 6 cm limb of the same age is white.
+    expect(barkStep(birch, 30, 0.02)).toBe(0);
+    expect(barkStep(birch, 30, 0.12)).toBe(BARK_STEPS / 2);
+    // A 60 cm trunk is black at its base and white above a fifth of the tree's height.
+    expect(barkStep(birch, 100, 1.2, 0)).toBe(BARK_STEPS - 1);
+    expect(barkStep(birch, 100, 1.2, 0.2)).toBe(BARK_STEPS / 2);
+    expect(fissureOpen(birch, 1.2, 0.2)).toBe(0);
+    // Every other species ages at any height, as before.
+    expect(barkStep(BARK_STYLES.oak, 100, 1.2, 0.9)).toBe(BARK_STEPS - 1);
   });
 });

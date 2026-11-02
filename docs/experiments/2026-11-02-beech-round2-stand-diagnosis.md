@@ -107,3 +107,24 @@ Track C's blind test v3, sets 3–4: under the measured mid-grey bark the stand 
 - **The cause is that the lift is re-read every season.** Secondary straightening is wood: once a lit axis has straightened, the shade that later falls on it does not bend it back (Troll's model, ADR 0042's source). The model keeps no memory of the light a metamer had when it was young.
 
 **Candidate (Part 2's second, not built):** latch the lift. A metamer's light term is the largest u it has reached, kept once its wood is `lightOver` old, so a base that rose stays risen when the crown closes over it, and shoots that were born shaded stay level. It needs one per-metamer column (the latched u) and so a checkpoint version with a reader for v2 (AGENTS.md), an ADR proposal, unit tests, and the 20-seed guard, since the lone tree's shape and height will move. A cheaper ratchet without storage (R3 never moving old wood back toward its level's angle) would also freeze sag and curvature, which are wanted, so the column is the honest form. This changes the lone tree only: the stand's trees are under the vigour gate (g = 0) and bit-identical.
+
+## Step 2b: the latched lift at 20 seeds (ADR 0045, proposed), and what the plates' level is made of
+
+Built as Part 2's second candidate at the user's request (`r2.lightLatch`; the metamers' `lit` column; checkpoints at version 3, commit 7106296). Runs: `evidence20.py --assign '{"c5.Tvig": 0, "r6.lifespan": 20, "r2.lightLatch": true}'` on the adopted beech, seeds 1–20 (`runs/round2/latch`), and on seeds 1–3 the adopted beech with wood 16× stiffer (`"r3.E": 64000000`, what a doubled radius would give, since sag goes as 1/(E·r⁴); `runs/round2/stiff`).
+
+| 20 seeds (seeds 1–3 for E ×16) | adopted | + latch | E ×16 |
+|---|---|---|---|
+| lone 100: H, median | 120 | **151** | 138 |
+| lone 100: W/H, median (photograph 1.3–1.5, passes of 20) | 1.50 (9) | **0.83 (0)** | 1.30 |
+| lone 60: H, W/H | 87, 1.53 | 102, 0.96 | — |
+| lone 100: leaf below H/6 ≤ 7% | 13 | 18 | — |
+| second-order wood older than 20, degrees from vertical | 78 | 69 | 73 |
+| second-order wood up to 3 old | 46 | 52 | 53 |
+| first-order limbs, r²-weighted | 36 | 37 | 34 |
+| stand (alive, floor, LAI, H/D) | 11 of 20 | identical: metrics and metamers byte-equal on 20 of 20 | LAI 8.4 |
+
+- **The latch does what ADR 0045 says and it is the wrong shape.** Old second-order wood keeps more of its rise (69° against 78°), and because every limb that was ever lit keeps it, the crown's width, which was the level plates, goes: the lone tree is a column again (W/H 0.83, H 151), the round-1 shape the fresh look set out to replace. "Rise, then arch" needs the arch: a lift that is kept at the base and a curve along the limb that brings its outer part level (ADR 0034's `curve` on the second level, which beech sets only on the trunk). That is a third candidate and outside this round's two.
+- **The stand is untouched:** under the vigour gate the latch writes the column but moves nothing (byte-equal metrics and metamers on every seed). The hash differs only because the column holds non-zero values.
+- **Sag is not the plates' cause either:** wood 16× stiffer leaves the old second-order wood at 73°, and makes the tree taller and the stand's LAI worse (8.4).
+- **So the plates are ADR 0042 working as written:** second-order wood born in shade inside the crown is born level and grows outward; the lit tips at the surface rise. The outline, upturned clumps on level plates, is what reads as oak under a realistic bark (blind test v3, sets 3–4 and the judging set: the lone beech at 60 is field maple or oak on 10 of 15 plates).
+- **Recommendation:** do not adopt the latch. Whether its code stays (a column and a checkpoint version for an off rule) or is reverted is the user's call; the finding stands either way.

@@ -1,8 +1,8 @@
 # Status
 
-_Last updated: 2026-11-02 (the fresh-look beech decided: ADR 0039–0042 accepted for beech, 0043 rejected; round 2's brief `docs/plans/2026-11-02-beech-round2.md`; merging `claude/beech-overnight` is the user's)_
+_Last updated: 2026-11-02 evening (round 2: ADR 0044 adopted for beech at 20; ADR 0045 built, evidence against; blind test v3's judging set: the beech stand passes under the measured bark, the lone tree does not)_
 
-**3D port** on the branch `3d-port` (work branches open PRs into it). ADR 0024–0029, 0031, 0032 and 0039–0042 accepted, 0030 and 0043 rejected. The live site stays on 0.14.0 (2D) until the bar below is met.
+**3D port** on the branch `3d-port` (work branches open PRs into it). ADR 0024–0029, 0031, 0032, 0039–0042 and 0044 accepted, 0030 and 0043 rejected, 0045 proposed (evidence against). The live site stays on 0.14.0 (2D) until the bar below is met.
 
 **Done means** (user): the mixed wood looks right in the garden in depth, within budget on the phone, with floor, H/D and crown base as 20-seed evidence. C3–C6 follow after shipping.
 
@@ -18,7 +18,7 @@ _Last updated: 2026-11-02 (the fresh-look beech decided: ADR 0039–0042 accepte
 - **Gallery** (`analysis/fit/gallery/`): round 2's spindles (beech, birch), round 3's beech cone, oak and hornbeam parasols, round 4's birch pagoda; `m27_gallery.py`. Oak and hornbeam pass the check; beech's cone sits within the noise of its round-2 form (1.17 against 0.77).
 
 ## Next
-1. **The user:** merge `claude/c1-calibration-ustbkz` (ADR 0044, beech's lifespan 20). Round 2 continues: track C on the beech stand's bark tone and stem drawing (`claude/foliage`, blind test v3's third set); then the stand's crown ratio (0.30 against 0.47) and the lone oak's form (reads as hazel), both the user's.
+1. **The user:** (a) beech's bark: measured mid grey (the stand reads beech, the lone tree oak) or pale (the reverse), blind test v3's judging set on `claude/foliage`; (b) ADR 0045's latch: not adopted on the evidence; keep or revert its column and checkpoint version 3; (c) merge `claude/c1-calibration-ustbkz` (ADR 0044 adopted, 0045 proposed) and `claude/foliage` (view options, off). Then the lone beech's rise-then-arch (a curve on the second level with a kept lift) and the stand's crown ratio (0.30 against 0.47): form, after shipping unless the user says otherwise.
 2. **A new hornbeam pilot** on the re-picked form, under the stand-death penalty; accept by measured targets in band and stand alive ≥ 0.8 at 60 and 100. Then the overnight for the eight (`--out round5`), verification, panels, the gallery check at six seeds (`m27_gallery.py --seeds 6`).
 3. **I3 steps 3–6** and C2's floor against LAI; then C3–C6 as hold-outs; release; the site's PR. R2's reiteration after shipping (ADR 0031).
 

@@ -28,7 +28,6 @@ VARIANTS = {
     "held": HELD,
     "held-r0x15": {"r2": {"dLambda": 0.04}, "c6": {"r0": 0.004236}},
     "held-r0x2": {"r2": {"dLambda": 0.04}, "c6": {"r0": 0.005648}},
-    "held-lh25": {"r2": {"dLambda": 0.04}, "r1": {"Lh": 25}},
 }
 SNAP = ",".join(str(s) for s in range(10, 101, 10))
 

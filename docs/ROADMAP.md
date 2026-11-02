@@ -156,12 +156,17 @@ No published value exists for these. Calibrate on *patterns*: several weak targe
 - the stand closes by 100 and then ages at O4's background rate, with no regeneration at τ 0; crowns release rather than widen;
 - 20-seed evidence at τ 0: floor at 100 20 of 20, H/D at 300 19, crown base 20, plateau (same trees) 17; re-run at shipping (2026-11-02, [note](experiments/2026-11-02-forest-evidence.md)): 20, 20, 20, 19.
 
-**I3 steps 1–2, the renderer** ([note](experiments/2026-10-30-i3.md), [plan](plans/2026-10-30-i3.md)):
+**I3, the renderer** ([note](experiments/2026-10-30-i3.md), [plan](plans/2026-10-30-i3.md), [brief for steps 3–6](plans/2026-11-02-i3-remaining.md)):
 - wood and leaves draw far to near in 64 depth slices (Canvas 2D 8), from the snapshot's `zOrder`; ADR 0008's pseudo-depth is removed;
 - the main thread's work per snapshot falls 55–60%; the slices cost 0.5–0.6 ms a frame;
 - the plate is capped at 160 cells and a young garden is framed at 65;
 - the garden plants one row at spacing 28, its recruits capped per width and kept to O4's `band` (the user's phone check);
-- the phone: draw p95 6.3 ms, frame p95 16.8 ms, worker 50 ms a season, 10.2k metamers. Steps 3–6 remain.
+- steps 1–2 on the phone: draw p95 6.3 ms, frame p95 16.8 ms, worker 50 ms a season, 10.2k metamers;
+- step 3 ✅: the snapshot is 8–11 ms at 160 cells, the metrics 15–17% of it, so no lean cadence;
+- memory ✅ (ADR 0026): 176 MB with the specimen beside the 160-cell plate at 200 seasons (was 242; 342 with both worlds live), 62 MB on the phone's plate. Three changes: `intoCheckpoint` for the swap, the lanes' accumulator sized once, the snapshot's buffer reused. Every snapshot and checkpoint byte is unchanged;
+- step 4 ✅ (track C, foliage note): the coverage instrument, the leaf opacity and minimum size knobs;
+- step 5 (ADR 0046): reduced motion draws the plate at once, and the still forest replaces it. There is no first-paint picture: 1.1 s on the phone's plate on the laptop, the phone's own wait at the soak;
+- step 6 ✅: `?bench` reports memory and the reduced-motion wait; headless, the phone's plate is 52–65 ms a season and 47 MB at 40. The user: "works great on my phone"; its captions at the soak. **I3 ✅ 2026-11-02.**
 
 **Species in 3D, steps 0–1** ([note](experiments/2026-10-30-species-3d.md), [plan](plans/2026-10-30-species.md)):
 - step 0 ✅: `m27_adopt.py` writes the 3D overlay (phyllotaxis, wood's E); `rust/presets.json` byte-identical; round 2's fits in `fits/round2/`;

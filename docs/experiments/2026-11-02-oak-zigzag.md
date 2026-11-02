@@ -33,3 +33,18 @@ Beech's accepted rules are generic: the vigour fork (ADR 0040) ends a leader gro
 Three oak variants are being rendered in the real renderer by track C (lone 60 and 100, stand 100; the garden at seed 10): today, held (dLambda 0.04), fork. The override on offer for shipping is **held**: it removes the garden's lightning bolts and the hazel-coppice fan, and leaves the lone oak a tall cone until the form round.
 
 Figures (the native harness's dots): [`figures/2026-11-02-oak-zigzag-sweep.png`](figures/2026-11-02-oak-zigzag-sweep.png) (lone, leaf-off), [`figures/2026-11-02-oak-zigzag-stand.png`](figures/2026-11-02-oak-zigzag-stand.png) (stand, leaf-off).
+
+## The held oak in the garden itself (storms on)
+
+Track C's garden sheet (seed 10, the page's own plate) showed the held oak thrown by a storm at season 92 (H 119, H/D 84; ADR 0027's windthrow ramp starts at 80), where today's stood at H/D 47. [`code/2026-11-02-overrides/oak-garden.py`](code/2026-11-02-overrides/oak-garden.py) runs the garden's worlds natively (`garden-params.ts`, the phone's 66-cell plate, `stormP` 0.05 as the page has it) for the four seeds of 1–20 that plant an oak (1, 10, 11, 20), 100 seasons:
+
+| planted oak at 100 | today | held (dLambda 0.04) | held, r0 ×1.5 | held, r0 ×2 |
+|---|---|---|---|---|
+| alive at 100 | 4 of 4 | 4 of 4 | 4 of 4 | 4 of 4 |
+| H/D at 100 (the four seeds) | 60, 54, 49, 75 | 67, 74, 80, 58 | 59, 65, 97, 96 | 50, 71, 79, 69 |
+| H/D, the maximum over the run | 134, 113, 151, 106 | the same four | 133, 105, 122, 101 | 125, 98, 121, 94 |
+
+- **The held oak stood in all four worlds.** The page's throw at seed 10 was one realisation on a different plate; the exposure is real but not the rule.
+- **The peak slenderness is identical for today and held** (it falls before age 28, when the two are the same tree): the garden's young oaks are slender at 106–151 whatever the override, and that is where the windthrow risk sits. At 100 the held oak is slenderer than today's (58–80 against 49–75), at the ramp's foot.
+- **A thicker pipe radius does not reliably help** (r0 ×1.5 gave 96–97 on two seeds) and r0 is R1's carbon economy as well as girth (ADR 0027), so it is not an override.
+- **So the offer stands as "held" alone:** straight stems in the garden at the same early exposure as today, a slenderer tree at 100, and a lone oak that reads as a cone until the form round.

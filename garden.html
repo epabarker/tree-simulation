@@ -94,9 +94,12 @@
           .filter((k) => query.has(k))
           .map((k) => [k, Number(query.get(k))]),
       );
-      // `?leafOpacity=0.8&leafMinPx=2`: I3's foliage knobs (step 4), for the coverage sheets.
+      // `?leafOpacity=0.8&leafMinPx=2`: I3's foliage knobs (step 4), for the coverage sheets;
+      // `?girth=1.45`: stems drawn at that multiple of their pipe-model radius (round 2).
       const view = Object.fromEntries(
-        ["leafOpacity", "leafMinPx"].filter((k) => query.has(k)).map((k) => [k, Number(query.get(k))]),
+        ["leafOpacity", "leafMinPx", "girth"]
+          .filter((k) => query.has(k))
+          .map((k) => [k, Number(query.get(k))]),
       );
       // `?clearBole`: no rosettes on a trunk below its limb crown base (round 2), for a phone look.
       if (query.has("clearBole")) view.clearBole = true;

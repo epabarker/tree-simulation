@@ -59,6 +59,8 @@ const view: ViewOptions & { preset: PresetName } = {
   ...(query.has("leafMinPx") ? { leafMinPx: Number(query.get("leafMinPx")) } : {}),
   // `&clearBole`: no rosettes on a trunk below its limb crown base (round 2; off by default).
   ...(query.has("clearBole") ? { clearBole: true } : {}),
+  // `&girth=1.45`: draw stems at that multiple of their pipe-model radius (round 2; 1 by default).
+  ...(query.has("girth") ? { girth: Number(query.get("girth")) } : {}),
 };
 
 const hud = element("hud");

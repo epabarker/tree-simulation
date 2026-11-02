@@ -108,6 +108,13 @@ export interface ViewOptions {
    * drawing choice: the model still counts that leaf in its light.
    */
   clearBole?: boolean;
+  /**
+   * Draw every stem at this multiple of its pipe-model radius (round 2, 1 by default). ADR 0027's
+   * radii give a stand's trunks about half a real stand's girth (bark-styles.ts), so at one scale a
+   * 35 m beech draws at H/D ≈ 105 against a real stand's ≈ 73 (Štefančík 2017). A drawing choice,
+   * as a drawn leaf stands for a spray: the model's girth and bark ramp are unchanged.
+   */
+  girth?: number;
 }
 
 export interface Camera {
@@ -247,6 +254,8 @@ export class Scene {
   leafStyle: LeafStyle = LEAF_STYLES.broadleaf;
   /** No rosettes on a trunk below its limb crown base; renderers copy `ViewOptions.clearBole`. */
   clearBole = false;
+  /** Drawn radius over the model's; renderers copy `ViewOptions.girth`. */
+  girth = 1;
   /**
    * What `fit` frames. "trees": the trees and the ground beneath them (the lab). "world": the
    * world's whole width, easing out only once crowns outgrow half its height (the home page); on
@@ -757,7 +766,7 @@ export class Scene {
       }
       g.tipX[j] = bx + len * Math.cos(ang);
       g.tipY[j] = by + len * Math.sin(ang);
-      g.radius[j] = r;
+      g.radius[j] = r * this.girth;
     }
     // Taper each metamer toward its thickest child, so the stem flows into whichever branch
     // dominates the junction (in decurrent crowns that is often a lateral, not the continuation).

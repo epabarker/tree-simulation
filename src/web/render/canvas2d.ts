@@ -152,6 +152,7 @@ export class Canvas2DRenderer implements Renderer {
 
     scene.leafStyle = LEAF_STYLES[view.leafStyle];
     scene.clearBole = view.clearBole ?? false;
+    scene.girth = view.girth ?? 1;
     scene.computeGeometry(t);
     const leaves = view.showLeaves ? scene.leaves(view.leafAge, t) : null;
     // On a ring seen whole, the trees are drawn once per copy of the world (Scene.wrapOffsets).

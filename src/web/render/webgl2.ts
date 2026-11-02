@@ -648,6 +648,7 @@ export class WebGL2Renderer implements Renderer {
       view.leafStyle,
       view.leafOpacity,
       view.clearBole,
+      view.girth,
       view.showBuds,
       view.showObstacles,
       scene.solo,
@@ -659,6 +660,7 @@ export class WebGL2Renderer implements Renderer {
     if (u.next !== s || u.prev !== scene.prev || u.key !== key) {
       scene.leafStyle = LEAF_STYLES[view.leafStyle];
       scene.clearBole = view.clearBole ?? false;
+      scene.girth = view.girth ?? 1;
       scene.computeGeometry(t);
       this.buildSegments(s, view);
       if (ghosts) this.buildGhosts(1 - t);

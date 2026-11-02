@@ -45,6 +45,23 @@ describe("Scene (shared by the WebGL2 and Canvas 2D renderers)", () => {
     }
   });
 
+  it("draws stems at `girth` times their radius and moves nothing (round 2's `&girth`)", () => {
+    scene.computeGeometry(1);
+    const radius = Float32Array.from(scene.geom.radius);
+    const tipRadius = Float32Array.from(scene.geom.tipRadius);
+    const tipX = Float32Array.from(scene.geom.tipX);
+    scene.girth = 1.5;
+    scene.computeGeometry(1);
+    const g = scene.geom;
+    for (let j = 0; j < tree.m.length; j++) {
+      expect(g.radius[j]).toBeCloseTo(1.5 * (radius[j] as number), 6);
+      expect(g.tipRadius[j]).toBeCloseTo(1.5 * (tipRadius[j] as number), 6);
+      expect(g.tipX[j]).toBe(tipX[j]);
+    }
+    scene.girth = 1;
+    scene.computeGeometry(1);
+  });
+
   it("tapers each segment toward its thickest child, never widening", () => {
     scene.computeGeometry(1);
     const g = scene.geom;

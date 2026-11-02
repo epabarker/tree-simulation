@@ -2,6 +2,13 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-02: garden-v0.15.0 live on edbarker.dev: the 3D garden shipped
+
+- **The release:** the first `gh release create` failed because a release had been made by hand on the tag; deleted, the failed job re-run, the archive attached by CI (run 41487544499, attempt 2). Note for next time: push the tag and let the workflow make the release.
+- **The site** (`epabarker/edbarker-dev` PR #7): `sync-garden.mjs 0.15.0` from CI's archive, `astro build` green, the built page smoke-loaded headlessly at phone size (mounted, growing, no console errors, the WASM as `application/wasm`), Cloudflare's preview built, the user's soak on the phone, merged to the site's `main`: production.
+- **The bar** ("done means"): the mixed wood reads right on the phone (the user, twice today); the `forest` evidence holds (20/20/20/19); the budget holds on the laptop's measurements, the phone's captions still to be read once on the live site.
+- **The week** (`plans/2026-11-01-tracks.md` §3) is complete. The tracks' sessions are done; the after-shipping form list is in STATUS.
+
 ## 2026-11-02: garden-v0.15.0 tagged: the 3D garden
 
 - **The tag** sits on `3d-port` at a417437 (PR #46's merge), the first release of the 3D port: the Rust core in a slab (ADR 0024, 0025), the species' forms as judged on the phone (the fresh-look beech, track B's picks, the judging pass's overrides), the measured beech bark, the renderer in depth, memory at 176 MB with the specimen (I3). The release workflow builds `garden-0.15.0.tgz`; the site (`epabarker/edbarker-dev`) vendors it with `scripts/sync-garden.mjs 0.15.0` and goes live on the site's PR after the user's phone soak on its preview.

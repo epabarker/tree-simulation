@@ -1,8 +1,8 @@
 # Status
 
-_Last updated: 2026-11-02 (I3 steps 3–6 on `claude/i3-remaining`: the snapshot's cost settled, the memory problem solved at 176 MB, reduced motion draws the plate at once, ADR 0046 accepted; the phone's captions at the soak)_
+_Last updated: 2026-11-02 evening: **shipped.** garden-v0.15.0 (the 3D garden) is live on edbarker.dev. The tracks plan's week is complete; what follows is the after-shipping list._
 
-**3D port** on the branch `3d-port` (work branches open PRs into it). ADR 0024–0029, 0031, 0032, 0039–0042 and 0044 and 0046 accepted, 0030, 0043 and 0045 rejected. **garden-v0.15.0** (the 3D garden) is tagged at a417437; the live site moves from 0.14.0 (2D) to it on the site's PR after the phone soak.
+**3D port** on the branch `3d-port` (work branches open PRs into it). ADR 0024–0029, 0031, 0032, 0039–0042 and 0044 and 0046 accepted, 0030, 0043 and 0045 rejected. **garden-v0.15.0, the 3D garden, is live on edbarker.dev** (tagged at a417437; the site's PR #7 merged 2026-11-02 after the user's phone soak). The 2D garden (0.14.0) is retired.
 
 **Done means** (user): the mixed wood looks right in the garden in depth, within budget on the phone, with floor, H/D and crown base as 20-seed evidence. C3–C6 follow after shipping.
 
@@ -19,9 +19,8 @@ _Last updated: 2026-11-02 (I3 steps 3–6 on `claude/i3-remaining`: the snapshot
 - **Gallery** (`analysis/fit/gallery/`): round 2's spindles (beech, birch), round 3's beech cone, oak and hornbeam parasols, round 4's birch pagoda; `m27_gallery.py`. Oak and hornbeam pass the check; beech's cone sits within the noise of its round-2 form (1.17 against 0.77).
 
 ## Next
-1. **The user:** merge the I3 PR (`claude/i3-remaining` into `3d-port`).
-2. **Ship (the user, 2026-11-02): no round-5 fit.** The species' looks are the form picks (ADR 0033–0038) and the beech; a species that reads wrong on the phone gets an override, never a round. I3 is done; next the release, the site's PR and the phone soak, which takes the phone's `?bench` captions and its reduced-motion wait (`garden.html?bench&seed=10`; over ≈ 3 s, ADR 0046's picture follows).
-3. **After shipping, the form list:** the lone beech's rise-then-arch and the stand's crown ratio (0.30 against 0.47); the lone oak's arms (held, it is a cone); maple's flat top (ADR 0031); willow's dense bush; hornbeam's clear trunk; C2's floor against LAI; C3–C6 as hold-outs; R2's reiteration.
+1. **Shipped.** The phone's `?bench` captions and reduced-motion wait on the live site are still to be read once (the soak was by eye); over ≈ 3 s on reduced motion, ADR 0046's picture follows. Merge `3d-port` into `main`'s place as the default line of work (the user).
+2. **The form list, in the order the judging pass ranked them:** the lone beech's rise-then-arch and the stand's crown ratio (0.30 against 0.47); the lone oak's arms (held, it is a cone); maple's flat top (ADR 0031); willow's dense bush; hornbeam's clear trunk; C2's floor against LAI; C3–C6 as hold-outs; R2's reiteration.
 
 ## Open questions (user)
 - **`levels.2.setPoint` ≥ 80** collapses every broadleaf (parasol, mound, column): a C3/R3 question after shipping.

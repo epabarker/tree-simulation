@@ -1,0 +1,6 @@
+# Judging sheets, 2026-11-02 (for the user's eye: labelled, not blind)
+
+- **Build:** `origin/3d-port` at 310d2f8 (PR #43 on top of round 2's merges), served by `npm run dev`, WebGL2 on the GPU (Playwright's Chromium 1248, Vulkan ANGLE).
+- **Garden** (`figures/2026-11-02-judging-garden.jpg`): `garden.html?seed=S&bench&seasons=N` at 390 × 844 CSS px, device pixel ratio 3, for seeds 10 (the bench's pinned phone forest), 2 and 3, N = 40 and 100. For the 100-season plates `garden.setYearSeconds(0)` steps past the intro without a year, so leaf-on is the scene's summer; winter is the same run held at τ 0.95. The sheet is at the canvas's own pixels (dpr 2, the garden's MAX_DPR; a dpr-3 phone only upsamples them), JPEG quality 75, to stay under 1.5 MB.
+- **Species** (`figures/2026-11-02-judging-<species>.jpg`): `/?preset=oakOpen&seed=4&p=<patch>&bench&seasons=N&frame=height`, at device pixel ratio 2, where the patch is the species' `rust/presets.json` entry alone in a 240-wide world (lone 60, lone 100) or as a 12-tree stand 84 wide with periodic sides (stand 100), as the blind test v3's plates.
+- **Reproduce:** `PW_FROM=<scratch>/node_modules/ ROOT=<3d-port checkout> node shots.mjs http://localhost:<port> <renders> garden|lab`, then `uv run --project analysis python sheet.py <renders> docs/experiments/figures`.

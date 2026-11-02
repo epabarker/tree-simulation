@@ -13,9 +13,11 @@ description: Run a parameter sweep, ablation or validation analysis for the tree
    - Keep the total cost small: check one run's time from `run.json` `meta.ms` first.
    - For calibration, judge on several patterns at once (e.g. H/D, crown base, crown width, ground light, stalled seedlings, Δ), not one target (pattern-oriented modelling, Reynolds & Ford 2005). Take targets from the ROADMAP calibration table.
 3. **Run.**
-   - Put the conditions in a script under `analysis/experiments/`. It should build a list of `Run(...)` objects and call `run_many(...)` from `analysis/sweep.py`, which runs `node cli/run.ts` in parallel and writes `runs/<experiment>/<condition>-seed<k>/`.
+   - Put the conditions in a script under `analysis/experiments/`. It should build a list of `Run(...)` objects and call `run_many(...)` from `analysis/treesim/sweep.py`, which runs `node cli/run.ts` in parallel and writes `runs/<experiment>/<condition>-seed<k>/`.
    - `runs/` is not committed. The script must recreate it exactly.
-4. **Analyse.** Load with `treesim_io.load_runs("runs/<experiment>")` into polars, with one row per run, season and tree. Plot with plotnine. Save small figures to `docs/experiments/figures/<note-name>-*.png`.
+4. **Analyse.** Load with `load_runs("runs/<experiment>")` (`from treesim import load_runs`) into polars, with one row per run, season and tree. Plot with plotnine. Save small figures to `docs/experiments/figures/<note-name>-*.png`.
+   - **Fan out when the sweep has ≥ 3 conditions or the experiment asks ≥ 2 questions.** After `run_many` has finished, start one `experiment-worker` sub-agent per condition or question, all in one message so they run in parallel. Each brief names the experiment directory, the condition, the metrics and the targets. Each worker writes only `runs/<experiment>/findings-<condition>.md` (≤ 20 lines, numbers only) and `runs/<experiment>/figures/<condition>-*.png`; workers never run the CLI and never write under `docs/`, `src/` or `analysis/`. The main session then reads the findings files, copies the figures the note uses to `docs/experiments/figures/<note-name>-<condition>-*.png`, and writes the one note (step 5) itself.
+   - Below those thresholds analyse in the main session: a sub-agent whose output you would have read anyway saves nothing.
 5. **Write up.** Create `docs/experiments/YYYY-MM-DD-<milestone>-<topic>.md` covering the question, setup (the exact `uv run …` command), result (numbers and figures), and conclusion with follow-ups.
 6. **Report.** Give a short summary to the user, and add follow-ups to STATUS or ROADMAP.
 

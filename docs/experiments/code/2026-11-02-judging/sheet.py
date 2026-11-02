@@ -14,6 +14,10 @@ Environment, for the sheets after the first:
 - TAG is the renders' tag (shots.mjs's TAG): `<species>-<TAG>-<trial>-s4.png`, `garden-<TAG>-s<seed>`.
 - GARDEN_ROWS ("label=tag:seed,…") draws the garden's rows from tagged renders instead of the seeds.
 - VARIANTS ("tag=label;…", with VSPECIES) draws one sheet, `<VSPECIES>-variants`: a row per variant.
+- LINEUP=1 draws the eight species on one sheet, `species<SUFFIX>`, a row each, in place of a sheet
+  per species. Each row's plates lose the same band of empty sky (above that row's tallest crown),
+  so every plate keeps the one scale and a row its common ground line; SCALE (default 1) shrinks
+  the whole sheet.
 """
 
 import io
@@ -21,6 +25,7 @@ import os
 import sys
 from pathlib import Path
 
+import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 
 renders, figures = Path(sys.argv[1]), Path(sys.argv[2])
@@ -130,12 +135,56 @@ def variants(sp: str, rows: list[tuple[str, str]]) -> None:
     save(sheet, figures / f"2026-11-02-judging-{sp}-variants.jpg")
 
 
+def sky_rows(im: Image.Image) -> int:
+    """How many rows at the top of a plate hold only sky: a row is sky while every pixel is within 40
+    of the row's median (the sky is level across the plate, a crown is not)."""
+    a = np.asarray(im, dtype=np.int16)
+    off = np.abs(a - np.median(a, axis=1, keepdims=True)).max(axis=2)
+    content = np.flatnonzero((off > 40).sum(axis=1) > 2)
+    return int(content[0]) if content.size else im.height
+
+
+def lineup() -> None:
+    """The eight species, a row each (lone 60, lone 100, stand 100), at the plates' one scale."""
+    grid = [[Image.open(renders / f"{sp}{TAG}-{t}-s4.png").convert("RGB") for t, _ in TRIALS] for sp in SPECIES]
+    crops = [max(0, min(sky_rows(im) for im in row) - 48) for row in grid]
+    grid = [[im.crop((0, c, im.width, im.height)) for im in row] for row, c in zip(grid, crops, strict=True)]
+    gap, title, head, band = 16, 100, 60, 64
+    widths = [im.width for im in grid[0]]
+    heights = [max(im.height for im in row) for row in grid]
+    W = sum(widths) + gap * (len(widths) - 1)
+    sheet = Image.new("RGB", (W, title + head + sum(band + h + gap for h in heights)), "white")
+    d = ImageDraw.Draw(sheet)
+    d.text((16, 14), "The eight species · seed 4 · one scale", fill="black", font=ImageFont.load_default(size=56))
+    font = ImageFont.load_default(size=36)
+    x = 0
+    for (_, label), w in zip(TRIALS, widths, strict=True):
+        d.text((x + 12, title + 8), label, fill="black", font=font)
+        x += w + gap
+    y = title + head
+    for name, row, h in zip(SPECIES.values(), grid, heights, strict=True):
+        d.text((16, y + 12), name, fill="black", font=ImageFont.load_default(size=44))
+        x = 0
+        for im in row:
+            sheet.paste(im, (x, y + band))
+            x += im.width + gap
+        y += band + h + gap
+    scale = float(os.environ.get("SCALE", "1"))
+    if scale != 1:
+        sheet = sheet.resize((round(sheet.width * scale), round(sheet.height * scale)), Image.Resampling.LANCZOS)
+    print("rows of sky cropped per species:", dict(zip(SPECIES, crops, strict=True)))
+    save(sheet, figures / f"2026-11-02-judging-species{SUFFIX}.jpg")
+
+
 if os.environ.get("VARIANTS"):
     variants(os.environ["VSPECIES"], [tuple(v.split("=", 1)) for v in os.environ["VARIANTS"].split(";")])
 else:
     rows = garden_rows()
     if (renders / f"{rows[0][1]}-40.png").exists():
         garden(rows)
-    for sp, name in SPECIES.items():
-        if all((renders / f"{sp}{TAG}-{t}-s4.png").exists() for t, _ in TRIALS):
-            species(sp, name)
+    if os.environ.get("LINEUP"):
+        lineup()
+    else:
+        for sp, name in SPECIES.items():
+            if all((renders / f"{sp}{TAG}-{t}-s4.png").exists() for t, _ in TRIALS):
+                species(sp, name)

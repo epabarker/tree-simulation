@@ -154,6 +154,7 @@ G2 moved the sky sweep (`rust/core/src/light/sky_sweep.rs`) into Rust behind the
 - **The boundary** (`rust/wasm/src/world.rs`, `src/wasm/world.ts`): params go in as JSON, read with JavaScript's semantics (`rust/core/src/json.rs`: key order kept, numbers printed as `Number.prototype.toString`). Events, checkpoints and records cross as JSON or bytes. A tree's columns are read on demand (`tree_column`), never per frame.
 - **The snapshot** is built in Rust into one buffer (`rust/core/src/snapshot.rs`) and copied out of linear memory once; every array the page gets is a view on that copy, and the copy is the transferable.
 - **The math** (`rust/core/src/math/`): never a platform `Math`; the `libm` crate, pure Rust.
+- **Memory (ADR 0026):** WASM's linear memory never shrinks, so a buffer grown by doubling keeps its peak, old and new side by side. The buffers that grow are sized once instead: the slab's lane accumulator for the whole slab, the snapshot's buffer reserved for its size and reused (I3 note, "The memory problem").
 
 ### The 3D slab sweep (ADR 0024, G3)
 `rust/core/src/light/slab_sweep.rs`: the world's light since I2.
@@ -193,7 +194,7 @@ Tapping a tree on the page fells it. `Scene.pickTree` finds the nearest drawn se
 | `init(params)` | New World; returns the season-0 snapshot |
 | `step(n)` | Runs n seasons; returns a snapshot. The page asks for one season at a time. While playing it asks as soon as a season is shown, so the worker computes season s+1 while the page tweens to s, and the result waits for its turn (pipelining, M15). Pausing shows the waiting season; while playing, events apply one season later |
 | `restore(bytes)` | Starts from a world checkpoint (M21), gzipped or already unzipped by the server; returns the snapshot of its season |
-| `swap(params \| null)` | Puts the running world aside and starts `params`, or with null resumes the world put aside (M19: Plate II's own oak while the forest waits). Returns a season snapshot; `init` drops anything put aside |
+| `swap(params \| null)` | Puts the running world aside and starts `params`, or with null resumes the world put aside (M19: Plate II's own oak while the forest waits). The world put aside is checkpoint bytes, written by `intoCheckpoint`, which frees what a checkpoint does not hold first (ADR 0026). Returns a season snapshot; `init` drops anything put aside |
 | `setParams(patch)`, `removeTree(id)` | Queue events |
 | `setSnapshotOptions({junctions, field})` | Which optional parts later snapshots carry: the Δ histogram's junction exponents and the shade field. Both default to on (the lab); the home page turns both off (M13) |
 | `record()` | Returns the run record |

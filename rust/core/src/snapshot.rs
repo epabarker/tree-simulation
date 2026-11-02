@@ -201,7 +201,22 @@ impl SnapshotBuilder {
         } else {
             Vec::new()
         };
-        let mut v = Vec::new();
+        // Into last season's buffer, reserved for this one's size (an upper bound: every bud, live
+        // or not) with a sixteenth to spare, so a growing stand reallocates it now and then, never
+        // by doubling beside its old self: WASM's linear memory keeps every peak (I3).
+        let a = |n: usize| n.div_ceil(8) * 8;
+        let size = live.len() * METRIC_NUMBERS.len() * 8
+            + 18 * a(4 * nm)
+            + a(nm)
+            + 2 * a(4 * nb_all)
+            + a(nb_all)
+            + a(4 * deltas.len())
+            + a(4 * shadow.len());
+        let mut v = std::mem::take(&mut self.bytes);
+        v.clear();
+        if v.capacity() < size {
+            v = Vec::with_capacity(size + size / 16);
+        }
         self.species.clear();
         for &ti in &live {
             let m = tree_metrics(&world.trees[ti], Some(world));
@@ -234,6 +249,7 @@ impl SnapshotBuilder {
         let deltas: Vec<f32> = deltas.iter().map(|&d| d as f32).collect();
         put_f32(&mut v, &deltas);
         put_f32(&mut v, &shadow);
+        debug_assert!(v.len() <= size);
         self.bytes = v;
         self.metamers = nm;
         self.buds = bud_m.len();

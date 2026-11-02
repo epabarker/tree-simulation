@@ -374,8 +374,13 @@ impl SlabSweep {
         }
         #[cfg(not(feature = "threads"))]
         {
+            // Sized once for the whole slab, not grown with the foliage's top: grown by doubling,
+            // it was reallocated beside its old self as the canopy rose, and WASM's linear memory
+            // keeps that peak (I3: 43 MB reserved for 27 MB of sums on a 160-cell plate at 200).
             let mut acc = std::mem::take(&mut self.scratch.acc);
-            acc.resize(4 * n, 0.0);
+            if acc.len() < 4 * n {
+                acc = vec![0.0; 4 * self.w * self.h * self.d];
+            }
             for lane in 0..LANES {
                 self.compute_part(season, lane, LANES);
                 for (f, field) in [&self.q, &self.vx, &self.vy, &self.vz].iter().enumerate() {

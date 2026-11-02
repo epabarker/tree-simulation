@@ -1,0 +1,24 @@
+# A measuring build of the Rust core for I3's memory problem (brief 2026-11-02): tree-core under a
+# counting allocator, with a report of what the world's tables, scratch, light and snapshot hold.
+# Not part of the product build. Built by ../memstats.sh into the scratch target given there.
+[package]
+name = "memstats"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+[lib]
+crate-type = ["cdylib"]
+path = "src/lib.rs"
+
+[dependencies]
+tree-core = { path = "../../../../../rust/core" }
+wasm-bindgen = "=0.2.129"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"
+
+[workspace]

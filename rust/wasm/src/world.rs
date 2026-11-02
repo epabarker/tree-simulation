@@ -6,6 +6,7 @@ use tree_core::checkpoint::{load_world, save_world};
 use tree_core::form::form_metrics;
 use tree_core::hash::hash_world;
 use tree_core::json::{self, Value};
+use tree_core::light::Light;
 use tree_core::metrics::tree_metrics;
 use tree_core::metrics::{ground_light, lai};
 use tree_core::snapshot::SnapshotBuilder;
@@ -54,6 +55,42 @@ impl World {
     }
 
     pub fn save(&self) -> Vec<u8> {
+        save_world(&self.core)
+    }
+
+    /// The world as checkpoint bytes, freeing it on the way (the worker's swap, ADR 0026). What a
+    /// checkpoint does not hold goes first: the light, the owner grid, the per-season scratch and
+    /// the snapshot's buffers. The bytes then take their space instead of growing linear memory,
+    /// which never shrinks (a 160-cell garden's 21 MB checkpoint, written beside the live world,
+    /// set the swap's peak).
+    pub fn into_checkpoint(mut self) -> Vec<u8> {
+        self.snap = SnapshotBuilder::default();
+        self.core.light = Light::Uniform {
+            width: 0.0,
+            height: 0.0,
+            depth: 0.0,
+            q: 0.0,
+        };
+        self.core.owner = Vec::new();
+        for t in &mut self.core.trees {
+            for v in [
+                &mut t.q_slot,
+                &mut t.v_slot,
+                &mut t.scratch_f,
+                &mut t.p_sum,
+                &mut t.m_sum,
+                &mut t.path_len,
+                &mut t.prev_radius,
+                &mut t.load_w,
+                &mut t.load_s,
+                &mut t.stress,
+                &mut t.node_shade,
+                &mut t.deficit,
+            ] {
+                *v = Vec::new();
+            }
+            t.scratch_u = Vec::new();
+        }
         save_world(&self.core)
     }
 

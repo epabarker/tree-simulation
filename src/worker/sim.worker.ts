@@ -62,8 +62,9 @@ const api: SimApi = {
   async swap(params: Params | null) {
     const w = await current();
     if (params) {
-      if (!aside) aside = w.save();
-      w.dispose();
+      // Saving frees the forest as it writes (intoCheckpoint), so its bytes never sit beside it.
+      if (aside) w.dispose();
+      else aside = w.intoCheckpoint();
       world = RustWorld.create(params);
     } else if (aside) {
       w.dispose();

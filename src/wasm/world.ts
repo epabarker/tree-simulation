@@ -349,6 +349,16 @@ export class RustWorld {
     return this.inner.save();
   }
 
+  /**
+   * The world as checkpoint bytes, freed on the way (the worker's swap, ADR 0026): the same bytes
+   * as `save`, written into the space of what a checkpoint does not hold. Later calls throw.
+   */
+  intoCheckpoint(): Uint8Array {
+    if (this.disposed) throw new Error("This world was disposed");
+    this.disposed = true;
+    return this.inner.into_checkpoint();
+  }
+
   /** Runs `seasons` seasons; `discard` frees dead trees after each (World.discardDead). */
   step(seasons = 1, discard = false): void {
     this.inner.step(seasons, discard);

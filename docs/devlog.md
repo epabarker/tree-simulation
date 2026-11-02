@@ -2,6 +2,14 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-02: ADR 0044 accepted for beech: short shoots end on wood older than 20 seasons (branch claude/c1-calibration-ustbkz)
+
+- **The user's sources** put a beech spur chain at 10–15 years (Aas, LWF Wissen 86; AFZ-DerWald 2022; Roloff 1988), with age and light both acting and clean boles in a stand. Recorded in ADR 0044.
+- **L 15, the sourced value, fails the ecology guard** (6 of 20 seeds; survival ≥ 10 of 12 on 13 against 19). The rule's clock is the wood's age, which inside the crown ends spurs younger than their chain's 15. **The user chose 20,** the nearest pass: guard 11 of 20, trunk leaf zero, LAI 7.0, lone tree unchanged (H 120, W/H 1.5, leaf below H/6 8.4% → 6.7%).
+- **Beech's patch:** `"r6.lifespan" = 20` in `hand-overrides.toml` and `flora-fitted.ts`; presets exported. Only beech's entries change.
+- **Goldens (intended):** `beechOpen:seed1:s40` 3525f9f7 → be65b72e and `beechWood:seed1:s30` 16213d5b → 83ecccbb, because both run past season 20 and the beech's spurs on wood older than 20 now rest leafless. The other 14 are unchanged.
+- **Left open:** a chain-age clock (a birth season per spur, a checkpoint version) would let the sourced 15 be set as it is; the stand's crown ratio (0.30 against a sourced 0.47 for crop trees).
+
 ## 2026-11-02: Beech round 2, Part 2: the stand's leafy boles, and a lifespan for short shoots (branch claude/c1-calibration-ustbkz)
 
 - **Diagnosis** ([note](experiments/2026-11-02-beech-round2-stand-diagnosis.md)). The namers' "leafy sprouts" on the beech stand are R6 short shoots that never end: 97% of the leaf below the limb crown base is on short shoots, and 55–63% of it sits on the trunk's own nodes. A short shoot is shed only with its branch, R4 does not age a leafy one, and the renderer draws a pair of rosettes on each. R4's epicormics are not the cause. The boles are about 2% off straight. Today's beech and the accepted build are alike.

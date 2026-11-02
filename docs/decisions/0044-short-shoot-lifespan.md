@@ -1,6 +1,6 @@
 # 0044: A lifespan for short shoots (r6.lifespan)
 
-- **Status:** proposed (beech round 2, 2026-11-02; not accepted, not adopted). The user chose to build it alongside a renderer rule; adopting it for any species is the user's decision, because it moves the stand's floor and leaf area.
+- **Status:** accepted (the user, 2026-11-02) for beech at `r6.lifespan` 20; proposed earlier the same day. No other species sets it.
 - **Date:** 2026-11-02
 - **Spec:** §R6 (short shoots), §R4 (dormant buds' lifespan, L_dorm), §C5 (shedding)
 - **Round:** [the brief](../plans/2026-11-02-beech-round2.md), Part 2; [the diagnosis](../experiments/2026-11-02-beech-round2-stand-diagnosis.md)
@@ -58,4 +58,4 @@ Sources found and read by the user, 2026-11-02: the German forestry texts in ful
 - What remains low at L 40 is mostly R4's released shoots.
 - **L 15, the sourced value, fails the ecology guard** (6 of 20; survival ≥ 10 of 12 on 13 seeds against the accepted 19): the wood-age clock ends crown short shoots younger than 15, and the weaker trees starve.
 - **Recommendation:** L 20 for beech, the nearest passing value (guard 11 of 20; trunks clear). On the bole, chains at 20 are five years past the sources' "up to 15"; inside the crown, the wood-age clock makes 20 on wood about 15 on the chain. A chain-age clock (a birth season per short shoot, a checkpoint change) would let the sourced 15 be set as it is; left for later.
-- **The user (2026-11-02) said to adopt 15 if it passed; it did not.** Adopting 20 is their call.
+- **The user (2026-11-02) said to adopt 15 if it passed; it did not, and they chose 20.** Beech's patch carries `r6.lifespan` 20 (`hand-overrides.toml`, `flora-fitted.ts`, `presets.json`); the goldens `beechOpen:seed1:s40` and `beechWood:seed1:s30` change (devlog).

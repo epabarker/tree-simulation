@@ -9,13 +9,15 @@
 //! 0011: 2D had lowered it to 10⁶ because a planar limb carried less foliage than a real one).
 //!
 //! Params: r3.*, o2.stormLoad, r2 posture set-points (and R2's light orthotropy: r2.lightSetPoint,
-//! r2.lightLo, r2.lightHi, r2.lightOver), c4.setPoint, r6 leaf areas.
+//! r2.lightLo, r2.lightHi, r2.lightOver, and its latch r2.lightLatch, ADR 0045: `Metamers::lit`
+//! keeps the largest light fraction each metamer has seen here), c4.setPoint, r6 leaf areas.
 
 use super::c3::is_live_bud;
 use super::c4::{horizontal_heading, set_point_direction};
 use super::c5::remove_branches;
 use super::r2::{
-    aged_offset, arm_set_point, curve_offset, hangs, light_set_point, pa_level, pendulous_set_point,
+    aged_offset, arm_set_point, curve_offset, hangs, light_set_point, lit_fraction, lit_set_point,
+    pa_level, pendulous_set_point,
 };
 use super::r6::deposit_area;
 use crate::geom::{
@@ -138,6 +140,17 @@ pub fn update_mechanics(tree: &mut Tree, params: &Params, storm: bool, season: f
     } else {
         Vec::new()
     };
+    // The latch (ADR 0045): each metamer keeps the largest light fraction it has seen, so a base
+    // that rose when lit stays risen when the crown closes over it.
+    let latch = params.r2.light_set_point.is_some() && params.r2.light_latch;
+    if latch {
+        for i in 0..nm {
+            let f = lit_fraction(light[i], &params.r2);
+            if f > tree.m.lit[i] {
+                tree.m.lit[i] = f;
+            }
+        }
+    }
     for i in (0..nm).rev() {
         let r = tree.m.radius[i];
         let l = tree.m.length[i];
@@ -234,7 +247,16 @@ pub fn update_mechanics(tree: &mut Tree, params: &Params, storm: bool, season: f
             };
             // R2's light orthotropy: lit wood of a vigorous tree is held erect, shaded wood level
             // (the light is C5's, per metamer of the subtree).
-            let base = if params.r2.light_set_point.is_some() {
+            let base = if latch {
+                lit_set_point(
+                    base / DEG,
+                    pa,
+                    tree.m.lit[i],
+                    wood_age,
+                    tree.v_base,
+                    &params.r2,
+                ) * DEG
+            } else if params.r2.light_set_point.is_some() {
                 light_set_point(base / DEG, pa, light[i], wood_age, tree.v_base, &params.r2) * DEG
             } else {
                 base
@@ -393,6 +415,56 @@ mod tests {
         assert!(close(t.m.base_y[1], turn0.sin(), 1e-12));
         assert!(close(t.m.hz[1], 0.0, 1e-12)); // it stays in its plane
         assert!(close(bud_angle(&t, 0), turn0 + turn1, 1e-12)); // buds turn with their metamer
+    }
+
+    #[test]
+    fn with_the_latch_old_wood_keeps_the_rise_it_earned_when_lit() {
+        // The adopted beech alone for 60 seasons: without the latch its old second-order wood,
+        // shaded inside the crown, is let fall back toward its level's 94.6°; with it the wood
+        // keeps the rise it took when young. Measured as the mean inclination from vertical of
+        // order-2 wood older than 15 seasons (degrees; 90 is level).
+        // A species patch replaces a group whole, so the latch rides on beech's own r2.
+        let old_wood_incl = |latch: bool| {
+            let base = preset("beechOpen", "{}");
+            let r2 = base
+                .get("species")
+                .unwrap()
+                .get("beech")
+                .unwrap()
+                .get("r2")
+                .unwrap();
+            let r2 = crate::json::merge(
+                r2,
+                &crate::json::parse(&format!(r#"{{"lightLatch":{latch}}}"#)).unwrap(),
+            );
+            let patch = format!(
+                r#"{{"species":{{"beech":{{"r2":{}}}}}}}"#,
+                crate::json::stringify(&r2, false)
+            );
+            let mut world = crate::world::World::new(preset("beechOpen", &patch));
+            for _ in 0..60 {
+                world.step(&mut |_| {});
+            }
+            let t = &world.trees[0];
+            let (mut sum, mut n) = (0.0, 0.0);
+            for i in 0..t.m.len() {
+                if t.m.order[i] == 2 && world.season - t.m.birth_season[i] as f64 > 15.0 {
+                    sum += math::acos(math::max(-1.0, math::min(1.0, t.m.hy[i]))) / DEG;
+                    n += 1.0;
+                }
+            }
+            (sum / n, t.m.lit.iter().any(|&l| l > 0.0))
+        };
+        let (plain, wrote) = old_wood_incl(false);
+        assert!(!wrote, "the latch off never writes `lit`");
+        let (latched, wrote) = old_wood_incl(true);
+        assert!(wrote);
+        // The gain is small (about 4° at 60): posture turns wood by c·Δr/r a season, so the latched
+        // target reaches only young wood, and the plates' level is sag's (the diagnosis note).
+        assert!(
+            latched < plain - 2.0,
+            "latched {latched:.1}° should be more erect than {plain:.1}°"
+        );
     }
 
     #[test]

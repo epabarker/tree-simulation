@@ -387,6 +387,12 @@ export interface Params {
     lightHi?: number;
     /** With light orthotropy: the wood age, seasons, at which it acts fully (absent: 1). */
     lightOver?: number;
+    /**
+     * The latch (ADR 0045, proposed): in posture, wood keeps the largest light fraction it has
+     * seen (the metamer's `lit`), so a limb that rose when lit stays risen once the crown shades
+     * it, as straightened wood does (Troll's model). Absent: the light is re-read every season.
+     */
+    lightLatch?: boolean;
   };
 
   /**

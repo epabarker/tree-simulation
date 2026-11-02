@@ -182,6 +182,7 @@ table!(
         my: f64 = "my",
         mz: f64 = "mz",
         pa_shift: u8 = "paShift",
+        lit: f64 = "lit",
     }
 );
 

@@ -6,17 +6,22 @@
 //! rows in use, padded to 8 bytes. The light field, the owner grid and the per-season scratch are
 //! rebuilt by the season that reads them.
 //!
-//! **Version 2** (I2, ADR 0025) is the 3D schema. **Version 1**, the 2D core's (the TypeScript
+//! **Version 3** (ADR 0045) adds the metamers' `lit` column, last; **version 2** (I2, ADR 0025),
+//! the 3D schema without it, still loads with that column zero (the latch is off in every forest
+//! saved before it existed). **Version 1**, the 2D core's (the TypeScript
 //! core's, and garden 0.14.0's opening forests), still loads: each angle becomes a heading in the
 //! x-y plane with reference +z, laterals take the in-plane azimuths (−π/2 left, π/2 right), the
 //! scalar moment becomes its vector, and the tree stands at z = 0.5. Its params have no depth, so
 //! the world is a slab one cell deep: the planar forest it was, growing on in 3D's code.
 
 use crate::json::{self, Value};
-use crate::tree::{ColMut, NUMBERS, SCALARS, Tree};
+use crate::tree::{ColMut, Metamers, NUMBERS, SCALARS, Tree};
 use crate::world::World;
 
-const VERSION: f64 = 2.0;
+const VERSION: f64 = 3.0;
+
+/// Metamer columns a version-2 checkpoint does not hold (zero on load).
+const METAMERS_NOT_IN_V2: [&str; 1] = ["lit"];
 
 /// The 2D schema (version 1): (name, size in bytes) of each column, in its order.
 const METAMERS_V1: [(&str, usize); 19] = [
@@ -179,7 +184,7 @@ pub fn load_world(bytes: &[u8]) -> Result<World, CheckpointError> {
     let header = json::parse(text).map_err(|e| CheckpointError(e.to_string()))?;
     let num = |v: &Value, k: &str| v.get(k).and_then(Value::as_f64).unwrap_or(0.0);
     let version = num(&header, "version");
-    if version != VERSION && version != 1.0 {
+    if version != VERSION && version != 2.0 && version != 1.0 {
         return Err(CheckpointError(format!("unknown version {version}")));
     }
     let mut at = pad8(4 + len);
@@ -210,7 +215,10 @@ pub fn load_world(bytes: &[u8]) -> Result<World, CheckpointError> {
             continue;
         }
         tree.m.set_len(nm);
-        for col in tree.m.columns_mut() {
+        for (name, col) in Metamers::NAMES.iter().zip(tree.m.columns_mut()) {
+            if version == 2.0 && METAMERS_NOT_IN_V2.contains(name) {
+                continue;
+            }
             fill(col, nm, bytes, &mut at)?;
         }
         tree.b.set_len(nb);
@@ -342,4 +350,68 @@ fn load_v1(
         b.v[i] = c("v", i);
     }
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::hash::hash_world;
+    use crate::testing::preset;
+    use crate::tree::Metamers;
+
+    /// A version-2 checkpoint of `world`: the same bytes as `save_world` without the columns
+    /// version 3 added, and the header saying 2.
+    fn save_v2(world: &World) -> Vec<u8> {
+        let v3 = save_world(world);
+        let len = u32::from_le_bytes(v3[0..4].try_into().unwrap()) as usize;
+        let text = std::str::from_utf8(&v3[4..4 + len]).unwrap().replacen(
+            "\"version\":3",
+            "\"version\":2",
+            1,
+        );
+        let mut out = Vec::new();
+        out.extend_from_slice(&(text.len() as u32).to_le_bytes());
+        out.extend_from_slice(text.as_bytes());
+        out.resize(pad8(out.len()), 0);
+        for t in &world.trees {
+            for (name, col) in Metamers::NAMES.iter().zip(t.m.columns()) {
+                if METAMERS_NOT_IN_V2.contains(name) {
+                    continue;
+                }
+                out.extend_from_slice(&col.bytes());
+                out.resize(pad8(out.len()), 0);
+            }
+            for col in t.b.columns() {
+                out.extend_from_slice(&col.bytes());
+                out.resize(pad8(out.len()), 0);
+            }
+        }
+        out
+    }
+
+    #[test]
+    fn a_version_2_checkpoint_loads_with_lit_zero_and_grows_on_as_version_3_does() {
+        let mut world = World::new(preset("beechOpen", "{}"));
+        for _ in 0..12 {
+            world.step(&mut |_| {});
+        }
+        let v3 = save_world(&world);
+        let v2 = save_v2(&world);
+        assert!(v2.len() < v3.len());
+        let mut a = load_world(&v3).unwrap();
+        let mut b = load_world(&v2).unwrap();
+        assert!(b.trees.iter().all(|t| t.m.lit.iter().all(|&l| l == 0.0)));
+        assert_eq!(hash_world(&a), hash_world(&b));
+        for _ in 0..5 {
+            a.step(&mut |_| {});
+            b.step(&mut |_| {});
+        }
+        assert_eq!(hash_world(&a), hash_world(&b));
+        assert_eq!(hash_world(&a), {
+            for _ in 0..5 {
+                world.step(&mut |_| {});
+            }
+            hash_world(&world)
+        });
+    }
 }

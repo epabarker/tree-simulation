@@ -2,6 +2,21 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-02: Track C (foliage): one scale, the blind test v3 baseline, and clearBole
+
+- **`origin/3d-port` merged into `claude/foliage`** (PR #40's accepted beech), so the renders use the accepted core. Only the devlog conflicted.
+- **One scale** (`&frame=height` in the lab, `Scene.frame = "height"`): the camera is fixed by the world's height, as the garden's world frame is once its crowns reach the top, and never fitted to the trees. Off by default.
+- **`clearBole`** (`ViewOptions`, the lab's `&clearBole`, `garden.html?clearBole`): no short-shoot rosettes on a trunk below its tree's limb crown base. Track E relayed the user's choice of "both". The snapshot already carries order, y0 and limbBase, so there is no core change. Off by default.
+- **The blind test v3** ([note](experiments/2026-11-02-blind-test-v3.md)): v2's protocol at one scale, seeds 1–3, and three fresh namers for each set.
+  - The accepted beech's lone tree passes without own-crown pruning (17 of 18), but both beech stands read as silver birch (18 of 18). With `clearBole` they read as birch 8 of 9: the dark bands go, the pale, slender, wavy stems stay.
+  - Oak leaves hawthorn (27 → 3), but the lone oak reads as hazel or goat willow by its multi-stemmed vase, and the stand reads as oak 6 of 9.
+  - Fir reads as Norway spruce at 100, never fir. Hornbeam now passes pooled; birch passes.
+- **Surprises:**
+  - The lab's chart row grows with a stand's trees and shrank its canvas, and so its scale, until the shot script pinned it.
+  - One namer transposed two adjacent rows; they are scored as given.
+  - v2's note overstated its namers' seed consistency (53 of 54, not 54).
+- Goldens unchanged.
+
 ## 2026-11-02: The fresh-look beech decided: four rules accepted, own-crown pruning rejected (branch claude/beech-overnight)
 
 - **The user's decisions** on the review and the overnight note ([overnight §4](experiments/2026-11-02-beech-overnight.md)):

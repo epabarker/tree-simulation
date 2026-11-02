@@ -245,39 +245,10 @@ pub fn vigour_gate(v_base: f64, r2: &R2) -> f64 {
 /// (Troll's model, Hallé et al. 1978). So the lit crown of an open-grown tree builds limbs that
 /// rise, then arch out at their young tips, and its shaded lower crown level sprays. The trunk
 /// and its relays (pa 0) are untouched; `set_point` is returned unchanged when off.
-///
-/// With `lightLatch` (ADR 0045, proposed) posture passes `lit_set_point` the largest fraction the
-/// wood has ever seen (`Metamers::lit`, kept by R3) instead of this season's: wood that rose when
-/// lit stays risen once the crown shades it, as straightened wood does, and the round's lone
-/// tree keeps the risen bases its rule meant to give it.
 pub fn light_set_point(
     set_point: f64,
     pa: f64,
     q: f64,
-    wood_age: f64,
-    v_base: f64,
-    r2: &R2,
-) -> f64 {
-    lit_set_point(set_point, pa, lit_fraction(q, r2), wood_age, v_base, r2)
-}
-
-/// Light orthotropy's light term: clamp((q − lightLo) / (lightHi − lightLo)).
-pub fn lit_fraction(q: f64, r2: &R2) -> f64 {
-    let span = r2.light_hi - r2.light_lo;
-    if span > 0.0 {
-        math::max(0.0, math::min(1.0, (q - r2.light_lo) / span))
-    } else if q >= r2.light_hi {
-        1.0
-    } else {
-        0.0
-    }
-}
-
-/// `light_set_point` from a light fraction already taken (this season's, or the latched one).
-pub fn lit_set_point(
-    set_point: f64,
-    pa: f64,
-    lit: f64,
     wood_age: f64,
     v_base: f64,
     r2: &R2,
@@ -288,6 +259,14 @@ pub fn lit_set_point(
     if !r2.enabled || pa < 1.0 {
         return set_point;
     }
+    let span = r2.light_hi - r2.light_lo;
+    let lit = if span > 0.0 {
+        math::max(0.0, math::min(1.0, (q - r2.light_lo) / span))
+    } else if q >= r2.light_hi {
+        1.0
+    } else {
+        0.0
+    };
     let aged = math::min(
         1.0,
         (math::max(0.0, wood_age) + 1.0) / math::max(1.0, r2.light_over),
@@ -1081,24 +1060,6 @@ mod tests {
         assert_eq!(arm_set_point(&t, false, 1.0, base, &p), None); // a limb keeps its level
         let off = with_r2(&[r#"{}"#, r#"{}"#], r#""relay":2"#);
         assert_eq!(arm_set_point(&t, false, 0.0, base, &off), None);
-    }
-
-    #[test]
-    fn the_latched_fraction_is_the_lights_clamped_term_and_sets_the_same_point() {
-        let p = crate::params::Params::from_json(&preset(
-            "default",
-            r#"{"r2":{"lightSetPoint":35,"lightLo":0.2,"lightHi":0.8,"lightOver":3,"vigourTreeLo":3000,"vigourTreeHi":10000}}"#,
-        ));
-        let r2 = &p.r2;
-        assert_eq!(lit_fraction(0.1, r2), 0.0);
-        assert!((lit_fraction(0.5, r2) - 0.5).abs() < 1e-12);
-        assert_eq!(lit_fraction(0.9, r2), 1.0);
-        for q in [0.1, 0.5, 0.9] {
-            assert_eq!(
-                lit_set_point(95.0, 2.0, lit_fraction(q, r2), 5.0, 20000.0, r2),
-                light_set_point(95.0, 2.0, q, 5.0, 20000.0, r2)
-            );
-        }
     }
 
     #[test]

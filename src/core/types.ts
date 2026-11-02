@@ -83,12 +83,6 @@ export const METAMER_SCHEMA = {
    * pa = min(order − paShift, levels − 1). Inherited by the whole subtree.
    */
   paShift: Uint8Array,
-  /**
-   * The largest light fraction (R2's light orthotropy, between lightLo and lightHi) this wood has
-   * seen in posture: with r2.lightLatch the lift it earned when lit is kept once the crown shades
-   * it (ADR 0045). Zero unless the latch is on.
-   */
-  lit: Float64Array,
 } as const;
 
 export const BUD_SCHEMA = {

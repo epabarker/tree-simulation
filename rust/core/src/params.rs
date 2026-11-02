@@ -271,10 +271,6 @@ pub struct R2 {
     /// Light orthotropy's wood-age ramp: wood straightens fully at this age, seasons (absent: 1,
     /// so even this season's shoot does).
     pub light_over: f64,
-    /// The latch (ADR 0045): in posture, wood keeps the largest light fraction it has seen
-    /// (`Metamers::lit`), so a limb that rose when lit stays risen once the crown shades it, as
-    /// straightened wood does. Off (the default): the light is re-read every season.
-    pub light_latch: bool,
 }
 
 #[derive(Clone, Debug)]
@@ -576,7 +572,6 @@ impl Params {
                 light_lo: opt(r2, "lightLo").unwrap_or(0.0),
                 light_hi: opt(r2, "lightHi").unwrap_or(1.0),
                 light_over: opt(r2, "lightOver").unwrap_or(1.0),
-                light_latch: flag(r2, "lightLatch"),
             },
             r3: R3 {
                 enabled: flag(r3, "enabled"),

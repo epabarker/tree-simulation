@@ -41,7 +41,7 @@
     --ghost: #9a8f80;
     --wall: rgba(90, 90, 100, 0.35);
     /* Species wood (render/bark-styles.ts): twig → bark by age, bark → old bark by girth. Birch
-       white with a black base, beech pale grey, oak grey-brown, pine orange above and grey-brown
+       white with a black base, beech mid grey (measured, below), oak grey-brown, pine orange above and grey-brown
        plates below, holly grey over green shoots (the species cards, 2026-11-01). */
     --birch-bark-twig: #6b3f2c;
     --birch-bark: #e9e6de;
@@ -50,8 +50,13 @@
     --oak-bark: #7d7365;
     --oak-bark-old: #4e463d;
     --beech-bark-twig: #6e5a3e;
-    --beech-bark: #a9a8a0;
-    --beech-bark-old: #94938c;
+    /* Beech's bark as measured: Pilarski et al. 2008 found about 15% reflectance over the visible
+       on beech trunks (sRGB #6b6e6e to #777a79); young bark at the lighter end, old at the darker.
+       The user's choice (2026-11-02), on the blind test's judging set (seeds 4–6, five namers):
+       the stand read beech 9 of 15 under it, against 0 of 9 under the pale grey on seeds 1–3.
+       The pale grey stays as data-bark="pale". */
+    --beech-bark: #777a79;
+    --beech-bark-old: #6b6e6e;
     --hornbeam-bark-twig: #6d5d48;
     --hornbeam-bark: #8e9090;
     --hornbeam-bark-old: #717474;
@@ -139,8 +144,8 @@
       --oak-bark: #9a8f80;
       --oak-bark-old: #6e6458;
       --beech-bark-twig: #8c7856;
-      --beech-bark: #b4b3ab;
-      --beech-bark-old: #a09f98;
+      --beech-bark: #828584;
+      --beech-bark-old: #777a79;
       --hornbeam-bark-twig: #8c7b62;
       --hornbeam-bark: #a4a6a6;
       --hornbeam-bark-old: #8a8d8d;
@@ -205,8 +210,8 @@
     --oak-bark: #9a8f80;
     --oak-bark-old: #6e6458;
     --beech-bark-twig: #8c7856;
-    --beech-bark: #b4b3ab;
-    --beech-bark-old: #a09f98;
+    --beech-bark: #828584;
+    --beech-bark-old: #777a79;
     --hornbeam-bark-twig: #8c7b62;
     --hornbeam-bark: #a4a6a6;
     --hornbeam-bark-old: #8a8d8d;
@@ -231,24 +236,23 @@
   }
 
   /*
-   * Beech's measured bark (round 2; off by default, on with data-bark="measured", the lab's
-   * &bark=measured). Pilarski et al. 2008 measured beech trunks at about 15% reflectance over the
-   * visible, sRGB #6b6e6e to #777a79 (track E's sources, 2026-11-02), where #a9a8a0 is near 40%:
-   * young bark at the lighter end, old bark at the darker. Dark mode keeps its usual lift.
+   * Beech's former pale grey (on with data-bark="pale", the lab's &bark=pale): track A's card
+   * ("Bark pale grey", TSO), the default until 2026-11-02. Under it the lone beech reads beech at
+   * one scale and the stand reads birch (the blind test v3).
    */
-  :root[data-bark="measured"] {
-    --beech-bark: #777a79;
-    --beech-bark-old: #6b6e6e;
+  :root[data-bark="pale"] {
+    --beech-bark: #a9a8a0;
+    --beech-bark-old: #94938c;
   }
   @media (prefers-color-scheme: dark) {
-    :root[data-bark="measured"]:not([data-theme="light"]) {
-      --beech-bark: #828584;
-      --beech-bark-old: #777a79;
+    :root[data-bark="pale"]:not([data-theme="light"]) {
+      --beech-bark: #b4b3ab;
+      --beech-bark-old: #a09f98;
     }
   }
-  :root[data-bark="measured"][data-theme="dark"] {
-    --beech-bark: #828584;
-    --beech-bark-old: #777a79;
+  :root[data-bark="pale"][data-theme="dark"] {
+    --beech-bark: #b4b3ab;
+    --beech-bark-old: #a09f98;
   }
 
   /*

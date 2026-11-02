@@ -26,12 +26,12 @@ function element<T extends HTMLElement>(id: string): T {
 }
 
 const query = new URLSearchParams(location.search);
-// `&bark=measured`: beech's bark at its measured reflectance (scene.css; round 2, off by default).
+// `&bark=pale`: beech's former pale grey bark (scene.css), before the measured one became default.
 // `&barkLight=0.5`: bark by light, every stem dimmed by its shade (Scene.woodLight) from beech's lit
 // base tone (data-bark="lit"); it takes precedence over `&bark`.
 const barkLight = Number(query.get("barkLight") ?? 0);
 if (barkLight > 0) document.documentElement.dataset.bark = "lit";
-else if (query.get("bark") === "measured") document.documentElement.dataset.bark = "measured";
+else if (query.get("bark") === "pale") document.documentElement.dataset.bark = "pale";
 const narrow = window.matchMedia("(max-width: 700px)").matches;
 // A phone shows a four-tree grove; the ten-tree stand would be too small to read.
 // `?preset=name` picks another (and `?bench` measures it, M15).

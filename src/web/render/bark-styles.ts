@@ -77,7 +77,10 @@ export const BARK_STYLES: Record<BarkPalette, BarkStyle> = {
     marks: 0,
     plates: 0,
   },
-  /** Beech: "bark pale grey", smooth "into old age" (TSO). */
+  /**
+   * Beech: smooth "into old age" (TSO); its tone is the measured mid grey (Pilarski et al. 2008,
+   * scene.css), where TSO says "bark pale grey" (the `data-bark="pale"` alternative).
+   */
   beech: {
     mature: 3,
     oldFrom: 16,

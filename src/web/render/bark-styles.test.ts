@@ -22,10 +22,10 @@ describe("bark styles (track C)", () => {
         expect(n, `--${p}-bark${suffix}`).toBe(3);
       }
     }
-    // Each override (beech's measured bark, bark by light's base) sets beech's bark and old bark in
-    // the same three places.
+    // Each override (beech's former pale grey, bark by light's base) sets beech's bark and old bark
+    // in the same three places.
     const over = css.slice(base.length);
-    const modes = ["measured", "lit"];
+    const modes = ["pale", "lit"];
     for (const mode of modes)
       expect(over.split(`[data-bark="${mode}"]`).length - 1, `data-bark="${mode}"`).toBe(3);
     for (const suffix of ["", "-old"])

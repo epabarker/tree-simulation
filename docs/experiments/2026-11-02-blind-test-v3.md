@@ -427,6 +427,14 @@ sunlit limb on an open-grown tree reads pale.
 - with the pale bark, the lone tree reads beech, and the stand reads birch (seeds 1–3; the pale bark
   was not judged at 4–6).
 
+**The user's decision (2026-11-02, relayed by track E):** beech ships with the measured mid-grey bark.
+- Its tokens (`#777a79`, `#6b6e6e`) are beech's default in `scene.css`; the pale grey stays as
+  `&bark=pale`.
+- `clearBole` and `&frame=height` stay as options, off by default. ADR 0044's `r6.lifespan` removes the
+  trunk tufts in the model, so `clearBole` has little left to hide once it is merged.
+- `girth` and `barkLight` stay off, recorded here as tried.
+- The lone beech's form is a question for after shipping.
+
 - **Candidate:** beech's measured bark (set 3's tokens, `&bark=measured`) with `clearBole`, girth
   off. Every other source is drawn as in the baseline (`&frame=height` only).
 - **Seeds 4–6,** the judging seeds; never 1001–1006.
@@ -530,6 +538,11 @@ SOURCES=beech VIEW='&clearBole&barkLight=0.5' PW_FROM=<scratch>/pw/x.js node doc
 
 Stop the dev server before `npm run check`: on this laptop two slow tests time out at 30 s while it
 runs.
+
+The measured bark has been beech's default since the user's decision. `&bark=measured` no longer
+exists and now draws the default, so the calls above still draw sets 3, 4 and the judging set as
+they were. The baseline's and set 2's beech plates need `&bark=pale` added to their `VIEW`, or a
+checkout at 22d0d6e.
 
 The trees are deterministic in the core (the seeds and patches fix them); the plates' pixels depend
 on the GPU and the moment of the shot. The namers' replies are not reproducible.

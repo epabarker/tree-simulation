@@ -27,6 +27,10 @@ Newest first. One entry per session or milestone: what changed, why, surprises, 
   - The stand passes pooled (beech 9 of 15, on all three seeds). The lone tree fails: 5 and 7 of 15, read as oak or field maple, which is the form's (Part 2).
   - Birch holds (45 of 45). Hornbeam's unchanged stand reads oak 12 of 15 on these seeds.
   - The note states the user's choice in one line. Track C's blind-test work stops here.
+- **The user's decision (2026-11-02, via track E): beech ships with the measured mid-grey bark.**
+  - `#777a79` and `#6b6e6e` (Pilarski et al. 2008, ≈ 15% reflectance) are beech's default tokens, with dark mode's usual lift; the old pale grey is `&bark=pale`.
+  - `clearBole`, `frame=height`, `girth` and `barkLight` stay off by default.
+  - Renderer only: goldens unchanged.
 - **Surprises:**
   - The oak stand's identical plates were named oak 6, 6 and then 0 of 9 by three sets of namers.
   - Two slow tests (one core-only) time out at 30 s while a vite dev server runs alongside. The committed HEAD failed the same way; with the server stopped, the check passes.

@@ -141,7 +141,7 @@ function leafRamps(v: (name: string, fallback: string) => string): Record<LeafPa
 const BARK_FALLBACK: Record<BarkPalette, [string, string, string]> = {
   birch: ["#6b3f2c", "#e9e6de", "#2f2b28"],
   oak: ["#7a6a4a", "#7d7365", "#4e463d"],
-  beech: ["#6e5a3e", "#a9a8a0", "#94938c"],
+  beech: ["#6e5a3e", "#777a79", "#6b6e6e"],
   hornbeam: ["#6d5d48", "#8e9090", "#717474"],
   maple: ["#7a5a3a", "#8f8170", "#6a5d50"],
   holly: ["#4e6a3a", "#9fa39a", "#81857d"],

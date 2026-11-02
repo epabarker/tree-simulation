@@ -40,6 +40,44 @@
     --pine-needle-sun: #6a8f6a;
     --ghost: #9a8f80;
     --wall: rgba(90, 90, 100, 0.35);
+    /* Species wood (render/bark-styles.ts): twig → bark by age, bark → old bark by girth. Birch
+       white with a black base, beech mid grey (measured, below), oak grey-brown, pine orange above and grey-brown
+       plates below, holly grey over green shoots (the species cards, 2026-11-01). */
+    --birch-bark-twig: #6b3f2c;
+    --birch-bark: #e9e6de;
+    --birch-bark-old: #2f2b28;
+    --oak-bark-twig: #7a6a4a;
+    --oak-bark: #7d7365;
+    --oak-bark-old: #4e463d;
+    --beech-bark-twig: #6e5a3e;
+    /* Beech's bark as measured: Pilarski et al. 2008 found about 15% reflectance over the visible
+       on beech trunks (sRGB #6b6e6e to #777a79); young bark at the lighter end, old at the darker.
+       The user's choice (2026-11-02), on the blind test's judging set (seeds 4–6, five namers):
+       the stand read beech 9 of 15 under it, against 0 of 9 under the pale grey on seeds 1–3.
+       The pale grey stays as data-bark="pale". */
+    --beech-bark: #777a79;
+    --beech-bark-old: #6b6e6e;
+    --hornbeam-bark-twig: #6d5d48;
+    --hornbeam-bark: #8e9090;
+    --hornbeam-bark-old: #717474;
+    --maple-bark-twig: #7a5a3a;
+    --maple-bark: #8f8170;
+    --maple-bark-old: #6a5d50;
+    --holly-bark-twig: #4e6a3a;
+    --holly-bark: #9fa39a;
+    --holly-bark-old: #81857d;
+    --rowan-bark-twig: #6a5444;
+    --rowan-bark: #8d8a84;
+    --rowan-bark-old: #6e6b66;
+    --willow-bark-twig: #7d7660;
+    --willow-bark: #7a6e5e;
+    --willow-bark-old: #554b40;
+    --pine-bark-twig: #7c6a55;
+    --pine-bark: #b9714b;
+    --pine-bark-old: #5e4e42;
+    --fir-bark-twig: #7a6a54;
+    --fir-bark: #8e8a82;
+    --fir-bark-old: #6e6a64;
     /* Autumn (M17): what each foliage turns to before it falls. */
     --leaf-autumn-shade: #8a3b16;
     --leaf-autumn-sun: #e3a43a;
@@ -99,6 +137,36 @@
       --pine-needle-sun: #5b7b5b;
       --ghost: #6f6a62;
       --wall: rgba(160, 160, 175, 0.25);
+      --birch-bark-twig: #8a5a44;
+      --birch-bark: #d6d2c8;
+      --birch-bark-old: #4a4440;
+      --oak-bark-twig: #9a8a66;
+      --oak-bark: #9a8f80;
+      --oak-bark-old: #6e6458;
+      --beech-bark-twig: #8c7856;
+      --beech-bark: #828584;
+      --beech-bark-old: #777a79;
+      --hornbeam-bark-twig: #8c7b62;
+      --hornbeam-bark: #a4a6a6;
+      --hornbeam-bark-old: #8a8d8d;
+      --maple-bark-twig: #9a7856;
+      --maple-bark: #a8998a;
+      --maple-bark-old: #85786a;
+      --holly-bark-twig: #6a8a52;
+      --holly-bark: #b0b4ab;
+      --holly-bark-old: #959a91;
+      --rowan-bark-twig: #88705e;
+      --rowan-bark: #a5a29c;
+      --rowan-bark-old: #88857f;
+      --willow-bark-twig: #9a937a;
+      --willow-bark: #978a78;
+      --willow-bark-old: #73685b;
+      --pine-bark-twig: #a38c6e;
+      --pine-bark: #c98660;
+      --pine-bark-old: #7d6b5d;
+      --fir-bark-twig: #988670;
+      --fir-bark: #a8a49c;
+      --fir-bark-old: #88847e;
     }
   }
 
@@ -135,5 +203,75 @@
     --pine-needle-sun: #5b7b5b;
     --ghost: #6f6a62;
     --wall: rgba(160, 160, 175, 0.25);
+    --birch-bark-twig: #8a5a44;
+    --birch-bark: #d6d2c8;
+    --birch-bark-old: #4a4440;
+    --oak-bark-twig: #9a8a66;
+    --oak-bark: #9a8f80;
+    --oak-bark-old: #6e6458;
+    --beech-bark-twig: #8c7856;
+    --beech-bark: #828584;
+    --beech-bark-old: #777a79;
+    --hornbeam-bark-twig: #8c7b62;
+    --hornbeam-bark: #a4a6a6;
+    --hornbeam-bark-old: #8a8d8d;
+    --maple-bark-twig: #9a7856;
+    --maple-bark: #a8998a;
+    --maple-bark-old: #85786a;
+    --holly-bark-twig: #6a8a52;
+    --holly-bark: #b0b4ab;
+    --holly-bark-old: #959a91;
+    --rowan-bark-twig: #88705e;
+    --rowan-bark: #a5a29c;
+    --rowan-bark-old: #88857f;
+    --willow-bark-twig: #9a937a;
+    --willow-bark: #978a78;
+    --willow-bark-old: #73685b;
+    --pine-bark-twig: #a38c6e;
+    --pine-bark: #c98660;
+    --pine-bark-old: #7d6b5d;
+    --fir-bark-twig: #988670;
+    --fir-bark: #a8a49c;
+    --fir-bark-old: #88847e;
+  }
+
+  /*
+   * Beech's former pale grey (on with data-bark="pale", the lab's &bark=pale): track A's card
+   * ("Bark pale grey", TSO), the default until 2026-11-02. Under it the lone beech reads beech at
+   * one scale and the stand reads birch (the blind test v3).
+   */
+  :root[data-bark="pale"] {
+    --beech-bark: #a9a8a0;
+    --beech-bark-old: #94938c;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root[data-bark="pale"]:not([data-theme="light"]) {
+      --beech-bark: #b4b3ab;
+      --beech-bark-old: #a09f98;
+    }
+  }
+  :root[data-bark="pale"][data-theme="dark"] {
+    --beech-bark: #b4b3ab;
+    --beech-bark-old: #a09f98;
+  }
+
+  /*
+   * Bark by light's base (round 2; on with data-bark="lit", the lab's &barkLight): beech's bark lit,
+   * at about 27% reflectance, between the pale token and the measured trunk (track E). The view's
+   * barkLight then darkens each stem by its shade, so a shaded bole reaches the measured range.
+   */
+  :root[data-bark="lit"] {
+    --beech-bark: #8f918e;
+    --beech-bark-old: #838582;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root[data-bark="lit"]:not([data-theme="light"]) {
+      --beech-bark: #9a9c99;
+      --beech-bark-old: #8e908d;
+    }
+  }
+  :root[data-bark="lit"][data-theme="dark"] {
+    --beech-bark: #9a9c99;
+    --beech-bark-old: #8e908d;
   }
 }

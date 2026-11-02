@@ -14,8 +14,13 @@ import type { SimApi } from "./api.ts";
 
 const ready = loadWorlds();
 let world: RustWorld | null = null;
-/** The world put aside by `swap`, if any. */
-let aside: RustWorld | null = null;
+/**
+ * The world put aside by `swap`, if any, as checkpoint bytes rather than a live world (ADR 0026):
+ * the core's linear memory never shrinks, so two live worlds cost their sum, while a world saved
+ * and freed leaves its space to the next and costs only its bytes, outside linear memory. A
+ * restored checkpoint grows on exactly as the world would have (checkpoint.test.ts).
+ */
+let aside: Uint8Array | null = null;
 let options: SnapshotOptions = FULL_SNAPSHOT;
 
 async function current(): Promise<RustWorld> {
@@ -33,7 +38,6 @@ function snapshot(w: RustWorld, ms: number): Snapshot {
 
 function replace(next: RustWorld): RustWorld {
   world?.dispose();
-  aside?.dispose();
   aside = null;
   world = next;
   return next;
@@ -58,12 +62,12 @@ const api: SimApi = {
   async swap(params: Params | null) {
     const w = await current();
     if (params) {
-      if (aside) w.dispose();
-      else aside = w;
+      if (!aside) aside = w.save();
+      w.dispose();
       world = RustWorld.create(params);
     } else if (aside) {
       w.dispose();
-      world = aside;
+      world = RustWorld.load(aside);
       aside = null;
     }
     const now = world as RustWorld;

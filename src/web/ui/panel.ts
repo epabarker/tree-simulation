@@ -9,7 +9,7 @@ import type { Params, ParamsPatch } from "../../core/params.ts";
 import { type PresetName, presets } from "../../core/presets.ts";
 import type { PlaybackState, Stats } from "../garden.ts";
 import type { LeafStyleName } from "../render/leaf-styles.ts";
-import type { ColorMode, ViewOptions } from "../render/scene.ts";
+import { type ColorMode, LEAF_MIN_PX, LEAF_OPACITY, type ViewOptions } from "../render/scene.ts";
 
 interface FieldSpec {
   key: string;
@@ -394,6 +394,16 @@ export class Panel {
       max: 12,
       step: 1,
     });
+    // I3's foliage knobs (step 4): the cards' opacity and their least on-screen length.
+    view.leafOpacity ??= LEAF_OPACITY;
+    view.leafMinPx ??= LEAF_MIN_PX;
+    viewFolder.addBinding(view, "leafOpacity", {
+      label: "leaf opacity",
+      min: 0.3,
+      max: 1,
+      step: 0.02,
+    });
+    viewFolder.addBinding(view, "leafMinPx", { label: "leaf min px", min: 0, max: 8, step: 0.5 });
     viewFolder.addBinding(view, "showBuds", { label: "buds" });
     viewFolder.addBinding(view, "showShadow", { label: "shadow" });
     viewFolder.addBinding(view, "showGhosts", { label: "shed ghosts" });

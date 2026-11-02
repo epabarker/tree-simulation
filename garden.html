@@ -68,7 +68,7 @@
             onDone: (result) => {
               window.bench = result;
               console.log("bench", JSON.stringify(result));
-              note.textContent = `bench: draw p95 ${result.drawP95} ms, frame p95 ${result.frameP95} ms, worker ${result.workerMean} ms (${result.metamers} metamers, ${result.renderer}, dpr ${result.dpr})`;
+              note.textContent = `bench: draw p95 ${result.drawP95} ms, frame p95 ${result.frameP95} ms, worker ${result.workerMean} ms (${result.metamers} metamers, ${result.renderer}, dpr ${result.dpr}); leaf pixels ${result.coverage.pixelCover} of the canopy`;
             },
           }
         : undefined;
@@ -94,6 +94,17 @@
           .filter((k) => query.has(k))
           .map((k) => [k, Number(query.get(k))]),
       );
+      // `?leafOpacity=0.8&leafMinPx=2`: I3's foliage knobs (step 4), for the coverage sheets;
+      // `?girth=1.45`: stems drawn at that multiple of their pipe-model radius (round 2).
+      const view = Object.fromEntries(
+        ["leafOpacity", "leafMinPx", "girth"]
+          .filter((k) => query.has(k))
+          .map((k) => [k, Number(query.get(k))]),
+      );
+      // `?clearBole`: no rosettes on a trunk below its limb crown base (round 2), for a phone look.
+      if (query.has("clearBole")) view.clearBole = true;
+      // `?bark=pale`: beech's former pale grey bark, for a comparison on the phone (scene.css).
+      if (query.get("bark") === "pale") document.documentElement.dataset.bark = "pale";
       // Exposed for poking at from the console (and headless checks); a host page needn't.
       window.garden = mountGarden(document.getElementById("garden"), {
         headroom: 140,
@@ -104,6 +115,7 @@
         seed,
         renderer,
         planting,
+        view,
       });
     </script>
   </body>

@@ -30,6 +30,7 @@ import {
   leafLength,
   Scene,
   type ViewOptions,
+  WOOD_CONTRAST,
 } from "./scene.ts";
 import { RAMP_STEPS, readTheme, type Theme } from "./theme.ts";
 
@@ -153,6 +154,7 @@ export class Canvas2DRenderer implements Renderer {
     scene.leafStyle = LEAF_STYLES[view.leafStyle];
     scene.clearBole = view.clearBole ?? false;
     scene.girth = view.girth ?? 1;
+    scene.woodContrast = view.woodContrast ?? WOOD_CONTRAST;
     scene.computeGeometry(t);
     const leaves = view.showLeaves ? scene.leaves(view.leafAge, t) : null;
     // On a ring seen whole, the trees are drawn once per copy of the world (Scene.wrapOffsets).

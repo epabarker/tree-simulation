@@ -95,9 +95,10 @@
           .map((k) => [k, Number(query.get(k))]),
       );
       // `?leafOpacity=0.8&leafMinPx=2`: I3's foliage knobs (step 4), for the coverage sheets;
-      // `?girth=1.45`: stems drawn at that multiple of their pipe-model radius (round 2).
+      // `?girth=1.45`: stems drawn at that multiple of their pipe-model radius (round 2);
+      // `?woodContrast=0`: wood in its tokens' colours, without the floor below the sky (round 2).
       const view = Object.fromEntries(
-        ["leafOpacity", "leafMinPx", "girth"]
+        ["leafOpacity", "leafMinPx", "girth", "woodContrast"]
           .filter((k) => query.has(k))
           .map((k) => [k, Number(query.get(k))]),
       );

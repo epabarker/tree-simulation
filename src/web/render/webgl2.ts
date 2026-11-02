@@ -43,6 +43,7 @@ import {
   type Leaves,
   Scene,
   type ViewOptions,
+  WOOD_CONTRAST,
 } from "./scene.ts";
 import { readTheme, type Theme } from "./theme.ts";
 
@@ -650,6 +651,7 @@ export class WebGL2Renderer implements Renderer {
       view.clearBole,
       view.girth,
       view.barkLight,
+      view.woodContrast,
       view.showBuds,
       view.showObstacles,
       scene.solo,
@@ -663,6 +665,7 @@ export class WebGL2Renderer implements Renderer {
       scene.clearBole = view.clearBole ?? false;
       scene.girth = view.girth ?? 1;
       scene.barkLight = view.barkLight ?? 0;
+      scene.woodContrast = view.woodContrast ?? WOOD_CONTRAST;
       scene.computeGeometry(t);
       this.buildSegments(s, view);
       if (ghosts) this.buildGhosts(1 - t);

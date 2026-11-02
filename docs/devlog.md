@@ -2,6 +2,14 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-02: The judging pass; track B's accepted picks adopted at last (birch, oak, maple, willow); goldens updated
+
+- **The user's judging pass** on the phone, from track C's sheets, verbatim in [`reviews/2026-11-02-judging-pass.md`](reviews/2026-11-02-judging-pass.md): oak "no" (a hazel coppice: zigzag limbs from a low fork; the garden's trunks read as lightning bolts), the other seven "nearly", and the pale depth fade hiding trees (garden seed 3, the birch stand). The fade and birch's black trunk are track C's.
+- **Surprise: track B's picks had never reached the species.** The user accepted them on 2026-11-01 (ADR 0033–0036 and 0038 for the species that use them), but the adoption step (the tracks plan's day 2, track D's) never ran, so the garden the user judged lacked oak's posture by age, maple's relay, willow's pendulous twigs and birch's. Three of the "nearly"s point where the picks point.
+- **Adopted** as hand overrides (`analysis/fit/hand-overrides.toml`, from `code/2026-11-01-atlas/picks.toml`): birch (twig set point 45, pendulous 140 to radius 0.01, laterals every third node), oak (limbs 35 → 85 over 50 seasons of wood), maple (relay 2 from age 10 at p 0.6, relays curving 30 over 30), willow (pendulous twigs, laterals every second node). Hornbeam, rowan and holly keep today's form as the user decided; beech's fresh-look rules stand over its atlas pick. `m27_adopt.py --round round2` reproduces `flora-fitted.ts` exactly before the change, so the regeneration is clean: only the four species' entries move.
+- **Goldens (intended):** `mixedWood:seed1:s15` 2c9953a3 → 7222241d, `oakOpen:seed1:s15` 222430cd → f2255ecd, `beechWood:seed1:s30` 83ecccbb → c3245824: the woods and the oak carry the four species' new forms. `beechOpen` and the 12 others are unchanged.
+- **The oak's zigzag** ([`code/2026-11-02-overrides/oak-zigzag.py`](experiments/code/2026-11-02-overrides/oak-zigzag.py), seeds 4–6): oak's trunk ends at a third of its height (order-0 top / H 0.36) and the crown is laterals fanning from a fork at 0.04–0.06 H, under R2's ontogenetic drop (dLambda 0.1154 over ramp 15). Lowering it straightens the trunk (top / H 1.0 at 0.03) but gives a cone (0.06) or a spire (0.03), never a dome: the freed limbs are level or straight, the same rise-then-arch gap as beech's. The garden's bolts are the stand's trunks; their straightness under the same variants is measured next.
+
 ## 2026-11-02: Round 2 merged (PRs #41–#43); the `forest` evidence re-run at shipping; the shipping order
 
 - **The user's look:** the beech on the phone passes. Round 2 is in `3d-port`: ADR 0039–0042 and 0044 for beech, the measured bark, the view options, the WASM gate at 200 kB.

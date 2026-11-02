@@ -38,14 +38,14 @@
 //! r2.kappa) and `lateralEvery` (laterals only at every k-th node of its axes) set how many fine
 //! shoots a limb carries and where along it.
 //!
-//! The relay's neighbour gate (ADR 0039, proposed; the fresh-look beech round, 2026-11-01): with `relayCrowd` k, the age relay's
+//! The relay's neighbour gate (ADR 0039, accepted 2026-11-02; the fresh-look beech round): with `relayCrowd` k, the age relay's
 //! relayPTerm acts by max(0, 1 − k·s̄), s̄ the tree's mean R5 neighbour shade (phase 2). A
 //! free-standing tree (s̄ = 0) loses its leader from relayAge and becomes polyarchic; a tree among
 //! neighbours keeps it through the race for height, a hierarchical bole (Nicolini & Caraglio 1994
 //! [r on the beech card]: forks at the extremes of growth, "une structure bien hiérarchisée" in
 //! between; Troll [r]: "young trees may develop a leader, aged crowns usually are polyarchic").
 //!
-//! The vigour fork (ADR 0040, proposed): a pa-0 shoot whose bud received v ≥ `forkAt` times the
+//! The vigour fork (ADR 0040, accepted): a pa-0 shoot whose bud received v ≥ `forkAt` times the
 //! full shoot (c1.maxMetamersPerShoot), more than the longest shoot can use, ends its apex, and
 //! the relay makes the laterals on its top nodes co-dominant arms, re-aimed to `forkAngle` from
 //! the ended apex (Nicolini & Caraglio 1994 [r]: forks at the highest growth rates). With it on,
@@ -54,13 +54,13 @@
 //! "all axes develop plagiotropically" [r], only the trunk straightened, so an arm rises and
 //! then arches instead of standing up as a second trunk.
 //!
-//! The vigour drop (ADR 0041, proposed): a node's vigour u = min(1, (v_in / v_base) / vigourShare)
+//! The vigour drop (ADR 0041, accepted): a node's vigour u = min(1, (v_in / v_base) / vigourShare)
 //! is the share of its tree's resource it carries; λ there falls by g·(1 − u)·vigourLambda (C3),
 //! g the tree's own vigour gate by v_base between vigourTreeLo and vigourTreeHi. A broad open
 //! crown spreads its resource over many limbs, so its weak wood loses apical control and its top
 //! divides into near-equal limbs (the dome); a stand member never opens the gate.
 //!
-//! Light orthotropy (ADR 0042, proposed): wood of pa ≥ 1 on a vigorous tree (the vigour
+//! Light orthotropy (ADR 0042, accepted): wood of pa ≥ 1 on a vigorous tree (the vigour
 //! gate g) takes a set point, in growth (C4) and posture (R3), moved from its level's toward
 //! `lightSetPoint` by its light and, over `lightOver` seasons, by its age: lit wood rises, shaded
 //! wood stays level (Nicolini & Caraglio 1994 [r]; Nicolini 2000 [s]). This season's shoot spreads

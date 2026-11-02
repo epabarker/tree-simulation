@@ -4,7 +4,7 @@
 //! crown top). `remove_branches` is shared with R3 breakage and obstacle clearance; with R4's bud
 //! bank each removed branch leaves a dormant bud in its slot.
 //!
-//! Own-crown pruning (ADR 0043, proposed; a C5 change for the user's decision): with `Tvig`, a vigorous tree (R2's vigour gate g
+//! Own-crown pruning (ADR 0043, rejected 2026-11-02: off by default, no species sets it): with `Tvig`, a vigorous tree (R2's vigour gate g
 //! by its production v_base, r2.vigourTreeLo/Hi) also sheds a lateral whose light per metamer is
 //! below g·Tvig·Q_top. An open-grown crown shades its own first limbs as it spreads above them,
 //! and a branch's fate is set by its light relative to the rest of its crown (branch autonomy:

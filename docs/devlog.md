@@ -2,6 +2,17 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-02: The fresh-look beech decided: four rules accepted, own-crown pruning rejected (branch claude/beech-overnight)
+
+- **The user's decisions** on the review and the overnight note ([overnight §4](experiments/2026-11-02-beech-overnight.md)):
+  - ADRs 0039–0042 (relay gate, vigour fork and arm hold, vigour drop, light orthotropy) are accepted for beech, at the repair's values under the resource vigour gate;
+  - ADR 0043 (own-crown pruning, `c5.Tvig`) is rejected, so the C5 boundary question is moot;
+  - round 2 targets the beech stand and oak's and fir's look in the renderer ([brief](plans/2026-11-02-beech-round2.md)).
+- **Beech without `c5.Tvig`:** removed from `hand-overrides.toml` and `flora-fitted.ts`, and presets exported. Only beech's entries change. The code and its test stay, off by default, so the review's runs reproduce.
+- **The unit-free gate prototype is removed** from the core (`r2.vigourCrowd`, commit 219a002): it was no better once own-crown pruning was off (overnight §2c). The scripts' `--assign` and `--variant` options stay.
+- **Golden (intended):** `beechOpen:seed1:s40` befbed31 → 3525f9f7, because own-crown pruning acted on the lone beech and is now off. `beechWood:seed1:s30` is unchanged: under the resource gate it never acted in the wood. The other 14 are unchanged.
+- **Merging this branch into `3d-port` adopts the round's beech for the garden.** That merge is the user's.
+
 ## 2026-11-01: A review of the fresh-look beech round (branch claude/fresh-look-beech)
 
 - **Reproduced:** the repair's sheet and metrics from the brief's command, all 63 numbers equal to `repair-round1/metrics.json`; the stand equal to the solver's; every changed `rust/presets.json` entry inside a beech patch. [Review note](experiments/2026-11-01-fresh-look-beech-review.md).

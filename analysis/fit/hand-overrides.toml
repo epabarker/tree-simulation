@@ -32,7 +32,8 @@
 # open-grown tree forks low; the vigour fork (excess vigour ends the apex) forks the stand's tops;
 # every arm holds the angle it was born at and curves 30° over 30 nodes (ADR 0034), rising then
 # arching; the vigour drop lowers λ in weak wood of a tree whose v_base passes 3000–10000 (the
-# open-grown crown; a stand member stays below 2000), so its top divides into near-equal limbs.
+# open-grown crown; a stand member stays near or below 3000: 2,409–3,020 at 20 seeds, review note
+# §2), so its top divides into near-equal limbs.
 # docs/experiments/code/2026-11-01-fresh-look-beech/notes.md, Solver decision.
 "r2.relay" = 2
 "r2.relayAge" = 15
@@ -50,10 +51,10 @@
 # twig (pa 2, set point 94.6°) grew and held level in the open. Light orthotropy: lit wood of a
 # vigorous tree is held erect (35°), shaded wood level, by its light (0.2–0.8) and over its first
 # 3 seasons, so the young shoot spreads level and its older base rises (rise, then arch); the
-# vigour gate (3000–10000) keeps the stand as it was. Own-crown pruning (Tvig 0.25, the same gate)
-# clears the sapling's lowest limbs under the young dome. notes.md, Repair.
+# vigour gate (3000–10000) keeps the stand as it was. notes.md, Repair. Own-crown pruning (c5.Tvig
+# 0.25) was part of the repair and is rejected (ADR 0043, 2026-11-02): it made the garden's edge
+# beech a pole with a cap and did not clear the lower trunk (2026-11-02-beech-overnight.md).
 "r2.lightSetPoint" = 35
 "r2.lightLo" = 0.2
 "r2.lightHi" = 0.8
 "r2.lightOver" = 3
-"c5.Tvig" = 0.25

@@ -1,6 +1,6 @@
 # 0043: Own-crown pruning: a vigorous tree sheds its own shaded laterals (c5.Tvig), a C5 shedding change
 
-- **Status:** proposed (the fresh-look beech round, repair, 2026-11-01; not accepted, not adopted). **For the user's decision: it changes C5 shedding, against ADR 0032's boundary.**
+- **Status:** rejected (the user, 2026-11-02); proposed 2026-11-01. `c5.Tvig` stays in the core, off by default (absent or 0: bit-identical), and no species sets it. The boundary question below is moot.
 - **Date:** 2026-11-01
 - **Spec:** §C5 (shedding, T and T_rel; ADR 0007's relative shedding), §R2 (ADR 0041's vigour gate)
 - **Round:** [the ledger](../experiments/code/2026-11-01-fresh-look-beech/notes.md), "The user's judgement" and Repair; [the review](../experiments/2026-11-01-fresh-look-beech-review.md)
@@ -29,3 +29,9 @@ The repair cited it from memory, as relative-light shedding and branch autonomy:
 - If accepted as it stands, beech's measured T_rel (ADR 0032) would hold in stands and be overridden in the open: the model would carry two shedding thresholds for one species with no source for the second.
 - The alternatives within the existing rules: none found by the round (a lower pa-2 set point broke the stand). Outside it: R1's carbon shedding, which ADR 0032's acclimated leaf cost made more lenient on shaded limbs (whether that is why the skirt survives is a hypothesis to test, not a finding), or accepting the remnant skirt.
 - **Test:** `a_vigorous_tree_sheds_its_own_shaded_limbs_and_a_weak_one_keeps_them`.
+
+## Outcome (2026-11-02): rejected
+- **In the open it overrides a measurement without a source.** The lone beech's lower limbs, the ones it clears, are well lit: their light per metamer is 14–80× T_rel·Q_top, and their production pays for their maintenance (P/M ≥ 1.5) ([overnight §1](../experiments/2026-11-02-beech-overnight.md)). An honest shedding rule should not clear them, so the bare lower trunk of an open-grown beech must come from something else: the sapling's history (grown up under cover, or browsed), or form, not C5.
+- **In the garden it strips a side-shaded beech to a pole with a cap.** Seed 13's edge beech on the phone plate. With `Tvig` 0 its crown stays clothed under either vigour gate ([overnight §2b](../experiments/2026-11-02-beech-overnight.md)).
+- **Dropping it costs the lone tree little:** at 20 seeds it is shorter and broader (120 cells against 137, W/H 1.50 against 1.31), and its leaf below H/6 rises from 5.6% to 8.4%, about a third of today's 23.5%. The stand is identical with and without it: under the resource gate it never acts there ([overnight §2c](../experiments/2026-11-02-beech-overnight.md)).
+- **What changes:** beech's `"c5.Tvig" = 0.25` is removed from `analysis/fit/hand-overrides.toml` and `flora-fitted.ts`; golden `beechOpen:seed1:s40` befbed31 → 3525f9f7 (devlog, 2026-11-02). The code and its test stay, off by default, so the review's runs reproduce.

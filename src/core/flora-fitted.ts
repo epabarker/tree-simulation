@@ -93,7 +93,7 @@ export const FITTED_FLORA = {
     common: "Beech",
     latin: "Fagus sylvatica",
     leaf: "beech",
-    c5: { enabled: true, T: 0.01, g: 3, Trel: 0.008, topQuantile: 0.9, Tvig: 0.25 },
+    c5: { enabled: true, T: 0.01, g: 3, Trel: 0.008, topQuantile: 0.9 },
     r1: {
       enabled: true,
       mw: 64,

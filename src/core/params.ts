@@ -179,7 +179,7 @@ export interface Params {
     /**
      * Own-crown pruning (fresh-look beech, repair): a vigorous tree (R2's vigour gate g by its
      * production, r2.vigourTreeLo/Hi) also sheds a lateral whose Q_b/n_b < g·Tvig·Q_top, so an
-     * open-grown crown clears its first limbs under itself (branch autonomy; Sprugel et al. 1991, unread: ADR 0043, proposed).
+     * open-grown crown clears its first limbs under itself (branch autonomy; Sprugel et al. 1991, unread: ADR 0043, rejected).
      * A stand member never opens the gate. 0 or absent: off.
      */
     Tvig?: number;

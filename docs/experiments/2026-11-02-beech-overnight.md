@@ -121,6 +121,12 @@ The user started a session on the laptop that ran the same protocol in the lab's
 
 ## 4. What this says for the open decisions
 
+**Decided (the user, 2026-11-02): all three as recommended below.**
+- ADR 0043 is rejected and `c5.Tvig` is removed from beech.
+- ADRs 0039–0042 are accepted at the repair's values under the resource gate.
+- The prototype gate is removed from the core.
+- Round 2's brief is [`plans/2026-11-02-beech-round2.md`](../plans/2026-11-02-beech-round2.md).
+
 1. **Own-crown pruning (ADR 0043):** reject it. In the open, the limbs it clears are well lit, so clearing them overrides the measurement (§1). In the garden, it strips any side-shaded beech to a pole with a cap (§2b). Without it, both gates give garden beeches clothed crowns.
 2. **The vigour gate's units:** keep the resource gate for now (§2c). The unit-free gate's apparent advantage in the stand was own-crown pruning; without it the two are level in the stand and the unit-free one makes the lone tree too broad. The resource gate's absolute units remain a maintenance risk (ADR 0041) and should be revisited if α, R1's costs or the cell size change.
 3. **Round 2:** the hornbeam is not a lead (§3, §3b). The instrument is now the garden's renderer with three namers (§3b); in it the round's lone beech already passes, and what fails is the stand (thin poles under small high crowns, read as lime, alder or aspen) and two decoys that read wrong whatever their form (oak as hawthorn, fir as holly or yew: leaf style and colour). A round 2 on the beech stand, and the oak's and fir's leaf styles in the renderer, would follow the evidence.

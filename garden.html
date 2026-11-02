@@ -68,7 +68,7 @@
             onDone: (result) => {
               window.bench = result;
               console.log("bench", JSON.stringify(result));
-              note.textContent = `bench: draw p95 ${result.drawP95} ms, frame p95 ${result.frameP95} ms, worker ${result.workerMean} ms (${result.metamers} metamers, ${result.renderer}, dpr ${result.dpr}); leaf pixels ${result.coverage.pixelCover} of the canopy`;
+              note.textContent = `bench: draw p95 ${result.drawP95} ms, frame p95 ${result.frameP95} ms, worker ${result.workerMean} ms, ${result.memoryMB} MB (${result.metamers} metamers, ${result.renderer}, dpr ${result.dpr}); leaf pixels ${result.coverage.pixelCover} of the canopy`;
             },
           }
         : undefined;
@@ -106,10 +106,14 @@
       if (query.has("clearBole")) view.clearBole = true;
       // `?bark=pale`: beech's former pale grey bark, for a comparison on the phone (scene.css).
       if (query.get("bark") === "pale") document.documentElement.dataset.bark = "pale";
+      let lastSnapshot = null;
       // Exposed for poking at from the console (and headless checks); a host page needn't.
       window.garden = mountGarden(document.getElementById("garden"), {
         headroom: 140,
         bench,
+        onSnapshot: (s) => {
+          lastSnapshot = s;
+        },
         specimen: "oak",
         focus: specimen ? "specimen" : "forest",
         first,
@@ -118,6 +122,21 @@
         planting,
         view,
       });
+      // `?bench` with reduced motion on, which has no intro to sample: the visitor's wait from
+      // navigation to the still forest (I3 step 5), and about how much of it the worker's 40 seasons took.
+      if (bench && matchMedia("(prefers-reduced-motion: reduce)").matches)
+        window.garden.ready.then(() => {
+          const s = lastSnapshot;
+          window.bench = {
+            reducedMotionMs: Math.round(performance.now()),
+            workerMs: Math.round(s.season * s.seasonMs + s.snapshotMs),
+            season: s.season,
+            metamers: s.metamerCount,
+            memoryMB: Math.round(s.memoryBytes / 1e5) / 10,
+          };
+          console.log("bench", JSON.stringify(window.bench));
+          note.textContent = `bench, reduced motion: the still forest after ${window.bench.reducedMotionMs} ms, ${window.bench.workerMs} ms of it the worker's ${s.season} seasons (${s.metamerCount} metamers, ${window.bench.memoryMB} MB)`;
+        });
     </script>
   </body>
 </html>

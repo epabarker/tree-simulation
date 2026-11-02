@@ -173,6 +173,11 @@ export interface Snapshot {
   seasonMs: number;
   /** Milliseconds the worker spent building this snapshot (set by the worker; 0 here). */
   snapshotMs: number;
+  /**
+   * The core's linear memory when the snapshot was built, bytes (set by the worker; 0 here). It
+   * never shrinks, so the last one is the run's peak, the figure ADR 0026's budget binds.
+   */
+  memoryBytes: number;
 }
 
 /**

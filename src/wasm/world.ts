@@ -557,6 +557,7 @@ export class RustWorld {
       metrics,
       seasonMs,
       snapshotMs: 0,
+      memoryBytes: 0,
     };
     if (ns > 0) s.shadow = f32(ns);
     return s;

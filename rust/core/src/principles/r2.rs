@@ -233,20 +233,11 @@ pub fn vigour_gate(v_base: f64, r2: &R2) -> f64 {
     )
 }
 
-/// The tree's vigour gate as the rules use it: the unit-free one by R5's neighbour shade `crowd`
-/// (s̄) when r2.vigourCrowd is set, clamp(1 − k·s̄), else `vigour_gate` by its resource `v_base`.
-pub fn tree_gate(v_base: f64, crowd: f64, r2: &R2) -> f64 {
-    match r2.vigour_crowd {
-        Some(k) => math::max(0.0, math::min(1.0, 1.0 - k * crowd)),
-        None => vigour_gate(v_base, r2),
-    }
-}
-
 /// Light orthotropy (fresh-look beech, repair): the set point (degrees from vertical), in growth
 /// and posture, of wood of physiological age `pa`, light `q` and age `wood_age` seasons, moved
 /// from its level's own `set_point` toward r2.lightSetPoint by
-/// u = g·clamp((q − lightLo) / (lightHi − lightLo))·min(1, (wood_age + 1) / lightOver), `gate` the
-/// tree's vigour gate g (`tree_gate`). Beech's laterals are
+/// u = g·clamp((q − lightLo) / (lightHi − lightLo))·min(1, (wood_age + 1) / lightOver), g the
+/// tree's vigour gate (`vigour_gate`, 1 when r2.vigourTreeLo/Hi are unset). Beech's laterals are
 /// plagiotropic under cover and erect in full light on a vigorous tree (Nicolini & Caraglio 1994
 /// [r]: vertical laterals 0.18–0.45 in full light against 0.03–0.1 in shade; Nicolini 2000 [s]:
 /// the axes of trees "very young or under dense cover" are plagiotropic with a flat crown, those
@@ -254,7 +245,14 @@ pub fn tree_gate(v_base: f64, crowd: f64, r2: &R2) -> f64 {
 /// (Troll's model, Hallé et al. 1978). So the lit crown of an open-grown tree builds limbs that
 /// rise, then arch out at their young tips, and its shaded lower crown level sprays. The trunk
 /// and its relays (pa 0) are untouched; `set_point` is returned unchanged when off.
-pub fn light_set_point(set_point: f64, pa: f64, q: f64, wood_age: f64, gate: f64, r2: &R2) -> f64 {
+pub fn light_set_point(
+    set_point: f64,
+    pa: f64,
+    q: f64,
+    wood_age: f64,
+    v_base: f64,
+    r2: &R2,
+) -> f64 {
     let Some(erect) = r2.light_set_point else {
         return set_point;
     };
@@ -273,7 +271,7 @@ pub fn light_set_point(set_point: f64, pa: f64, q: f64, wood_age: f64, gate: f64
         1.0,
         (math::max(0.0, wood_age) + 1.0) / math::max(1.0, r2.light_over),
     );
-    let u = lit * aged * gate;
+    let u = lit * aged * vigour_gate(v_base, r2);
     set_point + u * (erect - set_point)
 }
 
@@ -1074,49 +1072,16 @@ mod tests {
         let r2 = &p.r2;
         let open = 20000.0;
         // Old wood in full light takes the erect set point; in shade, its level's.
-        assert!(
-            (light_set_point(95.0, 2.0, 0.9, 5.0, vigour_gate(open, r2), r2) - 35.0).abs() < 1e-12
-        );
-        assert_eq!(
-            light_set_point(95.0, 2.0, 0.1, 5.0, vigour_gate(open, r2), r2),
-            95.0
-        );
-        assert!(
-            (light_set_point(95.0, 2.0, 0.5, 5.0, vigour_gate(open, r2), r2) - 65.0).abs() < 1e-12
-        ); // halfway
+        assert!((light_set_point(95.0, 2.0, 0.9, 5.0, open, r2) - 35.0).abs() < 1e-12);
+        assert_eq!(light_set_point(95.0, 2.0, 0.1, 5.0, open, r2), 95.0);
+        assert!((light_set_point(95.0, 2.0, 0.5, 5.0, open, r2) - 65.0).abs() < 1e-12); // halfway
         // This season's shoot only a third of the way (lightOver 3): it spreads, its base rises.
-        assert!(
-            (light_set_point(95.0, 2.0, 0.9, 0.0, vigour_gate(open, r2), r2) - 75.0).abs() < 1e-12
-        );
+        assert!((light_set_point(95.0, 2.0, 0.9, 0.0, open, r2) - 75.0).abs() < 1e-12);
         // A stand member (v_base below the gate), the trunk's level, and the rule off: unchanged.
-        assert_eq!(
-            light_set_point(95.0, 2.0, 0.9, 5.0, vigour_gate(2000.0, r2), r2),
-            95.0
-        );
-        assert_eq!(
-            light_set_point(0.0, 0.0, 0.9, 5.0, vigour_gate(open, r2), r2),
-            0.0
-        );
+        assert_eq!(light_set_point(95.0, 2.0, 0.9, 5.0, 2000.0, r2), 95.0);
+        assert_eq!(light_set_point(0.0, 0.0, 0.9, 5.0, open, r2), 0.0);
         let off = with_r2(&rows, "");
-        assert_eq!(
-            light_set_point(95.0, 2.0, 0.9, 5.0, vigour_gate(open, &off.r2), &off.r2),
-            95.0
-        );
-    }
-
-    #[test]
-    fn the_unit_free_gate_reads_neighbour_shade_not_resource() {
-        let rows = [r#"{}"#];
-        let crowd = with_r2(
-            &rows,
-            r#""vigourCrowd":10,"vigourTreeLo":3000,"vigourTreeHi":10000"#,
-        );
-        assert_eq!(tree_gate(100.0, 0.0, &crowd.r2), 1.0); // alone, whatever its resource
-        assert!((tree_gate(1e6, 0.05, &crowd.r2) - 0.5).abs() < 1e-12);
-        assert_eq!(tree_gate(1e6, 0.2, &crowd.r2), 0.0); // among neighbours, whatever its resource
-        let resource = with_r2(&rows, r#""vigourTreeLo":3000,"vigourTreeHi":10000"#);
-        assert_eq!(tree_gate(100.0, 0.0, &resource.r2), 0.0); // absent: the resource gate
-        assert_eq!(tree_gate(20000.0, 0.2, &resource.r2), 1.0);
+        assert_eq!(light_set_point(95.0, 2.0, 0.9, 5.0, open, &off.r2), 95.0);
     }
 
     #[test]

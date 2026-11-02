@@ -15,8 +15,7 @@ use super::c3::is_live_bud;
 use super::c4::{horizontal_heading, set_point_direction};
 use super::c5::remove_branches;
 use super::r2::{
-    aged_offset, arm_set_point, curve_offset, hangs, light_set_point, pa_level,
-    pendulous_set_point, tree_gate,
+    aged_offset, arm_set_point, curve_offset, hangs, light_set_point, pa_level, pendulous_set_point,
 };
 use super::r6::deposit_area;
 use crate::geom::{
@@ -236,14 +235,7 @@ pub fn update_mechanics(tree: &mut Tree, params: &Params, storm: bool, season: f
             // R2's light orthotropy: lit wood of a vigorous tree is held erect, shaded wood level
             // (the light is C5's, per metamer of the subtree).
             let base = if params.r2.light_set_point.is_some() {
-                light_set_point(
-                    base / DEG,
-                    pa,
-                    light[i],
-                    wood_age,
-                    tree_gate(tree.v_base, tree.relay_crowd, &params.r2),
-                    &params.r2,
-                ) * DEG
+                light_set_point(base / DEG, pa, light[i], wood_age, tree.v_base, &params.r2) * DEG
             } else {
                 base
             };

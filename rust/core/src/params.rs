@@ -260,10 +260,6 @@ pub struct R2 {
     /// `vigour_tree_hi` ≤ `vigour_tree_lo` (both absent).
     pub vigour_tree_lo: f64,
     pub vigour_tree_hi: f64,
-    /// A unit-free vigour gate (overnight prototype, 2026-11-01; not proposed): with k set, the
-    /// gate is clamp(1 − k·s̄), s̄ the tree's mean R5 neighbour shade (the relay gate's signal),
-    /// in place of the resource bounds above. Absent: the resource gate.
-    pub vigour_crowd: Option<f64>,
     /// Light orthotropy (fresh-look beech, repair): a new shoot of pa ≥ 1 takes a growth set
     /// point moved from its level's toward this one (degrees from vertical) by its bud's light,
     /// fully at `light_hi` and above, not at all at `light_lo` and below (Nicolini & Caraglio
@@ -570,7 +566,6 @@ impl Params {
                 vigour_lambda: opt(r2, "vigourLambda").unwrap_or(0.0),
                 vigour_tree_lo: opt(r2, "vigourTreeLo").unwrap_or(0.0),
                 vigour_tree_hi: opt(r2, "vigourTreeHi").unwrap_or(0.0),
-                vigour_crowd: opt(r2, "vigourCrowd"),
                 light_set_point: opt(r2, "lightSetPoint"),
                 light_lo: opt(r2, "lightLo").unwrap_or(0.0),
                 light_hi: opt(r2, "lightHi").unwrap_or(1.0),

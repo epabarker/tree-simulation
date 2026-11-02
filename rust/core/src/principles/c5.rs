@@ -17,7 +17,7 @@
 
 use super::c1::{add_bud, bud_frame};
 use super::c3::is_live_bud;
-use super::r2::tree_gate;
+use super::r2::vigour_gate;
 use crate::math;
 use crate::params::Params;
 use crate::tree::{Tree, bud, ensure, slot};
@@ -47,7 +47,7 @@ pub fn shed_branches(tree: &mut Tree, params: &Params, season: f64, evaluated: u
     let carbon = params.r1.enabled && params.r1.shed_carbon;
     // Own-crown pruning: the relative threshold a vigorous tree adds (0 when off).
     let own = if params.c5.t_vig > 0.0 {
-        params.c5.t_vig * tree_gate(tree.v_base, tree.relay_crowd, &params.r2) * tree.q_top
+        params.c5.t_vig * vigour_gate(tree.v_base, &params.r2) * tree.q_top
     } else {
         0.0
     };

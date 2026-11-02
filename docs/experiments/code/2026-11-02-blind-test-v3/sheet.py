@@ -23,6 +23,8 @@ LABELS = {
     "birch": "birch",
     "fir": "silver fir",
     "clearbole": "beech, clearBole",
+    "bark": "beech, measured bark",
+    "candidate": "beech, all three",
 }
 SOURCES = sys.argv[3].split(",") if len(sys.argv) > 3 else ["beech", "today", "hornbeam", "oak", "birch", "fir"]
 TRIALS = [("lone60", "lone 60"), ("lone100", "lone 100"), ("stand100", "stand 100")]

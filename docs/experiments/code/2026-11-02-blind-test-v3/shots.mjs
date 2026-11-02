@@ -10,8 +10,9 @@
 // stand at 100 (84 wide, periodic sides, faces [0, 0], 12 trees in three rows as render.py's
 // stand_trees).
 //   node shots.mjs <origin> <out-dir> [concurrency]
-// CLEARBOLE=1 draws only the accepted beech's nine plates, with the lab's &clearBole (no rosettes on
-// a trunk below its limb crown base), for the addendum's set.
+// VIEW adds view options to every URL, and SOURCES (a comma list) limits the sources:
+//   set 2, the addendum: SOURCES=beech VIEW='&clearBole' (no rosettes on a trunk below its limb
+//   crown base); set 3: VIEW='&clearBole&girth=1.45' (stems drawn at 1.45 × their radius).
 // Needs playwright-core (any scratch install) and Playwright's Chromium; set CHROME to override.
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { createRequire } from "node:module";
@@ -74,8 +75,8 @@ const jobs = [];
 for (const seed of [1, 2, 3])
   for (const trial of Object.keys(TRIALS))
     for (const source of Object.keys(SOURCES))
-      if (!process.env.CLEARBOLE || source === "beech") jobs.push({ source, trial, seed });
-const view = `&frame=height${process.env.CLEARBOLE ? "&clearBole" : ""}`;
+      if (!process.env.SOURCES || process.env.SOURCES.split(",").includes(source)) jobs.push({ source, trial, seed });
+const view = `&frame=height${process.env.VIEW ?? ""}`;
 const browser = await chromium.launch({
   executablePath: exe,
   args: ["--use-angle=vulkan", "--enable-features=Vulkan", "--ignore-gpu-blocklist"],

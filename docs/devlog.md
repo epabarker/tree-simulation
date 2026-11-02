@@ -11,7 +11,16 @@ Newest first. One entry per session or milestone: what changed, why, surprises, 
   - The accepted beech's lone tree passes without own-crown pruning (17 of 18), but both beech stands read as silver birch (18 of 18). With `clearBole` they read as birch 8 of 9: the dark bands go, the pale, slender, wavy stems stay.
   - Oak leaves hawthorn (27 → 3), but the lone oak reads as hazel or goat willow by its multi-stemmed vase, and the stand reads as oak 6 of 9.
   - Fir reads as Norway spruce at 100, never fir. Hornbeam now passes pooled; birch passes.
+- **Sets 3 and 4 (track E): the stand's renderer cues.**
+  - Diagnosis: stems are drawn at their pipe-model radius (beech stand H/D 101–110, against a real stand's ≈ 73). Waviness is the core's bole sweep (1.7–2.5%), unchanged with the wind off.
+  - Two view options, off by default:
+    - `girth` draws stems at k times their radius (`&girth=1.45`);
+    - `data-bark="measured"` gives beech's bark the measured ≈ 15% reflectance (`#777a79`/`#6b6e6e`, Pilarski et al. 2008).
+  - Results: the bark moves the stand to beech (6 of 9 alone, 9 of 9 with girth and clearBole), but the lone beech reads as oak (1 of 18 alone, 8 of 18 with all three), so nothing passes. Birch is unchanged (27 of 27); hornbeam's stand drops to 3 of 9 under girth.
+  - The same plates named by different namer sets differ by up to 6 of 9.
 - **Surprises:**
+  - The oak stand's identical plates were named oak 6, 6 and then 0 of 9 by three sets of namers.
+  - Two slow tests (one core-only) time out at 30 s when the machine is loaded; they pass on a quiet re-run.
   - The lab's chart row grows with a stand's trees and shrank its canvas, and so its scale, until the shot script pinned it.
   - One namer transposed two adjacent rows; they are scored as given.
   - v2's note overstated its namers' seed consistency (53 of 54, not 54).

@@ -11,7 +11,10 @@ change. Seeds 1–3 are development seeds; any claim waits for fresh namers at s
 fanning from ground level", while the oak stand is named oak 6 of 9. Silver fir is now a conifer
 (Norway spruce, 12 of 27) but never fir. Hornbeam and birch pass. The addendum's `clearBole` (no
 rosettes on a trunk below its limb crown base) removes the "dark bands" the namers named, but the
-stand stays silver birch (8 of 9) for its pale, slender, wavy stems with small high crowns.
+stand stays silver birch (8 of 9) for its pale, slender, wavy stems with small high crowns. In track
+E's sets 3 and 4, beech's measured bark (about 15% reflectance) moves the stand to beech: 6 of 9
+alone, 9 of 9 with stems drawn at a real girth. But it turns the lone beech into oak (1 of 18 alone,
+8 of 18 with all three), so nothing passes yet.
 
 ![Contact sheet](figures/2026-11-02-blind-test-v3-sheet.jpg)
 
@@ -232,6 +235,132 @@ The spread between sets of namers on one source is as large as some of the effec
 That is a reason for fresh namers on the judging seeds, and a sign that three namers is a thin
 sample.
 
+## Sets 3 and 4: the beech stand's renderer cues (track E)
+
+Track E's next step was to:
+- diagnose the stand's renderer cues on the dev seeds;
+- make at most two renderer changes, each switchable and off by default;
+- name all six sources with fresh namers.
+
+No species or core change. The beech is the accepted build, as in the baseline. ADR 0044's
+`r6.lifespan`, adopted on `claude/c1-calibration-ustbkz`, is not merged here, so the trunk's spur
+tufts are still in the model.
+
+### Diagnosis
+
+[`diagnose.mjs`](code/2026-11-02-blind-test-v3/diagnose.mjs) grows each stand as the shots do
+(`&frame=height&clearBole`) and reads the scene, per tree. The table gives medians per plate.
+
+| stand at 100 | trees | height | limb crown ratio | DBH (model) | drawn width | H/D | clear-bole offset | with the wind |
+|---|---|---|---|---|---|---|---|---|
+| beech, seed 1 | 12 | 37 m | 0.32 | 28.6 cm | 3.2 px | 106 | 2.5% (7.4 px), 3 waves | 7.2 px, 3 waves |
+| beech, seed 2 | 12 | 37 m | 0.33 | 30.7 cm | 3.4 px | 110 | 1.7% (3.1 px), 3 waves | 3.1 px, 3 waves |
+| beech, seed 3 | 11 | 31 m | 0.33 | 28.6 cm | 3.2 px | 101 | 1.7% (3.2 px), 2 waves | 3.2 px, 2 waves |
+| hornbeam, seed 1 | 8 | 25 m | 0.18 | 35.9 cm | 4.0 px | 72 | 2.1% (5.0 px) | 5.5 px |
+| birch, seed 1 | 12 | 32 m | 0.40 | 19.8 cm | 2.2 px | 162 | 0.3% (0.6 px) | 0.6 px |
+
+- **Width:** stems are drawn at their pipe-model radius. There is only a half-pixel floor, with no
+  minimum width and no taper of the renderer's own. So the beech boles are exactly as slender as
+  the model's: H/D 101–110.
+  - The reference's crop trees are 32.4–34.0 m tall at about 92 years, with DBH ≥ 45 cm, so H/D ≈ 73
+    (Štefančík 2017, track A's card).
+  - ADR 0027's radii give a stand's trunks about half a real girth (`bark-styles.ts`).
+- **Tone:** beech's bark `#a9a8a0` contrasts 2.0:1 with the sky behind the boles. Birch's white is
+  1.06:1 and reads by its black marks; hornbeam's `#8e9090` is 2.7:1.
+  - Track A's card says "Bark pale grey" (TSO).
+  - Track E's source measured beech trunks at about 15% visible reflectance (Pilarski et al. 2008),
+    sRGB `#6b6e6e`–`#777a79`, where `#a9a8a0` is near 40%.
+- **Waviness is the core's, not the drawing's.** The clear bole sweeps 1.7–2.5% of its length in
+  two or three waves. Turning the page's wind off changes it by less than half a pixel, because
+  the sway's compliance falls as the radius squared. Straightening it in the drawing would hide a
+  model trait, so it stays with Part 2.
+
+### The two changes (both off by default; goldens unchanged; `npm run check` passes)
+
+1. **`girth`** (d0e98b4; `ViewOptions.girth`, the lab's `&girth=`, `garden.html?girth=`):
+   - every stem is drawn at k times its pipe-model radius;
+   - k = 1.45 ≈ 105 / 73, taking the beech stand to the reference's H/D;
+   - global, because the girth deficit is the pipe model's, not beech's;
+   - the model's girth, its bark ramp and its light are unchanged.
+2. **Beech's measured bark** (30e56c4; `data-bark="measured"`, the lab's `&bark=measured`):
+   - a token override in `scene.css`, inside the garden's layer, so a host page still wins;
+   - `--beech-bark` `#777a79` and `--beech-bark-old` `#6b6e6e`, the two ends of the measured range;
+   - dark mode keeps its usual lift.
+
+### Sets
+
+- **Set 3, the bark alone**, as track E asked: the baseline's 45 non-beech plates, with beech's nine
+  drawn under `&bark=measured`.
+- **Set 4, all three changes:** every source under `&clearBole&girth=1.45`, with beech also under
+  `&bark=measured`. Girth changes every species, so this is the regression check.
+
+Each set had three fresh namers with their own shuffles (`~/blind-plates-v3c`, `~/blind-plates-v3d`)
+and the same prompt. Keys and replies are in [`bark/`](code/2026-11-02-blind-test-v3/bark/) and
+[`candidate/`](code/2026-11-02-blind-test-v3/candidate/).
+
+![Beech: baseline, measured bark, all three](figures/2026-11-02-blind-test-v3-beech-sets.jpg)
+
+_Rows: the accepted beech in the baseline, under the measured bark (set 3), and under all three
+changes (set 4). Columns as the main sheet. Set 4's full sheet:
+[`2026-11-02-blind-test-v3-set4.jpg`](figures/2026-11-02-blind-test-v3-set4.jpg) (its row labels
+name the source only)._
+
+### Results: first guesses naming the source, of 9
+
+| beech (accepted build) | lone 60 | lone 100 | stand 100 | namers passing | pooled |
+|---|---|---|---|---|---|
+| baseline | 9 | 8 | 0 (birch 9) | 0 | fail |
+| set 2: `clearBole` | 9 | 9 | 1 (birch 8) | 0 | fail |
+| set 3: measured bark | **0** (oak 7) | **1** (oak 8) | **6** | 0 | fail |
+| set 4: all three | 4 (oak 4) | 4 (oak 5) | **9** | 1 (n1) | fail (lone) |
+
+| the other sources: lone 60, lone 100, stand 100 | baseline | set 3 (same plates) | set 4 (`clearBole`, girth) |
+|---|---|---|---|
+| hornbeam | 8, 9, 6 | 9, 9, 6 | 8, 8, **3** (oak 6) |
+| birch | 9, 9, 9 | 9, 9, 9 | 9, 9, 9 |
+| oak | 0, 0, 6 | 0, 0, **0** | 0, 0, 3 |
+| beech (today) | 1, 0, 0 | 3, 3, 3 | 5, 6, 0 |
+| silver fir | 0, 0, 0 | 0, 0, 0 | 0, 0, 0 |
+
+Agreement: Fleiss' kappa 0.45 (set 3) and 0.46 (set 4), against 0.60 in the baseline and set 2.
+
+### Reading (measurement, not a decision)
+
+1. **The measured bark is what moves the stand.** It takes the stand from 0 to 6 of 9 on its own,
+   and to 9 of 9 with `clearBole` and girth. The namers now name the boles the earlier ones read as
+   birch:
+   - "Tall, smooth, mid-grey boles, clear of branches, with crowns only at the top" (set 4, n3);
+   - "In this stand, smooth grey clean boles carry flattish domed crowns" (set 3, n3).
+2. **The same bark turns the lone beech into oak.** On its own it falls from 9 to 0 at 60 and from
+   8 to 1 at 100; oak takes 15 of 18. The namers say:
+   - "An irregular, lumpy crown of separate layered clumps sits on stout spreading limbs from a
+     short grey trunk" (set 3, n3, oak);
+   - "A broad, lumpy crown with an uneven top is held on big horizontal grey limbs" (set 3, n1, oak).
+
+   With girth and `clearBole` as well it is 4 and 4, and namer 3 still says oak. A lone tree shows
+   its limbs through the crown, while a stand shows its boles. Drawn mid grey, the limbs read as
+   oak's heavy ones; drawn pale, they read as beech's smooth ones.
+3. **Nothing passes yet.** Set 4 passes for namer 1 only, and pooled it fails on the lone tree. Seeds
+   4–6 are not run (track E's rule: not until something passes on 1–3).
+4. **Girth's side effects:**
+   - the hornbeam stand falls from 6 to 3 (oak 6: "crooked grey stems with angular forks beneath a
+     flat, dense canopy");
+   - birch is unchanged (27 of 27);
+   - the oak stand falls from 6 to 3.
+
+   Given the noise below, hornbeam's drop is not clearly the girth's.
+5. **The noise is large.** Identical plates named by different sets of namers differ by up to 6 of 9:
+   - the oak stand was oak 6, 6 and 0 in the baseline, set 2 and set 3, on the same plates;
+   - today's beech at lone 100 was 0, 6 and 3.
+
+   Three namers per set cannot resolve a difference smaller than about a third of a cell. Birch
+   (27 of 27 in every set) and hornbeam's lone tree (17–18 of 18) are the stable results.
+6. **Leads, not done:**
+   - a bark tone by part (the measured grey on the bole, lighter on the limbs) is not sourced;
+   - the lone tree's limb mass is form, track B's or the user's.
+
+   Either is a decision for track E and the user.
+
 ## Caveats
 
 - **The namers are three runs of one model,** not three people, and each answers all 54 plates in
@@ -259,11 +388,20 @@ python3 docs/experiments/code/2026-11-02-blind-test-v3/shuffle.py <renders> ~/bl
 # v2's key.json and namer-N.md: git show origin/claude/blind-v2:docs/experiments/code/2026-11-02-blind-test-v2/<file>
 python3 docs/experiments/code/2026-11-02-blind-test-v3/tally.py docs/experiments/code/2026-11-02-blind-test-v3 <v2-dir>
 uv run --project analysis python docs/experiments/code/2026-11-02-blind-test-v3/sheet.py <renders> docs/experiments/figures/2026-11-02-blind-test-v3-sheet.jpg
-# the addendum
-CLEARBOLE=1 PW_FROM=<scratch>/pw/x.js node docs/experiments/code/2026-11-02-blind-test-v3/shots.mjs http://localhost:5181/ <renders-clearbole> 3
+# the addendum (set 2)
+SOURCES=beech VIEW='&clearBole' PW_FROM=<scratch>/pw/x.js node docs/experiments/code/2026-11-02-blind-test-v3/shots.mjs http://localhost:5181/ <renders-clearbole> 3
 # <set2> = <renders>/*.png with <renders-clearbole>/beech-*.png copied over them
 python3 docs/experiments/code/2026-11-02-blind-test-v3/shuffle.py <set2> ~/blind-plates-v3b clearbole "beech (accepted build, clearBole)"
 python3 docs/experiments/code/2026-11-02-blind-test-v3/tally.py docs/experiments/code/2026-11-02-blind-test-v3/clearbole docs/experiments/code/2026-11-02-blind-test-v3
+# sets 3 and 4: the diagnosis, then the renders (set 4's other sources: VIEW='&clearBole&girth=1.45', all sources)
+PW_FROM=<scratch>/pw/x.js node docs/experiments/code/2026-11-02-blind-test-v3/diagnose.mjs http://localhost:5181/ beech:stand100:1 beech:stand100:2 beech:stand100:3 hornbeam:stand100:1 birch:stand100:1
+SOURCES=beech VIEW='&bark=measured' PW_FROM=<scratch>/pw/x.js node docs/experiments/code/2026-11-02-blind-test-v3/shots.mjs http://localhost:5181/ <renders-bark> 3
+SOURCES=beech VIEW='&clearBole&girth=1.45&bark=measured' PW_FROM=<scratch>/pw/x.js node docs/experiments/code/2026-11-02-blind-test-v3/shots.mjs http://localhost:5181/ <renders-candidate-beech> 3
+# <set3> = <renders> with <renders-bark>/beech-*; <set4> = the all-source girth renders with <renders-candidate-beech>/beech-*
+python3 docs/experiments/code/2026-11-02-blind-test-v3/shuffle.py <set3> ~/blind-plates-v3c bark "beech (accepted build, measured bark)"
+python3 docs/experiments/code/2026-11-02-blind-test-v3/shuffle.py <set4> ~/blind-plates-v3d candidate "beech (accepted build, clearBole, girth 1.45, measured bark)" "clearBole, girth 1.45"
+python3 docs/experiments/code/2026-11-02-blind-test-v3/tally.py docs/experiments/code/2026-11-02-blind-test-v3/bark docs/experiments/code/2026-11-02-blind-test-v3
+python3 docs/experiments/code/2026-11-02-blind-test-v3/tally.py docs/experiments/code/2026-11-02-blind-test-v3/candidate docs/experiments/code/2026-11-02-blind-test-v3
 ```
 
 The trees are deterministic in the core (the seeds and patches fix them); the plates' pixels depend

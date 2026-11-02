@@ -2,7 +2,9 @@
  * Size gate for the garden build (ADR 0014): the gzipped JavaScript a host page downloads,
  * garden.js plus its worker and chunks, must stay within budget (ADR 0001: 100 kB for first paint).
  * The Rust core's WASM loads after first paint and has its own gate (ADR 0024, I1): its measured
- * size, 135 kB gzip at I1, plus 25%.
+ * size, 141 kB gzip at I1, plus 25% = 170 kB. The form vocabulary and the fresh-look beech (ADRs
+ * 0033–0044) took it to 170.7 kB, and the user raised the gate to 200 kB (2026-11-02): a ceiling,
+ * not a ratchet; the next rules fit under it or earn their bytes.
  *
  *   npm run build:garden    (builds dist-garden/, then runs this)
  */
@@ -13,7 +15,7 @@ import { gzipSync } from "node:zlib";
 
 const DIR = "dist-garden";
 const BUDGET_KB = 60;
-const WASM_BUDGET_KB = 170;
+const WASM_BUDGET_KB = 200;
 
 function files(dir: string): string[] {
   return readdirSync(dir).flatMap((name) => {

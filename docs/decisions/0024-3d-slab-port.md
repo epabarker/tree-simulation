@@ -71,7 +71,7 @@
   - The production build gets its own goldens at I1 stage 2.
   - **After I1, parity is a proof, not a mode** (user, 2026-10-30): the production build is the only one at HEAD, for the page, the CLI, the bench, the tests and the opening forests. The parity feature, its V8 ports and its WASM package are removed; they stay at the tag `golden-2d-ts`, where CI's `golden-2d` job runs the 2D goldens. The evidence tests' thresholds were re-derived on production first ([note](../experiments/2026-10-30-production-thresholds.md)); two M5 tests were restated over 20 seeds.
 
-**The bundle:** ADR 0014's 60 kB stays the first-paint JS budget. The WASM loads after first paint, and gets its own gate (its measured size plus 25%) at I1: 170 kB gzip (`cli/garden-size.ts`; 141.4 kB at the deletion). 3D first-paint data gets its own budget at I3.
+**The bundle:** ADR 0014's 60 kB stays the first-paint JS budget. The WASM loads after first paint, and gets its own gate (its measured size plus 25%) at I1: 170 kB gzip (`cli/garden-size.ts`; 141.4 kB at the deletion). 3D first-paint data gets its own budget at I3. **Amended 2026-11-02 (the user):** the WASM gate is 200 kB. The core reached 170.7 kB with the form vocabulary and the fresh-look beech (ADRs 0033–0044) and failed the 170 kB gate on PR #42 by 0.7 kB; 200 is a ceiling set once, not the measured size plus a margin again.
 
 **The sequence:**
 - **G1:** passed.

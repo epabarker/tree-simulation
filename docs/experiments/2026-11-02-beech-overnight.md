@@ -52,6 +52,26 @@ The same garden worlds with `c5.Tvig` 0, under the resource gate and under the u
 - **The mechanism:** in a garden row the neighbours shade a beech's lower crown from the side; with the gate open, own-crown pruning sheds everything below 25% of the top's light, and the tree is left a stem under a cap. In the open (§1) the same rule clears only the lowest limbs, because nothing shades the rest.
 - **The heights hardly move** without it; it is the lower crown, not the height, that the rule removes.
 
+### 2c. Both gates without own-crown pruning, 20 seeds
+
+| 20 seeds | today | repair | repair, Tvig 0 | k 20 | k 20, Tvig 0 |
+|---|---|---|---|---|---|
+| guard: all four (alive, floor, LAI 6–8, H/D) | 6 | 8 | 8 | 11 | 9 |
+| guard: LAI 6–8 | 20 | 11 | 11 | 13 | 10 |
+| guard: floor 3–5% | 19 | 16 | 16 | 16 | 17 |
+| lone 100: W/H 1.3–1.5 (photograph) | 0 | 9 | 9 | 13 | 1 |
+| lone 60: W/H 1.3–1.5 | 0 | 8 | 10 | 1 | 0 |
+| lone 100: leaf below H/6 ≤ 7% | 0 | 16 | 5 | 19 | 4 |
+| lone height at 100, median | 203 | 137 | 120 | 127 | 117 |
+| lone W/H at 100, median | 0.43 | 1.31 | 1.50 | 1.44 | 1.60 |
+| lone leaf below H/6 at 100, median | 23.5% | 5.6% | 8.4% | 4.9% | 8.1% |
+| stand limb crown ratio, median | 0.345 | 0.27 | 0.27 | 0.25 | 0.30 |
+
+- **Under the resource gate own-crown pruning never acts in the closed stand:** its stand is identical with and without it.
+- **On the lone tree it costs little to drop:** the tree is shorter and broader (120 cells, W/H 1.50, the photograph's band at 60 on 10 of 20 seeds), and its leaf below H/6 rises from 5.6% to 8.4%, still about a third of today's 23.5%.
+- **The unit-free gate's stand advantage was own-crown pruning acting on the young stand:** without it, 9 of 20 against the repair's 8, inside the noise. Its lone tree is then too broad (W/H 1.60; the photograph's band on 1 of 20).
+- **So the best of the five is the repair without own-crown pruning:** the stand of the repair, a broader lone tree with most of the skirt still gone, and (§2b) clothed garden crowns.
+
 ## 3. Three namers, form-only
 
 The previous tests had one namer each, and round 2's namer named the hornbeam decoy beech on 8 of 9 lone panels where round 1's named it hornbeam 9 of 9. This test repeats the protocol (`blind-test.md`) with **three independent namers** on the same 72 panels: beech as repaired, beech today, and decoys hornbeam, oak, birch and silver fir. All are drawn by the round's harness (`blind.py`: one colour for every species, leaves as dots), seeds 1–3, lone at 60 and 100 (leaf-on and leaf-off) and the stand at 100. The key names the species. Answers and key: `code/2026-11-01-fresh-look-beech/blind-round3/`. The namers were fresh agents of one model given only the image folder: independent in context, not in kind.
@@ -102,5 +122,5 @@ The user started a session on the laptop that ran the same protocol in the lab's
 ## 4. What this says for the open decisions
 
 1. **Own-crown pruning (ADR 0043):** reject it. In the open, the limbs it clears are well lit, so clearing them overrides the measurement (§1). In the garden, it strips any side-shaded beech to a pole with a cap (§2b). Without it, both gates give garden beeches clothed crowns.
-2. **The vigour gate's units:** with own-crown pruning gone, the unit-free gate at k 20 is the better of the two on the evidence here: the closed stand's whole guard on 11 of 20 seeds against 8, the same lone tree for every seed, and clothed garden crowns. Its 20-seed stand and lone runs above included own-crown pruning, so they need repeating without it before anything is proposed.
+2. **The vigour gate's units:** keep the resource gate for now (§2c). The unit-free gate's apparent advantage in the stand was own-crown pruning; without it the two are level in the stand and the unit-free one makes the lone tree too broad. The resource gate's absolute units remain a maintenance risk (ADR 0041) and should be revisited if α, R1's costs or the cell size change.
 3. **Round 2:** the hornbeam is not a lead (§3, §3b). The instrument is now the garden's renderer with three namers (§3b); in it the round's lone beech already passes, and what fails is the stand (thin poles under small high crowns, read as lime, alder or aspen) and two decoys that read wrong whatever their form (oak as hawthorn, fir as holly or yew: leaf style and colour). A round 2 on the beech stand, and the oak's and fir's leaf styles in the renderer, would follow the evidence.

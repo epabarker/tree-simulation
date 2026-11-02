@@ -103,6 +103,8 @@
       );
       // `?clearBole`: no rosettes on a trunk below its limb crown base (round 2), for a phone look.
       if (query.has("clearBole")) view.clearBole = true;
+      // `?bark=measured`: beech's bark at its measured reflectance (scene.css; round 2).
+      if (query.get("bark") === "measured") document.documentElement.dataset.bark = "measured";
       // Exposed for poking at from the console (and headless checks); a host page needn't.
       window.garden = mountGarden(document.getElementById("garden"), {
         headroom: 140,

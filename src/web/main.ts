@@ -26,6 +26,8 @@ function element<T extends HTMLElement>(id: string): T {
 }
 
 const query = new URLSearchParams(location.search);
+// `&bark=measured`: beech's bark at its measured reflectance (scene.css; round 2, off by default).
+if (query.get("bark") === "measured") document.documentElement.dataset.bark = "measured";
 const narrow = window.matchMedia("(max-width: 700px)").matches;
 // A phone shows a four-tree grove; the ten-tree stand would be too small to read.
 // `?preset=name` picks another (and `?bench` measures it, M15).

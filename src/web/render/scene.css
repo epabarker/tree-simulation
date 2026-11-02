@@ -229,4 +229,25 @@
     --fir-bark: #a8a49c;
     --fir-bark-old: #88847e;
   }
+
+  /*
+   * Beech's measured bark (round 2; off by default, on with data-bark="measured", the lab's
+   * &bark=measured). Pilarski et al. 2008 measured beech trunks at about 15% reflectance over the
+   * visible, sRGB #6b6e6e to #777a79 (track E's sources, 2026-11-02), where #a9a8a0 is near 40%:
+   * young bark at the lighter end, old bark at the darker. Dark mode keeps its usual lift.
+   */
+  :root[data-bark="measured"] {
+    --beech-bark: #777a79;
+    --beech-bark-old: #6b6e6e;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root[data-bark="measured"]:not([data-theme="light"]) {
+      --beech-bark: #828584;
+      --beech-bark-old: #777a79;
+    }
+  }
+  :root[data-bark="measured"][data-theme="dark"] {
+    --beech-bark: #828584;
+    --beech-bark-old: #777a79;
+  }
 }

@@ -14,12 +14,21 @@ describe("bark styles (track C)", () => {
   });
 
   it("declares each bark's three tokens in light and both dark blocks of scene.css", () => {
+    // The base blocks come before the optional overrides (round 2's `data-bark`).
+    const base = css.slice(0, css.indexOf(":root[data-bark"));
     for (const p of BARK_PALETTES) {
       for (const suffix of ["-twig", "", "-old"]) {
-        const n = css.split(`--${p}-bark${suffix}:`).length - 1;
+        const n = base.split(`--${p}-bark${suffix}:`).length - 1;
         expect(n, `--${p}-bark${suffix}`).toBe(3);
       }
     }
+    // Beech's measured bark overrides its bark and old bark in the same three places.
+    const over = css.slice(base.length);
+    for (const suffix of ["", "-old"])
+      expect(
+        over.split(`--beech-bark${suffix}:`).length - 1,
+        `measured --beech-bark${suffix}`,
+      ).toBe(3);
   });
 
   it("moves a stem from twig to bark by age, then to old bark by girth", () => {

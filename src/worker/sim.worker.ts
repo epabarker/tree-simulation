@@ -9,7 +9,7 @@
 import * as Comlink from "comlink";
 import { defaultParams, type Params, type ParamsPatch } from "../core/params.ts";
 import { FULL_SNAPSHOT, type Snapshot, type SnapshotOptions } from "../core/types.ts";
-import { loadWorlds, RustWorld, snapshotTransferables } from "../wasm/world.ts";
+import { loadWorlds, RustWorld, snapshotTransferables, wasmMemoryBytes } from "../wasm/world.ts";
 import type { SimApi } from "./api.ts";
 
 const ready = loadWorlds();
@@ -33,6 +33,7 @@ function snapshot(w: RustWorld, ms: number): Snapshot {
   const t0 = performance.now();
   const s = w.snapshot(ms, options);
   s.snapshotMs = performance.now() - t0;
+  s.memoryBytes = wasmMemoryBytes();
   return Comlink.transfer(s, snapshotTransferables(s));
 }
 
@@ -62,8 +63,9 @@ const api: SimApi = {
   async swap(params: Params | null) {
     const w = await current();
     if (params) {
-      if (!aside) aside = w.save();
-      w.dispose();
+      // Saving frees the forest as it writes (intoCheckpoint), so its bytes never sit beside it.
+      if (aside) w.dispose();
+      else aside = w.intoCheckpoint();
       world = RustWorld.create(params);
     } else if (aside) {
       w.dispose();

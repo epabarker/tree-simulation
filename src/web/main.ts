@@ -107,7 +107,7 @@ const garden = mountGarden(element("stage"), {
         onDone: (result) => {
           (window as unknown as { bench: unknown }).bench = result;
           console.log("bench", JSON.stringify(result));
-          hud.textContent = `bench: draw p95 ${result.drawP95} ms · frame p95 ${result.frameP95} ms · worker ${result.workerMean} ms`;
+          hud.textContent = `bench: draw p95 ${result.drawP95} ms · frame p95 ${result.frameP95} ms · worker ${result.workerMean} ms · ${result.memoryMB} MB`;
           panel.setPlaying(false);
           // `&tau=0.95`: then hold the plate at that time of year (M17's seasons), e.g. winter's
           // marcescent leaves, for a contact sheet.

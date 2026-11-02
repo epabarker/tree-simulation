@@ -26,3 +26,6 @@ The garden's worker holds at most **256 MB** of the core's linear memory, all wo
   - half-precision V.
 - Worker lanes cost a sweep each, so they fit the budget only on narrow plates.
 - **Revisit** if a phone's measured limit is known to be higher, or if a wide plate is wanted back in the garden.
+
+## Measured at I3 (2026-11-02)
+The rule holds, at the plate cap of 160 ([I3 note](../experiments/2026-10-30-i3.md), "The memory problem"): 176.4 MB with the specimen beside the 160-cell plate at 200 seasons, 61.9 MB on the phone's 66. The ≈ 40 B a cell above was the allocator's doubling: a buffer grown by doubling holds its old and new copies at once, and linear memory keeps that peak. The lanes' accumulator is now sized once for the slab, the snapshot's buffer is reused, and the swap frees what a checkpoint does not hold before writing it (`intoCheckpoint`).

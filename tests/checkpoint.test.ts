@@ -33,6 +33,21 @@ describe("world checkpoints (M21)", () => {
     expect(hashWorld(restored)).toBe(hashWorld(straight));
   });
 
+  it("writes the same bytes when it frees the world on the way (the worker's swap)", () => {
+    const params = presetParams("succession", 1);
+    const kept = new World(params);
+    const freed = new World(params);
+    kept.run(15);
+    freed.run(15);
+    const bytes = freed.intoCheckpoint();
+    expect(Buffer.compare(bytes, saveWorld(kept))).toBe(0);
+    expect(() => freed.step(1)).toThrow();
+    const restored = loadWorld(bytes);
+    kept.run(5);
+    restored.run(5);
+    expect(hashWorld(restored)).toBe(hashWorld(kept));
+  });
+
   it("keeps text beyond ASCII in the header (a species label, say)", () => {
     const base = presetParams("succession", 1);
     const birch = base.species?.birch as NonNullable<typeof base.species>[string];

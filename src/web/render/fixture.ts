@@ -50,5 +50,6 @@ export function nearAndFar(zOrder: number[] = []): Snapshot {
     metrics: [],
     seasonMs: 0,
     snapshotMs: 0,
+    memoryBytes: 0,
   };
 }

@@ -2,6 +2,24 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-02: I3 steps 3–6: the snapshot's cost, the memory problem (176 MB), reduced motion, the phone (track C, branch claude/i3-remaining)
+
+- **Step 3, no change** ([I3 note](experiments/2026-10-30-i3.md), "Step 3"). The garden's snapshot is 2–3 ms on the phone's plate and 8–11 ms at 160 cells, taken as the worker takes it: 6–7% of the season, under the plan's 20 ms. The metrics are 15–17% of it and the copy-out 0.4–1.5 ms. So there is no lean cadence and `SnapshotOptions` is unchanged. The plan's 17–148 ms was one cold call on the VM before the one-row planting.
+- **The memory problem, solved** ("The memory problem").
+  - **342.5 MB was the old worker,** both worlds live. Since `claude/foliage` the swap keeps the forest as checkpoint bytes, and with every-season snapshots it peaked at 241.9 MB.
+  - **The split:** a counting-allocator build of the core (`memstats/`). Half the memory is the plate's grids. The rest went to doublings: a realloc holds the old and new block at once, and linear memory keeps the peak. The lanes' accumulator doubled to 43 MB as the canopy rose (158 → 208.5 MB in 20 seasons). The swap's 21 MB checkpoint was written by doubling beside the live forest.
+  - **Three changes:** `intoCheckpoint` (tree-wasm, `RustWorld`, the worker's swap) frees the light, owner grid, scratch and snapshot buffers before writing; the accumulator is sized once for the slab (`slab_sweep.rs`); the snapshot writes into last season's buffer, reserved for its size (`snapshot.rs`, also 0.6–0.8 ms faster).
+  - **Result:** **176.4 MB** with the specimen beside the 160-cell plate at 200 seasons, and flat to 400. The phone's plate is 61.9 MB.
+  - **Byte-identical:** every season's snapshot and the checkpoints hash the same before and after (`same-bytes.ts`), and `intoCheckpoint`'s bytes are `save`'s (`checkpoint.test.ts`).
+  - **Not pulled:** tighter table and scratch growth (≈ 15 MB more), column types, the plate's cap.
+- **Step 5** (ADR 0046, accepted by track E for the user). A reduced-motion visitor used to see a black page for the whole of `growStill`, because the frame loop started after it. Now the plate draws at once and the still forest replaces it. The wait headless on the laptop is 1.1 s on the phone's plate and 2.8–5.1 s on the laptop's. It ships with no first-paint picture; the phone's wait is read at the soak, and the picture follows if it is over about 3 s.
+- **Step 6.**
+  - The worker stamps each snapshot with `wasmMemoryBytes` (`Snapshot.memoryBytes`, `BenchResult.memoryMB`, both captions).
+  - `garden.html?bench` with reduced motion on reports the wait.
+  - Headless (software GL): the phone's plate runs 52–65 ms a season and holds 47 MB at 40.
+  - The user's verdict on the phone: the garden "works great". No captions were taken (the laptop's network was out of reach); they are taken at the soak.
+- **Goldens unchanged.** `npm run check` passes. Its two slow tests (obstacles, seasons) time out in a full run beside another checkout's vite and pass on a re-run (96 of 96).
+
 ## 2026-11-02: The second judging pass: holly and rowan adopted, willow's pick withdrawn, maple to the form list; goldens updated
 
 - **The user's picks** on the real-renderer sheets ([judging pass](reviews/2026-11-02-judging-pass.md), second pass): holly fork40 (beech's fork rules from age 40: a bush, not a cypress), rowan kappa1 (level-1 λ 0.53, κ 1.0: an oval crown on a straight stem), birch yes, maple no (the picks barely moved its flat top), willow no (its pendulous pick made it "worse than before": a flat open fan).

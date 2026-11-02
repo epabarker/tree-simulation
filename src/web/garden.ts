@@ -72,6 +72,8 @@ export interface BenchResult {
   /** Worker time per season, simulation plus snapshot. */
   workerMean: number;
   workerMax: number;
+  /** The worker's WASM linear memory at the end, MB of 10⁶ bytes: its peak (ADR 0026). */
+  memoryMB: number;
   /** I3 step 4: how much of the canopy the leaves cover at the end of the run (render/coverage.ts). */
   coverage: Coverage;
   /** The foliage knobs it was measured at. */
@@ -645,6 +647,7 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
       longFrames: samples.frame.filter((dt) => dt > 33).length,
       workerMean: round(w.reduce((a, b) => a + b, 0) / Math.max(1, w.length)),
       workerMax: round(Math.max(0, ...w)),
+      memoryMB: Math.round((scene.next?.memoryBytes ?? 0) / 1e5) / 10,
       coverage: measureCoverage(renderer, view),
       leafOpacity: view.leafOpacity,
       leafMinPx: view.leafMinPx,
@@ -832,12 +835,15 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
       specimenSeed = randomSeed();
       await swapWorld(specimenParams(specimenSeed));
     }
+    // Drawing starts before the still forest is grown: reduced motion shows the plate at once and
+    // the grown forest replaces it when the worker has it (I3 step 5: until then the page drew
+    // nothing for the 2–5 s that growStill takes).
+    frameId = requestAnimationFrame(frame);
     if (reduceMotion) {
       if (reducedMode === "still") await growStill();
     } else if (options.autoplay ?? true) {
       playback.playing = true;
     }
-    frameId = requestAnimationFrame(frame);
   });
 
   return {

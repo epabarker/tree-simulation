@@ -41,9 +41,9 @@ const BUDGET_KB = 300;
 const out = process.argv[2] ?? join("dist-garden", "first");
 mkdirSync(out, { recursive: true });
 /**
- * I2 (ADR 0025): no opening forests while the trees grow in 3D and the 3D renderer is not built.
- * A 3D checkpoint is 1–6 MB (the review's Q7), so first paint's policy is decided at I3. The
- * manifest lists no widths, so the garden grows its forest from seed.
+ * No opening forests in 3D (ADR 0046): a 3D checkpoint is 4–16 MB gzipped (the I3 plan's §1.1),
+ * and the live intro self-paces, so the manifest lists no widths and the garden grows its forest
+ * from seed. Reduced motion draws the plate while the worker grows the intro behind it.
  */
 const FIRST_PAINT_3D = false;
 if (!FIRST_PAINT_3D) {
@@ -51,7 +51,7 @@ if (!FIRST_PAINT_3D) {
     join(out, "manifest.json"),
     `${JSON.stringify({ widths: [], seeds: SEEDS, season: SEASONS })}\n`,
   );
-  console.log("no grown forests until I3 (ADR 0025): the garden grows from seed");
+  console.log("no grown forests in 3D (ADR 0046): the garden grows from seed");
   process.exit(0);
 }
 let total = 0;

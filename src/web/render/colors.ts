@@ -37,6 +37,13 @@ export const CATEGORICAL = [
 export const BUD_ACTIVE = "#4caf50";
 export const BUD_DORMANT = "#d08a2e";
 
+/** An sRGB byte at `m` (0–1) times its luminance, scaled in linear light, as illumination scales it. */
+export function dimByte(v: number, m: number): number {
+  const c = v / 255;
+  const x = (c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4) * m;
+  return Math.round(255 * (x <= 0.0031308 ? 12.92 * x : 1.055 * x ** (1 / 2.4) - 0.055));
+}
+
 /** RGB triples of the shadow heatmap ramp (transparent at zero shade). */
 export function shadowRgb(t: number): [number, number, number] {
   const u = Math.min(1, Math.max(0, t));

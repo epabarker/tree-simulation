@@ -27,6 +27,43 @@ Newest first. One entry per session or milestone: what changed, why, surprises, 
 - **Track C's blind test v3** (`claude/foliage`; recounted here) uses one scale and three fresh namers, seeds 1–3. The accepted lone beech is beech on 17 of 18 plates; the beech stand reads as silver birch on 18 of 18, still 8 of 9 with `clearBole`; the oak stand is oak, the lone oak hazel or willow (its form).
 - **Disk:** the session's disk filled during the first lifespan runs, which wrote empty files. Old regenerable runs were deleted (the review's garden runs and the superseded 20-seed variants) and the runs repeated.
 
+## 2026-11-02: Track C (foliage): one scale, the blind test v3 baseline, and clearBole
+
+- **`origin/3d-port` merged into `claude/foliage`** (PR #40's accepted beech), so the renders use the accepted core. Only the devlog conflicted.
+- **One scale** (`&frame=height` in the lab, `Scene.frame = "height"`): the camera is fixed by the world's height, as the garden's world frame is once its crowns reach the top, and never fitted to the trees. Off by default.
+- **`clearBole`** (`ViewOptions`, the lab's `&clearBole`, `garden.html?clearBole`): no short-shoot rosettes on a trunk below its tree's limb crown base. Track E relayed the user's choice of "both". The snapshot already carries order, y0 and limbBase, so there is no core change. Off by default.
+- **The blind test v3** ([note](experiments/2026-11-02-blind-test-v3.md)): v2's protocol at one scale, seeds 1–3, and three fresh namers for each set.
+  - The accepted beech's lone tree passes without own-crown pruning (17 of 18), but both beech stands read as silver birch (18 of 18). With `clearBole` they read as birch 8 of 9: the dark bands go, the pale, slender, wavy stems stay.
+  - Oak leaves hawthorn (27 → 3), but the lone oak reads as hazel or goat willow by its multi-stemmed vase, and the stand reads as oak 6 of 9.
+  - Fir reads as Norway spruce at 100, never fir. Hornbeam now passes pooled; birch passes.
+- **Sets 3 and 4 (track E): the stand's renderer cues.**
+  - Diagnosis: stems are drawn at their pipe-model radius (beech stand H/D 101–110, against a real stand's ≈ 73). Waviness is the core's bole sweep (1.7–2.5%), unchanged with the wind off.
+  - Two view options, off by default:
+    - `girth` draws stems at k times their radius (`&girth=1.45`);
+    - `data-bark="measured"` gives beech's bark the measured ≈ 15% reflectance (`#777a79`/`#6b6e6e`, Pilarski et al. 2008).
+  - Results: the bark moves the stand to beech (6 of 9 alone, 9 of 9 with girth and clearBole), but the lone beech reads as oak (1 of 18 alone, 8 of 18 with all three), so nothing passes. Birch is unchanged (27 of 27); hornbeam's stand drops to 3 of 9 under girth.
+  - The same plates named by different namer sets differ by up to 6 of 9.
+- **Set 5 (track E): bark by light, a pilot, not named.**
+  - `&barkLight=0.5` gives beech a lit base tone (`#8f918e`) and dims every stem by the light field's shade at its base, in linear light. WebGL2 only, off by default.
+  - Neither light measure separates a stand's bole from a lone tree's limbs. The field gives both about 0.52; `s.light`, a subtree mean, makes the lone limbs darker.
+  - Beech's nine plates were drawn as a pilot, and five namers were not spent.
+  - The stand's H/D (101–110 against ≈ 73) is recorded as a model finding.
+- **The judging set (seeds 4–6, five namers, ≥ 3 of 5 pooled):** the sourced candidate (measured bark with clearBole).
+  - The stand passes pooled (beech 9 of 15, on all three seeds). The lone tree fails: 5 and 7 of 15, read as oak or field maple, which is the form's (Part 2).
+  - Birch holds (45 of 45). Hornbeam's unchanged stand reads oak 12 of 15 on these seeds.
+  - The note states the user's choice in one line. Track C's blind-test work stops here.
+- **The user's decision (2026-11-02, via track E): beech ships with the measured mid-grey bark.**
+  - `#777a79` and `#6b6e6e` (Pilarski et al. 2008, ≈ 15% reflectance) are beech's default tokens, with dark mode's usual lift; the old pale grey is `&bark=pale`.
+  - `clearBole`, `frame=height`, `girth` and `barkLight` stay off by default.
+  - Renderer only: goldens unchanged.
+- **Surprises:**
+  - The oak stand's identical plates were named oak 6, 6 and then 0 of 9 by three sets of namers.
+  - Two slow tests (one core-only) time out at 30 s while a vite dev server runs alongside. The committed HEAD failed the same way; with the server stopped, the check passes.
+  - The lab's chart row grows with a stand's trees and shrank its canvas, and so its scale, until the shot script pinned it.
+  - One namer transposed two adjacent rows; they are scored as given.
+  - v2's note overstated its namers' seed consistency (53 of 54, not 54).
+- Goldens unchanged.
+
 ## 2026-11-02: The fresh-look beech decided: four rules accepted, own-crown pruning rejected (branch claude/beech-overnight)
 
 - **The user's decisions** on the review and the overnight note ([overnight §4](experiments/2026-11-02-beech-overnight.md)):
@@ -37,6 +74,14 @@ Newest first. One entry per session or milestone: what changed, why, surprises, 
 - **The unit-free gate prototype is removed** from the core (`r2.vigourCrowd`, commit 219a002): it was no better once own-crown pruning was off (overnight §2c). The scripts' `--assign` and `--variant` options stay.
 - **Golden (intended):** `beechOpen:seed1:s40` befbed31 → 3525f9f7, because own-crown pruning acted on the lone beech and is now off. `beechWood:seed1:s30` is unchanged: under the resource gate it never acted in the wood. The other 14 are unchanged.
 - **Merging this branch into `3d-port` adopts the round's beech for the garden.** That merge is the user's.
+
+## 2026-11-01: Track C (foliage): per-species bark, clumping, the coverage instrument, the specimen's memory
+
+- **Bark per species** (`render/bark-styles.ts`): three tokens per species in `scene.css` (twig, bark, old bark), with age moving a stem to bark and girth moving it to old bark. WebGL2 adds a girth-driven texture (fissures, birch's marks, pine's plates). Thresholds are set on the model's girths, about half a real stand's under ADR 0027. Surprise: pine's first try, on real girths, stayed orange to the ground in the stand; birch's lone trunk went black nearly to the crown.
+- **Clumping** (`LeafClump` in `LEAF_STYLES`): gather, spread back, fan, hang, level and size variation per species; never a card added or removed (ADR 0024). Oak is now marcescent (young trees, lower crown). The lab's `?bench` takes `&tau=`.
+- **I3 step 4:** `render/coverage.ts` (cells and leaf pixels); `leafOpacity` and `leafMinPx` as view options. **I3 step 3:** metrics are 18–30% of a 6–22 ms snapshot, so no lean cadence. **Step 5:** `growStill` takes 3.6 s (phone plate) and 5.5 s (laptop plate) headless. **Step 6:** Canvas 2D finishes the phone's intro.
+- **Memory:** the worker holds the forest as checkpoint bytes while the specimen grows, so the 160-cell plate with the specimen peaks at 218.7 MB, not 341.7 MB (ADR 0026's 256). The reloaded hash is unchanged.
+- Goldens unchanged. Note: [`2026-11-01-foliage.md`](experiments/2026-11-01-foliage.md).
 
 ## 2026-11-01: A review of the fresh-look beech round (branch claude/fresh-look-beech)
 

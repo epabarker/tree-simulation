@@ -26,6 +26,12 @@ function element<T extends HTMLElement>(id: string): T {
 }
 
 const query = new URLSearchParams(location.search);
+// `&bark=pale`: beech's former pale grey bark (scene.css), before the measured one became default.
+// `&barkLight=0.5`: bark by light, every stem dimmed by its shade (Scene.woodLight) from beech's lit
+// base tone (data-bark="lit"); it takes precedence over `&bark`.
+const barkLight = Number(query.get("barkLight") ?? 0);
+if (barkLight > 0) document.documentElement.dataset.bark = "lit";
+else if (query.get("bark") === "pale") document.documentElement.dataset.bark = "pale";
 const narrow = window.matchMedia("(max-width: 700px)").matches;
 // A phone shows a four-tree grove; the ten-tree stand would be too small to read.
 // `?preset=name` picks another (and `?bench` measures it, M15).
@@ -54,6 +60,14 @@ const view: ViewOptions & { preset: PresetName } = {
   showShadow: false,
   showGhosts: true,
   showObstacles: true,
+  // `&leafOpacity=0.8&leafMinPx=2`: I3's foliage knobs (the View panel has them too).
+  ...(query.has("leafOpacity") ? { leafOpacity: Number(query.get("leafOpacity")) } : {}),
+  ...(query.has("leafMinPx") ? { leafMinPx: Number(query.get("leafMinPx")) } : {}),
+  // `&clearBole`: no rosettes on a trunk below its limb crown base (round 2; off by default).
+  ...(query.has("clearBole") ? { clearBole: true } : {}),
+  ...(barkLight > 0 ? { barkLight } : {}),
+  // `&girth=1.45`: draw stems at that multiple of their pipe-model radius (round 2; 1 by default).
+  ...(query.has("girth") ? { girth: Number(query.get("girth")) } : {}),
 };
 
 const hud = element("hud");
@@ -75,14 +89,16 @@ const garden = mountGarden(element("stage"), {
   renderer: query.get("renderer") === "canvas" ? "canvas2d" : "auto",
   interaction: "full",
   obstacles: null, // the lab's own obstacles come from the preset (ADR 0015)
-  frame: "trees",
+  // `&frame=height`: one scale for every plate, the camera fixed by the world's height as the
+  // garden's world frame is once its crowns reach the top, not fitted to the trees (round 2).
+  frame: query.get("frame") === "height" ? "height" : "trees",
   headroom: 52, // the title and hint
   pace: null,
   speed: 3,
   maxTweenMs: 450,
   reducedMotion: "pause",
   snapshot: FULL_SNAPSHOT,
-  // `?bench[&preset=forest][&seasons=60]`: play at the panel's speed, then report frame costs.
+  // `?bench[&preset=forest][&seasons=60][&tau=0.95]`: play at the panel's speed, then report frame costs.
   bench: query.has("bench")
     ? {
         seasons: Number(query.get("seasons") ?? 60),
@@ -91,6 +107,14 @@ const garden = mountGarden(element("stage"), {
           console.log("bench", JSON.stringify(result));
           hud.textContent = `bench: draw p95 ${result.drawP95} ms · frame p95 ${result.frameP95} ms · worker ${result.workerMean} ms`;
           panel.setPlaying(false);
+          // `&tau=0.95`: then hold the plate at that time of year (M17's seasons), e.g. winter's
+          // marcescent leaves, for a contact sheet.
+          const tau = query.get("tau");
+          if (tau !== null) {
+            garden.scene.seasons = true;
+            garden.scene.tau = Number(tau);
+            garden.redraw();
+          }
         },
       }
     : undefined,

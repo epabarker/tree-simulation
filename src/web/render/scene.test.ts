@@ -252,3 +252,31 @@ describe("one scale (the lab's `&frame=height`, round 2's blind test)", () => {
       expect(scene.camera.scale).toBeCloseTo((600 - 18 - 52) / (world.height * 1.05 + LEAF_LENGTH));
   });
 });
+
+describe("clear boles (the lab's `&clearBole`, round 2)", () => {
+  it("draws no rosettes on a trunk below its limb crown base, and every other leaf as before", () => {
+    const world = productionWorld(presetParams("forest", 1));
+    world.run(40);
+    const scene = new Scene();
+    scene.setSize(800, 600, 1);
+    scene.setSnapshot(world.snapshot(0));
+    scene.computeGeometry(1);
+    const s = scene.next;
+    if (!s) throw new Error("no snapshot");
+    // Short shoots on order-0 wood older than the leafy shoots (leafAge 3), below the tree's
+    // limb crown base: each carries a rosette of two cards.
+    const limbBase = new Map(s.metrics.map((m) => [m.tree, Math.fround(m.limbBase)]));
+    let bole = 0;
+    for (let i = 0; i < s.budCount; i++) {
+      const j = s.budMetamer[i] as number;
+      if (s.budState[i] !== BudState.shortShoot || s.age[j] <= 4 || s.order[j] !== 0) continue;
+      if ((s.y0[j] as number) < (limbBase.get(s.tree[j] as number) ?? 0)) bole++;
+    }
+    expect(bole).toBeGreaterThan(0);
+    const all = scene.leaves(3, 1).count;
+    scene.clearBole = true;
+    expect(scene.leaves(3, 1).count).toBe(all - 2 * bole);
+    scene.clearBole = false;
+    expect(scene.leaves(3, 1).count).toBe(all);
+  });
+});

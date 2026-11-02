@@ -57,6 +57,8 @@ const view: ViewOptions & { preset: PresetName } = {
   // `&leafOpacity=0.8&leafMinPx=2`: I3's foliage knobs (the View panel has them too).
   ...(query.has("leafOpacity") ? { leafOpacity: Number(query.get("leafOpacity")) } : {}),
   ...(query.has("leafMinPx") ? { leafMinPx: Number(query.get("leafMinPx")) } : {}),
+  // `&clearBole`: no rosettes on a trunk below its limb crown base (round 2; off by default).
+  ...(query.has("clearBole") ? { clearBole: true } : {}),
 };
 
 const hud = element("hud");

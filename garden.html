@@ -98,6 +98,8 @@
       const view = Object.fromEntries(
         ["leafOpacity", "leafMinPx"].filter((k) => query.has(k)).map((k) => [k, Number(query.get(k))]),
       );
+      // `?clearBole`: no rosettes on a trunk below its limb crown base (round 2), for a phone look.
+      if (query.has("clearBole")) view.clearBole = true;
       // Exposed for poking at from the console (and headless checks); a host page needn't.
       window.garden = mountGarden(document.getElementById("garden"), {
         headroom: 140,

@@ -101,6 +101,13 @@ export interface ViewOptions {
    */
   leafOpacity?: number;
   leafMinPx?: number;
+  /**
+   * Draw no short-shoot rosettes on a trunk (order 0) below its tree's limb crown base (round 2,
+   * off by default). R6 never ends a trunk's short shoots, so a closed stand's boles carry leaf
+   * that blind namers read as lime's sprouts, where a beech high forest's boles are clean. A
+   * drawing choice: the model still counts that leaf in its light.
+   */
+  clearBole?: boolean;
 }
 
 export interface Camera {
@@ -238,6 +245,8 @@ export class Scene {
   dpr = 1;
   /** Foliage style; renderers copy `LEAF_STYLES[ViewOptions.leafStyle]` here. */
   leafStyle: LeafStyle = LEAF_STYLES.broadleaf;
+  /** No rosettes on a trunk below its limb crown base; renderers copy `ViewOptions.clearBole`. */
+  clearBole = false;
   /**
    * What `fit` frames. "trees": the trees and the ground beneath them (the lab). "world": the
    * world's whole width, easing out only once crowns outgrow half its height (the home page); on
@@ -322,6 +331,7 @@ export class Scene {
     for: null as Snapshot | null,
     leafAge: -1,
     style: null as LeafStyle | null,
+    clearBole: false,
     count: 0,
     slice: new Uint8Array(0),
     at: new Int32Array(0),
@@ -1209,7 +1219,8 @@ export class Scene {
   private layoutLeaves(s: Snapshot, leafAge: number): Scene["layout"] {
     const L = this.layout;
     const style = this.leafStyle;
-    if (L.for === s && L.leafAge === leafAge && L.style === style) return L;
+    if (L.for === s && L.leafAge === leafAge && L.style === style && L.clearBole === this.clearBole)
+      return L;
     const n = s.metamerCount;
     // Each tree is drawn as its species (M19), resolved once per tree into arrays by tree id.
     const { styles, kindOf } = this.treeStyles(s);
@@ -1306,11 +1317,16 @@ export class Scene {
       push(j, side, c, 0);
       if (pairOf[kindOf[s.tree[j] as number] as number]) push(j, -side, c, 0);
     }
-    // Short-shoot rosettes on wood older than the leafy shoots (R6).
+    // Short-shoot rosettes on wood older than the leafy shoots (R6). With `clearBole`, none on a
+    // trunk below its tree's limb crown base (a height on the tree, as `marcescentBelow`).
+    const boleTop = new Float32Array(kindOf.length);
+    if (this.clearBole) for (const m of s.metrics) boleTop[m.tree] = m.limbBase;
     for (let i = 0; i < s.budCount; i++) {
       if (s.budState[i] !== BudState.shortShoot) continue;
       const j = s.budMetamer[i];
       if (s.age[j] <= leafAge + 1) continue;
+      if (s.order[j] === 0 && (s.y0[j] as number) < (boleTop[s.tree[j] as number] as number))
+        continue;
       const c = shade(s.budQ[i], s.tree[j], s.birthId[j] ^ 0x5bd1);
       push(j, 1, c, 1);
       push(j, -1, c, 1);
@@ -1326,6 +1342,7 @@ export class Scene {
     L.for = s;
     L.leafAge = leafAge;
     L.style = style;
+    L.clearBole = this.clearBole;
     return L;
   }
 }

@@ -647,6 +647,7 @@ export class WebGL2Renderer implements Renderer {
       view.showLeaves ? view.leafAge : -1,
       view.leafStyle,
       view.leafOpacity,
+      view.clearBole,
       view.showBuds,
       view.showObstacles,
       scene.solo,
@@ -657,6 +658,7 @@ export class WebGL2Renderer implements Renderer {
     const u = this.uploaded;
     if (u.next !== s || u.prev !== scene.prev || u.key !== key) {
       scene.leafStyle = LEAF_STYLES[view.leafStyle];
+      scene.clearBole = view.clearBole ?? false;
       scene.computeGeometry(t);
       this.buildSegments(s, view);
       if (ghosts) this.buildGhosts(1 - t);

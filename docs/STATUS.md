@@ -2,7 +2,7 @@
 
 _Last updated: 2026-11-02 (I3 steps 3–6 on `claude/i3-remaining`: the snapshot's cost settled, the memory problem solved at 176 MB, reduced motion draws the plate at once, ADR 0046 accepted; the phone's captions at the soak)_
 
-**3D port** on the branch `3d-port` (work branches open PRs into it). ADR 0024–0029, 0031, 0032, 0039–0042 and 0044 and 0046 accepted, 0030, 0043 and 0045 rejected. The live site stays on 0.14.0 (2D) until the bar below is met.
+**3D port** on the branch `3d-port` (work branches open PRs into it). ADR 0024–0029, 0031, 0032, 0039–0042 and 0044 and 0046 accepted, 0030, 0043 and 0045 rejected. **garden-v0.15.0** (the 3D garden) is tagged at a417437; the live site moves from 0.14.0 (2D) to it on the site's PR after the phone soak.
 
 **Done means** (user): the mixed wood looks right in the garden in depth, within budget on the phone, with floor, H/D and crown base as 20-seed evidence. C3–C6 follow after shipping.
 

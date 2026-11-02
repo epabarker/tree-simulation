@@ -2,6 +2,12 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-02: garden-v0.15.0 tagged: the 3D garden
+
+- **The tag** sits on `3d-port` at a417437 (PR #46's merge), the first release of the 3D port: the Rust core in a slab (ADR 0024, 0025), the species' forms as judged on the phone (the fresh-look beech, track B's picks, the judging pass's overrides), the measured beech bark, the renderer in depth, memory at 176 MB with the specimen (I3). The release workflow builds `garden-0.15.0.tgz`; the site (`epabarker/edbarker-dev`) vendors it with `scripts/sync-garden.mjs 0.15.0` and goes live on the site's PR after the user's phone soak on its preview.
+- **The bar** (STATUS's "done means"): the mixed wood reads right on the phone (the user, 2026-11-02); the `forest` evidence holds (20/20/20/19 at τ 0); the budget holds on the laptop's measurements, the phone's captions at the soak.
+- **Rehearsed before the tag:** a local build packaged as the workflow does, synced into the site on a throwaway branch, `astro build` green, the page loaded headlessly at phone size with the garden mounted and growing, no console errors, the WASM served as `application/wasm`.
+
 ## 2026-11-02: I3 steps 3–6: the snapshot's cost, the memory problem (176 MB), reduced motion, the phone (track C, branch claude/i3-remaining)
 
 - **Step 3, no change** ([I3 note](experiments/2026-10-30-i3.md), "Step 3"). The garden's snapshot is 2–3 ms on the phone's plate and 8–11 ms at 160 cells, taken as the worker takes it: 6–7% of the season, under the plan's 20 ms. The metrics are 15–17% of it and the copy-out 0.4–1.5 ms. So there is no lean cadence and `SnapshotOptions` is unchanged. The plan's 17–148 ms was one cold call on the VM before the one-row planting.

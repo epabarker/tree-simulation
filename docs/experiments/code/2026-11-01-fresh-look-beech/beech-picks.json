@@ -1,0 +1,10 @@
+{
+ "r2.relay": 2,
+ "r2.relayAge": 20,
+ "r2.relayPTerm": 0.6,
+ "r2.levels.0.curve": 45,
+ "r2.levels.0.curveLength": 30,
+ "r2.levels.1.setPoint": 28,
+ "r2.levels.1.agedSetPoint": 80,
+ "r2.levels.1.agedOver": 50
+}

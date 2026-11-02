@@ -38,6 +38,13 @@ export const GOLDEN_CASES: GoldenCase[] = [
   { preset: "thinning", seed: 1, seasons: 15 },
   { preset: "mixedWood", seed: 1, seasons: 15 },
   { preset: "oakOpen", seed: 1, seasons: 15 },
+  // The fresh-look round's beech rules (ADR 0039–0043, proposed), run long enough to act: the
+  // lone beech exercises the fork's arm hold, the vigour drop, light orthotropy and own-crown
+  // pruning; the beech wood the relay's neighbour gate, the fork, the drop and light orthotropy
+  // (docs/experiments/code/2026-11-01-fresh-look-beech/golden-coverage.py). The cases above with
+  // beech stop at 15, before any of them acts.
+  { preset: "beechOpen", seed: 1, seasons: 40 },
+  { preset: "beechWood", seed: 1, seasons: 30 },
 ];
 
 export function caseKey(c: GoldenCase): string {

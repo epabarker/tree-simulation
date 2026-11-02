@@ -1,0 +1,191 @@
+diff -ru /home/claude/tree/tree-simulation/rust/core/src/params.rs rust/core/src/params.rs
+--- /home/claude/tree/tree-simulation/rust/core/src/params.rs	2026-11-01 17:56:47.504575810 +0000
++++ rust/core/src/params.rs	2026-11-01 18:58:58.061977517 +0000
+@@ -219,6 +219,9 @@
+     pub aged_set_point: Option<f64>,
+     pub aged_over: Option<f64>,
+     pub aged_by_tree: bool,
++    /// Proposal B's vigour response: λ at this level's nodes falls by (1 − u)·vigourLambda, u the
++    /// node's vigour (r2.vigourShare). Absent: r2.vigourLambda.
++    pub vigour_lambda: Option<f64>,
+ }
+ 
+ #[derive(Clone, Debug)]
+@@ -236,6 +239,21 @@
+     /// From this tree age (seasons) a pa-0 terminal ends with probability `relay_p_term`.
+     pub relay_age: f64,
+     pub relay_p_term: f64,
++    /// Vigour response (proposal B, fresh-look beech; Troll's model; Nicolini & Caraglio 1994,
++    /// Nicolini 2000): the share s of the tree's resource v_base at which wood is fully vigorous,
++    /// u = min(1, (vIn / v_base) / s). Absent or 0: off.
++    pub vigour_share: f64,
++    /// λ falls by (1 − u)·vigourLambda at a node: weak wood forks (a level's own
++    /// `vigourLambda` overrides it). Absent: 0.
++    pub vigour_lambda: f64,
++    /// Vigorous wood's posture set point, degrees (absent: 0, orthotropic). R3's posture target
++    /// runs from the level's growth set point (weak: plagiotropic) to it by u, the trunk included.
++    pub vigour_set_point: f64,
++    /// The tree's own vigour gate g = clamp((v_base − vigourTreeLo)/(vigourTreeHi − vigourTreeLo)):
++    /// the response acts by g, so a tree whose whole production stays small (suppressed, or a
++    /// stand member) is untouched. Absent (vigourTreeHi ≤ vigourTreeLo): g = 1.
++    pub vigour_tree_lo: f64,
++    pub vigour_tree_hi: f64,
+ }
+ 
+ #[derive(Clone, Debug)]
+@@ -513,6 +531,7 @@
+                         aged_set_point: opt(l, "agedSetPoint"),
+                         aged_over: opt(l, "agedOver"),
+                         aged_by_tree: text(l, "agedBy") == "tree",
++                        vigour_lambda: opt(l, "vigourLambda"),
+                     })
+                     .collect(),
+                 a_c: num(r2, "aC"),
+@@ -523,6 +542,11 @@
+                 relay: opt(r2, "relay").unwrap_or(0.0),
+                 relay_age: opt(r2, "relayAge").unwrap_or(0.0),
+                 relay_p_term: opt(r2, "relayPTerm").unwrap_or(0.0),
++                vigour_share: opt(r2, "vigourShare").unwrap_or(0.0),
++                vigour_lambda: opt(r2, "vigourLambda").unwrap_or(0.0),
++                vigour_set_point: opt(r2, "vigourSetPoint").unwrap_or(0.0),
++                vigour_tree_lo: opt(r2, "vigourTreeLo").unwrap_or(0.0),
++                vigour_tree_hi: opt(r2, "vigourTreeHi").unwrap_or(0.0),
+             },
+             r3: R3 {
+                 enabled: flag(r3, "enabled"),
+diff -ru /home/claude/tree/tree-simulation/rust/core/src/principles/c3.rs rust/core/src/principles/c3.rs
+--- /home/claude/tree/tree-simulation/rust/core/src/principles/c3.rs	2026-11-01 17:56:47.507103515 +0000
++++ rust/core/src/principles/c3.rs	2026-11-01 18:58:58.069935014 +0000
+@@ -6,7 +6,7 @@
+ //! Params: c3.mode, c3.lambda (λ), c3.alpha (α); with R2 λ by pa and age and acrotony κ; with R5
+ //! λ rises at shaded nodes; with R1, v_base is the tree's net production.
+ 
+-use super::r2::{acrotony_weights, lambda_at};
++use super::r2::{acrotony_weights, lambda_at, pa_level, vigour, vigour_gate, vigour_on};
+ use super::r5::shaded_lambda;
+ use super::r6::light_weight;
+ use crate::params::{C3Mode, Params, R6};
+@@ -100,6 +100,7 @@
+                 tree.v_base = if nm > 0 { alpha * tree.q_base } else { 0.0 };
+             }
+             let acro = acrotony_weights(tree, params);
++            let gate = vigour_gate(tree.v_base, &params.r2);
+             ensure(&mut tree.v_slot, SLOTS * nm);
+             ensure(&mut tree.node_shade, nm);
+             let age = tree.age;
+@@ -123,7 +124,15 @@
+                 let q_main = q_slot[at];
+                 let q_lat: f64 = q_slot[at + 1..at + SLOTS].iter().sum();
+                 let pa = m.order[i] as f64 - m.pa_shift[i] as f64;
+-                let lambda = shaded_lambda(lambda_at(pa, age, params), shade[i], &params.r5);
++                let mut lambda = shaded_lambda(lambda_at(pa, age, params), shade[i], &params.r5);
++                if vigour_on(&params.r2) {
++                    let drop = pa_level(pa, &params.r2)
++                        .and_then(|l| l.vigour_lambda)
++                        .unwrap_or(params.r2.vigour_lambda);
++                    if drop != 0.0 {
++                        lambda -= drop * gate * (1.0 - vigour(v, v_base, &params.r2));
++                    }
++                }
+                 let lateral = if acro { q_lat * w[i] } else { q_lat };
+                 let v_main = bh_main_share(v, q_main, lateral, lambda);
+                 let v_lat = if q_main + q_lat > 0.0 {
+diff -ru /home/claude/tree/tree-simulation/rust/core/src/principles/r2.rs rust/core/src/principles/r2.rs
+--- /home/claude/tree/tree-simulation/rust/core/src/principles/r2.rs	2026-11-01 17:56:47.507103515 +0000
++++ rust/core/src/principles/r2.rs	2026-11-01 18:58:58.065961185 +0000
+@@ -316,6 +316,49 @@
+     set_point + w * (hang - set_point)
+ }
+ 
++/// True if the vigour response (proposal B, fresh-look beech) is on.
++pub fn vigour_on(r2: &R2) -> bool {
++    r2.enabled && r2.vigour_share > 0.0
++}
++
++/// The vigour response's u in [0, 1]: the share of the tree's resource `v_base` that flows through
++/// a node this season (`v_in`), against r2.vigourShare. Troll's model: every axis is plagiotropic
++/// and straightens secondarily (Hallé et al. 1978); in beech, vigorous axes are orthotropic and
++/// weak ones plagiotropic (Nicolini 2000), and forks form where growth is weak or very strong
++/// (Nicolini & Caraglio 1994). So weak wood (u → 0) loses apical control (λ falls by
++/// (1 − u)·vigourLambda, C3) and keeps its level's plagiotropic growth set point as its posture
++/// target (R3), while wood that carries a large share of its tree (u → 1, a bole) keeps λ and
++/// straightens toward vigourSetPoint. A narrow stand crown passes most of its resource up its
++/// leader, which stays a bole; a broad open crown spreads it over many limbs, so its top divides
++/// and leans out: the trunk is lost in the crown as the crown grows.
++pub fn vigour(v_in: f64, v_base: f64, r2: &R2) -> f64 {
++    if v_base <= 0.0 {
++        return 0.0;
++    }
++    math::max(0.0, math::min(1.0, v_in / v_base / r2.vigour_share))
++}
++
++/// The tree's vigour gate g in [0, 1] by its resource `v_base` (1 when no gate is set).
++pub fn vigour_gate(v_base: f64, r2: &R2) -> f64 {
++    if r2.vigour_tree_hi <= r2.vigour_tree_lo {
++        return 1.0;
++    }
++    math::max(
++        0.0,
++        math::min(1.0, (v_base - r2.vigour_tree_lo) / (r2.vigour_tree_hi - r2.vigour_tree_lo)),
++    )
++}
++
++/// The posture set point (radians) of wood of vigour `u` on an axis of physiological age `pa`
++/// whose offsets (curve, age) add `bend` radians: from the level's growth set point (weak) to
++/// r2.vigourSetPoint (vigorous), within [0, π].
++pub fn vigour_posture(pa: f64, bend: f64, u: f64, params: &Params) -> f64 {
++    let deg = crate::params::DEG;
++    let weak = direction_params(params, pa).set_point * deg + bend;
++    let target = weak + u * (params.r2.vigour_set_point * deg - weak);
++    math::max(0.0, math::min(std::f64::consts::PI, target))
++}
++
+ /// Acrotony weights exp(κ(pos − 1)) per metamer in `tree.scratch_f` (first nm entries), pos its
+ /// node's place in the shoot it grew with. False when κ is 0 (no weights).
+ pub fn acrotony_weights(tree: &mut Tree, params: &Params) -> bool {
+diff -ru /home/claude/tree/tree-simulation/rust/core/src/principles/r3.rs rust/core/src/principles/r3.rs
+--- /home/claude/tree/tree-simulation/rust/core/src/principles/r3.rs	2026-11-01 17:56:47.507103515 +0000
++++ rust/core/src/principles/r3.rs	2026-11-01 18:58:58.070632312 +0000
+@@ -13,7 +13,10 @@
+ use super::c3::is_live_bud;
+ use super::c4::{horizontal_heading, set_point_direction};
+ use super::c5::remove_branches;
+-use super::r2::{aged_offset, curve_offset, hangs, pa_level, pendulous_set_point};
++use super::r2::{
++    aged_offset, curve_offset, hangs, pa_level, pendulous_set_point, vigour, vigour_on,
++    vigour_gate, vigour_posture,
++};
+ use super::r6::deposit_area;
+ use crate::geom::{
+     IDENTITY, M3, V3, add, angle_between, apply, compose, cross, norm, normalize_or, reject,
+@@ -76,6 +79,12 @@
+ /// The MECHANICS step of §6. Expects `tree.prev_radius` to hold the radii before girth.
+ pub fn update_mechanics(tree: &mut Tree, params: &Params, storm: bool, season: f64) {
+     let r3 = &params.r3;
++    // Proposal B's vigour response: how far it acts on this tree (0 when off).
++    let gate = if vigour_on(&params.r2) {
++        vigour_gate(tree.v_base, &params.r2)
++    } else {
++        0.0
++    };
+     let storm_load = if storm {
+         params.o2.storm_load.unwrap_or(0.0)
+     } else {
+@@ -205,11 +214,16 @@
+             let bend = (curve_offset(trunk, pa, tree.m.axis_node[i] as f64, params)
+                 + aged_offset(trunk, pa, wood_age, tree.age, params))
+                 * DEG;
+-            let set_point = if bend == 0.0 {
++            let mut set_point = if bend == 0.0 {
+                 posture_set_point(pa, params)
+             } else {
+                 math::max(0.0, math::min(PI, posture_set_point(pa, params) + bend))
+             };
++            if gate > 0.0 {
++                // Proposal B's vigour response: weak wood plagiotropic, vigorous wood orthotropic.
++                let u = vigour(tree.m.v_in[i], tree.v_base, &params.r2);
++                set_point += gate * (vigour_posture(pa, bend, u, params) - set_point);
++            }
+             // R2's pendulous twigs (ADR 0035): a thin axis hangs (degrees there and back only when on,
+             // so the set point is bit-for-bit the same without it).
+             let set_point = if hangs(pa, params) {

@@ -2,6 +2,26 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-02: The fresh-look beech decided: four rules accepted, own-crown pruning rejected (branch claude/beech-overnight)
+
+- **The user's decisions** on the review and the overnight note ([overnight §4](experiments/2026-11-02-beech-overnight.md)):
+  - ADRs 0039–0042 (relay gate, vigour fork and arm hold, vigour drop, light orthotropy) are accepted for beech, at the repair's values under the resource vigour gate;
+  - ADR 0043 (own-crown pruning, `c5.Tvig`) is rejected, so the C5 boundary question is moot;
+  - round 2 targets the beech stand and oak's and fir's look in the renderer ([brief](plans/2026-11-02-beech-round2.md)).
+- **Beech without `c5.Tvig`:** removed from `hand-overrides.toml` and `flora-fitted.ts`, and presets exported. Only beech's entries change. The code and its test stay, off by default, so the review's runs reproduce.
+- **The unit-free gate prototype is removed** from the core (`r2.vigourCrowd`, commit 219a002): it was no better once own-crown pruning was off (overnight §2c). The scripts' `--assign` and `--variant` options stay.
+- **Golden (intended):** `beechOpen:seed1:s40` befbed31 → 3525f9f7, because own-crown pruning acted on the lone beech and is now off. `beechWood:seed1:s30` is unchanged: under the resource gate it never acted in the wood. The other 14 are unchanged.
+- **Merging this branch into `3d-port` adopts the round's beech for the garden.** That merge is the user's.
+
+## 2026-11-01: A review of the fresh-look beech round (branch claude/fresh-look-beech)
+
+- **Reproduced:** the repair's sheet and metrics from the brief's command, all 63 numbers equal to `repair-round1/metrics.json`; the stand equal to the solver's; every changed `rust/presets.json` entry inside a beech patch. [Review note](experiments/2026-11-01-fresh-look-beech-review.md).
+- **Fixed:** `to_degrees` from std in two core paths, replaced by the core's own multiply (bit-identical: the repair's seed-1 hashes unchanged). Tests for the fork's action in growth and the relay gate's signal.
+- **ADRs 0039–0043, proposed,** for the round's five rules. 0043 (own-crown pruning, `c5.Tvig`) is a C5 shedding change against ADR 0032, for the user's decision. Sprugel et al. 1991 and Takenaka 1994 exist but could not be read here; their claimed content is marked unverified.
+- **A preset, `beechOpen`:** oakOpen's lone specimen with a beech, 240 wide (the repair's world). No other preset changed.
+- **Goldens (intended, new cases only):** `beechOpen:seed1:s40` and `beechWood:seed1:s30`. The round's goldens stopped at 15 seasons, before any of its rules acts; these two run long enough. `golden-coverage.py` shows each case's hash moves when a rule is switched off: the lone case exercises four rules (all but the relay gate, which is identically nil alone), the wood four (all but own-crown pruning); together all five. The 14 existing hashes are unchanged.
+- **Surprise:** in `beechWood` the vigour gate opens by season 30 (the drop and light orthotropy change its hash), and in the round's closed stand the largest v_base reaches 2,400–3,000 against the gate's 3,000 (20 seeds), not the "≤ 2,000" the round reported.
+
 ## 2026-11-01: Track B (vocabulary): the six judged; picks.toml final
 
 - **The user's decisions:** oak accepted (posture by age, 35 → 85 by wood over 50); maple accepted (relay from age 10, relays curving 30); willow accepted (pendulous twigs, twig laterals every second node). Hornbeam (the relay leaves the flat cap), rowan and holly keep today's [form]. `picks.toml` final for all eight; ADRs 0033–0036 and 0038 accepted for the species that use them.

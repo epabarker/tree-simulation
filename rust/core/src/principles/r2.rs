@@ -38,9 +38,41 @@
 //! r2.kappa) and `lateralEvery` (laterals only at every k-th node of its axes) set how many fine
 //! shoots a limb carries and where along it.
 //!
+//! The relay's neighbour gate (ADR 0039, accepted 2026-11-02; the fresh-look beech round): with `relayCrowd` k, the age relay's
+//! relayPTerm acts by max(0, 1 − k·s̄), s̄ the tree's mean R5 neighbour shade (phase 2). A
+//! free-standing tree (s̄ = 0) loses its leader from relayAge and becomes polyarchic; a tree among
+//! neighbours keeps it through the race for height, a hierarchical bole (Nicolini & Caraglio 1994
+//! [r on the beech card]: forks at the extremes of growth, "une structure bien hiérarchisée" in
+//! between; Troll [r]: "young trees may develop a leader, aged crowns usually are polyarchic").
+//!
+//! The vigour fork (ADR 0040, accepted): a pa-0 shoot whose bud received v ≥ `forkAt` times the
+//! full shoot (c1.maxMetamersPerShoot), more than the longest shoot can use, ends its apex, and
+//! the relay makes the laterals on its top nodes co-dominant arms, re-aimed to `forkAngle` from
+//! the ended apex (Nicolini & Caraglio 1994 [r]: forks at the highest growth rates). With it on,
+//! every arm (a pa-0 axis not the trunk's own) holds the inclination of its own base as its set
+//! point, growth and posture, instead of the trunk's vertical, plus the level's curve: Troll's
+//! "all axes develop plagiotropically" [r], only the trunk straightened, so an arm rises and
+//! then arches instead of standing up as a second trunk.
+//!
+//! The vigour drop (ADR 0041, accepted): a node's vigour u = min(1, (v_in / v_base) / vigourShare)
+//! is the share of its tree's resource it carries; λ there falls by g·(1 − u)·vigourLambda (C3),
+//! g the tree's own vigour gate by v_base between vigourTreeLo and vigourTreeHi. A broad open
+//! crown spreads its resource over many limbs, so its weak wood loses apical control and its top
+//! divides into near-equal limbs (the dome); a stand member never opens the gate.
+//!
+//! Light orthotropy (ADR 0042, accepted): wood of pa ≥ 1 on a vigorous tree (the vigour
+//! gate g) takes a set point, in growth (C4) and posture (R3), moved from its level's toward
+//! `lightSetPoint` by its light and, over `lightOver` seasons, by its age: lit wood rises, shaded
+//! wood stays level (Nicolini & Caraglio 1994 [r]; Nicolini 2000 [s]). This season's shoot spreads
+//! near its level's angle and its base rises as it ages (Troll's secondary straightening of the
+//! proximal part of plagiotropic axes, Hallé et al. 1978), so a lit limb rises, then arches; the
+//! lower crown's shaded sprays stay level. A stand member never opens the gate.
+//!
 //! Params: r2.enabled, r2.levels (curve, curveLength, pendulous, pendulousRadius, kappa,
 //! lateralEvery), r2.aC, r2.dLambda, r2.ramp, r2.kappa, r2.relay,
-//! r2.relayAge, r2.relayPTerm; c1.branchAngle, c3.lambda, c4.setPoint, c4.eta when off.
+//! r2.relayAge, r2.relayPTerm, r2.relayCrowd, r2.forkAt, r2.forkAngle, r2.vigourShare,
+//! r2.vigourLambda, r2.vigourTreeLo, r2.vigourTreeHi, r2.lightSetPoint, r2.lightLo, r2.lightHi,
+//! r2.lightOver; c1.branchAngle, c3.lambda, c4.setPoint, c4.eta when off.
 
 use crate::math;
 use crate::params::{C4, Generator, PaLevel, Params, Phyllotaxis, R2};
@@ -131,6 +163,118 @@ pub fn relay_on(params: &Params) -> bool {
         && (r2.relay >= 1.0 || r2.levels.iter().any(|l| l.relay.unwrap_or(0.0) >= 1.0))
 }
 
+/// The vigour fork: true if a shoot of physiological age `pa` grown from a bud
+/// that received `v` ends at its apex, because it grew as fast as a shoot can (v at or above
+/// `forkAt` times the full shoot, c1.maxMetamersPerShoot). Only pa 0 forks, and only with the
+/// relay on, which makes the ended apex's top laterals the co-dominant arms.
+pub fn vigour_forks(pa: f64, v: f64, cap: f64, tree_age: f64, params: &Params) -> bool {
+    let r2 = &params.r2;
+    let full = params.c1.max_metamers_per_shoot;
+    // Young trees keep a leader (Troll: "young trees may develop a leader"): no fork while the
+    // juvenile cap (r2.hJ) still holds the shoot below its full length, nor before r2.relayAge.
+    r2.fork_at > 0.0
+        && pa == 0.0
+        && relay_on(params)
+        && cap >= full
+        && tree_age >= r2.relay_age
+        && v >= r2.fork_at * full
+}
+
+/// With the vigour fork on, the set point (degrees) of a fork arm (a pa-0 axis that is not the
+/// trunk's own): the angle from vertical it was born at, which it holds (Troll: every axis is
+/// plagiotropic; only the trunk's base is straightened). None when off or on the trunk.
+pub fn arm_set_point(tree: &Tree, trunk: bool, pa: f64, m: usize, params: &Params) -> Option<f64> {
+    if params.r2.fork_at <= 0.0 || trunk || pa != 0.0 {
+        return None;
+    }
+    let axis = tree.m.axis[m];
+    let n = tree.m.len();
+    // birth_id ascends with the row: the axis's first metamer by binary search.
+    let ids = &tree.m.birth_id[..n];
+    let first = ids.binary_search(&axis).ok()?;
+    let h = tree.heading(first);
+    // Degrees as form.rs takes them: one multiplication, the same bits as std's to_degrees.
+    Some(math::acos(math::max(-1.0, math::min(1.0, h[1]))) * (180.0 / std::f64::consts::PI))
+}
+
+/// True if the vigour drop (fresh-look beech) is on: λ falls in weak wood of a vigorous tree.
+pub fn vigour_drop_on(r2: &R2) -> bool {
+    r2.enabled && r2.vigour_share > 0.0 && r2.vigour_lambda != 0.0
+}
+
+/// A node's vigour u in [0, 1]: the share of its tree's resource `v_base` that flows through it
+/// this season (`v_in`), against r2.vigourShare. Troll's model (Pfisterer [r] on the card): every
+/// axis is plagiotropic and "aged crowns usually are polyarchic"; Nicolini & Caraglio 1994 [r]:
+/// beech forks at the extremes of growth rate and keeps "une structure bien hiérarchisée" only
+/// in between. A narrow stand crown passes most of its resource up one leader, which keeps its
+/// apical control; a broad open crown spreads it over many limbs, so the wood that carries little
+/// of it (u → 0) loses apical control and its top divides.
+pub fn vigour(v_in: f64, v_base: f64, r2: &R2) -> f64 {
+    if v_base <= 0.0 || r2.vigour_share <= 0.0 {
+        return 0.0;
+    }
+    math::max(0.0, math::min(1.0, v_in / v_base / r2.vigour_share))
+}
+
+/// The tree's vigour gate g in [0, 1] by its resource `v_base`: 0 at r2.vigourTreeLo and below,
+/// 1 at r2.vigourTreeHi and above (1 when no gate is set). Like C5's Q_top and R1's maturity
+/// height a tree-level signal: an open-grown crown produces an order of magnitude more than a
+/// stand member of the same age, so the drop leaves the stand alone.
+pub fn vigour_gate(v_base: f64, r2: &R2) -> f64 {
+    if r2.vigour_tree_hi <= r2.vigour_tree_lo {
+        return 1.0;
+    }
+    math::max(
+        0.0,
+        math::min(
+            1.0,
+            (v_base - r2.vigour_tree_lo) / (r2.vigour_tree_hi - r2.vigour_tree_lo),
+        ),
+    )
+}
+
+/// Light orthotropy (fresh-look beech, repair): the set point (degrees from vertical), in growth
+/// and posture, of wood of physiological age `pa`, light `q` and age `wood_age` seasons, moved
+/// from its level's own `set_point` toward r2.lightSetPoint by
+/// u = g·clamp((q − lightLo) / (lightHi − lightLo))·min(1, (wood_age + 1) / lightOver), g the
+/// tree's vigour gate (`vigour_gate`, 1 when r2.vigourTreeLo/Hi are unset). Beech's laterals are
+/// plagiotropic under cover and erect in full light on a vigorous tree (Nicolini & Caraglio 1994
+/// [r]: vertical laterals 0.18–0.45 in full light against 0.03–0.1 in shade; Nicolini 2000 [s]:
+/// the axes of trees "very young or under dense cover" are plagiotropic with a flat crown, those
+/// of vigorous trees orthotropic), and a plagiotropic axis straightens at its base as it ages
+/// (Troll's model, Hallé et al. 1978). So the lit crown of an open-grown tree builds limbs that
+/// rise, then arch out at their young tips, and its shaded lower crown level sprays. The trunk
+/// and its relays (pa 0) are untouched; `set_point` is returned unchanged when off.
+pub fn light_set_point(
+    set_point: f64,
+    pa: f64,
+    q: f64,
+    wood_age: f64,
+    v_base: f64,
+    r2: &R2,
+) -> f64 {
+    let Some(erect) = r2.light_set_point else {
+        return set_point;
+    };
+    if !r2.enabled || pa < 1.0 {
+        return set_point;
+    }
+    let span = r2.light_hi - r2.light_lo;
+    let lit = if span > 0.0 {
+        math::max(0.0, math::min(1.0, (q - r2.light_lo) / span))
+    } else if q >= r2.light_hi {
+        1.0
+    } else {
+        0.0
+    };
+    let aged = math::min(
+        1.0,
+        (math::max(0.0, wood_age) + 1.0) / math::max(1.0, r2.light_over),
+    );
+    let u = lit * aged * vigour_gate(v_base, r2);
+    set_point + u * (erect - set_point)
+}
+
 /// How many nodes under an ended apex relay on an axis of physiological age `pa`: the level's
 /// own `relay` (ADR 0037), else r2.relay for pa 0 (ADR 0033), else none.
 pub fn relay_nodes(pa: f64, params: &Params) -> f64 {
@@ -144,14 +288,21 @@ pub fn relay_nodes(pa: f64, params: &Params) -> f64 {
 
 /// The probability that a shoot of physiological age `order` ends in its terminal bud, on a tree
 /// of age `tree_age`: the row's p_term, and with the relay on, at least `relayPTerm` for pa 0 from
-/// `relayAge` on (the leader stops after an age, Troll's and Leeuwenberg's modules).
-pub fn p_term_at(order: f64, tree_age: f64, params: &Params) -> f64 {
+/// `relayAge` on (the leader stops after an age, Troll's and Leeuwenberg's modules), scaled by the
+/// neighbour gate max(0, 1 − relayCrowd·`crowd`) when set, `crowd` the tree's mean R5 shade.
+pub fn p_term_at(order: f64, tree_age: f64, crowd: f64, params: &Params) -> f64 {
     let Some(level) = pa_level(order, &params.r2) else {
         return 0.0;
     };
     let r2 = &params.r2;
     if relay_on(params) && order == 0.0 && tree_age >= r2.relay_age {
-        return math::max(level.p_term, r2.relay_p_term);
+        // The crowding gate: a leader beside other crowns keeps growing (shade avoidance
+        // keeps apical dominance); a free-standing one ends at relay_p_term.
+        let gate = match r2.relay_crowd {
+            Some(k) => math::max(0.0, 1.0 - k * crowd),
+            None => 1.0,
+        };
+        return math::max(level.p_term, r2.relay_p_term * gate);
     }
     level.p_term
 }
@@ -164,9 +315,10 @@ pub fn terminates(
     birth_id: f64,
     season: f64,
     tree_age: f64,
+    crowd: f64,
     params: &Params,
 ) -> bool {
-    let p_term = p_term_at(order, tree_age, params);
+    let p_term = p_term_at(order, tree_age, crowd, params);
     if p_term <= 0.0 {
         return false;
     }
@@ -435,11 +587,17 @@ mod tests {
             "",
         );
         let ids: Vec<f64> = (0..2000).map(|i| i as f64).collect();
-        assert!(!ids.iter().any(|&id| terminates(0.0, 0.0, id, 3.0, 0.0, &p)));
-        assert!(ids.iter().all(|&id| terminates(1.0, 0.0, id, 3.0, 0.0, &p)));
+        assert!(
+            !ids.iter()
+                .any(|&id| terminates(0.0, 0.0, id, 3.0, 0.0, 0.0, &p))
+        );
+        assert!(
+            ids.iter()
+                .all(|&id| terminates(1.0, 0.0, id, 3.0, 0.0, 0.0, &p))
+        );
         let half = ids
             .iter()
-            .filter(|&&id| terminates(2.0, 0.0, id, 3.0, 0.0, &p))
+            .filter(|&&id| terminates(2.0, 0.0, id, 3.0, 0.0, 0.0, &p))
             .count() as f64
             / ids.len() as f64;
         assert!(half > 0.45 && half < 0.55, "{half}");
@@ -463,15 +621,15 @@ mod tests {
     fn ends_the_leader_from_relay_age_with_relay_p_term() {
         let rows = [r#"{"pTerm":0}"#, r#"{"pTerm":0.2}"#];
         let p = with_r2(&rows, r#""relay":2,"relayAge":30,"relayPTerm":0.7"#);
-        assert_eq!(p_term_at(0.0, 29.0, &p), 0.0);
-        assert_eq!(p_term_at(0.0, 30.0, &p), 0.7);
-        assert_eq!(p_term_at(1.0, 30.0, &p), 0.2); // only pa 0 relays
+        assert_eq!(p_term_at(0.0, 29.0, 0.0, &p), 0.0);
+        assert_eq!(p_term_at(0.0, 30.0, 0.0, &p), 0.7);
+        assert_eq!(p_term_at(1.0, 30.0, 0.0, &p), 0.2); // only pa 0 relays
         let off = with_r2(&rows, r#""relayAge":30,"relayPTerm":0.7"#); // relay absent: off
-        assert_eq!(p_term_at(0.0, 50.0, &off), 0.0);
+        assert_eq!(p_term_at(0.0, 50.0, 0.0, &off), 0.0);
         let ids: Vec<f64> = (0..2000).map(|i| i as f64).collect();
         let ended = ids
             .iter()
-            .filter(|&&id| terminates(0.0, 0.0, id, 3.0, 40.0, &p))
+            .filter(|&&id| terminates(0.0, 0.0, id, 3.0, 40.0, 0.0, &p))
             .count() as f64
             / ids.len() as f64;
         assert!(ended > 0.65 && ended < 0.75, "{ended}");
@@ -775,5 +933,176 @@ mod tests {
             .map(|i| t.m.axis[i])
             .collect();
         assert!(axes.len() > 5, "{axes:?}"); // many relay axes, all order 0
+    }
+
+    #[test]
+    fn a_leader_grown_at_full_vigour_ends_and_its_top_laterals_leave_at_the_fork_angle() {
+        // The vigour fork in growth (season.rs grow_buds): a pa-0 shoot whose bud got v ≥ forkAt·
+        // full ends its apex, and the laterals on its top `relay` nodes are re-aimed to forkAngle
+        // from the shoot. Below the threshold the leader grows on (relayPTerm 0: no age relay).
+        let fork = |v: f64| {
+            let p = with_r2(
+                &[r#"{"generator":"spiral"}"#, r#"{"generator":"none"}"#],
+                r#""relay":2,"relayAge":0,"forkAt":1.3,"forkAngle":30"#,
+            );
+            let mut t = Tree::new(0, 10.0, 0.5);
+            crate::principles::c1::plant_seedling(&mut t, &p, 0.0, 0.0);
+            t.ensure_scratch();
+            let before = t.b.len();
+            for j in 0..before {
+                t.b.v[j] = v;
+            }
+            crate::season::grow_buds(&mut t, &p, 1.0);
+            let full = p.c1.max_metamers_per_shoot;
+            let apex = (before..t.b.len())
+                .find(|&j| t.b.slot[j] == slot::MAIN && t.m.order[t.b.metamer[j] as usize] == 0)
+                .expect("a new leader bud");
+            // The leader's shoot: this season's order-0 metamers (the seedling's lateral grows
+            // too, as order 1); its top two nodes (or as many as it has) carry the arms.
+            let leader: Vec<usize> = (0..t.m.len())
+                .filter(|&i| t.m.order[i] == 0 && t.m.birth_season[i] == 1)
+                .collect();
+            let top = &leader[leader.len().saturating_sub(2)..];
+            let arms: Vec<f64> = (before..t.b.len())
+                .filter(|&j| t.b.slot[j] != slot::MAIN && top.contains(&(t.b.metamer[j] as usize)))
+                .map(|j| math::acos(t.b.hy[j]) * (180.0 / std::f64::consts::PI))
+                .collect();
+            (t.b.state[apex], arms, 1.3 * full)
+        };
+        let (state, arms, threshold) = fork(5.0);
+        assert!(5.0 >= threshold);
+        assert_eq!(state, bud::TERMINATED);
+        assert!(!arms.is_empty());
+        for a in &arms {
+            assert!((a - 30.0).abs() < 1e-6, "an arm at {a}°");
+        }
+        let (state, _, threshold) = fork(1.0);
+        assert!(1.0 < threshold);
+        assert_ne!(state, bud::TERMINATED);
+    }
+
+    #[test]
+    fn the_relay_gates_signal_is_zero_alone_and_positive_among_neighbours() {
+        // phase_sample's s̄: the mean of R5's neighbour shade over the tree's metamers. A tree
+        // alone in the open reads 0; the middle of three trees 6 cells apart reads more.
+        use crate::world::World;
+        let world = |xs: &str| {
+            let p = crate::testing::preset(
+                "oakOpen",
+                &format!(r#"{{"trees":[{xs}],"species":{{"oak":{{"r2":{{"relayCrowd":10}}}}}}}}"#),
+            );
+            let mut w = World::new(p);
+            w.run(25, &[]);
+            w
+        };
+        let alone = world(r#"{"x":80,"species":"oak"}"#);
+        assert_eq!(alone.trees[0].relay_crowd, 0.0);
+        let row =
+            world(r#"{"x":74,"species":"oak"},{"x":80,"species":"oak"},{"x":86,"species":"oak"}"#);
+        assert!(
+            row.trees[1].relay_crowd > 0.0,
+            "{}",
+            row.trees[1].relay_crowd
+        );
+    }
+
+    #[test]
+    fn the_relay_gate_keeps_the_leader_of_a_tree_among_neighbours() {
+        let rows = [r#"{"pTerm":0}"#, r#"{"pTerm":0.2}"#];
+        let p = with_r2(
+            &rows,
+            r#""relay":2,"relayAge":15,"relayPTerm":0.4,"relayCrowd":10"#,
+        );
+        assert_eq!(p_term_at(0.0, 20.0, 0.0, &p), 0.4); // alone in the open: the full relay
+        assert!((p_term_at(0.0, 20.0, 0.05, &p) - 0.2).abs() < 1e-12); // half shaded: half
+        assert_eq!(p_term_at(0.0, 20.0, 0.2, &p), 0.0); // among neighbours: the leader holds
+        assert_eq!(p_term_at(1.0, 20.0, 0.2, &p), 0.2); // a limb keeps its row's pTerm
+        let off = with_r2(&rows, r#""relay":2,"relayAge":15,"relayPTerm":0.4"#);
+        assert_eq!(p_term_at(0.0, 20.0, 0.2, &off), 0.4); // no gate: age alone
+    }
+
+    #[test]
+    fn forks_a_leader_only_at_full_vigour_with_the_relay_on() {
+        let rows = [r#"{}"#, r#"{}"#];
+        let p = with_r2(&rows, r#""relay":2,"relayAge":10,"forkAt":1.3"#);
+        let full = p.c1.max_metamers_per_shoot;
+        let v = 1.3 * full;
+        assert!(vigour_forks(0.0, v, full, 20.0, &p));
+        assert!(!vigour_forks(0.0, v - 0.01, full, 20.0, &p)); // below the threshold
+        assert!(!vigour_forks(1.0, v, full, 20.0, &p)); // only pa 0 forks
+        assert!(!vigour_forks(0.0, v, full - 0.5, 20.0, &p)); // the juvenile cap still holds
+        assert!(!vigour_forks(0.0, v, full, 5.0, &p)); // before relayAge
+        let no_relay = with_r2(&rows, r#""forkAt":1.3"#);
+        assert!(!vigour_forks(0.0, v, full, 20.0, &no_relay));
+        let off = with_r2(&rows, r#""relay":2"#);
+        assert!(!vigour_forks(0.0, 100.0, full, 20.0, &off));
+    }
+
+    #[test]
+    fn an_arm_holds_the_inclination_of_its_base_and_the_trunk_does_not() {
+        use crate::testing::{LEFT, metamer};
+        use std::f64::consts::FRAC_PI_2;
+        let p = with_r2(&[r#"{}"#, r#"{}"#], r#""relay":2,"forkAt":1.3"#);
+        let mut t = Tree::new(0, 10.0, 0.5);
+        let trunk = metamer(&mut t, -1, slot::MAIN, FRAC_PI_2, 1.0, 0.02, 0.0);
+        // An arm leaving at 2.5 rad in the plane (53.2° from vertical), relayed to pa 0, then
+        // bending to 3.0 rad: both its metamers hold its base's 53.2°.
+        let base = metamer(&mut t, trunk as i32, LEFT, 2.5, 1.0, 0.02, 0.0);
+        let next = metamer(&mut t, base as i32, slot::MAIN, 3.0, 1.0, 0.02, 0.0);
+        t.m.pa_shift[base] = 1;
+        t.m.pa_shift[next] = 1;
+        let want = (2.5 - FRAC_PI_2).to_degrees();
+        for m in [base, next] {
+            let a = arm_set_point(&t, false, 0.0, m, &p).unwrap();
+            assert!((a - want).abs() < 1e-9, "{a} vs {want}");
+        }
+        assert_eq!(arm_set_point(&t, true, 0.0, trunk, &p), None); // the trunk stays upright
+        assert_eq!(arm_set_point(&t, false, 1.0, base, &p), None); // a limb keeps its level
+        let off = with_r2(&[r#"{}"#, r#"{}"#], r#""relay":2"#);
+        assert_eq!(arm_set_point(&t, false, 0.0, base, &off), None);
+    }
+
+    #[test]
+    fn lit_wood_of_a_vigorous_tree_rises_and_shaded_wood_stays_level() {
+        let rows = [r#"{}"#, r#"{}"#, r#"{"setPoint":95}"#];
+        let p = with_r2(
+            &rows,
+            r#""lightSetPoint":35,"lightLo":0.2,"lightHi":0.8,"lightOver":3,"vigourTreeLo":3000,"vigourTreeHi":10000"#,
+        );
+        let r2 = &p.r2;
+        let open = 20000.0;
+        // Old wood in full light takes the erect set point; in shade, its level's.
+        assert!((light_set_point(95.0, 2.0, 0.9, 5.0, open, r2) - 35.0).abs() < 1e-12);
+        assert_eq!(light_set_point(95.0, 2.0, 0.1, 5.0, open, r2), 95.0);
+        assert!((light_set_point(95.0, 2.0, 0.5, 5.0, open, r2) - 65.0).abs() < 1e-12); // halfway
+        // This season's shoot only a third of the way (lightOver 3): it spreads, its base rises.
+        assert!((light_set_point(95.0, 2.0, 0.9, 0.0, open, r2) - 75.0).abs() < 1e-12);
+        // A stand member (v_base below the gate), the trunk's level, and the rule off: unchanged.
+        assert_eq!(light_set_point(95.0, 2.0, 0.9, 5.0, 2000.0, r2), 95.0);
+        assert_eq!(light_set_point(0.0, 0.0, 0.9, 5.0, open, r2), 0.0);
+        let off = with_r2(&rows, "");
+        assert_eq!(light_set_point(95.0, 2.0, 0.9, 5.0, open, &off.r2), 95.0);
+    }
+
+    #[test]
+    fn weak_wood_of_a_vigorous_tree_loses_apical_control() {
+        let rows = [r#"{}"#];
+        let p = with_r2(
+            &rows,
+            r#""vigourShare":0.3,"vigourLambda":0.03,"vigourTreeLo":3000,"vigourTreeHi":10000"#,
+        );
+        assert!(vigour_drop_on(&p.r2));
+        assert_eq!(vigour(600.0, 1000.0, &p.r2), 1.0); // 60% of the tree: fully vigorous
+        assert!((vigour(150.0, 1000.0, &p.r2) - 0.5).abs() < 1e-12);
+        assert_eq!(vigour(5.0, 0.0, &p.r2), 0.0);
+        assert_eq!(vigour_gate(2000.0, &p.r2), 0.0); // a stand member's production
+        assert!((vigour_gate(6500.0, &p.r2) - 0.5).abs() < 1e-12);
+        assert_eq!(vigour_gate(20000.0, &p.r2), 1.0); // an open-grown crown
+        let ungated = with_r2(&rows, r#""vigourShare":0.3,"vigourLambda":0.03"#);
+        assert_eq!(vigour_gate(10.0, &ungated.r2), 1.0);
+        assert!(!vigour_drop_on(
+            &with_r2(&rows, r#""vigourLambda":0.03"#).r2
+        ));
+        assert!(!vigour_drop_on(&with_r2(&rows, "").r2));
     }
 }

@@ -1,8 +1,8 @@
 # Status
 
-_Last updated: 2026-11-01 02:30 (overnight: budget holds; form re-run under ADR 0032 with provisional stand-first picks; hornbeam pilot failed (1 of 6), no overnight fit. Read code/2026-10-31-species-round5/overnight.md)_
+_Last updated: 2026-11-02 (the fresh-look beech decided: ADR 0039–0042 accepted for beech, 0043 rejected; round 2's brief `docs/plans/2026-11-02-beech-round2.md`; merging `claude/beech-overnight` is the user's)_
 
-**3D port** on the branch `3d-port` (work branches open PRs into it). ADR 0024–0029, 0031 and 0032 accepted, 0030 rejected. The live site stays on 0.14.0 (2D) until the bar below is met.
+**3D port** on the branch `3d-port` (work branches open PRs into it). ADR 0024–0029, 0031, 0032 and 0039–0042 accepted, 0030 and 0043 rejected. The live site stays on 0.14.0 (2D) until the bar below is met.
 
 **Done means** (user): the mixed wood looks right in the garden in depth, within budget on the phone, with floor, H/D and crown base as 20-seed evidence. C3–C6 follow after shipping.
 
@@ -14,10 +14,11 @@ _Last updated: 2026-11-01 02:30 (overnight: budget holds; form re-run under ADR 
 - **Species harness (rounds 4–5):** closed stand (LAI, limb crown ratio, at 60 and 100); shade house 10 roofs; `lone100` (the reported shape at 100); `limbElevation` (form.rs); `m27_rescore.py`; line-up panels (`code/2026-10-31-species-round4/panel-*`, round `form`).
 - **Round 5 (ADR 0029, accepted):** targets files hold `[form]` (the picks, dated 2026-10-31), `[[formRange]]`, `[[report]]` (shape, never scored); the fit is eight physiology knobs (T_rel fixed, ADR 0032). `fit_lm.py` logs the shape at every accepted step (`<sp>-steps.csv`) and flags a fit nearer a gallery reject than the hand form (`shapeFlag`); `m27_fit.py --pilot` stops after LM and draws the panel.
 - **Form sweep and grids** (`code/2026-10-31-species-round5/form-{sweep,grid}.py`): one knob at a time, then the user's 4 × 4 × 3 grids and the posture sweep (birch, oak), seed 1; `figures/2026-10-31-form-{sweep,grid,posture}-<sp>-{60,100}.png`. `postureSetPoint` is the tenth form knob (ADR 0029, `[form]`).
+- **Beech, fresh look (ADR 0039–0042, `claude/beech-overnight`):** relay gate, vigour fork and arm hold, vigour drop, light orthotropy; no own-crown pruning. 20 seeds: guard 8 of 20 (today 6), lone at 100 H 120, W/H 1.50. Real renderer: the lone beech is named beech, the stand is not.
 - **Gallery** (`analysis/fit/gallery/`): round 2's spindles (beech, birch), round 3's beech cone, oak and hornbeam parasols, round 4's birch pagoda; `m27_gallery.py`. Oak and hornbeam pass the check; beech's cone sits within the noise of its round-2 form (1.17 against 0.77).
 
 ## Next
-1. **The user:** read `overnight.md`, then the stand panels at 100 (`figures/2026-10-31-species-panel-<sp>-form-adr32.png`). Re-pick hornbeam and maple (the rule's columns halve their stands' LAI); the best-outline alternatives are in the log.
+1. **The user:** merge `claude/beech-overnight` into `3d-port` (it adopts the round's beech for the garden). Then round 2 (its brief): track C on oak's and fir's bark and leaf, with blind-test plates at one scale; then the beech stand's leafy boles and wavy stems, diagnosed before any change.
 2. **A new hornbeam pilot** on the re-picked form, under the stand-death penalty; accept by measured targets in band and stand alive ≥ 0.8 at 60 and 100. Then the overnight for the eight (`--out round5`), verification, panels, the gallery check at six seeds (`m27_gallery.py --seeds 6`).
 3. **I3 steps 3–6** and C2's floor against LAI; then C3–C6 as hold-outs; release; the site's PR. R2's reiteration after shipping (ADR 0031).
 
@@ -26,8 +27,6 @@ _Last updated: 2026-11-01 02:30 (overnight: budget holds; form re-run under ADR 
 - **Birch's pick stops growing after 60** (H 113 → 112, stand crown ratio 0.17): the form or the fit?
 - **The flat top** (ADR 0031, accepted): in growth, not pruning; the fix is R2's reiteration (Troll's model), after shipping.
 - **Hornbeam pilot** (`fits/round5-pilot`): under the new stand-at-100 penalty it loses to its start (24.7 vs 8.3); a re-run of the pilot is next.
-- **`limbElevation` reads back the set point** for most species (oak 31° = 90 − 58.6 in every row but setPoint's): little information beyond the knob itself.
-- At 100 most beech sweep cells reach the woods' top (200): the flat tops there are the ceiling.
 
 ## Known issues
 - **Memory, 160-cell plate + specimen** (ADR 0026's 256 MB): 312.5 MB before ADR 0032, 342.5 MB after, at 200 seasons. I3's open problem; the phone's 66-cell plate is 74.9 MB.

@@ -139,6 +139,10 @@ pub struct C5 {
     pub g: f64,
     pub t_rel: f64,
     pub top_quantile: f64,
+    /// Own-crown pruning (fresh-look beech, repair): a lateral whose light per metamer is below
+    /// g·Tvig·Q_top is shed too, g the tree's vigour gate (r2.vigourTreeLo/Hi; 1 when unset).
+    /// 0 or absent: off.
+    pub t_vig: f64,
 }
 
 #[derive(Clone, Debug)]
@@ -236,6 +240,37 @@ pub struct R2 {
     /// From this tree age (seasons) a pa-0 terminal ends with probability `relay_p_term`.
     pub relay_age: f64,
     pub relay_p_term: f64,
+    /// The vigour fork (Nicolini & Caraglio 1994: beech forks where growth is fastest): a pa-0
+    /// shoot whose bud received v ≥ `forkAt`·c1.maxMetamersPerShoot ends its terminal bud, so the
+    /// relay (r2.relay nodes) turns the season's apex into co-dominant arms. 0 or absent: off.
+    pub fork_at: f64,
+    /// The fork arms' angle from the ended apex's heading, degrees (absent: the laterals' own β).
+    pub fork_angle: Option<f64>,
+    /// The relay's neighbour gate (fresh-look beech): a pa-0 apex ends by `relay_p_term`·max(0,
+    /// 1 − k·s̄), s̄ the tree's mean R5 neighbour shade over its metamers (0 alone in the open).
+    /// Absent: off, the relay fires by age alone.
+    pub relay_crowd: Option<f64>,
+    /// The vigour drop (fresh-look beech): the share s of the tree's resource v_base at which a
+    /// node is fully vigorous, u = min(1, (v_in / v_base) / s). 0 or absent: off.
+    pub vigour_share: f64,
+    /// λ falls by g·(1 − u)·vigourLambda at a node: weak wood loses apical control (absent: 0).
+    pub vigour_lambda: f64,
+    /// The tree's own vigour gate g = clamp((v_base − lo) / (hi − lo)), so a tree whose whole
+    /// production stays small (a stand member, a suppressed tree) is untouched; g = 1 when
+    /// `vigour_tree_hi` ≤ `vigour_tree_lo` (both absent).
+    pub vigour_tree_lo: f64,
+    pub vigour_tree_hi: f64,
+    /// Light orthotropy (fresh-look beech, repair): a new shoot of pa ≥ 1 takes a growth set
+    /// point moved from its level's toward this one (degrees from vertical) by its bud's light,
+    /// fully at `light_hi` and above, not at all at `light_lo` and below (Nicolini & Caraglio
+    /// 1994: vertical laterals are more frequent in full light; Nicolini 2000: axes under cover
+    /// are plagiotropic). Absent: off.
+    pub light_set_point: Option<f64>,
+    pub light_lo: f64,
+    pub light_hi: f64,
+    /// Light orthotropy's wood-age ramp: wood straightens fully at this age, seasons (absent: 1,
+    /// so even this season's shoot does).
+    pub light_over: f64,
 }
 
 #[derive(Clone, Debug)]
@@ -450,6 +485,7 @@ impl Params {
                     g: num(g, "g"),
                     t_rel: num(g, "Trel"),
                     top_quantile: num(g, "topQuantile"),
+                    t_vig: opt(g, "Tvig").unwrap_or(0.0),
                 }
             },
             c6: {
@@ -523,6 +559,17 @@ impl Params {
                 relay: opt(r2, "relay").unwrap_or(0.0),
                 relay_age: opt(r2, "relayAge").unwrap_or(0.0),
                 relay_p_term: opt(r2, "relayPTerm").unwrap_or(0.0),
+                fork_at: opt(r2, "forkAt").unwrap_or(0.0),
+                fork_angle: opt(r2, "forkAngle"),
+                relay_crowd: opt(r2, "relayCrowd"),
+                vigour_share: opt(r2, "vigourShare").unwrap_or(0.0),
+                vigour_lambda: opt(r2, "vigourLambda").unwrap_or(0.0),
+                vigour_tree_lo: opt(r2, "vigourTreeLo").unwrap_or(0.0),
+                vigour_tree_hi: opt(r2, "vigourTreeHi").unwrap_or(0.0),
+                light_set_point: opt(r2, "lightSetPoint"),
+                light_lo: opt(r2, "lightLo").unwrap_or(0.0),
+                light_hi: opt(r2, "lightHi").unwrap_or(1.0),
+                light_over: opt(r2, "lightOver").unwrap_or(1.0),
             },
             r3: R3 {
                 enabled: flag(r3, "enabled"),

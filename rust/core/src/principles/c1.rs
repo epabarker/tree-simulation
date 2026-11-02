@@ -161,7 +161,15 @@ pub fn form_terminal_bud(tree: &mut Tree, m: usize, params: &Params, season: f64
     let i = add_bud(tree, m, slot::MAIN, h, l, 0.0, order);
     let pa = order - tree.m.pa_shift[m] as f64;
     let birth = tree.m.birth_id[m] as f64;
-    if terminates(pa, tree.id as f64, birth, season, tree.age, params) {
+    if terminates(
+        pa,
+        tree.id as f64,
+        birth,
+        season,
+        tree.age,
+        tree.relay_crowd,
+        params,
+    ) {
         tree.b.state[i] = bud::TERMINATED;
     }
 }

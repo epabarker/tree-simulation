@@ -361,6 +361,62 @@ Agreement: Fleiss' kappa 0.45 (set 3) and 0.46 (set 4), against 0.60 in the base
 
    Either is a decision for track E and the user.
 
+## A model finding: the beech stand's stems are too slender
+
+The stand's H/D at 100 is 101–110: DBH 29–31 cm at 31–37 m, by the diagnosis above. A real pure
+stand's crop trees reach about 73 (Štefančík 2017: 32.4–34.0 m at about 92 years, DBH ≥ 45 cm). The
+renderer draws stems at the model's own radius, so this is the pipe model's girth (ADR 0027:
+about half a real stand's), not the drawing's. The `girth` option corrects it in the picture only.
+Track E has taken it out of later sets: it moved hornbeam's stand the wrong way, and the deficit is
+a model question for the user.
+
+## Set 5: bark by light (a pilot; not named)
+
+Track E's set 5 asked for one view option:
+- beech's bark base at a middle tone (about 27% reflectance, `#8f918e`);
+- every stem's tone darkened by the shade on its metamer, on every species, with `clearBole` on and
+  girth off.
+
+The physical reading is that a bole under a closed canopy is in shade and reads mid grey, while a
+sunlit limb on an open-grown tree reads pale.
+
+- **The option** (83b39db; `ViewOptions.barkLight`, the lab's `&barkLight=0.5`, off by default):
+  - beech's base tone is `data-bark="lit"` (`#8f918e`, old bark `#838582`);
+  - each stem's luminance is scaled in linear light by 1 − 0.5 × shade;
+  - shade is the snapshot's light field at the cell of the metamer's base (C2: 1 − mean Q/C over the
+    slab's depth).
+
+  Strength 0.5 is set so that full shade halves a stem's luminance, taking the 27% base to about
+  14%, Pilarski's measured range. It is WebGL2 only, and only where the snapshot carries the field:
+  the lab's does, the garden asks for none.
+- **Why the field and not `s.light`:** the snapshot's `light` is the subtree's mean
+  (`q_sum / n_sum`, snapshot.rs). For old wood that is the crown above it, not the shade on the stem.
+- **Neither measure separates the two cases the rule needs.** The factor is 1 − 0.5 × shade, so
+  0.5 is full shade and 1 is open sky. Medians on seed 1 at 100:
+
+  | plate | clear bole (order 0, below the limb crown base) | limbs (orders 1–2, older than 5) | shoots (age ≤ 1) |
+  |---|---|---|---|
+  | beech stand, the field | 0.53 | 0.60 | 0.78 |
+  | beech lone, the field | 0.53 | **0.52** | 0.81 |
+  | beech stand, `s.light` instead | 0.64 | 0.64 | 0.50 |
+  | beech lone, `s.light` instead | 0.62 | **0.56** | 0.50 |
+
+  - The field gives the lone tree's limbs the same deep shade as the stand's boles. An open-grown
+    crown this dense is dark inside, and an average over the slab's depth cannot tell the sunlit
+    outer limbs from the inner ones.
+  - `s.light` points the wrong way: the lone tree's limbs come out darker than the stand's boles.
+
+  So the rule would draw the lone beech's limbs at about `#5f615e`. That is darker than set 3's
+  measured bark, which already turned the lone tree into oak for 15 of 18 first guesses.
+- **Not named.** The beech's nine plates were drawn under `&clearBole&barkLight=0.5` as a pilot
+  (below, bottom row). The lone tree's limbs come out as dark as under the measured bark (middle row).
+  Five fresh namers were not spent on a set whose lone tree this measurement already predicts. The
+  option is committed and the set can be run as specified if track E wants the names. Setting a
+  stem's shade by the light reaching it from the side, the open-grown tree's case, would need a field
+  resolved in depth, a core change, and is not proposed here.
+
+![Beech: baseline, measured bark, bark by light](figures/2026-11-02-blind-test-v3-barklight.jpg)
+
 ## Caveats
 
 - **The namers are three runs of one model,** not three people, and each answers all 54 plates in
@@ -402,7 +458,13 @@ python3 docs/experiments/code/2026-11-02-blind-test-v3/shuffle.py <set3> ~/blind
 python3 docs/experiments/code/2026-11-02-blind-test-v3/shuffle.py <set4> ~/blind-plates-v3d candidate "beech (accepted build, clearBole, girth 1.45, measured bark)" "clearBole, girth 1.45"
 python3 docs/experiments/code/2026-11-02-blind-test-v3/tally.py docs/experiments/code/2026-11-02-blind-test-v3/bark docs/experiments/code/2026-11-02-blind-test-v3
 python3 docs/experiments/code/2026-11-02-blind-test-v3/tally.py docs/experiments/code/2026-11-02-blind-test-v3/candidate docs/experiments/code/2026-11-02-blind-test-v3
+# set 5's pilot: the light factors by part, then beech's nine plates under bark by light
+PW_FROM=<scratch>/pw/x.js node docs/experiments/code/2026-11-02-blind-test-v3/barklight.mjs http://localhost:5181/
+SOURCES=beech VIEW='&clearBole&barkLight=0.5' PW_FROM=<scratch>/pw/x.js node docs/experiments/code/2026-11-02-blind-test-v3/shots.mjs http://localhost:5181/ <renders-light> 3
 ```
+
+Stop the dev server before `npm run check`: on this laptop two slow tests time out at 30 s while it
+runs.
 
 The trees are deterministic in the core (the seeds and patches fix them); the plates' pixels depend
 on the GPU and the moment of the shot. The namers' replies are not reproducible.

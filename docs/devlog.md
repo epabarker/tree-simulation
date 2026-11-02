@@ -18,9 +18,14 @@ Newest first. One entry per session or milestone: what changed, why, surprises, 
     - `data-bark="measured"` gives beech's bark the measured ≈ 15% reflectance (`#777a79`/`#6b6e6e`, Pilarski et al. 2008).
   - Results: the bark moves the stand to beech (6 of 9 alone, 9 of 9 with girth and clearBole), but the lone beech reads as oak (1 of 18 alone, 8 of 18 with all three), so nothing passes. Birch is unchanged (27 of 27); hornbeam's stand drops to 3 of 9 under girth.
   - The same plates named by different namer sets differ by up to 6 of 9.
+- **Set 5 (track E): bark by light, a pilot, not named.**
+  - `&barkLight=0.5` gives beech a lit base tone (`#8f918e`) and dims every stem by the light field's shade at its base, in linear light. WebGL2 only, off by default.
+  - Neither light measure separates a stand's bole from a lone tree's limbs. The field gives both about 0.52; `s.light`, a subtree mean, makes the lone limbs darker.
+  - Beech's nine plates were drawn as a pilot, and five namers were not spent.
+  - The stand's H/D (101–110 against ≈ 73) is recorded as a model finding.
 - **Surprises:**
   - The oak stand's identical plates were named oak 6, 6 and then 0 of 9 by three sets of namers.
-  - Two slow tests (one core-only) time out at 30 s when the machine is loaded; they pass on a quiet re-run.
+  - Two slow tests (one core-only) time out at 30 s while a vite dev server runs alongside. The committed HEAD failed the same way; with the server stopped, the check passes.
   - The lab's chart row grows with a stand's trees and shrank its canvas, and so its scale, until the shot script pinned it.
   - One namer transposed two adjacent rows; they are scored as given.
   - v2's note overstated its namers' seed consistency (53 of 54, not 54).

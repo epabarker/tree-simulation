@@ -180,7 +180,7 @@ export const FITTED_FLORA = {
       sigmaBreak: 7000,
       ground: true,
     },
-    r6: { enabled: true, qMin: 0.01257, leafArea: 2.474 },
+    r6: { enabled: true, qMin: 0.01257, leafArea: 2.474, lifespan: 20 },
     o4: { cSeed: 10, d: 12, qEst: 0.03, pEst: 0.3, m0: 0.002 },
     c3: { mode: "bh", lambda: 0.5, alpha: 2.959 },
     c6: { enabled: true, n: 2, r0: 0.003096 },

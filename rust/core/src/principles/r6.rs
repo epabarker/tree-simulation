@@ -2,7 +2,15 @@
 //! Q ≥ Q_ss becomes a leafy short shoot; foliage follows shoot type (active 1, short shoot a_ss,
 //! dormant 0), and a short shoot's Q counts a_ss times in the basipetal sum.
 //!
-//! Params: r6.enabled, r6.qMin (Q_ss), r6.leafArea (a_ss).
+//! A lifespan for short shoots (ADR 0044, proposed; beech round 2, 2026-11-02): with `lifespan` L,
+//! a short shoot on wood older than L seasons rests as a leafless dormant bud instead, so R4 ages
+//! it toward L_dorm and aborts it (or releases it). Without it a short shoot on the trunk lives
+//! for ever: it is shed only with its branch (§R6.4) and the trunk is no branch, so a closed
+//! stand's boles stay leafy to the ground (docs/experiments/2026-11-02-beech-round2-stand-
+//! diagnosis.md). The clock is the wood's age, which a short shoot formed on young wood shares.
+//! Absent: off, bit-identical.
+//!
+//! Params: r6.enabled, r6.qMin (Q_ss), r6.leafArea (a_ss), r6.lifespan (L, optional).
 
 use crate::params::R6;
 use crate::tree::bud;
@@ -34,6 +42,11 @@ pub fn resting_state(q: f64, r6: &R6) -> u8 {
     } else {
         bud::DORMANT
     }
+}
+
+/// Whether a bud resting as a short shoot on wood `wood_age` seasons old has outlived its lifespan.
+pub fn outlived(state: u8, wood_age: f64, r6: &R6) -> bool {
+    r6.enabled && state == bud::SHORT_SHOOT && r6.lifespan.is_some_and(|l| wood_age > l)
 }
 
 #[cfg(test)]
@@ -118,5 +131,45 @@ mod tests {
         assert_eq!(run(false).0, 0);
         let (short, broke) = run(true);
         assert!(short > 0 && broke > 0);
+    }
+
+    #[test]
+    fn a_short_shoot_on_wood_older_than_its_lifespan_ends() {
+        let mut r6 = on();
+        assert!(!outlived(bud::SHORT_SHOOT, 50.0, &r6));
+        r6.lifespan = Some(10.0);
+        assert!(!outlived(bud::SHORT_SHOOT, 10.0, &r6));
+        assert!(outlived(bud::SHORT_SHOOT, 11.0, &r6));
+        assert!(!outlived(bud::DORMANT, 11.0, &r6));
+        assert!(!outlived(
+            bud::SHORT_SHOOT,
+            11.0,
+            &R6 {
+                lifespan: Some(10.0),
+                ..off()
+            }
+        ));
+    }
+
+    #[test]
+    fn with_a_lifespan_no_short_shoot_rests_on_old_wood() {
+        // A lone tree for 40 seasons: without a lifespan short shoots sit on wood of every age;
+        // with L 10 none sits on wood older than 10 (R4 then ages the dormant bud it became).
+        let run = |patch: &str| {
+            let mut world = World::new(preset("skyTree", patch));
+            for _ in 0..40 {
+                world.step(&mut |_| {});
+            }
+            let t = &world.trees[0];
+            let season = world.season;
+            (0..t.b.len())
+                .filter(|&i| t.b.state[i] == bud::SHORT_SHOOT)
+                .map(|i| season - t.m.birth_season[t.b.metamer[i] as usize] as f64)
+                .fold(0.0, f64::max)
+        };
+        let base = r#"{"r6":{"enabled":true,"qMin":0.05}, "r4":{"enabled":true}}"#;
+        assert!(run(base) > 12.0);
+        let with = r#"{"r6":{"enabled":true,"qMin":0.05,"lifespan":10}, "r4":{"enabled":true}}"#;
+        assert!(run(with) <= 11.0);
     }
 }

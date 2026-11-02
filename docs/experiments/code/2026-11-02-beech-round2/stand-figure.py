@@ -30,9 +30,11 @@ SEEDS = (1, 2, 3)
 
 def main() -> None:
     today, accepted, out = Path(sys.argv[1]), Path(sys.argv[2]), Path(sys.argv[3])
+    # Optional row labels (default: today's beech above the accepted build).
+    names = sys.argv[4].split(",") if len(sys.argv) > 4 else ["today", "accepted"]
     fig, axes = plt.subplots(2, len(SEEDS), figsize=(5.2 * len(SEEDS), 2 * 5.6))
     ratios = {}
-    for r, (label, d) in enumerate((("today", today), ("accepted", accepted))):
+    for r, (label, d) in enumerate(zip(names, (today, accepted))):
         rs = []
         for c, s in enumerate(SEEDS):
             m, b, mt, _, _ = render.load(d / f"stand-{s}", 100)

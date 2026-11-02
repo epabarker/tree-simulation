@@ -53,3 +53,35 @@ uv run --project analysis python docs/experiments/code/2026-11-02-beech-round2/s
 ```
 
 The runs come from `evidence20.py --label today --off` and `--label repair-notvig --assign '{"c5.Tvig": 0}'` on the review's build (`docs/experiments/code/2026-11-01-fresh-look-beech/`). The accepted build in `3d-port` has the same beech without `c5.Tvig`.
+
+## Step 2: the lifespan rule at 20 seeds (ADR 0044, proposed)
+
+The user chose to build both fixes: the growth rule (here) and the renderer's `clearBole` (track C, [blind test v3](https://github.com/epabarker/tree-simulation/blob/claude/foliage/docs/experiments/2026-11-02-blind-test-v3.md)). The runs are `r6.lifespan` L on the accepted build's beech, using `evidence20.py --assign '{"c5.Tvig": 0, "r6.lifespan": L}'` on seeds 1–20 (outputs `runs/round2/life{10,20,40}`). The criteria are the review's, fixed before its runs.
+
+| 20 seeds | today | accepted | L 40 | L 20 | L 10 |
+|---|---|---|---|---|---|
+| guard: all four (alive, floor, LAI 6–8, H/D) | 6 | 8 | **12** | **11** | 0 |
+| guard: alive ≥ 10 of 12 | 20 | 19 | 17 | 18 | 14 |
+| guard: floor 3–5% | 19 | 16 | 17 | 14 | 1 |
+| guard: LAI 6–8 | 20 | 11 | 16 | 18 | 2 |
+| guard: H/D 70–110 | 6 | 20 | 20 | 20 | 19 |
+| stand floor, median | 4.3% | 4.0% | 4.1% | 4.8% | 5.7% |
+| stand LAI, median | 7.45 | 7.9 | 7.7 | 7.0 | 5.35 |
+| stand limb crown ratio, median | 0.345 | 0.27 | 0.30 | 0.30 | 0.375 |
+| leaf below the limb crown base, per-tree median (p90) | 6.5% (21%) | 6.9% (31%) | 3.3% (4.8%) | 2.9% (4.4%) | 3.0% (4.4%) |
+| of it, on the trunk's own nodes | 55% | 63% | 0% | 0% | 0% |
+| of it, on branches R4 released later | 17% | 10% | 80% | 47% | 70% |
+| lone 100: leaf below H/6 ≤ 7% | 0 | 5 | 10 | 13 | 6 |
+| lone 100: leaf below H/6, median | 23.5% | 8.4% | 6.7% | 6.7% | 7.8% |
+| lone 100: W/H 1.3–1.5 (photograph) | 0 | 9 | 9 | 9 | 7 |
+| lone 100: H, median | 203 | 120 | 121 | 120 | 122 |
+
+- **L 20–40 clears the trunks and helps the guard.** The trunk's own leaf goes to zero, and the leaf below the crown base halves, with its tail gone (p90 31% → about 5%). The guard passes on 11–12 seeds against the accepted build's 8, mostly because LAI comes down into its band (7.9 → 7.0–7.7). Survival drops a little (alive ≥ 10 of 12 on 17–18 seeds against 19).
+- **L 10 is too short.** It thins the crowns themselves: LAI 5.35, floor 5.7%, and the guard passes on no seed.
+- **The lone tree's skirt thins too.** Its leaf below H/6 falls from 8.4% to 6.7%, and passes the 7% line on 10–13 seeds against 5, with the shape unchanged (H 120, W/H 1.5).
+- **What is left low in the stand is R4's.** At L 40, 80% of the remaining low leaf is on branches released from dormant buds after their node formed: the orange strings in the figure below. These are epicormics, which beech does make when a gap opens. The lifespan also makes more dormant buds on old wood for R4 to release.
+- **It moves the stand's ecology numbers,** so adopting it is the user's decision (ADR 0044). The blind test v3 suggests it will not change the stand's name by itself: hiding the same short shoots in the drawing (`clearBole`) left the stand named birch, from its pale, thin, wavy stems under small crowns.
+
+![The accepted stand and the same with r6.lifespan 40](figures/2026-11-02-beech-round2-stand-lifespan40.png)
+
+_The stand at 100, seeds 1–3: the accepted build (top) and with `r6.lifespan` 40 (bottom). Orange is leaf below the limb crown base._

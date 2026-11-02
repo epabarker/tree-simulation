@@ -2,6 +2,16 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-02: Beech round 2, Part 2: the stand's leafy boles, and a lifespan for short shoots (branch claude/c1-calibration-ustbkz)
+
+- **Diagnosis** ([note](experiments/2026-11-02-beech-round2-stand-diagnosis.md)). The namers' "leafy sprouts" on the beech stand are R6 short shoots that never end: 97% of the leaf below the limb crown base is on short shoots, and 55–63% of it sits on the trunk's own nodes. A short shoot is shed only with its branch, R4 does not age a leafy one, and the renderer draws a pair of rosettes on each. R4's epicormics are not the cause. The boles are about 2% off straight. Today's beech and the accepted build are alike.
+- **ADR 0044 (proposed): `r6.lifespan`.** A short shoot on wood older than L rests as a leafless dormant bud instead. Off by default; no species sets it; goldens unchanged. Results for beech at 20 seeds:
+  - at L 40, the guard passes on 12 of 20 seeds (the accepted build: 8), the trunk's leaf goes to zero, LAI falls 7.9 → 7.7, and the lone tree's leaf below H/6 falls 8.4% → 6.7%;
+  - at L 10 the crowns thin (LAI 5.35).
+  Adoption moves the stand's ecology numbers, so it is the user's.
+- **Track C's blind test v3** (`claude/foliage`; recounted here) uses one scale and three fresh namers, seeds 1–3. The accepted lone beech is beech on 17 of 18 plates; the beech stand reads as silver birch on 18 of 18, still 8 of 9 with `clearBole`; the oak stand is oak, the lone oak hazel or willow (its form).
+- **Disk:** the session's disk filled during the first lifespan runs, which wrote empty files. Old regenerable runs were deleted (the review's garden runs and the superseded 20-seed variants) and the runs repeated.
+
 ## 2026-11-02: The fresh-look beech decided: four rules accepted, own-crown pruning rejected (branch claude/beech-overnight)
 
 - **The user's decisions** on the review and the overnight note ([overnight §4](experiments/2026-11-02-beech-overnight.md)):

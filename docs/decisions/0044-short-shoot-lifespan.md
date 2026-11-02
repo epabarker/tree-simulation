@@ -29,3 +29,18 @@ With `r6.lifespan` = L, a bud that would rest as a short shoot on a metamer whos
 - **Tests:**
   - `a_short_shoot_on_wood_older_than_its_lifespan_ends` (the rule);
   - `with_a_lifespan_no_short_shoot_rests_on_old_wood` (in a world, 40 seasons).
+
+## Evidence (beech, 20 seeds, 2026-11-02)
+[The diagnosis note, step 2](../experiments/2026-11-02-beech-round2-stand-diagnosis.md):
+
+| | accepted | L 40 | L 20 | L 10 |
+|---|---|---|---|---|
+| ecology guard passes | 8 of 20 | 12 | 11 | 0 |
+| stand LAI, median | 7.9 | 7.7 | 7.0 | 5.35 |
+| leaf on the stand's trunks | 63% of the low leaf | 0 | 0 | 0 |
+| lone tree's leaf below H/6 | 8.4% | 6.7% | 6.7% | 7.8% |
+
+- L 20–40 clears the trunks and brings LAI into band.
+- L 10 thins the crowns themselves.
+- What remains low at L 40 is mostly R4's released shoots.
+- **Recommendation, if adopted:** L in 20–40 for beech, pending a sourced lifespan.

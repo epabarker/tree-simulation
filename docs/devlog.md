@@ -2,6 +2,12 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-02: Round 2 merged (PRs #41–#43); the `forest` evidence re-run at shipping; the shipping order
+
+- **The user's look:** the beech on the phone passes. Round 2 is in `3d-port`: ADR 0039–0042 and 0044 for beech, the measured bark, the view options, the WASM gate at 200 kB.
+- **`forest`, 20 seeds, τ 0** ([note](experiments/2026-11-02-forest-evidence.md)): floor 20, H/D 20, crown base 20, plateau 19 of 20 (2026-10-30: 20, 19, 20, 17). The floor at 150 is in band on 19 of 20 (was 8) and release beside gaps fell from 13 trees to 5: the R4 fix and ADR 0032 settled the stand. τ 0.2 reported beside, as before.
+- **The shipping order (the user):** no round-5 fit; one judging pass over the other species on the phone with overrides for misses; I3 steps 3–6 on a fresh track C session; the release and the site's PR. The form gaps (the lone beech's arch, the stand's crown ratio, the lone oak's vase) wait for after the site is live.
+
 ## 2026-11-02: Beech round 2, Part 2: the lone tree's limbs, the latched lift (ADR 0045, proposed, evidence against), track C's blind test v3 (branch claude/c1-calibration-ustbkz; track C on claude/foliage)
 
 - **Why the lone beech reads as oak under a realistic bark** ([note, step 1b](experiments/2026-11-02-beech-round2-stand-diagnosis.md)): the first-order scaffold rises at 36°, but the old second-order wood is level (77°) because it is shaded (ADR 0042 re-reads the light every season), while the lit tips stand at 48°: upturned clumps on level plates.

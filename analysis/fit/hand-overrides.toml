@@ -58,3 +58,8 @@
 "r2.lightLo" = 0.2
 "r2.lightHi" = 0.8
 "r2.lightOver" = 3
+# Round 2 (2026-11-02, ADR 0044): a short shoot on wood older than 20 seasons rests leafless, so the
+# stand's boles lose the spur tufts they kept for ever (the "leafy sprouts" of the blind test). The
+# sources put a beech spur chain at 10–15 years; 15 fails the ecology guard (6 of 20) under the
+# rule's wood-age clock, 20 passes (11 of 20) and clears the trunks. 2026-11-02-beech-round2-stand-diagnosis.md.
+"r6.lifespan" = 20

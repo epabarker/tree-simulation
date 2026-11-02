@@ -26,7 +26,7 @@ use crate::principles::r2::{
 use crate::principles::r3::update_mechanics;
 use crate::principles::r4::{aborts, growth_threshold, light_releases, released_shift};
 use crate::principles::r5::{elongation, neighbour_share, set_point_scale, shade_of};
-use crate::principles::r6::{deposit_area, resting_state};
+use crate::principles::r6::{deposit_area, outlived, resting_state};
 use crate::rng::{normal, purpose, uniform};
 use crate::tree::{Tree, bud, slot, store_i32};
 use crate::world::World;
@@ -582,6 +582,11 @@ pub fn grow_buds(tree: &mut Tree, params: &Params, season: f64) {
             }
         } else {
             tree.b.state[i] = resting_state(tree.b.q[i], &params.r6);
+            // ADR 0044: a short shoot on wood past its lifespan rests leafless, and R4 ages it.
+            let wood = season - tree.m.birth_season[tree.b.metamer[i] as usize] as f64;
+            if outlived(tree.b.state[i], wood, &params.r6) {
+                tree.b.state[i] = bud::DORMANT;
+            }
             // R4's age counts the seasons a bud rests dormant (§R4: dormant buds have a finite
             // lifespan): a leafy short shoot (R6) does not age toward L_dorm or a higher break.
             if tree.b.state[i] == bud::DORMANT {

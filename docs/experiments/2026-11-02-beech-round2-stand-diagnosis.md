@@ -87,3 +87,23 @@ The user chose to build both fixes: the growth rule (here) and the renderer's `c
 ![The accepted stand and the same with r6.lifespan 40](figures/2026-11-02-beech-round2-stand-lifespan40.png)
 
 _The stand at 100, seeds 1–3: the accepted build (top) and with `r6.lifespan` 40 (bottom). Orange is leaf below the limb crown base._
+
+## Step 1b: the lone tree's limbs (why it reads as oak under any bark but a pale one)
+
+Track C's blind test v3, sets 3–4: under the measured mid-grey bark the stand reads as beech (9 of 9) but the lone tree reads as oak (15 of 18): "stout spreading limbs from a short grey trunk", "an irregular, lumpy crown of separate layered clumps". Measured on the adopted beech (`runs/round2/life20`, lone at 60 and 100, seeds 1–20; the rule off on seeds 1–3, `runs/round2/nolight`, `--assign '{"r2.lightSetPoint": null}'`):
+
+| degrees from vertical (90 = level), medians | adopted | light orthotropy off |
+|---|---|---|
+| first-order limbs, r²-weighted (the scaffold) | 36 | 35 |
+| first-order limbs, thickest quarter, base-to-tip chord | 36 | — |
+| second-order wood, r²-weighted | 66 | 76 |
+| second-order wood older than 20 seasons | 77 | 87 |
+| second-order wood up to 3 seasons old | 48 | 70 |
+| lone at 100: H, W/H (seeds 1–3) | 124, 1.39 | 98, 2.0 |
+
+- **The scaffold ascends.** The thick first-order limbs rise at about 36° whatever the rule does (their level's set point is 34°). The "stout spreading limbs" are not these.
+- **What is level is the old second-order wood, and it is level because it is shaded.** Its subtree light is 0.05–0.07, below `lightLo` 0.2, so ADR 0042's u is 0, its set point returns to the level's 94.6°, and R3's posture takes it there (77°, against 87° with the rule off). The few old second-order metamers still lit (u > 0.8) stand at 27–65°.
+- **The lit young shoots at the surface stand up** (48°, against 70° with the rule off). So the rule, as it acts, is the reverse of its intent: ADR 0042 says "the young shoot spreads level and its older base rises"; what happens is that the young shoot rises and its base, once the crown closes over it, is let fall back to level. The outline becomes a mound of upturned clumps on level plates, which reads as oak once the bark is not pale. The rule's gain is the taller, narrower tree (H 124 against 98; W/H 1.39 against 2.0); the shape that was wanted, limbs that rise then arch, never forms.
+- **The cause is that the lift is re-read every season.** Secondary straightening is wood: once a lit axis has straightened, the shade that later falls on it does not bend it back (Troll's model, ADR 0042's source). The model keeps no memory of the light a metamer had when it was young.
+
+**Candidate (Part 2's second, not built):** latch the lift. A metamer's light term is the largest u it has reached, kept once its wood is `lightOver` old, so a base that rose stays risen when the crown closes over it, and shoots that were born shaded stay level. It needs one per-metamer column (the latched u) and so a checkpoint version with a reader for v2 (AGENTS.md), an ADR proposal, unit tests, and the 20-seed guard, since the lone tree's shape and height will move. A cheaper ratchet without storage (R3 never moving old wood back toward its level's angle) would also freeze sag and curvature, which are wanted, so the column is the honest form. This changes the lone tree only: the stand's trees are under the vigour gate (g = 0) and bit-identical.

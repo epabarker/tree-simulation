@@ -250,4 +250,24 @@
     --beech-bark: #828584;
     --beech-bark-old: #777a79;
   }
+
+  /*
+   * Bark by light's base (round 2; on with data-bark="lit", the lab's &barkLight): beech's bark lit,
+   * at about 27% reflectance, between the pale token and the measured trunk (track E). The view's
+   * barkLight then darkens each stem by its shade, so a shaded bole reaches the measured range.
+   */
+  :root[data-bark="lit"] {
+    --beech-bark: #8f918e;
+    --beech-bark-old: #838582;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root[data-bark="lit"]:not([data-theme="light"]) {
+      --beech-bark: #9a9c99;
+      --beech-bark-old: #8e908d;
+    }
+  }
+  :root[data-bark="lit"][data-theme="dark"] {
+    --beech-bark: #9a9c99;
+    --beech-bark-old: #8e908d;
+  }
 }

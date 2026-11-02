@@ -27,7 +27,11 @@ function element<T extends HTMLElement>(id: string): T {
 
 const query = new URLSearchParams(location.search);
 // `&bark=measured`: beech's bark at its measured reflectance (scene.css; round 2, off by default).
-if (query.get("bark") === "measured") document.documentElement.dataset.bark = "measured";
+// `&barkLight=0.5`: bark by light, every stem dimmed by its shade (Scene.woodLight) from beech's lit
+// base tone (data-bark="lit"); it takes precedence over `&bark`.
+const barkLight = Number(query.get("barkLight") ?? 0);
+if (barkLight > 0) document.documentElement.dataset.bark = "lit";
+else if (query.get("bark") === "measured") document.documentElement.dataset.bark = "measured";
 const narrow = window.matchMedia("(max-width: 700px)").matches;
 // A phone shows a four-tree grove; the ten-tree stand would be too small to read.
 // `?preset=name` picks another (and `?bench` measures it, M15).
@@ -61,6 +65,7 @@ const view: ViewOptions & { preset: PresetName } = {
   ...(query.has("leafMinPx") ? { leafMinPx: Number(query.get("leafMinPx")) } : {}),
   // `&clearBole`: no rosettes on a trunk below its limb crown base (round 2; off by default).
   ...(query.has("clearBole") ? { clearBole: true } : {}),
+  ...(barkLight > 0 ? { barkLight } : {}),
   // `&girth=1.45`: draw stems at that multiple of their pipe-model radius (round 2; 1 by default).
   ...(query.has("girth") ? { girth: Number(query.get("girth")) } : {}),
 };

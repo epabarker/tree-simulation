@@ -115,6 +115,13 @@ export interface ViewOptions {
    * as a drawn leaf stands for a spray: the model's girth and bark ramp are unchanged.
    */
   girth?: number;
+  /**
+   * Bark by light (round 2, off by default): wood draws at 1 − barkLight × shade of its colour's
+   * luminance, the shade the light field gives the cell at the metamer's base (`Scene.woodLight`), so
+   * a bole under a closed canopy reads darker than a sunlit limb. WebGL2 only, and only where the
+   * snapshot carries the field (the lab's does; the garden asks for none).
+   */
+  barkLight?: number;
 }
 
 export interface Camera {
@@ -256,6 +263,10 @@ export class Scene {
   clearBole = false;
   /** Drawn radius over the model's; renderers copy `ViewOptions.girth`. */
   girth = 1;
+  /** How far shade darkens wood (0: not at all); renderers copy `ViewOptions.barkLight`. */
+  barkLight = 0;
+  private woodLightFor = { s: null as Snapshot | null, k: 0 };
+  private woodLightOf = new Float32Array(0);
   /**
    * What `fit` frames. "trees": the trees and the ground beneath them (the lab). "world": the
    * world's whole width, easing out only once crowns outgrow half its height (the home page); on
@@ -982,6 +993,32 @@ export class Scene {
       }
     }
     return this.colors;
+  }
+
+  /**
+   * Bark by light (`barkLight` k > 0): each metamer's share of its wood colour's lit luminance,
+   * 1 − k·shade, where shade is the snapshot's field (`shadow`: 1 − mean Q/C over the slab's depth,
+   * C2) at the cell of the metamer's base. It reads the field, not `light`: for old wood `light` is
+   * its subtree's mean (q_sum/n_sum, the crown above), not the shade on the stem itself. Null when
+   * off or when the snapshot carries no field.
+   */
+  woodLight(s: Snapshot): Float32Array | null {
+    const k = this.barkLight;
+    const field = s.shadow;
+    if (!(k > 0) || !field) return null;
+    if (this.woodLightFor.s === s && this.woodLightFor.k === k) return this.woodLightOf;
+    const n = s.metamerCount;
+    if (this.woodLightOf.length < n) this.woodLightOf = new Float32Array(2 * n);
+    const w = s.width;
+    const h = Math.floor(field.length / w);
+    for (let j = 0; j < n; j++) {
+      const col = ((Math.floor(s.x0[j] as number) % w) + w) % w;
+      const row = Math.min(h - 1, Math.max(0, Math.floor(s.y0[j] as number)));
+      const shade = Math.min(1, Math.max(0, field[row * w + col] as number));
+      this.woodLightOf[j] = 1 - k * shade;
+    }
+    this.woodLightFor = { s, k };
+    return this.woodLightOf;
   }
 
   /**

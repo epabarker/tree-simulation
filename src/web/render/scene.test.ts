@@ -3,6 +3,7 @@ import { productionWorld } from "../../../tests/production-world.ts";
 import { presetParams, presets } from "../../core/presets.ts";
 import { BudState } from "../../core/types.ts";
 import type { RustWorld, TreeView as Tree } from "../../wasm/world.ts";
+import { dimByte } from "./colors.ts";
 import { FAR, NEAR, nearAndFar } from "./fixture.ts";
 import { isLeafStyleName, LEAF_STYLES } from "./leaf-styles.ts";
 import { DEPTH_SLICES, depthSlice, LEAF_LENGTH, Scene } from "./scene.ts";
@@ -295,5 +296,41 @@ describe("clear boles (the lab's `&clearBole`, round 2)", () => {
     expect(scene.leaves(3, 1).count).toBe(all - 2 * bole);
     scene.clearBole = false;
     expect(scene.leaves(3, 1).count).toBe(all);
+  });
+
+  it("darkens wood by the shade at its base under `barkLight`, boles more than the crown's shoots", () => {
+    const world = productionWorld(presetParams("forest", 1));
+    world.run(40);
+    const scene = new Scene();
+    scene.setSnapshot(world.snapshot(0));
+    const s = scene.next;
+    if (!s?.shadow) throw new Error("no field");
+    expect(scene.woodLight(s)).toBeNull();
+    scene.barkLight = 0.5;
+    const light = scene.woodLight(s);
+    if (!light) throw new Error("no wood light");
+    const limbBase = new Map(s.metrics.map((m) => [m.tree, m.limbBase]));
+    const mean = (pick: (j: number) => boolean) => {
+      let sum = 0;
+      let n = 0;
+      for (let j = 0; j < s.metamerCount; j++)
+        if (pick(j)) {
+          sum += light[j] as number;
+          n++;
+        }
+      return sum / n;
+    };
+    for (let j = 0; j < s.metamerCount; j++) {
+      expect(light[j]).toBeGreaterThanOrEqual(0.5);
+      expect(light[j]).toBeLessThanOrEqual(1);
+    }
+    const bole = mean((j) => s.order[j] === 0 && s.y0[j] < (limbBase.get(s.tree[j]) ?? 0));
+    const shoots = mean((j) => s.age[j] <= 1);
+    expect(bole).toBeLessThan(shoots);
+    // Applied in linear light: no change at full light, and a 0.55 share takes beech's lit base
+    // (#8f) into the measured trunk's range (#6b–#77).
+    expect(dimByte(200, 1)).toBe(200);
+    expect(dimByte(0x8f, 0.55)).toBeGreaterThanOrEqual(0x6b);
+    expect(dimByte(0x8f, 0.55)).toBeLessThanOrEqual(0x77);
   });
 });

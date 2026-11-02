@@ -33,7 +33,7 @@ import {
 } from "twgl.js";
 import type { Snapshot } from "../../core/types.ts";
 import { BudState } from "../../core/types.ts";
-import { BUD_ACTIVE, BUD_DORMANT, parseColor, SEQUENTIAL, shadeImage } from "./colors.ts";
+import { BUD_ACTIVE, BUD_DORMANT, dimByte, parseColor, SEQUENTIAL, shadeImage } from "./colors.ts";
 import { LEAF_PALETTES, LEAF_STYLES } from "./leaf-styles.ts";
 import { MAX_DPR, type Renderer, type RendererOptions } from "./renderer.ts";
 import {
@@ -649,6 +649,7 @@ export class WebGL2Renderer implements Renderer {
       view.leafOpacity,
       view.clearBole,
       view.girth,
+      view.barkLight,
       view.showBuds,
       view.showObstacles,
       scene.solo,
@@ -661,6 +662,7 @@ export class WebGL2Renderer implements Renderer {
       scene.leafStyle = LEAF_STYLES[view.leafStyle];
       scene.clearBole = view.clearBole ?? false;
       scene.girth = view.girth ?? 1;
+      scene.barkLight = view.barkLight ?? 0;
       scene.computeGeometry(t);
       this.buildSegments(s, view);
       if (ghosts) this.buildGhosts(1 - t);
@@ -778,6 +780,9 @@ export class WebGL2Renderer implements Renderer {
     const path = this.pathLength(s, n);
     const textured = view.colorMode === "natural";
     const tex = scene.bark;
+    // Bark by light (Scene.woodLight), in the natural view: each stem's colour dimmed by its shade.
+    const light = textured ? scene.woodLight(s) : null;
+    const lit = light ? this.litColors(s, light, palette, index) : null;
     // Far to near in z (I2), so nearer wood covers farther.
     const order = scene.drawOrder(s);
     for (let k = 0; k < n; k++) {
@@ -791,14 +796,32 @@ export class WebGL2Renderer implements Renderer {
       r[2 * k] = g.radius[j];
       r[2 * k + 1] = g.tipRadius[j];
       const c = index[j] * 4;
-      color[4 * k] = palette[c] as number;
-      color[4 * k + 1] = palette[c + 1] as number;
-      color[4 * k + 2] = palette[c + 2] as number;
+      for (let q = 0; q < 3; q++)
+        color[4 * k + q] = lit ? (lit[3 * j + q] as number) : (palette[c + q] as number);
       // A solo plate draws one specimen: the other trees' wood is fully transparent.
       color[4 * k + 3] =
         scene.solo >= 0 && s.tree[j] !== scene.solo ? 0 : (palette[c + 3] as number);
     }
     this.upload(batch, n);
+  }
+
+  private litFor = { s: null as Snapshot | null, k: 0, theme: -1 };
+  private lit = new Uint8Array(0);
+
+  /** Each metamer's wood colour under bark by light, once per snapshot (tweens rebuild every frame). */
+  private litColors(s: Snapshot, light: Float32Array, palette: Uint8Array, index: Uint16Array) {
+    const f = this.litFor;
+    const k = this.scene.barkLight;
+    if (f.s === s && f.k === k && f.theme === this.themeVersion) return this.lit;
+    const n = s.metamerCount;
+    if (this.lit.length < 3 * n) this.lit = new Uint8Array(6 * n);
+    for (let j = 0; j < n; j++) {
+      const c = (index[j] as number) * 4;
+      const m = light[j] as number;
+      for (let q = 0; q < 3; q++) this.lit[3 * j + q] = dimByte(palette[c + q] as number, m);
+    }
+    this.litFor = { s, k, theme: this.themeVersion };
+    return this.lit;
   }
 
   private path = new Float32Array(0);

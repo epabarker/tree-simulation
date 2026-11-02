@@ -22,13 +22,16 @@ describe("bark styles (track C)", () => {
         expect(n, `--${p}-bark${suffix}`).toBe(3);
       }
     }
-    // Beech's measured bark overrides its bark and old bark in the same three places.
+    // Each override (beech's measured bark, bark by light's base) sets beech's bark and old bark in
+    // the same three places.
     const over = css.slice(base.length);
+    const modes = ["measured", "lit"];
+    for (const mode of modes)
+      expect(over.split(`[data-bark="${mode}"]`).length - 1, `data-bark="${mode}"`).toBe(3);
     for (const suffix of ["", "-old"])
-      expect(
-        over.split(`--beech-bark${suffix}:`).length - 1,
-        `measured --beech-bark${suffix}`,
-      ).toBe(3);
+      expect(over.split(`--beech-bark${suffix}:`).length - 1, `--beech-bark${suffix}`).toBe(
+        3 * modes.length,
+      );
   });
 
   it("moves a stem from twig to bark by age, then to old bark by girth", () => {

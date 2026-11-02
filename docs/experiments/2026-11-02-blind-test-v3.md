@@ -14,7 +14,9 @@ rosettes on a trunk below its limb crown base) removes the "dark bands" the name
 stand stays silver birch (8 of 9) for its pale, slender, wavy stems with small high crowns. In track
 E's sets 3 and 4, beech's measured bark (about 15% reflectance) moves the stand to beech: 6 of 9
 alone, 9 of 9 with stems drawn at a real girth. But it turns the lone beech into oak (1 of 18 alone,
-8 of 18 with all three), so nothing passes yet.
+8 of 18 with all three), so nothing passes yet. On the judging seeds 4–6 with five namers, the sourced
+candidate (measured bark with `clearBole`) passes the stand pooled (9 of 15) but not the lone tree (5
+and 7 of 15, oak and field maple). Birch holds; hornbeam's unchanged stand reads oak on those seeds.
 
 ![Contact sheet](figures/2026-11-02-blind-test-v3-sheet.jpg)
 
@@ -417,6 +419,63 @@ sunlit limb on an open-grown tree reads pale.
 
 ![Beech: baseline, measured bark, bark by light](figures/2026-11-02-blind-test-v3-barklight.jpg)
 
+## The judging set: the sourced candidate at seeds 4–6
+
+**The user's choice, in one line:**
+- with the measured bark, the stand reads beech, and the lone tree reads oak or field maple until its
+  form is fixed;
+- with the pale bark, the lone tree reads beech, and the stand reads birch (seeds 1–3; the pale bark
+  was not judged at 4–6).
+
+- **Candidate:** beech's measured bark (set 3's tokens, `&bark=measured`) with `clearBole`, girth
+  off. Every other source is drawn as in the baseline (`&frame=height` only).
+- **Seeds 4–6,** the judging seeds; never 1001–1006.
+- **Five fresh namers,** each with their own shuffle (`~/blind-plates-v3e`), the same prompt.
+- **Pooled rule:** a seed counts when ≥ 3 of 5 namers name it. Keys and replies are in
+  [`judge/`](code/2026-11-02-blind-test-v3/judge/), with the sheet below.
+
+![The judging set, seeds 4–6](figures/2026-11-02-blind-test-v3-judge.jpg)
+
+_Rows as the main sheet. The top row is the candidate beech (measured bark, `clearBole`); its label
+says "accepted" because the build is._
+
+| beech | lone 60 | lone 100 | stand 100 | namers passing | pooled |
+|---|---|---|---|---|---|
+| baseline, pale bark (seeds 1–3, 3 namers) | 9/9 | 8/9 | 0/9 (birch 9) | 0 of 3 | fail (stand) |
+| set 3, measured bark (seeds 1–3, 3 namers) | 0/9 (oak 7) | 1/9 (oak 8) | 6/9 | 0 of 3 | fail (lone) |
+| set 4, measured bark, `clearBole`, girth (seeds 1–3, 3 namers) | 4/9 | 4/9 | 9/9 | 1 of 3 | fail (lone) |
+| **judging: measured bark, `clearBole` (seeds 4–6, 5 namers)** | **5/15** (field maple 6, oak 4) | **7/15** (oak 8) | **9/15** (hornbeam 6) | **0 of 5** | **fail**: stand 3 of 3 seeds, lone 0 and 1 |
+
+| other sources, judging set (seeds 4–6, of 15): lone 60, lone 100, stand 100 | first guesses | pooled |
+|---|---|---|
+| birch | 15, 15, 15 | pass |
+| hornbeam | 15, 12, **3** (oak 12) | fail (stand) |
+| oak | 0, 0, 0 (hazel, hawthorn) | fail |
+| beech (today) | 7, 6, 0 (birch 12) | fail |
+| silver fir | 0, 0, 0 (holly 39 of 45) | fail |
+
+Agreement: Fleiss' kappa 0.56 (observed 0.61, chance 0.12). A namer named all three seeds of a cell
+alike in 72 of 90 namer × cell combinations.
+
+**Reading (measurement, not a decision):**
+1. **The stand passes pooled under the measured bark**, on all three judging seeds: 9 of 15, and
+   hornbeam takes the other 6.
+   - Beech: "a stand of tall grey clean boles, slightly wavy, with spreading crowns only at the top"
+     (n2).
+   - Hornbeam: "smooth grey, wavy poles with rounded crowns only at the top" (n4).
+2. **The lone tree fails** (5 and 7 of 15). It is oak at 100 ("a very broad crown, much wider than
+   tall, on crooked horizontal limbs", n4, seed 5), and field maple or oak at 60 ("a compact, dense, low dome on
+   grey limbs with foliage to the ground", n1, field maple). The lone tree reads beech for some
+   namers on some seeds ("a broad, tiered dome on a smooth grey trunk, with layered sprays reaching
+   almost to the ground", n3), but not by the rule. As track E expected, this is the form's,
+   Part 2's: level, stout limbs in layered plates, and on these seeds a dome wider than tall.
+3. **Birch holds** (45 of 45). **Hornbeam does not:** its lone tree holds (27 of 30), but its stand,
+   drawn exactly as in the baseline, reads oak 12 of 15 at seeds 4–6 ("clear grey trunks split into
+   crooked, twisting limbs under a flat shared canopy", n4), against 6 of 9 hornbeam at seeds 1–3.
+   That is seeds and namers, not a renderer change. The hornbeam stand's pass at 1–3 does not carry
+   to the judging seeds.
+4. **No set 7,** as track E asked. Track C's blind-test work stops here.
+
 ## Caveats
 
 - **The namers are three runs of one model,** not three people, and each answers all 54 plates in
@@ -458,6 +517,12 @@ python3 docs/experiments/code/2026-11-02-blind-test-v3/shuffle.py <set3> ~/blind
 python3 docs/experiments/code/2026-11-02-blind-test-v3/shuffle.py <set4> ~/blind-plates-v3d candidate "beech (accepted build, clearBole, girth 1.45, measured bark)" "clearBole, girth 1.45"
 python3 docs/experiments/code/2026-11-02-blind-test-v3/tally.py docs/experiments/code/2026-11-02-blind-test-v3/bark docs/experiments/code/2026-11-02-blind-test-v3
 python3 docs/experiments/code/2026-11-02-blind-test-v3/tally.py docs/experiments/code/2026-11-02-blind-test-v3/candidate docs/experiments/code/2026-11-02-blind-test-v3
+# the judging set: seeds 4–6, five namers
+SEEDS=4,5,6 SOURCES=beech VIEW='&bark=measured&clearBole' PW_FROM=<scratch>/pw/x.js node docs/experiments/code/2026-11-02-blind-test-v3/shots.mjs http://localhost:5181/ <renders-judge> 3
+SEEDS=4,5,6 SOURCES=today,hornbeam,oak,birch,fir PW_FROM=<scratch>/pw/x.js node docs/experiments/code/2026-11-02-blind-test-v3/shots.mjs http://localhost:5181/ <renders-judge> 3
+NAMERS=5 python3 docs/experiments/code/2026-11-02-blind-test-v3/shuffle.py <renders-judge> ~/blind-plates-v3e judge "beech (accepted build, measured bark, clearBole)"
+python3 docs/experiments/code/2026-11-02-blind-test-v3/tally.py docs/experiments/code/2026-11-02-blind-test-v3/judge docs/experiments/code/2026-11-02-blind-test-v3
+SEEDS=4,5,6 uv run --project analysis python docs/experiments/code/2026-11-02-blind-test-v3/sheet.py <renders-judge> docs/experiments/figures/2026-11-02-blind-test-v3-judge.jpg
 # set 5's pilot: the light factors by part, then beech's nine plates under bark by light
 PW_FROM=<scratch>/pw/x.js node docs/experiments/code/2026-11-02-blind-test-v3/barklight.mjs http://localhost:5181/
 SOURCES=beech VIEW='&clearBole&barkLight=0.5' PW_FROM=<scratch>/pw/x.js node docs/experiments/code/2026-11-02-blind-test-v3/shots.mjs http://localhost:5181/ <renders-light> 3

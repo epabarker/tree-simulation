@@ -23,6 +23,10 @@ Newest first. One entry per session or milestone: what changed, why, surprises, 
   - Neither light measure separates a stand's bole from a lone tree's limbs. The field gives both about 0.52; `s.light`, a subtree mean, makes the lone limbs darker.
   - Beech's nine plates were drawn as a pilot, and five namers were not spent.
   - The stand's H/D (101–110 against ≈ 73) is recorded as a model finding.
+- **The judging set (seeds 4–6, five namers, ≥ 3 of 5 pooled):** the sourced candidate (measured bark with clearBole).
+  - The stand passes pooled (beech 9 of 15, on all three seeds). The lone tree fails: 5 and 7 of 15, read as oak or field maple, which is the form's (Part 2).
+  - Birch holds (45 of 45). Hornbeam's unchanged stand reads oak 12 of 15 on these seeds.
+  - The note states the user's choice in one line. Track C's blind-test work stops here.
 - **Surprises:**
   - The oak stand's identical plates were named oak 6, 6 and then 0 of 9 by three sets of namers.
   - Two slow tests (one core-only) time out at 30 s while a vite dev server runs alongside. The committed HEAD failed the same way; with the server stopped, the check passes.

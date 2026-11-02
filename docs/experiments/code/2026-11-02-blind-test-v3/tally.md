@@ -1,3 +1,5 @@
+_3 namers; seeds 1, 2, 3; pooled: a seed counts when ≥ 2 of 3 namers named it._
+
 ## First guesses per plate
 
 | source | trial | seed | namer-1 | namer-2 | namer-3 |
@@ -68,7 +70,7 @@
 | birch | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | pass | pass | pass |
 | silver fir | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | fail | fail | fail |
 
-## Pooled: first guesses of 9 (3 namers × 3 seeds); seeds with ≥ 2 of 3 namers; the pass rule on those
+## Pooled: first guesses of 9 (3 namers × 3 seeds); seeds named by ≥ 2 of 3; the pass rule on those
 
 | source | lone60 /9 | lone100 /9 | stand100 /9 | lone60 seeds | lone100 seeds | stand100 seeds | pooled pass | second guess too /27 |
 |---|---|---|---|---|---|---|---|---|
@@ -102,7 +104,7 @@
 | silver fir | lone100 | norway spruce 6, holly 3 |
 | silver fir | stand100 | norway spruce 6, common alder 3 |
 
-## Beside 2026-11-02-blind-test-v2: first guesses named, of 9 per trial (2026-11-02-blind-test-v2 → this set)
+## Beside 2026-11-02-blind-test-v2: first guesses named, per trial (2026-11-02-blind-test-v2, of 9 → this set, of 9)
 
 | source | lone60 | lone100 | stand100 | per-namer passes, 2026-11-02-blind-test-v2 | per-namer passes, this set | pooled, 2026-11-02-blind-test-v2 | pooled, this set |
 |---|---|---|---|---|---|---|---|
@@ -141,7 +143,7 @@
 - namer-1 and namer-2: 34 of 54 plates (63%)
 - namer-1 and namer-3: 39 of 54 plates (72%)
 - namer-2 and namer-3: 33 of 54 plates (61%)
-- all three the same: 28 of 54
+- all 3 the same: 28 of 54
 - a namer's first guess the same on all three seeds of a cell: 50 of 54
 - Fleiss' kappa: 0.60 (observed 0.65, chance 0.14; 13 distinct names)
 

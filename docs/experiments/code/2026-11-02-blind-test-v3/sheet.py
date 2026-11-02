@@ -6,9 +6,11 @@ keeps the plates' one scale (a lone plate is the 240-cell field, a stand plate o
 
 [sources] is a comma list of the rows to draw (default: all six), e.g. "beech,clearbole" for the
 addendum's sheet, its renders folder holding the baseline's beech-*.png and the clearBole plates
-renamed clearbole-*.png.
+renamed clearbole-*.png. SEEDS (a comma list, default 1,2,3) picks the seeds, e.g. 4,5,6 for the
+judging set.
 """
 
+import os
 import sys
 from pathlib import Path
 
@@ -25,17 +27,20 @@ LABELS = {
     "clearbole": "beech, clearBole",
     "bark": "beech, measured bark",
     "candidate": "beech, all three",
+    "light": "beech, bark by light",
 }
 SOURCES = sys.argv[3].split(",") if len(sys.argv) > 3 else ["beech", "today", "hornbeam", "oak", "birch", "fir"]
 TRIALS = [("lone60", "lone 60"), ("lone100", "lone 100"), ("stand100", "stand 100")]
-TRIALS = [t for t in TRIALS if any((renders / f"{s}-{t[0]}-s1.png").exists() for s in SOURCES)]
+SEEDS = [int(x) for x in os.environ.get("SEEDS", "1,2,3").split(",")]
+TRIALS = [t for t in TRIALS if any((renders / f"{s}-{t[0]}-s{SEEDS[0]}.png").exists() for s in SOURCES)]
 F, GAP, LEFT, TOP = 0.4, 6, 190, 44
 font = ImageFont.load_default(size=16)
 # Column widths from the first source's plates (all plates of a trial share a width).
 cols = []
 for trial, label in TRIALS:
-    w, h = Image.open(next(renders / f"{s}-{trial}-s1.png" for s in SOURCES if (renders / f"{s}-{trial}-s1.png").exists())).size
-    cols += [(trial, label, k, round(w * F), round(h * F)) for k in (1, 2, 3)]
+    first = next(renders / f"{s}-{trial}-s{SEEDS[0]}.png" for s in SOURCES if (renders / f"{s}-{trial}-s{SEEDS[0]}.png").exists())
+    w, h = Image.open(first).size
+    cols += [(trial, label, k, round(w * F), round(h * F)) for k in SEEDS]
 H = max(c[4] for c in cols)
 sheet = Image.new("RGB", (LEFT + sum(c[3] + GAP for c in cols), TOP + (H + GAP) * len(SOURCES)), "white")
 d = ImageDraw.Draw(sheet)

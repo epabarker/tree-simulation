@@ -9,10 +9,15 @@ The later sets, each its renders folder and a fresh namers' root:
 - set 2: `shuffle.py <set2> ~/blind-plates-v3b clearbole "beech (accepted build, clearBole)"`;
 - set 3: `shuffle.py <set3> ~/blind-plates-v3c bark "beech (accepted build, measured bark)"`;
 - set 4: `shuffle.py <set4> ~/blind-plates-v3d candidate "beech (accepted build, clearBole, girth
-  1.45, measured bark)" "clearBole, girth 1.45"`, the note added to every other source's label.
+  1.45, measured bark)" "clearBole, girth 1.45"`, the note added to every other source's label;
+- the judging set (seeds 4–6, five namers): `NAMERS=5 shuffle.py <judge> ~/blind-plates-v3e judge
+  "beech (accepted build, measured bark, clearBole)"`.
+
+NAMERS (default 3) sets how many namers' folders to make.
 """
 
 import json
+import os
 import random
 import shutil
 import sys
@@ -29,7 +34,7 @@ if len(sys.argv) > 4:
     SPECIES["beech"] = sys.argv[4]
 files = sorted(renders.glob("*.png"))
 key = {}
-for n in range(1, 4):
+for n in range(1, int(os.environ.get("NAMERS", "3")) + 1):
     folder = root / f"namer-{n}"
     folder.mkdir(parents=True, exist_ok=True)
     order = list(files)
@@ -42,4 +47,4 @@ for n in range(1, 4):
         key[f"namer-{n}"][name] = {"source": source, "species": SPECIES[source], "trial": trial, "seed": int(seed[1:])}
 key_dir.mkdir(exist_ok=True)
 (key_dir / "key.json").write_text(json.dumps(key, indent=1) + "\n")
-print(len(files), "renders → 3 folders under", root, "; key in", key_dir)
+print(len(files), "renders →", len(key), "folders under", root, "; key in", key_dir)

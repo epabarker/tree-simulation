@@ -5,7 +5,7 @@ import { BudState } from "../../core/types.ts";
 import type { RustWorld, TreeView as Tree } from "../../wasm/world.ts";
 import { FAR, NEAR, nearAndFar } from "./fixture.ts";
 import { isLeafStyleName, LEAF_STYLES } from "./leaf-styles.ts";
-import { DEPTH_SLICES, depthSlice, Scene } from "./scene.ts";
+import { DEPTH_SLICES, depthSlice, LEAF_LENGTH, Scene } from "./scene.ts";
 
 /** Young metamers (leafy shoots) and short shoots on older wood (rosettes) in a snapshot. */
 function leafSites(scene: Scene, leafAge: number): { young: number; rosettes: number } {
@@ -223,5 +223,32 @@ describe("rings in the lab's frame (M26)", () => {
     open.frame = "trees";
     open.setSnapshot(productionWorld(presetParams("skyTree", 1)).snapshot(0));
     expect(open.wrapOffsets()).toEqual([0]);
+  });
+});
+
+describe("one scale (the lab's `&frame=height`, round 2's blind test)", () => {
+  it("fixes the camera by the world's height, however tall the trees or wide the world", () => {
+    const fitted = (frame: "trees" | "height", preset: "skyTree" | "forest", seasons: number) => {
+      const world = productionWorld(presetParams(preset, 1));
+      world.run(seasons);
+      const scene = new Scene();
+      scene.setSize(800, 600, 1);
+      scene.frame = frame;
+      scene.setSnapshot(world.snapshot(0));
+      scene.fit(true);
+      return { scene, world: world.params.world };
+    };
+    const young = fitted("height", "skyTree", 0);
+    const grown = fitted("height", "skyTree", 20);
+    expect(grown.scene.camera.scale).toBe(young.scene.camera.scale);
+    expect(grown.scene.camera.cx).toBe(grown.world.width / 2);
+    // The fitted frame, by contrast, follows the tree as it grows.
+    expect(fitted("trees", "skyTree", 20).scene.camera.scale).not.toBe(
+      fitted("trees", "skyTree", 0).scene.camera.scale,
+    );
+    // Pixels per cell from the height alone (600 px less the ground margin and the headroom),
+    // for a ring 210 wide as for the lone tree's world.
+    for (const { scene, world } of [grown, fitted("height", "forest", 10)])
+      expect(scene.camera.scale).toBeCloseTo((600 - 18 - 52) / (world.height * 1.05 + LEAF_LENGTH));
   });
 });

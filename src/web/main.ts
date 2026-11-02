@@ -78,7 +78,9 @@ const garden = mountGarden(element("stage"), {
   renderer: query.get("renderer") === "canvas" ? "canvas2d" : "auto",
   interaction: "full",
   obstacles: null, // the lab's own obstacles come from the preset (ADR 0015)
-  frame: "trees",
+  // `&frame=height`: one scale for every plate, the camera fixed by the world's height as the
+  // garden's world frame is once its crowns reach the top, not fitted to the trees (round 2).
+  frame: query.get("frame") === "height" ? "height" : "trees",
   headroom: 52, // the title and hint
   pace: null,
   speed: 3,

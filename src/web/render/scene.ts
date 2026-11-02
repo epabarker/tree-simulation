@@ -241,9 +241,12 @@ export class Scene {
   /**
    * What `fit` frames. "trees": the trees and the ground beneath them (the lab). "world": the
    * world's whole width, easing out only once crowns outgrow half its height (the home page); on
-   * a ring the crowns are then drawn across the seam as well.
+   * a ring the crowns are then drawn across the seam as well. "height": one scale for every
+   * plate of a world this tall, the "world" frame with its tallest crown at the world's top,
+   * centred on the world and never fitted to the trees, so a tree's drawn size is its height
+   * (round 2's blind test: a fitted plate draws a 25 m oak as large as a 6 m hawthorn).
    */
-  frame: "trees" | "world" | "tree" = "trees";
+  frame: "trees" | "world" | "tree" | "height" = "trees";
   /**
    * The least height in cells the "world" frame shows (the garden's half plate, I3); 0: half the
    * world's height. Under the woods' 200-cell top, half the world framed a young garden for 100.
@@ -569,6 +572,9 @@ export class Scene {
       cx = s.width / 2;
       spanX = s.width;
       spanY = Math.max(this.frameHeight || 0.5 * s.height, maxY * 1.05 + LEAF_LENGTH);
+    } else if (this.frame === "height") {
+      cx = s.width / 2;
+      spanY = s.height * 1.05 + LEAF_LENGTH;
     } else if (this.frame === "trees" && s.periodic) {
       // A ring has no edge to frame: show one lap, the crowns that cross the seam drawn at both
       // sides (wrapOffsets), as the garden does (M26; the lab drew them past the world's end).
@@ -577,7 +583,12 @@ export class Scene {
     }
     const fitH = Math.max(1, this.height - GROUND_MARGIN - this.headroom);
     const first = this.target === null;
-    this.target = { cx, scale: Math.min(this.width / spanX, fitH / spanY) };
+    // "height" ignores the width, so a world wider than the plate is cut at its sides.
+    const scale = fitH / spanY;
+    this.target = {
+      cx,
+      scale: this.frame === "height" ? scale : Math.min(this.width / spanX, scale),
+    };
     if (snap || first) {
       this.camera.cx = this.target.cx;
       this.camera.scale = this.target.scale;

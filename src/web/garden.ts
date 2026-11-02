@@ -104,7 +104,7 @@ export interface GardenOptions {
   /** "fell": tap a tree to fell it (default). "full": also pan, pinch, zoom (the lab). */
   interaction?: "none" | "fell" | "full";
   /** What the camera fits (Scene.frame). Default "world". */
-  frame?: "trees" | "world";
+  frame?: "trees" | "world" | "height";
   /**
    * "forest" (default): the frame above. "specimen": one tree alone, the broadest crown among the
    * taller trees when chosen, kept

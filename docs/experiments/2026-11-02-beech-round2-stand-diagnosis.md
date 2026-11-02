@@ -87,3 +87,44 @@ The user chose to build both fixes: the growth rule (here) and the renderer's `c
 ![The accepted stand and the same with r6.lifespan 40](figures/2026-11-02-beech-round2-stand-lifespan40.png)
 
 _The stand at 100, seeds 1–3: the accepted build (top) and with `r6.lifespan` 40 (bottom). Orange is leaf below the limb crown base._
+
+## Step 1b: the lone tree's limbs (why it reads as oak under any bark but a pale one)
+
+Track C's blind test v3, sets 3–4: under the measured mid-grey bark the stand reads as beech (9 of 9) but the lone tree reads as oak (15 of 18): "stout spreading limbs from a short grey trunk", "an irregular, lumpy crown of separate layered clumps". Measured on the adopted beech (`runs/round2/life20`, lone at 60 and 100, seeds 1–20; the rule off on seeds 1–3, `runs/round2/nolight`, `--assign '{"r2.lightSetPoint": null}'`):
+
+| degrees from vertical (90 = level), medians | adopted | light orthotropy off |
+|---|---|---|
+| first-order limbs, r²-weighted (the scaffold) | 36 | 35 |
+| first-order limbs, thickest quarter, base-to-tip chord | 36 | — |
+| second-order wood, r²-weighted | 66 | 76 |
+| second-order wood older than 20 seasons | 77 | 87 |
+| second-order wood up to 3 seasons old | 48 | 70 |
+| lone at 100: H, W/H (seeds 1–3) | 124, 1.39 | 98, 2.0 |
+
+- **The scaffold ascends.** The thick first-order limbs rise at about 36° whatever the rule does (their level's set point is 34°). The "stout spreading limbs" are not these.
+- **What is level is the old second-order wood, and it is level because it is shaded.** Its subtree light is 0.05–0.07, below `lightLo` 0.2, so ADR 0042's u is 0, its set point returns to the level's 94.6°, and R3's posture takes it there (77°, against 87° with the rule off). The few old second-order metamers still lit (u > 0.8) stand at 27–65°.
+- **The lit young shoots at the surface stand up** (48°, against 70° with the rule off). So the rule, as it acts, is the reverse of its intent: ADR 0042 says "the young shoot spreads level and its older base rises"; what happens is that the young shoot rises and its base, once the crown closes over it, is let fall back to level. The outline becomes a mound of upturned clumps on level plates, which reads as oak once the bark is not pale. The rule's gain is the taller, narrower tree (H 124 against 98; W/H 1.39 against 2.0); the shape that was wanted, limbs that rise then arch, never forms.
+- **The cause is that the lift is re-read every season.** Secondary straightening is wood: once a lit axis has straightened, the shade that later falls on it does not bend it back (Troll's model, ADR 0042's source). The model keeps no memory of the light a metamer had when it was young.
+
+**Candidate (Part 2's second, not built):** latch the lift. A metamer's light term is the largest u it has reached, kept once its wood is `lightOver` old, so a base that rose stays risen when the crown closes over it, and shoots that were born shaded stay level. It needs one per-metamer column (the latched u) and so a checkpoint version with a reader for v2 (AGENTS.md), an ADR proposal, unit tests, and the 20-seed guard, since the lone tree's shape and height will move. A cheaper ratchet without storage (R3 never moving old wood back toward its level's angle) would also freeze sag and curvature, which are wanted, so the column is the honest form. This changes the lone tree only: the stand's trees are under the vigour gate (g = 0) and bit-identical.
+
+## Step 2b: the latched lift at 20 seeds (ADR 0045, proposed), and what the plates' level is made of
+
+Built as Part 2's second candidate at the user's request (`r2.lightLatch`; the metamers' `lit` column; checkpoints at version 3, commit 7106296). Runs: `evidence20.py --assign '{"c5.Tvig": 0, "r6.lifespan": 20, "r2.lightLatch": true}'` on the adopted beech, seeds 1–20 (`runs/round2/latch`), and on seeds 1–3 the adopted beech with wood 16× stiffer (`"r3.E": 64000000`, what a doubled radius would give, since sag goes as 1/(E·r⁴); `runs/round2/stiff`).
+
+| 20 seeds (seeds 1–3 for E ×16) | adopted | + latch | E ×16 |
+|---|---|---|---|
+| lone 100: H, median | 120 | **151** | 138 |
+| lone 100: W/H, median (photograph 1.3–1.5, passes of 20) | 1.50 (9) | **0.83 (0)** | 1.30 |
+| lone 60: H, W/H | 87, 1.53 | 102, 0.96 | — |
+| lone 100: leaf below H/6 ≤ 7% | 13 | 18 | — |
+| second-order wood older than 20, degrees from vertical | 78 | 69 | 73 |
+| second-order wood up to 3 old | 46 | 52 | 53 |
+| first-order limbs, r²-weighted | 36 | 37 | 34 |
+| stand (alive, floor, LAI, H/D) | 11 of 20 | identical: metrics and metamers byte-equal on 20 of 20 | LAI 8.4 |
+
+- **The latch does what ADR 0045 says and it is the wrong shape.** Old second-order wood keeps more of its rise (69° against 78°), and because every limb that was ever lit keeps it, the crown's width, which was the level plates, goes: the lone tree is a column again (W/H 0.83, H 151), the round-1 shape the fresh look set out to replace. "Rise, then arch" needs the arch: a lift that is kept at the base and a curve along the limb that brings its outer part level (ADR 0034's `curve` on the second level, which beech sets only on the trunk). That is a third candidate and outside this round's two.
+- **The stand is untouched:** under the vigour gate the latch writes the column but moves nothing (byte-equal metrics and metamers on every seed). The hash differs only because the column holds non-zero values.
+- **Sag is not the plates' cause either:** wood 16× stiffer leaves the old second-order wood at 73°, and makes the tree taller and the stand's LAI worse (8.4).
+- **So the plates are ADR 0042 working as written:** second-order wood born in shade inside the crown is born level and grows outward; the lit tips at the surface rise. The outline, upturned clumps on level plates, is what reads as oak under a realistic bark (blind test v3, sets 3–4 and the judging set: the lone beech at 60 is field maple or oak on 10 of 15 plates).
+- **Recommendation:** do not adopt the latch. Whether its code stays (a column and a checkpoint version for an off rule) or is reverted is the user's call; the finding stands either way.

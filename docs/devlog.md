@@ -2,6 +2,14 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-02: Beech round 2, Part 2: the lone tree's limbs, the latched lift (ADR 0045, proposed, evidence against), track C's blind test v3 (branch claude/c1-calibration-ustbkz; track C on claude/foliage)
+
+- **Why the lone beech reads as oak under a realistic bark** ([note, step 1b](experiments/2026-11-02-beech-round2-stand-diagnosis.md)): the first-order scaffold rises at 36°, but the old second-order wood is level (77°) because it is shaded (ADR 0042 re-reads the light every season), while the lit tips stand at 48°: upturned clumps on level plates.
+- **ADR 0045 (proposed): `r2.lightLatch`**, a per-metamer `lit` column (the largest light fraction the wood has seen), **checkpoints at version 3** (version 2 loads with the column zero; a test builds v2 bytes), `hash.rs` hashing the column only when non-zero so the 16 goldens hold (ADR 0011's rule). Off by default; no species sets it; `npm run check` passes.
+- **Evidence against it** (20 seeds): the lone tree becomes a column (H 151, W/H 0.83) because every limb keeps its rise and the width was the level plates; the stand is byte-identical. Wood 16× stiffer does not level the plates either (73°). **Rejected by the user and the code reverted** (it is in commit 7106296): checkpoints stay at version 2, the schema unchanged, goldens unchanged. The user also chose the measured mid-grey bark for beech (track C makes it the default on `claude/foliage`).
+- **The garden's WASM gate: 170 → 200 kB gzip** (`cli/garden-size.ts`, ADR 0024 amended, the user's decision). The core is 170.7 kB after ADRs 0033–0044; PR #42 failed the gate by 0.7 kB.
+- **Track C's blind test v3** (`claude/foliage`, recounted here): at one scale with three namers, the accepted lone beech is beech 17 of 18 under the pale bark; under Pilarski's measured mid grey the stand is beech (9 of 9 with clearBole) and the lone tree oak. The judging set (seeds 4–6, five namers): the stand passes (9 of 15), the lone tree fails (5 and 7 of 15), birch 45 of 45, hornbeam's stand reads oak on those seeds. Girth ×1.45 and bark by light were tried and set aside. The choice is the user's: measured bark (stand right, lone tree's form to fix) or pale (lone tree right, stand reads birch).
+
 ## 2026-11-02: ADR 0044 accepted for beech: short shoots end on wood older than 20 seasons (branch claude/c1-calibration-ustbkz)
 
 - **The user's sources** put a beech spur chain at 10–15 years (Aas, LWF Wissen 86; AFZ-DerWald 2022; Roloff 1988), with age and light both acting and clean boles in a stand. Recorded in ADR 0044.

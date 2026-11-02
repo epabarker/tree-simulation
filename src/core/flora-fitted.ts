@@ -244,7 +244,7 @@ export const FITTED_FLORA = {
         },
       ],
       aC: 13.51,
-      dLambda: 0.1154,
+      dLambda: 0.04,
       ramp: 15,
       kappa: 0.7488,
       hJ: 22.69,

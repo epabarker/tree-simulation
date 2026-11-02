@@ -2,6 +2,11 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-02: The oak held (dLambda 0.04, the user's override); goldens updated
+
+- **The user chose "held"** for the oak after the garden sheets ([oak note](experiments/2026-11-02-oak-zigzag.md)): `r2.dLambda` 0.04 in `hand-overrides.toml` [oak], so λ stays at 0.52 and the stems are straight (1–2 kinks against 60–76). In the garden's four oak-bearing seeds the held oak stands to 100 (4 of 4, storms on) with the same peak slenderness as today's; the page's throw at seed 10 was one realisation. The lone oak is a cone until its form round (after shipping, with beech's rise-then-arch).
+- **Goldens (intended):** `oakOpen:seed1:s15` f2255ecd → 955e7b1e and `mixedWood:seed1:s15` 7222241d → afab738c (the oak's ramp ends at age 28, so only the cases with an oak past it move). `beechWood` and the other 13 are unchanged.
+
 ## 2026-11-02: The judging pass; track B's accepted picks adopted at last (birch, oak, maple, willow); goldens updated
 
 - **The user's judging pass** on the phone, from track C's sheets, verbatim in [`reviews/2026-11-02-judging-pass.md`](reviews/2026-11-02-judging-pass.md): oak "no" (a hazel coppice: zigzag limbs from a low fork; the garden's trunks read as lightning bolts), the other seven "nearly", and the pale depth fade hiding trees (garden seed 3, the birch stand). The fade and birch's black trunk are track C's.

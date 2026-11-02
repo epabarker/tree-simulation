@@ -81,6 +81,11 @@
 "r2.levels.1.setPoint" = 35
 "r2.levels.1.agedSetPoint" = 85
 "r2.levels.1.agedOver" = 50
+# The zigzag (the user's judging pass, 2026-11-02; docs/experiments/2026-11-02-oak-zigzag.md): the fit's
+# dLambda 0.1154 takes lambda below 0.5 once the ramp ends, so a lateral takes over at nearly every
+# node (60-76 kinks a stem: the garden's "lightning bolts"). Held at 0.04 (lambda 0.52) the stems are
+# straight (1-2 kinks); the lone oak is a cone until its form round. The user's override, 2026-11-02.
+"r2.dLambda" = 0.04
 
 [maple]
 # Track B's accepted form (the user, 2026-11-01; picks.toml): the relay from age 10 (ADR 0033), its

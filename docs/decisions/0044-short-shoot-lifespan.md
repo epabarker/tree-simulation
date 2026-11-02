@@ -46,14 +46,16 @@ Sources found and read by the user, 2026-11-02: the German forestry texts in ful
 ## Evidence (beech, 20 seeds, 2026-11-02)
 [The diagnosis note, step 2](../experiments/2026-11-02-beech-round2-stand-diagnosis.md):
 
-| | accepted | L 40 | L 20 | L 10 |
-|---|---|---|---|---|
-| ecology guard passes | 8 of 20 | 12 | 11 | 0 |
-| stand LAI, median | 7.9 | 7.7 | 7.0 | 5.35 |
-| leaf on the stand's trunks | 63% of the low leaf | 0 | 0 | 0 |
-| lone tree's leaf below H/6 | 8.4% | 6.7% | 6.7% | 7.8% |
+| | accepted | L 40 | L 20 | L 15 | L 10 |
+|---|---|---|---|---|---|
+| ecology guard passes | 8 of 20 | 12 | 11 | 6 | 0 |
+| stand LAI, median | 7.9 | 7.7 | 7.0 | 6.65 | 5.35 |
+| leaf on the stand's trunks | 63% of the low leaf | 0 | 0 | 0 | 0 |
+| lone tree's leaf below H/6 | 8.4% | 6.7% | 6.7% | 7.6% | 7.8% |
 
 - L 20–40 clears the trunks and brings LAI into band.
 - L 10 thins the crowns themselves.
 - What remains low at L 40 is mostly R4's released shoots.
-- **Recommendation, if adopted:** the sourced value is about 15. Its 20-seed evidence decides between 15 and 20 (L 10 thinned the crowns; L 20 passed).
+- **L 15, the sourced value, fails the ecology guard** (6 of 20; survival ≥ 10 of 12 on 13 seeds against the accepted 19): the wood-age clock ends crown short shoots younger than 15, and the weaker trees starve.
+- **Recommendation:** L 20 for beech, the nearest passing value (guard 11 of 20; trunks clear). On the bole, chains at 20 are five years past the sources' "up to 15"; inside the crown, the wood-age clock makes 20 on wood about 15 on the chain. A chain-age clock (a birth season per short shoot, a checkpoint change) would let the sourced 15 be set as it is; left for later.
+- **The user (2026-11-02) said to adopt 15 if it passed; it did not.** Adopting 20 is their call.

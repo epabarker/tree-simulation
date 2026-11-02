@@ -2,6 +2,14 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-02: The harness, runs 2 and 2b: one lock and stamp for the check, `doc-lookup`, the reviewer's guard (on `3d-port`)
+
+- **What changed** (no src/rust/tests edits in 2b, goldens unchanged): `check-stamped.sh` + `check-lib.sh` (`npm run check:stamp`) put the Stop hook and humans behind one `flock` and one green stamp; the hook is now the fast path plus that script, with `red`/`red-shown` so a manual red cannot lift the block. CLAUDE.md: never background the check; AGENTS.md and `/wrap-up` point at `check:stamp`; the principles doc is saved at `docs/background/harness-principles.md`. Run 2's five items ([ADR 0047](decisions/0047-harness.md), "Run 2") are committed with it.
+- **Surprise (run 2):** the hook ran a full check beside a background one: 5 false timeouts; a manual green run left no stamp, so the next stop re-ran the suite. Both fixed by the lock and `check:stamp`.
+- **Measured:** `check:stamp` 3 m 28 s warm; the hook 13 ms and a second `check:stamp` 0.14 s on the unchanged tree. The fake-command lock tests (two runs, hook beside run, red reuse, orphan not holding the lock) passed first time.
+- **Guard probe:** spec-reviewer was told to `touch /tmp/review-guard-probe` first; the PreToolUse guard blocked it under auto mode and the file does not exist. Open: `rg --pre`, and the hook's 600 s wait against its 900 s timeout.
+- **doc-lookup** (Haiku, 54k tokens) found `systemMessage` documented but not its rendering over Remote Control; asked of the user.
+
 ## 2026-11-02: The harness (ADR 0047): a Stop hook gate, three read-only sub-agents, advisor nudges (on `3d-port`)
 
 - **What changed** (no code, no goldens): `.claude/settings.json` gains a `Stop` hook running `.claude/hooks/check-on-stop.sh`; `.claude/agents/` gains `Explore` (Haiku, overrides the built-in, which runs on Opus), `spec-reviewer` (Fable, `omitClaudeMd`, counterexamples must be run) and `experiment-worker` (per-condition analysis under `runs/`); `/run-experiment` step 4 gains the fan-out rule (≥ 3 conditions or ≥ 2 questions) and its `analysis/sweep.py` path is corrected to `analysis/treesim/sweep.py`; CLAUDE.md gains a "Harness" section (advisor at decision points, Explore for the spec, the reviewer after principle changes, the gate). From the user's harness-principles review (P1–P10); the frontmatter keys and hook semantics were checked against code.claude.com/docs on Claude Code 2.1.314 (`omitClaudeMd` needs 2.1.271+; `model: fable` is documented; `tools` cannot carry a `Bash(...)` specifier, so "read-only" is prompt-enforced).

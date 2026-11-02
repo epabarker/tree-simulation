@@ -39,6 +39,7 @@ const onTrees = (scene: Scene, l: ReturnType<Scene["leaves"]>) =>
   drawn(l, 0, l.count - scene.fallenLeaves);
 
 describe("seasons (M17)", () => {
+  // 33.6 s inside a clean full run (2026-11-02), over the 30 s default: it grows a broadleaf stand first.
   it("leafs out in spring, keeps a full crown in summer, and stands bare in winter", () => {
     const scene = grown("broadleaf");
     const early = drawn(play(scene, 0, 0.005));
@@ -52,7 +53,7 @@ describe("seasons (M17)", () => {
     for (let k = 0; k < winter.count; k++)
       if ((winter.size[k] as number) > 0 && (winter.y[k] as number) > 0.2) aloft++;
     expect(aloft).toBe(0);
-  });
+  }, 90_000);
 
   it("turns shaded leaves first in autumn", () => {
     const scene = grown("broadleaf");

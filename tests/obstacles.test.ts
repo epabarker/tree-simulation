@@ -48,6 +48,8 @@ describe("obstacles (ADR 0015)", () => {
     expect(insideObstacle(presetParams("skyTree"), 60, 10)).toBe(false); // none
   });
 
+  // Measured 12.5–13.1 s alone (2026-11-02, 3 runs), 31 s inside a clean full run (41 s when a second check ran beside it); the core's stepping
+  // (5 seeds × 45 seasons) is almost all of it. It passed the 30 s default once and blocked the Stop hook.
   it("keeps growth out: no tip ever enters, and the tree grows around and past it (5 seeds)", () => {
     for (let seed = 1; seed <= 5; seed++) {
       const base = presetParams("skyTree", seed);
@@ -59,7 +61,7 @@ describe("obstacles (ADR 0015)", () => {
       }
       expect(height(world.trees[0] as Tree)).toBeGreaterThan(block.y + block.height + 5);
     }
-  });
+  }, 90_000);
 
   it("clears branches when an obstacle appears over a grown crown, and changes nothing without one", () => {
     const base = presetParams("skyTree", 2);

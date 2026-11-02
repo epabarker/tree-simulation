@@ -1,37 +1,44 @@
 #!/usr/bin/env bash
-# Stop hook (ADR 0047, P1): when code changed since the last green run, run `npm run check`
-# and block the stop on failure, feeding the log's tail back to Claude.
-# Exit 0 lets Claude stop. Exit 2 blocks it; stderr is the message Claude receives
-# (code.claude.com/docs/en/hooks). .claude/settings.json runs this on every stop, so it must be
-# cheap when nothing changed: it fingerprints the files `npm run check` covers.
+# Stop hook (ADR 0047, P1): when code changed since the last green run, run the stamped check and block the stop on
+# failure, feeding the log's tail back to Claude. Exit 0 lets Claude stop; exit 2 blocks it and stderr is Claude's reason
+# (code.claude.com/docs/en/hooks). It runs on every stop, so an unchanged tree must cost milliseconds.
+# The suite itself runs in check-stamped.sh, under the lock: if a check is already running (a human's, Claude's) this
+# hook waits for it and reuses its result, never a second suite.
 set -u
-cd "${CLAUDE_PROJECT_DIR:-.}" || exit 0
-export PATH="$HOME/.cargo/bin:$PATH"
-
-# What `npm run check` covers. Tracked and untracked, ignoring the ignored (rust/target, src/wasm/pkg).
-PATHS=(src rust tests cli package.json package-lock.json biome.json 'tsconfig*.json' .node-version rust-toolchain.toml)
-fp=$(git ls-files -c -o --exclude-standard -z -- "${PATHS[@]}" | sort -z | xargs -0 sha1sum 2>/dev/null | sha1sum | cut -d' ' -f1)
-state="${TMPDIR:-/tmp}/treesim-check-$(printf %s "$PWD" | sha1sum | cut -c1-8)"
-mkdir -p "$state"
+here=$(cd "$(dirname "$0")" && pwd)
+. "$here/check-lib.sh"
+fp=$(fingerprint)
 
 # Unchanged since the last green run: nothing to do (docs-only turns, questions, the turn after a commit).
-[ -f "$state/green" ] && [ "$(cat "$state/green")" = "$fp" ] && exit 0
+[ "$(cat "$state/green" 2>/dev/null)" = "$fp" ] && exit 0
 # First run on a clean tree: HEAD was checked before it was committed, and by CI. Trust it once.
 if [ ! -f "$state/green" ] && [ -z "$(git status --porcelain -- "${PATHS[@]}")" ]; then
   echo "$fp" >"$state/green"
   exit 0
 fi
-# The same failing state a second time: Claude saw the log and changed no code (it is asking the user). Let it stop.
-[ -f "$state/red" ] && [ "$(cat "$state/red")" = "$fp" ] && exit 0
-
-if npm run check >"$state/check.log" 2>&1; then
-  echo "$fp" >"$state/green"
-  rm -f "$state/red"
+# The hook already blocked on this same failing state and Claude changed no code (it is asking the user): let it stop,
+# and say so. `systemMessage` is the documented JSON field for a warning to the user; the docs do not say whether a Stop
+# hook's one reaches Remote Control or the desktop app (2026-11-02, doc-lookup), so the final report names the log too.
+if [ "$(cat "$state/red-shown" 2>/dev/null)" = "$fp" ]; then
+  jq -n --arg m "Stop hook: npm run check is STILL RED and this stop was let through (the hook already blocked once on this same failing state). Log: $state/check.log" '{systemMessage: $m}'
   exit 0
 fi
-echo "$fp" >"$state/red"
-{
-  echo "Stop hook: 'npm run check' failed (full log: $state/check.log). Fix it before stopping, or tell the user why you cannot. Last 40 lines:"
-  tail -40 "$state/check.log"
-} >&2
-exit 2
+
+block() {
+  echo "$fp" >"$state/red-shown"
+  {
+    echo "Stop hook: 'npm run check' failed (full log: $state/check.log). Fix it before stopping, or tell the user why you cannot. Last 40 lines:"
+    tail -40 "$state/check.log"
+  } >&2
+  exit 2
+}
+# A failed run on this very tree already exists (someone ran check:stamp and it went red): feed its log back, do not re-run.
+[ "$(cat "$state/red" 2>/dev/null)" = "$fp" ] && block
+
+CHECK_LOCK_WAIT=600 "$here/check-stamped.sh" >/dev/null 2>&1
+case $? in
+  0) exit 0 ;;
+  1) block ;;
+  *) jq -n --arg m "Stop hook: could not run or wait for npm run check; this stop was let through UNCHECKED. Log: $state/check.log" '{systemMessage: $m}'
+     exit 0 ;;
+esac

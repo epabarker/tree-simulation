@@ -1,6 +1,6 @@
 # Status
 
-_Last updated: 2026-11-02 (the harness, ADR 0047, on `3d-port`: Stop hook, three read-only sub-agents, advisor nudges; I3 merged earlier today)_
+_Last updated: 2026-11-02 (the harness, ADR 0047, runs 2 and 2b on `3d-port`: one check lock and stamp, `doc-lookup`, the reviewer guard; I3 merged earlier today)_
 
 **3D port** on the branch `3d-port` (work branches open PRs into it). ADR 0024–0029, 0031, 0032, 0039–0042, 0044, 0046 and 0047 accepted, 0030, 0043 and 0045 rejected. The live site stays on 0.14.0 (2D) until the bar below is met.
 
@@ -16,11 +16,12 @@ _Last updated: 2026-11-02 (the harness, ADR 0047, on `3d-port`: Stop hook, three
 - **Species forms after the judging pass (`hand-overrides.toml`, 2026-11-02):** birch's pendulous twigs; oak's posture by age and held apical control; maple's relay; holly's late fork; rowan's held limbs; willow's pick withdrawn; hornbeam as fitted; beech the fresh look. The user's two passes: `reviews/2026-11-02-judging-pass.md`.
 - **Gallery** (`analysis/fit/gallery/`): rounds 2–4's rejects; `m27_gallery.py`. Oak and hornbeam pass the check; beech's cone sits within the noise of its round-2 form.
 
-## Harness (ADR 0047, 2026-11-02)
-- **Added:** a Stop hook (`.claude/hooks/check-on-stop.sh`) runs `npm run check` when the code paths changed since the last green run (244 s here; no-op in 18 ms otherwise) and blocks the stop with the log's tail; `.claude/agents/`: `Explore` on Haiku (finding), `spec-reviewer` on Fable (demonstrated divergences only), `experiment-worker` (per-condition analysis under `runs/`); CLAUDE.md nudges for the advisor.
-- **This repo can answer (harness doc §5):** 3b's hit rate (log every reviewer verdict after a principle change: demonstrated hits against unverified or false alarms, for a month); 3c's token delta (one rough point: similar C2 lookups, prompts differed, 36k tokens on the built-in Opus Explore against 10k on Haiku); Opus+Fable against Sonnet+Opus (below).
-- **A/B plan (3g):** the same principle change twice from the same commit, with and without 3b/3c and as Opus+Fable against Sonnet+Opus; goldens bit-identical are the oracle; compare tokens, wall-clock, advisor calls, and whether `check` went green first time.
-- **Known:** in the hook's first real block the obstacles test also timed out (30 s) on a warm laptop: the gate can block falsely; the second stop on the same failing state is let through.
+## Harness (ADR 0047, runs 1–2b, 2026-11-02; principles: docs/background/harness-principles.md)
+- **Gate:** Stop hook → `.claude/hooks/check-stamped.sh` (one lock, one stamp, shared fingerprint in `check-lib.sh`). Run `npm run check:stamp` in the foreground, never in the background: a manual green counts, a concurrent run is waited for and reused. Unchanged tree: hook in 13 ms. Let-through only after the hook has blocked once on the same red (`red-shown`).
+- **Agents:** `Explore` and `doc-lookup` (Haiku: finding), `spec-reviewer` (Fable; `reviewer-bash-guard.sh` blocked `touch` under auto mode, 2026-11-02), `experiment-worker`. Open: `rg` is on the guard's allow-list (`rg --pre` runs commands); the hook's 600 s wait plus a 300 s+ suite exceeds its 900 s timeout.
+- **Measured:** check 3 m 28 s warm; obstacles test 12.5–13.1 s alone, 31 s in a full run, seasons "leafs out" 33.6 s (both 90 s timeouts); goldens bit-identical.
+- **Still to measure (harness doc §5):** 3b's hit rate (log every reviewer verdict for a month); 3c's token delta (36k Opus Explore vs 10k Haiku, prompts differed); the 3g A/B, Opus+Fable against Sonnet+Opus, goldens as oracle.
+- **Known:** the first real block also timed out the obstacles test (fixed by the 90 s timeouts). Whether a Stop hook's `systemMessage` shows over Remote Control is not documented: asked of the user.
 
 ## Next
 1. **Ship (the user, 2026-11-02): no round-5 fit.** The species' looks are the form picks (ADR 0033–0038) and the beech; a species that reads wrong on the phone gets an override, never a round. Next the release, the site's PR and the phone soak (`garden.html?bench&seed=10`; over ≈ 3 s, ADR 0046's picture follows).

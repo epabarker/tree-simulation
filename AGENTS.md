@@ -26,6 +26,7 @@ An interactive tree-growth simulator for a personal website: trees grow in a 3D 
 ```
 npm run dev                # page with hot reload (add -- --host to test on a phone over the LAN)
 npm run check              # builds the WASM, Rust fmt/clippy/tests, lint, typecheck, tests: run before saying anything is done
+npm run check:stamp        # the same check under the Stop hook's lock; a green run is the hook's stamp. Use it, in the foreground
 npm run build:wasm         # the Rust core → src/wasm/pkg/ (generated; check and test build it too)
 npm run rust:check         # cargo fmt, clippy -D warnings and tests, with and without the threads feature
 npm run test               # tests only

@@ -22,6 +22,7 @@
     "test": "vitest run",
     "evidence:2d": "vitest run -c tests/evidence-2d/vitest.config.ts",
     "check": "npm run build:wasm && npm run rust:check && npm run lint && npm run typecheck && npm run test",
+    "check:stamp": "bash .claude/hooks/check-stamped.sh",
     "sim": "node cli/run.ts",
     "pregolden:update": "node cli/require-node.mjs",
     "golden:update": "node tests/update-golden.ts",

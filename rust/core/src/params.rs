@@ -346,6 +346,8 @@ pub struct R6 {
     pub enabled: bool,
     pub q_min: f64,
     pub leaf_area: f64,
+    /// L: a short shoot on wood older than this rests as a dormant bud (ADR 0044). Absent: off.
+    pub lifespan: Option<f64>,
 }
 
 /// The typed view of one params object (the world's, or a species' merged over it).
@@ -633,6 +635,7 @@ impl Params {
                     enabled: flag(g, "enabled"),
                     q_min: num(g, "qMin"),
                     leaf_area: num(g, "leafArea"),
+                    lifespan: opt(g, "lifespan"),
                 }
             },
             species: species_table.map(|t| t.iter().map(|(k, _)| k.clone()).collect()),

@@ -509,6 +509,12 @@ export interface Params {
     qMin: number;
     /** a_ss: leaf area of a short shoot, in units of a long shoot's (calibrate). */
     leafArea: number;
+    /**
+     * L: a short shoot on wood older than this many seasons rests as a leafless dormant bud, which
+     * R4 ages and aborts, so the trunk's short shoots do not live for ever (ADR 0044, proposed).
+     * Absent: off.
+     */
+    lifespan?: number;
   };
 }
 

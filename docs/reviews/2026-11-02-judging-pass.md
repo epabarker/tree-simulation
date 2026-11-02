@@ -21,3 +21,18 @@ Two cross-cutting notes (the user): the oak zigzag is the single fix with the bi
 ## What follows (track E)
 - **Renderer, track C:** the depth fade (garden seed 3, the birch stand) and birch's black trunk.
 - **Growth, overrides only (the shipping order):** the oak's zigzag first; then holly, rowan, willow, maple, hornbeam, birch's lone spire, each an override judged on a sheet. Beech's plates are the parked form gap (rise-then-arch).
+
+## The second pass: the candidates in the real renderer (the user, 2026-11-02, later)
+
+On track C's variant sheets (`figures/2026-11-02-judging-{oak,holly,rowan}-variants.jpg`, `-{birch,maple,willow}-picked.jpg`, `-garden-oak.jpg`; seed 4, one scale). The user's words, verbatim. Format: `species: pick · what's still wrong · which plate`.
+
+```
+oak: held  (chosen on the garden sheets and the note: straight stems; the lone oak a cone until its form round)
+holly: fork40 · lone 100 crown is lumpy and two-lobed, a bit squat, but a bush not a cypress · lone 100
+rowan: kappa1 · a touch dense for rowan and the top leans; stand stems still snake, accept · lone 100; stand
+birch: yes · crown still a narrow cone with no pendulous sweep, but it's a birch now · lone 100
+maple: no · pollard/topped lime · still a flat-topped inverted cone; the picks barely moved it · lone 60 and 100
+willow: no · hawthorn/umbrella thorn · now wider than tall, flat-topped open fan; worse than before · lone 100 (60 same); stand poles cross in X's
+```
+
+**Done with it (track E):** oak held, holly fork40 and rowan kappa1 adopted as overrides; birch ships with its pick; maple keeps its pick (it did no harm) and goes on the after-shipping form list (the flat top, ADR 0031); willow's pick is withdrawn (worse than before) and willow ships as its round-2 fit, on the after-shipping list. Hornbeam and beech as before.

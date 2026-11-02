@@ -2,6 +2,12 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-02: The second judging pass: holly and rowan adopted, willow's pick withdrawn, maple to the form list; goldens updated
+
+- **The user's picks** on the real-renderer sheets ([judging pass](reviews/2026-11-02-judging-pass.md), second pass): holly fork40 (beech's fork rules from age 40: a bush, not a cypress), rowan kappa1 (level-1 λ 0.53, κ 1.0: an oval crown on a straight stem), birch yes, maple no (the picks barely moved its flat top), willow no (its pendulous pick made it "worse than before": a flat open fan).
+- **Adopted** in `hand-overrides.toml`: holly's fork, rowan's λ and κ. **Withdrawn:** willow's pick (its keys stripped from `flora-fitted.ts` by hand, since `m27_adopt.py` amends over the current entry and a removed override leaves its keys). Maple keeps its relay pick; its flat top is ADR 0031's, after shipping. Willow's form (a dense rounded bush) joins the after-shipping list.
+- **Goldens (intended):** `mixedWood:seed1:s15` afab738c → 6b76672e and `beechWood:seed1:s30` c3245824 → c036c7ff (holly, rowan and willow are in the woods). The other 14 unchanged.
+
 ## 2026-11-02: The oak held (dLambda 0.04, the user's override); goldens updated
 
 - **The user chose "held"** for the oak after the garden sheets ([oak note](experiments/2026-11-02-oak-zigzag.md)): `r2.dLambda` 0.04 in `hand-overrides.toml` [oak], so λ stays at 0.52 and the stems are straight (1–2 kinks against 60–76). In the garden's four oak-bearing seeds the held oak stands to 100 (4 of 4, storms on) with the same peak slenderness as today's; the page's throw at seed 10 was one realisation. The lone oak is a cone until its form round (after shipping, with beech's rise-then-arch).

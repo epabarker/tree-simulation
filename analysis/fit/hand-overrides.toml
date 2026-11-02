@@ -14,10 +14,28 @@
 "o4.qEst" = 0.01
 # The fitted juvenile height (39) left the founding holly too slow to hold its place.
 "r2.hJ" = 20
+# The judging pass (the user, 2026-11-02; docs/experiments/2026-11-02-overrides.md): the lone holly at
+# 100 was a narrow pointed spire (a cypress). Beech's fork rules from age 40 (ADR 0033, 0039-0041)
+# end the leader and round the top: a bush, W/H 0.69 against 0.45; the stand's LAI and survival
+# unchanged. The user's pick, with the reservation "lone 100 crown is lumpy and two-lobed, a bit squat".
+"r2.relay" = 2
+"r2.relayAge" = 40
+"r2.relayPTerm" = 0.3
+"r2.relayCrowd" = 10
+"r2.forkAt" = 1.3
+"r2.forkAngle" = 45
+"r2.vigourTreeLo" = 3000
+"r2.vigourTreeHi" = 10000
 
 [rowan]
 # The fit lowered Q_ss to 0.039, so rowan survived 5.4% (band 8–14%, the oak's score): back to M25's.
 "r6.qMin" = 0.06
+# The judging pass (the user, 2026-11-02): the lone rowan was stacked lumpy tiers with a leaning flat
+# cap. Its first-order lambda was 0.4917 (below 0.5 from birth: the limbs lost their apex at every
+# node) and kappa 1.448. Held at 0.53 with kappa 1.0: an oval crown on a straight stem. The user's
+# pick, with the reservations "a touch dense, the top leans; the stand's stems still snake, accept".
+"r2.levels.1.lambda" = 0.53
+"r2.kappa" = 1.0
 
 [pine]
 # The fit lowered Q_ss to 0.096: pine survived 12.7%, as tolerant as birch (band 20–30%).
@@ -97,9 +115,7 @@
 "r2.levels.0.curveLength" = 30
 
 [willow]
-# Track B's accepted form (the user, 2026-11-01; picks.toml): pendulous twigs (ADR 0035) on willow's
-# own twig set point, twig laterals every second node (ADR 0036): a broader, low, bushy crown.
-# Adopted 2026-11-02.
-"r2.levels.2.pendulous" = 140
-"r2.levels.2.pendulousRadius" = 0.01
-"r2.levels.2.lateralEvery" = 2
+# Track B's accepted form (2026-11-01: pendulous twigs with laterals every second node) was adopted on
+# 2026-11-02 and withdrawn the same day on the user's judging pass in the real renderer: "wider than
+# tall, flat-topped open fan; worse than before; stand poles cross in X's". Willow ships as its
+# round-2 fit; its form (a dense rounded bush) is on the after-shipping list.

@@ -35,6 +35,7 @@ block() {
 # A failed run on this very tree already exists (someone ran check:stamp and it went red): feed its log back, do not re-run.
 [ "$(cat "$state/red" 2>/dev/null)" = "$fp" ] && block
 
+# Wait at most 600 s for a lock, then a cold suite of up to 600 s: both fit the 1200 s hook timeout in settings.json.
 CHECK_LOCK_WAIT=600 "$here/check-stamped.sh" >/dev/null 2>&1
 case $? in
   0) exit 0 ;;

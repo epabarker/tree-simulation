@@ -18,7 +18,7 @@ _Last updated: 2026-11-02 (the harness, ADR 0047, runs 2 and 2b on `3d-port`: on
 
 ## Harness (ADR 0047, runs 1–2b, 2026-11-02; principles: docs/background/harness-principles.md)
 - **Gate:** Stop hook → `.claude/hooks/check-stamped.sh` (one lock, one stamp, shared fingerprint in `check-lib.sh`). Run `npm run check:stamp` in the foreground, never in the background: a manual green counts, a concurrent run is waited for and reused. Unchanged tree: hook in 13 ms. Let-through only after the hook has blocked once on the same red (`red-shown`).
-- **Agents:** `Explore` and `doc-lookup` (Haiku: finding), `spec-reviewer` (Fable; `reviewer-bash-guard.sh` blocked `touch` under auto mode, 2026-11-02), `experiment-worker`. Open: `rg` is on the guard's allow-list (`rg --pre` runs commands); the hook's 600 s wait plus a 300 s+ suite exceeds its 900 s timeout.
+- **Agents:** `Explore` and `doc-lookup` (Haiku: finding), `spec-reviewer` (Fable; `reviewer-bash-guard.sh` blocked `touch` under auto mode, 2026-11-02), `experiment-worker`. `rg` dropped from the guard's allow-list (`rg --pre` runs commands); hook timeout 1200 s (600 s lock wait + a cold suite).
 - **Measured:** check 3 m 28 s warm; obstacles test 12.5–13.1 s alone, 31 s in a full run, seasons "leafs out" 33.6 s (both 90 s timeouts); goldens bit-identical.
 - **Still to measure (harness doc §5):** 3b's hit rate (log every reviewer verdict for a month); 3c's token delta (36k Opus Explore vs 10k Haiku, prompts differed); the 3g A/B, Opus+Fable against Sonnet+Opus, goldens as oracle.
 - **Known:** the first real block also timed out the obstacles test (fixed by the 90 s timeouts). Whether a Stop hook's `systemMessage` shows over Remote Control is not documented: asked of the user.

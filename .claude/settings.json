@@ -22,7 +22,7 @@
           {
             "type": "command",
             "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/check-on-stop.sh",
-            "timeout": 900,
+            "timeout": 1200,
             "statusMessage": "Stop hook: npm run check (code changed since the last green run)"
           }
         ]

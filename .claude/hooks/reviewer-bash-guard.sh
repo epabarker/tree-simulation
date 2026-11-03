@@ -14,7 +14,7 @@ for p in "${parts[@]}"; do
     'export PATH="$HOME/.cargo/bin:$PATH"'|'git diff'*|'git status'*|'git log'*|'git show'*) ;;
     'npm run test'|'npx vitest run'*|'cargo test'*|'cd rust'|'cd '"${CLAUDE_PROJECT_DIR:-.}"|'cd '"${CLAUDE_PROJECT_DIR:-.}"/rust) ;;
     'node cli/run.ts '*'--out /tmp/review-'*) ;;
-    grep\ *|rg\ *|ls|ls\ *|cat\ *|head\ *|tail\ *|wc\ *) ;;
+    grep\ *|ls|ls\ *|cat\ *|head\ *|tail\ *|wc\ *) ;;
     *) deny "$p";;
   esac
 done

@@ -292,39 +292,21 @@ no z was computed, and nothing registered changed after it.
 - **Before any fitted params are accepted:** the gallery regression and `shapeFlag` (the session after the sweep).
 
 ### State
-_(rewritten at the end of each session)_ **1d-i done (2026-11-03): gate c v3 is registered from real QSMs only
-(`phase1-tolerances.json` v3, commit 6610fb4).** v2 (3f13c29) admitted no species; the user ruled; v3 follows.
-Nothing simulated has been measured since v1. The note's section is "v2 and v3".
-- **The v3 instrument:**
-  - coarsening is prune only (the re-cut withdrawn), with inflation gated;
-  - the segment-length-dependent descriptors are read at the 0.5 m step: limbElevation05 and pendulousFraction05
-    are new, and the per-cylinder tortuosity, limbElevation and pendulousFraction are report-only, beside ldSlope
-    and junctionDelta;
-  - beech is the median of its 5 BioDiv repeats, with the floor SD / √5. Wytham stays single-model (an asymmetry,
-    recorded);
-  - amendment E is applied over the descriptors that pass the floor;
-  - tiers A and B are in `tiers.py` (hashed, not yet wired).
-- **The control's d_min:**
-  - Wytham: 5.0 mm (p20);
-  - BioDiv: 8.6 mm (p2; it fails at p5);
-  - Demol (reported): none.
-- **Before any simulated tree, the descriptors that pass the floor:** oak 18 (length2 is A-only), maple 15,
-  beech 21. Noise-limited: oak 3, maple 6, beech 2 (branchAngle2, taper).
-- **Size-match references:** oak 0.596 m, maple 0.247 m, beech 0.291 m (`rules.size_match`).
-- **Code:**
-  - `analysis/treesim/{…,coarsen (prune only),describe (+2 descriptors),control,tiers,tolerance}.py`;
-  - tests: 72 pass.
+_(rewritten at the end of each session)_ **Phase 2 built, sweep not run (2026-11-03).** Targets pre-registered
+(9b1f4c0, §k); the measurement, loss, gate, resumable fitter and sweep script are in; the beech dry run passed.
+- **Targets** (`tallo-level0.json`): n (H/CR) beech 8,931/7,082, oak 3,749/3,617, birch 1,250/1,126, hornbeam
+  1,075/1,070 (2 sources), maple 166/155, pine 15,088/13,340, fir 1,070/1,044, sycamore (reference) 686/668; flagged
+  n < 100 with a borrowed band: willow 33/19, rowan 44/36, holly 25/25 (one source, 8–17 cm). T 0.81–0.87 (thin:
+  0.97, 0.96, 0.51); control self-consistency 15–20 of 20; coverage per tercile 0.75–0.87 (thin: noise).
+- **Dry run (beech):** 8.8 s wall an evaluation on 12 workers; the shipped beech's gate 0 of 20, too tall for its DBH
+  (z_H +1.5 to +1.7) and for its age (127 cells at 60 against 84); CR inside its band. No codominant stems.
+- **Step 6 (conflicts):** none found in the data: each species' height-at-age targets sit inside Tallo's H band over
+  a wide DBH window (beech H60 21 m at 15–77 cm, H100 30 m at 32–77 cm); holly's is narrow (14–17 cm at 100, at the
+  support's top), so holly at 150 is likely not comparable. Whether the fit can reach both is the sweep's question.
 - **Next:**
-  1. Phase 2 (Tallo, Level 0).
-  2. 1d-ii, in order:
-     - register v3.1: tier B's bracket to the control's first failing grid point (above);
-     - wire `tiers.py` into `phase1_degradation.py`;
-     - the size-matched seasons;
-     - gate c on phase 2's trees.
-  - **Demol** serves tier A descriptors only, in phase 3.
-- **Standing rulings:**
-  - R2: match on measured DBH;
-  - R3: done;
-  - R5: BioDiv "Phase 1 only", amended for beech's tolerances, floor and size reference;
-  - §g is reordered: beech is phase 3, oak phase 4;
-  - ADR 0049 is accepted.
+  1. The user runs `analysis/experiments/level0_sweep.sh` (default 420 evaluations ≈ 62 min a species, ≈ 10.3 h for
+     ten; thin for 7 knobs: fewer species a night for depth).
+  2. Then `level0_gate.py --fit` per species; **before any fitted params are accepted, the gallery regression and
+     `shapeFlag`**; adoption through the fit files only.
+  3. 1d-ii (register v3.1, wire `tiers.py`, size-matched seasons, gate c) on phase 2's trees.
+- **Standing rulings:** §k (phase 2); R2, R3 done, R5 as amended; §g reordered; ADR 0049 accepted.

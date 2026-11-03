@@ -2,6 +2,37 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-03: Reference fidelity, phase 2: Level 0 targets from Tallo, the measurement, the gate, the fitter (no sweep run)
+
+- **What changed** (Python, `cli/`, targets `[level0]`, docs; no src/rust/presets/species; goldens unchanged; gate c's
+  registration untouched):
+  - pre-registered first (9b1f4c0): `treesim/tallo.py` → `analysis/fit/sources/tallo-level0.{json,csv}` (Tallo v1.0.0,
+    CC-BY 4.0: H–DBH and CR–DBH quantile curves, support, T, coverage), the plan's §k with the knobs;
+  - `cli/allometry.ts` (phase 1's DBH and height ported, parity 1e-9 on 67 stand trees; CR the mean of the four largest
+    live-bud tip offsets), `runStand` to 150 (`stand150`), `cli/level0-dump.ts` (parity only, in no build);
+  - `fit.py`: `load_spec(species, level=0)`, `stand.talloH`/`talloCR`, per-trait loss contributions (existing callers
+    unchanged); `treesim/fit_level0.py` (resumable CMA-ES, budget in evaluations, best-so-far each generation);
+    `level0_fit.py`, `level0_gate.py`, `level0_sweep.sh` (not launched).
+- **The user's rulings in session:** thin species (willow, rowan, holly) borrow the band width from the broadleaves'
+  pooled residuals about their own median; the budget in evaluations with a max-hours safety stop and a checkpoint;
+  ten gated, sycamore reference; scored traits are Tallo's two plus height at 60, lateShare, LAI, shade (an exception
+  to ADR 0049 §1 for the two time anchors); CR by the largest tip offset; T from a real-data control, joint over H and
+  CR, drawn from the whole support; coverage per tercile as the conditionality diagnostic.
+- **Numbers:** T 0.81–0.87 for the well-sampled species (willow 0.97, rowan 0.96, holly 0.51); control
+  self-consistency 15–20 of 20; coverage 0.75–0.87 per tercile (the thin three's terciles hold 6–11 trees: noise).
+  Dry run (beech, 78 evaluations): 8.8 s wall an evaluation on 12 workers (96 s CPU, against 18.8 s alone; 6 workers
+  slower). Shipped beech's gate: **0 of 20**: too tall for its DBH (median z_H +1.5 to +1.7; CR inside, +0.3 to +0.5),
+  and too tall for its age (127 cells at 60 against 84).
+- **Surprises:**
+  - The rule as first registered (per-trait T at 90%, both traits) passes a Tallo-drawn seed with p ≈ 0.81, so its
+    18/20 self-consistency could not hold; ruled to a joint T. The first binned control's T was not flat in DBH
+    (25-tree bins: noise); ruled to whole-support draws, with coverage as the diagnostic.
+  - A bug in the Step 0 commit: the `>= 100` edit landed in `runLone` (harmless) instead of `runStand`, so the first
+    dry run read 60, 60, 110; fixed and re-run.
+  - The parity dump read simulated DBH, H and CR before the pre-registration commit (recorded there; no z computed).
+  - Metamer coordinates are continuous across the ring; 7 of 210 beech readings carry a limb longer than half of it.
+    No codominant stem below 1.3 m in 210 readings: no √Σd² question.
+
 ## 2026-11-03: Reference fidelity, phase 1c: coarsen(), the pre-registered tolerances, gate c (stops oak and beech)
 
 - **What changed** (Python, `cli/dump-trees.ts --gate-c`, and docs; no src/rust/presets/species; goldens unchanged):

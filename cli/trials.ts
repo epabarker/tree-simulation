@@ -254,7 +254,7 @@ export function runLone(
     ldSlope: f.ldSlope,
     leafStemSlope: f.leafStemSlope,
   };
-  if (seasons >= 100) {
+  if (seasons === 100) {
     world.run(40);
     const t = world.trees[0] as Tree;
     traits.alive100 = t.alive;
@@ -335,7 +335,7 @@ export function runStand(
     lai: world.lai(0, STAND_WIDTH),
     widestAt: mean(live.map((t) => world.formOf(t).widestAt)),
   };
-  if (seasons === 100) {
+  if (seasons >= 100) {
     world.run(40);
     const still = interior.filter((t) => t.alive);
     traits.height100 = mean(still.map((t) => world.metricsOf(t).height));

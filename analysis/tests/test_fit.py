@@ -90,3 +90,27 @@ def test_a_stand_that_dies_after_60_is_penalised_at_100_as_at_60():
     assert loss(spec, alive) == 0.0
     assert math.isclose(loss(spec, dead_late), DEATH_PENALTY * 5 * 0.8)
     assert math.isclose(loss(spec, dead_late), loss(spec, dead_early))
+
+
+def test_level0_tallo_traits_skip_trees_outside_the_support():
+    from treesim.fit import tallo_traits
+
+    curves = {
+        k: {"support": [5.0, 50.0], "band": "own",
+            "coef": {"0.1": [-0.2, 1.0], "0.5": [0.0, 1.0], "0.9": [0.3, 1.0]}}
+        for k in ("H", "CR")
+    }
+    # At 60 one tree is inside the support (20 cm: y = 0.2 m sits at its median), one below it (3 cm).
+    allometry = [
+        {"season": 60, "dbh": 0.20, "height": 20.0, "crownRadius": 20.0},
+        {"season": 60, "dbh": 0.03, "height": 3.0, "crownRadius": 3.0},
+    ]
+    t = tallo_traits(allometry, curves)
+    assert t["stand.talloH.0"] == 0.0 and t["stand.talloCR.0"] == 0.0
+    assert t["stand.talloH.1"] is None and t["stand.dbh.1"] is None
+
+
+def test_level0_partial_traits_leave_out_a_season_with_no_comparable_tree():
+    t = {"name": "stand.talloH", "profile": [0.0, 0.0, 0.0], "band": 1.0, "weight": 1.0, "partial": True}
+    assert scaled(t, {"stand.talloH.0": 0.5, "stand.talloH.1": None, "stand.talloH.2": -1.0}) == [0.5, -1.0]
+    assert scaled(t, {"stand.talloH.0": None, "stand.talloH.1": None, "stand.talloH.2": None}) is None

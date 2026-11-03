@@ -1,12 +1,12 @@
 # Status
 
-_Last updated: 2026-11-03 (reference fidelity, 1d-i on `claude/reference-fidelity`: gate c v3 registered; before that the harness, ADR 0047, 2026-11-02)_
+_Last updated: 2026-11-03 (reference fidelity, phase 2 on `claude/reference-fidelity`: Level 0 built, the overnight sweep is the user's; before that 1d-i, gate c v3 registered)_
 
 **3D port** on the branch `3d-port` (work branches open PRs into it). ADR 0024–0029, 0031, 0032, 0039–0042, 0044, 0046 and 0047 accepted, 0030, 0043 and 0045 rejected. The live site stays on 0.14.0 (2D) until the bar below is met.
 
 **Done means** (user): the mixed wood looks right in the garden in depth, within budget on the phone, with floor, H/D and crown base as 20-seed evidence. C3–C6 follow after shipping.
 
-**Direction (the user, 2026-11-03):** species fidelity from reference data (ADR 0049, accepted; [plan](plans/2026-11-03-reference-fidelity.md) §g: beech phase 3, oak 4). Phase 1 ([note](experiments/2026-11-03-phase1-converter.md)): gates a, b pass; gate c v1 stopped oak and beech. **Gate c v3 is registered (1d-i, 6610fb4, real data only; v2 admitted no species):** prune-only coarsening, a 0.5 m step for every segment-length-dependent descriptor, and beech as the median of its BioDiv repeats. d_min: Wytham 5.0 mm, BioDiv 8.6 mm. The descriptors that pass the floor: oak 18, maple 15, beech 21. Next: phase 2 (Tallo), then 1d-ii (wire `tiers.py`, run gate c v3).
+**Direction (the user, 2026-11-03):** species fidelity from reference data (ADR 0049, accepted; [plan](plans/2026-11-03-reference-fidelity.md) §g: beech phase 3, oak 4). Phase 1 ([note](experiments/2026-11-03-phase1-converter.md)): gates a, b pass; gate c v1 stopped oak and beech. **Gate c v3 is registered (1d-i, 6610fb4, real data only; v2 admitted no species):** prune-only coarsening, a 0.5 m step for every segment-length-dependent descriptor, and beech as the median of its BioDiv repeats. d_min: Wytham 5.0 mm, BioDiv 8.6 mm. The descriptors that pass the floor: oak 18, maple 15, beech 21. **Phase 2 (Level 0, Tallo) is built** (plan §k; targets pre-registered 9b1f4c0): curves for ten species plus sycamore, T from a real-data control, `cli/allometry.ts` (phase 1's DBH, parity 1e-9), a resumable fitter and `level0_sweep.sh`. Beech dry run: 8.8 s an evaluation on 12 workers; shipped beech fails Level 0 0 of 20 (too tall for its DBH and its age). Next: the user's sweep, the gate per species, the gallery and `shapeFlag` before adoption, then 1d-ii.
 
 ## Works
 - **Core** (`rust/core`): C1–C6, R1–R6, O2, O4 in 3D; slab sweep in fixed lanes; checkpoints v2. O4's `band` keeps recruits near a row (the garden).

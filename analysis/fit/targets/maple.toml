@@ -276,4 +276,4 @@ gate_c_survive = ['widestAt', 'profileCentre', 'crownFullness', 'branchAngle2', 
 gate_c_held_out_noise = ['forkHeight', 'limbDroop', 'limbUpturn', 'bifurcationRatio', 'bifurcationRatio2', 'length2']
 gate_c_held_out_resolution = ['length0', 'length1', 'length3', 'centroidHeight']
 gate_c_held_out_tolerance_uncertain = []
-gate_c = "12 of 22 gated descriptors survive"
+gate_c = "12 of 22 gated descriptors survive with H1 extended to maple; 12 of 26 without (a stop): the user's to rule"

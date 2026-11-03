@@ -13,7 +13,8 @@ Newest first. One entry per session or milestone: what changed, why, surprises, 
   - held-out lists in the oak, beech and maple targets files;
   - ADR 0049 accepted, plan §g reordered (beech 3, oak 4);
   - [the note](experiments/2026-11-03-phase1-converter.md).
-- **Gate c:** oak 5 of 22 and beech 1 of 26 survive (amendment E's stop); maple 12 of 22. Nothing loosened.
+- **Gate c:** oak 5 of 22 and beech 1 of 26 survive (amendment E's stop); maple 12 of 22. Nothing loosened. Maple passes only under
+  H1's extension to it (the spec-reviewer: 12 of 26 without it, a stop).
 - **Surprises:**
   - The pre-registered control finds the coarsening not neutral on the datasets' own QSMs (Demol 20 of 26 over
     tolerance): d_min as the median terminal diameter prunes half of a QSM's own tips. Demol's d_min is 43 mm.

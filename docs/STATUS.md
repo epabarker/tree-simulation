@@ -9,7 +9,8 @@ _Last updated: 2026-11-03 (reference fidelity, phase 1 done on `claude/reference
 **Direction (the user, 2026-11-03):** species fidelity from measured reference data on three levels (ADR 0049, accepted;
 the [plan](plans/2026-11-03-reference-fidelity.md); §g: beech is phase 3, oak phase 4). Phase 1 is done
 ([note](experiments/2026-11-03-phase1-converter.md)): gates a and b pass. Gate c stops oak (5 of 22 descriptors
-survive) and beech (1 of 26); maple 12 of 22. The control shows d_min (the median terminal diameter) is not neutral
+survive) and beech (1 of 26); maple passes (12 of 22) only if H1 is extended to it,
+and stops otherwise (12 of 26). The control shows d_min (the median terminal diameter) is not neutral
 on the datasets' own QSMs.
 - **Waiting on the user:** the note's five decisions (d_min after the control, H1 for maple, beech's noise floor,
   `--gate-c`, size matching). Phase 2 (Tallo, Level 0) does not depend on them.

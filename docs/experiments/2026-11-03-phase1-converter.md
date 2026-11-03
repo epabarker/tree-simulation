@@ -3,7 +3,9 @@
 _2026-11-03, sessions 1a–1c of the [reference-fidelity plan](../plans/2026-11-03-reference-fidelity.md) §j; ADR 0049._
 
 **Result.** Gates a and b pass. Gate c triggers amendment E's stop for oak (5 of 22 gated descriptors survive)
-and beech (1 of 26). Maple passes (12 of 22). Nothing was loosened; the plan waits on the user (Decisions below).
+and beech (1 of 26). Maple passes (12 of 22) only under
+this session's extension of H1 to maple. Under the user's ruling as given (H1 for oak only) its four radius
+descriptors count, none survives, and maple stops too: 12 of 26 (spec-reviewer, checked against `gate-c.csv`). Nothing was loosened; the plan waits on the user (Decisions below).
 The pre-registered control shows the coarsening at a dataset's own resolution is not neutral on that dataset's
 own QSMs: badly so on Demol, mildly on Wytham. So part of gate c's failure measures the operator, not the
 simulator.
@@ -126,7 +128,7 @@ Full table: `runs/phase1/gate-c.md`.
 |---|---|---|---|---|---|
 | oak | **5 of 22: stop** | forkHeight, limbElevation, p0, tortuosity, tortuosity05 | widestAt, limbDroop, limbUpturn | profileCentre, crownFullness, branchAngle2, p2, p3, both bifurcation ratios, length0–3, centroidHeight | p1, pendulousFraction |
 | beech | **1 of 26: stop** | taper | (not measured) | crownFullness, leaderDominance, branchAngle2, limbDroop, junctionDelta, ldSlope, limbElevation, p2, both bifurcation ratios, tortuosity, tortuosity05, length0–3, pendulousFraction, centroidHeight | widestAt, profileCentre, forkHeight, limbUpturn, p0, p1, p3 |
-| maple | **12 of 22** | widestAt, profileCentre, crownFullness, branchAngle2, limbElevation, p0–p3, tortuosity, tortuosity05, pendulousFraction | forkHeight, limbDroop, limbUpturn, both bifurcation ratios, length2 (forkHeight and limbDroop also pass gate c) | length0, length1, length3, centroidHeight | – |
+| maple | **12 of 22** with H1 extended; **12 of 26: stop** without | widestAt, profileCentre, crownFullness, branchAngle2, limbElevation, p0–p3, tortuosity, tortuosity05, pendulousFraction | forkHeight, limbDroop, limbUpturn, both bifurcation ratios, length2 (forkHeight and limbDroop also pass gate c) | length0, length1, length3, centroidHeight | – |
 
 H1-excluded and not counted: junctionDelta, ldSlope, taper and leaderDominance for oak and maple.
 
@@ -203,7 +205,12 @@ descriptors and raw tortuosity also move on Wytham's own trees.
    quantile of terminal diameters. It would be fixed from real data alone, with the reason in this note, before
    gate c is re-run. Whether that counts as loosening is the user's call; this session changed nothing. The other
    options: accept the hold-outs (beech would fit on one descriptor), or keep ×1 and drop ×2 at Demol.
-2. **H1 for maple:** the exclusion extended to Wytham's sycamores. Confirm or revert.
+2. **H1 for maple:** the exclusion extended to Wytham's sycamores. This decides maple's gate c. Confirmed, it passes
+   (12 of 22). Reverted, it stops (12 of 26): junctionDelta and ldSlope pass 0 seeds of 20, leaderDominance 3, and
+   taper passes gate c but is held out by its noise floor (0.504 × the SD).
+   The count here is of descriptors that survive (pass gate c and clear the noise floor), the reading of the
+   pre-registered `held_out` rule. Counting gate c passes alone would give maple 14 of 22, or 14 of 26 (a pass
+   either way); oak and beech stop under both readings (oak 6 of 22, beech 1 of 26).
 3. **Beech's noise floor:** no 10-model set exists for beech. BioDiv's 5 repeats give large ratios (taper 4.4,
    bifurcation ratios 1.7–2.0) but are "Phase 1 only". Use them as the verdict, fetch repeats elsewhere, or leave
    it unmeasured?

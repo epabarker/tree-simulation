@@ -233,7 +233,8 @@ E; the plan waits on the user's ruling** (the note's Decisions:
   |---|---|---|
   | oak | 5 of 22 | stop |
   | beech | 1 of 26 | stop |
-  | maple | 12 of 22 | passes |
+  | maple | 12 of 22 | passes with H1 extended to maple |
+  | maple | 12 of 26 | stops under the ruling as given (oak only) |
 
   The held-out lists are in each targets file's `[level1]`. The ×2 bracket point does most of the damage.
 - **The control:** real QSMs coarsened at their own dataset's resolution move on Demol (20 of 26 descriptors over

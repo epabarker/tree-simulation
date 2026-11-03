@@ -72,9 +72,18 @@ def summary(spec: Spec, a: dict, t: dict) -> dict:
 
 
 def _save(path: Path, state: dict) -> None:
+    # cmaes drops its RandomState when pickled and reseeds from the OS on load (CMA.__setstate__), so a resumed
+    # generation would draw other candidates than the killed one: its state is kept beside the object.
+    state["cma_rng"] = state["cma"]._rng.get_state()
     tmp = path.with_suffix(".tmp")
     tmp.write_bytes(pickle.dumps(state))
     tmp.replace(path)
+
+
+def _load(path: Path) -> dict:
+    state = pickle.loads(path.read_bytes())
+    state["cma"]._rng.set_state(state["cma_rng"])
+    return state
 
 
 def fit_level0(spec: Spec, settings: Level0Settings, out_dir: Path, run_dir: Path, resume: bool = False,
@@ -85,7 +94,7 @@ def fit_level0(spec: Spec, settings: Level0Settings, out_dir: Path, run_dir: Pat
     pool = Pool(settings.workers)
     try:
         if resume and ckpt.exists():
-            st = pickle.loads(ckpt.read_bytes())
+            st = _load(ckpt)
             log(f"resumed at generation {st['generation']}, {st['evals']} evaluations")
         else:
             start = pool.ask({"describe": spec.species, "paths": spec.paths})["values"]

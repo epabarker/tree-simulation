@@ -289,24 +289,42 @@ no z was computed, and nothing registered changed after it.
   2,000 pseudo-seeds of 4 real Tallo trees drawn from the whole support (no simulated DBH); self-consistency: 20 fresh
   pseudo-seeds judged by the gate's own rule, ≥ 15. **Coverage** per tercile of ln D is the conditionality
   diagnostic (near 0.8; outside 0.65–0.95 a note, never tuned on).
-- **Before any fitted params are accepted:** the gallery regression and `shapeFlag` (the session after the sweep).
+- **Thin species borrow T too** (the user, 06915ac): willow, rowan and holly take the pooled T of the broadleaves'
+  controls (0.84, 12,000 pseudo-seeds of 12,537 trees), "borrowed T"; their own (0.97, 0.96, 0.51) are small-pool
+  artefacts, kept as `T_own`.
+- **The sweep** (the user): deep on three a night. `level0_sweep.sh night1` (beech, oak, birch; 1200 evaluations
+  each), `night2` (hornbeam, maple, pine, fir; 900 each, four species), `night3` (willow, rowan, holly; 1200 each);
+  12 workers (the knee is 6–8; 12 the fastest). A killed run resumes from its last whole generation: the partial
+  generation is neither counted nor charged, and is redrawn identically (the CMA's RandomState is checkpointed).
+- **The post-sweep session** (the user, 2026-11-03), per species:
+  1. the gate (`level0_gate.py --fit`);
+  2. **the gallery regression and `shapeFlag` on the fitted params before any are accepted** (ADR 0049 keeps the
+     gallery as the regression set);
+  3. the per-trait loss contributions, so the trade between height at age and Tallo is visible;
+  4. the write-up (`docs/experiments/`).
+- **The bound rule** (the user): if a species cannot reach the band at the full budget, the next step is a report on
+  which knob is at its bound and why, never more generations.
 
 ### State
-_(rewritten at the end of each session)_ **Phase 2 built, sweep not run (2026-11-03).** Targets pre-registered
-(9b1f4c0, §k); the measurement, loss, gate, resumable fitter and sweep script are in; the beech dry run passed.
+_(rewritten at the end of each session)_ **Phase 2 built; night 1 is the user's (2026-11-03).** Targets pre-registered
+(9b1f4c0), thin species' borrowed T (06915ac), §k. The measurement, loss, gate, resumable fitter and sweep presets are in;
+the beech dry run passed.
 - **Targets** (`tallo-level0.json`): n (H/CR) beech 8,931/7,082, oak 3,749/3,617, birch 1,250/1,126, hornbeam
   1,075/1,070 (2 sources), maple 166/155, pine 15,088/13,340, fir 1,070/1,044, sycamore (reference) 686/668; flagged
-  n < 100 with a borrowed band: willow 33/19, rowan 44/36, holly 25/25 (one source, 8–17 cm). T 0.81–0.87 (thin:
-  0.97, 0.96, 0.51); control self-consistency 15–20 of 20; coverage per tercile 0.75–0.87 (thin: noise).
-- **Dry run (beech):** 8.8 s wall an evaluation on 12 workers; the shipped beech's gate 0 of 20, too tall for its DBH
-  (z_H +1.5 to +1.7) and for its age (127 cells at 60 against 84); CR inside its band. No codominant stems.
-- **Step 6 (conflicts):** none found in the data: each species' height-at-age targets sit inside Tallo's H band over
-  a wide DBH window (beech H60 21 m at 15–77 cm, H100 30 m at 32–77 cm); holly's is narrow (14–17 cm at 100, at the
-  support's top), so holly at 150 is likely not comparable. Whether the fit can reach both is the sweep's question.
+  n < 100, band and T borrowed: willow 33/19, rowan 44/36, holly 25/25 (one source, 8–17 cm). T 0.81–0.87 (thin:
+  0.84 borrowed); control self-consistency 15–20 of 20; coverage per tercile 0.75–0.87 (thin: noise).
+- **Dry run (beech):** the shipped beech fails Level 0 0 of 20: too tall for its DBH (z_H +1.5 to +1.7) and for its
+  age (127 cells at 60 against 84); CR inside its band; no codominant stems.
+- **Scaling** (wall per evaluation, beech smoke config): 1 worker 26.2 s, 2 19.1, 4 13.4, 6 10.6, 8 9.2, 12 8.6.
+  Over 99% of an evaluation is the core's seasons (stand to 150 11.5 s, lone 4.4 s, shade house 2.4 s; world build
+  and measurement under 0.05 s; Node and WASM load once per worker). The limit is the chip's power budget; the Pool
+  has no fixed cost to remove. Not done (outside the Pool, proposed): the search could skip the lone tree (23% of an
+  evaluation; it scores only its death penalty) and run it for the finalists.
+- **Step 6 (conflicts):** none in the data; holly at 150 is likely outside its support (17 cm).
 - **Next:**
-  1. The user runs `analysis/experiments/level0_sweep.sh` (default 420 evaluations ≈ 62 min a species, ≈ 10.3 h for
-     ten; thin for 7 knobs: fewer species a night for depth).
-  2. Then `level0_gate.py --fit` per species; **before any fitted params are accepted, the gallery regression and
-     `shapeFlag`**; adoption through the fit files only.
+  1. The user runs night 1, `level0_sweep.sh night1`; nights 2 and 3 follow.
+  2. The post-sweep session per species (§k): gate, gallery and `shapeFlag`, loss contributions, the write-up; the
+     bound rule.
   3. 1d-ii (register v3.1, wire `tiers.py`, size-matched seasons, gate c) on phase 2's trees.
-- **Standing rulings:** §k (phase 2); R2, R3 done, R5 as amended; §g reordered; ADR 0049 accepted.
+- **Standing rulings:** §k (phase 2, the forest-grown reading accepted: by source, nothing to filter on); R2, R3 done,
+  R5 as amended; §g reordered; ADR 0049 accepted.

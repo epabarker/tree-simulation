@@ -32,6 +32,11 @@ Newest first. One entry per session or milestone: what changed, why, surprises, 
   - The parity dump read simulated DBH, H and CR before the pre-registration commit (recorded there; no z computed).
   - Metamer coordinates are continuous across the ring; 7 of 210 beech readings carry a limb longer than half of it.
     No codominant stem below 1.3 m in 210 readings: no √Σd² question.
+- **Before the sweep (the user's three asks):** thin species borrow T (0.84, pooled; 06915ac). Scaling: 1/2/4/6/8/12
+  workers give 26.2/19.1/13.4/10.6/9.2/8.6 s an evaluation; the core's seasons are over 99% of it, so no Pool change.
+  Sweep presets night1–3 (deep on three). **A surprise:** cmaes drops its RandomState on pickle and reseeds from the OS,
+  so a resumed generation drew other candidates; the checkpoint now keeps the state, and a SIGKILL 20 s into a
+  generation resumes to identical candidates and exactly the budgeted evaluations (28 of 28).
 
 ## 2026-11-03: Reference fidelity, phase 1c: coarsen(), the pre-registered tolerances, gate c (stops oak and beech)
 

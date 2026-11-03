@@ -245,6 +245,9 @@ E; the plan waits on the user's ruling** (the note's Decisions:
 - **H4:** the signs disagree, so BioDiv's thin DBH is not a method offset.
 - **Next (after the user rules):** the note's five decisions: d_min after the control, H1 for maple, beech's noise
   floor, `--gate-c`, and size matching (the simulated oak at 41 m and beech at 50 m are taller than any reference).
-  Phase 2 (Level 0 from Tallo) does not depend on gate c and can start.
+  Phase 2 (Level 0 from Tallo) does not depend on gate c: proposed to run meanwhile, the user's to approve.
+- **A deviation from the fixed choices:** the simulated trees were not DBH-matched ("stand to 150, DBH-matched").
+  Only the tolerance is detrended on ln DBH. The stand trees at 150 are small and sparse (oak DBH 0.27–0.46 m; 1–2k
+  metamers, maple 387–1,767 live), so a fixed d_min strips proportionally more from them than from the references.
 - **Standing rulings:** R2 (match on measured DBH), R3 (done), R5 (BioDiv "Phase 1 only"). §g is reordered: beech is
   phase 3, oak phase 4. ADR 0049 is accepted.

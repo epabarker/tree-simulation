@@ -215,6 +215,8 @@ descriptors and raw tortuosity also move on Wytham's own trees.
    bifurcation ratios 1.7–2.0) but are "Phase 1 only". Use them as the verdict, fetch repeats elsewhere, or leave
    it unmeasured?
 4. **`dump-trees.ts --gate-c`** widens a script approved for gate b only (it is still in no build). Keep it?
-5. **Size matching:** the simulated stand at 150 is taller than any reference: oak 41 m against Wytham's oaks'
+5. **Size matching (a deviation from the brief):** the fixed choices say "stand to 150, DBH-matched"; nothing was
+   matched, and only the tolerance is detrended on ln DBH. The stand trees carry 1–2k metamers (oak 1,028–1,871 on
+   seed 1; maple 387–1,767 live), so a fixed d_min strips proportionally more from them than from the references. Also, the simulated stand at 150 is taller than any reference: oak 41 m against Wytham's oaks'
    24 m at most, beech 50 m against BioDiv's 34 m. Oak's DBH sits at the bottom of Wytham's. Phases 3–4 compare at matched size, so this needs
    attention before they start.

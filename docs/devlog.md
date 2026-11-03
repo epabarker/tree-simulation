@@ -21,6 +21,8 @@ Newest first. One entry per session or milestone: what changed, why, surprises, 
   - H2 is reversed: inflating twigs raises ldSlope.
   - H4: the DBH bias signs disagree (Wytham oak +6.8%, BioDiv beech −7.4%).
   - The simulated oak and beech stands at 150 are 41 m and 50 m tall, above every reference.
+  - A deviation: the simulated trees were not DBH-matched (the fixed choices' "DBH-matched"); only the
+    tolerance is detrended on ln DBH. Recorded as the note's decision 5.
 - **Advisor** (one consult, at the plan):
   - keep the noise models out of every one-model glob;
   - beech's noise floor "not measured", not BioDiv's;

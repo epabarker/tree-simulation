@@ -2,6 +2,15 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-03: Reference fidelity, phase 0: reconcile, audit, plan (branch `claude/reference-fidelity`, from `3d-port`)
+
+- **What changed** (docs only; no src/rust/tests/presets/species; goldens unchanged): the user's reference document saved byte for byte (`research/2026-11-03-reference-data-and-evaluation.md`); a nine-dataset audit (`plans/reference-audit/`, counts by `count_species.py` from metadata in git-ignored `data/reference/`); [the plan](plans/2026-11-03-reference-fidelity.md); ADR 0049 proposed; ROADMAP M28.
+- **Audit design:** nine `doc-lookup` agents (Haiku) found links, licences and metadata URLs; the main session downloaded only metadata (≈ 100 MB) and counted with one script, since `doc-lookup` cannot write files and WebFetch summarises large CSVs. They cost ≈ 309k tokens against a 300k cap (estimate 135–270k).
+- **Surprises:** FOR-species20K is GPL-3.0 and Weiser CC-BY-SA, not CC-BY. FOR-species20K has no QSMs and contains Wytham and Weiser. Tallo's garden broadleaves are all forest-grown. TreeML has ≤ 41 trees per garden species, and 101 of its 3,755 DBHs are > 1.5 m. **BioDiv-3DTrees is the main Level 1 source** (1,659 valid beech QSMs, 88 oak, 38 hornbeam). Wytham has no beech or birch, and its 37 oaks are ≥ 39 cm.
+- **Measured** (oak, seed 1, one core): stand to 150 seasons 8.9 s (167 cells); lone to 150 27.9 s, hitting the 200-cell world top. DetailView falls back to CPU (read, not run).
+- **Advisor** (one consult, measurement design): leaf-dependent metrics need wood-only versions; continuation and order by geometry on both sides; a degradation test in phase 1; rTwig radii are partly modelled; the gate on held-out descriptors and between-tree spread; the classifier's real-tree control; the metres-per-cell scale is not identifiable from Tallo. All folded into the plan.
+- **Merge note:** this branch's STATUS is `3d-port`'s, which predates `claude/stems-bark`; its "Direction" lines will conflict when that branch merges. Keep both.
+
 ## 2026-11-02: The harness, runs 2 and 2b: one lock and stamp for the check, `doc-lookup`, the reviewer's guard (on `3d-port`)
 
 - **What changed** (no src/rust/tests edits in 2b, goldens unchanged): `check-stamped.sh` + `check-lib.sh` (`npm run check:stamp`) put the Stop hook and humans behind one `flock` and one green stamp; the hook is now the fast path plus that script, with `red`/`red-shown` so a manual red cannot lift the block. CLAUDE.md: never background the check; AGENTS.md and `/wrap-up` point at `check:stamp`; the principles doc is saved at `docs/background/harness-principles.md`. Run 2's five items ([ADR 0047](decisions/0047-harness.md), "Run 2") are committed with it.

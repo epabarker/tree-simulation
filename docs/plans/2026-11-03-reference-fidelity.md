@@ -255,4 +255,5 @@ _(rewritten at the end of each session)_ **1a and 1b done (2026-11-03); 1c next.
 - **Rulings still standing:** R2 (match on measured DBH, never DBHqsm), R3 (4 big oaks join the noise floor), R5
   (the 53 beech "Phase 1 only"; R1 is now settled, so the note gives the plot mix as found).
 - **For the user:** whether R4 should drop by start or tip (moot on today's data); whether TreeQSM 2.4.1's
-  `select_optimum` matches the 1.4.0 file read.
+  `select_optimum` matches the 1.4.0 file read. The internal checks are reported on every dataset and still gate TreeML's height
+  (amendment B: it publishes none); the 1b brief's "reported, not gated" was read as not overriding B.

@@ -37,7 +37,7 @@ def test_dbh_and_height_match_the_publishers_qsm_values(rows, source):
 
 
 # The internal checks stand in for a height gate only where the files carry no published height (§j, B); on the
-# gated datasets they are reported by `python -I -m treesim.qsm_gate` (BioDiv's HEW21_GD_117 fails one: an artifact).
+# gated datasets they are reported by `python -I -m treesim.qsm_gate` (all pass under R1's BioDiv models).
 UNGATED_HEIGHT = ["treeml"]
 
 

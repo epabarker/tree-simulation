@@ -13,8 +13,8 @@ Felled and point-cloud heights are ceilings: Demol's own point-cloud height is w
 91% of its 65 trees, and its QSM DBH within 5% of field DBH for 68% (§j, decision 1).
 
 The internal checks (cylinders.internal_checks: height positive, the trunk's base the lowest point, parent before
-child) are reported on every dataset, never gated (the 1b brief, R4). Under the median-size model BioDiv's
-HEW21_GD_117 carried a 3.4 m cylinder of radius 2.5 cm diving from 2.1 m above its base to 1.1 m below it; under
+child) are reported on every dataset (the 1b brief, R4) and gate height only on TreeML, which publishes none
+(§j, B). Under the median-size model BioDiv's HEW21_GD_117 carried a 3.4 m cylinder of radius 2.5 cm diving from 2.1 m above its base to 1.1 m below it; under
 TreeQSM's optimum (R1) no tree of any dataset has a cylinder starting or ending below its base.
 
 Wytham's DBH is gated against the model read, as Demol's and BioDiv's are (symmetric: decision 1). tls_summary's

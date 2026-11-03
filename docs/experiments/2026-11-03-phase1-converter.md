@@ -1,6 +1,6 @@
 # Phase 1: the converter, describe(), and which descriptors survive QSM resolution (gates a–c)
 
-_2026-11-03, sessions 1a–1c and 1d-i of the [reference-fidelity plan](../plans/2026-11-03-reference-fidelity.md) §j; ADR 0049._
+_2026-11-03, sessions 1a–1c and 1d-i (v2, v3) of the [reference-fidelity plan](../plans/2026-11-03-reference-fidelity.md) §j; ADR 0049._
 
 **Result.** Gates a and b pass. Gate c triggers amendment E's stop for oak (5 of 22 gated descriptors survive)
 and beech (1 of 26). Maple passes (12 of 22) only under
@@ -10,10 +10,14 @@ The pre-registered control shows the coarsening at a dataset's own resolution is
 own QSMs: badly so on Demol, mildly on Wytham. So part of gate c's failure measures the operator, not the
 simulator.
 
-**v2 (session 1d-i, below): as registered, it admits no species to gate c.** Wytham has no d_min, because the
-re-cut alone moves the tortuosities of its own QSMs, so oak and maple stop. Beech's d_min is 7.4 mm, but BioDiv's
-repeat floor holds out 13 of its 24 gated descriptors, so beech stops too. This happens before any simulated tree
-is measured. The plan waits on the user ("v2 instrument", decisions).
+**v2 (session 1d-i) admitted no species**: the re-cut moved Wytham's own tortuosities, and BioDiv's repeat floor
+held out 13 of 24 for beech. **v3 (the same session, after the user's rulings) is registered** (commit 6610fb4):
+- coarsening is prune only;
+- every segment-length-dependent descriptor is read at the 0.5 m step;
+- beech's value is the median of its repeats.
+
+The control is neutral at Wytham to 5.0 mm (p20) and at BioDiv to 8.6 mm (p2). Before any simulated tree, the
+descriptors that pass the floor are oak 18, maple 15 and beech 21. See "v2 and v3" below.
 
 ## Reproduce
 ```
@@ -226,7 +230,9 @@ descriptors and raw tortuosity also move on Wytham's own trees.
    24 m at most, beech 50 m against BioDiv's 34 m. Oak's DBH sits at the bottom of Wytham's. Phases 3–4 compare at matched size, so this needs
    attention before they start.
 
-## v2 instrument (session 1d-i, 2026-11-03)
+## v2 and v3 (session 1d-i, 2026-11-03)
+
+### v2
 **How it was made.**
 - **When:** v2 was designed after v1 failed and after its control was seen. It was registered in
   `phase1-tolerances.json` v2 (commit 3f13c29) before any simulated tree was measured again.
@@ -345,7 +351,7 @@ Every beech candidate's control is neutral at d_min, so none is "A only". **Refe
 `runs/phase1/control-grid.csv`, ≈ 25 min on 12 workers; the per-tree results are cached in `runs/phase1/real/`),
 and `… -m treesim.tolerance probe` (re-cut only).
 
-### Decisions for the user (v2; the plan waits here)
+### Decisions for the user after v2 (answered: v3 below)
 1. **Wytham's re-cut.** The re-cut is not neutral on Wytham's own QSMs at any d, through tortuosity and
    tortuosity05 (and forkHeight on oak). The options:
    - a different re-cut, which would be a new registration;
@@ -360,3 +366,111 @@ and `… -m treesim.tolerance probe` (re-cut only).
      suffice. That is a different reading from v1's and the user's to make.
 3. **Is BioDiv's p1 a stable d_min?** It is the grid's first point, and p2 (8.6 mm) already fails (8 of 11), so
    beech's d_min sits at the grid's edge.
+
+### v3 (commit 6610fb4)
+**How it was made.**
+- **When:** v3 was designed after v2's control failed on the re-cut, from the user's six rulings and two answers.
+- **Every v3 parameter derives from real data only,** as in v2.
+- **Nothing simulated has been measured since v1.** v2 and v3 read no simulated tree; `runs/phase1/sim` is v1's.
+- **The JSON keeps v2 and v1** in its `v2` and `v1` blocks.
+
+**What changed from v2, and why:**
+- **Coarsening is prune only** (`coarsen.py`; inflation stays a gated variant).
+  - The re-cut is withdrawn. It was a second answer to segmentation, which `describe()` already handles at its
+    0.5 m step, and v2's control showed it non-neutral on Wytham's own trees.
+- **The 0.5 m step, with no exceptions.** Droop, upturn and branchAngle2 were already 0.5 m chords, and
+  tortuosity05 exists. Two descriptors are new:
+  - **limbElevation05:** the length-weighted median elevation of the 0.5 m chords along each resampled first-order
+    path;
+  - **pendulousFraction05:** the share of order ≥ 1 length on axes whose last 0.5 m of arc heads below horizontal.
+  - The per-cylinder tortuosity, limbElevation and pendulousFraction are report-only. ldSlope and junctionDelta
+    stay report-only.
+- **Beech's estimator.**
+  - A tree's value is the median over its 5 repeats (NaN under 3 finite), in the tolerance and the control alike.
+  - The floor is the between-repeat SD / √5 against the between-tree SD of the medians, size-detrended on ln dTLS.
+  - **The asymmetry:** Wytham's trees stay single-model (only 12 have 10 models), with the floor their SD across
+    10 models, undivided.
+- **Amendment E** applies to the coarsening test, over the descriptors that pass the floor. Floor hold-outs are
+  reported as noise-limited at that dataset.
+- **The hashes are re-registered:** 10 code files, `dump-trees.ts`, the manifest, and data digests (now TreeML too).
+- **Not this session:** wiring `tiers.py` into `phase1_degradation.py` (1d-ii's first step).
+
+**The control curves, prune only.** Each cell is the number of descriptors passing the floor that are neutral
+(≥ 90% of trees within tolerance), at the same grid as v2.
+
+| dataset, species (pass the floor) | p1 | p2 | p5 | p10 | p20 | p50 | 5 cm | d_min |
+|---|---|---|---|---|---|---|---|---|
+| Wytham oak (18) | 18 | 18 | 18 | 18 | 17 | 10 | 1 | **5.0 mm (p20)** |
+| Wytham maple (15) | 15 | 15 | 15 | 15 | 15 | 4 | 0 | (shared) |
+| BioDiv beech (21) | 21 | 21 | 5 | 1 | 0 | 0 | 0 | **8.6 mm (p2)** |
+| Demol FSYL (21, reported) | 18 | 14 | 4 | 2 | 0 | 0 | 0 | none |
+
+- **Wytham at p20:** oak's one non-neutral descriptor is length2 (0.89). At p50 (12.1 mm) the rule fails for both
+  species.
+- **BioDiv (ruling 4, re-run before deciding about the edge):** d_min moved from v2's p1 (7.4 mm) to p2 (8.6 mm).
+  The rule fails at p5 (11.0 mm), where 16 descriptors drop under 0.9. It sits two grid points from the edge.
+- **Demol:** p1 (13.3 mm) already fails on crownFullness, p1 and p2 (0.87 each, 13 of 15 trees). It is reported,
+  never gated.
+- **TreeML** (3 optcsv trees, phase 7's; no tolerance set, no verdict), median shifts:
+  - at Wytham's 5.0 mm, 0 on every descriptor;
+  - at BioDiv's 8.6 mm: limbElevation05 +0.18°, branchAngle2 −0.40°, the bifurcation ratios −0.07 and −0.08,
+    junctionDelta +0.22, ldSlope +0.10, limbElevation +0.08°, the rest under 0.03.
+
+**Tolerances and floors, v2 beside v3.**
+- **Oak and maple:** unchanged, the same single-model descriptors. The new ones:
+  - limbElevation05: oak SD 9.6° (tolerance 4.8, floor 0.26); maple 14° (6.9, 0.31);
+  - pendulousFraction05: oak 0.095 (0.047, 0.16); maple 0.13 (0.067, 0.23).
+- **Beech** (BioDiv; v2 single-model, v3 the median of 5 repeats):
+
+| descriptor | v2 SD | v2 floor / SD | v3 SD [95%] | v3 tol | v3 floor / SD | v3 |
+|---|---|---|---|---|---|---|
+| widestAt | 0.21 | 0.51 | 0.19 [0.16, 0.24] | 0.096 | 0.25 | clear |
+| profileCentre | 0.039 | 0.61 | 0.043 [0.036, 0.053] | 0.021 | 0.25 | clear |
+| crownFullness | 0.071 | 0.63 | 0.077 [0.064, 0.095] | 0.038 | 0.26 | clear |
+| forkHeight | 0.15 | 0.61 | 0.13 [0.11, 0.17] | 0.067 | 0.30 | clear |
+| leaderDominance | 0.78 | 0.51 | 0.65 [0.54, 0.81] | 0.33 | 0.27 | clear |
+| branchAngle2 (°) | 7.1 | 1.17 | 5.3 [4.4, 6.5] | 2.6 | 0.71 | noise-limited |
+| limbDroop (°) | 19 | 0.57 | 18 [15, 22] | 9.0 | 0.27 | clear |
+| limbUpturn (°) | 16 | 0.58 | 11 [9, 13] | 5.4 | 0.40 | clear |
+| p0 | 0.20 | 0.45 | 0.22 [0.18, 0.27] | 0.11 | 0.19 | clear |
+| p1 | 0.16 | 0.35 | 0.17 [0.14, 0.21] | 0.083 | 0.15 | clear |
+| p2 | 0.14 | 0.58 | 0.13 [0.11, 0.17] | 0.067 | 0.27 | clear |
+| p3 | 0.14 | 0.57 | 0.14 [0.12, 0.17] | 0.069 | 0.26 | clear |
+| bifurcationRatio | 0.42 | 0.71 | 0.37 [0.31, 0.46] | 0.19 | 0.35 | clear |
+| bifurcationRatio2 | 0.60 | 0.73 | 0.54 [0.45, 0.67] | 0.27 | 0.36 | clear |
+| tortuosity05 | 0.20 | 0.42 | 0.14 [0.12, 0.17] | 0.069 | 0.27 | clear |
+| length0 | 0.077 | 0.06 | 0.078 [0.065, 0.096] | 0.039 | 0.03 | clear |
+| length1 | 0.075 | 0.16 | 0.075 [0.062, 0.092] | 0.037 | 0.07 | clear |
+| length2 | 0.080 | 0.19 | 0.078 [0.065, 0.097] | 0.039 | 0.09 | clear |
+| length3 | 0.13 | 0.16 | 0.13 [0.11, 0.16] | 0.065 | 0.07 | clear |
+| taper | 0.18 | 1.92 | 0.14 [0.12, 0.17] | 0.070 | 1.10 | noise-limited |
+| centroidHeight | 0.079 | 0.34 | 0.079 [0.066, 0.098] | 0.039 | 0.15 | clear |
+| limbElevation05 (°) | – | – | 14 [12, 17] | 7.0 | 0.09 | clear (new) |
+| pendulousFraction05 | – | – | 0.10 [0.086, 0.13] | 0.052 | 0.13 | clear (new) |
+
+Report-only: junctionDelta, ldSlope, tortuosity, limbElevation and pendulousFraction.
+
+**Noise-limited, by the floor alone** (the JSON's label is `held out (noise)`). These are the label- and base-dependent descriptors (the user's
+observation): they hang on which child continues, where order 1 starts, or the trunk's base.
+- Oak at Wytham: widestAt, limbDroop, limbUpturn.
+- Maple at Wytham: forkHeight, limbDroop, limbUpturn, both bifurcation ratios, length2.
+- Beech at BioDiv: branchAngle2 (order 1 → 2) and taper (the trunk's labels at half height).
+
+**Standings before any simulated tree** (`[level1]` `gate_c_v3_*` in each targets file):
+
+| species | dataset, d_min | report-only | H1 | noise-limited | pass the floor | of which A-only (control not neutral at d_min) | amendment E stops below |
+|---|---|---|---|---|---|---|---|
+| oak | Wytham, 5.0 mm | 5 | 2 | 3 | 18 | length2 | 9 |
+| maple | Wytham, 5.0 mm | 5 | 2 | 6 | 15 | – | 8 |
+| beech | BioDiv, 8.6 mm | 5 | 0 | 2 | 21 | – | 11 |
+
+Size-match references (median measured DBH): oak 0.596 m, maple 0.247 m, beech 0.291 m.
+
+**Reproduce:** `uv run --project analysis python -I -m treesim.tolerance` (≈ 17 min on 12 workers; it writes the
+JSON and `runs/phase1/control-grid.csv`, with per-tree results cached in `runs/phase1/real/control3-*`).
+
+**Next, 1d-ii (after phase 2):**
+1. Wire `tiers.py` into `phase1_degradation.py`. Its `gate` still reads v1's layout, so this must not change a
+   hashed file.
+2. Size-match each species by `rules.size_match`.
+3. Run gate c v3.

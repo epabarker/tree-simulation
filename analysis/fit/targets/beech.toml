@@ -281,16 +281,17 @@ gate_c_held_out_noise = []
 gate_c_held_out_resolution = ['crownFullness', 'leaderDominance', 'branchAngle2', 'limbDroop', 'junctionDelta', 'ldSlope', 'limbElevation', 'p2', 'bifurcationRatio', 'bifurcationRatio2', 'tortuosity', 'tortuosity05', 'length0', 'length1', 'length2', 'length3', 'pendulousFraction', 'centroidHeight']
 gate_c_held_out_tolerance_uncertain = ['widestAt', 'profileCentre', 'forkHeight', 'limbUpturn', 'p0', 'p1', 'p3']
 gate_c = "1 of 26 gated descriptors survive: fewer than half, so the plan stops here (amendment E); no Level 1 targets until the user rules"
-# Gate c v2 (session 1d-i, 2026-11-03; the note's "v2 instrument"): standings before any simulated tree, from
-# analysis/fit/sources/phase1-tolerances.json v2 (commit 3f13c29). Tier rules: that file's rules.tier_a, tier_b,
-# assign (treesim/tiers.py). ldSlope and junctionDelta are report-only (the 1d brief, 7).
-gate_c_v2_dataset = "biodiv"
-gate_c_v2_d_min_mm = 7.39
-gate_c_v2_report_only = ['junctionDelta', 'ldSlope']
-gate_c_v2_excluded_h1 = []
-gate_c_v2_held_out_noise = ['widestAt', 'profileCentre', 'crownFullness', 'forkHeight', 'leaderDominance', 'branchAngle2', 'limbDroop', 'limbUpturn', 'p2', 'p3', 'bifurcationRatio', 'bifurcationRatio2', 'taper']
-gate_c_v2_candidate_a_or_b = ['limbElevation', 'p0', 'p1', 'tortuosity', 'tortuosity05', 'length0', 'length1', 'length2', 'length3', 'pendulousFraction', 'centroidHeight']
-gate_c_v2_candidate_a_only = []
-gate_c_v2_clear_without_d_min = []
-gate_c_v2_size_match_dbh_m = 0.291  # the median measured DBH of biodiv Fagus_sylvatica (53 trees)
-gate_c_v2 = "d_min 7.4 mm (p1) at biodiv; 11 candidates of 24 gated (noise hold-outs counted, v1's reading): at most 11 of 24 can reach a tier, fewer than half: stop before any simulated tree under amendment E; the user's to rule"
+# Gate c v2 (3f13c29) stopped before any simulated tree: no d_min at Wytham (the re-cut moved the tortuosities),
+# beech's repeat floor held out 13 of 24. Superseded by v3; its standings are in that commit.
+# Gate c v3 (session 1d-i, 2026-11-03; the note's "v2 and v3"): standings before any simulated tree, from
+# analysis/fit/sources/phase1-tolerances.json v3 (commit 6610fb4). Coarsening is prune only; segment-length-dependent
+# descriptors at the 0.5 m step. Tier rules: that file's rules.tier_a, tier_b, assign (treesim/tiers.py).
+gate_c_v3_dataset = "biodiv"
+gate_c_v3_d_min_mm = 8.62  # p2 of its terminal diameters
+gate_c_v3_report_only = ['junctionDelta', 'ldSlope', 'limbElevation', 'tortuosity', 'pendulousFraction']
+gate_c_v3_excluded_h1 = []
+gate_c_v3_noise_limited = ['branchAngle2', 'taper']  # at biodiv
+gate_c_v3_candidate_a_or_b = ['widestAt', 'profileCentre', 'crownFullness', 'forkHeight', 'leaderDominance', 'limbDroop', 'limbUpturn', 'p0', 'p1', 'p2', 'p3', 'bifurcationRatio', 'bifurcationRatio2', 'tortuosity05', 'length0', 'length1', 'length2', 'length3', 'centroidHeight', 'limbElevation05', 'pendulousFraction05']
+gate_c_v3_candidate_a_only = []  # control not neutral at d_min
+gate_c_v3_size_match_dbh_m = 0.291  # the median measured DBH of biodiv Fagus_sylvatica (53 trees)
+gate_c_v3 = "21 descriptors pass the floor; amendment E stops the species if fewer than 11 reach a tier (1d-ii)"

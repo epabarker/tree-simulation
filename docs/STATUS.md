@@ -1,12 +1,12 @@
 # Status
 
-_Last updated: 2026-11-03 (reference fidelity, 1d-i on `claude/reference-fidelity`: gate c v2 registered; before that the harness, ADR 0047, 2026-11-02)_
+_Last updated: 2026-11-03 (reference fidelity, 1d-i on `claude/reference-fidelity`: gate c v3 registered; before that the harness, ADR 0047, 2026-11-02)_
 
 **3D port** on the branch `3d-port` (work branches open PRs into it). ADR 0024–0029, 0031, 0032, 0039–0042, 0044, 0046 and 0047 accepted, 0030, 0043 and 0045 rejected. The live site stays on 0.14.0 (2D) until the bar below is met.
 
 **Done means** (user): the mixed wood looks right in the garden in depth, within budget on the phone, with floor, H/D and crown base as 20-seed evidence. C3–C6 follow after shipping.
 
-**Direction (the user, 2026-11-03):** species fidelity from reference data (ADR 0049, accepted; [plan](plans/2026-11-03-reference-fidelity.md) §g: beech phase 3, oak 4). Phase 1 ([note](experiments/2026-11-03-phase1-converter.md)): gates a, b pass; gate c v1 stopped oak and beech. **Gate c v2 is registered (1d-i, 3f13c29, real data only), and as registered it admits no species:** Wytham has no neutral d_min (the re-cut moves the tortuosities), so oak and maple stop; beech's d_min is 7.4 mm but BioDiv's repeat floor holds out 13 of 24. Waiting on the user: the note's v2 decisions. Phase 2 (Tallo) is independent of them.
+**Direction (the user, 2026-11-03):** species fidelity from reference data (ADR 0049, accepted; [plan](plans/2026-11-03-reference-fidelity.md) §g: beech phase 3, oak 4). Phase 1 ([note](experiments/2026-11-03-phase1-converter.md)): gates a, b pass; gate c v1 stopped oak and beech. **Gate c v3 is registered (1d-i, 6610fb4, real data only; v2 admitted no species):** prune-only coarsening, a 0.5 m step for every segment-length-dependent descriptor, and beech as the median of its BioDiv repeats. d_min: Wytham 5.0 mm, BioDiv 8.6 mm. The descriptors that pass the floor: oak 18, maple 15, beech 21. Next: phase 2 (Tallo), then 1d-ii (wire `tiers.py`, run gate c v3).
 
 ## Works
 - **Core** (`rust/core`): C1–C6, R1–R6, O2, O4 in 3D; slab sweep in fixed lanes; checkpoints v2. O4's `band` keeps recruits near a row (the garden).
@@ -28,7 +28,7 @@ _Last updated: 2026-11-03 (reference fidelity, 1d-i on `claude/reference-fidelit
 2. **After shipping, the form list:** the lone beech's rise-then-arch and the stand's crown ratio; the lone oak's arms; maple's flat top (ADR 0031, R2's reiteration); willow's dense bush; hornbeam's clear trunk; C2's floor against LAI; C3–C6 as hold-outs.
 
 ## Open questions (user)
-- **Reference gate c v2:** the note's three v2 decisions (Wytham's re-cut, beech's floor, BioDiv's edge d_min). **`levels.2.setPoint` ≥ 80** collapses every broadleaf (C3/R3, after shipping). **Birch's pick stops growing after 60**: form or fit?
+**`levels.2.setPoint` ≥ 80** collapses every broadleaf (C3/R3, after shipping). **Birch's pick stops growing after 60**: form or fit?
 
 ## Known issues
 - **Regeneration:** `forest` cannot regenerate under its own floor at τ 0 (C5's). **The lab stutters** from season ≈ 75 on the phone. **The preview deploy** (`preview-3d`) has the old `i2.ts`: redeploy only when asked.

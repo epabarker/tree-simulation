@@ -288,16 +288,17 @@ gate_c_held_out_noise = ['widestAt', 'limbDroop', 'limbUpturn']
 gate_c_held_out_resolution = ['profileCentre', 'crownFullness', 'branchAngle2', 'p2', 'p3', 'bifurcationRatio', 'bifurcationRatio2', 'length0', 'length1', 'length2', 'length3', 'centroidHeight']
 gate_c_held_out_tolerance_uncertain = ['p1', 'pendulousFraction']
 gate_c = "5 of 22 gated descriptors survive: fewer than half, so the plan stops here (amendment E); no Level 1 targets until the user rules"
-# Gate c v2 (session 1d-i, 2026-11-03; the note's "v2 instrument"): standings before any simulated tree, from
-# analysis/fit/sources/phase1-tolerances.json v2 (commit 3f13c29). Tier rules: that file's rules.tier_a, tier_b,
-# assign (treesim/tiers.py). ldSlope and junctionDelta are report-only (the 1d brief, 7).
-gate_c_v2_dataset = "wytham"
-gate_c_v2_d_min_mm = nan
-gate_c_v2_report_only = ['junctionDelta', 'ldSlope']
-gate_c_v2_excluded_h1 = ['leaderDominance', 'taper']
-gate_c_v2_held_out_noise = ['widestAt', 'limbDroop', 'limbUpturn']
-gate_c_v2_candidate_a_or_b = []
-gate_c_v2_candidate_a_only = []
-gate_c_v2_clear_without_d_min = ['profileCentre', 'crownFullness', 'forkHeight', 'branchAngle2', 'limbElevation', 'p0', 'p1', 'p2', 'p3', 'bifurcationRatio', 'bifurcationRatio2', 'tortuosity', 'tortuosity05', 'length0', 'length1', 'length2', 'length3', 'pendulousFraction', 'centroidHeight']
-gate_c_v2_size_match_dbh_m = 0.596  # the median measured DBH of wytham QUERRO (34 trees)
-gate_c_v2 = "no d_min at wytham: no grid point is neutral on its own QSMs (the re-cut alone moves the tortuosities): stop before any simulated tree; the user's to rule"
+# Gate c v2 (3f13c29) stopped before any simulated tree: no d_min at Wytham (the re-cut moved the tortuosities),
+# beech's repeat floor held out 13 of 24. Superseded by v3; its standings are in that commit.
+# Gate c v3 (session 1d-i, 2026-11-03; the note's "v2 and v3"): standings before any simulated tree, from
+# analysis/fit/sources/phase1-tolerances.json v3 (commit 6610fb4). Coarsening is prune only; segment-length-dependent
+# descriptors at the 0.5 m step. Tier rules: that file's rules.tier_a, tier_b, assign (treesim/tiers.py).
+gate_c_v3_dataset = "wytham"
+gate_c_v3_d_min_mm = 5.0  # p20 of its terminal diameters
+gate_c_v3_report_only = ['junctionDelta', 'ldSlope', 'limbElevation', 'tortuosity', 'pendulousFraction']
+gate_c_v3_excluded_h1 = ['leaderDominance', 'taper']
+gate_c_v3_noise_limited = ['widestAt', 'limbDroop', 'limbUpturn']  # at wytham
+gate_c_v3_candidate_a_or_b = ['profileCentre', 'crownFullness', 'forkHeight', 'branchAngle2', 'p0', 'p1', 'p2', 'p3', 'bifurcationRatio', 'bifurcationRatio2', 'tortuosity05', 'length0', 'length1', 'length3', 'centroidHeight', 'limbElevation05', 'pendulousFraction05']
+gate_c_v3_candidate_a_only = ['length2']  # control not neutral at d_min
+gate_c_v3_size_match_dbh_m = 0.596  # the median measured DBH of wytham QUERRO (34 trees)
+gate_c_v3 = "18 descriptors pass the floor; amendment E stops the species if fewer than 9 reach a tier (1d-ii)"

@@ -250,34 +250,35 @@ fresh directory, read with `python -I`.
     trees, at their size-matched seasons.
 
 ### State
-_(rewritten at the end of each session)_ **1d-i done (2026-11-03): gate c v2 is registered from real QSMs only
-(`phase1-tolerances.json` v2, commit 3f13c29), and as registered it admits no species.** The plan waits on the
-user (the note's "v2 instrument", Decisions for the user (v2)).
+_(rewritten at the end of each session)_ **1d-i done (2026-11-03): gate c v3 is registered from real QSMs only
+(`phase1-tolerances.json` v3, commit 6610fb4).** v2 (3f13c29) admitted no species; the user ruled; v3 follows.
+Nothing simulated has been measured since v1. The note's section is "v2 and v3".
+- **The v3 instrument:**
+  - coarsening is prune only (the re-cut withdrawn), with inflation gated;
+  - the segment-length-dependent descriptors are read at the 0.5 m step: limbElevation05 and pendulousFraction05
+    are new, and the per-cylinder tortuosity, limbElevation and pendulousFraction are report-only, beside ldSlope
+    and junctionDelta;
+  - beech is the median of its 5 BioDiv repeats, with the floor SD / √5. Wytham stays single-model (an asymmetry,
+    recorded);
+  - amendment E is applied over the descriptors that pass the floor;
+  - tiers A and B are in `tiers.py` (hashed, not yet wired).
+- **The control's d_min:**
+  - Wytham: 5.0 mm (p20);
+  - BioDiv: 8.6 mm (p2; it fails at p5);
+  - Demol (reported): none.
+- **Before any simulated tree, the descriptors that pass the floor:** oak 18 (length2 is A-only), maple 15,
+  beech 21. Noise-limited: oak 3, maple 6, beech 2 (branchAngle2, taper).
+- **Size-match references:** oak 0.596 m, maple 0.247 m, beech 0.291 m (`rules.size_match`).
 - **Code:**
-  - phase 1: `analysis/treesim/{fetch,cylinders,qsm,qsm_gate,form,simtree,form_gate,describe,coarsen,tolerance}.py`;
-  - new in 1d-i: `control.py` (the grid and the 90/90 rule) and `tiers.py` (tiers A and B, a pure function,
-    hashed, not yet wired);
-  - `cli/dump-trees.ts` (in no build) and `analysis/experiments/phase1_degradation.py`. That file's `gate` still
-    reads v1's layout: 1d-ii wires it to `tiers.py` without changing any hashed file;
-  - tests: 70 pass (`test_control.py` is new).
-- **v1** is commit e74063c, in the JSON's `v1` block: oak 5, beech 0, maple 12 with H1.
-- **The v2 control, on each dataset's own QSMs:**
-  - **Wytham:** no grid point (p1–p50: 2.0–12.1 mm) is neutral. The re-cut alone moves tortuosity and
-    tortuosity05 (and forkHeight on oak); prune only is neutral to p10 or p20. Oak and maple have no d_min:
-    **stop**.
-  - **BioDiv:** d_min is 7.4 mm (p1), and p2 fails.
-  - **Demol** (reported): no point passes.
-- **Beech:** BioDiv's 5-repeat floor holds out 13 of 24 gated descriptors, leaving 11 candidates (A or B). Under
-  amendment E counted as in v1, at most 11 of 24 can reach a tier: **stop**.
-- **The rulings at the 1d-i plan:**
-  - inflation stays gated;
-  - oak is gated at Wytham only;
-  - beech's size-match reference is BioDiv (0.291 m; oak 0.596 m, maple 0.247 m).
-- **Next:** the user's rulings on the v2 decisions. Phase 2 (Tallo, Level 0) is independent of them. 1d-ii (gate
-  c v2 on phase 2's trees) cannot run as registered.
+  - `analysis/treesim/{…,coarsen (prune only),describe (+2 descriptors),control,tiers,tolerance}.py`;
+  - tests: 72 pass.
+- **Next:**
+  1. Phase 2 (Tallo, Level 0).
+  2. 1d-ii: first wire `tiers.py` into `phase1_degradation.py` (no hashed file changes), then the size-matched
+     seasons, then gate c v3 on phase 2's trees.
 - **Standing rulings:**
   - R2: match on measured DBH;
   - R3: done;
-  - R5: BioDiv "Phase 1 only", amended by the 1d brief's 4 for beech's tolerances, floor and size reference;
+  - R5: BioDiv "Phase 1 only", amended for beech's tolerances, floor and size reference;
   - §g is reordered: beech is phase 3, oak phase 4;
   - ADR 0049 is accepted.

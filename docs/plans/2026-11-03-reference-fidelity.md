@@ -118,3 +118,124 @@ free; BioDiv's QSMs are one 108 GB tarball (stream, keep the trees needed), Wyth
 9. **Licences:** commit summary statistics only, never per-tree tables from Weiser (CC-BY-SA) or FOR (GPL); ATI not used? _Yes._
 10. **CMA-ES as the fitter;** ABC deferred to a ≤ 6-knob posterior check after phase 4? _Yes._
 11. **Lone trees:** frontal-only comparison, or a deeper slab for the lone trial (a core change, ADR 0024)? _Frontal-only for now._
+
+**Decided (the user, 2026-11-03):** 1 ship first with overrides. 2 yes: form knobs fittable against measured Level 1
+descriptors only; phase 7's rule (same parameters, no refit, TreeML judges) binds even if it fails. 3 yes. 4 yes.
+5 keep 0.25 m fixed. 6 yes, labelled a proxy. 7 yes. 8 yes, but QSM files only (no point clouds), only the species
+the phases need; stream and filter, never mirror whole archives. 9 yes. 10 yes. 11 frontal only. **Reorder:** beech
+is phase 3 (BioDiv; Demol held out), oak phase 4 (its two sites confound species, size and site). ADR 0049 records
+these and goes to accepted in session 1c.
+
+## j. Phase 1 (approved 2026-11-03): three sessions sharing this file
+Each session ends by rewriting **State** below and stops at ≈ 200k context. Nothing in `src/`, `rust/`, presets or
+species params changes. Python in `analysis/`; data under `data/reference/` (git-ignored), each source in its own
+fresh directory, read with `python -I`.
+
+**Decisions on the phase-1 plan:**
+1. **Gate a** compares recomputed values against the publishers' own QSM-derived values, the same kind of
+   comparison per dataset (B). Felled height and Demol's `PC_treeheight` are reported as ceilings, never gated
+   (Demol's own point-cloud height is within 5% of felled height for 91% of trees; its QSM DBH within 5% of field
+   DBH for 68%).
+2. **`cli/dump-trees.ts`** is allowed: gate b only, out of anything shipped (not in the site build, not in
+   `npm run build`).
+3. **BioDiv:** option A: valid beech from the head of the stream's `QSM/all/` (the tarball is one zstd frame;
+   `all/` streams first; `raw/` is ≈ 7 h away at 3.9 MB/s). Each tree's model by Wytham's rule (median-size
+   model), not `select_optimum`. Take 50–100 valid beech. **Label "Phase 1 only"**: the head of the stream is one
+   plot and one gap treatment, so never a source of beech tolerances or phase-4 targets. (The user may run option
+   B, the full stream to `raw/`, as a detached job.)
+4. **TreeML:** three real `optcsv` files by range request from `Dataset_QSM.zip`, and a synthetic fixture.
+
+**Amendments:**
+- **A. One implementation.** `describe()` calls the same function as the literal `form.rs` port, parameterised by
+  (topology labels, limb-length threshold). Gate b runs that code path with the simulator's labels and the
+  10-metamer rule. Reported, not gated: form_py(simulator labels) vs form_py(geometric labels) on gate b's 30
+  trees (`forkHeight` and `leaderDominance` depend on what "main child" means).
+- **B. Gate a per dataset, same kind of comparison.** Height against the `.mat`'s own `TreeHeight` where the
+  layout carries it (Demol 2.3: `qsm.treedata.TreeHeight`; check Wytham 2.0's `TreeData` vector and BioDiv 2.4.1).
+  Where it does not, `Hgt_pts` is a ceiling, not a gate, and height is covered by internal checks: top z − base z
+  > 0, the trunk's base is the lowest cylinder, parent-before-child. DBH: Wytham's `DBH_QSM_avg` is a mean over 10
+  models and we read one (noted). BioDiv: establish whether `labels.csv`'s `dTLS`/`hTLS` are point- or
+  QSM-derived before gating on them (the `.mat`'s own `treedata` is the like-for-like comparison).
+- **C.** `test_readers.py` asserts the up axis for every format (QSMs z-up metres; the simulator y-up cells).
+- **D.** A committed manifest of every Wytham and BioDiv member fetched (member name, model index, bytes), for
+  reproducibility and CC-BY attribution: `analysis/fit/sources/reference-manifest.csv`.
+- **E.** Gate c's table shows pass/fail beside the noise floor and the tolerance (so a held-out descriptor reads as
+  "tolerance tight" or "resolution-sensitive"). If fewer than half the descriptors survive: stop and report;
+  never loosen the tolerance.
+
+**Fixed choices (the approved plan):**
+- **Common cylinder table** (`analysis/treesim/cylinders.py`): per cylinder start (x, y, z), unit axis, length,
+  radius (QSM `UnmodRadius`/raw where present), parent (−1 root, parent before child), metres, **z up**. The
+  simulator converts: cells × 0.25 m, (x, y, z)sim → (x, z, y). Continuation by geometry: at each node the child
+  with the larger subtree wood volume Σπr²l continues (ties: the smaller turn from the parent's axis); order +1 on
+  every other child. Never TreeQSM's `BranchOrder`/`BoC` or our slot 0.
+- **DBH:** the trunk (continuation from the root) cylinder spanning 1.3 m of stem length, ×2 (TreeQSM's
+  `DBHqsm`, which equals Demol's CSV `qsm_DBHqsm`). **H:** top z − base z.
+- **Wytham subset:** all 37 oaks; 40 sycamores DBH ≥ 10 cm stratified by DBH; all 10 models for 8 mid-sized
+  sycamores (the noise floor, 1c). One model per tree: the median-size member of its 10 (never the smallest:
+  that picks the coarsest reconstruction; never "closest to `DBH_QSM_avg`"). The zip is zip64; its central
+  directory sits at 39,472,397,759 (1.36 MB). Zenodo serves ranges on `…/files/DATA_QSM_opt.zip?download=1`.
+- **Coarsening (1c):** (1) prune simulated subtrees whose base diameter < d_min, the median terminal-cylinder
+  diameter of that dataset's QSMs (per dataset); (2) re-cut each continuation axis to the dataset's median
+  length/radius ratio by radius class: chord from first base to last tip, r = √(Σr²l / L); (3) then re-derive
+  continuation and order. Bracket: d_min × 0.5 and × 2, and a small-branch inflation variant from Demol et al.
+  2022 (*Silva Fennica* 56(1) 10550, doi 10.14214/sf.10550: in leaf-off *Fraxinus*, branches < 5 cm caused
+  80–83% of the volume overestimate; diameters < 10 cm read larger than measured), dropped if the paper gives no
+  error by diameter class.
+- **Tolerance (1c):** 0.5 × the size-detrended real between-tree SD (residual on log DBH, per species). Noise
+  floor: between-model SD over Wytham's 10 models; ≥ 0.5 × between-tree SD → held out regardless. Pass: the
+  per-seed shift (median of the four measured trees) within tolerance on ≥ 15 of seeds 1–20, at every bracket
+  point and each dataset's resolution. Simulated: oak, beech, field maple (sycamore proxy), stand to 150,
+  DBH-matched; lone at 100 reported only.
+- **Gate b:** oak, beech, birch × seeds 1, 2; lone at 60 and stand at 100 (30 trees); 12 values + 10 bands;
+  |a − b| ≤ 1e-9·max(1, |b|), NaN = NaN.
+- **Tests** skip with a reason when `data/reference/` or the WASM build is missing, and never touch the network.
+
+### Session briefs
+- **1a (readers, gate a):** `analysis/treesim/fetch.py` (Wytham range reads, Demol unzip, BioDiv head-of-stream,
+  TreeML range reads), `analysis/treesim/cylinders.py` (the table, validation, continuation/order, DBH, H),
+  `analysis/treesim/qsm.py` (TreeQSM 2.0, 2.3, 2.4.1, TreeML `optcsv`), `analysis/tests/test_readers.py` (field
+  maps on synthetic `.mat`/`optcsv`, up axis, C), `analysis/tests/test_qsm_gate.py` (gate a, B), the manifest (D).
+  Done: gate a ≥ 95% within 5% per dataset on the gated columns; numbers in State.
+- **1b (describe, gate b):** `analysis/treesim/form.py` (the one implementation, A), `analysis/treesim/simtree.py`,
+  `cli/dump-trees.ts`, `analysis/treesim/describe.py` (ported wood-only descriptors with geometric labels and a
+  2.5 m limb threshold; 4-band profile; new: Horton–Strahler bifurcation ratio, tortuosity, length fraction by
+  order, pendulous fraction, taper d(0.5 H)/DBH, length-weighted centroid height/H; report-only `leafStemSlope`,
+  crown base/H), `test_form_parity.py` (gate b), `test_topology.py`, `test_describe.py`, the relabelling table;
+  the simulator's case in `test_readers.py`'s up-axis test (C: y-up cells → z-up metres).
+- **1c (coarsening, gate c, wrap):** `coarsen()`, the Wytham 10-model noise floor, tolerances,
+  `analysis/experiments/phase1_degradation.py`, `test_coarsen.py`, gate c (E),
+  `docs/experiments/2026-11-03-phase1-converter.md` (gates, numbers, held-out list, BioDiv "Phase 1 only"),
+  ADR 0049 to accepted with the decisions above, §g reordered (beech 3, oak 4), spec-reviewer on the diff,
+  `/wrap-up`, commit, push, no PR.
+
+### State
+_(rewritten at the end of each session)_ **1a done (2026-11-03); 1b next.**
+- **Code:** `analysis/treesim/{fetch,cylinders,qsm,qsm_gate}.py`; `analysis/tests/{test_readers,test_qsm_gate}.py`
+  (22 Python tests pass); scipy an explicit dependency. Readers cache parsed tables as hidden `.npz` beside each file.
+- **Data** (`data/reference/`, manifest `analysis/fit/sources/reference-manifest.csv`, 199 rows): Demol 66 `.mat`
+  (16 MB); Wytham 77 (37 oaks, 40 sycamores ≥ 10 cm; median-size model of 10; 910 MB); BioDiv 53 valid beech
+  `all.mat` from the stream's first 97 members (1.8 GB; 19 plots, G and GD: not one plot, still "Phase 1 only");
+  TreeML 3 `optcsv` (beech 000036, hornbeam 000081, sycamore 000147).
+- **Gate a passes** (`python -I -m treesim.qsm_gate`):
+
+  | dataset | trees | DBH ≤ 5% | H ≤ 5% | max H err | DBH vs 10-model mean | ceiling DBH | ceiling H | internal checks failed |
+  |---|---|---|---|---|---|---|---|---|
+  | Demol | 65 | 100% | 100% | 3% | – | 68% (field) | 91% (felled) | none |
+  | Wytham | 77 | 100% | 100% | 4% | 94% (oaks 89%) | – | 99% (`Hgt_pts`) | none |
+  | BioDiv | 53 | 100% | 100% | 3% | – | 42% (`dTLS`) | 100% (`hTLS`) | HEW21_GD_117 |
+  | TreeML | 3 | – | – | – | – | – | – | none (gated) |
+- **For the user to confirm:** Wytham's DBH is gated against the model read (`TreeData[9]`), as Demol's and BioDiv's
+  are (decision 1's symmetry), not against `DBH_QSM_avg`. Recomputed DBH equals each file's own to 0.5%; against
+  the 10-model mean it is 94% (oaks 89%: one model of a big oak sits far from the mean, tree 81's between-model SD
+  is 23 cm). Gated as amendment B literally reads, Wytham fails gate a.
+- **Found:** TreeQSM 2.0's `TreeData` is a 33-vector: [3] height m, [9] DBHqsm cm (read off tree 8357). BioDiv's
+  `dTLS`/`hTLS` are from points (README): ceilings. BioDiv `all.mat` holds 80 models a tree. Orphan fragments (extra
+  roots never attached) occur in TreeML (all 3; ≤ 1.7% of wood volume) and BioDiv; dropped, recorded in meta.
+  Demol FEXC12 has a QSM but no row in the published table. **BioDiv HEW21_GD_117** carries a 3.4 m, r 2.5 cm
+  cylinder diving 1.1 m below the base: an artifact (1b: decide in the open whether describe() drops below-ground
+  cylinders; never silently). **BioDiv's median-size models read a median 6.6% under the point DBH** (quartiles
+  −15%, −4%; worst −61%): the median-size rule picks thinner reconstructions here (1c: weigh before any BioDiv
+  number becomes a tolerance; BioDiv is "Phase 1 only" anyway).
+- **1b starts from:** `cylinders.Cylinders`, `from_arrays`, `continuation`, `order_and_axis`, `trunk`, `dbh`,
+  `height` (continuation by subtree volume is written but only exercised through DBH: test_topology tests it).

@@ -9,6 +9,7 @@ dependencies = [
     "plotnine>=0.14",
     "polars>=1.20",
     "pyarrow>=18",
+    "scipy>=1.14",
 ]
 
 [build-system]

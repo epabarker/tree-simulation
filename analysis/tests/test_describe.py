@@ -155,15 +155,16 @@ def test_droop_reads_stretches_not_the_last_cylinder():
 
 
 def test_below_ground_subtrees_are_dropped_and_counted():
+    # R4: a cylinder that starts or ends below the root's base goes, with its subtree.
     t = trunk(5)
-    root_kid = t.add(0, [1, 0, -1], 1.0, 0.03)  # starts at 1 m, ends 0.29 m up: kept by both rules
-    dive = t.add(root_kid, [1, 0, -1], 1.0, 0.02)  # starts above, ends below the base: the tip rule only
+    root_kid = t.add(0, [1, 0, -1], 1.0, 0.03)  # starts at 1 m, ends 0.29 m up: kept
+    dive = t.add(root_kid, [1, 0, -1], 1.0, 0.02)  # starts above, ends below the base: dropped
     t.add(dive, [1, 0, 0], 0.5, 0.01, start=[1.0, 0.0, -0.3])  # starts below: dropped
     c, info = ds.drop_below_ground(t.table())
-    assert info["below"] == 1 and info["below_tip"] == 2 and len(c) == 7
-    assert info["below_volume"] == pytest.approx(np.pi * 0.01**2 * 0.5 / (np.pi * (0.04 * 5 + 0.03**2 + 0.02**2
-                                                                                  + 0.01**2 * 0.5)))
-    assert ds.describe(t.table())["below"] == 1
+    assert info["below"] == 2 and info["below_start"] == 1 and len(c) == 6
+    total = 0.04 * 5 + 0.03**2 + 0.02**2 + 0.01**2 * 0.5
+    assert info["below_volume"] == pytest.approx((0.02**2 + 0.01**2 * 0.5) / total)
+    assert ds.describe(t.table())["below"] == 2
 
 
 def test_leaf_stem_slope_is_nan_without_leaves():

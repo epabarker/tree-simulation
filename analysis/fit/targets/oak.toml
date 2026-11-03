@@ -272,3 +272,11 @@ hi = 4
 floor = { target = 0.084, band = 0.03, kind = "measured", source = "sessile oak canopies transmit a median 8.4% of PAR (4.9–12.8%; Hagemeier & Leuschner 2019 (overcast, diffuse PAR))" }
 survivalLight = [0.08, 0.14]   # lowest light all seedlings survive (Hagemeier & Leuschner 2019: sessile oak saplings need 11.4%; Ligot et al. 2013)
 shadeScore = 2.45   # Niinemets & Valladares 2006, Appendix A
+
+[level1]
+# Level 1 (ADR 0049; the reference-fidelity plan, 1c; the user's ruling 2026-11-03), a hypothesis for 1c to test:
+# Wytham's QSMs are TreeQSM 2.0, which carries no UnmodRadius, so its radii are the taper-corrected ones. Its
+# radius-based descriptors are therefore neither targets nor hold-outs for oak; its angles, lengths, tortuosity and
+# crown profile remain. Read by phase 1c and later; fit.py ignores this table.
+wytham_excluded = ["junctionDelta", "ldSlope", "taper", "leaderDominance"]
+wytham_reason = "TreeQSM 2.0 radii are taper-corrected (no UnmodRadius)"

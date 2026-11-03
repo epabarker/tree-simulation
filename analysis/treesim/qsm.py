@@ -17,8 +17,13 @@ A 2.4.1 `all.mat` holds every candidate model (BioDiv: 16 input sets × 5 repeat
 default optimum (the user's ruling R1, 2026-11-03), as `select_optimum` picks it with its default metric
 `all_mean_dis`: the mean point–model distance over all cylinders (`pmdistance.mean`) averaged over each input set's
 repeats, the input set with the smallest, then within it the model with the smallest `pmdistance.mean`. Read off
-`select_optimum.m` in InverseTampere/TreeQSM (its header says 1.4.0; the 2.4.1 file was not seen). Without
-`pmdistance`, the median-size model by cylinder count (Wytham's rule).
+`select_optimum.m` at the 2.4.1 tag of InverseTampere/TreeQSM: TreeQSM versions its files on their own, and this
+one's header says "Version 1.4.0, Latest update 2 May 2022" inside the 2.4.1 package (the user's ruling). Checked
+2026-11-03: every BioDiv model was run by TreeQSM 2.4.1 between 6 May and 22 June 2025, after that update, and carries
+every field the function reads (`pmdistance`'s ten means and maxima; `rundata.inputs`' PatchDiam1, PatchDiam2Min,
+PatchDiam2Max, its only grouping keys; `cylinder.SurfCov`, `branch`, `BranchOrder`; the `treedata` distributions).
+TreeQSM matches inputs within 1e-4, we by equality: a set's repeats carry identical values. Without `pmdistance`,
+the median-size model by cylinder count (Wytham's rule).
 
 Parsed tables are cached as .npz beside the source (a derived file under the git-ignored data/reference/).
 """

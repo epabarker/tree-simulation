@@ -231,9 +231,10 @@ _(rewritten at the end of each session)_ **1a and 1b done (2026-11-03); 1c next.
   re-run passes (BioDiv 100% / 100%, max H err 1%).
 - **Gate a** (`python -I -m treesim.qsm_gate`): Demol 65, Wytham 77, BioDiv 53 all 100% within 5% on DBH and H;
   ceilings as before (BioDiv DBH 32%, H 98%). Internal checks reported on every dataset, gated nowhere: all pass.
-- **R4:** the start rule is implemented (`describe.drop_below_ground`, counted per tree) beside a start-or-tip rule,
-  reported. **Under R1's models nothing on any dataset starts or ends below its base** (HEW21_GD_117's diving
-  cylinder was in the median-size model only), so both rules drop 0 of 199 QSMs and 0 of 30 simulated trees.
+- **R4 (ruled 2026-11-03: start or tip):** `describe.drop_below_ground` drops a cylinder that starts or ends below
+  the root's base z with its subtree, counted per tree (`below`, `below_volume`; `below_start` for the start-only
+  rule). Under R1's models nothing on any dataset starts or ends below its base (HEW21_GD_117's diving cylinder was
+  in the median-size model only): 0 of 199 QSMs, 0 of 30 simulated trees.
 - **Gate b passes** (`node cli/dump-trees.ts`, 89 s; `python -I -m treesim.form_gate`): 30 of 30 trees, 22 numbers
   each, worst relative error 2.5e-13 (beech lone, 72,900 metamers). Two stand beech are dead at 100 with their
   skeletons standing (120 and 39 metamers): gated like the rest.
@@ -249,11 +250,21 @@ _(rewritten at the end of each session)_ **1a and 1b done (2026-11-03); 1c next.
   fraction, taper d(0.5 H)/DBH (raw radii), centroid height/H; report-only `leafStemSlope` (NaN on QSMs: no wood
   proxy) and crown base/H. The measurement-design table (labels, resolution, gravity vs parent) is its docstring.
   Runs on all 199 QSMs (≈ 85 s) and the 30 simulated trees.
-- **For 1c, seen in passing (medians, not yet a finding):** Wytham's `junctionDelta` 3.95 against 1.4–1.9 elsewhere
-  (TreeQSM 2.0 has no UnmodRadius: its radii are the corrected ones); Demol's `ldSlope` 0.15 and BioDiv's 0.05
-  against the simulator's 0.91; simulated tortuosity 1.12 against 1.46–1.76.
+- **For 1c: hypotheses to test, not findings** (the user, 2026-11-03; from medians seen in passing: Wytham
+  `junctionDelta` 3.95 against 1.4–1.9 elsewhere; `ldSlope` Demol 0.15, BioDiv 0.05, simulator 0.91; tortuosity
+  simulator 1.12 against 1.46–1.76):
+  - **H1, Wytham radii:** its 2.0 radii are taper-corrected (no UnmodRadius), so its radius-based descriptors
+    (`junctionDelta`, `ldSlope`, `taper`, `leaderDominance`) are neither targets nor hold-outs for oak; angles,
+    lengths, tortuosity and profile remain (`analysis/fit/targets/oak.toml`, `[level1]`).
+  - **H2, `ldSlope`:** the gap is predicted to come from small-branch radius overestimation; gate c's inflation
+    variant should move it hard. Report whether it does.
+  - **H3, tortuosity:** measure both sides after resampling each path at the 0.5 m step the headings use, so
+    cylinder zigzag and metamer wobble drop out together. Report before and after.
+  - **H4, DBH offset:** one table, the median QSM-vs-measured DBH bias with sign for Demol (tape), Wytham
+    (`DBH_pts`) and BioDiv (`dTLS`). If all three agree, BioDiv's thin DBH is a method offset.
 - **Rulings still standing:** R2 (match on measured DBH, never DBHqsm), R3 (4 big oaks join the noise floor), R5
   (the 53 beech "Phase 1 only"; R1 is now settled, so the note gives the plot mix as found).
-- **For the user:** whether R4 should drop by start or tip (moot on today's data); whether TreeQSM 2.4.1's
-  `select_optimum` matches the 1.4.0 file read. The internal checks are reported on every dataset and still gate TreeML's height
-  (amendment B: it publishes none); the 1b brief's "reported, not gated" was read as not overriding B.
+- **The user's rulings after 1b (2026-11-03):** R1 accepted (the per-file version header is not the package's;
+  checked: the function's last update, 2 May 2022, predates the BioDiv runs, May–June 2025, which carry every field
+  it reads; `qsm.py`'s docstring); R4 start or tip; TreeML's internal checks stay its height gate; H1–H4 above;
+  ADR 0049 notes that pre-phase-1 shape targets are in simulator-label coordinates.

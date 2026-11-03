@@ -48,5 +48,7 @@ eleven species (thin for willow, rowan, holly), and open-grown structure only in
   comes from field measurements (Weiser), not from QSM wood.
 - Per-tree tables derived from GPL (FOR-species20K) or CC-BY-SA (Weiser) data are not committed; summary
   statistics are.
+- All pre-phase-1 shape targets and `hand-overrides.toml` are in simulator-label coordinates (slot 0 continues);
+  fitted Level 1 values use geometric labels (the heavier subtree continues) and are not comparable to them.
 - Willow, rowan and holly have no 3D data. They are fitted at Level 0 and judged at Level 2 only, as are fir and
   pine (Level 0).

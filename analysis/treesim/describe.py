@@ -29,8 +29,9 @@ Measurement design: what each descriptor depends on beyond the tree.
   exp(−slope) of ln N_ω on ω, over every order and, beside it, without order 1 (the twigs a QSM loses first).
 - **Report-only:** `leafStemSlope` (NaN without leaf area: no wood proxy, tip counts being the most
   resolution-dependent quantity there is), `crownBase` / H by wood (the field's crown base is Weiser's, §c).
-- **Below ground (R4):** subtrees whose start lies below the root's base z are dropped and counted; beside them,
-  what a start-or-tip rule would drop (reported; no tree of the four datasets has either under R1's models).
+- **Below ground (R4, the user's ruling 2026-11-03: start or tip):** a cylinder that starts or ends below the
+  root's base z is dropped with its subtree, counted per tree (`below`, `below_volume`); `below_start` counts what
+  the start-only rule would have dropped. No tree of the four datasets has either under R1's models.
 """
 
 from __future__ import annotations
@@ -76,9 +77,9 @@ def drop_below_ground(c: cy.Cylinders) -> tuple[cy.Cylinders, dict]:
     vol = np.pi * c.radius**2 * c.length
     by_start = _below(c, c.start[:, 2] < z0)
     by_tip = _below(c, (c.start[:, 2] < z0) | (c.tip[:, 2] < z0))
-    info = {"below": int(by_start.sum()), "below_volume": float(vol[by_start].sum() / vol.sum()),
-            "below_tip": int(by_tip.sum()), "below_tip_volume": float(vol[by_tip].sum() / vol.sum())}
-    return (subset(c, ~by_start) if by_start.any() else c), info
+    info = {"below": int(by_tip.sum()), "below_volume": float(vol[by_tip].sum() / vol.sum()),
+            "below_start": int(by_start.sum())}
+    return (subset(c, ~by_tip) if by_tip.any() else c), info
 
 
 def geometric_labels(c: cy.Cylinders) -> Labels:

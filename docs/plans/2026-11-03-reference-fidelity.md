@@ -306,9 +306,17 @@ no z was computed, and nothing registered changed after it.
   which knob is at its bound and why, never more generations.
 
 ### State
-_(rewritten at the end of each session)_ **Phase 2 built; night 1 is the user's (2026-11-03).** Targets pre-registered
-(9b1f4c0), thin species' borrowed T (06915ac), §k. The measurement, loss, gate, resumable fitter and sweep presets are in;
-the beech dry run passed.
+_(rewritten at the end of each session)_ **Phase 2 built; night 1 part-run; the trunk diagnosis is done, ADR 0050
+proposed (2026-11-03).** Targets pre-registered (9b1f4c0), thin species' borrowed T (06915ac), §k. The measurement, loss,
+gate, resumable fitter and sweep presets are in; the beech dry run passed.
+- **Night 1:** beech and oak complete (1200 evaluations each, `docs/experiments/fits/level0/`); **birch stopped at gen 4**
+  (300 evaluations, 22:08, no error in `runs/level0/birch.log`, tmux gone); it resumes from its checkpoint on the next
+  `level0_sweep.sh night1`.
+- **Trunk diagnosis** ([note](../experiments/2026-11-03-level0-trunk.md), [ADR 0050](../decisions/0050-level0-height-not-girth.md),
+  proposed): the hypothesis (maintenance charged on scars) is refuted. R1 already charges live pipes only
+  (`r1.rs:69–90`, `heartwood_costs_nothing`). r0's z_H gain is lost height. The binding trait is absolute height: Tallo's
+  median H peaks at 38.9 m (beech) and 19.5 m (oak). Oak adds a target conflict (a yield-table oak scores z_H up to +0.98
+  against T 0.84) and CR wider than the stand's spacing: two rulings for the user. Recommendation A: no core change.
 - **Targets** (`tallo-level0.json`): n (H/CR) beech 8,931/7,082, oak 3,749/3,617, birch 1,250/1,126, hornbeam
   1,075/1,070 (2 sources), maple 166/155, pine 15,088/13,340, fir 1,070/1,044, sycamore (reference) 686/668; flagged
   n < 100, band and T borrowed: willow 33/19, rowan 44/36, holly 25/25 (one source, 8–17 cm). T 0.81–0.87 (thin:
@@ -322,9 +330,10 @@ the beech dry run passed.
   evaluation; it scores only its death penalty) and run it for the finalists.
 - **Step 6 (conflicts):** none in the data; holly at 150 is likely outside its support (17 cm).
 - **Next:**
-  1. The user runs night 1, `level0_sweep.sh night1`; nights 2 and 3 follow.
-  2. The post-sweep session per species (§k): gate, gallery and `shapeFlag`, loss contributions, the write-up; the
-     bound rule.
-  3. 1d-ii (register v3.1, wire `tiers.py`, size-matched seasons, gate c) on phase 2's trees.
+  1. The user rules on ADR 0050 (A, B or C) and on oak's two questions (Tallo against the yield tables; CR's definition).
+  2. The user resumes night 1 (birch), then nights 2 and 3.
+  3. The post-sweep session per species (§k): gate, gallery and `shapeFlag`, loss contributions, the D* split of z_H
+     (ADR 0050), the write-up; the bound rule.
+  4. 1d-ii (register v3.1, wire `tiers.py`, size-matched seasons, gate c) on phase 2's trees.
 - **Standing rulings:** §k (phase 2, the forest-grown reading accepted: by source, nothing to filter on); R2, R3 done,
   R5 as amended; §g reordered; ADR 0049 accepted.

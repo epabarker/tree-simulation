@@ -104,6 +104,8 @@
       );
       // `?clearBole`: no rosettes on a trunk below its limb crown base (round 2), for a phone look.
       if (query.has("clearBole")) view.clearBole = true;
+      // `?interior`: a closed wood's dim interior between the boles (round 3); it needs the field.
+      if (query.has("interior")) view.interior = true;
       // `?bark=pale`: beech's former pale grey bark, for a comparison on the phone (scene.css).
       if (query.get("bark") === "pale") document.documentElement.dataset.bark = "pale";
       let lastSnapshot = null;
@@ -121,6 +123,7 @@
         renderer,
         planting,
         view,
+        ...(view.interior ? { snapshot: { junctions: false, field: true } } : {}),
       });
       // `?bench` with reduced motion on, which has no intro to sample: the visitor's wait from
       // navigation to the still forest (I3 step 5), and about how much of it the worker's 40 seasons took.

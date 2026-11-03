@@ -116,6 +116,13 @@ export interface ViewOptions {
    */
   girth?: number;
   /**
+   * The backdrop beyond a closed stand (round 3, off by default): at each height the sky is drawn
+   * toward `--interior` by `interiorDepth`, so where the wood is closed across its whole width its
+   * dim interior shows between the boles, as from inside a high forest, and a lone tree in a field
+   * keeps its sky. Needs the snapshot's field (the lab's has it; the garden asks for it with this).
+   */
+  interior?: boolean;
+  /**
    * Bark by light (round 2, off by default): wood draws at 1 − barkLight × shade of its colour's
    * luminance, the shade the light field gives the cell at the metamer's base (`Scene.woodLight`), so
    * a bole under a closed canopy reads darker than a sunlit limb. WebGL2 only, and only where the
@@ -194,6 +201,36 @@ export const LEAF_OPACITY = 0.92;
  * grey (L* 77), as a white stem against a bright sky looks.
  */
 export const WOOD_CONTRAST = 18;
+
+/**
+ * The backdrop beyond a closed stand (`ViewOptions.interior`). A row of the world is as closed as
+ * the light on its brightest INTERIOR_QUANTILE (the field's Q/C there): fully closed at or below
+ * INTERIOR_CLOSED, the top of a closed stand's floor light (2–10% of open sky, spec §10), open from
+ * INTERIOR_OPEN, twice that. The quantile, not the mean: where any tenth of the wood is open at a
+ * height, the view beyond the slab is open there too, so a lone tree's own shade never counts.
+ */
+export const INTERIOR_QUANTILE = 0.1;
+export const INTERIOR_CLOSED = 0.1;
+export const INTERIOR_OPEN = 0.2;
+
+/**
+ * How closed each row of the world is, 0 (open) → 1 (a closed wood's interior), row 0 at the
+ * ground, from the snapshot's field (`shadow`, 1 − Q/C over the slab's depth, row-major).
+ */
+export function interiorDepth(field: Float32Array, width: number): Float32Array {
+  const height = Math.floor(field.length / width);
+  const out = new Float32Array(height);
+  const row = new Float32Array(width);
+  const at = Math.min(width - 1, Math.floor(INTERIOR_QUANTILE * width));
+  for (let y = 0; y < height; y++) {
+    row.set(field.subarray(y * width, (y + 1) * width));
+    row.sort();
+    const light = 1 - Math.min(1, Math.max(0, row[at] as number));
+    const u = (INTERIOR_OPEN - light) / (INTERIOR_OPEN - INTERIOR_CLOSED);
+    out[y] = Math.min(1, Math.max(0, u));
+  }
+  return out;
+}
 
 /** Length of a full-size leaf of `length` world units at `scale` CSS pixels per world unit. */
 export function leafLength(
@@ -275,6 +312,10 @@ export class Scene {
   clearBole = false;
   /** Drawn radius over the model's; renderers copy `ViewOptions.girth`. */
   girth = 1;
+  /** The backdrop beyond a closed stand; renderers copy `ViewOptions.interior`. */
+  interior = false;
+  private interiorFor: Snapshot | null = null;
+  private interiorRows: Float32Array | null = null;
   /** How far shade darkens wood (0: not at all); renderers copy `ViewOptions.barkLight`. */
   barkLight = 0;
   /** The least ΔL* wood keeps below a light sky; renderers copy `ViewOptions.woodContrast`. */
@@ -1039,6 +1080,29 @@ export class Scene {
     }
     this.woodLightFor = { s, k };
     return this.woodLightOf;
+  }
+
+  /**
+   * Each row's closure for the backdrop (`interiorDepth`), once per snapshot; null when the
+   * backdrop is off or the snapshot carries no field.
+   */
+  interiorOf(s: Snapshot): Float32Array | null {
+    if (!this.interior || !s.shadow) return null;
+    if (this.interiorFor !== s) {
+      this.interiorRows = interiorDepth(s.shadow, s.width);
+      this.interiorFor = s;
+    }
+    return this.interiorRows;
+  }
+
+  /**
+   * The world-x span the backdrop covers: the visible width on a ring (the wood goes on beyond the
+   * picture), the world itself otherwise (its field says nothing beyond its sides).
+   */
+  interiorSpan(s: Snapshot): [number, number] {
+    if (!s.periodic) return [0, s.width];
+    const half = this.width / 2 / this.camera.scale + 1;
+    return [this.camera.cx - half, this.camera.cx + half];
   }
 
   /**

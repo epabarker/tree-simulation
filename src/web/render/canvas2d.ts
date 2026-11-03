@@ -7,7 +7,7 @@
 
 import type { Snapshot } from "../../core/types.ts";
 import { BudState } from "../../core/types.ts";
-import { BUD_ACTIVE, BUD_DORMANT, SEQUENTIAL, shadeImage } from "./colors.ts";
+import { BUD_ACTIVE, BUD_DORMANT, parseColor, SEQUENTIAL, shadeImage } from "./colors.ts";
 import {
   LEAF_PALETTES,
   LEAF_SHAPES,
@@ -43,6 +43,9 @@ export class Canvas2DRenderer implements Renderer {
   private readonly ctx: CanvasRenderingContext2D;
   private shadowImage: HTMLCanvasElement | null = null;
   private shadowFor: Snapshot | null = null;
+  /** The backdrop beyond a closed stand (Scene.interiorOf): one pixel per row of the world. */
+  private interiorImage: HTMLCanvasElement | null = null;
+  private interiorFor = { s: null as Snapshot | null, theme: null as Theme | null };
   private keys = new Uint16Array(0);
   private order = new Int32Array(0);
   private theme: Theme;
@@ -126,6 +129,20 @@ export class Canvas2DRenderer implements Renderer {
       this.cull.y1 = groundY / scale + margin;
     };
 
+    // The backdrop beyond a closed stand, over the sky and behind everything else.
+    scene.interior = view.interior ?? false;
+    const rows = scene.interiorOf(s);
+    if (rows) {
+      const image = this.buildInteriorImage(s, rows);
+      if (image) {
+        const [x0, x1] = scene.interiorSpan(s);
+        ctx.save();
+        ctx.imageSmoothingEnabled = true;
+        // Image row 0 is the ground row; the world transform already points y up.
+        ctx.drawImage(image, x0, 0, x1 - x0, rows.length);
+        ctx.restore();
+      }
+    }
     if (view.showShadow && this.shadowFor !== s) {
       // Built once per snapshot, and only while the overlay is shown.
       this.shadowImage = s.shadow ? this.buildShadowImage(s) : null;
@@ -400,6 +417,28 @@ export class Canvas2DRenderer implements Renderer {
       }
       ctx.fill();
     }
+  }
+
+  private buildInteriorImage(s: Snapshot, rows: Float32Array): HTMLCanvasElement | null {
+    const f = this.interiorFor;
+    if (f.s === s && f.theme === this.theme) return this.interiorImage;
+    const canvas = this.interiorImage ?? document.createElement("canvas");
+    canvas.width = 1;
+    canvas.height = rows.length;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return null;
+    const [r, g, b] = parseColor(this.theme.interior);
+    const img = new ImageData(1, rows.length);
+    for (let y = 0; y < rows.length; y++) {
+      img.data[4 * y] = r;
+      img.data[4 * y + 1] = g;
+      img.data[4 * y + 2] = b;
+      img.data[4 * y + 3] = Math.round(255 * (rows[y] as number));
+    }
+    ctx.putImageData(img, 0, 0);
+    this.interiorImage = canvas;
+    this.interiorFor = { s, theme: this.theme };
+    return canvas;
   }
 
   private buildShadowImage(s: Snapshot): HTMLCanvasElement | null {

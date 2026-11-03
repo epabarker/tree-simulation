@@ -2,6 +2,26 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-03: Stems and bark: the backdrop beyond a closed stand, and nothing moves the beech stand (branch claude/stems-bark)
+
+- **What changed** (renderer and page only, goldens bit-identical: 16/16 WASM, native golden ok): `ViewOptions.interior` (`&interior`, `garden.html?interior`, off by default) draws a closed wood's dim interior (`--interior`, light and dark) between the boles. Closure per row comes from the field's brightest tenth: closed at ≤ 10% of open light (§10's floor), open from 20%. The garden asks for the field only with the flag. Tests: `interiorDepth` and the field and span branches; the token in three blocks.
+- **Ruled out before naming:**
+  - bark by light: set 5's field, 0.53 on stand boles against 0.52 on lone limbs;
+  - bark by girth: Pilarski 2008's abstract gives 18% reflectance on 1-year stems, 10% at 10 years and ≈ 15% on trunks, so limbs aren't paler;
+  - root flare: no sourced numbers in two lookups.
+  - The backdrop's first gate form (shade relative to the top row) failed on the lone plates (0.41–0.50), because a lone crown shades its 240-cell field. The §10 form passed, with alpha 0 on every lone plate (user-approved).
+- **Dev set D** (seeds 1–3, three Sonnet namers, 66 plates, in-set): the beech stand is birch 6, aspen 3 under the measured bark, the pale bark, and either with the backdrop. Lone 60: pale 6, measured 4. Lone 100: oak 7 under every bark. **Girth set G** (36 stand plates): beech birch at k 1, 1.2 and 1.45. Hornbeam's k = 1 plates read 6/9 in D and 0/9 in G (noise). So J (4–6) was not run.
+- **Surprises:**
+  - oak reads wild cherry, 0 of 27;
+  - v3's measured-bark stand (beech 9/15) did not replicate under Sonnet namers;
+  - the in-set design anchored the names: the pale and candidate stands are 46% of pixels apart and got identical names;
+  - in the garden's winter the backdrop stays under bare crowns.
+- **Harness, the first Opus run:**
+  - six namers ≈ 648k tokens, about 2.5× the plan's estimate per namer;
+  - two advisor calls;
+  - spec-reviewer (Fable) found no divergences on 9293678;
+  - the Stop hook went red twice on load timeouts during renders, and green with vite stopped.
+
 ## 2026-11-02: The harness, runs 2 and 2b: one lock and stamp for the check, `doc-lookup`, the reviewer's guard (on `3d-port`)
 
 - **What changed** (no src/rust/tests edits in 2b, goldens unchanged): `check-stamped.sh` + `check-lib.sh` (`npm run check:stamp`) put the Stop hook and humans behind one `flock` and one green stamp; the hook is now the fast path plus that script, with `red`/`red-shown` so a manual red cannot lift the block. CLAUDE.md: never background the check; AGENTS.md and `/wrap-up` point at `check:stamp`; the principles doc is saved at `docs/background/harness-principles.md`. Run 2's five items ([ADR 0047](decisions/0047-harness.md), "Run 2") are committed with it.

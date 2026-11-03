@@ -143,3 +143,31 @@ def test_real_files_are_z_up_metres(source):
         assert 2.0 < rise < 60.0, f"{path.name}: a height of {rise:.1f} is not a tree in metres"
         assert rise > 0.5 * spread.max(), f"{path.name}: wider than tall twice over: is z up?"
         assert all(cy.internal_checks(c).values()), path.name
+
+
+def test_treeqsm_2_4_takes_treeqsms_default_optimum(tmp_path):
+    # Two input sets of two repeats: set A's mean pmdistance (0.010, 0.030) is 0.020, set B's (0.012, 0.014) 0.013.
+    # select_optimum picks set B, then its smaller model (index 2), though index 0 has the smallest distance of all.
+    models = np.empty(4, dtype=object)
+    for k, (diam, dist) in enumerate([(0.05, 0.010), (0.05, 0.030), (0.08, 0.012), (0.08, 0.014)]):
+        s = _struct()
+        s["treedata"] = {"DBHqsm": DBH + k, "TreeHeight": TREE_HEIGHT}
+        s["pmdistance"] = {"mean": dist}
+        s["rundata"] = {"version": "2.4.1", "inputs": {"PatchDiam1": diam, "PatchDiam2Min": 0.01, "PatchDiam2Max": 0.03}}
+        models[k] = s
+    p = tmp_path / "t_all.mat"
+    sio.savemat(p, {"QSMs": models})
+    q = qsm.read(p, cache=False)
+    assert q.meta["model"] == 2 and q.meta["dbh_qsm"] == pytest.approx(DBH + 2)
+
+
+def test_the_simulator_is_y_up_and_becomes_z_up():
+    # Amendment C's simulator case: a metamer heading up the core's y reads up our z, in metres.
+    from treesim import simtree
+
+    m = {"parent": [-1], "slot": [0], "order": [0], "axis": [0], "baseX": [4], "baseY": [0], "baseZ": [8],
+         "hx": [0], "hy": [1], "hz": [0], "length": [4], "radius": [0.5], "stressWood": [0]}
+    t = simtree.from_dump({"species": "oak", "seed": 1, "trial": "lone", "season": 1, "alive": True,
+                           "r6": {"enabled": False, "leafArea": 1}, "m": m, "b": {"metamer": [], "state": []},
+                           "form": {}, "profile": []})
+    assert t.cylinders.axis[0].tolist() == [0, 0, 1] and cy.height(t.cylinders) == 1.0

@@ -13,8 +13,12 @@ branches; max order; total area; DBHqsm; DBHcyl, …) is read off tree 8357: ind
 minus base; index 9 is 5.71 cm against `DBH_QSM_avg` 5.72 cm. All layouts are metres, z up. Branch order and
 branch ids are never read: continuation and order come from geometry (cylinders.py).
 
-A 2.4.1 `all.mat` holds every candidate model; the one read is the median-size model by cylinder count (§j, the
-user's decision 3; Wytham's rule, never TreeQSM's select_optimum).
+A 2.4.1 `all.mat` holds every candidate model (BioDiv: 16 input sets × 5 repeats). The one read is TreeQSM's own
+default optimum (the user's ruling R1, 2026-11-03), as `select_optimum` picks it with its default metric
+`all_mean_dis`: the mean point–model distance over all cylinders (`pmdistance.mean`) averaged over each input set's
+repeats, the input set with the smallest, then within it the model with the smallest `pmdistance.mean`. Read off
+`select_optimum.m` in InverseTampere/TreeQSM (its header says 1.4.0; the 2.4.1 file was not seen). Without
+`pmdistance`, the median-size model by cylinder count (Wytham's rule).
 
 Parsed tables are cached as .npz beside the source (a derived file under the git-ignored data/reference/).
 """
@@ -32,7 +36,7 @@ import scipy.io as sio
 from treesim.cylinders import Cylinders, from_arrays
 from treesim.fetch import lower_median
 
-CACHE_VERSION = 1
+CACHE_VERSION = 2
 
 
 @dataclass(frozen=True)
@@ -70,11 +74,34 @@ def _from_struct(q, layout: str, model: int | None, models: int) -> QSM:
     )
 
 
+def _inputs(q) -> tuple:
+    i = q.rundata.inputs
+    return tuple(float(np.atleast_1d(getattr(i, f))[0]) for f in ("PatchDiam1", "PatchDiam2Min", "PatchDiam2Max"))
+
+
+def select_optimum(qs: list) -> int:
+    """TreeQSM's default optimum among candidate models (see the module's docstring); the median-size model by
+    cylinder count where the models carry no `pmdistance`."""
+    if not all("pmdistance" in q._fieldnames for q in qs):
+        return median_size(qs)
+    dist = [float(q.pmdistance.mean) for q in qs]
+    sets: dict[tuple, list[int]] = {}
+    for k, q in enumerate(qs):
+        sets.setdefault(_inputs(q), []).append(k)
+    best = min(sets.values(), key=lambda ks: sum(dist[k] for k in ks) / len(ks))
+    return min(best, key=lambda k: dist[k])
+
+
+def median_size(qs: list) -> int:
+    """The median-size candidate by cylinder count (phase 1a's rule, kept for the comparison R1 asked for)."""
+    return qs.index(lower_median(qs, key=lambda q: np.size(q.cylinder.radius)))
+
+
 def parse_treeqsm(path: Path, model: int | None = None) -> QSM:
     d = sio.loadmat(path, squeeze_me=True, struct_as_record=False)
     if "QSMs" in d:  # TreeQSM 2.4.1, every candidate model (BioDiv all/)
         qs = list(np.atleast_1d(d["QSMs"]))
-        k = model if model is not None else qs.index(lower_median(qs, key=lambda q: np.size(q.cylinder.radius)))
+        k = model if model is not None else select_optimum(qs)
         return _from_struct(qs[k], "treeqsm-2.4", k, len(qs))
     if "qsm" in d:  # TreeQSM 2.3 (Demol): one model
         return _from_struct(d["qsm"], "treeqsm-2.3", None, 1)

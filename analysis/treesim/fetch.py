@@ -229,7 +229,7 @@ def fetch_biodiv(n: int = BIODIV_BEECH, max_members: int = BIODIV_MAX_MEMBERS) -
     """The first `n` valid beech of QSM/all/ at the head of the stream: "Phase 1 only" (§j; never a source of
     tolerances or targets: the head of a tar is an archive's order, not a sample; phase 1's 53 span 19 plots, G and
     GD). Each tree's all.mat holds its 80 candidate models;
-    qsm.read picks the median-size one. The stream is cut once `n` are kept or `max_members` read."""
+    qsm.read picks TreeQSM's default optimum (R1). The stream is cut once `n` are kept or `max_members` read."""
     dest = DATA / "biodiv" / "qsm-all"
     dest.mkdir(parents=True, exist_ok=True)
     beech = biodiv_valid_beech(DATA / "biodiv" / "labels.csv")
@@ -263,10 +263,12 @@ def fetch_biodiv(n: int = BIODIV_BEECH, max_members: int = BIODIV_MAX_MEMBERS) -
 
 def record_biodiv() -> None:
     """The manifest's BioDiv rows from the files on disk (a stream cut short still leaves a true record)."""
+    from treesim import qsm  # qsm imports this module
+
     dest = DATA / "biodiv" / "qsm-all"
     _manifest(
         [{"source": "biodiv", "tree": f.name.removesuffix("_all.mat"), "member": str(f.relative_to(dest)),
-          "model": "median-size", "bytes": f.stat().st_size, "url": BIODIV_URL, "licence": "CC-BY-4.0",
+          "model": f"optimum {qsm.read(f).meta['model'] + 1} of 80", "bytes": f.stat().st_size, "url": BIODIV_URL, "licence": "CC-BY-4.0",
           "citation": BIODIV_CITE} for f in sorted((dest / "QSM" / "all").glob("*_all.mat"))]
     )
 

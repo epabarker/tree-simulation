@@ -215,46 +215,44 @@ fresh directory, read with `python -I`.
   `/wrap-up`, commit, push, no PR.
 
 ### State
-_(rewritten at the end of each session)_ **1a done (2026-11-03); 1b next.**
-- **Code:** `analysis/treesim/{fetch,cylinders,qsm,qsm_gate}.py`; `analysis/tests/{test_readers,test_qsm_gate}.py`
-  (22 Python tests pass); scipy an explicit dependency. Readers cache parsed tables as hidden `.npz` beside each file.
-- **Data** (`data/reference/`, manifest `analysis/fit/sources/reference-manifest.csv`, 199 rows): Demol 66 `.mat`
-  (16 MB); Wytham 77 (37 oaks, 40 sycamores ≥ 10 cm; median-size model of 10; 910 MB); BioDiv 53 valid beech
-  `all.mat` from the stream's first 97 members (1.8 GB; 19 plots, G and GD: not one plot, still "Phase 1 only");
-  TreeML 3 `optcsv` (beech 000036, hornbeam 000081, sycamore 000147).
-- **Gate a passes** (`python -I -m treesim.qsm_gate`):
-
-  | dataset | trees | DBH ≤ 5% | H ≤ 5% | max H err | DBH vs 10-model mean | ceiling DBH | ceiling H | internal checks failed |
-  |---|---|---|---|---|---|---|---|---|
-  | Demol | 65 | 100% | 100% | 3% | – | 68% (field) | 91% (felled) | none |
-  | Wytham | 77 | 100% | 100% | 4% | 94% (oaks 89%) | – | 99% (`Hgt_pts`) | none |
-  | BioDiv | 53 | 100% | 100% | 3% | – | 42% (`dTLS`) | 100% (`hTLS`) | HEW21_GD_117 |
-  | TreeML | 3 | – | – | – | – | – | – | none (gated) |
-- **For the user to confirm:** Wytham's DBH is gated against the model read (`TreeData[9]`), as Demol's and BioDiv's
-  are (decision 1's symmetry), not against `DBH_QSM_avg`. Recomputed DBH equals each file's own to 0.5%; against
-  the 10-model mean it is 94% (oaks 89%: one model of a big oak sits far from the mean, tree 81's between-model SD
-  is 23 cm). Gated as amendment B literally reads, Wytham fails gate a.
-- **Found:** TreeQSM 2.0's `TreeData` is a 33-vector: [3] height m, [9] DBHqsm cm (read off tree 8357). BioDiv's
-  `dTLS`/`hTLS` are from points (README): ceilings. BioDiv `all.mat` holds 80 models a tree. Orphan fragments (extra
-  roots never attached) occur in TreeML (all 3; ≤ 1.7% of wood volume) and BioDiv; dropped, recorded in meta.
-  Demol FEXC12 has a QSM but no row in the published table. **BioDiv HEW21_GD_117** carries a 3.4 m, r 2.5 cm
-  cylinder diving 1.1 m below the base: an artifact (1b: decide in the open whether describe() drops below-ground
-  cylinders; never silently). **BioDiv's median-size models read a median 6.6% under the point DBH** (quartiles
-  −15%, −4%; worst −61%): the median-size rule picks thinner reconstructions here (1c: weigh before any BioDiv
-  number becomes a tolerance; BioDiv is "Phase 1 only" anyway).
-- **The user's rulings after 1a (2026-11-03).** 1a accepted as done: Wytham gated against each file's own DBHqsm;
-  the 10-model mean stays reported.
-  - **R1, BioDiv's model choice (1b, first):** check whether each model in `all.mat` carries `pmdistance` (the field
-    is present on HEW29_G_64's models; its contents not yet read). If it does, pick TreeQSM's default optimum
-    (argmin of the mean point–model distance) and re-run gate a on the 53: that should reproduce `raw/`. If not,
-    drop models whose DBH is more than 15% from `dTLS`, then the median size among the survivors. Either way,
-    record the rule and the number of trees whose chosen model changed.
-  - **R2, the size covariate:** wherever real trees are matched to simulated ones by size (1c's tolerances, phases
-    3–4), match on measured DBH (`dTLS`, `DBH_pts`, Demol's field DBH), never DBHqsm. QSM DBH is a descriptor
-    target only.
-  - **R3, the noise floor (1c):** 4 of the big Wytham oaks with all 10 models join the 8 sycamores, so oak radius
-    descriptors get their own floor. Reason: tree 81's between-model DBH SD is 23 cm.
-  - **R4, below-ground subtrees (1b):** as in 1b's brief (HEW21_GD_117's 3.4 m cylinder is the case).
-  - **R5:** the 53 beech stay "Phase 1 only" until R1 is settled; the note gives the plot mix as found.
-- **1b starts from:** `cylinders.Cylinders`, `from_arrays`, `continuation`, `order_and_axis`, `trunk`, `dbh`,
-  `height` (continuation by subtree volume is written but only exercised through DBH: test_topology tests it).
+_(rewritten at the end of each session)_ **1a and 1b done (2026-11-03); 1c next.**
+- **Code (1a):** `analysis/treesim/{fetch,cylinders,qsm,qsm_gate}.py`. **(1b):** `form.py` (the one implementation,
+  A), `simtree.py`, `form_gate.py`, `describe.py`, `cli/dump-trees.ts` (gate b only; in no build);
+  `analysis/tests/{test_readers,test_qsm_gate,test_form_parity,test_topology,test_describe}.py`: 46 pass. Readers
+  cache parsed tables as hidden `.npz` (`CACHE_VERSION` 2 since R1).
+- **Data** (`data/reference/`, manifest `analysis/fit/sources/reference-manifest.csv`, 199 rows): Demol 66 `.mat`;
+  Wytham 77 (37 oaks, 40 sycamores ≥ 10 cm; the median-size model of 10); BioDiv 53 valid beech `all.mat` (19
+  plots, G and GD: "Phase 1 only"; model: TreeQSM's optimum, R1); TreeML 3 `optcsv`.
+- **R1 settled:** every BioDiv model carries `pmdistance`. The reader takes `select_optimum`'s default
+  (`all_mean_dis`): `pmdistance.mean` averaged over each input set's 5 repeats (16 sets), the best set, then its
+  model of least `mean`. Read off `select_optimum.m` (InverseTampere/TreeQSM; its header says 1.4.0, the 2.4.1
+  file was not seen). **The model changed on all 53 trees**; a plain argmin of `mean` differs on 20. The thin bias
+  stays: DBH against `dTLS` median −7.4% (was −6.6%), within 5% for 32% (was 42%), worst −37% (was −61%). Gate a
+  re-run passes (BioDiv 100% / 100%, max H err 1%).
+- **Gate a** (`python -I -m treesim.qsm_gate`): Demol 65, Wytham 77, BioDiv 53 all 100% within 5% on DBH and H;
+  ceilings as before (BioDiv DBH 32%, H 98%). Internal checks reported on every dataset, gated nowhere: all pass.
+- **R4:** the start rule is implemented (`describe.drop_below_ground`, counted per tree) beside a start-or-tip rule,
+  reported. **Under R1's models nothing on any dataset starts or ends below its base** (HEW21_GD_117's diving
+  cylinder was in the median-size model only), so both rules drop 0 of 199 QSMs and 0 of 30 simulated trees.
+- **Gate b passes** (`node cli/dump-trees.ts`, 89 s; `python -I -m treesim.form_gate`): 30 of 30 trees, 22 numbers
+  each, worst relative error 2.5e-13 (beech lone, 72,900 metamers). Two stand beech are dead at 100 with their
+  skeletons standing (120 and 39 metamers): gated like the rest.
+- **Relabelling (reported):** form.rs's rules, simulator labels → geometric. Geometric continuation disagrees with
+  slot 0 at a median 15% of nodes (lone beech 52%: 52 limbs of ≥ 10 metamers where slot 0 sees 19). Profile,
+  `junctionDelta`, `leafStemSlope` unmoved (label-free); `forkHeight` moves on 4 of 30 (max 0.46);
+  `leaderDominance` 13 of 28 (mean −0.14); `branchAngle2` 28 of 28 (median 3.2°); `limbDroop` 28 of 28 (mean
+  +21.6°: the heavier child droops); `limbUpturn` median 3.7°; `ldSlope` median 0.023; `limbElevation` median 0.9°,
+  mean −9.3°, max 51°.
+- **describe()** (geometric labels; `DESCRIBE`: subtree 1.25 m, limb 2.5 m, crown base the lowest limb ≥ 2.5 m,
+  headings as chords over 0.5 m stretches, band width the diameter over azimuths, 4 bands). New: Strahler
+  bifurcation ratio (with and without order 1), tortuosity, length by order 0–3+, length-weighted pendulous
+  fraction, taper d(0.5 H)/DBH (raw radii), centroid height/H; report-only `leafStemSlope` (NaN on QSMs: no wood
+  proxy) and crown base/H. The measurement-design table (labels, resolution, gravity vs parent) is its docstring.
+  Runs on all 199 QSMs (≈ 85 s) and the 30 simulated trees.
+- **For 1c, seen in passing (medians, not yet a finding):** Wytham's `junctionDelta` 3.95 against 1.4–1.9 elsewhere
+  (TreeQSM 2.0 has no UnmodRadius: its radii are the corrected ones); Demol's `ldSlope` 0.15 and BioDiv's 0.05
+  against the simulator's 0.91; simulated tortuosity 1.12 against 1.46–1.76.
+- **Rulings still standing:** R2 (match on measured DBH, never DBHqsm), R3 (4 big oaks join the noise floor), R5
+  (the 53 beech "Phase 1 only"; R1 is now settled, so the note gives the plot mix as found).
+- **For the user:** whether R4 should drop by start or tip (moot on today's data); whether TreeQSM 2.4.1's
+  `select_optimum` matches the 1.4.0 file read.

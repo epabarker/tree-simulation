@@ -5,7 +5,12 @@
  * ports form.rs and must reproduce every value from these columns alone. Gate b only: not part of
  * any build. Reads the existing WASM API; writes JSON (NaN as null).
  *
- *   node cli/dump-trees.ts [out]        # default runs/gate-b/trees.json
+ * Gate c (phase 1c, the degradation test) reads the same columns of one species and seed: the
+ * closed stand's measured trees at 150 and the lone tree at 100 (reported only), one file a run
+ * (analysis/experiments/phase1_degradation.py runs them in parallel). Out of any build, as gate b.
+ *
+ *   node cli/dump-trees.ts [out]                          # gate b: runs/gate-b/trees.json
+ *   node cli/dump-trees.ts --gate-c species seed out      # gate c: one species and seed
  */
 
 import { mkdirSync, writeFileSync } from "node:fs";
@@ -53,6 +58,28 @@ function dump(world: RustWorld, tree: TreeView, trial: string, seed: number, sea
     form: Object.fromEntries(Object.entries(values).map(([k, v]) => [k, plain([v])[0]])),
     profile: plain(profile),
   };
+}
+
+function gateC(species: string, seed: number, out: string) {
+  const trees = [];
+  const stand = newWorld(standParams(species, seed));
+  stand.run(GATE_C_STAND);
+  for (const k of STAND_MEASURED)
+    trees.push(dump(stand, stand.trees[k] as TreeView, "stand", seed, GATE_C_STAND));
+  stand.dispose();
+  const lone = newWorld(loneParams(species, seed));
+  lone.run(GATE_C_LONE);
+  trees.push(dump(lone, lone.trees[0] as TreeView, "lone", seed, GATE_C_LONE));
+  lone.dispose();
+  mkdirSync(dirname(out), { recursive: true });
+  writeFileSync(out, JSON.stringify({ trees }));
+}
+
+const GATE_C_STAND = 150;
+const GATE_C_LONE = 100;
+if (process.argv[2] === "--gate-c") {
+  gateC(process.argv[3], Number(process.argv[4]), process.argv[5]);
+  process.exit(0);
 }
 
 const out = process.argv[2] ?? "runs/gate-b/trees.json";

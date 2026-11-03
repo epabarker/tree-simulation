@@ -6,7 +6,7 @@ Everything lands under data/reference/<source>/ (git-ignored), each source in it
 fetched is appended to the committed manifest (analysis/fit/sources/reference-manifest.csv) for
 reproducibility and CC-BY attribution. Downloaded files are data: read them with `python -I`.
 
-    uv run --project analysis python -I -m treesim.fetch wytham|demol|biodiv|treeml|all
+    uv run --project analysis python -I -m treesim.fetch wytham|noise|demol|biodiv|treeml|all
 """
 
 from __future__ import annotations
@@ -181,9 +181,18 @@ def wytham_selection(summary: Path) -> list[tuple[str, str]]:
     return [(t, "QUERRO") for t in oaks] + [(syc[k][1], "ACERPS") for k in picks]
 
 
+# The noise floor (1c, R3): all ten models of the 8 middle sycamores of the 40 by DBH (ranks 16–23) and the 4 oaks of
+# largest between-model DBH SD in tls_summary (`DBH_QSM_sd`: 81, 6, 8399, 56). In their own directory, so that no
+# glob of wytham/qsm/ (gate a, the between-tree set) ever counts a model as a tree.
+NOISE_SYCAMORES = ["889", "1927", "913", "1448", "809a", "602", "705a", "521a"]
+NOISE_OAKS = ["81", "6", "8399", "56"]
+NOISE_DIR = DATA / "wytham" / "qsm-noise"
+
+
 def fetch_wytham(trees: list[tuple[str, str]] | None = None, all_models: bool = False) -> None:
-    """One model per tree (the median-size member of its ten), or all ten with `all_models` (the noise floor)."""
-    dest = DATA / "wytham" / "qsm"
+    """One model per tree (the median-size member of its ten) into wytham/qsm/, or all ten with `all_models` (the
+    noise floor) into wytham/qsm-noise/."""
+    dest = NOISE_DIR if all_models else DATA / "wytham" / "qsm"
     dest.mkdir(parents=True, exist_ok=True)
     z = RangeZip(WYTHAM_URL, DATA / "wytham" / "qsm-central-directory.bin")
     members = wytham_members(z)
@@ -197,7 +206,7 @@ def fetch_wytham(trees: list[tuple[str, str]] | None = None, all_models: bool = 
             if not out.exists():
                 out.write_bytes(z.read(e.name))
             rows.append(
-                {"source": "wytham", "tree": tree, "member": e.name, "model": model, "bytes": e.usize,
+                {"source": "wytham-noise" if all_models else "wytham", "tree": tree, "member": e.name, "model": model, "bytes": e.usize,
                  "url": WYTHAM_URL, "licence": "CC-BY-4.0", "citation": f"{WYTHAM_CITE} ({species})"}
             )
             print(f"wytham {tree} {species} model {model}: {e.usize / 1e6:.1f} MB", flush=True)
@@ -301,5 +310,7 @@ if __name__ == "__main__":
         fetch_biodiv()
     if what == "biodiv-manifest":
         record_biodiv()
+    if what == "noise":
+        fetch_wytham([(t, "ACERPS") for t in NOISE_SYCAMORES] + [(t, "QUERRO") for t in NOISE_OAKS], all_models=True)
     if what == "treeml":
         fetch_treeml(sys.argv[2:])

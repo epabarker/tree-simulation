@@ -175,3 +175,20 @@ def test_the_profile_has_four_bands():
     d = ds.describe(trunk().table())
     assert [k for k in d if k.startswith("p") and k[1:].isdigit()] == ["p0", "p1", "p2", "p3"]
 
+
+
+def test_tortuosity05_drops_zigzag_under_the_step_and_keeps_bends_over_it():
+    t = trunk()
+    p = 2
+    for k in range(40):  # 0.1 m zigzag of ±10°: tortuosity reads it, the 0.5 m resampling mostly does not
+        a = math.radians(10 if k % 2 == 0 else -10)
+        p = t.add(p, [math.cos(a), 0, math.sin(a)], 0.1, 0.05)
+    d = ds.describe(t.table())
+    assert d["tortuosity"] == pytest.approx(1 / math.cos(math.radians(10)))
+    assert 1.0 <= d["tortuosity05"] < 1.001
+    t = trunk()
+    p = 2
+    for k in range(4):  # 1 m legs at ±45°: over the step, so both read path over chord
+        p = t.add(p, [1, 0, 1 if k % 2 == 0 else -1], 1.0, 0.05)
+    d = ds.describe(t.table())
+    assert d["tortuosity05"] == pytest.approx(d["tortuosity"], rel=0.05)

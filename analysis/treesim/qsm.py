@@ -90,11 +90,16 @@ def select_optimum(qs: list) -> int:
     if not all("pmdistance" in q._fieldnames for q in qs):
         return median_size(qs)
     dist = [float(q.pmdistance.mean) for q in qs]
+    return min(optimum_set(qs), key=lambda k: dist[k])
+
+
+def optimum_set(qs: list) -> list[int]:
+    """The candidates of the input set select_optimum picks (its repeats: one input set, random restarts)."""
+    dist = [float(q.pmdistance.mean) for q in qs]
     sets: dict[tuple, list[int]] = {}
     for k, q in enumerate(qs):
         sets.setdefault(_inputs(q), []).append(k)
-    best = min(sets.values(), key=lambda ks: sum(dist[k] for k in ks) / len(ks))
-    return min(best, key=lambda k: dist[k])
+    return min(sets.values(), key=lambda ks: sum(dist[k] for k in ks) / len(ks))
 
 
 def median_size(qs: list) -> int:

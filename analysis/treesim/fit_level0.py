@@ -61,7 +61,8 @@ def summary(spec: Spec, a: dict, t: dict) -> dict:
     """A candidate as written: its assignment, loss, each trait's share, the scored and reported traits."""
     scored = [k for k in t if any(k == x["name"] or k.startswith(x["name"] + ".") for x in spec.traits)]
     reports = set(report_names(spec, ("",)))
-    extra = [k for k in t if k.startswith(("stand.dbh.", "stand.H.", "stand.CR."))]
+    extra = [k for k in t if k.startswith(("stand.dbh.", "stand.H.", "stand.CR."))
+             or k in ("stand.height100", "stand.height150")]
     return {
         "assign": a,
         "loss": loss(spec, t),

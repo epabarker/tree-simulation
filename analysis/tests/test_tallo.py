@@ -48,12 +48,23 @@ def test_committed_targets_hold_the_registered_rule():
     if not tallo.TARGETS.exists():
         pytest.skip("no targets file")
     t = tallo.load_targets()
+    assert t["meta"]["version"] == tallo.VERSION
     assert set(t["species"]) == set(tallo.TAXA)
+    thin = t["meta"]["thin"]
     for s, e in t["species"].items():
-        assert e["gated"] == (s != "sycamore")
+        # v2: thin and ungated are read from REGION's height rows, never named.
+        n = e["n_H_region"]
+        assert (s in thin["species"]) == (n < tallo.SMALL_N) and (s in thin["ungated"]) == (n < tallo.UNGATED_N)
+        assert e["gated"] == (s not in tallo.REFERENCE_ONLY and n >= tallo.UNGATED_N)
+        assert (e["control"] is None) == (n < tallo.UNGATED_N)
         for trait in tallo.TRAITS:
-            assert e[trait]["band"] == ("borrowed" if s in tallo.THIN else "own")
+            if "support" not in e[trait]:
+                assert e[trait]["band"] == "none" and not e["gated"]
+                continue
+            assert e[trait]["band"] == ("borrowed" if s in thin["species"] else "own")
             lo, hi = e[trait]["support"]
             q = tallo.predict(e[trait], np.exp(np.linspace(np.log(lo), np.log(hi), 20)))
             assert np.all(np.diff(q, axis=1) >= 0)
-        assert 0 < e["control"]["T"] < 3
+        if e["control"] is not None:
+            assert 0 < e["control"]["T"] < 3
+    assert set(thin["pool"]) <= set(tallo.BROADLEAVES)

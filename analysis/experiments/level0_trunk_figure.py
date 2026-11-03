@@ -15,12 +15,12 @@ from plotnine import (aes, annotate, element_blank, element_text, facet_grid, ge
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from treesim import tallo  # noqa: E402
 
-FITS = Path("docs/experiments/fits/level0")
+FITS = Path("docs/experiments/fits/level0-v1")  # v1's fits, archived (Level 0 targets v2)
 PROBES = Path("docs/experiments/fits/level0-trunk")
 # Fixed categorical order (the dataviz reference palette, light): blue, orange, aqua, yellow.
 SERIES = {"hand": "#2a78d6", "final fit": "#eb6834", "r0 ×2": "#1baf7a", "r0 ×2, m_w ÷4": "#eda100"}
 SHAPES = {"hand": "o", "final fit": "s", "r0 ×2": "^", "r0 ×2, m_w ÷4": "D"}
-T = {s: tallo.load_targets()["species"][s]["control"]["T"] for s in ("beech", "oak")}
+T = {s: tallo.load_targets(tallo.TARGETS_V1)["species"][s]["control"]["T"] for s in ("beech", "oak")}
 
 
 def rows(species, label, traits):

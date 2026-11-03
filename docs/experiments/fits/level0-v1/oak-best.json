@@ -1,0 +1,189 @@
+{
+ "species": "oak",
+ "generation": 16,
+ "evaluations": 1140,
+ "assign": {
+  "r1.hydraulic": "hyperbolic",
+  "c5.Trel": 0.063,
+  "r1.leafCost": "acclimated",
+  "r1.leafCostShade": 0.3,
+  "r2.levels.0.lambda": 0.5631,
+  "r2.levels.1.lambda": 0.5607,
+  "r2.levels.1.setPoint": 58.61,
+  "r2.levels.1.branchAngle": 56.94,
+  "r2.levels.1.eta": 0.1512,
+  "r2.levels.2.setPoint": 49.63,
+  "r2.aC": 20,
+  "r2.dLambda": 0.1,
+  "r2.kappa": 0,
+  "c3.alpha": 3.46,
+  "r1.Lh": 22.12,
+  "r1.mf": 0.0355,
+  "r2.hJ": 23.18,
+  "c6.r0": 0.003469,
+  "r6.qMin": 0.1316,
+  "r6.leafArea": 2.715
+ },
+ "loss": 3.4506024256911294,
+ "contributions": {
+  "stand.height": 0.21932911448215134,
+  "stand.lai": 0.007281313996125992,
+  "stand.lateShare": 0.023188463448915297,
+  "shade.survivalLight": 0.026766047525047257,
+  "stand.talloH": 1.4528261253742596,
+  "stand.talloCR": 1.7212113608646298,
+  "death.lone": 0.0,
+  "death.stand": 0.0
+ },
+ "traits": {
+  "shade.survivalLight": 0.10909190028905866,
+  "stand.CR.0": 4.418977228665982,
+  "stand.CR.1": 4.650742657367459,
+  "stand.CR.2": 4.331270476052655,
+  "stand.H.0": 21.092324996172447,
+  "stand.H.1": 28.170349281028148,
+  "stand.H.2": 31.086751459552897,
+  "stand.dbh.0": 0.22211979514620223,
+  "stand.dbh.1": 0.30674878078409396,
+  "stand.dbh.2": 0.32963548336794146,
+  "stand.height": 84.08823622632069,
+  "stand.lai": 5.62799592372917,
+  "stand.lateShare": 1.319136655209435,
+  "stand.talloCR.0": 1.8394416730039886,
+  "stand.talloCR.1": 1.0975616400858854,
+  "stand.talloCR.2": 0.7585821382171861,
+  "stand.talloH.0": 1.042700515775256,
+  "stand.talloH.1": 1.2222210111250533,
+  "stand.talloH.2": 1.333202839214366
+ },
+ "reports": {
+  "lone.branchAngle": 66.78460779260116,
+  "lone.crownFullness": 0.7638324808055585,
+  "lone.earlyShare": 0.7774689020269755,
+  "lone.forkHeight": 0.48925273906399,
+  "lone.leaderDominance": 1.4633068404797993,
+  "lone.limbDroop": 12.328164367434578,
+  "lone.limbElevation": 12.090831661851222,
+  "lone.profile.0": 0.7060145197821696,
+  "lone.profile.1": 0.8812811358373326,
+  "lone.profile.2": 0.976267394453935,
+  "lone.profile.3": 0.994666576239719,
+  "lone.profile.4": 0.9172476483238073,
+  "lone.profile.5": 0.8018926790524109,
+  "lone.profile.6": 0.7573344704179025,
+  "lone.profile.7": 0.6414411877171015,
+  "lone.profile.8": 0.5289358440713254,
+  "lone.profile.9": 0.43324335215988297,
+  "lone.slenderness": 53.69745696041714,
+  "lone.spread": 1.3731805448114154,
+  "lone.widestAt": 0.30999999999999994,
+  "stand.crownRatio": 0.3987928390025696,
+  "stand.crownRatio100": 0.5133303614469098,
+  "stand.slenderness": 95.8956308415429
+ },
+ "patch": {
+  "common": "Pedunculate oak",
+  "latin": "Quercus robur",
+  "leaf": "oak",
+  "c3": {
+   "mode": "bh",
+   "lambda": 0.5,
+   "alpha": 3.46
+  },
+  "c5": {
+   "enabled": true,
+   "T": 0.05,
+   "g": 3,
+   "Trel": 0.063,
+   "topQuantile": 0.9
+  },
+  "r1": {
+   "enabled": true,
+   "mw": 64,
+   "mf": 0.0355,
+   "Lh": 22.12,
+   "hydraulic": "hyperbolic",
+   "sr": 0.1,
+   "fRep": 0.1,
+   "maturity": 40,
+   "kStarve": 3,
+   "reserve0": 2,
+   "store": 2,
+   "shed": "carbon",
+   "leafCost": "acclimated",
+   "leafCostShade": 0.3
+  },
+  "r2": {
+   "enabled": true,
+   "levels": [
+    {
+     "lambda": 0.5631,
+     "setPoint": 0,
+     "eta": 0.25,
+     "branchAngle": 45,
+     "generator": "spiral",
+     "tierEvery": 0,
+     "pTerm": 0
+    },
+    {
+     "lambda": 0.5607,
+     "setPoint": 58.61,
+     "eta": 0.1512,
+     "branchAngle": 56.94,
+     "generator": "spiral",
+     "tierEvery": 0,
+     "pTerm": 0,
+     "agedSetPoint": 85,
+     "agedOver": 50
+    },
+    {
+     "lambda": 0.5,
+     "setPoint": 49.63,
+     "eta": 0.2,
+     "branchAngle": 50,
+     "generator": "spiral",
+     "tierEvery": 0,
+     "pTerm": 0
+    }
+   ],
+   "aC": 20,
+   "dLambda": 0.1,
+   "ramp": 15,
+   "kappa": 0,
+   "hJ": 23.18
+  },
+  "r3": {
+   "enabled": true,
+   "rho": 1,
+   "leafMass": 0.002,
+   "E": 4000000,
+   "sag": "increment",
+   "phi": 1,
+   "posture": true,
+   "betaG": 0.2,
+   "gamma": 0.2,
+   "c": 0.1866,
+   "sigmaTarget": 3000,
+   "girthGain": 0.3,
+   "sigmaBreak": 7000,
+   "ground": true
+  },
+  "r6": {
+   "enabled": true,
+   "qMin": 0.1316,
+   "leafArea": 2.715
+  },
+  "o4": {
+   "cSeed": 10,
+   "d": 25,
+   "qEst": 0.1,
+   "pEst": 0.3,
+   "m0": 0.002
+  },
+  "c6": {
+   "enabled": true,
+   "n": 2,
+   "r0": 0.003469
+  }
+ }
+}

@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Level 0's overnight sweep (reference-fidelity phase 2, the plan's §k): one fit per species, one after another, each
 # writing docs/experiments/fits/level0/<species>.json (+ -progress.csv, -best.json after every generation) and its log
-# to runs/level0/<species>.log. The user runs it; a session never launches it.
+# to runs/level0/<species>.log. The user runs it; a session launches it only when the user says so (as for v2's night 1,
+# 2026-11-03, through level0_fit_gate.sh).
 #
 #   analysis/experiments/level0_sweep.sh night1|night2|night3        # the plan (the user, 2026-11-03)
 #   analysis/experiments/level0_sweep.sh MAX_EVALS MAX_HOURS WORKERS SPECIES...
@@ -9,7 +10,8 @@
 # The plan: deep on three a night, not thin on ten (the user, 2026-11-03).
 #   night1: beech, oak, birch          1200 evaluations each, ≈ 2.9 h each, ≈ 8.6 h
 #   night2: hornbeam, maple, pine, fir  900 evaluations each, ≈ 2.2 h each, ≈ 8.6 h (four species: 1200 would be 11.5 h)
-#   night3: willow, rowan, holly       1200 evaluations each, ≈ 8.6 h
+#   night3: rowan                      1200 evaluations, ≈ 2.9 h (v2: willow and holly are not gated at Level 0; rowan's
+#                                      borrowed T fails its control, so the user rules before it runs)
 # MAX_HOURS is a safety stop per species and per invocation, ≈ 1.2 × the expected time.
 #
 # Workers: 12. Wall per evaluation on the beech smoke config (lone + stand to 150 + shade house, 2026-11-03, i7-1260P,
@@ -31,7 +33,7 @@ WORKERS=12
 case "${1:-}" in
   night1) MAX_EVALS=1200; MAX_HOURS=3.5; SPECIES=(beech oak birch) ;;
   night2) MAX_EVALS=900; MAX_HOURS=2.75; SPECIES=(hornbeam maple pine fir) ;;
-  night3) MAX_EVALS=1200; MAX_HOURS=3.5; SPECIES=(willow rowan holly) ;;
+  night3) MAX_EVALS=1200; MAX_HOURS=3.5; SPECIES=(rowan) ;;
   *)
     if (($# < 4)); then
       echo "usage: $0 night1|night2|night3 | MAX_EVALS MAX_HOURS WORKERS SPECIES..." >&2

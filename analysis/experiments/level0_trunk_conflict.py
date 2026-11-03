@@ -15,7 +15,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from treesim import tallo  # noqa: E402
 
-T = tallo.load_targets()["species"]
+T = tallo.load_targets(tallo.TARGETS_V1)["species"]  # v1: what the diagnosis read
 # species: (season, H m, H/D lo, H/D hi)
 PAIRS = {
     "oak": [(60, 18.1, 74, 76), (60, 21.0, 74, 76), (100, 18.1 * 1.31, 59, 70), (100, 21.0 * 1.31, 59, 70)],

@@ -307,3 +307,21 @@ gate_c_v3 = "18 descriptors pass the floor; amendment E stops the species if few
 # Level 0 (reference-fidelity phase 2, the plan's §k): the physiology knobs fitted against Tallo's H–DBH and CR–DBH
 # bands; bounds from [[param]] above. Not r3.c (posture: form), not the form knobs, not c5.Trel, not the cell size.
 knobs = ["c3.alpha", "r1.Lh", "r1.mf", "r2.hJ", "c6.r0", "r6.qMin", "r6.leafArea"]
+
+# Level 0 v2's time anchors (the user, 2026-11-03): top height at 100 and 150 from the NW-FVA yield tables, classes 1–2,
+# the band form of stand.height (target the classes' midpoint in cells; band the same share of it as height at 60's, a sixth). Scored at Level 0 only.
+[[level0.trait]]
+name = "stand.height100"
+target = 102
+band = 17
+weight = 1
+kind = "measured"
+source = "NW-FVA yield tables (Albert et al. 2021, after Schober), oak classes 1–2: top height 24.0–27.0 m at 100 years (analysis/fit/sources/nwfva_h100.csv:83, :114)"
+
+[[level0.trait]]
+name = "stand.height150"
+target = 119
+band = 20
+weight = 1
+kind = "measured"
+source = "NW-FVA yield tables (Albert et al. 2021, after Schober), oak classes 1–2: top height 28.3–31.3 m at 150 years (analysis/fit/sources/nwfva_h100.csv:93, :124)"

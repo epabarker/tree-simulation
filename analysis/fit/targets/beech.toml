@@ -300,3 +300,15 @@ gate_c_v3 = "21 descriptors pass the floor; amendment E stops the species if few
 # Level 0 (reference-fidelity phase 2, the plan's §k): the physiology knobs fitted against Tallo's H–DBH and CR–DBH
 # bands; bounds from [[param]] above. Not r3.c (posture: form), not the form knobs, not c5.Trel, not the cell size.
 knobs = ["c3.alpha", "r1.Lh", "r1.mf", "r2.hJ", "c6.r0", "r6.qMin", "r6.leafArea"]
+
+# Level 0 v2's time anchors (the user, 2026-11-03): top height at 100 from the NW-FVA yield tables, classes 1–2 (as
+# stand.lateShare), in the band form of beech's stand.height (target the classes' midpoint in cells; band the same
+# share of it as height at 60's, 18/84). Scored at Level 0 only. Not at 150: class 1's table ends at 145 years (38.2 m, analysis/fit/sources/nwfva_h100.csv:221; class 2
+# 34.1 m at 150, :244), and no table value is extrapolated.
+[[level0.trait]]
+name = "stand.height100"
+target = 122
+band = 26
+weight = 1
+kind = "measured"
+source = "NW-FVA yield tables (Albert et al. 2021, after Schober), beech classes 1–2: top height 28.5–32.5 m at 100 years (analysis/fit/sources/nwfva_h100.csv:212, :234)"

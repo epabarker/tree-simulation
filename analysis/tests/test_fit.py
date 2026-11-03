@@ -114,3 +114,19 @@ def test_level0_partial_traits_leave_out_a_season_with_no_comparable_tree():
     t = {"name": "stand.talloH", "profile": [0.0, 0.0, 0.0], "band": 1.0, "weight": 1.0, "partial": True}
     assert scaled(t, {"stand.talloH.0": 0.5, "stand.talloH.1": None, "stand.talloH.2": -1.0}) == [0.5, -1.0]
     assert scaled(t, {"stand.talloH.0": None, "stand.talloH.1": None, "stand.talloH.2": None}) is None
+
+
+def test_level0_height150_is_the_live_measured_trees_mean_in_cells():
+    allometry = [{"season": 150, "dbh": 0.4, "height": h, "crownRadius": 4.0} for h in (30.0, 32.0)] + [
+        {"season": 100, "dbh": 0.3, "height": 99.0, "crownRadius": 3.0}]
+    assert seed_traits({"stand": [{"allometry": allometry}]})["stand.height150"] == 31.0 / 0.25
+
+
+def test_level0_v2_scores_the_time_anchors_and_reports_birch_late_share():
+    from treesim.fit import load_spec
+
+    oak = {t["name"] for t in load_spec("oak", level=0).traits}
+    assert {"stand.height100", "stand.height150", "stand.lateShare"} <= oak
+    birch = load_spec("birch", level=0)
+    assert "stand.lateShare" not in {t["name"] for t in birch.traits}
+    assert "stand.lateShare" in {r["name"] for r in birch.reports}

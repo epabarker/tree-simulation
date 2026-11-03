@@ -60,9 +60,14 @@ DEATH_PENALTY = 25.0
 MISSING_PENALTY = 4.0
 #: Level 0's scored traits besides Tallo's (the user, 2026-11-03): the time anchors Tallo cannot give (height at 60,
 #: 100 over 60; an exception to ADR 0049 §1), the stand's LAI and the shade house. Every other trait is reported.
+#: v2 (the user, 2026-11-03): a targets file's `[level0] reported` moves some of these to the reports (birch's
+#: lateShare, described, not measured), and its `[[level0.trait]]` adds the yield tables' heights at 100 and 150
+#: (`stand.height100`, `stand.height150`), scored at Level 0 only.
 LEVEL0_SCORED = ("stand.height", "stand.lateShare", "stand.lai", "shade.survivalLight")
 #: The stand's seasons Level 0 reads (cli/trials.ts runStand to 150), in a Tallo trait's entry order.
 LEVEL0_SEASONS = (60, 100, 150)
+#: Metres a cell (tallo-level0.json's measurement): stand.height150 is in cells, as stand.height and height100 are.
+CELL_M = 0.25
 
 
 @dataclass
@@ -109,12 +114,16 @@ def load_spec(species: str, level: int | None = None) -> Spec:
         return spec
     from treesim import tallo
 
+    entry = tallo.load_targets()["species"][species]
+    if not entry["gated"]:
+        raise ValueError(f"{species} is not gated at Level 0: {entry.get('not_gated_reason', 'reference only')}")
     knobs = data["level0"]["knobs"]
     by_path = {p["path"]: p for p in spec.params}
     spec.params = [by_path[k] for k in knobs]
-    spec.reports = spec.reports + [t for t in spec.traits if t["name"] not in LEVEL0_SCORED]
-    spec.tallo = tallo.load_targets()["species"][species]
-    spec.traits = [t for t in spec.traits if t["name"] in LEVEL0_SCORED] + [
+    scored = [n for n in LEVEL0_SCORED if n not in data["level0"].get("reported", [])]
+    spec.reports = spec.reports + [t for t in spec.traits if t["name"] not in scored]
+    spec.tallo = entry
+    spec.traits = [t for t in spec.traits if t["name"] in scored] + data["level0"].get("trait", []) + [
         {"name": f"stand.tallo{k}", "profile": [0.0] * len(LEVEL0_SEASONS), "band": 1.0, "weight": 1.0,
          "partial": True, "kind": "measured",
          "source": f"Tallo {k}–DBH band (analysis/fit/sources/tallo-level0.json): median z of the measured trees"}
@@ -282,8 +291,13 @@ def seed_traits(reply: dict, tallo_curves: dict | None = None) -> dict[str, floa
     flat: dict[str, float | None] = {}
     for trial in TRIALS:
         for rec in reply.get(trial, []):
-            if trial == "stand" and "allometry" in rec and tallo_curves is not None:
-                flat.update(tallo_traits(rec["allometry"], tallo_curves))
+            if trial == "stand" and "allometry" in rec:
+                if tallo_curves is not None:
+                    flat.update(tallo_traits(rec["allometry"], tallo_curves))
+                # The live measured trees' mean height at 150, in cells: the same reading as height and height100
+                # (metrics' height is the allometry's highest point; equal at 60 and 100 on four species, 2026-11-03).
+                hs = [a["height"] for a in rec["allometry"] if a["season"] == LEVEL0_SEASONS[-1]]
+                flat["stand.height150"] = float(np.mean(hs)) / CELL_M if hs else None
             for k, v in rec.items():
                 if k == "allometry":
                     continue

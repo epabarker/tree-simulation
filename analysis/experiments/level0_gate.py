@@ -2,7 +2,7 @@
 a seed passes when max(|median z_H|, |median z_CR|) ≤ T at every season (60, 100, 150) with a measured tree inside
 Tallo's support; the species passes on ≥ 15 of 20. A seed whose trees are outside the support at every season fails (it cannot show it is
 in band); a species with no comparable season on any seed is not gateable. T and the curves are the pre-registered
-analysis/fit/sources/tallo-level0.json's, from real trees only.
+analysis/fit/sources/tallo-level0.json's (v2), from real trees only.
 
     uv run --project analysis python -I analysis/experiments/level0_gate.py --species beech            # shipped
     uv run --project analysis python -I analysis/experiments/level0_gate.py --species beech \\
@@ -35,6 +35,8 @@ parser.add_argument("--json", help="also write the per-seed table here")
 args = parser.parse_args()
 
 entry = tallo.load_targets()["species"][args.species]
+if not entry["gated"]:
+    raise SystemExit(f"{args.species}: not gated at Level 0 ({entry.get('not_gated_reason', 'reference only')})")
 T = entry["control"]["T"]
 assign = {}
 if args.fit:

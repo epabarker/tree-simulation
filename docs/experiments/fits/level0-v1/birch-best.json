@@ -1,0 +1,196 @@
+{
+ "species": "birch",
+ "generation": 3,
+ "evaluations": 300,
+ "assign": {
+  "r1.hydraulic": "hyperbolic",
+  "c5.Trel": 0.21,
+  "r1.leafCost": "acclimated",
+  "r1.leafCostShade": 0.3,
+  "r2.levels.0.lambda": 0.59,
+  "r2.levels.1.lambda": 0.55,
+  "r2.levels.1.setPoint": 74.94,
+  "r2.levels.1.postureSetPoint": 50,
+  "r2.levels.1.branchAngle": 42.94,
+  "r2.levels.1.eta": 0.2434,
+  "r2.levels.2.setPoint": 144.8,
+  "r2.aC": 24.32,
+  "r2.dLambda": 0.07812,
+  "r2.kappa": 0.5545,
+  "c3.alpha": 3.653,
+  "r1.Lh": 85.54,
+  "r1.mf": 0.1182,
+  "r2.hJ": 68.37,
+  "c6.r0": 0.0116,
+  "r6.qMin": 0.1935,
+  "r6.leafArea": 2.674
+ },
+ "loss": 4.699544403002021,
+ "contributions": {
+  "stand.height": 0.1611643342554552,
+  "stand.lai": 1.4201600775709133,
+  "stand.lateShare": 0.7524809383832138,
+  "shade.survivalLight": 0.5523349472680115,
+  "stand.talloH": 0.16014271464430388,
+  "stand.talloCR": 1.6532613908801228,
+  "death.lone": 0.0,
+  "death.stand": 0.0
+ },
+ "traits": {
+  "shade.survivalLight": 0.17284037987048267,
+  "stand.CR.0": 5.3493057903099475,
+  "stand.CR.1": 4.702317169668577,
+  "stand.CR.2": 4.259303557452311,
+  "stand.H.0": 25.750673984616782,
+  "stand.H.1": 31.475203798670663,
+  "stand.H.2": 32.72823624687929,
+  "stand.dbh.0": 0.3175985129643217,
+  "stand.dbh.1": 0.3446263354601066,
+  "stand.dbh.2": 0.36736664368874805,
+  "stand.height": 103.0290555921716,
+  "stand.lai": 2.8124429590822686,
+  "stand.lateShare": 1.2181415101336084,
+  "stand.talloCR.0": 1.918839554750707,
+  "stand.talloCR.1": 1.063144335186583,
+  "stand.talloCR.2": 0.3841393735679218,
+  "stand.talloH.0": -0.16397985428570824,
+  "stand.talloH.1": 0.4842076946511731,
+  "stand.talloH.2": 0.46806159825598365
+ },
+ "reports": {
+  "lone.branchAngle": 49.421285861822824,
+  "lone.crownFullness": 0.6818949038562139,
+  "lone.earlyShare": 0.4452983324909848,
+  "lone.forkHeight": 0.9385689425842271,
+  "lone.leaderDominance": 2.3296651013106695,
+  "lone.limbDroop": 2.2819744451258757,
+  "lone.limbElevation": 39.97047268840193,
+  "lone.profile.0": 0.631162271733354,
+  "lone.profile.1": 0.8654695073128146,
+  "lone.profile.2": 0.9655604732158057,
+  "lone.profile.3": 0.9873536648997607,
+  "lone.profile.4": 0.9582140049920262,
+  "lone.profile.5": 0.7661005577098514,
+  "lone.profile.6": 0.6028430280360906,
+  "lone.profile.7": 0.4716380595840433,
+  "lone.profile.8": 0.3284249060971459,
+  "lone.profile.9": 0.24218256498124643,
+  "lone.slenderness": 41.99106782465991,
+  "lone.spread": 0.9657171580761933,
+  "lone.widestAt": 0.35,
+  "stand.crownRatio": 0.6284915236632149,
+  "stand.crownRatio100": 0.6054373915215597,
+  "stand.slenderness": 73.93585556807975
+ },
+ "patch": {
+  "common": "Silver birch",
+  "latin": "Betula pendula",
+  "leaf": "small",
+  "c3": {
+   "mode": "bh",
+   "lambda": 0.5,
+   "alpha": 3.653
+  },
+  "c5": {
+   "enabled": true,
+   "T": 0.1,
+   "g": 3,
+   "Trel": 0.21,
+   "topQuantile": 0.9
+  },
+  "c6": {
+   "enabled": true,
+   "n": 2,
+   "r0": 0.0116
+  },
+  "r1": {
+   "enabled": true,
+   "mw": 64,
+   "mf": 0.1182,
+   "Lh": 85.54,
+   "hydraulic": "hyperbolic",
+   "sr": 0.1,
+   "fRep": 0.1,
+   "maturity": 40,
+   "kStarve": 3,
+   "reserve0": 2,
+   "store": 2,
+   "shed": "carbon",
+   "leafCost": "acclimated",
+   "leafCostShade": 0.3
+  },
+  "r2": {
+   "enabled": true,
+   "levels": [
+    {
+     "lambda": 0.59,
+     "setPoint": 0,
+     "eta": 0.3,
+     "branchAngle": 45,
+     "generator": "spiral",
+     "tierEvery": 0,
+     "pTerm": 0
+    },
+    {
+     "lambda": 0.55,
+     "setPoint": 74.94,
+     "eta": 0.2434,
+     "branchAngle": 42.94,
+     "generator": "spiral",
+     "tierEvery": 0,
+     "pTerm": 0,
+     "postureSetPoint": 50
+    },
+    {
+     "lambda": 0.5,
+     "setPoint": 144.8,
+     "eta": 0.25,
+     "branchAngle": 40,
+     "generator": "spiral",
+     "tierEvery": 0,
+     "pTerm": 0,
+     "pendulous": 140,
+     "pendulousRadius": 0.01,
+     "lateralEvery": 3
+    }
+   ],
+   "aC": 24.32,
+   "dLambda": 0.07812,
+   "ramp": 20,
+   "kappa": 0.5545,
+   "hJ": 68.37
+  },
+  "r3": {
+   "enabled": true,
+   "rho": 1,
+   "leafMass": 0.001,
+   "E": 4000000,
+   "sag": "increment",
+   "phi": 0.5,
+   "posture": true,
+   "betaG": 0.1,
+   "gamma": 0.2,
+   "c": 0.1202,
+   "sigmaTarget": 3000,
+   "girthGain": 0.3,
+   "sigmaBreak": 7000,
+   "ground": true
+  },
+  "r4": {
+   "qRel": 0.3
+  },
+  "r6": {
+   "enabled": true,
+   "qMin": 0.1935,
+   "leafArea": 2.674
+  },
+  "o4": {
+   "cSeed": 2,
+   "d": 40,
+   "qEst": 0.25,
+   "pEst": 0.3,
+   "m0": 0.008,
+   "rain": 0.2
+  }
+ }
+}

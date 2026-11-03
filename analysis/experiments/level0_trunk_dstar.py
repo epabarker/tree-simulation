@@ -6,7 +6,7 @@ they disagree. Read from the stand's median traits (stand.dbh.k, stand.H.k, stan
 
   uv run --project analysis python -I analysis/experiments/level0_trunk_dstar.py [results.json ...]
 
-Each file is a fit (docs/experiments/fits/level0/<species>.json: hand and fit) or a probe (level0_trunk_probe.py).
+Each file is a fit (docs/experiments/fits/level0-v1/<species>.json: hand and fit) or a probe (level0_trunk_probe.py).
 """
 
 import json
@@ -18,7 +18,7 @@ import numpy as np
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from treesim import tallo  # noqa: E402
 
-CURVES = tallo.load_targets()["species"]
+CURVES = tallo.load_targets(tallo.TARGETS_V1)["species"]  # v1: what the diagnosis read
 
 
 def d_star(curve, y):
@@ -72,4 +72,4 @@ def main(paths):
 
 
 if __name__ == "__main__":
-    main(sys.argv[1:] or [f"docs/experiments/fits/level0/{s}.json" for s in ("beech", "oak")])
+    main(sys.argv[1:] or [f"docs/experiments/fits/level0-v1/{s}.json" for s in ("beech", "oak")])

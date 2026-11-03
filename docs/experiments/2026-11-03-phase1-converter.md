@@ -469,8 +469,23 @@ Size-match references (median measured DBH): oak 0.596 m, maple 0.247 m, beech 0
 **Reproduce:** `uv run --project analysis python -I -m treesim.tolerance` (≈ 17 min on 12 workers; it writes the
 JSON and `runs/phase1/control-grid.csv`, with per-tree results cached in `runs/phase1/real/control3-*`).
 
+**A ruling after v3's curves (the user, 2026-11-03), for 1d-ii.**
+- **Tier B's bracket** becomes [d_min, the first grid point at which the control fails], instead of
+  [d_min, 2·d_min]:
+  - Wytham [5.0, 12.1 mm] (p20 to p50);
+  - BioDiv [8.6, 11.0 mm] (p2 to p5).
+- **Its provenance:** it was set after the control curves were seen, and it is taken from them alone, so from real
+  data only. No simulated tree has been measured.
+- **The changed bracket in each dataset's terms:**
+  - Wytham's upper end is 2.4 × d_min, wider than 2·d_min (10.0 mm);
+  - BioDiv's is 1.28 × d_min, narrower than 2·d_min (17.2 mm), where its own control already fails.
+- **The files it touches:** `tiers.evaluation_points` and the JSON's rule text, both hashed. 1d-ii re-registers
+  them (v3.1) before anything else.
+- **For phase 3:** Demol has no neutral d_min (its p1, 13.3 mm, already fails). As beech's held-out site it serves
+  tier A descriptors only.
+
 **Next, 1d-ii (after phase 2):**
-1. Wire `tiers.py` into `phase1_degradation.py`. Its `gate` still reads v1's layout, so this must not change a
+1. Register v3.1 (tier B's bracket, above), then wire `tiers.py` into `phase1_degradation.py`. Its `gate` still reads v1's layout, so this must not change a
    hashed file.
 2. Size-match each species by `rules.size_match`.
 3. Run gate c v3.

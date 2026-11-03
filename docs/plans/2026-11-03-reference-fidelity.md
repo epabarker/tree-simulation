@@ -249,6 +249,16 @@ fresh directory, read with `python -I`.
   - **Order:** phase 2 (Tallo, Level 0) runs next, on Sonnet. 1d then re-registers and re-runs gate c on phase 2's
     trees, at their size-matched seasons.
 
+- **1d-ii (the user, 2026-11-03, after v3's control curves; set from real data only):**
+  - **Tier B's bracket** is [d_min, the first grid point at which the control fails], not [d_min, 2·d_min]:
+    Wytham [5.0, 12.1 mm] (p20 to p50), BioDiv [8.6, 11.0 mm] (p2 to p5). The evaluation points are d_min, the
+    grid points strictly inside, the upper end and inflation at d_min.
+  - This changes `tiers.evaluation_points` and the JSON's `rules.evaluation_points` and `rules.tier_b`, both
+    hashed. So 1d-ii's first step re-registers them as v3.1: the code, the rule text, the hashes, a commit. This
+    happens before `tiers.py` is wired and before any simulated tree. Tier A is unchanged.
+  - **For phase 3:** Demol has no neutral d_min (p1, 13.3 mm, already fails). As beech's held-out site it serves
+    tier A descriptors only.
+
 ### State
 _(rewritten at the end of each session)_ **1d-i done (2026-11-03): gate c v3 is registered from real QSMs only
 (`phase1-tolerances.json` v3, commit 6610fb4).** v2 (3f13c29) admitted no species; the user ruled; v3 follows.
@@ -274,8 +284,12 @@ Nothing simulated has been measured since v1. The note's section is "v2 and v3".
   - tests: 72 pass.
 - **Next:**
   1. Phase 2 (Tallo, Level 0).
-  2. 1d-ii: first wire `tiers.py` into `phase1_degradation.py` (no hashed file changes), then the size-matched
-     seasons, then gate c v3 on phase 2's trees.
+  2. 1d-ii, in order:
+     - register v3.1: tier B's bracket to the control's first failing grid point (above);
+     - wire `tiers.py` into `phase1_degradation.py`;
+     - the size-matched seasons;
+     - gate c on phase 2's trees.
+  - **Demol** serves tier A descriptors only, in phase 3.
 - **Standing rulings:**
   - R2: match on measured DBH;
   - R3: done;

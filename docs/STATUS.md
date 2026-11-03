@@ -1,13 +1,18 @@
 # Status
 
-_Last updated: 2026-11-03 (reference fidelity, phase 0: audit and plan on `claude/reference-fidelity`; before that the harness, ADR 0047, 2026-11-02)_
+_Last updated: 2026-11-03 (reference fidelity, phase 1 done on `claude/reference-fidelity`: gates a–c; before that the harness, ADR 0047, 2026-11-02)_
 
 **3D port** on the branch `3d-port` (work branches open PRs into it). ADR 0024–0029, 0031, 0032, 0039–0042, 0044, 0046 and 0047 accepted, 0030, 0043 and 0045 rejected. The live site stays on 0.14.0 (2D) until the bar below is met.
 
 **Done means** (user): the mixed wood looks right in the garden in depth, within budget on the phone, with floor, H/D and crown base as 20-seed evidence. C3–C6 follow after shipping.
 
-**Direction (the user, 2026-11-03):** species fidelity from measured reference data on three levels (Tallo allometry, QSM branching statistics, held-out perception). Phase 0 is done: the [plan](plans/2026-11-03-reference-fidelity.md), [audit](plans/reference-audit/) and ADR 0049 (proposed), on `claude/reference-fidelity`.
-- **Before phase 1:** the user's 11 decisions (plan §i), first among them "ship first, or pause shipping". The phases are sessions with deterministic gates; phase 1 builds the converter and `describe()`.
+**Direction (the user, 2026-11-03):** species fidelity from measured reference data on three levels (ADR 0049, accepted;
+the [plan](plans/2026-11-03-reference-fidelity.md); §g: beech is phase 3, oak phase 4). Phase 1 is done
+([note](experiments/2026-11-03-phase1-converter.md)): gates a and b pass. Gate c stops oak (5 of 22 descriptors
+survive) and beech (1 of 26); maple 12 of 22. The control shows d_min (the median terminal diameter) is not neutral
+on the datasets' own QSMs.
+- **Waiting on the user:** the note's five decisions (d_min after the control, H1 for maple, beech's noise floor,
+  `--gate-c`, size matching). Phase 2 (Tallo, Level 0) does not depend on them.
 
 ## Works
 - **Core** (`rust/core`): C1–C6, R1–R6, O2, O4 in 3D; slab sweep in fixed lanes; checkpoints v2. O4's `band` keeps recruits near a row (the garden).

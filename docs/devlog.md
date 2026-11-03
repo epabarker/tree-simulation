@@ -2,6 +2,35 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-03: Reference fidelity, phase 1c: coarsen(), the pre-registered tolerances, gate c (stops oak and beech)
+
+- **What changed** (Python, `cli/dump-trees.ts --gate-c`, and docs; no src/rust/presets/species; goldens unchanged):
+  - `treesim/coarsen.py` (idempotent) and `treesim/tolerance.py`;
+  - `analysis/fit/sources/phase1-tolerances.json`, committed (e74063c) before any run, with hashes the gate asserts;
+  - `tortuosity05` in describe() (H3);
+  - Wytham's 10-model noise sets under `wytham/qsm-noise/`;
+  - `analysis/experiments/phase1_degradation.py`;
+  - held-out lists in the oak, beech and maple targets files;
+  - ADR 0049 accepted, plan §g reordered (beech 3, oak 4);
+  - [the note](experiments/2026-11-03-phase1-converter.md).
+- **Gate c:** oak 5 of 22 and beech 1 of 26 survive (amendment E's stop); maple 12 of 22. Nothing loosened.
+- **Surprises:**
+  - The pre-registered control finds the coarsening not neutral on the datasets' own QSMs (Demol 20 of 26 over
+    tolerance): d_min as the median terminal diameter prunes half of a QSM's own tips. Demol's d_min is 43 mm.
+  - H2 is reversed: inflating twigs raises ldSlope.
+  - H4: the DBH bias signs disagree (Wytham oak +6.8%, BioDiv beech −7.4%).
+  - The simulated oak and beech stands at 150 are 41 m and 50 m tall, above every reference.
+- **Advisor** (one consult, at the plan):
+  - keep the noise models out of every one-model glob;
+  - beech's noise floor "not measured", not BioDiv's;
+  - a hash guard;
+  - the dead-tree rule, MIN_TREES and the H2 criterion written down before the run;
+  - χ² bounds for σ, read as "tolerance uncertain" against "resolution-sensitive";
+  - per-cylinder pruning for idempotence;
+  - the real-QSM control.
+
+  All adopted.
+
 ## 2026-11-03: Reference fidelity, phase 0: reconcile, audit, plan (branch `claude/reference-fidelity`, from `3d-port`)
 
 - **What changed** (docs only; no src/rust/tests/presets/species; goldens unchanged): the user's reference document saved byte for byte (`research/2026-11-03-reference-data-and-evaluation.md`); a nine-dataset audit (`plans/reference-audit/`, counts by `count_species.py` from metadata in git-ignored `data/reference/`); [the plan](plans/2026-11-03-reference-fidelity.md); ADR 0049 proposed; ROADMAP M28.

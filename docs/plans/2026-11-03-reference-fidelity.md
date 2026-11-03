@@ -83,13 +83,13 @@ free; BioDiv's QSMs are one 108 GB tarball (stream, keep the trees needed), Wyth
 **Classifier:** DetailView falls back to CPU (`predict.py`); three DenseNet-201s on 7 views, ≈ 0.5–2 s a tree
 (estimate, not run); needs CPU torch and 238 MB of weights. It also reads tree height, so it sees our scale.
 
-## g. Phases (a session each; a deterministic gate each)
+## g. Phases (a session each; a deterministic gate each; reordered 2026-11-03, the user: beech 3, oak 4)
 | # | phase | gate | tier |
 |---|---|---|---|
 | 1 | converter + `describe()`; Demol, a Wytham subset | QSM DBH and height vs `tls_summary.csv` and Demol's felled heights, ≥ 95% within 5%; the port equals `form.rs` on a simulated tree (1e-9); **a degradation test**: a simulated tree coarsened to QSM resolution moves each descriptor by less than a stated tolerance, else it is held out | Opus |
 | 2 | Level 0 from Tallo, eleven species | stand trees within the 10–90% band at matched DBH, ≥ 15 of seeds 1–20 | Sonnet |
-| 3 | Level 1 oak, one site held out | held-out descriptors \|z\| ≤ 2 at matched size, ≥ 15 of 20 fresh seeds; simulated between-tree SD within ×2 of the real; `shapeFlag` clear | Opus |
-| 4 | beech (BioDiv; Demol held out) | as 3 | Opus |
+| 3 | Level 1 beech (BioDiv; Demol held out) | held-out descriptors \|z\| ≤ 2 at matched size, ≥ 15 of 20 fresh seeds; simulated between-tree SD within ×2 of the real; `shapeFlag` clear | Opus |
+| 4 | oak, one site held out (its two sites confound species, size and site) | as 3 | Opus |
 | 5 | birch (pendulousness reported, not fitted) | as 3 | Opus |
 | 6 | hornbeam; field maple via sycamore | as 3 | Sonnet |
 | 7 | open-grown: TreeML, same parameters | frontal descriptors in TreeML's band, ≥ 15 of 20, no knob refitted | Opus |
@@ -215,56 +215,35 @@ fresh directory, read with `python -I`.
   `/wrap-up`, commit, push, no PR.
 
 ### State
-_(rewritten at the end of each session)_ **1a and 1b done (2026-11-03); 1c next.**
-- **Code (1a):** `analysis/treesim/{fetch,cylinders,qsm,qsm_gate}.py`. **(1b):** `form.py` (the one implementation,
-  A), `simtree.py`, `form_gate.py`, `describe.py`, `cli/dump-trees.ts` (gate b only; in no build);
-  `analysis/tests/{test_readers,test_qsm_gate,test_form_parity,test_topology,test_describe}.py`: 46 pass. Readers
-  cache parsed tables as hidden `.npz` (`CACHE_VERSION` 2 since R1).
-- **Data** (`data/reference/`, manifest `analysis/fit/sources/reference-manifest.csv`, 199 rows): Demol 66 `.mat`;
-  Wytham 77 (37 oaks, 40 sycamores ≥ 10 cm; the median-size model of 10); BioDiv 53 valid beech `all.mat` (19
-  plots, G and GD: "Phase 1 only"; model: TreeQSM's optimum, R1); TreeML 3 `optcsv`.
-- **R1 settled:** every BioDiv model carries `pmdistance`. The reader takes `select_optimum`'s default
-  (`all_mean_dis`): `pmdistance.mean` averaged over each input set's 5 repeats (16 sets), the best set, then its
-  model of least `mean`. Read off `select_optimum.m` (InverseTampere/TreeQSM; its header says 1.4.0, the 2.4.1
-  file was not seen). **The model changed on all 53 trees**; a plain argmin of `mean` differs on 20. The thin bias
-  stays: DBH against `dTLS` median −7.4% (was −6.6%), within 5% for 32% (was 42%), worst −37% (was −61%). Gate a
-  re-run passes (BioDiv 100% / 100%, max H err 1%).
-- **Gate a** (`python -I -m treesim.qsm_gate`): Demol 65, Wytham 77, BioDiv 53 all 100% within 5% on DBH and H;
-  ceilings as before (BioDiv DBH 32%, H 98%). Internal checks reported on every dataset, gated nowhere: all pass.
-- **R4 (ruled 2026-11-03: start or tip):** `describe.drop_below_ground` drops a cylinder that starts or ends below
-  the root's base z with its subtree, counted per tree (`below`, `below_volume`; `below_start` for the start-only
-  rule). Under R1's models nothing on any dataset starts or ends below its base (HEW21_GD_117's diving cylinder was
-  in the median-size model only): 0 of 199 QSMs, 0 of 30 simulated trees.
-- **Gate b passes** (`node cli/dump-trees.ts`, 89 s; `python -I -m treesim.form_gate`): 30 of 30 trees, 22 numbers
-  each, worst relative error 2.5e-13 (beech lone, 72,900 metamers). Two stand beech are dead at 100 with their
-  skeletons standing (120 and 39 metamers): gated like the rest.
-- **Relabelling (reported):** form.rs's rules, simulator labels → geometric. Geometric continuation disagrees with
-  slot 0 at a median 15% of nodes (lone beech 52%: 52 limbs of ≥ 10 metamers where slot 0 sees 19). Profile,
-  `junctionDelta`, `leafStemSlope` unmoved (label-free); `forkHeight` moves on 4 of 30 (max 0.46);
-  `leaderDominance` 13 of 28 (mean −0.14); `branchAngle2` 28 of 28 (median 3.2°); `limbDroop` 28 of 28 (mean
-  +21.6°: the heavier child droops); `limbUpturn` median 3.7°; `ldSlope` median 0.023; `limbElevation` median 0.9°,
-  mean −9.3°, max 51°.
-- **describe()** (geometric labels; `DESCRIBE`: subtree 1.25 m, limb 2.5 m, crown base the lowest limb ≥ 2.5 m,
-  headings as chords over 0.5 m stretches, band width the diameter over azimuths, 4 bands). New: Strahler
-  bifurcation ratio (with and without order 1), tortuosity, length by order 0–3+, length-weighted pendulous
-  fraction, taper d(0.5 H)/DBH (raw radii), centroid height/H; report-only `leafStemSlope` (NaN on QSMs: no wood
-  proxy) and crown base/H. The measurement-design table (labels, resolution, gravity vs parent) is its docstring.
-  Runs on all 199 QSMs (≈ 85 s) and the 30 simulated trees.
-- **For 1c: hypotheses to test, not findings** (the user, 2026-11-03; from medians seen in passing: Wytham
-  `junctionDelta` 3.95 against 1.4–1.9 elsewhere; `ldSlope` Demol 0.15, BioDiv 0.05, simulator 0.91; tortuosity
-  simulator 1.12 against 1.46–1.76):
-  - **H1, Wytham radii:** its 2.0 radii are taper-corrected (no UnmodRadius), so its radius-based descriptors
-    (`junctionDelta`, `ldSlope`, `taper`, `leaderDominance`) are neither targets nor hold-outs for oak; angles,
-    lengths, tortuosity and profile remain (`analysis/fit/targets/oak.toml`, `[level1]`).
-  - **H2, `ldSlope`:** the gap is predicted to come from small-branch radius overestimation; gate c's inflation
-    variant should move it hard. Report whether it does.
-  - **H3, tortuosity:** measure both sides after resampling each path at the 0.5 m step the headings use, so
-    cylinder zigzag and metamer wobble drop out together. Report before and after.
-  - **H4, DBH offset:** one table, the median QSM-vs-measured DBH bias with sign for Demol (tape), Wytham
-    (`DBH_pts`) and BioDiv (`dTLS`). If all three agree, BioDiv's thin DBH is a method offset.
-- **Rulings still standing:** R2 (match on measured DBH, never DBHqsm), R3 (4 big oaks join the noise floor), R5
-  (the 53 beech "Phase 1 only"; R1 is now settled, so the note gives the plot mix as found).
-- **The user's rulings after 1b (2026-11-03):** R1 accepted (the per-file version header is not the package's;
-  checked: the function's last update, 2 May 2022, predates the BioDiv runs, May–June 2025, which carry every field
-  it reads; `qsm.py`'s docstring); R4 start or tip; TreeML's internal checks stay its height gate; H1–H4 above;
-  ADR 0049 notes that pre-phase-1 shape targets are in simulator-label coordinates.
+_(rewritten at the end of each session)_ **Phase 1 done (1a–1c, 2026-11-03). Gate c stopped oak and beech under amendment
+E; the plan waits on the user's ruling** (the note's Decisions:
+[2026-11-03-phase1-converter.md](../experiments/2026-11-03-phase1-converter.md)).
+- **Code:** `analysis/treesim/{fetch,cylinders,qsm,qsm_gate,form,simtree,form_gate,describe,coarsen,tolerance}.py`,
+  `cli/dump-trees.ts` (gate b, and `--gate-c`; in no build), `analysis/experiments/phase1_degradation.py`. Tests:
+  `analysis/tests/{test_readers,test_qsm_gate,test_form_parity,test_topology,test_describe,test_coarsen,test_tolerance}.py`,
+  59 pass.
+- **Data:** the manifest has 319 rows; the 120 `wytham-noise` rows are under `wytham/qsm-noise/`, kept out of every
+  one-model glob. Outputs are in `runs/phase1/`.
+- **Gates a and b** pass (numbers as in 1a and 1b).
+- **The pre-registration** is `analysis/fit/sources/phase1-tolerances.json` (commit e74063c), written before any run,
+  with code hashes that the gate asserts. Beech's noise floor is not measured.
+- **Gate c:**
+
+  | species | survive | outcome |
+  |---|---|---|
+  | oak | 5 of 22 | stop |
+  | beech | 1 of 26 | stop |
+  | maple | 12 of 22 | passes |
+
+  The held-out lists are in each targets file's `[level1]`. The ×2 bracket point does most of the damage.
+- **The control:** real QSMs coarsened at their own dataset's resolution move on Demol (20 of 26 descriptors over
+  tolerance), and on Wytham mildly. d_min as the median terminal diameter is not neutral.
+- **H1:** applied for oak and extended to maple (to confirm).
+- **H2:** not supported; inflation raises ldSlope.
+- **H3:** resampling narrows the tortuosity gap but does not close it.
+- **H4:** the signs disagree, so BioDiv's thin DBH is not a method offset.
+- **Next (after the user rules):** the note's five decisions: d_min after the control, H1 for maple, beech's noise
+  floor, `--gate-c`, and size matching (the simulated oak at 41 m and beech at 50 m are taller than any reference).
+  Phase 2 (Level 0 from Tallo) does not depend on gate c and can start.
+- **Standing rulings:** R2 (match on measured DBH), R3 (done), R5 (BioDiv "Phase 1 only"). §g is reordered: beech is
+  phase 3, oak phase 4. ADR 0049 is accepted.

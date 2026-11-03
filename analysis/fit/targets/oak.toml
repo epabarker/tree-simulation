@@ -280,3 +280,11 @@ shadeScore = 2.45   # Niinemets & Valladares 2006, Appendix A
 # crown profile remain. Read by phase 1c and later; fit.py ignores this table.
 wytham_excluded = ["junctionDelta", "ldSlope", "taper", "leaderDominance"]
 wytham_reason = "TreeQSM 2.0 radii are taper-corrected (no UnmodRadius)"
+
+# Gate c (phase 1c, 2026-11-03; docs/experiments/2026-11-03-phase1-converter.md): the degradation test against
+# the tolerances pre-registered in analysis/fit/sources/phase1-tolerances.json (commit e74063c).
+gate_c_survive = ['forkHeight', 'limbElevation', 'p0', 'tortuosity', 'tortuosity05']
+gate_c_held_out_noise = ['widestAt', 'limbDroop', 'limbUpturn']
+gate_c_held_out_resolution = ['profileCentre', 'crownFullness', 'branchAngle2', 'p2', 'p3', 'bifurcationRatio', 'bifurcationRatio2', 'length0', 'length1', 'length2', 'length3', 'centroidHeight']
+gate_c_held_out_tolerance_uncertain = ['p1', 'pendulousFraction']
+gate_c = "5 of 22 gated descriptors survive: fewer than half, so the plan stops here (amendment E); no Level 1 targets until the user rules"

@@ -1,6 +1,6 @@
 # 0049: Species fidelity from measured reference data, with held-out perceptual tests
 
-- **Status:** proposed (drafted 2026-11-03 from the reference-fidelity plan's a, b and h; the user decides).
+- **Status:** accepted (2026-11-03, the user's decisions on the plan's §i; drafted the same day from its a, b and h).
 - **Date:** 2026-11-03
 - **Amends:** ADR 0029 (form by hand), ADR 0028 §6 (the acceptance rule), STATUS's "ship, no round-5 fit"
   (2026-11-02).
@@ -20,7 +20,7 @@ hornbeam (38), sycamore (Wytham 541, BioDiv 42) and birch (15). It found forest-
 eleven species (thin for willow, rowan, holly), and open-grown structure only in TreeML's pruned street trees
 (≤ 41 per species). Lone trees exceed the slab's 16 m depth (ADR 0024), so they compare frontally only.
 
-## Decision (proposed)
+## Decision
 1. **Measured targets re-open the form knobs.** The ten form knobs of ADR 0029 may be fitted again, against
    measured Level 1 descriptors only. These are distributions over real trees at a matched size class, read by
    one `describe()` applied identically to the model's skeleton and to the real cylinder tables. Described shape
@@ -38,12 +38,34 @@ eleven species (thin for willow, rowan, holly), and open-grown structure only in
 4. **Acceptance.** A species' fit is accepted when the held-out descriptors are within |z| ≤ 2 at matched size,
    on ≥ 15 of 20 fresh seeds, and the simulated between-tree spread is within a factor of 2 of the real one.
    ADR 0028 §6's line-up panel, judged by the user, remains the last step.
-5. **The ordering** (ship first with overrides, or pause shipping) is the user's, recorded when decided.
+5. **The ordering:** ship first, with overrides; phases 1–2 change no looks.
+
+**The user's decisions on the plan (2026-11-03, §i):**
+1. Ship first with overrides.
+2. The form knobs are fittable against measured Level 1 descriptors only. Phase 7's rule (TreeML judges the same
+   parameters, no refit) binds even if it fails.
+3. The namers are held out and recalibrated before any use.
+4. The principle line (§b): at most 4 profile bands, a held-out third of the descriptors, a held-out site.
+5. Metres per cell stay 0.25, never fitted to Tallo.
+6. Sycamore is field maple's Level 1 proxy, labelled a proxy.
+7. Hornbeam is in; fir and pine are Level 0 only.
+8. Downloads are QSM files only, never point clouds, and only the species the phases need: stream and filter,
+   never mirror whole archives.
+9. Licences: commit summary statistics only, never per-tree tables from Weiser or FOR-species20K; ATI is not used.
+10. CMA-ES is the fitter; ABC is deferred to a check of at most 6 knobs after phase 4.
+11. Lone trees are compared frontally only.
+- **Reorder:** beech is phase 3 (BioDiv; Demol held out), oak phase 4 (its two sites confound species, size and
+  site).
 
 ## Consequences
-- Phase 1 builds the converter and `describe()` before any fit. Its gates are deterministic: QSM DBH and height
-  against Wytham's `tls_summary.csv` and Demol's felled heights, and a degradation test showing which
-  descriptors survive QSM resolution.
+- Phase 1 builds the converter and `describe()` before any fit, with three deterministic gates (the plan's §j):
+  a, QSM DBH and height recomputed against each publisher's own QSM values (felled and point-cloud values are
+  ceilings, never gated); b, the Python port equal to `form.rs` on simulated trees; c, a degradation test showing
+  which descriptors survive each dataset's resolution, against tolerances pre-registered before the run
+  (`analysis/fit/sources/phase1-tolerances.json`; the results:
+  [the phase 1 note](../experiments/2026-11-03-phase1-converter.md)).
+- Beech's tolerances take their dispersion from Demol's 15 trees, phase 3's held-out site: its spread is used,
+  never its location.
 - Leaf-dependent definitions (`limbCrownRatio`, `leafBase`, `leafStemSlope`) need wood-only versions. Crown base
   comes from field measurements (Weiser), not from QSM wood.
 - Per-tree tables derived from GPL (FOR-species20K) or CC-BY-SA (Weiser) data are not committed; summary

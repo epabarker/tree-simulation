@@ -86,6 +86,7 @@
    "gated": true,
    "control": {
     "T": 0.8688214061906008,
+    "T_kind": "own",
     "T_first20": 0.8132875729065366,
     "trees": 6211,
     "self_consistency": {
@@ -184,6 +185,7 @@
    "gated": true,
    "control": {
     "T": 0.8416137605738886,
+    "T_kind": "own",
     "T_first20": 0.7909612544558245,
     "trees": 3436,
     "self_consistency": {
@@ -282,6 +284,7 @@
    "gated": true,
    "control": {
     "T": 0.8369052219372399,
+    "T_kind": "own",
     "T_first20": 0.7411544363008428,
     "trees": 1061,
     "self_consistency": {
@@ -378,6 +381,7 @@
    "gated": true,
    "control": {
     "T": 0.8293321250980217,
+    "T_kind": "own",
     "T_first20": 0.6969134981984967,
     "trees": 1045,
     "self_consistency": {
@@ -484,6 +488,7 @@
    "gated": true,
    "control": {
     "T": 0.8085521071416294,
+    "T_kind": "own",
     "T_first20": 0.8407504629086421,
     "trees": 145,
     "self_consistency": {
@@ -580,6 +585,7 @@
    "gated": true,
    "control": {
     "T": 0.8563615791968576,
+    "T_kind": "own",
     "T_first20": 0.8640097796895725,
     "trees": 12434,
     "self_consistency": {
@@ -676,6 +682,7 @@
    "gated": true,
    "control": {
     "T": 0.8336339749272906,
+    "T_kind": "own",
     "T_first20": 0.8656141037353372,
     "trees": 993,
     "self_consistency": {
@@ -772,6 +779,7 @@
    "gated": false,
    "control": {
     "T": 0.8464959428615939,
+    "T_kind": "own",
     "T_first20": 0.8059286369376373,
     "trees": 639,
     "self_consistency": {
@@ -907,10 +915,31 @@
    },
    "gated": true,
    "control": {
-    "T": 0.9739152879269183,
+    "T": 0.839853313513804,
+    "T_kind": "borrowed T",
     "T_first20": 0.777013640449915,
     "trees": 17,
     "self_consistency": {
+     "pass": 19,
+     "of": 20,
+     "need": 15,
+     "ok": true
+    },
+    "T_own": 0.9739152879269183,
+    "T_pooled": {
+     "T": 0.839853313513804,
+     "pseudo_seeds": 12000,
+     "trees": 12537,
+     "from": [
+      "beech",
+      "oak",
+      "birch",
+      "hornbeam",
+      "maple",
+      "sycamore"
+     ]
+    },
+    "self_consistency_own_T": {
      "pass": 19,
      "of": 20,
      "need": 15,
@@ -1043,10 +1072,31 @@
    },
    "gated": true,
    "control": {
-    "T": 0.9600045097913912,
+    "T": 0.839853313513804,
+    "T_kind": "borrowed T",
     "T_first20": 0.8598815890379707,
     "trees": 34,
     "self_consistency": {
+     "pass": 16,
+     "of": 20,
+     "need": 15,
+     "ok": true
+    },
+    "T_own": 0.9600045097913912,
+    "T_pooled": {
+     "T": 0.839853313513804,
+     "pseudo_seeds": 12000,
+     "trees": 12537,
+     "from": [
+      "beech",
+      "oak",
+      "birch",
+      "hornbeam",
+      "maple",
+      "sycamore"
+     ]
+    },
+    "self_consistency_own_T": {
      "pass": 16,
      "of": 20,
      "need": 15,
@@ -1179,10 +1229,31 @@
    },
    "gated": true,
    "control": {
-    "T": 0.512516287354737,
+    "T": 0.839853313513804,
+    "T_kind": "borrowed T",
     "T_first20": 0.42506358525604393,
     "trees": 24,
     "self_consistency": {
+     "pass": 20,
+     "of": 20,
+     "need": 15,
+     "ok": true
+    },
+    "T_own": 0.512516287354737,
+    "T_pooled": {
+     "T": 0.839853313513804,
+     "pseudo_seeds": 12000,
+     "trees": 12537,
+     "from": [
+      "beech",
+      "oak",
+      "birch",
+      "hornbeam",
+      "maple",
+      "sycamore"
+     ]
+    },
+    "self_consistency_own_T": {
      "pass": 17,
      "of": 20,
      "need": 15,
@@ -1286,6 +1357,20 @@
       "sycamore"
      ]
     }
+   },
+   "T": "borrowed: the pooled T of BROADLEAVES' control statistics (each species' pseudo-seeds alike)",
+   "pooled_T": {
+    "T": 0.839853313513804,
+    "pseudo_seeds": 12000,
+    "trees": 12537,
+    "from": [
+     "beech",
+     "oak",
+     "birch",
+     "hornbeam",
+     "maple",
+     "sycamore"
+    ]
    }
   },
   "z": "(ln y − q50)/(q90 − q50) above the median, (ln y − q50)/(q50 − q10) below; None outside the support",

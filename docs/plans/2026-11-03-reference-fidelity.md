@@ -213,10 +213,45 @@ fresh directory, read with `python -I`.
   plot mix as found: 19 plots, G and GD, R5),
   ADR 0049 to accepted with the decisions above, §g reordered (beech 3, oak 4), spec-reviewer on the diff,
   `/wrap-up`, commit, push, no PR.
+- **1d (gate c v2: re-register, re-run; after phase 2, on phase 2's trees).** The user's rulings, 2026-11-03.
+  - **Gate c v1 is recorded as it stands** (the note; nothing loosened):
+    - oak: 5 survive;
+    - beech: 0, since taper is held out by its noise floor under BioDiv's repeats (4.36 × the between-tree SD);
+    - maple: 12, with H1 extended.
+  - **The instrument is revised and pre-registered again** (a new commit before any run, with code hashes as v1's)
+    and re-run after phase 2.
+  1. **d_min, from real data only.**
+     - Per dataset, d_min is the largest value at which coarsening that dataset's own QSMs stays within tolerance
+       on ≥ 90% of the non-held-out descriptors, for ≥ 90% of its trees.
+     - The grid is the percentiles of that dataset's terminal diameters.
+     - The stress point above it is Demol 2022's ≈ 5 cm completeness threshold: reported, not gated.
+     - The ×0.5 / ×2 bracket is withdrawn.
+  2. **The pass rule has two tiers. Both tiers are targets;** the targets file records each descriptor's tier.
+     - **Tier A**, resolution-independent: v1's criterion, the shift from fine to coarse within tolerance.
+     - **Tier B**, valid at matched resolution: the simulator's coarsened value stays within tolerance across
+       [d_min, 2·d_min], and the control is neutral at d_min.
+     - **The fit always compares the coarsened simulator against the real QSMs.** Fine-simulator values never enter
+       a loss.
+  3. **H1 is extended to maple: confirmed.** It is the file format (TreeQSM 2.0, no UnmodRadius), not the species.
+  4. **Beech: tolerances and the noise floor come from BioDiv's 53** (its 5 repeats of the optimum's input set as
+     the floor). This amends R5's "never a source of tolerances" for this use. Demol becomes beech's held-out site
+     only, as phase 3 already says.
+  5. **`cli/dump-trees.ts --gate-c` is approved** (still in no build).
+  6. **Size matching is required.** Each species is read at the season where the stand's measured-tree median DBH
+     matches the reference median (measured DBH, R2). Report the height at that season.
+  7. **`ldSlope` and `junctionDelta` are report-only.** They are not targets in phases 3–4. The dead-limb
+     explanation is recorded as a hypothesis, for a later shed-limb comparison transform.
+  8. **The note** (`docs/experiments/2026-11-03-phase1-converter.md`, or a v2 note linked from it) states three
+     things:
+     - v2 was designed after v1 failed;
+     - every v2 parameter derives from real data only;
+     - v1 and v2, side by side.
+  - **Order:** phase 2 (Tallo, Level 0) runs next, on Sonnet. 1d then re-registers and re-runs gate c on phase 2's
+    trees, at their size-matched seasons.
 
 ### State
-_(rewritten at the end of each session)_ **Phase 1 done (1a–1c, 2026-11-03). Gate c stopped oak and beech under amendment
-E; the plan waits on the user's ruling** (the note's Decisions:
+_(rewritten at the end of each session)_ **Phase 1a–1c done (2026-11-03); gate c v1 stopped oak and beech under amendment
+E. The user has ruled: phase 2 next, then 1d (gate c v2)** (the note's Decisions:
 [2026-11-03-phase1-converter.md](../experiments/2026-11-03-phase1-converter.md)).
 - **Code:** `analysis/treesim/{fetch,cylinders,qsm,qsm_gate,form,simtree,form_gate,describe,coarsen,tolerance}.py`,
   `cli/dump-trees.ts` (gate b, and `--gate-c`; in no build), `analysis/experiments/phase1_degradation.py`. Tests:
@@ -243,9 +278,8 @@ E; the plan waits on the user's ruling** (the note's Decisions:
 - **H2:** not supported; inflation raises ldSlope.
 - **H3:** resampling narrows the tortuosity gap but does not close it.
 - **H4:** the signs disagree, so BioDiv's thin DBH is not a method offset.
-- **Next (after the user rules):** the note's five decisions: d_min after the control, H1 for maple, beech's noise
-  floor, `--gate-c`, and size matching (the simulated oak at 41 m and beech at 50 m are taller than any reference).
-  Phase 2 (Level 0 from Tallo) does not depend on gate c: proposed to run meanwhile, the user's to approve.
+- **The user ruled (2026-11-03):** gate c v1 is recorded as it stands (oak 5, beech 0, maple 12 with H1 extended).
+  The eight decisions are the 1d brief above. **Next: phase 2 (Tallo, Level 0) on Sonnet, then 1d.**
 - **A deviation from the fixed choices:** the simulated trees were not DBH-matched ("stand to 150, DBH-matched").
   Only the tolerance is detrended on ln DBH. The stand trees at 150 are small and sparse (oak DBH 0.27–0.46 m; 1–2k
   metamers, maple 387–1,767 live), so a fixed d_min strips proportionally more from them than from the references.

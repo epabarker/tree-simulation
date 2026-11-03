@@ -168,6 +168,11 @@ No published value exists for these. Calibrate on *patterns*: several weak targe
 - step 5 (ADR 0046): reduced motion draws the plate at once, and the still forest replaces it. There is no first-paint picture: 1.1 s on the phone's plate on the laptop, the phone's own wait at the soak;
 - step 6 ✅: `?bench` reports memory and the reduced-motion wait; headless, the phone's plate is 52–65 ms a season and 47 MB at 40. The user: "works great on my phone"; its captions at the soak. **I3 ✅ 2026-11-02.**
 
+**Stems and bark** ([note](experiments/2026-11-03-stems-bark.md), [plan](plans/2026-11-03-stems-bark.md), ADR 0048 proposed; renderer only):
+- `&interior` (off by default): a closed wood's dim interior between the boles, from the field's brightest tenth per row against §10's floor light; lone plates get none. Unit tests in `scene.test.ts`; the token in `scene.css`;
+- ruled out before naming: bark by light (set 5), bark by girth (Pilarski 2008), root flare (no source);
+- dev seeds 1–3, three Sonnet namers: the beech stand reads birch or aspen under every bark, backdrop and girth; the judging seeds not run. The user judges `interior` and the bark by eye.
+
 **Species in 3D, steps 0–1** ([note](experiments/2026-10-30-species-3d.md), [plan](plans/2026-10-30-species.md)):
 - step 0 ✅: `m27_adopt.py` writes the 3D overlay (phyllotaxis, wood's E); `rust/presets.json` byte-identical; round 2's fits in `fits/round2/`;
 - step 1 built: the trials at the woods' top, the leaf crown ratio, seasons survived in a shade house with opaque faces (roofs 30–1.8%), the floor in own woods (hold-out), `fit_lm.py` (least squares, r0 by its own rule);

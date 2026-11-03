@@ -202,10 +202,15 @@ fresh directory, read with `python -I`.
   2.5 m limb threshold; 4-band profile; new: Horton–Strahler bifurcation ratio, tortuosity, length fraction by
   order, pendulous fraction, taper d(0.5 H)/DBH, length-weighted centroid height/H; report-only `leafStemSlope`,
   crown base/H), `test_form_parity.py` (gate b), `test_topology.py`, `test_describe.py`, the relabelling table;
-  the simulator's case in `test_readers.py`'s up-axis test (C: y-up cells → z-up metres).
-- **1c (coarsening, gate c, wrap):** `coarsen()`, the Wytham 10-model noise floor, tolerances,
+  the simulator's case in `test_readers.py`'s up-axis test (C: y-up cells → z-up metres). **First**, ruling R1
+  (BioDiv's model choice, gate a re-run). **Below-ground subtrees (R4):** drop subtrees whose start lies below the
+  root cylinder's base z, counted and reported per tree as orphan fragments are; run the internal checks on every
+  dataset, reported, not gated.
+- **1c (coarsening, gate c, wrap):** `coarsen()`, the Wytham 10-model noise floor (8 mid-sized sycamores and 4 of
+  the big oaks, all 10 models each, R3), tolerances matched on measured DBH (R2),
   `analysis/experiments/phase1_degradation.py`, `test_coarsen.py`, gate c (E),
-  `docs/experiments/2026-11-03-phase1-converter.md` (gates, numbers, held-out list, BioDiv "Phase 1 only"),
+  `docs/experiments/2026-11-03-phase1-converter.md` (gates, numbers, held-out list, BioDiv "Phase 1 only" with its
+  plot mix as found: 19 plots, G and GD, R5),
   ADR 0049 to accepted with the decisions above, §g reordered (beech 3, oak 4), spec-reviewer on the diff,
   `/wrap-up`, commit, push, no PR.
 
@@ -237,5 +242,19 @@ _(rewritten at the end of each session)_ **1a done (2026-11-03); 1b next.**
   cylinders; never silently). **BioDiv's median-size models read a median 6.6% under the point DBH** (quartiles
   −15%, −4%; worst −61%): the median-size rule picks thinner reconstructions here (1c: weigh before any BioDiv
   number becomes a tolerance; BioDiv is "Phase 1 only" anyway).
+- **The user's rulings after 1a (2026-11-03).** 1a accepted as done: Wytham gated against each file's own DBHqsm;
+  the 10-model mean stays reported.
+  - **R1, BioDiv's model choice (1b, first):** check whether each model in `all.mat` carries `pmdistance` (the field
+    is present on HEW29_G_64's models; its contents not yet read). If it does, pick TreeQSM's default optimum
+    (argmin of the mean point–model distance) and re-run gate a on the 53: that should reproduce `raw/`. If not,
+    drop models whose DBH is more than 15% from `dTLS`, then the median size among the survivors. Either way,
+    record the rule and the number of trees whose chosen model changed.
+  - **R2, the size covariate:** wherever real trees are matched to simulated ones by size (1c's tolerances, phases
+    3–4), match on measured DBH (`dTLS`, `DBH_pts`, Demol's field DBH), never DBHqsm. QSM DBH is a descriptor
+    target only.
+  - **R3, the noise floor (1c):** 4 of the big Wytham oaks with all 10 models join the 8 sycamores, so oak radius
+    descriptors get their own floor. Reason: tree 81's between-model DBH SD is 23 cm.
+  - **R4, below-ground subtrees (1b):** as in 1b's brief (HEW21_GD_117's 3.4 m cylinder is the case).
+  - **R5:** the 53 beech stay "Phase 1 only" until R1 is settled; the note gives the plot mix as found.
 - **1b starts from:** `cylinders.Cylinders`, `from_arrays`, `continuation`, `order_and_axis`, `trunk`, `dbh`,
   `height` (continuation by subtree volume is written but only exercised through DBH: test_topology tests it).

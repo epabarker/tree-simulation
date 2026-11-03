@@ -40,6 +40,10 @@
     --pine-needle-sun: #6a8f6a;
     --ghost: #9a8f80;
     --wall: rgba(90, 90, 100, 0.35);
+    /* A closed wood's interior, seen between the boles beyond the slab (the view's `interior`): a
+       dim olive grey near 5% of the sky's luminance, as a closed stand's floor gets 2–10% of open
+       light (spec §10). */
+    --interior: #3a4234;
     /* Species wood (render/bark-styles.ts): twig → bark by age, bark → old bark by girth. Birch
        white with a black base, beech mid grey (measured, below), oak grey-brown, pine orange above and grey-brown
        plates below, holly grey over green shoots (the species cards, 2026-11-01). */
@@ -137,6 +141,7 @@
       --pine-needle-sun: #5b7b5b;
       --ghost: #6f6a62;
       --wall: rgba(160, 160, 175, 0.25);
+      --interior: #121812;
       --birch-bark-twig: #8a5a44;
       --birch-bark: #d6d2c8;
       --birch-bark-old: #4a4440;
@@ -203,6 +208,7 @@
     --pine-needle-sun: #5b7b5b;
     --ghost: #6f6a62;
     --wall: rgba(160, 160, 175, 0.25);
+    --interior: #121812;
     --birch-bark-twig: #8a5a44;
     --birch-bark: #d6d2c8;
     --birch-bark-old: #4a4440;

@@ -68,6 +68,8 @@ const view: ViewOptions & { preset: PresetName } = {
   ...(barkLight > 0 ? { barkLight } : {}),
   // `&girth=1.45`: draw stems at that multiple of their pipe-model radius (round 2; 1 by default).
   ...(query.has("girth") ? { girth: Number(query.get("girth")) } : {}),
+  // `&interior`: a closed wood's dim interior between the boles, not open sky (round 3; off by default).
+  ...(query.has("interior") ? { interior: true } : {}),
   // `&woodContrast=0`: wood in its tokens' colours, without the floor below the sky (round 2).
   ...(query.has("woodContrast") ? { woodContrast: Number(query.get("woodContrast")) } : {}),
 };

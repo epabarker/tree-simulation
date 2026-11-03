@@ -367,6 +367,10 @@ export class WebGL2Renderer implements Renderer {
   private shadeSize: [number, number] = [0, 0];
   private hasShade = false;
   private shadeFor: Snapshot | null = null;
+  /** The backdrop beyond a closed stand (Scene.interiorOf): one texel per row of the world. */
+  private interiorTexture: WebGLTexture | null = null;
+  private interiorHeight = 0;
+  private interiorFor = { s: null as Snapshot | null, theme: -1 };
   private paletteCache = new Map<string, Bytes>();
   /** Where each depth slice's leaves start in `leafBatch` (a copy of the scene's `Leaves.slices`). */
   private leafSlices = new Int32Array(DEPTH_SLICES + 1);
@@ -491,6 +495,8 @@ export class WebGL2Renderer implements Renderer {
     this.backdrop = this.program(BACKDROP_VS, BACKDROP_FS);
     this.shadeTexture = null;
     this.shadeSize = [0, 0];
+    this.interiorTexture = null;
+    this.interiorFor = { s: null, theme: -1 };
     this.uploaded = { next: null, prev: null, key: "" };
     this.shadeFor = null;
   }
@@ -527,6 +533,35 @@ export class WebGL2Renderer implements Renderer {
     } else {
       setTextureFromArray(gl, this.shadeTexture, pixels, options);
     }
+  }
+
+  /** Uploads the backdrop's rows in the interior's colour, alpha by closure, once per snapshot and theme. */
+  private uploadInterior(s: Snapshot, rows: Float32Array): void {
+    const f = this.interiorFor;
+    if (f.s === s && f.theme === this.themeVersion) return;
+    const gl = this.gl;
+    const [r, g, b] = parseColor(this.theme.interior);
+    const pixels = new Uint8Array(4 * rows.length);
+    for (let y = 0; y < rows.length; y++) {
+      pixels[4 * y] = r;
+      pixels[4 * y + 1] = g;
+      pixels[4 * y + 2] = b;
+      pixels[4 * y + 3] = Math.round(255 * (rows[y] as number));
+    }
+    const options = {
+      width: 1,
+      height: rows.length,
+      minMag: gl.LINEAR,
+      wrap: gl.CLAMP_TO_EDGE,
+      auto: false,
+    };
+    if (!this.interiorTexture || this.interiorHeight !== rows.length) {
+      this.interiorTexture = createTexture(gl, { ...options, src: pixels });
+      this.interiorHeight = rows.length;
+    } else {
+      setTextureFromArray(gl, this.interiorTexture, pixels, options);
+    }
+    this.interiorFor = { s, theme: this.themeVersion };
   }
 
   setMaxDpr(dpr: number): void {
@@ -650,6 +685,7 @@ export class WebGL2Renderer implements Renderer {
       view.leafOpacity,
       view.clearBole,
       view.girth,
+      view.interior,
       view.barkLight,
       view.woodContrast,
       view.showBuds,
@@ -684,6 +720,19 @@ export class WebGL2Renderer implements Renderer {
       u_leaf: [scene.leafStyle.length, scene.leafStyle.aspect, view.leafMinPx ?? LEAF_MIN_PX],
       u_point: [BUD_SIDE_PX, BUD_MIN_SIDE],
     };
+    // The backdrop beyond a closed stand, over the sky and behind everything else.
+    scene.interior = view.interior ?? false;
+    const rows = scene.interiorOf(s);
+    if (rows) {
+      this.uploadInterior(s, rows);
+      const [x0, x1] = scene.interiorSpan(s);
+      this.drawBatch(this.image, 1, {
+        ...uniforms,
+        u_rect: [x0, 0, x1 - x0, rows.length],
+        u_image: this.interiorTexture,
+        u_alpha: 1,
+      });
+    }
     if (view.showShadow) this.uploadShade(s);
     if (view.showShadow && this.hasShade && this.shadeTexture) {
       this.drawBatch(this.image, 1, {

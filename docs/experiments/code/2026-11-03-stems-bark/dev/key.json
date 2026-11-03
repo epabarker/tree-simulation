@@ -1,0 +1,998 @@
+{
+ "namer-1": {
+  "plate-01.png": {
+   "source": "beechP",
+   "trial": "stand100",
+   "seed": 2
+  },
+  "plate-02.png": {
+   "source": "beechP",
+   "trial": "stand100",
+   "seed": 3
+  },
+  "plate-03.png": {
+   "source": "hornbeam",
+   "trial": "stand100",
+   "seed": 2
+  },
+  "plate-04.png": {
+   "source": "beechP",
+   "trial": "stand100",
+   "seed": 1
+  },
+  "plate-05.png": {
+   "source": "hornbeam",
+   "trial": "stand100",
+   "seed": 1
+  },
+  "plate-06.png": {
+   "source": "oak",
+   "trial": "stand100",
+   "seed": 1
+  },
+  "plate-07.png": {
+   "source": "beechP",
+   "trial": "lone60",
+   "seed": 3
+  },
+  "plate-08.png": {
+   "source": "oak",
+   "trial": "stand100",
+   "seed": 2
+  },
+  "plate-09.png": {
+   "source": "beechM",
+   "trial": "stand100",
+   "seed": 2
+  },
+  "plate-10.png": {
+   "source": "beechC",
+   "trial": "lone60",
+   "seed": 3
+  },
+  "plate-11.png": {
+   "source": "birch",
+   "trial": "stand100",
+   "seed": 2
+  },
+  "plate-12.png": {
+   "source": "beechP",
+   "trial": "lone60",
+   "seed": 1
+  },
+  "plate-13.png": {
+   "source": "hornbeam",
+   "trial": "stand100",
+   "seed": 3
+  },
+  "plate-14.png": {
+   "source": "beechM",
+   "trial": "lone100",
+   "seed": 3
+  },
+  "plate-15.png": {
+   "source": "birch",
+   "trial": "stand100",
+   "seed": 1
+  },
+  "plate-16.png": {
+   "source": "hornbeam",
+   "trial": "lone60",
+   "seed": 3
+  },
+  "plate-17.png": {
+   "source": "oakI",
+   "trial": "stand100",
+   "seed": 2
+  },
+  "plate-18.png": {
+   "source": "beechM",
+   "trial": "lone100",
+   "seed": 2
+  },
+  "plate-19.png": {
+   "source": "birch",
+   "trial": "lone100",
+   "seed": 1
+  },
+  "plate-20.png": {
+   "source": "beechC",
+   "trial": "lone60",
+   "seed": 2
+  },
+  "plate-21.png": {
+   "source": "beechC",
+   "trial": "lone60",
+   "seed": 1
+  },
+  "plate-22.png": {
+   "source": "beechP",
+   "trial": "lone100",
+   "seed": 1
+  },
+  "plate-23.png": {
+   "source": "beechP",
+   "trial": "lone100",
+   "seed": 2
+  },
+  "plate-24.png": {
+   "source": "hornbeamI",
+   "trial": "stand100",
+   "seed": 1
+  },
+  "plate-25.png": {
+   "source": "oakI",
+   "trial": "stand100",
+   "seed": 3
+  },
+  "plate-26.png": {
+   "source": "beechM",
+   "trial": "lone60",
+   "seed": 3
+  },
+  "plate-27.png": {
+   "source": "beechMI",
+   "trial": "stand100",
+   "seed": 3
+  },
+  "plate-28.png": {
+   "source": "beechC",
+   "trial": "lone100",
+   "seed": 1
+  },
+  "plate-29.png": {
+   "source": "birch",
+   "trial": "lone100",
+   "seed": 2
+  },
+  "plate-30.png": {
+   "source": "oak",
+   "trial": "lone60",
+   "seed": 2
+  },
+  "plate-31.png": {
+   "source": "beechM",
+   "trial": "lone60",
+   "seed": 1
+  },
+  "plate-32.png": {
+   "source": "beechM",
+   "trial": "lone60",
+   "seed": 2
+  },
+  "plate-33.png": {
+   "source": "beechC",
+   "trial": "stand100",
+   "seed": 2
+  },
+  "plate-34.png": {
+   "source": "oak",
+   "trial": "stand100",
+   "seed": 3
+  },
+  "plate-35.png": {
+   "source": "beechMI",
+   "trial": "stand100",
+   "seed": 2
+  },
+  "plate-36.png": {
+   "source": "birch",
+   "trial": "lone60",
+   "seed": 3
+  },
+  "plate-37.png": {
+   "source": "hornbeam",
+   "trial": "lone60",
+   "seed": 1
+  },
+  "plate-38.png": {
+   "source": "hornbeam",
+   "trial": "lone100",
+   "seed": 1
+  },
+  "plate-39.png": {
+   "source": "beechM",
+   "trial": "stand100",
+   "seed": 1
+  },
+  "plate-40.png": {
+   "source": "birch",
+   "trial": "lone60",
+   "seed": 1
+  },
+  "plate-41.png": {
+   "source": "birch",
+   "trial": "lone60",
+   "seed": 2
+  },
+  "plate-42.png": {
+   "source": "beechMI",
+   "trial": "stand100",
+   "seed": 1
+  },
+  "plate-43.png": {
+   "source": "oak",
+   "trial": "lone100",
+   "seed": 2
+  },
+  "plate-44.png": {
+   "source": "oak",
+   "trial": "lone100",
+   "seed": 1
+  },
+  "plate-45.png": {
+   "source": "hornbeamI",
+   "trial": "stand100",
+   "seed": 3
+  },
+  "plate-46.png": {
+   "source": "hornbeam",
+   "trial": "lone60",
+   "seed": 2
+  },
+  "plate-47.png": {
+   "source": "beechC",
+   "trial": "lone100",
+   "seed": 3
+  },
+  "plate-48.png": {
+   "source": "oak",
+   "trial": "lone60",
+   "seed": 1
+  },
+  "plate-49.png": {
+   "source": "beechC",
+   "trial": "stand100",
+   "seed": 3
+  },
+  "plate-50.png": {
+   "source": "beechP",
+   "trial": "lone60",
+   "seed": 2
+  },
+  "plate-51.png": {
+   "source": "birchI",
+   "trial": "stand100",
+   "seed": 2
+  },
+  "plate-52.png": {
+   "source": "birch",
+   "trial": "stand100",
+   "seed": 3
+  },
+  "plate-53.png": {
+   "source": "birch",
+   "trial": "lone100",
+   "seed": 3
+  },
+  "plate-54.png": {
+   "source": "oak",
+   "trial": "lone60",
+   "seed": 3
+  },
+  "plate-55.png": {
+   "source": "birchI",
+   "trial": "stand100",
+   "seed": 3
+  },
+  "plate-56.png": {
+   "source": "birchI",
+   "trial": "stand100",
+   "seed": 1
+  },
+  "plate-57.png": {
+   "source": "beechM",
+   "trial": "lone100",
+   "seed": 1
+  },
+  "plate-58.png": {
+   "source": "oak",
+   "trial": "lone100",
+   "seed": 3
+  },
+  "plate-59.png": {
+   "source": "beechM",
+   "trial": "stand100",
+   "seed": 3
+  },
+  "plate-60.png": {
+   "source": "beechC",
+   "trial": "lone100",
+   "seed": 2
+  },
+  "plate-61.png": {
+   "source": "hornbeamI",
+   "trial": "stand100",
+   "seed": 2
+  },
+  "plate-62.png": {
+   "source": "oakI",
+   "trial": "stand100",
+   "seed": 1
+  },
+  "plate-63.png": {
+   "source": "beechC",
+   "trial": "stand100",
+   "seed": 1
+  },
+  "plate-64.png": {
+   "source": "beechP",
+   "trial": "lone100",
+   "seed": 3
+  },
+  "plate-65.png": {
+   "source": "hornbeam",
+   "trial": "lone100",
+   "seed": 3
+  },
+  "plate-66.png": {
+   "source": "hornbeam",
+   "trial": "lone100",
+   "seed": 2
+  }
+ },
+ "namer-2": {
+  "plate-01.png": {
+   "source": "beechC",
+   "trial": "lone100",
+   "seed": 1
+  },
+  "plate-02.png": {
+   "source": "birch",
+   "trial": "lone100",
+   "seed": 3
+  },
+  "plate-03.png": {
+   "source": "birch",
+   "trial": "stand100",
+   "seed": 2
+  },
+  "plate-04.png": {
+   "source": "beechM",
+   "trial": "lone60",
+   "seed": 2
+  },
+  "plate-05.png": {
+   "source": "birch",
+   "trial": "stand100",
+   "seed": 3
+  },
+  "plate-06.png": {
+   "source": "oakI",
+   "trial": "stand100",
+   "seed": 2
+  },
+  "plate-07.png": {
+   "source": "birch",
+   "trial": "stand100",
+   "seed": 1
+  },
+  "plate-08.png": {
+   "source": "hornbeam",
+   "trial": "lone100",
+   "seed": 3
+  },
+  "plate-09.png": {
+   "source": "beechP",
+   "trial": "stand100",
+   "seed": 1
+  },
+  "plate-10.png": {
+   "source": "hornbeam",
+   "trial": "stand100",
+   "seed": 2
+  },
+  "plate-11.png": {
+   "source": "beechP",
+   "trial": "lone100",
+   "seed": 3
+  },
+  "plate-12.png": {
+   "source": "beechC",
+   "trial": "lone60",
+   "seed": 1
+  },
+  "plate-13.png": {
+   "source": "oak",
+   "trial": "stand100",
+   "seed": 2
+  },
+  "plate-14.png": {
+   "source": "beechMI",
+   "trial": "stand100",
+   "seed": 3
+  },
+  "plate-15.png": {
+   "source": "birchI",
+   "trial": "stand100",
+   "seed": 3
+  },
+  "plate-16.png": {
+   "source": "hornbeamI",
+   "trial": "stand100",
+   "seed": 1
+  },
+  "plate-17.png": {
+   "source": "oak",
+   "trial": "lone60",
+   "seed": 1
+  },
+  "plate-18.png": {
+   "source": "oak",
+   "trial": "lone100",
+   "seed": 1
+  },
+  "plate-19.png": {
+   "source": "beechP",
+   "trial": "lone100",
+   "seed": 2
+  },
+  "plate-20.png": {
+   "source": "beechP",
+   "trial": "lone60",
+   "seed": 2
+  },
+  "plate-21.png": {
+   "source": "beechMI",
+   "trial": "stand100",
+   "seed": 2
+  },
+  "plate-22.png": {
+   "source": "beechM",
+   "trial": "lone60",
+   "seed": 1
+  },
+  "plate-23.png": {
+   "source": "birchI",
+   "trial": "stand100",
+   "seed": 2
+  },
+  "plate-24.png": {
+   "source": "birch",
+   "trial": "lone60",
+   "seed": 1
+  },
+  "plate-25.png": {
+   "source": "beechC",
+   "trial": "lone60",
+   "seed": 3
+  },
+  "plate-26.png": {
+   "source": "beechC",
+   "trial": "stand100",
+   "seed": 3
+  },
+  "plate-27.png": {
+   "source": "oak",
+   "trial": "stand100",
+   "seed": 3
+  },
+  "plate-28.png": {
+   "source": "hornbeam",
+   "trial": "stand100",
+   "seed": 1
+  },
+  "plate-29.png": {
+   "source": "birch",
+   "trial": "lone60",
+   "seed": 3
+  },
+  "plate-30.png": {
+   "source": "beechC",
+   "trial": "stand100",
+   "seed": 1
+  },
+  "plate-31.png": {
+   "source": "beechP",
+   "trial": "lone60",
+   "seed": 1
+  },
+  "plate-32.png": {
+   "source": "beechP",
+   "trial": "stand100",
+   "seed": 2
+  },
+  "plate-33.png": {
+   "source": "hornbeam",
+   "trial": "lone60",
+   "seed": 1
+  },
+  "plate-34.png": {
+   "source": "beechM",
+   "trial": "lone60",
+   "seed": 3
+  },
+  "plate-35.png": {
+   "source": "birch",
+   "trial": "lone100",
+   "seed": 1
+  },
+  "plate-36.png": {
+   "source": "birch",
+   "trial": "lone100",
+   "seed": 2
+  },
+  "plate-37.png": {
+   "source": "beechM",
+   "trial": "lone100",
+   "seed": 2
+  },
+  "plate-38.png": {
+   "source": "oak",
+   "trial": "stand100",
+   "seed": 1
+  },
+  "plate-39.png": {
+   "source": "hornbeam",
+   "trial": "lone60",
+   "seed": 3
+  },
+  "plate-40.png": {
+   "source": "oakI",
+   "trial": "stand100",
+   "seed": 3
+  },
+  "plate-41.png": {
+   "source": "oakI",
+   "trial": "stand100",
+   "seed": 1
+  },
+  "plate-42.png": {
+   "source": "beechM",
+   "trial": "lone100",
+   "seed": 3
+  },
+  "plate-43.png": {
+   "source": "beechC",
+   "trial": "lone100",
+   "seed": 2
+  },
+  "plate-44.png": {
+   "source": "beechC",
+   "trial": "stand100",
+   "seed": 2
+  },
+  "plate-45.png": {
+   "source": "beechP",
+   "trial": "lone100",
+   "seed": 1
+  },
+  "plate-46.png": {
+   "source": "hornbeam",
+   "trial": "lone60",
+   "seed": 2
+  },
+  "plate-47.png": {
+   "source": "beechM",
+   "trial": "lone100",
+   "seed": 1
+  },
+  "plate-48.png": {
+   "source": "birch",
+   "trial": "lone60",
+   "seed": 2
+  },
+  "plate-49.png": {
+   "source": "oak",
+   "trial": "lone100",
+   "seed": 3
+  },
+  "plate-50.png": {
+   "source": "oak",
+   "trial": "lone60",
+   "seed": 2
+  },
+  "plate-51.png": {
+   "source": "beechM",
+   "trial": "stand100",
+   "seed": 2
+  },
+  "plate-52.png": {
+   "source": "hornbeamI",
+   "trial": "stand100",
+   "seed": 3
+  },
+  "plate-53.png": {
+   "source": "beechMI",
+   "trial": "stand100",
+   "seed": 1
+  },
+  "plate-54.png": {
+   "source": "hornbeam",
+   "trial": "lone100",
+   "seed": 2
+  },
+  "plate-55.png": {
+   "source": "beechC",
+   "trial": "lone100",
+   "seed": 3
+  },
+  "plate-56.png": {
+   "source": "oak",
+   "trial": "lone100",
+   "seed": 2
+  },
+  "plate-57.png": {
+   "source": "hornbeam",
+   "trial": "lone100",
+   "seed": 1
+  },
+  "plate-58.png": {
+   "source": "oak",
+   "trial": "lone60",
+   "seed": 3
+  },
+  "plate-59.png": {
+   "source": "beechC",
+   "trial": "lone60",
+   "seed": 2
+  },
+  "plate-60.png": {
+   "source": "beechP",
+   "trial": "stand100",
+   "seed": 3
+  },
+  "plate-61.png": {
+   "source": "hornbeam",
+   "trial": "stand100",
+   "seed": 3
+  },
+  "plate-62.png": {
+   "source": "hornbeamI",
+   "trial": "stand100",
+   "seed": 2
+  },
+  "plate-63.png": {
+   "source": "beechM",
+   "trial": "stand100",
+   "seed": 3
+  },
+  "plate-64.png": {
+   "source": "beechP",
+   "trial": "lone60",
+   "seed": 3
+  },
+  "plate-65.png": {
+   "source": "beechM",
+   "trial": "stand100",
+   "seed": 1
+  },
+  "plate-66.png": {
+   "source": "birchI",
+   "trial": "stand100",
+   "seed": 1
+  }
+ },
+ "namer-3": {
+  "plate-01.png": {
+   "source": "beechM",
+   "trial": "stand100",
+   "seed": 1
+  },
+  "plate-02.png": {
+   "source": "beechC",
+   "trial": "lone60",
+   "seed": 2
+  },
+  "plate-03.png": {
+   "source": "birch",
+   "trial": "lone100",
+   "seed": 2
+  },
+  "plate-04.png": {
+   "source": "beechP",
+   "trial": "stand100",
+   "seed": 1
+  },
+  "plate-05.png": {
+   "source": "hornbeamI",
+   "trial": "stand100",
+   "seed": 2
+  },
+  "plate-06.png": {
+   "source": "birch",
+   "trial": "lone60",
+   "seed": 3
+  },
+  "plate-07.png": {
+   "source": "oak",
+   "trial": "lone100",
+   "seed": 1
+  },
+  "plate-08.png": {
+   "source": "beechMI",
+   "trial": "stand100",
+   "seed": 2
+  },
+  "plate-09.png": {
+   "source": "oak",
+   "trial": "lone60",
+   "seed": 3
+  },
+  "plate-10.png": {
+   "source": "birchI",
+   "trial": "stand100",
+   "seed": 1
+  },
+  "plate-11.png": {
+   "source": "beechC",
+   "trial": "stand100",
+   "seed": 3
+  },
+  "plate-12.png": {
+   "source": "hornbeamI",
+   "trial": "stand100",
+   "seed": 1
+  },
+  "plate-13.png": {
+   "source": "beechP",
+   "trial": "lone60",
+   "seed": 1
+  },
+  "plate-14.png": {
+   "source": "birch",
+   "trial": "lone100",
+   "seed": 1
+  },
+  "plate-15.png": {
+   "source": "beechM",
+   "trial": "lone100",
+   "seed": 1
+  },
+  "plate-16.png": {
+   "source": "hornbeam",
+   "trial": "lone60",
+   "seed": 2
+  },
+  "plate-17.png": {
+   "source": "hornbeam",
+   "trial": "stand100",
+   "seed": 2
+  },
+  "plate-18.png": {
+   "source": "birch",
+   "trial": "lone60",
+   "seed": 1
+  },
+  "plate-19.png": {
+   "source": "oak",
+   "trial": "lone60",
+   "seed": 2
+  },
+  "plate-20.png": {
+   "source": "birchI",
+   "trial": "stand100",
+   "seed": 2
+  },
+  "plate-21.png": {
+   "source": "beechM",
+   "trial": "lone100",
+   "seed": 3
+  },
+  "plate-22.png": {
+   "source": "hornbeam",
+   "trial": "lone100",
+   "seed": 2
+  },
+  "plate-23.png": {
+   "source": "oak",
+   "trial": "lone100",
+   "seed": 2
+  },
+  "plate-24.png": {
+   "source": "beechMI",
+   "trial": "stand100",
+   "seed": 3
+  },
+  "plate-25.png": {
+   "source": "beechP",
+   "trial": "lone100",
+   "seed": 1
+  },
+  "plate-26.png": {
+   "source": "oak",
+   "trial": "stand100",
+   "seed": 3
+  },
+  "plate-27.png": {
+   "source": "beechP",
+   "trial": "lone100",
+   "seed": 2
+  },
+  "plate-28.png": {
+   "source": "hornbeam",
+   "trial": "stand100",
+   "seed": 3
+  },
+  "plate-29.png": {
+   "source": "oak",
+   "trial": "lone60",
+   "seed": 1
+  },
+  "plate-30.png": {
+   "source": "beechM",
+   "trial": "stand100",
+   "seed": 2
+  },
+  "plate-31.png": {
+   "source": "beechM",
+   "trial": "stand100",
+   "seed": 3
+  },
+  "plate-32.png": {
+   "source": "beechP",
+   "trial": "lone100",
+   "seed": 3
+  },
+  "plate-33.png": {
+   "source": "beechMI",
+   "trial": "stand100",
+   "seed": 1
+  },
+  "plate-34.png": {
+   "source": "beechC",
+   "trial": "lone100",
+   "seed": 1
+  },
+  "plate-35.png": {
+   "source": "birch",
+   "trial": "stand100",
+   "seed": 2
+  },
+  "plate-36.png": {
+   "source": "beechC",
+   "trial": "lone100",
+   "seed": 3
+  },
+  "plate-37.png": {
+   "source": "beechP",
+   "trial": "stand100",
+   "seed": 3
+  },
+  "plate-38.png": {
+   "source": "hornbeam",
+   "trial": "lone100",
+   "seed": 3
+  },
+  "plate-39.png": {
+   "source": "hornbeam",
+   "trial": "lone60",
+   "seed": 3
+  },
+  "plate-40.png": {
+   "source": "birch",
+   "trial": "lone100",
+   "seed": 3
+  },
+  "plate-41.png": {
+   "source": "beechC",
+   "trial": "lone60",
+   "seed": 3
+  },
+  "plate-42.png": {
+   "source": "birch",
+   "trial": "lone60",
+   "seed": 2
+  },
+  "plate-43.png": {
+   "source": "birch",
+   "trial": "stand100",
+   "seed": 3
+  },
+  "plate-44.png": {
+   "source": "oakI",
+   "trial": "stand100",
+   "seed": 2
+  },
+  "plate-45.png": {
+   "source": "beechC",
+   "trial": "lone100",
+   "seed": 2
+  },
+  "plate-46.png": {
+   "source": "oakI",
+   "trial": "stand100",
+   "seed": 3
+  },
+  "plate-47.png": {
+   "source": "hornbeam",
+   "trial": "lone60",
+   "seed": 1
+  },
+  "plate-48.png": {
+   "source": "oak",
+   "trial": "lone100",
+   "seed": 3
+  },
+  "plate-49.png": {
+   "source": "oak",
+   "trial": "stand100",
+   "seed": 2
+  },
+  "plate-50.png": {
+   "source": "oak",
+   "trial": "stand100",
+   "seed": 1
+  },
+  "plate-51.png": {
+   "source": "birch",
+   "trial": "stand100",
+   "seed": 1
+  },
+  "plate-52.png": {
+   "source": "birchI",
+   "trial": "stand100",
+   "seed": 3
+  },
+  "plate-53.png": {
+   "source": "beechP",
+   "trial": "lone60",
+   "seed": 2
+  },
+  "plate-54.png": {
+   "source": "beechP",
+   "trial": "lone60",
+   "seed": 3
+  },
+  "plate-55.png": {
+   "source": "beechC",
+   "trial": "stand100",
+   "seed": 2
+  },
+  "plate-56.png": {
+   "source": "beechC",
+   "trial": "lone60",
+   "seed": 1
+  },
+  "plate-57.png": {
+   "source": "hornbeam",
+   "trial": "stand100",
+   "seed": 1
+  },
+  "plate-58.png": {
+   "source": "beechP",
+   "trial": "stand100",
+   "seed": 2
+  },
+  "plate-59.png": {
+   "source": "beechM",
+   "trial": "lone100",
+   "seed": 2
+  },
+  "plate-60.png": {
+   "source": "beechM",
+   "trial": "lone60",
+   "seed": 2
+  },
+  "plate-61.png": {
+   "source": "beechM",
+   "trial": "lone60",
+   "seed": 3
+  },
+  "plate-62.png": {
+   "source": "beechM",
+   "trial": "lone60",
+   "seed": 1
+  },
+  "plate-63.png": {
+   "source": "oakI",
+   "trial": "stand100",
+   "seed": 1
+  },
+  "plate-64.png": {
+   "source": "hornbeamI",
+   "trial": "stand100",
+   "seed": 3
+  },
+  "plate-65.png": {
+   "source": "hornbeam",
+   "trial": "lone100",
+   "seed": 1
+  },
+  "plate-66.png": {
+   "source": "beechC",
+   "trial": "stand100",
+   "seed": 1
+  }
+ }
+}

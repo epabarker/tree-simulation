@@ -14,6 +14,8 @@ export interface Theme {
   groundDeep: string;
   wall: string;
   ghost: string;
+  /** A closed wood's dim interior, the backdrop between boles (`ViewOptions.interior`). */
+  interior: string;
   /** `--ground-hatch: 1` draws the ground as ink hatching (an engraved plate) instead of a fill. */
   groundHatch: boolean;
   /** Young twig → old bark: the wood of trees whose style names no species bark. */
@@ -79,6 +81,7 @@ export function readTheme(el: Element): Theme {
     groundDeep: v("--ground-deep", "#6c5e45"),
     wall: v("--wall", "rgba(90, 90, 100, 0.35)"),
     ghost: v("--ghost", "#9a8f80"),
+    interior: v("--interior", "#3a4234"),
     groundHatch: style.getPropertyValue("--ground-hatch").trim() === "1",
     bark: ramp(v("--bark-young", "#8c7b4f"), v("--bark-old", "#4c3d31")),
     barkBy: barkRamps(v),

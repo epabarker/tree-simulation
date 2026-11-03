@@ -7,7 +7,15 @@ import { BARK_PALETTES } from "./bark-styles.ts";
 import { dimByte, keepContrast, lightness, parseColor } from "./colors.ts";
 import { FAR, NEAR, nearAndFar } from "./fixture.ts";
 import { isLeafStyleName, LEAF_STYLES } from "./leaf-styles.ts";
-import { DEPTH_SLICES, depthSlice, LEAF_LENGTH, Scene } from "./scene.ts";
+import {
+  DEPTH_SLICES,
+  depthSlice,
+  INTERIOR_CLOSED,
+  INTERIOR_OPEN,
+  interiorDepth,
+  LEAF_LENGTH,
+  Scene,
+} from "./scene.ts";
 import type { Theme } from "./theme.ts";
 
 /** Young metamers (leafy shoots) and short shoots on older wood (rosettes) in a snapshot. */
@@ -363,5 +371,34 @@ describe("clear boles (the lab's `&clearBole`, round 2)", () => {
     expect(scene.palette("natural", theme).every((c) => L(sky) - L(c) >= 17.5)).toBe(true);
     scene.woodContrast = 0;
     expect(scene.palette("natural", theme).some((c) => L(sky) - L(c) < 10)).toBe(true);
+  });
+});
+
+describe("the backdrop beyond a closed stand (round 3's `&interior`)", () => {
+  it("closes a row only where its brightest tenth gets a closed stand's floor light (§10)", () => {
+    const W = 20;
+    const rows = [
+      Array(W).fill(0.95), // closed: 5% of open light everywhere
+      [...Array(16).fill(0.95), ...Array(4).fill(0.3)], // a lone crown's shade with open field beside it
+      Array(W).fill(1 - (INTERIOR_CLOSED + INTERIOR_OPEN) / 2), // halfway between the bounds
+      Array(W).fill(0), // open sky
+    ];
+    const d = interiorDepth(Float32Array.from(rows.flat()), W);
+    expect(d.length).toBe(4);
+    expect(d[0]).toBe(1);
+    expect(d[1]).toBe(0);
+    expect(d[2]).toBeCloseTo(0.5, 5);
+    expect(d[3]).toBe(0);
+  });
+
+  it("draws nothing when off or without a field, and keeps the open world's own width", () => {
+    const { scene } = sceneAfter(3);
+    const s = scene.next;
+    if (!s) throw new Error("no snapshot");
+    expect(scene.interiorOf(s)).toBeNull();
+    scene.interior = true;
+    expect(scene.interiorOf({ ...s, shadow: null })).toBeNull();
+    if (s.shadow) expect(scene.interiorOf(s)?.length).toBe(Math.floor(s.shadow.length / s.width));
+    if (!s.periodic) expect(scene.interiorSpan(s)).toEqual([0, s.width]);
   });
 });

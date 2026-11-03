@@ -34,6 +34,11 @@ describe("bark styles (track C)", () => {
       );
   });
 
+  it("declares the closed wood's interior (round 3's backdrop) in light and both dark blocks", () => {
+    const base = css.slice(0, css.indexOf(":root[data-bark"));
+    expect(base.split("--interior:").length - 1).toBe(3);
+  });
+
   it("moves a stem from twig to bark by age, then to old bark by girth", () => {
     for (const style of Object.values(BARK_STYLES)) {
       expect(barkStep(style, 0, 0.01)).toBe(0);

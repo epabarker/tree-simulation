@@ -1,0 +1,1307 @@
+{
+ "species": {
+  "beech": {
+   "H": {
+    "n": 8931,
+    "taxa": {
+     "Fagus sylvatica": 8931
+    },
+    "sources": 11,
+    "support": [
+     7.3,
+     77.0
+    ],
+    "observed": [
+     1.7,
+     162.0
+    ],
+    "form": "quadratic in ln D",
+    "band": "own",
+    "coef": {
+     "0.1": [
+      0.21594647348647483,
+      1.062787552124336,
+      -0.10835169857585106
+     ],
+     "0.5": [
+      0.7577007215762732,
+      0.9351392619241765,
+      -0.07307838923977542
+     ],
+     "0.9": [
+      1.4412235321530076,
+      0.6707549747956951,
+      -0.03027266107151876
+     ]
+    },
+    "crossing": false,
+    "small_n": false,
+    "coverage_terciles": [
+     0.7969632768361582,
+     0.793006004945249,
+     0.8209113387495585
+    ]
+   },
+   "CR": {
+    "n": 7082,
+    "taxa": {
+     "Fagus sylvatica": 7082
+    },
+    "sources": 9,
+    "support": [
+     7.3025,
+     70.0
+    ],
+    "observed": [
+     2.0,
+     162.0
+    ],
+    "form": "quadratic in ln D",
+    "band": "own",
+    "coef": {
+     "0.1": [
+      -1.68521832992209,
+      0.6868720507988832,
+      0.015321837905419366
+     ],
+     "0.5": [
+      -0.19512218403361153,
+      0.15438236902353966,
+      0.07654305937614063
+     ],
+     "0.9": [
+      1.7279466211715053,
+      -0.707572626666483,
+      0.18846543627143325
+     ]
+    },
+    "crossing": false,
+    "small_n": false,
+    "coverage_terciles": [
+     0.8016049933125279,
+     0.8055307760927743,
+     0.796164139161463
+    ]
+   },
+   "gated": true,
+   "control": {
+    "T": 0.8688214061906008,
+    "T_first20": 0.8132875729065366,
+    "trees": 6211,
+    "self_consistency": {
+     "pass": 18,
+     "of": 20,
+     "need": 15,
+     "ok": true
+    }
+   }
+  },
+  "oak": {
+   "H": {
+    "n": 3749,
+    "taxa": {
+     "Quercus petraea": 1309,
+     "Quercus robur": 2440
+    },
+    "sources": 7,
+    "support": [
+     9.4,
+     76.0
+    ],
+    "observed": [
+     1.1,
+     203.7
+    ],
+    "form": "quadratic in ln D",
+    "band": "own",
+    "coef": {
+     "0.1": [
+      -0.8047977810988728,
+      1.3370869572562738,
+      -0.13592817190790024
+     ],
+     "0.5": [
+      -0.6973787903351412,
+      1.5293925672377362,
+      -0.15954039074710924
+     ],
+     "0.9": [
+      0.5790135494400723,
+      1.030389168534269,
+      -0.07686450720837623
+     ]
+    },
+    "crossing": false,
+    "small_n": false,
+    "coverage_terciles": [
+     0.7971380471380471,
+     0.8063973063973064,
+     0.7861952861952862
+    ]
+   },
+   "CR": {
+    "n": 3617,
+    "taxa": {
+     "Quercus petraea": 1276,
+     "Quercus robur": 2341
+    },
+    "sources": 7,
+    "support": [
+     10.0,
+     76.27999999999997
+    ],
+    "observed": [
+     4.1,
+     203.7
+    ],
+    "form": "quadratic in ln D",
+    "band": "own",
+    "coef": {
+     "0.1": [
+      -3.894521694837143,
+      1.9919866269617374,
+      -0.1821536890388583
+     ],
+     "0.5": [
+      -2.460079522463638,
+      1.4257037739273308,
+      -0.10402467549591828
+     ],
+     "0.9": [
+      -1.3900537232905041,
+      0.9658214357200606,
+      -0.03683748596606727
+     ]
+    },
+    "crossing": false,
+    "small_n": false,
+    "coverage_terciles": [
+     0.8111401218450827,
+     0.7874564459930313,
+     0.8057491289198606
+    ]
+   },
+   "gated": true,
+   "control": {
+    "T": 0.8416137605738886,
+    "T_first20": 0.7909612544558245,
+    "trees": 3436,
+    "self_consistency": {
+     "pass": 18,
+     "of": 20,
+     "need": 15,
+     "ok": true
+    }
+   }
+  },
+  "birch": {
+   "H": {
+    "n": 1250,
+    "taxa": {
+     "Betula pubescens": 466,
+     "Betula pendula": 784
+    },
+    "sources": 7,
+    "support": [
+     4.0,
+     43.0
+    ],
+    "observed": [
+     1.0,
+     84.0
+    ],
+    "form": "quadratic in ln D",
+    "band": "own",
+    "coef": {
+     "0.1": [
+      1.087744340427011,
+      0.10224702695047005,
+      0.12359775030740336
+     ],
+     "0.5": [
+      1.0421947142467078,
+      0.5900997656871043,
+      0.019271143320759895
+     ],
+     "0.9": [
+      1.1577851555171244,
+      0.693008130394151,
+      -0.006654910457489736
+     ]
+    },
+    "crossing": false,
+    "small_n": false,
+    "coverage_terciles": [
+     0.7934508816120907,
+     0.8211586901763224,
+     0.7783375314861462
+    ]
+   },
+   "CR": {
+    "n": 1126,
+    "taxa": {
+     "Betula pubescens": 470,
+     "Betula pendula": 656
+    },
+    "sources": 7,
+    "support": [
+     8.0,
+     44.0
+    ],
+    "observed": [
+     1.6,
+     84.0
+    ],
+    "form": "quadratic in ln D",
+    "band": "own",
+    "coef": {
+     "0.1": [
+      -0.736440694691689,
+      -0.047350195710496,
+      0.15549762635650674
+     ],
+     "0.5": [
+      -0.852678015207277,
+      0.42553191870275603,
+      0.05216253381252128
+     ],
+     "0.9": [
+      0.14479675671391634,
+      -0.0025822930414355493,
+      0.11150251114613095
+     ]
+    },
+    "crossing": false,
+    "small_n": false,
+    "coverage_terciles": [
+     0.770949720670391,
+     0.8603351955307262,
+     0.7737430167597765
+    ]
+   },
+   "gated": true,
+   "control": {
+    "T": 0.8369052219372399,
+    "T_first20": 0.7411544363008428,
+    "trees": 1061,
+    "self_consistency": {
+     "pass": 15,
+     "of": 20,
+     "need": 15,
+     "ok": true
+    }
+   }
+  },
+  "hornbeam": {
+   "H": {
+    "n": 1075,
+    "taxa": {
+     "Carpinus betulus": 1075
+    },
+    "sources": 2,
+    "support": [
+     8.0,
+     39.0
+    ],
+    "observed": [
+     8.0,
+     65.0
+    ],
+    "form": "quadratic in ln D",
+    "band": "own",
+    "coef": {
+     "0.1": [
+      -1.0590482143503204,
+      1.9676092970158563,
+      -0.22332759087513077
+     ],
+     "0.5": [
+      -0.22943596669286562,
+      1.7463653075597636,
+      -0.2140318439906275
+     ],
+     "0.9": [
+      0.9318957438869471,
+      1.1200001972086424,
+      -0.11900626967998842
+     ]
+    },
+    "crossing": false,
+    "small_n": false,
+    "coverage_terciles": [
+     0.7971428571428572,
+     0.7971428571428572,
+     0.8114285714285714
+    ]
+   },
+   "CR": {
+    "n": 1070,
+    "taxa": {
+     "Carpinus betulus": 1070
+    },
+    "sources": 2,
+    "support": [
+     8.0,
+     39.0
+    ],
+    "observed": [
+     8.0,
+     65.0
+    ],
+    "form": "quadratic in ln D",
+    "band": "own",
+    "coef": {
+     "0.1": [
+      -5.175054582615168,
+      3.145449728338641,
+      -0.37025139829652404
+     ],
+     "0.5": [
+      0.9135721648384225,
+      -0.46374695336640426,
+      0.1897997108267221
+     ],
+     "0.9": [
+      2.258695236915229,
+      -1.066910837243149,
+      0.2772094115927088
+     ]
+    },
+    "crossing": false,
+    "small_n": false,
+    "coverage_terciles": [
+     0.7908309455587392,
+     0.8275862068965517,
+     0.7557471264367817
+    ]
+   },
+   "gated": true,
+   "control": {
+    "T": 0.8293321250980217,
+    "T_first20": 0.6969134981984967,
+    "trees": 1045,
+    "self_consistency": {
+     "pass": 20,
+     "of": 20,
+     "need": 15,
+     "ok": true
+    }
+   }
+  },
+  "maple": {
+   "H": {
+    "n": 166,
+    "taxa": {
+     "Acer campestre": 166
+    },
+    "sources": 6,
+    "support": [
+     7.825,
+     53.7875
+    ],
+    "observed": [
+     2.2,
+     64.7
+    ],
+    "form": "linear in ln D",
+    "band": "own",
+    "coef": {
+     "0.1": [
+      -0.19321952038123502,
+      0.7655951875825268
+     ],
+     "0.5": [
+      0.7570611485994492,
+      0.6175500270244704
+     ],
+     "0.9": [
+      1.2931777931962984,
+      0.5266866115313358
+     ]
+    },
+    "crossing": false,
+    "small_n": false,
+    "bootstrap_band_ln": {
+     "at_dbh": 21.049940617493434,
+     "own": 0.758467313354909,
+     "ci90": [
+      0.6449794897204885,
+      0.8853895626099617
+     ]
+    },
+    "coverage_terciles": [
+     0.7884615384615384,
+     0.75,
+     0.8653846153846154
+    ]
+   },
+   "CR": {
+    "n": 155,
+    "taxa": {
+     "Acer campestre": 155
+    },
+    "sources": 4,
+    "support": [
+     9.85,
+     54.25500000000001
+    ],
+    "observed": [
+     5.0,
+     64.7
+    ],
+    "form": "linear in ln D",
+    "band": "own",
+    "coef": {
+     "0.1": [
+      -1.091514022541836,
+      0.5689649246931822
+     ],
+     "0.5": [
+      -0.5168069693749701,
+      0.5037308014888137
+     ],
+     "0.9": [
+      0.010026320683845008,
+      0.40913580545329137
+     ]
+    },
+    "crossing": false,
+    "small_n": false,
+    "bootstrap_band_ln": {
+     "at_dbh": 21.6,
+     "own": 0.6104344770444585,
+     "ci90": [
+      0.5156460728832947,
+      0.6949518378105648
+     ]
+    },
+    "coverage_terciles": [
+     0.8367346938775511,
+     0.7755102040816326,
+     0.8163265306122449
+    ]
+   },
+   "gated": true,
+   "control": {
+    "T": 0.8085521071416294,
+    "T_first20": 0.8407504629086421,
+    "trees": 145,
+    "self_consistency": {
+     "pass": 18,
+     "of": 20,
+     "need": 15,
+     "ok": true
+    }
+   }
+  },
+  "pine": {
+   "H": {
+    "n": 15088,
+    "taxa": {
+     "Pinus sylvestris": 15088
+    },
+    "sources": 11,
+    "support": [
+     7.6,
+     51.9
+    ],
+    "observed": [
+     1.0,
+     98.7
+    ],
+    "form": "quadratic in ln D",
+    "band": "own",
+    "coef": {
+     "0.1": [
+      0.10130798743765623,
+      0.4968059180145856,
+      0.031036023897809097
+     ],
+     "0.5": [
+      0.9765060218553836,
+      0.34146235240513134,
+      0.04836399406863152
+     ],
+     "0.9": [
+      0.8384116995795455,
+      0.8463808339554787,
+      -0.04017277332280864
+     ]
+    },
+    "crossing": false,
+    "small_n": false,
+    "coverage_terciles": [
+     0.7924764890282132,
+     0.8006269592476489,
+     0.8
+    ]
+   },
+   "CR": {
+    "n": 13340,
+    "taxa": {
+     "Pinus sylvestris": 13340
+    },
+    "sources": 11,
+    "support": [
+     7.9,
+     50.5
+    ],
+    "observed": [
+     1.1,
+     98.7
+    ],
+    "form": "quadratic in ln D",
+    "band": "own",
+    "coef": {
+     "0.1": [
+      -1.8676381688345807,
+      0.5379461492909698,
+      0.04782513411049632
+     ],
+     "0.5": [
+      -1.5435111761545122,
+      0.7373725234909485,
+      -0.0038864504895315807
+     ],
+     "0.9": [
+      -0.9884107517894324,
+      0.5990690277842087,
+      0.01308052057757404
+     ]
+    },
+    "crossing": false,
+    "small_n": false,
+    "coverage_terciles": [
+     0.8026969481902059,
+     0.7913413768630234,
+     0.809512541410317
+    ]
+   },
+   "gated": true,
+   "control": {
+    "T": 0.8563615791968576,
+    "T_first20": 0.8640097796895725,
+    "trees": 12434,
+    "self_consistency": {
+     "pass": 19,
+     "of": 20,
+     "need": 15,
+     "ok": true
+    }
+   }
+  },
+  "fir": {
+   "H": {
+    "n": 1070,
+    "taxa": {
+     "Abies alba": 1070
+    },
+    "sources": 7,
+    "support": [
+     4.4725,
+     68.0
+    ],
+    "observed": [
+     1.1,
+     113.0
+    ],
+    "form": "quadratic in ln D",
+    "band": "own",
+    "coef": {
+     "0.1": [
+      0.35254063375774713,
+      0.49541768939354075,
+      0.053374828570117015
+     ],
+     "0.5": [
+      -0.3852044796203312,
+      1.3247535991354777,
+      -0.08646317378319988
+     ],
+     "0.9": [
+      0.3611185820381077,
+      1.1809570506574092,
+      -0.09003763582574242
+     ]
+    },
+    "crossing": false,
+    "small_n": false,
+    "coverage_terciles": [
+     0.8176470588235294,
+     0.7617647058823529,
+     0.8377581120943953
+    ]
+   },
+   "CR": {
+    "n": 1044,
+    "taxa": {
+     "Abies alba": 1044
+    },
+    "sources": 7,
+    "support": [
+     4.407500000000001,
+     68.0
+    ],
+    "observed": [
+     1.1,
+     113.0
+    ],
+    "form": "quadratic in ln D",
+    "band": "own",
+    "coef": {
+     "0.1": [
+      -1.9578019330555299,
+      0.7413256748676524,
+      -0.01320590397235567
+     ],
+     "0.5": [
+      -0.8360565071805345,
+      0.41804850129700977,
+      0.01985285378876928
+     ],
+     "0.9": [
+      -0.8628237573980924,
+      0.7702624558796036,
+      -0.04539547866084554
+     ]
+    },
+    "crossing": false,
+    "small_n": false,
+    "coverage_terciles": [
+     0.7824773413897281,
+     0.8398791540785498,
+     0.7734138972809668
+    ]
+   },
+   "gated": true,
+   "control": {
+    "T": 0.8336339749272906,
+    "T_first20": 0.8656141037353372,
+    "trees": 993,
+    "self_consistency": {
+     "pass": 16,
+     "of": 20,
+     "need": 15,
+     "ok": true
+    }
+   }
+  },
+  "sycamore": {
+   "H": {
+    "n": 686,
+    "taxa": {
+     "Acer pseudoplatanus": 686
+    },
+    "sources": 6,
+    "support": [
+     9.0,
+     57.875
+    ],
+    "observed": [
+     5.0,
+     100.2
+    ],
+    "form": "quadratic in ln D",
+    "band": "own",
+    "coef": {
+     "0.1": [
+      -0.11949122720446229,
+      1.2896249085959401,
+      -0.10922519410691663
+     ],
+     "0.5": [
+      -0.015287984257017051,
+      1.4501783442179716,
+      -0.1457830828230395
+     ],
+     "0.9": [
+      0.39581691478600545,
+      1.3816646879057874,
+      -0.14578253607249703
+     ]
+    },
+    "crossing": false,
+    "small_n": false,
+    "coverage_terciles": [
+     0.8318181818181818,
+     0.7488584474885844,
+     0.8356164383561644
+    ]
+   },
+   "CR": {
+    "n": 668,
+    "taxa": {
+     "Acer pseudoplatanus": 668
+    },
+    "sources": 5,
+    "support": [
+     9.0,
+     55.649999999999864
+    ],
+    "observed": [
+     5.0,
+     100.2
+    ],
+    "form": "quadratic in ln D",
+    "band": "own",
+    "coef": {
+     "0.1": [
+      -2.219761223022073,
+      0.9674202686102241,
+      -0.040092921597733575
+     ],
+     "0.5": [
+      0.34620048504759926,
+      -0.225894874718409,
+      0.1255237949597713
+     ],
+     "0.9": [
+      1.6032459951932412,
+      -0.6535650927748365,
+      0.1747560655418595
+     ]
+    },
+    "crossing": false,
+    "small_n": false,
+    "coverage_terciles": [
+     0.7990654205607477,
+     0.7850467289719626,
+     0.8215962441314554
+    ]
+   },
+   "gated": false,
+   "control": {
+    "T": 0.8464959428615939,
+    "T_first20": 0.8059286369376373,
+    "trees": 639,
+    "self_consistency": {
+     "pass": 19,
+     "of": 20,
+     "need": 15,
+     "ok": true
+    }
+   }
+  },
+  "willow": {
+   "H": {
+    "n": 33,
+    "taxa": {
+     "Salix caprea": 33
+    },
+    "sources": 4,
+    "support": [
+     1.8,
+     25.639999999999997
+    ],
+    "observed": [
+     1.0,
+     29.8
+    ],
+    "form": "linear in ln D",
+    "band": "borrowed",
+    "coef": {
+     "0.5": [
+      1.155376989696646,
+      0.48270578105347123
+     ]
+    },
+    "crossing": false,
+    "small_n": true,
+    "own_tails_ungated": {
+     "0.1": [
+      0.9555114450274363,
+      0.41279496465227533
+     ],
+     "0.9": [
+      1.2062553414477275,
+      0.5852586357963051
+     ]
+    },
+    "bootstrap_band_ln": {
+     "at_dbh": 8.599999999999998,
+     "own": 0.621844705423384,
+     "ci90": [
+      0.43975629729706806,
+      0.7926115650651421
+     ]
+    },
+    "borrowed": {
+     "r10": -0.4807001476093453,
+     "r90": 0.3227801136785099,
+     "n": 15857,
+     "from": [
+      "beech",
+      "oak",
+      "birch",
+      "hornbeam",
+      "maple",
+      "sycamore"
+     ]
+    },
+    "coverage_terciles": [
+     1.0,
+     0.8,
+     0.6
+    ]
+   },
+   "CR": {
+    "n": 19,
+    "taxa": {
+     "Salix caprea": 19
+    },
+    "sources": 4,
+    "support": [
+     2.56,
+     27.055000000000003
+    ],
+    "observed": [
+     2.2,
+     29.8
+    ],
+    "form": "linear in ln D",
+    "band": "borrowed",
+    "coef": {
+     "0.5": [
+      -1.0217916283594992,
+      0.6480578789415326
+     ]
+    },
+    "crossing": false,
+    "small_n": true,
+    "own_tails_ungated": {
+     "0.1": [
+      -0.6751147863534719,
+      0.20836784694555768
+     ],
+     "0.9": [
+      -1.1067797867189642,
+      0.7558483095111709
+     ]
+    },
+    "bootstrap_band_ln": {
+     "at_dbh": 14.5,
+     "own": 1.0323791391917536,
+     "ci90": [
+      0.5908826554711505,
+      1.1695276051741124
+     ]
+    },
+    "borrowed": {
+     "r10": -0.43253807851684095,
+     "r90": 0.33589699581513827,
+     "n": 13718,
+     "from": [
+      "beech",
+      "oak",
+      "birch",
+      "hornbeam",
+      "maple",
+      "sycamore"
+     ]
+    },
+    "coverage_terciles": [
+     1.0,
+     0.5,
+     0.8
+    ]
+   },
+   "gated": true,
+   "control": {
+    "T": 0.9739152879269183,
+    "T_first20": 0.777013640449915,
+    "trees": 17,
+    "self_consistency": {
+     "pass": 19,
+     "of": 20,
+     "need": 15,
+     "ok": true
+    }
+   }
+  },
+  "rowan": {
+   "H": {
+    "n": 44,
+    "taxa": {
+     "Sorbus aucuparia": 44
+    },
+    "sources": 4,
+    "support": [
+     3.0825,
+     22.19999999999999
+    ],
+    "observed": [
+     2.0,
+     22.5
+    ],
+    "form": "linear in ln D",
+    "band": "borrowed",
+    "coef": {
+     "0.5": [
+      0.4570951228638843,
+      0.8579892800220708
+     ]
+    },
+    "crossing": false,
+    "small_n": true,
+    "own_tails_ungated": {
+     "0.1": [
+      1.0489137655325713,
+      0.27830116248710296
+     ],
+     "0.9": [
+      0.7835217415511967,
+      0.8696170690354115
+     ]
+    },
+    "bootstrap_band_ln": {
+     "at_dbh": 9.486832980505138,
+     "own": 1.0650124932717184,
+     "ci90": [
+      0.7909293599612631,
+      1.148912826660878
+     ]
+    },
+    "borrowed": {
+     "r10": -0.4807001476093453,
+     "r90": 0.3227801136785099,
+     "n": 15857,
+     "from": [
+      "beech",
+      "oak",
+      "birch",
+      "hornbeam",
+      "maple",
+      "sycamore"
+     ]
+    },
+    "coverage_terciles": [
+     0.7857142857142857,
+     0.6153846153846154,
+     0.6923076923076923
+    ]
+   },
+   "CR": {
+    "n": 36,
+    "taxa": {
+     "Sorbus aucuparia": 36
+    },
+    "sources": 3,
+    "support": [
+     5.0,
+     22.5
+    ],
+    "observed": [
+     5.0,
+     22.5
+    ],
+    "form": "linear in ln D",
+    "band": "borrowed",
+    "coef": {
+     "0.5": [
+      0.20575373163873148,
+      0.10302343663756597
+     ]
+    },
+    "crossing": false,
+    "small_n": true,
+    "own_tails_ungated": {
+     "0.1": [
+      -1.4290620980070141,
+      0.5571502196914015
+     ],
+     "0.9": [
+      0.5028008622504213,
+      0.12631611643045265
+     ]
+    },
+    "bootstrap_band_ln": {
+     "at_dbh": 11.489125293076055,
+     "own": 0.8800241663982675,
+     "ci90": [
+      0.6251457445321096,
+      0.9265345542550129
+     ]
+    },
+    "borrowed": {
+     "r10": -0.43253807851684095,
+     "r90": 0.33589699581513827,
+     "n": 13718,
+     "from": [
+      "beech",
+      "oak",
+      "birch",
+      "hornbeam",
+      "maple",
+      "sycamore"
+     ]
+    },
+    "coverage_terciles": [
+     0.5833333333333334,
+     0.6666666666666666,
+     0.8333333333333334
+    ]
+   },
+   "gated": true,
+   "control": {
+    "T": 0.9600045097913912,
+    "T_first20": 0.8598815890379707,
+    "trees": 34,
+    "self_consistency": {
+     "pass": 16,
+     "of": 20,
+     "need": 15,
+     "ok": true
+    }
+   }
+  },
+  "holly": {
+   "H": {
+    "n": 25,
+    "taxa": {
+     "Ilex aquifolium": 25
+    },
+    "sources": 1,
+    "support": [
+     8.0,
+     17.199999999999996
+    ],
+    "observed": [
+     8.0,
+     19.0
+    ],
+    "form": "linear in ln D",
+    "band": "borrowed",
+    "coef": {
+     "0.5": [
+      0.6253169131305633,
+      0.5976600349175971
+     ]
+    },
+    "crossing": false,
+    "small_n": true,
+    "own_tails_ungated": {
+     "0.1": [
+      0.7909783335527122,
+      0.4273344860751716
+     ],
+     "0.9": [
+      1.1052368596962916,
+      0.5328389553429941
+     ]
+    },
+    "bootstrap_band_ln": {
+     "at_dbh": 10.000000000000002,
+     "own": 0.5571915443239159,
+     "ci90": [
+      0.3209554563798762,
+      0.8908054648485062
+     ]
+    },
+    "borrowed": {
+     "r10": -0.4807001476093453,
+     "r90": 0.3227801136785099,
+     "n": 15857,
+     "from": [
+      "beech",
+      "oak",
+      "birch",
+      "hornbeam",
+      "maple",
+      "sycamore"
+     ]
+    },
+    "coverage_terciles": [
+     1.0,
+     0.625,
+     1.0
+    ]
+   },
+   "CR": {
+    "n": 25,
+    "taxa": {
+     "Ilex aquifolium": 25
+    },
+    "sources": 1,
+    "support": [
+     8.0,
+     17.199999999999996
+    ],
+    "observed": [
+     8.0,
+     19.0
+    ],
+    "form": "linear in ln D",
+    "band": "borrowed",
+    "coef": {
+     "0.5": [
+      -1.567096714396749,
+      0.9271243206792
+     ]
+    },
+    "crossing": false,
+    "small_n": true,
+    "own_tails_ungated": {
+     "0.1": [
+      -2.6048611056037867,
+      1.277404839966366
+     ],
+     "0.9": [
+      -0.28768207245178057,
+      0.49999999999999994
+     ]
+    },
+    "bootstrap_band_ln": {
+     "at_dbh": 10.000000000000002,
+     "own": 0.5271382374240297,
+     "ci90": [
+      0.3276687964590874,
+      0.7065899198488497
+     ]
+    },
+    "borrowed": {
+     "r10": -0.43253807851684095,
+     "r90": 0.33589699581513827,
+     "n": 13718,
+     "from": [
+      "beech",
+      "oak",
+      "birch",
+      "hornbeam",
+      "maple",
+      "sycamore"
+     ]
+    },
+    "coverage_terciles": [
+     0.75,
+     1.0,
+     1.0
+    ]
+   },
+   "gated": true,
+   "control": {
+    "T": 0.512516287354737,
+    "T_first20": 0.42506358525604393,
+    "trees": 24,
+    "self_consistency": {
+     "pass": 17,
+     "of": 20,
+     "need": 15,
+     "ok": true
+    }
+   }
+  }
+ },
+ "meta": {
+  "source": "Tallo v1.0.0, Jucker et al. 2022 (Global Change Biology 28:5254), doi 10.5281/zenodo.6637599, CC-BY 4.0",
+  "tallo_sha256": "bcd908a65634a07f1a5cac79affc91e10c80ac832d0243efc2b83c8c4c1668cd",
+  "filter": {
+   "europe_box": "latitude 35–72, longitude −25–45 (count_species.py)",
+   "H": "height_outlier == 'N', height_m > 0",
+   "CR": "crown_radius_outlier == 'N', crown_radius_m > 0",
+   "regime": "forest-grown by source (docs/plans/reference-audit/tallo.md); no column to filter on",
+   "taxa": {
+    "beech": [
+     "Fagus sylvatica"
+    ],
+    "oak": [
+     "Quercus robur",
+     "Quercus petraea"
+    ],
+    "birch": [
+     "Betula pendula",
+     "Betula pubescens"
+    ],
+    "hornbeam": [
+     "Carpinus betulus"
+    ],
+    "maple": [
+     "Acer campestre"
+    ],
+    "willow": [
+     "Salix caprea"
+    ],
+    "rowan": [
+     "Sorbus aucuparia"
+    ],
+    "holly": [
+     "Ilex aquifolium"
+    ],
+    "pine": [
+     "Pinus sylvestris"
+    ],
+    "fir": [
+     "Abies alba"
+    ],
+    "sycamore": [
+     "Acer pseudoplatanus"
+    ]
+   }
+  },
+  "model": {
+   "taus": [
+    0.1,
+    0.5,
+    0.9
+   ],
+   "quadratic_n": 300,
+   "support_percentiles": [
+    2.5,
+    97.5
+   ],
+   "solver": "linprog highs",
+   "rearrangement": "pointwise sort of the three predictions",
+   "bootstrap": 200
+  },
+  "thin": {
+   "species": [
+    "willow",
+    "rowan",
+    "holly"
+   ],
+   "band": "pooled ln residuals of BROADLEAVES about their own medians",
+   "pooled": {
+    "H": {
+     "r10": -0.4807001476093453,
+     "r90": 0.3227801136785099,
+     "n": 15857,
+     "from": [
+      "beech",
+      "oak",
+      "birch",
+      "hornbeam",
+      "maple",
+      "sycamore"
+     ]
+    },
+    "CR": {
+     "r10": -0.43253807851684095,
+     "r90": 0.33589699581513827,
+     "n": 13718,
+     "from": [
+      "beech",
+      "oak",
+      "birch",
+      "hornbeam",
+      "maple",
+      "sycamore"
+     ]
+    }
+   }
+  },
+  "z": "(ln y − q50)/(q90 − q50) above the median, (ln y − q50)/(q50 − q10) below; None outside the support",
+  "gate": {
+   "per_seed": "max(|median z_H|, |median z_CR|) of the comparable measured trees ≤ T (one T per species), at every season (60, 100, 150) with a comparable median",
+   "species": "≥ 15 of seeds 1–20; no comparable season: not gateable at Level 0",
+   "control": "pseudo-seeds of 4 real trees with both H and CR, drawn from the whole support; statistic max(|median z_H|, |median z_CR|); T its 90% quantile over 2000 pseudo-seeds; self-consistency: 20 fresh pseudo-seeds judged by the gate's rule, ≥ 15",
+   "seasons_note": "the control's T is for one draw of four trees; a simulated seed is checked at up to three seasons on the same four trees (correlated draws), so its pass rate under a perfect model is at most 0.9",
+   "coverage": "share of real trees inside their own band per tercile of ln D; outside (0.65, 0.95) is a note for the write-up, never tuned on",
+   "rng_seed": 2026
+  },
+  "measurement": {
+   "dbh": "phase 1's rule (cylinders.dbh): the trunk (continuation by subtree wood volume) cylinder spanning 1.3 m of stem length, ×2; wood only, no bark (the same bias as Level 1's size matching)",
+   "height": "highest point above the root's base (cylinders.height)",
+   "crown_radius": "mean over ±x, ±z of the largest offset of a live-bud metamer's tip from the trunk at 1.3 m",
+   "cell_m": 0.25
+  }
+ }
+}

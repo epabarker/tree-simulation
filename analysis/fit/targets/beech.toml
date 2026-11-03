@@ -295,3 +295,8 @@ gate_c_v3_candidate_a_or_b = ['widestAt', 'profileCentre', 'crownFullness', 'for
 gate_c_v3_candidate_a_only = []  # control not neutral at d_min
 gate_c_v3_size_match_dbh_m = 0.291  # the median measured DBH of biodiv Fagus_sylvatica (53 trees)
 gate_c_v3 = "21 descriptors pass the floor; amendment E stops the species if fewer than 11 reach a tier (1d-ii)"
+
+[level0]
+# Level 0 (reference-fidelity phase 2, the plan's §k): the physiology knobs fitted against Tallo's H–DBH and CR–DBH
+# bands; bounds from [[param]] above. Not r3.c (posture: form), not the form knobs, not c5.Trel, not the cell size.
+knobs = ["c3.alpha", "r1.Lh", "r1.mf", "r2.hJ", "c6.r0", "r6.qMin", "r6.leafArea"]

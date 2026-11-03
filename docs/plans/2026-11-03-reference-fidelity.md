@@ -259,6 +259,38 @@ fresh directory, read with `python -I`.
   - **For phase 3:** Demol has no neutral d_min (p1, 13.3 mm, already fails). As beech's held-out site it serves
     tier A descriptors only.
 
+## k. Phase 2: Level 0 from Tallo (approved 2026-11-03, with the user's rulings)
+Pre-registered in `analysis/fit/sources/tallo-level0.json` (`analysis/treesim/tallo.py`) before any z of a
+simulated tree is read. The parity dump (below) read simulated DBH, H and CR before this commit, as a measurement check;
+no z was computed, and nothing registered changed after it.
+- **Targets.** Tallo v1.0.0 (CC-BY 4.0): the species' taxa (oak = *Q. robur* + *petraea*, birch = *B. pendula* +
+  *pubescens*), count_species.py's Europe box, each trait's outlier flag "N". Quantile regressions of ln H and ln CR on
+  ln D at τ 0.1/0.5/0.9 (quadratic in ln D at n ≥ 300), rearranged where they cross; support DBH p2.5–p97.5.
+  **Thin species** (willow, rowan, holly; the user): their own median line, the band borrowed from the well-sampled
+  broadleaves' pooled ln residuals; their own 10/90 lines reported, ungated. Ten species gated; sycamore reference only.
+- **Knobs** (seven, every species, bounds from the targets file's `[[param]]`; machine copy `[level0] knobs`):
+  primary growth `c3.alpha`, `r1.Lh`, `r1.mf`, `r2.hJ`; secondary thickening `c6.r0`; crown expansion `r6.qMin`,
+  `r6.leafArea`. **Not fitted:** `r3.c` (posture rate: form; it is in every round-5 list), the ten form knobs (fir
+  and pine too), `c5.Trel` (ADR 0032), the cell (decision 5). No knob added.
+- **Measurement** (`cli/allometry.ts`, the closed stand's measured trees at 60, 100, 150): DBH by phase 1's rule
+  (`cylinders.dbh`, ported; parity 1e-9 on 67 trees, `test_level0_parity.py`), wood only, no bark (the same bias as
+  Level 1's size matching); H the highest point above the root; CR the mean over ±x, ±z of the largest offset of a
+  live-bud tip from the trunk at 1.3 m (the user). A codominant stem (a side child below the DBH cylinder holding ≥ half
+  the continuing child's subtree volume) is counted, never pooled; if any occur, the user rules on √Σd². The core's
+  metamer coordinates are continuous across the ring (no unwrap needed).
+- **Loss** (the user): scored `stand.talloH`, `stand.talloCR` (median z of the comparable trees at 60, 100, 150, the
+  three sharing weight 1), `stand.height`, `stand.lateShare`, `stand.lai`, `shade.survivalLight` and the death
+  penalties. Reported, not scored: `lone.slenderness`, `stand.slenderness`, `stand.crownRatio`, `lone.earlyShare`.
+  **An exception to ADR 0049 §1:** height at 60 and lateShare stay scored as the time anchors Tallo cannot give (it
+  has no ages). Results give each trait's loss contribution.
+- **Gate** (the user): z = (ln y − q50)/(q90 − q50) above the median, /(q50 − q10) below; out of support, not
+  comparable. A seed passes when max(|median z_H|, |median z_CR|) ≤ T at every comparable season; a species on ≥ 15
+  of seeds 1–20; no comparable season: not gateable. **T** per species is the 90th percentile of that statistic over
+  2,000 pseudo-seeds of 4 real Tallo trees drawn from the whole support (no simulated DBH); self-consistency: 20 fresh
+  pseudo-seeds judged by the gate's own rule, ≥ 15. **Coverage** per tercile of ln D is the conditionality
+  diagnostic (near 0.8; outside 0.65–0.95 a note, never tuned on).
+- **Before any fitted params are accepted:** the gallery regression and `shapeFlag` (the session after the sweep).
+
 ### State
 _(rewritten at the end of each session)_ **1d-i done (2026-11-03): gate c v3 is registered from real QSMs only
 (`phase1-tolerances.json` v3, commit 6610fb4).** v2 (3f13c29) admitted no species; the user ruled; v3 follows.

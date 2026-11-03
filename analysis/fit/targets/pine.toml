@@ -208,3 +208,8 @@ log = true
 floor = { target = 0.17, band = 0.06, kind = "described", source = "all-day relative light under pine 1.15 times that under birch (12.8% against 11.1%; Dobrowolska 2008), applied to birch's 14.8% (Hagemeier & Leuschner 2019); 2–59% across stand ages (Walter & Himmler 1996)" }
 survivalLight = [0.2, 0.3]   # lowest light all seedlings survive (less tolerant than birch, whose saplings need 21%)
 shadeScore = 1.67   # Niinemets & Valladares 2006, Appendix A
+
+[level0]
+# Level 0 (reference-fidelity phase 2, the plan's §k): the physiology knobs fitted against Tallo's H–DBH and CR–DBH
+# bands; bounds from [[param]] above. Not r3.c (posture: form), not the form knobs, not c5.Trel, not the cell size.
+knobs = ["c3.alpha", "r1.Lh", "r1.mf", "r2.hJ", "c6.r0", "r6.qMin", "r6.leafArea"]

@@ -272,3 +272,8 @@ hi = 4
 floor = { target = 0.015, band = 0.008, kind = "measured", source = "hornbeam canopies transmit a median 1.3% of PAR; hornbeam, lime and beech together 0.6–2.8% (Hagemeier & Leuschner 2019 (overcast, diffuse PAR))" }
 survivalLight = [0.025, 0.045]   # lowest light all seedlings survive (Hagemeier & Leuschner 2019: hornbeam saplings need 3.3%)
 shadeScore = 3.97   # Niinemets & Valladares 2006, Appendix A
+
+[level0]
+# Level 0 (reference-fidelity phase 2, the plan's §k): the physiology knobs fitted against Tallo's H–DBH and CR–DBH
+# bands; bounds from [[param]] above. Not r3.c (posture: form), not the form knobs, not c5.Trel, not the cell size.
+knobs = ["c3.alpha", "r1.Lh", "r1.mf", "r2.hJ", "c6.r0", "r6.qMin", "r6.leafArea"]

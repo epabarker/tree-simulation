@@ -270,10 +270,23 @@ shadeScore = 3.18   # Niinemets & Valladares 2006, Appendix A
 # fit.py ignores this table.
 wytham_excluded = ["junctionDelta", "ldSlope", "taper", "leaderDominance"]
 wytham_reason = "TreeQSM 2.0 radii are taper-corrected (no UnmodRadius): H1, the user's ruling for oak, extended to the same dataset (1c; the user's to confirm)"
-# Gate c (phase 1c, 2026-11-03; docs/experiments/2026-11-03-phase1-converter.md): the degradation test against
+# Gate c v1 (phase 1c, 2026-11-03; docs/experiments/2026-11-03-phase1-converter.md): the degradation test against
 # the tolerances pre-registered in analysis/fit/sources/phase1-tolerances.json (commit e74063c).
 gate_c_survive = ['widestAt', 'profileCentre', 'crownFullness', 'branchAngle2', 'limbElevation', 'p0', 'p1', 'p2', 'p3', 'tortuosity', 'tortuosity05', 'pendulousFraction']
 gate_c_held_out_noise = ['forkHeight', 'limbDroop', 'limbUpturn', 'bifurcationRatio', 'bifurcationRatio2', 'length2']
 gate_c_held_out_resolution = ['length0', 'length1', 'length3', 'centroidHeight']
 gate_c_held_out_tolerance_uncertain = []
 gate_c = "12 of 22 gated descriptors survive with H1 extended to maple; 12 of 26 without (a stop): the user's to rule"
+# Gate c v2 (session 1d-i, 2026-11-03; the note's "v2 instrument"): standings before any simulated tree, from
+# analysis/fit/sources/phase1-tolerances.json v2 (commit 3f13c29). Tier rules: that file's rules.tier_a, tier_b,
+# assign (treesim/tiers.py). ldSlope and junctionDelta are report-only (the 1d brief, 7).
+gate_c_v2_dataset = "wytham"
+gate_c_v2_d_min_mm = nan
+gate_c_v2_report_only = ['junctionDelta', 'ldSlope']
+gate_c_v2_excluded_h1 = ['leaderDominance', 'taper']
+gate_c_v2_held_out_noise = ['forkHeight', 'limbDroop', 'limbUpturn', 'bifurcationRatio', 'bifurcationRatio2', 'length2']
+gate_c_v2_candidate_a_or_b = []
+gate_c_v2_candidate_a_only = []
+gate_c_v2_clear_without_d_min = ['widestAt', 'profileCentre', 'crownFullness', 'branchAngle2', 'limbElevation', 'p0', 'p1', 'p2', 'p3', 'tortuosity', 'tortuosity05', 'length0', 'length1', 'length3', 'pendulousFraction', 'centroidHeight']
+gate_c_v2_size_match_dbh_m = 0.247  # the median measured DBH of wytham ACERPS (39 trees)
+gate_c_v2 = "no d_min at wytham: no grid point is neutral on its own QSMs (the re-cut alone moves the tortuosities): stop before any simulated tree; the user's to rule"

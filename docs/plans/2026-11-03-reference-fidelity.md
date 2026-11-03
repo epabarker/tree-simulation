@@ -250,38 +250,34 @@ fresh directory, read with `python -I`.
     trees, at their size-matched seasons.
 
 ### State
-_(rewritten at the end of each session)_ **Phase 1a–1c done (2026-11-03); gate c v1 stopped oak and beech under amendment
-E. The user has ruled: phase 2 next, then 1d (gate c v2)** (the note's Decisions:
-[2026-11-03-phase1-converter.md](../experiments/2026-11-03-phase1-converter.md)).
-- **Code:** `analysis/treesim/{fetch,cylinders,qsm,qsm_gate,form,simtree,form_gate,describe,coarsen,tolerance}.py`,
-  `cli/dump-trees.ts` (gate b, and `--gate-c`; in no build), `analysis/experiments/phase1_degradation.py`. Tests:
-  `analysis/tests/{test_readers,test_qsm_gate,test_form_parity,test_topology,test_describe,test_coarsen,test_tolerance}.py`,
-  59 pass.
-- **Data:** the manifest has 319 rows; the 120 `wytham-noise` rows are under `wytham/qsm-noise/`, kept out of every
-  one-model glob. Outputs are in `runs/phase1/`.
-- **Gates a and b** pass (numbers as in 1a and 1b).
-- **The pre-registration** is `analysis/fit/sources/phase1-tolerances.json` (commit e74063c), written before any run,
-  with code hashes that the gate asserts. Beech's noise floor is not measured.
-- **Gate c:**
-
-  | species | survive | outcome |
-  |---|---|---|
-  | oak | 5 of 22 | stop |
-  | beech | 1 of 26 | stop |
-  | maple | 12 of 22 | passes with H1 extended to maple |
-  | maple | 12 of 26 | stops under the ruling as given (oak only) |
-
-  The held-out lists are in each targets file's `[level1]`. The ×2 bracket point does most of the damage.
-- **The control:** real QSMs coarsened at their own dataset's resolution move on Demol (20 of 26 descriptors over
-  tolerance), and on Wytham mildly. d_min as the median terminal diameter is not neutral.
-- **H1:** applied for oak and extended to maple (to confirm).
-- **H2:** not supported; inflation raises ldSlope.
-- **H3:** resampling narrows the tortuosity gap but does not close it.
-- **H4:** the signs disagree, so BioDiv's thin DBH is not a method offset.
-- **The user ruled (2026-11-03):** gate c v1 is recorded as it stands (oak 5, beech 0, maple 12 with H1 extended).
-  The eight decisions are the 1d brief above. **Next: phase 2 (Tallo, Level 0) on Sonnet, then 1d.**
-- **A deviation from the fixed choices:** the simulated trees were not DBH-matched ("stand to 150, DBH-matched").
-  Only the tolerance is detrended on ln DBH. The stand trees at 150 are small and sparse (oak DBH 0.27–0.46 m; 1–2k
-  metamers, maple 387–1,767 live), so a fixed d_min strips proportionally more from them than from the references.
-- **Standing rulings:** R2 (match on measured DBH), R3 (done), R5 (BioDiv "Phase 1 only"). §g is reordered: beech is
-  phase 3, oak phase 4. ADR 0049 is accepted.
+_(rewritten at the end of each session)_ **1d-i done (2026-11-03): gate c v2 is registered from real QSMs only
+(`phase1-tolerances.json` v2, commit 3f13c29), and as registered it admits no species.** The plan waits on the
+user (the note's "v2 instrument", Decisions for the user (v2)).
+- **Code:**
+  - phase 1: `analysis/treesim/{fetch,cylinders,qsm,qsm_gate,form,simtree,form_gate,describe,coarsen,tolerance}.py`;
+  - new in 1d-i: `control.py` (the grid and the 90/90 rule) and `tiers.py` (tiers A and B, a pure function,
+    hashed, not yet wired);
+  - `cli/dump-trees.ts` (in no build) and `analysis/experiments/phase1_degradation.py`. That file's `gate` still
+    reads v1's layout: 1d-ii wires it to `tiers.py` without changing any hashed file;
+  - tests: 70 pass (`test_control.py` is new).
+- **v1** is commit e74063c, in the JSON's `v1` block: oak 5, beech 0, maple 12 with H1.
+- **The v2 control, on each dataset's own QSMs:**
+  - **Wytham:** no grid point (p1–p50: 2.0–12.1 mm) is neutral. The re-cut alone moves tortuosity and
+    tortuosity05 (and forkHeight on oak); prune only is neutral to p10 or p20. Oak and maple have no d_min:
+    **stop**.
+  - **BioDiv:** d_min is 7.4 mm (p1), and p2 fails.
+  - **Demol** (reported): no point passes.
+- **Beech:** BioDiv's 5-repeat floor holds out 13 of 24 gated descriptors, leaving 11 candidates (A or B). Under
+  amendment E counted as in v1, at most 11 of 24 can reach a tier: **stop**.
+- **The rulings at the 1d-i plan:**
+  - inflation stays gated;
+  - oak is gated at Wytham only;
+  - beech's size-match reference is BioDiv (0.291 m; oak 0.596 m, maple 0.247 m).
+- **Next:** the user's rulings on the v2 decisions. Phase 2 (Tallo, Level 0) is independent of them. 1d-ii (gate
+  c v2 on phase 2's trees) cannot run as registered.
+- **Standing rulings:**
+  - R2: match on measured DBH;
+  - R3: done;
+  - R5: BioDiv "Phase 1 only", amended by the 1d brief's 4 for beech's tolerances, floor and size reference;
+  - §g is reordered: beech is phase 3, oak phase 4;
+  - ADR 0049 is accepted.

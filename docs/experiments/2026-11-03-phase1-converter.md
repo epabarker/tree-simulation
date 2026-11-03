@@ -1,6 +1,6 @@
 # Phase 1: the converter, describe(), and which descriptors survive QSM resolution (gates a–c)
 
-_2026-11-03, sessions 1a–1c of the [reference-fidelity plan](../plans/2026-11-03-reference-fidelity.md) §j; ADR 0049._
+_2026-11-03, sessions 1a–1c and 1d-i of the [reference-fidelity plan](../plans/2026-11-03-reference-fidelity.md) §j; ADR 0049._
 
 **Result.** Gates a and b pass. Gate c triggers amendment E's stop for oak (5 of 22 gated descriptors survive)
 and beech (1 of 26). Maple passes (12 of 22) only under
@@ -9,6 +9,11 @@ descriptors count, none survives, and maple stops too: 12 of 26 (spec-reviewer, 
 The pre-registered control shows the coarsening at a dataset's own resolution is not neutral on that dataset's
 own QSMs: badly so on Demol, mildly on Wytham. So part of gate c's failure measures the operator, not the
 simulator.
+
+**v2 (session 1d-i, below): as registered, it admits no species to gate c.** Wytham has no d_min, because the
+re-cut alone moves the tortuosities of its own QSMs, so oak and maple stop. Beech's d_min is 7.4 mm, but BioDiv's
+repeat floor holds out 13 of its 24 gated descriptors, so beech stops too. This happens before any simulated tree
+is measured. The plan waits on the user ("v2 instrument", decisions).
 
 ## Reproduce
 ```
@@ -198,7 +203,7 @@ descriptors and raw tortuosity also move on Wytham's own trees.
   in 1b and is left alone: it is hashed code. Not investigated in 1c.
 - The gate's NaN rule counts a seed whose descriptor is NaN on any live tree as a fail.
 
-## Decisions for the user (the plan waits here)
+## Decisions for the user after v1 (answered: the 1d brief, plan §j)
 1. **What next for oak and beech, after the stop?** The control shows that d_min as the *median* terminal diameter
    prunes half of a real QSM's own tips. So "at the dataset's resolution" is not where the QSMs are. One option: a
    new pre-registration that sets d_min where the control is neutral on that dataset's own QSMs, for example a low
@@ -220,3 +225,138 @@ descriptors and raw tortuosity also move on Wytham's own trees.
    seed 1; maple 387–1,767 live), so a fixed d_min strips proportionally more from them than from the references. Also, the simulated stand at 150 is taller than any reference: oak 41 m against Wytham's oaks'
    24 m at most, beech 50 m against BioDiv's 34 m. Oak's DBH sits at the bottom of Wytham's. Phases 3–4 compare at matched size, so this needs
    attention before they start.
+
+## v2 instrument (session 1d-i, 2026-11-03)
+**How it was made.**
+- **When:** v2 was designed after v1 failed and after its control was seen. It was registered in
+  `phase1-tolerances.json` v2 (commit 3f13c29) before any simulated tree was measured again.
+- **What it was designed from:**
+  - the user's eight rulings (plan §j, the 1d brief);
+  - three rulings at the session's plan;
+  - the advisor's review of the plan as measurement design.
+- **Every v2 parameter derives from real data only:**
+  - the tolerances and noise floors, from the QSMs and their repeat or model sets;
+  - the grid, from each dataset's own terminal diameters;
+  - d_min, from the control on that dataset's own QSMs;
+  - the reference DBH, from the measured DBH;
+  - the stress point, from Demol et al. 2022.
+- **The fixed numbers are the user's:** 0.5 × SD, the 0.5 floor, 90/90, [d_min, 2·d_min] and 15 of 20.
+- **Nothing in v2 reads `runs/phase1/sim` or `cli/dump-trees.ts`.** The dump script is hashed, never run.
+- **v1** is commit e74063c. It is copied into the file's `v1` block.
+
+**What changed, and why.** v1's control failed at the median: d_min as the median terminal diameter prunes half
+of a QSM's own tips (Demol 20 of 26 descriptors over tolerance).
+
+| | v1 (e74063c) | v2 (3f13c29) |
+|---|---|---|
+| d_min | the median terminal diameter; bracket ×0.5, ×2 | the largest grid percentile (1, 2, 5, 10, 20, 50) at which ≥ 90% of gated descriptors have ≥ 90% of real trees within tolerance after `coarsen()`; bracket withdrawn |
+| points gated | ×0.5, ×1, ×2, inflation at ×1 | d_min, grid points inside (d_min, 2·d_min), 2·d_min, inflation at d_min (kept gated: the user) |
+| pass rule | per-seed median shift within tolerance on ≥ 15 of 20 seeds at every point | tier A, as v1 at every point; else tier B: per-seed median of v(p) − v(d_min) within tolerance at every point, and the control neutral at d_min (`tiers.py`, hashed) |
+| beech tolerances and floor | Demol's 15 FSYL; floor not measured | BioDiv's 53 (dTLS); floor from its 5 repeats (the 1d brief, 4) |
+| oak's datasets | Wytham, BioDiv (beech's resolution) | Wytham only (the user: no oak QSMs at BioDiv, so no control can set an oak d_min; this removes a dataset v1 failed oak on) |
+| Demol | gated for beech | control curve reported; beech's held-out site |
+| ldSlope, junctionDelta | gated (beech), H1 (oak, maple) | report-only |
+| H1 for maple | proposed | confirmed |
+| size matching | none (a deviation) | `rules.size_match`: the first season of 50–300 by 10 at which the seeds' median DBH reaches the reference median; lone tree ≤ 100 |
+| stress point | – | 5 cm (Demol 2022), reported only |
+| hashes | 5 code files | 10 code files, `dump-trees.ts`, the manifest, and per-dataset digests of every data file read |
+
+**The control curves.** The cell is the number of gated descriptors that are neutral (≥ 90% of trees within
+tolerance) at each grid percentile; "stress" is 5 cm. Gated means not report-only, not H1-excluded and not held
+out by the noise floor.
+
+| dataset, species (gated) | operator | p1 | p2 | p5 | p10 | p20 | p50 | stress | rule passes at |
+|---|---|---|---|---|---|---|---|---|---|
+| Wytham oak (19) | full | 16 | 13 | 13 | 13 | 13 | 8 | 0 | none |
+| | prune only | 19 | 19 | 19 | 19 | 17 | 10 | 1 | (diagnostic) |
+| Wytham maple (16) | full | 14 | 14 | 14 | 14 | 11 | 3 | 0 | none |
+| | prune only | 16 | 16 | 16 | 16 | 16 | 3 | 0 | |
+| BioDiv beech (11) | full | 11 | 8 | 3 | 0 | 0 | 0 | 0 | **p1: d_min 7.4 mm** |
+| | prune only | 11 | 11 | 4 | 0 | 0 | 0 | 0 | |
+| Demol FSYL (11, reported) | full | 9 | 6 | 2 | 1 | 0 | 0 | 0 | none |
+| | prune only | 10 | 9 | 2 | 1 | 0 | 0 | 0 | |
+
+- **Grid diameters (mm), p1 to p50:**
+  - Wytham: 2.0, 2.5, 2.5, 2.5, 5.0, 12.1. TreeQSM 2.0's terminal radii are quantised: p2 = p5 = p10.
+  - BioDiv: 7.4, 8.6, 11.0, 13.6, 18.3, 20.0.
+  - Demol: 13.3, 14.8, 17.7, 21.4, 27.3, 43.4.
+  - The curves fall monotonically, so d_min needed no tie-breaking rule.
+- **Re-cut only.** It does not depend on d. Wytham fails on it:
+  - oak: 16 of 19 descriptors neutral (forkHeight 0.89, tortuosity 0.73, tortuosity05 0.73);
+  - maple: 14 of 16 (both tortuosities 0.78);
+  - BioDiv and Demol pass.
+  - Since the full operator contains the re-cut, no grid point can pass at Wytham with `coarsen()` as it is.
+- **Why the Wytham trees fail.** None is NaN after coarsening; all are shifts beyond tolerance.
+  - The tortuosities fall systematically: oak tortuosity −0.09 to −0.22 on 10 of 37 trees, maple's −0.11 to −0.32
+    on 9 of 40. The re-cut merges every cylinder shorter than its class median, so a path-length descriptor
+    flattens by construction (`describe.py`'s table already says so).
+  - forkHeight jumps on 4 oaks, both ways (−0.27 to +0.48), with a median shift of 0: the fork is reassigned.
+
+**Tolerances, v1 beside v2.** Oak and maple are unchanged: the same Wytham sets, and their between-tree SDs, χ²
+intervals and floors are in the JSON. Beech's SD [95%] and noise ratio:
+
+| descriptor | v1 SD (Demol 15) | v2 SD [95%] (BioDiv 53) | v2 tol | v2 floor / SD (5 repeats) | v2 verdict |
+|---|---|---|---|---|---|
+| widestAt | 0.23 | 0.21 [0.18, 0.26] | 0.11 | 0.51 | noise |
+| profileCentre | 0.062 | 0.039 [0.033, 0.049] | 0.020 | 0.61 | noise |
+| crownFullness | 0.11 | 0.071 [0.060, 0.088] | 0.036 | 0.63 | noise |
+| forkHeight | 0.12 | 0.15 [0.13, 0.19] | 0.075 | 0.62 | noise |
+| leaderDominance | 0.43 | 0.78 [0.65, 0.96] | 0.39 | 0.51 | noise |
+| branchAngle2 (°) | 6.0 | 7.1 [6.0, 8.8] | 3.6 | 1.17 | noise |
+| limbDroop (°) | 16 | 20 [16, 24] | 9.7 | 0.57 | noise |
+| limbUpturn (°) | 10 | 16 [14, 20] | 8.2 | 0.58 | noise |
+| junctionDelta | 0.21 | 0.24 [0.20, 0.30] | 0.12 | 0.58 | report-only |
+| ldSlope | 0.15 | 0.11 [0.095, 0.14] | 0.057 | 0.91 | report-only |
+| limbElevation (°) | 9.8 | 13 [11, 16] | 6.5 | 0.19 | clear |
+| p0 | 0.32 | 0.20 [0.17, 0.25] | 0.10 | 0.45 | clear |
+| p1 | 0.22 | 0.16 [0.14, 0.20] | 0.081 | 0.35 | clear |
+| p2 | 0.098 | 0.14 [0.12, 0.18] | 0.071 | 0.58 | noise |
+| p3 | 0.14 | 0.14 [0.12, 0.18] | 0.071 | 0.57 | noise |
+| bifurcationRatio | 0.18 | 0.42 [0.35, 0.52] | 0.21 | 0.71 | noise |
+| bifurcationRatio2 | 0.21 | 0.60 [0.50, 0.74] | 0.30 | 0.73 | noise |
+| tortuosity | 0.13 | 0.28 [0.24, 0.35] | 0.14 | 0.39 | clear |
+| tortuosity05 | 0.10 | 0.20 [0.17, 0.25] | 0.10 | 0.42 | clear |
+| length0 | 0.017 | 0.077 [0.065, 0.096] | 0.039 | 0.06 | clear |
+| length1 | 0.032 | 0.075 [0.063, 0.093] | 0.037 | 0.16 | clear |
+| length2 | 0.038 | 0.080 [0.067, 0.099] | 0.040 | 0.19 | clear |
+| length3 | 0.077 | 0.13 [0.11, 0.16] | 0.065 | 0.16 | clear |
+| pendulousFraction | 0.055 | 0.093 [0.078, 0.12] | 0.046 | 0.22 | clear |
+| taper | 0.079 | 0.18 [0.15, 0.22] | 0.090 | 1.92 | noise |
+| centroidHeight | 0.075 | 0.079 [0.066, 0.098] | 0.040 | 0.34 | clear |
+
+**Hold-outs, by the noise floor alone** (`[level1]` `gate_c_v2_*` in each targets file):
+- oak: widestAt, limbDroop and limbUpturn;
+- maple: forkHeight, limbDroop, limbUpturn, both bifurcation ratios and length2;
+- beech: 13: widestAt, profileCentre, crownFullness, forkHeight, leaderDominance, branchAngle2, limbDroop,
+  limbUpturn, p2, p3, both bifurcation ratios and taper.
+
+**Standings before any simulated tree.**
+
+| species | dataset, d_min | report-only | H1 | noise | candidate A or B | outcome |
+|---|---|---|---|---|---|---|
+| oak | Wytham, none | 2 | 2 | 3 | – (19 clear, no d_min) | stop at the control |
+| maple | Wytham, none | 2 | 2 | 6 | – (16 clear, no d_min) | stop at the control |
+| beech | BioDiv, 7.4 mm (p1) | 2 | 0 | 13 | 11: limbElevation, p0, p1, tortuosity, tortuosity05, length0–3, pendulousFraction, centroidHeight | at most 11 of 24 can reach a tier: stop under amendment E (counted as v1 counted, noise hold-outs in the denominator) |
+
+Every beech candidate's control is neutral at d_min, so none is "A only". **Reference DBH for the size match**
+(median measured): oak 0.596 m (Wytham, 34), maple 0.247 m (39), beech 0.291 m (BioDiv, 53).
+
+**Reproduce:** `uv run --project analysis python -I -m treesim.tolerance` (writes the JSON and
+`runs/phase1/control-grid.csv`, ≈ 25 min on 12 workers; the per-tree results are cached in `runs/phase1/real/`),
+and `… -m treesim.tolerance probe` (re-cut only).
+
+### Decisions for the user (v2; the plan waits here)
+1. **Wytham's re-cut.** The re-cut is not neutral on Wytham's own QSMs at any d, through tortuosity and
+   tortuosity05 (and forkHeight on oak). The options:
+   - a different re-cut, which would be a new registration;
+   - prune-only coarsening (neutral to p10 = 2.5 mm on oak, p20 = 5.0 mm on maple), also a new registration;
+   - holding the two tortuosities, and forkHeight for oak, out at Wytham as re-cut-sensitive by construction. That
+     is a loosening of the 90/90 rule's input.
+2. **Beech's floor.** BioDiv's 5 repeats hold out 13 of 24, and under v1's reading of amendment E beech stops
+   before any simulated tree. The options:
+   - accept the stop;
+   - another floor (repeats elsewhere);
+   - read the denominator as the descriptors clear of the noise floor (11), under which 6 tier passes would
+     suffice. That is a different reading from v1's and the user's to make.
+3. **Is BioDiv's p1 a stable d_min?** It is the grid's first point, and p2 (8.6 mm) already fails (8 of 11), so
+   beech's d_min sits at the grid's edge.

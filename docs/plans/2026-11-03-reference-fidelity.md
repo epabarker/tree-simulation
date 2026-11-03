@@ -306,34 +306,44 @@ no z was computed, and nothing registered changed after it.
   which knob is at its bound and why, never more generations.
 
 ### State
-_(rewritten at the end of each session)_ **Phase 2 built; night 1 part-run; the trunk diagnosis is done, ADR 0050
-proposed (2026-11-03).** Targets pre-registered (9b1f4c0), thin species' borrowed T (06915ac), §k. The measurement, loss,
-gate, resumable fitter and sweep presets are in; the beech dry run passed.
-- **Night 1:** beech and oak complete (1200 evaluations each, `docs/experiments/fits/level0/`); **birch stopped at gen 4**
-  (300 evaluations, 22:08, no error in `runs/level0/birch.log`, tmux gone); it resumes from its checkpoint on the next
-  `level0_sweep.sh night1`.
-- **Trunk diagnosis** ([note](../experiments/2026-11-03-level0-trunk.md), [ADR 0050](../decisions/0050-level0-height-not-girth.md),
-  proposed): the hypothesis (maintenance charged on scars) is refuted. R1 already charges live pipes only
-  (`r1.rs:69–90`, `heartwood_costs_nothing`). r0's z_H gain is lost height. The binding trait is absolute height: Tallo's
-  median H peaks at 38.9 m (beech) and 19.5 m (oak). Oak adds a target conflict (a yield-table oak scores z_H up to +0.98
-  against T 0.84) and CR wider than the stand's spacing: two rulings for the user. Recommendation A: no core change.
-- **Targets** (`tallo-level0.json`): n (H/CR) beech 8,931/7,082, oak 3,749/3,617, birch 1,250/1,126, hornbeam
-  1,075/1,070 (2 sources), maple 166/155, pine 15,088/13,340, fir 1,070/1,044, sycamore (reference) 686/668; flagged
-  n < 100, band and T borrowed: willow 33/19, rowan 44/36, holly 25/25 (one source, 8–17 cm). T 0.81–0.87 (thin:
-  0.84 borrowed); control self-consistency 15–20 of 20; coverage per tercile 0.75–0.87 (thin: noise).
-- **Dry run (beech):** the shipped beech fails Level 0 0 of 20: too tall for its DBH (z_H +1.5 to +1.7) and for its
-  age (127 cells at 60 against 84); CR inside its band; no codominant stems.
-- **Scaling** (wall per evaluation, beech smoke config): 1 worker 26.2 s, 2 19.1, 4 13.4, 6 10.6, 8 9.2, 12 8.6.
-  Over 99% of an evaluation is the core's seasons (stand to 150 11.5 s, lone 4.4 s, shade house 2.4 s; world build
-  and measurement under 0.05 s; Node and WASM load once per worker). The limit is the chip's power budget; the Pool
-  has no fixed cost to remove. Not done (outside the Pool, proposed): the search could skip the lone tree (23% of an
-  evaluation; it scores only its death penalty) and run it for the finalists.
-- **Step 6 (conflicts):** none in the data; holly at 150 is likely outside its support (17 cm).
-- **Next:**
-  1. The user rules on ADR 0050 (A, B or C) and on oak's two questions (Tallo against the yield tables; CR's definition).
-  2. The user resumes night 1 (birch), then nights 2 and 3.
-  3. The post-sweep session per species (§k): gate, gallery and `shapeFlag`, loss contributions, the D* split of z_H
-     (ADR 0050), the write-up; the bound rule.
-  4. 1d-ii (register v3.1, wire `tiers.py`, size-matched seasons, gate c) on phase 2's trees.
-- **Standing rulings:** §k (phase 2, the forest-grown reading accepted: by source, nothing to filter on); R2, R3 done,
-  R5 as amended; §g reordered; ADR 0049 accepted.
+_(rewritten at the end of each session)_ **Level 0 targets v2 registered (7615b01, 2026-11-03); night 1 against v2 is
+running unattended.**
+- **Readings taken in the unattended session (the user's spec left these open; each is the narrower or the stated one):**
+  - Thin and ungated are read from the subset's n_H alone.
+  - The pool for the borrowed band and T is the six v1 broadleaves, each with n_H ≥ 100 in the subset.
+  - The control's three pseudo-seasons are independent draws (lenient beside the gate's correlated seasons).
+  - The audit's DBH window is the pooled median ÷/× 1.25.
+  - Time anchors come from the NW-FVA species only (beech, oak, pine), with no extrapolation (no 150 for beech or pine).
+  - The band is each species' own height-at-60 share: beech ± 26, the advisor's reading.
+  - Only birch's lateShare becomes reported.
+- **v2** ([note](../experiments/2026-11-03-level0-targets.md), "Level 0 targets v2"): Tallo in 45–58° N, 10° W–25° E for
+  every species, chosen after the oak audit (Lines et al. 2012 gave 73% of oak's European H rows).
+  - Oak's median H at 40 cm is 29.4 m (v1 16.0).
+  - n_H: beech 5,149; oak 613; birch 275 (*pendula*, linear); hornbeam 1,038; maple 160; pine 2,765; fir 585; rowan 38
+    (borrowed band).
+  - Willow (6) and holly (0) are not gated at Level 0.
+  - T (3 seasons × 4 trees, max |median z|) is 0.99–1.09; v1's statistic on the same trees gives 0.81–0.88.
+  - Heights at 100 (beech 122 ± 26, oak 102 ± 17, pine 108 ± 18) and at 150 (oak 119 ± 20) are scored at Level 0, from
+    `analysis/fit/sources/nwfva_h100.csv`.
+  - Birch's lateShare is reported.
+- **v1, archived:** `docs/experiments/fits/level0-v1/` (fits and v1 targets) and `runs/level0-v1/` (logs, checkpoints).
+  v1's gate: beech 2/20, oak 0/20.
+- **Running:** tmux `level0` (systemd-inhibit), `analysis/experiments/level0_fit_gate.sh beech oak birch`. Each species
+  runs 1200 evaluations on 12 workers, ≤ 3.5 h, then its gate.
+  - Results: `docs/experiments/fits/level0/S.json` (+ `-best.json`, `-progress.csv`).
+  - Logs: `runs/level0/S.log`. Gates: `runs/level0/S.gate.txt` and `.json`. The wrapper's log: `runs/level0/night1-v2.log`.
+  - Status: `analysis/experiments/level0_status.sh`. `analysis/` must stay as committed until the night ends: each gate
+    reads the targets when it starts.
+- **Not done (the user's):** no gallery, no `shapeFlag`, no params accepted.
+- **Open points for the user:**
+  1. Rowan's borrowed T fails its own control (9/20; H coverage ≈ 0.5). Rowan is gated by the rule but could not pass.
+     Night 3 is now rowan alone and waits on this ruling.
+  2. Maple, rowan and holly's lateShare (and holly and rowan's height at 60) are "described" but still scored.
+  3. H100 now enters the loss three times: height at 60, at 100, and lateShare.
+  4. Beech and pine have no anchor at 150.
+  5. ADR 0050's two oak rulings (Tallo against the yield tables; CR's definition) may be moot under v2. Re-read them on
+     oak's v2 gate.
+- **Next:** read the three gates. Then, per species, the post-sweep session (§k: gallery and `shapeFlag`, loss
+  contributions, the D* split, write-up). Nights 2 (hornbeam, maple, pine, fir) and 3 (rowan) follow, against v2.
+- **Standing rulings:** §k (as amended by v2); R2, R3 done; R5 as amended; §g reordered; ADR 0049 accepted;
+  ADR 0050 proposed.

@@ -1,11 +1,34 @@
 {
- "written": "2026-11-03, before any simulated tree was coarsened (phase 1c, step 2)",
+ "version": 2,
+ "supersedes": "e74063c",
+ "written": "2026-11-03, session 1d-i: from real QSMs only, before any simulated tree was measured again (designed after v1 failed)",
  "hashes": {
   "analysis/treesim/describe.py": "2c7fd644dc28b17d7d125275efb60997b251f8b1390e50d88fe5d59fc11a0915",
   "analysis/treesim/form.py": "23c5e1c035c9bbb625a8a002476fc12fd98f85438af4bba5adbb97c10ec6b48d",
   "analysis/treesim/cylinders.py": "0e262dce2e55193c3f8ed775ec92c7fbe29df9f9be0d738daed7623cb5629254",
   "analysis/treesim/qsm.py": "27927fc0188f155bf1eb47865b577774f18875461cac08ea8cd2e6a464c0a333",
-  "analysis/treesim/coarsen.py": "df75b486c3515229914427e98f7d5cf4293a2366f8ded0c1c49601dc68bc48f7"
+  "analysis/treesim/coarsen.py": "df75b486c3515229914427e98f7d5cf4293a2366f8ded0c1c49601dc68bc48f7",
+  "analysis/treesim/fetch.py": "d11298d3684ab72718dd8218a94353f8aff654c8029a49d491f1719124caabd2",
+  "analysis/treesim/simtree.py": "e69c7a26140b272f1274b07f3d6ae51acdba6abbfc655b27d3b8a02bb901ff6b",
+  "analysis/treesim/tolerance.py": "1501125e5cc7b85f211bb21a42bcb6f948c8bd982518687b41eccff1297cce8c",
+  "analysis/treesim/control.py": "20d29b0f48355d4e5a3504d08f3e169b060c9257a1b0326f790a769e87e96e70",
+  "analysis/treesim/tiers.py": "c7ebbc8a2e4d3f90b7577e2f49e92905b00f11830080f4d5ddd24366e5ddf088",
+  "cli/dump-trees.ts": "acc19ad15f14d0bdbeb5742adf173f334c20a12cd59434c8fb90f2117a58d329",
+  "analysis/fit/sources/reference-manifest.csv": "4540b2f7b53b7ee92cd971cbcf599c7a76ab307fa58e715c23193c0a256a6453"
+ },
+ "data": {
+  "demol": {
+   "files": 67,
+   "sha256": "96b18bec455fef1b1c52a5fa6d6fa1e4b6e1f497b6ca9bdc2e544d2195994ceb"
+  },
+  "wytham": {
+   "files": 199,
+   "sha256": "f4f4654043217cbed1280daa8ffa81393e8ceece1f4503146db97d35ee2b3346"
+  },
+  "biodiv": {
+   "files": 54,
+   "sha256": "b4a02b5bdf3ff9e84129fb223d5545438bda9f829f75bc733feb321d980ebc5d"
+  }
  },
  "rules": {
   "seeds": [
@@ -30,38 +53,69 @@
    19,
    20
   ],
-  "stand_season": 150,
-  "lone_season": 100,
-  "lone": "reported only",
-  "bracket": [
-   0.5,
-   1.0,
-   2.0
-  ],
-  "inflation": "Demol et al. 2022 (Silva Fennica 56(1) 10550, \u00a73.2, Table 3): diameter +73% under 2.5 cm, +4% over 10 cm, both measured on two leaf-off Fraxinus; log-interpolated between (not measured). One bracket point, at d_min \u00d7 1. Order: inflate, prune, re-cut",
   "datasets": {
    "oak": [
-    "wytham",
-    "biodiv"
+    "wytham"
    ],
    "beech": [
-    "demol",
     "biodiv"
    ],
    "maple": [
     "wytham"
    ]
   },
-  "datasets_note": "BioDiv's resolution is measured on its beech (the only BioDiv QSMs fetched) and applied to oak",
-  "shift": "per seed, the median over the stand's live measured trees (STAND_MEASURED, alive at 150) of describe(coarsen(tree)) \u2212 describe(tree)",
-  "pass": "|shift| <= tolerance on >= 15 of the 20 seeds, at every bracket point and the inflation point, at each of the species' datasets",
+  "datasets_note": "oak is gated at Wytham only (the user, 2026-11-03): BioDiv has no oaks, so no control can set an oak d_min there; v1 gated oak at BioDiv's beech resolution and failed it there (\u00d71: 7 of 19). Demol is beech's held-out site (the 1d brief, 4): its control curve is reported, never gated",
+  "d_min": "per dataset, the largest point of the grid (the [1, 2, 5, 10, 20, 50] percentiles of its pooled terminal raw diameters) at which, for every gated species of the dataset, >= 90% of its gated descriptors have >= 90% of its real trees within tolerance after coarsen() (control.py). Gated: not report-only, not H1-excluded, not held out by the noise floor. A NaN original leaves the tree; a NaN after coarsening is outside. No point passes: the dataset stops. The bracket \u00d70.5/\u00d72 is withdrawn",
+  "stress": {
+   "d": 0.05,
+   "use": "reported, never gated",
+   "source": "Demol et al. 2022, Silva Fennica 56(1) 10550: branches under \u2248 5 cm carry 80\u201383% of the QSM volume overestimate (Table 3); the completeness threshold the 1d brief names"
+  },
+  "inflation": "Demol et al. 2022 (\u00a73.2, Table 3): diameter +73% under 2.5 cm, +4% over 10 cm, log-interpolated between (not measured). Gated at d_min for both tiers (the user, 2026-11-03). Order: inflate, prune, re-cut",
+  "evaluation_points": "d_min, every grid point strictly inside (d_min, 2\u00b7d_min), 2\u00b7d_min, and inflation at d_min (tiers.evaluation_points)",
+  "tier_a": "resolution-independent: per seed, the median over the stand's live measured trees of the signed describe(coarsen(tree)) \u2212 describe(tree); |median| <= tolerance on >= 15 of the 20 seeds at every evaluation point (tiers.tier_a)",
+  "tier_b": "valid at matched resolution: per seed, the median of the signed v(p) \u2212 v(d_min); |median| <= tolerance on >= 15 of the 20 seeds at every other evaluation point, inflation against v(d_min); and the descriptor's control neutral at d_min (>= 90% of real trees within tolerance) (tiers.tier_b)",
+  "assign": "A if tier A passes, else B if tier B passes, else held out (tiers.assign). Both tiers are targets; the fit always compares the coarsened simulator against the real QSMs, never fine simulated values",
   "pass_seeds": 15,
-  "fail": "a seed with no live measured tree, or a NaN shift (the descriptor not computable at the resolution), counts as a fail",
-  "held_out": "gate c failed, or noise floor >= 0.5 \u00d7 between-tree SD, or fewer than MIN_TREES finite real trees",
-  "survive": "per species, over its gated descriptors (DESCRIPTORS less report-only and H1-excluded): if fewer than half pass, stop and report; never loosen",
-  "h2": "ldSlope under the inflation point moves toward the dataset's QSM median: the gap closed is median shift / (QSM median \u2212 simulated median, uncoarsened), on beech at Demol and BioDiv. 'Hard' means at least half the gap closed",
-  "h3": "tortuosity and tortuosity05 (0.5 m resampling) reported on the real QSMs, the simulated trees and the coarsened ones",
-  "control": "each real QSM coarsened at its own dataset's resolution (\u00d7 1, no inflation): the shift should be near zero; a large one says the re-cut moves the descriptor by construction"
+  "fail": "a seed with no live measured tree, or a NaN difference on any tree, fails that seed",
+  "held_out": "noise floor >= 0.5 \u00d7 between-tree SD, fewer than MIN_TREES finite real trees, or neither tier passes. Report-only (ldSlope, junctionDelta) and H1-excluded descriptors are neither targets nor hold-outs",
+  "survive": "per species, over its gated descriptors: if fewer than half reach a tier, stop and report; never loosen (amendment E)",
+  "size_match": {
+   "reference": "the median measured DBH of the species' tolerance set (R2): oak Wytham's DBH_pts, maple Wytham's sycamores' DBH_pts, beech BioDiv's dTLS (the user, 2026-11-03, extending the 1d brief's 4); values in `reference_dbh`",
+   "simulated": "the converter's DBH (describe()'s, cylinders.py's rule) on the uncoarsened live measured trees",
+   "stand_seasons": [
+    50,
+    60,
+    70,
+    80,
+    90,
+    100,
+    110,
+    120,
+    130,
+    140,
+    150,
+    160,
+    170,
+    180,
+    190,
+    200,
+    210,
+    220,
+    230,
+    240,
+    250,
+    260,
+    270,
+    280,
+    290,
+    300
+   ],
+   "stand": "the first season of stand_seasons at which the median over seeds 1\u201320 of the per-seed median DBH of the stand's live measured trees reaches the reference median. None by 300 (a compute bound): report and stop",
+   "lone": "the same on the lone tree's DBH, at seasons 50\u2013100 by 10. Not reached by 100: read at 100 and report the shortfall",
+   "report": "the median height at the chosen season, beside the reference's"
+  },
+  "control": "every gated species' real QSMs of each dataset coarsened at each grid point and at the stress point (full coarsen(), and prune only); re-cut only once (it does not depend on d). Reported in full"
  },
  "descriptors": [
   "widestAt",
@@ -94,6 +148,22 @@
  "min_trees": 10,
  "tolerance_factor": 0.5,
  "hold_noise": 0.5,
+ "control_rule": {
+  "grid": [
+   1,
+   2,
+   5,
+   10,
+   20,
+   50
+  ],
+  "trees": 0.9,
+  "descriptors": 0.9
+ },
+ "report_only": [
+  "ldSlope",
+  "junctionDelta"
+ ],
  "h1_excluded": {
   "oak": [
    "junctionDelta",
@@ -108,7 +178,7 @@
    "leaderDominance"
   ]
  },
- "h1_note": "oak: the user's ruling; maple: extended (same dataset), the user's to confirm",
+ "h1_note": "oak: the user's ruling; maple: extended (same dataset), confirmed (the 1d brief, 3)",
  "edges": [
   0.0,
   0.005,
@@ -121,7 +191,7 @@
  ],
  "resolution": {
   "demol": {
-   "d_min": 0.04335650056600571,
+   "median_terminal": 0.04335650056600571,
    "ratio": [
     29.17897358712928,
     14.314240903842519,
@@ -140,10 +210,20 @@
     9029,
     537
    ],
-   "trees": 66
+   "trees": 66,
+   "d_min": null,
+   "d_min_percentile": null,
+   "grid": {
+    "1": 0.013315040245652198,
+    "2": 0.014827138278633356,
+    "5": 0.017734291963279247,
+    "10": 0.02142766583710909,
+    "20": 0.0272965244948864,
+    "50": 0.04335650056600571
+   }
   },
   "wytham": {
-   "d_min": 0.01209430746874127,
+   "median_terminal": 0.01209430746874127,
    "ratio": [
     66.8309914905054,
     20.69534064969117,
@@ -162,10 +242,20 @@
     4138,
     795
    ],
-   "trees": 77
+   "trees": 77,
+   "d_min": null,
+   "d_min_percentile": null,
+   "grid": {
+    "1": 0.002,
+    "2": 0.0025,
+    "5": 0.0025,
+    "10": 0.0025,
+    "20": 0.005,
+    "50": 0.01209430746874127
+   }
   },
   "biodiv": {
-   "d_min": 0.019999999552965164,
+   "median_terminal": 0.019999999552965164,
    "ratio": [
     10.947723307238357,
     6.429461518109004,
@@ -184,7 +274,34 @@
     11707,
     4756
    ],
-   "trees": 53
+   "trees": 53,
+   "d_min": 0.007391901686787605,
+   "d_min_percentile": 1,
+   "grid": {
+    "1": 0.007391901686787605,
+    "2": 0.008621381595730782,
+    "5": 0.010951084084808826,
+    "10": 0.013575505465269089,
+    "20": 0.01833588443696499,
+    "50": 0.019999999552965164
+   }
+  }
+ },
+ "reference_dbh": {
+  "oak": {
+   "median_dbh": 0.595808369313319,
+   "trees": 34,
+   "set": "wytham QUERRO"
+  },
+  "maple": {
+   "median_dbh": 0.2474686281546851,
+   "trees": 39,
+   "set": "wytham ACERPS"
+  },
+  "beech": {
+   "median_dbh": 0.291206434977993,
+   "trees": 53,
+   "set": "biodiv Fagus_sylvatica"
   }
  },
  "qsm_medians": {
@@ -224,11 +341,9 @@
    "noise_rms": 0.08838834764831845,
    "noise_median": 0.060380736442455986,
    "noise_trees": 4,
+   "noise_source": "wytham 10 models",
    "noise_ratio": 0.5193602064402542,
-   "noise_verdict": "held out (noise)",
-   "biodiv_repeats_rms": null,
-   "biodiv_repeats_trees": 0,
-   "biodiv_repeats_ratio": null
+   "noise_verdict": "held out (noise)"
   },
   {
    "species": "oak",
@@ -244,11 +359,9 @@
    "noise_rms": 0.007540046295878664,
    "noise_median": 0.005882593684732968,
    "noise_trees": 4,
+   "noise_source": "wytham 10 models",
    "noise_ratio": 0.18818970640326071,
-   "noise_verdict": "clear",
-   "biodiv_repeats_rms": null,
-   "biodiv_repeats_trees": 0,
-   "biodiv_repeats_ratio": null
+   "noise_verdict": "clear"
   },
   {
    "species": "oak",
@@ -264,11 +377,9 @@
    "noise_rms": 0.011769783057436273,
    "noise_median": 0.009645279408294656,
    "noise_trees": 4,
+   "noise_source": "wytham 10 models",
    "noise_ratio": 0.18163005020934012,
-   "noise_verdict": "clear",
-   "biodiv_repeats_rms": null,
-   "biodiv_repeats_trees": 0,
-   "biodiv_repeats_ratio": null
+   "noise_verdict": "clear"
   },
   {
    "species": "oak",
@@ -284,11 +395,9 @@
    "noise_rms": 0.04383371045807606,
    "noise_median": 0.04737036050317485,
    "noise_trees": 4,
+   "noise_source": "wytham 10 models",
    "noise_ratio": 0.27895929655148144,
-   "noise_verdict": "clear",
-   "biodiv_repeats_rms": null,
-   "biodiv_repeats_trees": 0,
-   "biodiv_repeats_ratio": null
+   "noise_verdict": "clear"
   },
   {
    "species": "oak",
@@ -304,11 +413,9 @@
    "noise_rms": 0.18328952354448189,
    "noise_median": 0.16403249248061677,
    "noise_trees": 4,
+   "noise_source": "wytham 10 models",
    "noise_ratio": 0.8185823481615809,
-   "noise_verdict": "excluded (H1)",
-   "biodiv_repeats_rms": null,
-   "biodiv_repeats_trees": 0,
-   "biodiv_repeats_ratio": null
+   "noise_verdict": "excluded (H1)"
   },
   {
    "species": "oak",
@@ -324,11 +431,9 @@
    "noise_rms": 1.5500364859476237,
    "noise_median": 1.3172190036947815,
    "noise_trees": 4,
+   "noise_source": "wytham 10 models",
    "noise_ratio": 0.2967202885926253,
-   "noise_verdict": "clear",
-   "biodiv_repeats_rms": null,
-   "biodiv_repeats_trees": 0,
-   "biodiv_repeats_ratio": null
+   "noise_verdict": "clear"
   },
   {
    "species": "oak",
@@ -344,11 +449,9 @@
    "noise_rms": 9.164680063247609,
    "noise_median": 9.507423422564067,
    "noise_trees": 4,
+   "noise_source": "wytham 10 models",
    "noise_ratio": 0.5629957253531399,
-   "noise_verdict": "held out (noise)",
-   "biodiv_repeats_rms": null,
-   "biodiv_repeats_trees": 0,
-   "biodiv_repeats_ratio": null
+   "noise_verdict": "held out (noise)"
   },
   {
    "species": "oak",
@@ -364,11 +467,9 @@
    "noise_rms": 10.368331811954462,
    "noise_median": 9.89816403146156,
    "noise_trees": 4,
+   "noise_source": "wytham 10 models",
    "noise_ratio": 0.719588447248694,
-   "noise_verdict": "held out (noise)",
-   "biodiv_repeats_rms": null,
-   "biodiv_repeats_trees": 0,
-   "biodiv_repeats_ratio": null
+   "noise_verdict": "held out (noise)"
   },
   {
    "species": "oak",
@@ -384,11 +485,9 @@
    "noise_rms": 0.09351983189852289,
    "noise_median": 0.09437564594879275,
    "noise_trees": 4,
+   "noise_source": "wytham 10 models",
    "noise_ratio": 0.24861081574653546,
-   "noise_verdict": "excluded (H1)",
-   "biodiv_repeats_rms": null,
-   "biodiv_repeats_trees": 0,
-   "biodiv_repeats_ratio": null
+   "noise_verdict": "report-only"
   },
   {
    "species": "oak",
@@ -404,11 +503,9 @@
    "noise_rms": 0.14248723313313338,
    "noise_median": 0.08427623962387251,
    "noise_trees": 4,
+   "noise_source": "wytham 10 models",
    "noise_ratio": 0.5971821844741197,
-   "noise_verdict": "excluded (H1)",
-   "biodiv_repeats_rms": null,
-   "biodiv_repeats_trees": 0,
-   "biodiv_repeats_ratio": null
+   "noise_verdict": "report-only"
   },
   {
    "species": "oak",
@@ -424,11 +521,9 @@
    "noise_rms": 2.089195597597532,
    "noise_median": 1.78574162573788,
    "noise_trees": 4,
+   "noise_source": "wytham 10 models",
    "noise_ratio": 0.231851486193171,
-   "noise_verdict": "clear",
-   "biodiv_repeats_rms": null,
-   "biodiv_repeats_trees": 0,
-   "biodiv_repeats_ratio": null
+   "noise_verdict": "clear"
   },
   {
    "species": "oak",
@@ -444,11 +539,9 @@
    "noise_rms": 0.028814566616926145,
    "noise_median": 0.01807113927326347,
    "noise_trees": 4,
+   "noise_source": "wytham 10 models",
    "noise_ratio": 0.16699752352997194,
-   "noise_verdict": "clear",
-   "biodiv_repeats_rms": null,
-   "biodiv_repeats_trees": 0,
-   "biodiv_repeats_ratio": null
+   "noise_verdict": "clear"
   },
   {
    "species": "oak",
@@ -464,11 +557,9 @@
    "noise_rms": 0.028292348002383817,
    "noise_median": 0.019447554478853456,
    "noise_trees": 4,
+   "noise_source": "wytham 10 models",
    "noise_ratio": 0.16535097614209288,
-   "noise_verdict": "clear",
-   "biodiv_repeats_rms": null,
-   "biodiv_repeats_trees": 0,
-   "biodiv_repeats_ratio": null
+   "noise_verdict": "clear"
   },
   {
    "species": "oak",
@@ -484,11 +575,9 @@
    "noise_rms": 0.009090130677926932,
    "noise_median": 0.006417590965544427,
    "noise_trees": 4,
+   "noise_source": "wytham 10 models",
    "noise_ratio": 0.11130342574335815,
-   "noise_verdict": "clear",
-   "biodiv_repeats_rms": null,
-   "biodiv_repeats_trees": 0,
-   "biodiv_repeats_ratio": null
+   "noise_verdict": "clear"
   },
   {
    "species": "oak",
@@ -504,11 +593,9 @@
    "noise_rms": 0.030911981211964215,
    "noise_median": 0.0220556735116542,
    "noise_trees": 4,
+   "noise_source": "wytham 10 models",
    "noise_ratio": 0.2730585355563499,
-   "noise_verdict": "clear",
-   "biodiv_repeats_rms": null,
-   "biodiv_repeats_trees": 0,
-   "biodiv_repeats_ratio": null
+   "noise_verdict": "clear"
   },
   {
    "species": "oak",
@@ -524,11 +611,9 @@
    "noise_rms": 0.1524466740822169,
    "noise_median": 0.0377319491153775,
    "noise_trees": 4,
+   "noise_source": "wytham 10 models",
    "noise_ratio": 0.35133932531970063,
-   "noise_verdict": "clear",
-   "biodiv_repeats_rms": null,
-   "biodiv_repeats_trees": 0,
-   "biodiv_repeats_ratio": null
+   "noise_verdict": "clear"
   },
   {
    "species": "oak",
@@ -544,11 +629,9 @@
    "noise_rms": 0.17208982937910902,
    "noise_median": 0.0424746335227726,
    "noise_trees": 4,
+   "noise_source": "wytham 10 models",
    "noise_ratio": 0.4141451604731505,
-   "noise_verdict": "clear",
-   "biodiv_repeats_rms": null,
-   "biodiv_repeats_trees": 0,
-   "biodiv_repeats_ratio": null
+   "noise_verdict": "clear"
   },
   {
    "species": "oak",
@@ -564,11 +647,9 @@
    "noise_rms": 0.04006034210939824,
    "noise_median": 0.025752325297264712,
    "noise_trees": 4,
+   "noise_source": "wytham 10 models",
    "noise_ratio": 0.22277986373348563,
-   "noise_verdict": "clear",
-   "biodiv_repeats_rms": null,
-   "biodiv_repeats_trees": 0,
-   "biodiv_repeats_ratio": null
+   "noise_verdict": "clear"
   },
   {
    "species": "oak",
@@ -584,11 +665,9 @@
    "noise_rms": 0.018983071855660054,
    "noise_median": 0.014458506628047037,
    "noise_trees": 4,
+   "noise_source": "wytham 10 models",
    "noise_ratio": 0.2153704370359136,
-   "noise_verdict": "clear",
-   "biodiv_repeats_rms": null,
-   "biodiv_repeats_trees": 0,
-   "biodiv_repeats_ratio": null
+   "noise_verdict": "clear"
   },
   {
    "species": "oak",
@@ -604,11 +683,9 @@
    "noise_rms": 0.0012728549866357502,
    "noise_median": 0.0005004869093975039,
    "noise_trees": 4,
+   "noise_source": "wytham 10 models",
    "noise_ratio": 0.02322985284181283,
-   "noise_verdict": "clear",
-   "biodiv_repeats_rms": null,
-   "biodiv_repeats_trees": 0,
-   "biodiv_repeats_ratio": null
+   "noise_verdict": "clear"
   },
   {
    "species": "oak",
@@ -624,11 +701,9 @@
    "noise_rms": 0.0034838848394455934,
    "noise_median": 0.0021082366621291313,
    "noise_trees": 4,
+   "noise_source": "wytham 10 models",
    "noise_ratio": 0.034306180972180786,
-   "noise_verdict": "clear",
-   "biodiv_repeats_rms": null,
-   "biodiv_repeats_trees": 0,
-   "biodiv_repeats_ratio": null
+   "noise_verdict": "clear"
   },
   {
    "species": "oak",
@@ -644,11 +719,9 @@
    "noise_rms": 0.008742822065581376,
    "noise_median": 0.006183219184707036,
    "noise_trees": 4,
+   "noise_source": "wytham 10 models",
    "noise_ratio": 0.19765058259677937,
-   "noise_verdict": "clear",
-   "biodiv_repeats_rms": null,
-   "biodiv_repeats_trees": 0,
-   "biodiv_repeats_ratio": null
+   "noise_verdict": "clear"
   },
   {
    "species": "oak",
@@ -664,11 +737,9 @@
    "noise_rms": 0.011118093581343613,
    "noise_median": 0.007175203789999978,
    "noise_trees": 4,
+   "noise_source": "wytham 10 models",
    "noise_ratio": 0.0654455866638197,
-   "noise_verdict": "clear",
-   "biodiv_repeats_rms": null,
-   "biodiv_repeats_trees": 0,
-   "biodiv_repeats_ratio": null
+   "noise_verdict": "clear"
   },
   {
    "species": "oak",
@@ -684,11 +755,9 @@
    "noise_rms": 0.009967117550392961,
    "noise_median": 0.008265191451802118,
    "noise_trees": 4,
+   "noise_source": "wytham 10 models",
    "noise_ratio": 0.16053828314475568,
-   "noise_verdict": "clear",
-   "biodiv_repeats_rms": null,
-   "biodiv_repeats_trees": 0,
-   "biodiv_repeats_ratio": null
+   "noise_verdict": "clear"
   },
   {
    "species": "oak",
@@ -704,11 +773,9 @@
    "noise_rms": 0.09739062900692666,
    "noise_median": 0.09488750750096174,
    "noise_trees": 4,
+   "noise_source": "wytham 10 models",
    "noise_ratio": 0.7717426519326828,
-   "noise_verdict": "excluded (H1)",
-   "biodiv_repeats_rms": null,
-   "biodiv_repeats_trees": 0,
-   "biodiv_repeats_ratio": null
+   "noise_verdict": "excluded (H1)"
   },
   {
    "species": "oak",
@@ -724,11 +791,9 @@
    "noise_rms": 0.003814891158630215,
    "noise_median": 0.003477375701964957,
    "noise_trees": 4,
+   "noise_source": "wytham 10 models",
    "noise_ratio": 0.055387809511604685,
-   "noise_verdict": "clear",
-   "biodiv_repeats_rms": null,
-   "biodiv_repeats_trees": 0,
-   "biodiv_repeats_ratio": null
+   "noise_verdict": "clear"
   },
   {
    "species": "maple",
@@ -744,11 +809,9 @@
    "noise_rms": 0.10290907529357059,
    "noise_median": 0.05270462766947299,
    "noise_trees": 8,
+   "noise_source": "wytham 10 models",
    "noise_ratio": 0.4831317907594027,
-   "noise_verdict": "clear",
-   "biodiv_repeats_rms": null,
-   "biodiv_repeats_trees": 0,
-   "biodiv_repeats_ratio": null
+   "noise_verdict": "clear"
   },
   {
    "species": "maple",
@@ -764,11 +827,9 @@
    "noise_rms": 0.013949747688832123,
    "noise_median": 0.006462977910657529,
    "noise_trees": 8,
+   "noise_source": "wytham 10 models",
    "noise_ratio": 0.39731408119763184,
-   "noise_verdict": "clear",
-   "biodiv_repeats_rms": null,
-   "biodiv_repeats_trees": 0,
-   "biodiv_repeats_ratio": null
+   "noise_verdict": "clear"
   },
   {
    "species": "maple",
@@ -784,11 +845,9 @@
    "noise_rms": 0.03071928724684777,
    "noise_median": 0.019601999073209482,
    "noise_trees": 8,
+   "noise_source": "wytham 10 models",
    "noise_ratio": 0.41951773671661263,
-   "noise_verdict": "clear",
-   "biodiv_repeats_rms": null,
-   "biodiv_repeats_trees": 0,
-   "biodiv_repeats_ratio": null
+   "noise_verdict": "clear"
   },
   {
    "species": "maple",
@@ -804,11 +863,9 @@
    "noise_rms": 0.07452996491828887,
    "noise_median": 0.03944440069577636,
    "noise_trees": 8,
+   "noise_source": "wytham 10 models",
    "noise_ratio": 0.6617699263859655,
-   "noise_verdict": "held out (noise)",
-   "biodiv_repeats_rms": null,
-   "biodiv_repeats_trees": 0,
-   "biodiv_repeats_ratio": null
+   "noise_verdict": "held out (noise)"
   },
   {
    "species": "maple",
@@ -824,11 +881,9 @@
    "noise_rms": 0.17505820905204184,
    "noise_median": 0.14574009464035353,
    "noise_trees": 8,
+   "noise_source": "wytham 10 models",
    "noise_ratio": 0.781887357958006,
-   "noise_verdict": "excluded (H1)",
-   "biodiv_repeats_rms": null,
-   "biodiv_repeats_trees": 0,
-   "biodiv_repeats_ratio": null
+   "noise_verdict": "excluded (H1)"
   },
   {
    "species": "maple",
@@ -844,11 +899,9 @@
    "noise_rms": 2.214850830439899,
    "noise_median": 1.9453056695460549,
    "noise_trees": 8,
+   "noise_source": "wytham 10 models",
    "noise_ratio": 0.2926034083626447,
-   "noise_verdict": "clear",
-   "biodiv_repeats_rms": null,
-   "biodiv_repeats_trees": 0,
-   "biodiv_repeats_ratio": null
+   "noise_verdict": "clear"
   },
   {
    "species": "maple",
@@ -864,11 +917,9 @@
    "noise_rms": 12.376912230721993,
    "noise_median": 9.800334917304669,
    "noise_trees": 8,
+   "noise_source": "wytham 10 models",
    "noise_ratio": 0.6183325701520868,
-   "noise_verdict": "held out (noise)",
-   "biodiv_repeats_rms": null,
-   "biodiv_repeats_trees": 0,
-   "biodiv_repeats_ratio": null
+   "noise_verdict": "held out (noise)"
   },
   {
    "species": "maple",
@@ -884,11 +935,9 @@
    "noise_rms": 10.90429042107975,
    "noise_median": 9.019807810763625,
    "noise_trees": 8,
+   "noise_source": "wytham 10 models",
    "noise_ratio": 0.7076541675876833,
-   "noise_verdict": "held out (noise)",
-   "biodiv_repeats_rms": null,
-   "biodiv_repeats_trees": 0,
-   "biodiv_repeats_ratio": null
+   "noise_verdict": "held out (noise)"
   },
   {
    "species": "maple",
@@ -904,11 +953,9 @@
    "noise_rms": 0.24023317054453602,
    "noise_median": 0.24649991335121837,
    "noise_trees": 8,
+   "noise_source": "wytham 10 models",
    "noise_ratio": 0.7986730926632492,
-   "noise_verdict": "excluded (H1)",
-   "biodiv_repeats_rms": null,
-   "biodiv_repeats_trees": 0,
-   "biodiv_repeats_ratio": null
+   "noise_verdict": "report-only"
   },
   {
    "species": "maple",
@@ -924,11 +971,9 @@
    "noise_rms": 0.2911125821954947,
    "noise_median": 0.26015226020839405,
    "noise_trees": 8,
+   "noise_source": "wytham 10 models",
    "noise_ratio": 0.9137834125721125,
-   "noise_verdict": "excluded (H1)",
-   "biodiv_repeats_rms": null,
-   "biodiv_repeats_trees": 0,
-   "biodiv_repeats_ratio": null
+   "noise_verdict": "report-only"
   },
   {
    "species": "maple",
@@ -944,11 +989,9 @@
    "noise_rms": 4.326276824789869,
    "noise_median": 3.269456461810133,
    "noise_trees": 8,
+   "noise_source": "wytham 10 models",
    "noise_ratio": 0.3292020573521242,
-   "noise_verdict": "clear",
-   "biodiv_repeats_rms": null,
-   "biodiv_repeats_trees": 0,
-   "biodiv_repeats_ratio": null
+   "noise_verdict": "clear"
   },
   {
    "species": "maple",
@@ -964,11 +1007,9 @@
    "noise_rms": 0.06852274231773964,
    "noise_median": 0.032510017230434465,
    "noise_trees": 8,
+   "noise_source": "wytham 10 models",
    "noise_ratio": 0.3287859969379534,
-   "noise_verdict": "clear",
-   "biodiv_repeats_rms": null,
-   "biodiv_repeats_trees": 0,
-   "biodiv_repeats_ratio": null
+   "noise_verdict": "clear"
   },
   {
    "species": "maple",
@@ -984,11 +1025,9 @@
    "noise_rms": 0.06718984663639269,
    "noise_median": 0.02945396431627366,
    "noise_trees": 8,
+   "noise_source": "wytham 10 models",
    "noise_ratio": 0.3909895491943832,
-   "noise_verdict": "clear",
-   "biodiv_repeats_rms": null,
-   "biodiv_repeats_trees": 0,
-   "biodiv_repeats_ratio": null
+   "noise_verdict": "clear"
   },
   {
    "species": "maple",
@@ -1004,11 +1043,9 @@
    "noise_rms": 0.013918310446610663,
    "noise_median": 0.015214616848575113,
    "noise_trees": 8,
+   "noise_source": "wytham 10 models",
    "noise_ratio": 0.16033512533852742,
-   "noise_verdict": "clear",
-   "biodiv_repeats_rms": null,
-   "biodiv_repeats_trees": 0,
-   "biodiv_repeats_ratio": null
+   "noise_verdict": "clear"
   },
   {
    "species": "maple",
@@ -1024,11 +1061,9 @@
    "noise_rms": 0.028665137243575667,
    "noise_median": 0.027752099487604424,
    "noise_trees": 8,
+   "noise_source": "wytham 10 models",
    "noise_ratio": 0.1867502274130683,
-   "noise_verdict": "clear",
-   "biodiv_repeats_rms": null,
-   "biodiv_repeats_trees": 0,
-   "biodiv_repeats_ratio": null
+   "noise_verdict": "clear"
   },
   {
    "species": "maple",
@@ -1044,11 +1079,9 @@
    "noise_rms": 0.34938883682795446,
    "noise_median": 0.3273729020320959,
    "noise_trees": 8,
+   "noise_source": "wytham 10 models",
    "noise_ratio": 0.6425257330613374,
-   "noise_verdict": "held out (noise)",
-   "biodiv_repeats_rms": null,
-   "biodiv_repeats_trees": 0,
-   "biodiv_repeats_ratio": null
+   "noise_verdict": "held out (noise)"
   },
   {
    "species": "maple",
@@ -1064,11 +1097,9 @@
    "noise_rms": 0.440641024916401,
    "noise_median": 0.3946548829643488,
    "noise_trees": 8,
+   "noise_source": "wytham 10 models",
    "noise_ratio": 0.5563968401999594,
-   "noise_verdict": "held out (noise)",
-   "biodiv_repeats_rms": null,
-   "biodiv_repeats_trees": 0,
-   "biodiv_repeats_ratio": null
+   "noise_verdict": "held out (noise)"
   },
   {
    "species": "maple",
@@ -1084,11 +1115,9 @@
    "noise_rms": 0.08629379737269025,
    "noise_median": 0.07438333641896436,
    "noise_trees": 8,
+   "noise_source": "wytham 10 models",
    "noise_ratio": 0.41645072265117905,
-   "noise_verdict": "clear",
-   "biodiv_repeats_rms": null,
-   "biodiv_repeats_trees": 0,
-   "biodiv_repeats_ratio": null
+   "noise_verdict": "clear"
   },
   {
    "species": "maple",
@@ -1104,11 +1133,9 @@
    "noise_rms": 0.047873146923239455,
    "noise_median": 0.04721911712815294,
    "noise_trees": 8,
+   "noise_source": "wytham 10 models",
    "noise_ratio": 0.3835222629617946,
-   "noise_verdict": "clear",
-   "biodiv_repeats_rms": null,
-   "biodiv_repeats_trees": 0,
-   "biodiv_repeats_ratio": null
+   "noise_verdict": "clear"
   },
   {
    "species": "maple",
@@ -1124,11 +1151,9 @@
    "noise_rms": 0.005828589944639015,
    "noise_median": 0.004047745885780721,
    "noise_trees": 8,
+   "noise_source": "wytham 10 models",
    "noise_ratio": 0.2251365646743023,
-   "noise_verdict": "clear",
-   "biodiv_repeats_rms": null,
-   "biodiv_repeats_trees": 0,
-   "biodiv_repeats_ratio": null
+   "noise_verdict": "clear"
   },
   {
    "species": "maple",
@@ -1144,11 +1169,9 @@
    "noise_rms": 0.017609938597105693,
    "noise_median": 0.018255070522141932,
    "noise_trees": 8,
+   "noise_source": "wytham 10 models",
    "noise_ratio": 0.3642325093220652,
-   "noise_verdict": "clear",
-   "biodiv_repeats_rms": null,
-   "biodiv_repeats_trees": 0,
-   "biodiv_repeats_ratio": null
+   "noise_verdict": "clear"
   },
   {
    "species": "maple",
@@ -1164,11 +1187,9 @@
    "noise_rms": 0.021006255515119168,
    "noise_median": 0.01969305395477767,
    "noise_trees": 8,
+   "noise_source": "wytham 10 models",
    "noise_ratio": 0.5214242395654068,
-   "noise_verdict": "held out (noise)",
-   "biodiv_repeats_rms": null,
-   "biodiv_repeats_trees": 0,
-   "biodiv_repeats_ratio": null
+   "noise_verdict": "held out (noise)"
   },
   {
    "species": "maple",
@@ -1184,11 +1205,9 @@
    "noise_rms": 0.0331717742977603,
    "noise_median": 0.030177088117204744,
    "noise_trees": 8,
+   "noise_source": "wytham 10 models",
    "noise_ratio": 0.44751915583026636,
-   "noise_verdict": "clear",
-   "biodiv_repeats_rms": null,
-   "biodiv_repeats_trees": 0,
-   "biodiv_repeats_ratio": null
+   "noise_verdict": "clear"
   },
   {
    "species": "maple",
@@ -1204,11 +1223,9 @@
    "noise_rms": 0.019064352749327593,
    "noise_median": 0.018298516148721224,
    "noise_trees": 8,
+   "noise_source": "wytham 10 models",
    "noise_ratio": 0.18352570662031673,
-   "noise_verdict": "clear",
-   "biodiv_repeats_rms": null,
-   "biodiv_repeats_trees": 0,
-   "biodiv_repeats_ratio": null
+   "noise_verdict": "clear"
   },
   {
    "species": "maple",
@@ -1224,11 +1241,9 @@
    "noise_rms": 0.057628862781732154,
    "noise_median": 0.026479611012016388,
    "noise_trees": 8,
+   "noise_source": "wytham 10 models",
    "noise_ratio": 0.5043515955540158,
-   "noise_verdict": "excluded (H1)",
-   "biodiv_repeats_rms": null,
-   "biodiv_repeats_trees": 0,
-   "biodiv_repeats_ratio": null
+   "noise_verdict": "excluded (H1)"
   },
   {
    "species": "maple",
@@ -1244,531 +1259,2307 @@
    "noise_rms": 0.008313035416602154,
    "noise_median": 0.0058978257661952155,
    "noise_trees": 8,
+   "noise_source": "wytham 10 models",
    "noise_ratio": 0.12312988833303289,
-   "noise_verdict": "clear",
-   "biodiv_repeats_rms": null,
-   "biodiv_repeats_trees": 0,
-   "biodiv_repeats_ratio": null
+   "noise_verdict": "clear"
   },
   {
    "species": "beech",
    "descriptor": "widestAt",
-   "set": "demol FSYL",
-   "n": 15,
-   "median": 0.625,
-   "slope_lnDBH": 0.9908175295776892,
-   "between_sd": 0.22983683548040346,
-   "between_sd_lo95": 0.16662111717468034,
-   "between_sd_hi95": 0.37027689194694385,
-   "tolerance": 0.11491841774020173,
-   "noise_rms": null,
-   "noise_median": null,
-   "noise_trees": 0,
-   "noise_ratio": null,
-   "noise_verdict": "not measured",
-   "biodiv_repeats_rms": 0.10859306069076735,
-   "biodiv_repeats_trees": 53,
-   "biodiv_repeats_ratio": 0.4724789238582529
+   "set": "biodiv Fagus_sylvatica",
+   "n": 53,
+   "median": 0.375,
+   "slope_lnDBH": 0.15750092327622578,
+   "between_sd": 0.21252477573421827,
+   "between_sd_lo95": 0.17810598620981477,
+   "between_sd_hi95": 0.2635576921641194,
+   "tolerance": 0.10626238786710913,
+   "noise_rms": 0.10859306069076735,
+   "noise_median": 0.0,
+   "noise_trees": 53,
+   "noise_source": "biodiv 5 repeats",
+   "noise_ratio": 0.5109665934976585,
+   "noise_verdict": "held out (noise)"
   },
   {
    "species": "beech",
    "descriptor": "profileCentre",
-   "set": "demol FSYL",
-   "n": 15,
-   "median": 0.5366530046823375,
-   "slope_lnDBH": 0.1755847425740849,
-   "between_sd": 0.06146385258640455,
-   "between_sd_lo95": 0.044558461494653596,
-   "between_sd_hi95": 0.0990208738960795,
-   "tolerance": 0.030731926293202275,
-   "noise_rms": null,
-   "noise_median": null,
-   "noise_trees": 0,
-   "noise_ratio": null,
-   "noise_verdict": "not measured",
-   "biodiv_repeats_rms": 0.0240742820936472,
-   "biodiv_repeats_trees": 53,
-   "biodiv_repeats_ratio": 0.39168195745302653
+   "set": "biodiv Fagus_sylvatica",
+   "n": 53,
+   "median": 0.5078204446554266,
+   "slope_lnDBH": 0.043707720765129236,
+   "between_sd": 0.0393849798020512,
+   "between_sd_lo95": 0.03300650780721439,
+   "between_sd_hi95": 0.048842373067789886,
+   "tolerance": 0.0196924899010256,
+   "noise_rms": 0.0240742820936472,
+   "noise_median": 0.004138316001497643,
+   "noise_trees": 53,
+   "noise_source": "biodiv 5 repeats",
+   "noise_ratio": 0.6112554129682045,
+   "noise_verdict": "held out (noise)"
   },
   {
    "species": "beech",
    "descriptor": "crownFullness",
-   "set": "demol FSYL",
-   "n": 15,
-   "median": 0.7473039518947547,
-   "slope_lnDBH": -0.034296460696592104,
-   "between_sd": 0.10640770385155793,
-   "between_sd_lo95": 0.0771406831053885,
-   "between_sd_hi95": 0.17142732486292475,
-   "tolerance": 0.053203851925778964,
-   "noise_rms": null,
-   "noise_median": null,
-   "noise_trees": 0,
-   "noise_ratio": null,
-   "noise_verdict": "not measured",
-   "biodiv_repeats_rms": 0.04486448996155783,
-   "biodiv_repeats_trees": 53,
-   "biodiv_repeats_ratio": 0.42162821240974424
+   "set": "biodiv Fagus_sylvatica",
+   "n": 53,
+   "median": 0.8329762663248934,
+   "slope_lnDBH": -0.005453975391827227,
+   "between_sd": 0.07124213684382807,
+   "between_sd_lo95": 0.05970433799272844,
+   "between_sd_hi95": 0.08834929060168183,
+   "tolerance": 0.03562106842191404,
+   "noise_rms": 0.04486448996155783,
+   "noise_median": 0.012824213266578541,
+   "noise_trees": 53,
+   "noise_source": "biodiv 5 repeats",
+   "noise_ratio": 0.6297465509759562,
+   "noise_verdict": "held out (noise)"
   },
   {
    "species": "beech",
    "descriptor": "forkHeight",
-   "set": "demol FSYL",
-   "n": 15,
-   "median": 0.7312552367988358,
-   "slope_lnDBH": -0.2290936421123401,
-   "between_sd": 0.12216980780882611,
-   "between_sd_lo95": 0.08856748231663765,
-   "between_sd_hi95": 0.1968207429877558,
-   "tolerance": 0.061084903904413054,
-   "noise_rms": null,
-   "noise_median": null,
-   "noise_trees": 0,
-   "noise_ratio": null,
-   "noise_verdict": "not measured",
-   "biodiv_repeats_rms": 0.09180500510000103,
-   "biodiv_repeats_trees": 53,
-   "biodiv_repeats_ratio": 0.7514541174007529
+   "set": "biodiv Fagus_sylvatica",
+   "n": 53,
+   "median": 0.82430473793946,
+   "slope_lnDBH": -0.2039621562561758,
+   "between_sd": 0.14938969160211693,
+   "between_sd_lo95": 0.12519574840370545,
+   "between_sd_hi95": 0.1852621757427603,
+   "tolerance": 0.07469484580105847,
+   "noise_rms": 0.09180500510000103,
+   "noise_median": 0.05641900125416532,
+   "noise_trees": 53,
+   "noise_source": "biodiv 5 repeats",
+   "noise_ratio": 0.6145337346603111,
+   "noise_verdict": "held out (noise)"
   },
   {
    "species": "beech",
    "descriptor": "leaderDominance",
-   "set": "demol FSYL",
-   "n": 15,
-   "median": 1.7338287126654577,
-   "slope_lnDBH": -0.8121139162608226,
-   "between_sd": 0.43175947514693985,
-   "between_sd_lo95": 0.3130057283871304,
-   "between_sd_hi95": 0.6955828302799777,
-   "tolerance": 0.21587973757346993,
-   "noise_rms": null,
-   "noise_median": null,
-   "noise_trees": 0,
-   "noise_ratio": null,
-   "noise_verdict": "not measured",
-   "biodiv_repeats_rms": 0.39319581965536704,
-   "biodiv_repeats_trees": 52,
-   "biodiv_repeats_ratio": 0.9106825496338012
+   "set": "biodiv Fagus_sylvatica",
+   "n": 53,
+   "median": 1.655945925551097,
+   "slope_lnDBH": 0.04441515163214991,
+   "between_sd": 0.7757105497749304,
+   "between_sd_lo95": 0.6500827586041154,
+   "between_sd_hi95": 0.9619795225273757,
+   "tolerance": 0.3878552748874652,
+   "noise_rms": 0.39319581965536704,
+   "noise_median": 0.25759277627721977,
+   "noise_trees": 52,
+   "noise_source": "biodiv 5 repeats",
+   "noise_ratio": 0.5068847133372769,
+   "noise_verdict": "held out (noise)"
   },
   {
    "species": "beech",
    "descriptor": "branchAngle2",
-   "set": "demol FSYL",
-   "n": 15,
-   "median": 65.21803705234052,
-   "slope_lnDBH": 6.436635451988219,
-   "between_sd": 5.9816966757772345,
-   "between_sd_lo95": 4.336454514067889,
-   "between_sd_hi95": 9.63676709630388,
-   "tolerance": 2.9908483378886173,
-   "noise_rms": null,
-   "noise_median": null,
-   "noise_trees": 0,
-   "noise_ratio": null,
-   "noise_verdict": "not measured",
-   "biodiv_repeats_rms": 8.327197856916097,
-   "biodiv_repeats_trees": 53,
-   "biodiv_repeats_ratio": 1.3921130254960812
+   "set": "biodiv Fagus_sylvatica",
+   "n": 53,
+   "median": 80.36100921223829,
+   "slope_lnDBH": -5.699191134848184,
+   "between_sd": 7.109671025910261,
+   "between_sd_lo95": 5.958246351854457,
+   "between_sd_hi95": 8.81689431814004,
+   "tolerance": 3.5548355129551306,
+   "noise_rms": 8.327197856916097,
+   "noise_median": 1.3944176243290822,
+   "noise_trees": 53,
+   "noise_source": "biodiv 5 repeats",
+   "noise_ratio": 1.1712493906636072,
+   "noise_verdict": "held out (noise)"
   },
   {
    "species": "beech",
    "descriptor": "limbDroop",
-   "set": "demol FSYL",
-   "n": 15,
-   "median": 43.76728832295781,
-   "slope_lnDBH": 53.65749464502481,
-   "between_sd": 15.555534166213262,
-   "between_sd_lo95": 11.277045629373688,
-   "between_sd_hi95": 25.0606254284729,
-   "tolerance": 7.777767083106631,
-   "noise_rms": null,
-   "noise_median": null,
-   "noise_trees": 0,
-   "noise_ratio": null,
-   "noise_verdict": "not measured",
-   "biodiv_repeats_rms": 11.01789292515127,
-   "biodiv_repeats_trees": 52,
-   "biodiv_repeats_ratio": 0.7082940905418867
+   "set": "biodiv Fagus_sylvatica",
+   "n": 53,
+   "median": 38.97629870389013,
+   "slope_lnDBH": 22.82018891507495,
+   "between_sd": 19.4705698176586,
+   "between_sd_lo95": 16.317274197611535,
+   "between_sd_hi95": 24.145977467963636,
+   "tolerance": 9.7352849088293,
+   "noise_rms": 11.01789292515127,
+   "noise_median": 7.869829202371877,
+   "noise_trees": 52,
+   "noise_source": "biodiv 5 repeats",
+   "noise_ratio": 0.5658741900382763,
+   "noise_verdict": "held out (noise)"
   },
   {
    "species": "beech",
    "descriptor": "limbUpturn",
-   "set": "demol FSYL",
-   "n": 15,
-   "median": 14.640620544847529,
-   "slope_lnDBH": 12.746941113937288,
-   "between_sd": 10.45846035482346,
-   "between_sd_lo95": 7.581901937543722,
-   "between_sd_hi95": 16.84902329359014,
-   "tolerance": 5.22923017741173,
-   "noise_rms": null,
-   "noise_median": null,
-   "noise_trees": 0,
-   "noise_ratio": null,
-   "noise_verdict": "not measured",
-   "biodiv_repeats_rms": 9.579829245913901,
-   "biodiv_repeats_trees": 52,
-   "biodiv_repeats_ratio": 0.9159884840502042
+   "set": "biodiv Fagus_sylvatica",
+   "n": 53,
+   "median": 20.817241317621082,
+   "slope_lnDBH": -4.917210394352843,
+   "between_sd": 16.400311078572436,
+   "between_sd_lo95": 13.744249670211934,
+   "between_sd_hi95": 20.338467003243817,
+   "tolerance": 8.200155539286218,
+   "noise_rms": 9.579829245913901,
+   "noise_median": 6.927768853363966,
+   "noise_trees": 52,
+   "noise_source": "biodiv 5 repeats",
+   "noise_ratio": 0.5841248498286276,
+   "noise_verdict": "held out (noise)"
   },
   {
    "species": "beech",
    "descriptor": "junctionDelta",
-   "set": "demol FSYL",
-   "n": 15,
-   "median": 1.8839126303598779,
-   "slope_lnDBH": -0.5293612555927133,
-   "between_sd": 0.20782500788721975,
-   "between_sd_lo95": 0.15066355625122496,
-   "between_sd_hi95": 0.3348149039229616,
-   "tolerance": 0.10391250394360987,
-   "noise_rms": null,
-   "noise_median": null,
-   "noise_trees": 0,
-   "noise_ratio": null,
-   "noise_verdict": "not measured",
-   "biodiv_repeats_rms": 0.1385881451806881,
-   "biodiv_repeats_trees": 53,
-   "biodiv_repeats_ratio": 0.6668501860752756
+   "set": "biodiv Fagus_sylvatica",
+   "n": 53,
+   "median": 1.383475844833813,
+   "slope_lnDBH": -0.018887161592366475,
+   "between_sd": 0.2410926432669789,
+   "between_sd_lo95": 0.2020472335455928,
+   "between_sd_hi95": 0.29898547328268754,
+   "tolerance": 0.12054632163348945,
+   "noise_rms": 0.1385881451806881,
+   "noise_median": 0.06785672536644208,
+   "noise_trees": 53,
+   "noise_source": "biodiv 5 repeats",
+   "noise_ratio": 0.574833571455018,
+   "noise_verdict": "report-only"
   },
   {
    "species": "beech",
    "descriptor": "ldSlope",
-   "set": "demol FSYL",
-   "n": 15,
-   "median": 0.2990411087511455,
-   "slope_lnDBH": 0.3296889644480218,
-   "between_sd": 0.15260676594215827,
-   "between_sd_lo95": 0.1106328747371976,
-   "between_sd_hi95": 0.2458559737172983,
-   "tolerance": 0.07630338297107914,
-   "noise_rms": null,
-   "noise_median": null,
-   "noise_trees": 0,
-   "noise_ratio": null,
-   "noise_verdict": "not measured",
-   "biodiv_repeats_rms": 0.10264591211045399,
-   "biodiv_repeats_trees": 52,
-   "biodiv_repeats_ratio": 0.6726170460185187
+   "set": "biodiv Fagus_sylvatica",
+   "n": 52,
+   "median": 0.04540779973406567,
+   "slope_lnDBH": 0.10914770516007995,
+   "between_sd": 0.11314489033189451,
+   "between_sd_lo95": 0.09466935792356387,
+   "between_sd_hi95": 0.14064794231160674,
+   "tolerance": 0.056572445165947255,
+   "noise_rms": 0.10264591211045399,
+   "noise_median": 0.06553484738267423,
+   "noise_trees": 52,
+   "noise_source": "biodiv 5 repeats",
+   "noise_ratio": 0.9072076680560363,
+   "noise_verdict": "report-only"
   },
   {
    "species": "beech",
    "descriptor": "limbElevation",
-   "set": "demol FSYL",
-   "n": 15,
-   "median": 39.39650048580871,
-   "slope_lnDBH": -1.2940855719030402,
-   "between_sd": 9.791500770354622,
-   "between_sd_lo95": 7.09838696553205,
-   "between_sd_hi95": 15.774523109687271,
-   "tolerance": 4.895750385177311,
-   "noise_rms": null,
-   "noise_median": null,
-   "noise_trees": 0,
-   "noise_ratio": null,
-   "noise_verdict": "not measured",
-   "biodiv_repeats_rms": 2.4291009244953816,
-   "biodiv_repeats_trees": 53,
-   "biodiv_repeats_ratio": 0.24808259545358807
+   "set": "biodiv Fagus_sylvatica",
+   "n": 53,
+   "median": 22.790005106700264,
+   "slope_lnDBH": 15.505271022266466,
+   "between_sd": 12.94257226047137,
+   "between_sd_lo95": 10.84649819570141,
+   "between_sd_hi95": 16.050432067756166,
+   "tolerance": 6.471286130235685,
+   "noise_rms": 2.4291009244953816,
+   "noise_median": 1.5781710119953587,
+   "noise_trees": 53,
+   "noise_source": "biodiv 5 repeats",
+   "noise_ratio": 0.1876830104255422,
+   "noise_verdict": "clear"
   },
   {
    "species": "beech",
    "descriptor": "p0",
-   "set": "demol FSYL",
-   "n": 15,
-   "median": 0.7038110156771529,
-   "slope_lnDBH": -1.0091855745540024,
-   "between_sd": 0.314617287310744,
-   "between_sd_lo95": 0.22808303892895004,
-   "between_sd_hi95": 0.5068617963465377,
-   "tolerance": 0.157308643655372,
-   "noise_rms": null,
-   "noise_median": null,
-   "noise_trees": 0,
-   "noise_ratio": null,
-   "noise_verdict": "not measured",
-   "biodiv_repeats_rms": 0.09071399464689982,
-   "biodiv_repeats_trees": 53,
-   "biodiv_repeats_ratio": 0.28833124658309894
+   "set": "biodiv Fagus_sylvatica",
+   "n": 53,
+   "median": 0.701869020760994,
+   "slope_lnDBH": -0.22616169948323422,
+   "between_sd": 0.1997082910699694,
+   "between_sd_lo95": 0.16736515548557146,
+   "between_sd_hi95": 0.24766362471670508,
+   "tolerance": 0.0998541455349847,
+   "noise_rms": 0.09071399464689982,
+   "noise_median": 0.019983137378659383,
+   "noise_trees": 53,
+   "noise_source": "biodiv 5 repeats",
+   "noise_ratio": 0.4542324916050553,
+   "noise_verdict": "clear"
   },
   {
    "species": "beech",
    "descriptor": "p1",
-   "set": "demol FSYL",
-   "n": 15,
-   "median": 0.7956846515733021,
-   "slope_lnDBH": 0.31927395297469197,
-   "between_sd": 0.2179232874206701,
-   "between_sd_lo95": 0.15798434368674974,
-   "between_sd_hi95": 0.3510836606339643,
-   "tolerance": 0.10896164371033505,
-   "noise_rms": null,
-   "noise_median": null,
-   "noise_trees": 0,
-   "noise_ratio": null,
-   "noise_verdict": "not measured",
-   "biodiv_repeats_rms": 0.05745919863948568,
-   "biodiv_repeats_trees": 53,
-   "biodiv_repeats_ratio": 0.26366708817387113
+   "set": "biodiv Fagus_sylvatica",
+   "n": 53,
+   "median": 0.9438767627323796,
+   "slope_lnDBH": 0.021673353525773202,
+   "between_sd": 0.16245905997167887,
+   "between_sd_lo95": 0.13614850783873356,
+   "between_sd_hi95": 0.20146985107672788,
+   "tolerance": 0.08122952998583943,
+   "noise_rms": 0.05745919863948568,
+   "noise_median": 0.019107315114621264,
+   "noise_trees": 53,
+   "noise_source": "biodiv 5 repeats",
+   "noise_ratio": 0.3536841752593079,
+   "noise_verdict": "clear"
   },
   {
    "species": "beech",
    "descriptor": "p2",
-   "set": "demol FSYL",
-   "n": 15,
-   "median": 1.0,
-   "slope_lnDBH": 0.345406929064638,
-   "between_sd": 0.09766012950555181,
-   "between_sd_lo95": 0.070799094703975,
-   "between_sd_hi95": 0.1573346115076274,
-   "tolerance": 0.048830064752775904,
-   "noise_rms": null,
-   "noise_median": null,
-   "noise_trees": 0,
-   "noise_ratio": null,
-   "noise_verdict": "not measured",
-   "biodiv_repeats_rms": 0.08225787980663583,
-   "biodiv_repeats_trees": 53,
-   "biodiv_repeats_ratio": 0.842287228402248
+   "set": "biodiv Fagus_sylvatica",
+   "n": 53,
+   "median": 0.9511065081144281,
+   "slope_lnDBH": 0.0794620706438354,
+   "between_sd": 0.14134604383052016,
+   "between_sd_lo95": 0.11845478460720087,
+   "between_sd_hi95": 0.17528703173454208,
+   "tolerance": 0.07067302191526008,
+   "noise_rms": 0.08225787980663583,
+   "noise_median": 0.008469985795290165,
+   "noise_trees": 53,
+   "noise_source": "biodiv 5 repeats",
+   "noise_ratio": 0.581960963161208,
+   "noise_verdict": "held out (noise)"
   },
   {
    "species": "beech",
    "descriptor": "p3",
-   "set": "demol FSYL",
-   "n": 15,
-   "median": 0.8703047552355508,
-   "slope_lnDBH": 0.2073188497283035,
-   "between_sd": 0.1406737392620707,
-   "between_sd_lo95": 0.10198198014688731,
-   "between_sd_hi95": 0.2266313615206188,
-   "tolerance": 0.07033686963103535,
-   "noise_rms": null,
-   "noise_median": null,
-   "noise_trees": 0,
-   "noise_ratio": null,
-   "noise_verdict": "not measured",
-   "biodiv_repeats_rms": 0.07968371694419632,
-   "biodiv_repeats_trees": 53,
-   "biodiv_repeats_ratio": 0.5664434411297484
+   "set": "biodiv Fagus_sylvatica",
+   "n": 53,
+   "median": 0.8197928490479098,
+   "slope_lnDBH": 0.10321037374631654,
+   "between_sd": 0.14093804078297953,
+   "between_sd_lo95": 0.11811285842514617,
+   "between_sd_hi95": 0.17478105617835463,
+   "tolerance": 0.07046902039148976,
+   "noise_rms": 0.07968371694419632,
+   "noise_median": 0.022636017163117316,
+   "noise_trees": 53,
+   "noise_source": "biodiv 5 repeats",
+   "noise_ratio": 0.5653811880845968,
+   "noise_verdict": "held out (noise)"
   },
   {
    "species": "beech",
    "descriptor": "bifurcationRatio",
-   "set": "demol FSYL",
-   "n": 15,
-   "median": 3.48421849198606,
-   "slope_lnDBH": -0.791917863726279,
-   "between_sd": 0.17783117540228136,
-   "between_sd_lo95": 0.1289194095110182,
-   "between_sd_hi95": 0.2864935674109681,
-   "tolerance": 0.08891558770114068,
-   "noise_rms": null,
-   "noise_median": null,
-   "noise_trees": 0,
-   "noise_ratio": null,
-   "noise_verdict": "not measured",
-   "biodiv_repeats_rms": 0.2956072894901305,
-   "biodiv_repeats_trees": 53,
-   "biodiv_repeats_ratio": 1.6622917147199952
+   "set": "biodiv Fagus_sylvatica",
+   "n": 53,
+   "median": 3.8591774016124174,
+   "slope_lnDBH": -0.3101562990579466,
+   "between_sd": 0.41629383100135336,
+   "between_sd_lo95": 0.3488742574479053,
+   "between_sd_hi95": 0.516257179812712,
+   "tolerance": 0.20814691550067668,
+   "noise_rms": 0.2956072894901305,
+   "noise_median": 0.10158123080818059,
+   "noise_trees": 53,
+   "noise_source": "biodiv 5 repeats",
+   "noise_ratio": 0.7100928898683811,
+   "noise_verdict": "held out (noise)"
   },
   {
    "species": "beech",
    "descriptor": "bifurcationRatio2",
-   "set": "demol FSYL",
-   "n": 15,
-   "median": 3.422479530795241,
-   "slope_lnDBH": -1.0431960806713771,
-   "between_sd": 0.2143717277209175,
-   "between_sd_lo95": 0.15540962652425291,
-   "between_sd_hi95": 0.34536194729571856,
-   "tolerance": 0.10718586386045875,
-   "noise_rms": null,
-   "noise_median": null,
-   "noise_trees": 0,
-   "noise_ratio": null,
-   "noise_verdict": "not measured",
-   "biodiv_repeats_rms": 0.4346533895839098,
-   "biodiv_repeats_trees": 52,
-   "biodiv_repeats_ratio": 2.027568626725669
+   "set": "biodiv Fagus_sylvatica",
+   "n": 52,
+   "median": 3.886552539492778,
+   "slope_lnDBH": -0.549043198062411,
+   "between_sd": 0.5986854553707743,
+   "between_sd_lo95": 0.500925560949975,
+   "between_sd_hi95": 0.7442128154686132,
+   "tolerance": 0.29934272768538717,
+   "noise_rms": 0.4346533895839098,
+   "noise_median": 0.12033560637231944,
+   "noise_trees": 52,
+   "noise_source": "biodiv 5 repeats",
+   "noise_ratio": 0.7260129433321925,
+   "noise_verdict": "held out (noise)"
   },
   {
    "species": "beech",
    "descriptor": "tortuosity",
-   "set": "demol FSYL",
-   "n": 15,
-   "median": 1.5864285190850462,
-   "slope_lnDBH": -0.25661233581646775,
-   "between_sd": 0.12950347617922786,
-   "between_sd_lo95": 0.0938840540241747,
-   "between_sd_hi95": 0.20863559383655936,
-   "tolerance": 0.06475173808961393,
-   "noise_rms": null,
-   "noise_median": null,
-   "noise_trees": 0,
-   "noise_ratio": null,
-   "noise_verdict": "not measured",
-   "biodiv_repeats_rms": 0.10914720413530499,
-   "biodiv_repeats_trees": 52,
-   "biodiv_repeats_ratio": 0.8428129294710933
+   "set": "biodiv Fagus_sylvatica",
+   "n": 53,
+   "median": 1.4640242631256692,
+   "slope_lnDBH": -0.1342527065358549,
+   "between_sd": 0.28334753799969437,
+   "between_sd_lo95": 0.23745886813060685,
+   "between_sd_hi95": 0.3513869050683144,
+   "tolerance": 0.14167376899984718,
+   "noise_rms": 0.10914720413530499,
+   "noise_median": 0.05942962409295258,
+   "noise_trees": 52,
+   "noise_source": "biodiv 5 repeats",
+   "noise_ratio": 0.3852061143916582,
+   "noise_verdict": "clear"
   },
   {
    "species": "beech",
    "descriptor": "tortuosity05",
-   "set": "demol FSYL",
-   "n": 15,
-   "median": 1.287370091215811,
-   "slope_lnDBH": -0.11950617414410598,
-   "between_sd": 0.10273095048446658,
-   "between_sd_lo95": 0.07447520630172462,
-   "between_sd_hi95": 0.16550391921571236,
-   "tolerance": 0.05136547524223329,
-   "noise_rms": null,
-   "noise_median": null,
-   "noise_trees": 0,
-   "noise_ratio": null,
-   "noise_verdict": "not measured",
-   "biodiv_repeats_rms": 0.08441589910688992,
-   "biodiv_repeats_trees": 52,
-   "biodiv_repeats_ratio": 0.8217182719403926
+   "set": "biodiv Fagus_sylvatica",
+   "n": 53,
+   "median": 1.2597859546243715,
+   "slope_lnDBH": -0.10714721088323037,
+   "between_sd": 0.19973294926277782,
+   "between_sd_lo95": 0.16738582023740153,
+   "between_sd_hi95": 0.24769420400501194,
+   "tolerance": 0.09986647463138891,
+   "noise_rms": 0.08441589910688992,
+   "noise_median": 0.04408090580230317,
+   "noise_trees": 52,
+   "noise_source": "biodiv 5 repeats",
+   "noise_ratio": 0.42264383226939933,
+   "noise_verdict": "clear"
   },
   {
    "species": "beech",
    "descriptor": "length0",
-   "set": "demol FSYL",
-   "n": 15,
-   "median": 0.03505876798903148,
-   "slope_lnDBH": -0.035664097386177616,
-   "between_sd": 0.01648728619200052,
-   "between_sd_lo95": 0.011952522922393072,
-   "between_sd_hi95": 0.02656171746819162,
-   "tolerance": 0.00824364309600026,
-   "noise_rms": null,
-   "noise_median": null,
-   "noise_trees": 0,
-   "noise_ratio": null,
-   "noise_verdict": "not measured",
-   "biodiv_repeats_rms": 0.004567040900773543,
-   "biodiv_repeats_trees": 53,
-   "biodiv_repeats_ratio": 0.2770037984170754
+   "set": "biodiv Fagus_sylvatica",
+   "n": 53,
+   "median": 0.04105830040351555,
+   "slope_lnDBH": -0.0801769132679663,
+   "between_sd": 0.07707946651638523,
+   "between_sd_lo95": 0.06459630108065942,
+   "between_sd_hi95": 0.09558832017639973,
+   "tolerance": 0.03853973325819261,
+   "noise_rms": 0.004567040900773543,
+   "noise_median": 0.0019903488788184246,
+   "noise_trees": 53,
+   "noise_source": "biodiv 5 repeats",
+   "noise_ratio": 0.0592510704495172,
+   "noise_verdict": "clear"
   },
   {
    "species": "beech",
    "descriptor": "length1",
-   "set": "demol FSYL",
-   "n": 15,
-   "median": 0.12512189900801518,
-   "slope_lnDBH": -0.09861088396039619,
-   "between_sd": 0.031975618653810635,
-   "between_sd_lo95": 0.023180850412046945,
-   "between_sd_hi95": 0.051514078100084265,
-   "tolerance": 0.015987809326905317,
-   "noise_rms": null,
-   "noise_median": null,
-   "noise_trees": 0,
-   "noise_ratio": null,
-   "noise_verdict": "not measured",
-   "biodiv_repeats_rms": 0.011607077454826142,
-   "biodiv_repeats_trees": 53,
-   "biodiv_repeats_ratio": 0.36299774464075585
+   "set": "biodiv Fagus_sylvatica",
+   "n": 53,
+   "median": 0.187774017382323,
+   "slope_lnDBH": -0.17274063821903413,
+   "between_sd": 0.07486756831824476,
+   "between_sd_lo95": 0.06274262398059184,
+   "between_sd_hi95": 0.09284528571187724,
+   "tolerance": 0.03743378415912238,
+   "noise_rms": 0.011607077454826142,
+   "noise_median": 0.008469757391844268,
+   "noise_trees": 53,
+   "noise_source": "biodiv 5 repeats",
+   "noise_ratio": 0.15503478629741432,
+   "noise_verdict": "clear"
   },
   {
    "species": "beech",
    "descriptor": "length2",
-   "set": "demol FSYL",
-   "n": 15,
-   "median": 0.30509124168477975,
-   "slope_lnDBH": -0.11328756777896083,
-   "between_sd": 0.03783112422095148,
-   "between_sd_lo95": 0.027425822185958938,
-   "between_sd_hi95": 0.06094754596717819,
-   "tolerance": 0.01891556211047574,
-   "noise_rms": null,
-   "noise_median": null,
-   "noise_trees": 0,
-   "noise_ratio": null,
-   "noise_verdict": "not measured",
-   "biodiv_repeats_rms": 0.01551184201895256,
-   "biodiv_repeats_trees": 53,
-   "biodiv_repeats_ratio": 0.4100285766914073
+   "set": "biodiv Fagus_sylvatica",
+   "n": 53,
+   "median": 0.3438178158082027,
+   "slope_lnDBH": -0.04932309557730608,
+   "between_sd": 0.08009786521288091,
+   "between_sd_lo95": 0.06712586439748464,
+   "between_sd_hi95": 0.09933151760705818,
+   "tolerance": 0.040048932606440456,
+   "noise_rms": 0.01551184201895256,
+   "noise_median": 0.01229608499838698,
+   "noise_trees": 53,
+   "noise_source": "biodiv 5 repeats",
+   "noise_ratio": 0.19366111665680233,
+   "noise_verdict": "clear"
   },
   {
    "species": "beech",
    "descriptor": "length3",
-   "set": "demol FSYL",
-   "n": 15,
-   "median": 0.4903046059648228,
-   "slope_lnDBH": 0.2475625491255347,
-   "between_sd": 0.07657390451878096,
-   "between_sd_lo95": 0.05551255302779541,
-   "between_sd_hi95": 0.12336380854788508,
-   "tolerance": 0.03828695225939048,
-   "noise_rms": null,
-   "noise_median": null,
-   "noise_trees": 0,
-   "noise_ratio": null,
-   "noise_verdict": "not measured",
-   "biodiv_repeats_rms": 0.020492008656263272,
-   "biodiv_repeats_trees": 53,
-   "biodiv_repeats_ratio": 0.2676108628003589
+   "set": "biodiv Fagus_sylvatica",
+   "n": 53,
+   "median": 0.3977376451720722,
+   "slope_lnDBH": 0.30224064706430653,
+   "between_sd": 0.13027385973236075,
+   "between_sd_lo95": 0.10917576167217373,
+   "between_sd_hi95": 0.16155611834787614,
+   "tolerance": 0.06513692986618037,
+   "noise_rms": 0.020492008656263272,
+   "noise_median": 0.015260963256626417,
+   "noise_trees": 53,
+   "noise_source": "biodiv 5 repeats",
+   "noise_ratio": 0.15729946666478437,
+   "noise_verdict": "clear"
   },
   {
    "species": "beech",
    "descriptor": "pendulousFraction",
-   "set": "demol FSYL",
-   "n": 15,
-   "median": 0.21094073551839893,
-   "slope_lnDBH": 0.01774592741850433,
-   "between_sd": 0.05449822980027554,
-   "between_sd_lo95": 0.03950870587990932,
-   "between_sd_hi95": 0.08779896009652856,
-   "tolerance": 0.02724911490013777,
-   "noise_rms": null,
-   "noise_median": null,
-   "noise_trees": 0,
-   "noise_ratio": null,
-   "noise_verdict": "not measured",
-   "biodiv_repeats_rms": 0.020729678653088373,
-   "biodiv_repeats_trees": 53,
-   "biodiv_repeats_ratio": 0.38037343100974563
+   "set": "biodiv Fagus_sylvatica",
+   "n": 53,
+   "median": 0.38045067440694075,
+   "slope_lnDBH": 0.02157099974160579,
+   "between_sd": 0.09266831076187405,
+   "between_sd_lo95": 0.07766050250669085,
+   "between_sd_hi95": 0.11492046532819643,
+   "tolerance": 0.04633415538093703,
+   "noise_rms": 0.020729678653088373,
+   "noise_median": 0.015035908178627596,
+   "noise_trees": 53,
+   "noise_source": "biodiv 5 repeats",
+   "noise_ratio": 0.22369759934824512,
+   "noise_verdict": "clear"
   },
   {
    "species": "beech",
    "descriptor": "taper",
-   "set": "demol FSYL",
-   "n": 15,
-   "median": 0.7191549437694748,
-   "slope_lnDBH": -0.32269360798332536,
-   "between_sd": 0.079238265957246,
-   "between_sd_lo95": 0.057444092323949855,
-   "between_sd_hi95": 0.12765620785105178,
-   "tolerance": 0.039619132978623,
-   "noise_rms": null,
-   "noise_median": null,
-   "noise_trees": 0,
-   "noise_ratio": null,
-   "noise_verdict": "not measured",
-   "biodiv_repeats_rms": 0.3452278796787829,
-   "biodiv_repeats_trees": 53,
-   "biodiv_repeats_ratio": 4.356832844689646
+   "set": "biodiv Fagus_sylvatica",
+   "n": 53,
+   "median": 0.650080334209892,
+   "slope_lnDBH": 0.050020358853130636,
+   "between_sd": 0.18023945156833393,
+   "between_sd_lo95": 0.15104933137602936,
+   "between_sd_hi95": 0.22351979306019423,
+   "tolerance": 0.09011972578416697,
+   "noise_rms": 0.3452278796787829,
+   "noise_median": 0.06096120848823789,
+   "noise_trees": 53,
+   "noise_source": "biodiv 5 repeats",
+   "noise_ratio": 1.9153846545515987,
+   "noise_verdict": "held out (noise)"
   },
   {
    "species": "beech",
    "descriptor": "centroidHeight",
-   "set": "demol FSYL",
-   "n": 15,
-   "median": 0.8060883126924523,
-   "slope_lnDBH": 0.0906585376497196,
-   "between_sd": 0.07453453043119944,
-   "between_sd_lo95": 0.054034100767957796,
-   "between_sd_hi95": 0.12007829037979663,
-   "tolerance": 0.03726726521559972,
-   "noise_rms": null,
-   "noise_median": null,
-   "noise_trees": 0,
-   "noise_ratio": null,
-   "noise_verdict": "not measured",
-   "biodiv_repeats_rms": 0.02666135890926702,
-   "biodiv_repeats_trees": 53,
-   "biodiv_repeats_ratio": 0.35770479474446154
+   "set": "biodiv Fagus_sylvatica",
+   "n": 53,
+   "median": 0.6692438322716059,
+   "slope_lnDBH": 0.12546702946542346,
+   "between_sd": 0.07899274678995823,
+   "between_sd_lo95": 0.06619972199402467,
+   "between_sd_hi95": 0.09796103051863606,
+   "tolerance": 0.03949637339497911,
+   "noise_rms": 0.02666135890926702,
+   "noise_median": 0.002093234890731071,
+   "noise_trees": 53,
+   "noise_source": "biodiv 5 repeats",
+   "noise_ratio": 0.3375165441475227,
+   "noise_verdict": "clear"
   }
- ]
+ ],
+ "control": {
+  "wytham": {
+   "grid": {
+    "1": 0.002,
+    "2": 0.0025,
+    "5": 0.0025,
+    "10": 0.0025,
+    "20": 0.005,
+    "50": 0.01209430746874127
+   },
+   "terminals": 122753,
+   "species": [
+    "oak",
+    "maple"
+   ],
+   "gated": true,
+   "rule": {
+    "recut": false,
+    "full:p1": false,
+    "prune:p1": true,
+    "full:p2": false,
+    "prune:p2": true,
+    "full:p5": false,
+    "prune:p5": true,
+    "full:p10": false,
+    "prune:p10": true,
+    "full:p20": false,
+    "prune:p20": false,
+    "full:p50": false,
+    "prune:p50": false,
+    "full:stress": false,
+    "prune:stress": false
+   },
+   "curve": {
+    "1": false,
+    "2": false,
+    "5": false,
+    "10": false,
+    "20": false,
+    "50": false
+   },
+   "d_min": null,
+   "d_min_percentile": null,
+   "trees": {
+    "oak": 37,
+    "maple": 40
+   }
+  },
+  "biodiv": {
+   "grid": {
+    "1": 0.007391901686787605,
+    "2": 0.008621381595730782,
+    "5": 0.010951084084808826,
+    "10": 0.013575505465269089,
+    "20": 0.01833588443696499,
+    "50": 0.019999999552965164
+   },
+   "terminals": 85301,
+   "species": [
+    "beech"
+   ],
+   "gated": true,
+   "rule": {
+    "recut": true,
+    "full:p1": true,
+    "prune:p1": true,
+    "full:p2": false,
+    "prune:p2": true,
+    "full:p5": false,
+    "prune:p5": false,
+    "full:p10": false,
+    "prune:p10": false,
+    "full:p20": false,
+    "prune:p20": false,
+    "full:p50": false,
+    "prune:p50": false,
+    "full:stress": false,
+    "prune:stress": false
+   },
+   "curve": {
+    "1": true,
+    "2": false,
+    "5": false,
+    "10": false,
+    "20": false,
+    "50": false
+   },
+   "d_min": 0.007391901686787605,
+   "d_min_percentile": 1,
+   "trees": {
+    "beech": 53
+   }
+  },
+  "demol": {
+   "grid": {
+    "1": 0.013315040245652198,
+    "2": 0.014827138278633356,
+    "5": 0.017734291963279247,
+    "10": 0.02142766583710909,
+    "20": 0.0272965244948864,
+    "50": 0.04335650056600571
+   },
+   "terminals": 83986,
+   "species": [
+    "beech"
+   ],
+   "gated": false,
+   "rule": {
+    "recut": true,
+    "full:p1": false,
+    "prune:p1": true,
+    "full:p2": false,
+    "prune:p2": false,
+    "full:p5": false,
+    "prune:p5": false,
+    "full:p10": false,
+    "prune:p10": false,
+    "full:p20": false,
+    "prune:p20": false,
+    "full:p50": false,
+    "prune:p50": false,
+    "full:stress": false,
+    "prune:stress": false
+   },
+   "curve": {
+    "1": false,
+    "2": false,
+    "5": false,
+    "10": false,
+    "20": false,
+    "50": false
+   },
+   "d_min": null,
+   "d_min_percentile": null,
+   "trees": {
+    "beech": 15
+   }
+  }
+ },
+ "candidates": [
+  {
+   "species": "oak",
+   "descriptor": "widestAt",
+   "dataset": "wytham",
+   "standing": "held out (noise)",
+   "control_share_at_dmin": null
+  },
+  {
+   "species": "oak",
+   "descriptor": "profileCentre",
+   "dataset": "wytham",
+   "standing": "no d_min (stop)",
+   "control_share_at_dmin": null
+  },
+  {
+   "species": "oak",
+   "descriptor": "crownFullness",
+   "dataset": "wytham",
+   "standing": "no d_min (stop)",
+   "control_share_at_dmin": null
+  },
+  {
+   "species": "oak",
+   "descriptor": "forkHeight",
+   "dataset": "wytham",
+   "standing": "no d_min (stop)",
+   "control_share_at_dmin": null
+  },
+  {
+   "species": "oak",
+   "descriptor": "leaderDominance",
+   "dataset": "wytham",
+   "standing": "excluded (H1)",
+   "control_share_at_dmin": null
+  },
+  {
+   "species": "oak",
+   "descriptor": "branchAngle2",
+   "dataset": "wytham",
+   "standing": "no d_min (stop)",
+   "control_share_at_dmin": null
+  },
+  {
+   "species": "oak",
+   "descriptor": "limbDroop",
+   "dataset": "wytham",
+   "standing": "held out (noise)",
+   "control_share_at_dmin": null
+  },
+  {
+   "species": "oak",
+   "descriptor": "limbUpturn",
+   "dataset": "wytham",
+   "standing": "held out (noise)",
+   "control_share_at_dmin": null
+  },
+  {
+   "species": "oak",
+   "descriptor": "junctionDelta",
+   "dataset": "wytham",
+   "standing": "report-only",
+   "control_share_at_dmin": null
+  },
+  {
+   "species": "oak",
+   "descriptor": "ldSlope",
+   "dataset": "wytham",
+   "standing": "report-only",
+   "control_share_at_dmin": null
+  },
+  {
+   "species": "oak",
+   "descriptor": "limbElevation",
+   "dataset": "wytham",
+   "standing": "no d_min (stop)",
+   "control_share_at_dmin": null
+  },
+  {
+   "species": "oak",
+   "descriptor": "p0",
+   "dataset": "wytham",
+   "standing": "no d_min (stop)",
+   "control_share_at_dmin": null
+  },
+  {
+   "species": "oak",
+   "descriptor": "p1",
+   "dataset": "wytham",
+   "standing": "no d_min (stop)",
+   "control_share_at_dmin": null
+  },
+  {
+   "species": "oak",
+   "descriptor": "p2",
+   "dataset": "wytham",
+   "standing": "no d_min (stop)",
+   "control_share_at_dmin": null
+  },
+  {
+   "species": "oak",
+   "descriptor": "p3",
+   "dataset": "wytham",
+   "standing": "no d_min (stop)",
+   "control_share_at_dmin": null
+  },
+  {
+   "species": "oak",
+   "descriptor": "bifurcationRatio",
+   "dataset": "wytham",
+   "standing": "no d_min (stop)",
+   "control_share_at_dmin": null
+  },
+  {
+   "species": "oak",
+   "descriptor": "bifurcationRatio2",
+   "dataset": "wytham",
+   "standing": "no d_min (stop)",
+   "control_share_at_dmin": null
+  },
+  {
+   "species": "oak",
+   "descriptor": "tortuosity",
+   "dataset": "wytham",
+   "standing": "no d_min (stop)",
+   "control_share_at_dmin": null
+  },
+  {
+   "species": "oak",
+   "descriptor": "tortuosity05",
+   "dataset": "wytham",
+   "standing": "no d_min (stop)",
+   "control_share_at_dmin": null
+  },
+  {
+   "species": "oak",
+   "descriptor": "length0",
+   "dataset": "wytham",
+   "standing": "no d_min (stop)",
+   "control_share_at_dmin": null
+  },
+  {
+   "species": "oak",
+   "descriptor": "length1",
+   "dataset": "wytham",
+   "standing": "no d_min (stop)",
+   "control_share_at_dmin": null
+  },
+  {
+   "species": "oak",
+   "descriptor": "length2",
+   "dataset": "wytham",
+   "standing": "no d_min (stop)",
+   "control_share_at_dmin": null
+  },
+  {
+   "species": "oak",
+   "descriptor": "length3",
+   "dataset": "wytham",
+   "standing": "no d_min (stop)",
+   "control_share_at_dmin": null
+  },
+  {
+   "species": "oak",
+   "descriptor": "pendulousFraction",
+   "dataset": "wytham",
+   "standing": "no d_min (stop)",
+   "control_share_at_dmin": null
+  },
+  {
+   "species": "oak",
+   "descriptor": "taper",
+   "dataset": "wytham",
+   "standing": "excluded (H1)",
+   "control_share_at_dmin": null
+  },
+  {
+   "species": "oak",
+   "descriptor": "centroidHeight",
+   "dataset": "wytham",
+   "standing": "no d_min (stop)",
+   "control_share_at_dmin": null
+  },
+  {
+   "species": "maple",
+   "descriptor": "widestAt",
+   "dataset": "wytham",
+   "standing": "no d_min (stop)",
+   "control_share_at_dmin": null
+  },
+  {
+   "species": "maple",
+   "descriptor": "profileCentre",
+   "dataset": "wytham",
+   "standing": "no d_min (stop)",
+   "control_share_at_dmin": null
+  },
+  {
+   "species": "maple",
+   "descriptor": "crownFullness",
+   "dataset": "wytham",
+   "standing": "no d_min (stop)",
+   "control_share_at_dmin": null
+  },
+  {
+   "species": "maple",
+   "descriptor": "forkHeight",
+   "dataset": "wytham",
+   "standing": "held out (noise)",
+   "control_share_at_dmin": null
+  },
+  {
+   "species": "maple",
+   "descriptor": "leaderDominance",
+   "dataset": "wytham",
+   "standing": "excluded (H1)",
+   "control_share_at_dmin": null
+  },
+  {
+   "species": "maple",
+   "descriptor": "branchAngle2",
+   "dataset": "wytham",
+   "standing": "no d_min (stop)",
+   "control_share_at_dmin": null
+  },
+  {
+   "species": "maple",
+   "descriptor": "limbDroop",
+   "dataset": "wytham",
+   "standing": "held out (noise)",
+   "control_share_at_dmin": null
+  },
+  {
+   "species": "maple",
+   "descriptor": "limbUpturn",
+   "dataset": "wytham",
+   "standing": "held out (noise)",
+   "control_share_at_dmin": null
+  },
+  {
+   "species": "maple",
+   "descriptor": "junctionDelta",
+   "dataset": "wytham",
+   "standing": "report-only",
+   "control_share_at_dmin": null
+  },
+  {
+   "species": "maple",
+   "descriptor": "ldSlope",
+   "dataset": "wytham",
+   "standing": "report-only",
+   "control_share_at_dmin": null
+  },
+  {
+   "species": "maple",
+   "descriptor": "limbElevation",
+   "dataset": "wytham",
+   "standing": "no d_min (stop)",
+   "control_share_at_dmin": null
+  },
+  {
+   "species": "maple",
+   "descriptor": "p0",
+   "dataset": "wytham",
+   "standing": "no d_min (stop)",
+   "control_share_at_dmin": null
+  },
+  {
+   "species": "maple",
+   "descriptor": "p1",
+   "dataset": "wytham",
+   "standing": "no d_min (stop)",
+   "control_share_at_dmin": null
+  },
+  {
+   "species": "maple",
+   "descriptor": "p2",
+   "dataset": "wytham",
+   "standing": "no d_min (stop)",
+   "control_share_at_dmin": null
+  },
+  {
+   "species": "maple",
+   "descriptor": "p3",
+   "dataset": "wytham",
+   "standing": "no d_min (stop)",
+   "control_share_at_dmin": null
+  },
+  {
+   "species": "maple",
+   "descriptor": "bifurcationRatio",
+   "dataset": "wytham",
+   "standing": "held out (noise)",
+   "control_share_at_dmin": null
+  },
+  {
+   "species": "maple",
+   "descriptor": "bifurcationRatio2",
+   "dataset": "wytham",
+   "standing": "held out (noise)",
+   "control_share_at_dmin": null
+  },
+  {
+   "species": "maple",
+   "descriptor": "tortuosity",
+   "dataset": "wytham",
+   "standing": "no d_min (stop)",
+   "control_share_at_dmin": null
+  },
+  {
+   "species": "maple",
+   "descriptor": "tortuosity05",
+   "dataset": "wytham",
+   "standing": "no d_min (stop)",
+   "control_share_at_dmin": null
+  },
+  {
+   "species": "maple",
+   "descriptor": "length0",
+   "dataset": "wytham",
+   "standing": "no d_min (stop)",
+   "control_share_at_dmin": null
+  },
+  {
+   "species": "maple",
+   "descriptor": "length1",
+   "dataset": "wytham",
+   "standing": "no d_min (stop)",
+   "control_share_at_dmin": null
+  },
+  {
+   "species": "maple",
+   "descriptor": "length2",
+   "dataset": "wytham",
+   "standing": "held out (noise)",
+   "control_share_at_dmin": null
+  },
+  {
+   "species": "maple",
+   "descriptor": "length3",
+   "dataset": "wytham",
+   "standing": "no d_min (stop)",
+   "control_share_at_dmin": null
+  },
+  {
+   "species": "maple",
+   "descriptor": "pendulousFraction",
+   "dataset": "wytham",
+   "standing": "no d_min (stop)",
+   "control_share_at_dmin": null
+  },
+  {
+   "species": "maple",
+   "descriptor": "taper",
+   "dataset": "wytham",
+   "standing": "excluded (H1)",
+   "control_share_at_dmin": null
+  },
+  {
+   "species": "maple",
+   "descriptor": "centroidHeight",
+   "dataset": "wytham",
+   "standing": "no d_min (stop)",
+   "control_share_at_dmin": null
+  },
+  {
+   "species": "beech",
+   "descriptor": "widestAt",
+   "dataset": "biodiv",
+   "standing": "held out (noise)",
+   "control_share_at_dmin": 0.9433962264150944
+  },
+  {
+   "species": "beech",
+   "descriptor": "profileCentre",
+   "dataset": "biodiv",
+   "standing": "held out (noise)",
+   "control_share_at_dmin": 0.9245283018867925
+  },
+  {
+   "species": "beech",
+   "descriptor": "crownFullness",
+   "dataset": "biodiv",
+   "standing": "held out (noise)",
+   "control_share_at_dmin": 0.9056603773584906
+  },
+  {
+   "species": "beech",
+   "descriptor": "forkHeight",
+   "dataset": "biodiv",
+   "standing": "held out (noise)",
+   "control_share_at_dmin": 0.9245283018867925
+  },
+  {
+   "species": "beech",
+   "descriptor": "leaderDominance",
+   "dataset": "biodiv",
+   "standing": "held out (noise)",
+   "control_share_at_dmin": 0.6981132075471698
+  },
+  {
+   "species": "beech",
+   "descriptor": "branchAngle2",
+   "dataset": "biodiv",
+   "standing": "held out (noise)",
+   "control_share_at_dmin": 1.0
+  },
+  {
+   "species": "beech",
+   "descriptor": "limbDroop",
+   "dataset": "biodiv",
+   "standing": "held out (noise)",
+   "control_share_at_dmin": 0.8490566037735849
+  },
+  {
+   "species": "beech",
+   "descriptor": "limbUpturn",
+   "dataset": "biodiv",
+   "standing": "held out (noise)",
+   "control_share_at_dmin": 0.8113207547169812
+  },
+  {
+   "species": "beech",
+   "descriptor": "junctionDelta",
+   "dataset": "biodiv",
+   "standing": "report-only",
+   "control_share_at_dmin": 0.7924528301886793
+  },
+  {
+   "species": "beech",
+   "descriptor": "ldSlope",
+   "dataset": "biodiv",
+   "standing": "report-only",
+   "control_share_at_dmin": 0.8076923076923077
+  },
+  {
+   "species": "beech",
+   "descriptor": "limbElevation",
+   "dataset": "biodiv",
+   "standing": "candidate A or B",
+   "control_share_at_dmin": 1.0
+  },
+  {
+   "species": "beech",
+   "descriptor": "p0",
+   "dataset": "biodiv",
+   "standing": "candidate A or B",
+   "control_share_at_dmin": 0.9056603773584906
+  },
+  {
+   "species": "beech",
+   "descriptor": "p1",
+   "dataset": "biodiv",
+   "standing": "candidate A or B",
+   "control_share_at_dmin": 0.9245283018867925
+  },
+  {
+   "species": "beech",
+   "descriptor": "p2",
+   "dataset": "biodiv",
+   "standing": "held out (noise)",
+   "control_share_at_dmin": 0.9811320754716981
+  },
+  {
+   "species": "beech",
+   "descriptor": "p3",
+   "dataset": "biodiv",
+   "standing": "held out (noise)",
+   "control_share_at_dmin": 0.9811320754716981
+  },
+  {
+   "species": "beech",
+   "descriptor": "bifurcationRatio",
+   "dataset": "biodiv",
+   "standing": "held out (noise)",
+   "control_share_at_dmin": 0.9245283018867925
+  },
+  {
+   "species": "beech",
+   "descriptor": "bifurcationRatio2",
+   "dataset": "biodiv",
+   "standing": "held out (noise)",
+   "control_share_at_dmin": 0.9230769230769231
+  },
+  {
+   "species": "beech",
+   "descriptor": "tortuosity",
+   "dataset": "biodiv",
+   "standing": "candidate A or B",
+   "control_share_at_dmin": 0.9245283018867925
+  },
+  {
+   "species": "beech",
+   "descriptor": "tortuosity05",
+   "dataset": "biodiv",
+   "standing": "candidate A or B",
+   "control_share_at_dmin": 0.9056603773584906
+  },
+  {
+   "species": "beech",
+   "descriptor": "length0",
+   "dataset": "biodiv",
+   "standing": "candidate A or B",
+   "control_share_at_dmin": 1.0
+  },
+  {
+   "species": "beech",
+   "descriptor": "length1",
+   "dataset": "biodiv",
+   "standing": "candidate A or B",
+   "control_share_at_dmin": 1.0
+  },
+  {
+   "species": "beech",
+   "descriptor": "length2",
+   "dataset": "biodiv",
+   "standing": "candidate A or B",
+   "control_share_at_dmin": 1.0
+  },
+  {
+   "species": "beech",
+   "descriptor": "length3",
+   "dataset": "biodiv",
+   "standing": "candidate A or B",
+   "control_share_at_dmin": 0.9811320754716981
+  },
+  {
+   "species": "beech",
+   "descriptor": "pendulousFraction",
+   "dataset": "biodiv",
+   "standing": "candidate A or B",
+   "control_share_at_dmin": 0.9811320754716981
+  },
+  {
+   "species": "beech",
+   "descriptor": "taper",
+   "dataset": "biodiv",
+   "standing": "held out (noise)",
+   "control_share_at_dmin": 0.9433962264150944
+  },
+  {
+   "species": "beech",
+   "descriptor": "centroidHeight",
+   "dataset": "biodiv",
+   "standing": "candidate A or B",
+   "control_share_at_dmin": 1.0
+  }
+ ],
+ "v1": {
+  "commit": "e74063c",
+  "rules": {
+   "seeds": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20
+   ],
+   "stand_season": 150,
+   "lone_season": 100,
+   "lone": "reported only",
+   "bracket": [
+    0.5,
+    1.0,
+    2.0
+   ],
+   "inflation": "Demol et al. 2022 (Silva Fennica 56(1) 10550, \u00a73.2, Table 3): diameter +73% under 2.5 cm, +4% over 10 cm, both measured on two leaf-off Fraxinus; log-interpolated between (not measured). One bracket point, at d_min \u00d7 1. Order: inflate, prune, re-cut",
+   "datasets": {
+    "oak": [
+     "wytham",
+     "biodiv"
+    ],
+    "beech": [
+     "demol",
+     "biodiv"
+    ],
+    "maple": [
+     "wytham"
+    ]
+   },
+   "datasets_note": "BioDiv's resolution is measured on its beech (the only BioDiv QSMs fetched) and applied to oak",
+   "shift": "per seed, the median over the stand's live measured trees (STAND_MEASURED, alive at 150) of describe(coarsen(tree)) \u2212 describe(tree)",
+   "pass": "|shift| <= tolerance on >= 15 of the 20 seeds, at every bracket point and the inflation point, at each of the species' datasets",
+   "pass_seeds": 15,
+   "fail": "a seed with no live measured tree, or a NaN shift (the descriptor not computable at the resolution), counts as a fail",
+   "held_out": "gate c failed, or noise floor >= 0.5 \u00d7 between-tree SD, or fewer than MIN_TREES finite real trees",
+   "survive": "per species, over its gated descriptors (DESCRIPTORS less report-only and H1-excluded): if fewer than half pass, stop and report; never loosen",
+   "h2": "ldSlope under the inflation point moves toward the dataset's QSM median: the gap closed is median shift / (QSM median \u2212 simulated median, uncoarsened), on beech at Demol and BioDiv. 'Hard' means at least half the gap closed",
+   "h3": "tortuosity and tortuosity05 (0.5 m resampling) reported on the real QSMs, the simulated trees and the coarsened ones",
+   "control": "each real QSM coarsened at its own dataset's resolution (\u00d7 1, no inflation): the shift should be near zero; a large one says the re-cut moves the descriptor by construction"
+  },
+  "resolution": {
+   "demol": {
+    "d_min": 0.04335650056600571,
+    "ratio": [
+     29.17897358712928,
+     14.314240903842519,
+     6.753938437700561,
+     4.5279085800837775,
+     3.4998572806511197,
+     2.0028947370623134,
+     2.2404562099236682
+    ],
+    "count": [
+     313,
+     23929,
+     146035,
+     129308,
+     36329,
+     9029,
+     537
+    ],
+    "trees": 66
+   },
+   "wytham": {
+    "d_min": 0.01209430746874127,
+    "ratio": [
+     66.8309914905054,
+     20.69534064969117,
+     9.656261006602275,
+     5.374114609380631,
+     4.539947706449849,
+     4.740940745973458,
+     4.802750596308289
+    ],
+    "count": [
+     96410,
+     92354,
+     167777,
+     141477,
+     23378,
+     4138,
+     795
+    ],
+    "trees": 77
+   },
+   "biodiv": {
+    "d_min": 0.019999999552965164,
+    "ratio": [
+     10.947723307238357,
+     6.429461518109004,
+     5.207509917933832,
+     3.548933926662191,
+     2.631143386727868,
+     1.786601110238421,
+     1.1778121195052083
+    ],
+    "count": [
+     9473,
+     169413,
+     177718,
+     124669,
+     36325,
+     11707,
+     4756
+    ],
+    "trees": 53
+   }
+  },
+  "table": [
+   {
+    "species": "oak",
+    "descriptor": "widestAt",
+    "set": "wytham QUERRO",
+    "n": 34,
+    "between_sd": 0.1701869849716459,
+    "between_sd_lo95": 0.13686253096007062,
+    "between_sd_hi95": 0.2251051337744595,
+    "tolerance": 0.08509349248582294,
+    "noise_ratio": 0.5193602064402542,
+    "noise_verdict": "held out (noise)",
+    "biodiv_repeats_ratio": null
+   },
+   {
+    "species": "oak",
+    "descriptor": "profileCentre",
+    "set": "wytham QUERRO",
+    "n": 34,
+    "between_sd": 0.0400661993686389,
+    "between_sd_lo95": 0.032220803796813816,
+    "between_sd_hi95": 0.05299528145594835,
+    "tolerance": 0.02003309968431945,
+    "noise_ratio": 0.18818970640326071,
+    "noise_verdict": "clear",
+    "biodiv_repeats_ratio": null
+   },
+   {
+    "species": "oak",
+    "descriptor": "crownFullness",
+    "set": "wytham QUERRO",
+    "n": 34,
+    "between_sd": 0.064800857808886,
+    "between_sd_lo95": 0.052112148350153736,
+    "between_sd_hi95": 0.08571164104117181,
+    "tolerance": 0.032400428904443,
+    "noise_ratio": 0.18163005020934012,
+    "noise_verdict": "clear",
+    "biodiv_repeats_ratio": null
+   },
+   {
+    "species": "oak",
+    "descriptor": "forkHeight",
+    "set": "wytham QUERRO",
+    "n": 34,
+    "between_sd": 0.157132997537462,
+    "between_sd_lo95": 0.12636465558105134,
+    "between_sd_hi95": 0.2078387159684701,
+    "tolerance": 0.078566498768731,
+    "noise_ratio": 0.27895929655148144,
+    "noise_verdict": "clear",
+    "biodiv_repeats_ratio": null
+   },
+   {
+    "species": "oak",
+    "descriptor": "leaderDominance",
+    "set": "wytham QUERRO",
+    "n": 34,
+    "between_sd": 0.22391091617859094,
+    "between_sd_lo95": 0.1800667348498818,
+    "between_sd_hi95": 0.2961654015337366,
+    "tolerance": 0.11195545808929547,
+    "noise_ratio": 0.8185823481615809,
+    "noise_verdict": "excluded (H1)",
+    "biodiv_repeats_ratio": null
+   },
+   {
+    "species": "oak",
+    "descriptor": "branchAngle2",
+    "set": "wytham QUERRO",
+    "n": 34,
+    "between_sd": 5.223897878030536,
+    "between_sd_lo95": 4.201002122361573,
+    "between_sd_hi95": 6.90961315786924,
+    "tolerance": 2.611948939015268,
+    "noise_ratio": 0.2967202885926253,
+    "noise_verdict": "clear",
+    "biodiv_repeats_ratio": null
+   },
+   {
+    "species": "oak",
+    "descriptor": "limbDroop",
+    "set": "wytham QUERRO",
+    "n": 34,
+    "between_sd": 16.27841855726178,
+    "between_sd_lo95": 13.090927982215621,
+    "between_sd_hi95": 21.531350282629187,
+    "tolerance": 8.13920927863089,
+    "noise_ratio": 0.5629957253531399,
+    "noise_verdict": "held out (noise)",
+    "biodiv_repeats_ratio": null
+   },
+   {
+    "species": "oak",
+    "descriptor": "limbUpturn",
+    "set": "wytham QUERRO",
+    "n": 34,
+    "between_sd": 14.408696876106331,
+    "between_sd_lo95": 11.58731804684667,
+    "between_sd_hi95": 19.058282502342546,
+    "tolerance": 7.204348438053166,
+    "noise_ratio": 0.719588447248694,
+    "noise_verdict": "held out (noise)",
+    "biodiv_repeats_ratio": null
+   },
+   {
+    "species": "oak",
+    "descriptor": "junctionDelta",
+    "set": "wytham QUERRO",
+    "n": 34,
+    "between_sd": 0.37616960315141135,
+    "between_sd_lo95": 0.30251152264155196,
+    "between_sd_hi95": 0.4975569010367719,
+    "tolerance": 0.18808480157570567,
+    "noise_ratio": 0.24861081574653546,
+    "noise_verdict": "excluded (H1)",
+    "biodiv_repeats_ratio": null
+   },
+   {
+    "species": "oak",
+    "descriptor": "ldSlope",
+    "set": "wytham QUERRO",
+    "n": 34,
+    "between_sd": 0.23859926976657556,
+    "between_sd_lo95": 0.1918789497970056,
+    "between_sd_hi95": 0.31559358401138443,
+    "tolerance": 0.11929963488328778,
+    "noise_ratio": 0.5971821844741197,
+    "noise_verdict": "excluded (H1)",
+    "biodiv_repeats_ratio": null
+   },
+   {
+    "species": "oak",
+    "descriptor": "limbElevation",
+    "set": "wytham QUERRO",
+    "n": 34,
+    "between_sd": 9.010921740897892,
+    "between_sd_lo95": 7.2464857165656875,
+    "between_sd_hi95": 11.918683113482205,
+    "tolerance": 4.505460870448946,
+    "noise_ratio": 0.231851486193171,
+    "noise_verdict": "clear",
+    "biodiv_repeats_ratio": null
+   },
+   {
+    "species": "oak",
+    "descriptor": "p0",
+    "set": "wytham QUERRO",
+    "n": 34,
+    "between_sd": 0.17254487376727262,
+    "between_sd_lo95": 0.13875871960425884,
+    "between_sd_hi95": 0.22822389678006352,
+    "tolerance": 0.08627243688363631,
+    "noise_ratio": 0.16699752352997194,
+    "noise_verdict": "clear",
+    "biodiv_repeats_ratio": null
+   },
+   {
+    "species": "oak",
+    "descriptor": "p1",
+    "set": "wytham QUERRO",
+    "n": 34,
+    "between_sd": 0.17110481390851326,
+    "between_sd_lo95": 0.1376006390551696,
+    "between_sd_hi95": 0.22631913968478234,
+    "tolerance": 0.08555240695425663,
+    "noise_ratio": 0.16535097614209288,
+    "noise_verdict": "clear",
+    "biodiv_repeats_ratio": null
+   },
+   {
+    "species": "oak",
+    "descriptor": "p2",
+    "set": "wytham QUERRO",
+    "n": 34,
+    "between_sd": 0.08166981938980769,
+    "between_sd_lo95": 0.06567798463909078,
+    "between_sd_hi95": 0.1080240984476077,
+    "tolerance": 0.040834909694903845,
+    "noise_ratio": 0.11130342574335815,
+    "noise_verdict": "clear",
+    "biodiv_repeats_ratio": null
+   },
+   {
+    "species": "oak",
+    "descriptor": "p3",
+    "set": "wytham QUERRO",
+    "n": 34,
+    "between_sd": 0.11320642714567349,
+    "between_sd_lo95": 0.09103938319775191,
+    "between_sd_hi95": 0.14973734878140713,
+    "tolerance": 0.05660321357283674,
+    "noise_ratio": 0.2730585355563499,
+    "noise_verdict": "clear",
+    "biodiv_repeats_ratio": null
+   },
+   {
+    "species": "oak",
+    "descriptor": "bifurcationRatio",
+    "set": "wytham QUERRO",
+    "n": 34,
+    "between_sd": 0.43390153932668457,
+    "between_sd_lo95": 0.3489389207383545,
+    "between_sd_hi95": 0.5739185289130669,
+    "tolerance": 0.21695076966334229,
+    "noise_ratio": 0.35133932531970063,
+    "noise_verdict": "clear",
+    "biodiv_repeats_ratio": null
+   },
+   {
+    "species": "oak",
+    "descriptor": "bifurcationRatio2",
+    "set": "wytham QUERRO",
+    "n": 33,
+    "between_sd": 0.41553021936197615,
+    "between_sd_lo95": 0.3331319767165921,
+    "between_sd_hi95": 0.5524389392922034,
+    "tolerance": 0.20776510968098807,
+    "noise_ratio": 0.4141451604731505,
+    "noise_verdict": "clear",
+    "biodiv_repeats_ratio": null
+   },
+   {
+    "species": "oak",
+    "descriptor": "tortuosity",
+    "set": "wytham QUERRO",
+    "n": 34,
+    "between_sd": 0.17982030080296185,
+    "between_sd_lo95": 0.14460953926644188,
+    "between_sd_hi95": 0.23784705319480345,
+    "tolerance": 0.08991015040148093,
+    "noise_ratio": 0.22277986373348563,
+    "noise_verdict": "clear",
+    "biodiv_repeats_ratio": null
+   },
+   {
+    "species": "oak",
+    "descriptor": "tortuosity05",
+    "set": "wytham QUERRO",
+    "n": 34,
+    "between_sd": 0.08814149294080958,
+    "between_sd_lo95": 0.0708824344498976,
+    "between_sd_hi95": 0.11658413575413631,
+    "tolerance": 0.04407074647040479,
+    "noise_ratio": 0.2153704370359136,
+    "noise_verdict": "clear",
+    "biodiv_repeats_ratio": null
+   },
+   {
+    "species": "oak",
+    "descriptor": "length0",
+    "set": "wytham QUERRO",
+    "n": 34,
+    "between_sd": 0.05479393241547621,
+    "between_sd_lo95": 0.04406468727844579,
+    "between_sd_hi95": 0.07247555086817858,
+    "tolerance": 0.027396966207738106,
+    "noise_ratio": 0.02322985284181283,
+    "noise_verdict": "clear",
+    "biodiv_repeats_ratio": null
+   },
+   {
+    "species": "oak",
+    "descriptor": "length1",
+    "set": "wytham QUERRO",
+    "n": 34,
+    "between_sd": 0.10155268644652429,
+    "between_sd_lo95": 0.0816675710847183,
+    "between_sd_hi95": 0.1343230275306258,
+    "tolerance": 0.050776343223262146,
+    "noise_ratio": 0.034306180972180786,
+    "noise_verdict": "clear",
+    "biodiv_repeats_ratio": null
+   },
+   {
+    "species": "oak",
+    "descriptor": "length2",
+    "set": "wytham QUERRO",
+    "n": 34,
+    "between_sd": 0.044233727777151705,
+    "between_sd_lo95": 0.0355722850274854,
+    "between_sd_hi95": 0.05850764211069191,
+    "tolerance": 0.022116863888575852,
+    "noise_ratio": 0.19765058259677937,
+    "noise_verdict": "clear",
+    "biodiv_repeats_ratio": null
+   },
+   {
+    "species": "oak",
+    "descriptor": "length3",
+    "set": "wytham QUERRO",
+    "n": 34,
+    "between_sd": 0.16988301500687797,
+    "between_sd_lo95": 0.13661808160502203,
+    "between_sd_hi95": 0.22470307482974114,
+    "tolerance": 0.08494150750343898,
+    "noise_ratio": 0.0654455866638197,
+    "noise_verdict": "clear",
+    "biodiv_repeats_ratio": null
+   },
+   {
+    "species": "oak",
+    "descriptor": "pendulousFraction",
+    "set": "wytham QUERRO",
+    "n": 34,
+    "between_sd": 0.06208561194967879,
+    "between_sd_lo95": 0.04992857702399232,
+    "between_sd_hi95": 0.0821202043489405,
+    "tolerance": 0.031042805974839396,
+    "noise_ratio": 0.16053828314475568,
+    "noise_verdict": "clear",
+    "biodiv_repeats_ratio": null
+   },
+   {
+    "species": "oak",
+    "descriptor": "taper",
+    "set": "wytham QUERRO",
+    "n": 34,
+    "between_sd": 0.12619573216930585,
+    "between_sd_lo95": 0.10148524168242316,
+    "between_sd_hi95": 0.1669182116157136,
+    "tolerance": 0.06309786608465293,
+    "noise_ratio": 0.7717426519326828,
+    "noise_verdict": "excluded (H1)",
+    "biodiv_repeats_ratio": null
+   },
+   {
+    "species": "oak",
+    "descriptor": "centroidHeight",
+    "set": "wytham QUERRO",
+    "n": 34,
+    "between_sd": 0.06887600705405998,
+    "between_sd_lo95": 0.05538933925771611,
+    "between_sd_hi95": 0.09110181242318795,
+    "tolerance": 0.03443800352702999,
+    "noise_ratio": 0.055387809511604685,
+    "noise_verdict": "clear",
+    "biodiv_repeats_ratio": null
+   },
+   {
+    "species": "maple",
+    "descriptor": "widestAt",
+    "set": "wytham ACERPS",
+    "n": 39,
+    "between_sd": 0.2130041476505089,
+    "between_sd_lo95": 0.17365457010205812,
+    "between_sd_hi95": 0.27557353150195885,
+    "tolerance": 0.10650207382525445,
+    "noise_ratio": 0.4831317907594027,
+    "noise_verdict": "clear",
+    "biodiv_repeats_ratio": null
+   },
+   {
+    "species": "maple",
+    "descriptor": "profileCentre",
+    "set": "wytham ACERPS",
+    "n": 39,
+    "between_sd": 0.03511012659501802,
+    "between_sd_lo95": 0.028624015106459476,
+    "between_sd_hi95": 0.04542362993393497,
+    "tolerance": 0.01755506329750901,
+    "noise_ratio": 0.39731408119763184,
+    "noise_verdict": "clear",
+    "biodiv_repeats_ratio": null
+   },
+   {
+    "species": "maple",
+    "descriptor": "crownFullness",
+    "set": "wytham ACERPS",
+    "n": 39,
+    "between_sd": 0.07322524069488599,
+    "between_sd_lo95": 0.05969788773481556,
+    "between_sd_hi95": 0.09473495420605474,
+    "tolerance": 0.036612620347442996,
+    "noise_ratio": 0.41951773671661263,
+    "noise_verdict": "clear",
+    "biodiv_repeats_ratio": null
+   },
+   {
+    "species": "maple",
+    "descriptor": "forkHeight",
+    "set": "wytham ACERPS",
+    "n": 39,
+    "between_sd": 0.1126221696493663,
+    "between_sd_lo95": 0.09181677760806287,
+    "between_sd_hi95": 0.14570462292880357,
+    "tolerance": 0.05631108482468315,
+    "noise_ratio": 0.6617699263859655,
+    "noise_verdict": "held out (noise)",
+    "biodiv_repeats_ratio": null
+   },
+   {
+    "species": "maple",
+    "descriptor": "leaderDominance",
+    "set": "wytham ACERPS",
+    "n": 39,
+    "between_sd": 0.22389185254155747,
+    "between_sd_lo95": 0.18253092172763924,
+    "between_sd_hi95": 0.2896594698269736,
+    "tolerance": 0.11194592627077873,
+    "noise_ratio": 0.781887357958006,
+    "noise_verdict": "excluded (H1)",
+    "biodiv_repeats_ratio": null
+   },
+   {
+    "species": "maple",
+    "descriptor": "branchAngle2",
+    "set": "wytham ACERPS",
+    "n": 39,
+    "between_sd": 7.569463537126242,
+    "between_sd_lo95": 6.171109581394676,
+    "between_sd_hi95": 9.792972679216295,
+    "tolerance": 3.784731768563121,
+    "noise_ratio": 0.2926034083626447,
+    "noise_verdict": "clear",
+    "biodiv_repeats_ratio": null
+   },
+   {
+    "species": "maple",
+    "descriptor": "limbDroop",
+    "set": "wytham ACERPS",
+    "n": 39,
+    "between_sd": 20.01659435096187,
+    "between_sd_lo95": 16.31880470528135,
+    "between_sd_hi95": 25.896414012497488,
+    "tolerance": 10.008297175480935,
+    "noise_ratio": 0.6183325701520868,
+    "noise_verdict": "held out (noise)",
+    "biodiv_repeats_ratio": null
+   },
+   {
+    "species": "maple",
+    "descriptor": "limbUpturn",
+    "set": "wytham ACERPS",
+    "n": 39,
+    "between_sd": 15.409066915060079,
+    "between_sd_lo95": 12.562454395015212,
+    "between_sd_hi95": 19.935438036166122,
+    "tolerance": 7.704533457530039,
+    "noise_ratio": 0.7076541675876833,
+    "noise_verdict": "held out (noise)",
+    "biodiv_repeats_ratio": null
+   },
+   {
+    "species": "maple",
+    "descriptor": "junctionDelta",
+    "set": "wytham ACERPS",
+    "n": 39,
+    "between_sd": 0.30079036435728207,
+    "between_sd_lo95": 0.24522349442231833,
+    "between_sd_hi95": 0.3891467084655105,
+    "tolerance": 0.15039518217864103,
+    "noise_ratio": 0.7986730926632492,
+    "noise_verdict": "excluded (H1)",
+    "biodiv_repeats_ratio": null
+   },
+   {
+    "species": "maple",
+    "descriptor": "ldSlope",
+    "set": "wytham ACERPS",
+    "n": 39,
+    "between_sd": 0.3185794119156449,
+    "between_sd_lo95": 0.25972626087239303,
+    "between_sd_hi95": 0.4121612399278636,
+    "tolerance": 0.15928970595782244,
+    "noise_ratio": 0.9137834125721125,
+    "noise_verdict": "excluded (H1)",
+    "biodiv_repeats_ratio": null
+   },
+   {
+    "species": "maple",
+    "descriptor": "limbElevation",
+    "set": "wytham ACERPS",
+    "n": 39,
+    "between_sd": 13.141706523912626,
+    "between_sd_lo95": 10.713957554300269,
+    "between_sd_hi95": 17.00204675215526,
+    "tolerance": 6.570853261956313,
+    "noise_ratio": 0.3292020573521242,
+    "noise_verdict": "clear",
+    "biodiv_repeats_ratio": null
+   },
+   {
+    "species": "maple",
+    "descriptor": "p0",
+    "set": "wytham ACERPS",
+    "n": 39,
+    "between_sd": 0.20841137687098898,
+    "between_sd_lo95": 0.16991025035949878,
+    "between_sd_hi95": 0.26963164690932667,
+    "tolerance": 0.10420568843549449,
+    "noise_ratio": 0.3287859969379534,
+    "noise_verdict": "clear",
+    "biodiv_repeats_ratio": null
+   },
+   {
+    "species": "maple",
+    "descriptor": "p1",
+    "set": "wytham ACERPS",
+    "n": 39,
+    "between_sd": 0.17184563315013,
+    "between_sd_lo95": 0.140099523308651,
+    "between_sd_hi95": 0.2223248163133046,
+    "tolerance": 0.085922816575065,
+    "noise_ratio": 0.3909895491943832,
+    "noise_verdict": "clear",
+    "biodiv_repeats_ratio": null
+   },
+   {
+    "species": "maple",
+    "descriptor": "p2",
+    "set": "wytham ACERPS",
+    "n": 39,
+    "between_sd": 0.08680761883725667,
+    "between_sd_lo95": 0.07077110890582751,
+    "between_sd_hi95": 0.11230711865530958,
+    "tolerance": 0.043403809418628335,
+    "noise_ratio": 0.16033512533852742,
+    "noise_verdict": "clear",
+    "biodiv_repeats_ratio": null
+   },
+   {
+    "species": "maple",
+    "descriptor": "p3",
+    "set": "wytham ACERPS",
+    "n": 39,
+    "between_sd": 0.1534945238924499,
+    "between_sd_lo95": 0.12513852830367547,
+    "between_sd_hi95": 0.1985831190698561,
+    "tolerance": 0.07674726194622496,
+    "noise_ratio": 0.1867502274130683,
+    "noise_verdict": "clear",
+    "biodiv_repeats_ratio": null
+   },
+   {
+    "species": "maple",
+    "descriptor": "bifurcationRatio",
+    "set": "wytham ACERPS",
+    "n": 39,
+    "between_sd": 0.543774076040937,
+    "between_sd_lo95": 0.44331931771802363,
+    "between_sd_hi95": 0.7035062186661495,
+    "tolerance": 0.2718870380204685,
+    "noise_ratio": 0.6425257330613374,
+    "noise_verdict": "held out (noise)",
+    "biodiv_repeats_ratio": null
+   },
+   {
+    "species": "maple",
+    "descriptor": "bifurcationRatio2",
+    "set": "wytham ACERPS",
+    "n": 39,
+    "between_sd": 0.7919545782431874,
+    "between_sd_lo95": 0.6456518961819797,
+    "between_sd_hi95": 1.024589062339313,
+    "tolerance": 0.3959772891215937,
+    "noise_ratio": 0.5563968401999594,
+    "noise_verdict": "held out (noise)",
+    "biodiv_repeats_ratio": null
+   },
+   {
+    "species": "maple",
+    "descriptor": "tortuosity",
+    "set": "wytham ACERPS",
+    "n": 39,
+    "between_sd": 0.20721250481529432,
+    "between_sd_lo95": 0.16893285337575262,
+    "between_sd_hi95": 0.2680806094771877,
+    "tolerance": 0.10360625240764716,
+    "noise_ratio": 0.41645072265117905,
+    "noise_verdict": "clear",
+    "biodiv_repeats_ratio": null
+   },
+   {
+    "species": "maple",
+    "descriptor": "tortuosity05",
+    "set": "wytham ACERPS",
+    "n": 39,
+    "between_sd": 0.12482494902260327,
+    "between_sd_lo95": 0.1017652618487859,
+    "between_sd_hi95": 0.1614919352563536,
+    "tolerance": 0.062412474511301635,
+    "noise_ratio": 0.3835222629617946,
+    "noise_verdict": "clear",
+    "biodiv_repeats_ratio": null
+   },
+   {
+    "species": "maple",
+    "descriptor": "length0",
+    "set": "wytham ACERPS",
+    "n": 39,
+    "between_sd": 0.02588913068417405,
+    "between_sd_lo95": 0.021106470971883468,
+    "between_sd_hi95": 0.03349399177831701,
+    "tolerance": 0.012944565342087025,
+    "noise_ratio": 0.2251365646743023,
+    "noise_verdict": "clear",
+    "biodiv_repeats_ratio": null
+   },
+   {
+    "species": "maple",
+    "descriptor": "length1",
+    "set": "wytham ACERPS",
+    "n": 39,
+    "between_sd": 0.04834806928651847,
+    "between_sd_lo95": 0.03941643052411625,
+    "between_sd_hi95": 0.062550181963818,
+    "tolerance": 0.024174034643259235,
+    "noise_ratio": 0.3642325093220652,
+    "noise_verdict": "clear",
+    "biodiv_repeats_ratio": null
+   },
+   {
+    "species": "maple",
+    "descriptor": "length2",
+    "set": "wytham ACERPS",
+    "n": 39,
+    "between_sd": 0.04028630416688591,
+    "between_sd_lo95": 0.03284396528550232,
+    "between_sd_hi95": 0.052120295463196374,
+    "tolerance": 0.020143152083442955,
+    "noise_ratio": 0.5214242395654068,
+    "noise_verdict": "held out (noise)",
+    "biodiv_repeats_ratio": null
+   },
+   {
+    "species": "maple",
+    "descriptor": "length3",
+    "set": "wytham ACERPS",
+    "n": 39,
+    "between_sd": 0.07412369697609454,
+    "between_sd_lo95": 0.06043036661369993,
+    "between_sd_hi95": 0.09589732955434606,
+    "tolerance": 0.03706184848804727,
+    "noise_ratio": 0.44751915583026636,
+    "noise_verdict": "clear",
+    "biodiv_repeats_ratio": null
+   },
+   {
+    "species": "maple",
+    "descriptor": "pendulousFraction",
+    "set": "wytham ACERPS",
+    "n": 39,
+    "between_sd": 0.10387837813243501,
+    "between_sd_lo95": 0.0846882809394155,
+    "between_sd_hi95": 0.13439236664827722,
+    "tolerance": 0.05193918906621751,
+    "noise_ratio": 0.18352570662031673,
+    "noise_verdict": "clear",
+    "biodiv_repeats_ratio": null
+   },
+   {
+    "species": "maple",
+    "descriptor": "taper",
+    "set": "wytham ACERPS",
+    "n": 39,
+    "between_sd": 0.11426327048381497,
+    "between_sd_lo95": 0.09315470770493547,
+    "between_sd_hi95": 0.14782779262990187,
+    "tolerance": 0.05713163524190749,
+    "noise_ratio": 0.5043515955540158,
+    "noise_verdict": "excluded (H1)",
+    "biodiv_repeats_ratio": null
+   },
+   {
+    "species": "maple",
+    "descriptor": "centroidHeight",
+    "set": "wytham ACERPS",
+    "n": 39,
+    "between_sd": 0.06751435844819133,
+    "between_sd_lo95": 0.05504201219252131,
+    "between_sd_hi95": 0.08734651597105998,
+    "tolerance": 0.033757179224095664,
+    "noise_ratio": 0.12312988833303289,
+    "noise_verdict": "clear",
+    "biodiv_repeats_ratio": null
+   },
+   {
+    "species": "beech",
+    "descriptor": "widestAt",
+    "set": "demol FSYL",
+    "n": 15,
+    "between_sd": 0.22983683548040346,
+    "between_sd_lo95": 0.16662111717468034,
+    "between_sd_hi95": 0.37027689194694385,
+    "tolerance": 0.11491841774020173,
+    "noise_ratio": null,
+    "noise_verdict": "not measured",
+    "biodiv_repeats_ratio": 0.4724789238582529
+   },
+   {
+    "species": "beech",
+    "descriptor": "profileCentre",
+    "set": "demol FSYL",
+    "n": 15,
+    "between_sd": 0.06146385258640455,
+    "between_sd_lo95": 0.044558461494653596,
+    "between_sd_hi95": 0.0990208738960795,
+    "tolerance": 0.030731926293202275,
+    "noise_ratio": null,
+    "noise_verdict": "not measured",
+    "biodiv_repeats_ratio": 0.39168195745302653
+   },
+   {
+    "species": "beech",
+    "descriptor": "crownFullness",
+    "set": "demol FSYL",
+    "n": 15,
+    "between_sd": 0.10640770385155793,
+    "between_sd_lo95": 0.0771406831053885,
+    "between_sd_hi95": 0.17142732486292475,
+    "tolerance": 0.053203851925778964,
+    "noise_ratio": null,
+    "noise_verdict": "not measured",
+    "biodiv_repeats_ratio": 0.42162821240974424
+   },
+   {
+    "species": "beech",
+    "descriptor": "forkHeight",
+    "set": "demol FSYL",
+    "n": 15,
+    "between_sd": 0.12216980780882611,
+    "between_sd_lo95": 0.08856748231663765,
+    "between_sd_hi95": 0.1968207429877558,
+    "tolerance": 0.061084903904413054,
+    "noise_ratio": null,
+    "noise_verdict": "not measured",
+    "biodiv_repeats_ratio": 0.7514541174007529
+   },
+   {
+    "species": "beech",
+    "descriptor": "leaderDominance",
+    "set": "demol FSYL",
+    "n": 15,
+    "between_sd": 0.43175947514693985,
+    "between_sd_lo95": 0.3130057283871304,
+    "between_sd_hi95": 0.6955828302799777,
+    "tolerance": 0.21587973757346993,
+    "noise_ratio": null,
+    "noise_verdict": "not measured",
+    "biodiv_repeats_ratio": 0.9106825496338012
+   },
+   {
+    "species": "beech",
+    "descriptor": "branchAngle2",
+    "set": "demol FSYL",
+    "n": 15,
+    "between_sd": 5.9816966757772345,
+    "between_sd_lo95": 4.336454514067889,
+    "between_sd_hi95": 9.63676709630388,
+    "tolerance": 2.9908483378886173,
+    "noise_ratio": null,
+    "noise_verdict": "not measured",
+    "biodiv_repeats_ratio": 1.3921130254960812
+   },
+   {
+    "species": "beech",
+    "descriptor": "limbDroop",
+    "set": "demol FSYL",
+    "n": 15,
+    "between_sd": 15.555534166213262,
+    "between_sd_lo95": 11.277045629373688,
+    "between_sd_hi95": 25.0606254284729,
+    "tolerance": 7.777767083106631,
+    "noise_ratio": null,
+    "noise_verdict": "not measured",
+    "biodiv_repeats_ratio": 0.7082940905418867
+   },
+   {
+    "species": "beech",
+    "descriptor": "limbUpturn",
+    "set": "demol FSYL",
+    "n": 15,
+    "between_sd": 10.45846035482346,
+    "between_sd_lo95": 7.581901937543722,
+    "between_sd_hi95": 16.84902329359014,
+    "tolerance": 5.22923017741173,
+    "noise_ratio": null,
+    "noise_verdict": "not measured",
+    "biodiv_repeats_ratio": 0.9159884840502042
+   },
+   {
+    "species": "beech",
+    "descriptor": "junctionDelta",
+    "set": "demol FSYL",
+    "n": 15,
+    "between_sd": 0.20782500788721975,
+    "between_sd_lo95": 0.15066355625122496,
+    "between_sd_hi95": 0.3348149039229616,
+    "tolerance": 0.10391250394360987,
+    "noise_ratio": null,
+    "noise_verdict": "not measured",
+    "biodiv_repeats_ratio": 0.6668501860752756
+   },
+   {
+    "species": "beech",
+    "descriptor": "ldSlope",
+    "set": "demol FSYL",
+    "n": 15,
+    "between_sd": 0.15260676594215827,
+    "between_sd_lo95": 0.1106328747371976,
+    "between_sd_hi95": 0.2458559737172983,
+    "tolerance": 0.07630338297107914,
+    "noise_ratio": null,
+    "noise_verdict": "not measured",
+    "biodiv_repeats_ratio": 0.6726170460185187
+   },
+   {
+    "species": "beech",
+    "descriptor": "limbElevation",
+    "set": "demol FSYL",
+    "n": 15,
+    "between_sd": 9.791500770354622,
+    "between_sd_lo95": 7.09838696553205,
+    "between_sd_hi95": 15.774523109687271,
+    "tolerance": 4.895750385177311,
+    "noise_ratio": null,
+    "noise_verdict": "not measured",
+    "biodiv_repeats_ratio": 0.24808259545358807
+   },
+   {
+    "species": "beech",
+    "descriptor": "p0",
+    "set": "demol FSYL",
+    "n": 15,
+    "between_sd": 0.314617287310744,
+    "between_sd_lo95": 0.22808303892895004,
+    "between_sd_hi95": 0.5068617963465377,
+    "tolerance": 0.157308643655372,
+    "noise_ratio": null,
+    "noise_verdict": "not measured",
+    "biodiv_repeats_ratio": 0.28833124658309894
+   },
+   {
+    "species": "beech",
+    "descriptor": "p1",
+    "set": "demol FSYL",
+    "n": 15,
+    "between_sd": 0.2179232874206701,
+    "between_sd_lo95": 0.15798434368674974,
+    "between_sd_hi95": 0.3510836606339643,
+    "tolerance": 0.10896164371033505,
+    "noise_ratio": null,
+    "noise_verdict": "not measured",
+    "biodiv_repeats_ratio": 0.26366708817387113
+   },
+   {
+    "species": "beech",
+    "descriptor": "p2",
+    "set": "demol FSYL",
+    "n": 15,
+    "between_sd": 0.09766012950555181,
+    "between_sd_lo95": 0.070799094703975,
+    "between_sd_hi95": 0.1573346115076274,
+    "tolerance": 0.048830064752775904,
+    "noise_ratio": null,
+    "noise_verdict": "not measured",
+    "biodiv_repeats_ratio": 0.842287228402248
+   },
+   {
+    "species": "beech",
+    "descriptor": "p3",
+    "set": "demol FSYL",
+    "n": 15,
+    "between_sd": 0.1406737392620707,
+    "between_sd_lo95": 0.10198198014688731,
+    "between_sd_hi95": 0.2266313615206188,
+    "tolerance": 0.07033686963103535,
+    "noise_ratio": null,
+    "noise_verdict": "not measured",
+    "biodiv_repeats_ratio": 0.5664434411297484
+   },
+   {
+    "species": "beech",
+    "descriptor": "bifurcationRatio",
+    "set": "demol FSYL",
+    "n": 15,
+    "between_sd": 0.17783117540228136,
+    "between_sd_lo95": 0.1289194095110182,
+    "between_sd_hi95": 0.2864935674109681,
+    "tolerance": 0.08891558770114068,
+    "noise_ratio": null,
+    "noise_verdict": "not measured",
+    "biodiv_repeats_ratio": 1.6622917147199952
+   },
+   {
+    "species": "beech",
+    "descriptor": "bifurcationRatio2",
+    "set": "demol FSYL",
+    "n": 15,
+    "between_sd": 0.2143717277209175,
+    "between_sd_lo95": 0.15540962652425291,
+    "between_sd_hi95": 0.34536194729571856,
+    "tolerance": 0.10718586386045875,
+    "noise_ratio": null,
+    "noise_verdict": "not measured",
+    "biodiv_repeats_ratio": 2.027568626725669
+   },
+   {
+    "species": "beech",
+    "descriptor": "tortuosity",
+    "set": "demol FSYL",
+    "n": 15,
+    "between_sd": 0.12950347617922786,
+    "between_sd_lo95": 0.0938840540241747,
+    "between_sd_hi95": 0.20863559383655936,
+    "tolerance": 0.06475173808961393,
+    "noise_ratio": null,
+    "noise_verdict": "not measured",
+    "biodiv_repeats_ratio": 0.8428129294710933
+   },
+   {
+    "species": "beech",
+    "descriptor": "tortuosity05",
+    "set": "demol FSYL",
+    "n": 15,
+    "between_sd": 0.10273095048446658,
+    "between_sd_lo95": 0.07447520630172462,
+    "between_sd_hi95": 0.16550391921571236,
+    "tolerance": 0.05136547524223329,
+    "noise_ratio": null,
+    "noise_verdict": "not measured",
+    "biodiv_repeats_ratio": 0.8217182719403926
+   },
+   {
+    "species": "beech",
+    "descriptor": "length0",
+    "set": "demol FSYL",
+    "n": 15,
+    "between_sd": 0.01648728619200052,
+    "between_sd_lo95": 0.011952522922393072,
+    "between_sd_hi95": 0.02656171746819162,
+    "tolerance": 0.00824364309600026,
+    "noise_ratio": null,
+    "noise_verdict": "not measured",
+    "biodiv_repeats_ratio": 0.2770037984170754
+   },
+   {
+    "species": "beech",
+    "descriptor": "length1",
+    "set": "demol FSYL",
+    "n": 15,
+    "between_sd": 0.031975618653810635,
+    "between_sd_lo95": 0.023180850412046945,
+    "between_sd_hi95": 0.051514078100084265,
+    "tolerance": 0.015987809326905317,
+    "noise_ratio": null,
+    "noise_verdict": "not measured",
+    "biodiv_repeats_ratio": 0.36299774464075585
+   },
+   {
+    "species": "beech",
+    "descriptor": "length2",
+    "set": "demol FSYL",
+    "n": 15,
+    "between_sd": 0.03783112422095148,
+    "between_sd_lo95": 0.027425822185958938,
+    "between_sd_hi95": 0.06094754596717819,
+    "tolerance": 0.01891556211047574,
+    "noise_ratio": null,
+    "noise_verdict": "not measured",
+    "biodiv_repeats_ratio": 0.4100285766914073
+   },
+   {
+    "species": "beech",
+    "descriptor": "length3",
+    "set": "demol FSYL",
+    "n": 15,
+    "between_sd": 0.07657390451878096,
+    "between_sd_lo95": 0.05551255302779541,
+    "between_sd_hi95": 0.12336380854788508,
+    "tolerance": 0.03828695225939048,
+    "noise_ratio": null,
+    "noise_verdict": "not measured",
+    "biodiv_repeats_ratio": 0.2676108628003589
+   },
+   {
+    "species": "beech",
+    "descriptor": "pendulousFraction",
+    "set": "demol FSYL",
+    "n": 15,
+    "between_sd": 0.05449822980027554,
+    "between_sd_lo95": 0.03950870587990932,
+    "between_sd_hi95": 0.08779896009652856,
+    "tolerance": 0.02724911490013777,
+    "noise_ratio": null,
+    "noise_verdict": "not measured",
+    "biodiv_repeats_ratio": 0.38037343100974563
+   },
+   {
+    "species": "beech",
+    "descriptor": "taper",
+    "set": "demol FSYL",
+    "n": 15,
+    "between_sd": 0.079238265957246,
+    "between_sd_lo95": 0.057444092323949855,
+    "between_sd_hi95": 0.12765620785105178,
+    "tolerance": 0.039619132978623,
+    "noise_ratio": null,
+    "noise_verdict": "not measured",
+    "biodiv_repeats_ratio": 4.356832844689646
+   },
+   {
+    "species": "beech",
+    "descriptor": "centroidHeight",
+    "set": "demol FSYL",
+    "n": 15,
+    "between_sd": 0.07453453043119944,
+    "between_sd_lo95": 0.054034100767957796,
+    "between_sd_hi95": 0.12007829037979663,
+    "tolerance": 0.03726726521559972,
+    "noise_ratio": null,
+    "noise_verdict": "not measured",
+    "biodiv_repeats_ratio": 0.35770479474446154
+   }
+  ]
+ }
 }

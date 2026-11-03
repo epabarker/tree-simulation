@@ -398,7 +398,11 @@ describe("the backdrop beyond a closed stand (round 3's `&interior`)", () => {
     expect(scene.interiorOf(s)).toBeNull();
     scene.interior = true;
     expect(scene.interiorOf({ ...s, shadow: null })).toBeNull();
-    if (s.shadow) expect(scene.interiorOf(s)?.length).toBe(Math.floor(s.shadow.length / s.width));
-    if (!s.periodic) expect(scene.interiorSpan(s)).toEqual([0, s.width]);
+    // A field of 4 rows (the fixture's snapshot carries none): one closure per row.
+    const withField = { ...s, shadow: new Float32Array(4 * s.width) };
+    expect(scene.interiorOf(withField)?.length).toBe(4);
+    expect(scene.interiorSpan({ ...withField, periodic: false })).toEqual([0, s.width]);
+    const [x0, x1] = scene.interiorSpan({ ...withField, periodic: true });
+    expect(x1 - x0).toBeGreaterThan(scene.width / scene.camera.scale);
   });
 });

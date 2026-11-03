@@ -1,0 +1,548 @@
+{
+ "namer-1": {
+  "plate-01.png": {
+   "source": "hornbeamIk145",
+   "trial": "stand100",
+   "seed": 2
+  },
+  "plate-02.png": {
+   "source": "oakIk12",
+   "trial": "stand100",
+   "seed": 2
+  },
+  "plate-03.png": {
+   "source": "birchIk145",
+   "trial": "stand100",
+   "seed": 1
+  },
+  "plate-04.png": {
+   "source": "hornbeamI",
+   "trial": "stand100",
+   "seed": 3
+  },
+  "plate-05.png": {
+   "source": "beechC",
+   "trial": "stand100",
+   "seed": 3
+  },
+  "plate-06.png": {
+   "source": "beechC",
+   "trial": "stand100",
+   "seed": 1
+  },
+  "plate-07.png": {
+   "source": "beechC",
+   "trial": "stand100",
+   "seed": 2
+  },
+  "plate-08.png": {
+   "source": "hornbeamIk145",
+   "trial": "stand100",
+   "seed": 3
+  },
+  "plate-09.png": {
+   "source": "oakIk145",
+   "trial": "stand100",
+   "seed": 3
+  },
+  "plate-10.png": {
+   "source": "birchIk12",
+   "trial": "stand100",
+   "seed": 2
+  },
+  "plate-11.png": {
+   "source": "hornbeamI",
+   "trial": "stand100",
+   "seed": 2
+  },
+  "plate-12.png": {
+   "source": "hornbeamIk12",
+   "trial": "stand100",
+   "seed": 2
+  },
+  "plate-13.png": {
+   "source": "birchIk145",
+   "trial": "stand100",
+   "seed": 2
+  },
+  "plate-14.png": {
+   "source": "beechCk145",
+   "trial": "stand100",
+   "seed": 1
+  },
+  "plate-15.png": {
+   "source": "oakI",
+   "trial": "stand100",
+   "seed": 1
+  },
+  "plate-16.png": {
+   "source": "birchI",
+   "trial": "stand100",
+   "seed": 3
+  },
+  "plate-17.png": {
+   "source": "hornbeamIk12",
+   "trial": "stand100",
+   "seed": 1
+  },
+  "plate-18.png": {
+   "source": "beechCk12",
+   "trial": "stand100",
+   "seed": 2
+  },
+  "plate-19.png": {
+   "source": "oakI",
+   "trial": "stand100",
+   "seed": 2
+  },
+  "plate-20.png": {
+   "source": "oakIk12",
+   "trial": "stand100",
+   "seed": 3
+  },
+  "plate-21.png": {
+   "source": "birchIk12",
+   "trial": "stand100",
+   "seed": 1
+  },
+  "plate-22.png": {
+   "source": "beechCk145",
+   "trial": "stand100",
+   "seed": 3
+  },
+  "plate-23.png": {
+   "source": "birchI",
+   "trial": "stand100",
+   "seed": 2
+  },
+  "plate-24.png": {
+   "source": "birchI",
+   "trial": "stand100",
+   "seed": 1
+  },
+  "plate-25.png": {
+   "source": "oakIk145",
+   "trial": "stand100",
+   "seed": 2
+  },
+  "plate-26.png": {
+   "source": "beechCk12",
+   "trial": "stand100",
+   "seed": 1
+  },
+  "plate-27.png": {
+   "source": "hornbeamIk145",
+   "trial": "stand100",
+   "seed": 1
+  },
+  "plate-28.png": {
+   "source": "oakIk145",
+   "trial": "stand100",
+   "seed": 1
+  },
+  "plate-29.png": {
+   "source": "hornbeamI",
+   "trial": "stand100",
+   "seed": 1
+  },
+  "plate-30.png": {
+   "source": "birchIk12",
+   "trial": "stand100",
+   "seed": 3
+  },
+  "plate-31.png": {
+   "source": "beechCk12",
+   "trial": "stand100",
+   "seed": 3
+  },
+  "plate-32.png": {
+   "source": "oakI",
+   "trial": "stand100",
+   "seed": 3
+  },
+  "plate-33.png": {
+   "source": "hornbeamIk12",
+   "trial": "stand100",
+   "seed": 3
+  },
+  "plate-34.png": {
+   "source": "oakIk12",
+   "trial": "stand100",
+   "seed": 1
+  },
+  "plate-35.png": {
+   "source": "birchIk145",
+   "trial": "stand100",
+   "seed": 3
+  },
+  "plate-36.png": {
+   "source": "beechCk145",
+   "trial": "stand100",
+   "seed": 2
+  }
+ },
+ "namer-2": {
+  "plate-01.png": {
+   "source": "birchIk12",
+   "trial": "stand100",
+   "seed": 2
+  },
+  "plate-02.png": {
+   "source": "birchIk145",
+   "trial": "stand100",
+   "seed": 1
+  },
+  "plate-03.png": {
+   "source": "oakI",
+   "trial": "stand100",
+   "seed": 3
+  },
+  "plate-04.png": {
+   "source": "birchI",
+   "trial": "stand100",
+   "seed": 2
+  },
+  "plate-05.png": {
+   "source": "beechC",
+   "trial": "stand100",
+   "seed": 2
+  },
+  "plate-06.png": {
+   "source": "hornbeamI",
+   "trial": "stand100",
+   "seed": 1
+  },
+  "plate-07.png": {
+   "source": "oakIk12",
+   "trial": "stand100",
+   "seed": 3
+  },
+  "plate-08.png": {
+   "source": "birchIk145",
+   "trial": "stand100",
+   "seed": 3
+  },
+  "plate-09.png": {
+   "source": "hornbeamIk145",
+   "trial": "stand100",
+   "seed": 1
+  },
+  "plate-10.png": {
+   "source": "oakIk12",
+   "trial": "stand100",
+   "seed": 2
+  },
+  "plate-11.png": {
+   "source": "oakIk12",
+   "trial": "stand100",
+   "seed": 1
+  },
+  "plate-12.png": {
+   "source": "hornbeamIk12",
+   "trial": "stand100",
+   "seed": 2
+  },
+  "plate-13.png": {
+   "source": "hornbeamIk145",
+   "trial": "stand100",
+   "seed": 2
+  },
+  "plate-14.png": {
+   "source": "oakIk145",
+   "trial": "stand100",
+   "seed": 2
+  },
+  "plate-15.png": {
+   "source": "birchI",
+   "trial": "stand100",
+   "seed": 3
+  },
+  "plate-16.png": {
+   "source": "beechCk12",
+   "trial": "stand100",
+   "seed": 1
+  },
+  "plate-17.png": {
+   "source": "beechCk12",
+   "trial": "stand100",
+   "seed": 2
+  },
+  "plate-18.png": {
+   "source": "birchIk12",
+   "trial": "stand100",
+   "seed": 3
+  },
+  "plate-19.png": {
+   "source": "beechCk145",
+   "trial": "stand100",
+   "seed": 3
+  },
+  "plate-20.png": {
+   "source": "beechC",
+   "trial": "stand100",
+   "seed": 3
+  },
+  "plate-21.png": {
+   "source": "birchIk12",
+   "trial": "stand100",
+   "seed": 1
+  },
+  "plate-22.png": {
+   "source": "hornbeamIk12",
+   "trial": "stand100",
+   "seed": 3
+  },
+  "plate-23.png": {
+   "source": "oakIk145",
+   "trial": "stand100",
+   "seed": 1
+  },
+  "plate-24.png": {
+   "source": "beechCk12",
+   "trial": "stand100",
+   "seed": 3
+  },
+  "plate-25.png": {
+   "source": "beechCk145",
+   "trial": "stand100",
+   "seed": 2
+  },
+  "plate-26.png": {
+   "source": "hornbeamI",
+   "trial": "stand100",
+   "seed": 2
+  },
+  "plate-27.png": {
+   "source": "hornbeamIk145",
+   "trial": "stand100",
+   "seed": 3
+  },
+  "plate-28.png": {
+   "source": "beechCk145",
+   "trial": "stand100",
+   "seed": 1
+  },
+  "plate-29.png": {
+   "source": "oakIk145",
+   "trial": "stand100",
+   "seed": 3
+  },
+  "plate-30.png": {
+   "source": "hornbeamIk12",
+   "trial": "stand100",
+   "seed": 1
+  },
+  "plate-31.png": {
+   "source": "hornbeamI",
+   "trial": "stand100",
+   "seed": 3
+  },
+  "plate-32.png": {
+   "source": "birchIk145",
+   "trial": "stand100",
+   "seed": 2
+  },
+  "plate-33.png": {
+   "source": "oakI",
+   "trial": "stand100",
+   "seed": 2
+  },
+  "plate-34.png": {
+   "source": "birchI",
+   "trial": "stand100",
+   "seed": 1
+  },
+  "plate-35.png": {
+   "source": "beechC",
+   "trial": "stand100",
+   "seed": 1
+  },
+  "plate-36.png": {
+   "source": "oakI",
+   "trial": "stand100",
+   "seed": 1
+  }
+ },
+ "namer-3": {
+  "plate-01.png": {
+   "source": "oakIk12",
+   "trial": "stand100",
+   "seed": 2
+  },
+  "plate-02.png": {
+   "source": "hornbeamI",
+   "trial": "stand100",
+   "seed": 3
+  },
+  "plate-03.png": {
+   "source": "hornbeamIk12",
+   "trial": "stand100",
+   "seed": 3
+  },
+  "plate-04.png": {
+   "source": "birchIk145",
+   "trial": "stand100",
+   "seed": 2
+  },
+  "plate-05.png": {
+   "source": "beechC",
+   "trial": "stand100",
+   "seed": 2
+  },
+  "plate-06.png": {
+   "source": "oakI",
+   "trial": "stand100",
+   "seed": 3
+  },
+  "plate-07.png": {
+   "source": "hornbeamIk12",
+   "trial": "stand100",
+   "seed": 2
+  },
+  "plate-08.png": {
+   "source": "oakIk12",
+   "trial": "stand100",
+   "seed": 3
+  },
+  "plate-09.png": {
+   "source": "beechCk12",
+   "trial": "stand100",
+   "seed": 3
+  },
+  "plate-10.png": {
+   "source": "birchIk12",
+   "trial": "stand100",
+   "seed": 1
+  },
+  "plate-11.png": {
+   "source": "beechC",
+   "trial": "stand100",
+   "seed": 1
+  },
+  "plate-12.png": {
+   "source": "beechCk12",
+   "trial": "stand100",
+   "seed": 2
+  },
+  "plate-13.png": {
+   "source": "hornbeamI",
+   "trial": "stand100",
+   "seed": 2
+  },
+  "plate-14.png": {
+   "source": "birchIk145",
+   "trial": "stand100",
+   "seed": 3
+  },
+  "plate-15.png": {
+   "source": "oakIk145",
+   "trial": "stand100",
+   "seed": 1
+  },
+  "plate-16.png": {
+   "source": "oakIk12",
+   "trial": "stand100",
+   "seed": 1
+  },
+  "plate-17.png": {
+   "source": "beechCk12",
+   "trial": "stand100",
+   "seed": 1
+  },
+  "plate-18.png": {
+   "source": "birchIk145",
+   "trial": "stand100",
+   "seed": 1
+  },
+  "plate-19.png": {
+   "source": "beechCk145",
+   "trial": "stand100",
+   "seed": 1
+  },
+  "plate-20.png": {
+   "source": "oakIk145",
+   "trial": "stand100",
+   "seed": 3
+  },
+  "plate-21.png": {
+   "source": "hornbeamIk145",
+   "trial": "stand100",
+   "seed": 1
+  },
+  "plate-22.png": {
+   "source": "beechC",
+   "trial": "stand100",
+   "seed": 3
+  },
+  "plate-23.png": {
+   "source": "oakIk145",
+   "trial": "stand100",
+   "seed": 2
+  },
+  "plate-24.png": {
+   "source": "hornbeamIk145",
+   "trial": "stand100",
+   "seed": 2
+  },
+  "plate-25.png": {
+   "source": "birchIk12",
+   "trial": "stand100",
+   "seed": 3
+  },
+  "plate-26.png": {
+   "source": "birchI",
+   "trial": "stand100",
+   "seed": 1
+  },
+  "plate-27.png": {
+   "source": "hornbeamIk145",
+   "trial": "stand100",
+   "seed": 3
+  },
+  "plate-28.png": {
+   "source": "hornbeamIk12",
+   "trial": "stand100",
+   "seed": 1
+  },
+  "plate-29.png": {
+   "source": "birchIk12",
+   "trial": "stand100",
+   "seed": 2
+  },
+  "plate-30.png": {
+   "source": "beechCk145",
+   "trial": "stand100",
+   "seed": 3
+  },
+  "plate-31.png": {
+   "source": "birchI",
+   "trial": "stand100",
+   "seed": 2
+  },
+  "plate-32.png": {
+   "source": "hornbeamI",
+   "trial": "stand100",
+   "seed": 1
+  },
+  "plate-33.png": {
+   "source": "oakI",
+   "trial": "stand100",
+   "seed": 2
+  },
+  "plate-34.png": {
+   "source": "birchI",
+   "trial": "stand100",
+   "seed": 3
+  },
+  "plate-35.png": {
+   "source": "oakI",
+   "trial": "stand100",
+   "seed": 1
+  },
+  "plate-36.png": {
+   "source": "beechCk145",
+   "trial": "stand100",
+   "seed": 2
+  }
+ }
+}

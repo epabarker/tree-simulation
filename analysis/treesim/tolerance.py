@@ -1,12 +1,19 @@
 """Gate c's pre-registration (docs/plans/2026-11-03-reference-fidelity.md §j; v1 the 1c brief and amendment E, commit
-e74063c; v2 the 1d brief, session 1d-i): every number and rule the degradation test reads, computed from real QSMs
+e74063c; v2 the 1d brief, session 1d-i, commit 3f13c29; v3 the user's rulings after v2, session 1d-i): every number and rule the degradation test reads, computed from real QSMs
 only and committed before any simulated tree is coarsened. Nothing in the file changes after a gate c result is
 seen; a change is a new commit with its reason in the experiment note (docs/experiments/2026-11-03-phase1-converter.md).
 
 **v2** (designed after v1 failed; the note's "v2 instrument"): beech's tolerance set and noise floor are BioDiv's 53
 and its 5 repeats (decision 4); d_min per dataset from the control curve on its own QSMs (control.py, decision 1);
 the two tiers (tiers.py, decision 2); ldSlope and junctionDelta report-only (decision 7); the size-matching rule
-(decision 6). The rest below is v1's and unchanged.
+(decision 6).
+
+**v3** (designed after v2's control failed on the re-cut; the user's rulings, 2026-11-03): coarsening is prune only
+(coarsen.py); every segment-length-dependent descriptor is read at describe()'s fixed 0.5 m step, the per-cylinder
+ones (tortuosity, limbElevation, pendulousFraction) report-only; beech's per-tree value is the median over its 5
+repeats, its floor the between-repeat SD / √5 against the between-tree SD of those medians (Wytham stays single-model:
+only 12 trees have 10 models, an asymmetry the note records); amendment E's stop applies to the coarsening test over
+the descriptors that pass the floor. The rest below is v1's and unchanged.
 
 Per species and descriptor:
 - **between-tree SD**: the SD (ddof 2) of the residuals of an OLS fit of the descriptor on ln(measured DBH) (R2:
@@ -58,24 +65,39 @@ MIN_TREES = 10
 HOLD_NOISE = 0.5
 TOLERANCE = 0.5
 WYTHAM_RADIUS = ("junctionDelta", "ldSlope", "taper", "leaderDominance")
-REPORT_ONLY = ("ldSlope", "junctionDelta")  # the 1d brief, 7
+# The 1d brief, 7; v3: the per-cylinder readings, whose 0.5 m versions are gated (tortuosity05, limbElevation05,
+# pendulousFraction05).
+REPORT_ONLY = ("ldSlope", "junctionDelta", "tortuosity", "limbElevation", "pendulousFraction")
+REPEATS = 5  # BioDiv's repeats of the optimum's input set
 DESCRIBED = ("analysis/treesim/describe.py", "analysis/treesim/form.py", "analysis/treesim/cylinders.py",
              "analysis/treesim/qsm.py")
-# v2: every file the gate reads (code; the manifest; the data are digested per dataset, `data_digests`).
+# v2, v3: every file the gate reads (code; the manifest; the data are digested per dataset, `data_digests`).
 HASHED = DESCRIBED + ("analysis/treesim/coarsen.py", "analysis/treesim/fetch.py", "analysis/treesim/simtree.py",
                       "analysis/treesim/tolerance.py", "analysis/treesim/control.py", "analysis/treesim/tiers.py",
                       "cli/dump-trees.ts", "analysis/fit/sources/reference-manifest.csv")
-V1 = "e74063c"
+V1, V2 = "e74063c", "3f13c29"
 WORKERS = 12
 
-# The gate's rules, v2 (the 1d brief; the user's rulings at the 1d-i plan, 2026-11-03; the advisor's review at the
-# plan). v1's are in the file's `v1` block.
+# The gate's rules, v3 (the 1d brief; the user's rulings at the 1d-i plan and after v2, 2026-11-03; the advisor's
+# review at the plan). v1's and v2's are in the file's `v1` and `v2` blocks.
 RULES = {
     "seeds": list(range(1, 21)),
     "datasets": {"oak": ["wytham"], "beech": ["biodiv"], "maple": ["wytham"]},
     "datasets_note": "oak is gated at Wytham only (the user, 2026-11-03): BioDiv has no oaks, so no control can set "
                      "an oak d_min there; v1 gated oak at BioDiv's beech resolution and failed it there (×1: 7 of 19). "
                      "Demol is beech's held-out site (the 1d brief, 4): its control curve is reported, never gated",
+    "coarsen": "prune only (v3): every cylinder under d_min goes with its subtree; the re-cut of v1 and v2 is "
+               "withdrawn (coarsen.py)",
+    "describe": "every segment-length-dependent descriptor at the fixed 0.5 m step on both sides (droop, upturn, "
+                "branchAngle2 as 0.5 m chords; tortuosity05, limbElevation05, pendulousFraction05 resampled at 0.5 m); "
+                "tortuosity, limbElevation and pendulousFraction (per cylinder) report-only",
+    "beech_estimator": f"a tree's descriptor is the median over its {REPEATS} repeats of the optimum's input set "
+                       "(finite values; NaN under 3), for the tolerance, the floor and the control alike; Wytham's and "
+                       "Demol's trees are single-model (only 12 Wytham trees have 10 models)",
+    "floor": f"oak, maple: the RMS over Wytham's noise trees of the SD across 10 models; beech: the RMS over BioDiv's "
+             f"trees of the SD across its {REPEATS} repeats, / √{REPEATS} (the SD of a median-of-repeats value), "
+             "against the between-tree SD of the medians. Hold-out at >= 0.5 × the between-tree SD: reported as "
+             "noise-limited at that dataset",
     "d_min": f"per dataset, the largest point of the grid (the {list(ct.GRID)} percentiles of its pooled terminal raw "
              f"diameters) at which, for every gated species of the dataset, >= {ct.DESCRIPTORS:.0%} of its gated "
              f"descriptors have >= {ct.TREES:.0%} of its real trees within tolerance after coarsen() (control.py). "
@@ -87,7 +109,7 @@ RULES = {
                "threshold the 1d brief names"},
     "inflation": "Demol et al. 2022 (§3.2, Table 3): diameter +73% under 2.5 cm, +4% over 10 cm, log-interpolated "
                  "between (not measured). Gated at d_min for both tiers (the user, 2026-11-03). Order: inflate, "
-                 "prune, re-cut",
+                 "prune",
     "evaluation_points": "d_min, every grid point strictly inside (d_min, 2·d_min), 2·d_min, and inflation at d_min "
                          "(tiers.evaluation_points)",
     "tier_a": "resolution-independent: per seed, the median over the stand's live measured trees of the signed "
@@ -100,11 +122,12 @@ RULES = {
               "fit always compares the coarsened simulator against the real QSMs, never fine simulated values",
     "pass_seeds": tiers.PASS_SEEDS,
     "fail": "a seed with no live measured tree, or a NaN difference on any tree, fails that seed",
-    "held_out": "noise floor >= 0.5 × between-tree SD, fewer than MIN_TREES finite real trees, or neither tier "
-                "passes. Report-only (ldSlope, junctionDelta) and H1-excluded descriptors are neither targets nor "
-                "hold-outs",
-    "survive": "per species, over its gated descriptors: if fewer than half reach a tier, stop and report; never "
-               "loosen (amendment E)",
+    "held_out": "noise floor >= 0.5 × between-tree SD (noise-limited at the dataset), fewer than MIN_TREES finite "
+                "real trees, or neither tier passes (resolution-sensitive). Report-only and H1-excluded descriptors "
+                "are neither targets nor hold-outs",
+    "survive": "amendment E applies to the coarsening test (v3, the user): per species, over its descriptors that "
+               "pass the floor (gated, clear): if fewer than half reach a tier, stop and report; never loosen. Floor "
+               "hold-outs are reported as noise-limited at that dataset",
     "size_match": {
         "reference": "the median measured DBH of the species' tolerance set (R2): oak Wytham's DBH_pts, maple "
                      "Wytham's sycamores' DBH_pts, beech BioDiv's dTLS (the user, 2026-11-03, extending the 1d "
@@ -118,8 +141,8 @@ RULES = {
                 "report the shortfall",
         "report": "the median height at the chosen season, beside the reference's",
     },
-    "control": "every gated species' real QSMs of each dataset coarsened at each grid point and at the stress point "
-               "(full coarsen(), and prune only); re-cut only once (it does not depend on d). Reported in full",
+    "control": "every gated species' real QSMs of each dataset coarsened at each grid point and at the stress point; "
+               "TreeML's 3 optcsv trees' shifts at each d_min reported with no verdict (phase 7's)",
 }
 
 
@@ -230,15 +253,28 @@ def wytham_noise() -> dict[str, dict[str, list[float]]]:
     return out
 
 
+def biodiv_models(row: dict) -> list[dict]:
+    """describe() of each of a BioDiv tree's repeats of the optimum's input set (cached)."""
+    return [_describe_cached(f"biodiv-{row['tree']}-m{k}", lambda k=k: qsm.read(row["path"], model=k).cylinders)
+            for k in _optimum_set(row["path"])]
+
+
+def median_of(ds: list[dict]) -> dict:
+    """A tree's value over its repeats (v3, beech): the median of the finite values; NaN under 3."""
+    out = {}
+    for key in DESCRIPTORS:
+        v = [x for x in (_val(d, key) for d in ds) if math.isfinite(x)]
+        out[key] = float(np.median(v)) if len(v) >= 3 else math.nan
+    return out
+
+
 def biodiv_repeats(rows: list[dict]) -> dict[str, list[float]]:
-    """Descriptor → per-tree SDs over the 5 repeats of the optimum's input set (Phase 1 only, not a verdict)."""
+    """Descriptor → per-tree SDs (ddof 1) over the repeats of the optimum's input set."""
     out: dict[str, list[float]] = {}
     for r in rows:
         if r["dataset"] != "biodiv":
             continue
-        ds = []
-        for k in _optimum_set(r["path"]):
-            ds.append(_describe_cached(f"biodiv-{r['tree']}-m{k}", lambda k=k, r=r: qsm.read(r["path"], model=k).cylinders))
+        ds = biodiv_models(r)
         for key in DESCRIPTORS:
             v = [x for x in (_val(d, key) for d in ds) if math.isfinite(x)]
             out.setdefault(key, []).append(float(np.std(v, ddof=1)) if len(v) >= 3 else math.nan)
@@ -290,7 +326,8 @@ def data_files(rows: list[dict]) -> dict[str, list[Path]]:
     """Every data file the build reads, per dataset (the QSMs, the noise sets, the tables of measured DBH)."""
     out = {"demol": [DATA / "demol" / "Destructive_and_qsm_data_DEMOL.csv"],
            "wytham": [DATA / "wytham" / "analysis_and_figures" / f for f in ("tls_summary.csv", "trees_summary.csv")]
-           + sorted(NOISE_DIR.glob("*.mat")), "biodiv": [DATA / "biodiv" / "labels.csv"]}
+           + sorted(NOISE_DIR.glob("*.mat")), "biodiv": [DATA / "biodiv" / "labels.csv"],
+           "treeml": sorted((DATA / "treeml" / "optcsv").glob("*.csv"))}
     for r in rows:
         out[r["dataset"]].append(r["path"])
     return {k: sorted(set(v)) for k, v in out.items()}
@@ -305,101 +342,117 @@ def data_digests(rows: list[dict]) -> dict[str, dict]:
     return out
 
 
-def v1_block() -> dict:
-    """v1's registration, read from git (commit e74063c): its rules, resolution and table, for the side-by-side."""
-    text = subprocess.run(["git", "show", f"{V1}:analysis/fit/sources/phase1-tolerances.json"], cwd=ROOT,
+def prior_block(commit: str) -> dict:
+    """An earlier registration, read from git: its rules, resolution, control and table, for the side-by-side."""
+    text = subprocess.run(["git", "show", f"{commit}:analysis/fit/sources/phase1-tolerances.json"], cwd=ROOT,
                           check=True, capture_output=True, text=True).stdout
     t = json.loads(text)
     keep = ("species", "descriptor", "set", "n", "between_sd", "between_sd_lo95", "between_sd_hi95", "tolerance",
             "noise_ratio", "noise_verdict", "biodiv_repeats_ratio")
-    return {"commit": V1, "rules": t["rules"], "resolution": t["resolution"],
+    return {"commit": commit, "rules": t["rules"], "resolution": t["resolution"], "control": t.get("control"),
             "table": [{k: r.get(k) for k in keep} for r in t["table"]]}
 
 
-# The control (control.py): one real tree per job, every version described.
+# The control (control.py): one real tree per job, every version described; BioDiv's beech as the median over its
+# repeats.
 def _control_tree(job) -> dict:
-    path, points, ratio, count = job
-    c = qsm.read(Path(path)).cylinders
-    ratio = tuple(math.nan if v is None else v for v in ratio)
+    path, models, points = job
     keep = lambda d: {k: d.get(k) for k in DESCRIPTORS}  # noqa: E731
-    out = {"original": keep(describe(c)), "recut": keep(describe(ct.apply(c, co.Resolution(0.0, ratio, count),
-                                                                         "recut")))}
-    for name, d in points.items():
-        res = co.Resolution(d, ratio, count)
-        out[f"full:{name}"] = keep(describe(ct.apply(c, res, "full")))
-        out[f"prune:{name}"] = keep(describe(ct.apply(c, res, "prune")))
-    return out
+    per = []
+    for model in models:
+        c = qsm.read(Path(path), model=model).cylinders if model is not None else qsm.read(Path(path)).cylinders
+        out = {"original": keep(describe(c))}
+        for name, d in points.items():
+            out[name] = keep(describe(co.coarsen(c, co.Resolution(d, (), ()))))
+        per.append(out)
+    if len(per) == 1:
+        return per[0]
+    return {v: median_of([x[v] for x in per]) for v in per[0]}
 
 
-def _control_cached(row: dict, points: dict, res: dict) -> dict:
-    key = hashlib.sha256(json.dumps([points, res["ratio"], file_hashes()], sort_keys=True).encode()).hexdigest()[:12]
-    store = CACHE / f"control-{row['dataset']}-{row['tree']}.{key}.json"
+def _control_cached(row: dict, points: dict) -> dict:
+    key = hashlib.sha256(json.dumps([points, file_hashes()], sort_keys=True).encode()).hexdigest()[:12]
+    store = CACHE / f"control3-{row['dataset']}-{row['tree']}.{key}.json"
     if store.exists():
         return json.loads(store.read_text())
-    return {"_job": (str(row["path"]), points, res["ratio"], res["count"]), "_store": str(store)}
+    models = _optimum_set(row["path"]) if row["dataset"] == "biodiv" else [None]
+    return {"_job": (str(row["path"]), models, points), "_store": str(store)}
 
 
-def control(rows: list[dict], table: list[dict], resolution: dict, recut_only: bool = False) -> dict:
-    """Per dataset: the grid, the share of trees within tolerance per (species, descriptor, version), the rule at
-    each point and d_min (control.py's rules). recut_only: the probe (re-cut alone, and its rule)."""
-    tol = {(r["species"], r["descriptor"]): r for r in table}
-    out = {}
-    plan = []
-    for dataset in ("wytham", "biodiv", "demol"):
-        species = ct.GATED.get(dataset, ()) + ct.REPORTED.get(dataset, ())
-        sel = [r for r in rows if r["dataset"] == dataset and r["species"] in {code for _, code in species}]
-        diam = ct.terminal_diameters([qsm.read(r["path"]).cylinders for r in rows if r["dataset"] == dataset])
-        g = ct.grid(diam)
-        points = {f"p{p}": d for p, d in g.items()} | {"stress": ct.STRESS}
-        if recut_only:
-            points = {}
-        res = resolution[dataset]
-        out[dataset] = {"grid": g, "terminals": int(len(diam)), "species": [s for s, _ in species],
-                        "gated": dataset in ct.GATED, "trees": sel, "points": points}
-        plan += [(dataset, r, _control_cached(r, points, res)) for r in sel]
+def _run(plan: list) -> list:
     jobs = [(i, p["_job"]) for i, (_, _, p) in enumerate(plan) if "_job" in p]
     if jobs:
         with ProcessPoolExecutor(WORKERS) as ex:
             for (i, _), d in zip(jobs, ex.map(_control_tree, [j for _, j in jobs], chunksize=1)):
                 Path(plan[i][2]["_store"]).write_text(json.dumps(_clean(d)))
                 plan[i] = (plan[i][0], plan[i][1], d)
+    return plan
+
+
+def control(rows: list[dict], table: list[dict]) -> dict:
+    """Per dataset: the grid, the share of trees within tolerance per (species, descriptor, point), the rule at
+    each point and d_min (control.py's rules), the operator prune only (v3)."""
+    tol = {(r["species"], r["descriptor"]): r for r in table}
+    info, plan = {}, []
+    for dataset in ("wytham", "biodiv", "demol"):
+        species = ct.GATED.get(dataset, ()) + ct.REPORTED.get(dataset, ())
+        sel = [r for r in rows if r["dataset"] == dataset and r["species"] in {code for _, code in species}]
+        diam = ct.terminal_diameters([qsm.read(r["path"]).cylinders for r in rows if r["dataset"] == dataset])
+        g = ct.grid(diam)
+        points = {f"p{p}": d for p, d in g.items()} | {"stress": ct.STRESS}
+        info[dataset] = {"grid": g, "terminals": int(len(diam)), "species": species, "points": points}
+        plan += [(dataset, r, _control_cached(r, points)) for r in sel]
+    plan = _run(plan)
     result = {}
-    for dataset, info in out.items():
+    for dataset, i in info.items():
         described = [(r, d) for ds, r, d in plan if ds == dataset]
-        versions = ["recut"] + [f"{m}:{n}" for n in info["points"] for m in ("full", "prune")]
         shares: dict[str, dict] = {}
-        for sp, code in ct.GATED.get(dataset, ()) + ct.REPORTED.get(dataset, ()):
+        for sp, code in i["species"]:
             trees = [d for r, d in described if r["species"] == code]
             for k in DESCRIPTORS:
                 row = tol[(sp, k)]
-                gated = row["noise_verdict"] == "clear"
                 orig = [_val(d["original"], k) for d in trees]
-                for v in versions:
+                for v in i["points"]:
                     s = ct.share_within(orig, [_val(d[v], k) for d in trees], _num(row["tolerance"]))
                     shift = [_val(d[v], k) - a for d, a in zip(trees, orig)]
                     shares.setdefault(v, {}).setdefault(sp, {})[k] = {
-                        "share": s, "gated": gated, "trees": len(trees),
+                        "share": s, "gated": row["noise_verdict"] == "clear", "trees": len(trees),
                         "median_shift": float(np.nanmedian(shift)) if any(math.isfinite(x) for x in shift) else None}
         rule = {v: ct.rule_holds({sp: {k: c["share"] for k, c in by.items() if c["gated"]}
                                   for sp, by in per.items()}) for v, per in shares.items()}
-        curve = {p: rule[f"full:p{p}"] for p in ct.GRID} if info["points"] else {}
-        d_min = ct.choose(curve, info["grid"]) if curve else None
-        result[dataset] = {"grid": info["grid"], "terminals": info["terminals"], "species": info["species"],
-                           "gated": info["gated"], "rule": rule, "curve": curve, "d_min": d_min,
-                           "d_min_percentile": next((p for p, d in info["grid"].items() if d == d_min), None),
-                           "shares": shares, "trees": {sp: sum(r["species"] == code for r in info["trees"])
-                                                       for sp, code in ct.GATED.get(dataset, ())
-                                                       + ct.REPORTED.get(dataset, ())}}
+        curve = {p: rule[f"p{p}"] for p in ct.GRID}
+        d_min = ct.choose(curve, i["grid"])
+        result[dataset] = {"grid": i["grid"], "terminals": i["terminals"], "species": [s for s, _ in i["species"]],
+                           "gated": dataset in ct.GATED, "rule": rule, "curve": curve, "d_min": d_min,
+                           "d_min_percentile": next((p for p, d in i["grid"].items() if d == d_min), None),
+                           "shares": shares, "trees": {sp: sum(r["species"] == code for r, _ in described)
+                                                       for sp, code in i["species"]}}
     return result
 
 
+def treeml(ctl: dict) -> dict:
+    """TreeML's 3 optcsv trees (phase 7's dataset; no tolerance set in phase 1): each descriptor's median shift at
+    each dataset's d_min, with no verdict."""
+    paths = sorted((DATA / "treeml" / "optcsv").glob("*.csv"))
+    points = {d: c["d_min"] for d, c in ctl.items() if c["d_min"] is not None}
+    plan = _run([("treeml", {"dataset": "treeml", "tree": p.stem, "path": p}, _control_cached(
+        {"dataset": "treeml", "tree": p.stem, "path": p}, points)) for p in paths])
+    out = {"trees": [p.name for p in paths], "d_min": points, "median_shift": {}}
+    for name in points:
+        for k in DESCRIPTORS:
+            s = [_val(d[name], k) - _val(d["original"], k) for _, _, d in plan]
+            s = [x for x in s if math.isfinite(x)]
+            out["median_shift"].setdefault(name, {})[k] = float(np.median(s)) if s else None
+    return out
+
+
 def candidates(table: list[dict], ctl: dict) -> list[dict]:
-    """Before any simulated tree: each descriptor's standing (report-only, H1, held out by noise, or a candidate for
-    tier A or B, or A only where its control is not neutral at d_min)."""
+    """Before any simulated tree: each descriptor's standing (report-only, H1, noise-limited at the dataset, or a
+    candidate for tier A or B, or A only where its control is not neutral at d_min)."""
     out = []
     for species, (dataset, _) in SPECIES_SET.items():
         c = ctl[dataset]
-        at = c["shares"].get(f"full:p{c['d_min_percentile']}", {}).get(species, {}) if c["d_min"] else {}
+        at = c["shares"].get(f"p{c['d_min_percentile']}", {}).get(species, {}) if c["d_min"] else {}
         for r in (r for r in table if r["species"] == species):
             k = r["descriptor"]
             share = at.get(k, {}).get("share", math.nan)
@@ -416,22 +469,28 @@ def candidates(table: list[dict], ctl: dict) -> list[dict]:
 
 def tolerances(rows: list[dict]) -> tuple[list[dict], dict]:
     for r in rows:
-        r["d"] = _describe_cached(f"{r['dataset']}-{r['tree']}", lambda r=r: qsm.read(r["path"]).cylinders)
+        if r["dataset"] == "biodiv":
+            r["d"] = median_of(biodiv_models(r))  # v3: the median over its repeats
+        else:
+            r["d"] = _describe_cached(f"{r['dataset']}-{r['tree']}", lambda r=r: qsm.read(r["path"]).cylinders)
     noise = wytham_noise()
     repeats = biodiv_repeats(rows)
     table = []
     for species, (dataset, code) in SPECIES_SET.items():
         sel = [r for r in rows if r["dataset"] == dataset and r["species"] == code]
         floor = repeats if species == "beech" else noise.get(species, {})
+        scale = 1.0 / math.sqrt(REPEATS) if species == "beech" else 1.0
         for k in DESCRIPTORS:
             bt = between_tree(sel, k)
             rms, med, nn = _pool(floor.get(k, []))
+            rms, med = rms * scale, med * scale
             ratio = rms / bt["sd"] if math.isfinite(rms) and bt["sd"] > 0 else math.nan
             table.append({"species": species, "descriptor": k, "set": f"{dataset} {code}", "n": bt["n"],
                           "median": bt["median"], "slope_lnDBH": bt["slope"], "between_sd": bt["sd"],
                           "between_sd_lo95": bt["sd_lo"], "between_sd_hi95": bt["sd_hi"],
                           "tolerance": TOLERANCE * bt["sd"], "noise_rms": rms, "noise_median": med, "noise_trees": nn,
-                          "noise_source": "biodiv 5 repeats" if species == "beech" else "wytham 10 models",
+                          "noise_source": f"biodiv {REPEATS} repeats, SD / √{REPEATS}" if species == "beech"
+                          else "wytham 10 models",
                           "noise_ratio": ratio, "noise_verdict": _verdict(species, dataset, k, bt["n"], ratio)})
     reference = {}
     for species, (dataset, code) in SPECIES_SET.items():
@@ -441,15 +500,15 @@ def tolerances(rows: list[dict]) -> tuple[list[dict], dict]:
     return table, reference
 
 
-def build() -> dict:
+def build() -> tuple[dict, dict]:
     rows = real_sets()
     table, reference = tolerances(rows)
     resolution = {}
     for dataset in ("demol", "wytham", "biodiv"):
         res = co.resolution([qsm.read(r["path"]).cylinders for r in rows if r["dataset"] == dataset])
-        resolution[dataset] = {"median_terminal": res.d_min, "ratio": list(res.ratio), "count": list(res.count),
-                               "trees": sum(r["dataset"] == dataset for r in rows)}
-    ctl = control(rows, table, resolution)
+        resolution[dataset] = {"median_terminal": res.d_min, "ratio_reported": list(res.ratio),
+                               "count": list(res.count), "trees": sum(r["dataset"] == dataset for r in rows)}
+    ctl = control(rows, table)
     for dataset, c in ctl.items():
         resolution[dataset]["d_min"] = c["d_min"]
         resolution[dataset]["d_min_percentile"] = c["d_min_percentile"]
@@ -461,29 +520,19 @@ def build() -> dict:
             qsm_medians[f"{dataset} {species}"] = {k: float(np.nanmedian([_val(r["d"], k) for r in sel]))
                                                    for k in ("ldSlope", "tortuosity", "tortuosity05")}
     return _clean({
-        "version": 2, "supersedes": V1,
-        "written": "2026-11-03, session 1d-i: from real QSMs only, before any simulated tree was measured again "
-                   "(designed after v1 failed)",
+        "version": 3, "supersedes": [V2, V1],
+        "written": "2026-11-03, session 1d-i: from real QSMs only (designed after v2's control failed on the re-cut); "
+                   "nothing simulated has been measured since v1",
         "hashes": file_hashes(), "data": data_digests(rows), "rules": RULES, "descriptors": list(DESCRIPTORS),
-        "min_trees": MIN_TREES, "tolerance_factor": TOLERANCE, "hold_noise": HOLD_NOISE,
+        "min_trees": MIN_TREES, "tolerance_factor": TOLERANCE, "hold_noise": HOLD_NOISE, "repeats": REPEATS,
         "control_rule": {"grid": list(ct.GRID), "trees": ct.TREES, "descriptors": ct.DESCRIPTORS},
         "report_only": list(REPORT_ONLY), "h1_excluded": {"oak": list(WYTHAM_RADIUS), "maple": list(WYTHAM_RADIUS)},
         "h1_note": "oak: the user's ruling; maple: extended (same dataset), confirmed (the 1d brief, 3)",
         "edges": [e if math.isfinite(e) else None for e in co.EDGES], "resolution": resolution,
         "reference_dbh": reference, "qsm_medians": qsm_medians, "table": table,
         "control": {d: {k: v for k, v in c.items() if k != "shares"} for d, c in ctl.items()},
-        "candidates": candidates(table, ctl), "v1": v1_block(),
+        "treeml": treeml(ctl), "candidates": candidates(table, ctl), "v2": prior_block(V2), "v1": prior_block(V1),
     }), ctl
-
-
-def probe() -> dict:
-    """The advisor's probe before the grid: re-cut alone (no prune) on the real QSMs, per dataset, and its rule."""
-    rows = real_sets()
-    table, _ = tolerances(rows)
-    resolution = {d: {"ratio": list(r.ratio), "count": list(r.count)} for d, r in
-                  ((d, co.resolution([qsm.read(x["path"]).cylinders for x in rows if x["dataset"] == d]))
-                   for d in ("demol", "wytham", "biodiv"))}
-    return control(rows, table, resolution, recut_only=True)
 
 
 def _control_rows(ctl: dict) -> list[dict]:
@@ -497,24 +546,14 @@ def _control_rows(ctl: dict) -> list[dict]:
 
 
 if __name__ == "__main__":
-    import sys
-
-    if sys.argv[1:] == ["probe"]:
-        ctl = probe()
-        for dataset, c in ctl.items():
-            print(dataset, "re-cut only, rule holds:", c["rule"]["recut"])
-            for sp, by in c["shares"]["recut"].items():
-                bad = {k: round(x["share"], 2) for k, x in by.items() if x["gated"] and not ct.neutral(x["share"])}
-                print(" ", sp, f"{sum(x['gated'] for x in by.values())} gated; not neutral:", bad)
-    else:
-        t, ctl = build()
-        TOLERANCES.write_text(json.dumps(t, indent=1) + "\n")
-        out = ROOT / "runs" / "phase1" / "control-grid.csv"
-        rows = _control_rows(_clean(ctl))
-        with out.open("w", newline="") as f:
-            w = csv.DictWriter(f, list(rows[0]), lineterminator="\n")
-            w.writeheader()
-            w.writerows(rows)
-        print(f"{TOLERANCES}: {len(t['table'])} rows; {out}")
-        for dataset, c in t["control"].items():
-            print(dataset, "d_min", c["d_min"], "at p", c["d_min_percentile"], "curve", c["curve"])
+    t, ctl = build()
+    TOLERANCES.write_text(json.dumps(t, indent=1) + "\n")
+    out = ROOT / "runs" / "phase1" / "control-grid.csv"
+    rows = _control_rows(_clean(ctl))
+    with out.open("w", newline="") as f:
+        w = csv.DictWriter(f, list(rows[0]), lineterminator="\n")
+        w.writeheader()
+        w.writerows(rows)
+    print(f"{TOLERANCES}: {len(t['table'])} rows; {out}")
+    for dataset, c in t["control"].items():
+        print(dataset, "d_min", c["d_min"], "at p", c["d_min_percentile"], "curve", c["curve"])

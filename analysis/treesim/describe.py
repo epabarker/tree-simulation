@@ -15,9 +15,16 @@ Measurement design: what each descriptor depends on beyond the tree.
 | limbElevation | order 1 | low (length-weighted) | gravity |
 | profile p0–p3, widestAt, profileCentre, crownFullness | the crown base via order | low | gravity; azimuth-free |
 | pendulousFraction | none | high: a QSM's terminal cylinder is where its reconstruction stopped | gravity |
+| limbElevation05 | order 1 | moderate: each path resampled at 0.5 m (v3) | gravity |
+| pendulousFraction05 | axes | moderate: each axis's last 0.5 m of arc (v3) | gravity |
 | tortuosity | axes | high, and 1c's re-cut flattens it by construction | none |
 | tortuosity05 | axes | moderate: each path resampled at 0.5 m (H3), so zigzag under the step drops out | none |
 | centroidHeight | none | low | base z, H |
+
+- **The fixed 0.5 m step (v3, the user, 2026-11-03):** every descriptor that depends on segment length is read at
+  RESAMPLE on both sides (a QSM's cylinders and a simulator's metamers alike): droop, upturn and branchAngle2 as 0.5 m
+  chords (`Rules.window`), tortuosity05, limbElevation05 and pendulousFraction05 on paths resampled at 0.5 m of arc.
+  The per-cylinder versions (tortuosity, limbElevation, pendulousFraction) stay computed, report-only.
 
 - **Rules (form.py):** subtrees of ≥ 1.25 m of wood and limbs of ≥ 2.5 m (form.rs's 5 and 10 metamers at 0.25 m a
   cell); the crown base is the lowest first-order axis of ≥ 2.5 m (form.rs: any); headings read as chords over
@@ -42,13 +49,13 @@ import math
 import numpy as np
 
 from treesim import cylinders as cy
-from treesim.form import FORM_COLUMNS, Labels, Rules, form
+from treesim.form import FORM_COLUMNS, Labels, Rules, form, weighted_median
 
 DESCRIBE = Rules(min_subtree=("length", 1.25), min_limb=("length", 2.5), bole_limb=("length", 2.5), window=0.5,
                  width="diameter", bands=4)
 LIMB = 2.5
 NEW = ("bifurcationRatio", "bifurcationRatio2", "tortuosity", "tortuosity05", "length0", "length1", "length2", "length3",
-       "pendulousFraction", "taper", "centroidHeight")
+       "pendulousFraction", "taper", "centroidHeight", "limbElevation05", "pendulousFraction05")
 REPORT = ("leafStemSlope", "crownBase")
 
 
@@ -137,15 +144,54 @@ def tortuosity(c: cy.Cylinders, labels: Labels) -> float:
 RESAMPLE = 0.5
 
 
+def _resample(points: np.ndarray, at: np.ndarray | None = None, step: float = RESAMPLE) -> np.ndarray:
+    """A polyline's points every `step` metres of arc and at its end (or at the arc lengths `at`)."""
+    seg = np.linalg.norm(np.diff(points, axis=0), axis=1)
+    along = np.concatenate([[0.0], np.cumsum(seg)])
+    if at is None:
+        at = np.append(np.arange(0.0, along[-1], step), along[-1])
+    return np.stack([np.interp(at, along, points[:, k]) for k in range(3)], axis=1)
+
+
 def _resampled_length(points: np.ndarray, step: float = RESAMPLE) -> float:
     """The length of a polyline resampled at `step` metres of arc: the chords between points every `step` along it,
     and the last to its end (H3: a QSM's cylinder zigzag and a metamer's wobble under the step drop out alike)."""
-    seg = np.linalg.norm(np.diff(points, axis=0), axis=1)
-    along = np.concatenate([[0.0], np.cumsum(seg)])
-    total = along[-1]
-    at = np.append(np.arange(0.0, total, step), total)
-    pts = np.stack([np.interp(at, along, points[:, k]) for k in range(3)], axis=1)
-    return float(np.linalg.norm(np.diff(pts, axis=0), axis=1).sum())
+    return float(np.linalg.norm(np.diff(_resample(points, step=step), axis=0), axis=1).sum())
+
+
+def _paths(c: cy.Cylinders, labels: Labels, keep) -> list[np.ndarray]:
+    """Each axis whose order passes `keep`, as its polyline: its cylinders' starts and its last tip."""
+    axes: dict[int, list[int]] = {}
+    for i in range(len(c)):
+        if keep(labels.order[i]):
+            axes.setdefault(int(labels.axis[i]), []).append(i)
+    return [np.vstack([c.start[m], c.tip[m[-1]]]) for m in axes.values()]
+
+
+def limb_elevation05(c: cy.Cylinders, labels: Labels) -> float:
+    """The length-weighted median elevation (degrees) of the 0.5 m stretches of every first-order path: resampled
+    first, then each chord weighted by its length (v3; limbElevation reads each cylinder)."""
+    xs = []
+    for points in _paths(c, labels, lambda o: o == 1):
+        for d in np.diff(_resample(points), axis=0):
+            n = float(np.linalg.norm(d))
+            if n > 0:
+                xs.append((math.degrees(math.atan2(d[2], math.hypot(d[0], d[1]))), n))
+    return weighted_median(xs)
+
+
+def pendulous_fraction05(c: cy.Cylinders, labels: Labels) -> float:
+    """The share of first- and higher-order length on axes whose last 0.5 m of arc heads below horizontal (the
+    chord over that stretch, or the whole axis if shorter; v3; pendulousFraction reads terminal cylinders)."""
+    down = total = 0.0
+    for points in _paths(c, labels, lambda o: o >= 1):
+        length = float(np.linalg.norm(np.diff(points, axis=0), axis=1).sum())
+        if length <= 0:
+            continue
+        end = _resample(points, at=np.array([max(0.0, length - RESAMPLE), length]))
+        total += length
+        down += length if end[1, 2] - end[0, 2] < 0 else 0.0
+    return down / total if total > 0 else math.nan
 
 
 def tortuosity05(c: cy.Cylinders, labels: Labels) -> float:
@@ -209,6 +255,7 @@ def describe(c: cy.Cylinders, leaf: np.ndarray | None = None) -> dict:
         "pendulousFraction": down / tip_len if tip_len > 0 else math.nan,
         "taper": taper(c, labels, h),
         "centroidHeight": float((c.length * mid).sum() / total / h) if h > 0 and total > 0 else math.nan,
+        "limbElevation05": limb_elevation05(c, labels), "pendulousFraction05": pendulous_fraction05(c, labels),
         "leafStemSlope": f["leafStemSlope"],
         "crownBase": min(bases) / h if bases and h > 0 else math.nan,
         "dbh": 2.0 * float(c.radius_raw[_dbh_index(c, trunk_chain(labels))]), "height": h,

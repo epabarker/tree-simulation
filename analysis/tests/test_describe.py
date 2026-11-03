@@ -192,3 +192,35 @@ def test_tortuosity05_drops_zigzag_under_the_step_and_keeps_bends_over_it():
         p = t.add(p, [1, 0, 1 if k % 2 == 0 else -1], 1.0, 0.05)
     d = ds.describe(t.table())
     assert d["tortuosity05"] == pytest.approx(d["tortuosity"], rel=0.05)
+
+
+def test_limb_elevation05_reads_resampled_stretches_not_cylinders():
+    # A 3 m limb as a zigzag of 0.1 m cylinders at 50°, 10°, 10° (repeating): per cylinder the length-weighted median
+    # is 10°; at 0.5 m the chords follow the mean heading, ≈ 23°.
+    t = Tree()
+    p = t.chain(-1, UP, 10, 0.25, 0.05)
+    up, down = math.radians(50), math.radians(10)
+    q = p - 3
+    for k in range(30):
+        e = up if k % 3 == 0 else down
+        q = t.add(q, [math.cos(e), 0, math.sin(e)], 0.1, 0.01)
+    c = t.table()
+    labels = ds.geometric_labels(c)
+    mean = math.degrees(math.atan2(math.sin(up) + 2 * math.sin(down), math.cos(up) + 2 * math.cos(down)))
+    assert ds.limb_elevation05(c, labels) == pytest.approx(mean, abs=3.0)
+    assert ds.describe(c)["limbElevation"] == pytest.approx(10.0)
+
+
+def test_pendulous_fraction05_reads_each_axis_last_half_metre():
+    # Two 2 m limbs: one ends in a 0.1 m cylinder heading down (its last 0.5 m still rises), one whose last 0.6 m
+    # heads down.
+    t = Tree()
+    p = t.chain(-1, UP, 10, 0.25, 0.05)
+    a = t.chain(p - 2, [1, 0, 0.3], 19, 0.1, 0.01)
+    t.add(a, [1, 0, -0.5], 0.1, 0.01)
+    b = t.chain(p - 4, [-1, 0, 0.3], 14, 0.1, 0.01)
+    t.chain(b, [-1, 0, -0.5], 6, 0.1, 0.01)
+    c = t.table()
+    f = ds.pendulous_fraction05(c, ds.geometric_labels(c))
+    assert f == pytest.approx(0.5, abs=1e-9)
+    assert ds.describe(c)["pendulousFraction"] == pytest.approx(0.2 / 0.45)  # both limb tips and the trunk's

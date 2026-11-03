@@ -1,5 +1,5 @@
-"""coarsen() (gate c's degradation, coarsen.py) on synthetic trees with known answers: pruning, re-cutting, volume,
-the bracket's inflation, and that coarsening twice changes nothing. No data needed.
+"""coarsen() (gate c's degradation, coarsen.py) on synthetic trees with known answers: pruning (v3: prune only; the re-cut
+withdrawn), inflation, and that coarsening twice changes nothing. No data needed.
 Not in `npm run check`:  uv run --project analysis --with pytest python -I -m pytest analysis/tests -q"""
 
 import math
@@ -42,26 +42,13 @@ def test_prune_drops_every_cylinder_under_d_min_with_its_subtree():
     assert len(out) == len(c) - 3 - sum(2 * (0.015 - 0.0006 * k) < 0.02 for k in range(8))
 
 
-def test_recut_merges_to_the_ratio_and_keeps_volume():
-    c = co.prune(tree(), RES.d_min)
-    out = co.recut(c, RES)
-    assert len(out) < len(c)
-    assert volume(out) == pytest.approx(volume(c), rel=1e-12)
-    trunk = cy.trunk(out)
-    # Every trunk segment but the last is at least ten of its radii long, built from 0.1 m cylinders.
-    for i in trunk[:-1]:
-        assert out.length[i] >= 10 * out.radius_raw[i] - 1e-12
-    assert out.start[0] == pytest.approx(c.start[0])
-    assert cy.height(out) == pytest.approx(cy.height(c), abs=1e-9)
-
-
-def test_a_cylinder_already_long_enough_is_kept_unchanged():
-    t = Tree()
-    t.chain(-1, UP, 3, 2.0, 0.05)
-    c = t.table()
-    out = co.recut(c, RES)
+def test_coarsen_is_prune_only():
+    c = tree()
+    out = co.coarsen(c, RES)
+    ref = co.prune(c, RES.d_min)
     for f in ("start", "axis", "length", "radius", "radius_raw", "parent"):
-        assert np.array_equal(getattr(out, f), getattr(c, f))
+        assert np.array_equal(getattr(out, f), getattr(ref, f))
+    assert not hasattr(co, "recut")
 
 
 def test_coarsening_twice_changes_nothing():
@@ -86,10 +73,10 @@ def test_coarsening_twice_changes_nothing_on_a_branching_crown():
         tips = new
     c = t.table()
     for factor in (0.5, 1.0, 2.0):
-        res = co.scaled(RES, factor)
+        res = co.Resolution(RES.d_min * factor, RES.ratio, RES.count)
         once = co.coarsen(c, res)
         twice = co.coarsen(once, res)
-        assert len(once) < len(c)
+        assert len(once) < len(c) or factor < 2.0
         for f in ("start", "axis", "length", "radius", "radius_raw", "parent"):
             assert np.array_equal(getattr(once, f), getattr(twice, f)), (factor, f)
 
@@ -118,4 +105,3 @@ def test_resolution_reads_terminal_diameters_and_ratios_per_class():
     assert res.ratio[k] == pytest.approx(0.25 / 0.006)
     assert sum(res.count) == len(c)
     assert math.isnan(res.ratio[-1])
-    assert co.target_ratio(res, 1.0) == res.ratio[max(j for j, v in enumerate(res.ratio) if math.isfinite(v))]

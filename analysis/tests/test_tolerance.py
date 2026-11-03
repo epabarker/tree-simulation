@@ -58,7 +58,7 @@ def test_the_gate_refuses_to_run_when_hashed_code_has_changed():
         p1._check_hashes({"hashes": {**tol.file_hashes(), "analysis/treesim/describe.py": "0" * 64}})
 
 
-def test_v2_hashes_every_file_the_gate_reads():
+def test_v3_hashes_every_file_the_gate_reads():
     for f in ("analysis/treesim/control.py", "analysis/treesim/tiers.py", "analysis/treesim/simtree.py",
               "analysis/treesim/fetch.py", "analysis/treesim/tolerance.py", "cli/dump-trees.ts",
               "analysis/fit/sources/reference-manifest.csv"):
@@ -73,3 +73,14 @@ def test_v2_verdicts_report_only_before_h1_before_noise():
     assert tol._verdict("beech", "biodiv", "taper", 9, 0.1) == "held out (too few trees)"
     assert tol._verdict("beech", "biodiv", "p0", 53, math.nan) == "not measured"
     assert tol._verdict("beech", "biodiv", "p0", 53, 0.49) == "clear"
+    for k in ("tortuosity", "limbElevation", "pendulousFraction"):  # v3: the per-cylinder readings
+        assert tol._verdict("beech", "biodiv", k, 53, 0.1) == "report-only"
+    for k in ("tortuosity05", "limbElevation05", "pendulousFraction05"):
+        assert k in tol.DESCRIPTORS and tol._verdict("beech", "biodiv", k, 53, 0.1) == "clear"
+
+
+def test_v3_beech_value_is_the_median_of_its_repeats():
+    ds = [{k: float(v) for k in tol.DESCRIPTORS} for v in (1, 2, 9, 3, 4)]
+    assert tol.median_of(ds)["p0"] == 3.0
+    ds[0]["p0"] = ds[1]["p0"] = ds[2]["p0"] = math.nan
+    assert math.isnan(tol.median_of(ds)["p0"])

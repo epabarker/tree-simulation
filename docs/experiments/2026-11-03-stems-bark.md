@@ -9,7 +9,8 @@ or preset change, and the goldens are untouched.
 **In one line:** nothing passes. Two of the three planned levers were ruled out before any namer
 saw them:
 - bark by light was ruled out by set 5's measurement;
-- bark by girth was ruled out by Pilarski et al. 2008, where limbs are no paler than the trunk;
+- bark by girth (pale limbs, a darker trunk) has no support for limbs ten years and older in
+  Pilarski et al. 2008 (abstract only);
 - root flare was dropped because no source gives its numbers.
 
 The third lever, a closed wood's dim interior drawn between the boles (`&interior`), passed its
@@ -53,10 +54,12 @@ lone 100 and stand 100 at seeds 1–3. Every plate is shrunk by one factor, so t
    - The field gives the stand's clear boles 0.53 and the lone tree's limbs 0.52, so it cannot tell
      them apart, and `s.light` points the wrong way.
    - An open-grown dome is dark inside, so no light on the stem makes its limbs pale. Not re-run.
-2. **Bark by girth** (pale limbs, a darker trunk) was ruled out by the only measurement.
-   - Pilarski, Tokarz & Kocurek 2008 (abstract, PJOES) measured 400–700 nm reflectance of 18% on
-     1-year stems, 10% on 10-year stems and 15% on trunks.
-   - Limbs are not paler than the trunk, so the rule has no support. Not implemented.
+2. **Bark by girth** (pale limbs, a darker trunk) is unsupported for the limbs that matter.
+   - Pilarski, Tokarz & Kocurek 2008 (PJOES) report 400–700 nm reflectance of 18% on 1-year
+     stems and 10% on 10-year stems. The trunks' 15% came paraphrased from the abstract by the
+     lookup tool; the full text was not read.
+   - Only the youngest shoots are paler than the trunk. Limbs of ten years and older are darker, so
+     a pale-limb ramp has no support. Not implemented.
 3. **Root flare** has no sourced numbers, so it is dropped.
    - Two lookups found stump-to-DBH regressions only for oriental beech (no coefficients in the
      fetched text) and *Quercus frainetto*.
@@ -169,7 +172,11 @@ B. The key: A is HEAD's default; B is `&bark=pale&interior`.
 
 - **Three namers per set are one model run three times.** Each saw a whole set in one pass and named
   similar plates alike: the pale and candidate stands, 46% of pixels apart, got identical names.
-  That makes in-set comparisons conservative.
+  - The in-set design (the advisor's suggestion, adopted in the plan) removes the set-to-set noise
+    v3 measured, but adds this anchoring.
+  - That biases the result **toward no difference**: the backdrop's null is a null of this design.
+  - The conclusion still holds, because no condition moved the stand, including the measured bark
+    that v3's namers called beech.
 - **The namers may receive the repo's CLAUDE.md**, as in v3.
 - **The backdrop needs the field.** The garden asks for it only with `?interior`. Its cost on the
   phone (one W × H float array per snapshot) has not been measured.

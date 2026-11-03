@@ -3,6 +3,14 @@
 _Copied to `docs/plans/2026-11-03-stems-bark.md` on approval (plan mode writes only here). The prose
 is ≤ 60 lines; the code is in the appendix._
 
+## Revisions (during the run, 2026-11-03)
+- **The gate's first form failed.** Shade relative to the top row gave the lone plates 0.41–0.50.
+  The user approved the §10 form: closed at ≤ 10% of open light, open from 20%. The 20% was chosen
+  with the gate's data in view. The code is `interiorDepth` in `scene.ts`, not the appendix's
+  version.
+- **(c) root flare was dropped:** the second lookup found no sourced numbers. No flare code.
+- **J (seeds 4–6) was not run:** the candidate failed on 1–3 (track E's rule). See the note.
+
 ## 1. The question and the targets
 **Question:** can a general renderer rule, grounded in light or stem form, make the beech stand read
 beech while the lone beech keeps its pale-bark read, at no cost to birch, hornbeam or oak?

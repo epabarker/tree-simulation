@@ -11,8 +11,8 @@ measured bark. The brief asked for at most three renderer changes, each general 
 light, girth, age or the bark card, switchable and off by default:
 - **Bark by light** was already measured not to separate stand boles from lone limbs (set 5). An
   open-grown dome is dark inside.
-- **Bark by girth** is contradicted by the only measurement (Pilarski et al. 2008: 18% reflectance on
-  1-year stems, 10% at 10 years, 15% on trunks).
+- **Bark by girth** is unsupported for limbs ten years and older (Pilarski et al. 2008, abstract: 18%
+  reflectance on 1-year stems, 10% at 10 years, about 15% on trunks).
 - **Root flare** has no sourced numbers.
 - **The backdrop beyond a closed stand** (`ViewOptions.interior`; `&interior` in the lab,
   `garden.html?interior`) was built.
@@ -28,7 +28,11 @@ light, girth, age or the bark card, switchable and off by default:
    - It changes no plate of an open-grown tree. It does not change what the namers call the stand
      (silver birch or aspen, 9 of 9, every condition).
 2. **Make nothing default on identity grounds.**
-   - No condition passed on the dev seeds. The measured bark (2026-11-02) stays beech's default.
+   - No condition passed on the dev seeds.
+   - Keeping the measured bark as beech's default is the no-change outcome and the user's call. Its
+     support did not replicate under these namers: v3's named the measured stand beech (9 of 15 at
+     seeds 4–6); here it is birch or aspen, 0 of 9, under both barks. The pale grey was equal or
+     better in every cell (lone 60: 6 against 4).
    - `girth` stays off. It did not move the beech stand, and its effect on hornbeam is inside the
      namers' noise.
 3. **Record what was ruled out** (bark by light, bark by girth, root flare) so a later round starts

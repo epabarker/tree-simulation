@@ -56,7 +56,7 @@ for s in "${SPECIES[@]}"; do
   [[ -f "runs/level0/$s/checkpoint.pkl" ]] && resume=(--resume)
   echo "$s: start $(date -Iseconds) (max-evals $MAX_EVALS, max-hours $MAX_HOURS)"
   uv run --project analysis python -I analysis/experiments/level0_fit.py --species "$s" \
-    --max-evals "$MAX_EVALS" --max-hours "$MAX_HOURS" --workers "$WORKERS" "${resume[@]}" \
+    --max-evals "$MAX_EVALS" --max-hours "$MAX_HOURS" --workers "$WORKERS" ${resume[@]+"${resume[@]}"} \
     2>&1 | tee -a "runs/level0/$s.log"
   echo "$s: end $(date -Iseconds)"
 done

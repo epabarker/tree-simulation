@@ -28,9 +28,9 @@ echo "=== $s: $gens generations ($evals evaluations), ≤ $hours h; build:wasm $
 npm run build:wasm >>"$log" 2>&1 || { echo "build:wasm failed (see $log)"; exit 1; }
 resume=()
 [[ -f runs/$out/$s/checkpoint.pkl ]] && resume=(--resume)
-echo "=== $s: fit ${resume[*]} $(date -Iseconds)" | tee -a "$log"
+echo "=== $s: fit ${resume[@]+"${resume[@]}"} $(date -Iseconds)" | tee -a "$log"
 uv run --project analysis python -I analysis/experiments/level1_fit.py --species "$s" --max-evals "$evals" \
-  --max-hours "$hours" --out "$out" --workers "$(treesim_workers)" "${resume[@]}" >>"$log" 2>&1
+  --max-hours "$hours" --out "$out" --workers "$(treesim_workers)" ${resume[@]+"${resume[@]}"} >>"$log" 2>&1
 status=$?
 echo "=== $s: fit exit $status $(date -Iseconds)" | tee -a "$log"
 # A failed fit is never gated: an older results file from a previous run may still be on disk.

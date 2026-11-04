@@ -25,7 +25,13 @@ resume=()
 echo "=== $s: fit ${resume[*]} $(date -Is)" | tee -a "$log"
 uv run --project analysis python -I analysis/experiments/level1_fit.py --species "$s" --max-evals "$evals" \
   --max-hours "$hours" --workers 12 "${resume[@]}" >>"$log" 2>&1
-echo "=== $s: fit exit $? $(date -Is)" | tee -a "$log"
+status=$?
+echo "=== $s: fit exit $status $(date -Is)" | tee -a "$log"
+# A failed fit is never gated: an older results file from a previous run may still be on disk.
+if [[ $status -ne 0 ]]; then
+  echo "$s: the fit failed (exit $status); no gate (see $log)" | tee -a "$log"
+  exit "$status"
+fi
 fit=docs/experiments/fits/level1-pilot/$s.json
 [[ -f $fit ]] || fit=docs/experiments/fits/level1-pilot/$s-best.json
 if [[ ! -f $fit ]]; then

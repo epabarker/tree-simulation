@@ -2,6 +2,35 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-04: Reference fidelity, phase 3 pilot: Level 1 beech registered, controlled and dry-run (fit not launched)
+
+- **What changed** (analysis/ and docs only; no src/rust/cli/tests; goldens and gate c's hashed files unchanged):
+  - **Registration first** (3c64f48), from real QSMs only: `analysis/fit/sources/level1-beech.json` and beech.toml's
+    `[level1] pilot_*`.
+  - **New code:**
+    - `treesim/level1.py` (the rules) and `treesim/fit_level1.py` (resumable CMA-ES);
+    - `analysis/experiments/level1_eval.ts`, which grows the stand once for both levels and dumps skeletons to
+      /dev/shm;
+    - `level1_targets.py`, `level1_fit.py`, `level1_gate.py` (gate and real-tree control) and `level1_fit_gate.sh`;
+    - tests.
+  - **Parity:** the evaluator's reply equals `cli/fit-eval.ts`'s, and its dump at 150 is byte-identical to
+    `cli/dump-trees.ts --gate-c`'s. The describe path, serial and pooled, equals gate c's values exactly.
+- **The user's rulings in session:**
+  - correlated summaries of one measurement share one unit of weight (the outline group), as a general rule;
+  - the held-out draw stands (p1 and widestAt are outline, so the out-of-sample test rests on three);
+  - held-out values are never written by the fit;
+  - the budget is a generation count;
+  - the dry run reports memory.
+- **Surprises:**
+  - **r3.c is a girth knob.** Alone, it moves the size-matched season from 50 to 80 (stress wood; at 0.022 the stand is
+    0.46 m at 50).
+  - **The held-out rule is lenient:** the hand passes it 20/20, and the gate fails the hand on spread alone
+    (leaderDominance 0.38, limbUpturn 0.26).
+  - **The first two generations traded Level 0's lateShare** (0.51 → 6.80) for Level 1 terms.
+  - **A held-out name leaked:** the simulator's `stand.widestAt` from Level 0's trials sat in the dry run's rows. The
+    fit now drops every held-out-named trait.
+- **Open for the user:** r3.c. (a) launch v1; (b) freeze it, a v2 registration (recommended); (c) widen the seasons.
+
 ## 2026-11-03: Reference fidelity, phase 2: Level 0 targets from Tallo, the measurement, the gate, the fitter (no sweep run)
 
 - **What changed** (Python, `cli/`, targets `[level0]`, docs; no src/rust/presets/species; goldens unchanged; gate c's

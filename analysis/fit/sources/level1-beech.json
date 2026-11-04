@@ -1,5 +1,5 @@
 {
- "version": 1,
+ "version": 2,
  "species": "beech",
  "provisional": "phase 3 pilot (the user, 2026-11-04): pending Level 0's pass and ADR 0052; nothing from it is accepted into species params (the plan's \u00a7g)",
  "written": "2026-11-04, from real QSMs only, before any simulated tree was scored",
@@ -498,7 +498,8 @@
   "r2.hJ": 77.63,
   "c6.r0": 0.004689,
   "r6.qMin": 0.03103,
-  "r6.leafArea": 2.417
+  "r6.leafArea": 2.417,
+  "r3.c": 0.04879
  },
  "frozen_level0": {
   "c3.alpha": 3.312,
@@ -561,15 +562,13 @@
    "path": "r2.kappa",
    "lo": 0,
    "hi": 4
-  },
-  {
-   "path": "r3.c",
-   "lo": 0.01,
-   "hi": 0.3,
-   "log": true
   }
  ],
- "knobs_rule": "ADR 0029's ten form knobs (bounds: [[formRange]]) and r3.c ([[param]]); no knob added",
+ "knobs_rule": "ADR 0029's ten form knobs (bounds: [[formRange]]) and r3.c ([[param]]), less `frozen_form`; no knob added",
+ "frozen_form": {
+  "r3.c": 0.04879
+ },
+ "frozen_form_source": "the species' own values (cli/fit-eval.ts describe): what Level 0 and the hand grow by",
  "start": {
   "r2.levels.0.lambda": 0.5308,
   "r2.levels.1.lambda": 0.5124,
@@ -582,11 +581,58 @@
   "r2.kappa": 0.4314,
   "r2.levels.1.postureSetPoint": 34.32
  },
- "start_note": "the targets file's [form]; r3.c at the species' own value (cli/fit-eval.ts describe)",
+ "start_note": "the targets file's [form]; a knob it leaves unset (r3.c in v1) at the species' own value (cli/fit-eval.ts describe)",
+ "reason": "the user, 2026-11-04, after the dry run: r3.c frozen at the species' value as Level 0 did; alone it moved the size-matched season from 50 to 80 (stress wood: a girth knob), and nothing at Level 0 scores DBH at age; the knobs are ADR 0029's ten",
+ "prior": {
+  "version": 1,
+  "commit": "3c64f48",
+  "knobs": [
+   "r2.levels.0.lambda",
+   "r2.levels.1.lambda",
+   "r2.levels.1.setPoint",
+   "r2.levels.1.postureSetPoint",
+   "r2.levels.1.branchAngle",
+   "r2.levels.1.eta",
+   "r2.levels.2.setPoint",
+   "r2.aC",
+   "r2.dLambda",
+   "r2.kappa",
+   "r3.c"
+  ],
+  "fixed": {
+   "r1.hydraulic": "hyperbolic",
+   "c5.Trel": 0.008,
+   "r1.leafCost": "acclimated",
+   "r1.leafCostShade": 0.3,
+   "c3.alpha": 3.312,
+   "r1.Lh": 51.16,
+   "r1.mf": 0.0618,
+   "r2.hJ": 77.63,
+   "c6.r0": 0.004689,
+   "r6.qMin": 0.03103,
+   "r6.leafArea": 2.417
+  },
+  "hashes": {
+   "analysis/treesim/level1.py": "d2ad448a6a1a587c16196f22b106cdfe697729b6897f956374e5da0cddc1caa8",
+   "analysis/experiments/level1_eval.ts": "19d97301ce99d2a9843fca1980d0c12e6ce09c89318922cefae6f3cb4ebd48f1",
+   "analysis/experiments/level1_targets.py": "a4f45c4310db8863a0eed29312dbbc36dd70b7620c68296fc48775174740f49e",
+   "analysis/treesim/describe.py": "671f92d71131525cb1dcf5fdb771ed98b3c5ac05aea900366925ef61d5cc2bee",
+   "analysis/treesim/form.py": "23c5e1c035c9bbb625a8a002476fc12fd98f85438af4bba5adbb97c10ec6b48d",
+   "analysis/treesim/cylinders.py": "0e262dce2e55193c3f8ed775ec92c7fbe29df9f9be0d738daed7623cb5629254",
+   "analysis/treesim/coarsen.py": "b5e57ca6ebff39f9ec8a2b0364e621a549e5d6b6d8426cbbcbfb05cd87b34bc9",
+   "analysis/treesim/simtree.py": "e69c7a26140b272f1274b07f3d6ae51acdba6abbfc655b27d3b8a02bb901ff6b",
+   "analysis/treesim/tolerance.py": "7ec6553f51cee1734e68b3b1f5949d7c6996e820d61a6e53a3fc3fcd5c647b7c",
+   "analysis/fit/sources/phase1-tolerances.json": "896e1be07fbfd876e50792191e6aa8a1530d6f629818a26f7404871d90c38043",
+   "cli/trials.ts": "2660df8f06f210369a8f80f6b8e02435fe87ea605cdc80884d3827011118dac4",
+   "cli/allometry.ts": "b7f9c86322a68aafaf0258ef07834ba7ea2c806cb415159924e08d78e1d0f93c",
+   "analysis/fit/targets/beech.toml": "2f3f39bb5693061f6db3fd0a03f865ecebcf2e871f37cf6592a7ec038370b77a",
+   "docs/experiments/fits/level0/beech.json": "4794cfd86a29da8c64ea317813e0981df7ac1fa1f0c1522e675ca6994241f5b2"
+  }
+ },
  "hashes": {
   "analysis/treesim/level1.py": "d2ad448a6a1a587c16196f22b106cdfe697729b6897f956374e5da0cddc1caa8",
   "analysis/experiments/level1_eval.ts": "19d97301ce99d2a9843fca1980d0c12e6ce09c89318922cefae6f3cb4ebd48f1",
-  "analysis/experiments/level1_targets.py": "a4f45c4310db8863a0eed29312dbbc36dd70b7620c68296fc48775174740f49e",
+  "analysis/experiments/level1_targets.py": "d9020bd8fe81b2cb8f316527c8c04508689cb0a2827b55b774e8a6147368961d",
   "analysis/treesim/describe.py": "671f92d71131525cb1dcf5fdb771ed98b3c5ac05aea900366925ef61d5cc2bee",
   "analysis/treesim/form.py": "23c5e1c035c9bbb625a8a002476fc12fd98f85438af4bba5adbb97c10ec6b48d",
   "analysis/treesim/cylinders.py": "0e262dce2e55193c3f8ed775ec92c7fbe29df9f9be0d738daed7623cb5629254",
@@ -596,7 +642,7 @@
   "analysis/fit/sources/phase1-tolerances.json": "896e1be07fbfd876e50792191e6aa8a1530d6f629818a26f7404871d90c38043",
   "cli/trials.ts": "2660df8f06f210369a8f80f6b8e02435fe87ea605cdc80884d3827011118dac4",
   "cli/allometry.ts": "b7f9c86322a68aafaf0258ef07834ba7ea2c806cb415159924e08d78e1d0f93c",
-  "analysis/fit/targets/beech.toml": "2f3f39bb5693061f6db3fd0a03f865ecebcf2e871f37cf6592a7ec038370b77a",
+  "analysis/fit/targets/beech.toml": "c40c562828e4cd626090b4f66c57551b4e2cb46122cea89ecbb20314982728ea",
   "docs/experiments/fits/level0/beech.json": "4794cfd86a29da8c64ea317813e0981df7ac1fa1f0c1522e675ca6994241f5b2"
  }
 }

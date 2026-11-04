@@ -313,7 +313,10 @@ pilot_held_out_seed = 20261104
 pilot_held_out = ['length0', 'p1', 'pendulousFraction05', 'tortuosity05', 'widestAt']
 pilot_fitted = ['centroidHeight', 'crownFullness', 'forkHeight', 'leaderDominance', 'limbDroop', 'limbElevation05', 'limbUpturn', 'p0', 'p2', 'p3', 'profileCentre']
 pilot_outline_group = ['centroidHeight', 'crownFullness', 'p0', 'p2', 'p3', 'profileCentre']
-pilot_knobs = ['r2.levels.0.lambda', 'r2.levels.1.lambda', 'r2.levels.1.setPoint', 'r2.levels.1.postureSetPoint', 'r2.levels.1.branchAngle', 'r2.levels.1.eta', 'r2.levels.2.setPoint', 'r2.aC', 'r2.dLambda', 'r2.kappa', 'r3.c']
+pilot_knobs = ['r2.levels.0.lambda', 'r2.levels.1.lambda', 'r2.levels.1.setPoint', 'r2.levels.1.postureSetPoint', 'r2.levels.1.branchAngle', 'r2.levels.1.eta', 'r2.levels.2.setPoint', 'r2.aC', 'r2.dLambda', 'r2.kappa']
+pilot_version = 2
+pilot_frozen = { "r3.c" = 0.04879 }
+# v2: the user, 2026-11-04, after the dry run: r3.c frozen at the species' value as Level 0 did; alone it moved the size-matched season from 50 to 80 (stress wood: a girth knob), and nothing at Level 0 scores DBH at age; the knobs are ADR 0029's ten
 
 [level0]
 # Level 0 (reference-fidelity phase 2, the plan's §k): the physiology knobs fitted against Tallo's H–DBH and CR–DBH

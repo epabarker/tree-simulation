@@ -3,16 +3,27 @@ QSMs only, before any simulated tree is scored, and committed alone. Writes anal
 and the `[level1] pilot_*` keys of the species' targets file; nothing here reads a simulated tree.
 
     uv run --project analysis python -I analysis/experiments/level1_targets.py --species beech
+    uv run --project analysis python -I analysis/experiments/level1_targets.py --species beech --version 2 \
+        --freeze r3.c --reason "..."
 
 The species' descriptors are gate c v3.1's tiers (the targets file's `[level1] gate_c_v3_1_tier_a`, `_tier_b`); its
-dataset, d_min and matched DBH are phase1-tolerances.json's. Refuses if that file's own hashes have moved, or if the
-registration already exists (a registration is never rewritten in place: a new one is a new version, with a reason).
+dataset, d_min and matched DBH are phase1-tolerances.json's. Refuses if that file's own hashes have moved.
+
+A registration is never rewritten in place: a new one is the next version, with a reason, and keeps the previous one's
+knobs, fixed assignments and hashes in `prior`. `--freeze` takes knobs out of the search and fixes them at the
+species' own values (cli/fit-eval.ts describe, the values Level 0 and the hand grow by). Every target (descriptors,
+draw, groups, real distributions, Demol, size match) must come out identical to the previous version's, or it refuses.
+
+- v2 (the user, 2026-11-04, after the dry run): r3.c frozen at the species' value. Alone it moved the size-matched
+  season from 50 to 80 (stress wood thickens the stem: a girth knob in this model), and nothing at Level 0 scores DBH
+  at age. The knobs are ADR 0029's ten.
 """
 
 import argparse
 import json
 import math
 import re
+import subprocess
 import sys
 import tomllib
 
@@ -24,12 +35,18 @@ from treesim.sweep import REPO
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--species", required=True)
+parser.add_argument("--version", type=int, default=1, help="the next version when one is registered already")
+parser.add_argument("--freeze", nargs="*", default=[], help="knobs fixed at the species' own values")
+parser.add_argument("--reason", help="why a new version (required past version 1)")
 args = parser.parse_args()
 species = args.species
 
 out = l1.registration_path(species)
-if out.exists():
-    sys.exit(f"refusing: {out.relative_to(REPO)} exists; a registration is never rewritten in place")
+prior = json.loads(out.read_text()) if out.exists() else None
+expected = 1 if prior is None else prior["version"] + 1
+if args.version != expected or (prior is not None and not args.reason):
+    sys.exit(f"refusing: the next registration is version {expected}"
+             + ("" if prior is None else ", with --reason; a registration is never rewritten in place"))
 tolerances = json.loads(tol.TOLERANCES.read_text())
 moved = [f for f, h in tolerances["hashes"].items() if tol.file_hashes().get(f) != h]
 if moved:
@@ -82,13 +99,26 @@ level0 = json.loads((REPO / "docs" / "experiments" / "fits" / "level0" / f"{spec
 frozen = {k: level0["fit"]["assign"][k] for k in targets["level0"]["knobs"]}
 form_range = {p["path"]: p for p in targets["formRange"]}
 knobs = [form_range[p] for p in form_range] + [p for p in targets["param"] if p["path"] == "r3.c"]
+unknown = [k for k in args.freeze if k not in {p["path"] for p in knobs}]
+if unknown:
+    sys.exit(f"refusing: not a knob: {', '.join(unknown)}")
+frozen_form: dict = {}
+if args.freeze:
+    from treesim.fit import Pool
+
+    pool = Pool(1)
+    try:
+        frozen_form = pool.ask({"describe": species, "paths": list(args.freeze)})["values"]
+    finally:
+        pool.close()
+    knobs = [p for p in knobs if p["path"] not in frozen_form]
 start = dict(targets["form"])
 if "r2.levels.1.postureSetPoint" not in start:
     # r3.rs: an unset posture set point is the level's setPoint (`unwrap_or(set_point)`): the same tree.
     start["r2.levels.1.postureSetPoint"] = start["r2.levels.1.setPoint"]
 
 reg = {
-    "version": 1,
+    "version": args.version,
     "species": species,
     "provisional": "phase 3 pilot (the user, 2026-11-04): pending Level 0's pass and ADR 0052; nothing from it is "
                    "accepted into species params (the plan's §g)",
@@ -141,14 +171,43 @@ reg = {
                         "trees as pseudo-seeds on the tier A held-out descriptors: the out-of-sample check"},
     "seeds": {"fit": "drawn each generation from 1000–9999 less 1001–1003 (the gallery's)",
               "finalists": list(l1.FINAL_SEEDS), "gate": list(l1.GATE_SEEDS)},
-    "fixed": {**targets.get("fixed", {}), **frozen},
+    "fixed": {**targets.get("fixed", {}), **frozen, **frozen_form},
     "frozen_level0": frozen,
     "frozen_level0_source": f"docs/experiments/fits/level0/{species}.json fit.assign (v2, night 1; not accepted)",
     "knobs": knobs,
-    "knobs_rule": "ADR 0029's ten form knobs (bounds: [[formRange]]) and r3.c ([[param]]); no knob added",
+    "knobs_rule": "ADR 0029's ten form knobs (bounds: [[formRange]]) and r3.c ([[param]]), less `frozen_form`; no knob "
+                  "added",
+    "frozen_form": frozen_form,
+    "frozen_form_source": "the species' own values (cli/fit-eval.ts describe): what Level 0 and the hand grow by",
     "start": start,
-    "start_note": "the targets file's [form]; r3.c at the species' own value (cli/fit-eval.ts describe)",
+    "start_note": "the targets file's [form]; a knob it leaves unset (r3.c in v1) at the species' own value "
+                  "(cli/fit-eval.ts describe)",
 }
+SAME = ("species", "dataset", "code", "d_min_m", "size_match", "descriptors", "held_out_seed", "held_out", "fitted",
+        "groups", "outline", "real", "real_dbh_range_m", "real_trees", "real_trees_by_gap", "demol", "frozen_level0",
+        "start")
+
+
+def _clean(x):
+    if isinstance(x, float) and not math.isfinite(x):
+        return None
+    if isinstance(x, dict):
+        return {k: _clean(v) for k, v in x.items()}
+    if isinstance(x, list):
+        return [_clean(v) for v in x]
+    return x
+
+
+if prior is not None:
+    changed = [k for k in SAME if json.dumps(_clean(reg[k])) != json.dumps(prior.get(k))]
+    if changed:
+        sys.exit(f"refusing: version {args.version} would change the targets themselves: {', '.join(changed)}")
+    commit = subprocess.run(["git", "log", "-1", "--format=%h", "--", str(out.relative_to(REPO))], cwd=REPO,
+                            capture_output=True, text=True, check=True).stdout.strip()
+    reg["reason"] = args.reason
+    reg["prior"] = {"version": prior["version"], "commit": commit, "knobs": [p["path"] for p in prior["knobs"]],
+                    "fixed": prior["fixed"], "hashes": prior["hashes"], **({"prior": prior["prior"]}
+                                                                          if "prior" in prior else {})}
 
 # The targets file's pointer, before the hashes (the file is hashed with it).
 text = targets_path.read_text()
@@ -162,28 +221,31 @@ block = "\n".join([
     f"pilot_fitted = {fitted!r}",
     f"pilot_outline_group = {weight_groups.get('outline', [])!r}",
     f"pilot_knobs = {[p['path'] for p in knobs]!r}",
+    f"pilot_version = {args.version}",
+    *([f"pilot_frozen = {{ {', '.join(f'{json.dumps(k)} = {v!r}' for k, v in frozen_form.items())} }}"]
+      if frozen_form else []),
+    *([f"# v{args.version}: {args.reason}"] if prior is not None else []),
 ])
-anchor = re.search(r"^gate_c_v3_1 = .*$", text, flags=re.M)
-if anchor is None or "pilot_registration" in text:
-    sys.exit("refusing: no gate_c_v3_1 line to follow, or a pilot block already there")
-targets_path.write_text(text[:anchor.end()] + "\n" + block + text[anchor.end():])
-assert tomllib.loads(targets_path.read_text())["level1"]["pilot_held_out"] == held_out
+if prior is None:
+    anchor = re.search(r"^gate_c_v3_1 = .*$", text, flags=re.M)
+    if anchor is None or "pilot_registration" in text:
+        sys.exit("refusing: no gate_c_v3_1 line to follow, or a pilot block already there")
+    text = text[:anchor.end()] + "\n" + block + text[anchor.end():]
+else:
+    # The previous version's block: from its first comment line through its last pilot_* line or v-comment.
+    old = re.search(r"^# Level 1 pilot \(phase 3.*?(?=\n\n)", text, flags=re.M | re.S)
+    if old is None or not old.group(0).rstrip().splitlines()[-1].startswith(("pilot_", "# v")):
+        sys.exit("refusing: the previous pilot block is not where it was written")
+    text = text[:old.start()] + block + text[old.end():]
+targets_path.write_text(text)
+written = tomllib.loads(targets_path.read_text())["level1"]
+assert written["pilot_held_out"] == held_out and written["pilot_knobs"] == [p["path"] for p in knobs]
+assert written["pilot_version"] == args.version
 
 reg["hashes"] = l1.file_hashes(l1.HASHED + l1.species_files(species))
-
-
-def _clean(x):
-    if isinstance(x, float) and not math.isfinite(x):
-        return None
-    if isinstance(x, dict):
-        return {k: _clean(v) for k, v in x.items()}
-    if isinstance(x, list):
-        return [_clean(v) for v in x]
-    return x
-
-
 out.write_text(json.dumps(_clean(reg), indent=1) + "\n")
-print(f"{out.relative_to(REPO)}: held out {held_out}; fitted {fitted}; groups {weight_groups}")
+print(f"{out.relative_to(REPO)} v{args.version}: held out {held_out}; fitted {fitted}; groups {weight_groups}; "
+      f"knobs {[p['path'] for p in knobs]}; frozen {frozen_form}")
 for k in names:
     r = real[k]
     print(f"  {k:20s} {tier[k]} n {r['n']:2d} median@{at:.3f} {r['median']:.4g} sd {r['sd']:.4g} "

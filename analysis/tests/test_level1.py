@@ -169,3 +169,19 @@ def test_describe_pool_equals_gate_c():
                 want = float(row[k]) if row[k] not in ("", "nan") else math.nan
                 assert (math.isnan(want) and math.isnan(t[k])) or t[k] == want, (s, k_tree, k)
             assert t["dbh"] == float(_gate_c_fine(s)[k_tree]["dbh"])  # describe()'s DBH of the uncoarsened tree
+
+
+def test_registration_v2_loads_and_starts_at_the_hand():
+    """The committed registration passes its own hash check (it refuses once a hashed file changes: re-register, never
+    edit), freezes r3.c at the species' value (v2, the user), keeps v1's targets, and its start decodes to the hand."""
+    from treesim import fit
+
+    reg = l1.load("beech")
+    assert reg["version"] == 2 and reg["prior"]["version"] == 1
+    paths = [p["path"] for p in reg["knobs"]]
+    assert "r3.c" not in paths and len(paths) == 10 and "r3.c" in reg["prior"]["knobs"]
+    assert reg["fixed"]["r3.c"] == reg["frozen_form"]["r3.c"] == 0.04879
+    assert reg["held_out"] == ["length0", "p1", "pendulousFraction05", "tortuosity05", "widestAt"]
+    spec = f1.level1_spec("beech", reg)
+    hand = {**spec.fixed, **spec.form}
+    assert fit.decode(spec, fit.encode(spec, reg["start"])) == hand

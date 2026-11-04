@@ -29,7 +29,9 @@ Newest first. One entry per session or milestone: what changed, why, surprises, 
   - **The first two generations traded Level 0's lateShare** (0.51 → 6.80) for Level 1 terms.
   - **A held-out name leaked:** the simulator's `stand.widestAt` from Level 0's trials sat in the dry run's rows. The
     fit now drops every held-out-named trait.
-- **Open for the user:** r3.c. (a) launch v1; (b) freeze it, a v2 registration (recommended); (c) widen the seasons.
+- **The user's ruling, (b):** r3.c frozen at the species' value (0.04879). Registration v2 (44a21ba):
+  `level1_targets.py --version 2 --freeze r3.c` refuses unless every target is identical to v1's, and keeps v1 in
+  `prior`. Launched 11:46 UTC: tmux `level1`, 32 generations.
 
 ## 2026-11-03: Reference fidelity, phase 2: Level 0 targets from Tallo, the measurement, the gate, the fitter (no sweep run)
 

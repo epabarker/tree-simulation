@@ -308,31 +308,37 @@ no z was computed, and nothing registered changed after it.
 ### State
 _(rewritten at the end of each session)_
 
-**Phase 3 beech pilot, built and dry-run (2026-11-04, [note](../experiments/2026-11-04-level1-beech-pilot.md));
-provisional, nothing accepted. The overnight run is NOT launched: it waits on the user's r3.c decision.**
-- **Registered first** (3c64f48): `analysis/fit/sources/level1-beech.json` (`level1_targets.py`, real QSMs only) and
-  `[level1] pilot_*` in beech.toml.
-  - Held out (seed 20261104, never redrawn): length0, p1, pendulousFraction05, tortuosity05, widestAt. p1 and widestAt
-    are outline, so the out-of-sample test rests on the other three.
-  - Loss: forkHeight, leaderDominance, limbDroop, limbElevation05, limbUpturn, and the outline group (centroidHeight,
-    crownFullness, p0, p2, p3, profileCentre), which shares one unit (the user's general rule), plus Level 0's terms.
-  - Knobs: ADR 0029's ten and r3.c. Level 0's seven are frozen at the v2 fit.
+**Phase 3 beech pilot: registration v2, launched (2026-11-04, [note](../experiments/2026-11-04-level1-beech-pilot.md));
+provisional, nothing accepted.**
+- **The user's ruling after the dry run, (b):** r3.c is frozen at the species' value, 0.04879, as Level 0 did; the knobs
+  are ADR 0029's ten.
+  - Registered as v2 (44a21ba): targets identical to v1's (3c64f48), which is kept in the file's `prior`.
+  - Why: r3.c alone moved the size-matched season from 50 to 80 (stress wood thickens the stem), and nothing at Level 0
+    scores DBH at age.
+- **Running:** tmux `level1` (systemd-inhibit), `level1_fit_gate.sh beech 32 5`, launched 11:46 UTC: 32 generations,
+  1,960 evaluations, ≈ 3.75 h with the gate, a 5 h safety stop.
+  - Log: `runs/level1-pilot/beech.log`. Gate: `runs/level1-pilot/beech.gate.{txt,json}`.
+  - Results: `docs/experiments/fits/level1-pilot/`.
+  - A killed run resumes with the same command.
+- **Registered (v1, kept in v2):**
+  - Held out (seed 20261104): length0, p1, pendulousFraction05, tortuosity05, widestAt. p1 and widestAt are outline, so
+    the out-of-sample test rests on the other three.
+  - Loss: forkHeight, leaderDominance, limbDroop, limbElevation05 and limbUpturn, plus the outline group (one unit),
+    plus Level 0's terms.
+  - Level 0's seven knobs are frozen at the v2 fit.
 - **Control:** BioDiv 20/20 (in sample), Demol 18/20 (out of sample).
-- **Hand baseline** (Level 0 v2 fit with `[form]`):
-  - loss 18.52 on seeds 101–110 (Level 0's terms 2.17);
-  - the gate fails on spread alone: held out 20/20, spread outside ×2 (leaderDominance 0.38, limbUpturn 0.26),
-    shapeFlag clear.
-- **Cost:** 404 s a generation of 12 × 5 on 12 workers; describe 0.27 s a tree, pooled.
-- **Decision for the user:** r3.c alone moves the size-matched season from 50 to 80 (a girth knob: stress wood). The
-  dump window's edge costs 48. Options:
-  - (a) launch v1 as registered;
-  - (b) freeze r3.c, a v2 registration (recommended);
-  - (c) widen the seasons, also v2.
-- **Launch (v1):** `tmux new -s level1 'systemd-inhibit --what=sleep:idle --why="Level 1 beech pilot"
-  analysis/experiments/level1_fit_gate.sh beech 32 5'`: 32 generations, 1,960 evaluations, ≈ 3.75 h.
-- **Order:** the user's r3.c ruling; then the overnight run and its post-fit session (gate, each term's change from the
-  hand, `level0_gate.py` on the fit); then the audit (3), ADR 0052's probe (4), the O2 realism probe (2) and the
-  asymmetry check (5) below.
+- **Hand baseline:**
+  - loss 18.52 (Level 0's terms 2.17). The largest terms are spreads: limbUpturn at 0.26× the real SD (6.07),
+    leaderDominance at 0.38× (4.05).
+  - The gate fails on spread alone: held out 20/20, so **the held-out rule does not discriminate in this pilot**; the
+    gate rests on spread and shapeFlag.
+- **Next:** the post-fit session:
+  - the gate on the fit;
+  - each term's change from the hand (does the gain come from Level 0 terms?);
+  - `level0_gate.py` on the fit;
+  - the gallery.
+
+  Then the audit (3), ADR 0052's probe (4), the O2 realism probe (2) and the asymmetry check (5) below.
 
 **Earlier State (1d-ii and before), kept below.**
 

@@ -225,7 +225,19 @@ has the same name, and it was in the dry run's rows (`runs/level1-dry/`, not com
 held-out-named trait, the simulator's included, and asserts none on every row and results file (`test_level1.py`). The
 gate keeps them.
 
-## Decisions for the user (before the overnight run)
+## The user's ruling (2026-11-04, after the dry run): (b), registration v2
+- **r3.c is frozen at the species' value, 0.04879, as Level 0 did.** The knobs are ADR 0029's ten.
+- **Registered as v2** in one commit, with hashes, before the launch. `level1_targets.py --version 2 --freeze r3.c`
+  refuses unless every target comes out identical to v1's: descriptors, the draw, groups, real distributions, Demol,
+  size match and start. v1's knobs, fixed assignments and hashes are kept in the file's `prior` (v1: 3c64f48). The start
+  still decodes to the hand (`test_level1.py`).
+- **The held-out rule does not discriminate in this pilot.** It passed the hand params 20 of 20, as it passes the real
+  trees. The gate rests on the spread rule and shapeFlag.
+- **The hand params' largest loss terms are spread terms:** limbUpturn at 0.26× the real between-tree SD (6.07) and
+  leaderDominance at 0.38× (4.05). The simulated trees are too alike in those two, not wrong on average (z −1.26 and
+  −0.32).
+
+## Decisions for the user (before the overnight run; answered above)
 1. **r3.c: launch as registered, or freeze it?** The probe above shows r3.c alone moving the matched season from 50 to
    80.
    - Nothing at Level 0 scores DBH at age. So r3.c can trade the tree's age at matching for Level 1 terms.
@@ -245,11 +257,16 @@ gate keeps them.
 3. **Level 0 trades.** Two generations already gave up lateShare (0.51 → 6.80). The overnight write-up gives each term's
    change from the hand. If the gains come from Level 0 terms, it says so; the loss is not changed for it.
 
-## The overnight run (not launched)
+## The overnight run (registration v2; launched 2026-11-04 11:46 UTC)
+**Launched** on this machine at 11:46 UTC: tmux session `level1`, under systemd-inhibit, after the v2 commit (44a21ba).
+Expected to finish around 15:30 UTC (gate included). Watch it with `tail -f runs/level1-pilot/beech.log`. The progress
+file, one row a candidate with its matched season, is rewritten every generation at
+`docs/experiments/fits/level1-pilot/beech-progress.csv`.
+
 - **Budget:** 2000 evaluations fit the night. At 60 a generation plus 40 for the finalists and the hand, that is
   **32 generations = 1,960 evaluations**.
 - **Time:** 32 × 404 s ≈ 3.6 h, plus ≈ 4 min of finalists and ≈ 2.5 min of gate: **≈ 3.75 h**. The safety stop is 5 h.
-- **The command (v1, option a):**
+- **The command** (the wrapper reads whichever registration is committed; v2 now):
 ```
 tmux new -s level1 'systemd-inhibit --what=sleep:idle --why="Level 1 beech pilot" analysis/experiments/level1_fit_gate.sh beech 32 5'
 ```

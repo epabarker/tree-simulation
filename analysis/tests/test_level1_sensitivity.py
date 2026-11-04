@@ -121,3 +121,16 @@ def test_pair_conditions_rule():
 def test_boot_index_is_paired_and_fixed():
     a, b = sens.boot_index(10), sens.boot_index(10)
     assert a.shape == (sens.BOOT_N, 10) and np.array_equal(a, b)
+
+
+def test_pair_conditions_measure_one_assignment_once():
+    kn = {}
+    for path in ("a", "b"):
+        q = {"path": path, "lo": 0.0, "hi": 1.0}
+        kn[path] = {**q, "points": {lab: (u, sens.value_at(q, u)) for lab, u in
+                                    zip(sens.POINTS, (0.0, 0.25, 0.5, 0.75, 1.0))}}
+    moves = {"x": {"a": {"hi": 0.9}, "b": {"hi": 0.5}}, "y": {"a": {"hi": 0.4}, "b": {"hi": 0.8}}}
+    conds = sens.pair_conditions(["x", "y"], moves, kn, {"a": 0.5, "b": 0.5})
+    # x ranks a over b, y ranks b over a: y's (b*, a*), (b*, a½), (b½, a*) are x's three assignments
+    assert len(conds) == 3 and all(c["for"] == ["x", "y"] for c in conds)
+    assert {(c["assign"]["a"], c["assign"]["b"]) for c in conds} == {(1.0, 1.0), (1.0, 0.75), (0.75, 1.0)}

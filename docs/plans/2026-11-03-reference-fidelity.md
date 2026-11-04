@@ -308,6 +308,33 @@ no z was computed, and nothing registered changed after it.
 ### State
 _(rewritten at the end of each session)_
 
+**Level 1 sensitivity (beech, registration v3's targets; 2026-11-04, [note](../experiments/2026-11-04-level1-sensitivity.md);
+registered in 9e304db before any run; provisional, nothing accepted).** One knob at a time: 18 knobs (10 form, 8
+physiology including r3.c) × 5 points on each registered scale, at v3's 10 search seeds; all 16 descriptors measured
+(a reachability experiment; the v3 hold-out rule is unaffected).
+- **Reachability:** no descriptor is unreachable by single-knob moves.
+  - 4 are at target within noise.
+  - **tortuosity05** (the hand's largest location term) is reached only by wrecking the tree: dLambda 0.067–0.12 or
+    r3.c 0.01–0.022, ΔL0 +21 to +76. The best affordable move closes 31%, the cost-aware pair check 33%. It is a
+    rule's case.
+  - **limbUpturn** (held out): its median closes 61–69% of the gap at most; its spread reaches only 0.46× (2 of 72
+    conditions within ×2, both ΔL0 ≥ +22).
+  - **The outline is cheap by posture:** postureSetPoint (1) 90 overshoots p0, crownFullness and limbElevation05 at
+    ΔL0 +0.2. Its gap is a narrow base with wood carried high, not one that crown retreat closes.
+  - **leaderDominance's spread is a knob:** r0 at its lower bound gives 1.00× at ΔL0 −0.5.
+- **The pair checks:** the registered one was degenerate (its remaining gap ignores cost). The cost-aware supplement
+  (the user's call, added after the registration) is sub-additive and reaches nothing new for tortuosity05.
+- **Proposed ADR order:**
+  1. tip upturn and tortuosity;
+  2. individual variation, narrowed to limb tips;
+  3. the trunk increment (girth moves the size match: 4 unmatched, 8 flagged, seasons 50–110);
+  4. 0052, whose case is Level 0's, not Level 1's.
+- **lateShare, for v4:** the per-seed SD (0.137) is more than twice the band (0.06), and the hand's term (1.53) has
+  a bootstrap SE of 1.74. Form knobs "gain" up to −1.53 by noise, and the same noise sets ΔL0's SE (2–4).
+- **Next (the user's to frame):** v4, combining a one-sided spread penalty, a noise-aware lateShare and r0 free or
+  re-fitted; or the ADR work in the order above. Then the audit (3), ADR 0052's probe (4), the O2 realism probe (2)
+  and the asymmetry check (5).
+
 **Phase 3 beech pilot v2 (registration v3, 81b157a): stopped early by the user, checkpoint kept, resumable (the call
 on generation 7's status, after 8 of 32 generations: the median 15 → 9, the best unmoved since generation 0; the
 SIGINT at 19:08 UTC after generations 8–9); no finalists, no gate, not a result of the fit; provisional, nothing accepted

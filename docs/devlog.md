@@ -2,6 +2,34 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-04: Level 1 sensitivity, what the knobs can reach (beech); pilot v2's record reworded
+
+- **What changed:** no code under src/rust/cli/tests.
+  - **New:** `analysis/experiments/level1_sensitivity.py` (register, run, pairs [--cost], envelope, report) and
+    `analysis/tests/test_level1_sensitivity.py` (10 tests; the Python suite has 127);
+    `docs/experiments/fits/level1-sensitivity/` (registration, conditions, reach, pairs, envelope); two heat maps in
+    `figures/`; [the note](experiments/2026-11-04-level1-sensitivity.md).
+  - **Pilot v2's note** now reads "stopped early by the user, checkpoint kept, resumable", with the generation table.
+    The call came after 8 generations: median 15 → 9, best unmoved. Generation 8's best is an in-run reading, not a
+    result (e443d90).
+- **Registration first** (9e304db): 73 conditions (18 knobs × 4 non-hand points + the hand), the rules as reporting
+  conventions, the ADR → evidence map, hashes. The advisor reviewed it once: the bracket rule in place of
+  continuity, the pilot v2 envelope, the three-source verdict, ΔL0 without lateShare.
+- **Results:**
+  - **No descriptor is unreachable by single knobs.** tortuosity05 is reached only by wrecking the tree (ΔL0 +21 to
+    +76; affordable single and pairs ≤ 33%).
+  - **limbUpturn:** its median closes ≤ 69% and its spread ≤ 0.46×.
+  - **The outline is cheap by posture**, and leaderDominance's spread is cheap via r0 (frozen in v3).
+  - **Proposed ADR order:** tip upturn and tortuosity; individual variation (limb tips); the trunk increment; 0052.
+- **Surprises:**
+  - **The registered pair rule degenerated.** Its remaining gap ignores cost, and some knob crosses every target at
+    some cost. The user approved a cost-aware supplement, labelled as added after the registration.
+  - **lateShare's per-seed SD (0.137) is more than twice its band (0.06).** The hand's term has a bootstrap SE of
+    1.74, and form knobs "gain" up to −1.53 from it. ΔL0's SE is 2–4.
+  - **Forkserver:** under Python 3.14's forkserver, a driver script without a `__main__` guard re-runs itself in the
+    describe pool's children. The scratch drivers needed one; the committed script has it.
+- **Goldens:** unchanged.
+
 ## 2026-11-04: Reference fidelity, phase 3 pilot v2: stopped at generation 10 (the user); checkpoint kept, resumable
 
 - **What changed** (docs and committed partial results only; no code under src/rust/cli/tests/analysis):

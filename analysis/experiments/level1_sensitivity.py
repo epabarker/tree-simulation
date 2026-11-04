@@ -262,7 +262,7 @@ def pair_conditions(ranked: list[str], moves: dict[str, dict[str, dict[str, floa
                 a, b = order[i], order[j]
                 for la, lb in (("best", "best"), ("best", "half"), ("half", "best")):
                     va, vb = levels[a][la][2], levels[b][lb][2]
-                    key = (a, va, b, vb)
+                    key = tuple(sorted([(a, va), (b, vb)]))  # one assignment, whichever knob ranks first
                     if key in seen:
                         seen[key]["for"].append(d)
                         continue
@@ -432,11 +432,13 @@ def matched(r: dict) -> bool:
     return r.get("season") is not None and r.get("trees") not in (None, 0)
 
 
-def moves_table(rows: list[dict], names: list[str]) -> dict[str, dict[str, dict[str, float]]]:
+def moves_table(rows: list[dict], names: list[str], max_cost: float | None = None) -> dict[str, dict[str, dict[str, float]]]:
+    """m per descriptor, knob and grid point over the matched single-knob conditions; with `max_cost`, only those
+    whose ΔL0 ≤ max_cost (the cost-aware supplement)."""
     hand, rest = singles(rows)
     out = {k: {} for k in names}
     for r in rest:
-        if not matched(r):
+        if not matched(r) or (max_cost is not None and r["level0"] - hand["level0"] > max_cost):
             continue
         for k in names:
             m = toward(hand["descriptors"][k]["z"], r["descriptors"][k]["z"])
@@ -450,6 +452,10 @@ def knob_points(sreg: dict) -> dict[str, dict]:
 
 
 def pairs(args) -> None:
+    """The registered interaction check (or, with args.cost, the supplement added after the registration: the
+    same rule on the moves whose ΔL0 ≤ COST only, for the gap and the top movers alike; the user, 2026-11-04)."""
+    cost = getattr(args, "cost", False)
+    tag = "pairscost" if cost else "pairs"
     sreg = load_registration()
     rows = read_jsonl(RUNS / "main.jsonl")
     if len(rows) < len(sreg["conditions"]):
@@ -457,7 +463,7 @@ def pairs(args) -> None:
     names = sreg["descriptors"]
     hand, _ = singles(rows)
     se = bootstrap_hand_se(sreg, names)
-    mv = moves_table(rows, names)
+    mv = moves_table(rows, names, COST if cost else None)
     gaps = {}
     for k in names:
         zh = hand["descriptors"][k]["z"]
@@ -467,11 +473,12 @@ def pairs(args) -> None:
         gaps[k] = remaining_gap(zh, m_best)
     ranked = sorted(gaps, key=lambda k: (-gaps[k], names.index(k)))
     conds = pair_conditions(ranked, mv, knob_points(sreg), sreg["hand"])
-    (RUNS / "pairs-conditions.json").write_text(json.dumps(clean(
-        {"ranked": [(k, gaps[k]) for k in ranked], "conditions": conds}), indent=1))
-    print(f"pairs for {ranked[:TOP_DESCRIPTORS]} (remaining gaps "
-          f"{[round(gaps[k], 3) for k in ranked[:TOP_DESCRIPTORS]]}): {len(conds)} conditions")
-    measure_all(conds, RUNS / "pairs.jsonl", "pairs", args.workers, sreg["seeds"])
+    (RUNS / f"{tag}-conditions.json").write_text(json.dumps(clean(
+        {"ranked": [(k, gaps[k]) for k in ranked], "max_cost": COST if cost else None, "conditions": conds}),
+        indent=1))
+    print(f"{tag} for {ranked[:TOP_DESCRIPTORS]} (remaining gaps "
+          f"{[round(gaps[k], 3) for k in ranked[:TOP_DESCRIPTORS]]}): {len(conds)} conditions", flush=True)
+    measure_all(conds, RUNS / f"{tag}.jsonl", tag, args.workers, sreg["seeds"])
 
 
 def raw_of(tag: str, cid: str) -> dict:
@@ -507,8 +514,14 @@ def boot_condition(reg: dict, spec, raw: dict, seeds: list[int], names: list[str
                 w = np.bincount(row, minlength=len(seeds))[who]
                 if w.sum() >= l1.MIN_TREES:
                     out[k][b] = (float(np.median(np.repeat(vals, w))) - real["median"]) / real["sd"]
+    # Only the keys fit.contributions reads (a trait's own, its profile's, the survival ones): the same sums, faster.
+    need = {"lone.alive", "stand.alive", "stand.alive100"}
+    for t in spec.traits:
+        need.add(t["name"])
+        need.update(f"{t['name']}.{j}" for j in range(len(t.get("profile", []))))
+    per_seed = [{key: v for key, v in d.items() if key in need} for d in raw["per_seed"]]
     for b, row in enumerate(idx):
-        c = contributions(spec, mean_traits([raw["per_seed"][i] for i in row]))
+        c = contributions(spec, mean_traits([per_seed[i] for i in row]))
         l0[b] = sum(c.values())
         l0x[b] = l0[b] - c.get(LATE, 0.0)
     return {"z": out, "l0": l0, "l0x": l0x}
@@ -544,14 +557,32 @@ def envelope(_args) -> None:
         if best is None:
             continue
         fr, r = best
-        l0 = r["loss"] - sum(v for kk, v in r.items() if kk.startswith("loss:l1."))
+
+        def level0(row):
+            return row["loss"] - sum(v for kk, v in row.items() if kk.startswith("loss:l1."))
+
+        # Reported only (added after the registration; no rule reads it): the cheapest candidate closing > CLOSE.
+        closing = [c for c in cands if finite(fraction(zh, c.get(f"trait:l1.{k}.z")))
+                   and fraction(zh, c.get(f"trait:l1.{k}.z")) > CLOSE]
+        cheap = min(closing, key=level0) if closing else None
+        l0 = level0(r)
         s_all = {kk: r.get(f"trait:l1.{kk}.s") for kk in sreg["fitted"]}
         out["descriptors"][k] = {
             "z_hand": zh, "f": fr, "z": r.get(f"trait:l1.{k}.z"), "generation": r["generation"],
             "loss": r["loss"], "dL0": l0 - hand["level0"], "dL0_without_lateShare":
                 (l0 - r.get(f"loss:{LATE}", 0.0)) - (hand["level0"] - hand["contributions"].get(LATE, 0.0)),
             "s": r.get(f"trait:l1.{k}.s"), "s_collapsed": finite(r.get(f"trait:l1.{k}.s")) and r[f"trait:l1.{k}.s"] < -1,
-            "fitted_below_half": sum(1 for v in s_all.values() if finite(v) and v < -1), "season": r.get("trait:l1.season")}
+            "fitted_below_half": sum(1 for v in s_all.values() if finite(v) and v < -1), "season": r.get("trait:l1.season"),
+            "closing_count": len(closing),
+            "cheapest_closing": {
+                "f": fraction(zh, cheap.get(f"trait:l1.{k}.z")), "generation": cheap["generation"],
+                "dL0": level0(cheap) - hand["level0"],
+                "dL0_without_lateShare": (level0(cheap) - cheap.get(f"loss:{LATE}", 0.0))
+                - (hand["level0"] - hand["contributions"].get(LATE, 0.0)),
+                "s": cheap.get(f"trait:l1.{k}.s"),
+                "fitted_below_half": sum(1 for kk in sreg["fitted"] if finite(cheap.get(f"trait:l1.{kk}.s"))
+                                         and cheap[f"trait:l1.{kk}.s"] < -1),
+                "season": cheap.get("trait:l1.season")} if cheap else None}
     (OUT / "envelope.json").write_text(json.dumps(clean(out), indent=1) + "\n")
     print(json.dumps({k: round(v["f"], 2) for k, v in out["descriptors"].items()}))
 
@@ -598,8 +629,35 @@ def analyse(sreg: dict, rows: list[dict], tag: str, hand_boot: dict, spec, reg, 
     return out
 
 
+def pair_best(pair_long: list[dict], k: str, max_cost: float | None = None) -> dict | None:
+    pr = [r for r in pair_long if r["descriptor"] == k and k in (r.get("for") or []) and finite(r["f"])
+          and (max_cost is None or r["dL0"] <= max_cost)]
+    if not pr:
+        return None
+    b = max(pr, key=lambda r: r["f"])
+    return {x: b.get(x) for x in ("id", "f", "f_lo5", "m", "z", "dL0", "se_dL0", "dL0x", "additivity", "s", "season",
+                                  "flags")}
+
+
+def affordable_verdict(at_target: bool, single_f: float, pair_f: float | None, env_f: float | None) -> str:
+    """Reported only (added after the registration, with the cost-aware pair check): the three sources with every
+    move held to ΔL0 ≤ COST."""
+    if at_target:
+        return "at target within noise"
+    if finite(single_f) and single_f > CLOSE:
+        return "affordable by a single knob"
+    if pair_f is not None and finite(pair_f) and pair_f > CLOSE:
+        return "affordable jointly (cost-aware pair check)"
+    if env_f is not None and finite(env_f) and env_f > CLOSE:
+        return "affordable jointly (pilot v2 envelope)"
+    if pair_f is None and env_f is None:
+        return "not affordable by the knobs tested; joint moves untested"
+    return "not affordable by any source: a rule's case"
+
+
 def reach_summary(sreg: dict, long: list[dict], hand_se: dict, pair_long: list[dict], env: dict,
-                  pair_targets: list[str]) -> dict:
+                  pair_targets: list[str], cost_long: list[dict] | None = None,
+                  cost_targets: list[str] | None = None) -> dict:
     names = sreg["descriptors"]
     pts = {t["path"]: t["points"] for t in sreg["knobs"]}
     out = {}
@@ -626,6 +684,10 @@ def reach_summary(sreg: dict, long: list[dict], hand_se: dict, pair_long: list[d
         sp_ok = [r for r in rs if finite(r["ds_toward"])]
         sp_best = max(sp_ok, key=lambda r: r["ds_toward"]) if sp_ok else None
         within = sorted({r["id"] for r in rs if finite(r["s"]) and abs(r["s"]) <= SPREAD_OK})
+        # Reported only (added after the registration): the same with every move held to ΔL0 ≤ COST.
+        sp_aff = [r for r in sp_ok if r["dL0"] <= COST]
+        sp_aff_best = max(sp_aff, key=lambda r: r["ds_toward"]) if sp_aff else None
+        within_aff = sorted({r["id"] for r in rs if finite(r["s"]) and abs(r["s"]) <= SPREAD_OK and r["dL0"] <= COST})
         pr = [r for r in pair_long if r["descriptor"] == k and k in (r.get("for") or [])]
         if pr:
             check = "run"
@@ -635,6 +697,15 @@ def reach_summary(sreg: dict, long: list[dict], hand_se: dict, pair_long: list[d
             check = None
         pbest = max([r for r in pr if finite(r["f"])], key=lambda r: r["f"], default=None)
         e = env.get("descriptors", {}).get(k) if k in sreg["fitted"] else None
+        cheap_single = max([r for r in ok if r["dL0"] <= COST], key=lambda r: r["f"], default=None)
+        cp = pair_best(cost_long or [], k, COST)
+        cp_any = pair_best(cost_long or [], k)
+        cost_check = ("run" if cp_any else
+                      "no pair: fewer than two knobs move it toward the target within the cost" if
+                      k in (cost_targets or []) else None)
+        e_cheap = (e or {}).get("cheapest_closing") if e else None
+        env_aff = (e_cheap["f"] if e_cheap and e_cheap["dL0"] <= COST else 0.0) if e else None
+        pair_aff = (cp["f"] if cp else 0.0) if cost_check else None
         keep = ("id", "knob", "point", "value", "f", "f_lo5", "m", "z", "dL0", "se_dL0", "dL0x", "se_dL0x",
                 "season", "flags", "s")
         out[k] = {
@@ -644,10 +715,18 @@ def reach_summary(sreg: dict, long: list[dict], hand_se: dict, pair_long: list[d
             "reach": verdict, "remaining_gap": remaining_gap(zh, m_best),
             "unmatched": sorted(r["id"] for r in rs if not finite(r["z"])),
             "spread": {"best": {x: sp_best[x] for x in ("id", "s", "ds_toward", "dL0")} if sp_best else None,
-                       "within_x2": within},
+                       "within_x2": within,
+                       "best_affordable": {x: sp_aff_best[x] for x in ("id", "s", "ds_toward", "dL0")}
+                       if sp_aff_best else None, "within_x2_affordable": within_aff},
             "pair": ({x: pbest[x] for x in ("id", "f", "m", "z", "dL0", "dL0x", "additivity", "s")} if pbest else
                      None) if pr else None,
             "pair_check": check, "envelope": e,
+            "affordable": {
+                "single": {x: cheap_single[x] for x in keep} if cheap_single else None,
+                "pair_cost_check": cost_check, "pair": cp, "pair_any_cost": cp_any,
+                "envelope_cheapest_closing": e_cheap,
+                "verdict": affordable_verdict(at_target, cheap_single["f"] if cheap_single else math.nan,
+                                              pair_aff, env_aff)},
             "verdict": three_source(verdict, (pbest["f"] if pbest else math.nan) if pr else
                                     (0.0 if check else None),
                                     e["f"] if e else None),
@@ -728,21 +807,30 @@ def report(_args) -> None:
     hand_boot = boot_condition(reg, spec, raw_of("main", "hand"), sreg["seeds"], names, idx)
     hand_se = {k: float(np.nanstd(hand_boot["z"][k], ddof=1)) for k in names}
     long = analyse(sreg, rows, "main", hand_boot, spec, reg, idx)
-    prs = read_jsonl(RUNS / "pairs.jsonl")
-    pair_long = analyse(sreg, prs, "pairs", hand_boot, spec, reg, idx) if prs else []
     singles_dz = {(r["knob"], r["value"], r["descriptor"]): r["dz"] for r in long if r["id"] != "hand"}
-    by_pid = {r["id"]: r for r in prs}
-    for r in pair_long:
-        p = by_pid[r["id"]]
-        r["for"] = p.get("for")
-        r.update({x: p.get(x) for x in ("a", "a_value", "b", "b_value", "a_level", "b_level")})
-        da = singles_dz.get((p["a"], p["a_value"], r["descriptor"]))
-        db = singles_dz.get((p["b"], p["b_value"], r["descriptor"]))
-        r["additivity"] = r["dz"] - da - db if all(finite(x) for x in (r["dz"], da, db)) else math.nan
+
+    def pair_rows(tag: str) -> list[dict]:
+        prs = read_jsonl(RUNS / f"{tag}.jsonl")
+        out = analyse(sreg, prs, tag, hand_boot, spec, reg, idx) if prs else []
+        by_pid = {r["id"]: r for r in prs}
+        for r in out:
+            p = by_pid[r["id"]]
+            r["for"] = p.get("for")
+            r.update({x: p.get(x) for x in ("a", "a_value", "b", "b_value", "a_level", "b_level")})
+            da = singles_dz.get((p["a"], p["a_value"], r["descriptor"]))
+            db = singles_dz.get((p["b"], p["b_value"], r["descriptor"]))
+            r["additivity"] = r["dz"] - da - db if all(finite(x) for x in (r["dz"], da, db)) else math.nan
+        return out
+
+    pair_long = pair_rows("pairs")
+    cost_long = pair_rows("pairscost")
     env = json.loads((OUT / "envelope.json").read_text()) if (OUT / "envelope.json").exists() else {}
-    pc = RUNS / "pairs-conditions.json"
-    pair_targets = [k for k, _ in json.loads(pc.read_text())["ranked"][:TOP_DESCRIPTORS]] if pc.exists() else []
-    reach = reach_summary(sreg, long, hand_se, pair_long, env, pair_targets)
+    def targets(tag: str) -> list[str]:
+        pc = RUNS / f"{tag}-conditions.json"
+        return [k for k, _ in json.loads(pc.read_text())["ranked"][:TOP_DESCRIPTORS]] if pc.exists() else []
+
+    pair_targets, cost_targets = targets("pairs"), targets("pairscost")
+    reach = reach_summary(sreg, long, hand_se, pair_long, env, pair_targets, cost_long, cost_targets)
     hand = next(r for r in rows if r["id"] == "hand")
     l0_terms = sorted(k for k in hand["contributions"] if not k.startswith("l1."))
     l0 = [{"id": r["id"], "knob": r.get("knob"), "family": r.get("family"), "point": r.get("point"),
@@ -760,16 +848,20 @@ def report(_args) -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     pl.DataFrame(clean(long), infer_schema_length=None).write_csv(OUT / "conditions.csv")
     pl.DataFrame(clean(l0), infer_schema_length=None).write_csv(OUT / "conditions-level0.csv")
-    if pair_long:
-        pl.DataFrame(clean([{**r, "for": ";".join(r["for"] or [])} for r in pair_long]),
-                     infer_schema_length=None).write_csv(OUT / "pairs.csv")
+    for name, pls in (("pairs", pair_long), ("pairs-cost", cost_long)):
+        if pls:
+            pl.DataFrame(clean([{**r, "for": ";".join(r["for"] or [])} for r in pls]),
+                         infer_schema_length=None).write_csv(OUT / f"{name}.csv")
     (OUT / "reach.json").write_text(json.dumps(clean({
         "provisional": True, "registration": "docs/experiments/fits/level1-sensitivity/registration.json",
         "hand": {"loss": hand["level0"] + hand["l1_location"], "level0": hand["level0"],
                  "l1_location": hand["l1_location"], "season": hand["season"], "trees": hand["trees"]},
         "unmatched_conditions": sorted(r["id"] for r in rows if not matched(r)),
         "flagged_conditions": {r["id"]: r["flags"] for r in rows if r.get("flags")},
-        "pair_targets": pair_targets, "descriptors": reach, "lateShare": lateshare}), indent=1, ensure_ascii=False) + "\n")
+        "pair_targets": pair_targets, "pair_cost_targets": cost_targets,
+        "pair_cost_note": "added after the registration (the user, 2026-11-04): the registered remaining gap ignores "
+                          "Level 0 cost, so it found no gap but centroidHeight's; the supplement takes the gap and the "
+                          "top movers over moves with ΔL0 ≤ COST only", "descriptors": reach, "lateShare": lateshare}), indent=1, ensure_ascii=False) + "\n")
     heatmap(sreg, long, "m", "move toward the target (real SDs)", 2.0,
             FIGURES / "2026-11-04-level1-sensitivity.png")
     heatmap(sreg, long, "ds_toward", "spread: rise of s toward 0 (log2 units)", 1.5,
@@ -778,7 +870,7 @@ def report(_args) -> None:
         b = v["best"]
         best = f"{b['id']} f {b['f']:+.2f} dL0 {b['dL0']:+.2f}" if b else "—"
         print(f"{k:20s} z_h {v['z_hand']:+.2f} (SE {v['se_z_hand']:.2f}) | best {best} | {v['reach']} | "
-              f"{v['verdict']}")
+              f"{v['verdict']} | {v['affordable']['verdict']}")
 
 
 def main() -> None:
@@ -791,6 +883,8 @@ def main() -> None:
     p.set_defaults(fn=run)
     p = sub.add_parser("pairs")
     p.add_argument("--workers", type=int, default=12)
+    p.add_argument("--cost", action="store_true",
+                   help="the cost-aware supplement (added after the registration): moves with ΔL0 ≤ COST only")
     p.set_defaults(fn=pairs)
     sub.add_parser("envelope").set_defaults(fn=envelope)
     sub.add_parser("report").set_defaults(fn=report)

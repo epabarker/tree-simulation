@@ -308,8 +308,51 @@ no z was computed, and nothing registered changed after it.
 ### State
 _(rewritten at the end of each session)_
 
-**Phase 3 beech pilot: done, failed its gate (2026-11-04, [note](../experiments/2026-11-04-level1-beech-pilot.md),
-results in `docs/experiments/fits/level1-pilot/`); provisional, nothing accepted. v2 of the Level 1 fit is a fresh session.**
+**Phase 3 beech pilot v2: registered (registration v3, 81b157a) and launched (2026-11-04 17:01:59 UTC,
+[note](../experiments/2026-11-04-level1-beech-pilot-v2.md)); running, provisional, nothing accepted.**
+- **What v3 changes** (each with the pilot result behind it, in the registration's `changes`):
+  - **Weights:** 1/Σ|r| over the 16 real-tree correlations, |r| < 0.2706 (p < 0.05 at n = 53) zeroed, self
+    included. The fitted total is 4.44, beside Level 0's 7.0.
+  - **Hold-outs:** whole clusters (average linkage, |r| cut 0.5, 11 clusters), drawn with seed 20261104 until ≥ 5:
+    length0, limbElevation05, limbUpturn, p3, widestAt. The other 11 are fitted, pendulousFraction05 among them.
+  - **Spread:** out of the loss, gated on all 16.
+  - **Seeds:** fixed search seeds (20261107), 10 a candidate, by the rule below.
+- **The noise floor** on the pilot's own draws (the same trees; determinism exact):
+
+  | loss | 5 seeds | 10 seeds |
+  |---|---|---|
+  | the pilot | 21.58 ± 6.38 | 26.97 ± 13.20 |
+  | the pilot without spread | 6.93 ± 0.84 | 6.00 ± 0.58 |
+  | v3 | 5.89 ± 0.83 | 4.93 ± 0.40 |
+
+- **The seed rule:** 0.834 > 0.25 × the hand's Level 1 location loss (2.358), so 10 seeds.
+- **The advisor's points** (in the note; none changed the registration):
+  - the weights sit at the top of their bootstrap range;
+  - the clusters are fragile at n = 53;
+  - v3's held-out test is weaker than v1's: limbElevation05 is the one live out-of-sample check, and limbUpturn's z
+    is pinned near −1.27.
+- **Running:** tmux `level1v2` (systemd-inhibit), 32 generations × 12 × 10 seeds (3,880 evaluations), ≈ 730 s a
+  generation, expected to end ≈ 23:40 UTC with the gate; safety stop 9 h. Watch with
+  `tail -f runs/level1-pilot-v2/beech.log`. `analysis/` must stay as committed until it ends.
+- **Launch instructions** (a run resumes when its command is run again):
+  ```
+  tmux new -d -s level1v2 'systemd-inhibit --what=sleep:idle --why="Level 1 beech pilot v2" env LEVEL1_OUT=level1-pilot-v2 analysis/experiments/level1_fit_gate.sh beech 32 9'
+  ```
+  On macOS (no systemd): `caffeinate -ims` instead, with that host's own outputs and 8 workers (TREESIM_WORKERS,
+  `analysis/experiments/host.sh`). It holds the Mac awake only on AC power with the lid open:
+  ```
+  tmux new -d -s level1v2mac 'caffeinate -ims env TREESIM_WORKERS=8 LEVEL1_OUT=level1-pilot-v2-mac analysis/experiments/level1_fit_gate.sh beech 32 9'
+  ```
+- **Next session (reading the run):**
+  - the gate (`runs/level1-pilot-v2/beech.gate.txt`) and Level 0's gate on the finalist;
+  - each term, hand to finalists, on 101–110, and the spreads per descriptor (leaderDominance's above all);
+  - the gallery;
+  - copy the gate files into `fits/level1-pilot-v2/`, then the write-up.
+- **Then** the audit (3), ADR 0052's probe (4), the O2 realism probe (2) and the asymmetry check (5), as below.
+
+**Phase 3 beech pilot (registration v2): done, failed its gate (2026-11-04, [note](../experiments/2026-11-04-level1-beech-pilot.md),
+results in `docs/experiments/fits/level1-pilot/`); provisional, nothing accepted. v2 of the Level 1 fit was framed by
+the user and launched as above.**
 - **The run:** registration v2 (44a21ba: r3.c frozen, ADR 0029's ten knobs), 32 generations, 1,960 evaluations,
   3.4 h.
 - **Re-measured on 101–110:** no finalist beats the hand (hand 18.52; finalists 19.94, 21.58, 22.59). The finalists

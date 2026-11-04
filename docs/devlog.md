@@ -2,6 +2,30 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-04: Reference fidelity, phase 3 pilot v2: registration v3, its noise floor, the launch
+
+- **What changed** (analysis/ and docs only; no src/rust/cli/tests; goldens untouched):
+  - **Registration v3** (81b157a), from BioDiv's 53 real trees:
+    - location terms weighted by 1/Σ|r| (|r| under the p < 0.05 critical value zeroed);
+    - whole clusters held out to a third;
+    - spread out of the loss and gated on all 16;
+    - fixed search seeds; seeds per candidate by a rule.
+  - **New code:** `level1.py`'s correlation, weight, cluster and seed rules; `level1_noise.py` (the noise floor and
+    the seed decision); the gate's spread on all descriptors; the wrapper's commit line.
+  - **Results:** `fits/level1-pilot-v2/` (noise, correlation, control, the weights' bootstrap); 117 Python tests pass.
+- **Result:** on the pilot's own draws (the same trees), the 5-seed SD falls from 6.38 to 0.84 once the spread terms
+  go, and to 0.83 on v3's loss. The rule (SD > ¼ of the hand's Level 1 location loss, 2.36) gives 10 seeds. The run
+  was launched at 17:02 UTC: 32 generations, ≈ 6.6 h.
+- **Surprises:**
+  - The literal "one held out per cluster" would have held out every singleton (the user ruled whole clusters).
+  - Average linkage leaves five cross-cluster pairs at |r| ≥ 0.5 straddling the line, and the clusters come back in
+    0.05% of bootstrap resamples.
+  - The draw holds out limbUpturn and fits pendulousFraction05: v3's held-out test is weaker than v1's, and
+    limbElevation05 is its one live out-of-sample check.
+  - The simulated hand's correlations differ from the real ones: mean |Δr| 0.24.
+- **Not restored but added:** the plan's Darwin launch line. No commit's plan ever carried it; 3d64117's message
+  names the plan, but its diff touches only the note.
+
 ## 2026-11-04: Reference fidelity, phase 3 pilot: the overnight fit and its post-fit write-up (failed; nothing accepted)
 
 - **What changed** (docs and committed results only; no code under src/rust/cli/tests/analysis):

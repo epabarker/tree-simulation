@@ -275,6 +275,11 @@ The decision was made from this floor, measured on registration v3 after it was 
 the fit refuses to start without it.
 
 ## The launch
+**Launched 2026-11-04 at 17:01:59 UTC** on this machine, from 81b157a (the registration commit), in tmux session
+`level1v2` under systemd-inhibit. The log's first line: `=== beech: commit 81b157a; 32 generations × 12 × 10 seeds
+(3880 evaluations), ≤ 9 h`. Expected to finish around 23:40 UTC, the gate included. Watch it with
+`tail -f runs/level1-pilot-v2/beech.log`.
+
 **The budget** is unchanged at 32 generations, now at 10 seeds a candidate: 32 × 12 × 10 = 3,840 evaluations,
 plus 40 for the finalists and the hand on 101–110, or 3,880 in all.
 

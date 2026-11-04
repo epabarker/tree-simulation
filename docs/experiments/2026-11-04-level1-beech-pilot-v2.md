@@ -9,9 +9,10 @@ registers the changes below before any fit and keeps everything else. No core ch
 **Naming.** Pilot v2 runs registration **version 3**. v1 (3c64f48) was never run; v2 (44a21ba, r3.c frozen) is the
 pilot. Results go to `docs/experiments/fits/level1-pilot-v2/` and `runs/level1-pilot-v2/`.
 
-**Stopped at generation 10 of 32 (the user, 19:08 UTC); checkpoint kept, resumable.** No finalists, no gate. The
-best in-run candidate gained on Level 1 while its spread collapsed, which the loss cannot see. See
-[the stop](#the-stop-generation-10-of-32-by-the-user-1908-utc).
+**Stopped early by the user, checkpoint kept, resumable.** The call came on generation 7's status, after 8 of 32
+generations: the median had fallen from 15 to 9, and the best had not moved since generation 0's candidate. The
+SIGINT landed at 19:08 UTC, after generations 8 and 9 had run. No finalists, no gate: **nothing below is a result of
+the fit.** See [the stop](#the-stop-stopped-early-by-the-user).
 
 ## Reproduce
 ```
@@ -304,13 +305,16 @@ tmux new -d -s level1v2mac 'caffeinate -ims env TREESIM_WORKERS=8 LEVEL1_OUT=lev
   - in `docs/experiments/fits/level1-pilot-v2/`: `beech{.json,-best.json,-progress.csv}`;
   - in `runs/level1-pilot-v2/`: the log `beech.log`, the gate `beech.gate.{txt,json}`.
 
-## The stop: generation 10 of 32, by the user (19:08 UTC)
-**Stopped at generation 10, checkpoint kept, resumable** (`runs/level1-pilot-v2/beech/checkpoint.pkl`; the launch
-command resumes it). Ten generations (0–9), 120 candidates and 1,200 evaluations ran in 2 h 04 min, ≈ 745 s a
-generation against 730 projected.
-- **The stop:** SIGINT at 19:08:07. The wrapper logged "the fit failed (exit 130); no gate".
+## The stop: stopped early by the user
+**Stopped early by the user, checkpoint kept, resumable** (`runs/level1-pilot-v2/beech/checkpoint.pkl`; the launch
+command resumes it). **This is not a result of the fit:** no finalist was re-measured, the gate never ran, and every
+number below is an in-run reading on the ten fixed search seeds.
+- **The call** came on generation 7's status, after 8 of 32 generations: the median had fallen from 15 to 9, and the
+  best had not moved since generation 0's candidate.
+- **The SIGINT** landed at 19:08:07, after generations 8 and 9 had run: 120 candidates and 1,200 evaluations in
+  2 h 04 min, ≈ 745 s a generation against 730 projected. The wrapper logged "the fit failed (exit 130); no gate".
 - **Never run:** the finalists on 101–110, the gate and the gallery. `beech.json` and the gate files do not exist.
-- **The partial results**, as the run wrote them after generation 9 (19:06): `beech-best.json` (generation 8's best:
+- **The partial files,** as the run wrote them after generation 9 (19:06): `beech-best.json` (generation 8's best:
   its patch, traits and contributions) and `beech-progress.csv` (all 120 candidates).
 
 **The baseline:** the hand on the run's own ten search seeds, scored after the launch with the same Measure
@@ -318,18 +322,34 @@ generation against 730 projected.
 It scores 6.676: Level 1 location 2.604, Level 0 4.072, matched at season 70 with 40 trees. Every loss below is on
 those identical seeds.
 
-**Two readings. Both support stopping.**
-1. **The call, on the generation-7 status.** The best had not moved since generation 0: 5.137, 1.54 below the hand,
-   almost all of it Level 0. Its Level 1 location was 2.47 against the hand's 2.60; its Level 0 was 2.66 against
-   4.07, mostly lateShare (−1.53). The user stopped the run on that status.
-2. **Generation 8's best, found after the call.** It finished before the stop but after that status. It scores 3.935,
-   2.74 below the hand, matched at season 50, the window's first (DBH 0.298 m, 40 trees). It is the first candidate
-   to gain on Level 1 (2.60 → 1.47; Level 0 4.07 → 2.46).
-   - **Its spread collapsed** on six fitted descriptors, to 0.13–0.38× the real SD.
-   - **The collapse cost it nothing,** because the loss reads only medians: the case the advisor flagged (point 2
-     above).
-   - **The gate:** on the search seeds it is outside ×2 on those six of its 11 fitted descriptors, so it could not
-     pass the spread gate. That gate is measured on 101–110, which the run never reached.
+**The generations** (12 candidates each; `beech-progress.csv`, with the L1/L0 split from the checkpoint's rows):
+
+| gen | median | generation's best | run best | beat the hand (6.676) | matched at 50 | the generation best's L1 location / L0 (lateShare) |
+|---|---|---|---|---|---|---|
+| 0 | 15.11 | **5.137** | 5.137 | 1 | 1 | 2.47 / 2.66 (0.00) |
+| 1 | 13.79 | 6.394 | 5.137 | 1 | 0 | 2.52 / 3.88 (0.02) |
+| 2 | 14.75 | 8.265 | 5.137 | 0 | 4 | 3.61 / 4.65 (0.03) |
+| 3 | 12.60 | 5.167 | 5.137 | 1 | 5 | 1.97 / 3.20 (0.00) |
+| 4 | 10.04 | 6.815 | 5.137 | 0 | 6 | 2.55 / 4.26 (0.04) |
+| 5 | 11.33 | 7.436 | 5.137 | 0 | 6 | 3.90 / 3.54 (2.12) |
+| 6 | 8.70 | 5.705 | 5.137 | 2 | 6 | 1.66 / 4.05 (0.25) |
+| 7 | 9.28 | 6.510 | 5.137 | 1 | 7 | 1.83 / 4.68 (0.02) |
+| _the call_ | | | | | | |
+| 8 | 7.74 | 3.935 | 3.935 | 4 | 6 | 1.47 / 2.46 (0.02) |
+| 9 | 7.99 | 5.078 | 3.935 | 4 | 6 | 2.09 / 2.99 (0.00) |
+
+The hand: 2.60 / 4.07 (lateShare 1.53).
+
+**What the call saw:** the best had not moved since generation 0: 5.137, 1.54 below the hand, almost all of it Level 0.
+Its Level 1 location was 2.47 against the hand's 2.60. Its Level 0 was 2.66 against 4.07, mostly lateShare (1.53 →
+0.00) on the frozen seeds.
+
+**After the call (an in-run reading, not a result):** generation 8's best scored 3.935 at season 50, the window's
+first (DBH 0.298 m, 40 trees). It was the run's first candidate to gain on Level 1 (2.60 → 1.47; Level 0 4.07 → 2.46).
+- **Its spread fell** on six fitted descriptors, to 0.13–0.38× the real SD.
+- **The loss reads only medians,** so the fall cost nothing: the case the advisor flagged (point 2 above).
+- **On the search seeds** it is outside ×2 on those six of its 11 fitted descriptors. The spread gate is measured on
+  101–110, which the run never reached.
 
 **Spread (sim SD / real SD) and each location term, the hand against generation 8's best, on the search seeds:**
 

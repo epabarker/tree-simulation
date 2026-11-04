@@ -308,8 +308,9 @@ no z was computed, and nothing registered changed after it.
 ### State
 _(rewritten at the end of each session)_
 
-**Phase 3 beech pilot v2 (registration v3, 81b157a): stopped at generation 10 of 32 (the user, 19:08 UTC);
-checkpoint kept, resumable; no finalists, no gate; provisional, nothing accepted
+**Phase 3 beech pilot v2 (registration v3, 81b157a): stopped early by the user, checkpoint kept, resumable (the call
+on generation 7's status, after 8 of 32 generations: the median 15 → 9, the best unmoved since generation 0; the
+SIGINT at 19:08 UTC after generations 8–9); no finalists, no gate, not a result of the fit; provisional, nothing accepted
 ([note](../experiments/2026-11-04-level1-beech-pilot-v2.md) "The stop", partial results in
 `docs/experiments/fits/level1-pilot-v2/`).**
 - **What v3 changed** (each with the pilot result behind it, in the registration's `changes`):
@@ -324,11 +325,11 @@ checkpoint kept, resumable; no finalists, no gate; provisional, nothing accepted
   generation).
 - **The baseline:** the hand on the ten search seeds scores 6.676 (Level 1 location 2.604, Level 0 4.072, season 70;
   `hand-search-seeds.json`).
-- **Two readings, both for stopping:**
+- **What the call saw, and after it** (in-run readings, not results):
   1. **The call, on the generation-7 status:** the best was unmoved since generation 0, at 5.137 (1.54 below the
      hand), almost all of it Level 0. Its Level 1 location was 2.47 against 2.60; its Level 0 gain was mostly
      lateShare.
-  2. **Generation 8's best, found after the call:** 3.935, 2.74 below the hand, matched at season 50. It gained
+  2. **Generation 8's best, after the call (an in-run reading):** 3.935, 2.74 below the hand, matched at season 50. It gained
      Level 1 (2.60 → 1.47) while its spread collapsed on six fitted descriptors to 0.13–0.38× real (leaderDominance
      0.13, p1 0.15, centroidHeight 0.30, pendulousFraction05 0.31, limbDroop 0.36, forkHeight 0.38).
      - **The loss cannot see spread,** so the collapse cost nothing: the case the advisor flagged.

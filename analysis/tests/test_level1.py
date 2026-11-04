@@ -4,6 +4,8 @@ Not in `npm run check`:  uv run --project analysis --with pytest python -I -m py
 import csv
 import json
 import math
+import sys
+import warnings
 from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 
@@ -130,6 +132,21 @@ def test_load_refuses_a_changed_file(tmp_path, monkeypatch):
     assert l1.load("x")["hashes"] == reg["hashes"]
 
 
+#: Darwin's allowance against gate c's x86 values (the user, 2026-11-04); Linux stays exact.
+DARWIN_ULPS = 2
+
+
+def _same(a: float, b: float) -> bool:
+    return (math.isnan(a) and math.isnan(b)) or a == b
+
+
+def _ulps(a: float, b: float) -> float:
+    """Distance between two values in units in the last place of `b` (inf if either is not finite)."""
+    if math.isnan(a) or math.isnan(b) or math.isinf(a) or math.isinf(b):
+        return math.inf
+    return round(abs(a - b) / math.ulp(b), 3) if b != 0 else math.inf
+
+
 def _gate_c_inflated(seed: int) -> dict[int, dict]:
     with (GATE_C / "sim-describe.csv").open() as f:
         return {int(r["tree"]): r for r in csv.DictReader(f)
@@ -146,7 +163,11 @@ def _gate_c_fine(seed: int) -> dict[int, dict]:
 
 @pytest.mark.skipif(not (GATE_C / "sim-describe.csv").exists(), reason="no gate c run under runs/gate-c")
 def test_describe_pool_equals_gate_c():
-    """Level 1's describe path, serial and across a process pool, equals gate c's `inflated` values exactly."""
+    allowed = DARWIN_ULPS if sys.platform == "darwin" else 0
+    diffs: list[tuple] = []
+    """Level 1's describe path, serial and across a process pool, equals gate c's `inflated` values: exactly on Linux
+    (gate c ran on x86 Linux); within DARWIN_ULPS on Darwin (arm64's numpy/libm differ in the last bit or two, 2026-11-04:
+    1 of 54 values, 1 ulp). Every differing value is logged with its distance in ulps."""
     tol = json.loads((ROOT / "analysis" / "fit" / "sources" / "phase1-tolerances.json").read_text())
     d_min = tol["resolution"]["biodiv"]["d_min"]
     names = ["widestAt", "forkHeight", "limbDroop", "p1", "tortuosity05", "length0", "pendulousFraction05",
@@ -167,8 +188,16 @@ def test_describe_pool_equals_gate_c():
             row = ref[k_tree]
             for k in names:
                 want = float(row[k]) if row[k] not in ("", "nan") else math.nan
-                assert (math.isnan(want) and math.isnan(t[k])) or t[k] == want, (s, k_tree, k)
-            assert t["dbh"] == float(_gate_c_fine(s)[k_tree]["dbh"])  # describe()'s DBH of the uncoarsened tree
+                if not _same(t[k], want):
+                    diffs.append((s, k_tree, k, t[k], want, _ulps(t[k], want)))
+            # describe()'s DBH of the uncoarsened tree
+            dbh = float(_gate_c_fine(s)[k_tree]["dbh"])
+            if not _same(t["dbh"], dbh):
+                diffs.append((s, k_tree, "dbh", t["dbh"], dbh, _ulps(t["dbh"], dbh)))
+    report = "; ".join(f"seed {s} tree {i} {k}: {got!r} vs gate c {want!r} ({u} ulp)" for s, i, k, got, want, u in diffs)
+    if diffs:
+        warnings.warn(f"{len(diffs)} value(s) differ from gate c on {sys.platform}: {report}")
+    assert all(u <= allowed for *_, u in diffs), f"beyond {allowed} ulp on {sys.platform}: {report}"
 
 
 def test_registration_v2_loads_and_starts_at_the_hand():

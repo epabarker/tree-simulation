@@ -276,5 +276,6 @@ tmux new -s level1 'systemd-inhibit --what=sleep:idle --why="Level 1 beech pilot
 tmux new -d -s level1mac 'caffeinate -ims env TREESIM_WORKERS=8 LEVEL1_OUT=level1-pilot-mac analysis/experiments/level1_fit_gate.sh beech 32 5'
 ```
 - **Resume:** run the same command again; the wrapper resumes from `runs/level1-pilot/beech/checkpoint.pkl`.
+- **Across platforms:** the describe step differs in the last bit or two between x86 Linux and arm64 macOS (1 of 54 gate-c values, 1 ulp, 2026-11-04; `test_describe_pool_equals_gate_c` allows 2 ulp on Darwin, exact on Linux). Read a gate verdict from the two hosts with that in mind: a z, a spread ratio or a seed count within a few ulp of its threshold (|z| 2.0, ×2, 15 of 20) can flip between them, and a CMA-ES run that starts alike can drift apart.
 - **Outputs:** `docs/experiments/fits/level1-pilot/beech{.json,-best.json,-progress.csv}`; logs `runs/level1-pilot/beech.log`;
   gate `runs/level1-pilot/beech.gate.{txt,json}`.

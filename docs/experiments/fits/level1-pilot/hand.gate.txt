@@ -1,0 +1,51 @@
+gallery: candidate nearest round2-spindle at 0.67, the hand form at 0.00
+Level 1 gate, beech (hand: Level 0 v2 fit + [form]; provisional): season 70, 75 trees, median DBH 0.298 m; 0 outside the real DBH range; flags: none
+
+Held out: ['length0', 'p1', 'pendulousFraction05', 'tortuosity05', 'widestAt']. p1 and widestAt correlate with the fitted outline terms (one measurement), so the out-of-sample test rests on ['length0', 'pendulousFraction05', 'tortuosity05'].
+
+| seed | trees | length0 | p1 | pendulousFraction05 | tortuosity05 | widestAt | pass |
+|---|---|---|---|---|---|---|---|
+| 1 | 3 | -0.27 | -1.44 | +0.82 | -1.20 | +0.16 | yes |
+| 2 | 3 | -0.32 | -0.55 | +0.57 | -0.91 | +1.52 | yes |
+| 3 | 4 | -0.33 | -0.95 | +0.94 | -1.15 | +0.21 | yes |
+| 4 | 4 | -0.29 | -0.24 | +0.78 | -1.24 | +0.24 | yes |
+| 5 | 4 | -0.13 | +0.25 | -0.12 | -1.46 | -1.00 | yes |
+| 6 | 4 | -0.22 | +0.24 | +0.67 | -1.08 | -1.05 | yes |
+| 7 | 3 | -0.36 | -1.05 | +0.72 | -1.14 | +1.51 | yes |
+| 8 | 4 | -0.38 | -0.28 | +0.91 | -1.14 | +0.21 | yes |
+| 9 | 4 | +1.45 | -1.43 | +0.53 | -1.34 | +0.86 | yes |
+| 10 | 4 | -0.29 | -0.48 | +0.73 | -1.24 | +0.27 | yes |
+| 11 | 4 | -0.32 | -0.37 | +0.77 | -1.00 | +0.89 | yes |
+| 12 | 4 | -0.31 | -0.01 | +0.84 | -0.92 | -0.42 | yes |
+| 13 | 4 | -0.21 | -0.62 | +0.29 | -1.03 | -1.05 | yes |
+| 14 | 4 | -0.26 | +0.23 | +0.44 | -1.13 | -1.05 | yes |
+| 15 | 3 | -0.36 | -0.09 | +0.95 | -1.21 | +0.15 | yes |
+| 16 | 4 | -0.25 | +0.24 | +0.84 | -0.83 | -1.03 | yes |
+| 17 | 4 | -0.30 | +0.24 | +0.40 | -0.99 | -1.02 | yes |
+| 18 | 3 | -0.30 | +0.17 | +0.76 | -1.11 | +0.22 | yes |
+| 19 | 4 | -0.30 | +0.23 | +0.46 | -1.25 | -1.06 | yes |
+| 20 | 4 | -0.28 | +0.23 | +0.33 | -0.93 | -1.05 | yes |
+
+| descriptor | role | n | sim median | real median | z | sim SD / real SD | Demol z |
+|---|---|---|---|---|---|---|---|
+| centroidHeight | fitted | 75 | 0.7431 | 0.6648 | +0.99 | 0.61 | -0.85 |
+| crownFullness | fitted | 75 | 0.7979 | 0.8365 | -0.50 | 0.96 | +0.49 |
+| forkHeight | fitted | 75 | 0.793 | 0.7846 | +0.06 | 0.97 | +0.71 |
+| leaderDominance | fitted | 72 | 1.38 | 1.589 | -0.32 | 0.38 | -0.82 |
+| limbDroop | fitted | 72 | 38.62 | 40.16 | -0.09 | 0.59 | — |
+| limbElevation05 | fitted | 75 | 39.98 | 27.9 | +0.86 | 0.62 | -0.31 |
+| limbUpturn | fitted | 72 | 0.03035 | 13.69 | -1.26 | 0.26 | -1.43 |
+| p0 | fitted | 75 | 0.4877 | 0.7309 | -1.12 | 1.01 | -0.62 |
+| p2 | fitted | 75 | 0.9575 | 0.9548 | +0.02 | 0.76 | -0.33 |
+| p3 | fitted | 75 | 0.844 | 0.8146 | +0.21 | 1.13 | -0.16 |
+| profileCentre | fitted | 75 | 0.5384 | 0.5124 | +0.61 | 1.01 | +0.03 |
+| length0 | held out | 75 | 0.027 | 0.05002 | -0.30 | 1.79 | -0.90 |
+| p1 | held out | 75 | 0.9475 | 0.9599 | -0.07 | 0.95 | +0.73 |
+| pendulousFraction05 | held out | 75 | 0.4394 | 0.3668 | +0.70 | 0.79 | +3.95 |
+| tortuosity05 | held out | 72 | 1.117 | 1.27 | -1.10 | 0.52 | -1.72 |
+| widestAt | held out | 75 | 0.6172 | 0.5776 | +0.21 | 0.98 | -0.01 |
+
+shapeFlag: {"entries": 2, "candidate": {"nearest": "round2-spindle", "distance": 0.6731161921352352, "hand": 0.0, "flag": false}, "flag": false}
+Level 0's statistic on the same runs (reported, not gated): 9 of 20 seeds within T 1.00
+
+beech: FAIL: held out 20/20 (need 15); spread OUTSIDE ×2; shapeFlag clear

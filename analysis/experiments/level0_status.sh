@@ -24,6 +24,15 @@ for s in "${SPECIES[@]}"; do
   [[ -f docs/experiments/fits/level0/$s.json ]] && echo "  DONE: results file written"
   gate=runs/level0/$s.gate.txt
   [[ -f $gate ]] && echo "  GATE:   $(tail -n 1 "$gate")"
+  if [[ -f docs/experiments/fits/level0/$s.json ]]; then
+    # Finished: the results file's own budget and wall time, no ETA (the log's age keeps growing after the end).
+    python3 - "docs/experiments/fits/level0/$s.json" <<'PY'
+import json, sys
+d = json.load(open(sys.argv[1]))
+print(f"  finished: {d['status']}, {d['evaluations']} evals, {d['wall_seconds'] / 3600:.2f} h wall")
+PY
+    continue
+  fi
   first=$(stat -c %W "$log")  # the log's creation time: its lines carry no timestamps
   now=$(date +%s); el=$((now - first))
   printf '  elapsed: %dh%02dm since the log began\n' $((el/3600)) $((el%3600/60))

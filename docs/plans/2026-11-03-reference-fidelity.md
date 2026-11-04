@@ -306,8 +306,15 @@ no z was computed, and nothing registered changed after it.
   which knob is at its bound and why, never more generations.
 
 ### State
-_(rewritten at the end of each session)_ **Level 0 targets v2 registered (7615b01, 2026-11-03); night 1 against v2 is
-running unattended.**
+_(rewritten at the end of each session)_ **Night 1 against v2 done and read (2026-11-04,
+[note](../experiments/2026-11-04-level0-night1-v2.md)): beech 9/20, oak 0/20, birch 0/20; no gallery flag; no params
+accepted.** Height is no longer what blocks. Oak's binding term is CR (every seed over T at 60). Birch's is the girth
+trajectory (DBH +4.7 cm from 60 to 150; no r0 fits all three seasons): a case for ADR 0050's option C. Beech's medians
+are in band; its H spread grows to 1.72× the real one at 150 (within ×2). The bound report: oak's r1.mf is flat (not
+binding); birch's r6.qMin is the shade house against LAI. Height at 100 is scored three times (recorded, not changed).
+The rest of this State is from the v2 session; its open points stand.
+
+**Level 0 targets v2 registered (7615b01, 2026-11-03).**
 - **Readings taken in the unattended session (the user's spec left these open; each is the narrower or the stated one):**
   - Thin and ungated are read from the subset's n_H alone.
   - The pool for the borrowed band and T is the six v1 broadleaves, each with n_H ≥ 100 in the subset.
@@ -328,7 +335,7 @@ running unattended.**
   - Birch's lateShare is reported.
 - **v1, archived:** `docs/experiments/fits/level0-v1/` (fits and v1 targets) and `runs/level0-v1/` (logs, checkpoints).
   v1's gate: beech 2/20, oak 0/20.
-- **Running:** tmux `level0` (systemd-inhibit), `analysis/experiments/level0_fit_gate.sh beech oak birch`. Each species
+- **Ran (done 05:46, 2026-11-04):** tmux `level0` (systemd-inhibit), `analysis/experiments/level0_fit_gate.sh beech oak birch`. Each species
   runs 1200 evaluations on 12 workers, ≤ 3.5 h, then its gate.
   - Results: `docs/experiments/fits/level0/S.json` (+ `-best.json`, `-progress.csv`).
   - Logs: `runs/level0/S.log`. Gates: `runs/level0/S.gate.txt` and `.json`. The wrapper's log: `runs/level0/night1-v2.log`.

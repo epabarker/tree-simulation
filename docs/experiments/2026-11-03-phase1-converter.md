@@ -484,8 +484,22 @@ JSON and `runs/phase1/control-grid.csv`, with per-tree results cached in `runs/p
 - **For phase 3:** Demol has no neutral d_min (its p1, 13.3 mm, already fails). As beech's held-out site it serves
   tier A descriptors only.
 
+**v3.1 registered (2026-11-04, session 1d-ii, before any simulated tree was measured against it).**
+- **What changed:** `tiers.evaluation_points` (now `(grid, d_min, upper)`), a new `tiers.upper_end`, and the JSON's
+  `rules.evaluation_points` and `rules.tier_b`; the JSON gains each gated dataset's `upper_end`. Hashes of
+  `tiers.py` and `tolerance.py` re-taken; `describe.py`, `coarsen.py`, `control.py` and the rest unchanged.
+- **Provenance, as for v2 → v3:** the bracket was set from the control curves after seeing them; the criterion is
+  "the first grid point above d_min at which the dataset's control fails", not a chosen width; no simulated value
+  entered. The user's reason: under 2·d_min BioDiv's bracket runs to 17 mm, where BioDiv's own QSMs are already
+  non-neutral, so tier B would hold descriptors out for the bracket's fault rather than their own.
+- **Reading taken (the ruling is silent):** tier A's rule is unchanged but it reads the same evaluation points, so
+  it is now evaluated at d_min, the grid points inside, the upper end and inflation (Wytham 12.1 mm, wider than
+  v3's 10.0; BioDiv 11.0 mm, narrower than 17.2).
+- **Resulting points:** Wytham d_min 5.0 mm, upper 12.1 mm (p50), no grid point inside; BioDiv 8.6 mm, upper 11.0 mm
+  (p5), none inside. Each tier B check is therefore one coarsened point plus inflation, against d_min.
+
 **Next, 1d-ii (after phase 2):**
-1. Register v3.1 (tier B's bracket, above), then wire `tiers.py` into `phase1_degradation.py`. Its `gate` still reads v1's layout, so this must not change a
+1. ~~Register v3.1 (tier B's bracket, above)~~ (done, above), then wire `tiers.py` into `phase1_degradation.py`. Its `gate` still reads v1's layout, so this must not change a
    hashed file.
 2. Size-match each species by `rules.size_match`.
 3. Run gate c v3.

@@ -85,7 +85,25 @@ def test_fifteen_of_twenty_seeds_and_failing_seeds():
     assert ti.seeds_within(v, "dmin", ti.FINE, 0.1) == 13 and not ti.tier_a(v, ["dmin"], 0.1)
 
 
-def test_evaluation_points_span_d_min_to_twice_d_min_with_the_grid_inside():
+def test_upper_end_is_the_first_failing_grid_point_above_d_min():
     grid = {1: 0.004, 2: 0.006, 5: 0.009, 10: 0.012, 20: 0.02, 50: 0.03}
-    assert ti.evaluation_points(grid, 0.006) == [("dmin", 0.006), ("p5", 0.009), ("2dmin", 0.012)]
-    assert ti.evaluation_points(grid, 0.03) == [("dmin", 0.03), ("2dmin", 0.06)]
+    curve = {1: True, 2: True, 5: True, 10: False, 20: False, 50: False}
+    assert ti.upper_end(grid, curve, 0.006) == ("p10", 0.012)
+    assert ti.upper_end(grid, {**curve, 1: False}, 0.006) == ("p10", 0.012)  # a failure below d_min is not the upper end
+    with pytest.raises(ValueError, match="no upper end"):
+        ti.upper_end(grid, {p: True for p in grid}, 0.006)
+
+
+def test_upper_end_with_tied_grid_points_as_wytham_has_them():
+    grid = {1: 0.002, 2: 0.0025, 5: 0.0025, 10: 0.0025, 20: 0.005, 50: 0.0121}  # Wytham's grid has ties
+    curve = {1: True, 2: True, 5: True, 10: True, 20: True, 50: False}
+    assert ti.upper_end(grid, curve, 0.005) == ("p50", 0.0121)
+    assert ti.evaluation_points(grid, 0.005, 0.0121) == [("dmin", 0.005), ("upper", 0.0121)]
+
+
+def test_evaluation_points_span_d_min_to_the_upper_end_with_the_grid_inside():
+    grid = {1: 0.004, 2: 0.006, 5: 0.009, 10: 0.012, 20: 0.02, 50: 0.03}
+    assert ti.evaluation_points(grid, 0.006, 0.02) == [("dmin", 0.006), ("p5", 0.009), ("p10", 0.012),
+                                                       ("upper", 0.02)]
+    assert ti.evaluation_points(grid, 0.03, 0.06) == [("dmin", 0.03), ("upper", 0.06)]
+    assert ti.evaluation_points(grid, 0.006, 0.009) == [("dmin", 0.006), ("upper", 0.009)]  # BioDiv's shape: no inside

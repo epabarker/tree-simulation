@@ -1,10 +1,11 @@
 {
- "version": 3,
+ "version": 3.1,
  "supersedes": [
+  "6610fb4",
   "3f13c29",
   "e74063c"
  ],
- "written": "2026-11-03, session 1d-i: from real QSMs only (designed after v2's control failed on the re-cut); nothing simulated has been measured since v1",
+ "written": "2026-11-04, session 1d-ii: v3 (1d-i, from real QSMs only) with tier B's bracket from the control curves; nothing simulated has been measured since v1",
  "hashes": {
   "analysis/treesim/describe.py": "671f92d71131525cb1dcf5fdb771ed98b3c5ac05aea900366925ef61d5cc2bee",
   "analysis/treesim/form.py": "23c5e1c035c9bbb625a8a002476fc12fd98f85438af4bba5adbb97c10ec6b48d",
@@ -13,9 +14,9 @@
   "analysis/treesim/coarsen.py": "b5e57ca6ebff39f9ec8a2b0364e621a549e5d6b6d8426cbbcbfb05cd87b34bc9",
   "analysis/treesim/fetch.py": "d11298d3684ab72718dd8218a94353f8aff654c8029a49d491f1719124caabd2",
   "analysis/treesim/simtree.py": "e69c7a26140b272f1274b07f3d6ae51acdba6abbfc655b27d3b8a02bb901ff6b",
-  "analysis/treesim/tolerance.py": "8b0f52478913439bee7a810c3293dcc373610902896796ac848f7cdd863ba35a",
+  "analysis/treesim/tolerance.py": "7ec6553f51cee1734e68b3b1f5949d7c6996e820d61a6e53a3fc3fcd5c647b7c",
   "analysis/treesim/control.py": "a79fc7a2d03ba035969f55c34d36791f5a0dca37f99fee5b10fc148430c7acb4",
-  "analysis/treesim/tiers.py": "c7ebbc8a2e4d3f90b7577e2f49e92905b00f11830080f4d5ddd24366e5ddf088",
+  "analysis/treesim/tiers.py": "c3205f762a1f7ce29ed20c7efa28d048c2753bc9eee6c1d5e6f6e5daa88e44ae",
   "cli/dump-trees.ts": "acc19ad15f14d0bdbeb5742adf173f334c20a12cd59434c8fb90f2117a58d329",
   "analysis/fit/sources/reference-manifest.csv": "4540b2f7b53b7ee92cd971cbcf599c7a76ab307fa58e715c23193c0a256a6453"
  },
@@ -83,9 +84,9 @@
    "source": "Demol et al. 2022, Silva Fennica 56(1) 10550: branches under \u2248 5 cm carry 80\u201383% of the QSM volume overestimate (Table 3); the completeness threshold the 1d brief names"
   },
   "inflation": "Demol et al. 2022 (\u00a73.2, Table 3): diameter +73% under 2.5 cm, +4% over 10 cm, log-interpolated between (not measured). Gated at d_min for both tiers (the user, 2026-11-03). Order: inflate, prune",
-  "evaluation_points": "d_min, every grid point strictly inside (d_min, 2\u00b7d_min), 2\u00b7d_min, and inflation at d_min (tiers.evaluation_points)",
+  "evaluation_points": "v3.1 (the user, 2026-11-03, from the control curves): d_min, every grid point strictly inside (d_min, upper), the upper end, and inflation at d_min (tiers.evaluation_points). The upper end is the first grid point above d_min at which the dataset's control fails (tiers.upper_end): Wytham 12.1 mm (p50), BioDiv 11.0 mm (p5). Set after seeing the control curves, by the criterion 'first failing grid point' and not a chosen width; no simulated value entered. v3 had [d_min, 2\u00b7d_min]",
   "tier_a": "resolution-independent: per seed, the median over the stand's live measured trees of the signed describe(coarsen(tree)) \u2212 describe(tree); |median| <= tolerance on >= 15 of the 20 seeds at every evaluation point (tiers.tier_a)",
-  "tier_b": "valid at matched resolution: per seed, the median of the signed v(p) \u2212 v(d_min); |median| <= tolerance on >= 15 of the 20 seeds at every other evaluation point, inflation against v(d_min); and the descriptor's control neutral at d_min (>= 90% of real trees within tolerance) (tiers.tier_b)",
+  "tier_b": "valid at matched resolution: per seed, the median of the signed v(p) \u2212 v(d_min); |median| <= tolerance on >= 15 of the 20 seeds at every other evaluation point of [d_min, upper], inflation against v(d_min); and the descriptor's control neutral at d_min (>= 90% of real trees within tolerance) (tiers.tier_b)",
   "assign": "A if tier A passes, else B if tier B passes, else held out (tiers.assign). Both tiers are targets; the fit always compares the coarsened simulator against the real QSMs, never fine simulated values",
   "pass_seeds": 15,
   "fail": "a seed with no live measured tree, or a NaN difference on any tree, fails that seed",
@@ -269,6 +270,10 @@
     "10": 0.0025,
     "20": 0.005,
     "50": 0.01209430746874127
+   },
+   "upper_end": {
+    "name": "p50",
+    "d": 0.01209430746874127
    }
   },
   "biodiv": {
@@ -301,6 +306,10 @@
     "10": 0.013575505465269089,
     "20": 0.01833588443696499,
     "50": 0.019999999552965164
+   },
+   "upper_end": {
+    "name": "p5",
+    "d": 0.010951084084808826
    }
   }
  },
@@ -1895,6 +1904,10 @@
    "trees": {
     "oak": 37,
     "maple": 40
+   },
+   "upper_end": {
+    "name": "p50",
+    "d": 0.01209430746874127
    }
   },
   "biodiv": {
@@ -1932,6 +1945,10 @@
    "d_min_percentile": 2,
    "trees": {
     "beech": 53
+   },
+   "upper_end": {
+    "name": "p5",
+    "d": 0.010951084084808826
    }
   },
   "demol": {

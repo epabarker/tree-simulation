@@ -1,11 +1,15 @@
-"""Gate c v2's pass rule, the two tiers (docs/plans/2026-11-03-reference-fidelity.md §j, the 1d brief, decision 2),
-as a pure function over described values. Written and hashed in session 1d-i, before any simulated tree was
-measured again; 1d-ii feeds it the simulated trees and must not change it.
+"""Gate c's pass rule, the two tiers (docs/plans/2026-11-03-reference-fidelity.md §j, the 1d brief, decision 2),
+as a pure function over described values. Written and hashed in session 1d-i (v3); v3.1 (session 1d-ii, before any
+simulated tree was measured against it) changes only `evaluation_points`, to the user's bracket ruling of
+2026-11-03: [d_min, the first grid point above d_min at which the dataset's control fails]. Set from the control
+curves alone, after seeing them; the criterion is "first failing grid point", not a chosen width; no simulated value
+entered. 1d-ii feeds the module the simulated trees and must not change it again.
 
 Per descriptor, at one dataset, the input is `values[seed][version]`: the descriptor on each live measured stand tree
 (the same trees, in the same order, in every version). Versions: FINE (uncoarsened), one key per evaluation point
-(`points`: d_min, every grid point strictly inside (d_min, 2·d_min), 2·d_min), and INFLATED (Demol 2022's inflation at
-d_min, the user's ruling 2026-11-03: gated). `points[0]` is d_min.
+(`points`: d_min, every grid point strictly inside (d_min, upper), the upper end), and INFLATED (Demol 2022's
+inflation at d_min, the user's ruling 2026-11-03: gated). `points[0]` is d_min. Tier A's rule is unchanged; it reads
+the same evaluation points.
 
 - **Tier A** (resolution-independent; v1's criterion read strictly across the bracket): per seed the median over trees
   of the signed coarsened − fine, and |median| ≤ tolerance on ≥ PASS_SEEDS seeds, at every point and INFLATED.
@@ -65,7 +69,17 @@ def assign(values, points: Sequence[str], tolerance: float, control_neutral: boo
     return "held out"
 
 
-def evaluation_points(grid: Mapping[int, float], d_min: float) -> list[tuple[str, float]]:
-    """(name, diameter): d_min, the grid points strictly inside (d_min, 2·d_min), 2·d_min."""
-    inside = [(f"p{p}", d) for p, d in sorted(grid.items(), key=lambda kv: kv[1]) if d_min < d < 2.0 * d_min]
-    return [("dmin", d_min), *inside, ("2dmin", 2.0 * d_min)]
+def upper_end(grid: Mapping[int, float], curve: Mapping[int, bool], d_min: float) -> tuple[str, float]:
+    """The first grid point (ascending percentile) with diameter above d_min at which the control fails: (name,
+    diameter). `curve` is the dataset's control verdict per grid percentile (control.py). No such point: the bracket
+    is undefined and the dataset stops (nothing is invented)."""
+    for p in sorted(grid):
+        if grid[p] > d_min and not curve[p]:
+            return f"p{p}", grid[p]
+    raise ValueError("the control passes at every grid point above d_min: tier B's bracket has no upper end")
+
+
+def evaluation_points(grid: Mapping[int, float], d_min: float, upper: float) -> list[tuple[str, float]]:
+    """(name, diameter): d_min, the grid points strictly inside (d_min, upper), the upper end (named "upper")."""
+    inside = [(f"p{p}", d) for p, d in sorted(grid.items(), key=lambda kv: kv[1]) if d_min < d < upper]
+    return [("dmin", d_min), *inside, ("upper", upper)]

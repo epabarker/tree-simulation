@@ -75,7 +75,7 @@ DESCRIBED = ("analysis/treesim/describe.py", "analysis/treesim/form.py", "analys
 HASHED = DESCRIBED + ("analysis/treesim/coarsen.py", "analysis/treesim/fetch.py", "analysis/treesim/simtree.py",
                       "analysis/treesim/tolerance.py", "analysis/treesim/control.py", "analysis/treesim/tiers.py",
                       "cli/dump-trees.ts", "analysis/fit/sources/reference-manifest.csv")
-V1, V2 = "e74063c", "3f13c29"
+V1, V2, V3 = "e74063c", "3f13c29", "6610fb4"
 WORKERS = 12
 
 # The gate's rules, v3 (the 1d brief; the user's rulings at the 1d-i plan and after v2, 2026-11-03; the advisor's
@@ -110,14 +110,18 @@ RULES = {
     "inflation": "Demol et al. 2022 (§3.2, Table 3): diameter +73% under 2.5 cm, +4% over 10 cm, log-interpolated "
                  "between (not measured). Gated at d_min for both tiers (the user, 2026-11-03). Order: inflate, "
                  "prune",
-    "evaluation_points": "d_min, every grid point strictly inside (d_min, 2·d_min), 2·d_min, and inflation at d_min "
-                         "(tiers.evaluation_points)",
+    "evaluation_points": "v3.1 (the user, 2026-11-03, from the control curves): d_min, every grid point strictly inside "
+                         "(d_min, upper), the upper end, and inflation at d_min (tiers.evaluation_points). The upper "
+                         "end is the first grid point above d_min at which the dataset's control fails "
+                         "(tiers.upper_end): Wytham 12.1 mm (p50), BioDiv 11.0 mm (p5). Set after seeing the control "
+                         "curves, by the criterion 'first failing grid point' and not a chosen width; no simulated "
+                         "value entered. v3 had [d_min, 2·d_min]",
     "tier_a": "resolution-independent: per seed, the median over the stand's live measured trees of the signed "
               "describe(coarsen(tree)) − describe(tree); |median| <= tolerance on >= 15 of the 20 seeds at every "
               "evaluation point (tiers.tier_a)",
     "tier_b": "valid at matched resolution: per seed, the median of the signed v(p) − v(d_min); |median| <= tolerance "
-              "on >= 15 of the 20 seeds at every other evaluation point, inflation against v(d_min); and the "
-              "descriptor's control neutral at d_min (>= 90% of real trees within tolerance) (tiers.tier_b)",
+              "on >= 15 of the 20 seeds at every other evaluation point of [d_min, upper], inflation against "
+              "v(d_min); and the descriptor's control neutral at d_min (>= 90% of real trees within tolerance) (tiers.tier_b)",
     "assign": "A if tier A passes, else B if tier B passes, else held out (tiers.assign). Both tiers are targets; the "
               "fit always compares the coarsened simulator against the real QSMs, never fine simulated values",
     "pass_seeds": tiers.PASS_SEEDS,
@@ -510,6 +514,10 @@ def build() -> tuple[dict, dict]:
                                "count": list(res.count), "trees": sum(r["dataset"] == dataset for r in rows)}
     ctl = control(rows, table)
     for dataset, c in ctl.items():
+        if c["gated"]:  # v3.1: tier B's bracket ends at the control's first failing grid point above d_min
+            name, d = tiers.upper_end(c["grid"], c["curve"], c["d_min"])
+            c["upper_end"] = resolution[dataset]["upper_end"] = {"name": name, "d": d}
+    for dataset, c in ctl.items():
         resolution[dataset]["d_min"] = c["d_min"]
         resolution[dataset]["d_min_percentile"] = c["d_min_percentile"]
         resolution[dataset]["grid"] = c["grid"]
@@ -520,9 +528,9 @@ def build() -> tuple[dict, dict]:
             qsm_medians[f"{dataset} {species}"] = {k: float(np.nanmedian([_val(r["d"], k) for r in sel]))
                                                    for k in ("ldSlope", "tortuosity", "tortuosity05")}
     return _clean({
-        "version": 3, "supersedes": [V2, V1],
-        "written": "2026-11-03, session 1d-i: from real QSMs only (designed after v2's control failed on the re-cut); "
-                   "nothing simulated has been measured since v1",
+        "version": 3.1, "supersedes": [V3, V2, V1],
+        "written": "2026-11-04, session 1d-ii: v3 (1d-i, from real QSMs only) with tier B's bracket from the control "
+                   "curves; nothing simulated has been measured since v1",
         "hashes": file_hashes(), "data": data_digests(rows), "rules": RULES, "descriptors": list(DESCRIPTORS),
         "min_trees": MIN_TREES, "tolerance_factor": TOLERANCE, "hold_noise": HOLD_NOISE, "repeats": REPEATS,
         "control_rule": {"grid": list(ct.GRID), "trees": ct.TREES, "descriptors": ct.DESCRIPTORS},

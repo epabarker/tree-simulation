@@ -1,4 +1,4 @@
-# 0051: Crowns interpenetrate because nothing removes a lit limb inside a neighbour's crown; rule on CR's reading first
+# 0051: Crowns interpenetrate because nothing removes a lit limb inside a neighbour's crown; rule on CR's reading
 
 - **Status:** proposed (2026-11-04), for the user.
 - **Spec:** §O2 (abrasion, crown shyness), §C2 (light), §C5 (shedding), §R4–R6 (bud fates). ADR 0013 (O2 off), 0024 (the
@@ -56,8 +56,16 @@
    - **T_rel ×10:** +1.24 at LAI 3.3 (from 5.2), with z_H at 150 up to +1.42. It bounds CR by losing crown.
    - **qMin 0.3 / 0.5:** LAI 2.8 / 1.6, the shade house fails, deaths.
    - **e_s and L_dorm:** flat.
-   - **O2 at ADR 0013's settings:** halves oak fit's foreign tips at 60 (32 → 16%) at no measured cost, but trims CR
-     only ≈ 10% (z_CR at 60 +1.8).
+   - **O2 at ADR 0013's settings (p_abr 0.5), oak fit:**
+     - CR at 60 does not move: 4.84 against 4.85 m, down in 2 of 5 seeds, z_CR at 60 +1.93.
+     - It separates crowns: foreign tips at 60 32 → 20%, down in 5 of 5 seeds.
+     - z_H rises in 4 of 5 seeds at 100 and at 150 (+0.1 to +0.45): a possible height cost, suggestive on 5 seeds.
+   - **O2 at p_abr 1, beyond ADR 0013:**
+     - Oak fit's CR at 60 is 4.39 m and its foreign tips 16%.
+     - z_H at 100 rises in 5 of 5 seeds.
+     - Choosing p_abr 1 for its effect on CR would be fitting it to CR.
+   - **Hand oak at 0.5:** CR at 60 falls in 5 of 5 seeds (−0.23 to −0.54 m, 6.65 → 6.27).
+   - **Beech:** the O2 effects are within seed noise.
    - **Why every lever falls short:** the gate reads a maximum over ~2,000 tips, so it moves only when the last
      intruding tip goes. For oak fit, the 95th percentile of reach scores z +1.08 / +0.59 / +0.77 against the max's
      +1.76 / +1.11 / +1.25.
@@ -83,7 +91,8 @@
   - Oak's Level 0 waits on the ruling. Beech and birch go on as planned.
   - Nights 2–3 are unaffected unless the ruling changes the measurement. If it does, the registered targets stay, and
     the measurement in `cli/allometry.ts` changes, with its parity test.
-- **Cost:** oak stays failed until the ruling. If the ruling keeps the max, A falls through to B or C.
+- **Cost:** oak stays failed until the ruling. If the ruling keeps the max, no probed lever passes oak: neither B
+  nor the parameter-only alternative. Only an undemonstrated C remains.
 
 **B. O2 on in the woods, at ADR 0013's settings (a preset and trial setting, not a rule change).**
 - **What it is:** §O2 exists and is tested (`o2.rs`). Its switch is world-level (`season.rs:382`), so it is set in
@@ -100,7 +109,11 @@
   - Level 0 nights 1–3 re-run (≈ 8.6 h a night).
   - Phases 1d-ii and 3 wait on the new fits.
   - The garden's look changes: crowns stand slightly apart. The user judges it on the phone.
-- **Expected gain:** ≈ 10% on CR at 60 for oak, so on its own it does not pass oak.
+- **Expected gain:** crown separation, not the gate.
+  - Oak fit's foreign tips at 60 fall 32 → 20% (5 of 5 seeds).
+  - Its CR at 60 does not move (4.84 against 4.85 m). Hand oak's falls ≈ 6%.
+  - **Possible cost:** oak fit's z_H at 100 and 150 rises in 4 of 5 seeds. Measure it on 20 seeds before any adoption.
+- **Not a Level 0 fix.** Its case is realism and the spec's own design.
 
 **C. A rule change to O2 (a candidate for its own probe session, not adopted here).**
 - **What it would do:** let abrasion reach the tail. Its sway (`o2.rs:69–71`) depends on Q·h/r and reaches only the
@@ -121,12 +134,17 @@
 - It is a knob added because a fit asks for it: the wrong side of ADR 0049's line.
 
 ## Recommendation
-**A, then B if the ruling keeps the maximum.**
-- **Why A first:** oak's whole binding term is the reach past the midpoint, read by a maximum. No probed lever moves
-  that maximum without collapsing the canopy. So the reading decides whether any rule change is needed at Level 0.
-- **Why B second:** it is the spec's own rule. It is local, it is unfitted, and its premise for being off (ADR 0013,
-  2D) no longer holds in 3D. It costs goldens and a re-run, and buys real crown separation (foreign tips halved), but
-  not oak's pass on its own.
+**A.**
+- **Why:** oak's whole binding term is the reach past the midpoint, read by a maximum, and no probed lever moves that
+  maximum without collapsing the canopy. So the reading decides whether oak can pass Level 0 at all under the current
+  rules.
+- **If the ruling keeps the maximum:** no probed lever passes oak. The honest outcome is that oak fails Level 0 on a
+  measurement the model cannot meet, recorded as such, until a C is demonstrated.
+- **B is offered separately, on realism alone.**
+  - For: it is the spec's own rule, local and unfitted, and its premise for being off (ADR 0013, 2D) no longer holds in
+    3D. It separates crowns (oak fit's foreign tips −39%).
+  - Against: it does not move oak's gate term, it may cost height, and it changes four goldens and every Level 0 fit.
+  - So it is worth a 20-seed probe, never adoption on this evidence.
 - **C** waits for a demonstrated case.
 
 ## Consequences (if A is accepted)
@@ -135,4 +153,5 @@
   change now.
 - Open:
   - shipped birch's tip past its own image at 150 (hand only);
-  - R3's limb bending, untested as a bound on reach.
+  - R3's limb bending, untested as a bound on reach;
+  - beech fit reaches further in +x than in −x (mean 1.7 m at the same tree; the sky is untilted, `c2.skyTilt` 0).

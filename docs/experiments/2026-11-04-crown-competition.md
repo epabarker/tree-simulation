@@ -103,6 +103,32 @@ Notes on the columns:
 | oak | fit | 100 | 4 / 25 | 15 / 69 / 16 | 14 | 39 | 98 | 12 | 19 |
 | oak | fit | 150 | 2 / 15 | 2 / 81 / 16 | 37 | 12 | 94 | 7 | 16 |
 
+**Reach and nearest stem by direction** (medians over trees and seeds; nearest stem within ±45° of each axis):
+- **Beech hand:** the neighbour distances widen with deaths (8.80 m in x at 150).
+- **Beech fit:** reaches further in +x than in −x (mean 1.7 m at the same tree; the sky is untilted, `c2.skyTilt` 0).
+  Recorded, not chased.
+
+| species | set | season | reach +x / −x / +z / −z, m | nearest stem +x / −x / +z / −z, m |
+|---|---|---|---|---|
+| beech | hand | 60 | 4.42 / 3.47 / 4.10 / 3.92 | 5.25 / 5.25 / 5.61 / 5.61 |
+| beech | hand | 100 | 4.36 / 4.56 / 5.20 / 4.09 | 5.25 / 5.25 / 5.61 / 5.61 |
+| beech | hand | 150 | 6.98 / 7.20 / 6.80 / 5.77 | 8.80 / 8.80 / 6.38 / 6.38 |
+| beech | fit | 60 | 5.04 / 2.69 / 4.67 / 4.32 | 5.25 / 5.25 / 5.61 / 5.61 |
+| beech | fit | 100 | 4.91 / 3.44 / 4.16 / 4.23 | 5.25 / 5.25 / 5.61 / 5.61 |
+| beech | fit | 150 | 4.93 / 3.30 / 4.38 / 4.57 | 5.25 / 5.25 / 5.61 / 6.38 |
+| birch | hand | 60 | 4.37 / 4.36 / 4.20 / 4.51 | 5.25 / 5.25 / 5.61 / 5.61 |
+| birch | hand | 100 | 6.15 / 6.70 / 4.56 / 4.88 | 5.25 / 5.25 / 5.61 / 5.61 |
+| birch | hand | 150 | 9.09 / 9.46 / 5.39 / 6.07 | 5.25 / 5.25 / 5.61 / 5.61 |
+| birch | fit | 60 | 5.90 / 6.12 / 5.60 / 5.57 | 5.25 / 5.25 / 5.61 / 5.61 |
+| birch | fit | 100 | 5.16 / 5.01 / 5.16 / 5.10 | 5.25 / 5.25 / 5.61 / 5.61 |
+| birch | fit | 150 | 4.70 / 4.66 / 4.69 / 4.81 | 5.25 / 5.25 / 5.61 / 5.61 |
+| oak | hand | 60 | 6.55 / 6.77 / 6.54 / 6.90 | 5.25 / 5.25 / 5.61 / 5.61 |
+| oak | hand | 100 | 6.38 / 7.06 / 6.95 / 7.49 | 5.25 / 5.25 / 5.61 / 5.61 |
+| oak | hand | 150 | 5.79 / 6.57 / 7.21 / 7.75 | 5.25 / 5.25 / 5.61 / 5.61 |
+| oak | fit | 60 | 5.05 / 4.20 / 4.88 / 5.03 | 5.25 / 5.25 / 5.61 / 5.61 |
+| oak | fit | 100 | 4.94 / 4.12 / 4.61 / 5.63 | 5.25 / 5.25 / 5.61 / 5.61 |
+| oak | fit | 150 | 4.49 / 4.09 / 4.44 / 4.89 | 5.25 / 5.25 / 5.61 / 5.61 |
+
 **What step 1 shows**
 - **Crowns interpenetrate in every species and both parameter sets.** 24–42% of live-bud tips lie nearer a
   neighbour's stem than their own. The tips that set CR are on a neighbour's side in 84–100% of directions.
@@ -296,12 +322,19 @@ predicts height at 150; sideways spread at 60 does not.
   where the crown thins (oak hand); in beech it rises.
 - **e_s (shade elongation) and L_dorm:** flat, within seed noise. Shade elongation is not what drives tips in. L_dorm
   removes dormant extremes, but the short shoots then carry CR.
-- **O2 at ADR 0013's settings:**
-  - It halves oak fit's foreign tips at 60 (32 → 16% at p_abr 1) and trims CR by ≈ 10% (4.85 → 4.39 m at 60).
-  - It costs nothing measured: LAI 5.0–5.1, no deaths.
-  - It leaves z_CR at 60 at +1.8. A maximum over ~2,000 tips moves only when the last intruding tip goes, and O2
-    acts on the bulk. Its sway is k·Q·h/r cells (`o2.rs:69–71`), and with ADR 0013's k_sway it reaches only the
-    nearest cells.
+- **O2 at ADR 0013's settings (p_abr 0.5).** Paired per seed against the base, since seeds 1–5 are shared:
+  - **Oak fit:**
+    - CR at 60 does not move: 4.84 against 4.85 m, down in 2 of 5 seeds, z_CR at 60 +1.93.
+    - Foreign tips at 60 fall 32 → 20%, in 5 of 5 seeds.
+    - z_H rises in 4 of 5 seeds at 100 and at 150 (+0.1 to +0.45): a possible height cost, suggestive on 5 seeds.
+  - **Hand oak:** CR at 60 falls in 5 of 5 seeds (−0.23 to −0.54 m).
+  - **Beech:** within seed noise.
+- **O2 at p_abr 1** (beyond ADR 0013; choosing it for CR would be fitting it to CR):
+  - Oak fit's CR at 60 is 4.39 m, its foreign tips 16%, and z_CR at 60 +1.80.
+  - z_H at 100 rises in 5 of 5 seeds.
+- **Why O2 falls short of the gate either way:** the gate reads a maximum over ~2,000 tips, which moves only when the
+  last intruding tip goes, and O2 acts on the bulk. Its sway is k·Q·h/r cells (`o2.rs:69–71`), and it skips dormant
+  buds (`o2.rs:84`).
 - **Untested:** R3's bending of long horizontal limbs, the other physical bound on reach.
 
 ## Verdict
@@ -312,8 +345,11 @@ predicts height at 150; sideways spread at 60 does not.
   - R5 even lengthens it.
 - **Where it fails.** The spec's ownership-aware loss process (§O2) is off. ADR 0013's reason (2D crowns kept gaps) no
   longer holds in 3D.
-- **What the gate sees.** Oak's binding term is the reach past the midpoint, read by a maximum. The bulk levers (O2,
-  shedding) move the bulk well before they move that maximum.
+- **What the gate sees.** Oak's binding term is the reach past the midpoint, read by a maximum. The bulk levers move
+  the bulk well before they move that maximum:
+  - O2 at ADR 0013's setting separates crowns but leaves oak fit's CR at 60 unchanged;
+  - shedding trims CR by losing crown.
+- **With the maximum kept, no probed lever passes oak.**
 - **The ruling.** Whether the gate should read that maximum is ADR 0050's ruling 2, now with this evidence.
 
 ## Advisor (step 6): objections and answers
@@ -330,3 +366,9 @@ predicts height at 150; sideways spread at 60 does not.
    literature, never be fitted to Tallo CR. Its switch is world-level, so it is a preset or trial setting, and the
    goldens `oakOpen`, `forest`, `mixedWood` and `beechWood` would change if it were turned on in the woods.
 6. **Minor items.** Recorded above: hand birch's wrapped tip; step 4 is "no association detected"; R3 untested.
+7. **(Second round, after the commit.)** Option B's evidence had used p_abr 1's numbers under ADR 0013's label.
+   Corrected:
+   - At 0.5, oak fit's CR at 60 does not move.
+   - Paired per seed, its foreign tips fall in 5 of 5 seeds and z_H rises in 4 of 5.
+   - B is now offered on realism alone, never as a Level 0 fix.
+   - The directional reach and nearest-stem columns were added.

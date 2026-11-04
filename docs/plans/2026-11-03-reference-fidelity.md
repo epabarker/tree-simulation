@@ -322,7 +322,8 @@ _(rewritten at the end of each session)_
   - §O2 abrasion is off (ADR 0013's 2D premise no longer holds).
 - **Levers:** none brings oak fit's z_CR at 60 under T without collapsing LAI. The gate reads a maximum over ~2,000
   tips, which bulk processes move last:
-  - O2 at ADR 0013's settings halves the foreign tips and trims CR ≈ 10%;
+  - O2 at ADR 0013's setting (p_abr 0.5) separates crowns (oak fit's foreign tips 32 → 20%, 5 of 5 seeds) but leaves
+    CR at 60 unchanged, with z_H up in 4 of 5 seeds;
   - T_rel ×10 trims CR by losing crown;
   - qMin past its bound kills trees and widens beech.
 - **Rivals:**
@@ -331,8 +332,9 @@ _(rewritten at the end of each session)_
   - the slab, excluded for oak, not for beech (six rows: z_CR +0.39 / +0.23 / +0.34);
   - the user's qMin premise, refuted.
 - **Beech's spread:** CR at 60 shows no association with height rank at 150.
-- **ADR 0051 recommends** A: the user rules on CR's reading (ADR 0050 ruling 2), then B (O2 on in the woods, ADR
-  0013's settings, unfitted) if the max stays.
+- **ADR 0051 recommends A:** the user rules on CR's reading (ADR 0050 ruling 2).
+  - If the max stays, no probed lever passes oak.
+  - B (O2 on in the woods, unfitted) is offered on realism alone, worth a 20-seed probe.
 - **Next:** the user's rulings (CR's reading; ADR 0051; oak's CR, option C, rowan from night 1). Then nights 2–3 and
   1d-ii.
 

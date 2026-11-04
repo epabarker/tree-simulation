@@ -1,12 +1,12 @@
 # Status
 
-_Last updated: 2026-11-04 (reference fidelity, phase 2 on `claude/reference-fidelity`: night 1 against Level 0 v2 read; no species passes)_
+_Last updated: 2026-11-04 (reference fidelity on `claude/reference-fidelity`: crown competition diagnosed, ADR 0051; the user's rulings recorded)_
 
 **3D port** on the branch `3d-port` (work branches open PRs into it). ADR 0024–0029, 0031, 0032, 0039–0042, 0044, 0046 and 0047 accepted, 0030, 0043 and 0045 rejected. The live site stays on 0.14.0 (2D) until the bar below is met.
 
 **Done means** (user): the mixed wood looks right in the garden in depth, within budget on the phone, with floor, H/D and crown base as 20-seed evidence. C3–C6 follow after shipping.
 
-**Direction (the user, 2026-11-03):** species fidelity from reference data (ADR 0049, accepted; [plan](plans/2026-11-03-reference-fidelity.md) §g: beech phase 3, oak 4). Phase 1 ([note](experiments/2026-11-03-phase1-converter.md)): gates a, b pass; gate c v1 stopped oak and beech. **Gate c v3 is registered (1d-i, 6610fb4, real data only; v2 admitted no species):** prune-only coarsening, a 0.5 m step for every segment-length-dependent descriptor, and beech as the median of its BioDiv repeats. d_min: Wytham 5.0 mm, BioDiv 8.6 mm. The descriptors that pass the floor: oak 18, maple 15, beech 21. **Phase 2 (Level 0, Tallo):** v1's gate failed (beech 2/20, oak 0/20), and one Spanish inventory set oak's curve. **Targets v2** ([note](experiments/2026-11-03-level0-targets.md)): Tallo in 45–58° N, 10° W–25° E for every species; a control that matches the gate (T ≈ 1.0); NW-FVA heights at 100 and 150 scored; willow and holly not gated; rowan's borrowed T fails its control (a ruling). v1 is archived in `fits/level0-v1/`. **Night 1 on v2** ([note](experiments/2026-11-04-level0-night1-v2.md)): beech 9/20, oak 0/20 (CR), birch 0/20 (the girth trajectory: ADR 0050 option C's case); no gallery flag; nothing accepted. Next: the user's rulings (oak's CR, option C, rowan); then nights 2–3 and 1d-ii.
+**Direction (the user, 2026-11-03):** species fidelity from reference data (ADR 0049, accepted; [plan](plans/2026-11-03-reference-fidelity.md) §g: beech phase 3, oak 4). Phase 1 ([note](experiments/2026-11-03-phase1-converter.md)): gates a, b pass; gate c v1 stopped oak and beech. **Gate c v3 is registered (1d-i, 6610fb4, real data only; v2 admitted no species):** prune-only coarsening, a 0.5 m step for every segment-length-dependent descriptor, and beech as the median of its BioDiv repeats. d_min: Wytham 5.0 mm, BioDiv 8.6 mm. The descriptors that pass the floor: oak 18, maple 15, beech 21. **Phase 2 (Level 0, Tallo):** v1's gate failed (beech 2/20, oak 0/20), and one Spanish inventory set oak's curve. **Targets v2** ([note](experiments/2026-11-03-level0-targets.md)): Tallo in 45–58° N, 10° W–25° E for every species; a control that matches the gate (T ≈ 1.0); NW-FVA heights at 100 and 150 scored; willow and holly not gated; rowan's borrowed T fails its control (a ruling). v1 is archived in `fits/level0-v1/`. **Night 1 on v2** ([note](experiments/2026-11-04-level0-night1-v2.md)): beech 9/20, oak 0/20 (CR), birch 0/20 (the girth trajectory: ADR 0050 option C's case); no gallery flag; nothing accepted. **Crown competition** ([note](experiments/2026-11-04-crown-competition.md), ADR 0051, accepted as a realism probe only): crowns interpenetrate because nothing removes a lit limb inside a neighbour's crown; the gate keeps max-reach CR (the user). **Next (the plan's State):** 1d-ii today (fresh session); the phase 3 beech pilot overnight (provisional, nothing accepted); then the LAI/shade-house target audit, ADR 0052 (self-pruning, judged on Weiser's crown base/H), then option C.
 
 ## Works
 - **Core** (`rust/core`): C1–C6, R1–R6, O2, O4 in 3D; slab sweep in fixed lanes; checkpoints v2. O4's `band` keeps recruits near a row (the garden).
@@ -31,6 +31,7 @@ _Last updated: 2026-11-04 (reference fidelity, phase 2 on `claude/reference-fide
 **`levels.2.setPoint` ≥ 80** collapses every broadleaf (C3/R3, after shipping). **Birch's pick stops growing after 60**: form or fit?
 
 ## Known issues
+- **Suspected bug:** beech fit reaches 1.7 m further in +x than −x in the stand (untilted sky); mirror the seeds, check it flips (ADR 0051).
 - **Regeneration:** `forest` cannot regenerate under its own floor at τ 0 (C5's). **The lab stutters** from season ≈ 75 on the phone. **The preview deploy** (`preview-3d`) has the old `i2.ts`: redeploy only when asked.
 
 ## Notes for the next session

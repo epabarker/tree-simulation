@@ -81,3 +81,8 @@ is in band.
 - No code, goldens or params change. The night-1 sweep and the post-sweep session proceed per §k.
 - The post-sweep session reports, per species, the share of z_H from H (D* in the note), so a trunk lag is visible.
 - Open: oak's thinner trunk at held cost (r0 ×2, m_w ÷4).
+
+## Ruling 2, CR's definition (the user, 2026-11-04, after ADR 0051)
+- The gate keeps the maximum reach of a live bud. Voronoi-clipped and p95 CR are reported beside it, never gated.
+- Oak's excess is a missing loss process for unproductive limbs (ADR 0051; ADR 0052 to come), not the reading.
+- Option C follows ADR 0052's probe.

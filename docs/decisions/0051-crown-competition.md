@@ -1,6 +1,6 @@
 # 0051: Crowns interpenetrate because nothing removes a lit limb inside a neighbour's crown; rule on CR's reading
 
-- **Status:** proposed (2026-11-04), for the user.
+- **Status:** accepted as a realism probe only (the user, 2026-11-04). See the user's rulings below.
 - **Spec:** §O2 (abrasion, crown shyness), §C2 (light), §C5 (shedding), §R4–R6 (bud fates). ADR 0013 (O2 off), 0024 (the
   slab), 0049 (the principle line), 0050 (Level 0; ruling 2, CR's definition, open).
 - **Evidence:** [the findings note](../experiments/2026-11-04-crown-competition.md). Scripts: `analysis/experiments/crown_*.{ts,py}`.
@@ -155,3 +155,20 @@
   - shipped birch's tip past its own image at 150 (hand only);
   - R3's limb bending, untested as a bound on reach;
   - beech fit reaches further in +x than in −x (mean 1.7 m at the same tree; the sky is untilted, `c2.skyTilt` 0).
+
+## The user's rulings (2026-11-04)
+1. **CR's reading:** the gate keeps the maximum reach. Voronoi-clipped and p95 CR are reported beside it, never gated.
+   The missing piece is a loss process for unproductive limbs (self-pruning), not the reading.
+2. **This ADR is accepted as a realism probe only.**
+   - O2 at ADR 0013's settings, on 20 seeds, decoupled from the gate.
+   - Its parameters are never fitted to Tallo CR.
+   - It is not the fix.
+3. **Before any limb-loss ADR:** audit the provenance of the LAI and shade-house targets and their bands, as lateShare
+   was audited. Described numbers become reported; measured ones stay scored, with their source recorded. Read-only,
+   one commit.
+4. **Then ADR 0052's probe session:** a limb-loss / self-pruning rule under sustained low light or a negative limb
+   carbon balance.
+   - Judged against Weiser's field crown base/H, its measured target.
+   - z_CR, LAI and height reported, not targeted.
+   - ADR 0050's option C (the trunk) follows it.
+5. **Beech's +x/−x asymmetry** is a suspected bug (open fixes): mirror the seeds and check whether it flips.

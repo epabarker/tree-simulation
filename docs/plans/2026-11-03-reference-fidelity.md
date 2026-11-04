@@ -88,7 +88,7 @@ free; BioDiv's QSMs are one 108 GB tarball (stream, keep the trees needed), Wyth
 |---|---|---|---|
 | 1 | converter + `describe()`; Demol, a Wytham subset | QSM DBH and height vs `tls_summary.csv` and Demol's felled heights, ≥ 95% within 5%; the port equals `form.rs` on a simulated tree (1e-9); **a degradation test**: a simulated tree coarsened to QSM resolution moves each descriptor by less than a stated tolerance, else it is held out | Opus |
 | 2 | Level 0 from Tallo, eleven species | stand trees within the 10–90% band at matched DBH, ≥ 15 of seeds 1–20 | Sonnet |
-| 3 | Level 1 beech (BioDiv; Demol held out) | held-out descriptors \|z\| ≤ 2 at matched size, ≥ 15 of 20 fresh seeds; simulated between-tree SD within ×2 of the real; `shapeFlag` clear | Opus |
+| 3 | Level 1 beech (BioDiv; Demol held out). **Pilot now (the user, 2026-11-04): labelled provisional, pending Level 0 and ADR 0052; nothing from it is accepted into species params** | held-out descriptors \|z\| ≤ 2 at matched size, ≥ 15 of 20 fresh seeds; simulated between-tree SD within ×2 of the real; `shapeFlag` clear | Opus |
 | 4 | oak, one site held out (its two sites confound species, size and site) | as 3 | Opus |
 | 5 | birch (pendulousness reported, not fitted) | as 3 | Opus |
 | 6 | hornbeam; field maple via sycamore | as 3 | Sonnet |
@@ -308,6 +308,28 @@ no z was computed, and nothing registered changed after it.
 ### State
 _(rewritten at the end of each session)_
 
+**The user's rulings on ADR 0051 (2026-11-04):**
+1. **CR:** the gate keeps the maximum reach. Voronoi and p95 CR are reported beside it, never gated. The missing piece
+   is self-pruning of unproductive limbs, not the reading.
+2. **ADR 0051 is accepted as a realism probe only:** O2 at ADR 0013's settings, 20 seeds, decoupled from the gate,
+   never fitted to Tallo CR.
+3. **Audit before any limb-loss ADR:** the provenance of the LAI and shade-house targets and bands, as lateShare was
+   audited. Described numbers become reported; measured ones stay scored, with their source. Read-only, one commit.
+4. **ADR 0052's probe session:** limb loss under sustained low light or a negative limb carbon balance.
+   - Judged against Weiser's field crown base/H.
+   - z_CR, LAI and height reported, not targeted.
+   - Option C (the trunk) follows.
+   - Rowan: the thin-species rule as registered.
+5. **Open fix:** beech's +x/−x reach asymmetry, a suspected bug. Mirror the seeds and check whether it flips.
+6. **Phase 3 pilot on beech, now:** provisional, pending Level 0 and ADR 0052. Nothing from it is accepted into
+   species params (§g).
+
+**Order:**
+1. 1d-ii, today, in a fresh session.
+2. The phase 3 beech pilot fit overnight.
+3. Then the audit (3), ADR 0052's probe (4), the O2 realism probe (2) and the asymmetry check (5).
+
+
 **Crown competition diagnosed (2026-11-04, [note](../experiments/2026-11-04-crown-competition.md),
 [ADR 0051](../decisions/0051-crown-competition.md), proposed).** Read-only on the core; no params accepted.
 - **Overlap:** crowns interpenetrate in every species, hand and fit; 24–42% of live-bud tips lie on a neighbour's side.
@@ -385,4 +407,5 @@ The rest of this State is from the v2 session; its open points stand.
 - **Next:** read the three gates. Then, per species, the post-sweep session (§k: gallery and `shapeFlag`, loss
   contributions, the D* split, write-up). Nights 2 (hornbeam, maple, pine, fir) and 3 (rowan) follow, against v2.
 - **Standing rulings:** §k (as amended by v2); R2, R3 done; R5 as amended; §g reordered; ADR 0049 accepted;
-  ADR 0050 and 0051 proposed.
+  ADR 0050 proposed (ruling 2 given: max reach);
+  ADR 0051 accepted as a realism probe only.

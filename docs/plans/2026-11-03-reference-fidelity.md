@@ -306,7 +306,37 @@ no z was computed, and nothing registered changed after it.
   which knob is at its bound and why, never more generations.
 
 ### State
-_(rewritten at the end of each session)_ **Night 1 against v2 done and read (2026-11-04,
+_(rewritten at the end of each session)_
+
+**Crown competition diagnosed (2026-11-04, [note](../experiments/2026-11-04-crown-competition.md),
+[ADR 0051](../decisions/0051-crown-competition.md), proposed).** Read-only on the core; no params accepted.
+- **Overlap:** crowns interpenetrate in every species, hand and fit; 24–42% of live-bud tips lie on a neighbour's side.
+- **The decomposition:** the gate's CR = the Voronoi ceiling (≈ 2.8 m, half the 5.25 m spacing) + the reach past the
+  midpoint. Oak fit at 60: 4.92 = 2.83 + 2.1. A crown stopping at the midpoint would score z ≈ +0.46, so oak's whole
+  binding term is the reach past the midpoint.
+- **The tips that set CR:** young encroaching wood at 60; by 150 old limbs held as leafy short shoots. They sit inside
+  the neighbour's foliage, with the same light as own-side tips (q ratio ≈ 1).
+- **The mechanism:**
+  - Nothing removes a lit limb inside another tree's crown: light, Borchert–Honda, R6, R4 and C5 are all ownerless.
+  - R5's neighbour signal, the one owner-aware rule that is on, lengthens shoots.
+  - §O2 abrasion is off (ADR 0013's 2D premise no longer holds).
+- **Levers:** none brings oak fit's z_CR at 60 under T without collapsing LAI. The gate reads a maximum over ~2,000
+  tips, which bulk processes move last:
+  - O2 at ADR 0013's settings halves the foreign tips and trims CR ≈ 10%;
+  - T_rel ×10 trims CR by losing crown;
+  - qMin past its bound kills trees and widens beech.
+- **Rivals:**
+  - light resolution, excluded;
+  - mortality, excluded for oak and birch, partial for beech;
+  - the slab, excluded for oak, not for beech (six rows: z_CR +0.39 / +0.23 / +0.34);
+  - the user's qMin premise, refuted.
+- **Beech's spread:** CR at 60 shows no association with height rank at 150.
+- **ADR 0051 recommends** A: the user rules on CR's reading (ADR 0050 ruling 2), then B (O2 on in the woods, ADR
+  0013's settings, unfitted) if the max stays.
+- **Next:** the user's rulings (CR's reading; ADR 0051; oak's CR, option C, rowan from night 1). Then nights 2–3 and
+  1d-ii.
+
+**Night 1 against v2 done and read (2026-11-04,
 [note](../experiments/2026-11-04-level0-night1-v2.md)): beech 9/20, oak 0/20, birch 0/20; no gallery flag; no params
 accepted.** Height is no longer what blocks. Oak's binding term is CR (every seed over T at 60). Birch's is the girth
 trajectory (DBH +4.7 cm from 60 to 150; no r0 fits all three seasons): a case for ADR 0050's option C. Beech's medians
@@ -353,4 +383,4 @@ The rest of this State is from the v2 session; its open points stand.
 - **Next:** read the three gates. Then, per species, the post-sweep session (§k: gallery and `shapeFlag`, loss
   contributions, the D* split, write-up). Nights 2 (hornbeam, maple, pine, fir) and 3 (rowan) follow, against v2.
 - **Standing rulings:** §k (as amended by v2); R2, R3 done; R5 as amended; §g reordered; ADR 0049 accepted;
-  ADR 0050 proposed.
+  ADR 0050 and 0051 proposed.

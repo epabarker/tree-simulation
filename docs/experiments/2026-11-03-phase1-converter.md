@@ -1,8 +1,10 @@
 # Phase 1: the converter, describe(), and which descriptors survive QSM resolution (gates a–c)
 
-_2026-11-03, sessions 1a–1c and 1d-i (v2, v3) of the [reference-fidelity plan](../plans/2026-11-03-reference-fidelity.md) §j; ADR 0049._
+_2026-11-03/04, sessions 1a–1c, 1d-i (v2, v3) and 1d-ii (v3.1, run) of the [reference-fidelity plan](../plans/2026-11-03-reference-fidelity.md) §j; ADR 0049._
 
-**Result.** Gates a and b pass. Gate c triggers amendment E's stop for oak (5 of 22 gated descriptors survive)
+**Latest (1d-ii, 2026-11-04): gate c v3.1 on simulated trees, see "Gate c v3.1" at the end:** beech 16 of 21 floor-clear descriptors reach a tier (amendment E needs 11), maple 12 of 15, oak not run (its stand never reaches the reference DBH). The paragraphs below are v1's result, kept as written.
+
+**Result (v1).** Gates a and b pass. Gate c triggers amendment E's stop for oak (5 of 22 gated descriptors survive)
 and beech (1 of 26). Maple passes (12 of 22) only under
 this session's extension of H1 to maple. Under the user's ruling as given (H1 for oak only) its four radius
 descriptors count, none survives, and maple stops too: 12 of 26 (spec-reviewer, checked against `gate-c.csv`). Nothing was loosened; the plan waits on the user (Decisions below).
@@ -498,8 +500,106 @@ JSON and `runs/phase1/control-grid.csv`, with per-tree results cached in `runs/p
 - **Resulting points:** Wytham d_min 5.0 mm, upper 12.1 mm (p50), no grid point inside; BioDiv 8.6 mm, upper 11.0 mm
   (p5), none inside. Each tier B check is therefore one coarsened point plus inflation, against d_min.
 
-**Next, 1d-ii (after phase 2):**
-1. ~~Register v3.1 (tier B's bracket, above)~~ (done, above), then wire `tiers.py` into `phase1_degradation.py`. Its `gate` still reads v1's layout, so this must not change a
-   hashed file.
-2. Size-match each species by `rules.size_match`.
-3. Run gate c v3.
+**Next, 1d-ii:** done, see "Gate c v3.1" below.
+
+## Gate c v3.1 (session 1d-ii, 2026-11-04)
+
+**Order of events.** v3.1 registered (e66bbd3, before any simulated tree); `tiers.py` wired into
+`analysis/experiments/phase1_degradation.py` (not hashed) and tested on synthetic fixtures and a synthetic tree through
+the real `describe()` and `coarsen()` (`test_gate_c_wiring.py`, 12 tests) before any real run; size-matching; the gate.
+Nothing in the instrument changed after the registration. All hashes were verified against HEAD at the start (v3) and
+again by the script on every run (v3.1).
+
+**What ran.** Beech at its Level 0 fit (`docs/experiments/fits/level0/beech.json`, `fit.assign`; not accepted into
+species params). Oak and maple at the shipped params, "shipped params" tables so that they exist; their Level 0 fits are
+not accepted. 20 seeds (1–20), the closed stand's four measured trees, live ones only.
+`cli/dump-trees.ts` is hashed and fixed at season 150 (stand) and 100 (lone), so size-matched seasons need
+`analysis/experiments/gate_c_sim.ts`, whose `dump` is that file's, line for line. Its output at 150/100 for oak seed 1
+is byte-identical to `node cli/dump-trees.ts --gate-c oak 1`. The sweep's DBH is `cli/allometry.ts` (parity 1e-9 with
+`cylinders.dbh`); the gate re-reads `describe()`'s DBH on the dumped trees: beech 0.296 m (reference 0.291), maple
+0.251 m (0.247), both reproduce the size match.
+
+### Size matching (`rules.size_match`)
+Median over seeds 1–20 of the per-seed median DBH of the live measured trees; the first listed season that reaches the
+reference (median measured DBH, R2).
+
+| species | reference DBH, height (m) | stand season | sim median DBH, height (m) | live of 4 (median) | lone season | lone DBH, height (m) |
+|---|---|---|---|---|---|---|
+| beech (Level 0 fit) | 0.291, 26.8 (BioDiv hTLS) | **70** | 0.296, 22.5 | 4 | 50 (already above at the first listed) | 0.481, 15.3 |
+| maple (shipped) | 0.247, 18.2 (Wytham Hgt_pts) | **150** | 0.251, 20.9 | 3 | 50 (as beech) | 0.291, 16.6 |
+| oak (shipped) | 0.596, 19.9 (Wytham Hgt_pts) | **none by 300** | 0.352 at 300, 47.5 | 4 | 90 | 0.620, 41.4 |
+
+- **Oak:** the rule says "None by 300: report and stop", so oak's gate was **not run**. The stand's DBH flattens
+  (0.301 m at 80, 0.332 at 150, 0.352 at 300) while height keeps climbing to 47 m: a slender stand, 135 for H/D at 300.
+- **Beech** is shorter than BioDiv's at the same DBH (22.5 m against 26.8 m, 84%); maple taller (20.9 against 18.2, 115%).
+  Heights are reported, not gated.
+- The stand tables by season are in `runs/gate-c/sizematch.md` (not committed).
+
+### Points (d_min and tier B's bracket, from the control curves)
+| species | dataset | d_min | upper end | grid points inside | inflation |
+|---|---|---|---|---|---|
+| beech | BioDiv | 8.6 mm (p2) | 11.0 mm (p5) | none | at d_min |
+| maple | Wytham | 5.0 mm (p20) | 12.1 mm (p50) | none | at d_min |
+
+### The beech table (stand season 70, 20 seeds, tier A against the fine tree, tier B against d_min)
+**16 of 21 floor-clear descriptors reach a tier; amendment E stops below 11. No stop.** Shift is the median over seeds
+of the per-seed median signed shift at the deciding tier's worst point (for held-out, tier A's), in the descriptor's units.
+
+| descriptor | tier | shift | tolerance | floor ratio | verdict | reason |
+|---|---|---|---|---|---|---|
+| widestAt | A | 0 | 0.0963 | 0.252 | tier A | within tolerance on ≥ 15 seeds at every point (fewest 19, d_min) |
+| profileCentre | A | 0.00146 | 0.0213 | 0.252 | tier A | fewest 20 (d_min) |
+| crownFullness | A | −0.00506 | 0.0383 | 0.262 | tier A | fewest 20 (d_min) |
+| forkHeight | A | 0.0146 | 0.0673 | 0.305 | tier A | fewest 19 (upper) |
+| leaderDominance | A | 0.00347 | 0.326 | 0.27 | tier A | fewest 17 (d_min) |
+| branchAngle2 | – | – | 2.63 | 0.709 | held out (noise) | floor ≥ 0.5 × between-tree SD at BioDiv |
+| limbDroop | **B** | −0.355 | 8.98 | 0.274 | tier B | A fails (upper: 14 of 20); B passes (fewest 16, upper); control neutral at d_min |
+| limbUpturn | A | 0 | 5.41 | 0.396 | tier A | fewest 17 (d_min) |
+| junctionDelta, ldSlope, limbElevation, tortuosity, pendulousFraction | – | – | – | – | report-only | per-cylinder readings and the dead-limb pair (decision 7, v3) |
+| p0 | A | −0.00528 | 0.109 | 0.186 | tier A | fewest 20 (d_min) |
+| p1 | A | 0 | 0.0831 | 0.155 | tier A | fewest 20 (d_min) |
+| p2 | A | −0.000972 | 0.0671 | 0.274 | tier A | fewest 20 (d_min) |
+| p3 | A | 0 | 0.0692 | 0.257 | tier A | fewest 20 (d_min) |
+| bifurcationRatio | – | 0.181 | 0.187 | 0.354 | held out (resolution-sensitive) | A fails (upper: 8 of 20); B fails (inflated: 11 of 20) |
+| bifurcationRatio2 | – | 0.0416 | 0.271 | 0.359 | held out (resolution-sensitive) | A fails (d_min: 9 of 20); B fails (inflated: 9 of 20) |
+| tortuosity05 | A | −0.00464 | 0.0691 | 0.273 | tier A | fewest 17 (d_min) |
+| length0 | A | 0.0156 | 0.0388 | 0.0263 | tier A | fewest 19 (upper) |
+| length1 | – | 0.0661 | 0.0373 | 0.0697 | held out (resolution-sensitive) | A fails (upper: 0 of 20); B fails (inflated: 8 of 20) |
+| length2 | – | 0.0672 | 0.0391 | 0.0888 | held out (resolution-sensitive) | A fails (upper: 2 of 20); B fails (inflated: 4 of 20) |
+| length3 | – | −0.0925 | 0.0651 | 0.0703 | held out (resolution-sensitive) | A fails (d_min: 0 of 20); B fails (inflated: 0 of 20) |
+| taper | – | – | 0.0705 | 1.1 | held out (noise) | floor 1.1 × the between-tree SD |
+| centroidHeight | A | 0.00139 | 0.0394 | 0.151 | tier A | fewest 20 (d_min) |
+| limbElevation05 | A | 0.946 | 6.98 | 0.0873 | tier A | fewest 19 (d_min) |
+| pendulousFraction05 | A | 0.0126 | 0.0515 | 0.133 | tier A | fewest 19 (d_min) |
+
+- **Targets for phase 3 (beech, BioDiv):** tier A, 15: widestAt, profileCentre, crownFullness, forkHeight,
+  leaderDominance, limbUpturn, p0–p3, tortuosity05, length0, centroidHeight, limbElevation05, pendulousFraction05.
+  Tier B, 1: limbDroop (valid only against a BioDiv-resolution reading; the fit compares the coarsened simulator).
+  Held out, resolution-sensitive, 5: bifurcationRatio, bifurcationRatio2, length1, length2, length3 (the order-wise
+  length fractions and the Strahler ratios move when twigs are pruned or inflated, whatever the tree). Noise-limited at
+  BioDiv, 2: branchAngle2, taper.
+- **Demol** serves tier A descriptors only (no neutral d_min; its p1, 13.3 mm, already fails). Nothing was read there.
+
+### Maple (shipped params, stand season 150)
+**12 of 15 floor-clear descriptors reach a tier; amendment E stops below 8. No stop.** All twelve are tier A: widestAt,
+profileCentre, crownFullness, branchAngle2, p0–p3, tortuosity05, centroidHeight, limbElevation05, pendulousFraction05
+(fewest seeds: 16 for tortuosity05 at the 12.1 mm upper end, else ≥ 18 of 20). Held out, resolution-sensitive: length0
+(A and B both 1 of 20 at upper), length1 (1), length3 (0). Noise-limited at Wytham, 6: forkHeight, limbDroop, limbUpturn,
+both bifurcation ratios, length2. H1: leaderDominance, taper. Maple's table is in `[level1]` of
+`analysis/fit/targets/maple.toml`; it is a proxy for field maple (sycamore, Wytham) and the shipped params are not fitted.
+
+### Oak
+Not run (above). `analysis/fit/targets/oak.toml` records it.
+
+### Reading the result
+- What fails is the same family in both species: the length fractions by order (length0–3) and, for beech, the
+  Strahler ratios. Every profile descriptor (p0–p3, widestAt, crownFullness, centroidHeight) and the limb readings
+  (upturn, limbElevation05, pendulousFraction05) pass tier A on 17–20 of 20 seeds. (Observation from the tables; no
+  mechanism was tested.)
+- Two close calls, not loosened: beech limbDroop (tier A 14 of 20 at the upper end, so it is tier B) and maple
+  tortuosity05 (16 of 20 at the upper end, which v3.1 moved from 10.0 to 12.1 mm).
+- I did not run v3's 2·d_min bracket beside v3.1, so nothing here says what the bracket change did to the verdicts.
+
+**Reproduce:** `node analysis/experiments/gate_c_sim.ts sizematch SPECIES SEED OUT [assign.json]` per species and seed
+(60 jobs), then `uv run --project analysis python -I analysis/experiments/phase1_degradation.py sizematch`, `dump`, `gate`
+(≈ 2.5 min for the dumps, ≈ 3 min for the gate on 12 workers). Outputs in `runs/gate-c/` (not committed).

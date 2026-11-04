@@ -295,6 +295,16 @@ gate_c_v3_candidate_a_or_b = ['widestAt', 'profileCentre', 'crownFullness', 'for
 gate_c_v3_candidate_a_only = []  # control not neutral at d_min
 gate_c_v3_size_match_dbh_m = 0.291  # the median measured DBH of biodiv Fagus_sylvatica (53 trees)
 gate_c_v3 = "21 descriptors pass the floor; amendment E stops the species if fewer than 11 reach a tier (1d-ii)"
+# Gate c v3.1 run (session 1d-ii, 2026-11-04; the note's "Gate c v3.1"): the registered tiers (phase1-tolerances.json v3.1) on this
+# species' closed stand at its size-matched season, 20 seeds, the Level 0 fit (docs/experiments/fits/level0/beech.json, not accepted).
+gate_c_v3_1_stand_season = 70  # median DBH 0.296 m, height 22.5 m (reference 0.291 m, 26.8 m)
+gate_c_v3_1_lone_season = 50  # lone tree, reported only
+gate_c_v3_1_points = "dmin 8.6 mm, upper 11.0 mm; inflation at d_min"
+gate_c_v3_1_tier_a = ['widestAt', 'profileCentre', 'crownFullness', 'forkHeight', 'leaderDominance', 'limbUpturn', 'p0', 'p1', 'p2', 'p3', 'tortuosity05', 'length0', 'centroidHeight', 'limbElevation05', 'pendulousFraction05']
+gate_c_v3_1_tier_b = ['limbDroop']
+gate_c_v3_1_held_out_resolution = ['bifurcationRatio', 'bifurcationRatio2', 'length1', 'length2', 'length3']
+gate_c_v3_1_noise_limited = ['branchAngle2', 'taper']
+gate_c_v3_1 = "16 of 21 floor-clear descriptors reach a tier (amendment E stops below 11): proceed"
 
 [level0]
 # Level 0 (reference-fidelity phase 2, the plan's §k): the physiology knobs fitted against Tallo's H–DBH and CR–DBH

@@ -308,6 +308,27 @@ no z was computed, and nothing registered changed after it.
 ### State
 _(rewritten at the end of each session)_
 
+**1d-ii done (2026-11-04, [note](../experiments/2026-11-03-phase1-converter.md) "Gate c v3.1"): gate c v3.1 on simulated
+trees. Beech 16 of 21 floor-clear descriptors reach a tier (amendment E needs 11: no stop); maple 12 of 15 (needs 8);
+oak not run.**
+- **v3.1 registered first** (e66bbd3; the user's ruling, Option 1): tier B's bracket is [d_min, the control's first
+  failing grid point]: BioDiv 8.6–11.0 mm, Wytham 5.0–12.1 mm. The 1d-ii prompt's "everything is registered" was wrong on
+  this one point (the user said so). Tier A reads the same evaluation points (a reading, recorded).
+- **Size-matched seasons** (median DBH of the live measured trees; heights beside the reference's): beech (Level 0 fit,
+  not accepted) stand **70** (0.296 m, 22.5 m against BioDiv's 26.8 m), lone 50 (already above at the first listed);
+  maple (shipped) stand **150** (0.251 m, 20.9 m against 18.2 m), lone 50; **oak (shipped) never reaches Wytham's 0.596 m:
+  0.352 m at 300 with 47.5 m trees (H/D 135)**, so by `rules.size_match` it was reported and not run.
+- **Beech targets for phase 3 (BioDiv):** tier A 15 (widestAt, profileCentre, crownFullness, forkHeight, leaderDominance,
+  limbUpturn, p0–p3, tortuosity05, length0, centroidHeight, limbElevation05, pendulousFraction05); tier B 1 (limbDroop);
+  held out, resolution-sensitive 5 (bifurcationRatio, bifurcationRatio2, length1–3); noise-limited 2 (branchAngle2, taper).
+  Demol serves tier A only. Recorded in `[level1] gate_c_v3_1_*` of each targets file.
+- **Decision for the user:** oak. Its stand cannot be size-matched, so oak has no gate c v3.1 table. Options: (a) leave
+  it for phase 4 (the stand's DBH flattens at 0.33–0.35 m while height climbs: a girth question, as ADR 0050 raises for birch); (b) read oak at an
+  unregistered season, as exploration only, never as the gate.
+- **New files** (not hashed): `analysis/experiments/gate_c_sim.ts` (the dumper at chosen seasons; byte-identical to
+  `cli/dump-trees.ts --gate-c` at 150/100), `analysis/experiments/phase1_degradation.py` (rewritten for v3.1; the v1
+  `live` and `control` commands are gone, `bias` stays), `analysis/tests/test_gate_c_wiring.py` (12 tests).
+
 **The user's rulings on ADR 0051 (2026-11-04):**
 1. **CR:** the gate keeps the maximum reach. Voronoi and p95 CR are reported beside it, never gated. The missing piece
    is self-pruning of unproductive limbs, not the reading.
@@ -325,7 +346,7 @@ _(rewritten at the end of each session)_
    species params (§g).
 
 **Order:**
-1. 1d-ii, today, in a fresh session.
+1. ~~1d-ii~~ (done above).
 2. The phase 3 beech pilot fit overnight.
 3. Then the audit (3), ADR 0052's probe (4), the O2 realism probe (2) and the asymmetry check (5).
 

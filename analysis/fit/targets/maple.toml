@@ -291,6 +291,16 @@ gate_c_v3_candidate_a_or_b = ['widestAt', 'profileCentre', 'crownFullness', 'bra
 gate_c_v3_candidate_a_only = []  # control not neutral at d_min
 gate_c_v3_size_match_dbh_m = 0.247  # the median measured DBH of wytham ACERPS (39 trees)
 gate_c_v3 = "15 descriptors pass the floor; amendment E stops the species if fewer than 8 reach a tier (1d-ii)"
+# Gate c v3.1 run (session 1d-ii, 2026-11-04; the note's "Gate c v3.1"): the registered tiers (phase1-tolerances.json v3.1) on this
+# species' closed stand at its size-matched season, 20 seeds, the shipped params (the Level 0 fit is not accepted).
+gate_c_v3_1_stand_season = 150  # median DBH 0.251 m, height 20.9 m (reference 0.247 m, 18.2 m)
+gate_c_v3_1_lone_season = 50  # lone tree, reported only
+gate_c_v3_1_points = "dmin 5.0 mm, upper 12.1 mm; inflation at d_min"
+gate_c_v3_1_tier_a = ['widestAt', 'profileCentre', 'crownFullness', 'branchAngle2', 'p0', 'p1', 'p2', 'p3', 'tortuosity05', 'centroidHeight', 'limbElevation05', 'pendulousFraction05']
+gate_c_v3_1_tier_b = []
+gate_c_v3_1_held_out_resolution = ['length0', 'length1', 'length3']
+gate_c_v3_1_noise_limited = ['forkHeight', 'limbDroop', 'limbUpturn', 'bifurcationRatio', 'bifurcationRatio2', 'length2']
+gate_c_v3_1 = "12 of 15 floor-clear descriptors reach a tier (amendment E stops below 8): proceed"
 
 [level0]
 # Level 0 (reference-fidelity phase 2, the plan's §k): the physiology knobs fitted against Tallo's H–DBH and CR–DBH

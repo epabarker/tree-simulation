@@ -302,6 +302,9 @@ gate_c_v3_candidate_a_or_b = ['profileCentre', 'crownFullness', 'forkHeight', 'b
 gate_c_v3_candidate_a_only = ['length2']  # control not neutral at d_min
 gate_c_v3_size_match_dbh_m = 0.596  # the median measured DBH of wytham QUERRO (34 trees)
 gate_c_v3 = "18 descriptors pass the floor; amendment E stops the species if fewer than 9 reach a tier (1d-ii)"
+# Gate c v3.1 run (session 1d-ii, 2026-11-04): NOT RUN for oak. The shipped stand never reaches the reference DBH (Wytham's median
+# 0.596 m): 0.352 m at season 300 with the trees 47.5 m tall; rules.size_match.stand says "None by 300: report and stop".
+gate_c_v3_1 = "not run: the closed stand's median DBH is 0.352 m at season 300 against the reference 0.596 m (the lone tree reaches it at 90, height 41.4 m)"
 
 [level0]
 # Level 0 (reference-fidelity phase 2, the plan's §k): the physiology knobs fitted against Tallo's H–DBH and CR–DBH

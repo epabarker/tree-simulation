@@ -19,32 +19,61 @@ ROOT = Path(__file__).resolve().parents[2]
 GATE_C = ROOT / "runs" / "gate-c"
 
 
-def reg_of(fitted, held_out=(), real=None, at=0.3):
+def reg_of(fitted, held_out=(), real=None, at=0.3, weights=None):
     real = real or {k: {"median": 0.0, "sd": 1.0, "slope": 0.0} for k in [*fitted, *held_out]}
-    return {"fitted": list(fitted), "held_out": list(held_out), "groups": l1.groups(fitted), "real": real,
-            "size_match": {"dbh": at}}
+    names = [*fitted, *held_out]
+    return {"fitted": list(fitted), "held_out": list(held_out), "real": real, "size_match": {"dbh": at},
+            "descriptors": {k: "A" for k in names}, "location_weights": weights or {k: 1.0 for k in names}}
 
 
-def test_draw_is_seeded_and_a_third():
-    names = [f"d{k}" for k in range(16)]
-    a = l1.draw_held_out(names)
-    assert a == l1.draw_held_out(list(reversed(names)))  # order-free: drawn from the sorted names
-    assert len(a) == 5 and a == sorted(a)
-    assert l1.draw_held_out(names, seed=1) != a
+def test_correlation_pairwise_complete_and_symmetric():
+    rng = np.random.default_rng(0)
+    a = rng.normal(size=40)
+    x = np.column_stack([a, 2 * a + rng.normal(0, 0.1, 40), rng.normal(size=40)])
+    x[3, 1] = np.nan
+    r, n = l1.correlation(x)
+    assert np.allclose(r, r.T) and np.all(np.diag(r) == 1.0)
+    assert n[0, 1] == n[1, 0] == 39 and n[0, 2] == 40 and n[1, 1] == 39
+    assert r[0, 1] > 0.99 and abs(r[0, 2]) < 0.4
+    ok = np.isfinite(x[:, 1])
+    assert math.isclose(r[0, 1], np.corrcoef(x[ok, 0], x[ok, 1])[0, 1])
 
 
-def test_beech_draw_is_the_registered_one():
-    names = ["widestAt", "profileCentre", "crownFullness", "forkHeight", "leaderDominance", "limbUpturn", "p0", "p1",
-             "p2", "p3", "tortuosity05", "length0", "centroidHeight", "limbElevation05", "pendulousFraction05",
-             "limbDroop"]
-    assert l1.draw_held_out(names) == ["length0", "p1", "pendulousFraction05", "tortuosity05", "widestAt"]
+def test_r_critical_and_weights_zero_the_noise():
+    assert math.isclose(l1.r_critical(53), 0.2706, abs_tol=5e-4)
+    r = np.array([[1.0, 0.8, 0.2], [0.8, 1.0, -0.3], [0.2, -0.3, 1.0]])
+    w = l1.location_weights(r, ["a", "b", "c"], 0.27)
+    assert math.isclose(w["a"], 1 / 1.8)  # 0.2 is under the critical value: zeroed
+    assert math.isclose(w["b"], 1 / 2.1) and math.isclose(w["c"], 1 / 1.3)
+    assert l1.location_weights(np.eye(2), ["a", "b"], 0.27) == {"a": 1.0, "b": 1.0}
 
 
-def test_outline_members_share_one_group():
-    g = l1.groups(["p0", "p2", "crownFullness", "forkHeight", "limbDroop", "centroidHeight"])
-    assert g["outline"] == ["centroidHeight", "crownFullness", "p0", "p2"]
-    assert g["forkHeight"] == ["forkHeight"] and g["limbDroop"] == ["limbDroop"]
-    assert len(g) == 3
+def test_clusters_canonical_and_the_draw_takes_whole_clusters():
+    names = ["a", "b", "c", "d", "e", "f"]
+    r = np.eye(6)
+    r[0, 3] = r[3, 0] = 0.9   # a–d one cluster
+    r[1, 4] = r[4, 1] = -0.7  # b–e one cluster (|r|)
+    r[2, 5] = r[5, 2] = 0.3   # c, f apart
+    cl = l1.clusters(r, names)
+    assert cl == [["a", "d"], ["b", "e"], ["c"], ["f"]]
+    held, order, taken = l1.cluster_held_out(cl, seed=1)
+    assert sorted(order) == [0, 1, 2, 3] and len(held) >= 2  # round(6/3) = 2
+    assert held == sorted(m for i in order[:taken] for m in cl[i])
+    for c in cl:  # a cluster is never split
+        assert set(c) <= set(held) or not set(c) & set(held)
+    assert l1.cluster_held_out(cl, seed=1) == (held, order, taken)
+
+
+def test_search_seeds_fixed_and_disjoint():
+    s = l1.search_seeds()
+    d5, d10 = l1.noise_draws()
+    assert s == l1.search_seeds() and len(s) == l1.SEARCH_COUNT == len(set(s))
+    assert not set(s) & ({x for d in d5 + d10 for x in d} | set(l1.GALLERY_SEEDS) | set(l1.GATE_SEEDS)
+                         | set(l1.FINAL_SEEDS))
+    reg = {"loss": {"seeds_per_candidate": 5}, "seeds": {"search": {"list": s}}}
+    assert l1.fit_seeds(reg) == s[:5]
+    with pytest.raises(SystemExit, match="seeds_per_candidate"):
+        l1.fit_seeds({"loss": {"seeds_per_candidate": None}, "seeds": {"search": {"list": s}}})
 
 
 def test_distribution_detrends_to_the_matched_dbh():
@@ -83,16 +112,14 @@ def test_score_z_and_spread():
     assert math.isnan(l1.score(vals[:9], real)["z"])  # fewer than MIN_TREES
 
 
-def test_contributions_grouped_and_missing():
-    reg = reg_of(["p0", "p2", "forkHeight"])
-    t = {"l1.p0.z": 2.0, "l1.p0.s": 1.0, "l1.p2.z": 0.0, "l1.p2.s": float("nan"), "l1.forkHeight.z": 1.0,
+def test_contributions_location_only_weighted_and_missing():
+    reg = reg_of(["p0", "p2", "forkHeight"], weights={"p0": 0.5, "p2": 0.25, "forkHeight": 1.0})
+    t = {"l1.p0.z": 2.0, "l1.p0.s": 1.0, "l1.p2.z": float("nan"), "l1.p2.s": 0.3, "l1.forkHeight.z": 1.0,
          "l1.forkHeight.s": 0.5}
     c = l1.level1_contributions(reg, t)
-    assert c["l1.outline.loc"] == 2.0  # (4 + 0) / 2
-    assert c["l1.outline.sd"] == (1.0 + l1.MISSING_PENALTY) / 2
-    assert c["l1.forkHeight.loc"] == 1.0 and c["l1.forkHeight.sd"] == 0.25
+    assert c == {"l1.p0.loc": 2.0, "l1.p2.loc": 0.25 * l1.MISSING_PENALTY, "l1.forkHeight.loc": 1.0}  # no spread
     unmatched = l1.level1_contributions(reg, {"l1.season": None})
-    assert all(v == l1.MISSING_PENALTY for v in unmatched.values()) and len(unmatched) == 4
+    assert unmatched == {"l1.p0.loc": 2.0, "l1.p2.loc": 1.0, "l1.forkHeight.loc": 4.0}
 
 
 def test_traits_never_carry_held_out():
@@ -118,6 +145,7 @@ def test_seed_rule_and_spread_rule():
     assert not l1.seed_passes(l1.seed_z(reg, [{"dbh": 0.3, "a": 2.1, "b": 0.0}], ["a", "b"]))
     assert not l1.seed_passes({"a": float("nan")})
     assert l1.spread_passes({"a": 1.9, "b": 0.51}) and not l1.spread_passes({"a": 2.1})
+    assert l1.spread_names(reg_of(["x"], held_out=["a", "b"])) == ["a", "b", "x"]  # v3: fitted and held out
 
 
 def test_load_refuses_a_changed_file(tmp_path, monkeypatch):
@@ -200,17 +228,30 @@ def test_describe_pool_equals_gate_c():
     assert all(u <= allowed for *_, u in diffs), f"beyond {allowed} ulp on {sys.platform}: {report}"
 
 
-def test_registration_v2_loads_and_starts_at_the_hand():
+def test_registration_v3_loads_reproduces_its_draw_and_starts_at_the_hand():
     """The committed registration passes its own hash check (it refuses once a hashed file changes: re-register, never
-    edit), freezes r3.c at the species' value (v2, the user), keeps v1's targets, and its start decodes to the hand."""
+    edit), freezes r3.c at the species' value (v2), and its stored real matrix gives back its clusters, its draw and
+    its weights by level1's rules (v3); its start decodes to the hand."""
     from treesim import fit
 
     reg = l1.load("beech")
-    assert reg["version"] == 2 and reg["prior"]["version"] == 1
+    assert reg["version"] == 3 and reg["prior"]["version"] == 2 and reg["prior"]["prior"]["version"] == 1
+    assert reg["prior"]["held_out"] == ["length0", "p1", "pendulousFraction05", "tortuosity05", "widestAt"]
     paths = [p["path"] for p in reg["knobs"]]
-    assert "r3.c" not in paths and len(paths) == 10 and "r3.c" in reg["prior"]["knobs"]
+    assert "r3.c" not in paths and len(paths) == 10
     assert reg["fixed"]["r3.c"] == reg["frozen_form"]["r3.c"] == 0.04879
-    assert reg["held_out"] == ["length0", "p1", "pendulousFraction05", "tortuosity05", "widestAt"]
+    names = reg["correlation"]["names"]
+    r = np.array(reg["correlation"]["r"])
+    assert names == sorted(reg["descriptors"])
+    cl = l1.clusters(r, names)
+    assert cl == reg["clusters"]["list"]
+    held, order, taken = l1.cluster_held_out(cl)
+    assert held == reg["held_out"] and [cl[i] for i in order] == reg["clusters"]["draw_order"]
+    assert len(held) >= round(len(names) / 3) and sorted(reg["fitted"] + held) == names
+    w = l1.location_weights(r, names, reg["weights"]["r_crit"])
+    assert w == reg["location_weights"]
+    assert reg["loss"]["spread_in_loss"] is False
+    assert reg["seeds"]["search"]["list"] == l1.search_seeds()
     spec = f1.level1_spec("beech", reg)
     hand = {**spec.fixed, **spec.form}
     assert fit.decode(spec, fit.encode(spec, reg["start"])) == hand

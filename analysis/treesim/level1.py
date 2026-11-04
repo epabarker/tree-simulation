@@ -6,15 +6,20 @@ The registration (`analysis/fit/sources/level1-<species>.json`, written by analy
 before any simulated tree is scored) holds what this module reads: the descriptors and the held-out draw, the real
 distributions, the frozen Level 0 knobs, the fitted knobs and the file hashes. This module holds the rules.
 
-- **Descriptors.** Gate c v3.1's tier A and tier B for the species' dataset (the targets file's `[level1]`). A seeded
-  draw of a third holds out (ADR 0049 §3); the rest are the loss. Held-out values are computed and never written by
-  the fit (the user, 2026-11-04): only the gate reads them.
-- **Weights (the user, 2026-11-04, a general rule):** correlated summaries of a single measurement share one unit of
-  weight. OUTLINE (the crown's height distribution: the profile bands and their summaries) is one group, whatever
-  members the draw leaves in the loss; every other descriptor is its own group.
+- **Descriptors.** Gate c v3.1's tier A and tier B for the species' dataset (the targets file's `[level1]`). Held-out
+  values are computed and never written by the fit (the user, 2026-11-04): only the gate reads them.
 - **Real.** Each tree's value (BioDiv: the median over its repeats, tolerance.median_of); OLS on ln measured DBH
   (tolerance.between_tree's fit): the slope b, the residual SD (df n − 2) and the median of the values detrended to the
   matched DBH, y − b (ln d − ln d*).
+- **Correlation (registration v3, pilot v2; the user, 2026-11-04).** Pearson r between every two descriptors over the
+  real trees, pairwise complete, on the values detrended as the targets are (each by its own registered slope).
+- **Hold-outs (v3): whole clusters, to a third.** Average linkage on 1 − |r| cut at |r| = CLUSTER_CUT; each cluster
+  (pair or singleton) is one unit. The clusters in canonical order (members sorted, clusters by their first member),
+  drawn without replacement with HELD_OUT_SEED, are taken whole until the held-out descriptors number at least
+  round(HELD_OUT_SHARE × n) (ADR 0049 §3). A pair inside a cluster never straddles the fitted/held-out line.
+- **Weights (v3).** Each fitted descriptor's location term weighs 1 / Σ_j |r_ij| over all the descriptors, self
+  included, after every |r| below the two-sided R_ALPHA critical value at the real n is zeroed (sampling noise must not
+  compress independent descriptors).
 - **Simulated.** The stand's live measured trees at the size-matched season, coarsened at the dataset's d_min with
   Demol 2022's inflation (coarsen.coarsen(inflated=True): `rules.assign`, the fit compares the coarsened simulator
   only), described, and detrended with the registered b on the uncoarsened tree's DBH (cylinders.dbh, describe()'s
@@ -22,13 +27,16 @@ distributions, the frozen Level 0 knobs, the fitted knobs and the file hashes. T
 - **Size match** (phase1-tolerances.json `rules.size_match`, per candidate on its own seeds): the first season of
   MATCH_SEASONS at which the median over seeds of the per-seed median DBH of the live measured trees (cli/allometry.ts,
   parity 1e-9 with cylinders.dbh) reaches d*. A match outside DUMP_SEASONS, or none, is unmatched.
-- **Loss terms.** Per fitted descriptor, z = (median of the detrended simulated trees − real median) / real SD and
-  s = ln(simulated SD / real SD) / ln 2 (ADR 0049 §4's factor 2 as the band). A group's location term is the mean of its
-  members' z², its spread term the mean of their s²; a member with fewer than MIN_TREES finite trees, or an unmatched
-  candidate, costs MISSING_PENALTY in place of each.
+- **Loss terms (v3: location only).** Per fitted descriptor, z = (median of the detrended simulated trees − real
+  median) / real SD; its term is w z², or w × MISSING_PENALTY with fewer than MIN_TREES finite trees or an unmatched
+  candidate. The spread s = ln(simulated SD / real SD) / ln 2 is computed and kept in the traits (reported), never in
+  the loss: it is a gate criterion (ADR 0049 §4).
+- **Seeds (v3).** The search grows every candidate of every generation on the same seeds: the first
+  `seeds_per_candidate` of the registered list (SEARCH_SEED; never the gate's, the finalists', the gallery's or the
+  noise check's). `seeds_per_candidate` is set once, from the hand's noise floor on the v3 loss (level1_noise.py).
 - **Gate** (ADR 0049 §4): on GATE_SEEDS, a seed passes when every held-out descriptor's |z| ≤ Z_GATE, z read on the
-  median of that seed's trees; the species on ≥ PASS_SEEDS. Spread within ×2 on every fitted descriptor over all the
-  gate's trees. shapeFlag clear (gallery.py).
+  median of that seed's trees; the species on ≥ PASS_SEEDS. Spread within ×2 on every descriptor, fitted and held out
+  (v3, the user: spread is about the model, not the fit), over all the gate's trees. shapeFlag clear (gallery.py).
 """
 
 from __future__ import annotations
@@ -49,11 +57,13 @@ from treesim.fit import MISSING_PENALTY
 from treesim.sweep import REPO
 
 SOURCES = REPO / "analysis" / "fit" / "sources"
-#: The crown's height distribution and its summaries (describe.py: profile p0–p3, widestAt, profileCentre,
-#: crownFullness; centroidHeight, the wood's mean height): one measurement, one unit of weight.
-OUTLINE = ("p0", "p1", "p2", "p3", "widestAt", "profileCentre", "crownFullness", "centroidHeight")
 HELD_OUT_SEED = 20261104
 HELD_OUT_SHARE = 1 / 3
+#: The hold-out clusters (v3): average linkage on 1 − |r|, cut where |r| = CLUSTER_CUT.
+CLUSTER_METHOD = "average"
+CLUSTER_CUT = 0.5
+#: The weights (v3): an |r| below this two-sided level's critical value at the real n counts as 0.
+R_ALPHA = 0.05
 MATCH_SEASONS = tuple(range(50, 151, 10))
 DUMP_SEASONS = tuple(range(50, 101, 10))
 MIN_TREES = 10
@@ -62,8 +72,16 @@ SPREAD_BAND = math.log(2.0)
 PASS_SEEDS = 15
 GATE_SEEDS = tuple(range(1, 21))
 FINAL_SEEDS = tuple(range(101, 111))
-#: The fit's seeds, drawn afresh each generation: never the gate's, the finalists' or the gallery's (1001–1003).
+#: The seed range of the fit and the noise check: never the gate's, the finalists' or the gallery's (1001–1003).
+#: Registration v2 drew a candidate's seeds from it afresh each generation; v3 fixes them (`search_seeds`).
 FIT_SEEDS = tuple(s for s in range(1000, 10_000) if s not in (1001, 1002, 1003))
+#: The gallery's seeds in the pilot's post-fit check (1001–1006): never a search seed.
+GALLERY_SEEDS = tuple(range(1001, 1007))
+#: The hand's noise check: six 5-seed and three 10-seed draws from FIT_SEEDS (the pilot's postfit.py, and v3's).
+NOISE_SEED = 20261106
+#: The search's fixed seeds (v3): SEARCH_COUNT drawn once from FIT_SEEDS less the gallery's and the noise check's.
+SEARCH_SEED = 20261107
+SEARCH_COUNT = 10
 CONTROL_SEED = 20261105
 CONTROL_SETS = 2000
 #: The files whose bytes define the targets and the measurement; every Level 1 script refuses on a mismatch. The
@@ -101,22 +119,118 @@ def load(species: str, check: bool = True) -> dict:
     return reg
 
 
-# --- Descriptors and weights -------------------------------------------------------------------------------------
+# --- Descriptors, correlation, hold-outs and weights (v3) --------------------------------------------------------
 
 
-def draw_held_out(names, seed: int = HELD_OUT_SEED, share: float = HELD_OUT_SHARE) -> list[str]:
-    """The held-out third: a seeded draw from the sorted names, round(share × n) of them, sorted."""
-    pool = sorted(names)
-    k = round(share * len(pool))
-    return sorted(np.random.default_rng(seed).choice(pool, k, replace=False).tolist())
+def detrended_columns(trees: list[dict], names, real: dict, at: float) -> np.ndarray:
+    """A trees × names matrix of the values detrended to DBH `at` by each descriptor's registered slope (NaN where a
+    value or the DBH is missing). Trees in the simulated shape: descriptor keys at the top level (`as_sim`)."""
+    x = np.full((len(trees), len(names)), np.nan)
+    for i, t in enumerate(trees):
+        d = t.get("dbh")
+        if d is None or not math.isfinite(d) or d <= 0:
+            continue
+        for j, k in enumerate(names):
+            y = t.get(k)
+            if y is not None and math.isfinite(y):
+                x[i, j] = detrend(y, d, real[k]["slope"], at)
+    return x
 
 
-def groups(fitted) -> dict[str, list[str]]:
-    """Weight groups: OUTLINE's fitted members as "outline", every other descriptor alone."""
-    out: dict[str, list[str]] = {}
-    for k in sorted(fitted):
-        out.setdefault("outline" if k in OUTLINE else k, []).append(k)
-    return out
+def correlation(x: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    """Pearson r between every two columns over the rows where both are finite (pairwise complete), and those row
+    counts. Symmetric, with 1 on the diagonal."""
+    n = x.shape[1]
+    r, m = np.eye(n), np.zeros((n, n), dtype=int)
+    for a in range(n):
+        m[a, a] = int(np.isfinite(x[:, a]).sum())
+        for b in range(a + 1, n):
+            ok = np.isfinite(x[:, a]) & np.isfinite(x[:, b])
+            m[a, b] = m[b, a] = int(ok.sum())
+            r[a, b] = r[b, a] = float(np.corrcoef(x[ok, a], x[ok, b])[0, 1]) if ok.sum() > 2 else math.nan
+    return r, m
+
+
+def r_critical(n: int, alpha: float = R_ALPHA) -> float:
+    """The two-sided `alpha` critical value of Pearson's r at n pairs: t / √(t² + n − 2)."""
+    from scipy import stats
+
+    df = n - 2
+    t = float(stats.t.ppf(1 - alpha / 2, df))
+    return t / math.sqrt(t * t + df)
+
+
+def location_weights(r: np.ndarray, names, r_crit: float) -> dict[str, float]:
+    """Each descriptor's weight: 1 / Σ_j |r_ij| over all the descriptors, self included, with every |r| below r_crit
+    zeroed first."""
+    a = np.abs(np.asarray(r, dtype=float))
+    a[a < r_crit] = 0.0
+    np.fill_diagonal(a, 1.0)
+    return {k: float(1.0 / a[i].sum()) for i, k in enumerate(names)}
+
+
+def clusters(r: np.ndarray, names, cut: float = CLUSTER_CUT, method: str = CLUSTER_METHOD) -> list[list[str]]:
+    """Hierarchical clusters on the distance 1 − |r|, cut at the distance 1 − cut; canonical order: members sorted,
+    clusters by their first member."""
+    from scipy.cluster.hierarchy import fcluster, linkage
+    from scipy.spatial.distance import squareform
+
+    d = 1.0 - np.abs(np.asarray(r, dtype=float))
+    d = (d + d.T) / 2
+    np.fill_diagonal(d, 0.0)
+    labels = fcluster(linkage(squareform(d, checks=False), method=method), t=1.0 - cut, criterion="distance")
+    out: dict[int, list[str]] = {}
+    for k, c in zip(names, labels):
+        out.setdefault(int(c), []).append(k)
+    return sorted((sorted(v) for v in out.values()), key=lambda v: v[0])
+
+
+def cluster_held_out(groups: list[list[str]], seed: int = HELD_OUT_SEED,
+                     share: float = HELD_OUT_SHARE) -> tuple[list[str], list[int], int]:
+    """Whole clusters held out to a third: the clusters (canonical order) drawn without replacement with `seed`, taken
+    in the drawn order until the held-out descriptors number at least round(share × n). Returns the held-out
+    descriptors (sorted), the full draw order (indices into `groups`) and how many of it were taken."""
+    n = sum(len(g) for g in groups)
+    need = round(share * n)
+    order = [int(i) for i in np.random.default_rng(seed).choice(len(groups), len(groups), replace=False)]
+    held: list[str] = []
+    taken = 0
+    for i in order:
+        if len(held) >= need:
+            break
+        held += groups[i]
+        taken += 1
+    return sorted(held), order, taken
+
+
+def spread_names(reg: dict) -> list[str]:
+    """The descriptors the spread criterion reads (v3, the user): all of them, fitted and held out."""
+    return sorted(reg["descriptors"])
+
+
+# --- Seeds (v3) --------------------------------------------------------------------------------------------------
+
+
+def noise_draws(seed: int = NOISE_SEED) -> tuple[list[list[int]], list[list[int]]]:
+    """The noise check's six 5-seed and three 10-seed draws, disjoint, from FIT_SEEDS (the pilot's postfit.py's)."""
+    pool = np.random.default_rng(seed).choice(np.array(FIT_SEEDS), 6 * 5 + 3 * 10, replace=False).tolist()
+    return [pool[5 * i:5 * i + 5] for i in range(6)], [pool[30 + 10 * i:40 + 10 * i] for i in range(3)]
+
+
+def search_seeds(seed: int = SEARCH_SEED, count: int = SEARCH_COUNT) -> list[int]:
+    """The search's fixed seeds: `count` drawn once from FIT_SEEDS less the gallery's and the noise check's."""
+    d5, d10 = noise_draws()
+    taken = {s for d in d5 + d10 for s in d} | set(GALLERY_SEEDS)
+    pool = np.array([s for s in FIT_SEEDS if s not in taken])
+    return [int(s) for s in np.random.default_rng(seed).choice(pool, count, replace=False)]
+
+
+def fit_seeds(reg: dict) -> list[int]:
+    """Every candidate's seeds in every generation: the first `seeds_per_candidate` of the registered list."""
+    n = reg["loss"].get("seeds_per_candidate")
+    if n is None:
+        raise SystemExit("refusing: seeds_per_candidate is not set (analysis/experiments/level1_noise.py sets it)")
+    return list(reg["seeds"]["search"]["list"][:n])
 
 
 # --- Real distributions ------------------------------------------------------------------------------------------
@@ -252,17 +366,13 @@ def level1_traits(reg: dict, trees: list[dict] | None, season: int | None, flags
 
 
 def level1_contributions(reg: dict, traits: dict) -> dict[str, float]:
-    """Per weight group, `l1.<group>.loc` = mean of members' z² and `l1.<group>.sd` = mean of their s², weight 1
-    each; MISSING_PENALTY in place of a member that could not be scored (or of all, unmatched)."""
+    """Per fitted descriptor, `l1.<k>.loc` = w_k z² (v3: location only, the registered weights); w_k × MISSING_PENALTY
+    for a descriptor that could not be scored (or for every one, unmatched). Spread is not in the loss."""
+    w = reg["location_weights"]
     out = {}
-    for g, members in reg["groups"].items():
-        loc, spr = [], []
-        for k in members:
-            z, s = traits.get(f"l1.{k}.z"), traits.get(f"l1.{k}.s")
-            loc.append(z * z if z is not None and math.isfinite(z) else MISSING_PENALTY)
-            spr.append(s * s if s is not None and math.isfinite(s) else MISSING_PENALTY)
-        out[f"l1.{g}.loc"] = float(np.mean(loc))
-        out[f"l1.{g}.sd"] = float(np.mean(spr))
+    for k in reg["fitted"]:
+        z = traits.get(f"l1.{k}.z")
+        out[f"l1.{k}.loc"] = w[k] * (z * z if z is not None and math.isfinite(z) else MISSING_PENALTY)
     return out
 
 

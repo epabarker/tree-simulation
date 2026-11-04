@@ -1,0 +1,797 @@
+{
+ "species": "beech",
+ "registration_version": 3,
+ "noise_seed": 20261106,
+ "draws5": [
+  [
+   3046,
+   4395,
+   9388,
+   8411,
+   4398
+  ],
+  [
+   1536,
+   7852,
+   3830,
+   4571,
+   7270
+  ],
+  [
+   6785,
+   2909,
+   7779,
+   6609,
+   4456
+  ],
+  [
+   2201,
+   3520,
+   4298,
+   7574,
+   8689
+  ],
+  [
+   1418,
+   5716,
+   1163,
+   7917,
+   8122
+  ],
+  [
+   6358,
+   4178,
+   3872,
+   5893,
+   4019
+  ]
+ ],
+ "draws10": [
+  [
+   7346,
+   6397,
+   9457,
+   5967,
+   8897,
+   3268,
+   9557,
+   9413,
+   5306,
+   8525
+  ],
+  [
+   7009,
+   3410,
+   3493,
+   7085,
+   6212,
+   1772,
+   1424,
+   1050,
+   7182,
+   6727
+  ],
+  [
+   6456,
+   1483,
+   3789,
+   1822,
+   6562,
+   7785,
+   3205,
+   4404,
+   3804,
+   2254
+  ]
+ ],
+ "hand": {
+  "r1.hydraulic": "hyperbolic",
+  "c5.Trel": 0.008,
+  "r1.leafCost": "acclimated",
+  "r1.leafCostShade": 0.3,
+  "c3.alpha": 3.312,
+  "r1.Lh": 51.16,
+  "r1.mf": 0.0618,
+  "r2.hJ": 77.63,
+  "c6.r0": 0.004689,
+  "r6.qMin": 0.03103,
+  "r6.leafArea": 2.417,
+  "r3.c": 0.04879,
+  "r2.levels.0.lambda": 0.5308,
+  "r2.levels.1.lambda": 0.5124,
+  "r2.levels.1.setPoint": 34.32,
+  "r2.levels.1.branchAngle": 50.07,
+  "r2.levels.1.eta": 0.5696,
+  "r2.levels.2.setPoint": 94.59,
+  "r2.aC": 14.44,
+  "r2.dLambda": 0.01384,
+  "r2.kappa": 0.4314,
+  "r2.levels.1.postureSetPoint": 34.32
+ },
+ "pilot_v2": {
+  "5": {
+   "loss": {
+    "values": [
+     5.2116121029154465,
+     6.290993530963186,
+     7.126907064034731,
+     4.7525488389002275,
+     6.066002896668149,
+     5.908006697617234
+    ],
+    "mean": 5.892678521849828,
+    "sd": 0.8337863507698148
+   },
+   "level1_location": {
+    "values": [
+     1.8564173113208529,
+     2.3570517117941985,
+     2.0361693705663066,
+     1.8581188037503602,
+     3.069289628603936,
+     2.9735734939862515
+    ],
+    "mean": 2.358436720003651,
+    "sd": 0.5458763184368011
+   },
+   "level0": {
+    "values": [
+     3.3551947915945934,
+     3.933941819168987,
+     5.090737693468425,
+     2.8944300351498673,
+     2.996713268064213,
+     2.934433203630982
+    ],
+    "mean": 3.534241801846178,
+    "sd": 0.8570371954927672
+   },
+   "term_sd": {
+    "death.lone": 0.0,
+    "death.stand": 0.0,
+    "l1.centroidHeight.loc": 0.1495154300956155,
+    "l1.crownFullness.loc": 0.0722126391238617,
+    "l1.forkHeight.loc": 0.027823604080625,
+    "l1.leaderDominance.loc": 0.05928816119364638,
+    "l1.limbDroop.loc": 0.03474759691837054,
+    "l1.p0.loc": 0.18201378705890361,
+    "l1.p1.loc": 0.03161773117615573,
+    "l1.p2.loc": 0.00867429585393083,
+    "l1.pendulousFraction05.loc": 0.18662311894884673,
+    "l1.profileCentre.loc": 0.058639368962875096,
+    "l1.tortuosity05.loc": 0.084764051501963,
+    "shade.survivalLight": 0.0,
+    "stand.height": 0.1465122286233737,
+    "stand.height100": 0.15505540115331445,
+    "stand.lai": 0.335330092946679,
+    "stand.lateShare": 1.1401881987614015,
+    "stand.talloCR": 0.1166912013012977,
+    "stand.talloH": 0.09039991500706099
+   },
+   "term_mean": {
+    "death.lone": 0.0,
+    "death.stand": 0.0,
+    "l1.centroidHeight.loc": 0.46254682871830727,
+    "l1.crownFullness.loc": 0.09881750553930634,
+    "l1.forkHeight.loc": 0.02377172327832827,
+    "l1.leaderDominance.loc": 0.1160309661011978,
+    "l1.limbDroop.loc": 0.028158227572202765,
+    "l1.p0.loc": 0.324033870391104,
+    "l1.p1.loc": 0.024326733530473797,
+    "l1.p2.loc": 0.021399976119940285,
+    "l1.pendulousFraction05.loc": 0.2812322664024274,
+    "l1.profileCentre.loc": 0.09100843190616364,
+    "l1.tortuosity05.loc": 0.8871101904441994,
+    "shade.survivalLight": 0.1262131850018903,
+    "stand.height": 0.17163515486586803,
+    "stand.height100": 0.31453854776577433,
+    "stand.lai": 0.7372296864694347,
+    "stand.lateShare": 1.4894537179832181,
+    "stand.talloCR": 0.3354065051240352,
+    "stand.talloH": 0.3597650046359573
+   }
+  },
+  "10": {
+   "loss": {
+    "values": [
+     4.662605270457414,
+     4.734195043011298,
+     5.387956724343852
+    ],
+    "mean": 4.928252345937522,
+    "sd": 0.3997216037794837
+   },
+   "level1_location": {
+    "values": [
+     2.130220143584051,
+     2.460673274350085,
+     2.7512076251168818
+    ],
+    "mean": 2.4473670143503394,
+    "sd": 0.31070750790978263
+   },
+   "level0": {
+    "values": [
+     2.532385126873363,
+     2.273521768661213,
+     2.6367490992269706
+    ],
+    "mean": 2.4808853315871824,
+    "sd": 0.187009879694551
+   },
+   "term_sd": {
+    "death.lone": 0.0,
+    "death.stand": 0.0,
+    "l1.centroidHeight.loc": 0.16537552283761012,
+    "l1.crownFullness.loc": 0.04247042771476743,
+    "l1.forkHeight.loc": 0.025792399298756263,
+    "l1.leaderDominance.loc": 0.03360731487556793,
+    "l1.limbDroop.loc": 0.003969069976172425,
+    "l1.p0.loc": 0.20949970474565294,
+    "l1.p1.loc": 0.0030232778469491592,
+    "l1.p2.loc": 0.0033475254774556823,
+    "l1.pendulousFraction05.loc": 0.09997561816944901,
+    "l1.profileCentre.loc": 0.0384844701342045,
+    "l1.tortuosity05.loc": 0.06369200750473515,
+    "shade.survivalLight": 0.0,
+    "stand.height": 0.04260417017794964,
+    "stand.height100": 0.03492731040632084,
+    "stand.lai": 0.1916621064665466,
+    "stand.lateShare": 0.20833903734368306,
+    "stand.talloCR": 0.05480100121398459,
+    "stand.talloH": 0.035815173524180725
+   },
+   "term_mean": {
+    "death.lone": 0.0,
+    "death.stand": 0.0,
+    "l1.centroidHeight.loc": 0.4740216132089339,
+    "l1.crownFullness.loc": 0.05168991141639165,
+    "l1.forkHeight.loc": 0.028925124003859982,
+    "l1.leaderDominance.loc": 0.11289749836864736,
+    "l1.limbDroop.loc": 0.006096250550245582,
+    "l1.p0.loc": 0.40341460117200323,
+    "l1.p1.loc": 0.0036909287732040537,
+    "l1.p2.loc": 0.019893082118443,
+    "l1.pendulousFraction05.loc": 0.304910497915437,
+    "l1.profileCentre.loc": 0.12010219899223927,
+    "l1.tortuosity05.loc": 0.9217253078309343,
+    "shade.survivalLight": 0.1262131850018903,
+    "stand.height": 0.12426384997025348,
+    "stand.height100": 0.2647069408501846,
+    "stand.lai": 0.9281620388054691,
+    "stand.lateShare": 0.2684261791813523,
+    "stand.talloCR": 0.5383054677136991,
+    "stand.talloH": 0.23080767006433311
+   }
+  }
+ },
+ "runs": {
+  "5": [
+   {
+    "seeds": [
+     3046,
+     4395,
+     9388,
+     8411,
+     4398
+    ],
+    "loss": 5.2116121029154465,
+    "level1_location": 1.8564173113208529,
+    "level0": 3.3551947915945934,
+    "contributions": {
+     "stand.height": 0.34704168346276587,
+     "stand.lai": 1.1008099532363582,
+     "stand.lateShare": 0.787960834940441,
+     "shade.survivalLight": 0.1262131850018903,
+     "stand.height100": 0.2510375430022319,
+     "stand.talloH": 0.5406762108393006,
+     "stand.talloCR": 0.20145538111160613,
+     "death.lone": 0.0,
+     "death.stand": 0.0,
+     "l1.centroidHeight.loc": 0.5079052263425692,
+     "l1.crownFullness.loc": 0.0003833325540186194,
+     "l1.forkHeight.loc": 0.0043122416954948,
+     "l1.leaderDominance.loc": 0.01937263188428808,
+     "l1.limbDroop.loc": 0.0820621003310354,
+     "l1.p0.loc": 0.032388590702355356,
+     "l1.p1.loc": 0.08641356772141709,
+     "l1.p2.loc": 0.02004712319140458,
+     "l1.pendulousFraction05.loc": 0.08020836313562878,
+     "l1.profileCentre.loc": 0.027560700251359163,
+     "l1.tortuosity05.loc": 0.9957634335112818
+    },
+    "season": 80,
+    "trees": 16,
+    "spread_s": {
+     "centroidHeight": -1.4456982675023613,
+     "crownFullness": 0.012894149581490526,
+     "forkHeight": 0.22650587390628527,
+     "leaderDominance": -1.8818092547441445,
+     "limbDroop": -1.064340996738925,
+     "p0": -0.021304845779920825,
+     "p1": -0.3445272031286737,
+     "p2": -0.7754879031947652,
+     "pendulousFraction05": -1.1957581974104177,
+     "profileCentre": -0.36566843861194326,
+     "tortuosity05": -2.0767551270810727
+    }
+   },
+   {
+    "seeds": [
+     1536,
+     7852,
+     3830,
+     4571,
+     7270
+    ],
+    "loss": 6.290993530963186,
+    "level1_location": 2.3570517117941985,
+    "level0": 3.933941819168987,
+    "contributions": {
+     "stand.height": 0.009489905117680207,
+     "stand.lai": 0.398717680873947,
+     "stand.lateShare": 2.331370243192914,
+     "shade.survivalLight": 0.1262131850018903,
+     "stand.height100": 0.2131284942730244,
+     "stand.talloH": 0.32996218840211355,
+     "stand.talloCR": 0.5250601223074173,
+     "death.lone": 0.0,
+     "death.stand": 0.0,
+     "l1.centroidHeight.loc": 0.4681532660377179,
+     "l1.crownFullness.loc": 0.03845151500050747,
+     "l1.forkHeight.loc": 0.0026167289545822314,
+     "l1.leaderDominance.loc": 0.15132917432837703,
+     "l1.limbDroop.loc": 0.004878030094203189,
+     "l1.p0.loc": 0.3497315566985279,
+     "l1.p1.loc": 0.006984275810365564,
+     "l1.p2.loc": 0.02984114803122334,
+     "l1.pendulousFraction05.loc": 0.46025767085400326,
+     "l1.profileCentre.loc": 0.07144759052908295,
+     "l1.tortuosity05.loc": 0.7733607554556078
+    },
+    "season": 60,
+    "trees": 20,
+    "spread_s": {
+     "centroidHeight": -0.5696475212309149,
+     "crownFullness": -0.24417447980289486,
+     "forkHeight": -0.610965928909785,
+     "leaderDominance": -1.3095472298488928,
+     "limbDroop": -0.9915751430479033,
+     "p0": -0.366195843423997,
+     "p1": -1.0506436401151003,
+     "p2": -0.453486033290917,
+     "pendulousFraction05": -1.496388125244142,
+     "profileCentre": -0.2876246639189811,
+     "tortuosity05": -1.9365707400898475
+    }
+   },
+   {
+    "seeds": [
+     6785,
+     2909,
+     7779,
+     6609,
+     4456
+    ],
+    "loss": 7.126907064034731,
+    "level1_location": 2.0361693705663066,
+    "level0": 5.090737693468425,
+    "contributions": {
+     "stand.height": 0.07437999356807916,
+     "stand.lai": 0.3255504339679377,
+     "stand.lateShare": 3.4338157100062343,
+     "shade.survivalLight": 0.1262131850018903,
+     "stand.height100": 0.4510564250288097,
+     "stand.talloH": 0.30741418750139854,
+     "stand.talloCR": 0.372307758394075,
+     "death.lone": 0.0,
+     "death.stand": 0.0,
+     "l1.centroidHeight.loc": 0.4008317484050584,
+     "l1.crownFullness.loc": 0.16727162382711092,
+     "l1.forkHeight.loc": 0.0150879581034804,
+     "l1.leaderDominance.loc": 0.07241759950824209,
+     "l1.limbDroop.loc": 0.061530371969374116,
+     "l1.p0.loc": 0.31474625286963814,
+     "l1.p1.loc": 0.010061240308359112,
+     "l1.p2.loc": 0.015666097160407285,
+     "l1.pendulousFraction05.loc": 0.07647424815504705,
+     "l1.profileCentre.loc": 0.08235335704126233,
+     "l1.tortuosity05.loc": 0.8197288732183269
+    },
+    "season": 80,
+    "trees": 20,
+    "spread_s": {
+     "centroidHeight": -0.4795402638821962,
+     "crownFullness": -0.03314422573602407,
+     "forkHeight": 0.31791655263865004,
+     "leaderDominance": -1.0899746461587936,
+     "limbDroop": -1.1004290060371682,
+     "p0": -0.16451621508393025,
+     "p1": -0.22710803940417723,
+     "p2": -0.9879933581777821,
+     "pendulousFraction05": -1.344398706348443,
+     "profileCentre": -0.3211182428492314,
+     "tortuosity05": -1.7225594053567324
+    }
+   },
+   {
+    "seeds": [
+     2201,
+     3520,
+     4298,
+     7574,
+     8689
+    ],
+    "loss": 4.7525488389002275,
+    "level1_location": 1.8581188037503602,
+    "level0": 2.8944300351498673,
+    "contributions": {
+     "stand.height": 0.30294992868492926,
+     "stand.lai": 0.6159443064995315,
+     "stand.lateShare": 0.6583390614310699,
+     "shade.survivalLight": 0.1262131850018903,
+     "stand.height100": 0.5645997462186917,
+     "stand.talloH": 0.3323308599879737,
+     "stand.talloCR": 0.29405294732578136,
+     "death.lone": 0.0,
+     "death.stand": 0.0,
+     "l1.centroidHeight.loc": 0.2360459279429564,
+     "l1.crownFullness.loc": 0.1478223429414955,
+     "l1.forkHeight.loc": 0.007443940124509148,
+     "l1.leaderDominance.loc": 0.12034809643376494,
+     "l1.limbDroop.loc": 0.0009215355472123918,
+     "l1.p0.loc": 0.23443195233725092,
+     "l1.p1.loc": 0.01520551140063178,
+     "l1.p2.loc": 0.00754235940109581,
+     "l1.pendulousFraction05.loc": 0.1917357584917801,
+     "l1.profileCentre.loc": 0.04097838740247979,
+     "l1.tortuosity05.loc": 0.8556429917271834
+    },
+    "season": 70,
+    "trees": 20,
+    "spread_s": {
+     "centroidHeight": -0.10517629257377416,
+     "crownFullness": 0.43938258376522976,
+     "forkHeight": 0.7884387185692966,
+     "leaderDominance": -1.5439377751747705,
+     "limbDroop": -1.0747018815619618,
+     "p0": -0.014589884469874134,
+     "p1": 0.28127355394890746,
+     "p2": 0.3953225102625509,
+     "pendulousFraction05": 0.1909643568067854,
+     "profileCentre": 0.28550541676890645,
+     "tortuosity05": -0.9710590701684494
+    }
+   },
+   {
+    "seeds": [
+     1418,
+     5716,
+     1163,
+     7917,
+     8122
+    ],
+    "loss": 6.066002896668149,
+    "level1_location": 3.069289628603936,
+    "level0": 2.996713268064213,
+    "contributions": {
+     "stand.height": 0.2539201285919752,
+     "stand.lai": 1.0249495728397304,
+     "stand.lateShare": 0.7175503930533134,
+     "shade.survivalLight": 0.1262131850018903,
+     "stand.height100": 0.19480448812789095,
+     "stand.talloH": 0.29953812486412557,
+     "stand.talloCR": 0.37973737558528686,
+     "death.lone": 0.0,
+     "death.stand": 0.0,
+     "l1.centroidHeight.loc": 0.46621580031597487,
+     "l1.crownFullness.loc": 0.168467691371529,
+     "l1.forkHeight.loc": 0.07315530724899688,
+     "l1.leaderDominance.loc": 0.1664545945634292,
+     "l1.limbDroop.loc": 0.015174412903948505,
+     "l1.p0.loc": 0.5577355912685721,
+     "l1.p1.loc": 0.026455966247039366,
+     "l1.p2.loc": 0.027821602309835897,
+     "l1.pendulousFraction05.loc": 0.46882722506582575,
+     "l1.profileCentre.loc": 0.17102506238151735,
+     "l1.tortuosity05.loc": 0.9279563749272669
+    },
+    "season": 60,
+    "trees": 20,
+    "spread_s": {
+     "centroidHeight": -1.0231803372075725,
+     "crownFullness": 0.513542381766524,
+     "forkHeight": -0.4592034996981471,
+     "leaderDominance": -2.7358708950728006,
+     "limbDroop": -1.1782725626715569,
+     "p0": -0.29915203432911047,
+     "p1": 0.4917795271270423,
+     "p2": -0.7034227080093947,
+     "pendulousFraction05": 0.3301679524989862,
+     "profileCentre": 0.1579763351034132,
+     "tortuosity05": -0.05484350146629528
+    }
+   },
+   {
+    "seeds": [
+     6358,
+     4178,
+     3872,
+     5893,
+     4019
+    ],
+    "loss": 5.908006697617234,
+    "level1_location": 2.9735734939862515,
+    "level0": 2.934433203630982,
+    "contributions": {
+     "stand.height": 0.0420292897697784,
+     "stand.lai": 0.9574061713991022,
+     "stand.lateShare": 1.0076860652753368,
+     "shade.survivalLight": 0.1262131850018903,
+     "stand.height100": 0.21260458994399736,
+     "stand.talloH": 0.34866845622083176,
+     "stand.talloCR": 0.23982544602004482,
+     "death.lone": 0.0,
+     "death.stand": 0.0,
+     "l1.centroidHeight.loc": 0.6961290032655674,
+     "l1.crownFullness.loc": 0.07050852754117641,
+     "l1.forkHeight.loc": 0.04001416354290618,
+     "l1.leaderDominance.loc": 0.1662636998890855,
+     "l1.limbDroop.loc": 0.004382914587442985,
+     "l1.p0.loc": 0.4551692784702797,
+     "l1.p1.loc": 0.0008398396950298882,
+     "l1.p2.loc": 0.02748152662567482,
+     "l1.pendulousFraction05.loc": 0.40989033271227926,
+     "l1.profileCentre.loc": 0.15268549383128024,
+     "l1.tortuosity05.loc": 0.9502087138255293
+    },
+    "season": 60,
+    "trees": 20,
+    "spread_s": {
+     "centroidHeight": -1.3128988254617722,
+     "crownFullness": -0.25504033633917367,
+     "forkHeight": -1.1345478116238623,
+     "leaderDominance": -2.6776286375629748,
+     "limbDroop": -1.2342245338693734,
+     "p0": -0.2918279029433541,
+     "p1": -0.6607318636839046,
+     "p2": -2.369791578432257,
+     "pendulousFraction05": -2.0408907185149223,
+     "profileCentre": -0.61271243592184,
+     "tortuosity05": -2.510247678832384
+    }
+   }
+  ],
+  "10": [
+   {
+    "seeds": [
+     7346,
+     6397,
+     9457,
+     5967,
+     8897,
+     3268,
+     9557,
+     9413,
+     5306,
+     8525
+    ],
+    "loss": 4.662605270457414,
+    "level1_location": 2.130220143584051,
+    "level0": 2.532385126873363,
+    "contributions": {
+     "stand.height": 0.07572498108127458,
+     "stand.lai": 0.8539690882328358,
+     "stand.lateShare": 0.5067099199777343,
+     "shade.survivalLight": 0.1262131850018903,
+     "stand.height100": 0.22455541640237517,
+     "stand.talloH": 0.26871839716071755,
+     "stand.talloCR": 0.4764941390165354,
+     "death.lone": 0.0,
+     "death.stand": 0.0,
+     "l1.centroidHeight.loc": 0.4851807651275062,
+     "l1.crownFullness.loc": 0.04814120004159659,
+     "l1.forkHeight.loc": 0.013135671499134007,
+     "l1.leaderDominance.loc": 0.08273235399675737,
+     "l1.limbDroop.loc": 0.0032742365520455805,
+     "l1.p0.loc": 0.2671310927438279,
+     "l1.p1.loc": 0.004078968087101316,
+     "l1.p2.loc": 0.01757129077198931,
+     "l1.pendulousFraction05.loc": 0.25492038577486004,
+     "l1.profileCentre.loc": 0.07894127615094412,
+     "l1.tortuosity05.loc": 0.8751129028382884
+    },
+    "season": 70,
+    "trees": 38,
+    "spread_s": {
+     "centroidHeight": -0.9637677175692517,
+     "crownFullness": -0.2045745417359478,
+     "forkHeight": -0.5393250990795598,
+     "leaderDominance": -1.5222380446254749,
+     "limbDroop": -1.2754631863393036,
+     "p0": -0.3374448820687805,
+     "p1": -0.8262836128663471,
+     "p2": -0.78988983292982,
+     "pendulousFraction05": -1.0847828537241089,
+     "profileCentre": -0.2843011825388786,
+     "tortuosity05": -1.7320899863367734
+    }
+   },
+   {
+    "seeds": [
+     7009,
+     3410,
+     3493,
+     7085,
+     6212,
+     1772,
+     1424,
+     1050,
+     7182,
+     6727
+    ],
+    "loss": 4.734195043011298,
+    "level1_location": 2.460673274350085,
+    "level0": 2.273521768661213,
+    "contributions": {
+     "stand.height": 0.1415979421891869,
+     "stand.lai": 0.7846874266519941,
+     "stand.lateShare": 0.17793389229417486,
+     "shade.survivalLight": 0.1262131850018903,
+     "stand.height100": 0.2880703048758909,
+     "stand.talloH": 0.1975411488818063,
+     "stand.talloCR": 0.5574778687662693,
+     "death.lone": 0.0,
+     "death.stand": 0.0,
+     "l1.centroidHeight.loc": 0.6335349460923857,
+     "l1.crownFullness.loc": 0.011105180522996553,
+     "l1.forkHeight.loc": 0.014950516617832551,
+     "l1.leaderDominance.loc": 0.10683770403821474,
+     "l1.limbDroop.loc": 0.010634667695333123,
+     "l1.p0.loc": 0.29846611797682404,
+     "l1.p1.loc": 0.006501452019594656,
+     "l1.p2.loc": 0.018377620093254998,
+     "l1.pendulousFraction05.loc": 0.2397897077405014,
+     "l1.profileCentre.loc": 0.1261778934499126,
+     "l1.tortuosity05.loc": 0.9942974681032348
+    },
+    "season": 70,
+    "trees": 36,
+    "spread_s": {
+     "centroidHeight": -1.3692337549853608,
+     "crownFullness": -0.05537043534568798,
+     "forkHeight": -0.5142845917420642,
+     "leaderDominance": -2.6948512962939866,
+     "limbDroop": -1.5299617131552412,
+     "p0": -0.24969520089673422,
+     "p1": -0.3821319555970313,
+     "p2": -1.0263445071247874,
+     "pendulousFraction05": -1.440396379206525,
+     "profileCentre": -0.3739624938446427,
+     "tortuosity05": -1.945348234605612
+    }
+   },
+   {
+    "seeds": [
+     6456,
+     1483,
+     3789,
+     1822,
+     6562,
+     7785,
+     3205,
+     4404,
+     3804,
+     2254
+    ],
+    "loss": 5.387956724343852,
+    "level1_location": 2.7512076251168818,
+    "level0": 2.6367490992269706,
+    "contributions": {
+     "stand.height": 0.15546862664029895,
+     "stand.lai": 1.1458296015315776,
+     "stand.lateShare": 0.12063472527214769,
+     "shade.survivalLight": 0.1262131850018903,
+     "stand.height100": 0.2814951012722877,
+     "stand.talloH": 0.2261634641504755,
+     "stand.talloCR": 0.5809443953582926,
+     "death.lone": 0.0,
+     "death.stand": 0.0,
+     "l1.centroidHeight.loc": 0.30334912840690986,
+     "l1.crownFullness.loc": 0.0958233536845818,
+     "l1.forkHeight.loc": 0.05868918389461338,
+     "l1.leaderDominance.loc": 0.14912243707096995,
+     "l1.limbDroop.loc": 0.004379847403358041,
+     "l1.p0.loc": 0.6446465927953577,
+     "l1.p1.loc": 0.0004923662129161893,
+     "l1.p2.loc": 0.023730335490084704,
+     "l1.pendulousFraction05.loc": 0.4200214002309496,
+     "l1.profileCentre.loc": 0.15518742737586108,
+     "l1.tortuosity05.loc": 0.8957655525512797
+    },
+    "season": 60,
+    "trees": 39,
+    "spread_s": {
+     "centroidHeight": -0.9377342276821167,
+     "crownFullness": -0.01491426522003623,
+     "forkHeight": -0.044601543619590255,
+     "leaderDominance": -2.5091073349747015,
+     "limbDroop": -1.1309709150860854,
+     "p0": -0.36254849206525475,
+     "p1": -0.2363813206116892,
+     "p2": -0.9278655815292822,
+     "pendulousFraction05": -0.5085043062133212,
+     "profileCentre": -0.3551687298253089,
+     "tortuosity05": -1.541744027424829
+    }
+   }
+  ]
+ },
+ "pilot": {
+  "loss": {
+   "5": {
+    "values": [
+     20.67706023520416,
+     26.928711806592766,
+     14.982943188476362,
+     13.727895496942114,
+     23.489675393807264,
+     29.66220766410665
+    ],
+    "mean": 21.57808229752155,
+    "sd": 6.380746675432385
+   },
+   "10": {
+    "values": [
+     13.603298765517552,
+     39.9898214756134,
+     27.32733343017928
+    ],
+    "mean": 26.973484557103408,
+    "sd": 13.196819766570039
+   }
+  },
+  "location_only": {
+   "5": {
+    "values": [
+     6.152209400241549,
+     7.520334651032115,
+     8.10740099097721,
+     5.849391735245841,
+     7.009621660226852,
+     6.959471853294424
+    ],
+    "mean": 6.933071715169665,
+    "sd": 0.8384023042669094
+   },
+   "10": {
+    "values": [
+     5.6835292012500584,
+     5.637849187814176,
+     6.672533969732989
+    ],
+    "mean": 5.997970786265742,
+    "sd": 0.5846351702335195
+   }
+  },
+  "source": "docs/experiments/fits/level1-pilot/postfit.json (registration v2's loss, the same simulated trees)"
+ },
+ "determinism": {
+  "level0_max_abs": 0.0,
+  "z2_max_rel": 0.0,
+  "z2_descriptors": [
+   "forkHeight",
+   "leaderDominance",
+   "limbDroop"
+  ]
+ },
+ "decision": {
+  "sd5": 0.8337863507698148,
+  "gap": 2.358436720003651,
+  "share": 0.25,
+  "threshold": 0.5896091800009128,
+  "seeds_per_candidate": 10,
+  "rule": "10 if SD(v3 loss, six 5-seed draws) > share \u00d7 mean(the hand's Level 1 location loss over those draws), else 5",
+  "measured": "2026-11-04, on the v3 registration before any fit"
+ }
+}

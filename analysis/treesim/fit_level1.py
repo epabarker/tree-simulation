@@ -2,8 +2,9 @@
 against the registered real distributions, with Level 0's scored traits kept at their Level 0 weights (the user). The
 Level 0 knobs are frozen at the species' Level 0 fit. Resumable and bounded as fit_level0.py.
 
-One generation: every candidate on the same SEEDS_PER_CANDIDATE seeds (common random numbers, drawn afresh from
-level1.FIT_SEEDS), each (candidate, seed) one request to analysis/experiments/level1_eval.ts, which grows the stand once
+One generation: every candidate on the same seeds (common random numbers). Registration v3 fixes them for the whole
+run (level1.fit_seeds: the registered list's first seeds_per_candidate); v2 drew them afresh each generation. Each
+(candidate, seed) is one request to analysis/experiments/level1_eval.ts, which grows the stand once
 for both levels and leaves the measured trees' skeletons at DUMP_SEASONS in a RAM scratch directory. Per candidate:
 the size-matched season from its own seeds, that season's trees described across a process pool, the loss. The
 generation's scratch is then deleted. The held-out descriptors are computed by describe() and dropped before anything
@@ -65,6 +66,7 @@ class Level1Settings:
     max_evals: int
     max_hours: float = 12.0
     popsize: int = 12
+    #: The registration's seeds_per_candidate (level1.fit_seeds); recorded with the settings.
     seeds: int = 5
     sigma: float = 0.15
     finalists: int = 3
@@ -238,9 +240,12 @@ def fit_level1(spec: Spec, reg: dict, settings: Level1Settings, out_dir: Path, r
                            bounds=np.array([[0.0, 1.0]] * len(spec.params)), population_size=settings.popsize,
                            seed=int(rng.integers(1 << 30))),
             }
-        cma, rng = st["cma"], st["rng"]
+        cma = st["cma"]
+        seeds = l1.fit_seeds(reg)
+        if len(seeds) != settings.seeds:
+            raise SystemExit(f"refusing: settings.seeds {settings.seeds} but the registration's {len(seeds)}")
         started = time.time()
-        per_gen = settings.popsize * settings.seeds
+        per_gen = settings.popsize * len(seeds)
         status = "complete"
         while True:
             if st["evals"] + per_gen > settings.max_evals - settings.reserve:
@@ -253,7 +258,6 @@ def fit_level1(spec: Spec, reg: dict, settings: Level1Settings, out_dir: Path, r
                 break
             t0 = time.time()
             g = st["generation"]
-            seeds = [int(s) for s in rng.choice(np.array(l1.FIT_SEEDS), settings.seeds, replace=False)]
             xs = [cma.ask() for _ in range(cma.population_size)]
             assigns = [fit.decode(spec, x) for x in xs]
             traits, cpu, _ = measure(f"g{g}", assigns, seeds)

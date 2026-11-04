@@ -7,14 +7,13 @@ script that writes held-out descriptors.
         --fit docs/experiments/fits/level1-pilot/beech.json
 
 The gate, on seeds 1–20 size-matched over those seeds: (1) a seed passes when every held-out descriptor's |z| ≤ 2 on
-the median of its live measured trees, detrended; the species on ≥ 15 of 20; (2) every fitted descriptor's simulated
-SD over all the gate's trees within ×2 of the real SD; (3) shapeFlag clear (gallery.py). Reported beside it: every
-descriptor's z, Demol's z (tier A, the held-out site), the BioDiv gap strata, and Level 0's gate statistic on the same
-stand runs (never gated here).
-
-p1 and widestAt are drawn into the held-out set but correlate with the fitted outline terms (one measurement: the
-crown's height distribution), so the out-of-sample test rests on length0, pendulousFraction05 and tortuosity05 (the
-user, 2026-11-04). The draw is not redrawn.
+the median of its live measured trees, detrended; the species on ≥ 15 of 20; (2) every descriptor's simulated SD,
+fitted and held out (registration v3, the user), over all the gate's trees within ×2 of the real SD; (3) shapeFlag
+clear (gallery.py). Reported beside it: every descriptor's z and spread, Demol's z (tier A, the held-out site), the
+BioDiv gap strata, Level 0's gate statistic on the same stand runs (never gated here), and each held-out descriptor's
+largest real |r| with a fitted one (the registration's matrix: v3 holds out whole clusters, but average linkage
+leaves some cross-cluster pairs at |r| ≥ 0.5 on both sides). pendulousFraction05 is reported whether or not it is
+drawn (the user).
 
 --control judges real trees by the same rule (no simulation): 20 BioDiv pseudo-seeds of 4 trees (in sample: it can
 barely fail), the pass count over 2,000 such draws, and Demol's trees as pseudo-seeds (out of sample).
@@ -35,15 +34,28 @@ from treesim.fit_level1 import Measure, Pool, clear_scratch, level1_spec
 from treesim.host import scratch_root, workers_default
 from treesim.sweep import REPO
 
-CORRELATED = ("p1", "widestAt")
+#: Reported whatever the draw (the user, 2026-11-04): the pilot's held-out failure.
+WATCH = "pendulousFraction05"
 
 
 def fmt(v, d=2) -> str:
     return "—" if v is None or not math.isfinite(v) else f"{v:+.{d}f}"
 
 
+def nearest_fitted(reg: dict) -> dict[str, dict]:
+    """Each held-out descriptor's largest |r| with a fitted one, on the registration's real matrix."""
+    c = reg["correlation"]
+    ix = {k: i for i, k in enumerate(c["names"])}
+    out = {}
+    for h in reg["held_out"]:
+        f = max(reg["fitted"], key=lambda k: abs(c["r"][ix[h]][ix[k]]))
+        out[h] = {"fitted": f, "r": c["r"][ix[h]][ix[f]]}
+    return out
+
+
 def out_of_sample(reg: dict) -> list[str]:
-    return [k for k in reg["held_out"] if k not in l1.OUTLINE]
+    """The held-out descriptors with no fitted one at |r| ≥ the cluster cut."""
+    return [h for h, v in nearest_fitted(reg).items() if abs(v["r"]) < l1.CLUSTER_CUT]
 
 
 def control(reg: dict) -> dict:
@@ -52,7 +64,7 @@ def control(reg: dict) -> dict:
     seeds = l1.pseudo_seeds(trees, len(l1.GATE_SEEDS), 4, rng)
     zs = [l1.seed_z(reg, s, reg["held_out"]) for s in seeds]
     passed = sum(l1.seed_passes(z) for z in zs)
-    ratios = l1.spread_ratios(reg, [t for s in seeds for t in s], reg["fitted"])
+    ratios = l1.spread_ratios(reg, [t for s in seeds for t in s], l1.spread_names(reg))
     counts = [sum(l1.seed_passes(l1.seed_z(reg, s, reg["held_out"]))
                   for s in l1.pseudo_seeds(trees, len(l1.GATE_SEEDS), 4, rng)) for _ in range(l1.CONTROL_SETS)]
     demol = l1.as_sim(l1.real_trees("demol", "FSYL"))
@@ -82,7 +94,7 @@ def print_control(c: dict, reg: dict) -> None:
     print(f"BioDiv (in sample: the targets' own trees, so it can barely fail): {b['passed']} of {b['of']} seeds pass "
           f"the held-out rule; over {b['sets']['n']} draws P(≥ 15) = {b['sets']['share_ge_15']:.3f}, pass counts "
           f"5/50/95% {b['sets']['quantiles']}")
-    print("  spread on its 80 trees: " + ", ".join(f"{k} {v:.2f}" for k, v in b["spread"].items())
+    print("  spread on its 80 trees (every descriptor): " + ", ".join(f"{k} {v:.2f}" for k, v in b["spread"].items())
           + f" → {'within ×2' if b['spread_pass'] else 'OUTSIDE ×2'}")
     print(f"Demol (out of sample, held-out tier A {d['descriptors']}): {d['passed']} of {d['of']} seeds; on "
           f"{out_of_sample(reg)} alone {d['out_of_sample_passed']}; over {d['sets']['n']} draws P(≥ 15) = "
@@ -119,7 +131,7 @@ def gate(reg: dict, species: str, assign: dict, workers: int, label: str) -> dic
         ok = l1.seed_passes(z)
         passed += ok
         rows.append({"seed": s, "trees": sum(x["seed"] == s for x in ts), "pass": ok, **z})
-    ratios = l1.spread_ratios(reg, ts, reg["fitted"])
+    ratios = l1.spread_ratios(reg, ts, l1.spread_names(reg))
     at = reg["size_match"]["dbh"]
     all_z = {}
     for k in names:
@@ -146,7 +158,7 @@ def gate(reg: dict, species: str, assign: dict, workers: int, label: str) -> dic
         "trees": len(ts), "dbh_median": float(np.median([x["dbh"] for x in ts])),
         "outside_real_dbh": sum(not lo <= x["dbh"] <= hi for x in ts),
         "held_out": {"passed": passed, "of": len(l1.GATE_SEEDS), "pass": passed >= l1.PASS_SEEDS, "rows": rows,
-                     "out_of_sample": out_of_sample(reg), "correlated_with_fitted_outline": list(CORRELATED)},
+                     "out_of_sample": out_of_sample(reg), "nearest_fitted": nearest_fitted(reg)},
         "spread": {"ratios": ratios, "pass": l1.spread_passes(ratios)},
         "shape_flag": flag,
         "z": all_z, "demol_z": demol,
@@ -154,7 +166,7 @@ def gate(reg: dict, species: str, assign: dict, workers: int, label: str) -> dic
     })
     out["pass"] = bool(out["held_out"]["pass"] and out["spread"]["pass"] and not flag.get("flag", False))
     out["verdict"] = (f"{'PASS' if out['pass'] else 'FAIL'}: held out {passed}/20 (need {l1.PASS_SEEDS}); spread "
-                      f"{'within' if out['spread']['pass'] else 'OUTSIDE'} ×2; shapeFlag "
+                      f"{'within' if out['spread']['pass'] else 'OUTSIDE'} ×2 (all {len(ratios)}); shapeFlag "
                       f"{'FLAGGED' if flag.get('flag') else 'clear'}")
     return out
 
@@ -166,20 +178,25 @@ def print_gate(g: dict, reg: dict) -> None:
     if "held_out" not in g:
         print(g["verdict"])
         return
-    print(f"Held out: {reg['held_out']}. p1 and widestAt correlate with the fitted outline terms (one measurement), so "
-          f"the out-of-sample test rests on {g['held_out']['out_of_sample']}.\n")
+    near = ", ".join(f"{h} {v['fitted']} {v['r']:+.2f}" for h, v in g["held_out"]["nearest_fitted"].items())
+    print(f"Held out: {reg['held_out']}. Largest real |r| with a fitted descriptor: {near}; none at |r| ≥ "
+          f"{l1.CLUSTER_CUT}: {g['held_out']['out_of_sample']}.\n")
     print("| seed | trees | " + " | ".join(reg["held_out"]) + " | pass |")
     print("|---|---|" + "---|" * len(reg["held_out"]) + "---|")
     for r in g["held_out"]["rows"]:
         print(f"| {r['seed']} | {r['trees']} | " + " | ".join(fmt(r[k]) for k in reg["held_out"])
               + f" | {'yes' if r['pass'] else 'no'} |")
-    print("\n| descriptor | role | n | sim median | real median | z | sim SD / real SD | Demol z |")
+    print("\n| descriptor | role | n | sim median | real median | z | sim SD / real SD (gated ×2) | Demol z |")
     print("|---|---|---|---|---|---|---|---|")
     for k, s in g["z"].items():
         role = "held out" if k in reg["held_out"] else "fitted"
         ratio = s["sd"] / reg["real"][k]["sd"] if math.isfinite(s["sd"]) else math.nan
         print(f"| {k} | {role} | {s['n']} | {s['median']:.4g} | {reg['real'][k]['median']:.4g} | {fmt(s['z'])} | "
               f"{ratio:.2f} | {fmt(g['demol_z'].get(k, math.nan))} |")
+    w = g["z"].get(WATCH)
+    if w is not None:
+        print(f"\n{WATCH} ({'held out' if WATCH in reg['held_out'] else 'fitted'}; reported whatever the draw): z "
+              f"{fmt(w['z'])}, spread {g['spread']['ratios'].get(WATCH, math.nan):.2f}")
     sf = g["shape_flag"]
     print(f"\nshapeFlag: {json.dumps({k: v for k, v in sf.items() if k != 'seeds'}, default=float)}")
     print(f"Level 0's statistic on the same runs (reported, not gated): {g['level0']['passed']} of "

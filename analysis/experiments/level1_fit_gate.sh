@@ -5,8 +5,10 @@
 #   TREESIM_WORKERS=8 LEVEL1_OUT=level1-pilot-mac analysis/experiments/level1_fit_gate.sh ...   # another host / run
 #
 # GENERATIONS is the budget, set from the dry run's seconds a generation (the user, 2026-11-04): max-evals is
-# GENERATIONS × 12 candidates × 5 seeds plus the finalists' and the hand's re-measure (4 × 10 seeds). MAX_HOURS is the
-# safety stop after the current generation. A killed run resumes from its checkpoint: run the same command again.
+# GENERATIONS × 12 candidates × the registration's seeds per candidate (loss.seeds_per_candidate: 5 in v2, set by
+# level1_noise.py in v3) plus the finalists' and the hand's re-measure (4 × 10 seeds). MAX_HOURS is the safety stop
+# after the current generation. The log's first line of each launch names the commit (and "+dirty" if analysis/ has
+# uncommitted changes). A killed run resumes from its checkpoint: run the same command again.
 # The gate (seeds 1–20) reads docs/experiments/fits/level1-pilot/S.json, or S-best.json if the fit stopped early.
 # LEVEL1_OUT (default level1-pilot) names the results and logs: docs/experiments/fits/$LEVEL1_OUT/, runs/$LEVEL1_OUT/
 # (the second host's run goes beside the first's, never over it). TREESIM_WORKERS: analysis/experiments/host.sh.
@@ -21,10 +23,14 @@ out=${LEVEL1_OUT:-level1-pilot}
 s=${1:?species}
 gens=${2:?generations}
 hours=${3:?max hours}
-evals=$((gens * 12 * 5 + 4 * 10))
+seeds=$(uv run --project analysis python -I -c "import json, sys; n = json.load(open(sys.argv[1]))['loss']['seeds_per_candidate']; print(n if n else '')" "analysis/fit/sources/level1-$s.json")
+[[ -n $seeds ]] || { echo "$s: the registration has no seeds_per_candidate (analysis/experiments/level1_noise.py)"; exit 1; }
+evals=$((gens * 12 * seeds + 4 * 10))
+commit=$(git rev-parse --short HEAD)
+[[ -z $(git status --porcelain -- analysis) ]] || commit="$commit+dirty"
 mkdir -p runs/$out
 log=runs/$out/$s.log
-echo "=== $s: $gens generations ($evals evaluations), ≤ $hours h; build:wasm $(date -Iseconds)" | tee -a "$log"
+echo "=== $s: commit $commit; $gens generations × 12 × $seeds seeds ($evals evaluations), ≤ $hours h; build:wasm $(date -Iseconds)" | tee -a "$log"
 npm run build:wasm >>"$log" 2>&1 || { echo "build:wasm failed (see $log)"; exit 1; }
 resume=()
 [[ -f runs/$out/$s/checkpoint.pkl ]] && resume=(--resume)

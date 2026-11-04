@@ -306,17 +306,17 @@ gate_c_v3_1_held_out_resolution = ['bifurcationRatio', 'bifurcationRatio2', 'len
 gate_c_v3_1_noise_limited = ['branchAngle2', 'taper']
 gate_c_v3_1 = "16 of 21 floor-clear descriptors reach a tier (amendment E stops below 11): proceed"
 # Level 1 pilot (phase 3, 2026-11-04; provisional, pending Level 0 and ADR 0052): registered in
-# analysis/fit/sources/level1-beech.json (analysis/experiments/level1_targets.py) before any simulated tree was
-# scored. The held-out draw is seeded and never redrawn; held-out values are never written by the fit.
+# analysis/fit/sources/level1-beech.json (analysis/experiments/level1_targets.py) from real QSMs only, before
+# any simulated tree was scored. Held-out values are never written by the fit. v3 (pilot v2, the user) redrew the
+# hold-outs once, as whole clusters of correlated descriptors, for independence; never again.
 pilot_registration = "analysis/fit/sources/level1-beech.json"
 pilot_held_out_seed = 20261104
-pilot_held_out = ['length0', 'p1', 'pendulousFraction05', 'tortuosity05', 'widestAt']
-pilot_fitted = ['centroidHeight', 'crownFullness', 'forkHeight', 'leaderDominance', 'limbDroop', 'limbElevation05', 'limbUpturn', 'p0', 'p2', 'p3', 'profileCentre']
-pilot_outline_group = ['centroidHeight', 'crownFullness', 'p0', 'p2', 'p3', 'profileCentre']
+pilot_held_out = ['length0', 'limbElevation05', 'limbUpturn', 'p3', 'widestAt']
+pilot_fitted = ['centroidHeight', 'crownFullness', 'forkHeight', 'leaderDominance', 'limbDroop', 'p0', 'p1', 'p2', 'pendulousFraction05', 'profileCentre', 'tortuosity05']
 pilot_knobs = ['r2.levels.0.lambda', 'r2.levels.1.lambda', 'r2.levels.1.setPoint', 'r2.levels.1.postureSetPoint', 'r2.levels.1.branchAngle', 'r2.levels.1.eta', 'r2.levels.2.setPoint', 'r2.aC', 'r2.dLambda', 'r2.kappa']
-pilot_version = 2
+pilot_version = 3
 pilot_frozen = { "r3.c" = 0.04879 }
-# v2: the user, 2026-11-04, after the dry run: r3.c frozen at the species' value as Level 0 did; alone it moved the size-matched season from 50 to 80 (stress wood: a girth knob), and nothing at Level 0 scores DBH at age; the knobs are ADR 0029's ten
+# v3: pilot v2 (the user, 2026-11-04, after the pilot failed its gate): a location-only loss weighted by the measured correlation (|r| under its p < 0.05 critical value zeroed); whole clusters held out to a third, for independence; spread gated on all 16 and out of the loss; fixed search seeds; seeds per candidate from the v3 noise floor (level1_noise.py); each change and the pilot result behind it are in the registration's changes
 
 [level0]
 # Level 0 (reference-fidelity phase 2, the plan's §k): the physiology knobs fitted against Tallo's H–DBH and CR–DBH

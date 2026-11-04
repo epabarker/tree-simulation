@@ -7,7 +7,8 @@ after every generation, <species>-best.json; the checkpoint and the candidate lo
     uv run --project analysis python -I analysis/experiments/level1_fit.py --species beech --max-evals 2000 --resume
     uv run --project analysis python -I analysis/experiments/level1_fit.py --species beech --dry-run
 
---max-evals counts simulator evaluations, one a (candidate, seed), the finalists and the hand included; --max-hours is a
+--max-evals counts simulator evaluations, one a (candidate, seed), the finalists and the hand included; the seeds
+per candidate and the seeds themselves are the registration's (level1.fit_seeds), fixed for the run; --max-hours is a
 safety stop after the current generation (resume with --resume). Refuses if a registered file has changed. Needs Node
 24 first on PATH and the WASM build.
 """
@@ -38,21 +39,24 @@ def main() -> None:
     args = parser.parse_args()
 
     reg = l1.load(args.species)
+    seeds = len(l1.fit_seeds(reg))
     if args.dry_run:
-        settings = Level1Settings(max_evals=2 * 12 * 5 + 3 * len(l1.FINAL_SEEDS), max_hours=2, finalists=2,
-                                  workers=args.workers, scratch=f"{scratch_root()}/level1-dry")
+        settings = Level1Settings(max_evals=2 * 12 * seeds + 3 * len(l1.FINAL_SEEDS), max_hours=2, finalists=2,
+                                  seeds=seeds, workers=args.workers, scratch=f"{scratch_root()}/level1-dry")
         out_dir = run_dir = REPO / "runs" / "level1-dry" / args.species
     else:
         if args.max_evals is None:
             parser.error("--max-evals is required (or --dry-run)")
         settings = Level1Settings(max_evals=args.max_evals, max_hours=args.max_hours, popsize=args.popsize,
-                                  finalists=args.finalists, workers=args.workers, scratch=f"{scratch_root()}/{args.out}")
+                                  seeds=seeds, finalists=args.finalists, workers=args.workers,
+                                  scratch=f"{scratch_root()}/{args.out}")
         out_dir = REPO / "docs" / "experiments" / "fits" / args.out
         run_dir = REPO / "runs" / args.out / args.species
 
     spec = level1_spec(args.species, reg)
-    print(f"=== {args.species} (provisional): knobs {spec.paths}; fitted {reg['fitted']}; groups "
-          f"{list(reg['groups'])}; trials {spec.trials}; {settings}", flush=True)
+    print(f"=== {args.species} (provisional; registration v{reg['version']}): knobs {spec.paths}; fitted "
+          f"{reg['fitted']}; location weights {({k: round(reg['location_weights'][k], 3) for k in reg['fitted']})}; "
+          f"seeds {l1.fit_seeds(reg)} (every generation); trials {spec.trials}; {settings}", flush=True)
     result = fit_level1(spec, reg, settings, out_dir, run_dir, resume=args.resume, log=lambda m: print(m, flush=True))
     if result["status"].startswith("stopped"):
         print(f"{args.species}: {result['status']}; best so far in {out_dir / (args.species + '-best.json')}")

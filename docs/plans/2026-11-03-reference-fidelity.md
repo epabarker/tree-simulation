@@ -308,37 +308,31 @@ no z was computed, and nothing registered changed after it.
 ### State
 _(rewritten at the end of each session)_
 
-**Phase 3 beech pilot: registration v2, launched (2026-11-04, [note](../experiments/2026-11-04-level1-beech-pilot.md));
-provisional, nothing accepted.**
-- **The user's ruling after the dry run, (b):** r3.c is frozen at the species' value, 0.04879, as Level 0 did; the knobs
-  are ADR 0029's ten.
-  - Registered as v2 (44a21ba): targets identical to v1's (3c64f48), which is kept in the file's `prior`.
-  - Why: r3.c alone moved the size-matched season from 50 to 80 (stress wood thickens the stem), and nothing at Level 0
-    scores DBH at age.
-- **Running:** tmux `level1` (systemd-inhibit), `level1_fit_gate.sh beech 32 5`, launched 11:46 UTC: 32 generations,
-  1,960 evaluations, ≈ 3.75 h with the gate, a 5 h safety stop.
-  - Log: `runs/level1-pilot/beech.log`. Gate: `runs/level1-pilot/beech.gate.{txt,json}`.
-  - Results: `docs/experiments/fits/level1-pilot/`.
-  - A killed run resumes with the same command.
-- **Registered (v1, kept in v2):**
-  - Held out (seed 20261104): length0, p1, pendulousFraction05, tortuosity05, widestAt. p1 and widestAt are outline, so
-    the out-of-sample test rests on the other three.
-  - Loss: forkHeight, leaderDominance, limbDroop, limbElevation05 and limbUpturn, plus the outline group (one unit),
-    plus Level 0's terms.
-  - Level 0's seven knobs are frozen at the v2 fit.
-- **Control:** BioDiv 20/20 (in sample), Demol 18/20 (out of sample).
-- **Hand baseline:**
-  - loss 18.52 (Level 0's terms 2.17). The largest terms are spreads: limbUpturn at 0.26× the real SD (6.07),
-    leaderDominance at 0.38× (4.05).
-  - The gate fails on spread alone: held out 20/20, so **the held-out rule does not discriminate in this pilot**; the
-    gate rests on spread and shapeFlag.
-- **Next:** the post-fit session:
-  - the gate on the fit;
-  - each term's change from the hand (does the gain come from Level 0 terms?);
-  - `level0_gate.py` on the fit;
-  - the gallery.
-
-  Then the audit (3), ADR 0052's probe (4), the O2 realism probe (2) and the asymmetry check (5) below.
+**Phase 3 beech pilot: done, failed its gate (2026-11-04, [note](../experiments/2026-11-04-level1-beech-pilot.md),
+results in `docs/experiments/fits/level1-pilot/`); provisional, nothing accepted. v2 of the Level 1 fit is a fresh session.**
+- **The run:** registration v2 (44a21ba: r3.c frozen, ADR 0029's ten knobs), 32 generations, 1,960 evaluations,
+  3.4 h.
+- **Re-measured on 101–110:** no finalist beats the hand (hand 18.52; finalists 19.94, 21.58, 22.59). The finalists
+  bought Level 1 terms (16.35 → 8.1–12.8) with Level 0 (2.17 → 7.1–14.5: lateShare, stand deaths at 100).
+- **The gate on the finalist: FAIL.**
+  - Held out 0/20, on pendulousFraction05 on every seed (0.63 against 0.37). The held-out rule does discriminate: the
+    hand passes it 20/20.
+  - Spread outside ×2 (leaderDominance 0.22, limbUpturn 0.35).
+  - shapeFlag clear, but beech's hand and spindle are not separable on its observables.
+  - Level 0's gate: 4/20 (the hand's 9).
+- **Noise floor:** the hand's loss is 21.6 ± 6.4 on 5-seed draws and 27.0 ± 13.2 on 10-seed draws, mostly the spread
+  terms of limbUpturn and leaderDominance. The in-run bests (9.15–11.13) were selection on noise.
+- **For the ADR list (rules, not knobs):**
+  1. Limbs and the leader vary too little between trees: 0.22–0.65× the real SD, hand and fit alike. The outline is
+     0.85–1.13×.
+  2. Order-2 shoots droop with nothing to limit them: limbDroop 51.5° against 40°, pendulousFraction05 0.63 against
+     0.37; order 2's set point 94.6 → 110, aC 14 → 30.
+- **Design faults found:**
+  - r3.c is a girth knob in the size match (v2 froze it);
+  - a held-out name leaked (fixed);
+  - the noise floor is wider than the differences ranked. v2 of the fit must answer this one before another run.
+- **Next:** Level 1 fit v2, a fresh session, the user's to frame; then the audit (3), ADR 0052's probe (4), the O2
+  realism probe (2) and the asymmetry check (5) below.
 
 **Earlier State (1d-ii and before), kept below.**
 

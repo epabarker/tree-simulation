@@ -1,4 +1,4 @@
-# Level 1 beech pilot: registration, control, dry run (2026-11-04)
+# Level 1 beech pilot: registration, control, dry run, the overnight fit (2026-11-04)
 
 _Reference-fidelity plan §g, phase 3, run as a **pilot** (the user, 2026-11-04). It is provisional, pending Level 0's
 pass and ADR 0052. Nothing from it is accepted into species params. This session built the fit, registered its targets
@@ -19,10 +19,32 @@ Files:
 - **Code:** `analysis/treesim/level1.py` (the rules), `analysis/treesim/fit_level1.py` (the search),
   `analysis/experiments/level1_eval.ts` (the evaluator), and `level1_fit.py`, `level1_gate.py`, `level1_fit_gate.sh`.
 - **Tests:** `analysis/tests/test_level1.py`, `test_level1_eval.py`.
-- **Outputs:** `runs/level1-pilot/` and `runs/level1-dry/`, not committed. The overnight writes to
-  `docs/experiments/fits/level1-pilot/`.
+- **Outputs:** `runs/level1-pilot/` and `runs/level1-dry/` (not committed). The overnight run's results, gates and
+  post-fit checks are in `docs/experiments/fits/level1-pilot/` (its README names the registration they ran from).
+- **Post-fit:** `uv run --project analysis python -I docs/experiments/code/2026-11-04-level1-pilot/postfit.py`, then
+  `level0_gate.py --species beech --fit docs/experiments/fits/level1-pilot/beech.json`.
 
-## Verdict (of this session; the fit itself has not run)
+## Result (the overnight fit; provisional, nothing accepted)
+- **The fit fails its gate:**
+  - held out **0 of 20**, on pendulousFraction05 on every seed (z +2.2 to +2.9; the hand +0.70);
+  - spread outside ×2 (leaderDominance 0.22, limbUpturn 0.35);
+  - shapeFlag clear.
+- **It is no better than the hand on fresh seeds.** On 101–110 the hand scores 18.52, the finalists 19.94 (chosen),
+  21.58 and 22.59. In-run they scored 9.15–11.13: selection on noise.
+- **The noise floor is larger than the gains the search ranked by.** The hand's loss on six independent 5-seed draws
+  is 21.6 ± 6.4 (SD); on three 10-seed draws, 27.0 ± 13.2. The limbUpturn and leaderDominance spread terms carry most
+  of it.
+- **The finalists bought Level 1 terms with Level 0.** Level 1 fell from 16.35 to 8.1–12.8, Level 0 rose from 2.17 to
+  7.1–14.5 (lateShare, stand deaths at 100). Level 0's gate on the finalist: 4 of 20 (the hand's 9).
+- **Two rules-level findings for the ADR list** (below):
+  - limbs and the leader vary too little between trees, and fitting does not change it;
+  - order-2 shoots droop with nothing in the rules to limit them.
+- **What the pilot bought:**
+  - the machinery, end to end;
+  - two gate criteria shown to discriminate: held out and spread;
+  - three design faults found before anything was accepted.
+
+## Before the run (the build session's verdict)
 - **Registered first** (3c64f48), from real QSMs only; nothing simulated was scored before it.
 - **Control:**
   - BioDiv, in sample: 20 of 20.
@@ -31,8 +53,8 @@ Files:
   - held out 20 of 20;
   - spread outside ×2 on leaderDominance (0.38) and limbUpturn (0.26);
   - shapeFlag clear.
-- **The held-out rule barely discriminates.** The hand passes it 20 of 20 before any fit, as the real trees do. In this
-  pilot, the gate's teeth are the spread rule and shapeFlag.
+- ~~**The held-out rule barely discriminates.**~~ **Corrected after the run:** the hand passes it 20 of 20, as the real
+  trees do, but it failed the fit 0 of 20. It discriminates. What it cannot do is catch a fault the hand shares.
 - **The dry run refutes "DBH at a season barely moves".** Generation 0's candidates matched at seasons 50 to 100. The
   matched season follows `r3.c`, which moves girth, not form alone. The two generations already traded Level 1 terms
   for Level 0's lateShare. Both points are decisions for the user (below) before the overnight run.
@@ -231,7 +253,8 @@ gate keeps them.
   refuses unless every target comes out identical to v1's: descriptors, the draw, groups, real distributions, Demol,
   size match and start. v1's knobs, fixed assignments and hashes are kept in the file's `prior` (v1: 3c64f48). The start
   still decodes to the hand (`test_level1.py`).
-- **The held-out rule does not discriminate in this pilot.** It passed the hand params 20 of 20, as it passes the real
+- **The held-out rule does not discriminate in this pilot** (corrected after the run: it failed the fit 0 of 20, see
+  "The overnight run's result"). It passed the hand params 20 of 20, as it passes the real
   trees. The gate rests on the spread rule and shapeFlag.
 - **The hand params' largest loss terms are spread terms:** limbUpturn at 0.26× the real between-tree SD (6.07) and
   leaderDominance at 0.38× (4.05). The simulated trees are too alike in those two, not wrong on average (z −1.26 and
@@ -279,3 +302,145 @@ tmux new -d -s level1mac 'caffeinate -ims env TREESIM_WORKERS=8 LEVEL1_OUT=level
 - **Across platforms:** the describe step differs in the last bit or two between x86 Linux and arm64 macOS (1 of 54 gate-c values, 1 ulp, 2026-11-04; `test_describe_pool_equals_gate_c` allows 2 ulp on Darwin, exact on Linux). Read a gate verdict from the two hosts with that in mind: a z, a spread ratio or a seed count within a few ulp of its threshold (|z| 2.0, ×2, 15 of 20) can flip between them, and a CMA-ES run that starts alike can drift apart.
 - **Outputs:** `docs/experiments/fits/level1-pilot/beech{.json,-best.json,-progress.csv}`; logs `runs/level1-pilot/beech.log`;
   gate `runs/level1-pilot/beech.gate.{txt,json}`.
+
+## The overnight run's result
+**The run.** Registration v2 (44a21ba), 11:46–15:08 UTC: 32 generations, 1,960 evaluations, 3.37 h wall, ≈ 365 s a
+generation; the gate ran by 15:10. Matched seasons over the 384 candidates:
+
+| season | 50 | 60 | 70 | 80 | 90 | 100 |
+|---|---|---|---|---|---|---|
+| candidates | 1 | 109 | 207 | 55 | 11 | 1 |
+
+None was unmatched. Scratch in /dev/shm peaked at 930 MB, with ≥ 15.5 GB free. No errors.
+
+**The search.** Generation bests, on each generation's own 5 seeds, ran 9.1–20.4. Medians drifted from ≈ 28 (generations
+0–3) to 17–22 (generations 27–31). The three lowest in-run losses were 9.15 (generation 19), 10.31 (25) and 11.13 (31),
+and these became the finalists.
+
+**Each term, hand to finalists, on seeds 101–110** (`postfit.json`; the re-measure reproduces the run's own hand and
+chosen finalist to 1e-9):
+
+| term | hand | finalist 1 (gen 19) | finalist 2 (gen 25, chosen) | finalist 3 (gen 31) |
+|---|---|---|---|---|
+| l1.limbUpturn.sd | 6.07 | 1.81 | 1.96 | 2.40 |
+| l1.leaderDominance.sd | 4.05 | 0.75 | 7.70 | 0.33 |
+| l1.limbUpturn.loc | 1.60 | 0.73 | 1.59 | 0.80 |
+| l1.limbElevation05.sd | 1.48 | 0.15 | 0.02 | 0.27 |
+| l1.limbDroop.sd | 0.96 | 1.32 | 0.49 | 0.02 |
+| l1.limbElevation05.loc | 0.71 | 0.97 | 0.01 | 0.94 |
+| l1.outline.loc | 0.59 | 0.38 | 0.37 | 0.59 |
+| l1.outline.sd | 0.35 | 0.24 | 0.07 | 0.40 |
+| l1.forkHeight.sd | 0.22 | 0.07 | 0.04 | 0.04 |
+| l1.forkHeight.loc | 0.16 | 0.90 | 0.01 | 1.01 |
+| l1.leaderDominance.loc | 0.14 | 0.22 | 0.19 | 0.44 |
+| l1.limbDroop.loc | 0.02 | 0.54 | 0.36 | 1.44 |
+| stand.lai | 0.56 | 0.04 | 0.90 | 0.01 |
+| stand.lateShare | 0.51 | **13.55** | 1.42 | 2.36 |
+| stand.talloCR | 0.40 | 0.30 | 0.47 | 0.63 |
+| stand.height100 | 0.27 | 0.21 | 0.35 | 0.16 |
+| stand.talloH | 0.22 | 0.10 | 0.30 | 0.24 |
+| stand.height | 0.09 | 0.17 | 0.45 | 0.00 |
+| shade.survivalLight | 0.13 | 0.13 | 0.13 | 0.13 |
+| death.stand | 0 | 0 | **3.13** | **9.38** |
+| death.lone | 0 | 0 | 0 | 0 |
+| **Level 1 terms** | 16.35 | 8.09 | 12.80 | 8.69 |
+| **Level 0 terms** | 2.17 | 14.50 | 7.14 | 12.89 |
+| **total** | **18.52** | 22.59 | 19.94 | 21.58 |
+
+Every finalist bought Level 1 terms (−3.6 to −8.3) with Level 0 (+5.0 to +12.3):
+- finalist 1 with lateShare, 3.7 bands (0.22) off its target of 1.43 on these seeds (the chosen finalist's is 1.50,
+  the hand's 1.39);
+- finalists 2 and 3 with the stand's survival at season 100 (0.775 for finalist 2, against the hand's 0.925).
+
+Keeping Level 0's terms in the loss did what the brief meant it to: on fresh seeds the trade shows, and no finalist
+beats the hand.
+
+**The gate on the chosen finalist** (seeds 1–20, `beech.gate.txt`): **FAIL**. Season 70, 70 trees, median DBH 0.305 m.
+- **Held out: 0 of 20.** pendulousFraction05 has z +2.2 to +2.9 on every seed; its value is 0.63 against BioDiv's 0.37
+  (hand 0.44), and Demol's z is +7.7. The other four held-out descriptors stay inside ±1.5.
+- **Spread (sim SD / real SD), hand → fit:**
+
+| descriptor | hand | fit |
+|---|---|---|
+| leaderDominance | 0.38 | 0.22 |
+| limbUpturn | 0.26 | 0.35 |
+| limbDroop | 0.59 | 0.50 |
+| centroidHeight | 0.61 | 0.53 |
+| limbElevation05 | 0.62 | 0.65 |
+| p2 | 0.76 | 0.64 |
+| crownFullness, forkHeight, p0, p3, profileCentre | 0.96–1.13 | 0.85–1.01 |
+
+- **shapeFlag:** clear.
+
+**Level 0's gate on the finalist** (`beech.level0-gate.txt`): **4 of 20** (the hand: 9 of 20, night 1). Median z_CR is
++0.76 to +0.91 at every season, and median z_H at 60 is −0.86.
+
+**The gallery on the finalist** (six fresh seeds, 1001–1006, against the v2 hand):
+
+| point | distance to the hand | noise | 2 × noise |
+|---|---|---|---|
+| the finalist | 0.35 | 0.38 | 0.76 |
+| round2-spindle | 0.51 | 0.34 | 0.68 |
+| round3-cone | 0.82 | 0.33 | 0.65 |
+
+- **Not flagged:** the finalist's nearest reject is round2-spindle at 0.62, further away than the hand (0.35).
+- **But the hand itself is not separated from the spindle on these observables** (0.51 < 2 × 0.34), as night 1 found.
+  The cone is separated.
+- **So for beech, shapeFlag "clear" says little.** The finalist is within noise of the hand on the lone tree's shape,
+  and the panel decides beech's spindle question.
+
+**The noise floor** (`postfit.json`: the hand on independent seed draws from the fit's range, numpy seed 20261106):
+
+| draw | losses | mean | SD |
+|---|---|---|---|
+| six of 5 seeds | 20.68, 26.93, 14.98, 13.73, 23.49, 29.66 | 21.58 | **6.38** |
+| three of 10 seeds | 13.60, 39.99, 27.33 | 26.97 | **13.20** |
+
+- **Ten seeds are not quieter than five.** The 39.99 draw carries a limbUpturn spread term of 22.6. Three draws give a
+  rough SD at best.
+- **Where the noise comes from:** the term SDs over the 5-seed draws are limbUpturn spread 4.0, leaderDominance spread
+  2.8, limbElevation05 spread 1.3, lateShare 1.1, and the rest ≤ 0.5.
+- **Why:** the simulated limbs barely turn up. Most trees read 0°, so the 20-tree SD rests on one or two trees, and its
+  logarithm swings.
+- **What it means for the run:** the run's best in-run losses (9.15–11.13) sit 1.6–1.9 SD below the hand's 5-seed
+  mean. That is well within what picking the lowest of 384 noisy readings produces: the expected minimum of 384 draws
+  is ≈ 2.9 SD below the mean. Their fresh-seed losses (19.9–22.6) agree.
+
+## For the ADR list: rules-level findings (not knobs)
+1. **Limbs and the leader vary too little between trees, and fitting does not change it.**
+   - **The spreads:** the simulated between-tree SD of the limb and leader descriptors is 0.22–0.65× the real one, for
+     the hand and the fit alike: leaderDominance 0.38 → 0.22, limbUpturn 0.26 → 0.35, limbDroop 0.59 → 0.50,
+     limbElevation05 0.62 → 0.65, and tortuosity05 (held out) 0.52 → 0.43.
+   - **Not the whole tree:** the outline varies as much as real trees (p0, p3, profileCentre, crownFullness and
+     forkHeight at 0.85–1.13×). So the shortfall is in the limbs, not "no between-tree variation" in the whole tree.
+   - **Why the knobs cannot fix it:** every tree grows by the same rules with the same params; real trees differ by
+     microsite, genotype and history. No form knob widens the distribution, and none of the ten did.
+   - **limbUpturn's level:** the simulated limbs barely turn up at all (median 0.01–0.34° against 13.7°).
+2. **Order-2 shoots droop with nothing in the rules to limit them.**
+   - **The evidence:** the fit's limbDroop is 51.5° against the real 40° (hand 38.6°), and its pendulousFraction05 is
+     0.63 against 0.37 (hand 0.44), on every gate seed.
+   - **The knobs that moved:** order 2's set point 94.6 → 110 (past horizontal), and aC 14 → 30.
+   - **What is missing:** no cost (mechanical, hydraulic or light) bounds how far order-2 shoots hang, so the search
+     pays nothing for it until the held-out descriptor reads it. This joins STATUS's open question (`levels.2.setPoint`
+     ≥ 80 collapses every broadleaf).
+
+## What the pilot bought
+- **The machinery, end to end:**
+  - registration with hashes, and versioned re-registration;
+  - the real-tree control;
+  - an evaluator at parity with fit-eval and dump-trees;
+  - the size match per candidate;
+  - a resumable fit that never writes held-out values;
+  - the gate with Demol and Level 0 reported beside it;
+  - the post-fit checks.
+- **Two gate criteria shown to discriminate:**
+  - **held out:** the hand 20/20, the fit 0/20;
+  - **spread:** both fail, on the descriptors named in finding 1.
+  - shapeFlag did not discriminate here: beech's hand and spindle are not separable on its observables.
+- **Three design faults found before anything was accepted:**
+  1. **r3.c is a girth knob that moves the size match.** Found in the dry run; frozen in v2.
+  2. **A held-out name leaked into the fit's rows** (the simulator's `stand.widestAt`). Found in the dry run; the fit
+     now drops held-out-named traits.
+  3. **The loss's noise floor is wider than the differences the search ranks by.** The 5-seed SD is ≈ 6.4. The
+     spread terms on a near-degenerate simulated distribution (limbUpturn) are most of it. CMA-ES selected on noise.
+- **Nothing is accepted into species params.**

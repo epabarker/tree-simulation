@@ -2,6 +2,25 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-04: Reference fidelity, phase 3 pilot: the overnight fit and its post-fit write-up (failed; nothing accepted)
+
+- **What changed** (docs and committed results only; no code under src/rust/cli/tests/analysis):
+  - `docs/experiments/fits/level1-pilot/`: the run's files as written, the gates, Level 0's gate, `postfit.json`, and a
+    README naming registration v2 (44a21ba);
+  - `docs/experiments/code/2026-11-04-level1-pilot/postfit.py`;
+  - the note's result sections.
+- **Result:** on fresh seeds no finalist beats the hand (18.52 against 19.94, 21.58, 22.59). The gate on the finalist
+  fails: held out 0/20 on pendulousFraction05, spread outside ×2. Level 0's gate: 4/20 (the hand's 9). Gallery: not
+  flagged, but beech's hand and spindle stay inseparable.
+- **Surprises:**
+  - The noise floor: the hand's loss SD is 6.4 on 5-seed draws, and no smaller on 10 (13.2 over three draws). It comes
+    from the spread terms of near-degenerate simulated distributions (limbUpturn ≈ 0° on most trees). The in-run bests
+    were selection on noise.
+  - The held-out rule does discriminate (the hand 20/20, the fit 0/20): the earlier line in the note is corrected.
+- **For the ADR list:** limbs and the leader vary too little between trees (0.22–0.65× real, unchanged by fitting);
+  order-2 shoots droop with nothing in the rules to limit them.
+- **No mac replication** folder (`fits/level1-pilot-mac/`) was present, so none is recorded.
+
 ## 2026-11-04: Reference fidelity, phase 3 pilot: Level 1 beech registered, controlled and dry-run (fit not launched)
 
 - **What changed** (analysis/ and docs only; no src/rust/cli/tests; goldens and gate c's hashed files unchanged):

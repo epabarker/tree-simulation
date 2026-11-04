@@ -83,8 +83,15 @@ class Level1Settings:
 
 def level1_spec(species: str, reg: dict) -> Spec:
     """Level 0's spec (its scored traits, weights, trials) with the registered knobs free and the frozen Level 0 knobs
-    and the [fixed] assignments in `fixed`; `form` is the registered start (the hand form)."""
+    and the [fixed] assignments in `fixed`; `form` is the registered start (the hand form). v4: the traits named in
+    the registration's `loss.level0_reported` move from the scored traits to the reports (read, never scored)."""
     spec = load_spec(species, level=0)
+    reported = reg["loss"].get("level0_reported", [])
+    missing = [n for n in reported if n not in {t["name"] for t in spec.traits}]
+    if missing:
+        raise SystemExit(f"refusing: level0_reported names no scored Level 0 trait: {', '.join(missing)}")
+    spec.reports = spec.reports + [t for t in spec.traits if t["name"] in reported]
+    spec.traits = [t for t in spec.traits if t["name"] not in reported]
     spec.params = reg["knobs"]
     spec.fixed = dict(reg["fixed"])
     spec.form = dict(reg["start"])
@@ -182,9 +189,20 @@ def total(spec: Spec, reg: dict, t: dict) -> tuple[float, dict]:
     return float(sum(c.values())), c
 
 
+def reported_contributions(spec: Spec, reg: dict, t: dict) -> dict[str, float]:
+    """The terms the reported Level 0 traits (v4: `loss.level0_reported`) would add at their Level 0 weights: reported
+    beside the loss, never in it."""
+    names = reg["loss"].get("level0_reported", [])
+    traits = [r for r in spec.reports if r["name"] in names]
+    if not traits:
+        return {}
+    c = contributions(Spec(spec.species, traits, []), t)
+    return {k: v for k, v in c.items() if k in names}
+
+
 def summary(spec: Spec, reg: dict, a: dict, t: dict) -> dict:
     lo, c = total(spec, reg, t)
-    return {"assign": a, "loss": lo, "contributions": c,
+    return {"assign": a, "loss": lo, "contributions": c, "reported": reported_contributions(spec, reg, t),
             "traits": {k: v for k, v in sorted(t.items()) if k.startswith(("l1.", "stand.", "shade.", "lone.alive"))}}
 
 

@@ -122,6 +122,37 @@ def test_contributions_location_only_weighted_and_missing():
     assert unmatched == {"l1.p0.loc": 2.0, "l1.p2.loc": 1.0, "l1.forkHeight.loc": 4.0}
 
 
+def test_spread_penalty_one_sided_v4():
+    """v4: (ln(min(1, r / 0.5)) / ln 2)², r = 2^s: 0 at and above half the real spread, 1 at a quarter, 4 at an
+    eighth; None where s is missing."""
+    for r, want in ((2.0, 0.0), (1.0, 0.0), (0.5, 0.0), (0.25, 1.0), (0.125, 4.0)):
+        assert math.isclose(l1.spread_penalty(math.log2(r)), want, abs_tol=1e-12), r
+    assert l1.spread_penalty(float("nan")) is None and l1.spread_penalty(None) is None
+    reg = {**reg_of(["p0", "p2", "forkHeight"], weights={"p0": 0.5, "p2": 0.25, "forkHeight": 1.0}),
+           "loss": {"spread_floor": 0.5}}
+    t = {"l1.p0.z": 2.0, "l1.p0.s": -2.0, "l1.p2.z": 0.0, "l1.p2.s": float("nan"), "l1.forkHeight.z": 1.0,
+         "l1.forkHeight.s": 0.3}
+    c = l1.level1_contributions(reg, t)
+    assert c == {"l1.p0.loc": 2.0, "l1.p0.spr": 0.5, "l1.p2.loc": 0.0, "l1.p2.spr": 0.25 * l1.MISSING_PENALTY,
+                 "l1.forkHeight.loc": 1.0, "l1.forkHeight.spr": 0.0}
+    unmatched = l1.level1_contributions(reg, {"l1.season": None})
+    assert unmatched["l1.p0.spr"] == 0.5 * l1.MISSING_PENALTY
+
+
+def test_level0_reported_leave_the_loss_v4():
+    """v4: lateShare and height at 100 are reports, not scored; their terms are written beside the loss."""
+    reg = l1.load("beech", check=False)
+    spec = f1.level1_spec("beech", reg)
+    scored = [t["name"] for t in spec.traits]
+    assert "stand.lateShare" not in scored and "stand.height100" not in scored
+    assert {"stand.height", "stand.lai", "shade.survivalLight", "stand.talloH", "stand.talloCR"} <= set(scored)
+    t = {"stand.lateShare": 1.20, "stand.height100": 1.0, "stand.alive100": 0.5}
+    lo, c = f1.total(spec, reg, t)
+    assert "stand.lateShare" not in c and "stand.height100" not in c and c["death.stand"] > 0
+    rep = f1.reported_contributions(spec, reg, t)
+    assert set(rep) == {"stand.lateShare", "stand.height100"} and rep["stand.lateShare"] > 0
+
+
 def test_traits_never_carry_held_out():
     reg = reg_of(["forkHeight"], held_out=["length0"])
     trees = [{"dbh": 0.3, "forkHeight": x, "length0": x} for x in np.linspace(0, 1, 12)]
@@ -228,15 +259,20 @@ def test_describe_pool_equals_gate_c():
     assert all(u <= allowed for *_, u in diffs), f"beyond {allowed} ulp on {sys.platform}: {report}"
 
 
-def test_registration_v3_loads_reproduces_its_draw_and_starts_at_the_hand():
+def test_registration_v4_loads_reproduces_its_draw_and_starts_at_the_hand():
     """The committed registration passes its own hash check (it refuses once a hashed file changes: re-register, never
     edit), freezes r3.c at the species' value (v2), and its stored real matrix gives back its clusters, its draw and
-    its weights by level1's rules (v3); its start decodes to the hand."""
+    its weights by level1's rules (v3); v4 keeps v3's hold-outs, weights and seeds and adds the spread penalty and the
+    reported Level 0 traits; its start decodes to the hand."""
     from treesim import fit
 
     reg = l1.load("beech")
-    assert reg["version"] == 3 and reg["prior"]["version"] == 2 and reg["prior"]["prior"]["version"] == 1
-    assert reg["prior"]["held_out"] == ["length0", "p1", "pendulousFraction05", "tortuosity05", "widestAt"]
+    assert reg["version"] == 4 and reg["prior"]["version"] == 3 and reg["prior"]["prior"]["version"] == 2
+    assert reg["prior"]["prior"]["held_out"] == ["length0", "p1", "pendulousFraction05", "tortuosity05", "widestAt"]
+    assert reg["held_out"] == reg["prior"]["held_out"] and reg["location_weights"] == reg["prior"]["location_weights"]
+    assert reg["loss"]["seeds_per_candidate"] == reg["prior"]["loss"]["seeds_per_candidate"] == 10
+    assert reg["loss"]["spread_in_loss"] is True and reg["loss"]["spread_floor"] == l1.SPREAD_FLOOR
+    assert reg["loss"]["level0_reported"] == ["stand.lateShare", "stand.height100"]
     paths = [p["path"] for p in reg["knobs"]]
     assert "r3.c" not in paths and len(paths) == 10
     assert reg["fixed"]["r3.c"] == reg["frozen_form"]["r3.c"] == 0.04879
@@ -250,7 +286,6 @@ def test_registration_v3_loads_reproduces_its_draw_and_starts_at_the_hand():
     assert len(held) >= round(len(names) / 3) and sorted(reg["fitted"] + held) == names
     w = l1.location_weights(r, names, reg["weights"]["r_crit"])
     assert w == reg["location_weights"]
-    assert reg["loss"]["spread_in_loss"] is False
     assert reg["seeds"]["search"]["list"] == l1.search_seeds()
     spec = f1.level1_spec("beech", reg)
     hand = {**spec.fixed, **spec.form}

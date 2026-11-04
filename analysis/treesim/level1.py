@@ -29,8 +29,14 @@ distributions, the frozen Level 0 knobs, the fitted knobs and the file hashes. T
   parity 1e-9 with cylinders.dbh) reaches d*. A match outside DUMP_SEASONS, or none, is unmatched.
 - **Loss terms (v3: location only).** Per fitted descriptor, z = (median of the detrended simulated trees − real
   median) / real SD; its term is w z², or w × MISSING_PENALTY with fewer than MIN_TREES finite trees or an unmatched
-  candidate. The spread s = ln(simulated SD / real SD) / ln 2 is computed and kept in the traits (reported), never in
-  the loss: it is a gate criterion (ADR 0049 §4).
+  candidate. The spread s = ln(simulated SD / real SD) / ln 2 is computed and kept in the traits (reported); in v3 it
+  is never in the loss, only a gate criterion (ADR 0049 §4).
+- **Loss (v4, pilot v3; the user, 2026-11-04).** v3's terms, plus a one-sided spread penalty per fitted descriptor,
+  `l1.<k>.spr` = w_k (ln(min(1, r / SPREAD_FLOOR)) / ln 2)² with r = simulated SD / real SD, i.e. w_k min(0, s + 1)²:
+  0 while the simulated spread is at least half the real, 1 at a quarter, 4 at an eighth; w_k × MISSING_PENALTY where
+  s cannot be read (fewer than MIN_TREES finite trees, a zero SD, or an unmatched candidate). Read where the
+  registration's `loss.spread_floor` is set. Level 0's traits named in `loss.level0_reported` (v4: stand.lateShare and
+  stand.height100) are reported, not scored (fit_level1.level1_spec moves them to the spec's reports).
 - **Seeds (v3).** The search grows every candidate of every generation on the same seeds: the first
   `seeds_per_candidate` of the registered list (SEARCH_SEED; never the gate's, the finalists', the gallery's or the
   noise check's). `seeds_per_candidate` is set once, from the hand's noise floor on the v3 loss (level1_noise.py).
@@ -69,6 +75,8 @@ DUMP_SEASONS = tuple(range(50, 101, 10))
 MIN_TREES = 10
 Z_GATE = 2.0
 SPREAD_BAND = math.log(2.0)
+#: The spread penalty's floor (v4): no penalty while simulated SD / real SD is at least this.
+SPREAD_FLOOR = 0.5
 PASS_SEEDS = 15
 GATE_SEEDS = tuple(range(1, 21))
 FINAL_SEEDS = tuple(range(101, 111))
@@ -365,14 +373,27 @@ def level1_traits(reg: dict, trees: list[dict] | None, season: int | None, flags
     return out
 
 
+def spread_penalty(s: float | None, floor: float = SPREAD_FLOOR) -> float | None:
+    """The one-sided spread term (v4) of s = log2(simulated SD / real SD): (ln(min(1, r / floor)) / ln 2)², r = 2^s;
+    0 for r ≥ floor. None where s is missing or not finite."""
+    if s is None or not math.isfinite(s):
+        return None
+    return min(0.0, s - math.log2(floor)) ** 2
+
+
 def level1_contributions(reg: dict, traits: dict) -> dict[str, float]:
-    """Per fitted descriptor, `l1.<k>.loc` = w_k z² (v3: location only, the registered weights); w_k × MISSING_PENALTY
-    for a descriptor that could not be scored (or for every one, unmatched). Spread is not in the loss."""
+    """Per fitted descriptor, `l1.<k>.loc` = w_k z² (the registered weights); w_k × MISSING_PENALTY for a descriptor
+    that could not be scored (or for every one, unmatched). v3: location only. v4 (`loss.spread_floor` set): also
+    `l1.<k>.spr` = w_k × spread_penalty(s), or w_k × MISSING_PENALTY where s cannot be read."""
     w = reg["location_weights"]
+    floor = reg.get("loss", {}).get("spread_floor")
     out = {}
     for k in reg["fitted"]:
         z = traits.get(f"l1.{k}.z")
         out[f"l1.{k}.loc"] = w[k] * (z * z if z is not None and math.isfinite(z) else MISSING_PENALTY)
+        if floor is not None:
+            p = spread_penalty(traits.get(f"l1.{k}.s"), floor)
+            out[f"l1.{k}.spr"] = w[k] * (MISSING_PENALTY if p is None else p)
     return out
 
 

@@ -27,6 +27,13 @@ this registration's loss and sets them once, before any fit; level1.fit_seeds re
   measured correlation; whole clusters held out to a third; spread gated on every descriptor and out of the loss;
   fixed search seeds; seeds per candidate from the v3 noise floor. Each change and the pilot result behind it is in
   the registration's `changes`.
+- v4, pilot v3 (the user, 2026-11-04, after pilot v2 and the sensitivity note): "best achievable with the current
+  rules". lateShare and height at 100 reported, not scored, in the Level 1 loss; a one-sided spread penalty on every
+  fitted descriptor (level1.spread_penalty); seeds per candidate kept at v3's 10 (the user), not re-decided; every
+  target, hold-out and weight as v3 (no --redraw).
+
+        uv run --project analysis python -I analysis/experiments/level1_targets.py --species beech --version 4 \
+            --freeze r3.c --reason "..."
 """
 
 import argparse
@@ -181,6 +188,45 @@ CHANGES = {3: [
      "motivation": "the pilot's third design fault: the loss's noise floor was wider than the differences the "
                    "search ranked by"},
 ]}
+CHANGES[4] = [
+    {"change": "stand.lateShare and stand.height100 are reported, not scored, in the Level 1 loss "
+               "(`loss.level0_reported`; fit_level1.level1_spec moves them to the reports and summary() writes the "
+               "terms they would add beside the loss). They stay in the Level 0 gate. Height at 60, talloH, talloCR, "
+               "LAI, survivalLight and the death penalties (stand.alive100's included) stay scored at their Level 0 "
+               "weights",
+     "motivation": "the sensitivity note (2026-11-04-level1-sensitivity.md): lateShare's per-seed SD on the hand's "
+                   "ten search seeds is 0.137, more than twice its band (0.06), so on ten seeds the term is "
+                   "undetermined; both pilots gained it for free (pilot v2's generation-0 best: lateShare 1.53 -> 0.00 "
+                   "on the frozen seeds, from form knobs that shape limbs; 12 of the sweep's 40 form-knob conditions "
+                   "moved it by more than -1). Height at 100 goes with it, the same stand reading at the same age"},
+    {"change": "a one-sided spread penalty on every fitted descriptor: l1.<k>.spr = w_k (ln(min(1, r / 0.5)) / "
+               "ln 2)^2, r = simulated SD / real SD (= w_k min(0, s + 1)^2): 0 at r >= 0.5, 1 at 0.25, 4 at 0.125; "
+               "weighted like its location term (location_weights); w_k x missing_penalty where s cannot be read",
+     "motivation": "pilot v2's generation-8 best (3.94 on the search seeds) gained Level 1 (2.60 -> 1.47) by "
+                   "collapsing spread to 0.13-0.38x real on six fitted descriptors; the v3 loss could not see spread, "
+                   "so its best could not pass the spread gate. The floor at half the real spread leaves the gate's "
+                   "x2 band to the gate and penalises only collapse"},
+    {"change": "seeds per candidate kept at v3's 10 (the user: do not change seeds); the v4 noise check (the hand on "
+               "v3's three 10-seed draws) is reported beside v3's 0.40, never used to re-decide",
+     "motivation": "the user's instruction for pilot v3; the noise check says how far the v4 loss's floor moved"},
+]
+EXPECTED = {4: {
+    "object": "the fourteen descriptors the sensitivity note finds reachable at Level 0 cost <= 2 (its affordable "
+              "verdict): all sixteen less tortuosity05 and limbUpturn. Fitted among them: centroidHeight, "
+              "crownFullness, forkHeight, leaderDominance, limbDroop, p0, p1, p2, pendulousFraction05, "
+              "profileCentre; held out: length0, limbElevation05, p3, widestAt",
+    "expected_out_of_band": {"tortuosity05": "reachable only at Level 0 costs above 20 (dLambda 0.067-0.12, ΔL0 +22 "
+                                             "to +73; r3.c 0.01-0.022, +21 to +76); the best affordable single move "
+                                             "closes 31%, the best affordable pair 33%",
+                             "limbUpturn": "held out; its median closes at most 61-69% affordably and its spread "
+                                           "reaches 0.46x at best: a rule's case (the note's ADR item 1)"},
+    "source": "docs/experiments/2026-11-04-level1-sensitivity.md (e8f3edc)",
+}}
+UNCHANGED_V4 = ["every target, the hold-outs, the clusters and the location weights (no --redraw)",
+                "the ten form knobs, their bounds and the start", "Level 0's seven knobs and r3.c frozen",
+                "the ten fixed search seeds", "the coarsened-simulation rule", "the size match",
+                "32 generations (the wrapper's argument)", "the finalists (101-110) and the hand beside them",
+                "the gate: held out |z| 2 on 15 of 20, spread within x2 on all 16, shapeFlag"]
 UNCHANGED = ["Level 0's seven knobs frozen at the v2 beech fit", "r3.c frozen at the species' 0.04879",
              "Level 0's terms at their Level 0 weights", "ADR 0029's ten form knobs, their bounds and the start",
              "the coarsened-simulation rule", "the size match", "the budget in generations (the wrapper's argument)",
@@ -293,9 +339,33 @@ reg = {
 from treesim.fit import load_spec  # noqa: E402
 
 reg["weights"]["level0_total"] = float(sum(t["weight"] for t in load_spec(species, level=0).traits))
+if args.version >= 4:
+    # v4 (pilot v3): the loss changes; the seeds per candidate are v3's, kept by the user, not re-decided.
+    reg["written"] = ("2026-11-04, from real QSMs only, before any simulated tree was scored on this loss; "
+                      "seeds_per_candidate kept at v3's (the user)")
+    reported = ["stand.lateShare", "stand.height100"]
+    reg["loss"].update({
+        "terms": "Level 0's contributions less the level0_reported traits + Σ over fitted k of location_weights[k] · "
+                 "(z_k² + spread_penalty(s_k))",
+        "spread_in_loss": True,
+        "spread_floor": l1.SPREAD_FLOOR,
+        "spread_penalty": "level1.spread_penalty: (ln(min(1, r / spread_floor)) / ln 2)², r = simulated SD / real SD "
+                          "= 2^s; 0 at r >= spread_floor; w_k · missing_penalty where s cannot be read (fewer than "
+                          "min_trees finite trees, a zero SD, unmatched)",
+        "level0_reported": reported,
+        "level0_reported_rule": "reported, not scored, in the Level 1 loss (fit_level1.level1_spec); summary() writes "
+                                "the terms they would add at their Level 0 weights under `reported`; they stay in the "
+                                "Level 0 gate",
+        "seeds_per_candidate": prior["loss"]["seeds_per_candidate"],
+        "seeds_rule": "v3's 10, kept by the user for pilot v3 (2026-11-04), not re-decided; the v4 noise check (the "
+                      "hand on the three 10-seed draws) is reported only",
+    })
+    reg["weights"]["level0_scored_total"] = float(sum(t["weight"] for t in load_spec(species, level=0).traits
+                                                      if t["name"] not in reported))
+    reg["expected"] = EXPECTED[args.version]
 if args.version in CHANGES:
     reg["changes"] = CHANGES[args.version]
-    reg["unchanged"] = UNCHANGED
+    reg["unchanged"] = UNCHANGED_V4 if args.version >= 4 else UNCHANGED
 #: The targets themselves: never changed by a new version. --redraw (v3) lets the hold-outs and the weights move.
 SAME = ("species", "dataset", "code", "d_min_m", "size_match", "descriptors", "held_out_seed", "real",
         "real_dbh_range_m", "real_trees", "real_trees_by_gap", "demol", "frozen_level0", "start")

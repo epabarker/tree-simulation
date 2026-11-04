@@ -2,6 +2,30 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-04: Reference fidelity, phase 3 pilot v2: stopped at generation 10 (the user); checkpoint kept, resumable
+
+- **What changed** (docs and committed partial results only; no code under src/rust/cli/tests/analysis):
+  - the note's section "The stop";
+  - the fits README;
+  - the plan's State and STATUS;
+  - committed as the run wrote them: `fits/level1-pilot-v2/{beech-best.json, beech-progress.csv}`;
+  - `hand-search-seeds.json` and its script, `code/2026-11-04-level1-pilot-v2/hand_on_search_seeds.py`.
+- **Result:** 10 of 32 generations ran (1,200 evaluations); no finalists, no gate. The hand on the ten search seeds
+  scores 6.68.
+  - **The call:** the user stopped the run on the generation-7 status. The best had not moved since generation 0
+    (5.14, Level 1 2.47 against the hand's 2.60), and its gain was Level 0.
+  - **After the call:** generation 8's best (3.94) gained Level 1 (2.60 → 1.47) while its spread collapsed to
+    0.13–0.38× real on six fitted descriptors. The loss reads only medians, so the collapse was free, and the
+    candidate could not pass the spread gate.
+  - Both readings support stopping.
+- **Surprises:**
+  - **The gain came from medians** (tortuosity05, p0, centroidHeight). The two most collapsed descriptors
+    (leaderDominance and p1) gained little or lost, and collapse's direct reward is bounded at ≈ 0.17.
+  - **The hand fails the spread gate on these seeds** too: leaderDominance 0.26×.
+  - **The matched season drifted** to the window's first (season 50) in half the candidates from generation 4 on.
+- **For the next registration (the user):** a one-sided spread penalty below 0.5× the real SD. Its form and its noise
+  are to be measured before the seed rule is applied again.
+
 ## 2026-11-04: Reference fidelity, phase 3 pilot v2: registration v3, its noise floor, the launch
 
 - **What changed** (analysis/ and docs only; no src/rust/cli/tests; goldens untouched):

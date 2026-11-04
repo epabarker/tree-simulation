@@ -1,4 +1,4 @@
-# Level 1 beech pilot v2: registration v3, its noise floor, the launch (2026-11-04)
+# Level 1 beech pilot v2: registration v3, its noise floor, the launch, the stop (2026-11-04)
 
 _Reference-fidelity plan §g, phase 3, the beech pilot's second run (the user, 2026-11-04). Provisional: it waits on
 Level 0's pass and ADR 0052, and nothing from it is accepted into species params. The [pilot](2026-11-04-level1-beech-pilot.md)
@@ -8,6 +8,10 @@ registers the changes below before any fit and keeps everything else. No core ch
 
 **Naming.** Pilot v2 runs registration **version 3**. v1 (3c64f48) was never run; v2 (44a21ba, r3.c frozen) is the
 pilot. Results go to `docs/experiments/fits/level1-pilot-v2/` and `runs/level1-pilot-v2/`.
+
+**Stopped at generation 10 of 32 (the user, 19:08 UTC); checkpoint kept, resumable.** No finalists, no gate. The
+best in-run candidate gained on Level 1 while its spread collapsed, which the loss cannot see. See
+[the stop](#the-stop-generation-10-of-32-by-the-user-1908-utc).
 
 ## Reproduce
 ```
@@ -277,8 +281,8 @@ the fit refuses to start without it.
 ## The launch
 **Launched 2026-11-04 at 17:01:59 UTC** on this machine, from 81b157a (the registration commit), in tmux session
 `level1v2` under systemd-inhibit. The log's first line: `=== beech: commit 81b157a; 32 generations × 12 × 10 seeds
-(3880 evaluations), ≤ 9 h`. Expected to finish around 23:40 UTC, the gate included. Watch it with
-`tail -f runs/level1-pilot-v2/beech.log`.
+(3880 evaluations), ≤ 9 h`. It was expected to finish around 23:40 UTC, the gate included; it was stopped at
+19:08 (below).
 
 **The budget** is unchanged at 32 generations, now at 10 seeds a candidate: 32 × 12 × 10 = 3,840 evaluations,
 plus 40 for the finalists and the hand on 101–110, or 3,880 in all.
@@ -299,3 +303,76 @@ tmux new -d -s level1v2mac 'caffeinate -ims env TREESIM_WORKERS=8 LEVEL1_OUT=lev
 - **Outputs:**
   - in `docs/experiments/fits/level1-pilot-v2/`: `beech{.json,-best.json,-progress.csv}`;
   - in `runs/level1-pilot-v2/`: the log `beech.log`, the gate `beech.gate.{txt,json}`.
+
+## The stop: generation 10 of 32, by the user (19:08 UTC)
+**Stopped at generation 10, checkpoint kept, resumable** (`runs/level1-pilot-v2/beech/checkpoint.pkl`; the launch
+command resumes it). Ten generations (0–9), 120 candidates and 1,200 evaluations ran in 2 h 04 min, ≈ 745 s a
+generation against 730 projected.
+- **The stop:** SIGINT at 19:08:07. The wrapper logged "the fit failed (exit 130); no gate".
+- **Never run:** the finalists on 101–110, the gate and the gallery. `beech.json` and the gate files do not exist.
+- **The partial results**, as the run wrote them after generation 9 (19:06): `beech-best.json` (generation 8's best:
+  its patch, traits and contributions) and `beech-progress.csv` (all 120 candidates).
+
+**The baseline:** the hand on the run's own ten search seeds, scored after the launch with the same Measure
+(hide=True; `code/2026-11-04-level1-pilot-v2/hand_on_search_seeds.py` → `fits/level1-pilot-v2/hand-search-seeds.json`).
+It scores 6.676: Level 1 location 2.604, Level 0 4.072, matched at season 70 with 40 trees. Every loss below is on
+those identical seeds.
+
+**Two readings. Both support stopping.**
+1. **The call, on the generation-7 status.** The best had not moved since generation 0: 5.137, 1.54 below the hand,
+   almost all of it Level 0. Its Level 1 location was 2.47 against the hand's 2.60; its Level 0 was 2.66 against
+   4.07, mostly lateShare (−1.53). The user stopped the run on that status.
+2. **Generation 8's best, found after the call.** It finished before the stop but after that status. It scores 3.935,
+   2.74 below the hand, matched at season 50, the window's first (DBH 0.298 m, 40 trees). It is the first candidate
+   to gain on Level 1 (2.60 → 1.47; Level 0 4.07 → 2.46).
+   - **Its spread collapsed** on six fitted descriptors, to 0.13–0.38× the real SD.
+   - **The collapse cost it nothing,** because the loss reads only medians: the case the advisor flagged (point 2
+     above).
+   - **The gate:** on the search seeds it is outside ×2 on those six of its 11 fitted descriptors, so it could not
+     pass the spread gate. That gate is measured on 101–110, which the run never reached.
+
+**Spread (sim SD / real SD) and each location term, the hand against generation 8's best, on the search seeds:**
+
+| descriptor | hand's spread | best's spread | location term, hand → best |
+|---|---|---|---|
+| leaderDominance | 0.26 | **0.13** | 0.105 → 0.182 |
+| p1 | 0.93 | **0.15** | 0.049 → 0.014 |
+| centroidHeight | 0.45 | **0.30** | 0.469 → 0.233 |
+| pendulousFraction05 | 0.78 | **0.31** | 0.193 → 0.002 |
+| limbDroop | 0.49 | **0.36** | 0.006 → 0.001 |
+| forkHeight | 1.24 | **0.38** | 0.016 → 0.504 |
+| profileCentre | 0.92 | 0.53 | 0.166 → 0.070 |
+| tortuosity05 | 0.51 | 0.61 | 0.950 → 0.412 |
+| p0 | 0.95 | 0.67 | 0.503 → 0.000 |
+| crownFullness | 1.03 | 0.72 | 0.125 → 0.014 |
+| p2 | 0.67 | 0.78 | 0.021 → 0.039 |
+
+- **Where the Level 1 gain came from: the medians.**
+  - **Gains:** tortuosity05 −0.54, p0 −0.50, centroidHeight −0.24, pendulousFraction05 −0.19, crownFullness −0.11,
+    profileCentre −0.10.
+  - **Losses:** forkHeight +0.49 and leaderDominance +0.08.
+  - **The two most collapsed descriptors** (leaderDominance and p1) gained little or lost.
+  - **Collapse's direct reward** through the median's sampling variance is bounded at ≈ 0.17 (point 2).
+
+  The data do not show that the collapse bought the gain. They show that the loss let the collapse through.
+- **Level 0's part:** lateShare −1.52, height100 −0.40, talloCR −0.40, height −0.12; against lai +0.64, talloH +0.18.
+- **The hand fails the spread gate on these seeds too.** leaderDominance is at 0.26, and centroidHeight (0.45),
+  limbDroop (0.49) and tortuosity05 (0.51) sit at the line. As registered, the gate cannot pass until limbs and the
+  leader vary between trees as real ones do.
+- **The matched season drifted earlier.** Season-50 matches were 1 of 12 candidates in generation 0, and 6–7 of 12
+  from generation 4 on. Generation 8's best is one of them. A match at season 50 carries the flag "matched at the
+  first season", since the stand may reach the size before the window opens.
+- **14 of 120 candidates beat the hand.** By generation, 0–9: 1, 1, 0, 1, 0, 0, 2, 1, 4, 4.
+
+**Design note for the next registration (the user):** a one-sided spread penalty below 0.5× the real SD. It is zero
+at or above 0.5× and rises below it, so collapse costs while the fit is not asked to raise variance. Points for when
+it is registered:
+- **Not yet fixed: the penalty's form.** One candidate is w_k · max(0, −1 − s_k)², with s_k = log2(sim SD / real SD)
+  as the traits already carry it.
+- **The hand pays it too.** On these seeds the hand sits below 0.5× on leaderDominance (0.26) and centroidHeight (0.45),
+  and at 0.49 on limbDroop. That is a floor every candidate pays, and it still prices any further collapse.
+- **The penalty needs a noise check before the seed rule is applied again.** The pilot's two-sided spread terms were
+  its noise: +14.7 on the 5-seed mean, and the SD rose from 0.84 to 6.38. A one-sided term is zero wherever the spread
+  is near real, but it is live on the hand's low-spread descriptors.
+- **Resuming v3 is possible, but it would not help.** The checkpoint resumes under v3, but v3's loss would keep
+  letting collapse through.

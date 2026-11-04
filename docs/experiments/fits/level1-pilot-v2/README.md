@@ -15,9 +15,17 @@ The write-up is [the note](../../2026-11-04-level1-beech-pilot-v2.md).
     (`level1_gate.py --control`).
   - `weights-bootstrap.json`: the weights' and clusters' stability over 2,000 resamples of the real trees
     (`docs/experiments/code/2026-11-04-level1-pilot-v2/weights_bootstrap.py`; reported, never used).
-- **Written by the run** (`LEVEL1_OUT=level1-pilot-v2 analysis/experiments/level1_fit_gate.sh beech 32 H`):
-  - `beech.json`: the hand and the chosen finalist re-measured on seeds 101–110;
-  - `beech-best.json`, `beech-progress.csv`;
-  - the gate, in `runs/level1-pilot-v2/beech.gate.{txt,json}` (copied here when the run is read).
+- **Written by the run** (`LEVEL1_OUT=level1-pilot-v2 analysis/experiments/level1_fit_gate.sh beech 32 H`).
+  **Stopped at generation 10 of 32 (the user, 19:08 UTC); checkpoint kept, resumable**
+  (`runs/level1-pilot-v2/beech/checkpoint.pkl`). These are partial results, as the run wrote them after generation 9:
+  - `beech-best.json`: the in-run best (generation 8, 3.935 on the search seeds), with its patch, traits and
+    contributions;
+  - `beech-progress.csv`: all 120 candidates.
+
+  Never written, since the run stopped before its finalists and gate: `beech.json` (the hand and the finalist on
+  101–110) and the gate files.
+- **Written after the launch, beside the run:** `hand-search-seeds.json`, the hand on the run's ten fixed search seeds
+  with the same Measure (hide=True), so that in-run losses read against the hand on identical seeds
+  (`docs/experiments/code/2026-11-04-level1-pilot-v2/hand_on_search_seeds.py`).
 - **Held-out values** appear only in the gate files. The fit's own files carry none, and neither does the
   registration commit: `correlation.json` holds correlations only.

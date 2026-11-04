@@ -17,7 +17,8 @@ import json
 import sys
 
 from treesim import level1 as l1
-from treesim.fit_level1 import Level1Settings, fit_level1, level1_spec, workers_default
+from treesim.fit_level1 import Level1Settings, fit_level1, level1_spec
+from treesim.host import scratch_root, workers_default
 from treesim.sweep import REPO
 
 
@@ -39,13 +40,13 @@ def main() -> None:
     reg = l1.load(args.species)
     if args.dry_run:
         settings = Level1Settings(max_evals=2 * 12 * 5 + 3 * len(l1.FINAL_SEEDS), max_hours=2, finalists=2,
-                                  workers=args.workers, scratch="/dev/shm/level1-dry")
+                                  workers=args.workers, scratch=f"{scratch_root()}/level1-dry")
         out_dir = run_dir = REPO / "runs" / "level1-dry" / args.species
     else:
         if args.max_evals is None:
             parser.error("--max-evals is required (or --dry-run)")
         settings = Level1Settings(max_evals=args.max_evals, max_hours=args.max_hours, popsize=args.popsize,
-                                  finalists=args.finalists, workers=args.workers, scratch=f"/dev/shm/{args.out}")
+                                  finalists=args.finalists, workers=args.workers, scratch=f"{scratch_root()}/{args.out}")
         out_dir = REPO / "docs" / "experiments" / "fits" / args.out
         run_dir = REPO / "runs" / args.out / args.species
 

@@ -14,7 +14,8 @@
 #                                      borrowed T fails its control, so the user rules before it runs)
 # MAX_HOURS is a safety stop per species and per invocation, ≈ 1.2 × the expected time.
 #
-# Workers: 12. Wall per evaluation on the beech smoke config (lone + stand to 150 + shade house, 2026-11-03, i7-1260P,
+# Workers: treesim_workers (host.sh: TREESIM_WORKERS; 12 on the X1, 8 on the M5).
+# X1: wall per evaluation on the beech smoke config (lone + stand to 150 + shade house, 2026-11-03, i7-1260P,
 # RAPL 64 W, performance governor): 1 worker 26.2 s, 2 19.1, 4 13.4, 6 10.6, 8 9.2, 12 8.6. The knee is 6–8; 12 is
 # still the fastest (8 gives 93% of its throughput, for a machine also in use). Each evaluation slows 1.46× with only
 # two workers: the chip's power budget, not cores. Over 99% of an evaluation is the core's seasons; Node and the WASM
@@ -26,10 +27,12 @@
 #       --fit docs/experiments/fits/level0/S.json
 # and, before any fitted params are accepted, the gallery regression and shapeFlag (the plan's §k).
 set -uo pipefail
-cd "$(dirname "$0")/../.."
+here=$(cd "$(dirname "$0")" && pwd)
+cd "$here/../.."
 export PATH="$HOME/.cargo/bin:$PATH"
+. "$here/host.sh"
 
-WORKERS=12
+WORKERS=$(treesim_workers)
 case "${1:-}" in
   night1) MAX_EVALS=1200; MAX_HOURS=3.5; SPECIES=(beech oak birch) ;;
   night2) MAX_EVALS=900; MAX_HOURS=2.75; SPECIES=(hornbeam maple pine fir) ;;
@@ -51,9 +54,9 @@ for s in "${SPECIES[@]}"; do
   fi
   resume=()
   [[ -f "runs/level0/$s/checkpoint.pkl" ]] && resume=(--resume)
-  echo "$s: start $(date -Is) (max-evals $MAX_EVALS, max-hours $MAX_HOURS)"
+  echo "$s: start $(date -Iseconds) (max-evals $MAX_EVALS, max-hours $MAX_HOURS)"
   uv run --project analysis python -I analysis/experiments/level0_fit.py --species "$s" \
     --max-evals "$MAX_EVALS" --max-hours "$MAX_HOURS" --workers "$WORKERS" "${resume[@]}" \
     2>&1 | tee -a "runs/level0/$s.log"
-  echo "$s: end $(date -Is)"
+  echo "$s: end $(date -Iseconds)"
 done

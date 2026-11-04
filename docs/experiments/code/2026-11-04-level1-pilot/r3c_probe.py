@@ -4,15 +4,16 @@ from concurrent.futures import ThreadPoolExecutor
 import numpy as np
 from treesim import level1 as l1
 from treesim.fit_level1 import Pool, level1_spec
+from treesim.host import scratch_root, workers_default
 reg = l1.load("beech")
 spec = level1_spec("beech", reg)
 hand = {**spec.fixed, **spec.form}
 seeds = [2001, 2002, 2003, 2004, 2005]
 values = [0.022, 0.049, 0.10]
-pool = Pool(12)
+pool = Pool(workers_default())
 try:
     reqs = [{"species": "beech", "assign": {**hand, "r3.c": v}, "seeds": [s], "trials": ["stand150"],
-             "level1": {"scratch": "/dev/shm/level1-probe", "key": f"r{v}", "dumpSeasons": []}} for v in values for s in seeds]
+             "level1": {"scratch": f"{scratch_root()}/level1-probe", "key": f"r{v}", "dumpSeasons": []}} for v in values for s in seeds]
     replies = pool.map(reqs)
 finally:
     pool.close()

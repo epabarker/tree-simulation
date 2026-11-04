@@ -11,7 +11,8 @@ case "${1:-night1}" in
   *) echo "usage: $0 [night1|night2|night3]" >&2; exit 2 ;;
 esac
 echo "tmux: $(tmux ls 2>&1 | grep level0 || echo 'no session')"
-echo "fit:  $(pgrep -af 'level0_fit.py' | grep -v pgrep | grep -o -- '--species [a-z]*' | head -1 || true)"
+if [[ "$(uname)" == Darwin ]]; then pgrep_cmd=(pgrep -fl); else pgrep_cmd=(pgrep -af); fi  # macOS's -a is ancestors, not the command line
+echo "fit:  $("${pgrep_cmd[@]}" 'level0_fit.py' | grep -v pgrep | grep -o -- '--species [a-z]*' | head -1 || true)"
 for s in "${SPECIES[@]}"; do
   log=runs/level0/$s.log
   echo "--- $s (budget $BUDGET evals)"
@@ -33,7 +34,8 @@ print(f"  finished: {d['status']}, {d['evaluations']} evals, {d['wall_seconds'] 
 PY
     continue
   fi
-  first=$(stat -c %W "$log")  # the log's creation time: its lines carry no timestamps
+  # the log's creation time: its lines carry no timestamps
+  if [[ "$(uname)" == Darwin ]]; then first=$(stat -f %B "$log"); else first=$(stat -c %W "$log"); fi
   now=$(date +%s); el=$((now - first))
   printf '  elapsed: %dh%02dm since the log began\n' $((el/3600)) $((el%3600/60))
   ev=$(echo "$gen" | grep -oE '[0-9]+ evals' | grep -oE '^[0-9]+')

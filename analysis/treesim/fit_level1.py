@@ -16,13 +16,12 @@ from __future__ import annotations
 
 import json
 import math
-import os
 import pickle
 import shutil
 import subprocess
 import time
 from concurrent.futures import ProcessPoolExecutor
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
 import numpy as np
@@ -32,6 +31,7 @@ from treesim import fit
 from treesim import level1 as l1
 from treesim.fit import Spec, contributions, load_spec, seed_traits
 from treesim.fit_level0 import _load, _save
+from treesim.host import mem_available_mb, scratch_root
 from treesim.sweep import REPO
 
 EVAL = "analysis/experiments/level1_eval.ts"
@@ -71,7 +71,7 @@ class Level1Settings:
     patience: int = 25
     workers: int = 12
     rng_seed: int = 2026
-    scratch: str = "/dev/shm/level1-pilot"
+    scratch: str = field(default_factory=lambda: f"{scratch_root()}/level1-pilot")
 
     @property
     def reserve(self) -> int:
@@ -90,12 +90,10 @@ def level1_spec(species: str, reg: dict) -> Spec:
 
 
 def shm_usage(path: str) -> dict:
-    """The scratch directory's size and /dev/shm's and the machine's free memory, in MB."""
+    """The scratch directory's size and its filesystem's and the machine's free memory, in MB (treesim/host.py)."""
     size = sum(f.stat().st_size for f in Path(path).glob("*")) if Path(path).exists() else 0
-    shm = shutil.disk_usage("/dev/shm")
-    with open("/proc/meminfo") as f:
-        mem = {line.split(":")[0]: int(line.split()[1]) for line in f}
-    return {"scratch_mb": size / 1e6, "shm_free_mb": shm.free / 1e6, "mem_available_mb": mem["MemAvailable"] / 1e3}
+    shm = shutil.disk_usage(scratch_root())
+    return {"scratch_mb": size / 1e6, "shm_free_mb": shm.free / 1e6, "mem_available_mb": mem_available_mb()}
 
 
 def clear_scratch(path: str) -> None:
@@ -289,7 +287,7 @@ def fit_level1(spec: Spec, reg: dict, settings: Level1Settings, out_dir: Path, r
             log(f"gen {g}: best {gen_best:.2f}, median {np.median(losses):.2f}, run best {st['best']:.2f}; seasons "
                 f"{sorted(set(map(str, seasons)))}; {st['evals']} evals, {time.time() - t0:.0f} s this generation, "
                 f"{st['wall']:.0f} s wall, {cpu / len(assigns):.1f} CPU-s a candidate; scratch peak "
-                f"{measure.peak['scratch_mb']:.0f} MB, /dev/shm free ≥ {measure.peak['shm_free_mb']:.0f} MB, "
+                f"{measure.peak['scratch_mb']:.0f} MB, scratch filesystem free ≥ {measure.peak['shm_free_mb']:.0f} MB, "
                 f"memory available ≥ {measure.peak['mem_available_mb']:.0f} MB")
         if status.startswith("stopped"):
             return {"species": spec.species, "status": status}
@@ -359,7 +357,3 @@ def write(result: dict, rows: list[dict], out_dir: Path, run_dir: Path) -> Path:
     path = out_dir / f"{result['species']}.json"
     path.write_text(json.dumps(result, indent=1, default=float) + "\n")
     return path
-
-
-def workers_default() -> int:
-    return min(12, os.cpu_count() or 4)

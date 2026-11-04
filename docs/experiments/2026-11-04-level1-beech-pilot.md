@@ -270,6 +270,11 @@ file, one row a candidate with its matched season, is rewritten every generation
 ```
 tmux new -s level1 'systemd-inhibit --what=sleep:idle --why="Level 1 beech pilot" analysis/experiments/level1_fit_gate.sh beech 32 5'
 ```
+  On macOS (no systemd): `caffeinate -ims` instead, with the second host's own outputs and 8 workers (TREESIM_WORKERS,
+  `analysis/experiments/host.sh`); it holds the Mac awake only on AC power with the lid open:
+```
+tmux new -d -s level1mac 'caffeinate -ims env TREESIM_WORKERS=8 LEVEL1_OUT=level1-pilot-mac analysis/experiments/level1_fit_gate.sh beech 32 5'
+```
 - **Resume:** run the same command again; the wrapper resumes from `runs/level1-pilot/beech/checkpoint.pkl`.
 - **Outputs:** `docs/experiments/fits/level1-pilot/beech{.json,-best.json,-progress.csv}`; logs `runs/level1-pilot/beech.log`;
   gate `runs/level1-pilot/beech.gate.{txt,json}`.

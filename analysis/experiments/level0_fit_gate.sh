@@ -10,21 +10,24 @@
 # when the fit stopped early, and writes runs/level0/S.gate.txt (and S.gate.json). The targets are read when each gate
 # starts, hours after launch: analysis/ stays as committed while it runs.
 set -uo pipefail
-cd "$(dirname "$0")/../.."
+here=$(cd "$(dirname "$0")" && pwd)
+cd "$here/../.."
 export PATH="$HOME/.cargo/bin:$PATH"
+. "$here/host.sh"
+workers=$(treesim_workers)
 mkdir -p runs/level0
 for s in "$@"; do
-  echo "=== $s: fit $(date -Is)"
-  analysis/experiments/level0_sweep.sh 1200 3.5 12 "$s"
+  echo "=== $s: fit $(date -Iseconds)"
+  analysis/experiments/level0_sweep.sh 1200 3.5 "$workers" "$s"
   fit=docs/experiments/fits/level0/$s.json
   [[ -f $fit ]] || fit=docs/experiments/fits/level0/$s-best.json
   if [[ ! -f $fit ]]; then
-    echo "$s: no fit to gate ($(date -Is))" | tee "runs/level0/$s.gate.txt"
+    echo "$s: no fit to gate ($(date -Iseconds))" | tee "runs/level0/$s.gate.txt"
     continue
   fi
-  echo "=== $s: gate on $fit $(date -Is)"
-  uv run --project analysis python -I analysis/experiments/level0_gate.py --species "$s" --fit "$fit" --workers 12 \
+  echo "=== $s: gate on $fit $(date -Iseconds)"
+  uv run --project analysis python -I analysis/experiments/level0_gate.py --species "$s" --fit "$fit" --workers "$workers" \
     --json "runs/level0/$s.gate.json" >"runs/level0/$s.gate.txt" 2>&1
-  echo "=== $s: gate exit $? $(date -Is): $(tail -n 1 "runs/level0/$s.gate.txt")"
+  echo "=== $s: gate exit $? $(date -Iseconds): $(tail -n 1 "runs/level0/$s.gate.txt")"
 done
-echo "=== done $(date -Is)"
+echo "=== done $(date -Iseconds)"

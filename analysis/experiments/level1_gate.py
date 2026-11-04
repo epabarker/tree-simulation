@@ -31,7 +31,8 @@ import numpy as np
 from treesim import fit, gallery, tallo
 from treesim import level1 as l1
 from treesim.fit import LEVEL0_SEASONS
-from treesim.fit_level1 import Measure, Pool, clear_scratch, level1_spec, workers_default
+from treesim.fit_level1 import Measure, Pool, clear_scratch, level1_spec
+from treesim.host import scratch_root, workers_default
 from treesim.sweep import REPO
 
 CORRELATED = ("p1", "widestAt")
@@ -94,7 +95,7 @@ def print_control(c: dict, reg: dict) -> None:
 def gate(reg: dict, species: str, assign: dict, workers: int, label: str) -> dict:
     spec = level1_spec(species, reg)
     names = reg["fitted"] + reg["held_out"]
-    scratch = "/dev/shm/level1-gate"
+    scratch = f"{scratch_root()}/level1-gate"
     clear_scratch(scratch)
     pool = Pool(workers)
     executor = ProcessPoolExecutor(workers)

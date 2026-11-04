@@ -308,6 +308,74 @@ no z was computed, and nothing registered changed after it.
 ### State
 _(rewritten at the end of each session)_
 
+**Readings made by the unattended session (2026-11-04 night; the user's brief did not settle these):**
+1. **The spread penalty's form.** The brief's `(ln(min(1, r)/0.5)/ln 2)²` gives 1 at r = 1 and 0 at r = 0.5. That
+   contradicts its own "zero when sim spread is at least half the real". Implemented as `(ln(min(1, r/0.5))/ln 2)²` =
+   min(0, s + 1)²: 0 at r ≥ 0.5, 1 at 0.25, 4 at 0.125 (`level1.spread_penalty`, unit-tested).
+2. **A spread that cannot be read** (fewer than 10 trees, a zero SD, unmatched) costs w_k × the missing penalty (4),
+   as the location term does. An unmatched candidate therefore pays both.
+3. **"Height-100"** is `stand.height100`. `death.stand`, which reads `stand.alive100`, stays scored: it is a death
+   penalty. The scored Level 0 weight falls from 7 to 5.
+4. **"The fourteen reachable descriptors"** are the sensitivity note's affordable verdict: all 16 less tortuosity05
+   and limbUpturn. Ten are fitted (all but tortuosity05) and four are held out (length0, limbElevation05, p3,
+   widestAt). Recorded in the registration's `expected`.
+5. **"In band" for the morning:**
+   - location: |z| ≤ 2 (the gate's held-out rule). Fitted descriptors are read from `beech.json` on 101–110; the
+     held-out ones from the gate's per-seed counts.
+   - spread: within ×2 (the gate's rule), over the gate's trees.
+6. **The noise check ran on its own script** (`level1_noise_v4.py`). `level1_noise.py` refuses once the seeds are
+   set, and it reads a v2-only `groups` key.
+7. **MAX_HOURS is 9,** as v2's.
+8. **No-ops and side effects:**
+   - `git pull` was a no-op: the sensitivity commit (e8f3edc) was made in this checkout.
+   - **Pilot v2 is no longer resumable from HEAD.** v3's hashes no longer match `level1.py`, so resume from a
+     checkout of 81b157a's `analysis/`.
+   - The sensitivity note reproduces from e8f3edc, not HEAD: its registration hashes v3's files.
+
+**Phase 3 beech pilot v3 (registration v4, 8e7594b, "best achievable with the current rules"): launched 23:49 UTC
+2026-11-04, running; provisional, nothing accepted.**
+- **What v4 changed from v3** (each with its reason in the registration's `changes`):
+  1. **lateShare and height at 100 are reported, not scored,** in the Level 1 loss. They stay in the Level 0 gate.
+     - The reason: lateShare's per-seed SD (0.137) exceeds twice its band (0.06), so the term is undetermined on
+       ten seeds, and both pilots gained it for free.
+     - Their would-be terms are written under `reported` beside each loss.
+  2. **A one-sided spread penalty on every fitted descriptor,** `l1.<k>.spr` = w_k min(0, s + 1)², weighted like its
+     location term. The reason: pilot v2's generation-8 best gained Level 1 by collapsing spread to 0.13–0.38×.
+  3. **Everything else as v3** (no redraw, checked by the registration script): the weights, the cluster hold-outs,
+     the ten form knobs, Level 0 and r3.c frozen, the ten search seeds, the coarsened-simulation rule, the size
+     match, 32 generations.
+- **The registration's expectation, stated before the run:** tortuosity05 stays out of band, reachable only at
+  Level 0 costs above 20. The fit's object is the fourteen descriptors (reading 4).
+- **Noise check on the v4 loss** (`fits/level1-pilot-v3/noise.json`): the hand on v3's three 10-seed draws scores
+  4.53, 7.07 and 6.71.
+  - **SD 1.38 against v3's 0.40: over 0.6, noted, seeds unchanged** (the user).
+  - **Where the noise comes from:** leaderDominance's spread term (mean 1.20, SD 0.90; the hand sits near 0.3×
+    real), then tortuosity05's (0.41, 0.21).
+  - **The cross-check:** the simulated v4 loss equals v3's stored terms re-scored on the same trees to 9e-16.
+  - **The hand's mean** is 6.10: location 2.45, spread 1.71, Level 0 1.95.
+- **A forecast, not a result:** r0 (frozen) is the knob that restored leaderDominance's spread in the sweep. The
+  form knobs may not be able to buy down the hand's largest new term, so a stuck best is a possible outcome.
+- **The run:** `tmux` session `level1v3`, under `systemd-inhibit`, 12 workers. Log `runs/level1-pilot-v3/beech.log`
+  (first line: commit 8e7594b, clean); results in `docs/experiments/fits/level1-pilot-v3/`. ≈ 740 s a generation
+  puts the 32 generations near 06:25 UTC, and the finalists and the gate near 06:45. The same command resumes from
+  the checkpoint:
+  ```
+  tmux new -d -s level1v3 'systemd-inhibit --what=sleep:idle --why="Level 1 beech pilot v3" env LEVEL1_OUT=level1-pilot-v3 analysis/experiments/level1_fit_gate.sh beech 32 9'
+  ```
+- **The reading for the morning:**
+  1. **The gate** (`runs/level1-pilot-v3/beech.gate.txt`): held out, how many of 20 seeds pass; spread within ×2 on
+     all 16; shapeFlag; Level 0's statistic beside it. If the fit stopped early, it gates `beech-best.json`.
+  2. **The per-term table, fit against the hand on 101–110** (`fits/level1-pilot-v3/beech.json`):
+     - each `.loc`, `.spr` and Level 0 term, and the `reported` lateShare and height at 100;
+     - whether the finalist beats the hand on fresh seeds at all (pilot 1 did not);
+     - whether the gain is location, spread or Level 0.
+  3. **Whether the fourteen came into band** (reading 5): the ten fitted on 101–110, the four held out from the gate;
+     tortuosity05 and limbUpturn beside them, against the expectation.
+  4. **The noise floor for judging** a gain: the 10-seed SD is 1.38 on the hand. A finalist less than about 2
+     below the hand on 101–110 is within noise.
+- **Then:** the write-up (`docs/experiments/2026-11-05-level1-beech-pilot-v3.md`), and the user's choice between the
+  sensitivity note's ADR order (tip upturn and tortuosity first) and a further fit.
+
 **Level 1 sensitivity (beech, registration v3's targets; 2026-11-04, [note](../experiments/2026-11-04-level1-sensitivity.md);
 registered in 9e304db before any run; provisional, nothing accepted).** One knob at a time: 18 knobs (10 form, 8
 physiology including r3.c) × 5 points on each registered scale, at v3's 10 search seeds; all 16 descriptors measured
@@ -331,9 +399,8 @@ physiology including r3.c) × 5 points on each registered scale, at v3's 10 sear
   4. 0052, whose case is Level 0's, not Level 1's.
 - **lateShare, for v4:** the per-seed SD (0.137) is more than twice the band (0.06), and the hand's term (1.53) has
   a bootstrap SE of 1.74. Form knobs "gain" up to −1.53 by noise, and the same noise sets ΔL0's SE (2–4).
-- **Next (the user's to frame):** v4, combining a one-sided spread penalty, a noise-aware lateShare and r0 free or
-  re-fitted; or the ADR work in the order above. Then the audit (3), ADR 0052's probe (4), the O2 realism probe (2)
-  and the asymmetry check (5).
+- **Next:** framed by the user as v4, pilot v3 (above: lateShare unscored, the spread penalty, r0 still frozen).
+  Then the audit (3), ADR 0052's probe (4), the O2 realism probe (2) and the asymmetry check (5).
 
 **Phase 3 beech pilot v2 (registration v3, 81b157a): stopped early by the user, checkpoint kept, resumable (the call
 on generation 7's status, after 8 of 32 generations: the median 15 → 9, the best unmoved since generation 0; the

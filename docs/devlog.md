@@ -2,6 +2,26 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-04 (night): pilot v3 registered (registration v4) and launched, unattended
+
+- **What changed:** no code under src/rust/cli/tests; nothing accepted into species params.
+  - `analysis/treesim/level1.py`: `spread_penalty` and the `l1.<k>.spr` term, read where `loss.spread_floor` is set.
+  - `analysis/treesim/fit_level1.py`: `loss.level0_reported` traits move to the reports; `summary()` writes their
+    would-be terms under `reported`.
+  - `analysis/experiments/level1_targets.py`: version 4; `level1_noise_v4.py`, the reported-only noise check.
+  - Python tests: 129 passed (2 new, the registration test moved to v4).
+- **Registration v4 (8e7594b):**
+  - lateShare and height at 100 unscored in the Level 1 loss;
+  - a one-sided spread penalty below 0.5× real, weighted like the location term;
+  - everything else as v3.
+- **Noise:** the hand's 10-seed SD under v4 is 1.38 (v3's 0.40), mostly leaderDominance's spread term. Over the
+  user's 0.6, so noted; the seeds are unchanged. The cross-check against v3's stored terms matches to 9e-16.
+- **Launched** 23:49 UTC in tmux `level1v3`, ≈ 7 h.
+- **Surprises:**
+  - The brief's penalty formula, read literally, is zero at 0.5× and 1 at 1×. It was implemented as its stated
+    intent (the plan's State, reading 1).
+  - Pilot v2 is no longer resumable from HEAD (a `level1.py` hash).
+
 ## 2026-11-04: Level 1 sensitivity, what the knobs can reach (beech); pilot v2's record reworded
 
 - **What changed:** no code under src/rust/cli/tests.

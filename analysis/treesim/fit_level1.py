@@ -105,8 +105,11 @@ def clear_scratch(path: str) -> None:
 class Measure:
     """A generation's evaluation: requests, the size match, the describe pool, the traits; the held-out dropped."""
 
-    def __init__(self, pool: Pool, spec: Spec, reg: dict, scratch: str, executor: ProcessPoolExecutor) -> None:
+    def __init__(self, pool: Pool, spec: Spec, reg: dict, scratch: str, executor: ProcessPoolExecutor,
+                 hide: bool = True) -> None:
+        """`hide`: drop every held-out-named trait (the fit); the gate passes False."""
         self.pool, self.spec, self.reg, self.scratch, self.executor = pool, spec, reg, scratch, executor
+        self.hide = hide
         self.names = reg["fitted"]
         self.peak = {"scratch_mb": 0.0, "shm_free_mb": math.inf, "mem_available_mb": math.inf}
 
@@ -161,6 +164,8 @@ class Measure:
         for i in range(len(assigns)):
             rs = replies[i * len(seeds):(i + 1) * len(seeds)]
             self.per_seed.append([seed_traits(r, self.spec.tallo) for r in rs])
+            if self.hide:
+                self.per_seed[-1] = [without_held_out(self.reg, x) for x in self.per_seed[-1]]
             t = fit.mean_traits(self.per_seed[-1])
             lo, hi = self.reg["real_dbh_range_m"]
             if trees[i] is not None:
@@ -168,7 +173,7 @@ class Measure:
                 if outside:
                     flags[i].append(f"{outside} trees outside the real DBH range")
             t.update(l1.level1_traits(self.reg, trees[i], seasons[i], flags[i]))
-            out.append(t)
+            out.append(without_held_out(self.reg, t) if self.hide else t)
         return out, sum(r.get("ms", 0) for r in replies) / 1000, trees
 
 
@@ -183,12 +188,31 @@ def summary(spec: Spec, reg: dict, a: dict, t: dict) -> dict:
             "traits": {k: v for k, v in sorted(t.items()) if k.startswith(("l1.", "stand.", "shade.", "lone.alive"))}}
 
 
+def held_out_key(reg: dict, key: str) -> bool:
+    """A trait named after a held-out descriptor: Level 1's own (`l1.<k>.…`), or the simulator's form.rs reading of the
+    same name in Level 0's trials (`stand.widestAt`, `lone.widestAt`: a different measurement, dropped all the same)."""
+    parts = key.removeprefix("trait:").split(".")
+    return any(p == k or (p.startswith(k) and p[len(k):].isdigit()) for p in parts for k in reg["held_out"])
+
+
+def without_held_out(reg: dict, traits: dict) -> dict:
+    return {k: v for k, v in traits.items() if not held_out_key(reg, k)}
+
+
 def assert_no_held_out(reg: dict, obj) -> None:
     """The fit's outputs never name a held-out descriptor (the user, 2026-11-04)."""
-    text = json.dumps(obj, default=str)
-    for k in reg["held_out"]:
-        if f"l1.{k}." in text:
-            raise AssertionError(f"held-out {k} in the fit's output")
+    def keys(x):
+        if isinstance(x, dict):
+            for k, v in x.items():
+                yield k
+                yield from keys(v)
+        elif isinstance(x, list):
+            for v in x:
+                yield from keys(v)
+
+    bad = [k for k in keys(obj) if held_out_key(reg, str(k))]
+    if bad:
+        raise AssertionError(f"held-out descriptors in the fit's output: {sorted(set(bad))}")
 
 
 def fit_level1(spec: Spec, reg: dict, settings: Level1Settings, out_dir: Path, run_dir: Path, resume: bool = False,

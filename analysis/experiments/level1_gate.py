@@ -99,7 +99,7 @@ def gate(reg: dict, species: str, assign: dict, workers: int, label: str) -> dic
     pool = Pool(workers)
     executor = ProcessPoolExecutor(workers)
     try:
-        measure = Measure(pool, spec, reg, scratch, executor)
+        measure = Measure(pool, spec, reg, scratch, executor, hide=False)
         traits, cpu, trees = measure("gate", [assign], list(l1.GATE_SEEDS), names=names, trials=["stand150"])
         per_seed = measure.per_seed[0]
     finally:

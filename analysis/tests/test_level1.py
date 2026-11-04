@@ -101,6 +101,13 @@ def test_traits_never_carry_held_out():
     f1.assert_no_held_out(reg, {"traits": t})
     with pytest.raises(AssertionError):
         f1.assert_no_held_out(reg, {"l1.length0.z": 0.1})
+    reg = reg_of(["forkHeight"], held_out=["widestAt"])
+    rows = [{"trait:stand.widestAt": 0.4, "trait:lone.widestAt100": 0.5, "trait:stand.height": 80}]
+    with pytest.raises(AssertionError):
+        f1.assert_no_held_out(reg, rows)
+    assert f1.held_out_key(reg, "trait:lone.widestAt100")
+    kept = f1.without_held_out(reg, {"stand.widestAt": 0.4, "stand.height": 80, "lone.profile.3": 0.9})
+    assert kept == {"stand.height": 80, "lone.profile.3": 0.9}
 
 
 def test_seed_rule_and_spread_rule():

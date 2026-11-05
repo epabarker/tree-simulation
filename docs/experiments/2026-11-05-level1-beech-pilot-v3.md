@@ -138,6 +138,13 @@ Per fitted descriptor on 101–110, z (spread ratio): the hand → the fit.
 - **The cross-check:** equal to v3's stored terms re-scored on the same trees, to 9e-16.
 - **The rule:** over the user's 0.6, so it was noted; the seeds per candidate stayed at 10 (the user).
 
+## What the fit looks like (render, 2026-11-05)
+![Shipped beech, v3's fit, v4's best so far, and three real QSMs](figures/2026-11-05-beech-hand-vs-fit.png)
+Script: `code/2026-11-05-render/` (the garden's renderer; hand is the shipped beech with no assign, fit is `fit.assign` over it, the third column is v4's best so far at generation 16, provisional, search seeds). Seeds 101, 102.
+- **Hand to fit, in the stand:** the hand's trees are tall (33–38 m at season 70) with long clear boles and small crowns at the top; the fit's are about 22 m, with limbs starting lower and spreading wider, crowns that touch or overlap in seed 102. Alone at 100, the hand is a large broad crown 30 m tall; the fit is a lower, flatter dome, about 24–26 m, with a denser, more even limb fan.
+- **Against the three real QSMs (24–27 m, measured DBH 0.29 m):** each is a thin clear trunk with a small, narrow crown of thin twigs at the top, and a few stray low limbs. The fit's stand height is the nearer one and the hand's is far too tall, but the real crowns are narrower and higher than the fit's wide, low ones; the hand's high, narrow crowns look nearer in shape, if not in height. Neither looks like these trees; v4's best so far looks like the fit.
+- The QSMs are drawn raw from TreeQSM's optimum model in their file's own azimuth (cylinders cut where branches leave), with a bark age proxy from girth. Leaves-on and lone-tree panels have no real counterpart.
+
 ## Limits
 - **Point estimates on 10 + 20 seeds.** The finalist was selected from 384 candidates on the search seeds;
   re-measuring it on 101–110 removes that selection, and its 1.62 sits within the finalists' 1.62–4.82.

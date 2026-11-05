@@ -2,6 +2,19 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-05: pilot v4's result and write-up
+
+- **What changed:** docs only. [The note](experiments/2026-11-05-level1-beech-pilot-v4.md); the gate files copied to
+  `docs/experiments/fits/level1-pilot-v4/` with a README; the plan's State and STATUS.
+- **Result:** 6.88 → 3.31 on 101–110 (hand SD 1.31); held out 20/20. The gate fails on spread only:
+  tortuosity05 0.48×, limbUpturn 0.36×.
+- **The question** (tortuosity05 and late growth together?): both partly off. tortuosity05 is in band (z −0.81) and
+  lateShare is one band short (1.326 against 1.43). The price is about a third of v3's per unit z.
+- **Surprises:**
+  - The route was not dLambda (0.0165, near the hand's) but kappa 0.43 → 0.22 and branchAngle (1) 50° → 40°.
+  - The search-seed best (3.24, generation 30) re-measured at 4.24; generation 16's (3.57) held at 3.31.
+  - Late height is lost outright here (H100 104 against 109, H150 112 against 119), not front-loaded as in v3.
+
 ## 2026-11-05: ADR 0053, individual variation (proposed)
 
 - **What changed:** docs only. [ADR 0053](decisions/0053-individual-variation.md), drafted from reading, with no

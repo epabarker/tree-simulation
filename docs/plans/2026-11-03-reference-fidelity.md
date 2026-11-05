@@ -308,7 +308,7 @@ no z was computed, and nothing registered changed after it.
 ### State
 _(rewritten at the end of each session)_
 
-**Docs while pilot v4 runs (2026-11-05): two items, both awaiting the user.**
+**Docs written while pilot v4 ran (2026-11-05): two items, both awaiting the user.**
 - **The provenance audit (ruling 3), done:** [note](../experiments/2026-11-05-target-provenance-audit.md). Its
   proposals are under ruling 3 below.
 - **ADR 0053, individual variation, proposed:** [ADR](../decisions/0053-individual-variation.md). Drafted from
@@ -326,35 +326,25 @@ _(rewritten at the end of each session)_
   - **The question for the user:** is a measured, frozen per-tree parameter inside ADR 0049 §2, or "a knob added
     to serve a fit"?
 
-**Phase 3 beech pilot v4 (registration v5, edbd327): launched 07:49 UTC 2026-11-05, running; provisional, nothing
-accepted.**
-- **This run answers whether tortuosity05 and late height growth can be had together with the current rules.**
-  Pilot v3 had one without the other: dLambda is one λ offset for every order (`r2.rs:107`).
-- **What v5 changed from v4** (the registration's `changes`):
-  - **lateShare scored again** in the Level 1 loss, at weight 1 and band 0.10 (`loss.level0_band`). The band applies
-    to this loss only: the targets file keeps 0.06, and Level 0's fit and gate are unchanged.
-  - **Why 0.10** (the user): the smallest band consistent with lateShare's per-seed SD of 0.137 on ten seeds
-    (SE 0.043). As written: 0.06 + 0.043 ≈ 0.10. The sensitivity note had offered √(0.06² + 0.043²) ≈ 0.074 as one
-    option; the user chose 0.10.
-  - **Height at 100 stays reported:** lateShare is H100/H60, and height at 60 is scored.
-  - **Everything else as v4,** the spread penalty included. The scored Level 0 weight is 6.
-- **Noise check** (`fits/level1-pilot-v4/noise.json`; the JSON keys still say "v4"): the hand on v3's three 10-seed
-  draws scores 4.71, 7.14 and 6.75.
-  - The SD is 1.31 (v4 1.38, v3 0.40): over 0.6, noted, seeds unchanged.
-  - lateShare adds 0.10 ± 0.08 on the hand.
-  - The cross-check matches v3's stored terms to 9e-16.
-- **The run:** `tmux` session `level1v4` under `systemd-inhibit`, 12 workers. Log `runs/level1-pilot-v4/beech.log`
-  (first line: commit edbd327, clean); results in `docs/experiments/fits/level1-pilot-v4/`. ≈ 745 s a generation puts
-  the finish, gate included, near 14:30 UTC. The same command resumes from the checkpoint:
-  ```
-  tmux new -d -s level1v4 'systemd-inhibit --what=sleep:idle --why="Level 1 beech pilot v4" env LEVEL1_OUT=level1-pilot-v4 analysis/experiments/level1_fit_gate.sh beech 32 9'
-  ```
-- **The reading:**
-  1. **The gate** (`runs/level1-pilot-v4/beech.gate.txt`): whether limbDroop and limbUpturn spread still fail alone.
-  2. **The per-term table, fit against the hand on 101–110:** tortuosity05's z and its spread term, against
-     lateShare's term. Both in band together means the rules allow it. If one is traded for the other, that is the
-     coupling's case for a per-level dLambda (the ADR list).
-  3. **The finalist's dLambda and λ(0)** beside pilot v3's 0.027 and 0.546.
+**Phase 3 beech pilot v4 (registration v5, edbd327): done; the gate fails on spread only, and tortuosity05 and late
+growth trade on a soft line (2026-11-05, [note](../experiments/2026-11-05-level1-beech-pilot-v4.md), results in
+`docs/experiments/fits/level1-pilot-v4/`); provisional, nothing accepted.**
+- **The question** (the user): can tortuosity05 and late height growth be had together with the current rules?
+  **Answer: the third reading, both partly off.** On 101–110 tortuosity05 is in band (z −0.81; the hand −1.11) and
+  lateShare is about one band short (1.326, term 1.07, band 0.10; the hand 1.387).
+  - **The price:** +0.30 z of tortuosity for −0.06 of lateShare (v3: +0.45 for −0.15). Coupled, but softer than v3
+    implied; reading 2 (tortuosity back out of band) did not happen.
+  - **Not via dLambda:** the finalist's dLambda is 0.0165 (the hand 0.0138, v3 0.027). kappa 0.431 → 0.224
+    (acrotony, `r2.rs:471–515`) and branchAngle (1) 50.1° → 40.3° moved most. Which carries tortuosity is untested.
+- **The fit:** 6.88 → 3.31 on 101–110 (hand SD 1.31). v3's finalist under this loss scores 5.25.
+- **The gate:** FAIL. Held out 20/20; shapeFlag clear; Level 0's statistic 9/20. **Spread outside ×2 on
+  tortuosity05 (0.48×, fitted) and limbUpturn (0.36×, held out)**; limbDroop clears at 0.51×. Individual variation
+  (ADR 0053) is still the blocker.
+- **Setup** (as launched): registration v5 = v4 with lateShare scored again at band 0.10 (`loss.level0_band`, the
+  smallest band consistent with its per-seed SD 0.137, SE 0.043; the user); height at 100 reported. Noise SD 1.31.
+  edbd327, clean; 32 generations, 6.68 h.
+- **For the ADR list:** a per-level dLambda is not demanded by this run (it may still close the last band of
+  lateShare; untested). A one-knob probe from the hand on kappa and branchAngle (1) would name tortuosity's route.
 
 **Phase 3 beech pilot v3 (registration v4, 8e7594b): done; the first real fit, which fails its gate on limb-posture
 spread only (2026-11-05, [note](../experiments/2026-11-05-level1-beech-pilot-v3.md), results in
@@ -371,7 +361,7 @@ spread only (2026-11-05, [note](../experiments/2026-11-05-level1-beech-pilot-v3.
   - **What dLambda does:** one λ offset for every order after aC (`r2.rs:107`).
   - **Why the two are coupled:** lowering the limbs' λ makes them wander, and it lowers the trunk's λ with them. The
     fit kept the trunk by raising its early λ, which front-loads height (H60 78.5 → 85.0, H100 108.6 → 105.1 cells).
-- **Pilot v4 (registration v5)** is above.
+- **Pilot v4 (registration v5)** is above; it answers the coupling question.
 
 **Readings made by the unattended session (2026-11-04 night; the user's brief did not settle these):**
 1. **The spread penalty's form.** The brief's `(ln(min(1, r)/0.5)/ln 2)²` gives 1 at r = 1 and 0 at r = 0.5. That

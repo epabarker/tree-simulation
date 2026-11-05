@@ -53,3 +53,33 @@ fn every_golden() {
         .collect();
     assert!(wrong.is_empty(), "goldens differ:\n{}", wrong.join("\n"));
 }
+
+/// The prototype rules of agent A9 (c1.budBreak, c1.shootLengthSD, c4.axisSD) written out as off
+/// give the goldens' bits: off is the old model, not merely close to it.
+#[test]
+fn the_prototype_rules_written_as_off_keep_the_goldens() {
+    let presets = read("../presets.json");
+    let cases = read("../../tests/golden.json");
+    let off = json::parse(
+        r#"{"c1":{"budBreak":{"mode":"deterministic","width":0.25},"shootLengthSD":0},"c4":{"axisSD":0}}"#,
+    )
+    .unwrap();
+    for key in [
+        "forest:seed1:s20",
+        "oakOpen:seed1:s15",
+        "beechOpen:seed1:s40",
+    ] {
+        let parts: Vec<&str> = key.split(':').collect();
+        let base = presets
+            .get("presets")
+            .and_then(|t| t.get(parts[0]))
+            .unwrap();
+        let mut params = json::merge(base, &off);
+        params.set("seed", Value::Num(1.0));
+        let seasons: usize = parts[2].trim_start_matches('s').parse().unwrap();
+        let mut world = World::new(params);
+        world.run(seasons, &[]);
+        let got = Value::Str(hash_world(&world));
+        assert_eq!(Some(&got), cases.get(key), "{key}");
+    }
+}

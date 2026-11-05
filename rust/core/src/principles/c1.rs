@@ -9,15 +9,23 @@
 //! metamer to metamer by parallel transport, so phyllotaxis follows the axis as it bends. A
 //! seedling's L is turned about its heading by a per-tree azimuth [RNG: seedlingAzimuth] (ADR 0054).
 //!
+//! Variable shoot length (prototype, agent A9): with `c1.shootLengthSD` s > 0, each shoot's
+//! internode length is multiplied by exp(s·z − s²/2), z ~ N(0, 1) [RNG: shootLength, keyed by the
+//! bud's birthId and the season], a lognormal of mean 1, so the mean extension is kept. Why: ADR
+//! 0004's l = v'/n·l0 lies in [1, 2)·l0 by construction (CV ≈ 0.19 in lone hornbeam), where real
+//! annual shoots vary many-fold with vigour and weather; the uniform line texture is a cue the
+//! blinded judge names. Off (absent or 0): no draw.
+//!
 //! Params: c1.phyllotaxis, c1.divergence (δ), c1.branchAngle (β), c1.internodeLength (l0),
-//! c1.maxMetamersPerShoot, c6.r0; with R2 the levels' generator, whorl, β and p_term.
+//! c1.maxMetamersPerShoot, c1.shootLengthSD (s), c6.r0; with R2 the levels' generator, whorl, β
+//! and p_term.
 
 use super::obstacles::inside_obstacle;
 use super::r2::{branch_angle_of, laterals, terminates};
 use crate::geom::{V3, any_perpendicular, normalize_or, reject, rotate, tilt, transport};
 use crate::math;
 use crate::params::{DEG, Params};
-use crate::rng::{purpose, uniform};
+use crate::rng::{normal, purpose, uniform};
 use crate::tree::{Tree, bud, slot, store_i32, store_u8};
 
 /// Appends a metamer at `slot` of `parent`'s upper node (parent −1 = root) with heading `h` and
@@ -228,6 +236,24 @@ pub fn shoot_size(v: f64, params: &Params, length: &mut f64, cap: f64) -> f64 {
     }
     *length = (capped / n) * params.c1.internode_length;
     n
+}
+
+/// The multiplier on the internode length of the shoot bud `bud_id` grows this season: lognormal
+/// with mean 1, exp(s·z − s²/2) [RNG: shootLength], and exactly 1 when s = 0 (no draw).
+pub fn shoot_length_factor(params: &Params, tree_id: f64, bud_id: f64, season: f64) -> f64 {
+    let s = params.c1.shoot_length_sd;
+    if s <= 0.0 {
+        return 1.0;
+    }
+    let z = normal(
+        params.seed,
+        purpose::SHOOT_LENGTH,
+        tree_id,
+        bud_id,
+        season,
+        0.0,
+    );
+    math::exp(s * z - 0.5 * s * s)
 }
 
 /// The juvenile cap on a shoot (ADR 0022), by the tree's height at the start of the season.

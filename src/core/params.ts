@@ -99,6 +99,20 @@ export interface Params {
     internodeLength: number;
     /** Maximum metamers one bud may produce per season (the cap in C3). */
     maxMetamersPerShoot: number;
+    /**
+     * Bud break (§R4.4's "optional stochastic break [RNG]", §6's BUD_FATE). 'deterministic' (or
+     * absent): a lateral bud whose v reaches its threshold θ (R4's v_cont or v_break; 1 without R4)
+     * grows. 'stochastic': it grows only with probability p = 1/(1 + exp(−(v − θ)/width)), a
+     * logistic through the threshold [RNG: budBreak, keyed by the bud and season]; one that does
+     * not rests (R4's bank). Main-slot buds stay deterministic. Prototype (agent A9), not an ADR.
+     */
+    budBreak?: { mode: "deterministic" | "stochastic"; width: number };
+    /**
+     * s: SD of ln(shoot length): each shoot's internode length is multiplied by
+     * exp(s·z − s²/2), z ~ N(0, 1) [RNG: shootLength, keyed by the bud and season], so the mean
+     * length is unchanged. Absent or 0: off. Prototype (agent A9), not an ADR.
+     */
+    shootLengthSD?: number;
   };
 
   /** C2 Shared light field: the Beer–Lambert sky sweep over the slab (§C2.4, G3; ADR 0024). */
@@ -159,6 +173,13 @@ export interface Params {
     epsilon: number;
     /** Angular noise σ of u, degrees. */
     sigma: number;
+    /**
+     * s_ax: SD, degrees, of a per-axis offset to A_set, drawn once when an axis starts [RNG:
+     * axisOffset, keyed by its first metamer's birthId] and kept along it in C4's tropism and R3's
+     * posture, so limbs differ and keep their crooks (ADR 0053's option (b)). The trunk's own axis
+     * is exempt. Absent or 0: off. Prototype (agent A9), not an ADR.
+     */
+    axisSD?: number;
   };
 
   /** C5 Self-pruning. */

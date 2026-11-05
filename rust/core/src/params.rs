@@ -84,6 +84,10 @@ pub struct C1 {
     pub branch_angle: f64,
     pub internode_length: f64,
     pub max_metamers_per_shoot: f64,
+    /// c1.budBreak (prototype): `Some(width)` when stochastic, `None` deterministic (or absent).
+    pub bud_break_width: Option<f64>,
+    /// c1.shootLengthSD (prototype): SD s of ln(shoot length); 0 when absent (off).
+    pub shoot_length_sd: f64,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -130,6 +134,8 @@ pub struct C4 {
     pub set_point: f64,
     pub epsilon: f64,
     pub sigma: f64,
+    /// c4.axisSD (prototype): SD, degrees, of a per-axis offset to A_set; 0 when absent (off).
+    pub axis_sd: f64,
 }
 
 #[derive(Clone, Debug)]
@@ -445,6 +451,11 @@ impl Params {
                     branch_angle: num(g, "branchAngle"),
                     internode_length: num(g, "internodeLength"),
                     max_metamers_per_shoot: num(g, "maxMetamersPerShoot"),
+                    bud_break_width: {
+                        let b = group(g, "budBreak");
+                        (text(b, "mode") == "stochastic").then(|| num(b, "width"))
+                    },
+                    shoot_length_sd: opt(g, "shootLengthSD").unwrap_or(0.0),
                 }
             },
             c2: C2 {
@@ -478,6 +489,7 @@ impl Params {
                 set_point: num(c4, "setPoint"),
                 epsilon: num(c4, "epsilon"),
                 sigma: num(c4, "sigma"),
+                axis_sd: opt(c4, "axisSD").unwrap_or(0.0),
             },
             c5: {
                 let g = group(v, "c5");

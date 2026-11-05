@@ -10,9 +10,11 @@ use crate::geom::V3;
 use crate::light::{Light, depth_of};
 use crate::math;
 use crate::params::{DEG, Params};
-use crate::principles::c1::{grow_shoot, juvenile_cap, lateral_frame, shoot_size};
+use crate::principles::c1::{
+    grow_shoot, juvenile_cap, lateral_frame, shoot_length_factor, shoot_size,
+};
 use crate::principles::c3::{allocate, gather_light, is_live_bud};
-use crate::principles::c4::shoot_direction;
+use crate::principles::c4::{axis_offset, shoot_direction};
 use crate::principles::c5::{crown_top_light, shed_branches};
 use crate::principles::c6::update_girth;
 use crate::principles::o2::{EMPTY, Grid, abrade, tag_owner};
@@ -24,7 +26,7 @@ use crate::principles::r2::{
     pendulous_set_point, relay_depth, relay_nodes, relay_on, relay_shift, vigour_forks,
 };
 use crate::principles::r3::update_mechanics;
-use crate::principles::r4::{aborts, growth_threshold, light_releases, released_shift};
+use crate::principles::r4::{aborts, breaks, growth_threshold, light_releases, released_shift};
 use crate::principles::r5::{elongation, neighbour_share, set_point_scale, shade_of};
 use crate::principles::r6::{deposit_area, outlived, resting_state};
 use crate::rng::{normal, purpose, uniform};
@@ -440,12 +442,25 @@ pub fn grow_buds(tree: &mut Tree, params: &Params, season: f64) {
         let age = tree.b.age[i] as f64;
         let threshold = growth_threshold(state, age, shade, params);
         let v = tree.b.v[i];
-        let mut n = if v >= threshold {
+        // A stochastic break (c1.budBreak) may refuse a lateral that passed: it rests below, and
+        // is not released by light either this season.
+        let refused = v >= threshold
+            && !breaks(
+                v,
+                threshold,
+                tree.b.slot[i],
+                tree.id as f64,
+                tree.b.birth_id[i] as f64,
+                season,
+                params,
+            );
+        let mut n = if v >= threshold && !refused {
             shoot_size(v, params, &mut shoot_length, cap)
         } else {
             0.0
         };
-        if n == 0.0 && state == bud::DORMANT && light_releases(tree.b.q[i], age, params) {
+        if n == 0.0 && !refused && state == bud::DORMANT && light_releases(tree.b.q[i], age, params)
+        {
             // R4's light trigger: the first metamer is paid from the reserve (free without R1).
             let cost = 1.0;
             if !params.r1.enabled || tree.reserve >= cost {
@@ -499,7 +514,19 @@ pub fn grow_buds(tree: &mut Tree, params: &Params, season: f64) {
             } else {
                 0.0
             };
-            let length = shoot_length * elongation(shade, r5);
+            let mut length = shoot_length * elongation(shade, r5);
+            if params.c1.shoot_length_sd > 0.0 {
+                length *=
+                    shoot_length_factor(params, tree.id as f64, tree.b.birth_id[i] as f64, season);
+            }
+            // The axis this shoot extends or starts (a lateral's: the id its first metamer takes),
+            // and its offset to the set point (c4.axisSD), kept for the axis's life.
+            let axis = if tree.b.slot[i] == slot::MAIN {
+                tree.m.axis[host] as f64
+            } else {
+                tree.next_metamer_id
+            };
+            let axis_bend = axis_offset(trunk, params.seed, tree.id as f64, axis, c4.axis_sd);
             let mut direct = |tree: &Tree, prev: V3, b: usize, id: f64| -> V3 {
                 if !c4.enabled {
                     return prev;
@@ -528,7 +555,8 @@ pub fn grow_buds(tree: &mut Tree, params: &Params, season: f64) {
                 dir.set_point =
                     light_set_point(dir.set_point, pa, tree.b.q[b], 0.0, tree.v_base, &params.r2);
                 let bend = curve_offset(trunk, pa, node, params)
-                    + aged_offset(trunk, pa, 0.0, tree.age, params);
+                    + aged_offset(trunk, pa, 0.0, tree.age, params)
+                    + axis_bend;
                 dir.set_point = curved(dir.set_point, bend);
                 dir.set_point =
                     pendulous_set_point(dir.set_point, trunk, pa, girth_of_host, params);

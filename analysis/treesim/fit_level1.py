@@ -84,7 +84,8 @@ class Level1Settings:
 def level1_spec(species: str, reg: dict) -> Spec:
     """Level 0's spec (its scored traits, weights, trials) with the registered knobs free and the frozen Level 0 knobs
     and the [fixed] assignments in `fixed`; `form` is the registered start (the hand form). v4: the traits named in
-    the registration's `loss.level0_reported` move from the scored traits to the reports (read, never scored)."""
+    the registration's `loss.level0_reported` move from the scored traits to the reports (read, never scored). v5: the
+    bands in `loss.level0_band` replace those traits' Level 0 bands in this loss."""
     spec = load_spec(species, level=0)
     reported = reg["loss"].get("level0_reported", [])
     missing = [n for n in reported if n not in {t["name"] for t in spec.traits}]
@@ -92,6 +93,12 @@ def level1_spec(species: str, reg: dict) -> Spec:
         raise SystemExit(f"refusing: level0_reported names no scored Level 0 trait: {', '.join(missing)}")
     spec.reports = spec.reports + [t for t in spec.traits if t["name"] in reported]
     spec.traits = [t for t in spec.traits if t["name"] not in reported]
+    # v5: a scored Level 0 trait's band, set for the Level 1 loss only (`loss.level0_band`); Level 0's own is unchanged.
+    bands = reg["loss"].get("level0_band", {})
+    missing = [n for n in bands if n not in {t["name"] for t in spec.traits}]
+    if missing:
+        raise SystemExit(f"refusing: level0_band names no scored Level 0 trait: {', '.join(missing)}")
+    spec.traits = [{**t, "band": bands[t["name"]]} if t["name"] in bands else t for t in spec.traits]
     spec.params = reg["knobs"]
     spec.fixed = dict(reg["fixed"])
     spec.form = dict(reg["start"])

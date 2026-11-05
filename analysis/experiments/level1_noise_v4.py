@@ -1,4 +1,4 @@
-"""Pilot v3's noise check (Level 1, registration v4; analysis/treesim/level1.py). Reported only: the seeds per candidate
+"""Pilots v3 and v4's noise check (Level 1, registrations v4 and v5; analysis/treesim/level1.py). Reported only: the seeds per candidate
 stay at v3's 10 (the user, 2026-11-04). Provisional: nothing here writes species params.
 
     uv run --project analysis python -I analysis/experiments/level1_noise_v4.py --species beech
@@ -6,10 +6,11 @@ stay at v3's 10 (the user, 2026-11-04). Provisional: nothing here writes species
 Run once on the v4 registration, after its commit and before the fit:
 1. The hand (the Level 0 fit with [form]) on v3's three 10-seed draws (level1.noise_draws, numpy seed 20261106),
    each scored by the v4 loss: Level 0's scored terms (lateShare and height at 100 reported, not scored), the location
-   terms and the spread penalty, at the registered weights.
+   terms and the spread penalty, at the registered weights (v5: lateShare scored again at the registered band).
 2. Its SD over the three draws beside v3's on the same draws (0.40, docs/experiments/fits/level1-pilot-v2/noise.json).
 3. A cross-check on the same trees: v3's noise.json holds each draw's contributions and each fitted descriptor's
-   spread s, so the v4 loss is arithmetic on it (v3's loss less the two reported terms plus Σ w_k spread_penalty(s_k)).
+   spread s, so the v4/v5 loss is arithmetic on it (v3's loss less the reported terms, a re-banded term rescaled,
+   plus Σ w_k spread_penalty(s_k)).
    The simulated v4 loss must equal it to 1e-9 (determinism and the implementation at once).
 
 Writes docs/experiments/fits/<out>/noise.json. The registration is not touched.
@@ -35,9 +36,15 @@ NOTE_SD = 0.6
 
 
 def v4_from_v3(reg: dict, run: dict) -> float:
-    """The v4 loss of a v3 noise run, by arithmetic on its stored terms."""
+    """The v4 (or v5) loss of a v3 noise run, by arithmetic on its stored terms: the reported traits' terms out; a
+    re-banded scalar trait's term scaled by (Level 0 band / registered band)² (v5); the spread penalty in."""
+    from treesim.fit import load_spec
+
     c = run["contributions"]
     lo = run["loss"] - sum(c[k] for k in reg["loss"]["level0_reported"])
+    bands = {t["name"]: t["band"] for t in load_spec(reg["species"], level=0).traits}
+    for k, b in reg["loss"].get("level0_band", {}).items():
+        lo += c[k] * ((bands[k] / b) ** 2 - 1)
     for k in reg["fitted"]:
         p = l1.spread_penalty(run["spread_s"].get(k), reg["loss"]["spread_floor"])
         lo += reg["location_weights"][k] * (MISSING_PENALTY if p is None else p)
@@ -48,12 +55,13 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--species", required=True)
     parser.add_argument("--workers", type=int, default=workers_default())
-    parser.add_argument("--out", default="level1-pilot-v3", help="docs/experiments/fits/<out>/")
+    parser.add_argument("--out", help="docs/experiments/fits/<out>/ (default: level1-pilot-v<version − 1>)")
     args = parser.parse_args()
 
     reg = l1.load(args.species)
     if reg["version"] < 4:
-        sys.exit("refusing: this noise check is registration v4's")
+        sys.exit("refusing: this noise check is registration v4's and later")
+    args.out = args.out or f"level1-pilot-v{reg['version'] - 1}"
     spec = level1_spec(args.species, reg)
     hand = {**spec.fixed, **spec.form}
     _, d10 = l1.noise_draws()
@@ -109,7 +117,7 @@ def main() -> None:
              "cross_check": {"max_abs": worst, "rule": "v3's loss on the same trees less the reported terms plus "
                                                        "Σ w_k spread_penalty(s_k), to 1e-9"},
              "note_sd": NOTE_SD, "over_note": bool(sd > NOTE_SD),
-             "decision": "none: the seeds per candidate stay at 10 (the user)",
+             "decision": "none: the seeds per candidate stay at 10 (the user)", "loss_rule": reg["loss"]["terms"],
              "measured": "2026-11-04, on the v4 registration before the fit"}
     (out_dir / "noise.json").write_text(json.dumps(noise, indent=1, default=float) + "\n")
     print(json.dumps({"v4_sd10": sd, "v4_mean10": noise["v4"]["loss"]["mean"], "v3_sd10": v3_sd,

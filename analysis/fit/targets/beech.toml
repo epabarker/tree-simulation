@@ -313,9 +313,9 @@ pilot_held_out_seed = 20261104
 pilot_held_out = ['length0', 'limbElevation05', 'limbUpturn', 'p3', 'widestAt']
 pilot_fitted = ['centroidHeight', 'crownFullness', 'forkHeight', 'leaderDominance', 'limbDroop', 'p0', 'p1', 'p2', 'pendulousFraction05', 'profileCentre', 'tortuosity05']
 pilot_knobs = ['r2.levels.0.lambda', 'r2.levels.1.lambda', 'r2.levels.1.setPoint', 'r2.levels.1.postureSetPoint', 'r2.levels.1.branchAngle', 'r2.levels.1.eta', 'r2.levels.2.setPoint', 'r2.aC', 'r2.dLambda', 'r2.kappa']
-pilot_version = 4
+pilot_version = 5
 pilot_frozen = { "r3.c" = 0.04879 }
-# v4: pilot v3 (the user, 2026-11-04, after pilot v2 and the sensitivity note): best achievable with the current rules; lateShare and height at 100 reported, not scored, in the Level 1 loss; a one-sided spread penalty below half the real spread on every fitted descriptor, weighted like its location term; everything else as v3
+# v5: pilot v4 (the user, 2026-11-05, after pilot v3): lateShare scored again in the Level 1 loss at band 0.10, the smallest consistent with its per-seed SD of 0.137 on ten seeds (SE 0.043); height at 100 stays reported (it duplicates the same measurement); everything else as v4
 
 [level0]
 # Level 0 (reference-fidelity phase 2, the plan's §k): the physiology knobs fitted against Tallo's H–DBH and CR–DBH

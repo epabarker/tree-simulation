@@ -34,6 +34,8 @@ this registration's loss and sets them once, before any fit; level1.fit_seeds re
 
         uv run --project analysis python -I analysis/experiments/level1_targets.py --species beech --version 4 \
             --freeze r3.c --reason "..."
+- v5, pilot v4 (the user, 2026-11-05, after pilot v3): lateShare scored again in the Level 1 loss at band 0.10 (its
+  Level 0 band, 0.06, unchanged); height at 100 stays reported; everything else as v4.
 """
 
 import argparse
@@ -210,6 +212,23 @@ CHANGES[4] = [
                "v3's three 10-seed draws) is reported beside v3's 0.40, never used to re-decide",
      "motivation": "the user's instruction for pilot v3; the noise check says how far the v4 loss's floor moved"},
 ]
+CHANGES[5] = [
+    {"change": "stand.lateShare scored again in the Level 1 loss, at its Level 0 weight (1) and a band of 0.10 in "
+               "this loss only (`loss.level0_band`; the targets file's band, 0.06, and Level 0's fit and gate are "
+               "unchanged). stand.height100 stays reported, not scored",
+     "motivation": "pilot v3 (2026-11-05-level1-beech-pilot-v3.md): with lateShare unscored, the fit reached "
+                   "tortuosity05 through dLambda 0.027 at a lateShare of 1.24 against 1.43 (its would-be term 10.1): "
+                   "late height growth was spent for wandering limbs. The term returns so that the fit must buy both "
+                   "or neither. Its band is 0.10, the smallest consistent with its measured per-seed SD of 0.137 on "
+                   "ten seeds (SE 0.043; the sensitivity note): 0.06 + 0.043 ≈ 0.10, so a ten-seed mean one SE from "
+                   "the target still sits inside one band (the user). Height at 100 duplicates the same measurement "
+                   "(lateShare is H100/H60, and height at 60 is scored)"},
+]
+EXPECTED_5 = {
+    "question": "whether tortuosity05 and late height growth can be had together with the current rules (dLambda is "
+                "one λ offset for every order: pilot v3's coupling)",
+    "source": "docs/experiments/2026-11-05-level1-beech-pilot-v3.md (506626d)",
+}
 EXPECTED = {4: {
     "object": "the fourteen descriptors the sensitivity note finds reachable at Level 0 cost <= 2 (its affordable "
               "verdict): all sixteen less tortuosity05 and limbUpturn. Fitted among them: centroidHeight, "
@@ -222,6 +241,7 @@ EXPECTED = {4: {
                                            "reaches 0.46x at best: a rule's case (the note's ADR item 1)"},
     "source": "docs/experiments/2026-11-04-level1-sensitivity.md (e8f3edc)",
 }}
+EXPECTED[5] = EXPECTED_5
 UNCHANGED_V4 = ["every target, the hold-outs, the clusters and the location weights (no --redraw)",
                 "the ten form knobs, their bounds and the start", "Level 0's seven knobs and r3.c frozen",
                 "the ten fixed search seeds", "the coarsened-simulation rule", "the size match",
@@ -342,11 +362,13 @@ reg["weights"]["level0_total"] = float(sum(t["weight"] for t in load_spec(specie
 if args.version >= 4:
     # v4 (pilot v3): the loss changes; the seeds per candidate are v3's, kept by the user, not re-decided.
     reg["written"] = ("2026-11-04, from real QSMs only, before any simulated tree was scored on this loss; "
+                      "seeds_per_candidate kept at v3's (the user)" if args.version == 4 else
+                      "2026-11-05, from real QSMs only, before any simulated tree was scored on this loss; "
                       "seeds_per_candidate kept at v3's (the user)")
-    reported = ["stand.lateShare", "stand.height100"]
+    reported = ["stand.lateShare", "stand.height100"] if args.version == 4 else ["stand.height100"]
     reg["loss"].update({
-        "terms": "Level 0's contributions less the level0_reported traits + Σ over fitted k of location_weights[k] · "
-                 "(z_k² + spread_penalty(s_k))",
+        "terms": "Level 0's contributions less the level0_reported traits (at level0_band where given) + Σ over "
+                 "fitted k of location_weights[k] · (z_k² + spread_penalty(s_k))",
         "spread_in_loss": True,
         "spread_floor": l1.SPREAD_FLOOR,
         "spread_penalty": "level1.spread_penalty: (ln(min(1, r / spread_floor)) / ln 2)², r = simulated SD / real SD "
@@ -356,16 +378,21 @@ if args.version >= 4:
         "level0_reported_rule": "reported, not scored, in the Level 1 loss (fit_level1.level1_spec); summary() writes "
                                 "the terms they would add at their Level 0 weights under `reported`; they stay in the "
                                 "Level 0 gate",
+        **({"level0_band": {"stand.lateShare": 0.10},
+            "level0_band_rule": "the band of a scored Level 0 trait in the Level 1 loss only (fit_level1.level1_spec); "
+                                "Level 0's targets file, fit and gate keep their own"} if args.version >= 5 else {}),
         "seeds_per_candidate": prior["loss"]["seeds_per_candidate"],
-        "seeds_rule": "v3's 10, kept by the user for pilot v3 (2026-11-04), not re-decided; the v4 noise check (the "
-                      "hand on the three 10-seed draws) is reported only",
+        "seeds_rule": "v3's 10, kept by the user for pilots v3 and v4, not re-decided; the noise check "
+                      "(level1_noise_v4.py: the hand on the three 10-seed draws) is reported only",
     })
     reg["weights"]["level0_scored_total"] = float(sum(t["weight"] for t in load_spec(species, level=0).traits
                                                       if t["name"] not in reported))
     reg["expected"] = EXPECTED[args.version]
 if args.version in CHANGES:
     reg["changes"] = CHANGES[args.version]
-    reg["unchanged"] = UNCHANGED_V4 if args.version >= 4 else UNCHANGED
+    reg["unchanged"] = (UNCHANGED_V4 + ["v4's one-sided spread penalty, its floor 0.5 and weights",
+                                        "height at 100 reported, not scored (v4)"] if args.version >= 5
+                        else UNCHANGED_V4 if args.version >= 4 else UNCHANGED)
 #: The targets themselves: never changed by a new version. --redraw (v3) lets the hold-outs and the weights move.
 SAME = ("species", "dataset", "code", "d_min_m", "size_match", "descriptors", "held_out_seed", "real",
         "real_dbh_range_m", "real_trees", "real_trees_by_gap", "demol", "frozen_level0", "start")

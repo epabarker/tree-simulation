@@ -354,6 +354,30 @@ mod tests {
         Params::from_json(&preset("default", patch))
     }
 
+    #[test]
+    fn a_shoot_length_factor_is_lognormal_with_mean_one_and_off_at_zero() {
+        let off = params("{}");
+        assert_eq!(shoot_length_factor(&off, 0.0, 5.0, 3.0), 1.0);
+        let on = params(r#"{"c1":{"shootLengthSD":0.4}}"#);
+        // Keyed by the bud and the season: the same pair gives the same factor, another season not.
+        let f = shoot_length_factor(&on, 0.0, 5.0, 3.0);
+        assert_eq!(f, shoot_length_factor(&on, 0.0, 5.0, 3.0));
+        assert_ne!(f, shoot_length_factor(&on, 0.0, 5.0, 4.0));
+        let n = 20_000;
+        let (mut mean, mut s1, mut s2) = (0.0f64, 0.0f64, 0.0f64);
+        for id in 0..n {
+            let x = shoot_length_factor(&on, 1.0, id as f64, 7.0);
+            assert!(x > 0.0);
+            mean += x;
+            s1 += x.ln();
+            s2 += x.ln() * x.ln();
+        }
+        let n = n as f64;
+        let sd = (s2 / n - (s1 / n).powi(2)).sqrt();
+        assert!((mean / n - 1.0).abs() < 0.01, "mean {}", mean / n);
+        assert!((sd - 0.4).abs() < 0.01, "sd {sd}");
+    }
+
     fn close(a: f64, b: f64) -> bool {
         (a - b).abs() < 1e-12
     }

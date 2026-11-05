@@ -2,6 +2,24 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-05: crownBase80, trunkTortuosity05, the bole's sway, ADR 0052's probe
+
+- **What changed:**
+  - `analysis/treesim/describe.py`: crownBase80, 70 and 90, trunkTortuosity05, and three diagnostics, with eight
+    synthetic tests. The 16 registered descriptors are bit-identical (7,440 values).
+  - Gate c v3.2 as a supplement, with d_min frozen.
+  - Probe scripts and a contact sheet; [the note](experiments/2026-11-05-crown-base-and-bole.md).
+  - ADR 0052 created (proposed).
+  - Nothing under `src/`, `rust/`, `cli/` or `tests/`.
+- **Results:**
+  - crownBase80 is tier A; trunkTortuosity05 is held out on noise.
+  - Simulated crown bases sit above BioDiv's (hand +1.31, v4 +1.03).
+  - More limb loss raises it further, so beech makes no case for ADR 0052.
+- **Surprise:** the render's "low crowns" did not survive 53 trees. Two of the three QSMs drawn were high-crowned. What
+  differs is crown width and density, and a bole that sways twice the real (path over chord cannot see it).
+- **Side effect:** `test_level1.py::test_registration_v5…` now fails at HEAD. That is the registration's own hash
+  refusal (describe.py moved), cleared by v6's registration. It is not in `npm run check`.
+
 ## 2026-11-05: pilot v4's result and write-up
 
 - **What changed:** docs only. [The note](experiments/2026-11-05-level1-beech-pilot-v4.md); the gate files copied to

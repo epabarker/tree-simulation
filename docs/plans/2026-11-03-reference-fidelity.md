@@ -308,6 +308,34 @@ no z was computed, and nothing registered changed after it.
 ### State
 _(rewritten at the end of each session)_
 
+**Crown base and bole (2026-11-05, [note](../experiments/2026-11-05-crown-base-and-bole.md)); provisional, nothing
+accepted, no core change.** The user's brief after the render: two descriptors, gate c, the trunk's sinuosity, ADR
+0052's probe, a proposed v6.
+- **crownBase80** (80% of non-trunk length above, over H; 70/90 beside) passes gate c v3.2 at **tier A**.
+  **trunkTortuosity05** is **held out (noise)** (floor 0.75). The 16 registered descriptors are bit-identical across
+  the edit (7,440 values).
+- **The instrument contradicts the render's reading:** every simulated stand's crown base is **above** BioDiv's
+  (0.50 ± 0.138): hand +1.31, v3 +0.94, v4 +1.03 on 101–110. crownBase80 is r 0.95 with centroidHeight.
+  - **The contact sheet agrees with the numbers.** Two of three QSMs are high-crowned (0.70, 0.69), the third 0.27.
+    The gap the eye reads is crown width and density, and bole sway.
+- **Sway** (a diagnostic, not gate-c'd): real 0.019 of the stretch, hand 0.024, v3 0.031, v4 0.036.
+  - The trunk's set point (40°, Troll's model) is the largest probed share: −30% at ×0, at a Level 0 cost.
+  - ξ straightens the bole. Direction noise is unprobed.
+  - Not a knob: the routes are a fixed change with a reason, or R3.
+- **ADR 0052's probe:** T_rel ×3/×10 and O2 raise beech's crownBase80, away from the real. LAI stays within one
+  band, z_CR < 1. [ADR 0052](../decisions/0052-limb-loss.md) was created (proposed: A, no rule for beech's sake;
+  open for oak's CR).
+- **Proposed v6 (not registered):**
+  - crownBase80 fitted (weight 0.295; centroidHeight 0.363 → 0.270);
+  - v5's hold-outs kept;
+  - trunkTortuosity05 not eligible (gate c);
+  - the spread floor at 0.65×;
+  - lateShare's Level 0 band 0.12.
+  - At HEAD `level1_targets.py` refuses until v6 re-hashes.
+- **Next:** the user's rulings on v6, on ADR 0052 (A) and ADR 0053, and on whether crown width or sway gets a
+  descriptor.
+
+
 **Docs written while pilot v4 ran (2026-11-05): two items, both awaiting the user.**
 - **The provenance audit (ruling 3), done:** [note](../experiments/2026-11-05-target-provenance-audit.md). Its
   proposals are under ruling 3 below.

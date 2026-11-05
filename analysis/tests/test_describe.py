@@ -224,3 +224,124 @@ def test_pendulous_fraction05_reads_each_axis_last_half_metre():
     f = ds.pendulous_fraction05(c, ds.geometric_labels(c))
     assert f == pytest.approx(0.5, abs=1e-9)
     assert ds.describe(c)["pendulousFraction"] == pytest.approx(0.2 / 0.45)  # both limb tips and the trunk's
+
+
+# --- crownBase80 and trunkTortuosity05 (2026-11-05) ---------------------------------------------------------------
+
+
+def _crown(t: Tree, heights, length=2.0, radius=0.03, direction=(1, 0, 0)):
+    """A level limb of `length` from each trunk node at the given heights (a 1 m trunk node per metre)."""
+    for h in heights:
+        t.chain(h - 1, direction, 1, length, radius)
+
+
+def test_crown_base80_is_the_length_weighted_quantile_of_level_limbs():
+    # Ten level limbs of 2 m at 1..10 m on a 12 m trunk: 80% of the length lies above 3 m exactly (limbs at 3..10 are
+    # 8 of 10; a level limb is a point mass, so the quantile sits at the jump, 3 m).
+    t = trunk(n=12)
+    _crown(t, range(1, 11))
+    d = ds.describe(t.table())
+    assert d["height"] == pytest.approx(12.0)
+    assert d["crownBase80"] * 12.0 == pytest.approx(3.0, abs=1e-6)
+    assert d["crownBase70"] * 12.0 == pytest.approx(4.0, abs=1e-6)
+    assert d["crownBase90"] * 12.0 == pytest.approx(2.0, abs=1e-6)
+
+
+def test_crown_base80_spreads_a_sloping_cylinder_over_its_height():
+    # One limb rising 45° from 2 m, 4 m long: its z runs 2 → 2 + 4·cos 45° uniformly; 80% lies above
+    # 2 + 0.2·(4 cos 45°).
+    t = trunk(n=12)
+    t.add(1, [1, 0, 1], 4.0, 0.05)
+    d = ds.describe(t.table())
+    assert d["crownBase80"] * d["height"] == pytest.approx(2.0 + 0.2 * 4.0 * math.sqrt(0.5), abs=1e-6)
+
+
+def test_one_low_stub_moves_crown_base80_by_its_share_while_the_lowest_limb_jumps():
+    t = trunk(n=20)
+    _crown(t, range(11, 19), length=3.0)  # 24 m of crown limbs from 11 to 18 m
+    before = ds.describe(t.table())
+    t.chain(1, [1, 0, 0], 1, 2.6, 0.03)  # a 2.6 m stub at 2 m: just over the 2.5 m limb rule
+    after = ds.describe(t.table())
+    assert after["crownBase"] * after["height"] == pytest.approx(2.0)
+    assert before["crownBase"] * before["height"] == pytest.approx(11.0)
+    # 26.6 m in all, 80% = 21.28 m above: the limbs at 13..18 hold 18 m, the limb at 12 brings it to 21 m, so the
+    # base falls from 12 m (without the stub: 80% of 24 = 19.2, reached at 12) to 11 m.
+    assert before["crownBase80"] * before["height"] == pytest.approx(12.0, abs=1e-6)
+    assert after["crownBase80"] * after["height"] == pytest.approx(11.0, abs=1e-6)
+    # below 11 m only the stub (the limb at 11 is level, a point at the cut, so above it): all of it a stub
+    assert after["stubShareBelow"] == pytest.approx(1.0)
+    t.chain(4, [0, 1, 0], 1, 1.0, 0.03)  # a second low limb at 5 m, 2 m long, with a 0.5 m branch: not a stub
+    q = t.chain(len(t.rows) - 1, [0, 1, 0], 1, 1.0, 0.02)
+    t.add(q - 1, [0, 0, 1], 0.5, 0.01)
+    mixed = ds.describe(t.table())
+    assert 0.0 < mixed["stubShareBelow"] < 1.0
+
+
+def test_many_low_stubs_pull_crown_base80_down():
+    t = trunk(n=20)
+    _crown(t, range(11, 19), length=3.0)
+    for h in range(2, 10):
+        t.chain(h - 1, [0, 1, 0], 1, 3.0, 0.03)  # eight 3 m stubs at 2..9 m: 48 m in all, 80% above = 38.4
+    d = ds.describe(t.table())
+    # above 3 m: the stubs at 3..9 (21 m) and the crown (24 m) = 45 ≥ 38.4; above 5 m: 15 + 24 = 39; above 6 m: 36.
+    assert d["crownBase80"] * d["height"] == pytest.approx(5.0, abs=1e-6)
+    assert d["stubShareBelow"] == pytest.approx(1.0)
+
+
+def test_pruning_top_twigs_lowers_crown_base80_by_the_computed_amount():
+    t = trunk(n=12)
+    _crown(t, range(1, 11))
+    full = ds.describe(t.table())
+    for h in (9, 10):  # thin twigs on the top two limbs, gone at a 10 mm d_min
+        t.chain(h - 1, [0, 1, 0], 1, 2.0, 0.002)
+    with_twigs = ds.describe(t.table())
+    pruned = ds.describe(__import__("treesim.coarsen", fromlist=["prune"]).prune(t.table(), 0.010))
+    assert pruned["crownBase80"] == pytest.approx(full["crownBase80"], abs=1e-9)
+    # 24 m with the twigs: 80% = 19.2 above, reached at 2 m less a 0.8 m share... level limbs: above 2 m holds 22,
+    # above 3 m holds 20 ≥ 19.2, above 4 m 18: the base is 3 m, the same; the twigs sit high, so it can only rise.
+    assert with_twigs["crownBase80"] >= full["crownBase80"] - 1e-9
+
+
+def test_trunk_tortuosity05_is_one_on_a_straight_trunk_and_cut_at_crown_base80():
+    t = trunk(n=12)
+    _crown(t, range(5, 11))
+    d = ds.describe(t.table())
+    assert d["trunkTortuosity05"] == pytest.approx(1.0)
+    assert d["trunkStretch"] == pytest.approx(d["crownBase80"] * d["height"])
+
+
+def test_trunk_tortuosity05_reads_a_metres_scale_zigzag_and_drops_a_shoot_scale_one_at_one_metre():
+    # A trunk of 2 m segments alternately 30° either side of vertical, then a straight top: path over chord 1/cos 30°
+    # at 0.5 m (the step divides each 2 m segment exactly) and at 1 m.
+    t = Tree()
+    p = -1
+    for k in range(6):
+        p = t.add(p, [math.sin(math.radians(30)) * (1 if k % 2 == 0 else -1), 0, math.cos(math.radians(30))], 2.0, 0.2)
+    top = t.chain(p, UP, 4, 1.0, 0.15)
+    for node in (top - 2, top - 1, top):  # three level limbs on the straight top, above the zigzag
+        t.chain(node, [1, 0, 0], 1, 2.0, 0.03)
+    d = ds.describe(t.table())
+    zig_top = 12 * math.cos(math.radians(30))
+    assert d["crownBase80"] * d["height"] > zig_top
+    straight = d["crownBase80"] * d["height"] - zig_top
+    expected = (12.0 + straight) / (zig_top + straight)
+    assert d["trunkTortuosity05"] == pytest.approx(expected, rel=1e-3)
+    assert d["trunkTortuosity1"] == pytest.approx(expected, rel=1e-3)
+    # 0.25 m segments alternating ±30°: zigzag under the 0.5 m step mostly drops out
+    t = Tree()
+    p = -1
+    for k in range(48):
+        p = t.add(p, [math.sin(math.radians(30)) * (1 if k % 2 == 0 else -1), 0, math.cos(math.radians(30))], 0.25, 0.2)
+    top = t.chain(p, UP, 4, 1.0, 0.15)
+    for node in (top - 2, top - 1, top):
+        t.chain(node, [1, 0, 0], 1, 2.0, 0.03)
+    d = ds.describe(t.table())
+    assert d["trunkTortuosity05"] < 1.0 + 0.2 * (1 / math.cos(math.radians(30)) - 1)
+
+
+def test_trunk_tortuosity05_is_nan_on_a_short_stretch_and_without_limbs():
+    t = trunk(n=12)
+    _crown(t, [1, 2, 3])  # crownBase80 near 1 m: a stretch under 2.5 m
+    assert math.isnan(ds.describe(t.table())["trunkTortuosity05"])
+    assert math.isnan(ds.describe(trunk(n=12).table())["crownBase80"])
+    assert math.isnan(ds.describe(trunk(n=12).table())["trunkTortuosity05"])

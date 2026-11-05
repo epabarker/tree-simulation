@@ -20,6 +20,8 @@ Measurement design: what each descriptor depends on beyond the tree.
 | tortuosity | axes | high, and 1c's re-cut flattens it by construction | none |
 | tortuosity05 | axes | moderate: each path resampled at 0.5 m (H3), so zigzag under the step drops out | none |
 | centroidHeight | none | low | base z, H |
+| crownBase80 (70, 90) | trunk | low (length quantile; a stub counts by its length) | base z, H |
+| trunkTortuosity05 | trunk | moderate: the trunk's path resampled at 0.5 m, to crownBase80's height | none |
 
 - **The fixed 0.5 m step (v3, the user, 2026-11-03):** every descriptor that depends on segment length is read at
   RESAMPLE on both sides (a QSM's cylinders and a simulator's metamers alike): droop, upturn and branchAngle2 as 0.5 m
@@ -35,6 +37,15 @@ Measurement design: what each descriptor depends on beyond the tree.
 - **Strahler:** a tip is order 1; a node takes its children's largest order, plus one where two or more children
   share it (the simulator's nodes carry up to eight). A stream is a run of cylinders of one order. The ratio is
   exp(−slope) of ln N_ω on ω, over every order and, beside it, without order 1 (the twigs a QSM loses first).
+- **crownBase80 (2026-11-05, docs/experiments/2026-11-05-crown-base-and-bole.md):** the height above the root's base,
+  over H, above which 80% of the non-trunk wood length (order ≥ 1) lies: the length-weighted 20% quantile of z, each
+  cylinder's length spread evenly over its z-extent (a level cylinder is a point). **The 80% is a convention**;
+  crownBase70 and crownBase90 are read beside it. Unlike `crownBase` (the lowest ≥ 2.5 m limb), one dead stub moves it
+  only by its share of the length. On the simulator it is read after coarsening, as every descriptor is.
+- **trunkTortuosity05:** the trunk's path (its chain by continuation, the starts and the last tip) from the root to
+  where it first reaches crownBase80's height, resampled at 0.5 m, over its chord; NaN under 2.5 m or without a
+  crownBase80. Diagnostics beside it (`DIAGNOSTIC`, not descriptors): the same at a 1 m step, the stretch's arc length
+  in metres, and the share of the non-trunk length below crownBase80 on order-1 axes that carry no branch (stubs).
 - **Report-only:** `leafStemSlope` (NaN without leaf area: no wood proxy, tip counts being the most
   resolution-dependent quantity there is), `crownBase` / H by wood (the field's crown base is Weiser's, §c).
 - **Below ground (R4, the user's ruling 2026-11-03: start or tip):** a cylinder that starts or ends below the
@@ -55,8 +66,10 @@ DESCRIBE = Rules(min_subtree=("length", 1.25), min_limb=("length", 2.5), bole_li
                  width="diameter", bands=4)
 LIMB = 2.5
 NEW = ("bifurcationRatio", "bifurcationRatio2", "tortuosity", "tortuosity05", "length0", "length1", "length2", "length3",
-       "pendulousFraction", "taper", "centroidHeight", "limbElevation05", "pendulousFraction05")
+       "pendulousFraction", "taper", "centroidHeight", "limbElevation05", "pendulousFraction05",
+       "crownBase80", "crownBase70", "crownBase90", "trunkTortuosity05")
 REPORT = ("leafStemSlope", "crownBase")
+DIAGNOSTIC = ("trunkTortuosity1", "trunkStretch", "stubShareBelow")
 
 
 def subset(c: cy.Cylinders, keep: np.ndarray) -> cy.Cylinders:
@@ -211,6 +224,79 @@ def tortuosity05(c: cy.Cylinders, labels: Labels) -> float:
     return float(np.median(vals)) if vals else math.nan
 
 
+def length_above(c: cy.Cylinders, rows: np.ndarray, z: float) -> float:
+    """The length of the cylinders `rows` above height z, each cylinder's length spread evenly over its z-extent."""
+    lo = np.minimum(c.start[rows, 2], c.tip[rows, 2])
+    hi = np.maximum(c.start[rows, 2], c.tip[rows, 2])
+    span = hi - lo
+    frac = np.where(span > 0, np.clip((hi - z) / np.where(span > 0, span, 1.0), 0.0, 1.0), (lo >= z).astype(float))
+    return float((c.length[rows] * frac).sum())
+
+
+def crown_base_at(c: cy.Cylinders, labels: Labels, share: float) -> float:
+    """The height above the base z, over H, above which `share` of the non-trunk length lies (bisection on the
+    monotone length above; NaN without non-trunk wood)."""
+    rows = np.flatnonzero(labels.order >= 1)
+    h = cy.height(c)
+    if len(rows) == 0 or h <= 0:
+        return math.nan
+    total = float(c.length[rows].sum())
+    z0 = c.start[0, 2]
+    lo = float(min(c.start[rows, 2].min(), c.tip[rows, 2].min()))
+    hi = float(max(c.start[rows, 2].max(), c.tip[rows, 2].max()))
+    for _ in range(60):
+        mid = 0.5 * (lo + hi)
+        if length_above(c, rows, mid) >= share * total:
+            lo = mid
+        else:
+            hi = mid
+    return (0.5 * (lo + hi) - z0) / h
+
+
+def trunk_stretch(c: cy.Cylinders, labels: Labels, base: float) -> np.ndarray | None:
+    """The trunk's polyline from the root to where it first reaches z0 + base·H (the whole chain if it never does)."""
+    if not math.isfinite(base):
+        return None
+    chain = trunk_chain(labels)
+    points = np.vstack([c.start[chain], c.tip[chain[-1]]])
+    cut = c.start[0, 2] + base * cy.height(c)
+    above = np.flatnonzero(points[:, 2] >= cut)
+    if len(above) == 0 or above[0] == 0:
+        return points if len(above) == 0 else points[:1]
+    k = int(above[0])
+    a, b = points[k - 1], points[k]
+    t = (cut - a[2]) / (b[2] - a[2]) if b[2] != a[2] else 1.0
+    return np.vstack([points[:k], a + t * (b - a)])
+
+
+def trunk_tortuosity(points: np.ndarray | None, step: float = RESAMPLE) -> float:
+    """Path (resampled at `step`) over chord of a trunk stretch; NaN under LIMB metres or without one."""
+    if points is None or len(points) < 2:
+        return math.nan
+    arc = float(np.linalg.norm(np.diff(points, axis=0), axis=1).sum())
+    chord = float(np.linalg.norm(points[-1] - points[0]))
+    if arc < LIMB or chord <= 0:
+        return math.nan
+    return _resampled_length(points, step) / chord
+
+
+def stub_share_below(c: cy.Cylinders, labels: Labels, base: float) -> float:
+    """Of the non-trunk length below z0 + base·H, the share on order-1 axes that carry no branch (dead-stub proxy)."""
+    if not math.isfinite(base):
+        return math.nan
+    rows = np.flatnonzero(labels.order >= 1)
+    cut = c.start[0, 2] + base * cy.height(c)
+    below = float(c.length[rows].sum()) - length_above(c, rows, cut)
+    if below <= 0:
+        return math.nan
+    branched = {int(labels.axis[c.parent[i]]) for i in range(1, len(c))
+                if labels.order[c.parent[i]] == 1 and labels.axis[i] != labels.axis[c.parent[i]]}
+    stubs = np.array([i for i in rows if labels.order[i] == 1 and int(labels.axis[i]) not in branched], int)
+    if len(stubs) == 0:
+        return 0.0
+    return (float(c.length[stubs].sum()) - length_above(c, stubs, cut)) / below
+
+
 def _dbh_index(c: cy.Cylinders, chain: list[int]) -> int:
     along = np.cumsum(c.length[chain])
     return chain[min(int(np.searchsorted(along, cy.BREAST_HEIGHT)), len(chain) - 1)]
@@ -246,6 +332,8 @@ def describe(c: cy.Cylinders, leaf: np.ndarray | None = None) -> dict:
     bases = [c.start[i, 2] - z0 for i in range(1, len(c))
              if labels.order[i] == 1 and labels.order[c.parent[i]] == 0 and labels.axis[i] in big]
     r2, r2_no_twigs = bifurcation(c)
+    cb = {k: crown_base_at(c, labels, k / 100.0) for k in (70, 80, 90)}
+    stretch = trunk_stretch(c, labels, cb[80])
     out = {k: f[k] for k in FORM_COLUMNS if k != "leafStemSlope"}
     out.update({f"p{k}": w for k, w in enumerate(f["profile"])})
     out.update({
@@ -257,6 +345,11 @@ def describe(c: cy.Cylinders, leaf: np.ndarray | None = None) -> dict:
         "centroidHeight": float((c.length * mid).sum() / total / h) if h > 0 and total > 0 else math.nan,
         "limbElevation05": limb_elevation05(c, labels), "pendulousFraction05": pendulous_fraction05(c, labels),
         "leafStemSlope": f["leafStemSlope"],
+        **{f"crownBase{k}": v for k, v in cb.items()},
+        "trunkTortuosity05": trunk_tortuosity(stretch), "trunkTortuosity1": trunk_tortuosity(stretch, 1.0),
+        "trunkStretch": float(np.linalg.norm(np.diff(stretch, axis=0), axis=1).sum()) if stretch is not None
+        else math.nan,
+        "stubShareBelow": stub_share_below(c, labels, cb[80]),
         "crownBase": min(bases) / h if bases and h > 0 else math.nan,
         "dbh": 2.0 * float(c.radius_raw[_dbh_index(c, trunk_chain(labels))]), "height": h,
         **below, **{f"check_{k}": bool(v) for k, v in cy.internal_checks(c).items()},

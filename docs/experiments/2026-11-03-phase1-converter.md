@@ -603,3 +603,19 @@ Not run (above). `analysis/fit/targets/oak.toml` records it.
 **Reproduce:** `node analysis/experiments/gate_c_sim.ts sizematch SPECIES SEED OUT [assign.json]` per species and seed
 (60 jobs), then `uv run --project analysis python -I analysis/experiments/phase1_degradation.py sizematch`, `dump`, `gate`
 (≈ 2.5 min for the dumps, ≈ 3 min for the gate on 12 workers). Outputs in `runs/gate-c/` (not committed).
+
+## Gate c v3.2 (2026-11-05): a supplement for crownBase80 and trunkTortuosity05
+v3.1's rules unchanged, on four new descriptors, as a supplement (`analysis/fit/sources/phase1-tolerances-v3.2.json`,
+`analysis/experiments/gate_c_v32.py`). `phase1-tolerances.json` (v3.1) is untouched. d_min and the upper end are frozen
+at v3.1's (BioDiv 8.6 mm, 11.0 mm), because a full rerun could re-choose d_min over the larger descriptor set; d_min's
+rule holds with the new descriptors as without. Self-checks: all 84 v3.1 rows reproduce exactly; the control's shares at
+d_min reproduce on all 28 beech descriptors. The 16 registered Level 1 descriptors are bit-identical before and after
+the describe.py edit (7,440 values).
+
+| descriptor | tier | floor ratio | control at d_min | seeds within (A: d_min, upper, inflated) |
+|---|---|---|---|---|
+| crownBase80 (70, 90) | **A** | 0.080 (0.089, 0.053) | 1.00 | 19, 19, 20 (each) |
+| trunkTortuosity05 | held out (noise) | **0.747** | 0.98 | – |
+
+Readings and the probe that used them: [the crown base and bole note](2026-11-05-crown-base-and-bole.md). At HEAD,
+`level1_targets.py` refuses (describe.py's hash moved, by design); v5 reproduces from b4fdbff.

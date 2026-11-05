@@ -1,0 +1,237 @@
+{
+ "version": 3.2,
+ "supplement_of": {
+  "file": "analysis/fit/sources/phase1-tolerances.json",
+  "version": 3.1
+ },
+ "written": "2026-11-05: v3.1's rules unchanged on four new descriptors; d_min and the upper end frozen at v3.1's; written from real QSMs only, before any simulated tree is read",
+ "descriptors": [
+  "crownBase80",
+  "crownBase70",
+  "crownBase90",
+  "trunkTortuosity05"
+ ],
+ "frozen": {
+  "d_min": 0.008621381595730782,
+  "upper_end": {
+   "name": "p5",
+   "d": 0.010951084084808826
+  },
+  "evaluation_points": "tiers.evaluation_points(grid, d_min, upper)"
+ },
+ "rules": {
+  "seeds": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9,
+   10,
+   11,
+   12,
+   13,
+   14,
+   15,
+   16,
+   17,
+   18,
+   19,
+   20
+  ],
+  "datasets": {
+   "oak": [
+    "wytham"
+   ],
+   "beech": [
+    "biodiv"
+   ],
+   "maple": [
+    "wytham"
+   ]
+  },
+  "datasets_note": "oak is gated at Wytham only (the user, 2026-11-03): BioDiv has no oaks, so no control can set an oak d_min there; v1 gated oak at BioDiv's beech resolution and failed it there (\u00d71: 7 of 19). Demol is beech's held-out site (the 1d brief, 4): its control curve is reported, never gated",
+  "coarsen": "prune only (v3): every cylinder under d_min goes with its subtree; the re-cut of v1 and v2 is withdrawn (coarsen.py)",
+  "describe": "every segment-length-dependent descriptor at the fixed 0.5 m step on both sides (droop, upturn, branchAngle2 as 0.5 m chords; tortuosity05, limbElevation05, pendulousFraction05 resampled at 0.5 m); tortuosity, limbElevation and pendulousFraction (per cylinder) report-only",
+  "beech_estimator": "a tree's descriptor is the median over its 5 repeats of the optimum's input set (finite values; NaN under 3), for the tolerance, the floor and the control alike; Wytham's and Demol's trees are single-model (only 12 Wytham trees have 10 models)",
+  "floor": "oak, maple: the RMS over Wytham's noise trees of the SD across 10 models; beech: the RMS over BioDiv's trees of the SD across its 5 repeats, / \u221a5 (the SD of a median-of-repeats value), against the between-tree SD of the medians. Hold-out at >= 0.5 \u00d7 the between-tree SD: reported as noise-limited at that dataset",
+  "d_min": "per dataset, the largest point of the grid (the [1, 2, 5, 10, 20, 50] percentiles of its pooled terminal raw diameters) at which, for every gated species of the dataset, >= 90% of its gated descriptors have >= 90% of its real trees within tolerance after coarsen() (control.py). Gated: not report-only, not H1-excluded, not held out by the noise floor. A NaN original leaves the tree; a NaN after coarsening is outside. No point passes: the dataset stops. The bracket \u00d70.5/\u00d72 is withdrawn",
+  "stress": {
+   "d": 0.05,
+   "use": "reported, never gated",
+   "source": "Demol et al. 2022, Silva Fennica 56(1) 10550: branches under \u2248 5 cm carry 80\u201383% of the QSM volume overestimate (Table 3); the completeness threshold the 1d brief names"
+  },
+  "inflation": "Demol et al. 2022 (\u00a73.2, Table 3): diameter +73% under 2.5 cm, +4% over 10 cm, log-interpolated between (not measured). Gated at d_min for both tiers (the user, 2026-11-03). Order: inflate, prune",
+  "evaluation_points": "v3.1 (the user, 2026-11-03, from the control curves): d_min, every grid point strictly inside (d_min, upper), the upper end, and inflation at d_min (tiers.evaluation_points). The upper end is the first grid point above d_min at which the dataset's control fails (tiers.upper_end): Wytham 12.1 mm (p50), BioDiv 11.0 mm (p5). Set after seeing the control curves, by the criterion 'first failing grid point' and not a chosen width; no simulated value entered. v3 had [d_min, 2\u00b7d_min]",
+  "tier_a": "resolution-independent: per seed, the median over the stand's live measured trees of the signed describe(coarsen(tree)) \u2212 describe(tree); |median| <= tolerance on >= 15 of the 20 seeds at every evaluation point (tiers.tier_a)",
+  "tier_b": "valid at matched resolution: per seed, the median of the signed v(p) \u2212 v(d_min); |median| <= tolerance on >= 15 of the 20 seeds at every other evaluation point of [d_min, upper], inflation against v(d_min); and the descriptor's control neutral at d_min (>= 90% of real trees within tolerance) (tiers.tier_b)",
+  "assign": "A if tier A passes, else B if tier B passes, else held out (tiers.assign). Both tiers are targets; the fit always compares the coarsened simulator against the real QSMs, never fine simulated values",
+  "pass_seeds": 15,
+  "fail": "a seed with no live measured tree, or a NaN difference on any tree, fails that seed",
+  "held_out": "noise floor >= 0.5 \u00d7 between-tree SD (noise-limited at the dataset), fewer than MIN_TREES finite real trees, or neither tier passes (resolution-sensitive). Report-only and H1-excluded descriptors are neither targets nor hold-outs",
+  "survive": "amendment E applies to the coarsening test (v3, the user): per species, over its descriptors that pass the floor (gated, clear): if fewer than half reach a tier, stop and report; never loosen. Floor hold-outs are reported as noise-limited at that dataset",
+  "size_match": {
+   "reference": "the median measured DBH of the species' tolerance set (R2): oak Wytham's DBH_pts, maple Wytham's sycamores' DBH_pts, beech BioDiv's dTLS (the user, 2026-11-03, extending the 1d brief's 4); values in `reference_dbh`",
+   "simulated": "the converter's DBH (describe()'s, cylinders.py's rule) on the uncoarsened live measured trees",
+   "stand_seasons": [
+    50,
+    60,
+    70,
+    80,
+    90,
+    100,
+    110,
+    120,
+    130,
+    140,
+    150,
+    160,
+    170,
+    180,
+    190,
+    200,
+    210,
+    220,
+    230,
+    240,
+    250,
+    260,
+    270,
+    280,
+    290,
+    300
+   ],
+   "stand": "the first season of stand_seasons at which the median over seeds 1\u201320 of the per-seed median DBH of the stand's live measured trees reaches the reference median. None by 300 (a compute bound): report and stop",
+   "lone": "the same on the lone tree's DBH, at seasons 50\u2013100 by 10. Not reached by 100: read at 100 and report the shortfall",
+   "report": "the median height at the chosen season, beside the reference's"
+  },
+  "control": "every gated species' real QSMs of each dataset coarsened at each grid point and at the stress point; TreeML's 3 optcsv trees' shifts at each d_min reported with no verdict (phase 7's)"
+ },
+ "self_check": {
+  "rows": 84,
+  "keys": [
+   "n",
+   "median",
+   "slope_lnDBH",
+   "between_sd",
+   "tolerance",
+   "noise_rms",
+   "noise_ratio",
+   "noise_verdict"
+  ],
+  "differing": 0
+ },
+ "control_path_check": {
+  "descriptors": 28,
+  "differing": 0
+ },
+ "table": [
+  {
+   "species": "beech",
+   "descriptor": "crownBase80",
+   "set": "biodiv Fagus_sylvatica",
+   "n": 53,
+   "median": 0.5279685241847665,
+   "slope_lnDBH": 0.180678721872101,
+   "between_sd": 0.1376491651973056,
+   "between_sd_lo95": 0.11535662246308406,
+   "between_sd_hi95": 0.17070243308050387,
+   "tolerance": 0.0688245825986528,
+   "noise_rms": 0.01101856944806728,
+   "noise_median": 0.0009862485071587804,
+   "noise_trees": 53,
+   "noise_source": "biodiv 5 repeats, SD / \u221a5",
+   "noise_ratio": 0.08004821120617273,
+   "noise_verdict": "clear"
+  },
+  {
+   "species": "beech",
+   "descriptor": "crownBase70",
+   "set": "biodiv Fagus_sylvatica",
+   "n": 53,
+   "median": 0.6229593165558673,
+   "slope_lnDBH": 0.14753497709693145,
+   "between_sd": 0.12753301099120726,
+   "between_sd_lo95": 0.10687879857030197,
+   "between_sd_hi95": 0.158157118084054,
+   "tolerance": 0.06376650549560363,
+   "noise_rms": 0.011297747673124641,
+   "noise_median": 0.0011239691397316183,
+   "noise_trees": 53,
+   "noise_source": "biodiv 5 repeats, SD / \u221a5",
+   "noise_ratio": 0.08858684967379593,
+   "noise_verdict": "clear"
+  },
+  {
+   "species": "beech",
+   "descriptor": "crownBase90",
+   "set": "biodiv Fagus_sylvatica",
+   "n": 53,
+   "median": 0.4557320069001964,
+   "slope_lnDBH": 0.2161056620074734,
+   "between_sd": 0.1675904008798434,
+   "between_sd_lo95": 0.1404488183783873,
+   "between_sd_hi95": 0.20783336499076907,
+   "tolerance": 0.0837952004399217,
+   "noise_rms": 0.008820346068454943,
+   "noise_median": 0.0008937161240636761,
+   "noise_trees": 53,
+   "noise_source": "biodiv 5 repeats, SD / \u221a5",
+   "noise_ratio": 0.052630377528476886,
+   "noise_verdict": "clear"
+  },
+  {
+   "species": "beech",
+   "descriptor": "trunkTortuosity05",
+   "set": "biodiv Fagus_sylvatica",
+   "n": 52,
+   "median": 1.0060616429735756,
+   "slope_lnDBH": 0.01743640795906088,
+   "between_sd": 0.047333258307638224,
+   "between_sd_lo95": 0.0396041673580654,
+   "between_sd_hi95": 0.0588389397377536,
+   "tolerance": 0.023666629153819112,
+   "noise_rms": 0.035364311334567994,
+   "noise_median": 0.0007762325366564922,
+   "noise_trees": 52,
+   "noise_source": "biodiv 5 repeats, SD / \u221a5",
+   "noise_ratio": 0.7471345222997507,
+   "noise_verdict": "held out (noise)"
+  }
+ ],
+ "control": {
+  "dmin": {
+   "crownBase80": 1.0,
+   "crownBase70": 1.0,
+   "crownBase90": 1.0,
+   "trunkTortuosity05": 0.9807692307692307
+  },
+  "upper": {
+   "crownBase80": 0.9056603773584906,
+   "crownBase70": 0.9245283018867925,
+   "crownBase90": 0.9622641509433962,
+   "trunkTortuosity05": 0.9230769230769231
+  }
+ },
+ "dmin_rule_with_new": {
+  "without": true,
+  "with": true
+ },
+ "hashes": {
+  "analysis/treesim/describe.py": "b4f025b0985fe2336c4e994c3cd93b77a6dadf72c20d3e6e5a183e76173a018c",
+  "analysis/treesim/form.py": "23c5e1c035c9bbb625a8a002476fc12fd98f85438af4bba5adbb97c10ec6b48d",
+  "analysis/treesim/cylinders.py": "0e262dce2e55193c3f8ed775ec92c7fbe29df9f9be0d738daed7623cb5629254",
+  "analysis/treesim/qsm.py": "27927fc0188f155bf1eb47865b577774f18875461cac08ea8cd2e6a464c0a333",
+  "analysis/treesim/coarsen.py": "b5e57ca6ebff39f9ec8a2b0364e621a549e5d6b6d8426cbbcbfb05cd87b34bc9",
+  "analysis/treesim/fetch.py": "d11298d3684ab72718dd8218a94353f8aff654c8029a49d491f1719124caabd2",
+  "analysis/treesim/simtree.py": "e69c7a26140b272f1274b07f3d6ae51acdba6abbfc655b27d3b8a02bb901ff6b",
+  "analysis/treesim/tolerance.py": "7ec6553f51cee1734e68b3b1f5949d7c6996e820d61a6e53a3fc3fcd5c647b7c",
+  "analysis/treesim/control.py": "a79fc7a2d03ba035969f55c34d36791f5a0dca37f99fee5b10fc148430c7acb4",
+  "analysis/treesim/tiers.py": "c3205f762a1f7ce29ed20c7efa28d048c2753bc9eee6c1d5e6f6e5daa88e44ae",
+  "cli/dump-trees.ts": "acc19ad15f14d0bdbeb5742adf173f334c20a12cd59434c8fb90f2117a58d329",
+  "analysis/fit/sources/reference-manifest.csv": "4540b2f7b53b7ee92cd971cbcf599c7a76ab307fa58e715c23193c0a256a6453"
+ }
+}

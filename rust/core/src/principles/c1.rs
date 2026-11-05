@@ -9,8 +9,18 @@
 //! metamer to metamer by parallel transport, so phyllotaxis follows the axis as it bends. A
 //! seedling's L is turned about its heading by a per-tree azimuth [RNG: seedlingAzimuth] (ADR 0054).
 //!
+//! Graded extension (a prototype, no ADR; A7's candidate 1 for the flat cap): with `c1.vMin` a
+//! growing bud (active or a short shoot, not a dormant one, whose break keeps R4's threshold) with
+//! v_min ≤ v < 1 grows one metamer of internode length v·l0, where §C3.4 grows none ("v < 1 →
+//! none"): Palubicki's l = v/n continued below n = 1. Under R1's costs a tree's resource per unit
+//! of bud light falls below the one-metamer threshold by season ≈ 30, after which only buds under
+//! nearly open sky grow, one internode a season, and the crown's front advances as a plateau (the
+//! flat cap, ADR 0031). Graded, the front's speed falls off with light, so the shoulders advance at
+//! a fraction of the top's rate. The top's rate and the tree's carbon are unchanged: the resource
+//! used is what sub-threshold buds lose today.
+//!
 //! Params: c1.phyllotaxis, c1.divergence (δ), c1.branchAngle (β), c1.internodeLength (l0),
-//! c1.maxMetamersPerShoot, c6.r0; with R2 the levels' generator, whorl, β and p_term.
+//! c1.maxMetamersPerShoot, c1.vMin, c6.r0; with R2 the levels' generator, whorl, β and p_term.
 
 use super::obstacles::inside_obstacle;
 use super::r2::{branch_angle_of, laterals, terminates};
@@ -220,9 +230,44 @@ pub fn plant_seedling(tree: &mut Tree, params: &Params, season: f64, lean: f64, 
 
 /// Metamers n and internode length (into `length`) for a bud receiving v (ADR 0004).
 pub fn shoot_size(v: f64, params: &Params, length: &mut f64, cap: f64) -> f64 {
+    graded_shoot_size(v, params, length, cap, None)
+}
+
+/// v_min when graded extension is on (`c1.vMin` in (0, 1)), else None.
+pub fn graded_min(params: &Params) -> Option<f64> {
+    params.c1.v_min.filter(|&m| m > 0.0 && m < 1.0)
+}
+
+/// The growth gate with graded extension: a growing bud (`dormant` false) grows from v_min
+/// (below R4's v_cont, or 1 without R4); a dormant bud keeps its break `threshold`. Returns the
+/// gate and the v_min to size the shoot with (None: ADR 0004's rule).
+pub fn graded_gate(threshold: f64, dormant: bool, params: &Params) -> (f64, Option<f64>) {
+    match graded_min(params) {
+        Some(m) if !dormant => (math::min(threshold, m), Some(m)),
+        _ => (threshold, None),
+    }
+}
+
+/// `shoot_size` with graded extension: given `v_min` (from `graded_min`, for a growing bud), a
+/// bud with v_min ≤ v' < 1 grows one metamer of length v'·l0 where ADR 0004 grows none. One
+/// metamer, so the node, its leaf and its buds are §C1's as ever; only the internode is shorter.
+/// Above 1 the rule is unchanged, so lengths run continuously from v_min·l0 to 2·l0.
+pub fn graded_shoot_size(
+    v: f64,
+    params: &Params,
+    length: &mut f64,
+    cap: f64,
+    v_min: Option<f64>,
+) -> f64 {
     let capped = math::min(v, cap);
     let n = capped.floor();
     if n < 1.0 {
+        if let Some(m) = v_min
+            && capped >= m
+        {
+            *length = capped * params.c1.internode_length;
+            return 1.0;
+        }
         *length = 0.0;
         return 0.0;
     }
@@ -508,5 +553,56 @@ mod tests {
         let mut length = 0.0;
         assert_eq!(shoot_size(10.0, &p, &mut length, 1.5), 1.0);
         assert!((length - 1.5 * p.c1.internode_length).abs() < 1e-12);
+    }
+
+    #[test]
+    fn graded_extension_grows_one_short_metamer_between_v_min_and_one() {
+        let off = Params::from_json(&preset("default", "{}"));
+        assert_eq!(graded_min(&off), None);
+        for v_min in ["1", "0", "1.5"] {
+            let p = Params::from_json(&preset(
+                "default",
+                &format!(r#"{{"c1":{{"vMin":{v_min}}}}}"#),
+            ));
+            assert_eq!(graded_min(&p), None, "vMin {v_min} is off");
+        }
+        let p = Params::from_json(&preset("default", r#"{"c1":{"vMin":0.3}}"#));
+        let g = graded_min(&p);
+        assert_eq!(g, Some(0.3));
+        let l0 = p.c1.internode_length;
+        let mut length = 0.0;
+        // Below v_min: nothing, as without it.
+        assert_eq!(graded_shoot_size(0.29, &p, &mut length, 3.0, g), 0.0);
+        assert_eq!(length, 0.0);
+        // In [v_min, 1): one metamer of length v·l0.
+        assert_eq!(graded_shoot_size(0.3, &p, &mut length, 3.0, g), 1.0);
+        assert!((length - 0.3 * l0).abs() < 1e-12);
+        assert_eq!(graded_shoot_size(0.75, &p, &mut length, 3.0, g), 1.0);
+        assert!((length - 0.75 * l0).abs() < 1e-12);
+        // Without v_min (a dormant bud, or off) v < 1 grows nothing.
+        assert_eq!(graded_shoot_size(0.75, &p, &mut length, 3.0, None), 0.0);
+        assert_eq!(shoot_size(0.75, &p, &mut length, 3.0), 0.0);
+        // From 1 up the rule is ADR 0004's.
+        for v in [1.0, 1.6, 2.5, 7.0] {
+            let (mut a, mut b) = (0.0, 0.0);
+            assert_eq!(
+                graded_shoot_size(v, &p, &mut a, 3.0, g),
+                shoot_size(v, &off, &mut b, 3.0)
+            );
+            assert_eq!(a, b);
+        }
+    }
+
+    #[test]
+    fn graded_extension_lowers_the_gate_for_growing_buds_only() {
+        let off = Params::from_json(&preset("default", "{}"));
+        assert_eq!(graded_gate(1.0, false, &off), (1.0, None));
+        assert_eq!(graded_gate(2.4, true, &off), (2.4, None));
+        let p = Params::from_json(&preset("default", r#"{"c1":{"vMin":0.5}}"#));
+        assert_eq!(graded_gate(1.0, false, &p), (0.5, Some(0.5)));
+        // A dormant bud's break keeps R4's threshold and ADR 0004's sizing.
+        assert_eq!(graded_gate(2.4, true, &p), (2.4, None));
+        // A v_cont already under v_min stays.
+        assert_eq!(graded_gate(0.2, false, &p), (0.2, Some(0.5)));
     }
 }

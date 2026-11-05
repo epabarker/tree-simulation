@@ -10,7 +10,9 @@ use crate::geom::V3;
 use crate::light::{Light, depth_of};
 use crate::math;
 use crate::params::{DEG, Params};
-use crate::principles::c1::{grow_shoot, juvenile_cap, lateral_frame, shoot_size};
+use crate::principles::c1::{
+    graded_gate, graded_shoot_size, grow_shoot, juvenile_cap, lateral_frame,
+};
 use crate::principles::c3::{allocate, gather_light, is_live_bud};
 use crate::principles::c4::shoot_direction;
 use crate::principles::c5::{crown_top_light, shed_branches};
@@ -439,9 +441,11 @@ pub fn grow_buds(tree: &mut Tree, params: &Params, season: f64) {
         let state = tree.b.state[i];
         let age = tree.b.age[i] as f64;
         let threshold = growth_threshold(state, age, shade, params);
+        // C1's graded extension (c1.vMin): a growing bud may grow one short metamer below 1.
+        let (threshold, v_min) = graded_gate(threshold, state == bud::DORMANT, params);
         let v = tree.b.v[i];
         let mut n = if v >= threshold {
-            shoot_size(v, params, &mut shoot_length, cap)
+            graded_shoot_size(v, params, &mut shoot_length, cap, v_min)
         } else {
             0.0
         };

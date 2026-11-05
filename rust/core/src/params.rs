@@ -84,6 +84,9 @@ pub struct C1 {
     pub branch_angle: f64,
     pub internode_length: f64,
     pub max_metamers_per_shoot: f64,
+    /// v_min, graded extension (`c1.vMin`): a growing bud with v in [v_min, 1) grows one metamer of
+    /// length v·l0. None, or outside (0, 1): off.
+    pub v_min: Option<f64>,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -232,6 +235,8 @@ pub struct R2 {
     pub a_c: f64,
     pub d_lambda: f64,
     pub ramp: f64,
+    /// Δλ on pa-0 wood only (`r2.dLambdaTrunk`); false: every level.
+    pub d_lambda_trunk: bool,
     pub kappa: Option<f64>,
     pub h_j: Option<f64>,
     /// The sympodial relay (ADR 0033): laterals on the top `relay` nodes below a pa-0 axis's
@@ -445,6 +450,7 @@ impl Params {
                     branch_angle: num(g, "branchAngle"),
                     internode_length: num(g, "internodeLength"),
                     max_metamers_per_shoot: num(g, "maxMetamersPerShoot"),
+                    v_min: opt(g, "vMin"),
                 }
             },
             c2: C2 {
@@ -556,6 +562,7 @@ impl Params {
                 a_c: num(r2, "aC"),
                 d_lambda: num(r2, "dLambda"),
                 ramp: num(r2, "ramp"),
+                d_lambda_trunk: flag(r2, "dLambdaTrunk"),
                 kappa: opt(r2, "kappa"),
                 h_j: opt(r2, "hJ"),
                 relay: opt(r2, "relay").unwrap_or(0.0),

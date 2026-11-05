@@ -68,8 +68,17 @@
 //! proximal part of plagiotropic axes, Hallé et al. 1978), so a lit limb rises, then arches; the
 //! lower crown's shaded sprays stay level. A stand member never opens the gate.
 //!
+//! Δλ on the trunk only (a prototype, no ADR; A7's candidate 2 for the flat cap): with
+//! `dLambdaTrunk` the ontogenetic fall of λ (§R2.4: "λ declines after age a_c") applies to pa-0
+//! wood only. Every level falls today, so after a_c + ramp hornbeam's limbs sit at λ ≈ 0.42, below
+//! Palubicki et al.'s whole range (0.46–0.54), and spread a limb's resource over its laterals'
+//! sub-threshold buds. Keeping the limbs at their row's λ concentrates a lit limb's resource in its
+//! terminal, which then extends (Palubicki et al. 2009, Fig. 10: apical control removed early in
+//! the main stem, persistent in the first-order branches). λ is read by pa, so "the trunk" is
+//! every axis at pa 0: the trunk, and the relays, fork arms and reiterations that take its row.
+//!
 //! Params: r2.enabled, r2.levels (curve, curveLength, pendulous, pendulousRadius, kappa,
-//! lateralEvery), r2.aC, r2.dLambda, r2.ramp, r2.kappa, r2.relay,
+//! lateralEvery), r2.aC, r2.dLambda, r2.dLambdaTrunk, r2.ramp, r2.kappa, r2.relay,
 //! r2.relayAge, r2.relayPTerm, r2.relayCrowd, r2.forkAt, r2.forkAngle, r2.vigourShare,
 //! r2.vigourLambda, r2.vigourTreeLo, r2.vigourTreeHi, r2.lightSetPoint, r2.lightLo, r2.lightHi,
 //! r2.lightOver; c1.branchAngle, c3.lambda, c4.setPoint, c4.eta when off.
@@ -104,6 +113,10 @@ pub fn lambda_at(order: f64, tree_age: f64, params: &Params) -> f64 {
     } else {
         math::min(1.0, (tree_age - r2.a_c) / math::max(1.0, r2.ramp))
     };
+    // dLambdaTrunk: the fall is the trunk's (pa 0) alone; the limbs keep their row's λ.
+    if r2.d_lambda_trunk && order > 0.0 {
+        return level.lambda;
+    }
     level.lambda - r2.d_lambda * t
 }
 
@@ -578,6 +591,25 @@ mod tests {
         assert!((lambda_at(0.0, 100.0, &p) - 0.5).abs() < 1e-12);
         let off = Params::from_json(&preset("default", "{}"));
         assert_eq!(lambda_at(0.0, 100.0, &off), off.c3.lambda);
+    }
+
+    #[test]
+    fn lowers_lambda_on_the_trunk_only_with_d_lambda_trunk() {
+        let rows = [r#"{"lambda":0.56}"#, r#"{"lambda":0.52}"#];
+        let all = with_r2(&rows, r#""aC":10,"dLambda":0.06,"ramp":20"#);
+        let trunk = with_r2(
+            &rows,
+            r#""aC":10,"dLambda":0.06,"ramp":20,"dLambdaTrunk":true"#,
+        );
+        // The trunk (pa 0) falls as before, at every age.
+        for age in [5.0, 20.0, 100.0] {
+            assert_eq!(lambda_at(0.0, age, &trunk), lambda_at(0.0, age, &all));
+        }
+        // A limb keeps its row's λ where every level would have fallen.
+        assert!((lambda_at(1.0, 100.0, &all) - 0.46).abs() < 1e-12);
+        assert_eq!(lambda_at(1.0, 100.0, &trunk), 0.52);
+        assert_eq!(lambda_at(3.0, 100.0, &trunk), 0.52); // pa capped at the last row
+        assert_eq!(lambda_at(1.0, 5.0, &trunk), lambda_at(1.0, 5.0, &all));
     }
 
     #[test]

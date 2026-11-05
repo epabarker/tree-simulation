@@ -99,6 +99,14 @@ export interface Params {
     internodeLength: number;
     /** Maximum metamers one bud may produce per season (the cap in C3). */
     maxMetamersPerShoot: number;
+    /**
+     * v_min, graded extension (a prototype for the flat cap; A7's candidate 1, no ADR yet): a
+     * growing bud (not a dormant one) whose resource v is in [v_min, 1) grows one metamer of
+     * internode length v·l0, where §C3.4 grows none ("v < 1 → none"). The front's speed then falls
+     * off with light instead of stepping from one internode to none. In (0, 1); absent or ≥ 1: off
+     * (the spec's rule).
+     */
+    vMin?: number;
   };
 
   /** C2 Shared light field: the Beer–Lambert sky sweep over the slab (§C2.4, G3; ADR 0024). */
@@ -318,6 +326,14 @@ export interface Params {
     aC: number;
     dLambda: number;
     ramp: number;
+    /**
+     * Δλ on the trunk only (a prototype for the flat cap; A7's candidate 2, no ADR yet): the
+     * ontogenetic fall applies to pa-0 wood (row 0: the trunk, and the relays, fork arms and
+     * reiterations that take pa 0), and the limbs keep their level's λ (Palubicki et al. 2009,
+     * Fig. 10: apical control lost early in the main stem, kept in the first-order branches).
+     * Absent or false: every level falls (§R2.4).
+     */
+    dLambdaTrunk?: boolean;
     /**
      * κ, acrotony (§R2.4, M19): a lateral's light counts exp(κ(pos − 1)) where its node splits,
      * pos its node's place in the season's shoot (0 base, 1 tip). 0 or absent: off.

@@ -561,6 +561,17 @@ oak not run.**
    never fitted to Tallo CR.
 3. **Audit before any limb-loss ADR:** the provenance of the LAI and shade-house targets and bands, as lateShare was
    audited. Described numbers become reported; measured ones stay scored, with their source. Read-only, one commit.
+   **Done (2026-11-05, [note](../experiments/2026-11-05-target-provenance-audit.md)); its proposals await the
+   user. Nothing applied.**
+   - LAI and the shade house are measured (H&L 2019) for beech, birch, hornbeam and oak. Their bands are
+     conventions.
+   - Maple's scored LAI is described (a sycamore proxy, w 0.5).
+   - Proposed reported: maple LAI and lateShare; rowan height at 60 and lateShare. This folds in open point 2
+     below and extends ADR 0049 §1.
+   - Flagged: beech lateShare's bands (0.06 at Level 0, 0.10 in the Level 1 loss) both sit under its per-seed SD of
+     0.137–0.161.
+   - For the user: oak fit's Trel×10 is LAI z −1.47 against the measured band. Is its "collapse" read against the
+     band or the base? And should LAI stay scored, given the litter-trap-against-model mismatch?
 4. **ADR 0052's probe session:** limb loss under sustained low light or a negative limb carbon balance.
    - Judged against Weiser's field crown base/H.
    - z_CR, LAI and height reported, not targeted.
@@ -646,6 +657,8 @@ The rest of this State is from the v2 session; its open points stand.
   1. Rowan's borrowed T fails its own control (9/20; H coverage ≈ 0.5). Rowan is gated by the rule but could not pass.
      Night 3 is now rowan alone and waits on this ruling.
   2. Maple, rowan and holly's lateShare (and holly and rowan's height at 60) are "described" but still scored.
+     (Audited 2026-11-05: holly is not gated, so moot. Maple's LAI is in the same case. Proposal 1 of the audit
+     note.)
   3. H100 now enters the loss three times: height at 60, at 100, and lateShare.
   4. Beech and pine have no anchor at 150.
   5. ADR 0050's two oak rulings (Tallo against the yield tables; CR's definition) may be moot under v2. Re-read them on

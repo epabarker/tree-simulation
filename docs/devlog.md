@@ -2,6 +2,21 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-05: provenance audit of the Level 0 targets (ruling 3)
+
+- **What changed:** docs only, read-only on targets and sources (pilot v4 running).
+  - [The note](experiments/2026-11-05-target-provenance-audit.md): every scored Level 0 trait × species, with its
+    provenance, the band's own provenance, and per-seed SD from outputs on disk.
+  - The crown note gains a pointer; the plan's ruling 3 is marked done, its proposals pending.
+- **Findings:**
+  - LAI and the shade house are measured (H&L 2019) for beech, birch, hornbeam and oak. Maple's scored LAI is a
+    described proxy.
+  - Every band but Tallo's is a convention.
+  - Only beech lateShare's bands (0.06 at Level 0, 0.10 at Level 1) are under its per-seed SD (0.137–0.161).
+- **Surprise:** oak fit's Trel×10 is LAI z −1.47 against the measured band, so its "collapse" was read against the
+  base. The verdict that no lever passes oak stands.
+- The shade house's SD is 0 on 10 seeds: roof-ladder quantisation, not precision.
+
 ## 2026-11-05: pilot v4 registered (registration v5) and launched
 
 - **What changed:** no code under src/rust/cli/tests.

@@ -352,6 +352,15 @@ predicts height at 150; sideways spread at 60 does not.
 - **With the maximum kept, no probed lever passes oak.**
 - **The ruling.** Whether the gate should read that maximum is ADR 0050's ruling 2, now with this evidence.
 
+**Provenance audit (2026-11-05, ruling 3; [note](2026-11-05-target-provenance-audit.md)).** Step 5's "collapse"
+verdicts read LAI and the shade house. Both are measured (Hagemeier & Leuschner 2019), with conventional bands.
+- The shade-house failures past qMin's bound stand: z +4.9 to +65.
+- Oak fit's Trel×10 is LAI z −1.47 against the measured 5.5 ± 1.5: outside one band, inside two. Its "collapse" was
+  read against the model's base.
+- "No probed lever passes oak" is unchanged: Trel×10's z_CR stays over T.
+- The text above and the oak-fit table disagree on Trel×10's z_CR at 60 (+1.24 against +1.34) and its z_H at 150
+  (+1.42 against +1.56). Not re-derived.
+
 ## Advisor (step 6): objections and answers
 1. **"Voronoi CR in band" is a ceiling, not a crown.** Accepted: reframed as the decomposition, CR = ceiling + reach
    past the midpoint.

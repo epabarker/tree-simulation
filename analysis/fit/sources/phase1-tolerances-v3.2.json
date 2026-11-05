@@ -4,13 +4,14 @@
   "file": "analysis/fit/sources/phase1-tolerances.json",
   "version": 3.1
  },
- "written": "2026-11-05: v3.1's rules unchanged on five new descriptors (boleSway added the same day); d_min and the upper end frozen at v3.1's; written from real QSMs only, before any simulated tree is read",
+ "written": "2026-11-05: v3.1's rules unchanged on six new descriptors (boleSway and leanAngle added the same day); d_min and the upper end frozen at v3.1's; written from real QSMs only, before any simulated tree is read",
  "descriptors": [
   "crownBase80",
   "crownBase70",
   "crownBase90",
   "trunkTortuosity05",
-  "boleSway"
+  "boleSway",
+  "leanAngle"
  ],
  "frozen": {
   "d_min": 0.008621381595730782,
@@ -127,11 +128,22 @@
  },
  "amended": {
   "added": [
+   "boleSway",
+   "leanAngle"
+  ],
+  "why": {
+   "boleSway": "the user's ruling, 2026-11-05: bole sway as a descriptor",
+   "leanAngle": "the user's ruling, 2026-11-05 (the lean audit, ADR 0054): the bole's lean below crownBase80 as a descriptor; simulated tiers wait for the re-run"
+  },
+  "first_from": "557ce5a",
+  "first": [
+   "crownBase80",
+   "crownBase70",
+   "crownBase90",
+   "trunkTortuosity05",
    "boleSway"
   ],
-  "why": "the user's ruling, 2026-11-05: bole sway as a descriptor",
-  "first_four_from": "3dc1278",
-  "first_four_differing": 0
+  "first_differing": 0
  },
  "control_path_check": {
   "descriptors": 28,
@@ -227,6 +239,24 @@
    "noise_source": "biodiv 5 repeats, SD / \u221a5",
    "noise_ratio": 0.3450267219302724,
    "noise_verdict": "clear"
+  },
+  {
+   "species": "beech",
+   "descriptor": "leanAngle",
+   "set": "biodiv Fagus_sylvatica",
+   "n": 52,
+   "median": 3.583415401765854,
+   "slope_lnDBH": -2.424516966452145,
+   "between_sd": 2.2716971320910018,
+   "between_sd_lo95": 1.9007496340401075,
+   "between_sd_hi95": 2.823897095543084,
+   "tolerance": 1.1358485660455009,
+   "noise_rms": 0.1467282848132292,
+   "noise_median": 0.05267235110223355,
+   "noise_trees": 52,
+   "noise_source": "biodiv 5 repeats, SD / \u221a5",
+   "noise_ratio": 0.06458972137635793,
+   "noise_verdict": "clear"
   }
  ],
  "control": {
@@ -235,14 +265,16 @@
    "crownBase70": 1.0,
    "crownBase90": 1.0,
    "trunkTortuosity05": 0.9807692307692307,
-   "boleSway": 0.9615384615384616
+   "boleSway": 0.9615384615384616,
+   "leanAngle": 1.0
   },
   "upper": {
    "crownBase80": 0.9056603773584906,
    "crownBase70": 0.9245283018867925,
    "crownBase90": 0.9622641509433962,
    "trunkTortuosity05": 0.9230769230769231,
-   "boleSway": 0.8846153846153846
+   "boleSway": 0.8846153846153846,
+   "leanAngle": 0.9807692307692307
   }
  },
  "dmin_rule_with_new": {
@@ -250,7 +282,7 @@
   "with": true
  },
  "hashes": {
-  "analysis/treesim/describe.py": "4d6deca8aa58b23b288d6a346d50c0343a893f2e484bf0b334f73c4557a396ff",
+  "analysis/treesim/describe.py": "228d30893a94b34c3f0b9f889cb53e8918a3ec59c8f1d6514ed8a00686658651",
   "analysis/treesim/form.py": "23c5e1c035c9bbb625a8a002476fc12fd98f85438af4bba5adbb97c10ec6b48d",
   "analysis/treesim/cylinders.py": "0e262dce2e55193c3f8ed775ec92c7fbe29df9f9be0d738daed7623cb5629254",
   "analysis/treesim/qsm.py": "27927fc0188f155bf1eb47865b577774f18875461cac08ea8cd2e6a464c0a333",

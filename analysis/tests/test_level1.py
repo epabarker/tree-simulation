@@ -276,15 +276,21 @@ def test_describe_pool_equals_gate_c():
     assert all(u <= allowed for *_, u in diffs), f"beyond {allowed} ulp on {sys.platform}: {report}"
 
 
-def test_registration_v6_loads_keeps_v5s_hold_outs_and_starts_at_the_hand():
-    """The committed registration passes its own hash check (it refuses once a hashed file changes: re-register, never
-    edit) and freezes r3.c at the species' value (v2). v6 (2026-11-05) adds crownBase80 and boleSway (gate c v3.2) to
+def test_registration_v6_is_superseded_refuses_its_hash_check_and_keeps_v5s_hold_outs():
+    """v6 is superseded (2026-11-05, the user's ruling): ADR 0054 changes every simulated realisation and describe.py
+    gains leanAngle, so its hash check refuses, naming describe.py; the guard itself is tested here. The re-registration
+    is v7 (never v6 again); when v7 is registered, this test moves to loading it. v6's content stays as registered
+    (read with check=False): it freezes r3.c at the species' value (v2), adds crownBase80 and boleSway (gate c v3.2) to
     the fitted set and keeps v5's hold-outs (no redraw): its stored real matrix gives back its clusters and its weights
     by level1's rules, its 16-descriptor block equals v5's matrix, and the draw over the larger set is recorded, not
     applied. The spread floor is 0.65, lateShare's band 0.12; its start decodes to the hand."""
     from treesim import fit
 
-    reg = l1.load("beech")
+    with pytest.raises(SystemExit, match=r"changed since Level 1's registration: .*analysis/treesim/describe\.py"):
+        l1.load("beech")
+    reg = l1.load("beech", check=False)
+    assert reg["status"] == "superseded" and "ADR 0054" in reg["superseded"]["why"]
+    assert reg["superseded"]["next"].startswith("v7")
     v5 = reg["prior"]
     assert reg["version"] == 6 and v5["version"] == 5 and v5["prior"]["version"] == 4
     assert reg["held_out"] == v5["held_out"] == ["length0", "limbElevation05", "limbUpturn", "p3", "widestAt"]

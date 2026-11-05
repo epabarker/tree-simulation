@@ -66,7 +66,7 @@ mod tests {
     /// A seedling at x = 10; its lateral bud (index 1) is made dormant at light q.
     fn seedling(p: &Params, q: f64) -> Tree {
         let mut t = Tree::new(0, 10.0, 0.5);
-        plant_seedling(&mut t, p, 0.0, 0.0);
+        plant_seedling(&mut t, p, 0.0, 0.0, 0.0);
         t.ensure_scratch();
         for j in 0..t.b.len() {
             t.b.v[j] = 0.0;

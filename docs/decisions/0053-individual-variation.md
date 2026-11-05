@@ -276,7 +276,7 @@ One review, on the draft (2026-11-05). Each objection, and the answer taken:
   median, and this ADR is rejected.
 
 ## Consequences (if accepted)
-- A new RNG purpose, INDIVIDUAL, appended in `rng.rs`.
+- A new RNG purpose, INDIVIDUAL, appended in `rng.rs` (id 15: ADR 0054 took 14, `SEEDLING_AZIMUTH`).
 - A per-tree parameter read in R3's posture and C4's growth set point, through one accessor that every reader
   calls.
 - Goldens unchanged at the default; ADR 0049's spread clause becomes testable for posture.

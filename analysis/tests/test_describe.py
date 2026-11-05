@@ -376,3 +376,30 @@ def test_bole_sway_reads_a_bow_to_first_order_and_tortuosity_to_second():
     big, small = _bow(10), _bow(5)
     assert small["boleSway"] / big["boleSway"] == pytest.approx(0.5, rel=0.02)
     assert (small["trunkTortuosity05"] - 1) / (big["trunkTortuosity05"] - 1) == pytest.approx(0.25, rel=0.05)
+
+
+def _tilted(deg: float, toward: tuple[float, float] = (1.0, 0.0)) -> dict:
+    """A straight trunk 12 m long at `deg` from vertical toward (x, y), with three level limbs at its top."""
+    t = Tree()
+    a = math.radians(deg)
+    p = t.chain(-1, [math.sin(a) * toward[0], math.sin(a) * toward[1], math.cos(a)], 12, 1.0, 0.2)
+    for node in (p - 2, p - 1, p):
+        t.chain(node, [1, 0, 0], 1, 2.0, 0.03)
+    return ds.describe(t.table())
+
+
+def test_lean_angle_reads_a_straight_trunks_tilt_whatever_its_azimuth():
+    assert _tilted(0)["leanAngle"] == pytest.approx(0.0, abs=1e-9)
+    for deg in (5, 12, 25):
+        assert _tilted(deg)["leanAngle"] == pytest.approx(deg, abs=1e-9)
+        assert _tilted(deg, (0.0, 1.0))["leanAngle"] == pytest.approx(deg, abs=1e-9)
+        assert _tilted(deg, (-0.6, 0.8))["leanAngle"] == pytest.approx(deg, abs=1e-9)
+
+
+def test_lean_angle_is_near_zero_on_a_bow_that_returns_and_nan_without_a_stretch():
+    # The bow returns to x = 0 below crownBase80, so the chord is vertical: sway without lean.
+    assert _bow(10)["leanAngle"] == pytest.approx(0.0, abs=1e-9)
+    t = trunk(n=12)
+    _crown(t, [1, 2, 3])  # a stretch under 2.5 m
+    assert math.isnan(ds.describe(t.table())["leanAngle"])
+    assert math.isnan(ds.describe(trunk(n=12).table())["leanAngle"])

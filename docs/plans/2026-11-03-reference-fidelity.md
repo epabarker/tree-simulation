@@ -308,6 +308,30 @@ no z was computed, and nothing registered changed after it.
 ### State
 _(rewritten at the end of each session)_
 
+**ADR 0054: a per-tree seedling azimuth (2026-11-05, same session; [ADR](../decisions/0054-seedling-azimuth.md),
+[note](../experiments/2026-11-05-lean-audit.md#after-adr-0054-the-per-tree-seedling-azimuth-same-script-unchanged)).**
+- **The core change:** each seedling's L is turned about its heading by a per-tree draw (`SEEDLING_AZIMUTH`, 14,
+  keyed by tree id).
+  - The one-way lean is gone. Hand's middle row: Rayleigh p 0.56, crown centroid x −0.00 m (was +1.12). v3's middle
+    row reads p 0.016, its all 12 p 0.85: reported as chance.
+  - The magnitude is unchanged: 8–10° on the middle rows, BioDiv 4.1°.
+  - **A slab limitation, recorded and not fixed (ADR 0024):** in the face rows, depth leans are damped and gather on
+    ±x (v4 most: axial p 3e-3 per face row). It affects the stand trial's face rows and any read of the front view
+    alone (Level 0's lone width and W/H).
+- **Goldens re-baselined** (16 of 16). With φ forced to 0, the old goldens pass natively and in WASM.
+- **leanAngle** (the chord's angle from vertical below crownBase80) is in describe(). Bit-identity holds on the 21
+  (9,765 values). The v3.2 supplement's real-data parts: BioDiv median 3.6°, between-tree SD 2.27°, noise ratio 0.065
+  (clear), control 1.0 at d_min. Its simulated tier waits for the re-run.
+- **v6 is superseded** (`status` in its registration; its test asserts the hash guard refuses, naming describe.py).
+  The re-registration is v7.
+- **The re-run order** (no fit re-run in this session; the existing fits are kept as the "before"):
+  1. goldens: **done**;
+  2. the arch-magnitude decision: an ADR for Troll's relay (an erect relay that overtakes the arch) or R3's
+     straightening;
+  3. Level 0, all species, on the new core;
+  4. gate c's simulated rows (leanAngle's tier with them);
+  5. Level 1 **v7**, registered with leanAngle.
+
 **After the user's rulings (2026-11-05, same session; [note](../experiments/2026-11-05-crown-base-and-bole.md#after-the-users-rulings-2026-11-05-same-day)).**
 - **ADR 0052 accepted:** no limb-loss rule for beech; open for oak's crown radius.
 - **boleSway** (the bole's largest offset from its chord below crownBase80, per metre) is in describe() and passes the

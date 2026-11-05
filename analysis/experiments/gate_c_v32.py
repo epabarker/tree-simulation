@@ -1,6 +1,7 @@
 """Gate c v3.2 (2026-11-05; docs/experiments/2026-11-05-crown-base-and-bole.md): v3.1's rules, unchanged, applied to
-five new descriptors (crownBase80, its 70 and 90 companions, trunkTortuosity05; boleSway added on the user's
-ruling, 2026-11-05, the first four reproducing their 3dc1278 rows exactly) as a supplement to the v3.1
+six new descriptors (crownBase80, its 70 and 90 companions, trunkTortuosity05; boleSway added on the user's
+ruling, 2026-11-05, the first four reproducing their 3dc1278 rows exactly; leanAngle added on the user's ruling the
+same day, after the lean audit, the first five reproducing their 557ce5a rows exactly) as a supplement to the v3.1
 registration (`phase1-tolerances.json`, untouched). d_min and tier B's bracket are frozen at v3.1's (BioDiv p2,
 8.6 mm; upper end p5, 11.0 mm): rerunning the control's d_min rule over a larger descriptor set could move d_min and
 with it every registered row, so it is reported (`dmin_rule_with_new`), never re-chosen. Beech only (BioDiv).
@@ -35,10 +36,12 @@ from treesim import tiers  # noqa: E402
 from treesim import tolerance as tol  # noqa: E402
 from treesim.describe import DIAGNOSTIC  # noqa: E402
 
-NEW4 = ("crownBase80", "crownBase70", "crownBase90", "trunkTortuosity05", "boleSway")
-# boleSway joined on the user's ruling (2026-11-05), under the same rules; the four registered first must reproduce.
-FIRST = ("crownBase80", "crownBase70", "crownBase90", "trunkTortuosity05")
-FIRST_COMMIT = "3dc1278"
+NEW4 = ("crownBase80", "crownBase70", "crownBase90", "trunkTortuosity05", "boleSway", "leanAngle")
+# boleSway joined on the user's ruling (2026-11-05), under the same rules, the four registered first reproducing their
+# 3dc1278 rows; leanAngle joined the same way after the lean audit (ADR 0054): the five registered before it must
+# reproduce their 557ce5a rows.
+FIRST = ("crownBase80", "crownBase70", "crownBase90", "trunkTortuosity05", "boleSway")
+FIRST_COMMIT = "557ce5a"
 V31 = ROOT / "analysis/fit/sources/phase1-tolerances.json"
 V32 = ROOT / "analysis/fit/sources/phase1-tolerances-v3.2.json"
 OUT = ROOT / "runs/crown-base"
@@ -91,7 +94,7 @@ def register() -> None:
     frow = {r["descriptor"]: r for r in first["table"]}
     fdiff = [(k, key) for k in FIRST for key in KEYS if not _eq(frow[k].get(key), tol._clean(new[("beech", k)]).get(key))]
     fctl = [(v, k) for v in points for k in FIRST if not _eq(first["control"][v][k], tol._clean(shares[v][k]))]
-    print(f"first four ({FIRST_COMMIT}): rows differing {len(fdiff)}, control differing {len(fctl)}")
+    print(f"first {len(FIRST)} ({FIRST_COMMIT}): rows differing {len(fdiff)}, control differing {len(fctl)}")
     if fdiff or fctl:
         sys.exit(f"refusing: a v3.2 row registered at {FIRST_COMMIT} moved: {fdiff + fctl}")
     gated_old = {k: s for k, s in shares["dmin"].items() if new[("beech", k)]["noise_verdict"] == "clear"
@@ -105,13 +108,16 @@ def register() -> None:
                            **{k: float(np.nanmedian([tol._val(d, k) for d in ds])) for k in DIAGNOSTIC}}
     out = tol._clean({
         "version": 3.2, "supplement_of": {"file": str(V31.relative_to(ROOT)), "version": v31["version"]},
-        "written": "2026-11-05: v3.1's rules unchanged on five new descriptors (boleSway added the same day); d_min and the upper end frozen at "
+        "written": "2026-11-05: v3.1's rules unchanged on six new descriptors (boleSway and leanAngle added the same day); d_min and the upper end frozen at "
                    "v3.1's; written from real QSMs only, before any simulated tree is read",
         "descriptors": list(NEW4), "frozen": {"d_min": res["d_min"], "upper_end": res["upper_end"],
                                               "evaluation_points": "tiers.evaluation_points(grid, d_min, upper)"},
         "rules": v31["rules"], "self_check": {"rows": len(v31["table"]), "keys": list(KEYS), "differing": 0},
-        "amended": {"added": ["boleSway"], "why": "the user's ruling, 2026-11-05: bole sway as a descriptor",
-                    "first_four_from": FIRST_COMMIT, "first_four_differing": 0},
+        "amended": {"added": ["boleSway", "leanAngle"],
+                    "why": {"boleSway": "the user's ruling, 2026-11-05: bole sway as a descriptor",
+                            "leanAngle": "the user's ruling, 2026-11-05 (the lean audit, ADR 0054): the bole's lean "
+                                         "below crownBase80 as a descriptor; simulated tiers wait for the re-run"},
+                    "first_from": FIRST_COMMIT, "first": list(FIRST), "first_differing": 0},
         "control_path_check": {"descriptors": len(path_check), "differing": len(moved)},
         "table": [new[("beech", k)] for k in NEW4],
         "control": {v: {k: shares[v][k] for k in NEW4} for v in points},

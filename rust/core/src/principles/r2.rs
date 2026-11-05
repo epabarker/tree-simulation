@@ -914,7 +914,7 @@ mod tests {
             r#""relay":1,"relayAge":0,"relayPTerm":1"#,
         );
         let mut t = Tree::new(0, 10.0, 0.5);
-        crate::principles::c1::plant_seedling(&mut t, &p, 0.0, 0.0);
+        crate::principles::c1::plant_seedling(&mut t, &p, 0.0, 0.0, 0.0);
         for season in 1..30 {
             t.ensure_scratch();
             for j in 0..t.b.len() {
@@ -946,7 +946,7 @@ mod tests {
                 r#""relay":2,"relayAge":0,"forkAt":1.3,"forkAngle":30"#,
             );
             let mut t = Tree::new(0, 10.0, 0.5);
-            crate::principles::c1::plant_seedling(&mut t, &p, 0.0, 0.0);
+            crate::principles::c1::plant_seedling(&mut t, &p, 0.0, 0.0, 0.0);
             t.ensure_scratch();
             let before = t.b.len();
             for j in 0..before {

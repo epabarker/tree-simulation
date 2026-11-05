@@ -23,6 +23,7 @@ Measurement design: what each descriptor depends on beyond the tree.
 | crownBase80 (70, 90) | trunk | low (length quantile; a stub counts by its length) | base z, H |
 | trunkTortuosity05 | trunk | moderate: the trunk's path resampled at 0.5 m, to crownBase80's height | none |
 | boleSway | trunk | moderate: the same path; its largest offset from the chord, per metre | none |
+| leanAngle | trunk | low: the same stretch's chord (two points) | gravity; azimuth-free |
 
 - **The fixed 0.5 m step (v3, the user, 2026-11-03):** every descriptor that depends on segment length is read at
   RESAMPLE on both sides (a QSM's cylinders and a simulator's metamers alike): droop, upturn and branchAngle2 as 0.5 m
@@ -52,6 +53,9 @@ Measurement design: what each descriptor depends on beyond the tree.
   bole. Path over chord reads a gentle sway only to second order (a sine of amplitude A over wavelength λ reads
   1 + (πA/λ)²), so a bole that visibly snakes can read 1.005; the offset reads it to first order. NaN as
   trunkTortuosity05.
+- **leanAngle (2026-11-05, the user; the lean audit, ADR 0054):** the angle from vertical, in degrees, of the same
+  stretch's chord: from the root to where the trunk first reaches crownBase80's height. Azimuth-free (a scanner's
+  frame is arbitrary, and after ADR 0054 so is a simulated tree's). NaN as trunkTortuosity05.
 - **Report-only:** `leafStemSlope` (NaN without leaf area: no wood proxy, tip counts being the most
   resolution-dependent quantity there is), `crownBase` / H by wood (the field's crown base is Weiser's, §c).
 - **Below ground (R4, the user's ruling 2026-11-03: start or tip):** a cylinder that starts or ends below the
@@ -73,7 +77,7 @@ DESCRIBE = Rules(min_subtree=("length", 1.25), min_limb=("length", 2.5), bole_li
 LIMB = 2.5
 NEW = ("bifurcationRatio", "bifurcationRatio2", "tortuosity", "tortuosity05", "length0", "length1", "length2", "length3",
        "pendulousFraction", "taper", "centroidHeight", "limbElevation05", "pendulousFraction05",
-       "crownBase80", "crownBase70", "crownBase90", "trunkTortuosity05", "boleSway")
+       "crownBase80", "crownBase70", "crownBase90", "trunkTortuosity05", "boleSway", "leanAngle")
 REPORT = ("leafStemSlope", "crownBase")
 DIAGNOSTIC = ("trunkTortuosity1", "trunkStretch", "stubShareBelow")
 
@@ -304,6 +308,18 @@ def bole_sway(points: np.ndarray | None, step: float = RESAMPLE) -> float:
     return float(np.linalg.norm(rel - np.outer(rel @ u, u), axis=1).max()) / arc
 
 
+def lean_angle(points: np.ndarray | None) -> float:
+    """The angle from vertical (degrees) of a trunk stretch's chord, root to end; NaN under LIMB metres of arc or
+    without one."""
+    if points is None or len(points) < 2:
+        return math.nan
+    arc = float(np.linalg.norm(np.diff(points, axis=0), axis=1).sum())
+    if arc < LIMB:
+        return math.nan
+    d = points[-1] - points[0]
+    return math.degrees(math.atan2(math.hypot(float(d[0]), float(d[1])), float(d[2])))
+
+
 def stub_share_below(c: cy.Cylinders, labels: Labels, base: float) -> float:
     """Of the non-trunk length below z0 + base·H, the share on order-1 axes that carry no branch (dead-stub proxy)."""
     if not math.isfinite(base):
@@ -371,7 +387,7 @@ def describe(c: cy.Cylinders, leaf: np.ndarray | None = None) -> dict:
         "leafStemSlope": f["leafStemSlope"],
         **{f"crownBase{k}": v for k, v in cb.items()},
         "trunkTortuosity05": trunk_tortuosity(stretch), "trunkTortuosity1": trunk_tortuosity(stretch, 1.0),
-        "boleSway": bole_sway(stretch),
+        "boleSway": bole_sway(stretch), "leanAngle": lean_angle(stretch),
         "trunkStretch": float(np.linalg.norm(np.diff(stretch, axis=0), axis=1).sum()) if stretch is not None
         else math.nan,
         "stubShareBelow": stub_share_below(c, labels, cb[80]),

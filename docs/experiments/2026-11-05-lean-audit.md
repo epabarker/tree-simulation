@@ -194,8 +194,63 @@ BioDiv's maximum, 14.7°. Real boleSway 0.0182 per metre (SD 0.0082).
 - v4 has 12 of 40 bent over; its form knobs (kappa 0.22, branchAngle (1) 40°) make more of them.
 - The same trees on seeds 101–110 lean +x (32 of 37, 30 of 39, 32 of 40), so the sheet showed the artefact as drawn.
 
+## After ADR 0054 (the per-tree seedling azimuth; same script, unchanged)
+The fix, [ADR 0054](../decisions/0054-seedling-azimuth.md), turns each seedling's L by φ = 2π·uniform(seed,
+`SEEDLING_AZIMUTH`, tree id). It is checked by `lean_audit.py runs|sky|report` unchanged, on the new core (summaries in
+`runs/lean-audit-v2`; before, in `runs/lean-audit-v2-before`), and by `lean_geometry.py` on both. Figure:
+[figures/2026-11-05-lean-audit-after.png](figures/2026-11-05-lean-audit-after.png).
+
+The lean-0 rows (L = +x, the name kept), at season 70 (stand) and 100 (lone):
+
+| set | before: az, R, p | after: az, R, p | lean, before → after | centroid x (m), before → after |
+|---|---|---|---|---|
+| hand stand, middle row | 352°, 0.56, 3e-11 | 27°, 0.09, **0.56** | 9.0° → 7.7° | +1.12 → **−0.00** |
+| hand stand, all 12 | 358°, 0.46, 6e-21 | 345°, 0.09, 0.18 | 10.2° → 9.7° | +1.13 → +0.04 |
+| v3 stand, middle row | 356°, 0.46, 3e-8 | 354°, 0.23, **0.016** | 10.4° → 10.4° | +1.06 → +0.30 |
+| v3 stand, all 12 | 358°, 0.50, 1e-24 | 45°, 0.03, 0.85 | 12.0° → 12.5° | +1.20 → −0.02 |
+| v4 stand, middle row | 0°, 0.25, 7e-3 | 37°, 0.03, 0.94 | 9.3° → 9.0° | +0.53 → +0.22 |
+| v4 stand, all 12 | 1°, 0.36, 4e-14 | 83°, 0.06, 0.47 | 11.3° → 11.3° | +0.92 → +0.12 |
+| lone (open; τ 0.2), hand | p 0.08; 0.28 | p 0.22; 0.47 | 13.8°, 16.4° → 15.8°, 15.3° | |
+| lone, v3 / v4 (open) | p 0.14 / 0.90 | p 0.19 / 0.40 | | |
+| young leaders, stand age 2 (all three) | R 0.79–0.84, p < 1e-60 | R 0.07–0.11, p 0.07–0.30 | | |
+| young leaders, lone age 2–10 | R 0.71–0.83, p < 1e-5 | R 0.25–0.30, p 0.17–0.30 | | |
+
+- **The one-way lean is gone.** Every lean-0 set is uniform but one: v3's middle row (p 0.016, R 0.23). Its own
+  all 12 read p 0.85, and about one test in 20 falls under 0.05 by chance; it is reported, not explained away. Hand's
+  crown centroid offset in x is −0.00 m (it was +1.12).
+- **The lean's magnitude stays as it was:** 7.7–10.4° on the middle rows, 9.7–12.5° on all 12. That is near
+  alternating-L's 10.1° and 11.6° (hand), and still ≈ 2.3× BioDiv's 4.1°. The arch stays: the top 2 m at 33–37°.
+  That is the separate ADR's question.
+- **The ±ε rows** now lean where the world lean tells them (+x and −x). Lean keeps its world meaning by design; this is
+  not the bias.
+
+### The slab's geometry (`lean_geometry.py`: an axial test, which a ±x concentration of either sign would fail)
+| set (after) | axial R, p, axis | SD of x / depth lean (m) | tops past a face | lean 3D / as drawn |
+|---|---|---|---|---|
+| hand stand, middle / all 12 | 0.11, 0.41 / 0.07, 0.30 | 2.91 / 2.56; 3.01 / 2.69 | 0 of 221 | 7.7° / 5.2° |
+| v3 stand, middle / all 12 | 0.05, 0.85 / 0.11, 0.05 | 3.17 / 2.93; 3.31 / 3.05 | 0 of 229 | 10.4° / 6.9° |
+| v4 stand, middle / all 12 | 0.13, 0.26 / **0.23, 6e-6, 5°** | 3.15 / 2.67; 3.33 / 2.52 | 1 of 229 | 9.0° / 6.2° |
+| v4 front / back rows | 0.28, 3e-3 / 0.28, 2e-3 (both ≈ ±x) | 3.40 / 2.03; 3.36 / 2.16 | | |
+| lone, age 1 (φ alone, before any growth) | 0.35, 0.09, 168° | | | |
+| lone, age 10 / 100 (hand) | 0.32, 0.13 / 0.41, 0.03 | 1.10 / 0.77 (age 10) | 0 | |
+
+- **The lone tree's ±x tendency is in its 20 draws, not the slab.** At age 1 the lean is just L's draw, and it is
+  already axial at R 0.35. hand, v3 and v4 share those draws (φ keys on seed and tree id, not the assign), so their
+  three lone sets are one sample, not three.
+- **The stand's middle row is not axially concentrated in any set** (p 0.26–0.85).
+- **A slab limitation, recorded and not fixed here (ADR 0024; the user's ruling):**
+  - **The face rows:** in the rows next to the opaque faces, depth leans are damped and gather on ±x as the stand
+    grows. v4 shows it most: axial p 3e-3 in each face row at 70, against R 0.10 at age 1 over all 12. Over the whole
+    stand, depth's SD runs 8–24% under x's (all 12).
+  - **No crown grows past a face** (1 top of 679).
+  - **What it affects:** the stand trial's face rows, and any read of the front view alone (Level 0's lone-tree width
+    and W/H, which read x only).
+  - **The picture:** a lean into depth looks straighter in the frontal picture (as drawn, 5–7°, against 8–10° in 3D).
+- **The depth effect the audit found stays as it was.** Front and back rows lean inward (+1.6 to +2.2 m, and −0.9 to
+  −1.9 m in depth), away from the dark faces.
+
 ## Next (for the user)
-1. **The fix (§4):** an ADR for the seedling azimuth (new RNG purpose), then the re-run order. v6 stays registered and
-   unlaunched.
+1. **The fix (§4): done as ADR 0054** (above). The re-run order is in the reference plan's State. v6 is superseded;
+   the re-registration is v7.
 2. **Lean angle as a gate c candidate (§1c)**, and **Troll's relay (§2)** as the candidate remedy for the magnitude,
    probed after the fix.

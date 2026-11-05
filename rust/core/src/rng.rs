@@ -19,6 +19,8 @@ pub mod purpose {
     pub const MORTALITY: u32 = 11;
     pub const INITIAL_POSITIONS: u32 = 12;
     pub const SEED_RAIN: u32 = 13;
+    /// A seedling's reference azimuth about its heading (ADR 0054), keyed by the tree's id.
+    pub const SEEDLING_AZIMUTH: u32 = 14;
 }
 
 const TWO_POW_32: f64 = 4294967296.0;

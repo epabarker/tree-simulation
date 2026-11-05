@@ -124,7 +124,7 @@ mod tests {
             r#"{"r5":{"enabled":true,"eS":0.5,"signal":"light"}}"#,
         ));
         let mut t = Tree::new(0, 10.0, 0.5);
-        plant_seedling(&mut t, &p, 0.0, 0.0);
+        plant_seedling(&mut t, &p, 0.0, 0.0, 0.0);
         t.ensure_scratch();
         t.b.state[1] = bud::ACTIVE;
         t.b.q[0] = 1.0; // open sky: s = 0

@@ -1,5 +1,11 @@
 {
  "version": 6,
+ "status": "superseded",
+ "superseded": {
+  "on": "2026-11-05",
+  "why": "ADR 0054 (a per-tree azimuth for the seedling's frame) changes every simulated realisation, and analysis/treesim/describe.py gains leanAngle, so this registration's hash check refuses by design. Never launched.",
+  "next": "v7, registered after the re-run (version numbers are never reused): docs/plans/2026-11-03-reference-fidelity.md, State"
+ },
  "species": "beech",
  "provisional": "phase 3 pilot (the user, 2026-11-04): pending Level 0's pass and ADR 0052; nothing from it is accepted into species params (the plan's \u00a7g)",
  "written": "2026-11-05, from real QSMs only, before any simulated tree was scored on this loss; seeds_per_candidate kept at v3's (the user); registered, not launched (the user)",

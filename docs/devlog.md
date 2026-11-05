@@ -2,6 +2,24 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-05: ADR 0054, a per-tree seedling azimuth; goldens re-baselined; leanAngle; v6 superseded
+
+- **What changed:**
+  - **Core:** `seedling_azimuth` (c1.rs), drawn from a new purpose `SEEDLING_AZIMUTH` (14), keyed by tree id.
+    `plant_seedling` takes the azimuth; every planting path passes it (world.rs, o4.rs); unit tests pass 0.
+  - **describe():** `leanAngle`, with two tests. Bit-identity holds on the 21 (9,765 values).
+  - **Gate c v3.2 amended for leanAngle:** the real-data parts only; the first five rows reproduce 557ce5a.
+  - **v6 marked superseded;** its test asserts the hash guard.
+  - `lean_geometry.py`, and the after figure.
+- **Goldens:** all 16 changed, because every seedling's L (and with it the phyllotaxis plane and the noise's azimuth
+  origin) now turns per tree. With φ forced to 0, the old `tests/golden.json` passes natively and in WASM, so the
+  change is the azimuth alone.
+- **Surprises:**
+  - The lone trials' three assigns share their 20 φ draws (keyed by seed and tree id), so they are one sample, not
+    three.
+  - The face rows damp depth leans: the slab limitation above.
+  - BioDiv's leanAngle (below crownBase80, 3.6°) sits just under the audit's whole-tree chord (4.1°).
+
 ## 2026-11-05: lean audit: the one-way lean is the seedling's frame (L = +x), carried by Troll's set point
 
 - **What changed:**

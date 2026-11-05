@@ -2,6 +2,20 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-05: ADR 0053, individual variation (proposed)
+
+- **What changed:** docs only. [ADR 0053](decisions/0053-individual-variation.md), drafted from reading, with no
+  probe. The plan's State and STATUS are updated.
+- **Finding:** no RNG purpose is per tree (`rng.rs:9–21`). R3's posture loop pulls every limb to a per-order set
+  point, and the descriptors are per-tree medians over limbs. So per-metamer noise reaches the outline, not
+  posture.
+- **Surprise:** limbUpturn is floored at 0° (27 of 40 hand trees). Across 69 sweep conditions, its spread tracks its
+  median (r 0.58), but only to ≈ 0.55× real at the real median. Part of the 0.47× is location.
+- **Literature** (abstract level only): crown plasticity toward neighbours is well supported (Schröter 2012,
+  Juchheim 2017). No heritability of branch posture in beech was found.
+- **Advisor:** the σ_A-from-limbElevation route made limbElevation05 circular. The hold-out is now limbUpturn and
+  Demol, and the stop rule is read at pilot v3's best.
+
 ## 2026-11-05: provenance audit of the Level 0 targets (ruling 3)
 
 - **What changed:** docs only, read-only on targets and sources (pilot v4 running).

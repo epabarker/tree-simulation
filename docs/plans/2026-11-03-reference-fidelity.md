@@ -308,6 +308,24 @@ no z was computed, and nothing registered changed after it.
 ### State
 _(rewritten at the end of each session)_
 
+**Docs while pilot v4 runs (2026-11-05): two items, both awaiting the user.**
+- **The provenance audit (ruling 3), done:** [note](../experiments/2026-11-05-target-provenance-audit.md). Its
+  proposals are under ruling 3 below.
+- **ADR 0053, individual variation, proposed:** [ADR](../decisions/0053-individual-variation.md). Drafted from
+  reading, with no probe.
+  - **The finding.** No random draw in the model is per tree, and R3 pulls every limb back to a per-order set
+    point, so per-metamer noise never reaches a tree's median posture.
+  - **The floor.** limbUpturn is floored at 0° (27 of 40 of the hand's trees). Across the sensitivity sweep, its
+    spread rises with its median, but only to ≈ 0.55× real at the real median.
+  - **Recommended:** a per-tree draw of postureSetPoint (1), with its SD from BioDiv's report-only `limbElevation`
+    less the model's own posture variance (≈ 11.8°).
+  - **The hold-out:** limbUpturn's spread, with Demol out of sample. limbElevation05's spread stops counting once
+    the draw is on.
+  - **The probe** is designed, not run. Its step 2 is pilot v3's best at σ_A and at 0, seeds 101–110. It passes at
+    ≥ 0.71× at ΔL0 ≤ 2 and stops under 0.6×.
+  - **The question for the user:** is a measured, frozen per-tree parameter inside ADR 0049 §2, or "a knob added
+    to serve a fit"?
+
 **Phase 3 beech pilot v4 (registration v5, edbd327): launched 07:49 UTC 2026-11-05, running; provisional, nothing
 accepted.**
 - **This run answers whether tortuosity05 and late height growth can be had together with the current rules.**

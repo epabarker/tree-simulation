@@ -1,8 +1,7 @@
 # Level 1 beech pilot v3: the run's results (provisional)
 
 **Provisional: nothing here is accepted into species params** (the plan's §g: pending Level 0's pass and ADR 0052).
-The plan's State (`docs/plans/2026-11-03-reference-fidelity.md`) holds the registration, the launch and the morning's
-reading; the write-up follows the run.
+The write-up is [the note](../../2026-11-05-level1-beech-pilot-v3.md).
 
 - **Ran from:** registration v4 of `analysis/fit/sources/level1-beech.json` (8e7594b). Its `prior` holds v3 (81b157a,
   pilot v2's run), and so on back to v1. The commit the run launched from is the first line of
@@ -18,5 +17,6 @@ reading; the write-up follows the run.
   - `beech-best.json`, `beech-progress.csv`: the in-run best and every candidate, rewritten each generation;
   - `beech.json`: the hand and the finalist re-measured on 101–110, with per-term `contributions` and, beside them,
     the `reported` terms lateShare and height at 100 would add;
-  - the gate: `runs/level1-pilot-v3/beech.gate.txt` and `beech.gate.json` (git-ignored; copy here once read).
+  - the gate: `beech.gate.txt` and `beech.gate.json` (copied here from `runs/level1-pilot-v3/`). FAIL: held out 19/20,
+    spread outside ×2 on limbDroop (0.48) and limbUpturn (0.47), shapeFlag clear.
 - **Held-out values** appear only in the gate files.

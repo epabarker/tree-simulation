@@ -2,6 +2,18 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-05: pilot v3's result and write-up
+
+- **What changed:** docs only. [The note](experiments/2026-11-05-level1-beech-pilot-v3.md); the gate files copied to
+  `docs/experiments/fits/level1-pilot-v3/`.
+- **Result:** the first real Level 1 fit, 6.70 → 1.62 on 101–110 (SD 1.38).
+  - Fourteen in band; held out 19/20; the spread penalty held.
+  - The gate fails on limbDroop (0.48×) and limbUpturn (0.47×) spread only.
+- **Surprises:**
+  - tortuosity05 came into band via dLambda 0.027, a value the sensitivity sweep's grid skipped (it has no point
+    between 0.0069 and 0.067). The price was unscored lateShare (10.1): one λ offset for every order.
+  - limbDroop sat exactly at the penalty's floor, which is also the gate's edge.
+
 ## 2026-11-04 (night): pilot v3 registered (registration v4) and launched, unattended
 
 - **What changed:** no code under src/rust/cli/tests; nothing accepted into species params.

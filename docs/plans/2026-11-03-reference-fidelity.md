@@ -308,6 +308,23 @@ no z was computed, and nothing registered changed after it.
 ### State
 _(rewritten at the end of each session)_
 
+**Phase 3 beech pilot v3 (registration v4, 8e7594b): done; the first real fit, which fails its gate on limb-posture
+spread only (2026-11-05, [note](../experiments/2026-11-05-level1-beech-pilot-v3.md), results in
+`docs/experiments/fits/level1-pilot-v3/`); provisional, nothing accepted.**
+- **The fit:** 6.70 → 1.62 on the fresh seeds 101–110; the hand's 10-seed SD is 1.38.
+  - All fourteen affordable descriptors are in band; every pooled |z| on the gate's seeds is ≤ 1.04.
+  - The spread penalty held: every fitted spread term is 0 on 101–110.
+- **The gate:** FAIL. Held out 19/20; shapeFlag clear; Level 0's statistic 10/20.
+  - **Spread is outside ×2 on limbDroop (0.48×, fitted) and limbUpturn (0.47×, held out).** Individual variation of
+    limb posture is beech's single Level 1 blocker.
+  - limbDroop sits at the penalty's floor, which is the gate's edge.
+- **tortuosity05 came into band** (−0.66 on 101–110, −0.48 on the gate's seeds), against v4's expectation. It came by
+  dLambda 0.027, at an unscored lateShare cost of 10.1 (1.24 against 1.43).
+  - **What dLambda does:** one λ offset for every order after aC (`r2.rs:107`).
+  - **Why the two are coupled:** lowering the limbs' λ makes them wander, and it lowers the trunk's λ with them. The
+    fit kept the trunk by raising its early λ, which front-loads height (H60 78.5 → 85.0, H100 108.6 → 105.1 cells).
+- **Pilot v4 (registration v5) follows:** lateShare scored again, at band 0.10.
+
 **Readings made by the unattended session (2026-11-04 night; the user's brief did not settle these):**
 1. **The spread penalty's form.** The brief's `(ln(min(1, r)/0.5)/ln 2)²` gives 1 at r = 1 and 0 at r = 0.5. That
    contradicts its own "zero when sim spread is at least half the real". Implemented as `(ln(min(1, r/0.5))/ln 2)²` =
@@ -336,8 +353,8 @@ _(rewritten at the end of each session)_
    it. They also remain scored in Level 0's own fit (`load_spec(level=0)` is unchanged); only the Level 1 spec drops
    them.
 
-**Phase 3 beech pilot v3 (registration v4, 8e7594b, "best achievable with the current rules"): launched 23:49 UTC
-2026-11-04, running; provisional, nothing accepted.**
+**Phase 3 beech pilot v3 (registration v4, 8e7594b, "best achievable with the current rules"): the registration and
+the launch (23:49 UTC 2026-11-04); its result is above.**
 - **What v4 changed from v3** (each with its reason in the registration's `changes`):
   1. **lateShare and height at 100 are reported, not scored,** in the Level 1 loss. They stay in the Level 0 gate.
      - The reason: lateShare's per-seed SD (0.137) exceeds twice its band (0.06), so the term is undetermined on

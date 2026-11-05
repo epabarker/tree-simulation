@@ -2,6 +2,14 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-05: garden 0.16.0 prepared (for the user to tag)
+
+- **Release notes:**
+  - The plate shows one lap of the forest and draws trees larger; on the phone, no crowns are cropped. (`plateWidth` = 140·w/(h−18−headroom), clamped to [40, 200]; a young garden is framed at most 1.5× closer.)
+  - Trees no longer all lean one way (ADR 0054; goldens re-baselined).
+- **How it ships:** there is no version file; the version is the tag (`release.yml` reads `GITHUB_REF_NAME`). After the PR merges into `3d-port`, the user tags the merge commit `garden-v0.16.0` and pushes the tag. The site then pins 0.16.0 with its `sync-garden.mjs`.
+- **Speed and memory:** see the PR body.
+
 ## 2026-11-05: ADR 0054, a per-tree seedling azimuth; goldens re-baselined; leanAngle; v6 superseded
 
 - **What changed:**

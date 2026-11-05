@@ -1,25 +1,31 @@
 /** The garden's plate (I3): its width for a host, its cap and its intended height. */
+import { GROUND_MARGIN, HEADER_MARGIN } from "./render/scene.ts";
 
 /**
- * The plate's intended height in cells (the 2D world's 130): the ring's width follows the host's
- * aspect at this height, and a young garden is framed at half of it (`Scene.frameHeight`), not at
- * half the woods' 200-cell top (I3).
+ * The plate's intended height in cells: the ring is as wide as it takes for the canvas, fitted to
+ * one lap across its width, to show this many cells between the ground and the headroom line. Mature
+ * crowns (oak and hornbeam, ≈ 128 cells by season 150) fit under it. A young garden is framed at
+ * half of it (`Scene.frameHeight`), not at half the woods' 200-cell top (I3).
  */
-export const PLATE_HEIGHT = 130;
+export const PLATE_HEIGHT = 140;
 /**
- * The widest ring (I3, ADR 0026): a 200-cell plate reached 225 MB by season 100 on its own, past
- * the worker's 256 MB with the specimen beside it; 160 cells reached 161 MB.
+ * The widest ring (I3, ADR 0026), set by the worker's 256 MB with the specimen beside the forest at
+ * 200 seasons (`memory-worker.ts` swap, seed 10): 160 cells reach 187 MB, 200 reach 211 MB, 240 reach
+ * 290 MB. The 160-cell cap held 146–160 cells in practice; 200 leaves about 45 MB for a seed that
+ * grows more (the browser's laptop runs spread ±20 MB across seeds 9, 10 and 12).
  */
-export const PLATE_MAX = 160;
+export const PLATE_MAX = 200;
+/** The narrowest ring: a tall, narrow host still gets a few trees. */
+export const PLATE_MIN = 40;
 
 /**
- * The ring's width for a host of this size: a share of what the host's aspect would give the
- * plate's height, at most PLATE_MAX. The plate fits the ring's width, so the share sets how large
- * the trees are drawn: two thirds on a portrait host (a phone; M21 art pass) and 0.7 on a landscape
- * one (M24: with the site's wide plate, about as many trees as before, 1.7 times larger). Crowns
- * taller than the plate ease the camera out, as ever.
+ * The ring's width for a host of this size: the camera fits the ring's width to the canvas
+ * (`Scene.fit`, "world" frame on a periodic world), so the canvas shows PLATE_HEIGHT cells above the
+ * ground and below the host's headroom (CSS pixels of title and text kept clear) when the ring is
+ * `PLATE_HEIGHT × width / (height − ground margin − headroom)` cells wide, between PLATE_MIN and
+ * PLATE_MAX. A host too wide for the cap shows less height, and the tallest crowns crop at the top.
  */
-export function plateWidth(width: number, height: number): number {
-  const aspect = width / Math.max(1, height);
-  return Math.min(PLATE_MAX, PLATE_HEIGHT * aspect * (aspect < 1 ? 0.65 : 0.7));
+export function plateWidth(width: number, height: number, headroom = HEADER_MARGIN): number {
+  const fitH = Math.max(1, height - GROUND_MARGIN - headroom);
+  return Math.max(PLATE_MIN, Math.min(PLATE_MAX, (PLATE_HEIGHT * width) / fitH));
 }

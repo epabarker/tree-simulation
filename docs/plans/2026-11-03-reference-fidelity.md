@@ -331,6 +331,10 @@ _(rewritten at the end of each session)_
    - **Pilot v2 is no longer resumable from HEAD.** v3's hashes no longer match `level1.py`, so resume from a
      checkout of 81b157a's `analysis/`.
    - The sensitivity note reproduces from e8f3edc, not HEAD: its registration hashes v3's files.
+9. **"They stay in the Level 0 gate"** holds trivially. Level 0's gate statistic (`level0_gate.py`, and
+   `level1_gate.py`'s reported line) reads only the Tallo z within T, so lateShare and height at 100 were never in
+   it. They also remain scored in Level 0's own fit (`load_spec(level=0)` is unchanged); only the Level 1 spec drops
+   them.
 
 **Phase 3 beech pilot v3 (registration v4, 8e7594b, "best achievable with the current rules"): launched 23:49 UTC
 2026-11-04, running; provisional, nothing accepted.**
@@ -353,11 +357,17 @@ _(rewritten at the end of each session)_
     real), then tortuosity05's (0.41, 0.21).
   - **The cross-check:** the simulated v4 loss equals v3's stored terms re-scored on the same trees to 9e-16.
   - **The hand's mean** is 6.10: location 2.45, spread 1.71, Level 0 1.95.
+- **The in-run baseline:** the hand on the ten search seeds under v4 scores **5.17**: location 2.60, spread 0.58
+  (all leaderDominance), Level 0 1.98. This is arithmetic on pilot v2's `hand-search-seeds.json`, the same trees.
+- **Generation 0 (764 s, 00:02 UTC):** best 4.58, median 13.28. The fit loop's v4 paths ran clean: the `.spr` terms,
+  `reported` and the checkpoint.
+  - **Watch:** that best's unscored lateShare term would be **5.19** (height at 100: 0.45). v4 made the term free, and
+    the fit is already spending it. In the morning, read the finalist's `reported` lateShare beside its Level 1 gain.
 - **A forecast, not a result:** r0 (frozen) is the knob that restored leaderDominance's spread in the sweep. The
   form knobs may not be able to buy down the hand's largest new term, so a stuck best is a possible outcome.
 - **The run:** `tmux` session `level1v3`, under `systemd-inhibit`, 12 workers. Log `runs/level1-pilot-v3/beech.log`
-  (first line: commit 8e7594b, clean); results in `docs/experiments/fits/level1-pilot-v3/`. ≈ 740 s a generation
-  puts the 32 generations near 06:25 UTC, and the finalists and the gate near 06:45. The same command resumes from
+  (first line: commit 8e7594b, clean); results in `docs/experiments/fits/level1-pilot-v3/`. ≈ 764 s a generation
+  puts the 32 generations near 06:40 UTC, and the finalists and the gate near 07:00. The same command resumes from
   the checkpoint:
   ```
   tmux new -d -s level1v3 'systemd-inhibit --what=sleep:idle --why="Level 1 beech pilot v3" env LEVEL1_OUT=level1-pilot-v3 analysis/experiments/level1_fit_gate.sh beech 32 9'

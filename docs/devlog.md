@@ -2,6 +2,26 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-05: lean audit: the one-way lean is the seedling's frame (L = +x), carried by Troll's set point
+
+- **What changed:**
+  - `analysis/experiments/lean_dump.ts` and `lean_audit.py`.
+  - The note `experiments/2026-11-05-lean-audit.md`, with a figure.
+  - Nothing under `src/`, `rust/`, `cli/` or `tests/`. Nothing launched; v6 stays registered and unlaunched.
+- **The finding:**
+  - The cause: every seedling is planted with L = +x (`c1.rs:179–182`). Beech's trunk set point (40°) takes its
+    azimuth from L when the leader is vertical (`c4.rs:13–19`), and after that from its own lean.
+  - The test: flip only L's sign (lean −1e-6°) and the stand's lean and crown centroid flip with it. Ages 2–10 flip
+    near exactly; at 70 the means mirror (+1.1 m ↔ −1.1 m centroid x).
+  - Ruled out: the sky (net ≤ 1.8%, and toward −x), the planting's mirror and the sky's phase.
+  - This explains ADR 0051's "+x reach" (logged as a suspected bug).
+- **Surprises:**
+  - The lean's magnitude is model behaviour, independent of its side. The stand leans ≈ 9–10° (BioDiv 4.1°, max 14.7°).
+  - The bent-over suppressed trees carry boleSway's whole spread excess (×1.2–1.4 without them), but not its z.
+- **Proposed, not done:** a per-tree seedling azimuth (new RNG purpose, ADR). Every golden changes. Then the re-run
+  order: goldens → Level 0 (all species) → gate c's simulated rows → Level 1. Also lean angle as a gate c candidate,
+  and a Troll relay (an erect relay that overtakes the arch) as the remedy for the magnitude.
+
 ## 2026-11-05: boleSway, the like-for-like sheet, Level 1 v6 registered (not launched)
 
 - **What changed:**

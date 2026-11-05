@@ -2,6 +2,16 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-05: pilot v4 registered (registration v5) and launched
+
+- **What changed:** no code under src/rust/cli/tests.
+  - `fit_level1.level1_spec` reads `loss.level0_band`, a Level 0 trait's band in the Level 1 loss only.
+  - `level1_targets.py` handles version 5; `level1_noise_v4.py` handles v5, rescaling the re-banded term in its
+    cross-check.
+  - Python tests: 130 passed.
+- **Registration v5 (edbd327):** lateShare scored again at band 0.10; height at 100 reported; else v4.
+- **Noise:** the hand's SD is 1.31. Launched 07:49 UTC, tmux `level1v4`, ≈ 7 h.
+
 ## 2026-11-05: pilot v3's result and write-up
 
 - **What changed:** docs only. [The note](experiments/2026-11-05-level1-beech-pilot-v3.md); the gate files copied to

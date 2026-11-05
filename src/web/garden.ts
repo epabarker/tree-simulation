@@ -315,7 +315,7 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
   const params =
     options.params ??
     forestParams(
-      plateWidth(rect.width, rect.height),
+      plateWidth(rect.width, rect.height, scene.headroom),
       options.seed ?? dailySeed(options.seeds),
       options.planting,
     );

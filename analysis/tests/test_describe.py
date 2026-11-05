@@ -345,3 +345,34 @@ def test_trunk_tortuosity05_is_nan_on_a_short_stretch_and_without_limbs():
     assert math.isnan(ds.describe(t.table())["trunkTortuosity05"])
     assert math.isnan(ds.describe(trunk(n=12).table())["crownBase80"])
     assert math.isnan(ds.describe(trunk(n=12).table())["trunkTortuosity05"])
+
+
+def _bow(deg: float) -> dict:
+    """3 m out at `deg` from vertical, 3 m back, then a straight top carrying three level limbs."""
+    t = Tree()
+    a = math.radians(deg)
+    p = t.chain(-1, [math.sin(a), 0, math.cos(a)], 3, 1.0, 0.2)
+    p = t.chain(p, [-math.sin(a), 0, math.cos(a)], 3, 1.0, 0.2)
+    top = t.chain(p, UP, 6, 1.0, 0.15)
+    for node in (top - 2, top - 1, top):
+        t.chain(node, [1, 0, 0], 1, 2.0, 0.03)
+    return ds.describe(t.table())
+
+
+def test_bole_sway_is_zero_on_a_straight_trunk_and_the_offset_per_metre_on_a_bow():
+    t = trunk(n=12)
+    _crown(t, range(5, 11))
+    assert ds.describe(t.table())["boleSway"] == pytest.approx(0.0, abs=1e-12)
+    d = _bow(10)
+    a = math.radians(10)
+    zc = d["crownBase80"] * d["height"]
+    kink = np.array([3 * math.sin(a), 0.0, 3 * math.cos(a)])
+    end = np.array([0.0, 0.0, zc])  # the bow returns to x = 0, so the chord is vertical
+    off = np.linalg.norm(np.cross(kink, end)) / np.linalg.norm(end)
+    assert d["boleSway"] == pytest.approx(off / d["trunkStretch"], rel=1e-6)
+
+
+def test_bole_sway_reads_a_bow_to_first_order_and_tortuosity_to_second():
+    big, small = _bow(10), _bow(5)
+    assert small["boleSway"] / big["boleSway"] == pytest.approx(0.5, rel=0.02)
+    assert (small["trunkTortuosity05"] - 1) / (big["trunkTortuosity05"] - 1) == pytest.approx(0.25, rel=0.05)

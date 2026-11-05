@@ -4,12 +4,13 @@
   "file": "analysis/fit/sources/phase1-tolerances.json",
   "version": 3.1
  },
- "written": "2026-11-05: v3.1's rules unchanged on four new descriptors; d_min and the upper end frozen at v3.1's; written from real QSMs only, before any simulated tree is read",
+ "written": "2026-11-05: v3.1's rules unchanged on five new descriptors (boleSway added the same day); d_min and the upper end frozen at v3.1's; written from real QSMs only, before any simulated tree is read",
  "descriptors": [
   "crownBase80",
   "crownBase70",
   "crownBase90",
-  "trunkTortuosity05"
+  "trunkTortuosity05",
+  "boleSway"
  ],
  "frozen": {
   "d_min": 0.008621381595730782,
@@ -124,6 +125,14 @@
   ],
   "differing": 0
  },
+ "amended": {
+  "added": [
+   "boleSway"
+  ],
+  "why": "the user's ruling, 2026-11-05: bole sway as a descriptor",
+  "first_four_from": "3dc1278",
+  "first_four_differing": 0
+ },
  "control_path_check": {
   "descriptors": 28,
   "differing": 0
@@ -200,6 +209,24 @@
    "noise_source": "biodiv 5 repeats, SD / \u221a5",
    "noise_ratio": 0.7471345222997507,
    "noise_verdict": "held out (noise)"
+  },
+  {
+   "species": "beech",
+   "descriptor": "boleSway",
+   "set": "biodiv Fagus_sylvatica",
+   "n": 52,
+   "median": 0.01875149010825941,
+   "slope_lnDBH": -0.003740424622992941,
+   "between_sd": 0.008169866101056336,
+   "between_sd_lo95": 0.006835801208872346,
+   "between_sd_hi95": 0.010155782136553182,
+   "tolerance": 0.004084933050528168,
+   "noise_rms": 0.0028188221194567235,
+   "noise_median": 0.0010104070606621897,
+   "noise_trees": 52,
+   "noise_source": "biodiv 5 repeats, SD / \u221a5",
+   "noise_ratio": 0.3450267219302724,
+   "noise_verdict": "clear"
   }
  ],
  "control": {
@@ -207,13 +234,15 @@
    "crownBase80": 1.0,
    "crownBase70": 1.0,
    "crownBase90": 1.0,
-   "trunkTortuosity05": 0.9807692307692307
+   "trunkTortuosity05": 0.9807692307692307,
+   "boleSway": 0.9615384615384616
   },
   "upper": {
    "crownBase80": 0.9056603773584906,
    "crownBase70": 0.9245283018867925,
    "crownBase90": 0.9622641509433962,
-   "trunkTortuosity05": 0.9230769230769231
+   "trunkTortuosity05": 0.9230769230769231,
+   "boleSway": 0.8846153846153846
   }
  },
  "dmin_rule_with_new": {
@@ -221,7 +250,7 @@
   "with": true
  },
  "hashes": {
-  "analysis/treesim/describe.py": "b4f025b0985fe2336c4e994c3cd93b77a6dadf72c20d3e6e5a183e76173a018c",
+  "analysis/treesim/describe.py": "4d6deca8aa58b23b288d6a346d50c0343a893f2e484bf0b334f73c4557a396ff",
   "analysis/treesim/form.py": "23c5e1c035c9bbb625a8a002476fc12fd98f85438af4bba5adbb97c10ec6b48d",
   "analysis/treesim/cylinders.py": "0e262dce2e55193c3f8ed775ec92c7fbe29df9f9be0d738daed7623cb5629254",
   "analysis/treesim/qsm.py": "27927fc0188f155bf1eb47865b577774f18875461cac08ea8cd2e6a464c0a333",

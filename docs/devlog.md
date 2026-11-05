@@ -2,6 +2,21 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-05: boleSway, the like-for-like sheet, Level 1 v6 registered (not launched)
+
+- **What changed:**
+  - describe(): `boleSway`, with two tests. Bit-identity holds on the 16 and the four (9,300 values).
+  - The v3.2 supplement amended for boleSway (tier A); its first four rows reproduce exactly.
+  - ADR 0052 accepted (no rule for beech; open for oak's CR).
+  - The like-for-like sheet.
+  - v6 registered: `level1_targets.py --add`, v5's hold-outs kept, floor 0.65, lateShare band 0.12. The registration
+    test is now v6's.
+  - Nothing under `src/`, `rust/`, `cli/` or `tests/`.
+- **Surprises:**
+  - Coarsening at 8.6 mm removes almost nothing from simulated beech: inflated twigs are all above it.
+  - boleSway's simulated spread is too wide (2.7–6.5×), not too narrow.
+  - R3's straightening is capped at c·Δr/r, so a slow stand stem keeps its bends.
+
 ## 2026-11-05: crownBase80, trunkTortuosity05, the bole's sway, ADR 0052's probe
 
 - **What changed:**
@@ -17,8 +32,8 @@ Newest first. One entry per session or milestone: what changed, why, surprises, 
   - More limb loss raises it further, so beech makes no case for ADR 0052.
 - **Surprise:** the render's "low crowns" did not survive 53 trees. Two of the three QSMs drawn were high-crowned. What
   differs is crown width and density, and a bole that sways twice the real (path over chord cannot see it).
-- **Side effect:** `test_level1.py::test_registration_v5…` now fails at HEAD. That is the registration's own hash
-  refusal (describe.py moved), cleared by v6's registration. It is not in `npm run check`.
+- **Side effect:** `test_level1.py::test_registration_v5…` failed at HEAD on the registration's own hash refusal
+  (describe.py moved); cleared the same day by v6's registration (the test is now v6's).
 
 ## 2026-11-05: pilot v4's result and write-up
 

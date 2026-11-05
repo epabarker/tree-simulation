@@ -22,6 +22,7 @@ Measurement design: what each descriptor depends on beyond the tree.
 | centroidHeight | none | low | base z, H |
 | crownBase80 (70, 90) | trunk | low (length quantile; a stub counts by its length) | base z, H |
 | trunkTortuosity05 | trunk | moderate: the trunk's path resampled at 0.5 m, to crownBase80's height | none |
+| boleSway | trunk | moderate: the same path; its largest offset from the chord, per metre | none |
 
 - **The fixed 0.5 m step (v3, the user, 2026-11-03):** every descriptor that depends on segment length is read at
   RESAMPLE on both sides (a QSM's cylinders and a simulator's metamers alike): droop, upturn and branchAngle2 as 0.5 m
@@ -46,6 +47,11 @@ Measurement design: what each descriptor depends on beyond the tree.
   where it first reaches crownBase80's height, resampled at 0.5 m, over its chord; NaN under 2.5 m or without a
   crownBase80. Diagnostics beside it (`DIAGNOSTIC`, not descriptors): the same at a 1 m step, the stretch's arc length
   in metres, and the share of the non-trunk length below crownBase80 on order-1 axes that carry no branch (stubs).
+- **boleSway (2026-11-05, the user):** on trunkTortuosity05's stretch (resampled at 0.5 m), the largest distance of
+  the path from its chord (root to the stretch's end), over the stretch's arc length: metres of offset per metre of
+  bole. Path over chord reads a gentle sway only to second order (a sine of amplitude A over wavelength λ reads
+  1 + (πA/λ)²), so a bole that visibly snakes can read 1.005; the offset reads it to first order. NaN as
+  trunkTortuosity05.
 - **Report-only:** `leafStemSlope` (NaN without leaf area: no wood proxy, tip counts being the most
   resolution-dependent quantity there is), `crownBase` / H by wood (the field's crown base is Weiser's, §c).
 - **Below ground (R4, the user's ruling 2026-11-03: start or tip):** a cylinder that starts or ends below the
@@ -67,7 +73,7 @@ DESCRIBE = Rules(min_subtree=("length", 1.25), min_limb=("length", 2.5), bole_li
 LIMB = 2.5
 NEW = ("bifurcationRatio", "bifurcationRatio2", "tortuosity", "tortuosity05", "length0", "length1", "length2", "length3",
        "pendulousFraction", "taper", "centroidHeight", "limbElevation05", "pendulousFraction05",
-       "crownBase80", "crownBase70", "crownBase90", "trunkTortuosity05")
+       "crownBase80", "crownBase70", "crownBase90", "trunkTortuosity05", "boleSway")
 REPORT = ("leafStemSlope", "crownBase")
 DIAGNOSTIC = ("trunkTortuosity1", "trunkStretch", "stubShareBelow")
 
@@ -280,6 +286,24 @@ def trunk_tortuosity(points: np.ndarray | None, step: float = RESAMPLE) -> float
     return _resampled_length(points, step) / chord
 
 
+def bole_sway(points: np.ndarray | None, step: float = RESAMPLE) -> float:
+    """A trunk stretch's largest distance from its chord (resampled at `step`) over its arc length; NaN under LIMB
+    metres or without one."""
+    if points is None or len(points) < 2:
+        return math.nan
+    arc = float(np.linalg.norm(np.diff(points, axis=0), axis=1).sum())
+    if arc < LIMB:
+        return math.nan
+    pts = _resample(points, step=step)
+    a, e = pts[0], pts[-1]
+    n = float(np.linalg.norm(e - a))
+    if n <= 0:
+        return math.nan
+    u = (e - a) / n
+    rel = pts - a
+    return float(np.linalg.norm(rel - np.outer(rel @ u, u), axis=1).max()) / arc
+
+
 def stub_share_below(c: cy.Cylinders, labels: Labels, base: float) -> float:
     """Of the non-trunk length below z0 + base·H, the share on order-1 axes that carry no branch (dead-stub proxy)."""
     if not math.isfinite(base):
@@ -347,6 +371,7 @@ def describe(c: cy.Cylinders, leaf: np.ndarray | None = None) -> dict:
         "leafStemSlope": f["leafStemSlope"],
         **{f"crownBase{k}": v for k, v in cb.items()},
         "trunkTortuosity05": trunk_tortuosity(stretch), "trunkTortuosity1": trunk_tortuosity(stretch, 1.0),
+        "boleSway": bole_sway(stretch),
         "trunkStretch": float(np.linalg.norm(np.diff(stretch, axis=0), axis=1).sum()) if stretch is not None
         else math.nan,
         "stubShareBelow": stub_share_below(c, labels, cb[80]),

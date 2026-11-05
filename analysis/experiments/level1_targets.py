@@ -36,6 +36,14 @@ this registration's loss and sets them once, before any fit; level1.fit_seeds re
             --freeze r3.c --reason "..."
 - v5, pilot v4 (the user, 2026-11-05, after pilot v3): lateShare scored again in the Level 1 loss at band 0.10 (its
   Level 0 band, 0.06, unchanged); height at 100 stays reported; everything else as v4.
+- v6 (the user, 2026-11-05, after the crown base and bole note): `--add` descriptors that passed gate c v3.2 (the
+  supplement, analysis/fit/sources/phase1-tolerances-v3.2.json; tiers from docs/experiments/fits/crown-base/
+  gate-c-v32.json) join the fitted set; v5's hold-outs are kept (redrawn once in v3, never again), so the new ones are
+  fitted; the weights and clusters are recomputed over the larger set; every v5 target and correlation must come out
+  identical. The spread penalty's floor 0.5 -> 0.65; lateShare's band in this loss 0.10 -> 0.12. Not launched.
+
+        uv run --project analysis python -I analysis/experiments/level1_targets.py --species beech --version 6 \
+            --freeze r3.c --add crownBase80 boleSway --reason "..."
 """
 
 import argparse
@@ -57,6 +65,8 @@ parser.add_argument("--species", required=True)
 parser.add_argument("--version", type=int, default=1, help="the next version when one is registered already")
 parser.add_argument("--freeze", nargs="*", default=[], help="knobs fixed at the species' own values")
 parser.add_argument("--reason", help="why a new version (required past version 1)")
+parser.add_argument("--add", nargs="*", default=[],
+                    help="v6: descriptors that passed gate c v3.2 to join the fitted set, v5's hold-outs kept")
 parser.add_argument("--redraw", action="store_true",
                     help="the version redraws the hold-outs and the weights (v3); every other target must not change")
 args = parser.parse_args()
@@ -70,8 +80,20 @@ if args.version != expected or (prior is not None and not args.reason):
              + ("" if prior is None else ", with --reason; a registration is never rewritten in place"))
 tolerances = json.loads(tol.TOLERANCES.read_text())
 moved = [f for f, h in tolerances["hashes"].items() if tol.file_hashes().get(f) != h]
+V32 = REPO / "analysis" / "fit" / "sources" / "phase1-tolerances-v3.2.json"
+supplement = json.loads(V32.read_text()) if args.version >= 6 else None
+if supplement is not None:
+    # v6: describe.py moved on purpose (the v3.2 descriptors); v3.2 re-registered its table against v3.1's and found
+    # every row identical, and the 16 descriptors are bit-identical across the edit (the note). Anything else moving
+    # refuses, as do the supplement's own hashes.
+    moved = [f for f in moved if f != "analysis/treesim/describe.py"]
+    moved += [f for f, h in supplement["hashes"].items() if tol.file_hashes().get(f) != h]
+    if supplement["self_check"]["differing"] != 0:
+        sys.exit("refusing: the v3.2 supplement's self-check against v3.1 is not clean")
 if moved:
-    sys.exit(f"refusing: changed since phase1-tolerances.json was committed: {', '.join(moved)}")
+    sys.exit(f"refusing: changed since phase1-tolerances.json (or v3.2) was committed: {', '.join(moved)}")
+if args.add and args.version < 6:
+    sys.exit("refusing: --add is v6's")
 
 targets_path = REPO / "analysis" / "fit" / "targets" / f"{species}.toml"
 targets = tomllib.loads(targets_path.read_text())
@@ -80,11 +102,20 @@ dataset, code = tol.SPECIES_SET[species]
 d_min = tolerances["resolution"][dataset]["d_min"]
 at = tolerances["reference_dbh"][species]["median_dbh"]
 tier = {**{k: "A" for k in lv1["gate_c_v3_1_tier_a"]}, **{k: "B" for k in lv1["gate_c_v3_1_tier_b"]}}
+if args.add:
+    gate32 = {r["descriptor"]: r for r in json.loads(
+        (REPO / "docs" / "experiments" / "fits" / "crown-base" / "gate-c-v32.json").read_text())}
+    bad = [k for k in args.add if gate32.get(k, {}).get("tier") not in ("A", "B")]
+    if bad:
+        sys.exit(f"refusing: not through gate c v3.2 at tier A or B: {', '.join(bad)}")
+    tier.update({k: gate32[k]["tier"] for k in args.add})
 names = sorted(tier)
 
 # Real distributions: every candidate descriptor, held-out ones included (the gate reads them).
 trees = l1.real_trees(dataset, code)
 noise = {r["descriptor"]: r for r in tolerances["table"] if r["species"] == species}
+if supplement is not None:
+    noise.update({r["descriptor"]: r for r in supplement["table"] if r["species"] == species})
 real = {}
 for k in names:
     d = l1.distribution([t["d"][k] for t in trees], [t["dbh"] for t in trees], at)
@@ -99,6 +130,10 @@ r_crit = l1.r_critical(len(trees))
 weights = l1.location_weights(r, names, r_crit)
 cluster_list = l1.clusters(r, names)
 held_out, draw_order, taken = l1.cluster_held_out(cluster_list)
+if args.add:
+    # v6: v5's hold-outs kept (the rule: redrawn once in v3, never again); a redraw is recorded, never applied.
+    redraw_would = held_out
+    held_out = list(prior["held_out"])
 fitted = [k for k in names if k not in held_out]
 ix = {k: i for i, k in enumerate(names)}
 straddling = [{"held_out": h, "fitted": f, "r": float(r[ix[h], ix[f]])} for h in held_out for f in fitted
@@ -224,6 +259,22 @@ CHANGES[5] = [
                    "the target still sits inside one band (the user). Height at 100 duplicates the same measurement "
                    "(lateShare is H100/H60, and height at 60 is scored)"},
 ]
+CHANGES[6] = [
+    {"change": "crownBase80 (gate c v3.2, tier A) joins the fitted descriptors; the weights (1 / Σ|r|) and the "
+               "clusters are recomputed over the larger set; v5's hold-outs are kept",
+     "motivation": "the render (2026-11-05) suggested low, wide crowns; the crown base and bole note found the "
+                   "simulated crown base above BioDiv's (hand z +1.31, v4 +1.03 on 101-110) and limb loss raising it "
+                   "further, so the fit must reach it, if at all, by form. It is r 0.95 with centroidHeight: the pair "
+                   "weighs about 1.56x centroidHeight's v5 weight (stated, accepted by the user)"},
+    {"change": "boleSway (gate c v3.2) joins the fitted descriptors if it passed at tier A or B (`--add`)",
+     "motivation": "the user's ruling: the simulated boles sway about twice the real (Troll's arching leader, R3's "
+                   "straightening), which path over chord (trunkTortuosity05, held out on noise) cannot read"},
+    {"change": "the one-sided spread penalty's floor 0.5 -> 0.65 (`loss.spread_floor`)",
+     "motivation": "pilots v3 and v4: the floor at 0.5 equalled the gate's x2 edge, so a fitted descriptor held at "
+                   "the floor (limbDroop 0.48x, tortuosity05 0.48x) cost nothing and failed the gate on noise"},
+    {"change": "stand.lateShare's band in the Level 1 loss 0.10 -> 0.12 (`loss.level0_band`; Level 0's own unchanged)",
+     "motivation": "the provenance audit: the per-seed SD is 0.137 on ten seeds; pilot v4 missed by 0.04 past 0.10"},
+]
 EXPECTED_5 = {
     "question": "whether tortuosity05 and late height growth can be had together with the current rules (dLambda is "
                 "one λ offset for every order: pilot v3's coupling)",
@@ -242,6 +293,11 @@ EXPECTED = {4: {
     "source": "docs/experiments/2026-11-04-level1-sensitivity.md (e8f3edc)",
 }}
 EXPECTED[5] = EXPECTED_5
+EXPECTED[6] = {
+    "question": "whether form knobs can lower the crown base toward BioDiv's (and straighten the bole) while keeping "
+                "v4's gains; the limb-loss probe moved crownBase80 the other way",
+    "source": "docs/experiments/2026-11-05-crown-base-and-bole.md",
+}
 UNCHANGED_V4 = ["every target, the hold-outs, the clusters and the location weights (no --redraw)",
                 "the ten form knobs, their bounds and the start", "Level 0's seven knobs and r3.c frozen",
                 "the ten fixed search seeds", "the coarsened-simulation rule", "the size match",
@@ -364,13 +420,14 @@ if args.version >= 4:
     reg["written"] = ("2026-11-04, from real QSMs only, before any simulated tree was scored on this loss; "
                       "seeds_per_candidate kept at v3's (the user)" if args.version == 4 else
                       "2026-11-05, from real QSMs only, before any simulated tree was scored on this loss; "
-                      "seeds_per_candidate kept at v3's (the user)")
+                      "seeds_per_candidate kept at v3's (the user)" + ("; registered, not launched (the user)"
+                                                                       if args.version >= 6 else ""))
     reported = ["stand.lateShare", "stand.height100"] if args.version == 4 else ["stand.height100"]
     reg["loss"].update({
         "terms": "Level 0's contributions less the level0_reported traits (at level0_band where given) + Σ over "
                  "fitted k of location_weights[k] · (z_k² + spread_penalty(s_k))",
         "spread_in_loss": True,
-        "spread_floor": l1.SPREAD_FLOOR,
+        "spread_floor": 0.65 if args.version >= 6 else l1.SPREAD_FLOOR,
         "spread_penalty": "level1.spread_penalty: (ln(min(1, r / spread_floor)) / ln 2)², r = simulated SD / real SD "
                           "= 2^s; 0 at r >= spread_floor; w_k · missing_penalty where s cannot be read (fewer than "
                           "min_trees finite trees, a zero SD, unmatched)",
@@ -378,7 +435,7 @@ if args.version >= 4:
         "level0_reported_rule": "reported, not scored, in the Level 1 loss (fit_level1.level1_spec); summary() writes "
                                 "the terms they would add at their Level 0 weights under `reported`; they stay in the "
                                 "Level 0 gate",
-        **({"level0_band": {"stand.lateShare": 0.10},
+        **({"level0_band": {"stand.lateShare": 0.12 if args.version >= 6 else 0.10},
             "level0_band_rule": "the band of a scored Level 0 trait in the Level 1 loss only (fit_level1.level1_spec); "
                                 "Level 0's targets file, fit and gate keep their own"} if args.version >= 5 else {}),
         "seeds_per_candidate": prior["loss"]["seeds_per_candidate"],
@@ -389,10 +446,23 @@ if args.version >= 4:
                                                       if t["name"] not in reported))
     reg["expected"] = EXPECTED[args.version]
 if args.version in CHANGES:
-    reg["changes"] = CHANGES[args.version]
-    reg["unchanged"] = (UNCHANGED_V4 + ["v4's one-sided spread penalty, its floor 0.5 and weights",
+    reg["changes"] = [c for c in CHANGES[args.version]
+                      if args.version != 6 or "boleSway" in args.add or not c["change"].startswith("boleSway")]
+    reg["unchanged"] = ([u for u in UNCHANGED_V4 if not u.startswith("every target")]
+                        + ["every v5 target (real distributions, Demol, gap strata) and the correlations among v5's 16",
+                           "v5's hold-outs (no redraw)", "height at 100 reported, not scored (v4)",
+                           "the gate: spread within x2 on every descriptor, the added ones included"]
+                        if args.version >= 6 else
+                        UNCHANGED_V4 + ["v4's one-sided spread penalty, its floor 0.5 and weights",
                                         "height at 100 reported, not scored (v4)"] if args.version >= 5
                         else UNCHANGED_V4 if args.version >= 4 else UNCHANGED)
+if args.add:
+    reg["added"] = {"descriptors": list(args.add), "tiers": {k: tier[k] for k in args.add},
+                    "source": "analysis/fit/sources/phase1-tolerances-v3.2.json; docs/experiments/fits/crown-base/"
+                              "gate-c-v32.json",
+                    "redraw_would_hold_out": redraw_would,
+                    "redraw_note": "the cluster draw over the larger set, recorded and not applied (v5's hold-outs "
+                                   "kept)"}
 #: The targets themselves: never changed by a new version. --redraw (v3) lets the hold-outs and the weights move.
 SAME = ("species", "dataset", "code", "d_min_m", "size_match", "descriptors", "held_out_seed", "real",
         "real_dbh_range_m", "real_trees", "real_trees_by_gap", "demol", "frozen_level0", "start")
@@ -410,6 +480,23 @@ def _clean(x):
     return x
 
 
+if args.add:
+    # v6: the targets of v5's 16 must not move; the added descriptors' rows are new. The correlations among v5's 16
+    # must reproduce; the weights, clusters and the fitted list change by the additions.
+    old = sorted(prior["descriptors"])
+    SAME = tuple(k for k in SAME if k not in ("descriptors", "real", "real_trees_by_gap", "demol", "held_out",
+                                                "fitted", "correlation", "clusters", "location_weights"))
+    sub = lambda d: {k: d[k] for k in old}  # noqa: E731
+    checks = {"descriptors": (sub(reg["descriptors"]), prior["descriptors"]), "real": (sub(reg["real"]), prior["real"]),
+              "demol": ({**reg["demol"], "descriptors": {k: v for k, v in reg["demol"]["descriptors"].items()
+                                                         if k in old}}, prior["demol"]),
+              "real_trees_by_gap": ({g: {k: v for k, v in d.items() if k == "trees" or k in old}
+                                     for g, d in reg["real_trees_by_gap"].items()}, prior["real_trees_by_gap"])}
+    ri = [names.index(k) for k in old]
+    checks["correlation"] = (np.array(reg["correlation"]["r"])[np.ix_(ri, ri)].tolist(), prior["correlation"]["r"])
+    bad = [k for k, (a, b) in checks.items() if json.dumps(_clean(a)) != json.dumps(_clean(b))]
+    if bad:
+        sys.exit(f"refusing: version {args.version} would change v5's own targets: {', '.join(bad)}")
 if prior is not None:
     changed = [k for k in SAME if json.dumps(_clean(reg[k])) != json.dumps(prior.get(k))]
     if changed:
@@ -457,7 +544,8 @@ written = tomllib.loads(targets_path.read_text())["level1"]
 assert written["pilot_held_out"] == held_out and written["pilot_knobs"] == [p["path"] for p in knobs]
 assert written["pilot_version"] == args.version
 
-reg["hashes"] = l1.file_hashes(l1.HASHED + l1.species_files(species))
+reg["hashes"] = l1.file_hashes(l1.HASHED + l1.species_files(species)
+                              + (("analysis/fit/sources/phase1-tolerances-v3.2.json",) if supplement else ()))
 out.write_text(json.dumps(_clean(reg), indent=1) + "\n")
 print(f"{out.relative_to(REPO)} v{args.version}: held out {held_out}; fitted {fitted}; knobs "
       f"{[p['path'] for p in knobs]}; frozen {frozen_form}")

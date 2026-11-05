@@ -610,12 +610,13 @@ v3.1's rules unchanged, on four new descriptors, as a supplement (`analysis/fit/
 at v3.1's (BioDiv 8.6 mm, 11.0 mm), because a full rerun could re-choose d_min over the larger descriptor set; d_min's
 rule holds with the new descriptors as without. Self-checks: all 84 v3.1 rows reproduce exactly; the control's shares at
 d_min reproduce on all 28 beech descriptors. The 16 registered Level 1 descriptors are bit-identical before and after
-the describe.py edit (7,440 values).
+the describe.py edit (7,440 values; with boleSway, the 16 and the four, 9,300 values). The amendment for boleSway reproduces the first four rows of 3dc1278 exactly.
 
 | descriptor | tier | floor ratio | control at d_min | seeds within (A: d_min, upper, inflated) |
 |---|---|---|---|---|
 | crownBase80 (70, 90) | **A** | 0.080 (0.089, 0.053) | 1.00 | 19, 19, 20 (each) |
 | trunkTortuosity05 | held out (noise) | **0.747** | 0.98 | – |
+| boleSway (amended the same day, the user) | **A** | 0.345 | 0.96 | 19, 19, 20 |
 
-Readings and the probe that used them: [the crown base and bole note](2026-11-05-crown-base-and-bole.md). At HEAD,
-`level1_targets.py` refuses (describe.py's hash moved, by design); v5 reproduces from b4fdbff.
+Readings and the probe that used them: [the crown base and bole note](2026-11-05-crown-base-and-bole.md). Level 1's v6
+registration hashes this supplement; v5 reproduces from b4fdbff.

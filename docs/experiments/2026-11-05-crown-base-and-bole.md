@@ -183,7 +183,7 @@ leaf-off, the stand camera; captions carry seeds 1–5's crownBase80, so a panel
   sway is what the diagnostic shows. Three QSMs are not BioDiv's 53: the median real tree is lower-crowned (0.50) than
   any of the simulated sets.
 
-## The next Level 1 registration (v6): proposed, not registered
+## The next Level 1 registration (v6): as proposed (registered since; see the rulings below)
 - **crownBase80 fitted.** It passes gate c at tier A. With it in, the real correlation matrix reproduces v5's on the 16
   exactly and adds crownBase80's row: r 0.95 with centroidHeight, −0.48 leaderDominance, +0.36 limbDroop, −0.32 p0,
   +0.27 limbElevation05.
@@ -210,6 +210,79 @@ leaf-off, the stand camera; captions carry seeds 1–5's crownBase80, so a panel
 - **Before registering:** `level1_targets.py` refuses at HEAD (describe.py's hash moved, by design). v6's registration
   re-hashes; v5 (pilot v4) reproduces from b4fdbff.
 
+
+## After the user's rulings (2026-11-05, same day)
+The rulings: ADR 0052 accepted as "no rule for beech; open for oak's crown radius"; boleSway into describe() and
+through the v3.2 supplement under the same rules; a like-for-like re-render; v6 registered as proposed, with boleSway
+if it passed gate c; not launched.
+
+### boleSway (`analysis/treesim/describe.py`)
+- **Definition:** on trunkTortuosity05's stretch (root to crownBase80's height, resampled at 0.5 m), the largest
+  distance of the path from its chord, over the stretch's arc length: metres of offset per metre of bole. It is the
+  sway diagnostic above, normalised and moved into describe(). It reads a bow to first order (tested: halving the
+  bow's angle halves boleSway and quarters trunkTortuosity05 − 1).
+- **Bit-identity:** the 16 registered descriptors and the four added before it (crownBase80/70/90,
+  trunkTortuosity05), on the same 465 tables: **9,300 values, 0 differ**.
+- **Gate c v3.2, amended** (`phase1-tolerances-v3.2.json`; the first four rows and their control reproduce their
+  3dc1278 values exactly; v3.1's 84 rows reproduce; d_min's rule holds):
+
+| descriptor | tier | shift | tolerance | floor ratio | control at d_min / upper | seeds within (A: d_min, upper, inflated) |
+|---|---|---|---|---|---|---|
+| boleSway | **A** | −0.00001 | 0.0041 | 0.345 | 0.96 / 0.92 | 19, 19, 20 |
+
+- **BioDiv:** 0.0182 per metre (SD 0.0082, n 52, detrended to 0.291 m).
+- **z (spread ratio) on 101–110:** shipped +0.76 (5.54×), **hand +0.72 (2.68×)**, **v3 +1.52 (2.81×)**, **v4 +2.10
+  (6.45×)**. The simulated spread is too *wide*: a few trees lean hard (v4's tree 6 at 0.153), and the gate's ×2 rule
+  fails from above on every set. v5's and v6's one-sided penalty does not see a spread above the real; the gate does.
+
+### The mechanism of bole sway (the user's reading, recorded)
+- **Troll's model:** beech's leader grows out arching (each new trunk shoot aims `levels[0].setPoint` 40° off vertical,
+  on the side it already leans: `r2.rs:377–389`, `c4.rs:22–30`) and then straightens behind (R3's posture,
+  `r3.rs:211–254`). The sway is what the straightening leaves.
+- **The remedy is probably in R3's straightening,** which is coupled to stress-wood girth through r3.c: each season's
+  posture turn (toward the set point, β_g sin θ, and toward the previous metamer, γ·kink) is capped at c·Δr/r
+  (`posture_turn`, `r3.rs:55–75`; Bastien's AC model), so a stem straightens only as fast as it lays down reaction
+  wood. A slow-growing stand stem (small Δr/r) keeps its bends; the lone trunk's lower sway per metre (0.026 against the stand's 0.034, seeds 1–5) fits this, untested. And r3.c is
+  a girth knob too: pilot v2's registration froze it because alone it moved the size match from 50 to 80.
+- **A candidate ADR, not a knob.** Neither the set point nor r3.c is added to the knob list (ADR 0029's ten; r3.c is
+  frozen since v2).
+
+### Like for like (`figures/2026-11-05-like-for-like.png`; `code/2026-11-05-like-for-like-render/`)
+![Simulated trees coarsened and drawn as cylinders, beside nine BioDiv QSMs at crownBase80's deciles](figures/2026-11-05-like-for-like.png)
+- **What was drawn:** the hand, v3's and v4's finalists, seed 101, the stand's four measured trees at season 70,
+  coarsened as v5's sim_rule (inflate, prune at 8.6 mm) and exported as cylinder tables; beside them nine BioDiv
+  QSMs, the trees nearest crownBase80's deciles 10–90 (HEW47_G_66, HEW47_GD_120, HEW32_GD_171, AEW39_G_328,
+  HEW19_G_124, HEW29_GD_167, AEW22_G_31, HEW05_GD_36, AEW42_GD_76). All through one path (the QSM path of the earlier
+  sheet), one tree a panel, leaf-off, the stand camera.
+- **Coarsening removes almost nothing from the simulated trees** (2,681 → 2,676 cylinders, the most 4,999 → 4,985):
+  with inflation, the simulator's thinnest shoots are over 8.6 mm (r0 4.7 mm). The real QSMs carry 3k–16k cylinders.
+- **The deciles ignore size:** the nine span DBH 0.13–0.51 m and H 15–34 m, so their heights are not the 0.29 m
+  stand's.
+- **What still differs by eye:**
+  1. **Crown structure.** The simulated crowns are bottle-brushes: many short, fine, similar laterals all along the
+     upper leader, none dominant. The real crowns (deciles 50–90) are a few stout limbs that fork into clumped twig
+     masses: rounder, with gaps, and wider at the top for their height.
+  2. **Lean.** The simulated boles and tops lean and arch to one side (v3's four, v4's trees 5 to 7); the real boles
+     stand vertical, any bend near the top. That is boleSway's reading (sim 0.017–0.153, real 0.010–0.037 in the
+     panels).
+  3. **Stubs.** The real boles carry short dead stubs below the crown (deciles 10–40 especially); the simulated boles
+     are clean (C5 removes shed wood).
+  4. **Similar now:** crown base (two of the real deciles at or above the hand's 0.71–0.75), a clear bole, the crown's
+     narrowness against the stand renders. The earlier impression of wide, dense simulated crowns was mostly the
+     stand view and the leaf-on renderer.
+
+### v6, registered, not launched (`analysis/fit/sources/level1-beech.json`, version 6)
+- `level1_targets.py --version 6 --freeze r3.c --add crownBase80 boleSway`; the registration refused unless v5's 16
+  targets, Demol, the gap strata and their correlation block reproduced exactly (they did), and records the redraw it
+  did not apply.
+- **Fitted (13):** v5's eleven, **crownBase80 (w 0.295)** and **boleSway (w 0.765)**. **Held out:** v5's five.
+- **Clusters:** boleSway on its own; crownBase80 with centroidHeight (0.363 → 0.270); leaderDominance on its own.
+- **Loss:** spread floor 0.65; lateShare's band 0.12; everything else as v5. Fitted weight 5.15 against Level 0's 7.0.
+- **Hashes:** v6 hashes the v3.2 supplement beside v5's files; `level1_targets.py` accepts v3.1's moved describe.py
+  only under the supplement's clean self-check. The registration test now checks v6 (and v5's block from git).
+- **For the user before a launch:** boleSway's simulated spread is 2.7–6.5× real, which the one-sided penalty cannot
+  see and the gate fails; and the hand's loss on v6 is not measured (a noise check, as for v4 and v5, before any fit).
+
 ## Reproduce
 ```
 uv run --project analysis python -I analysis/experiments/crownbase_bit_identity.py snap|compare ...
@@ -218,6 +291,9 @@ uv run --project analysis python -I analysis/experiments/gate_c_v32.py gate
 uv run --project analysis python -I analysis/experiments/crownbase_sim.py ztable|realsway
 uv run --project analysis python -I analysis/experiments/crownbase_weiser.py
 uv run --project analysis python -I analysis/experiments/crownbase_probes.py sinuosity|phototropism|limbloss
+uv run --project analysis python -I docs/experiments/code/2026-11-05-like-for-like-render/export.py runs/like-for-like-render
+NODE_PATH=<scratch>/node_modules node docs/experiments/code/2026-11-05-like-for-like-render/render.mjs runs/like-for-like-render docs/experiments/figures/2026-11-05-like-for-like.png
+uv run --project analysis python -I analysis/experiments/level1_targets.py --species beech --version 6 --freeze r3.c --add crownBase80 boleSway --reason "..."
 node docs/experiments/code/2026-11-05-limb-loss-render/snapshots.ts runs/limb-loss-render 101
 uv run --project analysis python -I docs/experiments/code/2026-11-05-limb-loss-render/qsm_export.py runs/limb-loss-render 3
 NODE_PATH=<scratch>/node_modules node docs/experiments/code/2026-11-05-limb-loss-render/render.mjs runs/limb-loss-render docs/experiments/figures/2026-11-05-limb-loss-probe.png

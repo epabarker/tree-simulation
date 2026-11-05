@@ -1,7 +1,8 @@
-# 0052: A limb-loss rule (self-pruning) under sustained low light or a negative limb carbon balance, judged against crownBase80 (proposed)
+# 0052: A limb-loss rule (self-pruning) under sustained low light or a negative limb carbon balance, judged against crownBase80
 
-- **Status:** proposed (2026-11-05). **Created this session.** ADR 0050 (ruling 2) and ADR 0051 (ruling 4) named it, but
-  no file existed until now. No rule is implemented and nothing is accepted.
+- **Status:** accepted (the user, 2026-11-05) as **"no rule for beech; open for oak's crown radius"** (option A).
+  Created 2026-11-05: ADR 0050 (ruling 2) and ADR 0051 (ruling 4) named it before any file existed. No rule is
+  implemented.
 - **Spec:** §C5 (shedding), §R1 (carbon; k_shed), §O2 (abrasion). ADR 0007 (relative shedding), 0013 (O2 off), 0032
   (T_rel fixed from shade leaves), 0049 (the principle line), 0050, 0051.
 - **Evidence:** [the crown base and bole note](../experiments/2026-11-05-crown-base-and-bole.md) (the descriptor,
@@ -62,3 +63,7 @@ as a memory).**
 - No code, goldens or params change.
 - ADR 0050's option C (the trunk) no longer waits on this ADR for beech.
 - Oak's Level 0 stays failed on CR until an oak-side case is made (ADR 0051).
+
+## The user's ruling (2026-11-05)
+Option A: no limb-loss rule for beech; the ADR stays open for oak's crown radius (ADR 0051), to be judged against oak's
+own measured crown base when an oak case exists. c5.Trel stays beech's measured 0.008 (ADR 0032).

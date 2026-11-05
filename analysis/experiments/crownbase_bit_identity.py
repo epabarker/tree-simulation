@@ -7,6 +7,7 @@ float.hex (NaN as "nan"). `compare A B` asserts equality, value by value.
 
   uv run --project analysis python -I analysis/experiments/crownbase_bit_identity.py snap runs/crown-base/before.json
   uv run --project analysis python -I analysis/experiments/crownbase_bit_identity.py compare A B
+  (--with-new: the four 2026-11-05 descriptors as well, for the boleSway edit)
 """
 
 import json
@@ -24,7 +25,9 @@ from treesim import tolerance as tol  # noqa: E402
 from treesim.describe import describe  # noqa: E402
 
 REG = json.loads((ROOT / "analysis/fit/sources/level1-beech.json").read_text())
-NAMES = sorted(REG["descriptors"])
+# The 16 registered, and (from the boleSway edit on) the four added on 2026-11-05.
+NAMES = sorted(REG["descriptors"]) + (["crownBase80", "crownBase70", "crownBase90", "trunkTortuosity05"]
+                                      if "--with-new" in sys.argv else [])
 D_MIN = REG["d_min_m"]
 DUMPS = ROOT / "runs/gate-c/trees"
 

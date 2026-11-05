@@ -308,6 +308,29 @@ no z was computed, and nothing registered changed after it.
 ### State
 _(rewritten at the end of each session)_
 
+**After the user's rulings (2026-11-05, same session; [note](../experiments/2026-11-05-crown-base-and-bole.md#after-the-users-rulings-2026-11-05-same-day)).**
+- **ADR 0052 accepted:** no limb-loss rule for beech; open for oak's crown radius.
+- **boleSway** (the bole's largest offset from its chord below crownBase80, per metre) is in describe() and passes the
+  amended v3.2 supplement at **tier A** (floor 0.35). Bit-identity on the 16 and the four: 9,300 values.
+  - z on 101–110: hand +0.72, v3 +1.52, v4 +2.10.
+  - **Its spread is 2.7–6.5× real** (too wide; the gate fails from above).
+- **Mechanism, recorded:** Troll's model (the arching leader, then straightening). The remedy is probably R3's
+  straightening, capped at c·Δr/r (`r3.rs:55–75`) and so coupled to girth through r3.c. A candidate ADR, not a knob.
+- **Like-for-like sheet** ([figure](../experiments/figures/2026-11-05-like-for-like.png)). Crown base and clear bole
+  now look alike. Still different:
+  - bottle-brush crowns against forked limbs with clumped twigs;
+  - lean;
+  - the real boles' stubs.
+- **v6 registered, not launched:** crownBase80 and boleSway fitted, v5's hold-outs kept, floor 0.65, lateShare 0.12.
+  - Before a launch: the hand's noise check on v6.
+  - boleSway's wide spread, which the one-sided penalty cannot see.
+- **Next:**
+  - the user's call on launching v6;
+  - an R3 straightening ADR;
+  - ADR 0053;
+  - a crown-structure descriptor (limb dominance in the crown).
+
+
 **Crown base and bole (2026-11-05, [note](../experiments/2026-11-05-crown-base-and-bole.md)); provisional, nothing
 accepted, no core change.** The user's brief after the render: two descriptors, gate c, the trunk's sinuosity, ADR
 0052's probe, a proposed v6.

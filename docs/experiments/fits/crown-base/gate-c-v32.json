@@ -67,5 +67,25 @@
   "tier": "\u2013",
   "verdict": "held out (noise)",
   "reason": "held out (noise)"
+ },
+ {
+  "descriptor": "boleSway",
+  "tolerance": 0.004084933050528168,
+  "noise_ratio": 0.3450267219302724,
+  "floor": "clear",
+  "tier": "A",
+  "verdict": "tier A",
+  "worst_point": "dmin",
+  "worst_seeds": 19,
+  "shift": -9.533461970578916e-06,
+  "median_abs_shift": 0.00012870268461211143,
+  "reason": "A: within tolerance on >= 15 of 20 seeds at every point (fewest 19 at dmin)",
+  "control_share_at_dmin": 0.9615384615384616,
+  "control_neutral": true,
+  "A:dmin": 19,
+  "A:upper": 19,
+  "A:inflated": 20,
+  "B:upper": 19,
+  "B:inflated": 19
  }
 ]

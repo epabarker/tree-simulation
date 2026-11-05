@@ -37,7 +37,7 @@ REG = json.loads((ROOT / "analysis/fit/sources/level1-beech.json").read_text())
 D_MIN = REG["d_min_m"]
 AT = REG["size_match"]["dbh"]
 SEASONS = [50, 60, 70, 80, 90, 100]
-NEW = ["crownBase80", "crownBase70", "crownBase90", "trunkTortuosity05"]
+NEW = ["crownBase80", "crownBase70", "crownBase90", "trunkTortuosity05", "boleSway"]
 NAMES = NEW + sorted(REG["descriptors"])
 FITS = ROOT / "docs/experiments/fits"
 

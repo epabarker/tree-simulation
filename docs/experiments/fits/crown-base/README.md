@@ -7,3 +7,4 @@ Copied from `runs/crown-base/` for [the note](../../2026-11-05-crown-base-and-bo
 - `ztable.json`: BioDiv's distributions and the shipped, hand, v3 and v4 sets' z on 101–110 (`crownbase_sim.py ztable`).
 - `sinuosity.json`, `phototropism.json`, `limbloss.json`: the probes, seeds 1–5 (`crownbase_probes.py`).
 - `weiser.json`: summary statistics only (CC-BY-SA; no per-tree table), `crownbase_weiser.py`.
+- The like-for-like sheet's tables are `runs/like-for-like-render/` (not committed); its figure is `figures/2026-11-05-like-for-like.png`.

@@ -155,17 +155,18 @@ def test_level0_reported_leave_the_loss_v4():
     assert set(rep) == {"stand.lateShare", "stand.height100"} and rep["stand.lateShare"] > 0
 
 
-def test_level0_band_v5():
-    """v5: lateShare scored at band 0.10 in the Level 1 loss only; height at 100 stays reported."""
+def test_level0_band_v5_v6():
+    """v5: lateShare scored at band 0.10 in the Level 1 loss only (v6: 0.12); height at 100 stays reported."""
     from treesim.fit import load_spec
 
     reg = l1.load("beech", check=False)
+    band = {5: 0.10, 6: 0.12}[reg["version"]]
     spec = f1.level1_spec("beech", reg)
     by = {t["name"]: t for t in spec.traits}
-    assert by["stand.lateShare"]["band"] == 0.10 and "stand.height100" not in by
+    assert by["stand.lateShare"]["band"] == band and "stand.height100" not in by
     assert {t["name"]: t for t in load_spec("beech", level=0).traits}["stand.lateShare"]["band"] == 0.06
     lo, c = f1.total(spec, reg, {"stand.lateShare": 1.23})
-    assert math.isclose(c["stand.lateShare"], ((1.23 - 1.43) / 0.10) ** 2)
+    assert math.isclose(c["stand.lateShare"], ((1.23 - 1.43) / band) ** 2)
     assert set(f1.reported_contributions(spec, reg, {"stand.height100": 1.0})) == {"stand.height100"}
 
 
@@ -275,34 +276,49 @@ def test_describe_pool_equals_gate_c():
     assert all(u <= allowed for *_, u in diffs), f"beyond {allowed} ulp on {sys.platform}: {report}"
 
 
-def test_registration_v5_loads_reproduces_its_draw_and_starts_at_the_hand():
+def test_registration_v6_loads_keeps_v5s_hold_outs_and_starts_at_the_hand():
     """The committed registration passes its own hash check (it refuses once a hashed file changes: re-register, never
-    edit), freezes r3.c at the species' value (v2), and its stored real matrix gives back its clusters, its draw and
-    its weights by level1's rules (v3); v4 keeps v3's hold-outs, weights and seeds and adds the spread penalty and the
-    reported Level 0 traits; v5 scores lateShare again at band 0.10; its start decodes to the hand."""
+    edit) and freezes r3.c at the species' value (v2). v6 (2026-11-05) adds crownBase80 and boleSway (gate c v3.2) to
+    the fitted set and keeps v5's hold-outs (no redraw): its stored real matrix gives back its clusters and its weights
+    by level1's rules, its 16-descriptor block equals v5's matrix, and the draw over the larger set is recorded, not
+    applied. The spread floor is 0.65, lateShare's band 0.12; its start decodes to the hand."""
     from treesim import fit
 
     reg = l1.load("beech")
-    assert reg["version"] == 5 and reg["prior"]["version"] == 4 and reg["prior"]["prior"]["version"] == 3
-    assert reg["prior"]["prior"]["prior"]["held_out"] == ["length0", "p1", "pendulousFraction05", "tortuosity05",
-                                                         "widestAt"]
-    assert reg["held_out"] == reg["prior"]["held_out"] and reg["location_weights"] == reg["prior"]["location_weights"]
-    assert reg["loss"]["seeds_per_candidate"] == reg["prior"]["loss"]["seeds_per_candidate"] == 10
-    assert reg["loss"]["spread_in_loss"] is True and reg["loss"]["spread_floor"] == l1.SPREAD_FLOOR
+    v5 = reg["prior"]
+    assert reg["version"] == 6 and v5["version"] == 5 and v5["prior"]["version"] == 4
+    assert reg["held_out"] == v5["held_out"] == ["length0", "limbElevation05", "limbUpturn", "p3", "widestAt"]
+    assert reg["added"]["descriptors"] == ["crownBase80", "boleSway"]
+    assert reg["added"]["tiers"] == {"crownBase80": "A", "boleSway": "A"}
+    assert reg["loss"]["seeds_per_candidate"] == v5["loss"]["seeds_per_candidate"] == 10
+    assert reg["loss"]["spread_in_loss"] is True and reg["loss"]["spread_floor"] == 0.65
+    assert v5["loss"]["spread_floor"] == l1.SPREAD_FLOOR == 0.5
     assert reg["loss"]["level0_reported"] == ["stand.height100"]
-    assert reg["loss"]["level0_band"] == {"stand.lateShare": 0.10}
-    assert reg["prior"]["loss"]["level0_reported"] == ["stand.lateShare", "stand.height100"]
+    assert reg["loss"]["level0_band"] == {"stand.lateShare": 0.12}
     paths = [p["path"] for p in reg["knobs"]]
     assert "r3.c" not in paths and len(paths) == 10
     assert reg["fixed"]["r3.c"] == reg["frozen_form"]["r3.c"] == 0.04879
     names = reg["correlation"]["names"]
     r = np.array(reg["correlation"]["r"])
-    assert names == sorted(reg["descriptors"])
+    assert names == sorted(reg["descriptors"]) and len(names) == 18
+    # v5's own 16-descriptor matrix (its committed file, b4fdbff) is the block of v6's (the registration refused
+    # otherwise; checked again here from git).
+    import subprocess
+
+    from treesim.sweep import REPO
+
+    v5_file = json.loads(subprocess.run(["git", "show", "b4fdbff:analysis/fit/sources/level1-beech.json"], cwd=REPO,
+                                        check=True, capture_output=True, text=True).stdout)
+    old = v5_file["correlation"]["names"]
+    ix = [names.index(k) for k in old]
+    assert r[np.ix_(ix, ix)].tolist() == v5_file["correlation"]["r"]
+    assert {k: reg["real"][k] for k in old} == v5_file["real"]
     cl = l1.clusters(r, names)
     assert cl == reg["clusters"]["list"]
-    held, order, taken = l1.cluster_held_out(cl)
-    assert held == reg["held_out"] and [cl[i] for i in order] == reg["clusters"]["draw_order"]
-    assert len(held) >= round(len(names) / 3) and sorted(reg["fitted"] + held) == names
+    held, order, _ = l1.cluster_held_out(cl)
+    assert held == reg["added"]["redraw_would_hold_out"] and [cl[i] for i in order] == reg["clusters"]["draw_order"]
+    assert sorted(reg["fitted"] + reg["held_out"]) == names
+    assert "crownBase80" in reg["fitted"] and "boleSway" in reg["fitted"]
     w = l1.location_weights(r, names, reg["weights"]["r_crit"])
     assert w == reg["location_weights"]
     assert reg["seeds"]["search"]["list"] == l1.search_seeds()

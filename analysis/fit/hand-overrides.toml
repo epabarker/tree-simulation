@@ -123,6 +123,12 @@ assign = { "c1.shootLengthSD" = 0.5, "c4.axisSD" = 50, "c1.betaSD" = 60, "c1.bud
 "r2.levels.2.pendulous" = 140
 "r2.levels.2.pendulousRadius" = 0.01
 "r2.levels.2.lateralEvery" = 3
+# The garden's birch poles (2026-11-06, docs/experiments/2026-11-06-birch-poles.md): at the fit's
+# trunk lambda 0.588 birch spends its growth on the leader, and its garden recruits grew as bare
+# 25-30 m poles (H/D 150-320, about 400 buds; the girth rule is right per leaf). 0.53 gives the
+# trunk's laterals their share: recruits' H/D about 95 and lone height about 34 m at 150 (Tallo's
+# band 33-42 m), where the fit's was 38-49 m.
+"r2.levels.0.lambda" = 0.53
 
 [oak]
 # Track B's accepted form (the user, 2026-11-01; picks.toml): posture by age (ADR 0038), limbs steep

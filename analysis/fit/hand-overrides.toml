@@ -47,6 +47,21 @@ assign = { "c1.shootLengthSD" = 0.5, "c4.axisSD" = 50, "c1.betaSD" = 60, "c1.bud
 # pick, with the reservations "a touch dense, the top leans; the stand's stems still snake, accept".
 "r2.levels.1.lambda" = 0.53
 "r2.kappa" = 1.0
+# Natural mature heights (overnight 2026-11-06, agent Y2; G-forest passed on the garden with thin
+# margins): R1's reproductive sink (fRep 0.8, from the species' maturity), so that height
+# levels off instead of climbing past the species' Level 0 band. Rowan 21.6 m.
+"r1.fRep" = 0.8
+"r1.maturity" = 85
+
+[hornbeam]
+# Natural mature heights (overnight 2026-11-06, agent Y2; G-forest passed on the garden with thin
+# margins): R1's reproductive sink (fRep 0.8, from the species' maturity), so that height
+# levels off instead of climbing past the species' Level 0 band.
+# Hornbeam levels at 29.1 m from season 100 (shipped: 37 m at 100, 49 m at 150), with dLambda
+# 0.0725 for its crown (0.62x metamers, W/H 0.65, D 0.34). Fragile: the crown flips within +-0.01.
+"r1.fRep" = 0.8
+"r1.maturity" = 115
+"r2.dLambda" = 0.0725
 
 [pine]
 # The fit lowered Q_ss to 0.096: pine survived 12.7%, as tolerant as birch (band 20–30%).
@@ -127,6 +142,11 @@ assign = { "c1.shootLengthSD" = 0.5, "c4.axisSD" = 50, "c1.betaSD" = 60, "c1.bud
 "c4.axisSD" = 35
 "c1.betaSD" = 40
 "c1.budBreak" = { mode = "stochastic", width = 1.0 }
+# Natural mature heights (overnight 2026-11-06, agent Y2; G-forest passed on the garden with thin
+# margins): R1's reproductive sink (fRep 0.8, from the species' maturity), so that height
+# levels off instead of climbing past the species' Level 0 band. Oak 33.2 m.
+"r1.fRep" = 0.8
+"r1.maturity" = 130
 
 [maple]
 # Track B's accepted form (the user, 2026-11-01; picks.toml): the relay from age 10 (ADR 0033), its

@@ -4,8 +4,18 @@ _Unattended, 00:05–07:30, orchestrated by the overseer.
 - **Plans:** [overseer](../plans/2026-11-05-overseer.md), [overnight](../plans/2026-11-06-overnight.md); the
   overnight plan's State block holds every number below.
 - **ADR:** [0055](../decisions/0055-within-tree-irregularity.md).
-- **Figures:** [hornbeam, before and after](figures/2026-11-06-hornbeam-irregularity.jpg); [the garden, 0.16.0 against the RC](figures/2026-11-06-garden-rc-sheet.jpg) (seeds 12, 9, 10, 2, 3, 6; laptop and phone; seasons 40, 80, 150).
+- **Figures:** [lone trees, 0.16.0 against the RC](figures/2026-11-06-lone-016-vs-rc.jpg); [hornbeam R0 against the milder setting 1, which was not adopted](figures/2026-11-06-hornbeam-irregularity.jpg); [the garden, 0.16.0 against the RC](figures/2026-11-06-garden-rc-sheet.jpg) (seeds 12, 9, 10, 2, 3, 6; laptop and phone; seasons 40, 80, 150).
 - **The release candidate:** branch `claude/overnight-rc`, [draft PR #49](https://github.com/epabarker/tree-simulation/pull/49) into `3d-port`, stacked on #48; preview at https://preview-3d-edbarker-dev.edbarker.workers.dev/._
+
+**The overseer's look at the lone sheet:**
+- **Clearly better:** hornbeam (a compact, rounded, irregular crown, 29 m flat) and rowan (21 m, rounded).
+- **Slightly better:** beech is fuller but still a flat "table" crown at 39 m.
+- **Unchanged and wrong:** oak is a spire-like leader over sprawling low limbs, more conifer than oak, and birch
+  is a pale column at 45–49 m.
+- **Lone heights at 150:** hornbeam 28.9, beech 39–40, oak 33–35, birch 45–49 and rowan 21.5 m. Beech and birch
+  have no height fix.
+- **Memory at the final commit, with the specimen:** at most 211 MB on the 170-cell plate and 117 MB on the
+  80-cell phone plate (seeds 9, 10, 12). Both pass.
 
 **The overseer's look at the garden sheet:** at season 150 the RC's trees are irregular, with rounded crowns, and read more like a mixed wood (seed 2 most clearly). Some flat-topped crowns remain (seed 9). On the phone, seed 3 is nearly empty by season 150 in both builds.
 

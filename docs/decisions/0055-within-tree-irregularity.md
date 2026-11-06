@@ -6,7 +6,8 @@
 - **Evidence:**
   - [the overseer's plan and log](../plans/2026-11-05-overseer.md);
   - [the overnight plan](../plans/2026-11-06-overnight.md), whose State block holds every gate's numbers;
-  - [the figure](../experiments/figures/2026-11-06-hornbeam-irregularity.jpg).
+  - [lone trees, 0.16.0 against the RC](../experiments/figures/2026-11-06-lone-016-vs-rc.jpg): hornbeam, beech, oak, birch, rowan at 40, 100 and 150, leaf on and off;
+  - [hornbeam R0 against the milder setting 1](../experiments/figures/2026-11-06-hornbeam-irregularity.jpg), the regularity effect alone. **Setting 1 is not the adopted base.**
 
 ## Context
 - **What the judge saw.** A blinded "which tree is real?" judge was calibrated: real against real 45%, gallery
@@ -47,7 +48,10 @@ These are within-tree draws. They are not ADR 0053's per-tree draw, which stays 
 ## Consequences
 - **Regularity (G-reg), hornbeam, seeds 101–108 and held-out 109–116:** the summed |z| falls 23 → about 5, and
   all four descriptors sit in the real bands, lone and stand.
-- **Look:** asymmetric crowns, varied limbs, gaps; the figure shows R0 against the base.
+- **Look** (the lone sheet, the overseer's reading):
+  - **Clearly better:** hornbeam, a compact, rounded, irregular crown at 29 m (it was a flat-topped cone at 38–50 m), and rowan.
+  - **Slightly better:** beech is fuller but still a flat "table" crown at 39 m.
+  - **Still wrong:** oak is a spire-like leader over sprawling low limbs in both builds, and birch is a pale column at 45–49 m in both.
 - **The garden's evidence** (`forestParams(160)`, 20 seeds, 300 seasons, against the base at d2c4f53):
 
   | check | adopted | base |

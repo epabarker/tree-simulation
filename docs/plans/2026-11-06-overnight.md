@@ -5,7 +5,8 @@ really close. Be ambitious." The overseer (this session) orchestrates the agents
 Nothing needs the user before morning._
 
 ## State (rewritten after every agent report; read this first after any compaction)
-- **Phase:** 0/1 (started 00:15).
+- **Phase:** done (05:00). The morning report is published; the RC is pushed as draft PR #49; the preview is redeployed.
+- (started 00:15)
 - **The user's approvals (00:12):**
   - push work branches plus one **draft** PR into `3d-port`;
   - **redeploy preview-3d with the RC**;
@@ -170,7 +171,26 @@ Nothing needs the user before morning._
     - **The composition shifts strongly:** hornbeam 0.43 → 0.20, beech 0.25 → 0.37, maple 0.16 → 0.21, oak
       0.01 → 0.06.
     - **Adopted as a separate commit (stage 2b)**, so it can be reverted alone.
-- **RC stages 2 and 3 (03:55):** species overrides, goldens, a quiet check, review, garden sheets, bench, push and
+- **RC done (04:35): draft PR #49** (`claude/overnight-rc`, stacked on #48).
+  - **Commits:** 8b6f0b2 (species), ce7ebb3 (a review fix: the off test now reaches the species), 7b105ae
+    (heights, separate), and e7116bf (the overseer's docs).
+  - **Check:** green, 99/99.
+  - **Review:** Fable had no credits, so an Opus stand-in ran it.
+  - **Goldens:** mixedWood s15 c95b46b9 → 3ee70704 → 93042bbc; oakOpen 29e5921a; beechOpen ef0a754d;
+    beechWood 6b8af072.
+  - **Preview:** preview-3d now runs the RC (main merged in, no force).
+  - **Bench:** RC phone seed 12 at 1.31× the base (over the frozen 1.3×), now being re-measured.
+  - **Base 0.16.0 at 200 cells:** 242 MB for the plate alone (seed 12). #48's body now says "don't tag alone".
+- **The advisor's pre-report checks (04:45):**
+  1. **PASSED (05:00).** The RC build at e7116bf with no patch gives **identical** simulation results to the gated `ev-height` run: every per-seed value matches; only timing, labels and NaNs differ. PR #49 ships what was gated.
+  2. **PASSED.** Memory with the specimen at the final commit is 197–211 MB on the 170-cell plate and 113–117 MB on the 80-cell phone plate (seeds 9, 10, 12; one fresh process per run).
+  3. **PASSED.** Phone time, re-measured (fresh processes), is 1.09–1.14× the base. The 1.31× was load noise. It is a laptop measurement, not the phone.
+  4. **DONE.** The lone sheet from the RC build (`figures/2026-11-06-lone-016-vs-rc.jpg`), in the overseer's reading:
+     - **Clearly better:** hornbeam (a compact, rounded, irregular crown, 29 m flat) and rowan.
+     - **Slightly better:** beech (fuller, but a flat "table" crown at 39 m).
+     - **Unchanged and wrong:** oak (a spire-like leader over low limbs) and birch (a pale column at 45–49 m).
+- **The morning report** (05:00): https://claude.ai/artifact/GL222vHH83bMQe3kzNb5LK
+- **RC stages 2 and 3 (03:55, done):** species overrides, goldens, a quiet check, review, garden sheets, bench, push and
   draft PR, the preview-3d redeploy. Hard stop 07:30.
 - (Earlier: G-forest on the species patches: the first run failed at 03:20 when /tmp (a 16 GB tmpfs) filled. The bulky intermediates of finished agents were deleted (to 43%), and the run restarted at 03:25 → `i0/ev-species`. **Rule from now on:** delete raw run outputs after extraction; Y2 was told.)
 - **S (02:15, done):** beech, oak and birch departures on the r-best0 base plus Y's oak height, using the i0/wt build (read-only), hard stop 05:15 → `s/results.md`.
@@ -363,6 +383,9 @@ blocked item 2.
   and keep Phase 4.
 
 ## Log
+- 05:00: checks 2–4 done. The lone sheet replaces the setting-1 figure. The morning report is published.
+- 05:00: check 1 passed (the RC equals the gated run).
+- 04:45: RC done (PR #49, preview). The advisor's four checks are running. PR #48 warned.
 - 04:09: height patches passed G-forest at the margin; adopted as a separate commit (RC stage 2b); RC resumes stage 3.
 - 03:57: Y2 done (the reproductive sink keeps the crown); G-forest on height patches started; RC check held.
 - 03:55: species G-forest passed; RC stages 2 and 3 started.

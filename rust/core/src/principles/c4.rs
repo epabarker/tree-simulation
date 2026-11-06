@@ -3,11 +3,21 @@
 //! heading, A_set from vertical; u is d_prev turned by N(0, σ²) about an axis perpendicular to it,
 //! at an azimuth drawn round it [RNG: directionNoise, keyed by the new metamer and season].
 //!
-//! Params: c4.wd, c4.xi (ξ), c4.eta (η), c4.setPoint (A_set), c4.epsilon (ε), c4.sigma (σ).
+//! Per-axis set-point offset (prototype, agent A9; ADR 0053's option (b)): with `c4.axisSD` (s_ax)
+//! above 0, every axis but the trunk's own draws one offset N(0, s_ax²), degrees, when it starts
+//! [RNG: axisOffset, keyed by the axis, i.e. its first metamer's birthId], added to its set point
+//! wherever the form offsets are (C4's tropism here and R3's posture), so it persists as the axis
+//! grows and thickens. Why: u is white and mean-reverting, and R3's posture restores every axis
+//! to its level's A_set, so limbs come out alike and straight; a persistent per-axis draw lets
+//! limbs differ and keep their course. Off (absent or 0): no draw.
+//!
+//! Params: c4.wd, c4.xi (ξ), c4.eta (η), c4.setPoint (A_set), c4.epsilon (ε), c4.sigma (σ),
+//! c4.axisSD (s_ax).
 
 use crate::geom::{V3, any_perpendicular, cross, normalize_or, reject, rotate};
 use crate::math;
 use crate::params::{C4, DEG};
+use crate::rng::{normal, purpose};
 
 /// The horizontal unit heading of `d`, or of `l` when `d` is vertical, or +x.
 pub fn horizontal_heading(d: V3, l: V3) -> V3 {
@@ -53,6 +63,16 @@ pub fn shoot_direction(prev: V3, l: V3, v: V3, angle: f64, azimuth: f64, c4: &C4
     normalize_or(d, prev)
 }
 
+/// The offset, degrees, of axis `axis` (its first metamer's birthId) to its set point: s_ax·N(0, 1)
+/// [RNG: axisOffset, keyed by the axis only, so it holds for the axis's life]; 0 on the trunk's
+/// own axis and when s_ax = 0 (no draw).
+pub fn axis_offset(trunk: bool, seed: f64, tree_id: f64, axis: f64, sd: f64) -> f64 {
+    if trunk || sd <= 0.0 {
+        return 0.0;
+    }
+    sd * normal(seed, purpose::AXIS_OFFSET, tree_id, axis, 0.0, 0.0)
+}
+
 /// Elevation of a direction above the horizontal, radians.
 pub fn elevation(d: V3) -> f64 {
     math::asin(math::max(-1.0, math::min(1.0, d[1])))
@@ -71,6 +91,7 @@ mod tests {
         set_point: 0.0,
         epsilon: 0.5,
         sigma: 20.0,
+        axis_sd: 0.0,
     };
     const X: V3 = [1.0, 0.0, 0.0];
     const Z: V3 = [0.0, 0.0, 1.0];
@@ -140,5 +161,29 @@ mod tests {
         let a = shoot_direction(UP, X, [0.0; 3], 0.2, 0.0, &noisy);
         let b = shoot_direction(UP, X, [0.0; 3], 0.2, 1.5, &noisy);
         assert!(dot(a, b) < 0.999);
+    }
+
+    #[test]
+    fn an_axis_offset_is_drawn_once_per_axis_and_spares_the_trunk() {
+        assert_eq!(axis_offset(false, 1.0, 0.0, 12.0, 0.0), 0.0);
+        assert_eq!(axis_offset(true, 1.0, 0.0, 12.0, 12.0), 0.0);
+        // The same axis gets the same offset whenever it is asked (it persists as the axis grows).
+        let a = axis_offset(false, 1.0, 0.0, 12.0, 12.0);
+        assert_eq!(a, axis_offset(false, 1.0, 0.0, 12.0, 12.0));
+        assert_ne!(a, axis_offset(false, 1.0, 0.0, 13.0, 12.0));
+        // N(0, s_ax²) over many axes.
+        let n = 20_000;
+        let (mut s1, mut s2) = (0.0, 0.0);
+        for k in 0..n {
+            let x = axis_offset(false, 3.0, 1.0, k as f64, 12.0);
+            s1 += x;
+            s2 += x * x;
+        }
+        let (mean, sd) = (
+            s1 / n as f64,
+            (s2 / n as f64 - (s1 / n as f64).powi(2)).sqrt(),
+        );
+        assert!(mean.abs() < 0.3, "mean {mean}");
+        assert!((sd - 12.0).abs() < 0.3, "sd {sd}");
     }
 }

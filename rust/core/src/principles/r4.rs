@@ -4,12 +4,23 @@
 //! seasons a bud has rested dormant: a leafy short shoot (R6) does not age. A released bud
 //! reiterates: its shoot takes a younger physiological age.
 //!
+//! Stochastic break (prototype, agent A9; §R4.4's "optional stochastic break [RNG]", §6's
+//! BUD_FATE [RNG]): with `c1.budBreak` stochastic, a lateral bud whose v reaches its threshold θ
+//! grows only with probability p = 1/(1 + exp(−(v − θ)/w)) [RNG: budBreak, keyed by the bud's
+//! birthId and the season]; one that is refused rests as any bud below θ does (R6's short shoot
+//! or R4's bank), so it can break in a later season. Why: a deterministic test forms a lateral at
+//! every lit node, the herringbone the blinded judge names; a bud fate drawn with a probability
+//! rising in its signal is how bud-fate models (Costes & Guédon's Markov models of lateral fate)
+//! leave nodes empty. Main-slot buds are exempt: a refused apex would go dormant and need v_break
+//! (hysteresis), so the leader would stop for good. Off (absent or 'deterministic'): no draw.
+//!
 //! Params: r4.enabled, r4.vBreak, r4.qRel, r4.vCont, r4.delta (δ), r4.lDorm, r4.juvenile,
-//! r4.bank; r5.dB (δ_b).
+//! r4.bank; r5.dB (δ_b); c1.budBreak (mode, width w).
 
 use crate::math;
 use crate::params::{Params, R4};
-use crate::tree::bud;
+use crate::rng::{purpose, uniform};
+use crate::tree::{bud, slot};
 
 /// The resource a live bud needs to grow this season (1 without R4).
 pub fn growth_threshold(state: u8, age: f64, shade: f64, params: &Params) -> f64 {
@@ -26,6 +37,44 @@ pub fn growth_threshold(state: u8, age: f64, shade: f64, params: &Params) -> f64
         1.0
     };
     r4.v_break * (1.0 + r4.delta * age) * suppressed
+}
+
+/// The probability a bud with resource `v` at threshold `threshold` breaks: a logistic of width
+/// `width` through the threshold (1/2 at θ), 1 for a width ≤ 0.
+pub fn break_probability(v: f64, threshold: f64, width: f64) -> f64 {
+    if width <= 0.0 {
+        return 1.0;
+    }
+    1.0 / (1.0 + math::exp(-(v - threshold) / width))
+}
+
+/// Whether a bud in `slot_` (birth id `bud_id`) that passed its threshold breaks this season:
+/// always, unless `c1.budBreak` is stochastic and the bud is a lateral; then with
+/// `break_probability` [RNG: budBreak, keyed by the bud and season].
+pub fn breaks(
+    v: f64,
+    threshold: f64,
+    slot_: u8,
+    tree_id: f64,
+    bud_id: f64,
+    season: f64,
+    params: &Params,
+) -> bool {
+    let Some(width) = params.c1.bud_break_width else {
+        return true;
+    };
+    if slot_ == slot::MAIN {
+        return true;
+    }
+    let u = uniform(
+        params.seed,
+        purpose::BUD_BREAK,
+        tree_id,
+        bud_id,
+        season,
+        0.0,
+    );
+    u < break_probability(v, threshold, width)
 }
 
 /// The light trigger: Q ≥ Q_rel·(1 + δ·age).
@@ -94,6 +143,35 @@ mod tests {
             growth_threshold(bud::DORMANT, 5.0, 0.5, &shaded),
             6.0
         ));
+    }
+
+    #[test]
+    fn a_stochastic_break_rises_through_the_threshold_and_spares_the_apex() {
+        assert!(close(break_probability(1.0, 1.0, 0.25), 0.5));
+        assert!(break_probability(1.5, 1.0, 0.25) > 0.85);
+        assert!(break_probability(1.1, 1.0, 0.25) < break_probability(1.3, 1.0, 0.25));
+        assert_eq!(break_probability(1.0, 1.0, 0.0), 1.0);
+        let off = params("{}");
+        let on = params(r#"{"c1":{"budBreak":{"mode":"stochastic","width":0.25}}}"#);
+        let (mut at_threshold, mut well_above) = (0.0f64, 0.0f64);
+        for id in 0..4000 {
+            let id = id as f64;
+            assert!(breaks(1.0, 1.0, slot::LATERAL, 0.0, id, 3.0, &off));
+            assert!(breaks(1.0, 1.0, slot::MAIN, 0.0, id, 3.0, &on));
+            if breaks(1.0, 1.0, slot::LATERAL, 0.0, id, 3.0, &on) {
+                at_threshold += 1.0;
+            }
+            if breaks(2.0, 1.0, slot::LATERAL, 0.0, id, 3.0, &on) {
+                well_above += 1.0;
+            }
+        }
+        assert!((at_threshold / 4000.0 - 0.5).abs() < 0.03);
+        assert!(well_above / 4000.0 > 0.96);
+        // Keyed by the bud and the season: the same bud draws afresh next season.
+        let draws: Vec<bool> = (0..64)
+            .map(|s| breaks(1.0, 1.0, slot::LATERAL, 0.0, 7.0, s as f64, &on))
+            .collect();
+        assert!(draws.iter().any(|&b| b) && draws.iter().any(|&b| !b));
     }
 
     #[test]

@@ -21,6 +21,15 @@ pub mod purpose {
     pub const SEED_RAIN: u32 = 13;
     /// A seedling's reference azimuth about its heading (ADR 0054), keyed by the tree's id.
     pub const SEEDLING_AZIMUTH: u32 = 14;
+    /// A shoot's length multiplier (c1.shootLengthSD), keyed by the bud and season. Prototype
+    /// (agent A9): provisional until its ADR, since another branch may claim 15 first.
+    pub const SHOOT_LENGTH: u32 = 15;
+    /// An axis's offset to its set point (c4.axisSD), keyed by the axis's first birthId.
+    /// Prototype (agent A9): provisional, as SHOOT_LENGTH.
+    pub const AXIS_OFFSET: u32 = 16;
+    /// An axis's offset to its branch angle β (c1.betaSD), keyed by the axis's first birthId.
+    /// Prototype (agent R): provisional, as SHOOT_LENGTH.
+    pub const BRANCH_ANGLE: u32 = 17;
 }
 
 const TWO_POW_32: f64 = 4294967296.0;

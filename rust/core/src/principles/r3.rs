@@ -12,7 +12,7 @@
 //! r2.lightLo, r2.lightHi, r2.lightOver), c4.setPoint, r6 leaf areas.
 
 use super::c3::is_live_bud;
-use super::c4::{horizontal_heading, set_point_direction};
+use super::c4::{axis_offset, horizontal_heading, set_point_direction};
 use super::c5::remove_branches;
 use super::r2::{
     aged_offset, arm_set_point, curve_offset, hangs, light_set_point, pa_level, pendulous_set_point,
@@ -224,8 +224,17 @@ pub fn update_mechanics(tree: &mut Tree, params: &Params, storm: bool, season: f
             let pa = tree.m.order[i] as f64 - tree.m.pa_shift[i] as f64;
             let trunk = tree.m.axis[i] == tree.m.axis[0];
             let wood_age = season - tree.m.birth_season[i] as f64;
+            // C4's per-axis offset (c4.axisSD), so posture holds the axis to its own set point.
+            let own = axis_offset(
+                trunk,
+                params.seed,
+                tree.id as f64,
+                tree.m.axis[i] as f64,
+                params.c4.axis_sd,
+            );
             let bend = (curve_offset(trunk, pa, tree.m.axis_node[i] as f64, params)
-                + aged_offset(trunk, pa, wood_age, tree.age, params))
+                + aged_offset(trunk, pa, wood_age, tree.age, params)
+                + own)
                 * DEG;
             // The vigour fork's arms hold their birth angle, not the trunk's vertical.
             let base = match arm_set_point(tree, trunk, pa, i, params) {

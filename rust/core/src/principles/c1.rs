@@ -9,15 +9,37 @@
 //! metamer to metamer by parallel transport, so phyllotaxis follows the axis as it bends. A
 //! seedling's L is turned about its heading by a per-tree azimuth [RNG: seedlingAzimuth] (ADR 0054).
 //!
+//! Variable shoot length (prototype, agent A9): with `c1.shootLengthSD` s > 0, each shoot's
+//! internode length is multiplied by exp(s·z − s²/2), z ~ N(0, 1) [RNG: shootLength, keyed by the
+//! bud's birthId and the season], a lognormal of mean 1, so the mean extension is kept. Why: ADR
+//! 0004's l = v'/n·l0 lies in [1, 2)·l0 by construction (CV ≈ 0.19 in lone hornbeam), where real
+//! annual shoots vary many-fold with vigour and weather; the uniform line texture is a cue the
+//! blinded judge names. Off (absent or 0): no draw.
+//!
+//! Per-axis branch angle (prototype, agent R; §C1.6's "branch angle β per order"; within-tree
+//! variation, not ADR 0053's between-tree draw): with `c1.betaSD` s_β > 0, a lateral bud that
+//! breaks into a new axis has
+//! its heading turned in the plane of its host's heading by s_β·N(0, 1) degrees [RNG:
+//! branchAngle, keyed by the axis, i.e. the birthId its first metamer takes], so its angle to the
+//! host becomes β + offset (held in [0, 180°]: it never crosses the host's heading). One draw per
+//! axis, at its start, as `c4.axisSD`'s. Why: β is fixed per level, so every limb leaves the trunk
+//! at one angle (within-tree SD of first-order insertion ≈ 6° in today's lone hornbeam, 13° with
+//! A9's three rules, against 31.5° in real lone hornbeam). Relays and fork arms, which start new
+//! axes from lateral buds, take the offset too. C4's noise is white and R3's posture restores the set point, so nothing else makes
+//! one limb leave steeper than its neighbour. Off (absent or 0): no draw, β as before.
+//!
 //! Params: c1.phyllotaxis, c1.divergence (δ), c1.branchAngle (β), c1.internodeLength (l0),
-//! c1.maxMetamersPerShoot, c6.r0; with R2 the levels' generator, whorl, β and p_term.
+//! c1.maxMetamersPerShoot, c1.shootLengthSD (s), c1.betaSD (s_β), c6.r0; with R2 the levels'
+//! generator, whorl, β and p_term.
 
 use super::obstacles::inside_obstacle;
 use super::r2::{branch_angle_of, laterals, terminates};
-use crate::geom::{V3, any_perpendicular, normalize_or, reject, rotate, tilt, transport};
+use crate::geom::{
+    V3, angle_between, any_perpendicular, cross, normalize_or, reject, rotate, tilt, transport,
+};
 use crate::math;
 use crate::params::{DEG, Params};
-use crate::rng::{purpose, uniform};
+use crate::rng::{normal, purpose, uniform};
 use crate::tree::{Tree, bud, slot, store_i32, store_u8};
 
 /// Appends a metamer at `slot` of `parent`'s upper node (parent −1 = root) with heading `h` and
@@ -230,6 +252,45 @@ pub fn shoot_size(v: f64, params: &Params, length: &mut f64, cap: f64) -> f64 {
     n
 }
 
+/// The multiplier on the internode length of the shoot bud `bud_id` grows this season: lognormal
+/// with mean 1, exp(s·z − s²/2) [RNG: shootLength], and exactly 1 when s = 0 (no draw).
+pub fn shoot_length_factor(params: &Params, tree_id: f64, bud_id: f64, season: f64) -> f64 {
+    let s = params.c1.shoot_length_sd;
+    if s <= 0.0 {
+        return 1.0;
+    }
+    let z = normal(
+        params.seed,
+        purpose::SHOOT_LENGTH,
+        tree_id,
+        bud_id,
+        season,
+        0.0,
+    );
+    math::exp(s * z - 0.5 * s * s)
+}
+
+/// The offset, degrees, to β of the axis `axis` (the birthId its first metamer takes): s_β·N(0, 1)
+/// [RNG: branchAngle, keyed by the axis only]; 0 when s_β = 0 (no draw).
+pub fn beta_offset(params: &Params, tree_id: f64, axis: f64) -> f64 {
+    let s = params.c1.beta_sd;
+    if s <= 0.0 {
+        return 0.0;
+    }
+    s * normal(params.seed, purpose::BRANCH_ANGLE, tree_id, axis, 0.0, 0.0)
+}
+
+/// A lateral's frame (`h`, `l`) turned by `offset` radians in the plane of its host's heading
+/// `host`, away from it for offset > 0, so the angle between them becomes β + offset, held in
+/// [0, π]. The reference is carried by parallel transport.
+pub fn offset_frame(host: V3, h: V3, l: V3, offset: f64) -> (V3, V3) {
+    let beta = angle_between(host, h);
+    let to = math::max(0.0, math::min(std::f64::consts::PI, beta + offset));
+    let axis = normalize_or(cross(host, h), any_perpendicular(h));
+    let turned = normalize_or(rotate(h, axis, to - beta), h);
+    (turned, transport(l, h, turned))
+}
+
 /// The juvenile cap on a shoot (ADR 0022), by the tree's height at the start of the season.
 pub fn juvenile_cap(height: f64, params: &Params) -> f64 {
     let max = params.c1.max_metamers_per_shoot;
@@ -326,6 +387,69 @@ mod tests {
 
     fn params(patch: &str) -> Params {
         Params::from_json(&preset("default", patch))
+    }
+
+    #[test]
+    fn a_branch_angle_offset_is_drawn_once_per_axis_and_turns_away_from_the_host() {
+        let off = params("{}");
+        assert_eq!(beta_offset(&off, 0.0, 12.0), 0.0);
+        let on = params(r#"{"c1":{"betaSD":20}}"#);
+        // Keyed by the axis only: the same axis gets the same offset, another axis not.
+        let a = beta_offset(&on, 1.0, 12.0);
+        assert_eq!(a, beta_offset(&on, 1.0, 12.0));
+        assert_ne!(a, beta_offset(&on, 1.0, 13.0));
+        let n = 20_000;
+        let (mut s1, mut s2) = (0.0f64, 0.0f64);
+        for k in 0..n {
+            let x = beta_offset(&on, 2.0, k as f64);
+            s1 += x;
+            s2 += x * x;
+        }
+        let mean = s1 / n as f64;
+        let sd = (s2 / n as f64 - mean * mean).sqrt();
+        assert!(mean.abs() < 0.5, "mean {mean}");
+        assert!((sd - 20.0).abs() < 0.5, "sd {sd}");
+        // The frame: a lateral at 45° from a vertical host turned by +15° sits at 60°, by -15° at
+        // 30°, in the same azimuthal plane; a turn past the host stops on it; L stays a frame.
+        let host = UP;
+        let h = tilt(UP, [1.0, 0.0, 0.0], 45f64.to_radians(), 0.3);
+        let l = normalize_or(reject(UP, h), any_perpendicular(h));
+        for (by, want) in [(15.0, 60.0), (-15.0, 30.0), (-80.0, 0.0), (0.0, 45.0)] {
+            let (th, tl) = offset_frame(host, h, l, f64::to_radians(by));
+            assert!(
+                close(angle_between(th, host), f64::to_radians(want)),
+                "{by}"
+            );
+            assert!(close(norm(th), 1.0) && close(norm(tl), 1.0) && dot(th, tl).abs() < 1e-9);
+            if want > 0.0 {
+                // The same side of the host: the horizontal parts point the same way.
+                assert!(th[0] * h[0] + th[2] * h[2] > 0.0);
+            }
+        }
+    }
+
+    #[test]
+    fn a_shoot_length_factor_is_lognormal_with_mean_one_and_off_at_zero() {
+        let off = params("{}");
+        assert_eq!(shoot_length_factor(&off, 0.0, 5.0, 3.0), 1.0);
+        let on = params(r#"{"c1":{"shootLengthSD":0.4}}"#);
+        // Keyed by the bud and the season: the same pair gives the same factor, another season not.
+        let f = shoot_length_factor(&on, 0.0, 5.0, 3.0);
+        assert_eq!(f, shoot_length_factor(&on, 0.0, 5.0, 3.0));
+        assert_ne!(f, shoot_length_factor(&on, 0.0, 5.0, 4.0));
+        let n = 20_000;
+        let (mut mean, mut s1, mut s2) = (0.0f64, 0.0f64, 0.0f64);
+        for id in 0..n {
+            let x = shoot_length_factor(&on, 1.0, id as f64, 7.0);
+            assert!(x > 0.0);
+            mean += x;
+            s1 += x.ln();
+            s2 += x.ln() * x.ln();
+        }
+        let n = n as f64;
+        let sd = (s2 / n - (s1 / n).powi(2)).sqrt();
+        assert!((mean / n - 1.0).abs() < 0.01, "mean {}", mean / n);
+        assert!((sd - 0.4).abs() < 0.01, "sd {sd}");
     }
 
     fn close(a: f64, b: f64) -> bool {

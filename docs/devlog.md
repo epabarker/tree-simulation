@@ -2,6 +2,14 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-06: O, oak's form: the spire mostly gone on a candidate (branch `claude/oak-form`), awaiting the user's look
+
+- **The spire's cause:** oak reaches its sink height (33 m) by about 50 as a cone, and nothing grows after it.
+- **The candidate** (existing rules: relay from 25, an arm curve, aged set point 55): lone D 0.46/0.45 over 30 seeds
+  (half in band). It passes on seeds 1–10 but fails on fresh seeds 21–30 (0.77/0.70), with more stem kinks.
+  G-forest passes.
+- **Not adopted;** the user looks first ([plan](plans/2026-11-06-day2.md)).
+
 ## 2026-11-06: ADR 0057, twigs keep λ: birch's crown rounds (the user adopted it for birch alone)
 
 - **`r2.levels[k].dLambdaShare`** (agent T; R2, `lambda_at`; bit-identical when absent; unit test).

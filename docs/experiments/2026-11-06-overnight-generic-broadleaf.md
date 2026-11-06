@@ -99,6 +99,23 @@ must be compared as well as the stand. The species with data come first.
 - **The 200-cell plate peaks at 247 MB with the specimen** (seed 10), over the 230 MB gate. **`PLATE_MAX` is now
   170** (worst 216 MB).
 
+## Advisory: the lone-tree judge (not a gate; 05:20)
+The simulated-against-simulated judge passed calibration only on lone trees (79%), so its lone readings are
+advisory. Fresh Opus judges, 0.16.0 against the RC with a real reference strip; release candidate preferred:
+
+| comparison | RC preferred | beech | hornbeam | oak | rowan |
+|---|---|---|---|---|---|
+| mature, season 100 (48 pairs) | 79% | 12/12 | 12/12 | 10/12 | 4/12 |
+| young, at matched height ~16 m (64 pairs) | 42% | 8/16 | 1/16 | 16/16 | 2/16 |
+
+- **Mature trees:** the release candidate wins on "irregular crown with leader" and "ascending limbs, rounded
+  crown", against 0.16.0's "regular V-shaped vase" and "flat tabular layers".
+- **Young trees:** the release candidate's hornbeam and beech lose for "branches to the ground" and "shapeless
+  dome without trunk". **The irregularity rules seem to cost young trees their clear trunk. That is the next
+  thing to look at.**
+- **Caveat:** pairs share one scale, so the release candidate's lower mature heights may favour it, since the
+  real references are all ≤ 22 m.
+
 ## Open, for the user
 1. Merge order: PR #48 (0.16.0) and then the RC; or the RC alone.
 2. **The height commit:** keep it (rounded hornbeam, natural heights, but thin G-forest margins and a strong

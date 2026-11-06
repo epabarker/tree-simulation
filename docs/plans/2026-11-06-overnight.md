@@ -184,7 +184,7 @@ Nothing needs the user before morning._
 - **The advisor's pre-report checks (04:45):**
   1. **PASSED (05:00).** The RC build at e7116bf with no patch gives **identical** simulation results to the gated `ev-height` run: every per-seed value matches; only timing, labels and NaNs differ. PR #49 ships what was gated.
   2. **PASSED.** Memory with the specimen at the final commit is 197–211 MB on the 170-cell plate and 113–117 MB on the 80-cell phone plate (seeds 9, 10, 12; one fresh process per run).
-  3. **PASSED.** Phone time, re-measured (fresh processes), is 1.09–1.14× the base. The 1.31× was load noise. It is a laptop measurement, not the phone.
+  3. **PASSED.** Phone time, re-measured (fresh processes), is 0.95–1.16× the base (medians of 3). The 1.31× was load noise. It is a laptop measurement, not the phone.
   4. **DONE.** The lone sheet from the RC build (`figures/2026-11-06-lone-016-vs-rc.jpg`), in the overseer's reading:
      - **Clearly better:** hornbeam (a compact, rounded, irregular crown, 29 m flat) and rowan.
      - **Slightly better:** beech (fuller, but a flat "table" crown at 39 m).
@@ -383,6 +383,7 @@ blocked item 2.
   and keep Phase 4.
 
 ## Log
+- 05:20: the advisory lone judge: RC preferred 79% at season 100 (beech 12/12, hornbeam 12/12, oak 10/12, rowan 4/12) but 42% at young matched height (the RC's young hornbeam and beech lose their clear trunk). The report was updated.
 - 05:00: checks 2–4 done. The lone sheet replaces the setting-1 figure. The morning report is published.
 - 05:00: check 1 passed (the RC equals the gated run).
 - 04:45: RC done (PR #49, preview). The advisor's four checks are running. PR #48 warned.

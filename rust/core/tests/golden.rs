@@ -55,7 +55,10 @@ fn every_golden() {
 }
 
 /// The prototype rules of agents A9 and R (c1.budBreak, c1.shootLengthSD, c1.betaSD, c4.axisSD)
-/// written out as off give the goldens' bits: off is the old model, not merely close to it.
+/// written out as off give the old model's bits: off is the old model, not merely close to it. The
+/// broadleaves take the rules as species params (ADR 0055), which a world patch does not reach, so
+/// the off patch goes onto every species too, and the presets with species are held to their
+/// hashes before the adoption (0.16.0, d2c4f53); forest has no species and keeps its golden.
 #[test]
 fn the_prototype_rules_written_as_off_keep_the_goldens() {
     let presets = read("../presets.json");
@@ -64,10 +67,11 @@ fn the_prototype_rules_written_as_off_keep_the_goldens() {
         r#"{"c1":{"budBreak":{"mode":"deterministic","width":0.25},"shootLengthSD":0,"betaSD":0},"c4":{"axisSD":0}}"#,
     )
     .unwrap();
-    for key in [
-        "forest:seed1:s20",
-        "oakOpen:seed1:s15",
-        "beechOpen:seed1:s40",
+    for (key, before) in [
+        ("forest:seed1:s20", None),
+        ("oakOpen:seed1:s15", Some("0877b79b")),
+        ("beechOpen:seed1:s40", Some("200f5a55")),
+        ("mixedWood:seed1:s15", Some("c95b46b9")),
     ] {
         let parts: Vec<&str> = key.split(':').collect();
         let base = presets
@@ -75,11 +79,22 @@ fn the_prototype_rules_written_as_off_keep_the_goldens() {
             .and_then(|t| t.get(parts[0]))
             .unwrap();
         let mut params = json::merge(base, &off);
+        let species = params.get("species").and_then(Value::as_object).map(|t| {
+            Value::Obj(
+                t.iter()
+                    .map(|(name, patch)| (name.clone(), json::merge(patch, &off)))
+                    .collect(),
+            )
+        });
+        if let Some(species) = species {
+            params.set("species", species);
+        }
         params.set("seed", Value::Num(1.0));
         let seasons: usize = parts[2].trim_start_matches('s').parse().unwrap();
         let mut world = World::new(params);
         world.run(seasons, &[]);
         let got = Value::Str(hash_world(&world));
-        assert_eq!(Some(&got), cases.get(key), "{key}");
+        let want = before.map_or_else(|| cases.get(key).cloned(), |h| Some(Value::Str(h.into())));
+        assert_eq!(Some(got), want, "{key}");
     }
 }

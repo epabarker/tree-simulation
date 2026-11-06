@@ -73,25 +73,27 @@ def in3d(sp: str, patch: dict) -> dict:
 
 def broadleaf(sp: str, patch: dict, own: dict) -> dict:
     """The generic irregularity base (hand-overrides.toml's [broadleaf]) on a listed species: each
-    `group.key` set in its group, unless the species' own overrides set that key. Added after the
-    amend so that only these keys land (the amend would fill each touched group whole)."""
+    `group.key` set in its group, the species' own value where its overrides set that key (a
+    departure from the base). Added after the amend so that only these keys land (the amend would
+    fill each touched group whole), so the amend is never given them (`BASE_KEYS`)."""
     base = overrides.get("broadleaf", {})
     if sp not in base.get("species", []):
         return patch
     for path, value in base["assign"].items():
         group, key = path.split(".")
-        if path not in own:
-            patch.setdefault(group, {})[key] = value
+        patch.setdefault(group, {})[key] = own.get(path, value)
     return patch
 
 
 overrides = tomllib.loads((REPO / "analysis" / "fit" / "hand-overrides.toml").read_text())
+BASE_KEYS = set(overrides.get("broadleaf", {}).get("assign", {}))
 
 pool = Pool(1)
 patches = {}
 try:
     for sp in SPECIES:
-        assign = {**json.loads((FITS / f"{sp}.json").read_text())["fit"]["assign"], **overrides.get(sp, {})}
+        own = {k: v for k, v in overrides.get(sp, {}).items() if k not in BASE_KEYS}
+        assign = {**json.loads((FITS / f"{sp}.json").read_text())["fit"]["assign"], **own}
         assign["c6.r0"] = float(f"{assign['c6.r0'] / GIRTH_SCALE:.4g}")
         assign["r1.mw"] = GIRTH_SCALE**2
         assign["r3.sigmaBreak"] = SIGMA_BREAK

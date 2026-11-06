@@ -1134,6 +1134,30 @@ mod tests {
     }
 
     #[test]
+    fn with_a_virtual_wood_the_lanes_still_sum_to_the_whole_field() {
+        let p = SlabParams {
+            rotate: true,
+            face_wood: 1.0,
+            ..params([1.0, 0.2])
+        };
+        let mut whole = SlabSweep::new(30, 26, 10, p);
+        canopy(&mut whole);
+        whole.compute(5.0);
+        let mut sum = vec![0.0f64; whole.q().len()];
+        for lane in 0..4 {
+            let mut part = SlabSweep::new(30, 26, 10, p);
+            canopy(&mut part);
+            part.compute_part(5.0, lane, 4);
+            for (s, q) in sum.iter_mut().zip(part.q()) {
+                *s += *q as f64;
+            }
+        }
+        for (s, q) in sum.iter().zip(whole.q()) {
+            assert!((s - *q as f64).abs() < 1e-6);
+        }
+    }
+
+    #[test]
     fn the_lanes_sum_to_the_whole_field() {
         let mut whole = SlabSweep::new(
             30,

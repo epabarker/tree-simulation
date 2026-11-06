@@ -2,6 +2,21 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-06: A5, crown rounding, lever 1: the reproductive sink does not round beech; ADR 0056 written
+
+- **Lone dome D on today's build** (seeds 1–5, at 100 / 150; real lone bands in brackets):
+  - hornbeam 0.33 / 0.39 [0.07–1.04];
+  - beech 0.20 / 0.32 [0.22–0.77];
+  - birch 0.05 / 0.15 [0.07–0.61];
+  - oak 1.06 / 1.22 [0.16–0.59], pointed;
+  - willow −0.05.
+
+  The height caps already rounded hornbeam.
+- **Capping beech's height** (sink maturity 125 or 135: 31.5–34 m) flattens it to D 0.11–0.13. Not adopted.
+  "Twigs keep λ" goes to the night (the user).
+- **ADR 0056** (proposed, parked) records `world.faceWood`, with the review's open questions. The review (on
+  Opus; the Fable model was out of credits) found no divergences. Added a lanes test with the wood on.
+
 ## 2026-11-06: A4, the crown base through the garden's light boundary: `world.faceWood` (off), parked
 
 [Note](experiments/2026-11-06-crown-base.md).

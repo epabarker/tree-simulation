@@ -6,15 +6,15 @@
       "live50": 24,
       "planted50": 1,
       "canopy50": 2,
-      "metamers50": 15245,
-      "live100": 23,
+      "metamers50": 15457,
+      "live100": 24,
       "planted100": 1,
       "canopy100": 3,
-      "metamers100": 15620,
+      "metamers100": 18131,
       "live150": 24,
       "planted150": 1,
-      "canopy150": 1,
-      "metamers150": 12259
+      "canopy150": 2,
+      "metamers150": 14083
     }
   },
   "forestRegeneration": {

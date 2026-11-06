@@ -1,0 +1,10 @@
+τ 0.2
+  150 base: buds 4276; active 6%, short 61%, dormant 33%; v ≥ 1 0.0%; leaf/bud 1.28; P 2132, M 476, P/M 4.49; vBase/P 0.62
+  150 k8  : buds 2444; active 5%, short 65%, dormant 30%; v ≥ 1 0.0%; leaf/bud 1.35; P 953, M 280, P/M 3.56; vBase/P 0.58
+  300 base: buds 3736; active 6%, short 67%, dormant 27%; v ≥ 1 0.0%; leaf/bud 1.41; P 1852, M 453, P/M 4.08; vBase/P 0.60
+  300 k8  : buds 2296; active 5%, short 74%, dormant 20%; v ≥ 1 0.0%; leaf/bud 1.54; P 1036, M 292, P/M 3.68; vBase/P 0.58
+τ 0
+  150 base: buds 3392; active 6%, short 61%, dormant 33%; v ≥ 1 0.0%; leaf/bud 1.28; P 1812, M 382, P/M 4.62; vBase/P 0.63
+  150 k8  : buds 2196; active 5%, short 65%, dormant 29%; v ≥ 1 0.0%; leaf/bud 1.36; P 937, M 254, P/M 3.71; vBase/P 0.58
+  300 base: buds 2899; active 6%, short 69%, dormant 24%; v ≥ 1 0.0%; leaf/bud 1.45; P 1638, M 381, P/M 4.27; vBase/P 0.61
+  300 k8  : buds 2024; active 5%, short 73%, dormant 22%; v ≥ 1 0.0%; leaf/bud 1.50; P 942, M 261, P/M 3.64; vBase/P 0.58

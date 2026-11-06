@@ -1,0 +1,28 @@
+{
+  "species": "oak",
+  "verdict": "not accepted: at 60 a parasol, widest at the top, fanning out from a short trunk (at 100 nearly right, a broad mound)",
+  "date": "2026-10-31",
+  "source": "docs/experiments/fits/round3/oak.json (fit.assign)",
+  "assign": {
+    "r2.levels.0.lambda": 0.5718,
+    "r2.levels.1.lambda": 0.5772,
+    "r2.levels.1.setPoint": 66.09,
+    "r2.levels.1.branchAngle": 55.01,
+    "r2.levels.1.eta": 0.08286,
+    "r2.levels.2.setPoint": 45.6,
+    "r2.aC": 1.915,
+    "r2.dLambda": 0.108,
+    "r2.kappa": 0.4125,
+    "c3.alpha": 4.932,
+    "c5.Trel": 0.2433,
+    "c6.r0": 0.002021,
+    "r1.Lh": 33.9,
+    "r1.mf": 0.0901,
+    "r3.c": 0.09225,
+    "r6.qMin": 0.1564,
+    "r6.leafArea": 1.453,
+    "r2.hJ": 10.16,
+    "r1.mw": 181.0,
+    "r1.hydraulic": "hyperbolic"
+  }
+}

@@ -1,0 +1,52 @@
+diff --git a/rust/cli/src/main.rs b/rust/cli/src/main.rs
+index 0fb6bc7..33dfeb0 100644
+--- a/rust/cli/src/main.rs
++++ b/rust/cli/src/main.rs
+@@ -405,23 +405,37 @@ fn main() {
+     }
+ }
+ 
+-/// Mean ms per season by phase, as JSON on stdout (as cli/bench.ts runs a case, its hash too).
++/// Mean ms per season by phase, as JSON on stdout (as cli/bench.ts runs a case, its hash too),
++/// and the series [season, live metamers, light ms, passes ms] per season (I2's measurements).
+ fn bench(world: &mut World, seasons: f64) {
+     use tree_core::season::{PHASES, Phase};
+     let mut totals = [0.0f64; 9];
+     let mut seasons_ms = Vec::new();
++    let mut series = Vec::new();
+     let mut s = 0.0;
+     while s < seasons {
+         s += 1.0;
+         let t_season = Instant::now();
+         let mut last = Instant::now();
++        let mut this = [0.0f64; 9];
+         world.step(&mut |phase: Phase| {
+             let now = Instant::now();
+             let k = PHASES.iter().position(|&p| p == phase).unwrap();
+-            totals[k] += (now - last).as_secs_f64() * 1000.0;
++            this[k] += (now - last).as_secs_f64() * 1000.0;
+             last = now;
+         });
+         seasons_ms.push(t_season.elapsed().as_secs_f64() * 1000.0);
++        for k in 0..9 {
++            totals[k] += this[k];
++        }
++        let live: usize = world.trees.iter().filter(|t| t.alive).map(|t| t.m.len()).sum();
++        let passes: f64 = this[1..].iter().sum();
++        series.push(Value::Arr(vec![
++            Value::Num(s),
++            Value::Num(live as f64),
++            Value::Num(this[0]),
++            Value::Num(passes),
++        ]));
+     }
+     let n = seasons_ms.len().max(1) as f64;
+     let mut fields = vec![(
+@@ -432,6 +446,7 @@ fn bench(world: &mut World, seasons: f64) {
+         fields.push((p.name().into(), Value::Num(totals[k] / n)));
+     }
+     fields.push(("hash".into(), Value::Str(hash_world(world))));
++    fields.push(("series".into(), Value::Arr(series)));
+     println!("{}", json::stringify(&Value::Obj(fields), false));
+ }
+ 

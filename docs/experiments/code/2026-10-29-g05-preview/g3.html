@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>G3 slab kernel</title>
+    <style>
+      :root { color-scheme: light dark; --ink: #2b2a26; --paper: #f6f2e9; --rule: #d8d1c2; --muted: #6b665c; }
+      @media (prefers-color-scheme: dark) { :root { --ink: #e9e4d8; --paper: #1b1a17; --rule: #3a3731; --muted: #a39d90; } }
+      body { margin: 0; background: var(--paper); color: var(--ink); font: 16px/1.45 Georgia, serif; }
+      main { max-width: 860px; margin: 0 auto; padding: 16px; }
+      table { border-collapse: collapse; width: 100%; font: 14px/1.4 ui-monospace, Menlo, monospace; }
+      td, th { border-bottom: 1px solid var(--rule); padding: 4px 6px; text-align: left; }
+      pre { white-space: pre-wrap; font: 12px/1.35 ui-monospace, Menlo, monospace; background: color-mix(in srgb, var(--rule) 30%, transparent); padding: 8px; }
+      button { font: inherit; padding: 0.5rem 1rem; }
+      .muted { color: var(--muted); }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>G3: the Rust slab sweep, timed</h1>
+      <p>The 3D light of ADR 0024 as it will ship (Float32, integer-shift transport, WASM SIMD), on the 3D prototype's stands at D = 64, K = 16 with the sky rotating each season. About a minute on a phone; keep the screen on.</p>
+      <p class="muted" id="env"></p>
+      <button id="run">Run</button> <span class="muted" id="status"></span>
+      <table id="out"><thead><tr><th>kernel</th><th>stand</th><th>K</th><th>median ms</th><th>min ms</th></tr></thead><tbody></tbody></table>
+      <pre id="json"></pre>
+    </main>
+    <script type="module" src="./g3.ts"></script>
+  </body>
+</html>

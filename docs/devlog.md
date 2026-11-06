@@ -2,6 +2,1383 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-06: The external review folded into the 0.17.0 box; birch's poles traced to trunk λ
+
+- **The review** (from the user; [kept verbatim](reviews/2026-11-06-external-review.md)) was checked against the
+  repo. Its documentation claims hold: the README and `package.json` still describe the 2D line, `main` is the
+  default branch, and CI has no Python job. Its "59 Python tests" is stale: there are 142.
+- **Found while checking:** two of the 142 fail locally, both on one TreeML QSM fetched overnight whose cylinder
+  dips below its root. They skip in CI, since `data/reference/` is ignored.
+- **Folded in** ([the box's plan](plans/2026-11-06-box-0.17.md)):
+  - A0 (docs truth, Python CI, named regressions for seed 3 and regeneration, a hard/soft/advisory validation
+    policy) goes ahead of the rest of the birch work;
+  - a budget smoke joins the release gate;
+  - a sensitivity sweep joins the night.
+  - Default branch and GitHub issues are the user's to decide.
+- **Birch** (A1, not yet adopted): the poles are birch's leader taking its growth (trunk λ 0.588). 0.53 passes
+  every hard gate (poles 18 of 20, lone height 39 m, G-forest 0/1/9/11 against B0, at the margin); 0.55 fails
+  crown base (6). Its crowns look leafless in the garden; that is next.
+
+## 2026-11-06: Garden 0.16.0 released; ADR 0055 accepted; the overseer's box closed
+
+- **Released:**
+  - the user merged #48 and #49 into `3d-port` (39eaaab) and tagged `garden-v0.16.0`;
+  - the release workflow failed at first because the release already existed, so it was deleted (keeping the
+    tag), the run was re-run, and the user's title was restored;
+  - the site's PR #8 synced 0.16.0; the user merged it, and it is live on edbarker.dev.
+- **ADR 0055 accepted** (the user). Purposes 15–17 are registered for good; `rng.rs` no longer calls them
+  provisional (comments only; goldens unchanged).
+- **The overseer's box** (3 sessions and 1 night) ends with an adopted look. Next is a new box: 2 sessions and
+  1 night toward 0.17.0, heights first, with G-forest against B0 (not re-baselined). See STATUS.
+- **The phone soak passed** (the user): no stutter, no empty forests, no tree unlike its kind.
+- **The garden's clutter** ([note](experiments/2026-11-06-garden-recruits.md)): the garden kept round 2's
+  recruit cap (229 at 160 cells) for one row of 6 trees, and every opening forest filled it with suppressed
+  saplings. `GARDEN_PLANTING.recruits` 1 → 0.25: G-forest holds (0/3/12/12 against B0's 2/3/11/11), planted H/D
+  gets its headroom back, CPU per season −10%. Goldens unchanged (they don't use `forestParams`). The rest of the
+  clutter is birch recruits as thin poles (H/D 150–320), which go to the birch work.
+- **Housekeeping:** the agents' worktrees removed; `claude/overnight-rc` and `-noheights` deleted (merged);
+  `a-crown` and `r-regularity` kept as the rejected prototypes.
+
+## 2026-11-06: The overnight run: a generic broadleaf (ADR 0055, proposed), natural heights, PLATE_MAX 170; a release candidate (draft PR)
+
+- **The overseer** (the user, 2026-11-05):
+  - The 3D garden was live as 0.15.0 since 2026-11-02, but STATUS said 0.14.0.
+  - Reference fidelity had churned through gate c v1–v3.2 and registrations v1–v6 with nothing adopted.
+  - The two tracks, the plan and the rulings are in `plans/2026-11-05-overseer.md`. The overnight plan and its
+    State block are in `plans/2026-11-06-overnight.md`.
+- **The judge** ([note](experiments/2026-11-06-overnight-generic-broadleaf.md)):
+  - A blinded "which is real?" judge caught every simulated broadleaf (144/144), on regularity cues.
+  - It then saturated: it caught the user's gallery rejects at 100% too, so it was retired.
+  - A simulated-against-simulated judge failed its gate on the user's past picks (69% against 75%). **No visual
+    gate was used overnight.**
+- **The objective instrument:** six within-tree descriptors on coarsened sims and real QSMs, with a scan-noise
+  floor from BioDiv's repeats. Four are usable.
+- **Data fetched:** TreeML (342 QSMs, CC0), Belgian hedgerows (68, CC-BY), BioDiv hornbeam (38). The manifest is
+  updated.
+- **ADR 0055 (proposed):** four off-by-default rules, purposes 5 (now drawn), 15, 16 and 17:
+  - stochastic lateral break (§R4.4);
+  - a lognormal shoot length;
+  - a per-axis set-point offset;
+  - a per-axis branch-angle offset.
+
+  **Adopted** as the `[broadleaf]` base in hand-overrides.toml: shootLengthSD 0.5, axisSD 50, betaSD 60,
+  budBreak width 1. Beech and oak have their own values. Hornbeam's summed |z| falls 23 → about 5, with all four
+  usable descriptors in the real bands, lone and stand.
+- **Heights (a separate commit):** R1's reproductive sink as a ceiling. Hornbeam is 29 m flat from 100, against
+  49 m at 150, and keeps a rounded crown; rowan 21.6 m, oak 33.2 m.
+  - L_h was rejected: it starves crowns into poles.
+  - The flat cap is a size effect.
+- **Garden evidence** (`forestParams(160)`, 20 seeds), against the base (2/3/11/11):
+  - the final RC: floor 1, planted H/D 1, crown base 12, plateau 13, metamers 0.96×;
+  - all-tree H/D 16/20;
+  - composition: hornbeam 0.43 → 0.20, beech 0.25 → 0.37.
+- **Memory:** PR #48's "regression" was a measuring artefact (many worlds in one process). The 200-cell plate
+  peaks at 247 MB with the specimen, so **PLATE_MAX is now 170**.
+- **Goldens (intended):** 4 of 16, all from the broadleaves' new species params (ADR 0055), then the separate height commit: `mixedWood:seed1:s15` c95b46b9 → 3ee70704 (stage 2) → 93042bbc (heights); `oakOpen:seed1:s15` 0877b79b → 29e5921a; `beechOpen:seed1:s40` 200f5a55 → ef0a754d; `beechWood:seed1:s30` f8b1fe35 → 6b8af072. The other 12 are unchanged; `golden.rs`'s off test now switches the species-level rules off too and reproduces 0.16.0's oakOpen and beechOpen bit for bit.
+- **Check:** green at 7b105ae (99/99, on a quiet machine). Review: the Fable spec-reviewer had no credits, so an Opus stand-in ran it. Its one demonstrated item (the off test never reached species rules) is fixed in ce7ebb3; its open questions are in PR #49.
+- **Preview:** the site's `preview-3d` carries the RC as 0.16.0 (main merged in, pushed without force): https://preview-3d-edbarker-dev.edbarker.workers.dev/
+- **PRs:** #48 (0.16.0, draft; CI green), #49 (this RC, draft, stacked on #48). The alternative is `claude/overnight-rc-noheights` (the height commit reverted; local check green). Nothing merged or tagged.
+- **The advisory lone judge:** RC preferred 79% at season 100, but 42% when young (the RC's young hornbeam and beech lose their clear trunk; rowan is disputed).
+- **Code and summaries** are kept in `experiments/code/2026-11-06-overnight/` (the scratchpad was in /tmp).
+
+## 2026-11-05: garden 0.16.0 prepared (for the user to tag)
+
+- **Release notes:**
+  - The plate shows one lap of the forest and draws trees larger; on the phone, no crowns are cropped. (`plateWidth` = 140·w/(h−18−headroom), clamped to [40, 200]; a young garden is framed at most 1.5× closer.)
+  - Trees no longer all lean one way (ADR 0054; goldens re-baselined).
+- **How it ships:** there is no version file; the version is the tag (`release.yml` reads `GITHUB_REF_NAME`). After the PR merges into `3d-port`, the user tags the merge commit `garden-v0.16.0` and pushes the tag. The site then pins 0.16.0 with its `sync-garden.mjs`.
+- **Speed and memory:** see the PR body.
+
+## 2026-11-05: ADR 0054, a per-tree seedling azimuth; goldens re-baselined; leanAngle; v6 superseded
+
+- **What changed:**
+  - **Core:** `seedling_azimuth` (c1.rs), drawn from a new purpose `SEEDLING_AZIMUTH` (14), keyed by tree id.
+    `plant_seedling` takes the azimuth; every planting path passes it (world.rs, o4.rs); unit tests pass 0.
+  - **describe():** `leanAngle`, with two tests. Bit-identity holds on the 21 (9,765 values).
+  - **Gate c v3.2 amended for leanAngle:** the real-data parts only; the first five rows reproduce 557ce5a.
+  - **v6 marked superseded;** its test asserts the hash guard.
+  - `lean_geometry.py`, and the after figure.
+- **Goldens:** all 16 changed, because every seedling's L (and with it the phyllotaxis plane and the noise's azimuth
+  origin) now turns per tree. With φ forced to 0, the old `tests/golden.json` passes natively and in WASM, so the
+  change is the azimuth alone.
+- **Surprises:**
+  - The lone trials' three assigns share their 20 φ draws (keyed by seed and tree id), so they are one sample, not
+    three.
+  - The face rows damp depth leans: the slab limitation above.
+  - BioDiv's leanAngle (below crownBase80, 3.6°) sits just under the audit's whole-tree chord (4.1°).
+
+## 2026-11-05: lean audit: the one-way lean is the seedling's frame (L = +x), carried by Troll's set point
+
+- **What changed:**
+  - `analysis/experiments/lean_dump.ts` and `lean_audit.py`.
+  - The note `experiments/2026-11-05-lean-audit.md`, with a figure.
+  - Nothing under `src/`, `rust/`, `cli/` or `tests/`. Nothing launched; v6 stays registered and unlaunched.
+- **The finding:**
+  - The cause: every seedling is planted with L = +x (`c1.rs:179–182`). Beech's trunk set point (40°) takes its
+    azimuth from L when the leader is vertical (`c4.rs:13–19`), and after that from its own lean.
+  - The test: flip only L's sign (lean −1e-6°) and the stand's lean and crown centroid flip with it. Ages 2–10 flip
+    near exactly; at 70 the means mirror (+1.1 m ↔ −1.1 m centroid x).
+  - Ruled out: the sky (net ≤ 1.8%, and toward −x), the planting's mirror and the sky's phase.
+  - This explains ADR 0051's "+x reach" (logged as a suspected bug).
+- **Surprises:**
+  - The lean's magnitude is model behaviour, independent of its side. The stand leans ≈ 9–10° (BioDiv 4.1°, max 14.7°).
+  - The bent-over suppressed trees carry boleSway's whole spread excess (×1.2–1.4 without them), but not its z.
+- **Proposed, not done:** a per-tree seedling azimuth (new RNG purpose, ADR). Every golden changes. Then the re-run
+  order: goldens → Level 0 (all species) → gate c's simulated rows → Level 1. Also lean angle as a gate c candidate,
+  and a Troll relay (an erect relay that overtakes the arch) as the remedy for the magnitude.
+
+## 2026-11-05: boleSway, the like-for-like sheet, Level 1 v6 registered (not launched)
+
+- **What changed:**
+  - describe(): `boleSway`, with two tests. Bit-identity holds on the 16 and the four (9,300 values).
+  - The v3.2 supplement amended for boleSway (tier A); its first four rows reproduce exactly.
+  - ADR 0052 accepted (no rule for beech; open for oak's CR).
+  - The like-for-like sheet.
+  - v6 registered: `level1_targets.py --add`, v5's hold-outs kept, floor 0.65, lateShare band 0.12. The registration
+    test is now v6's.
+  - Nothing under `src/`, `rust/`, `cli/` or `tests/`.
+- **Surprises:**
+  - Coarsening at 8.6 mm removes almost nothing from simulated beech: inflated twigs are all above it.
+  - boleSway's simulated spread is too wide (2.7–6.5×), not too narrow.
+  - R3's straightening is capped at c·Δr/r, so a slow stand stem keeps its bends.
+
+## 2026-11-05: crownBase80, trunkTortuosity05, the bole's sway, ADR 0052's probe
+
+- **What changed:**
+  - `analysis/treesim/describe.py`: crownBase80, 70 and 90, trunkTortuosity05, and three diagnostics, with eight
+    synthetic tests. The 16 registered descriptors are bit-identical (7,440 values).
+  - Gate c v3.2 as a supplement, with d_min frozen.
+  - Probe scripts and a contact sheet; [the note](experiments/2026-11-05-crown-base-and-bole.md).
+  - ADR 0052 created (proposed).
+  - Nothing under `src/`, `rust/`, `cli/` or `tests/`.
+- **Results:**
+  - crownBase80 is tier A; trunkTortuosity05 is held out on noise.
+  - Simulated crown bases sit above BioDiv's (hand +1.31, v4 +1.03).
+  - More limb loss raises it further, so beech makes no case for ADR 0052.
+- **Surprise:** the render's "low crowns" did not survive 53 trees. Two of the three QSMs drawn were high-crowned. What
+  differs is crown width and density, and a bole that sways twice the real (path over chord cannot see it).
+- **Side effect:** `test_level1.py::test_registration_v5…` failed at HEAD on the registration's own hash refusal
+  (describe.py moved); cleared the same day by v6's registration (the test is now v6's).
+
+## 2026-11-05: pilot v4's result and write-up
+
+- **What changed:** docs only. [The note](experiments/2026-11-05-level1-beech-pilot-v4.md); the gate files copied to
+  `docs/experiments/fits/level1-pilot-v4/` with a README; the plan's State and STATUS.
+- **Result:** 6.88 → 3.31 on 101–110 (hand SD 1.31); held out 20/20. The gate fails on spread only:
+  tortuosity05 0.48×, limbUpturn 0.36×.
+- **The question** (tortuosity05 and late growth together?): both partly off. tortuosity05 is in band (z −0.81) and
+  lateShare is one band short (1.326 against 1.43). The price is about a third of v3's per unit z.
+- **Surprises:**
+  - The route was not dLambda (0.0165, near the hand's) but kappa 0.43 → 0.22 and branchAngle (1) 50° → 40°.
+  - The search-seed best (3.24, generation 30) re-measured at 4.24; generation 16's (3.57) held at 3.31.
+  - Late height is lost outright here (H100 104 against 109, H150 112 against 119), not front-loaded as in v3.
+
+## 2026-11-05: ADR 0053, individual variation (proposed)
+
+- **What changed:** docs only. [ADR 0053](decisions/0053-individual-variation.md), drafted from reading, with no
+  probe. The plan's State and STATUS are updated.
+- **Finding:** no RNG purpose is per tree (`rng.rs:9–21`). R3's posture loop pulls every limb to a per-order set
+  point, and the descriptors are per-tree medians over limbs. So per-metamer noise reaches the outline, not
+  posture.
+- **Surprise:** limbUpturn is floored at 0° (27 of 40 hand trees). Across 69 sweep conditions, its spread tracks its
+  median (r 0.58), but only to ≈ 0.55× real at the real median. Part of the 0.47× is location.
+- **Literature** (abstract level only): crown plasticity toward neighbours is well supported (Schröter 2012,
+  Juchheim 2017). No heritability of branch posture in beech was found.
+- **Advisor:** the σ_A-from-limbElevation route made limbElevation05 circular. The hold-out is now limbUpturn and
+  Demol, and the stop rule is read at pilot v3's best.
+
+## 2026-11-05: provenance audit of the Level 0 targets (ruling 3)
+
+- **What changed:** docs only, read-only on targets and sources (pilot v4 running).
+  - [The note](experiments/2026-11-05-target-provenance-audit.md): every scored Level 0 trait × species, with its
+    provenance, the band's own provenance, and per-seed SD from outputs on disk.
+  - The crown note gains a pointer; the plan's ruling 3 is marked done, its proposals pending.
+- **Findings:**
+  - LAI and the shade house are measured (H&L 2019) for beech, birch, hornbeam and oak. Maple's scored LAI is a
+    described proxy.
+  - Every band but Tallo's is a convention.
+  - Only beech lateShare's bands (0.06 at Level 0, 0.10 at Level 1) are under its per-seed SD (0.137–0.161).
+- **Surprise:** oak fit's Trel×10 is LAI z −1.47 against the measured band, so its "collapse" was read against the
+  base. The verdict that no lever passes oak stands.
+- The shade house's SD is 0 on 10 seeds: roof-ladder quantisation, not precision.
+
+## 2026-11-05: pilot v4 registered (registration v5) and launched
+
+- **What changed:** no code under src/rust/cli/tests.
+  - `fit_level1.level1_spec` reads `loss.level0_band`, a Level 0 trait's band in the Level 1 loss only.
+  - `level1_targets.py` handles version 5; `level1_noise_v4.py` handles v5, rescaling the re-banded term in its
+    cross-check.
+  - Python tests: 130 passed.
+- **Registration v5 (edbd327):** lateShare scored again at band 0.10; height at 100 reported; else v4.
+- **Noise:** the hand's SD is 1.31. Launched 07:49 UTC, tmux `level1v4`, ≈ 7 h.
+
+## 2026-11-05: pilot v3's result and write-up
+
+- **What changed:** docs only. [The note](experiments/2026-11-05-level1-beech-pilot-v3.md); the gate files copied to
+  `docs/experiments/fits/level1-pilot-v3/`.
+- **Result:** the first real Level 1 fit, 6.70 → 1.62 on 101–110 (SD 1.38).
+  - Fourteen in band; held out 19/20; the spread penalty held.
+  - The gate fails on limbDroop (0.48×) and limbUpturn (0.47×) spread only.
+- **Surprises:**
+  - tortuosity05 came into band via dLambda 0.027, a value the sensitivity sweep's grid skipped (it has no point
+    between 0.0069 and 0.067). The price was unscored lateShare (10.1): one λ offset for every order.
+  - limbDroop sat exactly at the penalty's floor, which is also the gate's edge.
+
+## 2026-11-04 (night): pilot v3 registered (registration v4) and launched, unattended
+
+- **What changed:** no code under src/rust/cli/tests; nothing accepted into species params.
+  - `analysis/treesim/level1.py`: `spread_penalty` and the `l1.<k>.spr` term, read where `loss.spread_floor` is set.
+  - `analysis/treesim/fit_level1.py`: `loss.level0_reported` traits move to the reports; `summary()` writes their
+    would-be terms under `reported`.
+  - `analysis/experiments/level1_targets.py`: version 4; `level1_noise_v4.py`, the reported-only noise check.
+  - Python tests: 129 passed (2 new, the registration test moved to v4).
+- **Registration v4 (8e7594b):**
+  - lateShare and height at 100 unscored in the Level 1 loss;
+  - a one-sided spread penalty below 0.5× real, weighted like the location term;
+  - everything else as v3.
+- **Noise:** the hand's 10-seed SD under v4 is 1.38 (v3's 0.40), mostly leaderDominance's spread term. Over the
+  user's 0.6, so noted; the seeds are unchanged. The cross-check against v3's stored terms matches to 9e-16.
+- **Launched** 23:49 UTC in tmux `level1v3`, ≈ 7 h.
+- **Surprises:**
+  - The brief's penalty formula, read literally, is zero at 0.5× and 1 at 1×. It was implemented as its stated
+    intent (the plan's State, reading 1).
+  - Pilot v2 is no longer resumable from HEAD (a `level1.py` hash).
+
+## 2026-11-04: Level 1 sensitivity, what the knobs can reach (beech); pilot v2's record reworded
+
+- **What changed:** no code under src/rust/cli/tests.
+  - **New:** `analysis/experiments/level1_sensitivity.py` (register, run, pairs [--cost], envelope, report) and
+    `analysis/tests/test_level1_sensitivity.py` (10 tests; the Python suite has 127);
+    `docs/experiments/fits/level1-sensitivity/` (registration, conditions, reach, pairs, envelope); two heat maps in
+    `figures/`; [the note](experiments/2026-11-04-level1-sensitivity.md).
+  - **Pilot v2's note** now reads "stopped early by the user, checkpoint kept, resumable", with the generation table.
+    The call came after 8 generations: median 15 → 9, best unmoved. Generation 8's best is an in-run reading, not a
+    result (e443d90).
+- **Registration first** (9e304db): 73 conditions (18 knobs × 4 non-hand points + the hand), the rules as reporting
+  conventions, the ADR → evidence map, hashes. The advisor reviewed it once: the bracket rule in place of
+  continuity, the pilot v2 envelope, the three-source verdict, ΔL0 without lateShare.
+- **Results:**
+  - **No descriptor is unreachable by single knobs.** tortuosity05 is reached only by wrecking the tree (ΔL0 +21 to
+    +76; affordable single and pairs ≤ 33%).
+  - **limbUpturn:** its median closes ≤ 69% and its spread ≤ 0.46×.
+  - **The outline is cheap by posture**, and leaderDominance's spread is cheap via r0 (frozen in v3).
+  - **Proposed ADR order:** tip upturn and tortuosity; individual variation (limb tips); the trunk increment; 0052.
+- **Surprises:**
+  - **The registered pair rule degenerated.** Its remaining gap ignores cost, and some knob crosses every target at
+    some cost. The user approved a cost-aware supplement, labelled as added after the registration.
+  - **lateShare's per-seed SD (0.137) is more than twice its band (0.06).** The hand's term has a bootstrap SE of
+    1.74, and form knobs "gain" up to −1.53 from it. ΔL0's SE is 2–4.
+  - **Forkserver:** under Python 3.14's forkserver, a driver script without a `__main__` guard re-runs itself in the
+    describe pool's children. The scratch drivers needed one; the committed script has it.
+- **Goldens:** unchanged.
+
+## 2026-11-04: Reference fidelity, phase 3 pilot v2: stopped at generation 10 (the user); checkpoint kept, resumable
+
+- **What changed** (docs and committed partial results only; no code under src/rust/cli/tests/analysis):
+  - the note's section "The stop";
+  - the fits README;
+  - the plan's State and STATUS;
+  - committed as the run wrote them: `fits/level1-pilot-v2/{beech-best.json, beech-progress.csv}`;
+  - `hand-search-seeds.json` and its script, `code/2026-11-04-level1-pilot-v2/hand_on_search_seeds.py`.
+- **Result:** 10 of 32 generations ran (1,200 evaluations); no finalists, no gate. The hand on the ten search seeds
+  scores 6.68.
+  - **The call:** the user stopped the run on the generation-7 status. The best had not moved since generation 0
+    (5.14, Level 1 2.47 against the hand's 2.60), and its gain was Level 0.
+  - **After the call:** generation 8's best (3.94) gained Level 1 (2.60 → 1.47) while its spread collapsed to
+    0.13–0.38× real on six fitted descriptors. The loss reads only medians, so the collapse was free, and the
+    candidate could not pass the spread gate.
+  - Both readings support stopping.
+- **Surprises:**
+  - **The gain came from medians** (tortuosity05, p0, centroidHeight). The two most collapsed descriptors
+    (leaderDominance and p1) gained little or lost, and collapse's direct reward is bounded at ≈ 0.17.
+  - **The hand fails the spread gate on these seeds** too: leaderDominance 0.26×.
+  - **The matched season drifted** to the window's first (season 50) in half the candidates from generation 4 on.
+- **For the next registration (the user):** a one-sided spread penalty below 0.5× the real SD. Its form and its noise
+  are to be measured before the seed rule is applied again.
+
+## 2026-11-04: Reference fidelity, phase 3 pilot v2: registration v3, its noise floor, the launch
+
+- **What changed** (analysis/ and docs only; no src/rust/cli/tests; goldens untouched):
+  - **Registration v3** (81b157a), from BioDiv's 53 real trees:
+    - location terms weighted by 1/Σ|r| (|r| under the p < 0.05 critical value zeroed);
+    - whole clusters held out to a third;
+    - spread out of the loss and gated on all 16;
+    - fixed search seeds; seeds per candidate by a rule.
+  - **New code:** `level1.py`'s correlation, weight, cluster and seed rules; `level1_noise.py` (the noise floor and
+    the seed decision); the gate's spread on all descriptors; the wrapper's commit line.
+  - **Results:** `fits/level1-pilot-v2/` (noise, correlation, control, the weights' bootstrap); 117 Python tests pass.
+- **Result:** on the pilot's own draws (the same trees), the 5-seed SD falls from 6.38 to 0.84 once the spread terms
+  go, and to 0.83 on v3's loss. The rule (SD > ¼ of the hand's Level 1 location loss, 2.36) gives 10 seeds. The run
+  was launched at 17:02 UTC: 32 generations, ≈ 6.6 h.
+- **Surprises:**
+  - The literal "one held out per cluster" would have held out every singleton (the user ruled whole clusters).
+  - Average linkage leaves five cross-cluster pairs at |r| ≥ 0.5 straddling the line, and the clusters come back in
+    0.05% of bootstrap resamples.
+  - The draw holds out limbUpturn and fits pendulousFraction05: v3's held-out test is weaker than v1's, and
+    limbElevation05 is its one live out-of-sample check.
+  - The simulated hand's correlations differ from the real ones: mean |Δr| 0.24.
+- **Not restored but added:** the plan's Darwin launch line. No commit's plan ever carried it; 3d64117's message
+  names the plan, but its diff touches only the note.
+
+## 2026-11-04: Reference fidelity, phase 3 pilot: the overnight fit and its post-fit write-up (failed; nothing accepted)
+
+- **What changed** (docs and committed results only; no code under src/rust/cli/tests/analysis):
+  - `docs/experiments/fits/level1-pilot/`: the run's files as written, the gates, Level 0's gate, `postfit.json`, and a
+    README naming registration v2 (44a21ba);
+  - `docs/experiments/code/2026-11-04-level1-pilot/postfit.py`;
+  - the note's result sections.
+- **Result:** on fresh seeds no finalist beats the hand (18.52 against 19.94, 21.58, 22.59). The gate on the finalist
+  fails: held out 0/20 on pendulousFraction05, spread outside ×2. Level 0's gate: 4/20 (the hand's 9). Gallery: not
+  flagged, but beech's hand and spindle stay inseparable.
+- **Surprises:**
+  - The noise floor: the hand's loss SD is 6.4 on 5-seed draws, and no smaller on 10 (13.2 over three draws). It comes
+    from the spread terms of near-degenerate simulated distributions (limbUpturn ≈ 0° on most trees). The in-run bests
+    were selection on noise.
+  - The held-out rule does discriminate (the hand 20/20, the fit 0/20): the earlier line in the note is corrected.
+- **For the ADR list:** limbs and the leader vary too little between trees (0.22–0.65× real, unchanged by fitting);
+  order-2 shoots droop with nothing in the rules to limit them.
+- **No mac replication** folder (`fits/level1-pilot-mac/`) was present, so none is recorded.
+
+## 2026-11-04: Reference fidelity, phase 3 pilot: Level 1 beech registered, controlled and dry-run (fit not launched)
+
+- **What changed** (analysis/ and docs only; no src/rust/cli/tests; goldens and gate c's hashed files unchanged):
+  - **Registration first** (3c64f48), from real QSMs only: `analysis/fit/sources/level1-beech.json` and beech.toml's
+    `[level1] pilot_*`.
+  - **New code:**
+    - `treesim/level1.py` (the rules) and `treesim/fit_level1.py` (resumable CMA-ES);
+    - `analysis/experiments/level1_eval.ts`, which grows the stand once for both levels and dumps skeletons to
+      /dev/shm;
+    - `level1_targets.py`, `level1_fit.py`, `level1_gate.py` (gate and real-tree control) and `level1_fit_gate.sh`;
+    - tests.
+  - **Parity:** the evaluator's reply equals `cli/fit-eval.ts`'s, and its dump at 150 is byte-identical to
+    `cli/dump-trees.ts --gate-c`'s. The describe path, serial and pooled, equals gate c's values exactly.
+- **The user's rulings in session:**
+  - correlated summaries of one measurement share one unit of weight (the outline group), as a general rule;
+  - the held-out draw stands (p1 and widestAt are outline, so the out-of-sample test rests on three);
+  - held-out values are never written by the fit;
+  - the budget is a generation count;
+  - the dry run reports memory.
+- **Surprises:**
+  - **r3.c is a girth knob.** Alone, it moves the size-matched season from 50 to 80 (stress wood; at 0.022 the stand is
+    0.46 m at 50).
+  - **The held-out rule is lenient:** the hand passes it 20/20, and the gate fails the hand on spread alone
+    (leaderDominance 0.38, limbUpturn 0.26).
+  - **The first two generations traded Level 0's lateShare** (0.51 → 6.80) for Level 1 terms.
+  - **A held-out name leaked:** the simulator's `stand.widestAt` from Level 0's trials sat in the dry run's rows. The
+    fit now drops every held-out-named trait.
+- **The user's ruling, (b):** r3.c frozen at the species' value (0.04879). Registration v2 (44a21ba):
+  `level1_targets.py --version 2 --freeze r3.c` refuses unless every target is identical to v1's, and keeps v1 in
+  `prior`. Launched 11:46 UTC: tmux `level1`, 32 generations.
+
+## 2026-11-03: Reference fidelity, phase 2: Level 0 targets from Tallo, the measurement, the gate, the fitter (no sweep run)
+
+- **What changed** (Python, `cli/`, targets `[level0]`, docs; no src/rust/presets/species; goldens unchanged; gate c's
+  registration untouched):
+  - pre-registered first (9b1f4c0): `treesim/tallo.py` → `analysis/fit/sources/tallo-level0.{json,csv}` (Tallo v1.0.0,
+    CC-BY 4.0: H–DBH and CR–DBH quantile curves, support, T, coverage), the plan's §k with the knobs;
+  - `cli/allometry.ts` (phase 1's DBH and height ported, parity 1e-9 on 67 stand trees; CR the mean of the four largest
+    live-bud tip offsets), `runStand` to 150 (`stand150`), `cli/level0-dump.ts` (parity only, in no build);
+  - `fit.py`: `load_spec(species, level=0)`, `stand.talloH`/`talloCR`, per-trait loss contributions (existing callers
+    unchanged); `treesim/fit_level0.py` (resumable CMA-ES, budget in evaluations, best-so-far each generation);
+    `level0_fit.py`, `level0_gate.py`, `level0_sweep.sh` (not launched).
+- **The user's rulings in session:** thin species (willow, rowan, holly) borrow the band width from the broadleaves'
+  pooled residuals about their own median; the budget in evaluations with a max-hours safety stop and a checkpoint;
+  ten gated, sycamore reference; scored traits are Tallo's two plus height at 60, lateShare, LAI, shade (an exception
+  to ADR 0049 §1 for the two time anchors); CR by the largest tip offset; T from a real-data control, joint over H and
+  CR, drawn from the whole support; coverage per tercile as the conditionality diagnostic.
+- **Numbers:** T 0.81–0.87 for the well-sampled species (willow 0.97, rowan 0.96, holly 0.51); control
+  self-consistency 15–20 of 20; coverage 0.75–0.87 per tercile (the thin three's terciles hold 6–11 trees: noise).
+  Dry run (beech, 78 evaluations): 8.8 s wall an evaluation on 12 workers (96 s CPU, against 18.8 s alone; 6 workers
+  slower). Shipped beech's gate: **0 of 20**: too tall for its DBH (median z_H +1.5 to +1.7; CR inside, +0.3 to +0.5),
+  and too tall for its age (127 cells at 60 against 84).
+- **Surprises:**
+  - The rule as first registered (per-trait T at 90%, both traits) passes a Tallo-drawn seed with p ≈ 0.81, so its
+    18/20 self-consistency could not hold; ruled to a joint T. The first binned control's T was not flat in DBH
+    (25-tree bins: noise); ruled to whole-support draws, with coverage as the diagnostic.
+  - A bug in the Step 0 commit: the `>= 100` edit landed in `runLone` (harmless) instead of `runStand`, so the first
+    dry run read 60, 60, 110; fixed and re-run.
+  - The parity dump read simulated DBH, H and CR before the pre-registration commit (recorded there; no z computed).
+  - Metamer coordinates are continuous across the ring; 7 of 210 beech readings carry a limb longer than half of it.
+    No codominant stem below 1.3 m in 210 readings: no √Σd² question.
+- **Before the sweep (the user's three asks):** thin species borrow T (0.84, pooled; 06915ac). Scaling: 1/2/4/6/8/12
+  workers give 26.2/19.1/13.4/10.6/9.2/8.6 s an evaluation; the core's seasons are over 99% of it, so no Pool change.
+  Sweep presets night1–3 (deep on three). **A surprise:** cmaes drops its RandomState on pickle and reseeds from the OS,
+  so a resumed generation drew other candidates; the checkpoint now keeps the state, and a SIGKILL 20 s into a
+  generation resumes to identical candidates and exactly the budgeted evaluations (28 of 28).
+
+## 2026-11-03: Reference fidelity, phase 1c: coarsen(), the pre-registered tolerances, gate c (stops oak and beech)
+
+- **What changed** (Python, `cli/dump-trees.ts --gate-c`, and docs; no src/rust/presets/species; goldens unchanged):
+  - `treesim/coarsen.py` (idempotent) and `treesim/tolerance.py`;
+  - `analysis/fit/sources/phase1-tolerances.json`, committed (e74063c) before any run, with hashes the gate asserts;
+  - `tortuosity05` in describe() (H3);
+  - Wytham's 10-model noise sets under `wytham/qsm-noise/`;
+  - `analysis/experiments/phase1_degradation.py`;
+  - held-out lists in the oak, beech and maple targets files;
+  - ADR 0049 accepted, plan §g reordered (beech 3, oak 4);
+  - [the note](experiments/2026-11-03-phase1-converter.md).
+- **Gate c:** oak 5 of 22 and beech 1 of 26 survive (amendment E's stop); maple 12 of 22. Nothing loosened. Maple passes only under
+  H1's extension to it (the spec-reviewer: 12 of 26 without it, a stop).
+- **Surprises:**
+  - The pre-registered control finds the coarsening not neutral on the datasets' own QSMs (Demol 20 of 26 over
+    tolerance): d_min as the median terminal diameter prunes half of a QSM's own tips. Demol's d_min is 43 mm.
+  - H2 is reversed: inflating twigs raises ldSlope.
+  - H4: the DBH bias signs disagree (Wytham oak +6.8%, BioDiv beech −7.4%).
+  - The simulated oak and beech stands at 150 are 41 m and 50 m tall, above every reference.
+  - A deviation: the simulated trees were not DBH-matched (the fixed choices' "DBH-matched"); only the
+    tolerance is detrended on ln DBH. Recorded as the note's decision 5.
+- **Advisor** (one consult, at the plan):
+  - keep the noise models out of every one-model glob;
+  - beech's noise floor "not measured", not BioDiv's;
+  - a hash guard;
+  - the dead-tree rule, MIN_TREES and the H2 criterion written down before the run;
+  - χ² bounds for σ, read as "tolerance uncertain" against "resolution-sensitive";
+  - per-cylinder pruning for idempotence;
+  - the real-QSM control.
+
+  All adopted.
+
+## 2026-11-03: Reference fidelity, phase 0: reconcile, audit, plan (branch `claude/reference-fidelity`, from `3d-port`)
+
+- **What changed** (docs only; no src/rust/tests/presets/species; goldens unchanged): the user's reference document saved byte for byte (`research/2026-11-03-reference-data-and-evaluation.md`); a nine-dataset audit (`plans/reference-audit/`, counts by `count_species.py` from metadata in git-ignored `data/reference/`); [the plan](plans/2026-11-03-reference-fidelity.md); ADR 0049 proposed; ROADMAP M28.
+- **Audit design:** nine `doc-lookup` agents (Haiku) found links, licences and metadata URLs; the main session downloaded only metadata (≈ 100 MB) and counted with one script, since `doc-lookup` cannot write files and WebFetch summarises large CSVs. They cost ≈ 309k tokens against a 300k cap (estimate 135–270k).
+- **Surprises:** FOR-species20K is GPL-3.0 and Weiser CC-BY-SA, not CC-BY. FOR-species20K has no QSMs and contains Wytham and Weiser. Tallo's garden broadleaves are all forest-grown. TreeML has ≤ 41 trees per garden species, and 101 of its 3,755 DBHs are > 1.5 m. **BioDiv-3DTrees is the main Level 1 source** (1,659 valid beech QSMs, 88 oak, 38 hornbeam). Wytham has no beech or birch, and its 37 oaks are ≥ 39 cm.
+- **Measured** (oak, seed 1, one core): stand to 150 seasons 8.9 s (167 cells); lone to 150 27.9 s, hitting the 200-cell world top. DetailView falls back to CPU (read, not run).
+- **Advisor** (one consult, measurement design): leaf-dependent metrics need wood-only versions; continuation and order by geometry on both sides; a degradation test in phase 1; rTwig radii are partly modelled; the gate on held-out descriptors and between-tree spread; the classifier's real-tree control; the metres-per-cell scale is not identifiable from Tallo. All folded into the plan.
+- **Merge note:** this branch's STATUS is `3d-port`'s, which predates `claude/stems-bark`; its "Direction" lines will conflict when that branch merges. Keep both.
+
+## 2026-11-02: The harness, runs 2 and 2b: one lock and stamp for the check, `doc-lookup`, the reviewer's guard (on `3d-port`)
+
+- **What changed** (no src/rust/tests edits in 2b, goldens unchanged): `check-stamped.sh` + `check-lib.sh` (`npm run check:stamp`) put the Stop hook and humans behind one `flock` and one green stamp; the hook is now the fast path plus that script, with `red`/`red-shown` so a manual red cannot lift the block. CLAUDE.md: never background the check; AGENTS.md and `/wrap-up` point at `check:stamp`; the principles doc is saved at `docs/background/harness-principles.md`. Run 2's five items ([ADR 0047](decisions/0047-harness.md), "Run 2") are committed with it.
+- **Surprise (run 2):** the hook ran a full check beside a background one: 5 false timeouts; a manual green run left no stamp, so the next stop re-ran the suite. Both fixed by the lock and `check:stamp`.
+- **Measured:** `check:stamp` 3 m 28 s warm; the hook 13 ms and a second `check:stamp` 0.14 s on the unchanged tree. The fake-command lock tests (two runs, hook beside run, red reuse, orphan not holding the lock) passed first time.
+- **Guard probe:** spec-reviewer was told to `touch /tmp/review-guard-probe` first; the PreToolUse guard blocked it under auto mode and the file does not exist. Open: `rg --pre`, and the hook's 600 s wait against its 900 s timeout.
+- **doc-lookup** (Haiku, 54k tokens) found `systemMessage` documented but not its rendering over Remote Control; asked of the user.
+
+## 2026-11-02: The harness (ADR 0047): a Stop hook gate, three read-only sub-agents, advisor nudges (on `3d-port`)
+
+- **What changed** (no code, no goldens): `.claude/settings.json` gains a `Stop` hook running `.claude/hooks/check-on-stop.sh`; `.claude/agents/` gains `Explore` (Haiku, overrides the built-in, which runs on Opus), `spec-reviewer` (Fable, `omitClaudeMd`, counterexamples must be run) and `experiment-worker` (per-condition analysis under `runs/`); `/run-experiment` step 4 gains the fan-out rule (≥ 3 conditions or ≥ 2 questions) and its `analysis/sweep.py` path is corrected to `analysis/treesim/sweep.py`; CLAUDE.md gains a "Harness" section (advisor at decision points, Explore for the spec, the reviewer after principle changes, the gate). From the user's harness-principles review (P1–P10); the frontmatter keys and hook semantics were checked against code.claude.com/docs on Claude Code 2.1.314 (`omitClaudeMd` needs 2.1.271+; `model: fable` is documented; `tools` cannot carry a `Bash(...)` specifier, so "read-only" is prompt-enforced).
+- **The hook fingerprints the code paths** (`git ls-files -c -o --exclude-standard` over `src rust tests cli` and the root configs) and runs `npm run check` only when the fingerprint differs from the last green one, so doc-only turns and the turn after a commit cost nothing; the same failing fingerprint seen twice is let through (a question to the user is never trapped). Measured: no-op 18 ms; the full check 244 s (96 tests); `timeout` 900 s.
+- **Proof of the gate:** one assertion in `tests/structure.test.ts` was inverted and the turn ended; the hook blocked with the log's last 40 lines. **Surprise:** the same run also timed out the obstacles test (30 s) on the warm laptop, the false-block case the plan had flagged. Reverted; the next stop passed without a second run (fingerprint back to the green stamp).
+- **The reviewer, two baselines for 3b:** on the empty code diff, `Verdict: no divergences`, 8.3k tokens, 17 s, no invented finding. On the I3 merge (`git diff HEAD~1 -- src rust tests cli`, 11 files), `Verdict: no divergences`, items checked with file:line, spec § and the commands run (`npm run test` 96 of 96, `cargo test` 136 of 136), `Unverified: none`; 36.8k tokens, 278 s. It ran `cargo test` though its prompt lists only `npm run test` and `node cli/run.ts`: a wider net than asked, harmless here.
+- **Explore, one rough point for 3c:** a C2 heading lookup cost 36k tokens on the built-in (Opus) Explore and 10k on the Haiku override; the prompts differed (the first also asked for a subsection and took 4 tool uses, the second was narrower), so this is not a controlled delta. Haiku noticed the principle headings are `####` (the prompts now say so).
+
+## 2026-11-02: I3 steps 3–6: the snapshot's cost, the memory problem (176 MB), reduced motion, the phone (track C, branch claude/i3-remaining)
+
+- **Step 3, no change** ([I3 note](experiments/2026-10-30-i3.md), "Step 3"). The garden's snapshot is 2–3 ms on the phone's plate and 8–11 ms at 160 cells, taken as the worker takes it: 6–7% of the season, under the plan's 20 ms. The metrics are 15–17% of it and the copy-out 0.4–1.5 ms. So there is no lean cadence and `SnapshotOptions` is unchanged. The plan's 17–148 ms was one cold call on the VM before the one-row planting.
+- **The memory problem, solved** ("The memory problem").
+  - **342.5 MB was the old worker,** both worlds live. Since `claude/foliage` the swap keeps the forest as checkpoint bytes, and with every-season snapshots it peaked at 241.9 MB.
+  - **The split:** a counting-allocator build of the core (`memstats/`). Half the memory is the plate's grids. The rest went to doublings: a realloc holds the old and new block at once, and linear memory keeps the peak. The lanes' accumulator doubled to 43 MB as the canopy rose (158 → 208.5 MB in 20 seasons). The swap's 21 MB checkpoint was written by doubling beside the live forest.
+  - **Three changes:** `intoCheckpoint` (tree-wasm, `RustWorld`, the worker's swap) frees the light, owner grid, scratch and snapshot buffers before writing; the accumulator is sized once for the slab (`slab_sweep.rs`); the snapshot writes into last season's buffer, reserved for its size (`snapshot.rs`, also 0.6–0.8 ms faster).
+  - **Result:** **176.4 MB** with the specimen beside the 160-cell plate at 200 seasons, and flat to 400. The phone's plate is 61.9 MB.
+  - **Byte-identical:** every season's snapshot and the checkpoints hash the same before and after (`same-bytes.ts`), and `intoCheckpoint`'s bytes are `save`'s (`checkpoint.test.ts`).
+  - **Not pulled:** tighter table and scratch growth (≈ 15 MB more), column types, the plate's cap.
+- **Step 5** (ADR 0046, accepted by track E for the user). A reduced-motion visitor used to see a black page for the whole of `growStill`, because the frame loop started after it. Now the plate draws at once and the still forest replaces it. The wait headless on the laptop is 1.1 s on the phone's plate and 2.8–5.1 s on the laptop's. It ships with no first-paint picture; the phone's wait is read at the soak, and the picture follows if it is over about 3 s.
+- **Step 6.**
+  - The worker stamps each snapshot with `wasmMemoryBytes` (`Snapshot.memoryBytes`, `BenchResult.memoryMB`, both captions).
+  - `garden.html?bench` with reduced motion on reports the wait.
+  - Headless (software GL): the phone's plate runs 52–65 ms a season and holds 47 MB at 40.
+  - The user's verdict on the phone: the garden "works great". No captions were taken (the laptop's network was out of reach); they are taken at the soak.
+- **Goldens unchanged.** `npm run check` passes. Its two slow tests (obstacles, seasons) time out in a full run beside another checkout's vite and pass on a re-run (96 of 96).
+
+## 2026-11-02: The second judging pass: holly and rowan adopted, willow's pick withdrawn, maple to the form list; goldens updated
+
+- **The user's picks** on the real-renderer sheets ([judging pass](reviews/2026-11-02-judging-pass.md), second pass): holly fork40 (beech's fork rules from age 40: a bush, not a cypress), rowan kappa1 (level-1 λ 0.53, κ 1.0: an oval crown on a straight stem), birch yes, maple no (the picks barely moved its flat top), willow no (its pendulous pick made it "worse than before": a flat open fan).
+- **Adopted** in `hand-overrides.toml`: holly's fork, rowan's λ and κ. **Withdrawn:** willow's pick (its keys stripped from `flora-fitted.ts` by hand, since `m27_adopt.py` amends over the current entry and a removed override leaves its keys). Maple keeps its relay pick; its flat top is ADR 0031's, after shipping. Willow's form (a dense rounded bush) joins the after-shipping list.
+- **Goldens (intended):** `mixedWood:seed1:s15` afab738c → 6b76672e and `beechWood:seed1:s30` c3245824 → c036c7ff (holly, rowan and willow are in the woods). The other 14 unchanged.
+
+## 2026-11-02: The oak held (dLambda 0.04, the user's override); goldens updated
+
+- **The user chose "held"** for the oak after the garden sheets ([oak note](experiments/2026-11-02-oak-zigzag.md)): `r2.dLambda` 0.04 in `hand-overrides.toml` [oak], so λ stays at 0.52 and the stems are straight (1–2 kinks against 60–76). In the garden's four oak-bearing seeds the held oak stands to 100 (4 of 4, storms on) with the same peak slenderness as today's; the page's throw at seed 10 was one realisation. The lone oak is a cone until its form round (after shipping, with beech's rise-then-arch).
+- **Goldens (intended):** `oakOpen:seed1:s15` f2255ecd → 955e7b1e and `mixedWood:seed1:s15` 7222241d → afab738c (the oak's ramp ends at age 28, so only the cases with an oak past it move). `beechWood` and the other 13 are unchanged.
+
+## 2026-11-02: Track C: birch drawn as birch on the phone (the user's judging sheets), the contrast floor (branch claude/foliage)
+
+- **The user's judging pass** (the labelled sheets, `figures/2026-11-02-judging-*.jpg`): garden seed 3 "fades to mist" but for one black pole, the birch stand's stems "vanish", the lone birch at 100 has a black trunk.
+- **Not a depth fade.** The renderer has none: the 64 slices only order the drawing. The garden plants one row at mid-depth (z 32; recruits 18–46). The cause is birch's tone: by age alone everything older than 8 seasons drew white (#e9e6de, ΔL* 3 below the lower sky), 92–97% of it under 1 px wide. Measured (`code/2026-11-02-judging/pale.mjs`): birch's drawn wood averaged ΔL* 0–2 from the sky on garden seed 3 at 40, the stand and the lone tree at 100.
+- **Birch's bark** (`bark-styles.ts`, two new optional fields): twig → bark also by girth (`barkFrom` 1.5, `barkAt` 4 cm), so the fine crown keeps its red-brown (the species card's "purplish-brown haze"); and `oldBelow` 0.2, so the black, rugged bark and the fissures stay in the lowest fifth (RHS: "black and rugged at the base"). Every other species is unchanged.
+- **`woodContrast`** (`ViewOptions`, default WOOD_CONTRAST 18; `&woodContrast=0` in the lab and the garden for the tokens' colours): wood paler than 18 L* below the light sky's lower tone is darkened in linear light to that floor (`keepContrast`). Only birch's white moves (to L* 77); every other bark token is already ≥ 28 below. Dark theme untouched.
+- **After:** birch's wood averages ΔL* 16 on garden seed 3 at 40, 8 on the lone birch and 6 on the stand at 100 (the rest is sub-pixel coverage, unchanged). Garden seed 2 and the beech stand are unchanged (no birch; no token moves). Sheets `2026-11-02-judging-{garden,birch}-fixed.jpg`. Goldens unchanged; `npm run check` passes (95 tests).
+
+## 2026-11-02: The judging pass; track B's accepted picks adopted at last (birch, oak, maple, willow); goldens updated
+
+- **The user's judging pass** on the phone, from track C's sheets, verbatim in [`reviews/2026-11-02-judging-pass.md`](reviews/2026-11-02-judging-pass.md): oak "no" (a hazel coppice: zigzag limbs from a low fork; the garden's trunks read as lightning bolts), the other seven "nearly", and the pale depth fade hiding trees (garden seed 3, the birch stand). The fade and birch's black trunk are track C's.
+- **Surprise: track B's picks had never reached the species.** The user accepted them on 2026-11-01 (ADR 0033–0036 and 0038 for the species that use them), but the adoption step (the tracks plan's day 2, track D's) never ran, so the garden the user judged lacked oak's posture by age, maple's relay, willow's pendulous twigs and birch's. Three of the "nearly"s point where the picks point.
+- **Adopted** as hand overrides (`analysis/fit/hand-overrides.toml`, from `code/2026-11-01-atlas/picks.toml`): birch (twig set point 45, pendulous 140 to radius 0.01, laterals every third node), oak (limbs 35 → 85 over 50 seasons of wood), maple (relay 2 from age 10 at p 0.6, relays curving 30 over 30), willow (pendulous twigs, laterals every second node). Hornbeam, rowan and holly keep today's form as the user decided; beech's fresh-look rules stand over its atlas pick. `m27_adopt.py --round round2` reproduces `flora-fitted.ts` exactly before the change, so the regeneration is clean: only the four species' entries move.
+- **Goldens (intended):** `mixedWood:seed1:s15` 2c9953a3 → 7222241d, `oakOpen:seed1:s15` 222430cd → f2255ecd, `beechWood:seed1:s30` 83ecccbb → c3245824: the woods and the oak carry the four species' new forms. `beechOpen` and the 12 others are unchanged.
+- **The oak's zigzag** ([`code/2026-11-02-overrides/oak-zigzag.py`](experiments/code/2026-11-02-overrides/oak-zigzag.py), seeds 4–6): oak's trunk ends at a third of its height (order-0 top / H 0.36) and the crown is laterals fanning from a fork at 0.04–0.06 H, under R2's ontogenetic drop (dLambda 0.1154 over ramp 15). Lowering it straightens the trunk (top / H 1.0 at 0.03) but gives a cone (0.06) or a spire (0.03), never a dome: the freed limbs are level or straight, the same rise-then-arch gap as beech's. The garden's bolts are the stand's trunks; their straightness under the same variants is measured next.
+
+## 2026-11-02: Round 2 merged (PRs #41–#43); the `forest` evidence re-run at shipping; the shipping order
+
+- **The user's look:** the beech on the phone passes. Round 2 is in `3d-port`: ADR 0039–0042 and 0044 for beech, the measured bark, the view options, the WASM gate at 200 kB.
+- **`forest`, 20 seeds, τ 0** ([note](experiments/2026-11-02-forest-evidence.md)): floor 20, H/D 20, crown base 20, plateau 19 of 20 (2026-10-30: 20, 19, 20, 17). The floor at 150 is in band on 19 of 20 (was 8) and release beside gaps fell from 13 trees to 5: the R4 fix and ADR 0032 settled the stand. τ 0.2 reported beside, as before.
+- **The shipping order (the user):** no round-5 fit; one judging pass over the other species on the phone with overrides for misses; I3 steps 3–6 on a fresh track C session; the release and the site's PR. The form gaps (the lone beech's arch, the stand's crown ratio, the lone oak's vase) wait for after the site is live.
+
+## 2026-11-02: Beech round 2, Part 2: the lone tree's limbs, the latched lift (ADR 0045, proposed, evidence against), track C's blind test v3 (branch claude/c1-calibration-ustbkz; track C on claude/foliage)
+
+- **Why the lone beech reads as oak under a realistic bark** ([note, step 1b](experiments/2026-11-02-beech-round2-stand-diagnosis.md)): the first-order scaffold rises at 36°, but the old second-order wood is level (77°) because it is shaded (ADR 0042 re-reads the light every season), while the lit tips stand at 48°: upturned clumps on level plates.
+- **ADR 0045 (proposed): `r2.lightLatch`**, a per-metamer `lit` column (the largest light fraction the wood has seen), **checkpoints at version 3** (version 2 loads with the column zero; a test builds v2 bytes), `hash.rs` hashing the column only when non-zero so the 16 goldens hold (ADR 0011's rule). Off by default; no species sets it; `npm run check` passes.
+- **Evidence against it** (20 seeds): the lone tree becomes a column (H 151, W/H 0.83) because every limb keeps its rise and the width was the level plates; the stand is byte-identical. Wood 16× stiffer does not level the plates either (73°). **Rejected by the user and the code reverted** (it is in commit 7106296): checkpoints stay at version 2, the schema unchanged, goldens unchanged. The user also chose the measured mid-grey bark for beech (track C makes it the default on `claude/foliage`).
+- **The garden's WASM gate: 170 → 200 kB gzip** (`cli/garden-size.ts`, ADR 0024 amended, the user's decision). The core is 170.7 kB after ADRs 0033–0044; PR #42 failed the gate by 0.7 kB.
+- **Track C's blind test v3** (`claude/foliage`, recounted here): at one scale with three namers, the accepted lone beech is beech 17 of 18 under the pale bark; under Pilarski's measured mid grey the stand is beech (9 of 9 with clearBole) and the lone tree oak. The judging set (seeds 4–6, five namers): the stand passes (9 of 15), the lone tree fails (5 and 7 of 15), birch 45 of 45, hornbeam's stand reads oak on those seeds. Girth ×1.45 and bark by light were tried and set aside. The choice is the user's: measured bark (stand right, lone tree's form to fix) or pale (lone tree right, stand reads birch).
+
+## 2026-11-02: ADR 0044 accepted for beech: short shoots end on wood older than 20 seasons (branch claude/c1-calibration-ustbkz)
+
+- **The user's sources** put a beech spur chain at 10–15 years (Aas, LWF Wissen 86; AFZ-DerWald 2022; Roloff 1988), with age and light both acting and clean boles in a stand. Recorded in ADR 0044.
+- **L 15, the sourced value, fails the ecology guard** (6 of 20 seeds; survival ≥ 10 of 12 on 13 against 19). The rule's clock is the wood's age, which inside the crown ends spurs younger than their chain's 15. **The user chose 20,** the nearest pass: guard 11 of 20, trunk leaf zero, LAI 7.0, lone tree unchanged (H 120, W/H 1.5, leaf below H/6 8.4% → 6.7%).
+- **Beech's patch:** `"r6.lifespan" = 20` in `hand-overrides.toml` and `flora-fitted.ts`; presets exported. Only beech's entries change.
+- **Goldens (intended):** `beechOpen:seed1:s40` 3525f9f7 → be65b72e and `beechWood:seed1:s30` 16213d5b → 83ecccbb, because both run past season 20 and the beech's spurs on wood older than 20 now rest leafless. The other 14 are unchanged.
+- **Left open:** a chain-age clock (a birth season per spur, a checkpoint version) would let the sourced 15 be set as it is; the stand's crown ratio (0.30 against a sourced 0.47 for crop trees).
+
+## 2026-11-02: Beech round 2, Part 2: the stand's leafy boles, and a lifespan for short shoots (branch claude/c1-calibration-ustbkz)
+
+- **Diagnosis** ([note](experiments/2026-11-02-beech-round2-stand-diagnosis.md)). The namers' "leafy sprouts" on the beech stand are R6 short shoots that never end: 97% of the leaf below the limb crown base is on short shoots, and 55–63% of it sits on the trunk's own nodes. A short shoot is shed only with its branch, R4 does not age a leafy one, and the renderer draws a pair of rosettes on each. R4's epicormics are not the cause. The boles are about 2% off straight. Today's beech and the accepted build are alike.
+- **ADR 0044 (proposed): `r6.lifespan`.** A short shoot on wood older than L rests as a leafless dormant bud instead. Off by default; no species sets it; goldens unchanged. Results for beech at 20 seeds:
+  - at L 40, the guard passes on 12 of 20 seeds (the accepted build: 8), the trunk's leaf goes to zero, LAI falls 7.9 → 7.7, and the lone tree's leaf below H/6 falls 8.4% → 6.7%;
+  - at L 10 the crowns thin (LAI 5.35).
+  Adoption moves the stand's ecology numbers, so it is the user's.
+- **Track C's blind test v3** (`claude/foliage`; recounted here) uses one scale and three fresh namers, seeds 1–3. The accepted lone beech is beech on 17 of 18 plates; the beech stand reads as silver birch on 18 of 18, still 8 of 9 with `clearBole`; the oak stand is oak, the lone oak hazel or willow (its form).
+- **Disk:** the session's disk filled during the first lifespan runs, which wrote empty files. Old regenerable runs were deleted (the review's garden runs and the superseded 20-seed variants) and the runs repeated.
+
+## 2026-11-02: Track C (foliage): one scale, the blind test v3 baseline, and clearBole
+
+- **`origin/3d-port` merged into `claude/foliage`** (PR #40's accepted beech), so the renders use the accepted core. Only the devlog conflicted.
+- **One scale** (`&frame=height` in the lab, `Scene.frame = "height"`): the camera is fixed by the world's height, as the garden's world frame is once its crowns reach the top, and never fitted to the trees. Off by default.
+- **`clearBole`** (`ViewOptions`, the lab's `&clearBole`, `garden.html?clearBole`): no short-shoot rosettes on a trunk below its tree's limb crown base. Track E relayed the user's choice of "both". The snapshot already carries order, y0 and limbBase, so there is no core change. Off by default.
+- **The blind test v3** ([note](experiments/2026-11-02-blind-test-v3.md)): v2's protocol at one scale, seeds 1–3, and three fresh namers for each set.
+  - The accepted beech's lone tree passes without own-crown pruning (17 of 18), but both beech stands read as silver birch (18 of 18). With `clearBole` they read as birch 8 of 9: the dark bands go, the pale, slender, wavy stems stay.
+  - Oak leaves hawthorn (27 → 3), but the lone oak reads as hazel or goat willow by its multi-stemmed vase, and the stand reads as oak 6 of 9.
+  - Fir reads as Norway spruce at 100, never fir. Hornbeam now passes pooled; birch passes.
+- **Sets 3 and 4 (track E): the stand's renderer cues.**
+  - Diagnosis: stems are drawn at their pipe-model radius (beech stand H/D 101–110, against a real stand's ≈ 73). Waviness is the core's bole sweep (1.7–2.5%), unchanged with the wind off.
+  - Two view options, off by default:
+    - `girth` draws stems at k times their radius (`&girth=1.45`);
+    - `data-bark="measured"` gives beech's bark the measured ≈ 15% reflectance (`#777a79`/`#6b6e6e`, Pilarski et al. 2008).
+  - Results: the bark moves the stand to beech (6 of 9 alone, 9 of 9 with girth and clearBole), but the lone beech reads as oak (1 of 18 alone, 8 of 18 with all three), so nothing passes. Birch is unchanged (27 of 27); hornbeam's stand drops to 3 of 9 under girth.
+  - The same plates named by different namer sets differ by up to 6 of 9.
+- **Set 5 (track E): bark by light, a pilot, not named.**
+  - `&barkLight=0.5` gives beech a lit base tone (`#8f918e`) and dims every stem by the light field's shade at its base, in linear light. WebGL2 only, off by default.
+  - Neither light measure separates a stand's bole from a lone tree's limbs. The field gives both about 0.52; `s.light`, a subtree mean, makes the lone limbs darker.
+  - Beech's nine plates were drawn as a pilot, and five namers were not spent.
+  - The stand's H/D (101–110 against ≈ 73) is recorded as a model finding.
+- **The judging set (seeds 4–6, five namers, ≥ 3 of 5 pooled):** the sourced candidate (measured bark with clearBole).
+  - The stand passes pooled (beech 9 of 15, on all three seeds). The lone tree fails: 5 and 7 of 15, read as oak or field maple, which is the form's (Part 2).
+  - Birch holds (45 of 45). Hornbeam's unchanged stand reads oak 12 of 15 on these seeds.
+  - The note states the user's choice in one line. Track C's blind-test work stops here.
+- **The user's decision (2026-11-02, via track E): beech ships with the measured mid-grey bark.**
+  - `#777a79` and `#6b6e6e` (Pilarski et al. 2008, ≈ 15% reflectance) are beech's default tokens, with dark mode's usual lift; the old pale grey is `&bark=pale`.
+  - `clearBole`, `frame=height`, `girth` and `barkLight` stay off by default.
+  - Renderer only: goldens unchanged.
+- **Surprises:**
+  - The oak stand's identical plates were named oak 6, 6 and then 0 of 9 by three sets of namers.
+  - Two slow tests (one core-only) time out at 30 s while a vite dev server runs alongside. The committed HEAD failed the same way; with the server stopped, the check passes.
+  - The lab's chart row grows with a stand's trees and shrank its canvas, and so its scale, until the shot script pinned it.
+  - One namer transposed two adjacent rows; they are scored as given.
+  - v2's note overstated its namers' seed consistency (53 of 54, not 54).
+- Goldens unchanged.
+
+## 2026-11-02: The fresh-look beech decided: four rules accepted, own-crown pruning rejected (branch claude/beech-overnight)
+
+- **The user's decisions** on the review and the overnight note ([overnight §4](experiments/2026-11-02-beech-overnight.md)):
+  - ADRs 0039–0042 (relay gate, vigour fork and arm hold, vigour drop, light orthotropy) are accepted for beech, at the repair's values under the resource vigour gate;
+  - ADR 0043 (own-crown pruning, `c5.Tvig`) is rejected, so the C5 boundary question is moot;
+  - round 2 targets the beech stand and oak's and fir's look in the renderer ([brief](plans/2026-11-02-beech-round2.md)).
+- **Beech without `c5.Tvig`:** removed from `hand-overrides.toml` and `flora-fitted.ts`, and presets exported. Only beech's entries change. The code and its test stay, off by default, so the review's runs reproduce.
+- **The unit-free gate prototype is removed** from the core (`r2.vigourCrowd`, commit 219a002): it was no better once own-crown pruning was off (overnight §2c). The scripts' `--assign` and `--variant` options stay.
+- **Golden (intended):** `beechOpen:seed1:s40` befbed31 → 3525f9f7, because own-crown pruning acted on the lone beech and is now off. `beechWood:seed1:s30` is unchanged: under the resource gate it never acted in the wood. The other 14 are unchanged.
+- **Merging this branch into `3d-port` adopts the round's beech for the garden.** That merge is the user's.
+
+## 2026-11-01: Track C (foliage): per-species bark, clumping, the coverage instrument, the specimen's memory
+
+- **Bark per species** (`render/bark-styles.ts`): three tokens per species in `scene.css` (twig, bark, old bark), with age moving a stem to bark and girth moving it to old bark. WebGL2 adds a girth-driven texture (fissures, birch's marks, pine's plates). Thresholds are set on the model's girths, about half a real stand's under ADR 0027. Surprise: pine's first try, on real girths, stayed orange to the ground in the stand; birch's lone trunk went black nearly to the crown.
+- **Clumping** (`LeafClump` in `LEAF_STYLES`): gather, spread back, fan, hang, level and size variation per species; never a card added or removed (ADR 0024). Oak is now marcescent (young trees, lower crown). The lab's `?bench` takes `&tau=`.
+- **I3 step 4:** `render/coverage.ts` (cells and leaf pixels); `leafOpacity` and `leafMinPx` as view options. **I3 step 3:** metrics are 18–30% of a 6–22 ms snapshot, so no lean cadence. **Step 5:** `growStill` takes 3.6 s (phone plate) and 5.5 s (laptop plate) headless. **Step 6:** Canvas 2D finishes the phone's intro.
+- **Memory:** the worker holds the forest as checkpoint bytes while the specimen grows, so the 160-cell plate with the specimen peaks at 218.7 MB, not 341.7 MB (ADR 0026's 256). The reloaded hash is unchanged.
+- Goldens unchanged. Note: [`2026-11-01-foliage.md`](experiments/2026-11-01-foliage.md).
+
+## 2026-11-01: A review of the fresh-look beech round (branch claude/fresh-look-beech)
+
+- **Reproduced:** the repair's sheet and metrics from the brief's command, all 63 numbers equal to `repair-round1/metrics.json`; the stand equal to the solver's; every changed `rust/presets.json` entry inside a beech patch. [Review note](experiments/2026-11-01-fresh-look-beech-review.md).
+- **Fixed:** `to_degrees` from std in two core paths, replaced by the core's own multiply (bit-identical: the repair's seed-1 hashes unchanged). Tests for the fork's action in growth and the relay gate's signal.
+- **ADRs 0039–0043, proposed,** for the round's five rules. 0043 (own-crown pruning, `c5.Tvig`) is a C5 shedding change against ADR 0032, for the user's decision. Sprugel et al. 1991 and Takenaka 1994 exist but could not be read here; their claimed content is marked unverified.
+- **A preset, `beechOpen`:** oakOpen's lone specimen with a beech, 240 wide (the repair's world). No other preset changed.
+- **Goldens (intended, new cases only):** `beechOpen:seed1:s40` and `beechWood:seed1:s30`. The round's goldens stopped at 15 seasons, before any of its rules acts; these two run long enough. `golden-coverage.py` shows each case's hash moves when a rule is switched off: the lone case exercises four rules (all but the relay gate, which is identically nil alone), the wood four (all but own-crown pruning); together all five. The 14 existing hashes are unchanged.
+- **Surprise:** in `beechWood` the vigour gate opens by season 30 (the drop and light orthotropy change its hash), and in the round's closed stand the largest v_base reaches 2,400–3,000 against the gate's 3,000 (20 seeds), not the "≤ 2,000" the round reported.
+
+## 2026-11-01: Track B (vocabulary): the six judged; picks.toml final
+
+- **The user's decisions:** oak accepted (posture by age, 35 → 85 by wood over 50); maple accepted (relay from age 10, relays curving 30); willow accepted (pendulous twigs, twig laterals every second node). Hornbeam (the relay leaves the flat cap), rowan and holly keep today's [form]. `picks.toml` final for all eight; ADRs 0033–0036 and 0038 accepted for the species that use them.
+
+## 2026-11-01: Track B (vocabulary): combined sheets for the other six; picks.toml covers all eight
+
+- **`atlas.py combined --species <sp>`** for hornbeam, oak (a second proposal, replacing the first oak sheet), maple, willow, rowan and holly, at 60 and 100 (all below the ceiling), seeds 1–3, "today (off)" first.
+- **Proposed, awaiting the user** (`picks.toml`):
+  - Oak: posture by age, limbs 35 → 85; long, near-level low limbs under a broad crown.
+  - Maple: relay from age 10; a lower fork and a rounder head.
+  - Willow: pendulous twigs with twig laterals every second node; broad and low.
+  - Holly: old limbs levelling toward 80.
+  - Hornbeam: a weak proposal (relay + curve 30); the flat cap stays.
+  - Rowan: no change; posture by age moved nothing.
+
+## 2026-11-01: Track B (vocabulary): fix A for the relay's order; the authored picks; ADRs accepted for beech and birch
+
+- **Fix A** (the user's choice, ADR 0033): a relay is stored at the order of the axis it replaces, so orders no longer climb along a relay chain (the u8 limit). The form offsets exempt the trunk's own axis rather than order 0; C5's bud bank takes the order by slot. Goldens unchanged. The accepted beech and birch sheets are bit-identical before and after; only `limbElevation` reads 0–6° higher on beech (trunk relays' laterals count as limbs).
+- **`docs/experiments/code/2026-11-01-atlas/picks.toml`:** the authored form for beech (relay, relay curvature, posture by age) and birch (pendulous twigs, twig laterals every third node); oak and the other five hold today's [form]. Track D copies them into [form] after its fit.
+- **ADRs 0033–0036 and 0038** accepted for beech and birch as authored; 0037 (elbows) stays proposed, with oak waiting for the elbows to persist.
+
+## 2026-11-01: Track B (vocabulary): beech and fir with posture by age; the u8 order fix proposed
+
+- **`atlas.py combined --species beech-aged`** (relay, relay curvature 45, limbs set point 28 levelling to 80 with wood age over 30/50/80): the broadest beech yet (W/H 0.77–1.04 at 60) with a rounded top. The tiers partly break up into irregular masses, but some level plates remain. **`fir-aged`** (limbs 60 → 110): little change in the outline.
+- **ADR 0033:** two fixes for the u8 order limit proposed, not applied. A: a relay keeps the order of the axis it replaces (no schema change; form metrics read relays as trunk). B: store pa, with a checkpoint version (every golden changes).
+
+## 2026-11-01: Track B (vocabulary): posture by age (ADR 0038, proposed)
+
+- **`r2.levels[i].agedSetPoint`, `agedOver`, `agedBy`** (r2.rs, season.rs, r3.rs): a level's growth and posture set points move with the wood's age (gravimorphism) or the tree's (phase change). Off by default; presets and goldens unchanged.
+- **The sheet** (`atlas.py aged`): the strongest form knob so far. Limb elevation spans 69° to −27°; birch at 100–130 becomes a fir-like cone of descending lower limbs.
+
+## 2026-11-01: Track B (vocabulary): elbows (ADR 0037, proposed)
+
+- **`r2.levels[i].relay`** (r2.rs): an ended axis of any level is continued by its top laterals at that level, so the limb kinks at each takeover (the relay of ADR 0033, past the trunk). Off by default; presets and goldens unchanged.
+- **The sheet** (`atlas.py elbows`): the kinks don't read at the atlas's scale (the set point straightens them). A high limb pTerm narrows and densifies oak; birch at pTerm 1 gets a sinuous top.
+
+## 2026-11-01: Track B (vocabulary): the combined sheets; birch's spike explained
+
+- **Combined sheets** (`atlas.py combined --species <sp>`): beech (relay + curvature) at 60, birch (pendulous + twig spacing) and oak (curvature + per-level κ) at 60 and 100, seeds 1–3 down the rows, "today (off)" first. Beech loses the spire on every seed (fork 0.93–1.00 → 0.26–0.38, a multi-stemmed, rounded, irregular top); `levels.0.curve` 30–60 moves it less than the seed does.
+- **Birch's spike at `relayPTerm` 1** (ADR 0033): a sympodial leader, orders 40–52 through the top 30 cells, renewed each season; it keeps the height the monopodial leader loses. Not a bug. It exposes a limit: order is a u8 and overflows after ≈ 255 relays (forest's 300 seasons), to fix before adoption.
+
+## 2026-11-01: Track B (vocabulary): twig density (ADR 0036, proposed)
+
+- **`r2.levels[i].kappa`, `lateralEvery`** (r2.rs): acrotony per level, and laterals only at every k-th node. Off by default; presets and goldens unchanged.
+- **The sheet** (`atlas.py twigs`): `levels.2.lateralEvery` 3–4 makes birch's crown open, lacy and fine (long thin twig axes), the nearest to its texture on any sheet; per-level κ tufts and broadens the limbs.
+
+## 2026-11-01: Track B (vocabulary): pendulous twigs (ADR 0035, proposed)
+
+- **`r2.levels[i].pendulous`, `pendulousRadius`** (r2.rs, season.rs, r3.rs): a level's thin axes take a hanging set point in growth and posture, blended back to the level's own by girth. Off by default; presets and goldens unchanged.
+- **The sheet** (`atlas.py pendulous`): at radius ≤ 0.01 the twigs hang without the collapse that `levels.2.setPoint` ≥ 80 caused; at 0.02–0.04 oak collapses again. The hanging is faint at the atlas's scale: birch's curtains need long thin shoots as well (twig density and length, next).
+
+## 2026-11-01: Track B (vocabulary): curvature along the limb (ADR 0034, proposed)
+
+- **`r2.levels[i].curve`, `curveLength`** (r2.rs, season.rs, r3.rs): a level's growth and posture set points move by curve·min(1, node/curveLength) along each non-trunk axis. Off by default; presets and goldens unchanged.
+- **The sheet** (`atlas.py curve`): limbs lower and their tips arch; oak gets a fringe of hanging limb ends; with the relay, beech's top broadens and rounds at 60. No species changes kind on curvature alone. Track A's identity card ranks curvature first and pendulous twigs second; that is this track's order.
+
+## 2026-11-01: Track B (vocabulary): the sympodial relay (ADR 0033, proposed)
+
+- **`r2.relay`, `r2.relayAge`, `r2.relayPTerm`** (r2.rs, season.rs): laterals on the top nodes under an ended pa-0 apex grow as pa 0 (spec §R2.4's "distal laterals take over"), and the leader may end from an age. Off by default; presets and goldens unchanged.
+- **The form atlas** (`docs/experiments/code/2026-11-01-atlas/atlas.py`): a sheet per rule, beech, oak and birch at 60 and 100. The relay's sheet: beech splits into ascending co-dominant stems (a rounder top at 60 with a high relay p_term, a column of stems by 100); oak barely moves; birch fuller. The stems do not arch: curvature along the limb is next.
+
+## 2026-11-01: the form re-pick, the third hornbeam pilot, the round-5 overnight started
+
+- **The re-pick** (`repick.py`, the user's rule): stand LAI in band, then the floor nearest the measured, then alive ≥ 0.8 at 100, behind a guard (lone W/H 0.3–2.5, H < 190, stand limb crown ratio ≥ 0.2). It replaces the overnight's stand-first rule, which picked columns. The picks: hornbeam 2-3-2, birch 3-3-2, oak 0-3-0 (flagged), willow 0-2-2; maple 0-0-0, rowan and holly round 2's (the user's). The stands were replayed with the ground written; every hash matched.
+- **Hornbeam's third pilot:** start loss 15.4, LM 7.2; 4 of 6 measured in band after LM alone; stand alive; gallery 0.47 from the hand form. The user judged it a pass as a pilot. The plan's §3.4 and ADR 0029 now say the full acceptance rule applies after CMA-ES and verification, not at the end of LM.
+- **`m27_fit.py --active`** now adds to the screening's set, and `--active-for` limits it to named species; the old replace-the-set meaning is `--only-active`. Why: r6.qMin and r1.mf read inactive for birch, oak, beech and hornbeam, because the screening's 0.08 step on Q_ss's log scale cannot reach the roof above the seedling's cut.
+
+## 2026-11-01: ADR 0032: the acclimated leaf cost and T_rel fixed per species (goldens updated)
+
+- **The model's configuration** (ADR 0032, the user): R1's leaf cost acclimated with one global c = 0.3, and C5's T_rel fixed per species from Hagemeier & Leuschner's lowest shade leaves (birch 0.21, oak 0.063, hornbeam 0.025, beech 0.008 measured; willow 0.14, rowan 0.072, maple 0.044, holly 0.021, fir 0.0091, pine 0.23 estimated by the tolerance-score regression). FITTED_FLORA regenerated (`m27_adopt.py`; only those lines change); T_rel leaves the targets files' `[[param]]` for `[fixed]`; `forest` takes c 0.3 and T_rel 0.0155.
+- **Goldens updated, for that reason:** forest, mixedWood and oakOpen (the presets on FOREST and the species). The rest are unchanged.
+- **Why:** the stand, not the lone tree. Hornbeam's closed stand under it had LAI 9.2–9.6 (measured 8.3 ± 1.5) and a 1% floor (measured 1.3%), and forest's plateau held on 3 of 3 seeds. Metamers rise 40–70%: the phone's budget is checked next.
+
+## 2026-11-01: ADR 0029 and ADR 0031 accepted
+
+- **ADR 0029** (form by hand, physiology by fit) accepted.
+- **ADR 0031** accepted as a limitation on the open-grown crown's top, with an addition: the flat top is in growth, not pruning, so the fix is architectural, Troll's model's reiteration (ascending co-dominant limbs that arch at the tips), an R2 feature for after shipping. The dome is not diagnosed further.
+
+## 2026-10-31: Both shedding rules relaxed at once: still no dome
+
+- **`both.py`:** acclimated leaf cost (c 0.3) with T_rel at the measured shade tolerance (hornbeam 0.025, beech 0.008; forest 0.0155). Hornbeam fills inside (top fifth 33% against 38%) but stays flat-topped; its stand's crowns do not deepen and its floor darkens to 1%; forest's plateau holds; beech stays a spire. Metamers +13–72% throughout.
+- **ADR 0031** updated with it as the sixth diagnostic: the limitation stands.
+
+## 2026-10-31: Stand deaths at 100 penalised; the acclimated leaf cost; ADR 0031 drafted
+
+- **Harness:** `fit.loss` and `fit_lm`'s residuals penalise `stand.alive100` as `stand.alive` (one pytest). The hornbeam pilot re-scored on fresh seeds: its stand keeps 67% at 100 against the start's 79%, and its loss is 24.7 against 8.3.
+- **`r1.leafCost`** "acclimated" with `r1.leafCostShade` (default flat, goldens unchanged, two unit tests): m_f·(c + (1 − c)·Q) cuts the compensation light by up to two-thirds, but the shed twigs pass to C5's T_rel test and the cap stays (top fifth 44–46%). The plateau holds; the stand is mixed.
+- **ADR 0031** (proposed): the cap is the shedding rules together; no single-principle candidate met dome, stand crown and plateau; recorded as a limitation, ablations kept off, round 5 proceeds on the picks.
+
+## 2026-10-31: The hornbeam pilot; the cap on the fitted tree; R1's k_shed (proposed)
+
+- **Pilot** (`fits/round5-pilot/hornbeam.json`): one accepted LM step; not accepted (5 of 6 measured, `stand.lateShare` 1.35 against 1.23). α 2.81 → 2.50, m_f 0.0817 → 0.0822, L_h 92 → 125, m_f/α 0.029 → 0.033. Its closed stand's middle row is dead by 100, which the loss (stand scored at 60) cannot see. `panel-figure.py` now labels an all-dead middle row instead of failing.
+- **The cap persists on the fitted hornbeam** (top fifth 38% of the leaf); the shed branches are still single twigs at foliage cost.
+- **`r1.kShed`** (default 1, goldens unchanged, one unit test; `Tree::deficit` kept beside the table, out of the hash and checkpoints): at 3 the twigs are shed by T_rel·Q_top instead, the cap gets stronger (45%), the plateau holds on 3 of 3 seeds and forest keeps nearly twice the metamers at 300. Proposed, not adopted.
+
+## 2026-10-31: R4's abort age counts dormant seasons (goldens updated); ADR 0030 rejected
+
+- **R4** (spec §R4, "dormant buds have a finite lifespan"): a resting bud now ages only in the seasons it rests dormant (`season.rs`). A leafy short shoot (R6) no longer ages toward L_dorm, nor raises its break and light-release thresholds through δ·age. Before, a short shoot older than L_dorm was aborted at its first dark season: 87% of the lone birch's aborts between 60 and 100. One unit test, `a_short_shoot_does_not_age_toward_l_dorm`.
+- **Goldens updated, for that reason:** the ten presets that run R4 with short shoots (skyTree, skyStand, obliqueSun, conifer, weeping, troll, forest, thinning, mixedWood, oakOpen); explosion, bh, wall and pair are unchanged. The species' round-2 fits and the 20-seed evidence predate it.
+- **ADR 0030 rejected** (the user): the saturating response rounds the lone hornbeam only by raising production below full sun everywhere; the stand's crown gets shallower and forest's plateau holds on 1 of 3 seeds. `r1.response` stays as an ablation.
+
+## 2026-10-31: Species round 5: the shed branches decomposed; R1's light response; R4's abort age
+
+- **Shed branches** (`rust/core/examples/shed_log.rs`, hornbeam at ramp 25): 26,316 by season 100, almost all one leafy short shoot shed for P < M; sapwood is under 1% of M_b, so the test is α·Q·d(L) < m_f, a compensation light of 0.04–0.08 that rises with path length.
+- **R1's light response** (ADR 0030, proposed): `r1.response` "saturating" with `r1.qHalf` (default linear, goldens unchanged, two unit tests). It rounds the lone hornbeam at 60 but drives it to the ceiling by 100, makes the stand's crown shallower (limb crown ratio 0.39 → 0.33), and loosens forest's plateau (1 of 3 seeds pass against 3 of 3).
+- **R4's abort age** (proposed, `r4-dormant-age.patch`, not applied): age counts dormant seasons only; a unit test; 10 of 14 goldens move; birch keeps its crown to 100.
+- No fit.
+
+## 2026-10-31: Species round 5: the picks in [form], the cap is shedding, birch's aborts
+
+- **The picks** (`form-picks.py`, `[form]` with dated comments): the review's nearest-brief cell for six species, hornbeam the user's, beech round 2's. None changes kind on seeds 1–3. The lab panel, round `form` (`figures/2026-10-31-panel-form-*`).
+- **The cap** (`cap.py`, hornbeam at ramp 25): leaf, buds, light and aborts in ten height bands. Q_ss, k_ext and L_h leave the cap; C5 off is the same run (R1's `shed` "carbon" sheds regardless of C5); no shedding at all gives a dense rounded crown. The closed stand's lid is light-limited (Q 0.03–0.07, 15–80% of buds aborting per decade below 0.7 H): a different cap.
+- **Birch** (`cap.py --birch`): 87% of the buds aborted 60–100 were short shoots past l_dorm with light above Q_ss the season before. R4 counts resting age, short-shoot seasons included.
+- **`treesim`'s buds.csv** gains each bud's `birthId` (CLI only; the core and goldens untouched).
+- No fit.
+
+## 2026-10-31: Species round 5: the dome sweep, birch's vigour, the picks at three seeds
+
+- **The dome sweep** (`dome-sweep.py`; beech, hornbeam, oak, maple): `r2.ramp`, `levels.0.pTerm`, `levels.0.generator` and the twig set point, one at a time. Nothing rounds a top; the flat cap is in every cell. `r2.ramp` is live where Δλ is large (it moves fork height and breadth) and dead for beech. Beech stops on form.
+- **Birch is not starving** (`birch-vigour.py`): production exceeds maintenance, the reserve holds near 5200 (oak's near 0), and the crown shrinks 60 → 100 (live buds −36%).
+- **The picks at seeds 1–3** (`form-picks.py`): hornbeam's provisional pick keeps its kind; beech drawn at round 2's, flagged. `form-grid.py`'s drawing is now `draw_cells`, shared by the three scripts (it redraws the old sheets byte for byte).
+- No fit, no `[form]` change, no golden moved.
+
+## 2026-10-31: Species round 5: the form grids and the posture knob
+
+- **The grids:** `form-grid.py`, the user's three knobs per species (4 × 4 × 3, beech's and hornbeam's ranges theirs after their look at those sheets), seed 1, sheets at 60 and 100 (`figures/2026-10-31-form-grid-*`), with the cells nearest the review's named cells marked. `form-sweep.py`'s `run_cell` takes a seed for the picks' regrow.
+- **The posture set point is the tenth form knob** (ADR 0029 amended, `[form]` and `[[formRange]]` in the eight targets files, the gallery's pins): birch sets 70; the others leave it unset and follow `levels.1.setPoint`. Its sweep (birch, oak, 20–90) moves the limbs (elev 69° → 3°) but not the outline.
+- **Surprise:** beech's grid holds no dome. It runs from spires through tiered cones to stacked level tables, so the question moves to the core (the level-0 distichous generator). Notes in the [species note](experiments/2026-10-30-species-3d.md): `levels.2.setPoint` ≥ 80 is a core behaviour; the posture, not the growth set point, holds the limbs; the profile does not tell a spruce from a dome (also in the review's "could not settle" list).
+- No golden moved (Python and docs only). No fit started.
+
+## 2026-10-31: Species round 5 built: form by hand, physiology by fit (ADR 0029 proposed)
+
+- **Plan:** [round 5](plans/2026-10-31-species-round5.md) §3.1–3.4. The user changed §3.2: a one-knob-at-a-time sweep comes first, and the three-knob grid follows once the user has named the knobs per species. No fit started.
+- **Round 4 stopped** after birch: 5 of 5 measured in band, but at 100 a flat-topped pagoda (not accepted). Birch is the gallery's specimen ([note](experiments/2026-10-30-species-3d.md), "Round 4: birch").
+- **§3.1:** `limbElevation` (form.rs, `FORM_COLUMNS` 11 → 12, a unit test on hand-built limbs); the lone trial run on to 100 (`lone100`, the reported set as `…100`); the stand's `crownRatio100`. The lone trial to 100 takes 2.0–2.6× its time to 60.
+- **The form sweep:** `form-sweep.py`, eight species × nine knobs × four values plus the round-2 reference cell, natively at seed 1, two sheets a species (`figures/2026-10-31-form-sweep-*`).
+- **§3.3:** the gallery (six rejects) and `m27_gallery.py` (`gallery-check.txt`).
+- **§3.4:** the targets files' `[form]`, `[[formRange]]` and `[[report]]`; the LM step log; `shapeFlag`; `m27_fit.py --pilot`; the panel's round `form`. Python tests 4 → 7. ADR 0029 drafted.
+- **Surprises:**
+  - `limbElevation` mostly reads back the level-1 set point (oak 31° = 90 − 58.6 in every row but the set point's);
+  - birch's limbs are held at 20° by `postureSetPoint` 70, a form parameter outside the nine, so its set-point row does not move them;
+  - oak's and hornbeam's round-2 crowns are broad, not spindles, so they stay out of the gallery;
+  - beech's round 2 and round 3's cone are 1.2 standardised units apart, within the noise of three seeds;
+  - most beech sweep cells reach the woods' top by 100.
+- **Goldens:** unchanged (`bench --compare` against 1f41990: the same hash in all seven cases).
+
+## 2026-10-31: Species round 4: the harness, the targets re-sourced, ADR 0028; round 3 re-scored
+
+- **Plan:** [round 4](plans/2026-10-31-species-round4.md) steps B–D, after the [targets audit](reviews/2026-10-31-species-target-audit.md). Steps A (the hold-out) and E (the re-fit) are the user's.
+- **Harness:** stand LAI (`metrics::lai`); the limb crown base (`limbBase`, `limbCrownRatio`, metrics.csv 39 → 41) as `stand.crownRatio`; the profile trait kind (ten bands, one trait's weight); roofs 1.2 and 1.75 (26.3%, 18.5%); `m27_rescore.py`; `m27_holdout.py --skip floor`; `m27_fit.py --method lm --smoke`; line-up panels (`code/2026-10-31-species-round4/panel-*`).
+- **Targets** (ADR 0028): per-species stand H/D (birch 95, oak 75, beech 82, hornbeam 86, maple 68; the generic 70 described for the rest); `lone.spread` at the trial's age (beech 0.6, oak 0.75, hornbeam and maple 0.7); lone H/D described except beech's 48; the limb crown ratio measured for beech (0.57) and oak (0.42, half weight) from Pretzsch 2019; LAI measured for birch, oak, hornbeam, beech (Hagemeier & Leuschner 2019); `lone.profile` replaces `widestAt` and `crownFullness`; η ≤ 1.0 for the eight broadleaves; beech's acceptance withdrawn.
+- **The user's calls during the work:**
+  - Pretzsch 2015's "open-grown" relations are envelopes of forest-plot trees, so lone traits stay described;
+  - spread is set at 60 years, not parkland age;
+  - LAI is kept, though it does not deliver the floor;
+  - survival light credits only seasons past the 4-season starvation timer (birch had read 25% too tolerant);
+  - the limb base is cumulative from below (the per-limb rule read 0 on a 126-limb crown).
+- **Surprises:**
+  - beech's short stand crown is the model, not the definition;
+  - round 3's beech and hornbeam stands already have LAI in band, with floors of 4–7%;
+  - Hein & Spiecker 2008, which round 3's beech spread cited, is ash and sycamore;
+  - the profile shows oak, hornbeam and maple as vases;
+  - rowan and holly are left with no measured target.
+- **Re-score of round 3:** beech 6 of 8, birch 4 of 5, oak 4 of 7, hornbeam 4 of 6, willow 3 of 3, maple 2 of 2, rowan and holly 0 of 0 ([note](experiments/2026-10-30-species-3d.md), "Round 4").
+- **Goldens:** unchanged (`bench --compare`: the same hash in all seven cases).
+
+## 2026-10-31: Species steps 2–3: the seven fitted overnight, birch re-fitted, the hold-out stopped for a review of the targets
+
+- **Step 2** (the user's laptop, 12 workers, 7 h 53 min): willow, rowan, holly and maple pass on fresh seeds; birch, oak and hornbeam do not ([note](experiments/2026-10-30-species-3d.md)). Oak and hornbeam miss only the stand's late share, both high; they go to the hold-out as fitted (the user). κ and `r2.levels.1.eta` low recur (a finding about 3D crowns, not bounds to tighten); `r2.aC` at its bound is beech's alone.
+- **Birch** (the user): `c6.r0`'s top doubled to 0.0125 for birch alone. Re-fitted: r0 0.00997, stand H/D 70.2 (was 86.9), loss 15.9 → 3.6, 4 of 5 measured in band. It misses survival light by 0.004, which the shade house cannot resolve: the seedlings die at season 4 under every roof at light ≤ 0.158 and live at ≥ 0.217, and the band's bottom (0.16) falls between.
+- **Hold-out** (`m27_holdout.py`): batched across species, the continuous survival order, the tallest per species against the top, `--origin` for dev-server links. **Stopped by the user** during the mixed woods, to review how targets are defined. Only the floors survive: **every own wood's floor is 7–20%**, so the shade-tolerant woods are 5–9× too bright (beech 7.3% against 1.5%), round 2 and round 3 alike.
+- **Surprises:** the floor hardly depends on the species; `lone.slenderness` (48) and `stand.slenderness` (70) are the same target for all ten species; the shade house's death timer (season 4 below the cut) makes survival light a step for birch.
+- **Gotcha:** `m27_holdout.py`'s native runs need `~/.cargo/bin` on PATH; its sections print only at the end.
+- **Goldens:** unchanged (nothing adopted).
+
+## 2026-10-30: Species step 1 revised: the closed stand, 3D form metrics, LM then CMA-ES; beech passes
+
+- **User:** the first pilot's failure was the stand trial's, a hedgerow lit from its faces and empty depth. The user asked for:
+  - a closed stand;
+  - form metrics checked on 3D crowns;
+  - LM, then a CMA-ES finisher from the LM point, with a noise-tested active set;
+  - acceptance by measured targets on fresh seeds; the round-2 loss comparison dropped.
+
+  The four deviations of the first round stand ([note](experiments/2026-10-30-species-3d.md), plan §0.8–9 and §2).
+- **The trial:** three rows of four on an 84-cell periodic ring between opaque faces; the middle row is measured at 60 and 100. It takes ≈ 6 s to 100, against 45 s. Release keeps the one-row stand (`rowParams`).
+- **Form (`form.rs`):**
+  - the profile's band width is max(x, z extent), because the slab caps z at its 64-cell depth;
+  - a fork needs a lateral of ≥ 0.7 of the trunk's radius that also climbs ≥ 0.7 of the trunk's climb above the node. Beech's basal limb read as a fork at 0.014; now 0.98;
+  - `lone.spread` takes max(crownWidth, crownDepth).
+  - New unit tests: a crown spreading in z, and a thick basal limb that is not a fork.
+- **The search (`fit_lm.py`):** screening against seed noise (seeds 1–4); LM descent; CMA-ES from the LM point (covariance (JᵀJ)⁻¹, population 10, 4 seeds, 30 generations, patience 15); selection on seeds 501–506; verification on 1001–1006. With `--skip-done`, a done species' shift still carries on.
+- **Beech pilot: accepted.**
+  - All 6 measured targets are in band on fresh seeds: stand height 85, lateShare 1.45, earlyShare 0.51, H/D lone 52 and stand 64, survival light 2.6%.
+  - Loss 72.5 → 4.8.
+  - Only the stand's leaf crown ratio (described) is outside: 0.315 against 0.55.
+  - `r2.aC` went to its lower bound.
+  - Time: 1 h 50 min on 12 workers (screening 3.4 min, LM 19.5, CMA-ES 84, verification 3.5).
+- **Surprises:**
+  - the noise test activates all 17 parameters (seed noise ≈ 0.05 band on most traits);
+  - LM's best point (4.20) was a lucky realisation (9.4 on selection seeds); CMA-ES's fresh seeds corrected for it.
+- **Goldens:** unchanged (the form metrics are not hashed; no preset changed).
+
+## 2026-10-30: Species in 3D, steps 0–1, and the beech pilot (stopped)
+
+- **User:** [the species plan](plans/2026-10-30-species.md) steps 0–1 with the beech pilot, on the user's 12-core laptop (12 workers); stop on the plan's rules ([note](experiments/2026-10-30-species-3d.md)).
+- **Step 0 (gate passed):** `flora.ts`'s `in3d` moved into `m27_adopt.py` (`PHYLLOTAXIS`, E 4·10⁶); `FLORA = FITTED_FLORA`. The regenerated `flora-fitted.ts` differs only by the overlay's values; `rust/presets.json` is byte-identical; check green; goldens unchanged. Round 2's fits moved to `fits/round2/` (`m27_adopt.py --round`).
+- **Step 1:**
+  - trials at the woods' top (200); `runStand(…, 60 | 100)` with the leaf crown ratio (`boleCrownRatio` beside it); `runShade` reports seasons survived; a `wood` trial (own wood per area, τ 0, floor at 100 and 150); every trial frees its world;
+  - targets: `stand.floor` → `[holdout] floor`; `c6.r0` bounds ÷ 8 (the 2D bounds excluded every 3D r0);
+  - `shade.survivalLight` is now continuous (log-light intervals weighted by the seasons lived); the step statistic stays as `survivalLightStep`;
+  - `analysis/treesim/fit_lm.py` and `m27_fit.py --method lm`; `m27_holdout.py --round`, with the floor section, the mixed wood at 3 seeds every 50 seasons, and the tallest tree.
+- **Surprises:**
+  - the shade house between τ 0.2 faces floors at ≈ 8% under any roof. It now has opaque faces; roofs [1 … 5.6] give 30 → 1.8%;
+  - the plan's m_w = 64·(0.0025/r0)² would have cut beech's sapwood cost by a third at the start. m_w holds each species' own m_w·r0² instead;
+  - LM is a hand-written loop, not `least_squares`: r0's per-iteration update has no place in scipy's trust region.
+- **The pilot stopped on both rules.** Loss went 65.0 → 19.85 over 7 accepted iterations, then four rejected halvings. On fresh seeds the loss was start 71.3, fit 33.9, against round 2's 7.81.
+  - Heights at 60, lone H/D, earlyShare and survival light came into their bands.
+  - Stand H/D (41 against 70), lateShare, fork height and the leaf crown ratio stayed out.
+  - The r0 rule's premise fails: at thin tips the trunk is mostly stress wood, so no single r0 gives both slenderness targets.
+  - Realisation noise (≈ ±1–2 in loss under common seeds) matches a step's gain from iteration 4 on.
+  - The screening's 20% rule made 15 parameters active where 10 clear the noise.
+- **Timings (laptop, 12 workers):** one evaluation 11 s; screening 213 s; an iteration 194–258 s; the pilot 36 min.
+- **Goldens:** unchanged.
+
+## 2026-10-30: I3 steps 1–2: the picture in depth, the plate, the garden's planting
+
+- **User:** [the I3 plan](plans/2026-10-30-i3.md) steps 1–2, measured before and after beside its §1 ([note](experiments/2026-10-30-i3.md)); stop on any reading outside a step's range. Three stops, each resolved by the user.
+- **Step 1:**
+  - the snapshot gains `zOrder` (rows far to near, sorted in Rust) and drops `ref*` (8% fewer bytes);
+  - the scene cuts the order into 64 depth slices, wood then leaves in each; WebGL2 draws ranges of its batches by re-pointing the instance attributes, Canvas 2D 8 slices;
+  - leaves are foreshortened by their shoot's in-plane share;
+  - ADR 0008's pseudo-depth is removed, with the `depth` and `lite` view options and adaptive quality's last level.
+- **Stop 1: the frame bench could not judge the hitch.** Under SwiftShader the GL shares the CPU with the worker, so the same build's worker time swung 40% at idle. Interleaved runs (ABAB, 12 of them) were recorded with that caveat, and the user moved acceptance to a Node instrument (`scene.bench.ts`, per snapshot).
+- **Stop 2: the first leaf layout took back 4 ms.** Its z-order walk scattered its reads. One pass (row-order layout, one counting sort by slice, scattered writes) brought the per-snapshot work 55–60% under "before" (forest at 40: 53 → 21 ms). The per-frame Scene work is +0.5–0.6 ms, accepted as the slices' price.
+- **Step 2:** `plateWidth` (now `src/web/plate.ts`) is capped at 160; the "world" frame's floor is `Scene.frameHeight` (65 cells); recruits scale with area.
+- **Stop 3: the plan's premise was wrong.** Recruits do not dominate a phone plate at 40; the planted trees do. The cut was 2% at 40 and 11–12% at 100.
+- **Phone check (user):** no visible lag in the garden; the lab stutters from season ≈ 75 (the full snapshot); leaves stable; tree shapes good, the first time on the phone. But too many trees: three rows projected 21 crowns onto one strip.
+- **User's decision:** the garden plants one row (`Planting`; spacing 28 from the user's readings), recruits per cell of width, kept to O4's new `band` option. The calibration's forest and the woods keep per-area planting. `garden.html` takes `?seed=`, `?renderer=canvas`, `?rows=`, `?spacing=` and `?recruits=`. ADR 0024's view line was amended (no *added* foreshortening cue), and ADR 0025 gained the planting line.
+- **Phone `?bench`** (seed 10, 40 seasons): draw p95 6.3 ms, frame p95 16.8 ms, worker 50.5 ms, 10.2k metamers.
+- **Goldens:** unchanged (`bench --compare` against 422d704 after each step).
+
+## 2026-10-30: C1 round 3, form steps 3–5: closure, the τ 0.1 row, 20-seed evidence
+
+- **User:** steps 3 and 4 of [the form plan](plans/2026-10-30-form.md), stopping before step 4's knobs with step 3's readings; then step 5 with the user's criteria ([note](experiments/2026-10-30-c1-round3-form.md), [ADR 0027](decisions/0027-girth-in-3d.md)'s evidence section).
+- **Tools:** the CLI's `light.csv` gains `lad` (leaf area density over depth), and `--light` writes `buds.csv` (every live bud). Readers: `closure.py`, `budget.py`, `locality.py`, `evidence.py`, `plateau.py`.
+- **Step 3 (measured):**
+  - planted survival follows O4's background mortality (0.002 a season) within 2 trees: 76, 67, 59, 51 of 90 at 100, 150, 200, 300, against 74, 67, 60, 49;
+  - at τ 0 the floor tracks the gap fraction (7.7% at 31% gaps, 12.2% at 50%); crowns are 1.36 × the spacing and cannot widen; 1 of about 850 seedlings reaches 20 cells by 300 (127 at τ 0.2);
+  - the leaf crown ratio's rise from 150 to 300 is release beside dead neighbours (leaf base 43 → 36 there, 45 → 42 elsewhere);
+  - the rescale cut buds by 35–43% and production by about 55%, fates unchanged.
+- **Surprise:** the floor reads the same under gaps and under LAI ≥ 6 (12% at 200 and 300: the plan's stop). Transport is local under the canopy (rows 40–60: dense columns 0.15, gaps 0.35 at row 50), but 35–40 rows of bare boles under an oblique sky average it at the ground. The stop rule now reads rows 40–60.
+- **User's decisions:**
+  - gap filling is not a target: step 4's ξ and release runs were skipped;
+  - in their slot, the τ 0.1 row: floor 11.6 / 13.9 / 14.8% at 100 / 150 / 300, 79 seedlings to 20 cells; no preset's τ changes;
+  - each measure at its season: floor at 100 (first chosen at 150; 20 seeds put that at median 10.4%, 8 of 20), H/D at 300, crown base at 150 and 300, plateau on the same trees (the stand median's gain counts deaths of short trees: 13 of 20). Denser planting declined (1.7 × metamers).
+- **Evidence** (20 seeds, τ 0): floor 20 of 20, stand H/D 19 (median 70.6), crown base 20, plateau 17. τ 0.2 reported: floor 0, H/D 18, crown base 20, plateau 16.
+- **Goldens:** unchanged (CLI outputs and docs only).
+
+## 2026-10-30: C1 round 3, form steps 1–2: girth in 3D, the crown base by leaf area
+
+- **User:** implement [the form plan](plans/2026-10-30-form.md) step by step, stopping on any measurement outside a step's range. Two stops, each resolved by the user ([note](experiments/2026-10-30-c1-round3-form.md), [ADR 0027](decisions/0027-girth-in-3d.md)).
+- **Step 1, applied:**
+  - a shed branch's scar records its pipe radius, `radius − stressWood` (`c5.rs`);
+  - r0 ÷ 8 and m_w × 64 everywhere (world, fitted and hand species, fixtures), keeping m_w·r0²;
+  - lab sliders widened.
+- **Stop 1: storms broke the crowns.** With thin pipes, stress wood holds every branch near σ_target. σ_break was 1.5× that, and a storm loads the top 2.5×. At k8 every storm broke 82–95% of the stand's metamers, and stand H/D at 300 was 35–40. With storms off the rescale is sound: H/D 78 and 73, height level at 81–83. The plan's lower plateau (67) was storm damage.
+- **Stop 2: windthrow.** σ_break 9000 stopped breakage, but windthrow then threw 46 of 90 planted trees: its slenderness ramp started at H/D 40. It had been dormant in 3D because H/D was 10.
+- **The user's fixes:**
+  - the windthrow ramp starts at H/D 80, spec §10's band (`slenderness_risk`, with a test);
+  - σ_break 7000, chosen by sweep: the median storm takes 3–6% of the stand's metamers, the worst 10–40%; 6000 broke the crowns, 8000 broke nothing.
+- **Result** (`forest`, 3 seeds, 300 seasons): H/D 70 at both τ, height level at 77, windthrow 0–2 of 90, 68k metamers per seed (105k before).
+- **The lone tree:** `forest`'s own, with H/D 40–42, levels off at 87–89. Its first reading used `oakOpen`, a different model, pinned at its top (120). At the woods' top (200, now the preset's) the fitted oak climbs ≈ 1.4 cells a season and is pinned by 150: track 3's.
+- **The mixed wood:** windthrow 11%, nine birch at H/D ≈ 128.
+- **Step 2:** `leafBase` and `leafCrownRatio` (5% of live buds' leaf area; metrics 37 → 39). The stand reads 0.44–0.64, the lone tree 0.71–0.81, where the branch measure reads 0.99 for both. The stop rule doesn't trip. The stand's ratio still rises 150 → 300: carried into step 3.
+- **Tools:** `metamers.csv` gains R3's `stress`. Scripts and outputs in `experiments/code/2026-10-30-form/`.
+- **Surprise:** `flora-fitted.ts` no longer matches what `m27_adopt.py` generates (phyllotaxis and E), so this round edited it by hand. The script must reproduce the file before track 3 regenerates.
+- **Goldens** (intended): all 14 for the rescale (radius is in the hashed tables; the scar fix alone moved the 7 presets with R3); then `forest` for σ_break 7000. Moving `oakOpen`'s top changed no golden: at season 15 the tree is far below either top.
+
+## 2026-11-01: an independent review of the 3D port
+
+- **User:** review the port's progress and what remains to finish it ([review](reviews/2026-11-01-3d-port-review-2.md), from the handover). Docs only; nothing re-run.
+- **Corrections to round 2** (derived from the code, for round 3 to measure):
+  - R1's sapwood cost is m_w·π·r0²·Σ(path to each live tip), linear in tips, so thick trunks don't raise it. H/D is C6's: lower r0 and raise m_w to keep m_w·r0².
+  - The slab's sky has a near-zenith band (72.5–90° at K 16). A 17% floor is k·LAI ≈ 1.8; 2–10% needs 2.3–3.9. The limiter is the canopy's leaf area.
+  - The woods run the fitted beech (hyperbolic L_h 108.9, m_f 0.077, Q_ss 0.0126), not `HAND_FLORA`'s: the fix is a 3D re-fit.
+  - Crown ratio uses the lowest live first-order branch, which one twig pins: redefine by leaf area.
+- **User's decisions:** done means a shippable bar (the mixed wood right in depth, within the phone's budget, floor, H/D and crown base as 20-seed evidence); I3 alongside a merged C1 + C2; the 3D species fits run overnight on the user's 12-core machine.
+- **Goldens:** unchanged.
+
+## 2026-11-01: C1 round 2: height first, R5 on neighbours, the stand in depth
+
+- **User** (on round 1): height first, through R1, to 300 seasons; R5 on neighbours everywhere; the interior's stand planted per area, with the floor measured under the crowns; the crown base checked before adding anything. Accepted round 1, the pre-C1 fixes and ADR 0026 (PR #22).
+- **Height** ([note](experiments/2026-11-01-c1-round2.md)):
+  - with R5 on neighbours, R1 as it stands levels `forest` off at 82–83 and the lone tree at 86–87, flat from season 120 to 300 in every seed;
+  - every L_h, m_w and m_f variant also levels off, lower;
+  - **surprise: R5's own-shade signal, not R1, made round 1's poles climb.**
+  - The species' woods do not all level off: the beech wood runs to the top (1.3–2.6M metamers), and the mixed wood's beech and hornbeam reach 196–206. Beech's own L_h 30 slows it but does not stop it. Proposed: the species' R1 brought forward (C7–C8).
+- **Applied (goldens change):**
+  - `r5.signal` defaults to `"neighbours"` (`"light"` is the ablation; its unit test asks for it);
+  - `perArea` plants `forest`, `clearing`, the woods and `forestParams` in three staggered rows across the depth (30 trees on the ring, 9 on the phone's plate);
+  - goldens updated: skyTree, skyStand, obliqueSun, weeping, troll, thinning (R5), and forest and mixedWood (R5 and the planting). The rest are unchanged.
+- **Tools:** the CLI's `--light` writes `ground.csv` (the ground's light and the LAI above it), and `metamers.csv` gains `pSum` and `mSum` (each branch's R1 production and maintenance, from R1 on a copy). `c1.py` reads the floor under the crowns.
+- **The table in depth:**
+  - floor 16.7%, the same under the crowns as in the gaps: the slab's sky is all oblique, so the floor is the canopy's mean transmission;
+  - Q_ss 0.03 gives 11%, and empties the upper canopy;
+  - the crown base never lifts. Neither C5 threshold holds it: the lower branches get 0.37 light per metamer (T_rel·Q_top ≈ 0.12) and produce 3.9× their maintenance;
+  - H/D 6–18.
+- **Not proposed:** any R1, Q_ss, T_rel, k_ext or τ change. Round 3 asks what limits the stand's leaf area, and whether the sky needs a zenith band.
+
+## 2026-10-31: Before C1, and C1's first round
+
+- **User:** after V and the phone's timings (no stand over 250 ms; hedgerow 219 ms in one lane, interior 145, garden 160 cells 163, 66 cells 67), ADR 0025 accepted. Asked for a pre-C1 checklist (canvas fallback, memory budget, the backlog's harness, the phone, threads, the world's top), then C1.
+- **Before C1** ([note](experiments/2026-10-31-pre-c1.md)):
+  - **The preview's Canvas 2D** never drew, nor redrew on resize: fixed in `i2.ts`. The preview deploy is not rebuilt. `canvas2d.test.ts` shows Canvas 2D paints a grown 3D stand across the canvas.
+  - **Memory:** ≈ 1 MB a cell of plate width over 200 seasons. Garden 66: 70 MB; 160: 165 MB (257 with the specimen); 520: 553 MB. ADR 0026 (proposed): 256 MB for the worker. `wasmMemoryBytes()`; `dispose` is idempotent.
+  - **The backlog's "harness" failures were traps, not shared stands:**
+    - an unregulated world (`shadow`, R1 off) exhausts WASM's 4 GB, and the trap leaves its borrow flag set, so every later call fails;
+    - `tests/world.ts` now fails a world past 1.5M live metamers;
+    - loops free each seed's world;
+    - the 2D-era per-test timeouts are gone (30 min for the backlog).
+
+    39 of 78 pass and none trap (I2's "47 of 90" miscounted: 35 of 78).
+  - **Threads** need nightly (build-std with atomics) and cross-origin isolation: parked. **Worker lanes'** return trip (24–118 ms) costs what they save: one lane is the production path for I3.
+  - **Surprise: a crown pinned at the world's top runs away.** The garden's beech at 160 cells doubled every 15–20 seasons from season 120 (293k metamers by 200; the whole garden 1.3M with recruits; the 320-cell garden ran out of memory). The top row sees open sky however dense it gets. The woods' top is now 200 (`TOP` in `presets.ts`). That costs no light time until used, and +24 B a cell a row at birth. **Goldens unchanged.** The mixed wood still reaches 200 and runs away at season 388: height has no plateau in 3D yet.
+- **C1, round 1** ([note](experiments/2026-10-31-c1-round1.md)), `forest` and a lone tree, 3 seeds, 18 knobs:
+  - **Floor:** 14–16% at the default, set by R6's Q_ss (0.2 → 23%, 0.03 → 11%); k_ext, τ, T_rel, the sky's exponent and planting in rows barely move it. Below Q_ss ≈ 0.05 it levels off near 10%: the light comes obliquely through gaps (30–35% of the ground has no leaf above it). τ 0.2 caps the dark end at 6–8% under any canopy.
+  - **Crown base** never lifts (crown ratio 0.99): the first branches pay their carbon in the side light.
+  - **Surprise: R5's own-shade signal makes poles in 3D.** The lone tree is 122 tall at season 100 with a crown 0.27 × height wide. Sensing neighbours only gives 0.51 × height and 85 tall; the stand reaches 81 (2D plateau 78) with crowns 0.46 × height deep.
+  - **Candidate, not applied** (it changes every golden; crown base and H/D still off): R5 on neighbours, Q_ss 0.03. Floor 10.4%, crowns broad, own tops kept, ≈ 1.7× the metamers (m ≈ 52).
+  - **The order:** C1 before I3 is the user's choice, allowed by ADR 0024; coverage is with today's leaf drawing.
+- **Not carried over:** the laptop's four unpushed commits on its local `claude/gallant-brown-5k4g33` (7734dab, 511d87a, 30e65fd, 6780988: 2D realism work the 3D port supersedes; their ADR "0024" collides with 0024-3d-slab-port). Left alone.
+
+## 2026-10-30: I2, the trees grow in 3D
+
+- **User:** I2 as specified: 3D topology and directions, C4 as a vector sum, R3 with vector moments and E restored, R4's bank in 3D, the slab light at D = 64 with K = 16 rotating, τ as a world parameter. Also z and frames in the formats, the 2D goldens archived and new ones seeded. Deliverables: V on the preview, m and cost against the prototype, the phone's season in one lane and four, and the prototype's contradictions.
+- **The design:** ADR 0025 (proposed).
+  - Every metamer and bud carries a frame (heading H, reference L), carried by parallel transport (`rust/core/src/geom.rs`).
+  - Up to seven laterals a node, placed by phyllotaxis: spiral (new, 137.5°), distichous, decussate opposite, whorls of `whorl` (default 4).
+  - C4 is a vector sum; R3 uses vector moments and composed rotations, with E = 4·10⁶.
+  - The slab sweep is the only light model with the pooled ablation (the triangle and the 2D sky sweep are at the tag), computed in fixed lanes: one thread or four give the same bits (checked: the goldens with `threads`). The sky's tilt carries over.
+  - O4 disperses on the ground plane; the owner grid is the slab's.
+  - Species take their botanical phyllotaxis and wood's E in an overlay in `flora.ts`.
+- **Formats:**
+  - checkpoints are version 2; version 1 (2D) loads as a planar forest in a one-cell slab;
+  - the snapshot gains z0, H and L, with `angle` and `length` as drawn in the picture's plane;
+  - metrics gain rootZ, crownDepth and centroidOffsetZ;
+  - metamers.csv gains z0, z1 and H.
+- **Goldens:** `tests/golden.json` is 14 new 3D cases (10–20 seasons, 12 s natively). The 2D goldens are the tag's. The unit tests are in 3D: the 2D ones run on planar helpers (`crate::testing::{metamer, bud}`), with new ones for phyllotaxis, transport, the vector C4, moments in depth, ground rest, the slab's faces, fade and walls, and the 3D bank. Tests compile optimised (`[profile.test]`).
+- **The 2D evidence:**
+  - `tests/evidence/` is now `tests/evidence-2d/`: calibration's backlog, out of `npm test` (`npm run evidence:2d`). Against the 3D core, 47 of 90 pass, 29 miss their thresholds and 14 could not run cleanly (`code/2026-10-30-i2/evidence-2d-in-3d.md`).
+  - The structural tests (checkpoints, obstacles, trials, and a new `tests/structure.test.ts`) run on the 3D core in the default suite.
+- **Results** ([note](experiments/2026-10-30-i2-3d-growth.md)):
+  - **m:** under the prototype's rules the full core reproduces the prototype's m (within 1–3). With every principle m is 25–83 and does not fall back, two to four times the prototype's: R2–R5 do not prune 3D as they prune 2D.
+  - **Passes:** a 3D metamer costs 1.5–2.2× a 2D one.
+  - **Browser timing:** `forest` at season 40 in headless Chromium on the VM takes 191–235 ms a season in one lane, 130–185 with the light in four.
+  - **Crowns:** 0.25–0.57 × height deep, not 0.8. The edge and hedgerow pile foliage at their open faces by season 100. Trees reach 114–116 cells, near the world's top.
+  - **Recruits:** O4 fills every plate to its cap of 300 trees.
+- **V:** `/preview/i2/i2.html` on the site's preview deploy, beside garden 0.14.0; the phone's numbers are the user's.
+- **Surprises:**
+  - **WASM ran out of memory.** A 3D world holds ≈ 70 MB of light field, so the evidence tests now free their worlds after each test.
+  - **`shadow` exploded.** It (C3 `none` under light) grows without bound in 3D (Beer–Lambert light never reaches 0), and is out of the goldens.
+  - **The fade changed nothing at the interior's τ.** No crown comes within 3 cells of a face.
+- **The page:** pseudo-depth is off, and branches draw far to near (the 3D renderer is I3's). The lab has a World folder for τ (the three looks) and C1's phyllotaxis. No opening forests until I3 (Q7): the garden grows from seed.
+- **Goldens:** all new (3D); the 2D ones are archived at the tag.
+
+## 2026-10-30: parity becomes a proof; production is the only build
+
+- **User:** accepted I1 and the diagnosis of the two M5 tests. Asked for them to be restated over 20 seeds, a seed rule in AGENTS.md, production as the only build, parity as a CI job at the tag, and the opening forests regenerated and checked by eye. Then I2. The user's i1.html runs: all 27 goldens in both Rust builds on an X1 Carbon and a Pixel 8a, against 7 for the TypeScript core. Production is 0.8× TypeScript's time a season on the laptop and level on the phone.
+- **PR #20 had merged** before the request reached me, so this goes in a new PR into `claude/gallant-brown-5k4g33`. The branch was fast-forwarded to the merge.
+- **The thresholds on production** ([note](experiments/2026-10-30-production-thresholds.md)): 88 of 90 evidence tests passed. The two M5 stand tests failed on seeds 1 and 4. Over seeds 1–20 both builds fail them on 10–20% of seeds (parity 17/20/19/18 of 20, production 16/20/20/18), so the tests checked five seeds, not the behaviour.
+  - **Restated:** thresholds unchanged, each measure on at least 15 of seeds 1–20; nothing on the median.
+  - **AGENTS.md:** a claim about all of N seeds needs N ≥ 20 and a stated pass rate, with the counts beside it. The existing all-of-5 tests are listed in the note and stay until one fails.
+  - **On record:** `flora.test.ts:256` (beech over hornbeam in the canopy at season 400): 9 against 4 on parity, 7 against 4 on production (0.75× the threshold). Unchanged.
+- **One build:**
+  - removed: the `parity` feature and its V8 ports (`fdlibm.rs`, `pow.rs`), `src/wasm/pkg-parity`, `--parity` in the CLI and the bench, `TREE_BUILD`, `tests/wasm-math.test.ts`, the cross-core records (`tests/fixtures/ts-core.json`);
+  - `src/wasm/world.ts` loads one package (`coreWasm`, `loadWorlds()`, `RustWorld.create(params)`).
+  - **Goldens:** `tests/golden.json` is now the production hashes (it was `tests/golden-production.json`; no hash changed). The TypeScript core's 2D goldens are at the tag `golden-2d-ts`, where CI's new `golden-2d` job checks out the tag and runs them: the TypeScript core, the parity build in WASM with its records and Math, and natively. That takes 53 s here.
+  - `tests/checkpoint-bytes.test.ts` (was `rust-world.test.ts`): checkpoints round-trip and grow on alike, and garden 0.14.0's forest, written by the TypeScript core, still loads byte for byte.
+- **Opening forests:** regenerated on production. The bytes differ, but the forests are the same: topology identical in all twelve, tips within 10⁻¹² cells. The comparison page is at `/preview/first/compare.html` on the site's preview deploy. **The seed list stays.**
+- **Goldens:** none changed (`golden.json`'s contents are the former production file's).
+
+## 2026-10-29: I1 passed: the whole 2D core in Rust; the TypeScript core deleted
+
+- **User:** accepted G3, whole-cell shifts and K 16 with rotation (calibration runs with rotation on), and asked for two G3 checks and the SIMD path dropped unless the phone disagreed. Then I1: the whole 2D core in Rust, phase by phase, bit-identical to every golden; the TypeScript core deleted.
+- **Two things differed from the brief.** PR #20 was still open, not merged, so this work went onto it. The g3.html timings never arrived, so the hand-written SIMD path was dropped on the VM's numbers alone; it is in 77d4105 if the phone disagrees.
+- **G3 follow-ups** (5465008): mirror symmetry of the 3D field to rounding, and the lab's light heatmap at one season under shifts and under bilinear transport ([G3 note](experiments/2026-10-29-g3-slab-light.md) §4).
+- **I1** ([note](experiments/2026-10-29-i1-rust-core.md)):
+  - **How it landed:** the whole core was written in Rust first (4569037), then switched in one phase at a time, in the season loop's order. Each phase ran in Rust with the rest still TypeScript, the trees synced across around it, and passed every golden and a side-by-side comparison of every column before the next.
+  - **Math:** of the nine candidates only log, atan2 (with atan) and cbrt differed from V8 and were ported into parity mode; asin and acos match in the libm crate; log1p, tanh and expm1 are not called.
+  - **The world** (`rust/wasm/src/world.rs`, `src/wasm/world.ts` `RustWorld`): params as JSON with JavaScript's semantics, events, records and checkpoints byte for byte the TypeScript core's; the snapshot built in Rust and copied out once (lab view, forest: 2.44 → 1.11 ms in Chromium).
+  - **The page** runs the production build; the worker switched only after both builds passed their goldens.
+  - **The CLI** is a native binary (`rust/cli`, `treesim`); `cli/run.ts` builds and runs it, so `analysis/treesim/sweep.py` runs unchanged. In the parity build its files are byte for byte the TypeScript CLI's.
+  - **Tests:** every hand-built unit test is now a Rust test in the principle's file (110 Rust tests in all). The milestone tests moved to `tests/evidence/` and run on the parity build, since their thresholds were set on the TypeScript core's runs. Before the deletion, the TypeScript core's snapshots, checkpoint bytes and regrowth hashes were recorded in `tests/fixtures/ts-core.json` (`code/2026-10-29-i1/ts-records.ts`), and the Rust world is held to them.
+  - **Deleted** (a1bc8cf): the TypeScript core, its CLI, the G2 sky-sweep wrapper, the phase bridge, and the bench's `--slab`. All are at the tag `golden-2d-ts` (made locally; tag pushes are refused from cloud sessions, so the user pushes it).
+- **Goldens:** `tests/golden.json` is unchanged; it is the parity build's now. New: `tests/golden-production.json` (25 of 27 differ from parity; only the light-off `explosion` cases agree). In headless Chromium the parity build reproduces 27 of 27, against the TypeScript core's 7.
+- **Surprises:**
+  - **The speed-up is modest in the browser:** production 0.74–0.77 of the TypeScript core's time a season in Chromium, and parity 1.07–1.18 (slower). Natively the step takes 0.44–0.72 of it.
+  - **Hybrid runs broke where TypeScript wrote into scratch that Rust had sized:** mechanics writes `scratchU`, which girth's `ensureScratch` sizes. The bridge now sizes TypeScript's scratch before copying in (9f99ff9).
+  - **Biome reformatted `rust/presets.json`,** which broke its up-to-date test; it is excluded.
+  - **Opening forests:** `cli/first-paint.ts` grows in the parity build, so the shipped bytes stay the ones chosen by eye (all twelve: same bytes); the page grows them on in production.
+- **Sizes:** production WASM 141.4 kB gzip (gate 170), parity 144.3 kB, garden JS 49.1 kB.
+
+## 2026-10-29: 3D port, G3 passed: the 3D slab sweep in Rust; parity becomes a mode; PR #20 for CI
+
+- **User:** accepted G2 and asked for three adjustments, then G3.
+  - Put the V8 `Math` ports behind a `parity` feature.
+  - Run CI on a PR, without merging.
+  - Say in ADR 0002 and the README what non-determinism means for users.
+  - G3: the 3D slab sweep in Rust (production build), measured for accuracy, K and browser timing.
+- **Parity mode:**
+  - `tree-core`'s ports sit behind `parity`; without it the core uses the `libm` crate, which is pure Rust and the same natively and on wasm32 (`std` is glibc's natively);
+  - two packages, `src/wasm/pkg-parity/` for the tests and `--rust`, and `src/wasm/pkg/` for production (simd128);
+  - `rust:check` runs clippy and the tests in both modes, with threads, and for wasm32 with SIMD;
+  - **without parity the 2D sweep is 1.2× faster than TypeScript;** the G2 note and the review now carry both numbers.
+- **CI** ([PR #20](https://github.com/epabarker/tree-simulation/pull/20), into `claude/gallant-brown-5k4g33`): green. The cold run took 4:34 against 1:29 before, of which 1:53 was the toolchain (compiling wasm-bindgen-cli) and +1:03 was `check`.
+- **ADR 0002, corrected against the code:**
+  - `?forest=<seed>` does **not** open a checkpoint: with a seed set, the garden regrows from seed in the browser, so it is browser-specific like the lab's seed;
+  - a CLI replay repeats in Node but is not the run a Chrome visitor exported;
+  - only the opening checkpoint is the same for everyone.
+
+  The README says so. The user's brief had it the other way for `?forest`.
+- **G3** ([note](experiments/2026-10-29-g3-slab-light.md)): `rust/core/src/light/slab_sweep.rs`.
+  - **What it is:** Float32; a spherical Fibonacci sky rotated each season; τ per face; a polynomial exp with a Cody–Waite ln 2 split (relative error 2.5·10⁻⁷ on [−80, 0], where the first version was 4·10⁻⁶); scalar and SIMD kernels written alike; lanes; the exact tracer.
+  - **Tests:** with flat directions and the same ℓ on every z line it is the 2D sweep (2·10⁻⁵), and native, scalar WASM and SIMD WASM give the same bits.
+- **Surprise 1: the bilinear read of G, not the box mean, is the 3D light's error.**
+  - The first build gave mean |ΔQ|/C up to 0.095 on the mature hedgerow, over the 0.08 stop rule.
+  - The prescribed fallback (the exact segment integral) took it to 0.091 at 1.8–1.9× the cost.
+  - One-direction diagnostics showed a darkening bias in every direction, worst for the steepest: blurring shadows across four cells each row, under a convex exp.
+  - **Whole-cell shifts** (Bresenham) remove it: 0.045–0.053 on every stand, at 0.6–0.8× the bilinear cost. Adopted as the slab's default; the user is to confirm.
+- **K:** static, K = 16 is where Q at the buds stops changing by more than the model's error. Rotated, ten seasons take every K ≥ 8 under it. The prototype regrown under the Rust kernel (M6e's protocol, 2 seeds) has height, crown depth and width converged at every K.
+- **Surprise 2: rotation matters in 3D.** It cuts the stand's metamers 15–30%, where in 2D it changed nothing. Calibrate under it.
+- **Timing:** `…/preview/3d/g3.html` on the site's preview.
+  - Headless on the VM: 25–35 ms in four lanes at D = 64 (G1's kernel: 43), and 54–85 ms in one lane.
+  - **Surprise 3:** the hand-written SIMD path is 5–7% slower than the scalar code that LLVM vectorises under simd128.
+  - The user's devices are to run the page.
+- **Goldens unchanged.**
+
+## 2026-10-29: 3D port, G2 passed: the sky sweep in Rust, bit for bit; ADR 0024 accepted
+
+- **User:** looked at the τ stands and decided:
+  - ADR 0024 accepted, with D = 64 and τ a world parameter per face;
+  - the wood interior (0.2, 0.2) is the default look, with the edge and the hedgerow as presets;
+  - foliage density is a calibration and renderer target, split between C1 and I3;
+  - only the sky sweep is frozen until I1.
+
+  They asked for G2, Float64 scalar and bit-identical, and for a check of whether V8's sin, cos, atan2, pow and hypot match ("port the fdlibm routine rather than re-hash").
+- **Built** (`rust/`, `src/wasm/`): `tree-core` (dependency-free; the sweep ported operation for operation; `math/`; `threads` native-only) and `tree-wasm` (the wasm-bindgen wrapper). The core gains `setSkySweepFactory` and `LightModel.dispose()`. The CLI and bench take `--rust`.
+- **Toolchain:** `rust-toolchain.toml` (1.97); `cli/build-wasm.ts`; `npm run check` now runs `build:wasm` and `rust:check` first. CI and release use `.github/actions/rust`, which this push has not yet exercised: the workflows run on PRs and `main` only.
+- **Surprise 1: V8's Math is four implementations, not one.** Node's sin, cos and exp are V8's fdlibm port. `Math.pow` calls the C library: glibc's FMA variant of Arm's pow, compiled with GCC's contractions. hypot is V8's own formula. Rust's libm matches none of sin, cos, pow or hypot.
+  - All four are ported and match on 4M random and adversarial samples (G2 note §2).
+  - pow first missed 7 in 1M: GCC does not fuse a product reused in another basic block.
+  - "Port the fdlibm routine" would have been wrong for pow.
+- **Bit-identical:**
+  - 27/27 goldens with the Rust sweep;
+  - field-by-field parity on 10 configurations, including rotation and the M6 column sweep, which no golden uses;
+  - a native fixture held to the TypeScript hashes with and without threads;
+  - a planted one-bit error caught everywhere.
+- **Surprise 2: the TypeScript core is not deterministic across engines.** In Chromium 153, 7 of 27 goldens hold: Chrome's V8 has glibc trig, and its exp differs. ADR 0002 is corrected. I1 is the fix; G2 cannot be, since the rest of the core still calls the browser's Math.
+- **Surprise 3: bit-identical Rust is slower in WASM.** Light is 1.35× TypeScript's on `forest` (3.05 against 2.27 ms a season), because the exp is WASM-compiled fdlibm (≈ 18 ns) against V8's native one; the march itself is 2× faster. So the page keeps the TS sweep until I1, and the review drops "I1 ≈ 2× faster".
+- **Size:** `core_bg.wasm` 50.0 kB, 23.8 kB gzip (names stripped), plus 2.3 kB of glue.
+- **Docs:**
+  - the review rewritten as one document, with G1, the prototype, τ and G2 folded in;
+  - ADR 0024 accepted, with the density split;
+  - an experiments README note on the site's `preview-3d` branch (108 MB; never merge; delete after V);
+  - AGENTS invariants for the two sweeps and the vendored Math.
+- **Goldens unchanged.**
+
+## 2026-10-29: 3D port, the faces' transmission τ; ADR 0024 held open
+
+- **User:** the 3D stands read as hedges. They argued that this is structural: open faces light the lower crown, and nothing prunes lit foliage. They asked for a face transmission τ, the R6 set at D = 48 and 64 for τ ∈ {1, 0.5, 0.2, 0}, and a 42-cell planting, all on the proto page. ADR 0024 is held at accepted-in-principle with D and τ open.
+- **τ** (`cli/slab-light.ts`, default 1, so the bench is unchanged): the padded line beyond each z face carries depth −ln τ / k_ext. It is set per face (front, back), and τ = 1 reproduces the prototype's stands exactly.
+- **Added, not asked:**
+  - a wood edge (1 in front, 0 or 0.2 behind), since a symmetric τ cannot make one;
+  - the "below half" share on today's full 2D model, as an anchor;
+  - a picture-cover measure, because the share did not separate the 3D stands from the garden.
+- **Measured** ([note](experiments/2026-10-29-face-transmission.md)):
+  - **The lower crown follows τ:** τ 1 keeps 12–16% of each tree's leaves below half height and covers 26–33% of the picture's lower half; τ 0.5 7–9% and 14–19%; τ ≤ 0.2 0–2%. The edge gives 4–7%, on the viewer's side.
+  - **At τ < 1** crowns stop short of the faces and nothing piles, and m falls 12–38%.
+  - **The 42-cell planting** gives separate domes, as leafy low as the closed row.
+- **Surprise: today's 2D garden is as leafy below half height** (`forest`, `mixedWood` 13–15%; `oakOpen` 36%), but it covers 1–3% of the picture there. The 3D stands put 10–20× the leaves on the same picture at every τ. **The hedge is half faces, half density,** and the density is calibration's.
+- **Review §2d:** per look, hedgerow 1, 1 at D 64 (≈ 75 ms on the phone); wood edge 1, 0.2 at D 64 (≈ 71); wood interior 0.2, 0.2 at D 48 (≈ 56) or 64 (≈ 69). One D for all looks, 64, since τ is a world parameter the garden can expose and D is fixed per world.
+- **Site:** `preview-3d` carries 24 more stands (108 MB in all), with τ, edge and spacing controls on `proto.html`.
+- **Nothing in `src/`, the goldens or the default light model changed.**
+
+## 2026-10-29: 3D port, G1 passed; a throwaway 3D prototype; ADR 0024 accepted
+
+- **G1 (user, on a Pixel 8a and an X1 Carbon):**
+  - 4-lane WASM SIMD light at D = 32 takes 32 ms on the phone (rule: 150) and 13 ms on the laptop; D = 64 takes 43 and 32 ms.
+  - Single-threaded the phone is within 15% of the laptop, so M15's 2.7× is replaced.
+  - Lane scaling: phone 1.5–2.0×, laptop 2.3–3.2×.
+  - The results are in the open-slab note's addendum.
+- **Prototype** ([note](experiments/2026-10-29-proto3d.md)): throwaway, outside `src/`.
+  - **What it reuses:** the core's `Tree`, its tables widened at run time by 3D columns, and its dimension-free passes by import (C3, R1, C5, C6, R6).
+  - **What is new:** C1 laterals by divergence angle, C4 as a vector, and the slab sweep, open z with face clipping and an optional 3-cell fade.
+  - **The stand:** `forest`'s planting for 100 seasons at D = 32, 48 and 64.
+- **Surprise: the requested rules stunt the trees.** Under C1–C6 and R1 alone, 2D and 3D both stop at height 48 by season 40, because dormant buds keep leaves and their cost. With R6 (no new code) the trees reach 85–90, so a second set runs with R6, labelled.
+- **Measured:**
+  - **m:** 13–26 while growing, about 8 at a plateau, nearly independent of D.
+  - **Passes:** 1.1–1.8× a 2D metamer's cost, up to 2.7× in the fastest growth.
+  - **Crowns:** free crowns about 0.8 × height deep.
+  - **Faces, with R6:** foliage stacks at them. At D = 32 the fade moves the pile but does not cure it; at D = 48 it cures it; at D = 64 crowns taper of their own accord.
+- **Re-projected** (review §2): `forest` on the phone at season 40 costs ≈ 61–75 ms at D = 32–64 under SIMD and lanes, and single-threaded SIMD fits the intro too. D is chosen by the crowns: **D = 64 with the 3-cell fade**.
+- **The page:** `proto.html` on the site preview draws the 3D stands orthographically beside today's view of the same planting grown in 2D. They are uncalibrated and read as hedges (open-z side light keeps lower crowns leafy).
+- **ADR 0024 accepted,** with D and the fade filled in, for the user to confirm before G2.
+- **Nothing in `src/`, the goldens or the default light model changed.**
+
+## 2026-10-29: 3D port, re-costed at the open slab; G1 at three depths
+
+- **User:** G0.5 revealed a misunderstanding.
+  - **The aim:** the port is for trees that grow in 3D (branches toward and away from the viewer, crowns as volumes), drawn as today's orthographic frontal illustration in z order, with no perspective, darkening or second rank.
+  - **The world:** open in z, the faces clipping growth but not light.
+  - **D:** deferred to I2.
+  - **Gates:** G0.5 is not a gate; the visual check is after I2.
+- **Measured** ([note](experiments/2026-10-29-open-slab-cost.md)): light at D = 32 / 48 / 64, open z, K = 16, Float32.
+  - **TypeScript:** `forest` 241 / 362 / 472 ms, `panorama` 826 / 1291 / 1613.
+  - **WASM SIMD, 1 lane:** `forest` 54–111 ms.
+  - **4 lanes** (desktop browser, the updated G1 page): `forest` 23 / 28 / 43 ms.
+  - **Light in 2× cells at D = 64:** 1/8 of fine.
+- **Crowns:**
+  - Home-wood species grown alone are 45–137 cells wide at season 100. The faces clip beech, hornbeam and oak at every D.
+  - Side-lit crowns carry 0.8–2.4× a closed stand's leaf area per column.
+- **Re-costed** (review §2): under Rust, SIMD and 4 lanes the phone's `forest` intro holds at D = 32 (≈ 197 ms), not at 48 (≈ 273) or 64 (≈ 358). At D ≥ 48 the estimated tree passes dominate, so coarser light cells don't buy the same result.
+- **Disagreements, written into the review:**
+  - face clipping piles foliage at the faces and shifts allocation, so D shapes the crowns and V should see two values of D;
+  - a throwaway 3D prototype (about two sessions) could give a first look before the Rust work.
+- **Pages:**
+  - the G1 page runs all three depths and the coarse lattice, with the stop rule at D = 32;
+  - the G0.5 page carries a "superseded" banner.
+- **ADR 0024 restated,** still proposed.
+- **Nothing in `src/`, the goldens or the default light model changed.**
+
+## 2026-10-29: 3D port, G0.5: a frontal slab preview, and the review amended
+
+- **User:** the measurement and review are accepted. Before G1 and before the ADR leaves *proposed*, they asked for:
+  - G0.5, a frontal preview judged by eye on their phone, with both z boundaries, on a COOP/COEP preview deploy;
+  - four amendments: the z boundary left open, the pyramid on equal terms, the WASM gate argued, and the 2D freeze in sessions.
+- **Merged `claude/gallant-brown-5k4g33`** (garden-v0.14.0, M26–M27b) into this branch. Reasons:
+  - the preview's "today" panel and stands must be the live garden's code and species;
+  - that branch already has ADRs 0019–0023, so this port's ADR is renumbered **0024**.
+- **G0.5** ([note](experiments/2026-10-29-g05-slab-preview.md)):
+  - **Stands:** grown home woods at 66 and 520 cells (seeds 9, 10, 12; seasons 60, 100).
+  - **Depth:** per-limb golden-ratio targets, each limb continuous in depth.
+  - **Drawing:** the garden's WebGL2 renderer with only its draw call replaced at run time (perspective about the trunks' line, depth darkening, far-to-near slices).
+  - **Panels:** today, open z (a hedgerow), and periodic z (with the clone rank drawn behind).
+  - **Where:** deployed on the site's `preview-3d` branch with global COOP/COEP (never to merge).
+  - **COEP check:** locally, with the same headers, every page is cross-origin isolated with no failed request. The site has nothing cross-origin.
+  - **Not verified:** the deployed URL; the container cannot reach the site.
+- **G1 page** on the same deploy: WASM SIMD in 4 lanes, each a worker with its own instance, takes 22 ms in desktop Chromium (1 lane 70, TypeScript 335).
+- **Surprise: the pyramid on equal terms.** In Rust, with a precomputed 40-cell cone, it costs 33–35 ms single-threaded against the sweep's 63–153, and about the same threaded. The TS-only rejection was unequal. The sweep is kept on behaviour (side light through open faces, the light-weighted V, the M6–M27 calibrations), and the pyramid becomes the fallback.
+- **Surprise: the clone under periodic z** is not only a calibration matter. Tap-to-fell would fell every rank at once.
+- **Bundle:** `src/core` is 19 kB of the garden's 55.5 kB gzipped. The scratch WASM is 28–32 kB (mostly std) and compiles in 0.3 ms. 3D first-paint *data* (MB-sized checkpoints) outweighs any code gate.
+- **Review and ADR 0024 amended**, still proposed:
+  - the z boundary is the user's, with both options' consequences set out (Qz);
+  - the pyramid is compared on equal terms;
+  - the WASM moves after first paint, with ADR 0014's 60 kB kept;
+  - the 2D freeze is costed at 5–8 sessions, narrowable to I1's 3–5;
+  - I1 is described as an end state on its own;
+  - no calibration before the user has seen I2.
+
+## 2026-10-29: Should the model go 3D? The measurement, and a go/no-go review
+
+- **User:** review a 3D port (a slab one crown deep, seen from the front; threads allowed on edbarker.dev), measuring before judging. Do not start the port.
+- **Measured** ([note](experiments/2026-10-29-3d-light-cost.md)):
+  - **The bench:** `cli/bench.ts --slab model:D:K:precision[:periodic]` times a scratch 3D light model (`cli/slab-light.ts`) on the real run's deposits. Behaviour, goldens and bench hashes are unchanged.
+  - **D:** canopy crowns are 20–30 cells wide, so D = 32.
+  - **The 3D row march:** 24–28 ns per cell–direction update in TS (2D: 18–24), linear in D·K. At D = 32, K = 16: `forest` 250–290 ms, `panorama` ≈ 700, about 100× the 2D light.
+  - **The pyramid:** its deposit is cheap, but the V cone search takes 21 µs a sample, which makes it dearer than the sweep at 3D bud counts.
+  - **The kernel in Rust:** scalar WASM 2.0×, SIMD f32 5.2× (24 kB gzipped); 4 native threads a further 2.6–3.0×, but only with a private partial field per thread (reductions cap it at 1.5–2×).
+- **Surprise:** Float64 WASM gave bit-identical Q to the TS kernel, `exp` included, so a bit-identical Rust port of the 2D goldens looks attainable.
+- **Surprise:** foliage per ground column is the same in every 2D stand (Beer–Lambert sets it), so a closed slab carries D × closure ≈ 22–32× the metamers, more than the brief's 5–20×.
+- **Review** ([review](reviews/2026-10-29-3d-port-review.md)):
+  - per-season projections for TS, scalar WASM, SIMD, and SIMD with threads;
+  - answers to the brief's open questions;
+  - about 8 calibration milestones, about 14 in all.
+  - **Recommendation:** go with a reduced scope, through cheap gates, starting with G1 (the kernel on the user's phone).
+- **ADR 0024 (numbered after the 0019–0023 of M26–M27)** is proposed and awaits the user. Nothing in `src/` changed.
+- **Scratch code:** in `docs/experiments/code/2026-10-29-3d-port/` (Rust crate and harnesses), outside lint and typecheck.
+## 2026-10-28: M27b, the fitted species adopted (ADR 0023)
+
+- **User:** fit the rest by hand and put the fits on the site.
+- **Hand adjustments** (`analysis/fit/hand-overrides.toml`, with reasons; [note](experiments/2026-10-28-m27-fits.md), M27b):
+  - holly: Q_ss 0.013, m_f 0.025, Q_est 0.01, h_j 20; it had starved out of the mixed wood under the fitted beech's measured 1.3–1.5% floor;
+  - rowan: Q_ss 0.06;
+  - pine: Q_ss 0.2 and L_h 30, bounding its height after season 100.
+- **Adopted:** `FLORA` = `FITTED_FLORA` (`flora-fitted.ts`, generated by `m27_adopt.py`); the hand-tuned species are kept as `HAND_FLORA`.
+- **Mixed wood:** all species present through season 200; by 400 beech and hornbeam dominate, oak is gone, and holly, rowan and willow are thin (0.3–0.7 a run).
+- **Tests:**
+  - 7 species expectations updated from measured values (e.g. oak's seedlings now need ≈ 13% light);
+  - the acrotony and posture tests pinned to `HAND_FLORA.oak`;
+  - goldens unchanged.
+- **Surprises:**
+  - storms and slenderness were not what removed holly; starvation was;
+  - `c5.enabled: false` does not stop R1's carbon shedding.
+
+## 2026-10-28: M27 round 2
+
+- **Run in session** (the user away): `--start round1 --restarts 2,0 --generations 50 --seeds 3`, 79 minutes for all ten ([note](experiments/2026-10-28-m27-fits.md), round 2).
+- **Fits:** every measured target is within one band for every species. Losses range from 0.82 (birch) to 7.81 (beech); only described crown traits remain.
+  - Fir: 11.3 → 4.5, with the largest h_j (87).
+  - h_j orders the species sensibly: large for fir, beech and holly; small for willow, birch and pine.
+- **Hold-out:**
+  - survival 7 of 10 in band, Spearman −0.91;
+  - holly (8.5%) is still out, and rowan and pine are too tolerant;
+  - in the mixed wood, fitted beech dominates (3.3 a run) and holly, rowan and willow are gone by season 400;
+  - fitted pine is 31 m at 100 (table 29 m) but still reaches the world's top by 200.
+
+## 2026-10-28: M27 round 1, and the juvenile phase (ADR 0022)
+
+- **Round 1** ([note](experiments/2026-10-28-m27-fits.md)): the user ran all ten fits (1 h 51 min).
+  - Nine beat their hand-tuned patch, most by 5–80×. Holly tied (2.43 against 2.30); fir stayed high (11.3).
+  - **The hold-out:**
+    - shade tolerance drifted (Spearman −0.98 → −0.90; holly 8.5% against 2–5%);
+    - the fitted mixed wood lost willow and rowan, and holly and oak were down to 0.17 trees a run;
+    - fitted fir and pine reached the world's top (160 cells) by season 150.
+  - **Kept** in `docs/experiments/fits/round1/` with `round1` figures.
+- **User:** move shade survival into the fit for the four measured species, and do the juvenile-phase model change now.
+- **Juvenile phase** (`r2.hJ`, default off, goldens unchanged; spec §R2.4; ADR 0022):
+  - the shoot cap rises from 1 metamer to `c1.maxMetamersPerShoot` as the tree grows to h_j (`juvenileCap`);
+  - with h_j 80, pine's curve error against its table falls from 0.12 to 0.02, oak's from 0.12 to 0.08 and fir's from 0.27 to 0.11;
+  - three unit tests in `r2-physiological-age.test.ts`.
+- **Fit changes** (ADR 0020 addendum):
+  - `shade.survivalLight` is fitted for birch (21%), oak (11.4%), beech (3.4%) and hornbeam (3.3%);
+  - `stand.lateShare` (H100/H60) for every species, with `runStand(…, late)` and fit-eval's `stand100`;
+  - fir's H30/H60 goes to half weight;
+  - `r2.hJ` is free on 2–150 (log).
+  - Smoke fit of all ten passes. A candidate costs about 1.6× as much.
+- **Faster refits:** `m27_fit.py --start round1` starts warm restarts from an earlier round's fits; parameters new since start mid-range. A candidate's time is ≈ 70% the 100-season stand (≈ 0.3 s a seed), so round 2 runs 2 warm restarts, 50 generations and 3 seeds, an estimated 4–5× faster.
+- **Fixed:** the round-1 note of a fitted "oak needs 6.3%" was a shade-leaf value; saplings need 11.4%.
+
+## 2026-10-28: M27, a hyperbolic hydraulic discount (ADR 0021)
+
+- **User:** adjust the model so species stop levelling off early, aiming at realism; leave the home forest unchanged until fitted patches are adopted.
+- **The switch:** `r1.hydraulic: "exp" | "hyperbolic"` (default `exp`, goldens unchanged). The hyperbolic form discounts production by 1/(1 + L_path/L_h), a resistance growing linearly with path length.
+  - Unit test in `r1-carbon.test.ts`.
+  - Spec §R1 amended; ADR 0021.
+- **The comparison** ([note](experiments/2026-10-28-m27-height-curves.md), addendum; table 4 of `cli/height-diagnosis.ts`):
+  - with the hyperbolic form, stand top heights follow the yield tables after season 30, hornbeam and beech to within about a metre;
+  - the lone willow no longer shrinks;
+  - juvenile growth is still too fast (oak, pine, fir).
+- **Fits:**
+  - Each targets file gains `[fixed] "r1.hydraulic" = "hyperbolic"`, applied to every candidate and written into the fitted patch.
+  - L_h is searched over 10–200 on a log scale for all species.
+  - The hand-tuned comparison keeps `exp`.
+  - Smoke fits of all ten and the hold-out pass (hold-out ρ hand −0.98, smoke-fitted −0.94).
+
+## 2026-10-28: M27, diagnosis: the shrinking willow and the early height plateau
+
+- **User:** find out why the lone willow's height falls after season 30, before running the fits.
+- **Willow** ([note](experiments/2026-10-28-m27-height-curves.md); `node cli/height-diagnosis.ts`): sag after a plateau. Not dieback, not shedding.
+  - **The plateau:** R1's path discount with willow's short L_h (30) stops height at about season 25. The leader passes from lateral to lateral, so the path to the top is 1.56 times the height.
+  - **The loss:** R3's posture correction is capped by relative girth growth (c · Δr / r), so once growth stalls, loaded limbs settle by up to 12 cells.
+  - Willow's c is the default 0.05 (as for birch, rowan, fir and pine; 0.15 for the others).
+  - **Within the fit's bounds:** L_h 60 gives H30/H60 0.78, and L_h 45 with c 0.3 gives 0.87, with no seed shrinking.
+- **Surprise:** `c5.enabled: false` does not stop shedding under R1's `carbon` mode (by design, season.ts); ablate it with `r1.shed: "c5"` too.
+- **Every species:**
+  - The early plateau is structural. L_h at its upper bound (100) moves H30/H60 by 0.01–0.06; L_h 200 nears the yield tables but overshoots height by 25–100%.
+  - Stand top heights level off as early as lone trees.
+  - The fits will show whether α, λ or m_f can slow the juvenile ramp. If not, a slower juvenile phase is a model change for its own decision.
+
+## 2026-10-28: M27, willow's yield table and estimated floors for the rest
+
+- **User supplied** (`analysis/fit/sources/`):
+  - `minor_species_growth_curves.csv`: willow from the Arkhangelsk tree-willow yield tables (Paramonov et al. 2021), and fitted estimates for rowan and holly;
+  - `floor_light_targets.csv`: floors for fir, maple, holly, rowan and willow, regressed on tolerance score from Hagemeier & Leuschner's five species.
+- **Willow:** H30/H60 is 0.73 ± 0.06, now measured (was 0.9 from horticultural profiles). Stand height is 52 ± 14 cells, between British field guides and taiga stands (16.6–18 m).
+- **Rowan and holly:** fitted-curve estimates at half weight. Rowan is 60 cells with ratio 0.74; holly 41 cells with ratio 0.63, for open or edge growth.
+- **Floors** (estimates, half weight): fir 1.3% (was 4%), maple 4.5%, holly 2%, rowan 7.5% (was 12%), willow 12%.
+  - **A caveat:** they come from the tolerance score that the hold-out tests against.
+- **Held-out survival bands:** rowan 8–14% and maple 5–10%.
+- **Hand-tuned misses:**
+  - willow's lone tree shrinks after season 30 (H30/H60 1.03, 5.1 bands);
+  - fir's floor is 6% against 1.3% (5.9 bands at half weight).
+
+## 2026-10-28: M27, hornbeam's yield table and Hagemeier & Leuschner's full numbers
+
+- **User supplied:**
+  - Lockow & Lockow 2009's hornbeam yield table, extracted to CSV (`analysis/fit/sources/`);
+  - Hagemeier & Leuschner 2019's full-text values, gathered by their research agent;
+  - Dobrowolska 2008 on light under pine.
+- **Hornbeam:** stand height 84 ± 13 cells (20.3–22.0 m at 60, site index 25–27) and H30/H60 0.67 ± 0.05, both measured. The field-guide guess (68) was low.
+- **Floors (overcast PAR):**
+  - hornbeam 1.5% ± 0.8;
+  - pilot birch 15% ± 5 (was 18%);
+  - pilot beech 1.5% ± 0.8 (was 3%, from M19's 2–5%);
+  - pine 17% (described), scaled from birch by Dobrowolska's ratio.
+- **Held-out survival bands** from the saplings' minimum light demand: birch 15–25%, oak 8–14%, beech and hornbeam 2.5–4.5%. Pine and willow move up to stay in score order.
+  - **Correction:** the previous entry quoted shade-leaf values (oak 6.3%, hornbeam 2.5%) as if they were the saplings'.
+- **Generator bug fixed:** survival bands were printed to two decimals, rounding 0.015 and 0.045 to the wrong edges.
+- **Hand-tuned misses:**
+  - beech's floor (3.3%) is now 2.2 bands too light;
+  - hornbeam's stands are short (63 cells against 84) and its curve levels off early (0.81 against 0.67);
+  - birch's seedlings survive 13%, where saplings need 21% (a hold-out).
+
+## 2026-10-28: M27, measured targets for the eight newer species
+
+- **User:** find measured canopy transmittance and height-growth curves, and tighten the targets.
+- **Found** ([research note](research/2026-10-28-species-traits.md), "Sources found"):
+  - **Yield tables** for oak and pine: the NW-FVA tables, read from the data in CRAN `et.nwfva`.
+  - **Fir:** the Tirol fir tables (from Baden-Württemberg's).
+  - **Field maple:** heights from the 2012 national forest inventory (LWF Wissen 77).
+  - **Transmittance:** oak (median 8.4%) and hornbeam (1–3%), from Hagemeier & Leuschner 2019.
+- **Now measured at weight 1:**
+  - **Heights:** oak 78, fir 80, maple 64 and pine 84 cells, with narrower bands.
+  - **H30/H60:** oak 0.62, fir 0.42 and pine 0.60.
+  - **Floors:** oak 8.4% and hornbeam 2%.
+- **Described curve shapes revised** from growth descriptions: willow 0.9, rowan 0.78, maple 0.7.
+- **Checks on the held-out survival bands:** saplings' minimum light demand is oak 6.3% and hornbeam 2.5%, both in band. Birch's is 21%, above its 10–15% band (pilot, unchanged).
+- **Surprise:** with measured curves, the early height plateau is the largest miss. Hand-tuned oak, fir and pine sit 3.6–4.1 bands above their H30/H60.
+- **Not found:** curves for hornbeam, rowan, willow and holly; per-species transmittance for maple, holly, rowan, willow and fir. MDPI blocks automated downloads, so only the abstracts and excerpts of Hagemeier & Leuschner were read.
+
+## 2026-10-28: M27, targets and fitting for all ten species
+
+- **User:** fit all ten species, not only the pilot. Fir and pine keep their level-1 η at about 1.5–2.
+- **Targets** for oak, fir, hornbeam, field maple, holly, rowan, goat willow and Scots pine (`analysis/fit/targets/*.toml`; [research note](research/2026-10-28-species-traits.md)):
+  - heights from yield models or field-guide mature heights, converted to age 60, and H/D from MacFarlane and Watt, at weight 1;
+  - floors, growth-curve shape and form described, at weight 0.5;
+  - survival-light bands and Niinemets & Valladares scores held out.
+  - The literature searches returned abstracts only, with no per-species transmittance numbers, so the floors are bands set by the M25 ordering.
+- **`m27_fit.py`:**
+  - `--species all` writes each species' result as it finishes;
+  - `--skip-done` resumes an interrupted run;
+  - `--budget quick` (`FitSettings.budget`) runs one warm and one random restart, 50 generations, 4 seeds.
+- **`m27_holdout.py`** checks every species with a results file:
+  - the Spearman ρ of survival light against the tolerance scores;
+  - the mixed wood with all fitted patches at once;
+  - fir and pine in `firWood` and `pineWood` (200 seasons);
+  - progress and silhouette panels for every species.
+  - **Fixed:** the "open" lab links planted `oakOpen`'s oak, not the fitted species.
+- **Smoke:** all ten species fit in 27 s and the hold-out takes 27 s, on 16 cores. Hand-tuned ρ = −0.98.
+- **Surprise:** every hand-tuned species' height at 30 over height at 60 is 0.64–1.03, above every target (pilot included). Height growth levels off too early everywhere, through R1's plateau.
+- **Handed to the user:** the fits, `m27_fit.py --species all --skip-done` (20–40 minutes per species, full budget).
+
+## 2026-10-28: M27 machinery: fitting species to literature traits
+
+- **Targets** ([research note](research/2026-10-28-species-traits.md)): 13 traits each for birch and beech in `analysis/fit/targets/*.toml`, 17 free parameters with bounds. Heights from site-index studies (as commonly reported ranges; the searches returned abstracts only); shape and angles are descriptions turned into wide bands at half weight.
+- **Trials** (`src/core/trials.ts`): lone, stand, shade house and a felled-gap release, M25's settings, now shared with `flora.test.ts` (unchanged results). Candidates are dotted-path assignments (`amendSpecies`), applied over the species' effective params.
+- **Evaluator** (`cli/fit-eval.ts`): a long-lived JSON-lines process per core; ≈ 0.6 s per tree-run here.
+- **Driver** (`analysis/treesim/fit.py`, `m27_fit.py`): CMA-ES (`cmaes` 0.13) in a unit cube, common random seeds per generation, three warm and two random restarts, finalists re-measured on 10 fixed seeds beside the hand-tuned patch.
+- **Hold-out** (`m27_holdout.py`): shade survival and its order across the ten species, Δ and the M26 slopes, release, the mixed wood over 400 seasons, plausibility (bounds, restart spread), crown silhouettes and lab links.
+- **Smoke runs** pass end to end (6 s and 10 s). The hand-tuned birch scores 8.1 (stand height 69 against 95, open H/D 63 against 48); beech 7.8.
+- **Handed to the user:** the two full fits (≈ 20–40 minutes each on 12 cores).
+
+## 2026-10-28: M26, measurements, polish and the loupe
+
+- **User:** agreed M26 and M27 (plan reviewed in session): polish with small fixes, shareable lab links and the loupe; retire the old species presets; crown-shape targets from literature numbers; fitted values reported, not adopted; long computations handed to the user.
+- **Form metrics** (`src/core/form.ts`, CLI `form.csv` at snapshot seasons):
+  - the crown's width profile in 10 bands, widest band, centre and fullness;
+  - apical control (fork height, leader dominance), order-2 angles, limb droop and upturn;
+  - median Δ, the length–diameter slope and the leaf–section slope.
+  - They separate the species as field guides do (fir and holly cones; oak and willow fork low).
+- **§10 validation** ([note](experiments/2026-10-28-m26-validation.md), 230 runs, 77 s):
+  - neighbour response and gravitropic recovery match; Δ trivially;
+  - **misses:** the l–d slope is ≈ 1, not 2/3 (limbs are geometrically, not elastically, similar), and the leaf–section slope is 0.46–0.75 (total section area includes heartwood);
+  - crown shyness has no link to slenderness (O2 off, as expected);
+  - birch's open crown is an hourglass and beech's is bottom-heavy: targets for M27.
+- **New knobs:** `trees[].lean` (a tilted seedling); `patchSpecies` and CLI `--species-patch`. **Surprise:** a `species` entry in a params patch *replaces* that species' whole patch (`mergeParams` merges two levels), so the first lean runs silently grew every species with default params.
+- **Polish:**
+  - The lab frames a ring whole and draws the copies either side, so crowns wrap at the seam.
+  - `skyTree` is 160 cells tall (golden-safe: nothing differs until the tree nears the old top).
+  - No R3 preset sinks limbs below the ground by season 100, so `r3.ground` stays as it was.
+  - `npm test` and `golden:update` stop under Node < 24 (`cli/require-node.mjs`).
+- **Retired presets** (ADR 0019): `conifer`, `coniferStand`, `birch`, `birchStand`, `tropical`, `weeping` and `troll` moved to `src/core/fixtures.ts`. Goldens keep their keys and hashes; the CLI still runs them; the benches use `firWood` (new baseline `runs/bench/efb3bbd.json`).
+- **Shareable lab links:** `?preset&seed&p`, `p` a base64url `diffParams` patch; a Copy link button; a broken link falls back with a notice.
+- **The loupe** (`render/loupe.ts`): hold 450 ms to open a glass at 4× with true-scale leaves; a hold is never a tap and stops panning and scrolling. **Surprise:** the glass first cost ≈ 130 ms a frame in headless Chromium, drawing the whole forest off-screen; Canvas 2D now culls to the view (≈ 5 ms). It shows whatever the adaptive quality, since it is drawn only while held.
+- **Checks:** 232 tests pass; goldens unchanged; garden 56.1 kB gzip (gate 60). Seen headless in the lab (ring seam, link round trip, loupe) and in `garden.html` at desktop and phone sizes.
+
+## 2026-10-28: garden-v0.12.0 live
+
+- **Release:**
+  - PR #19 merged with CI green.
+  - The session's tag push was refused again (403), so the user pushed `garden-v0.12.0`.
+  - The release was byte-identical to the site branch's local build.
+  - Site PR #6 merged to production.
+
 ## 2026-10-28: M25 follow-ups: maple's shade and seed rain
 
 - **User:** do the three M25 follow-ups, and agreed to extend O4 with seed rain.

@@ -4,15 +4,19 @@
  * grows it (dead trees discarded every season), each saved as a gzipped checkpoint, plus a
  * manifest the host page can pass straight to `first`.
  *
+ * Grown in the Rust core, as the page grows them on. The seeds were chosen by eye on the
+ * TypeScript core's forests (M21, M25) and checked again on these (2026-10-30 note).
+ *
  *   node cli/first-paint.ts [out]     (default dist-garden/first; `npm run build:garden` runs it)
  */
 
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { gzipSync } from "node:zlib";
-import { saveWorld } from "../src/core/checkpoint.ts";
 import { forestParams } from "../src/core/presets.ts";
-import { World } from "../src/core/world.ts";
+import { coreWasm, loadWorldsSync, RustWorld } from "../src/wasm/world.ts";
+
+loadWorldsSync(readFileSync(coreWasm));
 
 /**
  * World widths a plate may want (garden.ts `plateWidth`): a portrait phone (≈ 66 cells, three
@@ -36,15 +40,27 @@ const BUDGET_KB = 300;
 
 const out = process.argv[2] ?? join("dist-garden", "first");
 mkdirSync(out, { recursive: true });
+/**
+ * No opening forests in 3D (ADR 0046): a 3D checkpoint is 4–16 MB gzipped (the I3 plan's §1.1),
+ * and the live intro self-paces, so the manifest lists no widths and the garden grows its forest
+ * from seed. Reduced motion draws the plate while the worker grows the intro behind it.
+ */
+const FIRST_PAINT_3D = false;
+if (!FIRST_PAINT_3D) {
+  writeFileSync(
+    join(out, "manifest.json"),
+    `${JSON.stringify({ widths: [], seeds: SEEDS, season: SEASONS })}\n`,
+  );
+  console.log("no grown forests in 3D (ADR 0046): the garden grows from seed");
+  process.exit(0);
+}
 let total = 0;
 for (const width of WIDTHS) {
   for (const seed of SEEDS) {
-    const world = new World(forestParams(width, seed));
-    for (let s = 0; s < SEASONS; s++) {
-      world.step();
-      world.discardDead();
-    }
-    const bytes = gzipSync(saveWorld(world), { level: 9 });
+    const world = RustWorld.create(forestParams(width, seed));
+    world.step(SEASONS, true);
+    const bytes = gzipSync(world.save(), { level: 9 });
+    world.dispose();
     const kb = bytes.length / 1024;
     total += kb;
     if (kb > BUDGET_KB)

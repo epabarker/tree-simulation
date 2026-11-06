@@ -8,17 +8,17 @@
  * than jump. Leaves are drawn at young nodes only: a view of the foliage, not part of the light
  * model, where buds cast the shade.
  *
- * Pseudo-depth (ADR 0008, page only): with `depth` on, the planar tree is drawn as if it were a
- * 3D crown seen from the side. Each first-order limb gets a stable azimuth φ about the trunk and
- * is foreshortened by the projected-spiral rule of spec §C1.4 (its spread from the trunk shrinks
- * by |sin φ|), and each leafy metamer draws a small cluster of leaves around its shoot, split into a
- * back layer (drawn behind the wood, darker: the far side of the crown's shell) and a front layer.
- * With `depth` off (the x-ray view) the page draws exactly the simulated geometry.
+ * Depth (I3; ADR 0024's view): the trees grow in a slab and are drawn orthographically along z, far
+ * to near. The snapshot lists its rows far to near (`zOrder`); the scene cuts that order into
+ * DEPTH_SLICES slices of the slab's depth, for the wood and for the leaves, and a renderer draws
+ * slice by slice, wood then leaves, so nearer crowns cover farther ones. ADR 0008's pseudo-depth
+ * (squeezed limbs, two-layer leaf clusters) is gone: the geometry carries real depth.
  */
 
-import type { Snapshot } from "../../core/snapshot.ts";
-import { BudState } from "../../core/tree.ts";
-import { CATEGORICAL, SEQUENTIAL } from "./colors.ts";
+import type { Snapshot } from "../../core/types.ts";
+import { BudState } from "../../core/types.ts";
+import { BARK_PALETTES, BARK_STEPS, BARK_STYLES, barkStep, fissureOpen } from "./bark-styles.ts";
+import { CATEGORICAL, keepContrast, SEQUENTIAL } from "./colors.ts";
 import {
   isLeafStyleName,
   LEAF_PALETTES,
@@ -86,8 +86,6 @@ export type ColorMode = "natural" | "order" | "light" | "resource" | "age" | "tr
 export interface ViewOptions {
   colorMode: ColorMode;
   showLeaves: boolean;
-  /** Pseudo-depth: foreshortened laterals and two-layer leaf clusters (off = x-ray view). */
-  depth: boolean;
   /** Metamers up to this many seasons old carry a leaf. */
   leafAge: number;
   /** How foliage is drawn (leaf-styles.ts); species presets pick one. */
@@ -95,10 +93,41 @@ export interface ViewOptions {
   showBuds: boolean;
   showShadow: boolean;
   showGhosts: boolean;
-  /** Leave out the back layer of leaves: the last step of adaptive quality (M15). */
-  lite?: boolean;
   /** Outline obstacles (ADR 0015): the lab shows them; a host page's content covers them. */
   showObstacles?: boolean;
+  /**
+   * I3's two foliage knobs (plan §2.5, step 4): the cards' opacity (LEAF_OPACITY) and the least
+   * length a card draws on screen in CSS pixels (LEAF_MIN_PX). Nothing else thins or hides leaves.
+   */
+  leafOpacity?: number;
+  leafMinPx?: number;
+  /**
+   * Draw no short-shoot rosettes on a trunk (order 0) below its tree's limb crown base (round 2,
+   * off by default). R6 never ends a trunk's short shoots, so a closed stand's boles carry leaf
+   * that blind namers read as lime's sprouts, where a beech high forest's boles are clean. A
+   * drawing choice: the model still counts that leaf in its light.
+   */
+  clearBole?: boolean;
+  /**
+   * Draw every stem at this multiple of its pipe-model radius (round 2, 1 by default). ADR 0027's
+   * radii give a stand's trunks about half a real stand's girth (bark-styles.ts), so at one scale a
+   * 35 m beech draws at H/D ≈ 105 against a real stand's ≈ 73 (Štefančík 2017). A drawing choice,
+   * as a drawn leaf stands for a spray: the model's girth and bark ramp are unchanged.
+   */
+  girth?: number;
+  /**
+   * Bark by light (round 2, off by default): wood draws at 1 − barkLight × shade of its colour's
+   * luminance, the shade the light field gives the cell at the metamer's base (`Scene.woodLight`), so
+   * a bole under a closed canopy reads darker than a sunlit limb. WebGL2 only, and only where the
+   * snapshot carries the field (the lab's does; the garden asks for none).
+   */
+  barkLight?: number;
+  /**
+   * The least ΔL* (CIE) wood keeps below a light sky (round 2's judging; WOOD_CONTRAST by default,
+   * 0 for the colours as the tokens give them): a paler bark draws darkened to that floor
+   * (`keepContrast`). Only pale wood moves, birch's white: every other bark is already darker.
+   */
+  woodContrast?: number;
 }
 
 export interface Camera {
@@ -123,12 +152,14 @@ export interface Geometry {
 /**
  * Leaves to draw this frame: base point, unit direction, size (0 → 1 as a leaf unfolds or falls)
  * and palette index. The drawn length is `leafLength(scale) · size`; the zoom-dependent minimum
- * is applied at draw time, so these arrays do not change when only the camera moves. The first
- * `back` leaves are the back layer, drawn before the branches; the rest are drawn after them.
+ * is applied at draw time, so these arrays do not change when only the camera moves. The crowns'
+ * leaves come far to near: depth slice i holds leaves [slices[i], slices[i + 1]); a leaf of size 0
+ * is not drawn this frame. Leaves from slices[DEPTH_SLICES] to `count` are falling or fallen, drawn
+ * after everything.
  */
 export interface Leaves {
   count: number;
-  back: number;
+  slices: Int32Array;
   x: Float32Array;
   y: Float32Array;
   ux: Float32Array;
@@ -145,9 +176,14 @@ export interface Leaves {
 }
 
 /** Ground sits this many CSS pixels above the bottom edge when the view is fitted. */
-const GROUND_MARGIN = 18;
+export const GROUND_MARGIN = 18;
 /** Room kept free above the crowns for the lab's title and hint, CSS pixels. */
-const HEADER_MARGIN = 52;
+export const HEADER_MARGIN = 52;
+/**
+ * On a ring framed whole ("world"), how much closer than one lap across the canvas a young garden
+ * may be framed (`frameHeight`): at 1.5 it shows two thirds of the ring.
+ */
+export const WORLD_ZOOM_MAX = 1.5;
 /** Time constant of the camera's easing toward its fitted target, ms. */
 const CAMERA_EASE_MS = 380;
 /** Default (broadleaf) leaf length in world units (one unit = one internode), and width over length. */
@@ -155,21 +191,30 @@ export const LEAF_LENGTH = LEAF_STYLES.broadleaf.length;
 export const LEAF_ASPECT = LEAF_STYLES.broadleaf.aspect;
 /** Leaves never draw shorter than this on screen, so zoomed-out crowns still read as foliage. */
 export const LEAF_MIN_PX = 3.5;
+/** A leaf card's opacity: overlapping cards build up depth, and a single card lets a little through. */
+export const LEAF_OPACITY = 0.92;
+/**
+ * The least ΔL* (CIE) wood keeps below a light sky's lower, palest tone (`ViewOptions.woodContrast`).
+ * Birch's white (L* 91) drew 3 below the sky (L* 95) and vanished in a stand; at 18 it draws a light
+ * grey (L* 77), as a white stem against a bright sky looks.
+ */
+export const WOOD_CONTRAST = 18;
 
 /** Length of a full-size leaf of `length` world units at `scale` CSS pixels per world unit. */
-export function leafLength(scale: number, length: number = LEAF_LENGTH): number {
-  return Math.max(length, LEAF_MIN_PX / scale);
+export function leafLength(
+  scale: number,
+  length: number = LEAF_LENGTH,
+  minPx: number = LEAF_MIN_PX,
+): number {
+  return Math.max(length, minPx / scale);
 }
-/** Leaves per cluster in the pseudo-depth view for the default (broadleaf) style. */
-export const CLUSTER_LEAVES = LEAF_STYLES.broadleaf.cluster;
 /**
- * Least foreshortening of a limb's spread. A fully random azimuth (squeeze |sin φ|) narrows crowns
- * by a third and breaks a stand's closed canopy into separate crowns, which misreads a stand whose
- * crowns touch, so the squeeze runs from MIN_SPREAD (limb facing the viewer) to 1 (in the plane).
+ * Slices of the slab's depth the picture is drawn in, far to near (I3). Within a slice wood draws
+ * before leaves, so a slice's own leaves sit over its wood; one cell of a 64-cell slab per slice.
+ * Canvas 2D draws them CANVAS_SLICE_STEP at a time.
  */
-const MIN_SPREAD = 0.55;
-/** Fraction of the light ramp kept by back-layer leaves (the shaded far side of the crown). */
-const BACK_SHADE = 0.55;
+export const DEPTH_SLICES = 64;
+export const CANVAS_SLICE_STEP = 8;
 /** Size of a short-shoot rosette's leaves relative to a long shoot's (R6). */
 const ROSETTE_SIZE = 0.8;
 
@@ -202,13 +247,19 @@ function jitter(tree: number, birthId: number): number {
   return ((Math.imul(birthId ^ (tree << 20), 0x9e3779b1) >>> 0) % 3) - 1;
 }
 
-/** A stable value in [0, 1) per (tree, birthId, salt): the page's pseudo-depth, never the model's. */
+/** A stable value in [0, 1) per (tree, birthId, salt): the page's own variation, never the model's. */
 function hash01(tree: number, birthId: number, salt: number): number {
   let h = Math.imul(birthId ^ (tree << 20) ^ (salt << 27), 0x9e3779b1);
   h ^= h >>> 15;
   h = Math.imul(h, 0x85ebca6b);
   h ^= h >>> 13;
   return (h >>> 0) / 4294967296;
+}
+
+/** The depth slice of z in a slab of depth `depth`: 0 at the back face, DEPTH_SLICES − 1 at the front. */
+export function depthSlice(z: number, depth: number): number {
+  const k = Math.floor((z / depth) * DEPTH_SLICES);
+  return DEPTH_SLICES - 1 - Math.min(DEPTH_SLICES - 1, Math.max(0, k));
 }
 
 export class Scene {
@@ -223,16 +274,32 @@ export class Scene {
   width = 1;
   height = 1;
   dpr = 1;
-  /** Pseudo-depth on (natural view) or off (x-ray); renderers copy `ViewOptions.depth` here. */
-  depth = false;
   /** Foliage style; renderers copy `LEAF_STYLES[ViewOptions.leafStyle]` here. */
   leafStyle: LeafStyle = LEAF_STYLES.broadleaf;
+  /** No rosettes on a trunk below its limb crown base; renderers copy `ViewOptions.clearBole`. */
+  clearBole = false;
+  /** Drawn radius over the model's; renderers copy `ViewOptions.girth`. */
+  girth = 1;
+  /** How far shade darkens wood (0: not at all); renderers copy `ViewOptions.barkLight`. */
+  barkLight = 0;
+  /** The least ΔL* wood keeps below a light sky; renderers copy `ViewOptions.woodContrast`. */
+  woodContrast = WOOD_CONTRAST;
+  private woodLightFor = { s: null as Snapshot | null, k: 0 };
+  private woodLightOf = new Float32Array(0);
   /**
    * What `fit` frames. "trees": the trees and the ground beneath them (the lab). "world": the
    * world's whole width, easing out only once crowns outgrow half its height (the home page); on
-   * a ring the crowns are then drawn across the seam as well.
+   * a ring the crowns are then drawn across the seam as well. "height": one scale for every
+   * plate of a world this tall, the "world" frame with its tallest crown at the world's top,
+   * centred on the world and never fitted to the trees, so a tree's drawn size is its height
+   * (round 2's blind test: a fitted plate draws a 25 m oak as large as a 6 m hawthorn).
    */
-  frame: "trees" | "world" | "tree" = "trees";
+  frame: "trees" | "world" | "tree" | "height" = "trees";
+  /**
+   * The least height in cells the "world" frame shows (the garden's half plate, I3); 0: half the
+   * world's height. Under the woods' 200-cell top, half the world framed a young garden for 100.
+   */
+  frameHeight = 0;
   /** The tree the "tree" frame fits: one specimen and the ground beneath it (D3). */
   focusTree = -1;
   /** Draw only this tree, as a botanical plate draws one specimen (-1: every tree). */
@@ -284,29 +351,30 @@ export class Scene {
   };
   /** CSS pixels kept free above the crowns when fitting. */
   headroom = HEADER_MARGIN;
-  /**
-   * Per metamer, the 2×2 map from simulated to drawn direction (row-major a b / c d) and the
-   * depth of its axis in [−1, 1]. Identity and 0 everywhere when `depth` is off.
-   */
-  private proj = new Float32Array(0);
-  private axisZ = new Float32Array(0);
-  /** The snapshot the projections were computed for: they change once a season, not per frame. */
-  private projFor: Snapshot | null = null;
   private colors = new Uint16Array(0);
-  private colorsFor = { s: null as Snapshot | null, mode: "", steps: 0 };
+  private colorsFor = {
+    s: null as Snapshot | null,
+    mode: "",
+    steps: 0,
+    style: null as LeafStyle | null,
+  };
   /**
    * Which leaves this snapshot carries, and everything about them that does not move during a
    * tween (M15): the metamer each sits on, its direction as a fixed rotation (a, b) of that
    * shoot's direction, a size scale and a colour. Rosettes keep a constant size; shoot leaves
-   * grow in and fade with their metamer. Back-layer leaves come first, up to `back`.
+   * grow in and fade with their metamer. The layout is in row order (its reads of the snapshot run
+   * in order); `at` is each leaf's place in the frame's far-to-near list, by one counting sort on
+   * its depth slice, and `slices` where each slice starts there (I3).
    */
   private layout = {
     for: null as Snapshot | null,
     leafAge: -1,
-    depth: false,
     style: null as LeafStyle | null,
+    clearBole: false,
     count: 0,
-    back: 0,
+    slice: new Uint8Array(0),
+    at: new Int32Array(0),
+    slices: new Int32Array(DEPTH_SLICES + 1),
     metamer: new Int32Array(0),
     a: new Float32Array(0),
     b: new Float32Array(0),
@@ -316,11 +384,18 @@ export class Scene {
     /** The style each leaf is drawn in (an index into `styles`), and whether it stays on in winter. */
     kind: new Uint8Array(0),
     keep: new Uint8Array(0),
+    /**
+     * Clumping (LeafClump): the metamer whose tip the card is drawn toward, the share of the way it
+     * goes, and the share of its own metamer it sits back from the tip.
+     */
+    end: new Int32Array(0),
+    pull: new Float32Array(0),
+    back: new Float32Array(0),
     styles: [] as LeafStyle[],
   };
   private leafList: Leaves = {
     count: 0,
-    back: 0,
+    slices: new Int32Array(DEPTH_SLICES + 1),
     x: new Float32Array(0),
     y: new Float32Array(0),
     ux: new Float32Array(0),
@@ -545,11 +620,30 @@ export class Scene {
     if (this.frame === "world") {
       cx = s.width / 2;
       spanX = s.width;
-      spanY = Math.max(0.5 * s.height, maxY * 1.05 + LEAF_LENGTH);
+      spanY = Math.max(this.frameHeight || 0.5 * s.height, maxY * 1.05 + LEAF_LENGTH);
+    } else if (this.frame === "height") {
+      cx = s.width / 2;
+      spanY = s.height * 1.05 + LEAF_LENGTH;
+    } else if (this.frame === "trees" && s.periodic) {
+      // A ring has no edge to frame: show one lap, the crowns that cross the seam drawn at both
+      // sides (wrapOffsets), as the garden does (M26; the lab drew them past the world's end).
+      cx = s.width / 2;
+      spanX = s.width;
     }
     const fitH = Math.max(1, this.height - GROUND_MARGIN - this.headroom);
     const first = this.target === null;
-    this.target = { cx, scale: Math.min(this.width / spanX, fitH / spanY) };
+    // "height" ignores the width, so a world wider than the plate is cut at its sides.
+    const scale = fitH / spanY;
+    const wide = this.width / spanX;
+    let fitted = this.frame === "height" ? scale : Math.min(wide, scale);
+    if (this.frame === "world" && s.periodic) {
+      // A ring shows one lap and no more (the garden): the scale never falls below the width's, so
+      // the canvas is never wider than the ring and no tree is drawn twice. Crowns taller than the
+      // canvas crop at the top rather than shrink the lap. A young garden is framed closer, but at
+      // most WORLD_ZOOM_MAX times the lap's scale, so the sides do not cut away most of the ring.
+      fitted = Math.min(Math.max(wide, scale), wide * WORLD_ZOOM_MAX);
+    }
+    this.target = { cx, scale: fitted };
     if (snap || first) {
       this.camera.cx = this.target.cx;
       this.camera.scale = this.target.scale;
@@ -578,12 +672,12 @@ export class Scene {
   }
 
   /**
-   * World-x offsets at which to draw the trees: on a ring in the "world" frame, one copy either
-   * side as well, so crowns that grew across the seam show at both edges.
+   * World-x offsets at which to draw the trees: on a ring framed whole ("world", or the lab's
+   * "trees"), one copy either side as well, so crowns that grew across the seam show at both edges.
    */
   wrapOffsets(): number[] {
     const s = this.next;
-    return s?.periodic && this.frame === "world" ? [-s.width, 0, s.width] : [0];
+    return s?.periodic && this.frame !== "tree" ? [-s.width, 0, s.width] : [0];
   }
 
   /** Canvas pixels of a world point (the inverse of `screenToWorld`). */
@@ -669,8 +763,6 @@ export class Scene {
     if (!s) return;
     const g = this.geom;
     const prev = this.prev;
-    if (this.depth) this.projectAll(s);
-    const proj = this.proj;
     const wind = this.wind;
     if (wind) {
       this.compliance(s);
@@ -708,17 +800,9 @@ export class Scene {
         swayAcc[j] = a;
         ang -= a;
       }
-      let dx = len * Math.cos(ang);
-      let dy = len * Math.sin(ang);
-      if (this.depth) {
-        const k = 4 * j;
-        const ex = proj[k] * dx + proj[k + 1] * dy;
-        dy = proj[k + 2] * dx + proj[k + 3] * dy;
-        dx = ex;
-      }
-      g.tipX[j] = bx + dx;
-      g.tipY[j] = by + dy;
-      g.radius[j] = r;
+      g.tipX[j] = bx + len * Math.cos(ang);
+      g.tipY[j] = by + len * Math.sin(ang);
+      g.radius[j] = r * this.girth;
     }
     // Taper each metamer toward its thickest child, so the stem flows into whichever branch
     // dominates the junction (in decurrent crowns that is often a lateral, not the continuation).
@@ -793,84 +877,128 @@ export class Scene {
     this.swayFor = s;
   }
 
-  /** Every metamer's projection for snapshot `s`, once per snapshot (parents come first). */
-  private projectAll(s: Snapshot): void {
-    if (this.projFor === s) return;
-    if (this.proj.length < 4 * s.metamerCount) {
-      this.proj = new Float32Array(8 * s.metamerCount);
-      this.axisZ = new Float32Array(2 * s.metamerCount);
-    }
-    for (let j = 0; j < s.metamerCount; j++) this.project(s, j, s.parent[j]);
-    this.projFor = s;
-  }
+  private orderFor: Snapshot | null = null;
+  private order: Int32Array<ArrayBufferLike> = new Int32Array(0);
+  private woodSliceStarts = new Int32Array(DEPTH_SLICES + 1);
 
   /**
-   * Sets metamer j's projection. Each first-order limb, with its whole subtree, is turned out of
-   * the plane about the trunk by a stable azimuth φ: seen from the side, the component of its
-   * geometry perpendicular to the trunk shrinks to MIN_SPREAD + (1 − MIN_SPREAD)·|sin φ| (spec §C1.4
-   * β_eff = atan(tan β·|sin φ|)) and its depth is cos φ. Everything else inherits its parent's
-   * projection, so the squeeze is applied once per limb, never compounded; higher-order axes only
-   * get their own depth (half their parent's, half their own azimuth) for the leaf layers.
+   * The snapshot's metamers far to near (z0 descending, row ascending on ties; the viewer faces
+   * z = 0): the order the wood is drawn in (I3). The core sorts it (`zOrder`); a snapshot without
+   * one (a test's, built by hand) is sorted here.
    */
-  private project(s: Snapshot, j: number, p: number): void {
-    const proj = this.proj;
-    const k = 4 * j;
-    if (p >= 0 && s.order[j] > s.order[p] && s.order[p] > 0) {
-      proj.copyWithin(k, 4 * p, 4 * p + 4);
-      const own = Math.cos(2 * Math.PI * hash01(s.tree[j], s.birthId[j], 1));
-      this.axisZ[j] = 0.5 * this.axisZ[p] + 0.5 * own;
-      return;
-    }
-    if (p < 0 || s.order[j] === s.order[p]) {
-      if (p < 0) {
-        proj[k] = 1;
-        proj[k + 1] = 0;
-        proj[k + 2] = 0;
-        proj[k + 3] = 1;
-        this.axisZ[j] = 0;
+  drawOrder(s: Snapshot): Int32Array<ArrayBufferLike> {
+    if (this.orderFor !== s) {
+      const n = s.metamerCount;
+      let order: Int32Array<ArrayBufferLike>;
+      if (s.zOrder && s.zOrder.length === n) {
+        order = s.zOrder;
       } else {
-        proj.copyWithin(k, 4 * p, 4 * p + 4);
-        this.axisZ[j] = this.axisZ[p];
+        order = Int32Array.from({ length: n }, (_, j) => j);
+        const z = s.z0;
+        order.sort((a, b) => (z[b] as number) - (z[a] as number) || a - b);
       }
-      return;
+      // Depth slice i holds the wood order[starts[i]] … order[starts[i + 1] − 1].
+      const starts = this.woodSliceStarts;
+      let k = 0;
+      for (let i = 0; i < DEPTH_SLICES; i++) {
+        starts[i] = k;
+        while (k < n && depthSlice(s.z0[order[k] as number] as number, s.depth) === i) k++;
+      }
+      starts[DEPTH_SLICES] = n;
+      this.order = order;
+      this.orderFor = s;
     }
-    const phi = 2 * Math.PI * hash01(s.tree[j], s.birthId[j], 1);
-    const squeeze = MIN_SPREAD + (1 - MIN_SPREAD) * Math.abs(Math.sin(phi));
-    // Unit parent direction u; S = u uᵀ + squeeze · (I − u uᵀ).
-    const pa = s.angle[p];
-    const ux = Math.cos(pa);
-    const uy = Math.sin(pa);
-    const f = 1 - squeeze;
-    const s00 = 1 - f * uy * uy;
-    const s01 = f * ux * uy;
-    const s11 = 1 - f * ux * ux;
-    const q = 4 * p;
-    const [a, b, c, d] = [proj[q], proj[q + 1], proj[q + 2], proj[q + 3]];
-    proj[k] = a * s00 + b * s01;
-    proj[k + 1] = a * s01 + b * s11;
-    proj[k + 2] = c * s00 + d * s01;
-    proj[k + 3] = c * s01 + d * s11;
-    this.axisZ[j] = Math.cos(phi);
+    return this.order;
+  }
+
+  /** Where each depth slice's wood starts in `drawOrder(s)`; the last entry is the metamer count. */
+  woodSlices(s: Snapshot): Int32Array {
+    this.drawOrder(s);
+    return this.woodSliceStarts;
   }
 
   /** The palette a colour mode draws with. */
   palette(mode: ColorMode, theme: Theme): string[] {
-    if (mode === "natural") return theme.bark;
+    if (mode === "natural") {
+      // The view's ramp, then each species' (bark-styles.ts): `colorIndices` points into both.
+      // Each kept at least `woodContrast` below the sky's palest tone, where wood stands.
+      if (this.naturalFor !== theme || this.naturalContrast !== this.woodContrast) {
+        const dL = this.woodContrast;
+        this.natural = [...theme.bark, ...BARK_PALETTES.flatMap((p) => theme.barkBy[p])].map((c) =>
+          keepContrast(c, theme.skyBottom, dL),
+        );
+        this.naturalFor = theme;
+        this.naturalContrast = dL;
+      }
+      return this.natural;
+    }
     if (mode === "light" || mode === "resource" || mode === "age" || mode === "stress") {
       return SEQUENTIAL;
     }
     return CATEGORICAL;
   }
 
+  private natural: string[] = [];
+  private naturalFor: Theme | null = null;
+  private naturalContrast = 0;
+
+  /**
+   * Each tree's drawing style (M19: each tree is drawn as its species): `styles[kindOf[tree]]`,
+   * the style its species names, else the view's (`styles[0]`). Once per snapshot and view style.
+   */
+  treeStyles(s: Snapshot): { styles: LeafStyle[]; kindOf: Uint8Array } {
+    const c = this.stylesFor;
+    if (c.s === s && c.style === this.leafStyle) return c;
+    const style = this.leafStyle;
+    const styles: LeafStyle[] = [style];
+    let maxTree = 0;
+    for (const m of s.metrics) maxTree = Math.max(maxTree, m.tree);
+    const n = s.metamerCount;
+    if (n > 0) maxTree = Math.max(maxTree, s.tree[n - 1] as number); // rows come in tree-id order
+    const kindOf = new Uint8Array(maxTree + 1);
+    for (const m of s.metrics) {
+      const name = m.species ? s.species[m.species]?.leaf : undefined;
+      const own: LeafStyle = name && isLeafStyleName(name) ? LEAF_STYLES[name] : style;
+      let kind = styles.indexOf(own);
+      if (kind < 0) kind = styles.push(own) - 1;
+      kindOf[m.tree] = kind;
+    }
+    this.stylesFor = { s, style, styles, kindOf };
+    return this.stylesFor;
+  }
+  private stylesFor = {
+    s: null as Snapshot | null,
+    style: null as LeafStyle | null,
+    styles: [] as LeafStyle[],
+    kindOf: new Uint8Array(0),
+  };
+
+  /**
+   * The bark texture of every metamer in the natural view, four bytes each: fissure depth, birch's
+   * marks, pine's plates (0–255, bark-styles.ts), and 0. Filled by `colorIndices("natural")`; zero
+   * for trees drawn in the view's own ramp.
+   */
+  bark = new Uint8Array(0);
+
   /** Palette index of every metamer for a colour mode and a palette of `steps` colours. */
   colorIndices(mode: ColorMode, steps: number): Uint16Array {
     const s = this.next;
     if (!s) return this.colors;
     const cached = this.colorsFor;
-    if (cached.s === s && cached.mode === mode && cached.steps === steps) return this.colors;
-    this.colorsFor = { s, mode, steps };
+    if (
+      cached.s === s &&
+      cached.mode === mode &&
+      cached.steps === steps &&
+      cached.style === this.leafStyle
+    )
+      return this.colors;
+    this.colorsFor = { s, mode, steps, style: this.leafStyle };
     const n = s.metamerCount;
     if (this.colors.length < n) this.colors = new Uint16Array(n * 2);
+    if (mode === "natural" && steps === RAMP_STEPS + BARK_PALETTES.length * BARK_STEPS) {
+      this.naturalIndices(s);
+      return this.colors;
+    }
     let field: Float32Array | null = null;
     if (mode === "light") field = s.light;
     else if (mode === "resource") field = s.resource;
@@ -899,22 +1027,89 @@ export class Scene {
   }
 
   /**
+   * Bark by light (`barkLight` k > 0): each metamer's share of its wood colour's lit luminance,
+   * 1 − k·shade, where shade is the snapshot's field (`shadow`: 1 − mean Q/C over the slab's depth,
+   * C2) at the cell of the metamer's base. It reads the field, not `light`: for old wood `light` is
+   * its subtree's mean (q_sum/n_sum, the crown above), not the shade on the stem itself. Null when
+   * off or when the snapshot carries no field.
+   */
+  woodLight(s: Snapshot): Float32Array | null {
+    const k = this.barkLight;
+    const field = s.shadow;
+    if (!(k > 0) || !field) return null;
+    if (this.woodLightFor.s === s && this.woodLightFor.k === k) return this.woodLightOf;
+    const n = s.metamerCount;
+    if (this.woodLightOf.length < n) this.woodLightOf = new Float32Array(2 * n);
+    const w = s.width;
+    const h = Math.floor(field.length / w);
+    for (let j = 0; j < n; j++) {
+      const col = ((Math.floor(s.x0[j] as number) % w) + w) % w;
+      const row = Math.min(h - 1, Math.max(0, Math.floor(s.y0[j] as number)));
+      const shade = Math.min(1, Math.max(0, field[row * w + col] as number));
+      this.woodLightOf[j] = 1 - k * shade;
+    }
+    this.woodLightFor = { s, k };
+    return this.woodLightOf;
+  }
+
+  /**
+   * The natural view's colours (`palette("natural")`): a tree whose style names a bark (bark-styles.ts)
+   * takes its species' ramp, twig → bark by the metamer's age and bark → old bark by its girth, and
+   * the texture bytes in `bark`; any other tree, the view's ramp by age as a share of the oldest
+   * wood's (the M6 picture, unchanged).
+   */
+  private naturalIndices(s: Snapshot): void {
+    const n = s.metamerCount;
+    const { styles, kindOf } = this.treeStyles(s);
+    const barkOf = styles.map((st) => (st.bark ? BARK_PALETTES.indexOf(st.bark) : -1));
+    if (this.bark.length < 4 * n) this.bark = new Uint8Array(8 * n);
+    let max = 0;
+    for (let j = 0; j < n; j++) if (s.age[j] > max) max = s.age[j];
+    // Each tree's height, for barks that age only low on the tree (`oldBelow`, birch's base).
+    const heightOf: number[] = [];
+    for (const m of s.metrics) heightOf[m.tree] = m.height;
+    for (let j = 0; j < n; j++) {
+      const p = barkOf[kindOf[s.tree[j] as number] as number] as number;
+      const q = 4 * j;
+      if (p < 0) {
+        const u = max > 0 ? s.age[j] / max : 0;
+        this.colors[j] = Math.min(RAMP_STEPS - 1, Math.floor(u * RAMP_STEPS));
+        this.bark[q] = 0;
+        this.bark[q + 1] = 0;
+        this.bark[q + 2] = 0;
+        continue;
+      }
+      const style = BARK_STYLES[BARK_PALETTES[p] as (typeof BARK_PALETTES)[number]];
+      const age = s.age[j] as number;
+      const r = s.radius[j] as number;
+      const H = heightOf[s.tree[j] as number] ?? 0;
+      const h = H > 0 ? (s.y0[j] as number) / H : 0;
+      this.colors[j] = RAMP_STEPS + p * BARK_STEPS + barkStep(style, age, r, h);
+      const mature = age >= style.mature ? 1 : age / style.mature;
+      const open = fissureOpen(style, r, h);
+      this.bark[q] = Math.round(255 * style.fissure * open);
+      this.bark[q + 1] = Math.round(255 * style.marks * mature);
+      this.bark[q + 2] = Math.round(255 * style.plates * open);
+    }
+  }
+
+  /**
    * Leaves at the tip of every metamer up to `leafAge` seasons old, coloured from shade to sun
    * (RAMP_STEPS indices) by the light its subtree gathers. Leaves unfold as their metamer grows in
    * and shrink away during the season in which they pass `leafAge`. Short shoots (R6) on older wood
-   * carry a rosette, coloured by their own light, so drawn foliage matches simulated foliage. In
-   * the x-ray view a young metamer carries one leaf on alternating sides (two, one each side, for
-   * styles with `xray` 2) and a rosette two; with `depth` on each carries the style's `cluster`
-   * leaves spaced around the shoot, each foreshortened by
-   * its out-of-plane angle, and those whose depth falls behind the plane go first, darkened, as
-   * the back layer. The layout is worked out once per snapshot (`layoutLeaves`); a frame only
-   * places each leaf on its shoot and sizes it.
+   * carry a rosette, coloured by their own light, so drawn foliage matches simulated foliage. A
+   * young metamer carries one leaf on alternating sides (two, one each side, for styles with
+   * `xray` 2) and a rosette two, far to near with their metamers (`Leaves.slices`). The layout is
+   * worked out once per snapshot (`layoutLeaves`); a frame only places each leaf on its shoot and
+   * sizes it, walking the layout in row order and writing each leaf to its far-to-near place. A
+   * leaf not drawn this frame (another tree's on a solo plate, or one shrunk away) keeps its
+   * place with size 0, so the slice table holds for the whole snapshot.
    */
   leaves(leafAge: number, t: number): Leaves {
     const s = this.next;
     const out = this.leafList;
     out.count = 0;
-    out.back = 0;
+    out.slices.fill(0);
     if (!s) return out;
     const L = this.layoutLeaves(s, leafAge);
     if (out.x.length < L.count + FALLEN_MAX) {
@@ -933,11 +1128,14 @@ export class Scene {
     const tau = this.tau;
     const palettes = L.styles.map((st) => LEAF_PALETTES.indexOf(st.palette));
     const shapes = L.styles.map((st) => LEAF_SHAPES.indexOf(st.shape));
+    const hangOf = L.styles.map((st) => st.clump?.hang ?? 0);
+    const levelOf = L.styles.map((st) => st.clump?.level ?? 0);
     if (this.seasons && tau < this.lastTau) this.fallen.count = 0; // a new year: last year's litter is gone
     const g = this.geom;
-    let k = 0;
+    out.slices.set(L.slices);
     for (let i = 0; i < L.count; i++) {
-      if (i === L.back) out.back = k;
+      const k = L.at[i] as number;
+      out.size[k] = 0;
       const j = L.metamer[i];
       if (this.solo >= 0 && s.tree[j] !== this.solo) continue;
       let size = ROSETTE_SIZE;
@@ -973,6 +1171,20 @@ export class Scene {
         dx = 1; // atan2(0, 0) = 0: a shoot of no length points along +x
         dy = 0;
       }
+      // Where the card sits (LeafClump): back along its metamer, then drawn toward its shoot's tip.
+      let px = g.tipX[j] as number;
+      let py = g.tipY[j] as number;
+      const back = L.back[i] as number;
+      if (back > 0) {
+        px -= (px - g.baseX[j]) * back;
+        py -= (py - g.baseY[j]) * back;
+      }
+      const e = L.end[i] as number;
+      if (e !== j) {
+        const pull = L.pull[i] as number;
+        px += (g.tipX[e] - px) * pull;
+        py += (g.tipY[e] - py) * pull;
+      }
       let a = L.a[i] as number;
       let b = L.b[i] as number;
       if (this.wind) {
@@ -985,19 +1197,35 @@ export class Scene {
         b += a * f;
         a = na;
       }
-      out.x[k] = g.tipX[j];
-      out.y[k] = g.tipY[j];
-      out.ux[k] = a * dx - b * dy;
-      out.uy[k] = a * dy + b * dx;
+      let ux = a * dx - b * dy;
+      let uy = a * dy + b * dx;
+      // Hanging strings and level sprays (LeafClump): the card turns toward down, or toward level.
+      const hang = hangOf[kind] as number;
+      const level = levelOf[kind] as number;
+      if (hang > 0 || level > 0) {
+        ux = (1 - hang - level) * ux + level * (ux < 0 ? -1 : 1);
+        uy = (1 - hang - level) * uy - hang;
+        const n = Math.sqrt(ux * ux + uy * uy);
+        if (n > 1e-6) {
+          ux /= n;
+          uy /= n;
+        } else {
+          ux = 0;
+          uy = -1;
+        }
+      }
+      out.x[k] = px;
+      out.y[k] = py;
+      out.ux[k] = ux;
+      out.uy[k] = uy;
       out.size[k] = size * L.scale[i];
       out.color[k] = L.color[i];
       out.turn[k] = turn;
       out.palette[k] = palettes[kind] as number;
       out.shape[k] = shapes[kind] as number;
       out.aspect[k] = style.aspect;
-      k++;
     }
-    if (L.back >= L.count) out.back = k;
+    let k = L.count;
     if (this.seasons) k = this.driftLeaves(out, k);
     this.lastTau = tau;
     out.count = k;
@@ -1073,25 +1301,34 @@ export class Scene {
   private layoutLeaves(s: Snapshot, leafAge: number): Scene["layout"] {
     const L = this.layout;
     const style = this.leafStyle;
-    if (L.for === s && L.leafAge === leafAge && L.depth === this.depth && L.style === style) {
+    if (L.for === s && L.leafAge === leafAge && L.style === style && L.clearBole === this.clearBole)
       return L;
-    }
-    if (this.depth) this.projectAll(s);
     const n = s.metamerCount;
-    // Each tree is drawn as its species (M19): the style its species names, else the view's.
-    const styles: LeafStyle[] = [style];
-    const kindOf = new Map<number, number>();
-    const keepOf = new Map<number, number>();
+    // Each tree is drawn as its species (M19), resolved once per tree into arrays by tree id.
+    const { styles, kindOf } = this.treeStyles(s);
+    const keepOf = new Uint8Array(kindOf.length);
+    // Marcescence by height on the tree (`marcescentBelow`): leaves on wood below this keep on.
+    const keepBelow = new Float32Array(kindOf.length);
     for (const m of s.metrics) {
-      const name = m.species ? s.species[m.species]?.leaf : undefined;
-      const own: LeafStyle = name && isLeafStyleName(name) ? LEAF_STYLES[name] : style;
-      let kind = styles.indexOf(own);
-      if (kind < 0) kind = styles.push(own) - 1;
-      kindOf.set(m.tree, kind);
-      keepOf.set(m.tree, own.marcescent !== undefined && m.height < own.marcescent ? 1 : 0);
+      const own = styles[kindOf[m.tree] as number] as LeafStyle;
+      keepOf[m.tree] = own.marcescent !== undefined && m.height < own.marcescent ? 1 : 0;
+      keepBelow[m.tree] = (own.marcescentBelow ?? 0) * m.height;
     }
-    const per = this.depth ? Math.max(...styles.map((st) => st.cluster)) : 2;
-    const cap = (n + s.budCount) * per;
+    // Each metamer's continuation (its child of the same order, the axis going on), for `gather`.
+    const cont = new Int32Array(n).fill(-1);
+    for (let j = 0; j < n; j++) {
+      const p = s.parent[j] as number;
+      if (p >= 0 && cont[p] < 0 && s.order[j] === s.order[p]) cont[p] = j;
+    }
+    const clumpOf = styles.map((st) => st.clump ?? {});
+    // Per kind: the leaf's turn from its shoot, its length relative to the view's style (the
+    // renderers draw at the latter), and whether it carries a leaf each side.
+    const spreadOf = styles.map((st) => st.spread);
+    const along = styles.map((st) => Math.cos(st.spread));
+    const across = styles.map((st) => Math.sin(st.spread));
+    const lengthOf = styles.map((st) => st.length / style.length);
+    const pairOf = styles.map((st) => st.xray === 2);
+    const cap = 2 * (n + s.budCount);
     if (L.metamer.length < cap) {
       L.metamer = new Int32Array(2 * cap);
       L.a = new Float32Array(2 * cap);
@@ -1101,6 +1338,11 @@ export class Scene {
       L.rosette = new Uint8Array(2 * cap);
       L.kind = new Uint8Array(2 * cap);
       L.keep = new Uint8Array(2 * cap);
+      L.slice = new Uint8Array(2 * cap);
+      L.at = new Int32Array(2 * cap);
+      L.end = new Int32Array(2 * cap);
+      L.pull = new Float32Array(2 * cap);
+      L.back = new Float32Array(2 * cap);
     }
     L.styles = styles;
     let maxLight = 0;
@@ -1111,87 +1353,78 @@ export class Scene {
       Math.floor((maxLight > 0 ? Math.sqrt(Math.min(1, light / maxLight)) : 0) * (RAMP_STEPS - 1)) +
       jitter(tree, id);
     let k = 0;
-    const push = (
-      j: number,
-      a: number,
-      b: number,
-      scale: number,
-      color: number,
-      rosette: number,
-    ) => {
+    // One leaf turned `side` · spread from shoot j. Its drawn length is foreshortened by the
+    // shoot's share in the picture's plane, √(Hx² + Hy²): the orthographic view of a leaf on a
+    // shoot that points at the viewer is short (I3), as the shoot itself is.
+    const push = (j: number, side: number, color: number, rosette: number) => {
+      const tree = s.tree[j] as number;
+      const kind = kindOf[tree] as number;
+      const hx = s.dirX[j] as number;
+      const hy = s.dirY[j] as number;
+      const c = clumpOf[kind] as NonNullable<LeafStyle["clump"]>;
+      // The page's own variation per card (never the model's): its fan, its place, its size.
+      const id = s.birthId[j] as number;
+      const salt = (side > 0 ? 11 : 17) + 5 * rosette;
       L.metamer[k] = j;
-      L.a[k] = a;
-      L.b[k] = b;
+      if (c.fan) {
+        const angle = side * (spreadOf[kind] as number) + c.fan * (2 * hash01(tree, id, salt) - 1);
+        L.a[k] = Math.cos(angle);
+        L.b[k] = Math.sin(angle);
+      } else {
+        L.a[k] = along[kind] as number;
+        L.b[k] = side * (across[kind] as number);
+      }
       L.color[k] = Math.max(0, Math.min(RAMP_STEPS - 1, color));
       L.rosette[k] = rosette;
-      const tree = s.tree[j] as number;
-      const kind = kindOf.get(tree) ?? 0;
       L.kind[k] = kind;
-      L.keep[k] = keepOf.get(tree) ?? 0;
-      // A species' leaf length relative to the view's style (the renderers draw at the latter).
-      L.scale[k] = scale * ((styles[kind] as LeafStyle).length / style.length);
+      // A ragged edge, not a line: each card's own height limit varies from 0.5 to 1.5 of it.
+      const below = (keepBelow[tree] as number) * (0.5 + hash01(tree, id, salt + 3));
+      L.keep[k] = keepOf[tree] || (below > 0 && (s.y0[j] as number) < below) ? 1 : 0;
+      const vary = c.vary ? 1 + c.vary * (2 * hash01(tree, id, salt + 1) - 1) : 1;
+      L.scale[k] = Math.sqrt(hx * hx + hy * hy) * (lengthOf[kind] as number) * vary;
+      // A rosette sits on its short shoot; a shoot's cards spread back and gather toward its tip.
+      let end = j;
+      if (!rosette && c.gather)
+        for (let r = c.reach ?? 2; r > 0 && cont[end] >= 0; r--) end = cont[end];
+      L.end[k] = end;
+      L.pull[k] = end !== j ? (c.gather ?? 0) : 0;
+      L.back[k] = !rosette && c.along ? c.along * hash01(tree, id, salt + 2) : 0;
+      L.slice[k] = depthSlice(s.z0[j] as number, s.depth);
       k++;
     };
-    const styleOf = (j: number): LeafStyle =>
-      styles[kindOf.get(s.tree[j] as number) ?? 0] as LeafStyle;
-    // One x-ray leaf turned `side` · spread from its shoot.
-    const xray = (j: number, side: number, c: number, rosette: number) => {
-      const spread = styleOf(j).spread;
-      push(j, Math.cos(spread), side * Math.sin(spread), 1, c, rosette);
-    };
-    // The leaves of a pseudo-depth cluster at metamer j that belong to layer `pass`.
-    const cluster = (j: number, id: number, pass: number, c: number, rosette: number) => {
-      const own = styleOf(j);
-      const along = Math.cos(own.spread);
-      const across = Math.sin(own.spread);
-      const turn = hash01(s.tree[j], id, 2);
-      for (let i = 0; i < own.cluster; i++) {
-        const psi = 2 * Math.PI * (turn + i / own.cluster);
-        const z = 0.6 * this.axisZ[j] + 0.4 * Math.sin(psi);
-        if ((z < 0 ? 0 : 1) !== pass) continue;
-        // Leaf direction in 3D is along·d + across·(n cos ψ + z-axis sin ψ); its drawn in-plane
-        // part is (along, w) in the shoot's frame, foreshortened to length hypot(along, w).
-        const w = across * Math.cos(psi);
-        const len = Math.hypot(along, w);
-        push(j, along / len, w / len, len, pass === 0 ? Math.floor(c * BACK_SHADE) : c, rosette);
-      }
-    };
-    // Pass 0 lays out the back layer, pass 1 the front (the x-ray view has only a front layer).
-    L.back = 0;
-    for (let pass = this.depth ? 0 : 1; pass < 2; pass++) {
-      for (let j = 0; j < n; j++) {
-        if (s.age[j] > leafAge + 1) continue;
-        const c = shade(s.light[j], s.tree[j], s.birthId[j]);
-        if (!this.depth) {
-          const side = s.birthId[j] & 1 ? 1 : -1;
-          xray(j, side, c, 0);
-          if (styleOf(j).xray === 2) xray(j, -side, c, 0);
-        } else {
-          cluster(j, s.birthId[j], pass, c, 0);
-        }
-      }
-      // Short-shoot rosettes on wood older than the leafy shoots (R6).
-      for (let i = 0; i < s.budCount; i++) {
-        if (s.budState[i] !== BudState.shortShoot) continue;
-        const j = s.budMetamer[i];
-        if (s.age[j] <= leafAge + 1) continue;
-        const id = s.birthId[j] ^ 0x5bd1;
-        const c = shade(s.budQ[i], s.tree[j], id);
-        if (!this.depth) {
-          xray(j, 1, c, 1);
-          xray(j, -1, c, 1);
-        } else {
-          cluster(j, id, pass, c, 1);
-        }
-      }
-      if (pass === 0) L.back = k;
+    for (let j = 0; j < n; j++) {
+      if (s.age[j] > leafAge + 1) continue;
+      const c = shade(s.light[j], s.tree[j], s.birthId[j]);
+      const side = s.birthId[j] & 1 ? 1 : -1;
+      push(j, side, c, 0);
+      if (pairOf[kindOf[s.tree[j] as number] as number]) push(j, -side, c, 0);
     }
-    if (!this.depth) L.back = 0;
+    // Short-shoot rosettes on wood older than the leafy shoots (R6). With `clearBole`, none on a
+    // trunk below its tree's limb crown base (a height on the tree, as `marcescentBelow`).
+    const boleTop = new Float32Array(kindOf.length);
+    if (this.clearBole) for (const m of s.metrics) boleTop[m.tree] = m.limbBase;
+    for (let i = 0; i < s.budCount; i++) {
+      if (s.budState[i] !== BudState.shortShoot) continue;
+      const j = s.budMetamer[i];
+      if (s.age[j] <= leafAge + 1) continue;
+      if (s.order[j] === 0 && (s.y0[j] as number) < (boleTop[s.tree[j] as number] as number))
+        continue;
+      const c = shade(s.budQ[i], s.tree[j], s.birthId[j] ^ 0x5bd1);
+      push(j, 1, c, 1);
+      push(j, -1, c, 1);
+    }
+    // One counting sort by slice: each leaf's place in the far-to-near list, and the slice table.
+    const starts = L.slices;
+    starts.fill(0);
+    for (let i = 0; i < k; i++) starts[(L.slice[i] as number) + 1]++;
+    for (let i = 0; i < DEPTH_SLICES; i++) starts[i + 1] += starts[i] as number;
+    const next = starts.slice(0, DEPTH_SLICES);
+    for (let i = 0; i < k; i++) L.at[i] = next[L.slice[i] as number]++;
     L.count = k;
     L.for = s;
     L.leafAge = leafAge;
-    L.depth = this.depth;
     L.style = style;
+    L.clearBole = this.clearBole;
     return L;
   }
 }

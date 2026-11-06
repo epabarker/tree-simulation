@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Opening forests: shipped and regenerated</title>
+    <style>
+      body { font: 15px/1.45 system-ui, sans-serif; margin: 0; color: #222; background: #fff; }
+      header { padding: 10px 16px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+      header h1 { font-size: 17px; margin: 0; }
+      button, select { font: inherit; padding: 4px 10px; }
+      .pair { display: grid; grid-template-columns: 1fr; gap: 6px; padding: 0 16px 16px; }
+      @media (min-width: 900px) { .pair { grid-template-columns: 1fr 1fr; } }
+      figure { margin: 0; }
+      figcaption { font-size: 13px; color: #555; padding: 2px 0; }
+      .plate { position: relative; width: 100%; aspect-ratio: var(--aspect, 1.6); border: 1px solid #ddd; }
+      #stats { font-size: 13px; color: #555; padding: 0 16px; }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Opening forests</h1>
+      <select id="pick"></select>
+      <button id="prev">◀</button><button id="next">▶</button>
+      <span id="stats"></span>
+    </header>
+    <div class="pair">
+      <figure><figcaption>Shipped (garden 0.14.0, the TypeScript core)</figcaption><div class="plate" id="old"></div></figure>
+      <figure><figcaption>Regenerated (the Rust core, as it will ship)</figcaption><div class="plate" id="new"></div></figure>
+    </div>
+    <script type="module" src="./compare.ts"></script>
+  </body>
+</html>

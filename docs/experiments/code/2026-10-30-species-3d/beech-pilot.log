@@ -1,0 +1,61 @@
+
+=== beech (least squares) ===
+screening: 36 evaluations in 213 s; active: c3.alpha, r2.levels.0.lambda, r2.levels.1.lambda, r2.levels.1.branchAngle, r2.levels.1.eta, r2.aC, r2.dLambda, r2.kappa, c5.Trel, r1.Lh, r1.mf, r3.c, r6.qMin, r6.leafArea, r2.hJ
+start: loss 65.04 (traits 65.04), r0 0.003096
+iteration 1 (stand 60): accepted loss 29.32 (current 29.32), step 0.245, r0 0.004954, 235 s
+iteration 2 (stand 60): accepted loss 26.57 (current 26.57), step 0.167, r0 0.003096, 208 s
+iteration 3 (stand 60): rejected loss 29.21 (current 26.57), step 0.250, r0 0.002057, 197 s
+iteration 3 (stand 60): accepted loss 23.85 (current 23.85), step 0.125, r0 0.002524, 215 s
+iteration 4 (stand 60): rejected loss 26.35 (current 23.85), step 0.151, r0 0.001875, 201 s
+iteration 4 (stand 60): accepted loss 23.31 (current 23.31), step 0.075, r0 0.002175, 219 s
+iteration 5 (stand 60): rejected loss 24.33 (current 23.31), step 0.250, r0 0.001875, 198 s
+iteration 5 (stand 60): rejected loss 24.19 (current 23.31), step 0.125, r0 0.00202, 217 s
+iteration 5 (stand 60): accepted loss 22.83 (current 22.83), step 0.062, r0 0.002096, 235 s
+iteration 6 (stand 60): rejected loss 23.02 (current 22.83), step 0.250, r0 0.001875, 203 s
+iteration 6 (stand 60): rejected loss 23.50 (current 22.83), step 0.125, r0 0.001982, 222 s
+iteration 6 (stand 60): rejected loss 24.54 (current 22.83), step 0.062, r0 0.002038, 240 s
+iteration 6 (stand 60): accepted loss 21.88 (current 21.88), step 0.031, r0 0.002067, 258 s
+iteration 7 (stand 60): accepted loss 19.85 (current 19.85), step 0.250, r0 0.001875, 202 s
+iteration 8 (stand 60): rejected loss 22.16 (current 19.85), step 0.238, r0 0.001875, 194 s
+iteration 8 (stand 60): rejected loss 22.77 (current 19.85), step 0.119, r0 0.001875, 210 s
+iteration 8 (stand 60): rejected loss 22.20 (current 19.85), step 0.059, r0 0.001875, 228 s
+iteration 8 (stand 60): rejected loss 21.76 (current 19.85), step 0.031, r0 0.001875, 244 s
+
+beech: 177 evaluations in 2162 s; stopped: 4 consecutive rejected steps
+loss on fresh seeds: start 71.32, fitted 33.93
+trait                      target    band    start   fitted   margin
+stand.height                   84      18      131     75.3     9.33
+lone.earlyShare               0.5    0.08    0.413    0.503   0.0772
+lone.spread                   0.9     0.2     0.57     1.22   -0.117
+lone.slenderness               48       8     90.7     44.6     4.63
+stand.slenderness              70      10      103     40.9    -19.1
+stand.crownRatio             0.55     0.1    0.936     0.77    -0.12
+lone.widestAt                 0.4    0.15      0.1    0.233  -0.0167
+lone.crownFullness           0.75     0.1    0.657    0.813   0.0374
+lone.forkHeight               0.7     0.2   0.0144   0.0239   -0.476
+lone.leaderDominance          2.0     0.8     1.86     1.21  0.00508
+lone.branchAngle               55      10       44     49.1     4.14
+lone.limbDroop                 10      10     6.53     4.92     4.92
+stand.lateShare              1.43    0.06     1.29     1.65   -0.161
+shade.survivalLight         0.034    0.01   0.0227    0.027  0.00295
+active: c3.alpha, r2.levels.0.lambda, r2.levels.1.lambda, r2.levels.1.branchAngle, r2.levels.1.eta, r2.aC, r2.dLambda, r2.kappa, c5.Trel, r1.Lh, r1.mf, r3.c, r6.qMin, r6.leafArea, r2.hJ
+c3.alpha                     2.96      2.5
+r2.levels.0.lambda          0.531    0.536
+r2.levels.1.lambda          0.512    0.535
+r2.levels.1.setPoint         34.3     34.3
+r2.levels.1.branchAngle      50.1     51.9
+r2.levels.1.eta              0.57    0.157
+r2.levels.2.setPoint         94.6     94.6
+r2.aC                        14.4     10.7
+r2.dLambda                 0.0138   0.0274
+r2.kappa                    0.431    0.171
+c5.Trel                    0.0454    0.104
+c6.r0                      0.0031  0.00187
+r1.Lh                         109      107
+r1.mf                       0.077   0.0941
+r3.c                       0.0488   0.0344
+r6.qMin                    0.0126   0.0114
+r6.leafArea                  2.47        3
+r2.hJ                          45     54.7
+r1.mw                          64      174
+wrote /home/edbarker/Documents/Projects/tree-simulation/docs/experiments/fits/round3/beech.json

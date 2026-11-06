@@ -1,0 +1,50 @@
+# check.py on the planning session's runs (2026-10-30, 3d-port 4d55ef7; same commands as run.sh)
+§0.1 lone oak, R3 off, 60 seasons: base against r0 ÷ 8, m_w × 64
+  seed 1: columns that differ: none; trunk 3.3008 -> 0.41261 (÷ 8.000); H/D 18.2 -> 145.6
+  seed 2: columns that differ: none; trunk 3.4589 -> 0.43237 (÷ 8.000); H/D 17.1 -> 136.9
+  seed 3: columns that differ: none; trunk 3.4487 -> 0.43108 (÷ 8.000); H/D 15.5 -> 123.9
+§0.2 K 16, band offset 0.0: top direction 72.5°, weight share 0.098
+§0.2 K 16, band offset 0.5: top direction 77.6°, weight share 0.097
+§0.2 K 16, band offset 1.0: top direction 90.0°, weight share 0.096
+§0.4–0.5 `forest`, 3 seeds
+  diag/base s100: metamers/seed 132,937; planted alive 76/90; median height 80.9, H/D 13.3, trunk r 3.03, crown width 22.4, buds 4898, P 2143, P/bud 0.44
+      floor 0.140 (gaps 0.148, under LAI ≥ 1 0.138); gap fraction 27%; stand LAI 10.7 (under crowns 14.7); light by row 0/20/40/50/60/70/80/90: 0.14 0.14 0.13 0.14 0.15 0.21 0.94 1.00
+  diag/base s150: metamers/seed 121,200; planted alive 68/90; median height 81.4, H/D 11.8, trunk r 3.46, crown width 21.8, buds 4266, P 2042, P/bud 0.48
+      floor 0.164 (gaps 0.171, under LAI ≥ 1 0.161); gap fraction 35%; stand LAI 9.4 (under crowns 14.5); light by row 0/20/40/50/60/70/80/90: 0.16 0.17 0.17 0.18 0.21 0.27 0.90 1.00
+      seed 1 tree 1: trunk r 3.44 (stress wood 0.000); pipe² 11.80: tips 0.608, scars and memory 11.19 (95%)
+      seed 1 tree 3: trunk r 3.89 (stress wood 0.000); pipe² 15.13: tips 1.151, scars and memory 13.98 (92%)
+      seed 1 tree 4: trunk r 3.40 (stress wood 0.000); pipe² 11.55: tips 0.577, scars and memory 10.97 (95%)
+  diag/k7 s100: metamers/seed 75,101; planted alive 76/90; median height 76.4, H/D 14.6, trunk r 2.52, crown width 22.5, buds 2679, P 1173, P/bud 0.43
+      floor 0.140 (gaps 0.145, under LAI ≥ 1 0.138); gap fraction 33%; stand LAI 7.4 (under crowns 11.2); light by row 0/20/40/50/60/70/80/90: 0.14 0.16 0.19 0.25 0.51 0.68 0.99 1.00
+  diag/k7 s150: metamers/seed 62,255; planted alive 68/90; median height 84.7, H/D 15.2, trunk r 2.79, crown width 19.9, buds 2320, P 875, P/bud 0.39
+      floor 0.169 (gaps 0.176, under LAI ≥ 1 0.163); gap fraction 45%; stand LAI 6.1 (under crowns 11.3); light by row 0/20/40/50/60/70/80/90: 0.17 0.21 0.25 0.29 0.38 0.56 0.82 1.00
+      seed 1 tree 1: trunk r 2.66 (stress wood 0.068); pipe² 6.74: tips 0.007, scars and memory 6.73 (100%)
+      seed 1 tree 3: trunk r 2.79 (stress wood 0.092); pipe² 7.30: tips 0.006, scars and memory 7.29 (100%)
+      seed 1 tree 4: trunk r 2.81 (stress wood 0.098); pipe² 7.37: tips 0.006, scars and memory 7.37 (100%)
+  diag/tau0 s100: metamers/seed 122,932; planted alive 76/90; median height 80.6, H/D 13.7, trunk r 2.97, crown width 22.9, buds 4572, P 2030, P/bud 0.45
+      floor 0.063 (gaps 0.061, under LAI ≥ 1 0.065); gap fraction 32%; stand LAI 9.3 (under crowns 13.7); light by row 0/20/40/50/60/70/80/90: 0.06 0.08 0.09 0.11 0.14 0.20 0.94 1.00
+  diag/tau0 s150: metamers/seed 107,738; planted alive 68/90; median height 81.3, H/D 12.2, trunk r 3.36, crown width 22.2, buds 3684, P 1975, P/bud 0.52
+      floor 0.091 (gaps 0.102, under LAI ≥ 1 0.084); gap fraction 41%; stand LAI 7.9 (under crowns 13.5); light by row 0/20/40/50/60/70/80/90: 0.09 0.11 0.13 0.15 0.19 0.26 0.92 1.00
+      seed 1 tree 1: trunk r 3.64 (stress wood 0.000); pipe² 13.22: tips 0.775, scars and memory 12.45 (94%)
+      seed 1 tree 3: trunk r 3.17 (stress wood 0.000); pipe² 10.06: tips 0.459, scars and memory 9.60 (95%)
+      seed 1 tree 4: trunk r 3.04 (stress wood 0.000); pipe² 9.22: tips 0.396, scars and memory 8.82 (96%)
+§0.4 R3 ablations at k 8, `forest`, 100 seasons
+  r3/k8 s100: metamers/seed 74,317; planted alive 76/90; median height 77.0, H/D 14.4, trunk r 2.55, crown width 22.7, buds 2706, P 1169, P/bud 0.43
+  r3/nosag s100: metamers/seed 84,673; planted alive 76/90; median height 82.6, H/D 20.2, trunk r 1.96, crown width 19.5, buds 3032, P 1354, P/bud 0.45
+  r3/nopost s100: metamers/seed 77,715; planted alive 76/90; median height 52.3, H/D 8.9, trunk r 2.92, crown width 50.2, buds 2832, P 1201, P/bud 0.43
+  r3/nogirth s100: metamers/seed 25; planted alive 76/90; median height 1.0, H/D 19.9, trunk r 0.03, crown width 0.0, buds 2, P 0, P/bud 0.00
+§0.4 the scar fix (scars record radius − stress wood), `forest`, 3 seeds
+  diag/base s100: metamers/seed 133,308; planted alive 76/90; median height 80.4, H/D 13.3, trunk r 3.02, crown width 22.8, buds 4922, P 2126, P/bud 0.43
+      floor 0.141 (gaps 0.147, under LAI ≥ 1 0.138); gap fraction 28%; stand LAI 10.8 (under crowns 14.9); light by row 0/20/40/50/60/70/80/90: 0.14 0.14 0.13 0.14 0.15 0.21 0.92 1.00
+  diag/base s150: metamers/seed 122,098; planted alive 68/90; median height 81.4, H/D 11.9, trunk r 3.44, crown width 22.3, buds 4244, P 1948, P/bud 0.47
+      floor 0.164 (gaps 0.170, under LAI ≥ 1 0.161); gap fraction 36%; stand LAI 9.5 (under crowns 14.8); light by row 0/20/40/50/60/70/80/90: 0.16 0.17 0.17 0.19 0.21 0.28 0.89 1.00
+      seed 1 tree 1: trunk r 3.49 (stress wood 0.000); pipe² 12.21: tips 0.681, scars and memory 11.53 (94%)
+      seed 1 tree 3: trunk r 3.33 (stress wood 0.000); pipe² 11.11: tips 0.639, scars and memory 10.47 (94%)
+      seed 1 tree 4: trunk r 3.61 (stress wood 0.000); pipe² 13.00: tips 0.769, scars and memory 12.24 (94%)
+  diag/k8 s100: metamers/seed 78,220; planted alive 70/90; median height 65.0, H/D 65.5, trunk r 0.47, crown width 28.7, buds 2976, P 1455, P/bud 0.52
+      floor 0.124 (gaps 0.131, under LAI ≥ 1 0.122); gap fraction 22%; stand LAI 7.4 (under crowns 9.5); light by row 0/20/40/50/60/70/80/90: 0.12 0.17 0.41 0.52 0.62 0.89 1.00 1.00
+  diag/k8 s150: metamers/seed 55,502; planted alive 62/90; median height 67.1, H/D 65.6, trunk r 0.52, crown width 27.7, buds 1887, P 1112, P/bud 0.61
+      floor 0.149 (gaps 0.159, under LAI ≥ 1 0.145); gap fraction 29%; stand LAI 6.0 (under crowns 8.5); light by row 0/20/40/50/60/70/80/90: 0.15 0.21 0.31 0.43 0.62 0.84 1.00 1.00
+      seed 1 tree 3: trunk r 0.59 (stress wood 0.166); pipe² 0.18: tips 0.005, scars and memory 0.18 (97%)
+      seed 1 tree 4: trunk r 0.52 (stress wood 0.114); pipe² 0.16: tips 0.006, scars and memory 0.16 (97%)
+      seed 1 tree 5: trunk r 0.43 (stress wood 0.048); pipe² 0.15: tips 0.004, scars and memory 0.14 (97%)

@@ -1,17 +1,15 @@
 /**
- * Adaptive quality (M15): when frames run slow, draw fewer pixels, then fewer leaves.
+ * Adaptive quality (M15): when frames run slow, draw fewer pixels.
  *
  * Levels run from best to cheapest: the device pixel ratio (capped) stepping down through 1.5 to
- * 1, then 1 without the back layer of leaves. While the garden animates, every 60 frame intervals
- * form a window: if its 90th percentile is above SLOW_MS (under ≈ 42 fps) the quality steps down
- * one level; after GOOD_WINDOWS windows in a row under FAST_MS it steps back up one. A change waits
+ * 1 (a last level without ADR 0008's back layer of leaves went with that layer, I3). While the
+ * garden animates, every 60 frame intervals form a window: if its 90th percentile is above SLOW_MS
+ * (under ≈ 42 fps) the quality steps down one level; after GOOD_WINDOWS windows in a row under FAST_MS it steps back up one. A change waits
  * SETTLE_MS before frames count again, so a resize's own hitch is not judged.
  */
 
 export interface QualityLevel {
   dpr: number;
-  /** Leave out the back layer of leaves. */
-  lite: boolean;
 }
 
 export const WINDOW = 60;
@@ -24,10 +22,7 @@ export const SETTLE_MS = 1000;
 export function qualityLevels(deviceDpr: number, maxDpr: number): QualityLevel[] {
   const cap = Math.min(deviceDpr || 1, maxDpr);
   const dprs = [cap, 1.5, 1].filter((d, i, all) => d <= cap && all.indexOf(d) === i);
-  return [
-    ...dprs.map((dpr) => ({ dpr, lite: false })),
-    { dpr: dprs[dprs.length - 1] as number, lite: true },
-  ];
+  return dprs.map((dpr) => ({ dpr }));
 }
 
 export interface Governor {

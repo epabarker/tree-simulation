@@ -3,5 +3,5 @@
   // here only lets page-side tests (src/web/**/*.test.ts) type-check. src/core stays DOM-free.
   "extends": "./tsconfig.base.json",
   "compilerOptions": { "lib": ["es2023", "dom"], "types": ["node"] },
-  "include": ["src/**/*.test.ts", "tests/**/*.ts", "vite.config.ts"]
+  "include": ["src/**/*.test.ts", "src/**/*.bench.ts", "tests/**/*.ts", "vite.config.ts"]
 }

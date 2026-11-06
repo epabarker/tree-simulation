@@ -14,24 +14,16 @@ function run(g: ReturnType<typeof governor>, dt: number, windows: number, now = 
 }
 
 describe("adaptive quality (M15)", () => {
-  it("steps the pixel ratio down to 1, then drops the back leaves", () => {
-    expect(qualityLevels(3, 2)).toEqual([
-      { dpr: 2, lite: false },
-      { dpr: 1.5, lite: false },
-      { dpr: 1, lite: false },
-      { dpr: 1, lite: true },
-    ]);
-    expect(qualityLevels(1, 2)).toEqual([
-      { dpr: 1, lite: false },
-      { dpr: 1, lite: true },
-    ]);
+  it("steps the pixel ratio down to 1", () => {
+    expect(qualityLevels(3, 2)).toEqual([{ dpr: 2 }, { dpr: 1.5 }, { dpr: 1 }]);
+    expect(qualityLevels(1, 2)).toEqual([{ dpr: 1 }]);
   });
 
   it("steps down one level per slow window, waiting for each change to settle, and stops at the last", () => {
     const g = governor(qualityLevels(3, 2));
     const { changes } = run(g, 40, 20); // 25 fps throughout
-    expect(changes).toEqual([1, 2, 3]);
-    expect(g.level).toBe(3);
+    expect(changes).toEqual([1, 2]);
+    expect(g.level).toBe(2);
   });
 
   it("ignores frames while a change settles", () => {

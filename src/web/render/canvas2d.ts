@@ -1,11 +1,12 @@
 /**
  * Canvas 2D renderer: the fallback when WebGL2 is unavailable, and the M0–M5 prototype renderer.
- * Segments are grouped by (colour, width) and each group is stroked as one path, which keeps
- * Canvas 2D usable into the tens of thousands of segments.
+ * Wood and leaves draw far to near in DEPTH_SLICES / CANVAS_SLICE_STEP slices of the slab (I3):
+ * within a slice the segments are grouped by (colour, width) and each group is stroked as one path,
+ * which keeps Canvas 2D usable into the tens of thousands of segments; then that slice's leaves.
  */
 
-import type { Snapshot } from "../../core/snapshot.ts";
-import { BudState } from "../../core/tree.ts";
+import type { Snapshot } from "../../core/types.ts";
+import { BudState } from "../../core/types.ts";
 import { BUD_ACTIVE, BUD_DORMANT, SEQUENTIAL, shadeImage } from "./colors.ts";
 import {
   LEAF_PALETTES,
@@ -19,7 +20,18 @@ import {
 const OUTLINES: Float32Array[] = LEAF_SHAPES.map(leafOutline);
 
 import { MAX_DPR, type Renderer, type RendererOptions } from "./renderer.ts";
-import { type ColorMode, type Leaves, leafLength, Scene, type ViewOptions } from "./scene.ts";
+import {
+  CANVAS_SLICE_STEP,
+  type ColorMode,
+  DEPTH_SLICES,
+  LEAF_MIN_PX,
+  LEAF_OPACITY,
+  type Leaves,
+  leafLength,
+  Scene,
+  type ViewOptions,
+  WOOD_CONTRAST,
+} from "./scene.ts";
 import { RAMP_STEPS, readTheme, type Theme } from "./theme.ts";
 
 const WIDTH_BUCKETS = 48;
@@ -34,6 +46,11 @@ export class Canvas2DRenderer implements Renderer {
   private keys = new Uint16Array(0);
   private order = new Int32Array(0);
   private theme: Theme;
+  /**
+   * The world rectangle in view for the copy being drawn: segments and leaves outside it are
+   * skipped. A zoomed view (the loupe, M26) then pays only for what it shows.
+   */
+  private cull = { x0: 0, x1: 0, y0: 0, y1: 0 };
 
   private readonly transparent: boolean;
   private maxDpr: number;
@@ -71,8 +88,14 @@ export class Canvas2DRenderer implements Renderer {
     this.scene.setSize(rect.width, rect.height, dpr);
   }
 
+  /** This frame's foliage knobs (ViewOptions.leafOpacity, leafMinPx). */
+  private leafOpacity = LEAF_OPACITY;
+  private leafMinPx = LEAF_MIN_PX;
+
   draw(t: number, view: ViewOptions): void {
     const { ctx, scene } = this;
+    this.leafOpacity = view.leafOpacity ?? LEAF_OPACITY;
+    this.leafMinPx = view.leafMinPx ?? LEAF_MIN_PX;
     const s = scene.next;
     const { width: w, height: h, dpr } = scene;
     const { cx, scale } = scene.camera;
@@ -94,6 +117,14 @@ export class Canvas2DRenderer implements Renderer {
         groundY * dpr,
       );
     world(0);
+    const halfW = w / 2 / scale;
+    const setCull = (offset: number): void => {
+      const margin = 2; // world units: room for a leaf or a thick limb reaching in
+      this.cull.x0 = cx - offset - halfW - margin;
+      this.cull.x1 = cx - offset + halfW + margin;
+      this.cull.y0 = (groundY - h) / scale - margin;
+      this.cull.y1 = groundY / scale + margin;
+    };
 
     if (view.showShadow && this.shadowFor !== s) {
       // Built once per snapshot, and only while the overlay is shown.
@@ -120,19 +151,27 @@ export class Canvas2DRenderer implements Renderer {
       ctx.restore();
     }
 
-    scene.depth = view.depth;
     scene.leafStyle = LEAF_STYLES[view.leafStyle];
+    scene.clearBole = view.clearBole ?? false;
+    scene.girth = view.girth ?? 1;
+    scene.woodContrast = view.woodContrast ?? WOOD_CONTRAST;
     scene.computeGeometry(t);
     const leaves = view.showLeaves ? scene.leaves(view.leafAge, t) : null;
     // On a ring seen whole, the trees are drawn once per copy of the world (Scene.wrapOffsets).
     for (const offset of scene.wrapOffsets()) {
       world(offset);
+      setCull(offset);
       if (view.showGhosts && scene.physics) this.drawDebris();
       else if (view.showGhosts && scene.prev && t < 1) this.drawGhosts(1 - t);
-      // Back-layer leaves (pseudo-depth, ADR 0008) go behind the wood, the rest in front.
-      if (leaves && !view.lite) this.drawLeaves(leaves, 0, leaves.back);
-      this.drawSegments(s, view.colorMode);
-      if (leaves) this.drawLeaves(leaves, leaves.back, leaves.count);
+      const wood = scene.woodSlices(s);
+      for (let i = 0; i < DEPTH_SLICES; i += CANVAS_SLICE_STEP) {
+        const end = i + CANVAS_SLICE_STEP;
+        this.drawSegments(s, view.colorMode, wood[i] as number, wood[end] as number);
+        if (leaves)
+          this.drawLeaves(leaves, leaves.slices[i] as number, leaves.slices[end] as number);
+      }
+      // Falling and fallen leaves (M17) over everything.
+      if (leaves) this.drawLeaves(leaves, leaves.slices[DEPTH_SLICES] as number, leaves.count);
       if (view.showBuds) this.drawBuds(s, view.colorMode === "light");
     }
 
@@ -179,9 +218,11 @@ export class Canvas2DRenderer implements Renderer {
     ctx.fillRect(0, groundY, w, h - groundY);
   }
 
-  private drawSegments(s: Snapshot, mode: ColorMode): void {
+  /** The wood at `drawOrder(s)` positions [from, to): one depth slice's segments. */
+  private drawSegments(s: Snapshot, mode: ColorMode, from: number, to: number): void {
+    if (to <= from) return;
     const { ctx, scene } = this;
-    const n = s.metamerCount;
+    const n = to - from;
     const palette = scene.palette(mode, this.theme);
     const colors = scene.colorIndices(mode, palette.length);
     if (this.keys.length < n) {
@@ -189,19 +230,21 @@ export class Canvas2DRenderer implements Renderer {
       this.order = new Int32Array(n * 2);
     }
     const g = scene.geom;
+    const depthOrder = scene.drawOrder(s);
     const pxPerUnit = scene.camera.scale;
-    for (let j = 0; j < n; j++) {
+    for (let i = 0; i < n; i++) {
+      const j = depthOrder[from + i] as number;
       const widthPx = Math.max(0.6, 2 * g.radius[j] * pxPerUnit);
       const wb = Math.min(WIDTH_BUCKETS - 1, Math.max(0, Math.round(Math.log2(widthPx / 0.6) * 4)));
-      this.keys[j] = colors[j] * WIDTH_BUCKETS + wb;
+      this.keys[i] = colors[j] * WIDTH_BUCKETS + wb;
     }
-    // Counting sort of segments by (colour, width) key.
+    // Counting sort of the slice's segments by (colour, width) key.
     const nKeys = palette.length * WIDTH_BUCKETS;
     const start = new Int32Array(nKeys + 1);
-    for (let j = 0; j < n; j++) start[this.keys[j] + 1]++;
+    for (let i = 0; i < n; i++) start[this.keys[i] + 1]++;
     for (let k = 0; k < nKeys; k++) start[k + 1] += start[k];
     const fill = start.slice(0, nKeys);
-    for (let j = 0; j < n; j++) this.order[fill[this.keys[j]]++] = j;
+    for (let i = 0; i < n; i++) this.order[fill[this.keys[i]]++] = depthOrder[from + i] as number;
 
     const unitsPerPx = 1 / scene.camera.scale;
     ctx.lineCap = "round";
@@ -213,9 +256,18 @@ export class Canvas2DRenderer implements Renderer {
       ctx.strokeStyle = palette[Math.floor(k / WIDTH_BUCKETS)] as string;
       ctx.lineWidth = 0.6 * 2 ** ((k % WIDTH_BUCKETS) / 4) * unitsPerPx;
       ctx.beginPath();
+      const { x0, x1, y0, y1 } = this.cull;
       for (let i = a; i < b; i++) {
         const j = this.order[i];
         if (scene.solo >= 0 && s.tree[j] !== scene.solo) continue; // a solo plate: one specimen
+        const r = g.radius[j];
+        if (
+          Math.max(g.baseX[j], g.tipX[j]) + r < x0 ||
+          Math.min(g.baseX[j], g.tipX[j]) - r > x1 ||
+          Math.max(g.baseY[j], g.tipY[j]) + r < y0 ||
+          Math.min(g.baseY[j], g.tipY[j]) - r > y1
+        )
+          continue;
         ctx.moveTo(g.baseX[j], g.baseY[j]);
         ctx.lineTo(g.tipX[j], g.tipY[j]);
       }
@@ -226,12 +278,13 @@ export class Canvas2DRenderer implements Renderer {
   private drawLeaves(leaves: Leaves, from: number, to: number): void {
     const { ctx } = this;
     const style = this.scene.leafStyle;
-    const full = leafLength(this.scene.camera.scale, style.length);
+    const full = leafLength(this.scene.camera.scale, style.length, this.leafMinPx);
+    const { x0, x1, y0, y1 } = this.cull;
     // The palettes this frame's leaves use (each tree is drawn as its species, M19).
     const used = new Set<number>();
     for (let k = from; k < to; k++) used.add(leaves.palette[k] as number);
     ctx.save();
-    ctx.globalAlpha = 0.92;
+    ctx.globalAlpha = this.leafOpacity;
     // Leaves drawn in two passes per colour: green, then those past halfway to autumn (M17).
     for (const p of used) {
       const name = LEAF_PALETTES[p] as LeafPalette;
@@ -245,8 +298,10 @@ export class Canvas2DRenderer implements Renderer {
         for (let k = from; k < to; k++) {
           if (leaves.palette[k] !== p) continue;
           if (leaves.color[k] !== c || (leaves.turn[k] as number) > 0.5 !== turned) continue;
+          if (leaves.size[k] <= 0) continue; // not drawn this frame (Scene.leaves)
           const bx = leaves.x[k];
           const by = leaves.y[k];
+          if (bx + full < x0 || bx - full > x1 || by + full < y0 || by - full > y1) continue;
           const ux = leaves.ux[k];
           const uy = leaves.uy[k];
           const len = full * leaves.size[k];

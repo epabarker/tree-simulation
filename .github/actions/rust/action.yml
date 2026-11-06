@@ -1,0 +1,27 @@
+name: Rust toolchain
+description: >-
+  The Rust core's toolchain (ADR 0024): the version and wasm32 target in rust-toolchain.toml, and
+  wasm-bindgen-cli at the version rust/Cargo.lock pins, cached between runs.
+runs:
+  using: composite
+  steps:
+    - name: Cache cargo and the Rust build
+      uses: actions/cache@v6
+      with:
+        path: |
+          ~/.cargo/bin/wasm-bindgen
+          ~/.cargo/registry
+          ~/.cargo/git
+          rust/target
+        key: rust-${{ runner.os }}-${{ hashFiles('rust-toolchain.toml', 'rust/Cargo.lock') }}
+        restore-keys: rust-${{ runner.os }}-
+    - name: Toolchain from rust-toolchain.toml
+      shell: bash
+      run: rustup show active-toolchain || rustup toolchain install
+    - name: wasm-bindgen-cli, the version rust/Cargo.lock pins
+      shell: bash
+      run: |
+        want=$(grep -A1 '^name = "wasm-bindgen"$' rust/Cargo.lock | sed -n 's/^version = "\(.*\)"/\1/p')
+        have=$(wasm-bindgen --version 2>/dev/null | cut -d' ' -f2 || true)
+        if [ "$have" != "$want" ]; then cargo install wasm-bindgen-cli --version "$want" --locked --force; fi
+        wasm-bindgen --version

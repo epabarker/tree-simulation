@@ -1,0 +1,164 @@
+# M27b: hand adjustments on top of the round-2 fits (docs/experiments/fits/<species>.json), each
+# with its reason. analysis/experiments/m27_adopt.py applies them and writes src/core/flora-fitted.ts.
+# Measured with the hold-out's tests: survival light in the shade house, the mixed wood over 400
+# seasons (12 seeds), and the lab woods over 200 (docs/experiments/2026-10-28-m27-fits.md, M27b).
+
+[broadleaf]
+# The generic irregularity base (overnight 2026-11-06, agent R's r-best0, branch r-regularity):
+# shoot length varies (lognormal, s 0.5), each axis keeps its own set-point offset (SD 50°) and
+# branch-angle offset (SD 60°), and lateral buds break stochastically (a logistic of width 1 through
+# R4's threshold). R's setting 1 (axis 40°, β 50°) failed G-forest (planted H/D 0 of 20); this one
+# passed it, G-reg and G-budget. The four prototype rules are off by default in the core; here they reach every
+# broadleaf, under each species' own overrides (a species' key below wins). Not fir or pine.
+# m27_adopt.py adds exactly these keys to each listed species' patch, nothing else in its groups.
+species = ["beech", "birch", "holly", "hornbeam", "maple", "oak", "rowan", "willow"]
+assign = { "c1.shootLengthSD" = 0.5, "c4.axisSD" = 50, "c1.betaSD" = 60, "c1.budBreak" = { mode = "stochastic", width = 1.0 } }
+
+[holly]
+# The fit raised Q_ss (0.03 → 0.059) and m_f (0.03 → 0.049) chasing an estimated height and floor:
+# holly then needed 8.5% light (band 2–5%) and starved under the fitted beech and hornbeam, whose
+# measured floors are 1.3–1.5%, vanishing from the mixed wood. Evergreen leaves live several years,
+# so their yearly cost is low; seedlings emerge densest in closed holly woodland (Arrieta et al.
+# 2005); a facultative understorey tree in oceanic climates (Valladares et al. 2005).
+"r6.qMin" = 0.013
+"r1.mf" = 0.025
+"o4.qEst" = 0.01
+# The fitted juvenile height (39) left the founding holly too slow to hold its place.
+"r2.hJ" = 20
+# The judging pass (the user, 2026-11-02; docs/experiments/2026-11-02-overrides.md): the lone holly at
+# 100 was a narrow pointed spire (a cypress). Beech's fork rules from age 40 (ADR 0033, 0039-0041)
+# end the leader and round the top: a bush, W/H 0.69 against 0.45; the stand's LAI and survival
+# unchanged. The user's pick, with the reservation "lone 100 crown is lumpy and two-lobed, a bit squat".
+"r2.relay" = 2
+"r2.relayAge" = 40
+"r2.relayPTerm" = 0.3
+"r2.relayCrowd" = 10
+"r2.forkAt" = 1.3
+"r2.forkAngle" = 45
+"r2.vigourTreeLo" = 3000
+"r2.vigourTreeHi" = 10000
+
+[rowan]
+# The fit lowered Q_ss to 0.039, so rowan survived 5.4% (band 8–14%, the oak's score): back to M25's.
+"r6.qMin" = 0.06
+# The judging pass (the user, 2026-11-02): the lone rowan was stacked lumpy tiers with a leaning flat
+# cap. Its first-order lambda was 0.4917 (below 0.5 from birth: the limbs lost their apex at every
+# node) and kappa 1.448. Held at 0.53 with kappa 1.0: an oval crown on a straight stem. The user's
+# pick, with the reservations "a touch dense, the top leans; the stand's stems still snake, accept".
+"r2.levels.1.lambda" = 0.53
+"r2.kappa" = 1.0
+# Natural mature heights (overnight 2026-11-06, agent Y2; G-forest passed on the garden with thin
+# margins): R1's reproductive sink (fRep 0.8, from the species' maturity), so that height
+# levels off instead of climbing past the species' Level 0 band. Rowan 21.6 m.
+"r1.fRep" = 0.8
+"r1.maturity" = 85
+
+[hornbeam]
+# Natural mature heights (overnight 2026-11-06, agent Y2; G-forest passed on the garden with thin
+# margins): R1's reproductive sink (fRep 0.8, from the species' maturity), so that height
+# levels off instead of climbing past the species' Level 0 band.
+# Hornbeam levels at 29.1 m from season 100 (shipped: 37 m at 100, 49 m at 150), with dLambda
+# 0.0725 for its crown (0.62x metamers, W/H 0.65, D 0.34). Fragile: the crown flips within +-0.01.
+"r1.fRep" = 0.8
+"r1.maturity" = 115
+"r2.dLambda" = 0.0725
+
+[pine]
+# The fit lowered Q_ss to 0.096: pine survived 12.7%, as tolerant as birch (band 20–30%).
+"r6.qMin" = 0.2
+# The fit sees 100 seasons: with L_h 37 pine reached 39 m by season 150. L_h 30 gives 27.5 m at 100
+# (table 29 m), 34.5 m at 150 and 37.4 m at 200, Scots pine's range.
+"r1.Lh" = 30
+
+[beech]
+# Fresh look, beech (2026-11-01, solver round 1): the lone tree a polyarchic dome, the stand kept.
+# The relay (ADR 0033) ends the leader from 15, gated by R5's neighbour shade (k 10), so only an
+# open-grown tree forks low; the vigour fork (excess vigour ends the apex) forks the stand's tops;
+# every arm holds the angle it was born at and curves 30° over 30 nodes (ADR 0034), rising then
+# arching; the vigour drop lowers λ in weak wood of a tree whose v_base passes 3000–10000 (the
+# open-grown crown; a stand member stays near or below 3000: 2,409–3,020 at 20 seeds, review note
+# §2), so its top divides into near-equal limbs.
+# docs/experiments/code/2026-11-01-fresh-look-beech/notes.md, Solver decision.
+"r2.relay" = 2
+"r2.relayAge" = 15
+"r2.relayPTerm" = 0.15
+"r2.relayCrowd" = 10
+"r2.forkAt" = 1.3
+"r2.forkAngle" = 30
+"r2.levels.0.curve" = 30
+"r2.levels.0.curveLength" = 30
+"r2.vigourShare" = 0.3
+"r2.vigourLambda" = 0.03
+"r2.vigourTreeLo" = 3000
+"r2.vigourTreeHi" = 10000
+# Repair round 1 (2026-11-01): the candidate's lone tree was a cedar of flat plates, because every
+# twig (pa 2, set point 94.6°) grew and held level in the open. Light orthotropy: lit wood of a
+# vigorous tree is held erect (35°), shaded wood level, by its light (0.2–0.8) and over its first
+# 3 seasons, so the young shoot spreads level and its older base rises (rise, then arch); the
+# vigour gate (3000–10000) keeps the stand as it was. notes.md, Repair. Own-crown pruning (c5.Tvig
+# 0.25) was part of the repair and is rejected (ADR 0043, 2026-11-02): it made the garden's edge
+# beech a pole with a cap and did not clear the lower trunk (2026-11-02-beech-overnight.md).
+"r2.lightSetPoint" = 35
+"r2.lightLo" = 0.2
+"r2.lightHi" = 0.8
+"r2.lightOver" = 3
+# Round 2 (2026-11-02, ADR 0044): a short shoot on wood older than 20 seasons rests leafless, so the
+# stand's boles lose the spur tufts they kept for ever (the "leafy sprouts" of the blind test). The
+# sources put a beech spur chain at 10–15 years; 15 fails the ecology guard (6 of 20) under the
+# rule's wood-age clock, 20 passes (11 of 20) and clears the trunks. 2026-11-02-beech-round2-stand-diagnosis.md.
+"r6.lifespan" = 20
+# The irregularity base's departure (overnight 2026-11-06, agent S, on beech's own descriptors; ADR
+# 0055): less shoot-length variation, a wider spread of branch angles. Passed G-forest on the garden.
+"c1.shootLengthSD" = 0.35
+"c4.axisSD" = 50
+"c1.betaSD" = 70
+"c1.budBreak" = { mode = "stochastic", width = 1.0 }
+
+[birch]
+# Track B's accepted form (the user, 2026-11-01; docs/experiments/code/2026-11-01-atlas/picks.toml):
+# pendulous twigs (ADR 0035) on the twig level's own set point 45, hanging to 140° up to radius
+# 0.01, and twig laterals every third node (ADR 0036). Adopted 2026-11-02 after the judging pass
+# found the picks had never reached the species.
+"r2.levels.2.setPoint" = 45
+"r2.levels.2.pendulous" = 140
+"r2.levels.2.pendulousRadius" = 0.01
+"r2.levels.2.lateralEvery" = 3
+
+[oak]
+# Track B's accepted form (the user, 2026-11-01; picks.toml): posture by age (ADR 0038), limbs steep
+# when young (35) levelling to 85 with their wood's age over 50 seasons: long, near-level low limbs
+# under a broad crown. Adopted 2026-11-02.
+"r2.levels.1.setPoint" = 35
+"r2.levels.1.agedSetPoint" = 85
+"r2.levels.1.agedOver" = 50
+# The zigzag (the user's judging pass, 2026-11-02; docs/experiments/2026-11-02-oak-zigzag.md): the fit's
+# dLambda 0.1154 takes lambda below 0.5 once the ramp ends, so a lateral takes over at nearly every
+# node (60-76 kinks a stem: the garden's "lightning bolts"). Held at 0.04 (lambda 0.52) the stems are
+# straight (1-2 kinks); the lone oak is a cone until its form round. The user's override, 2026-11-02.
+"r2.dLambda" = 0.04
+# The irregularity base's departure (overnight 2026-11-06, agent S, on oak's own descriptors; ADR
+# 0055): less variation in shoot length and in both angles. Passed G-forest on the garden.
+"c1.shootLengthSD" = 0.3
+"c4.axisSD" = 35
+"c1.betaSD" = 40
+"c1.budBreak" = { mode = "stochastic", width = 1.0 }
+# Natural mature heights (overnight 2026-11-06, agent Y2; G-forest passed on the garden with thin
+# margins): R1's reproductive sink (fRep 0.8, from the species' maturity), so that height
+# levels off instead of climbing past the species' Level 0 band. Oak 33.2 m.
+"r1.fRep" = 0.8
+"r1.maturity" = 130
+
+[maple]
+# Track B's accepted form (the user, 2026-11-01; picks.toml): the relay from age 10 (ADR 0033), its
+# relays curving 30° over 30 nodes (ADR 0034): a lower fork and a rounder head. Adopted 2026-11-02.
+"r2.relay" = 2
+"r2.relayAge" = 10
+"r2.relayPTerm" = 0.6
+"r2.levels.0.curve" = 30
+"r2.levels.0.curveLength" = 30
+
+[willow]
+# Track B's accepted form (2026-11-01: pendulous twigs with laterals every second node) was adopted on
+# 2026-11-02 and withdrawn the same day on the user's judging pass in the real renderer: "wider than
+# tall, flat-topped open fan; worse than before; stand poles cross in X's". Willow ships as its
+# round-2 fit; its form (a dense rounded bush) is on the after-shipping list.

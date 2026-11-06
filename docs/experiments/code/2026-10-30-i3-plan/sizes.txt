@@ -1,0 +1,10 @@
+(node:682) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///tmp/claude-0/-home-user-tree-simulation/bcfc9267-432f-55af-ac0a-466d0bffb1fe/scratchpad/i3/sizes.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /tmp/claude-0/-home-user-tree-simulation/bcfc9267-432f-55af-ac0a-466d0bffb1fe/scratchpad/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+{"width":66,"season":40,"trees":300,"metamers":20281,"buds":20581,"snapshotKB":1877,"bytesPerMetamer":94.8,"snapshotMs":17.2,"seasonMsMean":79,"memoryMB":55,"leaves":3774,"coverLow":0.14,"coverHigh":0.219,"perCellLow":1.7,"perCellHigh":3.9,"top":105}
+{"width":66,"season":100,"trees":300,"metamers":24710,"buds":23791,"snapshotKB":2255,"bytesPerMetamer":93.5,"snapshotMs":27,"seasonMsMean":134,"memoryMB":68,"leaves":7579,"coverLow":0.019,"coverHigh":0.237,"perCellLow":1.3,"perCellHigh":9,"top":103}
+{"width":160,"season":40,"trees":300,"metamers":45811,"buds":49737,"snapshotKB":4152,"bytesPerMetamer":92.8,"snapshotMs":89.5,"seasonMsMean":222,"memoryMB":134,"leaves":7593,"coverLow":0.183,"coverHigh":0.195,"perCellLow":2,"perCellHigh":2.6,"top":108}
+{"width":160,"season":100,"trees":300,"metamers":51974,"buds":53435,"snapshotKB":4672,"bytesPerMetamer":92.1,"snapshotMs":144.1,"seasonMsMean":300,"memoryMB":161,"leaves":14143,"coverLow":0.104,"coverHigh":0.258,"perCellLow":1.8,"perCellHigh":6.3,"top":97}
+{"width":200,"season":40,"trees":300,"metamers":60144,"buds":65880,"snapshotKB":5428,"bytesPerMetamer":92.4,"snapshotMs":148,"seasonMsMean":249,"memoryMB":175,"leaves":10094,"coverLow":0.182,"coverHigh":0.188,"perCellLow":1.9,"perCellHigh":3.1,"top":108}
+{"width":200,"season":100,"trees":300,"metamers":59865,"buds":59088,"snapshotKB":5346,"bytesPerMetamer":91.4,"snapshotMs":73.5,"seasonMsMean":396,"memoryMB":225,"leaves":11093,"coverLow":0.088,"coverHigh":0.175,"perCellLow":1.8,"perCellHigh":4.3,"top":121}

@@ -3,8 +3,14 @@
  * so it is type-checked against Params. Species presets (§9) use R2 (M7, ADR 0009).
  */
 
-import { FLORA, type FloraName, level } from "./flora.ts";
-import { defaultParams, mergeParams, type Params, type ParamsPatch } from "./params.ts";
+import { FLORA, type FloraName } from "./flora.ts";
+import {
+  defaultParams,
+  mergeParams,
+  type Params,
+  type ParamsPatch,
+  type TreeSpec,
+} from "./params.ts";
 
 export interface Preset {
   label: string;
@@ -16,7 +22,7 @@ export interface Preset {
 
 /** Principles shared by every stand preset (C2–C6 on, λ = 0.5). */
 const STAND = {
-  c2: { enabled: true, model: "triangle" },
+  c2: { enabled: true, model: "slab" },
   c3: { mode: "bh", lambda: 0.5 },
   c4: { enabled: true },
   c5: { enabled: true },
@@ -33,9 +39,9 @@ const STAND = {
  * from M9 R3's mechanics (ADR 0011): limbs sag under their load and reaction wood rights them, and
  * from M10 R4's dormancy and release and R5's shade avoidance (ADR 0012).
  */
-const SKY = {
+export const SKY = {
   ...STAND,
-  c2: { enabled: true, model: "sky" },
+  c2: { enabled: true, model: "slab" },
   c3: { mode: "bh", lambda: 0.5, alpha: 3 },
   c5: { enabled: true, T: 0.03, Trel: 0.12 },
   r1: { enabled: true },
@@ -58,130 +64,14 @@ export const PRE_R1 = {
 } satisfies ParamsPatch;
 
 /**
- * The M6 sky sweep (columns, periodic laps) the light model had before M18's row march: the M6–M7
- * evidence tests pin it, as they pin PRE_R1, so their calibrated thresholds keep testing what
- * they measured (the M18 note).
+ * The M6 sky sweep (columns, periodic laps) the light model had before M18's row march. The 2D
+ * sweeps are gone with I2 (the slab replaced them), so this patch is empty; the M6–M7 tests that
+ * pinned it are 2D-calibrated (tests/evidence-2d/).
  */
-export const M6_LIGHT = { c2: { sweep: "columns" } } satisfies ParamsPatch;
+export const M6_LIGHT = {} satisfies ParamsPatch;
 
 /** The sky presets before R4 and R5 (M8–M9): the tests of those milestones pin it. */
 export const PRE_R4 = { r4: { enabled: false }, r5: { enabled: false } } satisfies ParamsPatch;
-
-/**
- * The species keep the M7 resource scale and no carbon balance: under R1 their strong leaders
- * still reach the world's top or grow far too slender (M8 note), so they need their own R1
- * calibration (ROADMAP follow-up).
- */
-const SPECIES_PRE_R1 = {
-  c3: { mode: "bh", lambda: 0.5, alpha: 2 },
-  r1: { enabled: false },
-  r3: { enabled: false },
-  r4: { enabled: false },
-  r5: { enabled: false },
-} satisfies ParamsPatch;
-
-/**
- * M7 species (§9, ADR 0009): generic types named after a real example, with qualitative values.
- * Light knobs follow the ROADMAP anchors: k_ext higher for plagiotropic crowns (Kitajima et al.
- * 2004), the shedding floor T low for shade-tolerant and high for light-demanding species.
- */
-const CONIFER = {
-  ...SKY,
-  ...SPECIES_PRE_R1,
-  c2: { enabled: true, model: "sky", kExt: 0.6 },
-  c5: { enabled: true, T: 0.02, Trel: 0.12 },
-  // Whorls carry few tips, so the pipe model gives a thin trunk; a thicker tip radius brings
-  // stand H/D to ≈ 78 (stand-grown conifers 60–80, Watt et al. 2023; M7 note).
-  c6: { enabled: true, r0: 0.035 },
-  r2: {
-    enabled: true,
-    levels: [
-      // Massart: monopodial orthotropic trunk with a whorl at the start of each growth unit,
-      level({ lambda: 0.58, setPoint: 0, eta: 0.4, generator: "whorled" }),
-      // plagiotropic branches and branchlets in the plane of the tier.
-      level({ lambda: 0.52, setPoint: 85, eta: 2, branchAngle: 80 }),
-      level({ lambda: 0.5, setPoint: 90, eta: 0.5, branchAngle: 45 }),
-    ],
-  },
-} satisfies ParamsPatch;
-
-const BIRCH = {
-  ...SKY,
-  ...SPECIES_PRE_R1,
-  c2: { enabled: true, model: "sky", kExt: 0.35 },
-  c5: { enabled: true, T: 0.08, Trel: 0.2 },
-  r2: {
-    enabled: true,
-    // Excurrent when young; apical control fades from age 15 (λ −0.06 over 20 seasons).
-    aC: 15,
-    dLambda: 0.06,
-    ramp: 20,
-    levels: [
-      level({ lambda: 0.56, setPoint: 0, eta: 0.3 }),
-      // Fine, steep laterals; the finest twigs hang (A_set > 90°).
-      level({ lambda: 0.53, setPoint: 40, eta: 0.2, branchAngle: 35 }),
-      level({ lambda: 0.5, setPoint: 120, eta: 0.25, branchAngle: 40 }),
-    ],
-  },
-} satisfies ParamsPatch;
-
-const TROPICAL = {
-  ...SKY,
-  ...SPECIES_PRE_R1,
-  c2: { enabled: true, model: "sky", kExt: 0.6 },
-  r2: {
-    enabled: true,
-    levels: [
-      // Aubréville: orthotropic trunk with a tier every 7 nodes,
-      level({ lambda: 0.6, setPoint: 0, eta: 0.5, generator: "whorled", tierEvery: 7 }),
-      // plagiotropic sympodial modules: each season's shoot ends and two relays fork on.
-      level({ lambda: 0.5, setPoint: 88, eta: 2, branchAngle: 20, generator: "whorled", pTerm: 1 }),
-    ],
-  },
-} satisfies ParamsPatch;
-
-/**
- * M9 R3 demonstrations (§9, ADR 0011), not yet calibrated species (ADR 0009 keeps willow and beech
- * for later). Both keep the sky presets' R1 and R3 and strengthen posture control.
- *
- * Weeping (willow-like, §9): an upright scaffold with hanging curtains. The trunk's posture holds it
- * vertical; limbs grow out at 50° but their reaction wood bends them toward 140°, and twigs grow and
- * set toward 150–175°, so limbs arch over and twigs hang (pendulous axes; the peach WEEP gene,
- * Hollender et al. 2018). A stiffer wood and thicker tips keep the slender trunk from buckling.
- */
-const WEEPING = {
-  ...SKY,
-  c6: { enabled: true, r0: 0.03 },
-  r3: { enabled: true, E: 2e6, c: 0.3, betaG: 0.2 },
-  r2: {
-    enabled: true,
-    aC: 10,
-    dLambda: 0.05,
-    ramp: 15,
-    levels: [
-      level({ lambda: 0.53, setPoint: 0, eta: 0.4 }),
-      level({ lambda: 0.5, setPoint: 50, eta: 0.3, branchAngle: 40, postureSetPoint: 140 }),
-      level({ lambda: 0.5, setPoint: 150, eta: 1, branchAngle: 45, postureSetPoint: 175 }),
-    ],
-  },
-} satisfies ParamsPatch;
-
-/**
- * Troll's model (beech-like, §9: "Fagus type"): every axis grows plagiotropic, the trunk's leader
- * too (A_set 70°), and the trunk straightens secondarily because its posture set-point is vertical.
- * Without R3 the same tree sprawls (spec §9: "impossible without R3").
- */
-const TROLL = {
-  ...SKY,
-  r3: { enabled: true, c: 0.15, betaG: 0.2 },
-  r2: {
-    enabled: true,
-    levels: [
-      level({ lambda: 0.52, setPoint: 70, eta: 0.5, postureSetPoint: 0 }),
-      level({ lambda: 0.5, setPoint: 80, eta: 0.6, branchAngle: 45 }),
-    ],
-  },
-} satisfies ParamsPatch;
 
 /**
  * M11 (ADR 0013): a forest without edges. Periodic sides wrap light and growth around, so the
@@ -190,28 +80,69 @@ const TROLL = {
  */
 const FOREST = {
   ...SKY,
-  r1: { enabled: true, fRep: 0.1, maturity: 40 },
+  // ADR 0032: the acclimated leaf cost (one global c), and T_rel scaled as hornbeam's from its
+  // fitted 0.194 to the light of its lowest shade leaves, 0.025: 0.12 × 0.025/0.194.
+  c5: { ...SKY.c5, Trel: 0.0155 },
+  r1: { enabled: true, fRep: 0.1, maturity: 40, leafCost: "acclimated", leafCostShade: 0.3 },
   // M16: limbs rest on the ground; storms in 5% of seasons break exposed limbs and throw tall trees.
-  r3: { ...SKY.r3, ground: true, sigmaBreak: 4500 },
+  // σ_break 7000 ≈ 2.3 × σ_target (ADR 0027): with thin pipes stress wood holds every branch near
+  // σ_target, and a storm's load at the top is 2.5×, so 4500 broke whole crowns in every storm.
+  r3: { ...SKY.r3, ground: true, sigmaBreak: 7000 },
   o2: { stormP: 0.05, stormLoad: 1.5 },
   o4: { enabled: true },
 } satisfies ParamsPatch;
 
 /**
- * M19: the woodland the calibrated species (flora.ts) grow in, the forest's principles with R5
- * sensing its neighbours' shade rather than its own, so lone trees grow squat and stands slender.
+ * M19: the woodland the calibrated species (flora.ts) grow in, the forest's principles (R5 senses
+ * its neighbours' shade, as every preset's has since C1 round 2: lone trees grow squat).
  * Storms are the forest's: harder ones snapped the young woodland's tops (the succession note).
  */
 const WOODLAND = {
   ...FOREST,
-  r5: { enabled: true, signal: "neighbours" },
   species: FLORA,
 } satisfies ParamsPatch;
 
-/** A world of one calibrated species: `x` positions, all of `name`. */
-const flora = (name: FloraName, xs: number[]) => xs.map((x) => ({ x, species: name }));
+/** Spacing of a stand's trees, cells: the 2D stands' one tree every 21 cells, now per area. */
+const SPACING = 21;
 
-const RING: Params["world"] = { width: 210, height: 130, walls: [], sides: "periodic" };
+/**
+ * A stand that fills the slab's depth (C1 round 2; the user, 2026-10-31): trees per area, not in
+ * one row down the slab's middle. One row's `xs` is repeated in rows every ≈ SPACING cells across
+ * the depth, each row shifted a fraction of the spacing along x so the planting is staggered
+ * (wrapped on `width`). `spec(i, row)` gives tree i of a row its species. A lone tree and the
+ * hedgerow (one row between open faces) keep a single row.
+ */
+export function perArea(
+  xs: number[],
+  width: number,
+  spec: (i: number, row: number) => Omit<TreeSpec, "x" | "z"> = () => ({}),
+): TreeSpec[] {
+  const depth = defaultParams.world.depth ?? 64;
+  const rows = Math.max(1, Math.round(depth / SPACING));
+  return Array.from({ length: rows }, (_, r) =>
+    xs.map((x, i) => ({
+      ...spec(i, r),
+      x: (x + (r * SPACING) / rows) % width,
+      z: (depth * (r + 0.5)) / rows,
+    })),
+  ).flat();
+}
+
+/** A stand of one calibrated species, `xs` the positions of one row (perArea). */
+const flora = (name: FloraName, xs: number[], width: number) =>
+  perArea(xs, width, () => ({ species: name }));
+
+/**
+ * The woods' world top, cells. In 3D the trees' height has not levelled off by season 150 (C1), and
+ * a crown pinned at the top runs away: its top row sees the open sky however dense it grows, so it
+ * doubles every 15–20 seasons (the pre-C1 note). The light only marches up to the highest leafy
+ * row, so headroom costs memory (W × D × 24 bytes a row), not time, until a tree grows into it.
+ */
+export const TOP = 200;
+
+const RING = { width: 210, height: TOP, walls: [], sides: "periodic" } satisfies Params["world"];
+/** One row of the ring's stand: a tree every 21 cells. */
+const RING_X = [10, 31, 52, 73, 94, 115, 136, 157, 178, 199];
 
 /**
  * The mixed wood's planting (M25), one tree every 21 cells: three birch and a goat willow
@@ -230,7 +161,7 @@ const MIXED = [
   "maple",
 ] as const;
 
-const STAND_X = [20, 41, 62, 83, 104, 125, 146, 167, 188, 209].map((x) => ({ x }));
+export const STAND_X = [20, 41, 62, 83, 104, 125, 146, 167, 188, 209].map((x) => ({ x }));
 
 export const presets = {
   explosion: {
@@ -249,7 +180,7 @@ export const presets = {
     patch: {
       world: { width: 100, height: 70, walls: [] },
       trees: [{ x: 50 }],
-      c2: { enabled: true, model: "triangle" },
+      c2: { enabled: true, model: "slab" },
       c3: { mode: "none" },
     },
   },
@@ -259,7 +190,7 @@ export const presets = {
     patch: {
       world: { width: 120, height: 90, walls: [] },
       trees: [{ x: 60 }],
-      c2: { enabled: true, model: "triangle" },
+      c2: { enabled: true, model: "slab" },
       c3: { mode: "bh", lambda: 0.5 },
     },
   },
@@ -269,7 +200,7 @@ export const presets = {
     patch: {
       world: { width: 120, height: 90, walls: [] },
       trees: [{ x: 60 }],
-      c2: { enabled: true, model: "triangle" },
+      c2: { enabled: true, model: "slab" },
       c3: { mode: "bh", lambda: 0.56 },
     },
   },
@@ -279,7 +210,7 @@ export const presets = {
     patch: {
       world: { width: 120, height: 90, walls: [] },
       trees: [{ x: 60 }],
-      c2: { enabled: true, model: "triangle" },
+      c2: { enabled: true, model: "slab" },
       c3: { mode: "bh", lambda: 0.46 },
     },
   },
@@ -289,7 +220,7 @@ export const presets = {
     patch: {
       world: { width: 120, height: 90, walls: [] },
       trees: [{ x: 60 }],
-      c2: { enabled: true, model: "triangle" },
+      c2: { enabled: true, model: "slab" },
       c3: { mode: "bh", lambda: 0.5 },
       c4: { enabled: true },
     },
@@ -300,7 +231,7 @@ export const presets = {
     patch: {
       world: { width: 100, height: 80, walls: [{ x: 36, y: 0, width: 8, height: 80, shade: 3 }] },
       trees: [{ x: 50 }],
-      c2: { enabled: true, model: "triangle" },
+      c2: { enabled: true, model: "slab" },
       c3: { mode: "bh", lambda: 0.5 },
       c4: { enabled: true },
     },
@@ -311,7 +242,7 @@ export const presets = {
     patch: {
       world: { width: 120, height: 100, walls: [] },
       trees: [{ x: 60 }],
-      c2: { enabled: true, model: "triangle" },
+      c2: { enabled: true, model: "slab" },
       c3: { mode: "bh", lambda: 0.5 },
       c4: { enabled: true },
       c5: { enabled: true },
@@ -387,7 +318,7 @@ export const presets = {
     label: "M6: one tree under a full sky",
     description: "An open-grown tree keeps its low, side-lit branches.",
     patch: {
-      world: { width: 120, height: 100, walls: [] },
+      world: { width: 120, height: 160, walls: [] },
       trees: [{ x: 60 }],
       ...SKY,
     },
@@ -400,7 +331,7 @@ export const presets = {
       world: { width: 230, height: 110, walls: [] },
       trees: [20, 41, 62, 83, 104, 125, 146, 167, 188, 209].map((x) => ({ x })),
       ...SKY,
-      c2: { enabled: true, model: "sky", skyExponent: 1.5 },
+      c2: { enabled: true, model: "slab", skyExponent: 1.5 },
     },
   },
   obliqueSun: {
@@ -410,41 +341,8 @@ export const presets = {
       world: { width: 120, height: 100, walls: [] },
       trees: [{ x: 50 }],
       ...SKY,
-      c2: { enabled: true, model: "sky", skyTilt: 0.5 },
+      c2: { enabled: true, model: "slab", skyTilt: 0.5 },
     },
-  },
-  conifer: {
-    leaf: "needle",
-    label: "M7: conifer (fir-like)",
-    description:
-      "Massart's model, as in Abies: a straight trunk with a tier of flat branches each season (§9).",
-    patch: { world: { width: 120, height: 160, walls: [] }, trees: [{ x: 60 }], ...CONIFER },
-  },
-  coniferStand: {
-    leaf: "needle",
-    label: "M7: conifer stand",
-    description: "Ten fir-like trees: narrow spires with clear boles (§9).",
-    patch: { world: { width: 230, height: 160, walls: [] }, trees: STAND_X, ...CONIFER },
-  },
-  birch: {
-    leaf: "small",
-    label: "M7: pioneer (birch-like)",
-    description:
-      "Light-demanding and slender, like Betula: a leader when young, fine steep branches, hanging twigs (§9).",
-    patch: { world: { width: 120, height: 160, walls: [] }, trees: [{ x: 60 }], ...BIRCH },
-  },
-  birchStand: {
-    leaf: "small",
-    label: "M7: pioneer stand",
-    description: "Ten birch-like trees: open, slender crowns that lift fast (§9).",
-    patch: { world: { width: 230, height: 160, walls: [] }, trees: STAND_X, ...BIRCH },
-  },
-  tropical: {
-    leaf: "large",
-    label: "M7: tiered tropical tree (Terminalia-like)",
-    description:
-      "Aubréville's model, as in Terminalia catappa: a pagoda of flat tiers of forking branch modules (§9).",
-    patch: { world: { width: 140, height: 160, walls: [] }, trees: [{ x: 70 }], ...TROPICAL },
   },
   forest: {
     label: "M11: a forest without edges",
@@ -452,7 +350,7 @@ export const presets = {
       "Periodic sides and stand dynamics: seeds land, seedlings wait in the shade, and gaps refill when canopy trees die (O4).",
     patch: {
       world: RING,
-      trees: [10, 31, 52, 73, 94, 115, 136, 157, 178, 199].map((x) => ({ x })),
+      trees: perArea(RING_X, RING.width),
       ...FOREST,
     },
   },
@@ -462,7 +360,7 @@ export const presets = {
       "The forest grows around a solid region that casts no shade, as it grows around a page's text (ADR 0015).",
     patch: {
       world: { ...RING, obstacles: [{ x: 70, y: 32, width: 70, height: 22 }] },
-      trees: [10, 31, 52, 73, 94, 115, 136, 157, 178, 199].map((x) => ({ x })),
+      trees: perArea(RING_X, RING.width),
       ...FOREST,
     },
   },
@@ -471,9 +369,25 @@ export const presets = {
     description:
       "Quercus robur alone in a field: wide-angled limbs, a broad decurrent crown and a squat trunk (Plate II).",
     // A specimen: no seedlings around it, and no storms, which throw tall trees by height alone.
+    // The woods' top (C1 round 3): at 120 the lone oak reached it and its crown was clipped flat.
     patch: {
-      world: { width: 160, height: 120, walls: [] },
-      trees: flora("oak", [80]),
+      world: { width: 160, height: TOP, walls: [] },
+      trees: [{ x: 80, species: "oak" }],
+      ...WOODLAND,
+      o2: { stormP: 0 },
+      o4: { enabled: false },
+    },
+  },
+  beechOpen: {
+    label: "A beech grown in the open",
+    description:
+      "Fagus sylvatica alone in a field: the fresh-look round's lone tree (ADR 0039–0043, proposed), in a world wide enough for its crown.",
+    // oakOpen's specimen with the beech: 240 wide, as the fresh-look round's repair measured it
+    // (160 clipped a broad crown at the world's sides). A golden case: the open-grown beech is
+    // where the round's vigour-gated rules act.
+    patch: {
+      world: { width: 240, height: TOP, walls: [] },
+      trees: [{ x: 120, species: "beech" }],
       ...WOODLAND,
       o2: { stormP: 0 },
       o4: { enabled: false },
@@ -485,10 +399,11 @@ export const presets = {
     description:
       "Betula pendula: quick to grow, light-demanding, clean boles under a light canopy.",
     patch: {
-      world: { width: 230, height: 130, walls: [] },
+      world: { width: 230, height: TOP, walls: [] },
       trees: flora(
         "birch",
         STAND_X.map((t) => t.x),
+        230,
       ),
       ...WOODLAND,
     },
@@ -497,10 +412,11 @@ export const presets = {
     label: "M19: an oak wood",
     description: "Quercus robur in a stand: tall and slender, with crowns lifted to the light.",
     patch: {
-      world: { width: 230, height: 130, walls: [] },
+      world: { width: 230, height: TOP, walls: [] },
       trees: flora(
         "oak",
         STAND_X.map((t) => t.x),
+        230,
       ),
       ...WOODLAND,
     },
@@ -510,10 +426,11 @@ export const presets = {
     description:
       "Fagus sylvatica: deep, dense crowns over a dark floor, a few per cent of the sky.",
     patch: {
-      world: { width: 230, height: 130, walls: [] },
+      world: { width: 230, height: TOP, walls: [] },
       trees: flora(
         "beech",
         STAND_X.map((t) => t.x),
+        230,
       ),
       ...WOODLAND,
     },
@@ -523,10 +440,11 @@ export const presets = {
     label: "M19: a silver fir wood",
     description: "Abies alba: tiered spires that keep their shaded branches (a lab species).",
     patch: {
-      world: { width: 230, height: 160, walls: [] },
+      world: { width: 230, height: TOP, walls: [] },
       trees: flora(
         "fir",
         STAND_X.map((t) => t.x),
+        230,
       ),
       ...WOODLAND,
     },
@@ -537,10 +455,11 @@ export const presets = {
     description:
       "Pinus sylvestris: light-demanding whorled pines that shed their lower limbs, high crowns over a light floor (a lab species).",
     patch: {
-      world: { width: 230, height: 160, walls: [] },
+      world: { width: 230, height: TOP, walls: [] },
       trees: flora(
         "pine",
         STAND_X.map((t) => t.x),
+        230,
       ),
       ...WOODLAND,
     },
@@ -551,9 +470,9 @@ export const presets = {
       "Nine native species around a ring: birch and goat willow pioneer, rowan and field maple fill gaps, holly and hornbeam wait beneath, and beech and oak take the canopy.",
     patch: {
       world: RING,
-      trees: [10, 31, 52, 73, 94, 115, 136, 157, 178, 199].map((x, i) => ({
-        x,
-        species: MIXED[i] as string,
+      // Each row turns the mix by three, so no two of a kind stand side by side in depth either.
+      trees: perArea(RING_X, RING.width, (i, r) => ({
+        species: MIXED[(i + 3 * r) % MIXED.length] as string,
       })),
       ...WOODLAND,
     },
@@ -564,10 +483,10 @@ export const presets = {
       "Birch pioneers with a few oak and beech among them: beech grows up in their shade and takes the canopy, and storms reopen gaps for birch and oak.",
     patch: {
       world: RING,
-      trees: [10, 31, 52, 73, 94, 115, 136, 157, 178, 199].map((x, i) => ({
-        x,
-        species: i === 2 || i === 6 ? "oak" : i === 4 || i === 8 ? "beech" : "birch",
-      })),
+      trees: perArea(RING_X, RING.width, (i, r) => {
+        const k = (i + 3 * r) % 10;
+        return { species: k === 2 || k === 6 ? "oak" : k === 4 || k === 8 ? "beech" : "birch" };
+      }),
       ...WOODLAND,
     },
   },
@@ -580,19 +499,6 @@ export const presets = {
       trees: Array.from({ length: 60 }, (_, k) => ({ x: 1.75 + 3.5 * k })),
       ...SKY,
     },
-  },
-  weeping: {
-    leaf: "small",
-    label: "M9: weeping form (willow-like)",
-    description:
-      "R3 mechanics: limbs arch over and twigs hang in curtains, because their reaction wood sets them toward pendulous angles (§9).",
-    patch: { world: { width: 120, height: 120, walls: [] }, trees: [{ x: 60 }], ...WEEPING },
-  },
-  troll: {
-    label: "M9: Troll straightening (beech-like)",
-    description:
-      "Troll's model, as in Fagus: the leader grows out sideways and the trunk rights itself behind it with reaction wood (§9).",
-    patch: { world: { width: 120, height: 140, walls: [] }, trees: [{ x: 60 }], ...TROLL },
   },
 } satisfies Record<string, Preset>;
 
@@ -611,20 +517,60 @@ export function isPresetName(name: string): name is PresetName {
 }
 
 /**
- * The `mixedWood` woodland (M25) on a ring `width` cells wide, with a tree every ≈ 21 cells: about
- * as wide as the host is wide relative to the world's height, so a phone gets a narrower forest.
- * The seed turns the planting pattern (`MIXED`), so each forest starts from a different mix.
+ * How the garden plants its ring (I3; the picture sets it, not the calibration): `rows` rows of
+ * trees across the slab's depth, a tree every `spacing` cells along each, and the recruits capped
+ * at `recruits` × the ring's density per cell of width (300 on 210 cells) per row.
  */
-export function forestParams(width = 210, seed?: number): Params {
+export interface Planting {
+  rows: number;
+  spacing: number;
+  recruits: number;
+}
+
+/**
+ * The garden's planting: one row, as the 2D garden had, each tree a 3D crown, a tree every 28
+ * cells (the user's phone check, I3: 21 read as cluttered; a second row at 24 mildly so). Recruits
+ * at a quarter of the ring's density (2026-11-06, the user found 0.16.0 cluttered): at 1 every
+ * opening forest filled its cap (229 at 160 cells) by season 80, mostly with suppressed saplings;
+ * at 0.25 it holds 57, and the garden's 20-seed checks hold against their base
+ * (`experiments/2026-11-06-garden-recruits.md`).
+ */
+export const GARDEN_PLANTING: Planting = { rows: 1, spacing: 28, recruits: 0.25 };
+
+/**
+ * The `mixedWood` woodland (M25) on a ring `width` cells wide: about as wide as the host is wide
+ * relative to the world's height, so a phone gets a narrower forest. The seed turns the planting
+ * pattern (`MIXED`), so each forest starts from a different mix.
+ *
+ * The garden plants one row down the slab's middle (I3, the user's phone check): round 2's three
+ * staggered rows (`perArea`) projected 21 crowns plus recruits onto one strip where the 2D garden
+ * had 7, and no tree read as in front of another. Its recruits follow the row: capped per cell of
+ * width, and established only in a band about a crown's depth (`spacing` per row) around it
+ * (O4's `band`), so the depth does not fill with seedlings. The calibration's forest and the
+ * woods keep round 2's planting per area; `mixedWood` itself keeps 300 trees.
+ */
+export function forestParams(width = 210, seed?: number, planting: Partial<Planting> = {}): Params {
+  const { rows, spacing, recruits } = { ...GARDEN_PLANTING, ...planting };
   const base = presetParams("mixedWood", seed);
   // A phone in portrait gets a narrow ring of two or three trees, drawn large (D1).
   const W = Math.round(Math.min(520, Math.max(54, width)));
-  const n = Math.max(2, Math.round(W / 21));
-  const trees = Array.from({ length: n }, (_, k) => ({
-    x: ((k + 0.5) * W) / n,
-    species: MIXED[(k + base.seed) % MIXED.length] as string,
-  }));
-  return mergeParams(base, { world: { ...base.world, width: W }, trees });
+  const D = base.world.depth ?? 64;
+  const n = Math.max(2, Math.round(W / spacing));
+  const R = Math.max(1, Math.round(rows));
+  const trees = Array.from({ length: R }, (_, r) =>
+    Array.from({ length: n }, (_, k) => ({
+      species: MIXED[(k + 3 * r + base.seed) % MIXED.length] as string,
+      // Rows after the first shift along x a fraction of the spacing, staggered as perArea's.
+      x: (((k + 0.5) * W) / n + (r * spacing) / R) % W,
+      z: (D * (r + 0.5)) / R,
+    })),
+  ).flat();
+  const maxTrees = Math.max(20, Math.round(((300 * W) / RING.width) * R * recruits));
+  return mergeParams(base, {
+    world: { ...base.world, width: W },
+    trees,
+    o4: { ...base.o4, maxTrees, band: Math.min(D, R * spacing) },
+  });
 }
 
 /** Plate II (M19): an oak grown alone in the open, a new one for each seed. */

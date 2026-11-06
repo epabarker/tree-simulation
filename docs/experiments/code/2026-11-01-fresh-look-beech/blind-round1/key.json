@@ -1,0 +1,338 @@
+{
+ "tree-afv.png": {
+  "leaves": true,
+  "season": 100,
+  "seed": 3,
+  "source": "candidate",
+  "trial": "lone"
+ },
+ "tree-afy.png": {
+  "leaves": true,
+  "season": 100,
+  "seed": 1,
+  "source": "today",
+  "trial": "lone"
+ },
+ "tree-bbu.png": {
+  "leaves": false,
+  "season": 100,
+  "seed": 1,
+  "source": "candidate",
+  "trial": "lone"
+ },
+ "tree-bdf.png": {
+  "leaves": true,
+  "season": 100,
+  "seed": 3,
+  "source": "decoyA",
+  "trial": "stand"
+ },
+ "tree-bfu.png": {
+  "leaves": true,
+  "season": 100,
+  "seed": 2,
+  "source": "decoyA",
+  "trial": "stand"
+ },
+ "tree-dve.png": {
+  "leaves": false,
+  "season": 100,
+  "seed": 1,
+  "source": "decoyA",
+  "trial": "lone"
+ },
+ "tree-eeo.png": {
+  "leaves": true,
+  "season": 60,
+  "seed": 2,
+  "source": "candidate",
+  "trial": "lone"
+ },
+ "tree-eta.png": {
+  "leaves": false,
+  "season": 100,
+  "seed": 2,
+  "source": "candidate",
+  "trial": "lone"
+ },
+ "tree-evr.png": {
+  "leaves": false,
+  "season": 100,
+  "seed": 3,
+  "source": "today",
+  "trial": "lone"
+ },
+ "tree-fbm.png": {
+  "leaves": true,
+  "season": 60,
+  "seed": 2,
+  "source": "decoyB",
+  "trial": "lone"
+ },
+ "tree-fpw.png": {
+  "leaves": true,
+  "season": 60,
+  "seed": 3,
+  "source": "today",
+  "trial": "lone"
+ },
+ "tree-fqv.png": {
+  "leaves": true,
+  "season": 100,
+  "seed": 3,
+  "source": "decoyB",
+  "trial": "stand"
+ },
+ "tree-gzq.png": {
+  "leaves": false,
+  "season": 100,
+  "seed": 2,
+  "source": "decoyA",
+  "trial": "lone"
+ },
+ "tree-hik.png": {
+  "leaves": true,
+  "season": 100,
+  "seed": 1,
+  "source": "candidate",
+  "trial": "stand"
+ },
+ "tree-hnj.png": {
+  "leaves": false,
+  "season": 100,
+  "seed": 1,
+  "source": "today",
+  "trial": "lone"
+ },
+ "tree-ijw.png": {
+  "leaves": true,
+  "season": 60,
+  "seed": 1,
+  "source": "decoyB",
+  "trial": "lone"
+ },
+ "tree-jky.png": {
+  "leaves": true,
+  "season": 60,
+  "seed": 1,
+  "source": "today",
+  "trial": "lone"
+ },
+ "tree-jlz.png": {
+  "leaves": false,
+  "season": 100,
+  "seed": 1,
+  "source": "decoyB",
+  "trial": "lone"
+ },
+ "tree-jmq.png": {
+  "leaves": true,
+  "season": 60,
+  "seed": 3,
+  "source": "decoyA",
+  "trial": "lone"
+ },
+ "tree-kas.png": {
+  "leaves": true,
+  "season": 100,
+  "seed": 1,
+  "source": "decoyB",
+  "trial": "lone"
+ },
+ "tree-khf.png": {
+  "leaves": true,
+  "season": 100,
+  "seed": 3,
+  "source": "candidate",
+  "trial": "stand"
+ },
+ "tree-kho.png": {
+  "leaves": true,
+  "season": 100,
+  "seed": 1,
+  "source": "today",
+  "trial": "stand"
+ },
+ "tree-lap.png": {
+  "leaves": true,
+  "season": 100,
+  "seed": 2,
+  "source": "candidate",
+  "trial": "stand"
+ },
+ "tree-lpn.png": {
+  "leaves": true,
+  "season": 100,
+  "seed": 1,
+  "source": "decoyB",
+  "trial": "stand"
+ },
+ "tree-mbw.png": {
+  "leaves": true,
+  "season": 100,
+  "seed": 1,
+  "source": "candidate",
+  "trial": "lone"
+ },
+ "tree-mdp.png": {
+  "leaves": true,
+  "season": 60,
+  "seed": 3,
+  "source": "candidate",
+  "trial": "lone"
+ },
+ "tree-nqb.png": {
+  "leaves": true,
+  "season": 60,
+  "seed": 2,
+  "source": "today",
+  "trial": "lone"
+ },
+ "tree-odm.png": {
+  "leaves": true,
+  "season": 100,
+  "seed": 3,
+  "source": "today",
+  "trial": "lone"
+ },
+ "tree-ofk.png": {
+  "leaves": false,
+  "season": 100,
+  "seed": 2,
+  "source": "today",
+  "trial": "lone"
+ },
+ "tree-oud.png": {
+  "leaves": true,
+  "season": 60,
+  "seed": 3,
+  "source": "decoyB",
+  "trial": "lone"
+ },
+ "tree-pof.png": {
+  "leaves": true,
+  "season": 100,
+  "seed": 2,
+  "source": "decoyA",
+  "trial": "lone"
+ },
+ "tree-qqq.png": {
+  "leaves": true,
+  "season": 100,
+  "seed": 3,
+  "source": "decoyB",
+  "trial": "lone"
+ },
+ "tree-rne.png": {
+  "leaves": true,
+  "season": 100,
+  "seed": 2,
+  "source": "decoyB",
+  "trial": "stand"
+ },
+ "tree-rpc.png": {
+  "leaves": true,
+  "season": 100,
+  "seed": 2,
+  "source": "candidate",
+  "trial": "lone"
+ },
+ "tree-spg.png": {
+  "leaves": true,
+  "season": 60,
+  "seed": 2,
+  "source": "decoyA",
+  "trial": "lone"
+ },
+ "tree-sux.png": {
+  "leaves": true,
+  "season": 60,
+  "seed": 1,
+  "source": "decoyA",
+  "trial": "lone"
+ },
+ "tree-tbo.png": {
+  "leaves": true,
+  "season": 100,
+  "seed": 2,
+  "source": "today",
+  "trial": "lone"
+ },
+ "tree-upz.png": {
+  "leaves": true,
+  "season": 100,
+  "seed": 2,
+  "source": "today",
+  "trial": "stand"
+ },
+ "tree-vlg.png": {
+  "leaves": true,
+  "season": 100,
+  "seed": 2,
+  "source": "decoyB",
+  "trial": "lone"
+ },
+ "tree-waw.png": {
+  "leaves": true,
+  "season": 100,
+  "seed": 1,
+  "source": "decoyA",
+  "trial": "lone"
+ },
+ "tree-wnw.png": {
+  "leaves": true,
+  "season": 100,
+  "seed": 3,
+  "source": "decoyA",
+  "trial": "lone"
+ },
+ "tree-xcd.png": {
+  "leaves": true,
+  "season": 60,
+  "seed": 1,
+  "source": "candidate",
+  "trial": "lone"
+ },
+ "tree-xqb.png": {
+  "leaves": false,
+  "season": 100,
+  "seed": 3,
+  "source": "decoyB",
+  "trial": "lone"
+ },
+ "tree-yre.png": {
+  "leaves": true,
+  "season": 100,
+  "seed": 1,
+  "source": "decoyA",
+  "trial": "stand"
+ },
+ "tree-yuk.png": {
+  "leaves": false,
+  "season": 100,
+  "seed": 3,
+  "source": "decoyA",
+  "trial": "lone"
+ },
+ "tree-yyr.png": {
+  "leaves": false,
+  "season": 100,
+  "seed": 2,
+  "source": "decoyB",
+  "trial": "lone"
+ },
+ "tree-zdu.png": {
+  "leaves": false,
+  "season": 100,
+  "seed": 3,
+  "source": "candidate",
+  "trial": "lone"
+ },
+ "tree-zpp.png": {
+  "leaves": true,
+  "season": 100,
+  "seed": 3,
+  "source": "today",
+  "trial": "stand"
+ }
+}

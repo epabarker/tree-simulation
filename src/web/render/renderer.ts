@@ -3,7 +3,7 @@
  * Canvas 2D is the fallback for devices without WebGL2, and for comparison (`?renderer=canvas`).
  */
 
-import type { Snapshot } from "../../core/snapshot.ts";
+import type { Snapshot } from "../../core/types.ts";
 import type { Scene, ViewOptions } from "./scene.ts";
 
 export interface Renderer {

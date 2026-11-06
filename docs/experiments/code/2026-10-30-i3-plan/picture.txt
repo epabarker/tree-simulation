@@ -1,0 +1,3 @@
+{"width":66,"metamers":20281,"buds":20581,"pictureRawKB":394,"pictureGzKB":225,"snapshotKB":1877,"snapshotGzKB":1205,"checkpointGzKB":4132}
+{"width":160,"metamers":45811,"buds":49737,"pictureRawKB":896,"pictureGzKB":500,"snapshotKB":4152,"snapshotGzKB":2691,"checkpointGzKB":9500}
+{"width":220,"metamers":66741,"buds":73679,"pictureRawKB":1311,"pictureGzKB":730,"snapshotKB":6018,"snapshotGzKB":3909,"checkpointGzKB":13943}

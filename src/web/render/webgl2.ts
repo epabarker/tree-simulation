@@ -8,6 +8,10 @@
  *    profile along the leaf, or five lobes about a centre). Buds: squares. Walls: rectangles.
  *  - Shade overlay: a texture. Sky and ground: full-screen gradients.
  *
+ * Wood and leaves draw far to near in the Scene's depth slices (I3): per slice the wood's range of
+ * its batch, then the leaves'. WebGL2 has no base instance, so a range is drawn by pointing the
+ * batch's instance attributes at its first instance (`drawRange`).
+ *
  * Positions come from the shared Scene (the tween needs them on the CPU, and picking uses them).
  * Instance data never depends on the camera (zoom-dependent minimum sizes are applied in the
  * shaders), so when only the camera moves, a frame re-uses the uploaded buffers and changes only
@@ -27,12 +31,20 @@ import {
   setUniforms,
   type VertexArrayInfo,
 } from "twgl.js";
-import type { Snapshot } from "../../core/snapshot.ts";
-import { BudState } from "../../core/tree.ts";
-import { BUD_ACTIVE, BUD_DORMANT, parseColor, SEQUENTIAL, shadeImage } from "./colors.ts";
+import type { Snapshot } from "../../core/types.ts";
+import { BudState } from "../../core/types.ts";
+import { BUD_ACTIVE, BUD_DORMANT, dimByte, parseColor, SEQUENTIAL, shadeImage } from "./colors.ts";
 import { LEAF_PALETTES, LEAF_STYLES } from "./leaf-styles.ts";
 import { MAX_DPR, type Renderer, type RendererOptions } from "./renderer.ts";
-import { LEAF_MIN_PX, type Leaves, Scene, type ViewOptions } from "./scene.ts";
+import {
+  DEPTH_SLICES,
+  LEAF_MIN_PX,
+  LEAF_OPACITY,
+  type Leaves,
+  Scene,
+  type ViewOptions,
+  WOOD_CONTRAST,
+} from "./scene.ts";
 import { readTheme, type Theme } from "./theme.ts";
 
 // World → clip space: x_clip = (x − cx)·sx, y_clip = groundClip + y·sy, with u_view = (cx, sx, groundClip, sy).
@@ -49,10 +61,14 @@ in vec2 a_a;
 in vec2 a_b;
 in vec2 a_r;
 in vec4 a_color;
+in vec4 a_bark; // fissure depth, marks, plates (bark-styles.ts), 0
+in float a_s;   // path length from the tree's base to this segment's base, world units
 out vec2 v_p;
 out float v_h;
 out vec2 v_r;
 out vec4 v_color;
+out vec4 v_bark;
+out float v_s;
 void main() {
   vec2 d = a_b - a_a;
   float h = length(d);
@@ -68,6 +84,8 @@ void main() {
   v_h = h;
   v_r = r;
   v_color = vec4(a_color.rgb, a_color.a * coverage);
+  v_bark = a_bark;
+  v_s = a_s;
   gl_Position = toClip(a_a + dir * along + nrm * across);
 }`;
 
@@ -78,7 +96,40 @@ in vec2 v_p;
 in float v_h;
 in vec2 v_r;
 in vec4 v_color;
+in vec4 v_bark;
+in float v_s;
 out vec4 outColor;
+float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+// Bark (bark-styles.ts): how dark the bark is at local point p of a stem of radius r, 0 → 1.
+// The stem is read as a cylinder seen side on: across the drawn width, the arc length around it;
+// along it, the path length from the tree's base, so a pattern runs on unbroken from segment to
+// segment. Fissures wander up the stem; plates break them across; birch's marks are short dark
+// dashes. Each fades out where its spacing would be under a few pixels, so it never shimmers.
+float barkDark(vec2 p, float r) {
+  vec4 b = v_bark;
+  if (b.x + b.y + b.z <= 0.0) return 0.0;
+  float wide = smoothstep(1.5, 3.5, r / u_px);
+  if (wide <= 0.0) return 0.0;
+  float S = max(0.45, 0.6 * r);
+  float fine = smoothstep(2.5, 5.0, S / u_px);
+  float u = clamp(p.x / r, -0.999, 0.999);
+  float arc = asin(u) * r;
+  float y = v_s + p.y;
+  float fx = arc / S + 0.55 * sin(y / (2.3 * S)) + 0.2 * sin(y / (0.83 * S) + 1.7);
+  float col = floor(fx);
+  float d = abs(fract(fx) - 0.5) * 2.0;
+  // Each fissure narrows and breaks along its length, so it reads as bark, not stripes.
+  float run = 0.55 + 0.45 * sin(y / (1.9 * S) + 6.1 * hash(vec2(col, 3.0)));
+  float fissure = (1.0 - smoothstep(0.08, 0.3 * run + 0.05, d)) * b.x;
+  float py = y / (1.3 * S) + 0.5 * col;
+  float plate = (1.0 - smoothstep(0.05, 0.16, abs(fract(py) - 0.5) * 2.0)) * b.z;
+  float my = y / (0.55 * S);
+  float mx = arc / (0.9 * S) + 0.5 * floor(my);
+  float on = step(0.62, hash(vec2(floor(my), floor(mx))));
+  float dash = on * (1.0 - smoothstep(0.15, 0.4, abs(fract(my) - 0.5) * 2.0))
+    * (1.0 - smoothstep(0.55, 0.95, abs(fract(mx) - 0.5) * 2.0)) * b.y;
+  return wide * fine * max(max(fissure, plate), dash);
+}
 // Capsule from (0, 0) with radius r1 to (0, h) with radius r2 (I. Quilez, 2D distance functions).
 float sdUnevenCapsule(vec2 p, float r1, float r2, float h) {
   p.x = abs(p.x);
@@ -93,7 +144,9 @@ void main() {
   float d = sdUnevenCapsule(v_p, v_r.x, v_r.y, v_h);
   float alpha = clamp(0.5 - d / u_px, 0.0, 1.0) * v_color.a;
   if (alpha <= 0.0) discard;
-  outColor = vec4(v_color.rgb * alpha, alpha);
+  float r = mix(v_r.x, v_r.y, clamp(v_p.y / max(v_h, 1e-6), 0.0, 1.0));
+  vec3 rgb = v_color.rgb * (1.0 - 0.82 * clamp(barkDark(v_p, r), 0.0, 1.0));
+  outColor = vec4(rgb * alpha, alpha);
 }`;
 
 const LEAF_VS = /* glsl */ `#version 300 es
@@ -110,6 +163,11 @@ out vec2 v_size;
 flat out float v_shape;
 out vec4 v_color;
 void main() {
+  // A leaf not drawn this frame keeps its place at size 0 (Scene.leaves): put it outside the clip.
+  if (a_grow <= 0.0) {
+    gl_Position = vec4(2.0, 2.0, 2.0, 1.0);
+    return;
+  }
   float len = max(u_leaf.x, u_leaf.z * u_px) * a_grow;
   float wid = min(max(len * a_shape.y, u_px), 0.9 * len);
   float along = mix(-u_px, len + u_px, a_corner.y * 0.5 + 0.5);
@@ -274,6 +332,15 @@ interface Batch {
   streams: Map<string, { data: Floats | Bytes; size: number; gpuLength: number }>;
   /** Instances uploaded last time. */
   count: number;
+  /** Each instance attribute's location, buffer, type and bytes per instance, for `drawRange`. */
+  pointers: {
+    location: number;
+    buffer: WebGLBuffer;
+    size: number;
+    type: number;
+    normalize: boolean;
+    bytes: number;
+  }[];
 }
 
 function rgb(css: string): [number, number, number] {
@@ -292,8 +359,6 @@ export class WebGL2Renderer implements Renderer {
   private segments!: Batch;
   private ghostBatch!: Batch;
   private leafBatch!: Batch;
-  /** Back-layer leaves of the pseudo-depth view, drawn before the branches (ADR 0008). */
-  private leafBackBatch!: Batch;
   private budBatch!: Batch;
   private wallBatch!: Batch;
   private image!: Batch;
@@ -303,6 +368,8 @@ export class WebGL2Renderer implements Renderer {
   private hasShade = false;
   private shadeFor: Snapshot | null = null;
   private paletteCache = new Map<string, Bytes>();
+  /** Where each depth slice's leaves start in `leafBatch` (a copy of the scene's `Leaves.slices`). */
+  private leafSlices = new Int32Array(DEPTH_SLICES + 1);
   /** What the uploaded instance data was built from; if nothing differs it can be re-used. */
   private uploaded: { next: Snapshot | null; prev: Snapshot | null; key: string } = {
     next: null,
@@ -365,12 +432,28 @@ export class WebGL2Renderer implements Renderer {
       };
     }
     const buffers = createBufferInfoFromArrays(gl, arrays);
+    const pointers: Batch["pointers"] = [];
+    for (const [name, { size, bytes }] of Object.entries(attribs)) {
+      const location = gl.getAttribLocation(program.program, name);
+      const buffer = buffers.attribs?.[name]?.buffer;
+      if (location < 0 || !buffer) continue;
+      const type = bytes ? gl.UNSIGNED_BYTE : gl.FLOAT;
+      pointers.push({
+        location,
+        buffer,
+        size,
+        type,
+        normalize: !!bytes,
+        bytes: size * (bytes ? 1 : 4),
+      });
+    }
     return {
       program,
       buffers,
       vao: createVertexArrayInfo(gl, program, buffers),
       streams,
       count: 0,
+      pointers,
     };
   }
 
@@ -382,6 +465,8 @@ export class WebGL2Renderer implements Renderer {
       a_b: { size: 2 },
       a_r: { size: 2 },
       a_color: { size: 4, bytes: true },
+      a_bark: { size: 4, bytes: true },
+      a_s: { size: 1 },
     };
     this.segments = this.batch(segment, segmentAttribs);
     this.ghostBatch = this.batch(segment, segmentAttribs);
@@ -394,7 +479,6 @@ export class WebGL2Renderer implements Renderer {
       a_color: { size: 4, bytes: true },
     };
     this.leafBatch = this.batch(leafProgram, leafAttribs);
-    this.leafBackBatch = this.batch(leafProgram, leafAttribs);
     this.budBatch = this.batch(this.program(POINT_VS, FLAT_FS), {
       a_center: { size: 2 },
       a_color: { size: 4, bytes: true },
@@ -519,6 +603,22 @@ export class WebGL2Renderer implements Renderer {
     drawBufferInfo(gl, batch.vao, gl.TRIANGLE_STRIP, 4, 0, count);
   }
 
+  /**
+   * Instances [first, first + count) of `batch`, whose program is in use with its uniforms set:
+   * its instance attributes are pointed at `first` (and left there; `drawBatch`'s batches never
+   * take a range).
+   */
+  private drawRange(batch: Batch, first: number, count: number): void {
+    if (count <= 0) return;
+    const gl = this.gl;
+    gl.bindVertexArray(batch.vao.vertexArrayObject ?? null);
+    for (const p of batch.pointers) {
+      gl.bindBuffer(gl.ARRAY_BUFFER, p.buffer);
+      gl.vertexAttribPointer(p.location, p.size, p.type, p.normalize, 0, first * p.bytes);
+    }
+    gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, 4, count);
+  }
+
   draw(t: number, view: ViewOptions): void {
     if (this.lost) return;
     const { gl, scene, theme } = this;
@@ -546,8 +646,12 @@ export class WebGL2Renderer implements Renderer {
       t,
       view.colorMode,
       view.showLeaves ? view.leafAge : -1,
-      view.depth,
       view.leafStyle,
+      view.leafOpacity,
+      view.clearBole,
+      view.girth,
+      view.barkLight,
+      view.woodContrast,
       view.showBuds,
       view.showObstacles,
       scene.solo,
@@ -557,14 +661,17 @@ export class WebGL2Renderer implements Renderer {
     ].join();
     const u = this.uploaded;
     if (u.next !== s || u.prev !== scene.prev || u.key !== key) {
-      scene.depth = view.depth;
       scene.leafStyle = LEAF_STYLES[view.leafStyle];
+      scene.clearBole = view.clearBole ?? false;
+      scene.girth = view.girth ?? 1;
+      scene.barkLight = view.barkLight ?? 0;
+      scene.woodContrast = view.woodContrast ?? WOOD_CONTRAST;
       scene.computeGeometry(t);
       this.buildSegments(s, view);
       if (ghosts) this.buildGhosts(1 - t);
       else this.ghostBatch.count = 0;
-      if (view.showLeaves) this.buildLeaves(view.leafAge, t);
-      else this.leafBatch.count = this.leafBackBatch.count = 0;
+      if (view.showLeaves) this.buildLeaves(view.leafAge, t, view.leafOpacity ?? LEAF_OPACITY);
+      else this.leafBatch.count = 0;
       if (view.showBuds) this.buildBuds(s, view.colorMode === "light");
       else this.budBatch.count = 0;
       this.buildWalls(s, view);
@@ -574,7 +681,7 @@ export class WebGL2Renderer implements Renderer {
     const uniforms = {
       u_view: [cx, (2 * scale) / w, 1 - (2 * groundY) / h, (2 * scale) / h],
       u_px: 1 / scale,
-      u_leaf: [scene.leafStyle.length, scene.leafStyle.aspect, LEAF_MIN_PX],
+      u_leaf: [scene.leafStyle.length, scene.leafStyle.aspect, view.leafMinPx ?? LEAF_MIN_PX],
       u_point: [BUD_SIDE_PX, BUD_MIN_SIDE],
     };
     if (view.showShadow) this.uploadShade(s);
@@ -591,14 +698,55 @@ export class WebGL2Renderer implements Renderer {
     for (const offset of scene.wrapOffsets()) {
       const shifted = { ...uniforms, u_view: [cx - offset, ...uniforms.u_view.slice(1)] };
       this.drawBatch(this.ghostBatch, this.ghostBatch.count, shifted);
-      if (!view.lite) this.drawBatch(this.leafBackBatch, this.leafBackBatch.count, shifted);
-      this.drawBatch(this.segments, this.segments.count, shifted);
-      this.drawBatch(this.leafBatch, this.leafBatch.count, shifted);
+      this.drawSlices(s, shifted);
       this.drawBatch(this.budBatch, this.budBatch.count, shifted);
     }
 
     // Ground last, so stubs of shoots that turned downward stay underground.
     this.drawBackdrop(1, theme.ground, theme.groundDeep, groundFromBottom);
+  }
+
+  /**
+   * The wood and the crowns' leaves far to near, slice by slice (wood, then that slice's leaves),
+   * then the falling leaves over everything. Each program's uniforms are set once.
+   */
+  private drawSlices(s: Snapshot, uniforms: Record<string, unknown>): void {
+    const gl = this.gl;
+    const wood = this.segments;
+    const leaf = this.leafBatch;
+    const woodAt = this.scene.woodSlices(s);
+    const leafAt = this.leafSlices;
+    const leafCount = leaf.count;
+    for (const b of leafCount > 0 ? [wood, leaf] : [wood]) {
+      gl.useProgram(b.program.program);
+      setUniforms(b.program, uniforms);
+    }
+    let program: Batch | null = leafCount > 0 ? leaf : wood;
+    const use = (b: Batch) => {
+      if (program === b) return;
+      gl.useProgram(b.program.program);
+      program = b;
+    };
+    for (let i = 0; i < DEPTH_SLICES; i++) {
+      const w0 = woodAt[i] as number;
+      const w1 = Math.min(woodAt[i + 1] as number, wood.count);
+      if (w1 > w0) {
+        use(wood);
+        this.drawRange(wood, w0, w1 - w0);
+      }
+      if (leafCount === 0) continue;
+      const l0 = leafAt[i] as number;
+      const l1 = leafAt[i + 1] as number;
+      if (l1 > l0) {
+        use(leaf);
+        this.drawRange(leaf, l0, l1 - l0);
+      }
+    }
+    if (leafCount > (leafAt[DEPTH_SLICES] as number)) {
+      use(leaf);
+      const from = leafAt[DEPTH_SLICES] as number;
+      this.drawRange(leaf, from, leafCount - from);
+    }
   }
 
   private drawBackdrop(mode: number, top: string, bottom: string, groundFromBottom: number): void {
@@ -627,23 +775,70 @@ export class WebGL2Renderer implements Renderer {
     const b = this.stream<Floats>(batch, "a_b", n);
     const r = this.stream<Floats>(batch, "a_r", n);
     const color = this.stream<Bytes>(batch, "a_color", n);
+    const bark = this.stream<Bytes>(batch, "a_bark", n);
+    const along = this.stream<Floats>(batch, "a_s", n);
     const g = scene.geom;
-    for (let j = 0; j < n; j++) {
-      a[2 * j] = g.baseX[j];
-      a[2 * j + 1] = g.baseY[j];
-      b[2 * j] = g.tipX[j];
-      b[2 * j + 1] = g.tipY[j];
-      r[2 * j] = g.radius[j];
-      r[2 * j + 1] = g.tipRadius[j];
+    // Each metamer's path length from its tree's base (rows are parent before child), so the bark's
+    // pattern runs on along an axis; and its texture, in the natural view only.
+    const path = this.pathLength(s, n);
+    const textured = view.colorMode === "natural";
+    const tex = scene.bark;
+    // Bark by light (Scene.woodLight), in the natural view: each stem's colour dimmed by its shade.
+    const light = textured ? scene.woodLight(s) : null;
+    const lit = light ? this.litColors(s, light, palette, index) : null;
+    // Far to near in z (I2), so nearer wood covers farther.
+    const order = scene.drawOrder(s);
+    for (let k = 0; k < n; k++) {
+      const j = order[k] as number;
+      along[k] = path[j] as number;
+      for (let q = 0; q < 4; q++) bark[4 * k + q] = textured ? (tex[4 * j + q] as number) : 0;
+      a[2 * k] = g.baseX[j];
+      a[2 * k + 1] = g.baseY[j];
+      b[2 * k] = g.tipX[j];
+      b[2 * k + 1] = g.tipY[j];
+      r[2 * k] = g.radius[j];
+      r[2 * k + 1] = g.tipRadius[j];
       const c = index[j] * 4;
-      color[4 * j] = palette[c] as number;
-      color[4 * j + 1] = palette[c + 1] as number;
-      color[4 * j + 2] = palette[c + 2] as number;
+      for (let q = 0; q < 3; q++)
+        color[4 * k + q] = lit ? (lit[3 * j + q] as number) : (palette[c + q] as number);
       // A solo plate draws one specimen: the other trees' wood is fully transparent.
-      color[4 * j + 3] =
+      color[4 * k + 3] =
         scene.solo >= 0 && s.tree[j] !== scene.solo ? 0 : (palette[c + 3] as number);
     }
     this.upload(batch, n);
+  }
+
+  private litFor = { s: null as Snapshot | null, k: 0, theme: -1 };
+  private lit = new Uint8Array(0);
+
+  /** Each metamer's wood colour under bark by light, once per snapshot (tweens rebuild every frame). */
+  private litColors(s: Snapshot, light: Float32Array, palette: Uint8Array, index: Uint16Array) {
+    const f = this.litFor;
+    const k = this.scene.barkLight;
+    if (f.s === s && f.k === k && f.theme === this.themeVersion) return this.lit;
+    const n = s.metamerCount;
+    if (this.lit.length < 3 * n) this.lit = new Uint8Array(6 * n);
+    for (let j = 0; j < n; j++) {
+      const c = (index[j] as number) * 4;
+      const m = light[j] as number;
+      for (let q = 0; q < 3; q++) this.lit[3 * j + q] = dimByte(palette[c + q] as number, m);
+    }
+    this.litFor = { s, k, theme: this.themeVersion };
+    return this.lit;
+  }
+
+  private path = new Float32Array(0);
+  private pathFor: Snapshot | null = null;
+  private pathLength(s: Snapshot, n: number): Float32Array {
+    if (this.pathFor === s) return this.path;
+    this.pathFor = s;
+    if (this.path.length < n) this.path = new Float32Array(2 * n);
+    // The snapshot's lengths, not the frame's: the pattern stays put through a tween and the wind.
+    for (let j = 0; j < n; j++) {
+      const p = s.parent[j] as number;
+      this.path[j] = p >= 0 ? (this.path[p] as number) + (s.length[p] as number) : 0;
+    }
+    return this.path;
   }
 
   private buildGhosts(alpha: number): void {
@@ -714,13 +909,13 @@ export class WebGL2Renderer implements Renderer {
     this.upload(batch, n);
   }
 
-  private buildLeaves(leafAge: number, t: number): void {
+  private buildLeaves(leafAge: number, t: number, opacity: number): void {
     const leaves = this.scene.leaves(leafAge, t);
     // One summer and one autumn ramp per palette; each leaf takes its species' (M19).
-    const palette = LEAF_PALETTES.map((p) => this.paletteBytes(this.theme.leaf[p], 0.92));
-    const autumn = LEAF_PALETTES.map((p) => this.paletteBytes(this.theme.autumn[p], 0.92));
-    this.fillLeaves(this.leafBackBatch, leaves, 0, leaves.back, palette, autumn);
-    this.fillLeaves(this.leafBatch, leaves, leaves.back, leaves.count, palette, autumn);
+    const palette = LEAF_PALETTES.map((p) => this.paletteBytes(this.theme.leaf[p], opacity));
+    const autumn = LEAF_PALETTES.map((p) => this.paletteBytes(this.theme.autumn[p], opacity));
+    this.fillLeaves(this.leafBatch, leaves, 0, leaves.count, palette, autumn);
+    this.leafSlices.set(leaves.slices);
   }
 
   /** Uploads leaves [from, to) of the frame's leaf list into `batch`. */

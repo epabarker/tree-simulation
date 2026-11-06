@@ -30,10 +30,17 @@ export interface Obstacle {
 export interface TreeSpec {
   /** Root position along the ground, in cells. */
   x: number;
+  /** Root position in depth, in cells from the front face (I2). Optional: the slab's middle. */
+  z?: number;
   /** Its species, a key of `Params.species` (ADR 0016). Omitted: the world's own params. */
   species?: string;
   /** Season in which the seedling appears (default 0). */
   plantSeason?: number;
+  /**
+   * Tilt of the seedling's first shoot from vertical, degrees, positive to the right (default 0):
+   * a tilted stem for the gravitropic-recovery check (§10, Bastien et al. 2013; M26).
+   */
+  lean?: number;
 }
 
 export interface Params {
@@ -42,6 +49,19 @@ export interface Params {
     /** Grid width and height in cells. */
     width: number;
     height: number;
+    /**
+     * The slab's depth D in cells (ADR 0024, I2): trees grow in W × H × D, periodic or open in x,
+     * open in z. Optional: absent (a 2D record or checkpoint), the slab is one cell deep.
+     */
+    depth?: number;
+    /**
+     * Transmission τ of the sky seen beyond the [front, back] z faces (front = the viewer's, z < 0):
+     * 1 open sky, 0 a black wall, between as through a wood as tall as the stand (ADR 0024). The
+     * looks: wood interior [0.2, 0.2] (default), wood edge [1, 0.2], hedgerow [1, 1]. Optional: [1, 1].
+     */
+    faces?: [number, number];
+    /** Q fades linearly to 0 over this many cells before each z face (0: hard faces). Optional: 0. */
+    fade?: number;
     /** Static shade sources (M3 "lean away from a wall"). */
     walls: Wall[];
     /**
@@ -64,63 +84,69 @@ export interface Params {
    */
   species?: Record<string, SpeciesPatch>;
 
-  /** C1 Metamer structure, bud fate and 2D side sequence (always on). */
+  /** C1 Metamer structure, bud fate and phyllotaxis (always on; in 3D from I2, ADR 0025). */
   c1: {
-    /** Side sequence generator; distichous is the default and only planar phyllotaxis (§C1.5). */
-    generator: "distichous";
+    /**
+     * Without R2, one lateral a node: 'spiral', each a divergence angle round the axis from the
+     * last; 'distichous', alternating sides (180°). With R2 the level's generator decides.
+     */
+    phyllotaxis: "spiral" | "distichous";
+    /** The spiral's divergence angle, degrees (137.5°, the golden angle). */
+    divergence: number;
     /** Branch angle β between a lateral and its parent axis, degrees. */
     branchAngle: number;
     /** Base internode length l0 in cells (≈ one cell, Palubicki et al. §6). */
     internodeLength: number;
     /** Maximum metamers one bud may produce per season (the cap in C3). */
     maxMetamersPerShoot: number;
+    /**
+     * Bud break (§R4.4's "optional stochastic break [RNG]", §6's BUD_FATE). 'deterministic' (or
+     * absent): a lateral bud whose v reaches its threshold θ (R4's v_cont or v_break; 1 without R4)
+     * grows. 'stochastic': it grows only with probability p = 1/(1 + exp(−(v − θ)/width)), a
+     * logistic through the threshold [RNG: budBreak, keyed by the bud and season]; one that does
+     * not rests (R4's bank). Main-slot buds stay deterministic. Prototype (agent A9), not an ADR.
+     */
+    budBreak?: { mode: "deterministic" | "stochastic"; width: number };
+    /**
+     * s: SD of ln(shoot length): each shoot's internode length is multiplied by
+     * exp(s·z − s²/2), z ~ N(0, 1) [RNG: shootLength, keyed by the bud and season], so the mean
+     * length is unchanged. Absent or 0: off. Prototype (agent A9), not an ADR.
+     */
+    shootLengthSD?: number;
+    /**
+     * s_β: SD, degrees, of a per-axis offset to the branch angle β: a lateral bud that breaks into
+     * a new axis is turned in its host's plane so that it leaves at β + s_β·N(0, 1) (held in
+     * [0, 180°]) [RNG: branchAngle, keyed by the axis's first birthId]. Absent or 0: off.
+     * Prototype (agent R), not an ADR.
+     */
+    betaSD?: number;
   };
 
-  /** C2 Shared light field: shadow triangle (Palubicki et al. §4.1) or sky sweep (§C2.4, M6). */
+  /** C2 Shared light field: the Beer–Lambert sky sweep over the slab (§C2.4, G3; ADR 0024). */
   c2: {
     enabled: boolean;
     /**
-     * 'triangle': the baseline shadow triangle. 'sky': the Beer–Lambert sky sweep (M6). 'pooled':
-     * the §8 ablation, every leaf gets one homogeneous canopy's mean light (M22, light/pooled.ts).
+     * 'slab': the 3D sky sweep. 'pooled': the §8 ablation, every leaf gets one homogeneous
+     * canopy's mean light (M22).
      */
-    model: "triangle" | "sky" | "pooled";
-    /**
-     * Shadow strength a > 0 (calibrate). Also the self-shadow a bud removes from its own Q.
-     * Buds of one node share a cell and shade each other, so C must exceed a·(buds per node − 1).
-     */
-    a: number;
-    /** Shadow decay b > 1 per layer below the bud (calibrate). */
-    b: number;
-    /** Depth of the shadow triangle in layers (Palubicki: 4–8). */
-    qMax: number;
-    /** Full-exposure constant C in Q = max(C − s + a, 0) (calibrate). */
+    model: "slab" | "pooled";
+    /** Full-exposure constant C: Σ of the sky's weights (calibrate). */
     C: number;
-    /** Perception half-angle for the optimal direction V, degrees (Palubicki θ ≈ 90° full angle). */
-    perceptionAngle: number;
-    /** Perception distance for V, in cells (Palubicki r = 4–6). */
-    perceptionDistance: number;
-    /** Sky sweep: number of sky directions K (spec: 5–9). */
+    /** Number of sky directions K (G3: 16 with rotation). */
     K: number;
-    /** Sky sweep: extinction coefficient k_ext per unit of leaf area (one bud = one unit) (calibrate). */
+    /** Extinction coefficient k_ext per unit of leaf area (one bud = one unit) (calibrate). */
     kExt: number;
-    /** Sky sweep: weights ∝ sin(elevation)^p; p = 1 is a cosine-weighted (overcast-like) sky. */
+    /** Weights ∝ sin(elevation)^p; p = 1 is a cosine-weighted (overcast-like) sky. */
     skyExponent: number;
-    /** Sky sweep: −1…1; positive skies are brighter to the right (an oblique sun, §C2.6). */
-    skyTilt: number;
-    /** Sky sweep: lowest sky direction above the horizon, degrees. */
+    /** −1…1; positive skies are brighter toward +x (an oblique sun, §C2.6). Optional: 0. */
+    skyTilt?: number;
+    /** Lowest sky direction above the horizon, degrees. */
     minElevation: number;
     /**
-     * Sky sweep: move the K directions by a golden-ratio step each season (stratified, one per
-     * equal slice of the sky) so the streaks of a small K average out (M6e). Off: the fixed M6 grid.
+     * Move the K directions each season, within their bands and round the sky (G3), so the
+     * streaks of a small K average out. In 3D it matters: calibrate with it on (ADR 0024).
      */
     rotate: boolean;
-    /**
-     * Sky sweep (M18, ADR 0005 amendment): "rows" marches every ray up one row at a time and
-     * integrates the exact segment it crosses in each row from that row's prefix sums of leaf
-     * area, so shallow rays need no laps around a ring and diffuse once per row, not per column.
-     * "columns" is the M6 sweep (shallow rays step a column at a time, periodic ones lap the ring).
-     */
-    sweep?: "rows" | "columns";
   };
 
   /** C3 Basipetal light summation and acropetal Borchert–Honda allocation. */
@@ -154,6 +180,13 @@ export interface Params {
     epsilon: number;
     /** Angular noise σ of u, degrees. */
     sigma: number;
+    /**
+     * s_ax: SD, degrees, of a per-axis offset to A_set, drawn once when an axis starts [RNG:
+     * axisOffset, keyed by its first metamer's birthId] and kept along it in C4's tropism and R3's
+     * posture, so limbs differ and keep their crooks (ADR 0053's option (b)). The trunk's own axis
+     * is exempt. Absent or 0: off. Prototype (agent A9), not an ADR.
+     */
+    axisSD?: number;
   };
 
   /** C5 Self-pruning. */
@@ -171,6 +204,13 @@ export interface Params {
     Trel: number;
     /** Quantile of the tree's live-bud Q that stands for the light at its crown top. */
     topQuantile: number;
+    /**
+     * Own-crown pruning (fresh-look beech, repair): a vigorous tree (R2's vigour gate g by its
+     * production, r2.vigourTreeLo/Hi) also sheds a lateral whose Q_b/n_b < g·Tvig·Q_top, so an
+     * open-grown crown clears its first limbs under itself (branch autonomy; Sprugel et al. 1991, unread: ADR 0043, rejected).
+     * A stand member never opens the gate. 0 or absent: off.
+     */
+    Tvig?: number;
   };
 
   /** C6 Pipe-model girth with memory. */
@@ -179,9 +219,10 @@ export interface Params {
     /** Pipe exponent n (Palubicki: 2–3; empirical 1.8–2.3). */
     n: number;
     /**
-     * Tip radius r0 in cells. 0.02 gives stand-grown height/diameter ≈ 56–75 and open-grown ≈ 41,
-     * matching real slenderness (stand-grown 60–80, Watt et al. 2023); radius scales linearly with
-     * r0 under the pipe rule (literature review 2026-10-27 §4, M6c).
+     * Tip radius r0 in cells. 0.0025 (ADR 0027): in 3D the trunk's pipe sum is mostly scars, and
+     * with scars of the pipe radius stand-grown H/D lands near 65 (stand-grown 60–80, Watt et al.
+     * 2023). Radius scales linearly with r0 under the pipe rule; m_w·r0² is kept, so R1's sapwood
+     * cost is unchanged (×8 down, ×64 up: exact in binary).
      */
     r0: number;
   };
@@ -193,12 +234,20 @@ export interface Params {
    */
   r1: {
     enabled: boolean;
-    /** m_w: maintenance per unit of sapwood volume per season (calibrate). */
+    /**
+     * m_w: maintenance per unit of sapwood volume per season. 64 with r0 0.0025 (ADR 0027) is the
+     * cost m_w 1 had at r0 0.02: the cost is m_w·π·r0²·Σ path length to the live tips (n = 2).
+     */
     mw: number;
     /** m_f: foliage maintenance per unit of leaf area per season; Q_c = m_f/α is the compensation light. */
     mf: number;
     /** L_h: hydraulic path-length scale in cells; 0 switches the path-length cause off. */
     Lh: number;
+    /**
+     * How production falls with path length L: 'exp', exp(−L/L_h) (ADR 0010); 'hyperbolic',
+     * 1/(1 + L/L_h), a conductance under a resistance that grows linearly with path length.
+     */
+    hydraulic: "exp" | "hyperbolic";
     /** s_r: share of a surplus put into the reserve. */
     sr: number;
     /** f_rep: share of a surplus going to reproduction once the tree is mature; 0 = off. */
@@ -213,6 +262,22 @@ export interface Params {
     store: number;
     /** Branch shedding: 'c5' keeps C5's light rule; 'carbon' sheds branches whose P_b < M_b. */
     shed: "c5" | "carbon";
+    /**
+     * Production's light response f(Q) (ADR 0030): 'linear' (absent: the default), f = Q;
+     * 'saturating', f = Q·(1 + qHalf)/(Q + qHalf), the same at Q = 1 and more in shade.
+     */
+    response?: "linear" | "saturating";
+    /** q_half: the saturating response's half-saturation light, of open sky. */
+    qHalf?: number;
+    /** k_shed: with shed 'carbon', consecutive seasons of P_b < M_b before a branch is shed (absent: 1). */
+    kShed?: number;
+    /**
+     * Foliage maintenance: 'flat' (absent: the default), m_f per unit of leaf area; 'acclimated',
+     * m_f·(c + (1 − c)·Q), a shade leaf cheaper to keep. c is leafCostShade.
+     */
+    leafCost?: "flat" | "acclimated";
+    /** c: the acclimated leaf's cost at Q = 0, as a share of m_f. */
+    leafCostShade?: number;
   };
 
   /**
@@ -286,6 +351,70 @@ export interface Params {
      * pos its node's place in the season's shoot (0 base, 1 tip). 0 or absent: off.
      */
     kappa?: number;
+    /**
+     * h_j, the juvenile phase (ADR 0022): a tree's shoots may carry at most
+     * 1 + (c1.maxMetamersPerShoot − 1)·min(1, H/h_j) metamers' worth of resource, H its height in
+     * cells at the start of the season, so a seedling's shoots start short and lengthen as it grows.
+     * 0 or absent: off (the full cap from the first season).
+     */
+    hJ?: number;
+    /**
+     * The sympodial relay (§R2.4 "distal laterals take over", Troll's and Leeuwenberg's models;
+     * ADR 0033, proposed): when the terminal bud of a pa-0 axis has ended, the laterals on the top
+     * `relay` nodes below it grow as pa 0 (the trunk's row), so the crown divides into several
+     * ascending co-dominant limbs. 0 or absent: off.
+     */
+    relay?: number;
+    /** With the relay: from this tree age (seasons), a pa-0 terminal ends with `relayPTerm`. */
+    relayAge?: number;
+    /**
+     * With the relay: the probability that a pa-0 shoot's terminal ends from `relayAge` on (the
+     * larger of it and the row's pTerm). 0 or absent: only the row's pTerm ends it.
+     */
+    relayPTerm?: number;
+    /**
+     * The relay's neighbour gate k (fresh-look beech): `relayPTerm` acts by max(0, 1 − k·s̄), s̄ the
+     * tree's mean R5 neighbour shade, so a leader among neighbours keeps growing and a free-standing
+     * one forks (Nicolini & Caraglio 1994). Needs R5's neighbour signal. Absent: off (age alone).
+     */
+    relayCrowd?: number;
+    /**
+     * The vigour fork (fresh-look beech): a pa-0 shoot grown from a bud given v ≥ forkAt times
+     * c1.maxMetamersPerShoot ends its apex, and the relay makes its top laterals co-dominant arms;
+     * every arm (a pa-0 axis not the trunk's) holds the inclination it was born at (Troll: all axes
+     * plagiotropic). Needs the relay. 0 or absent: off.
+     */
+    forkAt?: number;
+    /** With the vigour fork: the arms' angle from the ended apex, degrees. Absent: the laterals' β. */
+    forkAngle?: number;
+    /**
+     * The vigour drop (fresh-look beech): a node's vigour u = min(1, (v_in / v_base) / vigourShare);
+     * λ there falls by g·(1 − u)·vigourLambda, g the tree's gate by v_base between vigourTreeLo and
+     * vigourTreeHi (1 when unset). Weak wood of a vigorous, open-grown crown loses apical control.
+     * 0 or absent: off.
+     */
+    vigourShare?: number;
+    /** With the vigour drop: how far λ falls in the weakest wood. */
+    vigourLambda?: number;
+    /** With the vigour drop: the tree resource v_base below which it does not act. */
+    vigourTreeLo?: number;
+    /** With the vigour drop: the tree resource v_base from which it acts fully. */
+    vigourTreeHi?: number;
+    /**
+     * Light orthotropy (fresh-look beech, repair): wood of pa ≥ 1 takes a set point (growth and
+     * posture) moved from its level's toward lightSetPoint (degrees from vertical) by
+     * u = g·clamp((Q − lightLo) / (lightHi − lightLo))·min(1, (woodAge + 1) / lightOver), Q the
+     * bud's light in growth and the subtree's light per metamer in posture, g the vigour gate
+     * (vigourTreeLo/Hi; 1 when unset). Lit wood of a vigorous tree rises, shaded wood stays level
+     * (Nicolini & Caraglio 1994; Nicolini 2000). Absent: off.
+     */
+    lightSetPoint?: number;
+    /** With light orthotropy: the light at and below which wood keeps its level's set point. */
+    lightLo?: number;
+    /** With light orthotropy: the light from which it takes lightSetPoint (absent: 1). */
+    lightHi?: number;
+    /** With light orthotropy: the wood age, seasons, at which it acts fully (absent: 1). */
+    lightOver?: number;
   };
 
   /**
@@ -335,10 +464,12 @@ export interface Params {
     /** δ_A: A_set·(1 − δ_A·s): shade makes shoots more upright (Roychoudhry et al. 2017) (calibrate). */
     dA: number;
     /**
-     * What the shade signal s reads (M19). "light" (default): 1 − Q/C, own foliage included, so a
-     * lone tree avoids its own shade and grows tall. "neighbours": that shade scaled by the share
-     * of the foliage above the node that belongs to other trees (O2's owner grid), standing in for
-     * the low R:FR of neighbours' light, so a lone tree grows squat (MacFarlane et al. 2017).
+     * What the shade signal s reads (M19). "neighbours" (default since C1 round 2): 1 − Q/C scaled
+     * by the share of the foliage above the node that belongs to other trees (O2's owner grid),
+     * standing in for the low R:FR of neighbours' light, so a lone tree grows squat (MacFarlane et
+     * al. 2017). "light": 1 − Q/C, own foliage included, so a tree avoids its own shade: the 2D
+     * presets' signal, kept as an ablation. A 3D crown shades its own interior far more than a
+     * planar one did, and under "light" a lone tree grew a pole (the C1 round 1 note).
      */
     signal?: "light" | "neighbours";
   };
@@ -391,6 +522,12 @@ export interface Params {
      * locally. 0 or absent: off, only parents in the world seed it (calibrate).
      */
     rain?: number;
+    /**
+     * The band of depth, in cells, that seedlings establish in, centred on the slab's middle (I3):
+     * the garden plants one row of trees, and its recruits stay about a crown's depth around it.
+     * Local seeds landing outside it are lost; seed rain lands inside it. Absent: anywhere.
+     */
+    band?: number;
   };
 
   /** R6 Short shoots (spec §R6, ADR 0006). Off = baseline: every live bud is one unit of leaf area. */
@@ -400,6 +537,12 @@ export interface Params {
     qMin: number;
     /** a_ss: leaf area of a short shoot, in units of a long shoot's (calibrate). */
     leafArea: number;
+    /**
+     * L: a short shoot on wood older than this many seasons rests as a leafless dormant bud, which
+     * R4 ages and aborts, so the trunk's short shoots do not live for ever (ADR 0044, proposed).
+     * Absent: off.
+     */
+    lifespan?: number;
   };
 }
 
@@ -413,10 +556,16 @@ export interface PaLevel {
   eta: number;
   /** Branch angle β of a lateral of this pa from its parent axis, degrees (C1). */
   branchAngle: number;
-  /** Where this axis forms lateral buds (§C1.4; ADR 0009). */
-  generator: "distichous" | "opposite" | "whorled" | "none";
+  /**
+   * Where this axis forms lateral buds (§C1.4; ADR 0009; in 3D, ADR 0025): one a node at 180°
+   * (distichous) or at c1.divergence (spiral), two at 180° with each pair a quarter turn on
+   * (opposite, decussate), a whorl, or none.
+   */
+  generator: "distichous" | "spiral" | "opposite" | "whorled" | "none";
   /** Whorled only: 0 = a tier at the start of each growth unit; k > 0 = at every k-th node. */
   tierEvery: number;
+  /** Whorled only: laterals in a whorl, 1–7. Optional: 4. */
+  whorl?: number;
   /** Probability that the terminal bud ends when a shoot of this pa ends: sympodial growth. */
   pTerm: number;
   /**
@@ -424,45 +573,92 @@ export interface PaLevel {
    * (Troll's model: shoots grow plagiotropic, the trunk straightens to 0 later; ADR 0011).
    */
   postureSetPoint?: number;
+  /**
+   * Curvature along the limb (ADR 0034, proposed; Weber & Penn 1995's nCurve): degrees added to
+   * this level's set points (growth and posture) at node k of an axis, curve·min(1, k/curveLength),
+   * so a limb bends progressively along its length: positive arches out and down (beech, oak),
+   * negative sweeps up (ash). The trunk itself (order 0) never curves; a relay does. Absent or 0: off.
+   */
+  curve?: number;
+  /** With curve: the nodes (≈ cells) over which the curve accrues; absent, 20. */
+  curveLength?: number;
+  /**
+   * Pendulous twigs (ADR 0035, proposed; §9's weeping and birch rows): the set point, degrees from
+   * vertical (> 90 hangs), that a thin axis of this level takes in growth and posture instead of
+   * its own: fully at pipe radius ≤ pendulousRadius, fading back to setPoint at twice it. Twigs
+   * hang; an axis that thickens into a limb rises to the level's angle. The trunk never hangs. A
+   * new lateral axis is as thin as can be; a continuation shoot is weighed by the metamer it
+   * grows from. Absent: off.
+   */
+  pendulous?: number;
+  /** With pendulous: the radius (cells) up to which an axis hangs fully; absent, 0.01. */
+  pendulousRadius?: number;
+  /**
+   * Twig density (ADR 0036, proposed): acrotony κ at this level's nodes, in place of r2.kappa;
+   * high κ gathers a limb's shoots at its shoot ends (tufts), low spreads them along it. Absent:
+   * r2.kappa.
+   */
+  kappa?: number;
+  /**
+   * Twig density (ADR 0036, proposed): this level forms laterals only at every k-th node of an
+   * axis (sparse, fine shoots: birch's), not for "whorled" (tierEvery). Absent or ≤ 1: every node.
+   */
+  lateralEvery?: number;
+  /**
+   * Elbows (ADR 0037, proposed): when an axis of this level ends (pTerm), the laterals on its top
+   * `relay` nodes continue it at this level, each from its own bud's angle: a sympodial limb with
+   * a kink at every takeover (oak's elbowed, sinuous limbs). Generalises r2.relay (ADR 0033) past
+   * the trunk; for level 0 it overrides r2.relay. Absent: 0 (off) for levels ≥ 1.
+   */
+  relay?: number;
+  /**
+   * Posture by age (ADR 0038, proposed): the set point, degrees, that this level's axes move toward
+   * with age, linearly over `agedOver` seasons, in growth and posture. By the wood's own age
+   * (gravimorphism: a fir limb erect, then level, then descending, with its young tips still up), or
+   * with agedBy "tree" by the tree's age (a phase change at maturity: Makowski et al. 2019). The
+   * trunk itself never moves. Absent: off.
+   */
+  agedSetPoint?: number;
+  /** With agedSetPoint: the seasons over which the set point moves; absent, 50. */
+  agedOver?: number;
+  /** With agedSetPoint: "wood" (the default), the metamer's own age, or "tree", the tree's. */
+  agedBy?: "wood" | "tree";
 }
 
 export const defaultParams: Params = {
   seed: 1,
-  world: { width: 160, height: 120, walls: [] },
+  world: { width: 160, height: 120, depth: 64, faces: [0.2, 0.2], walls: [] },
   trees: [{ x: 80 }],
   c1: {
-    generator: "distichous",
+    phyllotaxis: "spiral",
+    divergence: 137.5,
     branchAngle: 45,
     internodeLength: 1,
     maxMetamersPerShoot: 3,
   },
   c2: {
     enabled: false,
-    model: "sky", // M6; the M1–M5 presets pin "triangle"
-    a: 0.15, // calibrate (M5: 0.2 stalled 5/40 stand seedlings; 0.15 stalled none)
-    b: 1.5, // calibrate (M4: 1.5 shades deeper than 2 once shedding is on)
-    qMax: 6,
+    model: "slab",
     C: 1, // calibrate
-    perceptionAngle: 45,
-    perceptionDistance: 4,
-    K: 7,
+    K: 16,
     kExt: 0.5, // calibrate
     skyExponent: 1,
     skyTilt: 0,
     minElevation: 15,
-    rotate: false,
+    rotate: true,
   },
   c3: { mode: "none", lambda: 0.5, alpha: 2 },
   c4: { enabled: false, wd: 1, xi: 0.3, eta: 0.15, setPoint: 0, epsilon: 0.5, sigma: 20 },
   c5: { enabled: false, T: 0.1, g: 3, Trel: 0, topQuantile: 0.9 }, // T, Trel: calibrate
-  c6: { enabled: false, n: 2, r0: 0.02 },
+  c6: { enabled: false, n: 2, r0: 0.0025 },
   // M8 calibration (docs/experiments/2026-10-27-m8-carbon.md). With R1 on, the sky presets
   // also raise c3.alpha to 3, since costs and the L_h discount take ≈ 40% of the resource.
   r1: {
     enabled: false,
-    mw: 1, // stem maintenance ≈ 5–13% of production (Ryan et al. 1995)
+    mw: 64, // stem maintenance ≈ 5–13% of production (Ryan et al. 1995); ADR 0027's scale
     mf: 0.06, // Q_c = m_f/α ≈ 0.02–0.03 of open sky
     Lh: 60, // the plateau cause: stand trees level off at ≈ 78 cells
+    hydraulic: "exp",
     sr: 0.1,
     fRep: 0, // the alternative plateau cause, off
     maturity: 70,
@@ -477,9 +673,9 @@ export const defaultParams: Params = {
     enabled: false,
     rho: 1,
     leafMass: 0.002, // calibrate: a shoot's leaves weigh about as much as its first-year wood
-    // Wood's E ≈ 4·10⁶ here, but a 2D limb carries less foliage than the 3D limb it stands for,
-    // so the effective stiffness is lower (M9 note).
-    E: 1e6, // calibrate
+    // Wood's own E ≈ 4·10⁶ in these units (ρ_w·g·cell ≈ 2.5 kPa). 2D lowered it to 10⁶ because a
+    // planar limb carried less foliage than the 3D limb it stood for (M9); in 3D it is restored.
+    E: 4e6,
     sag: "increment",
     phi: 1, // calibrate
     posture: true,
@@ -501,7 +697,7 @@ export const defaultParams: Params = {
     juvenile: 1,
     bank: true,
   },
-  r5: { enabled: false, eS: 0.1, dLambda: 0.02, dB: 1, dA: 0.5 },
+  r5: { enabled: false, eS: 0.1, dLambda: 0.02, dB: 1, dA: 0.5, signal: "neighbours" },
   r6: { enabled: false, qMin: 0.2, leafArea: 1 }, // calibrate (M6d)
   // M11 calibration (docs/experiments/2026-10-27-m11-stand-dynamics.md).
   o2: { enabled: false, sway: 0.0005, maxSway: 3, pAbr: 0.5, stormP: 0, stormLoad: 1.5 },
@@ -549,6 +745,56 @@ export function mergeParams(base: Params, patch: ParamsPatch): Params {
     }
   }
   return out as unknown as Params;
+}
+
+/**
+ * The patch that turns `base` into `current`: each group's fields that differ (arrays and
+ * species entries whole), and any other top-level value that differs. The inverse of
+ * `mergeParams`: mergeParams(base, diffParams(base, current)) equals `current` when both have the
+ * same keys, as params always do. The lab's shareable links carry it (M26).
+ */
+export function diffParams(base: Params, current: Params): ParamsPatch {
+  const out: Record<string, unknown> = {};
+  const b = base as unknown as Record<string, unknown>;
+  const c = current as unknown as Record<string, unknown>;
+  const same = (x: unknown, y: unknown) => JSON.stringify(x) === JSON.stringify(y);
+  for (const key of Object.keys(c)) {
+    const now = c[key];
+    const was = b[key];
+    if (same(now, was)) continue;
+    const isGroup = (v: unknown) => v !== null && typeof v === "object" && !Array.isArray(v);
+    if (isGroup(now) && isGroup(was)) {
+      const group: Record<string, unknown> = {};
+      for (const [k, v] of Object.entries(now as Record<string, unknown>)) {
+        if (!same(v, (was as Record<string, unknown>)[k])) group[k] = clone(v);
+      }
+      out[key] = group;
+    } else out[key] = clone(now);
+  }
+  return out as ParamsPatch;
+}
+
+/**
+ * Params with one species' patch amended: `patch` merges into that species' groups the way
+ * `mergeParams` merges into the world's (each group shallowly), where a `species` entry inside a
+ * plain `mergeParams` patch would replace the species' whole patch (M26; M27 fits species this way).
+ */
+export function patchSpecies(params: Params, name: string, patch: SpeciesPatch): Params {
+  const out = clone(params);
+  const entry = (out.species?.[name] ?? {}) as unknown as Params;
+  out.species = {
+    ...out.species,
+    [name]: mergeParams(entry, patch as ParamsPatch) as unknown as SpeciesPatch,
+  };
+  return out;
+}
+
+/** The params a tree of `species` grows by: `params` with the species' patch on top (ADR 0016). */
+export function speciesParams(params: Params, species: string): Params {
+  const patch = params.species?.[species];
+  if (!patch) return params;
+  const { common: _c, latin: _l, leaf: _f, ...groups } = patch;
+  return mergeParams(params, groups);
 }
 
 /** Deep copy of plain JSON data (params never hold functions, dates or typed arrays). */

@@ -1,0 +1,6 @@
+{"case":"garden phone webgl","seconds":73.587,"renderer":"WebGL2","dpr":2,"seasons":40,"metamers":16864,"frames":83,"drawP50":0.8,"drawP95":48.3,"frameP50":16.7,"frameP95":100,"longFrames":28,"workerMean":99.42,"workerMax":170.3}
+{"case":"garden laptop webgl","seconds":150.189,"renderer":"WebGL2","dpr":2,"seasons":40,"metamers":44094,"frames":57,"drawP50":1.3,"drawP95":124.4,"frameP50":16.7,"frameP95":100,"longFrames":13,"workerMean":257.3,"workerMax":520}
+{"case":"lab mixedWood webgl","seconds":239.699,"renderer":"WebGL2","dpr":2,"seasons":40,"metamers":60184,"frames":72,"drawP50":1.7,"drawP95":93.2,"frameP50":16.7,"frameP95":100,"longFrames":27,"workerMean":333.46,"workerMax":626.4}
+{"case":"lab mixedWood canvas","seconds":618.49}
+
+{"case":"lab forest webgl","seconds":354.362,"renderer":"WebGL2","dpr":2,"seasons":40,"metamers":113454,"frames":64,"drawP50":2.3,"drawP95":134.5,"frameP50":16.7,"frameP95":100,"longFrames":24,"workerMean":406.6,"workerMax":668}

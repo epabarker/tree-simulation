@@ -7,7 +7,7 @@ description: End-of-session or end-of-milestone checklist for the tree simulatio
 
 Work through these steps in order. Don't skip any; if one doesn't apply, say so.
 
-1. **Verify.** Run `npm run check`. If anything visual changed, also run `npm run build`. Report failures honestly and do not wrap up over a red check unless the user agrees.
+1. **Verify.** Run `npm run check:stamp` in the foreground (it returns at once when the tree already has a green stamp). If anything visual changed, also run `npm run build`. Report failures honestly and do not wrap up over a red check unless the user agrees.
 2. **Goldens.** If `tests/golden.json` changed this session, make sure the devlog entry says why the behaviour change was intended.
 3. **STATUS** (`docs/STATUS.md`, ≤ 40 lines, loaded into every session). Rewrite it; don't append. It covers:
    - today's date;

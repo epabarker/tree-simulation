@@ -1,0 +1,84 @@
+
+forest/sb6000-t02
+  s150: metamers/seed 58,153; planted alive 68/90; height 76.8 (tallest 87.1); H/D 77.1; trunk r 0.480; crown width 30.6; crown ratio 0.99 (by leaf 0.67); limb droop 0.6; floor 0.151; LAI 6.31
+  s200: metamers/seed 52,534; planted alive 60/90; height 65.4 (tallest 75.8); H/D 63.4; trunk r 0.516; crown width 31.4; crown ratio 0.98 (by leaf 0.70); limb droop 2.1; floor 0.159; LAI 5.37
+  s300: metamers/seed 58,566; planted alive 52/90; height 69.9 (tallest 82.1); H/D 57.3; trunk r 0.603; crown width 33.0; crown ratio 0.99 (by leaf 0.65); limb droop 1.1; floor 0.143; LAI 6.05
+  plateau: median height 250 64.8 → 300 69.9 (gain +5.1)
+  planted deaths by 300: {'thrown': 3, 'starved': 0, 'other': 35}
+  trunk at 300: tips' pipe² 3.1% of the root's (scars and memory 96.9%); children's pipe² 100.0%; root's own stress wood 22.0% of its radius
+    order 0: n 1,865, median r 0.1236, stress ≥ 1 5.1%, with stress wood 100.0%
+    order 1: n 5,316, median r 0.0789, stress ≥ 1 14.2%, with stress wood 100.0%
+    order 2: n 8,886, median r 0.0614, stress ≥ 1 19.6%, with stress wood 100.0%
+    order 3: n 10,550, median r 0.0448, stress ≥ 1 23.3%, with stress wood 100.0%
+    order 4: n 11,581, median r 0.0366, stress ≥ 1 26.7%, with stress wood 100.0%
+
+forest/sb6000-t0
+  s150: metamers/seed 40,601; planted alive 68/90; height 76.0 (tallest 86.3); H/D 76.5; trunk r 0.475; crown width 27.9; crown ratio 0.99 (by leaf 0.60); limb droop 0.3; floor 0.114; LAI 4.54
+  s200: metamers/seed 32,317; planted alive 59/90; height 63.2 (tallest 82.3); H/D 63.3; trunk r 0.507; crown width 28.7; crown ratio 0.98 (by leaf 0.68); limb droop 3.8; floor 0.151; LAI 3.35
+  s300: metamers/seed 35,263; planted alive 52/90; height 69.4 (tallest 87.0); H/D 59.9; trunk r 0.573; crown width 28.2; crown ratio 0.99 (by leaf 0.65); limb droop 1.5; floor 0.133; LAI 3.77
+  plateau: median height 250 66.2 → 300 69.4 (gain +3.1)
+  planted deaths by 300: {'thrown': 2, 'starved': 0, 'other': 36}
+  trunk at 300: tips' pipe² 2.4% of the root's (scars and memory 97.6%); children's pipe² 100.0%; root's own stress wood 23.9% of its radius
+    order 0: n 1,936, median r 0.1098, stress ≥ 1 6.4%, with stress wood 100.0%
+    order 1: n 4,434, median r 0.0776, stress ≥ 1 18.0%, with stress wood 100.0%
+    order 2: n 6,047, median r 0.0559, stress ≥ 1 25.5%, with stress wood 100.0%
+    order 3: n 6,620, median r 0.0383, stress ≥ 1 30.6%, with stress wood 100.0%
+    order 4: n 7,406, median r 0.0342, stress ≥ 1 31.9%, with stress wood 100.0%
+
+forest/sb7000-t02
+  s150: metamers/seed 70,876; planted alive 68/90; height 75.8 (tallest 90.1); H/D 75.4; trunk r 0.459; crown width 28.2; crown ratio 0.99 (by leaf 0.58); limb droop 0.4; floor 0.158; LAI 6.56
+  s200: metamers/seed 68,102; planted alive 60/90; height 76.5 (tallest 92.4); H/D 72.0; trunk r 0.490; crown width 28.0; crown ratio 0.99 (by leaf 0.60); limb droop 1.0; floor 0.161; LAI 6.14
+  s300: metamers/seed 68,089; planted alive 53/90; height 77.6 (tallest 98.0); H/D 70.1; trunk r 0.543; crown width 27.4; crown ratio 0.99 (by leaf 0.62); limb droop 0.4; floor 0.148; LAI 5.81
+  plateau: median height 250 77.6 → 300 77.6 (gain -0.1)
+  planted deaths by 300: {'thrown': 2, 'starved': 0, 'other': 35}
+  trunk at 300: tips' pipe² 3.1% of the root's (scars and memory 96.9%); children's pipe² 100.0%; root's own stress wood 20.9% of its radius
+    order 0: n 1,971, median r 0.1416, stress ≥ 1 0.6%, with stress wood 100.0%
+    order 1: n 7,913, median r 0.0785, stress ≥ 1 4.2%, with stress wood 100.0%
+    order 2: n 11,529, median r 0.0532, stress ≥ 1 8.8%, with stress wood 100.0%
+    order 3: n 13,128, median r 0.0467, stress ≥ 1 9.4%, with stress wood 100.0%
+    order 4: n 14,904, median r 0.0428, stress ≥ 1 8.8%, with stress wood 100.0%
+
+forest/sb7000-t0
+  s150: metamers/seed 59,452; planted alive 67/90; height 75.0 (tallest 84.4); H/D 73.9; trunk r 0.471; crown width 28.9; crown ratio 0.99 (by leaf 0.42); limb droop 0.4; floor 0.099; LAI 5.40
+  s200: metamers/seed 53,270; planted alive 59/90; height 75.4 (tallest 86.3); H/D 71.7; trunk r 0.493; crown width 28.7; crown ratio 0.99 (by leaf 0.46); limb droop 1.6; floor 0.113; LAI 4.68
+  s300: metamers/seed 50,207; planted alive 51/90; height 76.9 (tallest 88.6); H/D 69.9; trunk r 0.540; crown width 28.5; crown ratio 0.99 (by leaf 0.50); limb droop 1.2; floor 0.122; LAI 4.06
+  plateau: median height 250 75.8 → 300 76.9 (gain +1.1)
+  planted deaths by 300: {'thrown': 0, 'starved': 3, 'other': 36}
+  trunk at 300: tips' pipe² 3.0% of the root's (scars and memory 97.0%); children's pipe² 100.0%; root's own stress wood 21.8% of its radius
+    order 0: n 1,916, median r 0.1350, stress ≥ 1 1.8%, with stress wood 100.0%
+    order 1: n 6,023, median r 0.0758, stress ≥ 1 4.6%, with stress wood 100.0%
+    order 2: n 8,574, median r 0.0562, stress ≥ 1 9.2%, with stress wood 100.0%
+    order 3: n 10,146, median r 0.0484, stress ≥ 1 9.0%, with stress wood 100.0%
+    order 4: n 11,781, median r 0.0450, stress ≥ 1 8.6%, with stress wood 100.0%
+
+forest/sb8000-t02
+  s150: metamers/seed 72,159; planted alive 66/90; height 80.4 (tallest 93.2); H/D 83.6; trunk r 0.467; crown width 26.3; crown ratio 0.99 (by leaf 0.55); limb droop 4.9; floor 0.159; LAI 6.82
+  s200: metamers/seed 69,224; planted alive 59/90; height 81.5 (tallest 95.9); H/D 81.0; trunk r 0.493; crown width 27.0; crown ratio 0.99 (by leaf 0.58); limb droop 5.8; floor 0.154; LAI 6.50
+  s300: metamers/seed 67,767; planted alive 50/90; height 85.7 (tallest 99.0); H/D 80.4; trunk r 0.540; crown width 27.1; crown ratio 0.99 (by leaf 0.57); limb droop 3.3; floor 0.147; LAI 6.19
+  plateau: median height 250 82.9 → 300 85.7 (gain +2.8)
+  planted deaths by 300: {'thrown': 6, 'starved': 0, 'other': 34}
+  trunk at 300: tips' pipe² 2.7% of the root's (scars and memory 97.3%); children's pipe² 100.0%; root's own stress wood 19.4% of its radius
+    order 0: n 2,457, median r 0.3206, stress ≥ 1 1.4%, with stress wood 100.0%
+    order 1: n 9,356, median r 0.0729, stress ≥ 1 4.2%, with stress wood 100.0%
+    order 2: n 14,435, median r 0.0462, stress ≥ 1 8.7%, with stress wood 100.0%
+    order 3: n 17,920, median r 0.0381, stress ≥ 1 9.0%, with stress wood 100.0%
+    order 4: n 20,424, median r 0.0334, stress ≥ 1 9.1%, with stress wood 100.0%
+
+forest/sb8000-t0
+  s150: metamers/seed 56,038; planted alive 66/90; height 78.3 (tallest 88.9); H/D 82.3; trunk r 0.474; crown width 25.8; crown ratio 0.99 (by leaf 0.40); limb droop 4.8; floor 0.121; LAI 5.17
+  s200: metamers/seed 50,184; planted alive 59/90; height 78.5 (tallest 93.2); H/D 78.0; trunk r 0.505; crown width 26.2; crown ratio 0.99 (by leaf 0.45); limb droop 4.8; floor 0.132; LAI 4.57
+  s300: metamers/seed 45,333; planted alive 51/90; height 80.1 (tallest 92.5); H/D 73.1; trunk r 0.552; crown width 24.7; crown ratio 0.99 (by leaf 0.48); limb droop 5.2; floor 0.134; LAI 3.98
+  plateau: median height 250 79.6 → 300 80.1 (gain +0.5)
+  planted deaths by 300: {'thrown': 5, 'starved': 0, 'other': 34}
+  trunk at 300: tips' pipe² 2.5% of the root's (scars and memory 97.5%); children's pipe² 99.1%; root's own stress wood 21.1% of its radius
+    order 0: n 2,593, median r 0.3324, stress ≥ 1 1.0%, with stress wood 100.0%
+    order 1: n 8,525, median r 0.0687, stress ≥ 1 5.2%, with stress wood 100.0%
+    order 2: n 12,666, median r 0.0434, stress ≥ 1 9.2%, with stress wood 100.0%
+    order 3: n 16,136, median r 0.0378, stress ≥ 1 8.5%, with stress wood 100.0%
+    order 4: n 17,881, median r 0.0322, stress ≥ 1 9.2%, with stress wood 100.0%
+lone/sb6000-t02: missing (No such file or directory (os error 2): runs/form/lone/sb6000-t02-s1/metrics.csv)
+lone/sb6000-t0: missing (No such file or directory (os error 2): runs/form/lone/sb6000-t0-s1/metrics.csv)
+lone/sb7000-t02: missing (No such file or directory (os error 2): runs/form/lone/sb7000-t02-s1/metrics.csv)
+lone/sb7000-t0: missing (No such file or directory (os error 2): runs/form/lone/sb7000-t0-s1/metrics.csv)
+lone/sb8000-t02: missing (No such file or directory (os error 2): runs/form/lone/sb8000-t02-s1/metrics.csv)
+lone/sb8000-t0: missing (No such file or directory (os error 2): runs/form/lone/sb8000-t0-s1/metrics.csv)

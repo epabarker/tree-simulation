@@ -1,0 +1,26 @@
+
+forest/sb9000-t02
+  s150: metamers/seed 71,881; planted alive 53/90; height 81.0 (tallest 92.0); H/D 81.9; trunk r 0.481; crown width 28.0; crown ratio 0.99 (by leaf 0.55); limb droop 4.2; floor 0.146; LAI 6.95
+  s200: metamers/seed 67,401; planted alive 41/90; height 85.0 (tallest 95.3); H/D 78.9; trunk r 0.516; crown width 27.8; crown ratio 0.99 (by leaf 0.58); limb droop 4.1; floor 0.145; LAI 6.44
+  s300: metamers/seed 63,117; planted alive 19/90; height 88.1 (tallest 103.7); H/D 73.1; trunk r 0.572; crown width 26.8; crown ratio 0.99 (by leaf 0.58); limb droop 2.1; floor 0.140; LAI 5.96
+  plateau: median height 250 87.3 → 300 88.1 (gain +0.8)
+  planted deaths by 300: {'thrown': 46, 'starved': 0, 'other': 25}
+  trunk at 300: tips' pipe² 2.7% of the root's (scars and memory 97.3%); children's pipe² 99.1%; root's own stress wood 21.1% of its radius
+    order 0: n 927, median r 0.3490, stress ≥ 1 0.5%, with stress wood 100.0%
+    order 1: n 3,393, median r 0.0790, stress ≥ 1 4.5%, with stress wood 100.0%
+    order 2: n 5,649, median r 0.0456, stress ≥ 1 7.5%, with stress wood 100.0%
+    order 3: n 6,992, median r 0.0369, stress ≥ 1 8.5%, with stress wood 100.0%
+    order 4: n 8,388, median r 0.0335, stress ≥ 1 7.8%, with stress wood 100.0%
+
+forest/sb9000-t0
+  s150: metamers/seed 50,711; planted alive 53/90; height 80.4 (tallest 86.1); H/D 84.6; trunk r 0.477; crown width 27.1; crown ratio 0.99 (by leaf 0.43); limb droop 5.7; floor 0.135; LAI 4.82
+  s200: metamers/seed 43,799; planted alive 41/90; height 82.6 (tallest 90.3); H/D 80.7; trunk r 0.505; crown width 27.6; crown ratio 0.99 (by leaf 0.48); limb droop 4.5; floor 0.147; LAI 4.12
+  s300: metamers/seed 41,313; planted alive 21/90; height 87.1 (tallest 94.3); H/D 77.7; trunk r 0.557; crown width 26.5; crown ratio 0.99 (by leaf 0.51); limb droop 3.5; floor 0.123; LAI 3.88
+  plateau: median height 250 84.0 → 300 87.1 (gain +3.0)
+  planted deaths by 300: {'thrown': 42, 'starved': 0, 'other': 27}
+  trunk at 300: tips' pipe² 2.7% of the root's (scars and memory 97.3%); children's pipe² 99.2%; root's own stress wood 21.0% of its radius
+    order 0: n 1,124, median r 0.3522, stress ≥ 1 0.6%, with stress wood 100.0%
+    order 1: n 4,106, median r 0.0701, stress ≥ 1 4.4%, with stress wood 100.0%
+    order 2: n 7,189, median r 0.0430, stress ≥ 1 8.3%, with stress wood 100.0%
+    order 3: n 8,853, median r 0.0330, stress ≥ 1 10.2%, with stress wood 100.0%
+    order 4: n 9,120, median r 0.0290, stress ≥ 1 10.0%, with stress wood 100.0%

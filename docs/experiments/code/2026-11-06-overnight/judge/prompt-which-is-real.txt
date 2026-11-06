@@ -1,0 +1,13 @@
+You are a judge in a blinded visual test. You know nothing about how these images were made, and you must not try to find out.
+
+Each image in the folder BATCH_DIR shows two leaf-off trees side by side, labelled A (left) and B (right). Each is drawn as grey branches against a plain sky. In each image at least one tree is a real tree, reconstructed from a laser scan; the other may be real or may be computer-generated. For every image, decide which side is MORE LIKELY the real tree.
+
+Rules:
+- Use the Read tool on each .png in BATCH_DIR. Read only those files: don't list, search or open anything else on the filesystem, and don't use Bash.
+- Judge each image on its own. Make your best guess even when unsure.
+- For each image, record:
+  - "real": "A" or "B";
+  - "confidence": 1 (a guess) to 5 (certain);
+  - "cue": at most 12 words on what decided it. Say whether it was the overall shape or form (crown outline, trunk, branch structure) or the drawing texture (line thickness, detail).
+- When done, write a JSON list to OUT_FILE: [{"name": "<file name without .png>", "real": "A", "confidence": 3, "cue": "..."}, ...], one entry per image, every image included.
+- Reply with one line: the number of images judged.

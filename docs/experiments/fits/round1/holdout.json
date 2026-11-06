@@ -1,0 +1,2559 @@
+{
+  "fitted": [
+    "birch",
+    "beech",
+    "oak",
+    "fir",
+    "hornbeam",
+    "maple",
+    "holly",
+    "rowan",
+    "willow",
+    "pine"
+  ],
+  "shade": {
+    "birch (hand)": 0.126769643645634,
+    "beech (hand)": 0.034627726824348046,
+    "oak (hand)": 0.08499221519548485,
+    "fir (hand)": 0.02105631331817314,
+    "hornbeam (hand)": 0.034627726824348046,
+    "maple (hand)": 0.054118613460304534,
+    "holly (hand)": 0.034627726824348046,
+    "rowan (hand)": 0.08499221519548485,
+    "willow (hand)": 0.126769643645634,
+    "pine (hand)": 0.19020162776587224,
+    "birch (fitted)": 0.126769643645634,
+    "beech (fitted)": 0.02105631331817314,
+    "oak (fitted)": 0.054118613460304534,
+    "fir (fitted)": 0.02105631331817314,
+    "hornbeam (fitted)": 0.034627726824348046,
+    "maple (fitted)": 0.054118613460304534,
+    "holly (fitted)": 0.08499221519548485,
+    "rowan (fitted)": 0.126769643645634,
+    "willow (fitted)": 0.126769643645634,
+    "pine (fitted)": 0.19020162776587224
+  },
+  "shadeBand": {
+    "birch": [
+      0.15,
+      0.25
+    ],
+    "beech": [
+      0.025,
+      0.045
+    ],
+    "oak": [
+      0.08,
+      0.14
+    ],
+    "fir": [
+      0.015,
+      0.04
+    ],
+    "hornbeam": [
+      0.025,
+      0.045
+    ],
+    "maple": [
+      0.05,
+      0.1
+    ],
+    "holly": [
+      0.02,
+      0.05
+    ],
+    "rowan": [
+      0.08,
+      0.14
+    ],
+    "willow": [
+      0.12,
+      0.2
+    ],
+    "pine": [
+      0.2,
+      0.3
+    ]
+  },
+  "shadeInBand": {
+    "birch": false,
+    "beech": false,
+    "oak": false,
+    "fir": true,
+    "hornbeam": true,
+    "maple": true,
+    "holly": false,
+    "rowan": true,
+    "willow": true,
+    "pine": false
+  },
+  "shadeSpearman": {
+    "hand": -0.9816498172140428,
+    "fitted": -0.9013891403349072
+  },
+  "allometry": {
+    "birch (hand)": {
+      "junctionDelta": 1.9999999999999998,
+      "ldSlope": 0.9223986079414805,
+      "leafStemSlope": 0.7345983795734476,
+      "epicormic": 0.4,
+      "lean": 0.05267460117442511
+    },
+    "birch (fitted)": {
+      "junctionDelta": 1.9999999999999998,
+      "ldSlope": 1.1010873204690708,
+      "leafStemSlope": 0.6988489318711755,
+      "epicormic": 0.4,
+      "lean": 0.1649421294215614
+    },
+    "beech (hand)": {
+      "junctionDelta": 1.9999999999999967,
+      "ldSlope": 1.03044973494155,
+      "leafStemSlope": 0.7718509598760229,
+      "epicormic": 9.0,
+      "lean": 1.7386109131501783
+    },
+    "beech (fitted)": {
+      "junctionDelta": 2.0,
+      "ldSlope": 1.0753771010970055,
+      "leafStemSlope": 0.7750099560874579,
+      "epicormic": 5.0,
+      "lean": 1.1669856514768555
+    },
+    "oak (hand)": {
+      "junctionDelta": 1.9999999999999996,
+      "ldSlope": 0.8982789259032935,
+      "leafStemSlope": 0.6605779465010142,
+      "epicormic": 6.2,
+      "lean": 1.5935519492314498
+    },
+    "oak (fitted)": {
+      "junctionDelta": 1.9999999999999998,
+      "ldSlope": 0.9949532791995293,
+      "leafStemSlope": 0.7052512882281086,
+      "epicormic": 9.4,
+      "lean": 1.5017189956100367
+    },
+    "fir (hand)": {
+      "junctionDelta": 2.0,
+      "ldSlope": 1.2181648536038125,
+      "leafStemSlope": 0.8423079346112311,
+      "epicormic": 9.6,
+      "lean": 0.10636471684648399
+    },
+    "fir (fitted)": {
+      "junctionDelta": 1.9999999999999996,
+      "ldSlope": 1.2440895236763427,
+      "leafStemSlope": 0.8607125224553106,
+      "epicormic": 3.2,
+      "lean": 0.16209433636528842
+    },
+    "hornbeam (hand)": {
+      "junctionDelta": 1.9012224178186619,
+      "ldSlope": 1.0869168695497942,
+      "leafStemSlope": 0.6202629031748991,
+      "epicormic": 3.0,
+      "lean": 2.395266843556236
+    },
+    "hornbeam (fitted)": {
+      "junctionDelta": 1.9999999999999996,
+      "ldSlope": 0.7920758671335797,
+      "leafStemSlope": 0.7617068783942472,
+      "epicormic": 1.4,
+      "lean": 2.6090507283434974
+    },
+    "maple (hand)": {
+      "junctionDelta": 2.0,
+      "ldSlope": 1.3624456495289812,
+      "leafStemSlope": 0.6907340479761762,
+      "epicormic": 7.4,
+      "lean": 0.3618422703913723
+    },
+    "maple (fitted)": {
+      "junctionDelta": 2.0,
+      "ldSlope": 0.8162815408090452,
+      "leafStemSlope": 0.6383736391703669,
+      "epicormic": 5.4,
+      "lean": 1.5921683566124032
+    },
+    "holly (hand)": {
+      "junctionDelta": 1.9999999999999996,
+      "ldSlope": 1.2307429675362356,
+      "leafStemSlope": 0.8706617823570881,
+      "epicormic": 2.8,
+      "lean": 0.08166981597792784
+    },
+    "holly (fitted)": {
+      "junctionDelta": 2.0,
+      "ldSlope": 1.044888838627982,
+      "leafStemSlope": 0.8328123793260298,
+      "epicormic": 7.6,
+      "lean": 0.23930375467126624
+    },
+    "rowan (hand)": {
+      "junctionDelta": 1.9999999999999996,
+      "ldSlope": 1.4404814131309998,
+      "leafStemSlope": 0.7678954626704251,
+      "epicormic": 0.0,
+      "lean": 0.30214328021401543
+    },
+    "rowan (fitted)": {
+      "junctionDelta": 2.0,
+      "ldSlope": 0.9525994464098991,
+      "leafStemSlope": 0.6793016434876962,
+      "epicormic": 0.2,
+      "lean": 0.5546248441127218
+    },
+    "willow (hand)": {
+      "junctionDelta": 1.9999999999999996,
+      "ldSlope": 0.8817067313802498,
+      "leafStemSlope": 0.5883951588380666,
+      "epicormic": 1.8,
+      "lean": 0.597452140807097
+    },
+    "willow (fitted)": {
+      "junctionDelta": 2.0000000000000004,
+      "ldSlope": 0.9131007501186585,
+      "leafStemSlope": 0.6184041916987972,
+      "epicormic": 0.0,
+      "lean": 1.0914952851677455
+    },
+    "pine (hand)": {
+      "junctionDelta": 1.9999999999999996,
+      "ldSlope": 1.09172487925238,
+      "leafStemSlope": 0.7009925904210621,
+      "epicormic": 2.0,
+      "lean": 0.3691446468996375
+    },
+    "pine (fitted)": {
+      "junctionDelta": 1.9999999999999998,
+      "ldSlope": 1.0654318557299933,
+      "leafStemSlope": 0.7470078082829053,
+      "epicormic": 3.2,
+      "lean": 0.7327930085794506
+    }
+  },
+  "wood": [
+    {
+      "patch": "fitted",
+      "season": 50,
+      "species": "beech",
+      "trees": 0.8333333333333333
+    },
+    {
+      "patch": "fitted",
+      "season": 50,
+      "species": "birch",
+      "trees": 2.1666666666666665
+    },
+    {
+      "patch": "fitted",
+      "season": 50,
+      "species": "holly",
+      "trees": 0.8333333333333333
+    },
+    {
+      "patch": "fitted",
+      "season": 50,
+      "species": "hornbeam",
+      "trees": 0.8333333333333333
+    },
+    {
+      "patch": "fitted",
+      "season": 50,
+      "species": "maple",
+      "trees": 1.1666666666666665
+    },
+    {
+      "patch": "fitted",
+      "season": 50,
+      "species": "oak",
+      "trees": 0.8333333333333333
+    },
+    {
+      "patch": "fitted",
+      "season": 50,
+      "species": "rowan",
+      "trees": 0.6666666666666666
+    },
+    {
+      "patch": "fitted",
+      "season": 50,
+      "species": "willow",
+      "trees": 0.16666666666666666
+    },
+    {
+      "patch": "fitted",
+      "season": 100,
+      "species": "beech",
+      "trees": 1.1666666666666665
+    },
+    {
+      "patch": "fitted",
+      "season": 100,
+      "species": "birch",
+      "trees": 2.0
+    },
+    {
+      "patch": "fitted",
+      "season": 100,
+      "species": "holly",
+      "trees": 0.5
+    },
+    {
+      "patch": "fitted",
+      "season": 100,
+      "species": "hornbeam",
+      "trees": 0.3333333333333333
+    },
+    {
+      "patch": "fitted",
+      "season": 100,
+      "species": "maple",
+      "trees": 0.8333333333333333
+    },
+    {
+      "patch": "fitted",
+      "season": 100,
+      "species": "oak",
+      "trees": 0.8333333333333333
+    },
+    {
+      "patch": "fitted",
+      "season": 100,
+      "species": "rowan",
+      "trees": 0.3333333333333333
+    },
+    {
+      "patch": "fitted",
+      "season": 100,
+      "species": "willow",
+      "trees": 0.16666666666666666
+    },
+    {
+      "patch": "fitted",
+      "season": 200,
+      "species": "beech",
+      "trees": 2.1666666666666665
+    },
+    {
+      "patch": "fitted",
+      "season": 200,
+      "species": "birch",
+      "trees": 1.3333333333333333
+    },
+    {
+      "patch": "fitted",
+      "season": 200,
+      "species": "holly",
+      "trees": 0.5
+    },
+    {
+      "patch": "fitted",
+      "season": 200,
+      "species": "hornbeam",
+      "trees": 1.1666666666666665
+    },
+    {
+      "patch": "fitted",
+      "season": 200,
+      "species": "maple",
+      "trees": 1.1666666666666665
+    },
+    {
+      "patch": "fitted",
+      "season": 200,
+      "species": "oak",
+      "trees": 0.8333333333333333
+    },
+    {
+      "patch": "fitted",
+      "season": 200,
+      "species": "rowan",
+      "trees": 0.3333333333333333
+    },
+    {
+      "patch": "fitted",
+      "season": 300,
+      "species": "beech",
+      "trees": 3.5
+    },
+    {
+      "patch": "fitted",
+      "season": 300,
+      "species": "birch",
+      "trees": 1.0
+    },
+    {
+      "patch": "fitted",
+      "season": 300,
+      "species": "holly",
+      "trees": 0.3333333333333333
+    },
+    {
+      "patch": "fitted",
+      "season": 300,
+      "species": "hornbeam",
+      "trees": 1.0
+    },
+    {
+      "patch": "fitted",
+      "season": 300,
+      "species": "maple",
+      "trees": 1.3333333333333333
+    },
+    {
+      "patch": "fitted",
+      "season": 300,
+      "species": "oak",
+      "trees": 0.5
+    },
+    {
+      "patch": "fitted",
+      "season": 400,
+      "species": "beech",
+      "trees": 2.6666666666666665
+    },
+    {
+      "patch": "fitted",
+      "season": 400,
+      "species": "birch",
+      "trees": 0.8333333333333333
+    },
+    {
+      "patch": "fitted",
+      "season": 400,
+      "species": "holly",
+      "trees": 0.16666666666666666
+    },
+    {
+      "patch": "fitted",
+      "season": 400,
+      "species": "hornbeam",
+      "trees": 1.0
+    },
+    {
+      "patch": "fitted",
+      "season": 400,
+      "species": "maple",
+      "trees": 1.0
+    },
+    {
+      "patch": "fitted",
+      "season": 400,
+      "species": "oak",
+      "trees": 0.16666666666666666
+    },
+    {
+      "patch": "hand",
+      "season": 50,
+      "species": "beech",
+      "trees": 0.8333333333333333
+    },
+    {
+      "patch": "hand",
+      "season": 50,
+      "species": "birch",
+      "trees": 2.5
+    },
+    {
+      "patch": "hand",
+      "season": 50,
+      "species": "holly",
+      "trees": 0.8333333333333333
+    },
+    {
+      "patch": "hand",
+      "season": 50,
+      "species": "hornbeam",
+      "trees": 0.8333333333333333
+    },
+    {
+      "patch": "hand",
+      "season": 50,
+      "species": "maple",
+      "trees": 1.0
+    },
+    {
+      "patch": "hand",
+      "season": 50,
+      "species": "oak",
+      "trees": 0.6666666666666666
+    },
+    {
+      "patch": "hand",
+      "season": 50,
+      "species": "rowan",
+      "trees": 0.6666666666666666
+    },
+    {
+      "patch": "hand",
+      "season": 50,
+      "species": "willow",
+      "trees": 0.6666666666666666
+    },
+    {
+      "patch": "hand",
+      "season": 100,
+      "species": "beech",
+      "trees": 0.8333333333333333
+    },
+    {
+      "patch": "hand",
+      "season": 100,
+      "species": "birch",
+      "trees": 2.1666666666666665
+    },
+    {
+      "patch": "hand",
+      "season": 100,
+      "species": "holly",
+      "trees": 0.5
+    },
+    {
+      "patch": "hand",
+      "season": 100,
+      "species": "hornbeam",
+      "trees": 0.6666666666666666
+    },
+    {
+      "patch": "hand",
+      "season": 100,
+      "species": "maple",
+      "trees": 0.8333333333333333
+    },
+    {
+      "patch": "hand",
+      "season": 100,
+      "species": "oak",
+      "trees": 0.6666666666666666
+    },
+    {
+      "patch": "hand",
+      "season": 100,
+      "species": "rowan",
+      "trees": 0.6666666666666666
+    },
+    {
+      "patch": "hand",
+      "season": 100,
+      "species": "willow",
+      "trees": 0.5
+    },
+    {
+      "patch": "hand",
+      "season": 200,
+      "species": "beech",
+      "trees": 1.8333333333333333
+    },
+    {
+      "patch": "hand",
+      "season": 200,
+      "species": "birch",
+      "trees": 2.0
+    },
+    {
+      "patch": "hand",
+      "season": 200,
+      "species": "holly",
+      "trees": 0.6666666666666666
+    },
+    {
+      "patch": "hand",
+      "season": 200,
+      "species": "hornbeam",
+      "trees": 1.0
+    },
+    {
+      "patch": "hand",
+      "season": 200,
+      "species": "maple",
+      "trees": 0.5
+    },
+    {
+      "patch": "hand",
+      "season": 200,
+      "species": "oak",
+      "trees": 0.8333333333333333
+    },
+    {
+      "patch": "hand",
+      "season": 200,
+      "species": "rowan",
+      "trees": 0.6666666666666666
+    },
+    {
+      "patch": "hand",
+      "season": 200,
+      "species": "willow",
+      "trees": 0.6666666666666666
+    },
+    {
+      "patch": "hand",
+      "season": 300,
+      "species": "beech",
+      "trees": 2.0
+    },
+    {
+      "patch": "hand",
+      "season": 300,
+      "species": "birch",
+      "trees": 0.5
+    },
+    {
+      "patch": "hand",
+      "season": 300,
+      "species": "holly",
+      "trees": 1.3333333333333333
+    },
+    {
+      "patch": "hand",
+      "season": 300,
+      "species": "hornbeam",
+      "trees": 1.6666666666666665
+    },
+    {
+      "patch": "hand",
+      "season": 300,
+      "species": "maple",
+      "trees": 1.1666666666666665
+    },
+    {
+      "patch": "hand",
+      "season": 300,
+      "species": "oak",
+      "trees": 1.0
+    },
+    {
+      "patch": "hand",
+      "season": 300,
+      "species": "rowan",
+      "trees": 0.5
+    },
+    {
+      "patch": "hand",
+      "season": 300,
+      "species": "willow",
+      "trees": 0.8333333333333333
+    },
+    {
+      "patch": "hand",
+      "season": 400,
+      "species": "beech",
+      "trees": 2.1666666666666665
+    },
+    {
+      "patch": "hand",
+      "season": 400,
+      "species": "birch",
+      "trees": 0.6666666666666666
+    },
+    {
+      "patch": "hand",
+      "season": 400,
+      "species": "holly",
+      "trees": 1.1666666666666665
+    },
+    {
+      "patch": "hand",
+      "season": 400,
+      "species": "hornbeam",
+      "trees": 1.5
+    },
+    {
+      "patch": "hand",
+      "season": 400,
+      "species": "maple",
+      "trees": 0.8333333333333333
+    },
+    {
+      "patch": "hand",
+      "season": 400,
+      "species": "oak",
+      "trees": 0.8333333333333333
+    },
+    {
+      "patch": "hand",
+      "season": 400,
+      "species": "rowan",
+      "trees": 0.6666666666666666
+    },
+    {
+      "patch": "hand",
+      "season": 400,
+      "species": "willow",
+      "trees": 0.3333333333333333
+    }
+  ],
+  "labWoods": [
+    {
+      "patch": "fitted",
+      "season": 50,
+      "live trees": 23.666666666666664,
+      "canopy trees": 9.666666666666666,
+      "tallest": 122.15164,
+      "canopy H/D": 62.563739999999996,
+      "species": "fir"
+    },
+    {
+      "patch": "fitted",
+      "season": 100,
+      "live trees": 29.166666666666664,
+      "canopy trees": 12.166666666666666,
+      "tallest": 162.14758,
+      "canopy H/D": 56.543763,
+      "species": "fir"
+    },
+    {
+      "patch": "fitted",
+      "season": 150,
+      "live trees": 32.166666666666664,
+      "canopy trees": 12.5,
+      "tallest": 162.88958,
+      "canopy H/D": 59.73735,
+      "species": "fir"
+    },
+    {
+      "patch": "fitted",
+      "season": 200,
+      "live trees": 35.166666666666664,
+      "canopy trees": 14.166666666666666,
+      "tallest": 162.67761,
+      "canopy H/D": 57.137,
+      "species": "fir"
+    },
+    {
+      "patch": "hand",
+      "season": 50,
+      "live trees": 26.5,
+      "canopy trees": 10.5,
+      "tallest": 92.652795,
+      "canopy H/D": 59.521831,
+      "species": "fir"
+    },
+    {
+      "patch": "hand",
+      "season": 100,
+      "live trees": 34.33333333333333,
+      "canopy trees": 13.0,
+      "tallest": 140.82331,
+      "canopy H/D": 64.899791,
+      "species": "fir"
+    },
+    {
+      "patch": "hand",
+      "season": 150,
+      "live trees": 38.5,
+      "canopy trees": 15.5,
+      "tallest": 161.09743,
+      "canopy H/D": 67.991232,
+      "species": "fir"
+    },
+    {
+      "patch": "hand",
+      "season": 200,
+      "live trees": 40.166666666666664,
+      "canopy trees": 17.333333333333332,
+      "tallest": 153.10266,
+      "canopy H/D": 67.5602265,
+      "species": "fir"
+    },
+    {
+      "patch": "fitted",
+      "season": 50,
+      "live trees": 18.833333333333332,
+      "canopy trees": 9.333333333333332,
+      "tallest": 81.338136,
+      "canopy H/D": 64.2045105,
+      "species": "pine"
+    },
+    {
+      "patch": "fitted",
+      "season": 100,
+      "live trees": 21.833333333333332,
+      "canopy trees": 9.0,
+      "tallest": 130.02545,
+      "canopy H/D": 74.755021,
+      "species": "pine"
+    },
+    {
+      "patch": "fitted",
+      "season": 150,
+      "live trees": 20.5,
+      "canopy trees": 9.833333333333332,
+      "tallest": 161.82488,
+      "canopy H/D": 74.969045,
+      "species": "pine"
+    },
+    {
+      "patch": "fitted",
+      "season": 200,
+      "live trees": 25.5,
+      "canopy trees": 9.166666666666666,
+      "tallest": 166.76798,
+      "canopy H/D": 63.573297,
+      "species": "pine"
+    },
+    {
+      "patch": "hand",
+      "season": 50,
+      "live trees": 22.333333333333332,
+      "canopy trees": 9.833333333333332,
+      "tallest": 77.774516,
+      "canopy H/D": 51.960898,
+      "species": "pine"
+    },
+    {
+      "patch": "hand",
+      "season": 100,
+      "live trees": 24.666666666666664,
+      "canopy trees": 9.0,
+      "tallest": 98.079184,
+      "canopy H/D": 52.4994065,
+      "species": "pine"
+    },
+    {
+      "patch": "hand",
+      "season": 150,
+      "live trees": 22.333333333333332,
+      "canopy trees": 10.333333333333332,
+      "tallest": 90.422093,
+      "canopy H/D": 51.7524095,
+      "species": "pine"
+    },
+    {
+      "patch": "hand",
+      "season": 200,
+      "live trees": 23.833333333333332,
+      "canopy trees": 10.0,
+      "tallest": 81.422047,
+      "canopy H/D": 48.4712795,
+      "species": "pine"
+    }
+  ],
+  "plausibility": [
+    {
+      "species": "birch",
+      "param": "c3.alpha",
+      "hand": 4,
+      "fitted": 3.056,
+      "lo": 2.5,
+      "hi": 6,
+      "at bound": false,
+      "restart spread (of range)": 0.17
+    },
+    {
+      "species": "birch",
+      "param": "r2.levels.0.lambda",
+      "hand": 0.56,
+      "fitted": 0.5882,
+      "lo": 0.5,
+      "hi": 0.6,
+      "at bound": false,
+      "restart spread (of range)": 0.14
+    },
+    {
+      "species": "birch",
+      "param": "r2.levels.1.lambda",
+      "hand": 0.53,
+      "fitted": 0.5126,
+      "lo": 0.48,
+      "hi": 0.58,
+      "at bound": false,
+      "restart spread (of range)": 0.1
+    },
+    {
+      "species": "birch",
+      "param": "r2.levels.1.setPoint",
+      "hand": 55,
+      "fitted": 72.53,
+      "lo": 20,
+      "hi": 90,
+      "at bound": false,
+      "restart spread (of range)": 0.13
+    },
+    {
+      "species": "birch",
+      "param": "r2.levels.1.branchAngle",
+      "hand": 45,
+      "fitted": 37.83,
+      "lo": 25,
+      "hi": 70,
+      "at bound": false,
+      "restart spread (of range)": 0.17
+    },
+    {
+      "species": "birch",
+      "param": "r2.levels.1.eta",
+      "hand": 0.3,
+      "fitted": 0.079,
+      "lo": 0.05,
+      "hi": 1.5,
+      "at bound": true,
+      "restart spread (of range)": 0.28
+    },
+    {
+      "species": "birch",
+      "param": "r2.levels.2.setPoint",
+      "hand": 120,
+      "fitted": 131.6,
+      "lo": 40,
+      "hi": 160,
+      "at bound": false,
+      "restart spread (of range)": 0.24
+    },
+    {
+      "species": "birch",
+      "param": "r2.aC",
+      "hand": 15,
+      "fitted": 22.61,
+      "lo": 0,
+      "hi": 40,
+      "at bound": false,
+      "restart spread (of range)": 0.1
+    },
+    {
+      "species": "birch",
+      "param": "r2.dLambda",
+      "hand": 0.06,
+      "fitted": 0.0816,
+      "lo": 0,
+      "hi": 0.12,
+      "at bound": false,
+      "restart spread (of range)": 0.16
+    },
+    {
+      "species": "birch",
+      "param": "r2.kappa",
+      "hand": null,
+      "fitted": 0.345,
+      "lo": 0,
+      "hi": 4,
+      "at bound": false,
+      "restart spread (of range)": 0.27
+    },
+    {
+      "species": "birch",
+      "param": "c5.Trel",
+      "hand": 0.4,
+      "fitted": 0.3451,
+      "lo": 0.005,
+      "hi": 0.6,
+      "at bound": false,
+      "restart spread (of range)": 0.05
+    },
+    {
+      "species": "birch",
+      "param": "c6.r0",
+      "hand": 0.033,
+      "fitted": 0.0447,
+      "lo": 0.015,
+      "hi": 0.05,
+      "at bound": false,
+      "restart spread (of range)": 0.1
+    },
+    {
+      "species": "birch",
+      "param": "r1.Lh",
+      "hand": 45,
+      "fitted": 49.95,
+      "lo": 10,
+      "hi": 200,
+      "at bound": false,
+      "restart spread (of range)": 0.08
+    },
+    {
+      "species": "birch",
+      "param": "r1.mf",
+      "hand": 0.1,
+      "fitted": 0.0774,
+      "lo": 0.02,
+      "hi": 0.15,
+      "at bound": false,
+      "restart spread (of range)": 0.21
+    },
+    {
+      "species": "birch",
+      "param": "r3.c",
+      "hand": 0.05,
+      "fitted": 0.186,
+      "lo": 0.01,
+      "hi": 0.3,
+      "at bound": false,
+      "restart spread (of range)": 0.2
+    },
+    {
+      "species": "birch",
+      "param": "r6.qMin",
+      "hand": 0.12,
+      "fitted": 0.113,
+      "lo": 0.01,
+      "hi": 0.2,
+      "at bound": false,
+      "restart spread (of range)": 0.03
+    },
+    {
+      "species": "birch",
+      "param": "r6.leafArea",
+      "hand": 1.6,
+      "fitted": 2.192,
+      "lo": 1,
+      "hi": 3,
+      "at bound": false,
+      "restart spread (of range)": 0.18
+    },
+    {
+      "species": "beech",
+      "param": "c3.alpha",
+      "hand": 3,
+      "fitted": 2.711,
+      "lo": 2.5,
+      "hi": 6,
+      "at bound": false,
+      "restart spread (of range)": 0.36
+    },
+    {
+      "species": "beech",
+      "param": "r2.levels.0.lambda",
+      "hand": 0.51,
+      "fitted": 0.5517,
+      "lo": 0.5,
+      "hi": 0.6,
+      "at bound": false,
+      "restart spread (of range)": 0.2
+    },
+    {
+      "species": "beech",
+      "param": "r2.levels.1.lambda",
+      "hand": 0.5,
+      "fitted": 0.4937,
+      "lo": 0.48,
+      "hi": 0.58,
+      "at bound": false,
+      "restart spread (of range)": 0.2
+    },
+    {
+      "species": "beech",
+      "param": "r2.levels.1.setPoint",
+      "hand": 55,
+      "fitted": 34.63,
+      "lo": 20,
+      "hi": 90,
+      "at bound": false,
+      "restart spread (of range)": 0.09
+    },
+    {
+      "species": "beech",
+      "param": "r2.levels.1.branchAngle",
+      "hand": 45,
+      "fitted": 51.15,
+      "lo": 25,
+      "hi": 70,
+      "at bound": false,
+      "restart spread (of range)": 0.11
+    },
+    {
+      "species": "beech",
+      "param": "r2.levels.1.eta",
+      "hand": 0.4,
+      "fitted": 0.1326,
+      "lo": 0.05,
+      "hi": 1.5,
+      "at bound": false,
+      "restart spread (of range)": 0.25
+    },
+    {
+      "species": "beech",
+      "param": "r2.levels.2.setPoint",
+      "hand": 85,
+      "fitted": 70.07,
+      "lo": 40,
+      "hi": 160,
+      "at bound": false,
+      "restart spread (of range)": 0.24
+    },
+    {
+      "species": "beech",
+      "param": "r2.aC",
+      "hand": 0,
+      "fitted": 3.447,
+      "lo": 0,
+      "hi": 40,
+      "at bound": false,
+      "restart spread (of range)": 0.14
+    },
+    {
+      "species": "beech",
+      "param": "r2.dLambda",
+      "hand": 0,
+      "fitted": 0.0316,
+      "lo": 0,
+      "hi": 0.12,
+      "at bound": false,
+      "restart spread (of range)": 0.13
+    },
+    {
+      "species": "beech",
+      "param": "r2.kappa",
+      "hand": null,
+      "fitted": 0.1268,
+      "lo": 0,
+      "hi": 4,
+      "at bound": false,
+      "restart spread (of range)": 0.11
+    },
+    {
+      "species": "beech",
+      "param": "c5.Trel",
+      "hand": 0.03,
+      "fitted": 0.0958,
+      "lo": 0.005,
+      "hi": 0.6,
+      "at bound": false,
+      "restart spread (of range)": 0.05
+    },
+    {
+      "species": "beech",
+      "param": "c6.r0",
+      "hand": 0.02,
+      "fitted": 0.0237,
+      "lo": 0.015,
+      "hi": 0.05,
+      "at bound": false,
+      "restart spread (of range)": 0.13
+    },
+    {
+      "species": "beech",
+      "param": "r1.Lh",
+      "hand": 60,
+      "fitted": 86.61,
+      "lo": 10,
+      "hi": 200,
+      "at bound": false,
+      "restart spread (of range)": 0.15
+    },
+    {
+      "species": "beech",
+      "param": "r1.mf",
+      "hand": 0.035,
+      "fitted": 0.0238,
+      "lo": 0.02,
+      "hi": 0.15,
+      "at bound": false,
+      "restart spread (of range)": 0.1
+    },
+    {
+      "species": "beech",
+      "param": "r3.c",
+      "hand": 0.15,
+      "fitted": 0.0287,
+      "lo": 0.01,
+      "hi": 0.3,
+      "at bound": false,
+      "restart spread (of range)": 0.02
+    },
+    {
+      "species": "beech",
+      "param": "r6.qMin",
+      "hand": 0.025,
+      "fitted": 0.0128,
+      "lo": 0.01,
+      "hi": 0.2,
+      "at bound": true,
+      "restart spread (of range)": 0.01
+    },
+    {
+      "species": "beech",
+      "param": "r6.leafArea",
+      "hand": 2.6,
+      "fitted": 2.295,
+      "lo": 1,
+      "hi": 3,
+      "at bound": false,
+      "restart spread (of range)": 0.13
+    },
+    {
+      "species": "oak",
+      "param": "c3.alpha",
+      "hand": 3.5,
+      "fitted": 4.019,
+      "lo": 2.5,
+      "hi": 6,
+      "at bound": false,
+      "restart spread (of range)": 0.09
+    },
+    {
+      "species": "oak",
+      "param": "r2.levels.0.lambda",
+      "hand": 0.54,
+      "fitted": 0.5476,
+      "lo": 0.5,
+      "hi": 0.6,
+      "at bound": false,
+      "restart spread (of range)": 0.2
+    },
+    {
+      "species": "oak",
+      "param": "r2.levels.1.lambda",
+      "hand": 0.5,
+      "fitted": 0.5254,
+      "lo": 0.48,
+      "hi": 0.58,
+      "at bound": false,
+      "restart spread (of range)": 0.14
+    },
+    {
+      "species": "oak",
+      "param": "r2.levels.1.setPoint",
+      "hand": 60,
+      "fitted": 78.2,
+      "lo": 20,
+      "hi": 90,
+      "at bound": false,
+      "restart spread (of range)": 0.25
+    },
+    {
+      "species": "oak",
+      "param": "r2.levels.1.branchAngle",
+      "hand": 55,
+      "fitted": 44.01,
+      "lo": 25,
+      "hi": 70,
+      "at bound": false,
+      "restart spread (of range)": 0.17
+    },
+    {
+      "species": "oak",
+      "param": "r2.levels.1.eta",
+      "hand": 0.3,
+      "fitted": 0.1906,
+      "lo": 0.05,
+      "hi": 1.5,
+      "at bound": false,
+      "restart spread (of range)": 0.13
+    },
+    {
+      "species": "oak",
+      "param": "r2.levels.2.setPoint",
+      "hand": 75,
+      "fitted": 49.65,
+      "lo": 40,
+      "hi": 160,
+      "at bound": false,
+      "restart spread (of range)": 0.13
+    },
+    {
+      "species": "oak",
+      "param": "r2.aC",
+      "hand": 8,
+      "fitted": 9.313,
+      "lo": 0,
+      "hi": 40,
+      "at bound": false,
+      "restart spread (of range)": 0.3
+    },
+    {
+      "species": "oak",
+      "param": "r2.dLambda",
+      "hand": 0.07,
+      "fitted": 0.0847,
+      "lo": 0,
+      "hi": 0.12,
+      "at bound": false,
+      "restart spread (of range)": 0.33
+    },
+    {
+      "species": "oak",
+      "param": "r2.kappa",
+      "hand": 3,
+      "fitted": 1.816,
+      "lo": 0,
+      "hi": 4,
+      "at bound": false,
+      "restart spread (of range)": 0.21
+    },
+    {
+      "species": "oak",
+      "param": "c5.Trel",
+      "hand": 0.08,
+      "fitted": 0.1877,
+      "lo": 0.005,
+      "hi": 0.6,
+      "at bound": false,
+      "restart spread (of range)": 0.04
+    },
+    {
+      "species": "oak",
+      "param": "c6.r0",
+      "hand": 0.02,
+      "fitted": 0.0346,
+      "lo": 0.015,
+      "hi": 0.05,
+      "at bound": false,
+      "restart spread (of range)": 0.18
+    },
+    {
+      "species": "oak",
+      "param": "r1.Lh",
+      "hand": 75,
+      "fitted": 37.42,
+      "lo": 10,
+      "hi": 200,
+      "at bound": false,
+      "restart spread (of range)": 0.06
+    },
+    {
+      "species": "oak",
+      "param": "r1.mf",
+      "hand": 0.08,
+      "fitted": 0.0526,
+      "lo": 0.02,
+      "hi": 0.15,
+      "at bound": false,
+      "restart spread (of range)": 0.16
+    },
+    {
+      "species": "oak",
+      "param": "r3.c",
+      "hand": 0.15,
+      "fitted": 0.174,
+      "lo": 0.01,
+      "hi": 0.3,
+      "at bound": false,
+      "restart spread (of range)": 0.11
+    },
+    {
+      "species": "oak",
+      "param": "r6.qMin",
+      "hand": 0.07,
+      "fitted": 0.0531,
+      "lo": 0.01,
+      "hi": 0.2,
+      "at bound": false,
+      "restart spread (of range)": 0.02
+    },
+    {
+      "species": "oak",
+      "param": "r6.leafArea",
+      "hand": 1.6,
+      "fitted": 1.192,
+      "lo": 1,
+      "hi": 3,
+      "at bound": false,
+      "restart spread (of range)": 0.35
+    },
+    {
+      "species": "fir",
+      "param": "c3.alpha",
+      "hand": 3,
+      "fitted": 5.056,
+      "lo": 2.5,
+      "hi": 6,
+      "at bound": false,
+      "restart spread (of range)": 0.2
+    },
+    {
+      "species": "fir",
+      "param": "r2.levels.0.lambda",
+      "hand": 0.55,
+      "fitted": 0.5878,
+      "lo": 0.5,
+      "hi": 0.6,
+      "at bound": false,
+      "restart spread (of range)": 0.12
+    },
+    {
+      "species": "fir",
+      "param": "r2.levels.1.lambda",
+      "hand": 0.52,
+      "fitted": 0.5437,
+      "lo": 0.48,
+      "hi": 0.58,
+      "at bound": false,
+      "restart spread (of range)": 0.22
+    },
+    {
+      "species": "fir",
+      "param": "r2.levels.1.setPoint",
+      "hand": 85,
+      "fitted": 79.33,
+      "lo": 20,
+      "hi": 90,
+      "at bound": false,
+      "restart spread (of range)": 0.04
+    },
+    {
+      "species": "fir",
+      "param": "r2.levels.1.branchAngle",
+      "hand": 80,
+      "fitted": 89.18,
+      "lo": 50,
+      "hi": 90,
+      "at bound": false,
+      "restart spread (of range)": 0.17
+    },
+    {
+      "species": "fir",
+      "param": "r2.levels.1.eta",
+      "hand": 2,
+      "fitted": 1.96,
+      "lo": 1.5,
+      "hi": 2,
+      "at bound": false,
+      "restart spread (of range)": 0.22
+    },
+    {
+      "species": "fir",
+      "param": "r2.levels.2.setPoint",
+      "hand": 90,
+      "fitted": 43.19,
+      "lo": 40,
+      "hi": 160,
+      "at bound": false,
+      "restart spread (of range)": 0.27
+    },
+    {
+      "species": "fir",
+      "param": "r2.aC",
+      "hand": 0,
+      "fitted": 5.788,
+      "lo": 0,
+      "hi": 40,
+      "at bound": false,
+      "restart spread (of range)": 0.05
+    },
+    {
+      "species": "fir",
+      "param": "r2.dLambda",
+      "hand": 0,
+      "fitted": 0.0048,
+      "lo": 0,
+      "hi": 0.12,
+      "at bound": false,
+      "restart spread (of range)": 0.01
+    },
+    {
+      "species": "fir",
+      "param": "r2.kappa",
+      "hand": null,
+      "fitted": 3.307,
+      "lo": 0,
+      "hi": 4,
+      "at bound": false,
+      "restart spread (of range)": 0.07
+    },
+    {
+      "species": "fir",
+      "param": "c5.Trel",
+      "hand": 0.25,
+      "fitted": 0.1133,
+      "lo": 0.005,
+      "hi": 0.6,
+      "at bound": false,
+      "restart spread (of range)": 0.04
+    },
+    {
+      "species": "fir",
+      "param": "c6.r0",
+      "hand": 0.035,
+      "fitted": 0.042,
+      "lo": 0.015,
+      "hi": 0.05,
+      "at bound": false,
+      "restart spread (of range)": 0.07
+    },
+    {
+      "species": "fir",
+      "param": "r1.Lh",
+      "hand": 50,
+      "fitted": 23.3,
+      "lo": 10,
+      "hi": 200,
+      "at bound": false,
+      "restart spread (of range)": 0.06
+    },
+    {
+      "species": "fir",
+      "param": "r1.mf",
+      "hand": 0.05,
+      "fitted": 0.0879,
+      "lo": 0.02,
+      "hi": 0.15,
+      "at bound": false,
+      "restart spread (of range)": 0.21
+    },
+    {
+      "species": "fir",
+      "param": "r3.c",
+      "hand": 0.05,
+      "fitted": 0.0194,
+      "lo": 0.01,
+      "hi": 0.3,
+      "at bound": false,
+      "restart spread (of range)": 0.35
+    },
+    {
+      "species": "fir",
+      "param": "r6.qMin",
+      "hand": 0.02,
+      "fitted": 0.0103,
+      "lo": 0.01,
+      "hi": 0.2,
+      "at bound": true,
+      "restart spread (of range)": 0.08
+    },
+    {
+      "species": "fir",
+      "param": "r6.leafArea",
+      "hand": 2.4,
+      "fitted": 2.311,
+      "lo": 1,
+      "hi": 3,
+      "at bound": false,
+      "restart spread (of range)": 0.14
+    },
+    {
+      "species": "hornbeam",
+      "param": "c3.alpha",
+      "hand": 3,
+      "fitted": 2.77,
+      "lo": 2.5,
+      "hi": 6,
+      "at bound": false,
+      "restart spread (of range)": 0.05
+    },
+    {
+      "species": "hornbeam",
+      "param": "r2.levels.0.lambda",
+      "hand": 0.51,
+      "fitted": 0.5207,
+      "lo": 0.5,
+      "hi": 0.6,
+      "at bound": false,
+      "restart spread (of range)": 0.12
+    },
+    {
+      "species": "hornbeam",
+      "param": "r2.levels.1.lambda",
+      "hand": 0.5,
+      "fitted": 0.4905,
+      "lo": 0.48,
+      "hi": 0.58,
+      "at bound": false,
+      "restart spread (of range)": 0.05
+    },
+    {
+      "species": "hornbeam",
+      "param": "r2.levels.1.setPoint",
+      "hand": 50,
+      "fitted": 35.44,
+      "lo": 20,
+      "hi": 90,
+      "at bound": false,
+      "restart spread (of range)": 0.03
+    },
+    {
+      "species": "hornbeam",
+      "param": "r2.levels.1.branchAngle",
+      "hand": 45,
+      "fitted": 49.86,
+      "lo": 25,
+      "hi": 70,
+      "at bound": false,
+      "restart spread (of range)": 0.04
+    },
+    {
+      "species": "hornbeam",
+      "param": "r2.levels.1.eta",
+      "hand": 0.4,
+      "fitted": 0.5619,
+      "lo": 0.05,
+      "hi": 1.5,
+      "at bound": false,
+      "restart spread (of range)": 0.11
+    },
+    {
+      "species": "hornbeam",
+      "param": "r2.levels.2.setPoint",
+      "hand": 75,
+      "fitted": 48.57,
+      "lo": 40,
+      "hi": 160,
+      "at bound": false,
+      "restart spread (of range)": 0.02
+    },
+    {
+      "species": "hornbeam",
+      "param": "r2.aC",
+      "hand": 20,
+      "fitted": 7.107,
+      "lo": 0,
+      "hi": 40,
+      "at bound": false,
+      "restart spread (of range)": 0.06
+    },
+    {
+      "species": "hornbeam",
+      "param": "r2.dLambda",
+      "hand": 0.05,
+      "fitted": 0.0448,
+      "lo": 0,
+      "hi": 0.12,
+      "at bound": false,
+      "restart spread (of range)": 0.06
+    },
+    {
+      "species": "hornbeam",
+      "param": "r2.kappa",
+      "hand": null,
+      "fitted": 0.0786,
+      "lo": 0,
+      "hi": 4,
+      "at bound": true,
+      "restart spread (of range)": 0.0
+    },
+    {
+      "species": "hornbeam",
+      "param": "c5.Trel",
+      "hand": 0.02,
+      "fitted": 0.0315,
+      "lo": 0.005,
+      "hi": 0.6,
+      "at bound": false,
+      "restart spread (of range)": 0.05
+    },
+    {
+      "species": "hornbeam",
+      "param": "c6.r0",
+      "hand": 0.02,
+      "fitted": 0.0206,
+      "lo": 0.015,
+      "hi": 0.05,
+      "at bound": false,
+      "restart spread (of range)": 0.04
+    },
+    {
+      "species": "hornbeam",
+      "param": "r1.Lh",
+      "hand": 50,
+      "fitted": 133.9,
+      "lo": 10,
+      "hi": 200,
+      "at bound": false,
+      "restart spread (of range)": 0.14
+    },
+    {
+      "species": "hornbeam",
+      "param": "r1.mf",
+      "hand": 0.045,
+      "fitted": 0.0911,
+      "lo": 0.02,
+      "hi": 0.15,
+      "at bound": false,
+      "restart spread (of range)": 0.16
+    },
+    {
+      "species": "hornbeam",
+      "param": "r3.c",
+      "hand": 0.15,
+      "fitted": 0.0759,
+      "lo": 0.01,
+      "hi": 0.3,
+      "at bound": false,
+      "restart spread (of range)": 0.02
+    },
+    {
+      "species": "hornbeam",
+      "param": "r6.qMin",
+      "hand": 0.03,
+      "fitted": 0.0119,
+      "lo": 0.01,
+      "hi": 0.2,
+      "at bound": true,
+      "restart spread (of range)": 0.0
+    },
+    {
+      "species": "hornbeam",
+      "param": "r6.leafArea",
+      "hand": 2.3,
+      "fitted": 2.122,
+      "lo": 1,
+      "hi": 3,
+      "at bound": false,
+      "restart spread (of range)": 0.07
+    },
+    {
+      "species": "maple",
+      "param": "c3.alpha",
+      "hand": 3.2,
+      "fitted": 3.663,
+      "lo": 2.5,
+      "hi": 6,
+      "at bound": false,
+      "restart spread (of range)": 0.1
+    },
+    {
+      "species": "maple",
+      "param": "r2.levels.0.lambda",
+      "hand": 0.52,
+      "fitted": 0.5316,
+      "lo": 0.5,
+      "hi": 0.6,
+      "at bound": false,
+      "restart spread (of range)": 0.12
+    },
+    {
+      "species": "maple",
+      "param": "r2.levels.1.lambda",
+      "hand": 0.5,
+      "fitted": 0.4881,
+      "lo": 0.48,
+      "hi": 0.58,
+      "at bound": false,
+      "restart spread (of range)": 0.05
+    },
+    {
+      "species": "maple",
+      "param": "r2.levels.1.setPoint",
+      "hand": 45,
+      "fitted": 49.76,
+      "lo": 20,
+      "hi": 90,
+      "at bound": false,
+      "restart spread (of range)": 0.11
+    },
+    {
+      "species": "maple",
+      "param": "r2.levels.1.branchAngle",
+      "hand": 45,
+      "fitted": 49.01,
+      "lo": 25,
+      "hi": 70,
+      "at bound": false,
+      "restart spread (of range)": 0.14
+    },
+    {
+      "species": "maple",
+      "param": "r2.levels.1.eta",
+      "hand": 0.3,
+      "fitted": 0.3501,
+      "lo": 0.05,
+      "hi": 1.5,
+      "at bound": false,
+      "restart spread (of range)": 0.16
+    },
+    {
+      "species": "maple",
+      "param": "r2.levels.2.setPoint",
+      "hand": 65,
+      "fitted": 44.43,
+      "lo": 40,
+      "hi": 160,
+      "at bound": false,
+      "restart spread (of range)": 0.33
+    },
+    {
+      "species": "maple",
+      "param": "r2.aC",
+      "hand": 12,
+      "fitted": 6.282,
+      "lo": 0,
+      "hi": 40,
+      "at bound": false,
+      "restart spread (of range)": 0.05
+    },
+    {
+      "species": "maple",
+      "param": "r2.dLambda",
+      "hand": 0.06,
+      "fitted": 0.0511,
+      "lo": 0,
+      "hi": 0.12,
+      "at bound": false,
+      "restart spread (of range)": 0.2
+    },
+    {
+      "species": "maple",
+      "param": "r2.kappa",
+      "hand": null,
+      "fitted": 0.0241,
+      "lo": 0,
+      "hi": 4,
+      "at bound": true,
+      "restart spread (of range)": 0.21
+    },
+    {
+      "species": "maple",
+      "param": "c5.Trel",
+      "hand": 0.06,
+      "fitted": 0.2023,
+      "lo": 0.005,
+      "hi": 0.6,
+      "at bound": false,
+      "restart spread (of range)": 0.1
+    },
+    {
+      "species": "maple",
+      "param": "c6.r0",
+      "hand": 0.024,
+      "fitted": 0.0193,
+      "lo": 0.015,
+      "hi": 0.05,
+      "at bound": false,
+      "restart spread (of range)": 0.15
+    },
+    {
+      "species": "maple",
+      "param": "r1.Lh",
+      "hand": 45,
+      "fitted": 19.49,
+      "lo": 10,
+      "hi": 200,
+      "at bound": false,
+      "restart spread (of range)": 0.01
+    },
+    {
+      "species": "maple",
+      "param": "r1.mf",
+      "hand": 0.04,
+      "fitted": 0.0673,
+      "lo": 0.02,
+      "hi": 0.15,
+      "at bound": false,
+      "restart spread (of range)": 0.07
+    },
+    {
+      "species": "maple",
+      "param": "r3.c",
+      "hand": 0.15,
+      "fitted": 0.03,
+      "lo": 0.01,
+      "hi": 0.3,
+      "at bound": false,
+      "restart spread (of range)": 0.07
+    },
+    {
+      "species": "maple",
+      "param": "r6.qMin",
+      "hand": 0.045,
+      "fitted": 0.0498,
+      "lo": 0.01,
+      "hi": 0.2,
+      "at bound": false,
+      "restart spread (of range)": 0.03
+    },
+    {
+      "species": "maple",
+      "param": "r6.leafArea",
+      "hand": 1.5,
+      "fitted": 2.294,
+      "lo": 1,
+      "hi": 3,
+      "at bound": false,
+      "restart spread (of range)": 0.05
+    },
+    {
+      "species": "holly",
+      "param": "c3.alpha",
+      "hand": 2.6,
+      "fitted": 2.605,
+      "lo": 1.8,
+      "hi": 4.5,
+      "at bound": false,
+      "restart spread (of range)": 0.07
+    },
+    {
+      "species": "holly",
+      "param": "r2.levels.0.lambda",
+      "hand": 0.52,
+      "fitted": 0.5444,
+      "lo": 0.5,
+      "hi": 0.6,
+      "at bound": false,
+      "restart spread (of range)": 0.06
+    },
+    {
+      "species": "holly",
+      "param": "r2.levels.1.lambda",
+      "hand": 0.5,
+      "fitted": 0.5067,
+      "lo": 0.48,
+      "hi": 0.58,
+      "at bound": false,
+      "restart spread (of range)": 0.02
+    },
+    {
+      "species": "holly",
+      "param": "r2.levels.1.setPoint",
+      "hand": 70,
+      "fitted": 75.61,
+      "lo": 20,
+      "hi": 90,
+      "at bound": false,
+      "restart spread (of range)": 0.05
+    },
+    {
+      "species": "holly",
+      "param": "r2.levels.1.branchAngle",
+      "hand": 60,
+      "fitted": 61.3,
+      "lo": 35,
+      "hi": 80,
+      "at bound": false,
+      "restart spread (of range)": 0.14
+    },
+    {
+      "species": "holly",
+      "param": "r2.levels.1.eta",
+      "hand": 0.35,
+      "fitted": 0.3498,
+      "lo": 0.05,
+      "hi": 1.5,
+      "at bound": false,
+      "restart spread (of range)": 0.08
+    },
+    {
+      "species": "holly",
+      "param": "r2.levels.2.setPoint",
+      "hand": 75,
+      "fitted": 72.7,
+      "lo": 40,
+      "hi": 160,
+      "at bound": false,
+      "restart spread (of range)": 0.09
+    },
+    {
+      "species": "holly",
+      "param": "r2.aC",
+      "hand": 0,
+      "fitted": 3.714,
+      "lo": 0,
+      "hi": 40,
+      "at bound": false,
+      "restart spread (of range)": 0.2
+    },
+    {
+      "species": "holly",
+      "param": "r2.dLambda",
+      "hand": 0,
+      "fitted": 0.0267,
+      "lo": 0,
+      "hi": 0.12,
+      "at bound": false,
+      "restart spread (of range)": 0.0
+    },
+    {
+      "species": "holly",
+      "param": "r2.kappa",
+      "hand": null,
+      "fitted": 1.565,
+      "lo": 0,
+      "hi": 4,
+      "at bound": false,
+      "restart spread (of range)": 0.07
+    },
+    {
+      "species": "holly",
+      "param": "c5.Trel",
+      "hand": 0.02,
+      "fitted": 0.0987,
+      "lo": 0.005,
+      "hi": 0.6,
+      "at bound": false,
+      "restart spread (of range)": 0.04
+    },
+    {
+      "species": "holly",
+      "param": "c6.r0",
+      "hand": 0.026,
+      "fitted": 0.0289,
+      "lo": 0.015,
+      "hi": 0.05,
+      "at bound": false,
+      "restart spread (of range)": 0.05
+    },
+    {
+      "species": "holly",
+      "param": "r1.Lh",
+      "hand": 25,
+      "fitted": 14.06,
+      "lo": 10,
+      "hi": 200,
+      "at bound": false,
+      "restart spread (of range)": 0.01
+    },
+    {
+      "species": "holly",
+      "param": "r1.mf",
+      "hand": 0.03,
+      "fitted": 0.0558,
+      "lo": 0.02,
+      "hi": 0.15,
+      "at bound": false,
+      "restart spread (of range)": 0.1
+    },
+    {
+      "species": "holly",
+      "param": "r3.c",
+      "hand": 0.15,
+      "fitted": 0.0957,
+      "lo": 0.01,
+      "hi": 0.3,
+      "at bound": false,
+      "restart spread (of range)": 0.24
+    },
+    {
+      "species": "holly",
+      "param": "r6.qMin",
+      "hand": 0.03,
+      "fitted": 0.0682,
+      "lo": 0.01,
+      "hi": 0.2,
+      "at bound": false,
+      "restart spread (of range)": 0.11
+    },
+    {
+      "species": "holly",
+      "param": "r6.leafArea",
+      "hand": 2.6,
+      "fitted": 2.661,
+      "lo": 1,
+      "hi": 3,
+      "at bound": false,
+      "restart spread (of range)": 0.13
+    },
+    {
+      "species": "rowan",
+      "param": "c3.alpha",
+      "hand": 3.6,
+      "fitted": 2.696,
+      "lo": 2.5,
+      "hi": 6,
+      "at bound": false,
+      "restart spread (of range)": 0.29
+    },
+    {
+      "species": "rowan",
+      "param": "r2.levels.0.lambda",
+      "hand": 0.54,
+      "fitted": 0.5411,
+      "lo": 0.5,
+      "hi": 0.6,
+      "at bound": false,
+      "restart spread (of range)": 0.12
+    },
+    {
+      "species": "rowan",
+      "param": "r2.levels.1.lambda",
+      "hand": 0.52,
+      "fitted": 0.4946,
+      "lo": 0.48,
+      "hi": 0.58,
+      "at bound": false,
+      "restart spread (of range)": 0.1
+    },
+    {
+      "species": "rowan",
+      "param": "r2.levels.1.setPoint",
+      "hand": 40,
+      "fitted": 44.78,
+      "lo": 20,
+      "hi": 90,
+      "at bound": false,
+      "restart spread (of range)": 0.06
+    },
+    {
+      "species": "rowan",
+      "param": "r2.levels.1.branchAngle",
+      "hand": 35,
+      "fitted": 28.58,
+      "lo": 20,
+      "hi": 60,
+      "at bound": false,
+      "restart spread (of range)": 0.06
+    },
+    {
+      "species": "rowan",
+      "param": "r2.levels.1.eta",
+      "hand": 0.35,
+      "fitted": 0.2546,
+      "lo": 0.05,
+      "hi": 1.5,
+      "at bound": false,
+      "restart spread (of range)": 0.06
+    },
+    {
+      "species": "rowan",
+      "param": "r2.levels.2.setPoint",
+      "hand": 60,
+      "fitted": 48.24,
+      "lo": 40,
+      "hi": 160,
+      "at bound": false,
+      "restart spread (of range)": 0.02
+    },
+    {
+      "species": "rowan",
+      "param": "r2.aC",
+      "hand": 12,
+      "fitted": 8.92,
+      "lo": 0,
+      "hi": 40,
+      "at bound": false,
+      "restart spread (of range)": 0.01
+    },
+    {
+      "species": "rowan",
+      "param": "r2.dLambda",
+      "hand": 0.05,
+      "fitted": 0.0464,
+      "lo": 0,
+      "hi": 0.12,
+      "at bound": false,
+      "restart spread (of range)": 0.19
+    },
+    {
+      "species": "rowan",
+      "param": "r2.kappa",
+      "hand": null,
+      "fitted": 0.6265,
+      "lo": 0,
+      "hi": 4,
+      "at bound": false,
+      "restart spread (of range)": 0.1
+    },
+    {
+      "species": "rowan",
+      "param": "c5.Trel",
+      "hand": 0.2,
+      "fitted": 0.1944,
+      "lo": 0.005,
+      "hi": 0.6,
+      "at bound": false,
+      "restart spread (of range)": 0.04
+    },
+    {
+      "species": "rowan",
+      "param": "c6.r0",
+      "hand": 0.026,
+      "fitted": 0.0303,
+      "lo": 0.015,
+      "hi": 0.05,
+      "at bound": false,
+      "restart spread (of range)": 0.11
+    },
+    {
+      "species": "rowan",
+      "param": "r1.Lh",
+      "hand": 38,
+      "fitted": 16.41,
+      "lo": 10,
+      "hi": 200,
+      "at bound": false,
+      "restart spread (of range)": 0.02
+    },
+    {
+      "species": "rowan",
+      "param": "r1.mf",
+      "hand": 0.08,
+      "fitted": 0.0289,
+      "lo": 0.02,
+      "hi": 0.15,
+      "at bound": false,
+      "restart spread (of range)": 0.14
+    },
+    {
+      "species": "rowan",
+      "param": "r3.c",
+      "hand": 0.05,
+      "fitted": 0.0977,
+      "lo": 0.01,
+      "hi": 0.3,
+      "at bound": false,
+      "restart spread (of range)": 0.21
+    },
+    {
+      "species": "rowan",
+      "param": "r6.qMin",
+      "hand": 0.06,
+      "fitted": 0.0944,
+      "lo": 0.01,
+      "hi": 0.2,
+      "at bound": false,
+      "restart spread (of range)": 0.16
+    },
+    {
+      "species": "rowan",
+      "param": "r6.leafArea",
+      "hand": 1.5,
+      "fitted": 2.393,
+      "lo": 1,
+      "hi": 3,
+      "at bound": false,
+      "restart spread (of range)": 0.14
+    },
+    {
+      "species": "willow",
+      "param": "c3.alpha",
+      "hand": 5.5,
+      "fitted": 4.678,
+      "lo": 3,
+      "hi": 7,
+      "at bound": false,
+      "restart spread (of range)": 0.05
+    },
+    {
+      "species": "willow",
+      "param": "r2.levels.0.lambda",
+      "hand": 0.52,
+      "fitted": 0.503,
+      "lo": 0.5,
+      "hi": 0.6,
+      "at bound": false,
+      "restart spread (of range)": 0.06
+    },
+    {
+      "species": "willow",
+      "param": "r2.levels.1.lambda",
+      "hand": 0.5,
+      "fitted": 0.5191,
+      "lo": 0.48,
+      "hi": 0.58,
+      "at bound": false,
+      "restart spread (of range)": 0.05
+    },
+    {
+      "species": "willow",
+      "param": "r2.levels.1.setPoint",
+      "hand": 55,
+      "fitted": 42.64,
+      "lo": 20,
+      "hi": 90,
+      "at bound": false,
+      "restart spread (of range)": 0.06
+    },
+    {
+      "species": "willow",
+      "param": "r2.levels.1.branchAngle",
+      "hand": 50,
+      "fitted": 48.52,
+      "lo": 25,
+      "hi": 70,
+      "at bound": false,
+      "restart spread (of range)": 0.06
+    },
+    {
+      "species": "willow",
+      "param": "r2.levels.1.eta",
+      "hand": 0.25,
+      "fitted": 0.4445,
+      "lo": 0.05,
+      "hi": 1.5,
+      "at bound": false,
+      "restart spread (of range)": 0.14
+    },
+    {
+      "species": "willow",
+      "param": "r2.levels.2.setPoint",
+      "hand": 70,
+      "fitted": 60.43,
+      "lo": 40,
+      "hi": 160,
+      "at bound": false,
+      "restart spread (of range)": 0.27
+    },
+    {
+      "species": "willow",
+      "param": "r2.aC",
+      "hand": 6,
+      "fitted": 1.784,
+      "lo": 0,
+      "hi": 40,
+      "at bound": false,
+      "restart spread (of range)": 0.05
+    },
+    {
+      "species": "willow",
+      "param": "r2.dLambda",
+      "hand": 0.07,
+      "fitted": 0.0203,
+      "lo": 0,
+      "hi": 0.12,
+      "at bound": false,
+      "restart spread (of range)": 0.07
+    },
+    {
+      "species": "willow",
+      "param": "r2.kappa",
+      "hand": null,
+      "fitted": 1.234,
+      "lo": 0,
+      "hi": 4,
+      "at bound": false,
+      "restart spread (of range)": 0.18
+    },
+    {
+      "species": "willow",
+      "param": "c5.Trel",
+      "hand": 0.25,
+      "fitted": 0.2539,
+      "lo": 0.005,
+      "hi": 0.6,
+      "at bound": false,
+      "restart spread (of range)": 0.1
+    },
+    {
+      "species": "willow",
+      "param": "c6.r0",
+      "hand": 0.03,
+      "fitted": 0.0176,
+      "lo": 0.015,
+      "hi": 0.05,
+      "at bound": false,
+      "restart spread (of range)": 0.07
+    },
+    {
+      "species": "willow",
+      "param": "r1.Lh",
+      "hand": 30,
+      "fitted": 15.35,
+      "lo": 10,
+      "hi": 200,
+      "at bound": false,
+      "restart spread (of range)": 0.02
+    },
+    {
+      "species": "willow",
+      "param": "r1.mf",
+      "hand": 0.12,
+      "fitted": 0.0676,
+      "lo": 0.02,
+      "hi": 0.15,
+      "at bound": false,
+      "restart spread (of range)": 0.17
+    },
+    {
+      "species": "willow",
+      "param": "r3.c",
+      "hand": 0.05,
+      "fitted": 0.1026,
+      "lo": 0.01,
+      "hi": 0.3,
+      "at bound": false,
+      "restart spread (of range)": 0.03
+    },
+    {
+      "species": "willow",
+      "param": "r6.qMin",
+      "hand": 0.12,
+      "fitted": 0.0987,
+      "lo": 0.01,
+      "hi": 0.2,
+      "at bound": false,
+      "restart spread (of range)": 0.21
+    },
+    {
+      "species": "willow",
+      "param": "r6.leafArea",
+      "hand": 1.5,
+      "fitted": 2.103,
+      "lo": 1,
+      "hi": 3,
+      "at bound": false,
+      "restart spread (of range)": 0.08
+    },
+    {
+      "species": "pine",
+      "param": "c3.alpha",
+      "hand": 3.8,
+      "fitted": 2.513,
+      "lo": 2.5,
+      "hi": 6,
+      "at bound": true,
+      "restart spread (of range)": 0.04
+    },
+    {
+      "species": "pine",
+      "param": "r2.levels.0.lambda",
+      "hand": 0.51,
+      "fitted": 0.5401,
+      "lo": 0.5,
+      "hi": 0.6,
+      "at bound": false,
+      "restart spread (of range)": 0.03
+    },
+    {
+      "species": "pine",
+      "param": "r2.levels.1.lambda",
+      "hand": 0.51,
+      "fitted": 0.4916,
+      "lo": 0.48,
+      "hi": 0.58,
+      "at bound": false,
+      "restart spread (of range)": 0.03
+    },
+    {
+      "species": "pine",
+      "param": "r2.levels.1.setPoint",
+      "hand": 75,
+      "fitted": 61.27,
+      "lo": 20,
+      "hi": 90,
+      "at bound": false,
+      "restart spread (of range)": 0.05
+    },
+    {
+      "species": "pine",
+      "param": "r2.levels.1.branchAngle",
+      "hand": 70,
+      "fitted": 81.57,
+      "lo": 50,
+      "hi": 90,
+      "at bound": false,
+      "restart spread (of range)": 0.15
+    },
+    {
+      "species": "pine",
+      "param": "r2.levels.1.eta",
+      "hand": 1.5,
+      "fitted": 1.558,
+      "lo": 1.5,
+      "hi": 2,
+      "at bound": false,
+      "restart spread (of range)": 0.05
+    },
+    {
+      "species": "pine",
+      "param": "r2.levels.2.setPoint",
+      "hand": 80,
+      "fitted": 72.08,
+      "lo": 40,
+      "hi": 160,
+      "at bound": false,
+      "restart spread (of range)": 0.06
+    },
+    {
+      "species": "pine",
+      "param": "r2.aC",
+      "hand": 30,
+      "fitted": 5.486,
+      "lo": 0,
+      "hi": 40,
+      "at bound": false,
+      "restart spread (of range)": 0.34
+    },
+    {
+      "species": "pine",
+      "param": "r2.dLambda",
+      "hand": 0.06,
+      "fitted": 0.0114,
+      "lo": 0,
+      "hi": 0.12,
+      "at bound": false,
+      "restart spread (of range)": 0.06
+    },
+    {
+      "species": "pine",
+      "param": "r2.kappa",
+      "hand": null,
+      "fitted": 0.1719,
+      "lo": 0,
+      "hi": 4,
+      "at bound": false,
+      "restart spread (of range)": 0.08
+    },
+    {
+      "species": "pine",
+      "param": "c5.Trel",
+      "hand": 0.3,
+      "fitted": 0.3516,
+      "lo": 0.005,
+      "hi": 0.6,
+      "at bound": false,
+      "restart spread (of range)": 0.04
+    },
+    {
+      "species": "pine",
+      "param": "c6.r0",
+      "hand": 0.03,
+      "fitted": 0.0272,
+      "lo": 0.015,
+      "hi": 0.05,
+      "at bound": false,
+      "restart spread (of range)": 0.06
+    },
+    {
+      "species": "pine",
+      "param": "r1.Lh",
+      "hand": 60,
+      "fitted": 45.66,
+      "lo": 10,
+      "hi": 200,
+      "at bound": false,
+      "restart spread (of range)": 0.11
+    },
+    {
+      "species": "pine",
+      "param": "r1.mf",
+      "hand": 0.09,
+      "fitted": 0.0782,
+      "lo": 0.02,
+      "hi": 0.15,
+      "at bound": false,
+      "restart spread (of range)": 0.17
+    },
+    {
+      "species": "pine",
+      "param": "r3.c",
+      "hand": 0.05,
+      "fitted": 0.0678,
+      "lo": 0.01,
+      "hi": 0.3,
+      "at bound": false,
+      "restart spread (of range)": 0.06
+    },
+    {
+      "species": "pine",
+      "param": "r6.qMin",
+      "hand": 0.15,
+      "fitted": 0.1722,
+      "lo": 0.01,
+      "hi": 0.2,
+      "at bound": false,
+      "restart spread (of range)": 0.22
+    },
+    {
+      "species": "pine",
+      "param": "r6.leafArea",
+      "hand": 1.4,
+      "fitted": 2.83,
+      "lo": 1,
+      "hi": 3,
+      "at bound": false,
+      "restart spread (of range)": 0.21
+    }
+  ],
+  "links": {
+    "birch": "https://epabarker.github.io/tree-simulation/?preset=birchWood&seed=1&p=eyJzcGVjaWVzIjp7ImJpcmNoIjp7ImNvbW1vbiI6IlNpbHZlciBiaXJjaCIsImxhdGluIjoiQmV0dWxhIHBlbmR1bGEiLCJsZWFmIjoic21hbGwiLCJjMyI6eyJtb2RlIjoiYmgiLCJsYW1iZGEiOjAuNSwiYWxwaGEiOjMuMDU2fSwiYzUiOnsiZW5hYmxlZCI6dHJ1ZSwiVCI6MC4xLCJnIjozLCJUcmVsIjowLjM0NTEsInRvcFF1YW50aWxlIjowLjl9LCJjNiI6eyJlbmFibGVkIjp0cnVlLCJuIjoyLCJyMCI6MC4wNDQ3NH0sInIxIjp7ImVuYWJsZWQiOnRydWUsIm13IjoxLCJtZiI6MC4wNzc0MSwiTGgiOjQ5Ljk1LCJoeWRyYXVsaWMiOiJoeXBlcmJvbGljIiwic3IiOjAuMSwiZlJlcCI6MC4xLCJtYXR1cml0eSI6NDAsImtTdGFydmUiOjMsInJlc2VydmUwIjoyLCJzdG9yZSI6Miwic2hlZCI6ImNhcmJvbiJ9LCJyMiI6eyJlbmFibGVkIjp0cnVlLCJsZXZlbHMiOlt7ImxhbWJkYSI6MC41ODgyLCJzZXRQb2ludCI6MCwiZXRhIjowLjMsImJyYW5jaEFuZ2xlIjo0NSwiZ2VuZXJhdG9yIjoiZGlzdGljaG91cyIsInRpZXJFdmVyeSI6MCwicFRlcm0iOjB9LHsibGFtYmRhIjowLjUxMjYsInNldFBvaW50Ijo3Mi41MywiZXRhIjowLjA3ODk2LCJicmFuY2hBbmdsZSI6MzcuODMsImdlbmVyYXRvciI6ImRpc3RpY2hvdXMiLCJ0aWVyRXZlcnkiOjAsInBUZXJtIjowLCJwb3N0dXJlU2V0UG9pbnQiOjcwfSx7ImxhbWJkYSI6MC41LCJzZXRQb2ludCI6MTMxLjYsImV0YSI6MC4yNSwiYnJhbmNoQW5nbGUiOjQwLCJnZW5lcmF0b3IiOiJkaXN0aWNob3VzIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MH1dLCJhQyI6MjIuNjEsImRMYW1iZGEiOjAuMDgxNTksInJhbXAiOjIwLCJrYXBwYSI6MC4zNDV9LCJyMyI6eyJlbmFibGVkIjp0cnVlLCJyaG8iOjEsImxlYWZNYXNzIjowLjAwMSwiRSI6MTAwMDAwMCwic2FnIjoiaW5jcmVtZW50IiwicGhpIjowLjUsInBvc3R1cmUiOnRydWUsImJldGFHIjowLjEsImdhbW1hIjowLjIsImMiOjAuMTg2LCJzaWdtYVRhcmdldCI6MzAwMCwiZ2lydGhHYWluIjowLjMsInNpZ21hQnJlYWsiOjQ1MDAsImdyb3VuZCI6dHJ1ZX0sInI0Ijp7InFSZWwiOjAuM30sInI2Ijp7ImVuYWJsZWQiOnRydWUsInFNaW4iOjAuMTEzLCJsZWFmQXJlYSI6Mi4xOTJ9LCJvNCI6eyJjU2VlZCI6MiwiZCI6NDAsInFFc3QiOjAuMjUsInBFc3QiOjAuMywibTAiOjAuMDA4LCJyYWluIjowLjJ9fX19",
+    "birch (open)": "https://epabarker.github.io/tree-simulation/?preset=oakOpen&seed=1&p=eyJ0cmVlcyI6W3sieCI6ODAsInNwZWNpZXMiOiJiaXJjaCJ9XSwic3BlY2llcyI6eyJiaXJjaCI6eyJjb21tb24iOiJTaWx2ZXIgYmlyY2giLCJsYXRpbiI6IkJldHVsYSBwZW5kdWxhIiwibGVhZiI6InNtYWxsIiwiYzMiOnsibW9kZSI6ImJoIiwibGFtYmRhIjowLjUsImFscGhhIjozLjA1Nn0sImM1Ijp7ImVuYWJsZWQiOnRydWUsIlQiOjAuMSwiZyI6MywiVHJlbCI6MC4zNDUxLCJ0b3BRdWFudGlsZSI6MC45fSwiYzYiOnsiZW5hYmxlZCI6dHJ1ZSwibiI6MiwicjAiOjAuMDQ0NzR9LCJyMSI6eyJlbmFibGVkIjp0cnVlLCJtdyI6MSwibWYiOjAuMDc3NDEsIkxoIjo0OS45NSwiaHlkcmF1bGljIjoiaHlwZXJib2xpYyIsInNyIjowLjEsImZSZXAiOjAuMSwibWF0dXJpdHkiOjQwLCJrU3RhcnZlIjozLCJyZXNlcnZlMCI6Miwic3RvcmUiOjIsInNoZWQiOiJjYXJib24ifSwicjIiOnsiZW5hYmxlZCI6dHJ1ZSwibGV2ZWxzIjpbeyJsYW1iZGEiOjAuNTg4Miwic2V0UG9pbnQiOjAsImV0YSI6MC4zLCJicmFuY2hBbmdsZSI6NDUsImdlbmVyYXRvciI6ImRpc3RpY2hvdXMiLCJ0aWVyRXZlcnkiOjAsInBUZXJtIjowfSx7ImxhbWJkYSI6MC41MTI2LCJzZXRQb2ludCI6NzIuNTMsImV0YSI6MC4wNzg5NiwiYnJhbmNoQW5nbGUiOjM3LjgzLCJnZW5lcmF0b3IiOiJkaXN0aWNob3VzIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MCwicG9zdHVyZVNldFBvaW50Ijo3MH0seyJsYW1iZGEiOjAuNSwic2V0UG9pbnQiOjEzMS42LCJldGEiOjAuMjUsImJyYW5jaEFuZ2xlIjo0MCwiZ2VuZXJhdG9yIjoiZGlzdGljaG91cyIsInRpZXJFdmVyeSI6MCwicFRlcm0iOjB9XSwiYUMiOjIyLjYxLCJkTGFtYmRhIjowLjA4MTU5LCJyYW1wIjoyMCwia2FwcGEiOjAuMzQ1fSwicjMiOnsiZW5hYmxlZCI6dHJ1ZSwicmhvIjoxLCJsZWFmTWFzcyI6MC4wMDEsIkUiOjEwMDAwMDAsInNhZyI6ImluY3JlbWVudCIsInBoaSI6MC41LCJwb3N0dXJlIjp0cnVlLCJiZXRhRyI6MC4xLCJnYW1tYSI6MC4yLCJjIjowLjE4Niwic2lnbWFUYXJnZXQiOjMwMDAsImdpcnRoR2FpbiI6MC4zLCJzaWdtYUJyZWFrIjo0NTAwLCJncm91bmQiOnRydWV9LCJyNCI6eyJxUmVsIjowLjN9LCJyNiI6eyJlbmFibGVkIjp0cnVlLCJxTWluIjowLjExMywibGVhZkFyZWEiOjIuMTkyfSwibzQiOnsiY1NlZWQiOjIsImQiOjQwLCJxRXN0IjowLjI1LCJwRXN0IjowLjMsIm0wIjowLjAwOCwicmFpbiI6MC4yfX19fQ",
+    "beech": "https://epabarker.github.io/tree-simulation/?preset=beechWood&seed=1&p=eyJzcGVjaWVzIjp7ImJlZWNoIjp7ImNvbW1vbiI6IkJlZWNoIiwibGF0aW4iOiJGYWd1cyBzeWx2YXRpY2EiLCJsZWFmIjoiYmVlY2giLCJjNSI6eyJlbmFibGVkIjp0cnVlLCJUIjowLjAxLCJnIjozLCJUcmVsIjowLjA5NTgsInRvcFF1YW50aWxlIjowLjl9LCJyMSI6eyJlbmFibGVkIjp0cnVlLCJtdyI6MSwibWYiOjAuMDIzNzYsIkxoIjo4Ni42MSwiaHlkcmF1bGljIjoiaHlwZXJib2xpYyIsInNyIjowLjEsImZSZXAiOjAuMSwibWF0dXJpdHkiOjQwLCJrU3RhcnZlIjozLCJyZXNlcnZlMCI6Miwic3RvcmUiOjIsInNoZWQiOiJjYXJib24ifSwicjIiOnsiZW5hYmxlZCI6dHJ1ZSwibGV2ZWxzIjpbeyJsYW1iZGEiOjAuNTUxNywic2V0UG9pbnQiOjQwLCJldGEiOjAuNCwiYnJhbmNoQW5nbGUiOjQ1LCJnZW5lcmF0b3IiOiJkaXN0aWNob3VzIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MCwicG9zdHVyZVNldFBvaW50IjowfSx7ImxhbWJkYSI6MC40OTM3LCJzZXRQb2ludCI6MzQuNjMsImV0YSI6MC4xMzI2LCJicmFuY2hBbmdsZSI6NTEuMTUsImdlbmVyYXRvciI6ImRpc3RpY2hvdXMiLCJ0aWVyRXZlcnkiOjAsInBUZXJtIjowfSx7ImxhbWJkYSI6MC41LCJzZXRQb2ludCI6NzAuMDcsImV0YSI6MC40LCJicmFuY2hBbmdsZSI6NDUsImdlbmVyYXRvciI6ImRpc3RpY2hvdXMiLCJ0aWVyRXZlcnkiOjAsInBUZXJtIjowfV0sImFDIjozLjQ0NywiZExhbWJkYSI6MC4wMzE2NSwicmFtcCI6MSwia2FwcGEiOjAuMTI2OH0sInIzIjp7ImVuYWJsZWQiOnRydWUsInJobyI6MSwibGVhZk1hc3MiOjAuMDAyLCJFIjoxMDAwMDAwLCJzYWciOiJpbmNyZW1lbnQiLCJwaGkiOjEsInBvc3R1cmUiOnRydWUsImJldGFHIjowLjIsImdhbW1hIjowLjIsImMiOjAuMDI4NzEsInNpZ21hVGFyZ2V0IjozMDAwLCJnaXJ0aEdhaW4iOjAuMywic2lnbWFCcmVhayI6NDUwMCwiZ3JvdW5kIjp0cnVlfSwicjYiOnsiZW5hYmxlZCI6dHJ1ZSwicU1pbiI6MC4wMTI4MSwibGVhZkFyZWEiOjIuMjk1fSwibzQiOnsiY1NlZWQiOjEwLCJkIjoxMiwicUVzdCI6MC4wMywicEVzdCI6MC4zLCJtMCI6MC4wMDJ9LCJjMyI6eyJtb2RlIjoiYmgiLCJsYW1iZGEiOjAuNSwiYWxwaGEiOjIuNzExfSwiYzYiOnsiZW5hYmxlZCI6dHJ1ZSwibiI6MiwicjAiOjAuMDIzNjd9fX19",
+    "beech (open)": "https://epabarker.github.io/tree-simulation/?preset=oakOpen&seed=1&p=eyJ0cmVlcyI6W3sieCI6ODAsInNwZWNpZXMiOiJiZWVjaCJ9XSwic3BlY2llcyI6eyJiZWVjaCI6eyJjb21tb24iOiJCZWVjaCIsImxhdGluIjoiRmFndXMgc3lsdmF0aWNhIiwibGVhZiI6ImJlZWNoIiwiYzUiOnsiZW5hYmxlZCI6dHJ1ZSwiVCI6MC4wMSwiZyI6MywiVHJlbCI6MC4wOTU4LCJ0b3BRdWFudGlsZSI6MC45fSwicjEiOnsiZW5hYmxlZCI6dHJ1ZSwibXciOjEsIm1mIjowLjAyMzc2LCJMaCI6ODYuNjEsImh5ZHJhdWxpYyI6Imh5cGVyYm9saWMiLCJzciI6MC4xLCJmUmVwIjowLjEsIm1hdHVyaXR5Ijo0MCwia1N0YXJ2ZSI6MywicmVzZXJ2ZTAiOjIsInN0b3JlIjoyLCJzaGVkIjoiY2FyYm9uIn0sInIyIjp7ImVuYWJsZWQiOnRydWUsImxldmVscyI6W3sibGFtYmRhIjowLjU1MTcsInNldFBvaW50Ijo0MCwiZXRhIjowLjQsImJyYW5jaEFuZ2xlIjo0NSwiZ2VuZXJhdG9yIjoiZGlzdGljaG91cyIsInRpZXJFdmVyeSI6MCwicFRlcm0iOjAsInBvc3R1cmVTZXRQb2ludCI6MH0seyJsYW1iZGEiOjAuNDkzNywic2V0UG9pbnQiOjM0LjYzLCJldGEiOjAuMTMyNiwiYnJhbmNoQW5nbGUiOjUxLjE1LCJnZW5lcmF0b3IiOiJkaXN0aWNob3VzIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MH0seyJsYW1iZGEiOjAuNSwic2V0UG9pbnQiOjcwLjA3LCJldGEiOjAuNCwiYnJhbmNoQW5nbGUiOjQ1LCJnZW5lcmF0b3IiOiJkaXN0aWNob3VzIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MH1dLCJhQyI6My40NDcsImRMYW1iZGEiOjAuMDMxNjUsInJhbXAiOjEsImthcHBhIjowLjEyNjh9LCJyMyI6eyJlbmFibGVkIjp0cnVlLCJyaG8iOjEsImxlYWZNYXNzIjowLjAwMiwiRSI6MTAwMDAwMCwic2FnIjoiaW5jcmVtZW50IiwicGhpIjoxLCJwb3N0dXJlIjp0cnVlLCJiZXRhRyI6MC4yLCJnYW1tYSI6MC4yLCJjIjowLjAyODcxLCJzaWdtYVRhcmdldCI6MzAwMCwiZ2lydGhHYWluIjowLjMsInNpZ21hQnJlYWsiOjQ1MDAsImdyb3VuZCI6dHJ1ZX0sInI2Ijp7ImVuYWJsZWQiOnRydWUsInFNaW4iOjAuMDEyODEsImxlYWZBcmVhIjoyLjI5NX0sIm80Ijp7ImNTZWVkIjoxMCwiZCI6MTIsInFFc3QiOjAuMDMsInBFc3QiOjAuMywibTAiOjAuMDAyfSwiYzMiOnsibW9kZSI6ImJoIiwibGFtYmRhIjowLjUsImFscGhhIjoyLjcxMX0sImM2Ijp7ImVuYWJsZWQiOnRydWUsIm4iOjIsInIwIjowLjAyMzY3fX19fQ",
+    "oak": "https://epabarker.github.io/tree-simulation/?preset=oakWood&seed=1&p=eyJzcGVjaWVzIjp7Im9hayI6eyJjb21tb24iOiJQZWR1bmN1bGF0ZSBvYWsiLCJsYXRpbiI6IlF1ZXJjdXMgcm9idXIiLCJsZWFmIjoib2FrIiwiYzMiOnsibW9kZSI6ImJoIiwibGFtYmRhIjowLjUsImFscGhhIjo0LjAxOX0sImM1Ijp7ImVuYWJsZWQiOnRydWUsIlQiOjAuMDUsImciOjMsIlRyZWwiOjAuMTg3NywidG9wUXVhbnRpbGUiOjAuOX0sInIxIjp7ImVuYWJsZWQiOnRydWUsIm13IjoxLCJtZiI6MC4wNTI2NCwiTGgiOjM3LjQyLCJoeWRyYXVsaWMiOiJoeXBlcmJvbGljIiwic3IiOjAuMSwiZlJlcCI6MC4xLCJtYXR1cml0eSI6NDAsImtTdGFydmUiOjMsInJlc2VydmUwIjoyLCJzdG9yZSI6Miwic2hlZCI6ImNhcmJvbiJ9LCJyMiI6eyJlbmFibGVkIjp0cnVlLCJsZXZlbHMiOlt7ImxhbWJkYSI6MC41NDc2LCJzZXRQb2ludCI6MCwiZXRhIjowLjI1LCJicmFuY2hBbmdsZSI6NDUsImdlbmVyYXRvciI6ImRpc3RpY2hvdXMiLCJ0aWVyRXZlcnkiOjAsInBUZXJtIjowfSx7ImxhbWJkYSI6MC41MjU0LCJzZXRQb2ludCI6NzguMiwiZXRhIjowLjE5MDYsImJyYW5jaEFuZ2xlIjo0NC4wMSwiZ2VuZXJhdG9yIjoiZGlzdGljaG91cyIsInRpZXJFdmVyeSI6MCwicFRlcm0iOjB9LHsibGFtYmRhIjowLjUsInNldFBvaW50Ijo0OS42NSwiZXRhIjowLjIsImJyYW5jaEFuZ2xlIjo1MCwiZ2VuZXJhdG9yIjoiZGlzdGljaG91cyIsInRpZXJFdmVyeSI6MCwicFRlcm0iOjB9XSwiYUMiOjkuMzEzLCJkTGFtYmRhIjowLjA4NDcsInJhbXAiOjE1LCJrYXBwYSI6MS44MTZ9LCJyMyI6eyJlbmFibGVkIjp0cnVlLCJyaG8iOjEsImxlYWZNYXNzIjowLjAwMiwiRSI6MjUwMDAwMCwic2FnIjoiaW5jcmVtZW50IiwicGhpIjoxLCJwb3N0dXJlIjp0cnVlLCJiZXRhRyI6MC4yLCJnYW1tYSI6MC4yLCJjIjowLjE3NCwic2lnbWFUYXJnZXQiOjMwMDAsImdpcnRoR2FpbiI6MC4zLCJzaWdtYUJyZWFrIjo0NTAwLCJncm91bmQiOnRydWV9LCJyNiI6eyJlbmFibGVkIjp0cnVlLCJxTWluIjowLjA1MzExLCJsZWFmQXJlYSI6MS4xOTJ9LCJvNCI6eyJjU2VlZCI6MTAsImQiOjI1LCJxRXN0IjowLjEsInBFc3QiOjAuMywibTAiOjAuMDAyfSwiYzYiOnsiZW5hYmxlZCI6dHJ1ZSwibiI6MiwicjAiOjAuMDM0NjN9fX19",
+    "oak (open)": "https://epabarker.github.io/tree-simulation/?preset=oakOpen&seed=1&p=eyJ0cmVlcyI6W3sieCI6ODAsInNwZWNpZXMiOiJvYWsifV0sInNwZWNpZXMiOnsib2FrIjp7ImNvbW1vbiI6IlBlZHVuY3VsYXRlIG9hayIsImxhdGluIjoiUXVlcmN1cyByb2J1ciIsImxlYWYiOiJvYWsiLCJjMyI6eyJtb2RlIjoiYmgiLCJsYW1iZGEiOjAuNSwiYWxwaGEiOjQuMDE5fSwiYzUiOnsiZW5hYmxlZCI6dHJ1ZSwiVCI6MC4wNSwiZyI6MywiVHJlbCI6MC4xODc3LCJ0b3BRdWFudGlsZSI6MC45fSwicjEiOnsiZW5hYmxlZCI6dHJ1ZSwibXciOjEsIm1mIjowLjA1MjY0LCJMaCI6MzcuNDIsImh5ZHJhdWxpYyI6Imh5cGVyYm9saWMiLCJzciI6MC4xLCJmUmVwIjowLjEsIm1hdHVyaXR5Ijo0MCwia1N0YXJ2ZSI6MywicmVzZXJ2ZTAiOjIsInN0b3JlIjoyLCJzaGVkIjoiY2FyYm9uIn0sInIyIjp7ImVuYWJsZWQiOnRydWUsImxldmVscyI6W3sibGFtYmRhIjowLjU0NzYsInNldFBvaW50IjowLCJldGEiOjAuMjUsImJyYW5jaEFuZ2xlIjo0NSwiZ2VuZXJhdG9yIjoiZGlzdGljaG91cyIsInRpZXJFdmVyeSI6MCwicFRlcm0iOjB9LHsibGFtYmRhIjowLjUyNTQsInNldFBvaW50Ijo3OC4yLCJldGEiOjAuMTkwNiwiYnJhbmNoQW5nbGUiOjQ0LjAxLCJnZW5lcmF0b3IiOiJkaXN0aWNob3VzIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MH0seyJsYW1iZGEiOjAuNSwic2V0UG9pbnQiOjQ5LjY1LCJldGEiOjAuMiwiYnJhbmNoQW5nbGUiOjUwLCJnZW5lcmF0b3IiOiJkaXN0aWNob3VzIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MH1dLCJhQyI6OS4zMTMsImRMYW1iZGEiOjAuMDg0NywicmFtcCI6MTUsImthcHBhIjoxLjgxNn0sInIzIjp7ImVuYWJsZWQiOnRydWUsInJobyI6MSwibGVhZk1hc3MiOjAuMDAyLCJFIjoyNTAwMDAwLCJzYWciOiJpbmNyZW1lbnQiLCJwaGkiOjEsInBvc3R1cmUiOnRydWUsImJldGFHIjowLjIsImdhbW1hIjowLjIsImMiOjAuMTc0LCJzaWdtYVRhcmdldCI6MzAwMCwiZ2lydGhHYWluIjowLjMsInNpZ21hQnJlYWsiOjQ1MDAsImdyb3VuZCI6dHJ1ZX0sInI2Ijp7ImVuYWJsZWQiOnRydWUsInFNaW4iOjAuMDUzMTEsImxlYWZBcmVhIjoxLjE5Mn0sIm80Ijp7ImNTZWVkIjoxMCwiZCI6MjUsInFFc3QiOjAuMSwicEVzdCI6MC4zLCJtMCI6MC4wMDJ9LCJjNiI6eyJlbmFibGVkIjp0cnVlLCJuIjoyLCJyMCI6MC4wMzQ2M319fX0",
+    "fir": "https://epabarker.github.io/tree-simulation/?preset=firWood&seed=1&p=eyJzcGVjaWVzIjp7ImZpciI6eyJjb21tb24iOiJTaWx2ZXIgZmlyIiwibGF0aW4iOiJBYmllcyBhbGJhIiwibGVhZiI6Im5lZWRsZSIsImM1Ijp7ImVuYWJsZWQiOnRydWUsIlQiOjAuMDIsImciOjMsIlRyZWwiOjAuMTEzMywidG9wUXVhbnRpbGUiOjAuOX0sImM2Ijp7ImVuYWJsZWQiOnRydWUsIm4iOjIsInIwIjowLjA0Mn0sInIxIjp7ImVuYWJsZWQiOnRydWUsIm13IjoxLCJtZiI6MC4wODc4NiwiTGgiOjIzLjMsImh5ZHJhdWxpYyI6Imh5cGVyYm9saWMiLCJzciI6MC4xLCJmUmVwIjowLjEsIm1hdHVyaXR5Ijo0MCwia1N0YXJ2ZSI6MywicmVzZXJ2ZTAiOjIsInN0b3JlIjoyLCJzaGVkIjoiY2FyYm9uIn0sInIyIjp7ImVuYWJsZWQiOnRydWUsImxldmVscyI6W3sibGFtYmRhIjowLjU4NzgsInNldFBvaW50IjowLCJldGEiOjAuNCwiYnJhbmNoQW5nbGUiOjQ1LCJnZW5lcmF0b3IiOiJ3aG9ybGVkIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MH0seyJsYW1iZGEiOjAuNTQzNywic2V0UG9pbnQiOjc5LjMzLCJldGEiOjEuOTYsImJyYW5jaEFuZ2xlIjo4OS4xOCwiZ2VuZXJhdG9yIjoiZGlzdGljaG91cyIsInRpZXJFdmVyeSI6MCwicFRlcm0iOjB9LHsibGFtYmRhIjowLjUsInNldFBvaW50Ijo0My4xOSwiZXRhIjowLjUsImJyYW5jaEFuZ2xlIjo0NSwiZ2VuZXJhdG9yIjoiZGlzdGljaG91cyIsInRpZXJFdmVyeSI6MCwicFRlcm0iOjB9XSwiYUMiOjUuNzg4LCJkTGFtYmRhIjowLjAwNDc1NCwicmFtcCI6MSwia2FwcGEiOjMuMzA3fSwicjYiOnsiZW5hYmxlZCI6dHJ1ZSwicU1pbiI6MC4wMTAyNiwibGVhZkFyZWEiOjIuMzExfSwibzQiOnsiY1NlZWQiOjYsImQiOjI1LCJxRXN0IjowLjAyLCJwRXN0IjowLjMsIm0wIjowLjAwMn0sImMzIjp7Im1vZGUiOiJiaCIsImxhbWJkYSI6MC41LCJhbHBoYSI6NS4wNTZ9LCJyMyI6eyJlbmFibGVkIjp0cnVlLCJyaG8iOjEsImxlYWZNYXNzIjowLjAwMiwiRSI6MTAwMDAwMCwic2FnIjoiaW5jcmVtZW50IiwicGhpIjoxLCJwb3N0dXJlIjp0cnVlLCJiZXRhRyI6MC4xLCJnYW1tYSI6MC4yLCJjIjowLjAxOTQsInNpZ21hVGFyZ2V0IjozMDAwLCJnaXJ0aEdhaW4iOjAuMywic2lnbWFCcmVhayI6NDUwMCwiZ3JvdW5kIjp0cnVlfX19fQ",
+    "fir (open)": "https://epabarker.github.io/tree-simulation/?preset=oakOpen&seed=1&p=eyJ0cmVlcyI6W3sieCI6ODAsInNwZWNpZXMiOiJmaXIifV0sInNwZWNpZXMiOnsiZmlyIjp7ImNvbW1vbiI6IlNpbHZlciBmaXIiLCJsYXRpbiI6IkFiaWVzIGFsYmEiLCJsZWFmIjoibmVlZGxlIiwiYzUiOnsiZW5hYmxlZCI6dHJ1ZSwiVCI6MC4wMiwiZyI6MywiVHJlbCI6MC4xMTMzLCJ0b3BRdWFudGlsZSI6MC45fSwiYzYiOnsiZW5hYmxlZCI6dHJ1ZSwibiI6MiwicjAiOjAuMDQyfSwicjEiOnsiZW5hYmxlZCI6dHJ1ZSwibXciOjEsIm1mIjowLjA4Nzg2LCJMaCI6MjMuMywiaHlkcmF1bGljIjoiaHlwZXJib2xpYyIsInNyIjowLjEsImZSZXAiOjAuMSwibWF0dXJpdHkiOjQwLCJrU3RhcnZlIjozLCJyZXNlcnZlMCI6Miwic3RvcmUiOjIsInNoZWQiOiJjYXJib24ifSwicjIiOnsiZW5hYmxlZCI6dHJ1ZSwibGV2ZWxzIjpbeyJsYW1iZGEiOjAuNTg3OCwic2V0UG9pbnQiOjAsImV0YSI6MC40LCJicmFuY2hBbmdsZSI6NDUsImdlbmVyYXRvciI6Indob3JsZWQiLCJ0aWVyRXZlcnkiOjAsInBUZXJtIjowfSx7ImxhbWJkYSI6MC41NDM3LCJzZXRQb2ludCI6NzkuMzMsImV0YSI6MS45NiwiYnJhbmNoQW5nbGUiOjg5LjE4LCJnZW5lcmF0b3IiOiJkaXN0aWNob3VzIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MH0seyJsYW1iZGEiOjAuNSwic2V0UG9pbnQiOjQzLjE5LCJldGEiOjAuNSwiYnJhbmNoQW5nbGUiOjQ1LCJnZW5lcmF0b3IiOiJkaXN0aWNob3VzIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MH1dLCJhQyI6NS43ODgsImRMYW1iZGEiOjAuMDA0NzU0LCJyYW1wIjoxLCJrYXBwYSI6My4zMDd9LCJyNiI6eyJlbmFibGVkIjp0cnVlLCJxTWluIjowLjAxMDI2LCJsZWFmQXJlYSI6Mi4zMTF9LCJvNCI6eyJjU2VlZCI6NiwiZCI6MjUsInFFc3QiOjAuMDIsInBFc3QiOjAuMywibTAiOjAuMDAyfSwiYzMiOnsibW9kZSI6ImJoIiwibGFtYmRhIjowLjUsImFscGhhIjo1LjA1Nn0sInIzIjp7ImVuYWJsZWQiOnRydWUsInJobyI6MSwibGVhZk1hc3MiOjAuMDAyLCJFIjoxMDAwMDAwLCJzYWciOiJpbmNyZW1lbnQiLCJwaGkiOjEsInBvc3R1cmUiOnRydWUsImJldGFHIjowLjEsImdhbW1hIjowLjIsImMiOjAuMDE5NCwic2lnbWFUYXJnZXQiOjMwMDAsImdpcnRoR2FpbiI6MC4zLCJzaWdtYUJyZWFrIjo0NTAwLCJncm91bmQiOnRydWV9fX19",
+    "hornbeam": "https://epabarker.github.io/tree-simulation/?preset=mixedWood&seed=1&p=eyJzcGVjaWVzIjp7Imhvcm5iZWFtIjp7ImNvbW1vbiI6Ikhvcm5iZWFtIiwibGF0aW4iOiJDYXJwaW51cyBiZXR1bHVzIiwibGVhZiI6Imhvcm5iZWFtIiwiYzUiOnsiZW5hYmxlZCI6dHJ1ZSwiVCI6MC4wMSwiZyI6MywiVHJlbCI6MC4wMzE1LCJ0b3BRdWFudGlsZSI6MC45fSwicjEiOnsiZW5hYmxlZCI6dHJ1ZSwibXciOjEsIm1mIjowLjA5MTA3LCJMaCI6MTMzLjksImh5ZHJhdWxpYyI6Imh5cGVyYm9saWMiLCJzciI6MC4xLCJmUmVwIjowLjEsIm1hdHVyaXR5Ijo0MCwia1N0YXJ2ZSI6MywicmVzZXJ2ZTAiOjIsInN0b3JlIjoyLCJzaGVkIjoiY2FyYm9uIn0sInIyIjp7ImVuYWJsZWQiOnRydWUsImxldmVscyI6W3sibGFtYmRhIjowLjUyMDcsInNldFBvaW50IjozMCwiZXRhIjowLjQsImJyYW5jaEFuZ2xlIjo0NSwiZ2VuZXJhdG9yIjoiZGlzdGljaG91cyIsInRpZXJFdmVyeSI6MCwicFRlcm0iOjAsInBvc3R1cmVTZXRQb2ludCI6MH0seyJsYW1iZGEiOjAuNDkwNSwic2V0UG9pbnQiOjM1LjQ0LCJldGEiOjAuNTYxOSwiYnJhbmNoQW5nbGUiOjQ5Ljg2LCJnZW5lcmF0b3IiOiJkaXN0aWNob3VzIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MH0seyJsYW1iZGEiOjAuNSwic2V0UG9pbnQiOjQ4LjU3LCJldGEiOjAuNCwiYnJhbmNoQW5nbGUiOjQ1LCJnZW5lcmF0b3IiOiJkaXN0aWNob3VzIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MH1dLCJhQyI6Ny4xMDcsImRMYW1iZGEiOjAuMDQ0ODEsInJhbXAiOjIwLCJrYXBwYSI6MC4wNzg1OH0sInIzIjp7ImVuYWJsZWQiOnRydWUsInJobyI6MSwibGVhZk1hc3MiOjAuMDAyLCJFIjoxMDAwMDAwLCJzYWciOiJpbmNyZW1lbnQiLCJwaGkiOjEsInBvc3R1cmUiOnRydWUsImJldGFHIjowLjIsImdhbW1hIjowLjIsImMiOjAuMDc1OTMsInNpZ21hVGFyZ2V0IjozMDAwLCJnaXJ0aEdhaW4iOjAuMywic2lnbWFCcmVhayI6NDUwMCwiZ3JvdW5kIjp0cnVlfSwicjYiOnsiZW5hYmxlZCI6dHJ1ZSwicU1pbiI6MC4wMTE5MiwibGVhZkFyZWEiOjIuMTIyfSwibzQiOnsiY1NlZWQiOjUsImQiOjIwLCJxRXN0IjowLjA0LCJwRXN0IjowLjMsIm0wIjowLjAwM30sImMzIjp7Im1vZGUiOiJiaCIsImxhbWJkYSI6MC41LCJhbHBoYSI6Mi43N30sImM2Ijp7ImVuYWJsZWQiOnRydWUsIm4iOjIsInIwIjowLjAyMDU3fX19fQ",
+    "hornbeam (open)": "https://epabarker.github.io/tree-simulation/?preset=oakOpen&seed=1&p=eyJ0cmVlcyI6W3sieCI6ODAsInNwZWNpZXMiOiJob3JuYmVhbSJ9XSwic3BlY2llcyI6eyJob3JuYmVhbSI6eyJjb21tb24iOiJIb3JuYmVhbSIsImxhdGluIjoiQ2FycGludXMgYmV0dWx1cyIsImxlYWYiOiJob3JuYmVhbSIsImM1Ijp7ImVuYWJsZWQiOnRydWUsIlQiOjAuMDEsImciOjMsIlRyZWwiOjAuMDMxNSwidG9wUXVhbnRpbGUiOjAuOX0sInIxIjp7ImVuYWJsZWQiOnRydWUsIm13IjoxLCJtZiI6MC4wOTEwNywiTGgiOjEzMy45LCJoeWRyYXVsaWMiOiJoeXBlcmJvbGljIiwic3IiOjAuMSwiZlJlcCI6MC4xLCJtYXR1cml0eSI6NDAsImtTdGFydmUiOjMsInJlc2VydmUwIjoyLCJzdG9yZSI6Miwic2hlZCI6ImNhcmJvbiJ9LCJyMiI6eyJlbmFibGVkIjp0cnVlLCJsZXZlbHMiOlt7ImxhbWJkYSI6MC41MjA3LCJzZXRQb2ludCI6MzAsImV0YSI6MC40LCJicmFuY2hBbmdsZSI6NDUsImdlbmVyYXRvciI6ImRpc3RpY2hvdXMiLCJ0aWVyRXZlcnkiOjAsInBUZXJtIjowLCJwb3N0dXJlU2V0UG9pbnQiOjB9LHsibGFtYmRhIjowLjQ5MDUsInNldFBvaW50IjozNS40NCwiZXRhIjowLjU2MTksImJyYW5jaEFuZ2xlIjo0OS44NiwiZ2VuZXJhdG9yIjoiZGlzdGljaG91cyIsInRpZXJFdmVyeSI6MCwicFRlcm0iOjB9LHsibGFtYmRhIjowLjUsInNldFBvaW50Ijo0OC41NywiZXRhIjowLjQsImJyYW5jaEFuZ2xlIjo0NSwiZ2VuZXJhdG9yIjoiZGlzdGljaG91cyIsInRpZXJFdmVyeSI6MCwicFRlcm0iOjB9XSwiYUMiOjcuMTA3LCJkTGFtYmRhIjowLjA0NDgxLCJyYW1wIjoyMCwia2FwcGEiOjAuMDc4NTh9LCJyMyI6eyJlbmFibGVkIjp0cnVlLCJyaG8iOjEsImxlYWZNYXNzIjowLjAwMiwiRSI6MTAwMDAwMCwic2FnIjoiaW5jcmVtZW50IiwicGhpIjoxLCJwb3N0dXJlIjp0cnVlLCJiZXRhRyI6MC4yLCJnYW1tYSI6MC4yLCJjIjowLjA3NTkzLCJzaWdtYVRhcmdldCI6MzAwMCwiZ2lydGhHYWluIjowLjMsInNpZ21hQnJlYWsiOjQ1MDAsImdyb3VuZCI6dHJ1ZX0sInI2Ijp7ImVuYWJsZWQiOnRydWUsInFNaW4iOjAuMDExOTIsImxlYWZBcmVhIjoyLjEyMn0sIm80Ijp7ImNTZWVkIjo1LCJkIjoyMCwicUVzdCI6MC4wNCwicEVzdCI6MC4zLCJtMCI6MC4wMDN9LCJjMyI6eyJtb2RlIjoiYmgiLCJsYW1iZGEiOjAuNSwiYWxwaGEiOjIuNzd9LCJjNiI6eyJlbmFibGVkIjp0cnVlLCJuIjoyLCJyMCI6MC4wMjA1N319fX0",
+    "maple": "https://epabarker.github.io/tree-simulation/?preset=mixedWood&seed=1&p=eyJzcGVjaWVzIjp7Im1hcGxlIjp7ImNvbW1vbiI6IkZpZWxkIG1hcGxlIiwibGF0aW4iOiJBY2VyIGNhbXBlc3RyZSIsImxlYWYiOiJtYXBsZSIsImMzIjp7Im1vZGUiOiJiaCIsImxhbWJkYSI6MC41LCJhbHBoYSI6My42NjN9LCJjNSI6eyJlbmFibGVkIjp0cnVlLCJUIjowLjAyLCJnIjozLCJUcmVsIjowLjIwMjMsInRvcFF1YW50aWxlIjowLjl9LCJjNiI6eyJlbmFibGVkIjp0cnVlLCJuIjoyLCJyMCI6MC4wMTkzMn0sInIxIjp7ImVuYWJsZWQiOnRydWUsIm13IjoxLCJtZiI6MC4wNjcyNiwiTGgiOjE5LjQ5LCJoeWRyYXVsaWMiOiJoeXBlcmJvbGljIiwic3IiOjAuMSwiZlJlcCI6MC4xLCJtYXR1cml0eSI6MzAsImtTdGFydmUiOjMsInJlc2VydmUwIjoyLCJzdG9yZSI6Miwic2hlZCI6ImNhcmJvbiJ9LCJyMiI6eyJlbmFibGVkIjp0cnVlLCJsZXZlbHMiOlt7ImxhbWJkYSI6MC41MzE2LCJzZXRQb2ludCI6MCwiZXRhIjowLjI1LCJicmFuY2hBbmdsZSI6NDUsImdlbmVyYXRvciI6ImRpc3RpY2hvdXMiLCJ0aWVyRXZlcnkiOjAsInBUZXJtIjowfSx7ImxhbWJkYSI6MC40ODgxLCJzZXRQb2ludCI6NDkuNzYsImV0YSI6MC4zNTAxLCJicmFuY2hBbmdsZSI6NDkuMDEsImdlbmVyYXRvciI6ImRpc3RpY2hvdXMiLCJ0aWVyRXZlcnkiOjAsInBUZXJtIjowfSx7ImxhbWJkYSI6MC41LCJzZXRQb2ludCI6NDQuNDMsImV0YSI6MC4yNSwiYnJhbmNoQW5nbGUiOjQ1LCJnZW5lcmF0b3IiOiJkaXN0aWNob3VzIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MH1dLCJhQyI6Ni4yODIsImRMYW1iZGEiOjAuMDUxMTIsInJhbXAiOjE1LCJrYXBwYSI6MC4wMjQxNH0sInIzIjp7ImVuYWJsZWQiOnRydWUsInJobyI6MSwibGVhZk1hc3MiOjAuMDAyLCJFIjoyNTAwMDAwLCJzYWciOiJpbmNyZW1lbnQiLCJwaGkiOjEsInBvc3R1cmUiOnRydWUsImJldGFHIjowLjIsImdhbW1hIjowLjIsImMiOjAuMDMwMDIsInNpZ21hVGFyZ2V0IjozMDAwLCJnaXJ0aEdhaW4iOjAuMywic2lnbWFCcmVhayI6NDUwMCwiZ3JvdW5kIjp0cnVlfSwicjYiOnsiZW5hYmxlZCI6dHJ1ZSwicU1pbiI6MC4wNDk4MywibGVhZkFyZWEiOjIuMjk0fSwibzQiOnsiY1NlZWQiOjUsImQiOjI1LCJxRXN0IjowLjA1LCJwRXN0IjowLjMsIm0wIjowLjAwNH19fX0",
+    "maple (open)": "https://epabarker.github.io/tree-simulation/?preset=oakOpen&seed=1&p=eyJ0cmVlcyI6W3sieCI6ODAsInNwZWNpZXMiOiJtYXBsZSJ9XSwic3BlY2llcyI6eyJtYXBsZSI6eyJjb21tb24iOiJGaWVsZCBtYXBsZSIsImxhdGluIjoiQWNlciBjYW1wZXN0cmUiLCJsZWFmIjoibWFwbGUiLCJjMyI6eyJtb2RlIjoiYmgiLCJsYW1iZGEiOjAuNSwiYWxwaGEiOjMuNjYzfSwiYzUiOnsiZW5hYmxlZCI6dHJ1ZSwiVCI6MC4wMiwiZyI6MywiVHJlbCI6MC4yMDIzLCJ0b3BRdWFudGlsZSI6MC45fSwiYzYiOnsiZW5hYmxlZCI6dHJ1ZSwibiI6MiwicjAiOjAuMDE5MzJ9LCJyMSI6eyJlbmFibGVkIjp0cnVlLCJtdyI6MSwibWYiOjAuMDY3MjYsIkxoIjoxOS40OSwiaHlkcmF1bGljIjoiaHlwZXJib2xpYyIsInNyIjowLjEsImZSZXAiOjAuMSwibWF0dXJpdHkiOjMwLCJrU3RhcnZlIjozLCJyZXNlcnZlMCI6Miwic3RvcmUiOjIsInNoZWQiOiJjYXJib24ifSwicjIiOnsiZW5hYmxlZCI6dHJ1ZSwibGV2ZWxzIjpbeyJsYW1iZGEiOjAuNTMxNiwic2V0UG9pbnQiOjAsImV0YSI6MC4yNSwiYnJhbmNoQW5nbGUiOjQ1LCJnZW5lcmF0b3IiOiJkaXN0aWNob3VzIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MH0seyJsYW1iZGEiOjAuNDg4MSwic2V0UG9pbnQiOjQ5Ljc2LCJldGEiOjAuMzUwMSwiYnJhbmNoQW5nbGUiOjQ5LjAxLCJnZW5lcmF0b3IiOiJkaXN0aWNob3VzIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MH0seyJsYW1iZGEiOjAuNSwic2V0UG9pbnQiOjQ0LjQzLCJldGEiOjAuMjUsImJyYW5jaEFuZ2xlIjo0NSwiZ2VuZXJhdG9yIjoiZGlzdGljaG91cyIsInRpZXJFdmVyeSI6MCwicFRlcm0iOjB9XSwiYUMiOjYuMjgyLCJkTGFtYmRhIjowLjA1MTEyLCJyYW1wIjoxNSwia2FwcGEiOjAuMDI0MTR9LCJyMyI6eyJlbmFibGVkIjp0cnVlLCJyaG8iOjEsImxlYWZNYXNzIjowLjAwMiwiRSI6MjUwMDAwMCwic2FnIjoiaW5jcmVtZW50IiwicGhpIjoxLCJwb3N0dXJlIjp0cnVlLCJiZXRhRyI6MC4yLCJnYW1tYSI6MC4yLCJjIjowLjAzMDAyLCJzaWdtYVRhcmdldCI6MzAwMCwiZ2lydGhHYWluIjowLjMsInNpZ21hQnJlYWsiOjQ1MDAsImdyb3VuZCI6dHJ1ZX0sInI2Ijp7ImVuYWJsZWQiOnRydWUsInFNaW4iOjAuMDQ5ODMsImxlYWZBcmVhIjoyLjI5NH0sIm80Ijp7ImNTZWVkIjo1LCJkIjoyNSwicUVzdCI6MC4wNSwicEVzdCI6MC4zLCJtMCI6MC4wMDR9fX19",
+    "holly": "https://epabarker.github.io/tree-simulation/?preset=mixedWood&seed=1&p=eyJzcGVjaWVzIjp7ImhvbGx5Ijp7ImNvbW1vbiI6IkhvbGx5IiwibGF0aW4iOiJJbGV4IGFxdWlmb2xpdW0iLCJsZWFmIjoiaG9sbHkiLCJjMyI6eyJtb2RlIjoiYmgiLCJsYW1iZGEiOjAuNSwiYWxwaGEiOjIuNjA1fSwiYzUiOnsiZW5hYmxlZCI6dHJ1ZSwiVCI6MC4wMSwiZyI6MywiVHJlbCI6MC4wOTg3LCJ0b3BRdWFudGlsZSI6MC45fSwiYzYiOnsiZW5hYmxlZCI6dHJ1ZSwibiI6MiwicjAiOjAuMDI4ODZ9LCJyMSI6eyJlbmFibGVkIjp0cnVlLCJtdyI6MSwibWYiOjAuMDU1NzYsIkxoIjoxNC4wNiwiaHlkcmF1bGljIjoiaHlwZXJib2xpYyIsInNyIjowLjEsImZSZXAiOjAuMSwibWF0dXJpdHkiOjMwLCJrU3RhcnZlIjozLCJyZXNlcnZlMCI6Miwic3RvcmUiOjIsInNoZWQiOiJjYXJib24ifSwicjIiOnsiZW5hYmxlZCI6dHJ1ZSwibGV2ZWxzIjpbeyJsYW1iZGEiOjAuNTQ0NCwic2V0UG9pbnQiOjAsImV0YSI6MC40LCJicmFuY2hBbmdsZSI6NDUsImdlbmVyYXRvciI6ImRpc3RpY2hvdXMiLCJ0aWVyRXZlcnkiOjAsInBUZXJtIjowfSx7ImxhbWJkYSI6MC41MDY3LCJzZXRQb2ludCI6NzUuNjEsImV0YSI6MC4zNDk4LCJicmFuY2hBbmdsZSI6NjEuMywiZ2VuZXJhdG9yIjoiZGlzdGljaG91cyIsInRpZXJFdmVyeSI6MCwicFRlcm0iOjB9LHsibGFtYmRhIjowLjUsInNldFBvaW50Ijo3Mi43LCJldGEiOjAuMjUsImJyYW5jaEFuZ2xlIjo0NSwiZ2VuZXJhdG9yIjoiZGlzdGljaG91cyIsInRpZXJFdmVyeSI6MCwicFRlcm0iOjB9XSwiYUMiOjMuNzE0LCJkTGFtYmRhIjowLjAyNjY3LCJyYW1wIjoxLCJrYXBwYSI6MS41NjV9LCJyMyI6eyJlbmFibGVkIjp0cnVlLCJyaG8iOjEsImxlYWZNYXNzIjowLjAwMiwiRSI6MTAwMDAwMCwic2FnIjoiaW5jcmVtZW50IiwicGhpIjoxLCJwb3N0dXJlIjp0cnVlLCJiZXRhRyI6MC4yLCJnYW1tYSI6MC4yLCJjIjowLjA5NTY3LCJzaWdtYVRhcmdldCI6MzAwMCwiZ2lydGhHYWluIjowLjMsInNpZ21hQnJlYWsiOjQ1MDAsImdyb3VuZCI6dHJ1ZX0sInI2Ijp7ImVuYWJsZWQiOnRydWUsInFNaW4iOjAuMDY4MjIsImxlYWZBcmVhIjoyLjY2MX0sIm80Ijp7ImNTZWVkIjo4LCJkIjo0MCwicUVzdCI6MC4wMywicEVzdCI6MC4zLCJtMCI6MC4wMDN9fX19",
+    "holly (open)": "https://epabarker.github.io/tree-simulation/?preset=oakOpen&seed=1&p=eyJ0cmVlcyI6W3sieCI6ODAsInNwZWNpZXMiOiJob2xseSJ9XSwic3BlY2llcyI6eyJob2xseSI6eyJjb21tb24iOiJIb2xseSIsImxhdGluIjoiSWxleCBhcXVpZm9saXVtIiwibGVhZiI6ImhvbGx5IiwiYzMiOnsibW9kZSI6ImJoIiwibGFtYmRhIjowLjUsImFscGhhIjoyLjYwNX0sImM1Ijp7ImVuYWJsZWQiOnRydWUsIlQiOjAuMDEsImciOjMsIlRyZWwiOjAuMDk4NywidG9wUXVhbnRpbGUiOjAuOX0sImM2Ijp7ImVuYWJsZWQiOnRydWUsIm4iOjIsInIwIjowLjAyODg2fSwicjEiOnsiZW5hYmxlZCI6dHJ1ZSwibXciOjEsIm1mIjowLjA1NTc2LCJMaCI6MTQuMDYsImh5ZHJhdWxpYyI6Imh5cGVyYm9saWMiLCJzciI6MC4xLCJmUmVwIjowLjEsIm1hdHVyaXR5IjozMCwia1N0YXJ2ZSI6MywicmVzZXJ2ZTAiOjIsInN0b3JlIjoyLCJzaGVkIjoiY2FyYm9uIn0sInIyIjp7ImVuYWJsZWQiOnRydWUsImxldmVscyI6W3sibGFtYmRhIjowLjU0NDQsInNldFBvaW50IjowLCJldGEiOjAuNCwiYnJhbmNoQW5nbGUiOjQ1LCJnZW5lcmF0b3IiOiJkaXN0aWNob3VzIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MH0seyJsYW1iZGEiOjAuNTA2Nywic2V0UG9pbnQiOjc1LjYxLCJldGEiOjAuMzQ5OCwiYnJhbmNoQW5nbGUiOjYxLjMsImdlbmVyYXRvciI6ImRpc3RpY2hvdXMiLCJ0aWVyRXZlcnkiOjAsInBUZXJtIjowfSx7ImxhbWJkYSI6MC41LCJzZXRQb2ludCI6NzIuNywiZXRhIjowLjI1LCJicmFuY2hBbmdsZSI6NDUsImdlbmVyYXRvciI6ImRpc3RpY2hvdXMiLCJ0aWVyRXZlcnkiOjAsInBUZXJtIjowfV0sImFDIjozLjcxNCwiZExhbWJkYSI6MC4wMjY2NywicmFtcCI6MSwia2FwcGEiOjEuNTY1fSwicjMiOnsiZW5hYmxlZCI6dHJ1ZSwicmhvIjoxLCJsZWFmTWFzcyI6MC4wMDIsIkUiOjEwMDAwMDAsInNhZyI6ImluY3JlbWVudCIsInBoaSI6MSwicG9zdHVyZSI6dHJ1ZSwiYmV0YUciOjAuMiwiZ2FtbWEiOjAuMiwiYyI6MC4wOTU2Nywic2lnbWFUYXJnZXQiOjMwMDAsImdpcnRoR2FpbiI6MC4zLCJzaWdtYUJyZWFrIjo0NTAwLCJncm91bmQiOnRydWV9LCJyNiI6eyJlbmFibGVkIjp0cnVlLCJxTWluIjowLjA2ODIyLCJsZWFmQXJlYSI6Mi42NjF9LCJvNCI6eyJjU2VlZCI6OCwiZCI6NDAsInFFc3QiOjAuMDMsInBFc3QiOjAuMywibTAiOjAuMDAzfX19fQ",
+    "rowan": "https://epabarker.github.io/tree-simulation/?preset=mixedWood&seed=1&p=eyJzcGVjaWVzIjp7InJvd2FuIjp7ImNvbW1vbiI6IlJvd2FuIiwibGF0aW4iOiJTb3JidXMgYXVjdXBhcmlhIiwibGVhZiI6InJvd2FuIiwiYzMiOnsibW9kZSI6ImJoIiwibGFtYmRhIjowLjUsImFscGhhIjoyLjY5Nn0sImM1Ijp7ImVuYWJsZWQiOnRydWUsIlQiOjAuMDUsImciOjMsIlRyZWwiOjAuMTk0NCwidG9wUXVhbnRpbGUiOjAuOX0sImM2Ijp7ImVuYWJsZWQiOnRydWUsIm4iOjIsInIwIjowLjAzMDN9LCJyMSI6eyJlbmFibGVkIjp0cnVlLCJtdyI6MSwibWYiOjAuMDI4OTQsIkxoIjoxNi40MSwiaHlkcmF1bGljIjoiaHlwZXJib2xpYyIsInNyIjowLjEsImZSZXAiOjAuMSwibWF0dXJpdHkiOjI1LCJrU3RhcnZlIjozLCJyZXNlcnZlMCI6Miwic3RvcmUiOjIsInNoZWQiOiJjYXJib24ifSwicjIiOnsiZW5hYmxlZCI6dHJ1ZSwibGV2ZWxzIjpbeyJsYW1iZGEiOjAuNTQxMSwic2V0UG9pbnQiOjAsImV0YSI6MC4zLCJicmFuY2hBbmdsZSI6NDUsImdlbmVyYXRvciI6ImRpc3RpY2hvdXMiLCJ0aWVyRXZlcnkiOjAsInBUZXJtIjowfSx7ImxhbWJkYSI6MC40OTQ2LCJzZXRQb2ludCI6NDQuNzgsImV0YSI6MC4yNTQ2LCJicmFuY2hBbmdsZSI6MjguNTgsImdlbmVyYXRvciI6ImRpc3RpY2hvdXMiLCJ0aWVyRXZlcnkiOjAsInBUZXJtIjowfSx7ImxhbWJkYSI6MC41LCJzZXRQb2ludCI6NDguMjQsImV0YSI6MC4yNSwiYnJhbmNoQW5nbGUiOjQwLCJnZW5lcmF0b3IiOiJkaXN0aWNob3VzIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MH1dLCJhQyI6OC45MiwiZExhbWJkYSI6MC4wNDY0MSwicmFtcCI6MjAsImthcHBhIjowLjYyNjV9LCJyNCI6eyJxUmVsIjowLjI1fSwicjYiOnsiZW5hYmxlZCI6dHJ1ZSwicU1pbiI6MC4wOTQ0MywibGVhZkFyZWEiOjIuMzkzfSwibzQiOnsiY1NlZWQiOjMsImQiOjUwLCJxRXN0IjowLjA2LCJwRXN0IjowLjMsIm0wIjowLjAwNn0sInIzIjp7ImVuYWJsZWQiOnRydWUsInJobyI6MSwibGVhZk1hc3MiOjAuMDAyLCJFIjoxMDAwMDAwLCJzYWciOiJpbmNyZW1lbnQiLCJwaGkiOjEsInBvc3R1cmUiOnRydWUsImJldGFHIjowLjEsImdhbW1hIjowLjIsImMiOjAuMDk3NjksInNpZ21hVGFyZ2V0IjozMDAwLCJnaXJ0aEdhaW4iOjAuMywic2lnbWFCcmVhayI6NDUwMCwiZ3JvdW5kIjp0cnVlfX19fQ",
+    "rowan (open)": "https://epabarker.github.io/tree-simulation/?preset=oakOpen&seed=1&p=eyJ0cmVlcyI6W3sieCI6ODAsInNwZWNpZXMiOiJyb3dhbiJ9XSwic3BlY2llcyI6eyJyb3dhbiI6eyJjb21tb24iOiJSb3dhbiIsImxhdGluIjoiU29yYnVzIGF1Y3VwYXJpYSIsImxlYWYiOiJyb3dhbiIsImMzIjp7Im1vZGUiOiJiaCIsImxhbWJkYSI6MC41LCJhbHBoYSI6Mi42OTZ9LCJjNSI6eyJlbmFibGVkIjp0cnVlLCJUIjowLjA1LCJnIjozLCJUcmVsIjowLjE5NDQsInRvcFF1YW50aWxlIjowLjl9LCJjNiI6eyJlbmFibGVkIjp0cnVlLCJuIjoyLCJyMCI6MC4wMzAzfSwicjEiOnsiZW5hYmxlZCI6dHJ1ZSwibXciOjEsIm1mIjowLjAyODk0LCJMaCI6MTYuNDEsImh5ZHJhdWxpYyI6Imh5cGVyYm9saWMiLCJzciI6MC4xLCJmUmVwIjowLjEsIm1hdHVyaXR5IjoyNSwia1N0YXJ2ZSI6MywicmVzZXJ2ZTAiOjIsInN0b3JlIjoyLCJzaGVkIjoiY2FyYm9uIn0sInIyIjp7ImVuYWJsZWQiOnRydWUsImxldmVscyI6W3sibGFtYmRhIjowLjU0MTEsInNldFBvaW50IjowLCJldGEiOjAuMywiYnJhbmNoQW5nbGUiOjQ1LCJnZW5lcmF0b3IiOiJkaXN0aWNob3VzIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MH0seyJsYW1iZGEiOjAuNDk0Niwic2V0UG9pbnQiOjQ0Ljc4LCJldGEiOjAuMjU0NiwiYnJhbmNoQW5nbGUiOjI4LjU4LCJnZW5lcmF0b3IiOiJkaXN0aWNob3VzIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MH0seyJsYW1iZGEiOjAuNSwic2V0UG9pbnQiOjQ4LjI0LCJldGEiOjAuMjUsImJyYW5jaEFuZ2xlIjo0MCwiZ2VuZXJhdG9yIjoiZGlzdGljaG91cyIsInRpZXJFdmVyeSI6MCwicFRlcm0iOjB9XSwiYUMiOjguOTIsImRMYW1iZGEiOjAuMDQ2NDEsInJhbXAiOjIwLCJrYXBwYSI6MC42MjY1fSwicjQiOnsicVJlbCI6MC4yNX0sInI2Ijp7ImVuYWJsZWQiOnRydWUsInFNaW4iOjAuMDk0NDMsImxlYWZBcmVhIjoyLjM5M30sIm80Ijp7ImNTZWVkIjozLCJkIjo1MCwicUVzdCI6MC4wNiwicEVzdCI6MC4zLCJtMCI6MC4wMDZ9LCJyMyI6eyJlbmFibGVkIjp0cnVlLCJyaG8iOjEsImxlYWZNYXNzIjowLjAwMiwiRSI6MTAwMDAwMCwic2FnIjoiaW5jcmVtZW50IiwicGhpIjoxLCJwb3N0dXJlIjp0cnVlLCJiZXRhRyI6MC4xLCJnYW1tYSI6MC4yLCJjIjowLjA5NzY5LCJzaWdtYVRhcmdldCI6MzAwMCwiZ2lydGhHYWluIjowLjMsInNpZ21hQnJlYWsiOjQ1MDAsImdyb3VuZCI6dHJ1ZX19fX0",
+    "willow": "https://epabarker.github.io/tree-simulation/?preset=mixedWood&seed=1&p=eyJzcGVjaWVzIjp7IndpbGxvdyI6eyJjb21tb24iOiJHb2F0IHdpbGxvdyIsImxhdGluIjoiU2FsaXggY2FwcmVhIiwibGVhZiI6IndpbGxvdyIsImMzIjp7Im1vZGUiOiJiaCIsImxhbWJkYSI6MC41LCJhbHBoYSI6NC42Nzh9LCJjNSI6eyJlbmFibGVkIjp0cnVlLCJUIjowLjEsImciOjMsIlRyZWwiOjAuMjUzOSwidG9wUXVhbnRpbGUiOjAuOX0sImM2Ijp7ImVuYWJsZWQiOnRydWUsIm4iOjIsInIwIjowLjAxNzZ9LCJyMSI6eyJlbmFibGVkIjp0cnVlLCJtdyI6MSwibWYiOjAuMDY3NiwiTGgiOjE1LjM1LCJoeWRyYXVsaWMiOiJoeXBlcmJvbGljIiwic3IiOjAuMSwiZlJlcCI6MC4xLCJtYXR1cml0eSI6MjAsImtTdGFydmUiOjMsInJlc2VydmUwIjoyLCJzdG9yZSI6Miwic2hlZCI6ImNhcmJvbiJ9LCJyMiI6eyJlbmFibGVkIjp0cnVlLCJsZXZlbHMiOlt7ImxhbWJkYSI6MC41MDMsInNldFBvaW50IjowLCJldGEiOjAuMjUsImJyYW5jaEFuZ2xlIjo0NSwiZ2VuZXJhdG9yIjoiZGlzdGljaG91cyIsInRpZXJFdmVyeSI6MCwicFRlcm0iOjB9LHsibGFtYmRhIjowLjUxOTEsInNldFBvaW50Ijo0Mi42NCwiZXRhIjowLjQ0NDUsImJyYW5jaEFuZ2xlIjo0OC41MiwiZ2VuZXJhdG9yIjoiZGlzdGljaG91cyIsInRpZXJFdmVyeSI6MCwicFRlcm0iOjB9LHsibGFtYmRhIjowLjQ5LCJzZXRQb2ludCI6NjAuNDMsImV0YSI6MC4yLCJicmFuY2hBbmdsZSI6NDUsImdlbmVyYXRvciI6ImRpc3RpY2hvdXMiLCJ0aWVyRXZlcnkiOjAsInBUZXJtIjowfV0sImFDIjoxLjc4NCwiZExhbWJkYSI6MC4wMjAzMSwicmFtcCI6MTAsImthcHBhIjoxLjIzNH0sInI0Ijp7InFSZWwiOjAuM30sInI2Ijp7ImVuYWJsZWQiOnRydWUsInFNaW4iOjAuMDk4NjUsImxlYWZBcmVhIjoyLjEwM30sIm80Ijp7ImNTZWVkIjoxLjUsImQiOjYwLCJxRXN0IjowLjMsInBFc3QiOjAuMywibTAiOjAuMDEyLCJyYWluIjoxfSwicjMiOnsiZW5hYmxlZCI6dHJ1ZSwicmhvIjoxLCJsZWFmTWFzcyI6MC4wMDIsIkUiOjEwMDAwMDAsInNhZyI6ImluY3JlbWVudCIsInBoaSI6MSwicG9zdHVyZSI6dHJ1ZSwiYmV0YUciOjAuMSwiZ2FtbWEiOjAuMiwiYyI6MC4xMDI2LCJzaWdtYVRhcmdldCI6MzAwMCwiZ2lydGhHYWluIjowLjMsInNpZ21hQnJlYWsiOjQ1MDAsImdyb3VuZCI6dHJ1ZX19fX0",
+    "willow (open)": "https://epabarker.github.io/tree-simulation/?preset=oakOpen&seed=1&p=eyJ0cmVlcyI6W3sieCI6ODAsInNwZWNpZXMiOiJ3aWxsb3cifV0sInNwZWNpZXMiOnsid2lsbG93Ijp7ImNvbW1vbiI6IkdvYXQgd2lsbG93IiwibGF0aW4iOiJTYWxpeCBjYXByZWEiLCJsZWFmIjoid2lsbG93IiwiYzMiOnsibW9kZSI6ImJoIiwibGFtYmRhIjowLjUsImFscGhhIjo0LjY3OH0sImM1Ijp7ImVuYWJsZWQiOnRydWUsIlQiOjAuMSwiZyI6MywiVHJlbCI6MC4yNTM5LCJ0b3BRdWFudGlsZSI6MC45fSwiYzYiOnsiZW5hYmxlZCI6dHJ1ZSwibiI6MiwicjAiOjAuMDE3Nn0sInIxIjp7ImVuYWJsZWQiOnRydWUsIm13IjoxLCJtZiI6MC4wNjc2LCJMaCI6MTUuMzUsImh5ZHJhdWxpYyI6Imh5cGVyYm9saWMiLCJzciI6MC4xLCJmUmVwIjowLjEsIm1hdHVyaXR5IjoyMCwia1N0YXJ2ZSI6MywicmVzZXJ2ZTAiOjIsInN0b3JlIjoyLCJzaGVkIjoiY2FyYm9uIn0sInIyIjp7ImVuYWJsZWQiOnRydWUsImxldmVscyI6W3sibGFtYmRhIjowLjUwMywic2V0UG9pbnQiOjAsImV0YSI6MC4yNSwiYnJhbmNoQW5nbGUiOjQ1LCJnZW5lcmF0b3IiOiJkaXN0aWNob3VzIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MH0seyJsYW1iZGEiOjAuNTE5MSwic2V0UG9pbnQiOjQyLjY0LCJldGEiOjAuNDQ0NSwiYnJhbmNoQW5nbGUiOjQ4LjUyLCJnZW5lcmF0b3IiOiJkaXN0aWNob3VzIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MH0seyJsYW1iZGEiOjAuNDksInNldFBvaW50Ijo2MC40MywiZXRhIjowLjIsImJyYW5jaEFuZ2xlIjo0NSwiZ2VuZXJhdG9yIjoiZGlzdGljaG91cyIsInRpZXJFdmVyeSI6MCwicFRlcm0iOjB9XSwiYUMiOjEuNzg0LCJkTGFtYmRhIjowLjAyMDMxLCJyYW1wIjoxMCwia2FwcGEiOjEuMjM0fSwicjQiOnsicVJlbCI6MC4zfSwicjYiOnsiZW5hYmxlZCI6dHJ1ZSwicU1pbiI6MC4wOTg2NSwibGVhZkFyZWEiOjIuMTAzfSwibzQiOnsiY1NlZWQiOjEuNSwiZCI6NjAsInFFc3QiOjAuMywicEVzdCI6MC4zLCJtMCI6MC4wMTIsInJhaW4iOjF9LCJyMyI6eyJlbmFibGVkIjp0cnVlLCJyaG8iOjEsImxlYWZNYXNzIjowLjAwMiwiRSI6MTAwMDAwMCwic2FnIjoiaW5jcmVtZW50IiwicGhpIjoxLCJwb3N0dXJlIjp0cnVlLCJiZXRhRyI6MC4xLCJnYW1tYSI6MC4yLCJjIjowLjEwMjYsInNpZ21hVGFyZ2V0IjozMDAwLCJnaXJ0aEdhaW4iOjAuMywic2lnbWFCcmVhayI6NDUwMCwiZ3JvdW5kIjp0cnVlfX19fQ",
+    "pine": "https://epabarker.github.io/tree-simulation/?preset=pineWood&seed=1&p=eyJzcGVjaWVzIjp7InBpbmUiOnsiY29tbW9uIjoiU2NvdHMgcGluZSIsImxhdGluIjoiUGludXMgc3lsdmVzdHJpcyIsImxlYWYiOiJwaW5lIiwiYzMiOnsibW9kZSI6ImJoIiwibGFtYmRhIjowLjUsImFscGhhIjoyLjUxM30sImM1Ijp7ImVuYWJsZWQiOnRydWUsIlQiOjAuMSwiZyI6MywiVHJlbCI6MC4zNTE2LCJ0b3BRdWFudGlsZSI6MC45fSwiYzYiOnsiZW5hYmxlZCI6dHJ1ZSwibiI6MiwicjAiOjAuMDI3MTV9LCJyMSI6eyJlbmFibGVkIjp0cnVlLCJtdyI6MSwibWYiOjAuMDc4MiwiTGgiOjQ1LjY2LCJoeWRyYXVsaWMiOiJoeXBlcmJvbGljIiwic3IiOjAuMSwiZlJlcCI6MC4xLCJtYXR1cml0eSI6NDAsImtTdGFydmUiOjMsInJlc2VydmUwIjoyLCJzdG9yZSI6Miwic2hlZCI6ImNhcmJvbiJ9LCJyMiI6eyJlbmFibGVkIjp0cnVlLCJsZXZlbHMiOlt7ImxhbWJkYSI6MC41NDAxLCJzZXRQb2ludCI6MCwiZXRhIjowLjQsImJyYW5jaEFuZ2xlIjo0NSwiZ2VuZXJhdG9yIjoid2hvcmxlZCIsInRpZXJFdmVyeSI6MCwicFRlcm0iOjB9LHsibGFtYmRhIjowLjQ5MTYsInNldFBvaW50Ijo2MS4yNywiZXRhIjoxLjU1OCwiYnJhbmNoQW5nbGUiOjgxLjU3LCJnZW5lcmF0b3IiOiJkaXN0aWNob3VzIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MH0seyJsYW1iZGEiOjAuNSwic2V0UG9pbnQiOjcyLjA4LCJldGEiOjAuNCwiYnJhbmNoQW5nbGUiOjQ1LCJnZW5lcmF0b3IiOiJkaXN0aWNob3VzIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MH1dLCJhQyI6NS40ODYsImRMYW1iZGEiOjAuMDExNDIsInJhbXAiOjMwLCJrYXBwYSI6MC4xNzE5fSwicjQiOnsicVJlbCI6MC4zfSwicjYiOnsiZW5hYmxlZCI6dHJ1ZSwicU1pbiI6MC4xNzIyLCJsZWFmQXJlYSI6Mi44M30sIm80Ijp7ImNTZWVkIjozLCJkIjo0MCwicUVzdCI6MC4zLCJwRXN0IjowLjMsIm0wIjowLjAwM30sInIzIjp7ImVuYWJsZWQiOnRydWUsInJobyI6MSwibGVhZk1hc3MiOjAuMDAyLCJFIjoxMDAwMDAwLCJzYWciOiJpbmNyZW1lbnQiLCJwaGkiOjEsInBvc3R1cmUiOnRydWUsImJldGFHIjowLjEsImdhbW1hIjowLjIsImMiOjAuMDY3NzYsInNpZ21hVGFyZ2V0IjozMDAwLCJnaXJ0aEdhaW4iOjAuMywic2lnbWFCcmVhayI6NDUwMCwiZ3JvdW5kIjp0cnVlfX19fQ",
+    "pine (open)": "https://epabarker.github.io/tree-simulation/?preset=oakOpen&seed=1&p=eyJ0cmVlcyI6W3sieCI6ODAsInNwZWNpZXMiOiJwaW5lIn1dLCJzcGVjaWVzIjp7InBpbmUiOnsiY29tbW9uIjoiU2NvdHMgcGluZSIsImxhdGluIjoiUGludXMgc3lsdmVzdHJpcyIsImxlYWYiOiJwaW5lIiwiYzMiOnsibW9kZSI6ImJoIiwibGFtYmRhIjowLjUsImFscGhhIjoyLjUxM30sImM1Ijp7ImVuYWJsZWQiOnRydWUsIlQiOjAuMSwiZyI6MywiVHJlbCI6MC4zNTE2LCJ0b3BRdWFudGlsZSI6MC45fSwiYzYiOnsiZW5hYmxlZCI6dHJ1ZSwibiI6MiwicjAiOjAuMDI3MTV9LCJyMSI6eyJlbmFibGVkIjp0cnVlLCJtdyI6MSwibWYiOjAuMDc4MiwiTGgiOjQ1LjY2LCJoeWRyYXVsaWMiOiJoeXBlcmJvbGljIiwic3IiOjAuMSwiZlJlcCI6MC4xLCJtYXR1cml0eSI6NDAsImtTdGFydmUiOjMsInJlc2VydmUwIjoyLCJzdG9yZSI6Miwic2hlZCI6ImNhcmJvbiJ9LCJyMiI6eyJlbmFibGVkIjp0cnVlLCJsZXZlbHMiOlt7ImxhbWJkYSI6MC41NDAxLCJzZXRQb2ludCI6MCwiZXRhIjowLjQsImJyYW5jaEFuZ2xlIjo0NSwiZ2VuZXJhdG9yIjoid2hvcmxlZCIsInRpZXJFdmVyeSI6MCwicFRlcm0iOjB9LHsibGFtYmRhIjowLjQ5MTYsInNldFBvaW50Ijo2MS4yNywiZXRhIjoxLjU1OCwiYnJhbmNoQW5nbGUiOjgxLjU3LCJnZW5lcmF0b3IiOiJkaXN0aWNob3VzIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MH0seyJsYW1iZGEiOjAuNSwic2V0UG9pbnQiOjcyLjA4LCJldGEiOjAuNCwiYnJhbmNoQW5nbGUiOjQ1LCJnZW5lcmF0b3IiOiJkaXN0aWNob3VzIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MH1dLCJhQyI6NS40ODYsImRMYW1iZGEiOjAuMDExNDIsInJhbXAiOjMwLCJrYXBwYSI6MC4xNzE5fSwicjQiOnsicVJlbCI6MC4zfSwicjYiOnsiZW5hYmxlZCI6dHJ1ZSwicU1pbiI6MC4xNzIyLCJsZWFmQXJlYSI6Mi44M30sIm80Ijp7ImNTZWVkIjozLCJkIjo0MCwicUVzdCI6MC4zLCJwRXN0IjowLjMsIm0wIjowLjAwM30sInIzIjp7ImVuYWJsZWQiOnRydWUsInJobyI6MSwibGVhZk1hc3MiOjAuMDAyLCJFIjoxMDAwMDAwLCJzYWciOiJpbmNyZW1lbnQiLCJwaGkiOjEsInBvc3R1cmUiOnRydWUsImJldGFHIjowLjEsImdhbW1hIjowLjIsImMiOjAuMDY3NzYsInNpZ21hVGFyZ2V0IjozMDAwLCJnaXJ0aEdhaW4iOjAuMywic2lnbWFCcmVhayI6NDUwMCwiZ3JvdW5kIjp0cnVlfX19fQ",
+    "mixed wood (all fitted)": "https://epabarker.github.io/tree-simulation/?preset=mixedWood&seed=1&p=eyJzcGVjaWVzIjp7ImJpcmNoIjp7ImNvbW1vbiI6IlNpbHZlciBiaXJjaCIsImxhdGluIjoiQmV0dWxhIHBlbmR1bGEiLCJsZWFmIjoic21hbGwiLCJjMyI6eyJtb2RlIjoiYmgiLCJsYW1iZGEiOjAuNSwiYWxwaGEiOjMuMDU2fSwiYzUiOnsiZW5hYmxlZCI6dHJ1ZSwiVCI6MC4xLCJnIjozLCJUcmVsIjowLjM0NTEsInRvcFF1YW50aWxlIjowLjl9LCJjNiI6eyJlbmFibGVkIjp0cnVlLCJuIjoyLCJyMCI6MC4wNDQ3NH0sInIxIjp7ImVuYWJsZWQiOnRydWUsIm13IjoxLCJtZiI6MC4wNzc0MSwiTGgiOjQ5Ljk1LCJoeWRyYXVsaWMiOiJoeXBlcmJvbGljIiwic3IiOjAuMSwiZlJlcCI6MC4xLCJtYXR1cml0eSI6NDAsImtTdGFydmUiOjMsInJlc2VydmUwIjoyLCJzdG9yZSI6Miwic2hlZCI6ImNhcmJvbiJ9LCJyMiI6eyJlbmFibGVkIjp0cnVlLCJsZXZlbHMiOlt7ImxhbWJkYSI6MC41ODgyLCJzZXRQb2ludCI6MCwiZXRhIjowLjMsImJyYW5jaEFuZ2xlIjo0NSwiZ2VuZXJhdG9yIjoiZGlzdGljaG91cyIsInRpZXJFdmVyeSI6MCwicFRlcm0iOjB9LHsibGFtYmRhIjowLjUxMjYsInNldFBvaW50Ijo3Mi41MywiZXRhIjowLjA3ODk2LCJicmFuY2hBbmdsZSI6MzcuODMsImdlbmVyYXRvciI6ImRpc3RpY2hvdXMiLCJ0aWVyRXZlcnkiOjAsInBUZXJtIjowLCJwb3N0dXJlU2V0UG9pbnQiOjcwfSx7ImxhbWJkYSI6MC41LCJzZXRQb2ludCI6MTMxLjYsImV0YSI6MC4yNSwiYnJhbmNoQW5nbGUiOjQwLCJnZW5lcmF0b3IiOiJkaXN0aWNob3VzIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MH1dLCJhQyI6MjIuNjEsImRMYW1iZGEiOjAuMDgxNTksInJhbXAiOjIwLCJrYXBwYSI6MC4zNDV9LCJyMyI6eyJlbmFibGVkIjp0cnVlLCJyaG8iOjEsImxlYWZNYXNzIjowLjAwMSwiRSI6MTAwMDAwMCwic2FnIjoiaW5jcmVtZW50IiwicGhpIjowLjUsInBvc3R1cmUiOnRydWUsImJldGFHIjowLjEsImdhbW1hIjowLjIsImMiOjAuMTg2LCJzaWdtYVRhcmdldCI6MzAwMCwiZ2lydGhHYWluIjowLjMsInNpZ21hQnJlYWsiOjQ1MDAsImdyb3VuZCI6dHJ1ZX0sInI0Ijp7InFSZWwiOjAuM30sInI2Ijp7ImVuYWJsZWQiOnRydWUsInFNaW4iOjAuMTEzLCJsZWFmQXJlYSI6Mi4xOTJ9LCJvNCI6eyJjU2VlZCI6MiwiZCI6NDAsInFFc3QiOjAuMjUsInBFc3QiOjAuMywibTAiOjAuMDA4LCJyYWluIjowLjJ9fSwiYmVlY2giOnsiY29tbW9uIjoiQmVlY2giLCJsYXRpbiI6IkZhZ3VzIHN5bHZhdGljYSIsImxlYWYiOiJiZWVjaCIsImM1Ijp7ImVuYWJsZWQiOnRydWUsIlQiOjAuMDEsImciOjMsIlRyZWwiOjAuMDk1OCwidG9wUXVhbnRpbGUiOjAuOX0sInIxIjp7ImVuYWJsZWQiOnRydWUsIm13IjoxLCJtZiI6MC4wMjM3NiwiTGgiOjg2LjYxLCJoeWRyYXVsaWMiOiJoeXBlcmJvbGljIiwic3IiOjAuMSwiZlJlcCI6MC4xLCJtYXR1cml0eSI6NDAsImtTdGFydmUiOjMsInJlc2VydmUwIjoyLCJzdG9yZSI6Miwic2hlZCI6ImNhcmJvbiJ9LCJyMiI6eyJlbmFibGVkIjp0cnVlLCJsZXZlbHMiOlt7ImxhbWJkYSI6MC41NTE3LCJzZXRQb2ludCI6NDAsImV0YSI6MC40LCJicmFuY2hBbmdsZSI6NDUsImdlbmVyYXRvciI6ImRpc3RpY2hvdXMiLCJ0aWVyRXZlcnkiOjAsInBUZXJtIjowLCJwb3N0dXJlU2V0UG9pbnQiOjB9LHsibGFtYmRhIjowLjQ5MzcsInNldFBvaW50IjozNC42MywiZXRhIjowLjEzMjYsImJyYW5jaEFuZ2xlIjo1MS4xNSwiZ2VuZXJhdG9yIjoiZGlzdGljaG91cyIsInRpZXJFdmVyeSI6MCwicFRlcm0iOjB9LHsibGFtYmRhIjowLjUsInNldFBvaW50Ijo3MC4wNywiZXRhIjowLjQsImJyYW5jaEFuZ2xlIjo0NSwiZ2VuZXJhdG9yIjoiZGlzdGljaG91cyIsInRpZXJFdmVyeSI6MCwicFRlcm0iOjB9XSwiYUMiOjMuNDQ3LCJkTGFtYmRhIjowLjAzMTY1LCJyYW1wIjoxLCJrYXBwYSI6MC4xMjY4fSwicjMiOnsiZW5hYmxlZCI6dHJ1ZSwicmhvIjoxLCJsZWFmTWFzcyI6MC4wMDIsIkUiOjEwMDAwMDAsInNhZyI6ImluY3JlbWVudCIsInBoaSI6MSwicG9zdHVyZSI6dHJ1ZSwiYmV0YUciOjAuMiwiZ2FtbWEiOjAuMiwiYyI6MC4wMjg3MSwic2lnbWFUYXJnZXQiOjMwMDAsImdpcnRoR2FpbiI6MC4zLCJzaWdtYUJyZWFrIjo0NTAwLCJncm91bmQiOnRydWV9LCJyNiI6eyJlbmFibGVkIjp0cnVlLCJxTWluIjowLjAxMjgxLCJsZWFmQXJlYSI6Mi4yOTV9LCJvNCI6eyJjU2VlZCI6MTAsImQiOjEyLCJxRXN0IjowLjAzLCJwRXN0IjowLjMsIm0wIjowLjAwMn0sImMzIjp7Im1vZGUiOiJiaCIsImxhbWJkYSI6MC41LCJhbHBoYSI6Mi43MTF9LCJjNiI6eyJlbmFibGVkIjp0cnVlLCJuIjoyLCJyMCI6MC4wMjM2N319LCJvYWsiOnsiY29tbW9uIjoiUGVkdW5jdWxhdGUgb2FrIiwibGF0aW4iOiJRdWVyY3VzIHJvYnVyIiwibGVhZiI6Im9hayIsImMzIjp7Im1vZGUiOiJiaCIsImxhbWJkYSI6MC41LCJhbHBoYSI6NC4wMTl9LCJjNSI6eyJlbmFibGVkIjp0cnVlLCJUIjowLjA1LCJnIjozLCJUcmVsIjowLjE4NzcsInRvcFF1YW50aWxlIjowLjl9LCJyMSI6eyJlbmFibGVkIjp0cnVlLCJtdyI6MSwibWYiOjAuMDUyNjQsIkxoIjozNy40MiwiaHlkcmF1bGljIjoiaHlwZXJib2xpYyIsInNyIjowLjEsImZSZXAiOjAuMSwibWF0dXJpdHkiOjQwLCJrU3RhcnZlIjozLCJyZXNlcnZlMCI6Miwic3RvcmUiOjIsInNoZWQiOiJjYXJib24ifSwicjIiOnsiZW5hYmxlZCI6dHJ1ZSwibGV2ZWxzIjpbeyJsYW1iZGEiOjAuNTQ3Niwic2V0UG9pbnQiOjAsImV0YSI6MC4yNSwiYnJhbmNoQW5nbGUiOjQ1LCJnZW5lcmF0b3IiOiJkaXN0aWNob3VzIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MH0seyJsYW1iZGEiOjAuNTI1NCwic2V0UG9pbnQiOjc4LjIsImV0YSI6MC4xOTA2LCJicmFuY2hBbmdsZSI6NDQuMDEsImdlbmVyYXRvciI6ImRpc3RpY2hvdXMiLCJ0aWVyRXZlcnkiOjAsInBUZXJtIjowfSx7ImxhbWJkYSI6MC41LCJzZXRQb2ludCI6NDkuNjUsImV0YSI6MC4yLCJicmFuY2hBbmdsZSI6NTAsImdlbmVyYXRvciI6ImRpc3RpY2hvdXMiLCJ0aWVyRXZlcnkiOjAsInBUZXJtIjowfV0sImFDIjo5LjMxMywiZExhbWJkYSI6MC4wODQ3LCJyYW1wIjoxNSwia2FwcGEiOjEuODE2fSwicjMiOnsiZW5hYmxlZCI6dHJ1ZSwicmhvIjoxLCJsZWFmTWFzcyI6MC4wMDIsIkUiOjI1MDAwMDAsInNhZyI6ImluY3JlbWVudCIsInBoaSI6MSwicG9zdHVyZSI6dHJ1ZSwiYmV0YUciOjAuMiwiZ2FtbWEiOjAuMiwiYyI6MC4xNzQsInNpZ21hVGFyZ2V0IjozMDAwLCJnaXJ0aEdhaW4iOjAuMywic2lnbWFCcmVhayI6NDUwMCwiZ3JvdW5kIjp0cnVlfSwicjYiOnsiZW5hYmxlZCI6dHJ1ZSwicU1pbiI6MC4wNTMxMSwibGVhZkFyZWEiOjEuMTkyfSwibzQiOnsiY1NlZWQiOjEwLCJkIjoyNSwicUVzdCI6MC4xLCJwRXN0IjowLjMsIm0wIjowLjAwMn0sImM2Ijp7ImVuYWJsZWQiOnRydWUsIm4iOjIsInIwIjowLjAzNDYzfX0sImhvcm5iZWFtIjp7ImNvbW1vbiI6Ikhvcm5iZWFtIiwibGF0aW4iOiJDYXJwaW51cyBiZXR1bHVzIiwibGVhZiI6Imhvcm5iZWFtIiwiYzUiOnsiZW5hYmxlZCI6dHJ1ZSwiVCI6MC4wMSwiZyI6MywiVHJlbCI6MC4wMzE1LCJ0b3BRdWFudGlsZSI6MC45fSwicjEiOnsiZW5hYmxlZCI6dHJ1ZSwibXciOjEsIm1mIjowLjA5MTA3LCJMaCI6MTMzLjksImh5ZHJhdWxpYyI6Imh5cGVyYm9saWMiLCJzciI6MC4xLCJmUmVwIjowLjEsIm1hdHVyaXR5Ijo0MCwia1N0YXJ2ZSI6MywicmVzZXJ2ZTAiOjIsInN0b3JlIjoyLCJzaGVkIjoiY2FyYm9uIn0sInIyIjp7ImVuYWJsZWQiOnRydWUsImxldmVscyI6W3sibGFtYmRhIjowLjUyMDcsInNldFBvaW50IjozMCwiZXRhIjowLjQsImJyYW5jaEFuZ2xlIjo0NSwiZ2VuZXJhdG9yIjoiZGlzdGljaG91cyIsInRpZXJFdmVyeSI6MCwicFRlcm0iOjAsInBvc3R1cmVTZXRQb2ludCI6MH0seyJsYW1iZGEiOjAuNDkwNSwic2V0UG9pbnQiOjM1LjQ0LCJldGEiOjAuNTYxOSwiYnJhbmNoQW5nbGUiOjQ5Ljg2LCJnZW5lcmF0b3IiOiJkaXN0aWNob3VzIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MH0seyJsYW1iZGEiOjAuNSwic2V0UG9pbnQiOjQ4LjU3LCJldGEiOjAuNCwiYnJhbmNoQW5nbGUiOjQ1LCJnZW5lcmF0b3IiOiJkaXN0aWNob3VzIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MH1dLCJhQyI6Ny4xMDcsImRMYW1iZGEiOjAuMDQ0ODEsInJhbXAiOjIwLCJrYXBwYSI6MC4wNzg1OH0sInIzIjp7ImVuYWJsZWQiOnRydWUsInJobyI6MSwibGVhZk1hc3MiOjAuMDAyLCJFIjoxMDAwMDAwLCJzYWciOiJpbmNyZW1lbnQiLCJwaGkiOjEsInBvc3R1cmUiOnRydWUsImJldGFHIjowLjIsImdhbW1hIjowLjIsImMiOjAuMDc1OTMsInNpZ21hVGFyZ2V0IjozMDAwLCJnaXJ0aEdhaW4iOjAuMywic2lnbWFCcmVhayI6NDUwMCwiZ3JvdW5kIjp0cnVlfSwicjYiOnsiZW5hYmxlZCI6dHJ1ZSwicU1pbiI6MC4wMTE5MiwibGVhZkFyZWEiOjIuMTIyfSwibzQiOnsiY1NlZWQiOjUsImQiOjIwLCJxRXN0IjowLjA0LCJwRXN0IjowLjMsIm0wIjowLjAwM30sImMzIjp7Im1vZGUiOiJiaCIsImxhbWJkYSI6MC41LCJhbHBoYSI6Mi43N30sImM2Ijp7ImVuYWJsZWQiOnRydWUsIm4iOjIsInIwIjowLjAyMDU3fX0sIm1hcGxlIjp7ImNvbW1vbiI6IkZpZWxkIG1hcGxlIiwibGF0aW4iOiJBY2VyIGNhbXBlc3RyZSIsImxlYWYiOiJtYXBsZSIsImMzIjp7Im1vZGUiOiJiaCIsImxhbWJkYSI6MC41LCJhbHBoYSI6My42NjN9LCJjNSI6eyJlbmFibGVkIjp0cnVlLCJUIjowLjAyLCJnIjozLCJUcmVsIjowLjIwMjMsInRvcFF1YW50aWxlIjowLjl9LCJjNiI6eyJlbmFibGVkIjp0cnVlLCJuIjoyLCJyMCI6MC4wMTkzMn0sInIxIjp7ImVuYWJsZWQiOnRydWUsIm13IjoxLCJtZiI6MC4wNjcyNiwiTGgiOjE5LjQ5LCJoeWRyYXVsaWMiOiJoeXBlcmJvbGljIiwic3IiOjAuMSwiZlJlcCI6MC4xLCJtYXR1cml0eSI6MzAsImtTdGFydmUiOjMsInJlc2VydmUwIjoyLCJzdG9yZSI6Miwic2hlZCI6ImNhcmJvbiJ9LCJyMiI6eyJlbmFibGVkIjp0cnVlLCJsZXZlbHMiOlt7ImxhbWJkYSI6MC41MzE2LCJzZXRQb2ludCI6MCwiZXRhIjowLjI1LCJicmFuY2hBbmdsZSI6NDUsImdlbmVyYXRvciI6ImRpc3RpY2hvdXMiLCJ0aWVyRXZlcnkiOjAsInBUZXJtIjowfSx7ImxhbWJkYSI6MC40ODgxLCJzZXRQb2ludCI6NDkuNzYsImV0YSI6MC4zNTAxLCJicmFuY2hBbmdsZSI6NDkuMDEsImdlbmVyYXRvciI6ImRpc3RpY2hvdXMiLCJ0aWVyRXZlcnkiOjAsInBUZXJtIjowfSx7ImxhbWJkYSI6MC41LCJzZXRQb2ludCI6NDQuNDMsImV0YSI6MC4yNSwiYnJhbmNoQW5nbGUiOjQ1LCJnZW5lcmF0b3IiOiJkaXN0aWNob3VzIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MH1dLCJhQyI6Ni4yODIsImRMYW1iZGEiOjAuMDUxMTIsInJhbXAiOjE1LCJrYXBwYSI6MC4wMjQxNH0sInIzIjp7ImVuYWJsZWQiOnRydWUsInJobyI6MSwibGVhZk1hc3MiOjAuMDAyLCJFIjoyNTAwMDAwLCJzYWciOiJpbmNyZW1lbnQiLCJwaGkiOjEsInBvc3R1cmUiOnRydWUsImJldGFHIjowLjIsImdhbW1hIjowLjIsImMiOjAuMDMwMDIsInNpZ21hVGFyZ2V0IjozMDAwLCJnaXJ0aEdhaW4iOjAuMywic2lnbWFCcmVhayI6NDUwMCwiZ3JvdW5kIjp0cnVlfSwicjYiOnsiZW5hYmxlZCI6dHJ1ZSwicU1pbiI6MC4wNDk4MywibGVhZkFyZWEiOjIuMjk0fSwibzQiOnsiY1NlZWQiOjUsImQiOjI1LCJxRXN0IjowLjA1LCJwRXN0IjowLjMsIm0wIjowLjAwNH19LCJob2xseSI6eyJjb21tb24iOiJIb2xseSIsImxhdGluIjoiSWxleCBhcXVpZm9saXVtIiwibGVhZiI6ImhvbGx5IiwiYzMiOnsibW9kZSI6ImJoIiwibGFtYmRhIjowLjUsImFscGhhIjoyLjYwNX0sImM1Ijp7ImVuYWJsZWQiOnRydWUsIlQiOjAuMDEsImciOjMsIlRyZWwiOjAuMDk4NywidG9wUXVhbnRpbGUiOjAuOX0sImM2Ijp7ImVuYWJsZWQiOnRydWUsIm4iOjIsInIwIjowLjAyODg2fSwicjEiOnsiZW5hYmxlZCI6dHJ1ZSwibXciOjEsIm1mIjowLjA1NTc2LCJMaCI6MTQuMDYsImh5ZHJhdWxpYyI6Imh5cGVyYm9saWMiLCJzciI6MC4xLCJmUmVwIjowLjEsIm1hdHVyaXR5IjozMCwia1N0YXJ2ZSI6MywicmVzZXJ2ZTAiOjIsInN0b3JlIjoyLCJzaGVkIjoiY2FyYm9uIn0sInIyIjp7ImVuYWJsZWQiOnRydWUsImxldmVscyI6W3sibGFtYmRhIjowLjU0NDQsInNldFBvaW50IjowLCJldGEiOjAuNCwiYnJhbmNoQW5nbGUiOjQ1LCJnZW5lcmF0b3IiOiJkaXN0aWNob3VzIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MH0seyJsYW1iZGEiOjAuNTA2Nywic2V0UG9pbnQiOjc1LjYxLCJldGEiOjAuMzQ5OCwiYnJhbmNoQW5nbGUiOjYxLjMsImdlbmVyYXRvciI6ImRpc3RpY2hvdXMiLCJ0aWVyRXZlcnkiOjAsInBUZXJtIjowfSx7ImxhbWJkYSI6MC41LCJzZXRQb2ludCI6NzIuNywiZXRhIjowLjI1LCJicmFuY2hBbmdsZSI6NDUsImdlbmVyYXRvciI6ImRpc3RpY2hvdXMiLCJ0aWVyRXZlcnkiOjAsInBUZXJtIjowfV0sImFDIjozLjcxNCwiZExhbWJkYSI6MC4wMjY2NywicmFtcCI6MSwia2FwcGEiOjEuNTY1fSwicjMiOnsiZW5hYmxlZCI6dHJ1ZSwicmhvIjoxLCJsZWFmTWFzcyI6MC4wMDIsIkUiOjEwMDAwMDAsInNhZyI6ImluY3JlbWVudCIsInBoaSI6MSwicG9zdHVyZSI6dHJ1ZSwiYmV0YUciOjAuMiwiZ2FtbWEiOjAuMiwiYyI6MC4wOTU2Nywic2lnbWFUYXJnZXQiOjMwMDAsImdpcnRoR2FpbiI6MC4zLCJzaWdtYUJyZWFrIjo0NTAwLCJncm91bmQiOnRydWV9LCJyNiI6eyJlbmFibGVkIjp0cnVlLCJxTWluIjowLjA2ODIyLCJsZWFmQXJlYSI6Mi42NjF9LCJvNCI6eyJjU2VlZCI6OCwiZCI6NDAsInFFc3QiOjAuMDMsInBFc3QiOjAuMywibTAiOjAuMDAzfX0sInJvd2FuIjp7ImNvbW1vbiI6IlJvd2FuIiwibGF0aW4iOiJTb3JidXMgYXVjdXBhcmlhIiwibGVhZiI6InJvd2FuIiwiYzMiOnsibW9kZSI6ImJoIiwibGFtYmRhIjowLjUsImFscGhhIjoyLjY5Nn0sImM1Ijp7ImVuYWJsZWQiOnRydWUsIlQiOjAuMDUsImciOjMsIlRyZWwiOjAuMTk0NCwidG9wUXVhbnRpbGUiOjAuOX0sImM2Ijp7ImVuYWJsZWQiOnRydWUsIm4iOjIsInIwIjowLjAzMDN9LCJyMSI6eyJlbmFibGVkIjp0cnVlLCJtdyI6MSwibWYiOjAuMDI4OTQsIkxoIjoxNi40MSwiaHlkcmF1bGljIjoiaHlwZXJib2xpYyIsInNyIjowLjEsImZSZXAiOjAuMSwibWF0dXJpdHkiOjI1LCJrU3RhcnZlIjozLCJyZXNlcnZlMCI6Miwic3RvcmUiOjIsInNoZWQiOiJjYXJib24ifSwicjIiOnsiZW5hYmxlZCI6dHJ1ZSwibGV2ZWxzIjpbeyJsYW1iZGEiOjAuNTQxMSwic2V0UG9pbnQiOjAsImV0YSI6MC4zLCJicmFuY2hBbmdsZSI6NDUsImdlbmVyYXRvciI6ImRpc3RpY2hvdXMiLCJ0aWVyRXZlcnkiOjAsInBUZXJtIjowfSx7ImxhbWJkYSI6MC40OTQ2LCJzZXRQb2ludCI6NDQuNzgsImV0YSI6MC4yNTQ2LCJicmFuY2hBbmdsZSI6MjguNTgsImdlbmVyYXRvciI6ImRpc3RpY2hvdXMiLCJ0aWVyRXZlcnkiOjAsInBUZXJtIjowfSx7ImxhbWJkYSI6MC41LCJzZXRQb2ludCI6NDguMjQsImV0YSI6MC4yNSwiYnJhbmNoQW5nbGUiOjQwLCJnZW5lcmF0b3IiOiJkaXN0aWNob3VzIiwidGllckV2ZXJ5IjowLCJwVGVybSI6MH1dLCJhQyI6OC45MiwiZExhbWJkYSI6MC4wNDY0MSwicmFtcCI6MjAsImthcHBhIjowLjYyNjV9LCJyNCI6eyJxUmVsIjowLjI1fSwicjYiOnsiZW5hYmxlZCI6dHJ1ZSwicU1pbiI6MC4wOTQ0MywibGVhZkFyZWEiOjIuMzkzfSwibzQiOnsiY1NlZWQiOjMsImQiOjUwLCJxRXN0IjowLjA2LCJwRXN0IjowLjMsIm0wIjowLjAwNn0sInIzIjp7ImVuYWJsZWQiOnRydWUsInJobyI6MSwibGVhZk1hc3MiOjAuMDAyLCJFIjoxMDAwMDAwLCJzYWciOiJpbmNyZW1lbnQiLCJwaGkiOjEsInBvc3R1cmUiOnRydWUsImJldGFHIjowLjEsImdhbW1hIjowLjIsImMiOjAuMDk3NjksInNpZ21hVGFyZ2V0IjozMDAwLCJnaXJ0aEdhaW4iOjAuMywic2lnbWFCcmVhayI6NDUwMCwiZ3JvdW5kIjp0cnVlfX0sIndpbGxvdyI6eyJjb21tb24iOiJHb2F0IHdpbGxvdyIsImxhdGluIjoiU2FsaXggY2FwcmVhIiwibGVhZiI6IndpbGxvdyIsImMzIjp7Im1vZGUiOiJiaCIsImxhbWJkYSI6MC41LCJhbHBoYSI6NC42Nzh9LCJjNSI6eyJlbmFibGVkIjp0cnVlLCJUIjowLjEsImciOjMsIlRyZWwiOjAuMjUzOSwidG9wUXVhbnRpbGUiOjAuOX0sImM2Ijp7ImVuYWJsZWQiOnRydWUsIm4iOjIsInIwIjowLjAxNzZ9LCJyMSI6eyJlbmFibGVkIjp0cnVlLCJtdyI6MSwibWYiOjAuMDY3NiwiTGgiOjE1LjM1LCJoeWRyYXVsaWMiOiJoeXBlcmJvbGljIiwic3IiOjAuMSwiZlJlcCI6MC4xLCJtYXR1cml0eSI6MjAsImtTdGFydmUiOjMsInJlc2VydmUwIjoyLCJzdG9yZSI6Miwic2hlZCI6ImNhcmJvbiJ9LCJyMiI6eyJlbmFibGVkIjp0cnVlLCJsZXZlbHMiOlt7ImxhbWJkYSI6MC41MDMsInNldFBvaW50IjowLCJldGEiOjAuMjUsImJyYW5jaEFuZ2xlIjo0NSwiZ2VuZXJhdG9yIjoiZGlzdGljaG91cyIsInRpZXJFdmVyeSI6MCwicFRlcm0iOjB9LHsibGFtYmRhIjowLjUxOTEsInNldFBvaW50Ijo0Mi42NCwiZXRhIjowLjQ0NDUsImJyYW5jaEFuZ2xlIjo0OC41MiwiZ2VuZXJhdG9yIjoiZGlzdGljaG91cyIsInRpZXJFdmVyeSI6MCwicFRlcm0iOjB9LHsibGFtYmRhIjowLjQ5LCJzZXRQb2ludCI6NjAuNDMsImV0YSI6MC4yLCJicmFuY2hBbmdsZSI6NDUsImdlbmVyYXRvciI6ImRpc3RpY2hvdXMiLCJ0aWVyRXZlcnkiOjAsInBUZXJtIjowfV0sImFDIjoxLjc4NCwiZExhbWJkYSI6MC4wMjAzMSwicmFtcCI6MTAsImthcHBhIjoxLjIzNH0sInI0Ijp7InFSZWwiOjAuM30sInI2Ijp7ImVuYWJsZWQiOnRydWUsInFNaW4iOjAuMDk4NjUsImxlYWZBcmVhIjoyLjEwM30sIm80Ijp7ImNTZWVkIjoxLjUsImQiOjYwLCJxRXN0IjowLjMsInBFc3QiOjAuMywibTAiOjAuMDEyLCJyYWluIjoxfSwicjMiOnsiZW5hYmxlZCI6dHJ1ZSwicmhvIjoxLCJsZWFmTWFzcyI6MC4wMDIsIkUiOjEwMDAwMDAsInNhZyI6ImluY3JlbWVudCIsInBoaSI6MSwicG9zdHVyZSI6dHJ1ZSwiYmV0YUciOjAuMSwiZ2FtbWEiOjAuMiwiYyI6MC4xMDI2LCJzaWdtYVRhcmdldCI6MzAwMCwiZ2lydGhHYWluIjowLjMsInNpZ21hQnJlYWsiOjQ1MDAsImdyb3VuZCI6dHJ1ZX19fX0"
+  }
+}

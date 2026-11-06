@@ -1,0 +1,82 @@
+skipped (done): beech; their shifts carry to the rest
+
+=== birch (least squares) ===
+birch: own start loss 120.57, shifted by 1 species' fits 32.27
+screening: 38 evaluations in 109 s; active (17): c3.alpha, r2.levels.0.lambda, r2.levels.1.lambda, r2.levels.1.setPoint, r2.levels.1.branchAngle, r2.levels.1.eta, r2.levels.2.setPoint, r2.aC, r2.dLambda, r2.kappa, c5.Trel, r1.Lh, r1.mf, r3.c, r6.qMin, r6.leafArea, r2.hJ
+LM start: loss 35.86, r0 0.007075
+LM 1: accepted loss 6.72 (current 6.72), step 0.250, r0 0.01088, measured in band 4, 179 s
+LM 2: rejected loss 7.30 (current 6.72), step 0.250, r0 0.01058, measured in band 4, 172 s
+LM 2: accepted loss 6.57 (current 6.57), step 0.125, r0 0.01073, measured in band 4, 183 s
+LM 3: accepted loss 3.70 (current 3.70), step 0.250, r0 0.01043, measured in band 4, 170 s
+LM 4: rejected loss 4.26 (current 3.70), step 0.250, r0 0.01037, measured in band 4, 160 s
+LM 4: accepted loss 2.90 (current 2.90), step 0.125, r0 0.0104, measured in band 4, 171 s
+LM 5: rejected loss 3.72 (current 2.90), step 0.211, r0 0.01042, measured in band 4, 161 s
+LM 5: rejected loss 3.06 (current 2.90), step 0.121, r0 0.01041, measured in band 4, 172 s
+LM 5: rejected loss 3.22 (current 2.90), step 0.060, r0 0.0104, measured in band 4, 183 s
+LM 5: rejected loss 3.03 (current 2.90), step 0.030, r0 0.0104, measured in band 4, 194 s
+LM ends: 4 consecutive rejected steps
+CMA-ES: σ 0.120; initial sd by (JᵀJ)⁻¹ (unit cube) c3.alpha 0.104, r2.levels.0.lambda 0.092, r2.levels.1.lambda 0.106, r2.levels.1.setPoint 0.064, r2.levels.1.branchAngle 0.058, r2.levels.1.eta 0.110, r2.levels.2.setPoint 0.084, r2.aC 0.028, r2.dLambda 0.071, r2.kappa 0.038, c5.Trel 0.120, r1.Lh 0.060, r1.mf 0.108, r3.c 0.056, r6.qMin 0.002, r6.leafArea 0.041, r2.hJ 0.020, c6.r0 0.026
+CMA 0: best 2.66, median 3.64, run best 2.66, measured in band 4/5, 134 s
+CMA 1: best 2.99, median 3.50, run best 2.66, measured in band 4/5, 137 s
+CMA 2: best 2.57, median 3.60, run best 2.57, measured in band 4/5, 135 s
+CMA 3: best 2.98, median 3.94, run best 2.57, measured in band 4/5, 136 s
+CMA 4: best 2.76, median 3.34, run best 2.57, measured in band 4/5, 136 s
+CMA 5: best 2.29, median 4.09, run best 2.29, measured in band 4/5, 136 s
+CMA 6: best 2.29, median 3.64, run best 2.29, measured in band 4/5, 135 s
+CMA 7: best 3.22, median 3.48, run best 2.29, measured in band 4/5, 135 s
+CMA 8: best 2.65, median 3.56, run best 2.29, measured in band 4/5, 136 s
+CMA 9: best 2.57, median 3.70, run best 2.29, measured in band 4/5, 136 s
+CMA 10: best 2.72, median 3.15, run best 2.29, measured in band 4/5, 135 s
+CMA 11: best 2.64, median 3.24, run best 2.29, measured in band 4/5, 135 s
+CMA 12: best 2.79, median 3.59, run best 2.29, measured in band 4/5, 135 s
+CMA 13: best 2.52, median 3.53, run best 2.29, measured in band 4/5, 136 s
+CMA 14: best 3.03, median 3.57, run best 2.29, measured in band 4/5, 135 s
+CMA 15: best 2.30, median 3.32, run best 2.29, measured in band 4/5, 135 s
+CMA 16: best 2.74, median 3.24, run best 2.29, measured in band 4/5, 134 s
+CMA 17: best 2.65, median 3.47, run best 2.29, measured in band 4/5, 134 s
+CMA 18: best 2.52, median 3.41, run best 2.29, measured in band 4/5, 137 s
+CMA 19: best 2.86, median 3.37, run best 2.29, measured in band 4/5, 135 s
+CMA 20: best 2.99, median 3.64, run best 2.29, measured in band 4/5, 134 s
+selection: lm 4 in band, loss 3.16; cma 1 4 in band, loss 3.50; cma 2 4 in band, loss 2.94; cma 3 4 in band, loss 3.41; cma 4 4 in band, loss 4.27; cma 5 4 in band, loss 2.63
+
+birch: 357 evaluations in 4016 s (screening 109 s, lm 908 s, cma 2839 s, verification 161 s); stopped: CMA-ES's best not improved for 15 generations; measured outside: shade.survivalLight
+accepted: False (measured targets in band on fresh seeds: 4 of 5; outside: shade.survivalLight); fit from cma 5
+loss on fresh seeds (progress only): start 34.24, fitted 3.58
+trait                         kind   target    band    start   fitted   margin
+stand.height              measured       95      20     89.8     91.6     16.6
+lone.earlyShare           measured     0.72    0.08    0.774    0.687   0.0472
+lone.spread              described     0.45    0.12    0.567    0.481   0.0892
+lone.slenderness          measured       48       8     73.7     50.7     5.28
+stand.slenderness         measured       70      10      105     70.2     9.81
+stand.crownRatio         described     0.38     0.1    0.329    0.393   0.0867
+lone.widestAt            described      0.4    0.15    0.167     0.15     -0.1
+lone.crownFullness       described      0.7     0.1    0.749     0.75   0.0499
+lone.forkHeight          described      0.9     0.1    0.992    0.981   0.0194
+lone.leaderDominance     described      3.0     1.0     2.33     2.72    0.722
+lone.branchAngle         described       45      10     64.5     48.1     6.86
+lone.limbDroop           described       15      10     8.51     17.4     7.56
+stand.lateShare          described     1.12    0.08     1.08     1.16   0.0415
+shade.survivalLight       measured     0.21    0.05   0.0859    0.156 -0.00394
+active: c3.alpha, r2.levels.0.lambda, r2.levels.1.lambda, r2.levels.1.setPoint, r2.levels.1.branchAngle, r2.levels.1.eta, r2.levels.2.setPoint, r2.aC, r2.dLambda, r2.kappa, c5.Trel, r1.Lh, r1.mf, r3.c, r6.qMin, r6.leafArea, r2.hJ
+c3.alpha                     3.07     2.85
+r2.levels.0.lambda          0.586    0.595
+r2.levels.1.lambda          0.507    0.495
+r2.levels.1.setPoint         78.2     47.3
+r2.levels.1.branchAngle      50.4     33.2
+r2.levels.1.eta             0.502    0.607
+r2.levels.2.setPoint          136      147
+r2.aC                        10.5     14.7
+r2.dLambda                 0.0802   0.0804
+r2.kappa                    0.243    0.568
+c5.Trel                     0.562    0.203
+c6.r0                     0.00707  0.00997
+r1.Lh                        36.6     42.4
+r1.mf                       0.106    0.136
+r3.c                       0.0896   0.0912
+r6.qMin                     0.123      0.2
+r6.leafArea                  2.45     2.72
+r2.hJ                        10.1     31.8
+r1.mw                          64     32.2
+wrote /home/edbarker/Documents/Projects/tree-simulation/docs/experiments/fits/round3/birch.json
+
+finished: fitted birch; skipped beech

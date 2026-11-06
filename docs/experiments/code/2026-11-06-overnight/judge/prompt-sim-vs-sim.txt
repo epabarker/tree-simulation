@@ -1,0 +1,18 @@
+You are judging simulated trees against real ones. Each image has two parts.
+Top row, labelled "Reference: real trees": four real trees (laser-scanned, drawn as flat silhouettes of bare branches).
+Bottom row, two panels labelled "A" and "B": two simulated trees, drawn by the same renderer at one shared scale.
+
+Task, for each image listed below: decide which of A or B is more like the reference trees in overall form and branching
+(the habit, crown shape, how the limbs and twigs are arranged and spaced, the trunk). Ignore the label position and
+image framing. Always choose A or B, even when the difference is small; lower your confidence instead.
+
+Use the Read tool on each file, one image at a time. You have no other tools to look at them (no Glob). Do not
+read any other file, and do not look for a key or for how the images were made.
+
+Files (read every one):
+{FILES}
+
+Answer for every file with: the file name, "pick" (A or B), "conf" (1 = guessing, 5 = certain), and "cue" (at most 12
+words: what made you choose). Write a JSON list to {OUT}, one object per file, like
+[{"file": "q1a2b3.png", "pick": "A", "conf": 3, "cue": "limbs spaced and tapering like the reference"}]
+with the "file" value the bare file name. Use the Write tool; then reply only "done" plus the number of entries.

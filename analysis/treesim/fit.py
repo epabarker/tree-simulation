@@ -1,0 +1,523 @@
+"""Fit a species' patch to literature traits by CMA-ES (M27, ADR 0020).
+
+A candidate is a set of dotted-path assignments to the species' patch (src/core/trials.ts), plus the
+targets file's fixed assignments (the hyperbolic hydraulic discount, ADR 0021) and its `[form]`: the
+ten form parameters, set by hand from the form sheet and applied like `[fixed]` (ADR 0029). Each is grown in the
+standard trials by a pool of long-lived evaluators (`node cli/fit-eval.ts`, one per worker), and
+scored against the targets in analysis/fit/targets/<species>.toml:
+
+    loss = Σ weight · ((seed-mean trait − target) / band)²  + penalties for dead trees
+
+A profile trait (`profile = [t0 … t9]` and one `band` in place of `target`: the crown's width in ten
+height bands, species plan of 2026-10-31, step B.3) adds weight/10 · ((p_k − t_k) / band)² per band,
+so the vector weighs as one trait.
+
+Level 0 (reference-fidelity phase 2, the plan's §k): `load_spec(species, level=0)` scores each stand tree's place in
+Tallo's H–DBH and CR–DBH bands (`stand.talloH`, `stand.talloCR`: per season 60, 100, 150, the median z of the measured
+trees inside the support; analysis/treesim/tallo.py) with the time anchors Tallo cannot give, and reports the rest.
+
+`[[report]]` traits (the crown's shape: ADR 0029) are read from the same replies and written beside
+the fit, never scored. Each is reported at 60 and, where the lone tree is run on (`lone100`), at 100
+as `<name>100`; a report's target, band or profile is the description it is judged against by eye.
+
+The search runs in [0, 1]^n (log scale where a parameter asks for it). Every candidate of a
+generation sees the same seeds (common random numbers), drawn afresh each generation so no fit
+learns one seed's quirks. Restarts: some from today's values, some from random points. At the end
+the best candidates are re-measured on fixed seeds, beside the hand-tuned patch.
+"""
+
+from __future__ import annotations
+
+import json
+import math
+import queue
+import subprocess
+import time
+import tomllib
+from concurrent.futures import ThreadPoolExecutor
+from dataclasses import dataclass, field
+from pathlib import Path
+
+import numpy as np
+from cmaes import CMA
+
+from treesim.sweep import REPO
+
+TARGETS = REPO / "analysis" / "fit" / "targets"
+TRIALS = ["lone", "stand"]
+#: Light a seedling that dies under every roof of the shade house is taken to need: above the
+#: lightest roof (≈ 61%), so the loss still ranks how far a candidate is from surviving.
+NO_SURVIVAL_LIGHT = 0.7
+#: Seasons a seedling lives in the dark: under an opaque roof it bears no leaf, burns its reserve
+#: and starves (R1's reserve0 and kStarve, world defaults the fit never moves), dying in season 5
+#: for every species, at round 2's patches and round 3's fits alike (measured:
+#: docs/experiments/code/2026-10-31-species-round4/starve-s0.txt; tests/trials.test.ts asserts it).
+#: The survival light credits only the seasons past it: those are the part that varies with light.
+STARVE_SEASONS = 4
+#: Loss added for each lone tree that dies, and for each fifth of a stand's interior lost.
+DEATH_PENALTY = 25.0
+#: Loss for a trait that could not be measured (a tree with no limbs to measure, say).
+MISSING_PENALTY = 4.0
+#: Level 0's scored traits besides Tallo's (the user, 2026-11-03): the time anchors Tallo cannot give (height at 60,
+#: 100 over 60; an exception to ADR 0049 §1), the stand's LAI and the shade house. Every other trait is reported.
+#: v2 (the user, 2026-11-03): a targets file's `[level0] reported` moves some of these to the reports (birch's
+#: lateShare, described, not measured), and its `[[level0.trait]]` adds the yield tables' heights at 100 and 150
+#: (`stand.height100`, `stand.height150`), scored at Level 0 only.
+LEVEL0_SCORED = ("stand.height", "stand.lateShare", "stand.lai", "shade.survivalLight")
+#: The stand's seasons Level 0 reads (cli/trials.ts runStand to 150), in a Tallo trait's entry order.
+LEVEL0_SEASONS = (60, 100, 150)
+#: Metres a cell (tallo-level0.json's measurement): stand.height150 is in cells, as stand.height and height100 are.
+CELL_M = 0.25
+
+
+@dataclass
+class Spec:
+    species: str
+    traits: list[dict]
+    params: list[dict]
+    holdout: dict = field(default_factory=dict)
+    #: Assignments every candidate carries unchanged, e.g. {"r1.hydraulic": "hyperbolic"} (ADR 0021).
+    fixed: dict = field(default_factory=dict)
+    #: The form parameters, by hand (ADR 0029): applied to every candidate like `fixed`.
+    form: dict = field(default_factory=dict)
+    #: Traits read and written, never scored (ADR 0029): the crown's shape.
+    reports: list[dict] = field(default_factory=list)
+    #: Level 0: the species' Tallo curves (tallo-level0.json's entry), read by seed_traits for z.
+    tallo: dict | None = None
+
+    @property
+    def paths(self) -> list[str]:
+        return [p["path"] for p in self.params]
+
+    @property
+    def trials(self) -> list[str]:
+        """The trials its traits need: the stand runs on to season 100 for stand.lateShare, and the
+        shade house runs only for shade.survivalLight (each costs time)."""
+        names = {t["name"] for t in self.traits}
+        if any(n.startswith("stand.tallo") for n in names):
+            stand = "stand150"
+        else:
+            stand = "stand100" if "stand.lateShare" in names else "stand"
+        trials = ["lone", stand]
+        if any(n.startswith("shade.") for n in names):
+            trials.append("shade")
+        return trials
+
+
+def load_spec(species: str, level: int | None = None) -> Spec:
+    """The species' targets. level=0: Level 0 (the plan's §k): Tallo's two traits and LEVEL0_SCORED scored, every
+    other trait reported, the params `[level0] knobs` only."""
+    data = tomllib.loads((TARGETS / f"{species}.toml").read_text())
+    spec = Spec(data["species"], data["trait"], data["param"], data.get("holdout", {}), data.get("fixed", {}),
+                data.get("form", {}), data.get("report", []))
+    if level != 0:
+        return spec
+    from treesim import tallo
+
+    entry = tallo.load_targets()["species"][species]
+    if not entry["gated"]:
+        raise ValueError(f"{species} is not gated at Level 0: {entry.get('not_gated_reason', 'reference only')}")
+    knobs = data["level0"]["knobs"]
+    by_path = {p["path"]: p for p in spec.params}
+    spec.params = [by_path[k] for k in knobs]
+    scored = [n for n in LEVEL0_SCORED if n not in data["level0"].get("reported", [])]
+    spec.reports = spec.reports + [t for t in spec.traits if t["name"] not in scored]
+    spec.tallo = entry
+    spec.traits = [t for t in spec.traits if t["name"] in scored] + data["level0"].get("trait", []) + [
+        {"name": f"stand.tallo{k}", "profile": [0.0] * len(LEVEL0_SEASONS), "band": 1.0, "weight": 1.0,
+         "partial": True, "kind": "measured",
+         "source": f"Tallo {k}–DBH band (analysis/fit/sources/tallo-level0.json): median z of the measured trees"}
+        for k in tallo.TRAITS
+    ]
+    return spec
+
+
+def report_names(spec: Spec, seasons: tuple[str, ...] = ("", "100")) -> list[str]:
+    """The flat trait names a spec's reports read: each at 60 (its name) and, for the lone tree, at 100
+    (`<name>100`); a profile's ten bands as `<name>.k`. The stand's are read where the stand runs
+    (stand.crownRatio100 is its own report)."""
+    out = []
+    for r in spec.reports:
+        for suffix in seasons if r["name"].startswith("lone.") else ("",):
+            name = r["name"] + suffix
+            out += [f"{name}.{k}" for k in range(10)] if "profile" in r else [name]
+    return out
+
+
+class Evaluator:
+    """One `node cli/fit-eval.ts` process: a JSON line out, a JSON line back."""
+
+    def __init__(self) -> None:
+        self.proc = subprocess.Popen(
+            ["node", "cli/fit-eval.ts"],
+            cwd=REPO,
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            text=True,
+            bufsize=1,
+        )
+        self.next_id = 0
+
+    def ask(self, request: dict) -> dict:
+        self.next_id += 1
+        assert self.proc.stdin and self.proc.stdout
+        self.proc.stdin.write(json.dumps({**request, "id": self.next_id}) + "\n")
+        self.proc.stdin.flush()
+        line = self.proc.stdout.readline()
+        if not line:
+            raise RuntimeError("fit-eval stopped (is Node 24 first on PATH?)")
+        reply = json.loads(line)
+        if "error" in reply:
+            raise RuntimeError(reply["error"])
+        return reply
+
+    def close(self) -> None:
+        if self.proc.stdin:
+            self.proc.stdin.close()
+        self.proc.wait(timeout=10)
+
+
+class Pool:
+    """Evaluators shared by threads: each request takes a free one."""
+
+    def __init__(self, workers: int) -> None:
+        self.evaluators = [Evaluator() for _ in range(workers)]
+        self.free: queue.Queue[Evaluator] = queue.Queue()
+        for e in self.evaluators:
+            self.free.put(e)
+        self.executor = ThreadPoolExecutor(workers)
+
+    def _run(self, request: dict) -> dict:
+        e = self.free.get()
+        try:
+            return e.ask(request)
+        finally:
+            self.free.put(e)
+
+    def map(self, requests: list[dict]) -> list[dict]:
+        return list(self.executor.map(self._run, requests))
+
+    def ask(self, request: dict) -> dict:
+        return self._run(request)
+
+    def close(self) -> None:
+        self.executor.shutdown()
+        for e in self.evaluators:
+            e.close()
+
+
+# --- Encoding --------------------------------------------------------------------------------
+
+
+def decode(spec: Spec, x: np.ndarray) -> dict:
+    """Unit-cube point → the candidate's assignments: the fixed ones and the form, then the free
+    parameters to 4 significant figures (short patches and links)."""
+    out = {**spec.fixed, **spec.form}
+    for p, u in zip(spec.params, np.clip(x, 0, 1)):
+        lo, hi = p["lo"], p["hi"]
+        if p.get("log"):
+            v = math.exp(math.log(lo) + u * (math.log(hi) - math.log(lo)))
+        else:
+            v = lo + u * (hi - lo)
+        out[p["path"]] = float(f"{v:.4g}")
+    return out
+
+
+def encode(spec: Spec, values: dict[str, float | None]) -> np.ndarray:
+    """Parameter values → unit cube (a missing value, e.g. an unset κ, sits at its lower bound)."""
+    x = []
+    for p in spec.params:
+        lo, hi = p["lo"], p["hi"]
+        v = values.get(p["path"])
+        v = lo if v is None else min(hi, max(lo, float(v)))
+        if p.get("log"):
+            x.append((math.log(v) - math.log(lo)) / (math.log(hi) - math.log(lo)))
+        else:
+            x.append((v - lo) / (hi - lo))
+    return np.array(x)
+
+
+# --- Traits and loss -------------------------------------------------------------------------
+
+
+def survival_light(reply: dict, k: int = 0) -> tuple[float, float]:
+    """Seed k's survival light in the shade house: (continuous, step).
+
+    The step is the lowest light the seedling lives to season 30 under (alive or dead is a step in
+    the parameters). The continuous one reads the seasons it lived under each roof (species plan
+    §2.2): on a log-light axis each roof owns the interval from its light up to the next brighter
+    roof's (the brightest's up to NO_SURVIVAL_LIGHT), and the survival light is the top minus the
+    intervals weighted by the share of the 30 seasons lived past STARVE_SEASONS (round 4: the
+    seasons a leafless seedling takes to starve are the same under every roof below the cut, and
+    crediting them read birch 25% too tolerant). A clean step at roof a gives roof a's light, as
+    the step statistic does; a seedling that dies late under the next darker roof moves it toward
+    that roof's light."""
+    roofs = sorted(reply["shade"], key=lambda r: reply["light"][r])
+    lights = [reply["light"][r] for r in roofs]
+    survived = reply.get("survived")
+    share = [
+        (max(0, survived[r][k] - STARVE_SEASONS) / (30 - STARVE_SEASONS) if survived else float(reply["shade"][r][k]))
+        for r in roofs
+    ]
+    edges = [math.log(x) for x in lights] + [math.log(NO_SURVIVAL_LIGHT)]
+    log_light = edges[-1] - sum(f * (edges[i + 1] - edges[i]) for i, f in enumerate(share))
+    lit = [x for r, x in zip(roofs, lights) if reply["shade"][r][k]]
+    return math.exp(log_light), (min(lit) if lit else NO_SURVIVAL_LIGHT)
+
+
+def tallo_traits(allometry: list[dict], curves: dict) -> dict[str, float | None]:
+    """`stand.talloH.k`, `stand.talloCR.k`: at LEVEL0_SEASONS[k], the median z of the measured trees inside the
+    support (None where none is); `stand.dbh.k`, `stand.H.k`, `stand.CR.k`: their median measurements, metres."""
+    from treesim import tallo
+
+    out: dict[str, float | None] = {}
+    for k, season in enumerate(LEVEL0_SEASONS):
+        trees = [a for a in allometry if a["season"] == season]
+        for name, key in (("dbh", "dbh"), ("H", "height"), ("CR", "crownRadius")):
+            out[f"stand.{name}.{k}"] = float(np.median([a[key] for a in trees])) if trees else None
+        for trait, key in (("H", "height"), ("CR", "crownRadius")):
+            zs = [tallo.z_score(curves[trait], 100 * a["dbh"], a[key]) for a in trees]
+            zs = [z for z in zs if z is not None]
+            out[f"stand.tallo{trait}.{k}"] = float(np.median(zs)) if zs else None
+    return out
+
+
+def seed_traits(reply: dict, tallo_curves: dict | None = None) -> dict[str, float | None]:
+    """Flat traits of one seed's reply, `trial.trait` (a vector's entries `trial.trait.k`, as
+    lone.profile.0 … lone.profile.9), with derived ones: lone.earlyShare (H30/H60),
+    stand.lateShare (H100/H60), and shade.survivalLight (the light the seedling survives down to,
+    from the seasons it lived under each roof; shade.survivalLightStep is the lowest light it lived
+    to season 30 under, the statistic before 3D)."""
+    flat: dict[str, float | None] = {}
+    for trial in TRIALS:
+        for rec in reply.get(trial, []):
+            if trial == "stand" and "allometry" in rec:
+                if tallo_curves is not None:
+                    flat.update(tallo_traits(rec["allometry"], tallo_curves))
+                # The live measured trees' mean height at 150, in cells: the same reading as height and height100
+                # (metrics' height is the allometry's highest point; equal at 60 and 100 on four species, 2026-11-03).
+                hs = [a["height"] for a in rec["allometry"] if a["season"] == LEVEL0_SEASONS[-1]]
+                flat["stand.height150"] = float(np.mean(hs)) / CELL_M if hs else None
+            for k, v in rec.items():
+                if k == "allometry":
+                    continue
+                if isinstance(v, list):
+                    for i, x in enumerate(v):
+                        flat[f"{trial}.{k}.{i}"] = None if x is None else float(x)
+                    continue
+                # Booleans (alive) count as 0 or 1; null is a trait that could not be measured.
+                flat[f"{trial}.{k}"] = None if v is None else float(v)
+    h30, h60 = flat.get("lone.height30"), flat.get("lone.height60")
+    flat["lone.earlyShare"] = h30 / h60 if h30 is not None and h60 else None
+    s60, s100 = flat.get("stand.height"), flat.get("stand.height100")
+    flat["stand.lateShare"] = s100 / s60 if s100 is not None and s60 else None
+    if "shade" in reply:
+        flat["shade.survivalLight"], flat["shade.survivalLightStep"] = survival_light(reply)
+    return flat
+
+
+def mean_traits(per_seed: list[dict[str, float | None]]) -> dict[str, float | None]:
+    keys = {k for t in per_seed for k in t}
+    out: dict[str, float | None] = {}
+    for k in keys:
+        xs = [t[k] for t in per_seed if t.get(k) is not None and math.isfinite(t[k])]
+        out[k] = float(np.mean(xs)) if xs else None
+    return out
+
+
+def targets_of(t: dict) -> list[float]:
+    """A trait's targets: one, or a profile's ten."""
+    return list(t["profile"]) if "profile" in t else [t["target"]]
+
+
+def value_of(t: dict, traits: dict) -> float | list[float] | None:
+    """The trait's seed-mean value: a number, a profile's list of band values, or None where any of
+    it could not be measured."""
+    if "profile" not in t:
+        return traits.get(t["name"])
+    vs = [traits.get(f"{t['name']}.{k}") for k in range(len(t["profile"]))]
+    if t.get("partial"):
+        # Level 0's Tallo traits: a season with no tree inside the support is left out, not missing.
+        return None if all(v is None for v in vs) else vs
+    return None if any(v is None for v in vs) else vs
+
+
+def scaled(t: dict, traits: dict) -> list[float] | None:
+    """(value − target)/band for each of the trait's terms (one, or a profile's ten); None if missing."""
+    v = value_of(t, traits)
+    if v is None:
+        return None
+    vs = v if isinstance(v, list) else [v]
+    return [(x - g) / t["band"] for x, g in zip(vs, targets_of(t)) if x is not None]
+
+
+def contributions(spec: Spec, traits: dict[str, float | None]) -> dict[str, float]:
+    """Each scored trait's share of the loss, and the death penalties' (`death.lone`, `death.stand`)."""
+    out: dict[str, float] = {}
+    for t in spec.traits:
+        z = scaled(t, traits)
+        # A profile's bands share the trait's weight.
+        out[t["name"]] = t["weight"] * (MISSING_PENALTY if z is None else float(np.mean(np.square(z))))
+    lone_alive = traits.get("lone.alive")
+    out["death.lone"] = DEATH_PENALTY * (1 - lone_alive) if lone_alive is not None else 0.0
+    # The stand's survival at 60, and at 100 where the stand runs on (stand.lateShare): a stand
+    # whose measured row dies after 60 is penalised as one that dies before it.
+    out["death.stand"] = 0.0
+    for key in ("stand.alive", "stand.alive100"):
+        stand_alive = traits.get(key)
+        if stand_alive is not None:
+            out["death.stand"] += DEATH_PENALTY * 5 * max(0.0, 0.8 - stand_alive)
+    return out
+
+
+def loss(spec: Spec, traits: dict[str, float | None]) -> float:
+    return float(sum(contributions(spec, traits).values()))
+
+
+def measure(pool: Pool, spec: Spec, assigns: list[dict], seeds: list[int]) -> list[dict]:
+    """Seed-mean traits of each candidate, every (candidate, seed) a request of its own."""
+    requests = [
+        {"species": spec.species, "assign": a, "seeds": [s], "trials": spec.trials}
+        for a in assigns
+        for s in seeds
+    ]
+    replies = pool.map(requests)
+    n = len(seeds)
+    return [mean_traits([seed_traits(r, spec.tallo) for r in replies[i * n : (i + 1) * n]])
+            for i in range(len(assigns))]
+
+
+# --- The search --------------------------------------------------------------------------------
+
+
+@dataclass
+class FitSettings:
+    generations: int = 100
+    popsize: int = 12
+    seeds: int = 5
+    warm_restarts: int = 3
+    random_restarts: int = 2
+    #: Stop a restart when its best loss has not improved by 1% in this many generations.
+    patience: int = 25
+    #: Candidates re-measured at the end, on `final_seeds` fixed seeds.
+    finalists: int = 10
+    final_seeds: int = 10
+    workers: int = 4
+    rng_seed: int = 2026
+
+    @classmethod
+    def budget(cls, name: str, **overrides) -> FitSettings:
+        """A named budget: "full" (ADR 0020's), or "quick" (2 restarts, 50 generations, 4 seeds;
+        about a sixth of the candidates, for a first look at every species)."""
+        presets = {
+            "full": {},
+            "quick": {"generations": 50, "seeds": 4, "warm_restarts": 1, "random_restarts": 1},
+        }
+        return cls(**{**presets[name], **overrides})
+
+
+#: Every species with a targets file, the pilot species first.
+SPECIES = ["birch", "beech", "oak", "fir", "hornbeam", "maple", "holly", "rowan", "willow", "pine"]
+
+
+def fit(spec: Spec, settings: FitSettings, log=print, start: dict | None = None) -> dict:
+    """Fits `spec`. Warm restarts start from the hand-tuned values, or from `start` (an earlier fit's
+    assignments) where given; a parameter `start` lacks (one added since) starts mid-range."""
+    rng = np.random.default_rng(settings.rng_seed)
+    pool = Pool(settings.workers)
+    rows: list[dict] = []
+    try:
+        start_values = pool.ask({"describe": spec.species, "paths": spec.paths})["values"]
+        x_hand = encode(spec, start_values)
+        if start is not None:
+            x_hand = np.array([
+                encode(Spec(spec.species, [], [p]), {p["path"]: start[p["path"]]})[0] if p["path"] in start else 0.5
+                for p in spec.params
+            ])
+        n = len(spec.params)
+        bounds = np.array([[0.0, 1.0]] * n)
+        restarts = ["warm"] * settings.warm_restarts + ["random"] * settings.random_restarts
+        ends: list[dict] = []
+        t0 = time.time()
+        for r, kind in enumerate(restarts):
+            mean = x_hand if kind == "warm" else rng.uniform(0.1, 0.9, n)
+            cma = CMA(
+                mean=mean.copy(),
+                sigma=0.15 if kind == "warm" else 0.3,
+                bounds=bounds,
+                population_size=settings.popsize,
+                seed=int(rng.integers(1 << 30)),
+            )
+            best = math.inf
+            since = 0
+            for g in range(settings.generations):
+                seeds = [int(s) for s in rng.choice(np.arange(1, 10_000), settings.seeds, replace=False)]
+                xs = [cma.ask() for _ in range(cma.population_size)]
+                assigns = [decode(spec, x) for x in xs]
+                traits = measure(pool, spec, assigns, seeds)
+                losses = [loss(spec, t) for t in traits]
+                cma.tell(list(zip(xs, losses)))
+                for x, a, t, lo in zip(xs, assigns, traits, losses):
+                    rows.append({"restart": r, "kind": kind, "generation": g, "loss": lo, **a,
+                                 **{f"trait:{k}": v for k, v in t.items()}})
+                gen_best = min(losses)
+                if gen_best < best * 0.99:
+                    best, since = gen_best, 0
+                else:
+                    since += 1
+                log(f"restart {r} ({kind}) gen {g}: best {gen_best:.2f}, median {np.median(losses):.2f}, "
+                    f"run best {best:.2f}, {time.time() - t0:.0f} s")
+                if since >= settings.patience or cma.should_stop():
+                    break
+            sd = np.sqrt(np.diag(cma._C)) * cma._sigma if hasattr(cma, "_C") else np.full(n, np.nan)
+            ends.append({"restart": r, "kind": kind, "mean": decode(spec, cma._mean), "best": best,
+                         "sd_unit": dict(zip(spec.paths, map(float, sd)))})
+
+        # Finalists: the lowest-loss candidates over the whole search, re-measured on fixed seeds.
+        ranked = sorted(rows, key=lambda row: row["loss"])
+        finalists: list[dict] = []
+        for row in ranked:
+            a = {**spec.fixed, **spec.form, **{p: row[p] for p in spec.paths}}
+            if a not in finalists:
+                finalists.append(a)
+            if len(finalists) >= settings.finalists:
+                break
+        fixed_seeds = list(range(1, settings.final_seeds + 1))
+        hand_traits = measure(pool, spec, [{}], fixed_seeds)[0]
+        final_traits = measure(pool, spec, finalists, fixed_seeds)
+        final_losses = [loss(spec, t) for t in final_traits]
+        k = int(np.argmin(final_losses))
+        patch = pool.ask({"amend": spec.species, "assign": finalists[k]})["patch"]
+        return {
+            "species": spec.species,
+            "settings": settings.__dict__,
+            "seconds": round(time.time() - t0),
+            "candidates": len(rows),
+            "hand": {"values": start_values, "loss": loss(spec, hand_traits), "traits": hand_traits},
+            "fit": {"assign": finalists[k], "loss": final_losses[k], "traits": final_traits[k], "patch": patch},
+            "finalists": [{"assign": a, "loss": lo} for a, lo in zip(finalists, final_losses)],
+            "restarts": ends,
+            "rows": rows,
+        }
+    finally:
+        pool.close()
+
+
+def write_results(result: dict, out_dir: Path, log_dir: Path) -> Path:
+    """The full log as parquet under runs/; the small, committable summary as JSON in `out_dir`."""
+    import polars as pl
+
+    log_dir.mkdir(parents=True, exist_ok=True)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    rows = result.pop("rows")
+    pl.DataFrame(rows, infer_schema_length=None).write_parquet(log_dir / "log.parquet")
+    progress = (
+        pl.DataFrame(rows, infer_schema_length=None)
+        .group_by("restart", "generation")
+        .agg(pl.col("loss").min().alias("best"), pl.col("loss").median().alias("median"))
+        .sort("restart", "generation")
+    )
+    progress.write_csv(out_dir / f"{result['species']}-progress.csv")
+    path = out_dir / f"{result['species']}.json"
+    path.write_text(json.dumps(result, indent=2, default=float) + "\n")
+    return path

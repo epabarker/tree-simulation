@@ -1,0 +1,12 @@
+k8-t0 season 150
+  row 0: LAI<1 0.097 (n 6), 1–6 0.103 (n 377), ≥6 0.093 (n 247); corr(light, LAI) -0.25
+  row 20: LAI<1 0.135 (n 6), 1–6 0.128 (n 377), ≥6 0.105 (n 247); corr(light, LAI) -0.43
+  row 40: LAI<1 0.237 (n 6), 1–6 0.177 (n 377), ≥6 0.124 (n 247); corr(light, LAI) -0.61
+  row 50: LAI<1 0.346 (n 6), 1–6 0.231 (n 377), ≥6 0.149 (n 247); corr(light, LAI) -0.72
+  row 60: LAI<1 0.633 (n 6), 1–6 0.368 (n 377), ≥6 0.258 (n 247); corr(light, LAI) -0.80
+k8-t0 season 300
+  row 0: LAI<1 0.102 (n 26), 1–6 0.122 (n 507), ≥6 0.130 (n 97); corr(light, LAI) +0.40
+  row 20: LAI<1 0.156 (n 26), 1–6 0.157 (n 507), ≥6 0.157 (n 97); corr(light, LAI) +0.05
+  row 40: LAI<1 0.253 (n 26), 1–6 0.206 (n 507), ≥6 0.166 (n 97); corr(light, LAI) -0.60
+  row 50: LAI<1 0.362 (n 26), 1–6 0.262 (n 507), ≥6 0.181 (n 97); corr(light, LAI) -0.77
+  row 60: LAI<1 0.545 (n 26), 1–6 0.386 (n 507), ≥6 0.262 (n 97); corr(light, LAI) -0.84

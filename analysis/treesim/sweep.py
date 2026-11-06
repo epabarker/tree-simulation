@@ -23,6 +23,9 @@ class Run:
     patch: dict = field(default_factory=dict)
     snapshots: list[int] = field(default_factory=list)
     light: bool = False  # also write light.csv (per-cell shade) at the snapshot seasons
+    # {species: patch}, each merged into that species' groups (a "species" entry in `patch`
+    # replaces the species' whole patch instead); M26
+    species_patch: dict = field(default_factory=dict)
 
 
 def run_one(run: Run) -> Path:
@@ -39,6 +42,8 @@ def run_one(run: Run) -> Path:
         cmd += ["--snapshots", ",".join(str(s) for s in run.snapshots)]
     if run.light:
         cmd.append("--light")
+    if run.species_patch:
+        cmd += ["--species-patch", json.dumps(run.species_patch)]
     subprocess.run(cmd, input=json.dumps(run.patch), text=True, cwd=REPO, check=True)
     return REPO / run.out
 

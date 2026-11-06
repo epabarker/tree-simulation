@@ -1,0 +1,308 @@
+# M27 fit targets: field maple (Acer campestre). Read by analysis/treesim/fit.py.
+# Units: 1 cell ≈ 0.25 m, 1 season = 1 year (ROADMAP). Each trait is a trial's trait, the mean
+# over seeds; it costs ((mean − target) / band)² × weight. "measured": a number from a study;
+# "described": a field-guide description turned into a wide band, at half weight.
+# Sources: docs/research/2026-10-28-species-traits.md.
+
+species = "maple"
+
+[[trait]]
+# Scale: 1 cell ≈ 0.25 m is uncertain by ±20% (traits note); the two shares are scale-free and
+# carry the growth information.
+name = "stand.height"
+target = 64
+band = 11
+weight = 1
+kind = "measured"
+source = "German national forest inventory (BWI 2012, 782 trees): mean height 16.1 m at mean age 63 (Bavarian LWF report, LWF Wissen 77)"
+
+[[trait]]
+# Lone against stand: a lone tree scored against yield-table top heights (closed stands): assumes
+# open-grown trees follow a similar curve, though open-grown height curves run lower and flatter
+# (audit §1.4).
+name = "lone.earlyShare"
+target = 0.7
+band = 0.08
+weight = 0.5
+kind = "described"
+source = "height at 30 over height at 60: maples grow fast young and lose growth early; height growth largely done by about 25 years (EUFORGEN Austria; waldwissen.net)"
+
+[[report]]
+name = "lone.spread"
+target = 0.7
+band = 0.2
+kind = "described"
+source = "open-grown W/H at about 60 years, by proxy: sycamore 0.40 (Pretzsch et al. 2015's envelope, a lower bound), urban sycamore 0.55 and Norway maple 0.65 (Franceschi et al. 2022 Table 1 means); field maple itself not found. Re-centred at the trial's age as hornbeam (round 4)"
+
+[[report]]
+# Replaces lone.widestAt and lone.crownFullness (round 4): one vector a tiered crown
+# cannot satisfy, each band ±0.1, the ten sharing the trait's weight.
+name = "lone.profile"
+profile = [0.26, 0.65, 0.88, 0.98, 1, 0.99, 0.93, 0.79, 0.56, 0.22]
+band = 0.1
+kind = "described"
+source = "the crown's width in ten bands, base to top, over its widest: widest at 0.45 of the crown, as full as 0.72 (1 − |u|^q, q = p/(1 − p); the round-4 plan, step C.5). Norway maple, the nearest species classified, is spherical (44%) or ovoid (38%) (Franceschi et al. 2022 Table 5): widest near the middle"
+
+[[trait]]
+name = "lone.slenderness"
+target = 48
+band = 8
+weight = 0.5
+kind = "described"
+source = "open-grown trees are squat, H/D ≈ 40–55 (MacFarlane et al. 2017): a generic range, no species number found; half weight. Proxies: sycamore 57–52 at d 40–50 cm (Pretzsch et al. 2015's envelope), urban sycamore 41 (Franceschi et al. 2022)"
+
+[[trait]]
+# Stand density: read in the closed stand at spacing 21 ≈ 5.25 m, ≈ 360 stems/ha: sparser than a
+# yield-table stand at 60 (420–1000/ha), which lowers H/D and raises crown ratio against the
+# tables (audit §1.4).
+name = "stand.slenderness"
+target = 68
+band = 12
+weight = 0.5
+kind = "measured"
+source = "field maple H/D 65 in the German national inventory (BWI 2012 mean: d 24.7 cm, h 16.1 m, age 63) and 64–73 for canopy maples in mixed stands (Klemmt et al. 2015, LWF Wissen 77, Tables 1 and 3): an inventory mix of positions, half weight"
+
+[[trait]]
+# The crown's share of the height to its base by limbs: where the first-order limbs, from the
+# bottom up, first hold 5% of the leaf area (metrics' limbCrownRatio, cli/trials.ts): the field's
+# live crown base (round 4, ADR 0028).
+name = "stand.crownRatio"
+target = 0.5
+band = 0.1
+weight = 0.5
+kind = "described"
+source = "mid-tolerant: a crown between birch's and beech's in depth (Kothari et al. 2025)"
+
+[[trait]]
+# Leaf area index over the closed stand's ring at 60 (cli/trials.ts): leaf area per cell of
+# ground.
+name = "stand.lai"
+target = 4
+band = 1.5
+weight = 0.5
+kind = "described"
+source = "a sycamore stand's maximum LAI 4.0 (Černý et al. 2020, J. For. Res. 31:827, read from the abstract): a proxy species and one stand, half weight. Field maple not found"
+
+[[report]]
+name = "lone.forkHeight"
+target = 0.35
+band = 0.2
+kind = "described"
+source = "rounded and forking low: decurrent (M25)"
+
+[[report]]
+name = "lone.leaderDominance"
+target = 1.6
+band = 0.6
+kind = "described"
+source = "weak apical control once the crown forms"
+
+[[report]]
+name = "lone.branchAngle"
+target = 45
+band = 10
+kind = "described"
+source = "ascending limbs on stiff wood (M25)"
+
+[[report]]
+name = "lone.limbDroop"
+target = 10
+band = 10
+kind = "described"
+source = "limbs that arch a little at the tips"
+
+[[trait]]
+# Scale-free: the ratio carries the growth curve whatever the cell's size.
+name = "stand.lateShare"
+target = 1.3
+band = 0.1
+weight = 0.5
+kind = "described"
+source = "stand height at 100 over height at 60: canopy maples reach 24.6–26.4 m at 88–102 years against a mean of 16.1 m at 63 across the inventory (LWF Wissen 77); an estimate"
+
+[[report]]
+# Round 5 (ADR 0029): the length-weighted median elevation of the first-order limbs' segments
+# (form.rs's limbElevation), read along the limbs: a limb that rises and then arches out level reads
+# level, where a chord would read it ascending. No described value: the sheet and the panel judge it.
+name = "lone.limbElevation"
+kind = "described"
+
+[[report]]
+# The profile's summaries (form.rs), reported beside the profile itself.
+name = "lone.widestAt"
+kind = "described"
+
+[[report]]
+name = "lone.crownFullness"
+kind = "described"
+
+[[report]]
+# The stand's limb crown ratio at 100 beside the scored one at 60: a low T_rel can hold the crown
+# at 60 and strip it by 100 (the round-5 plan, §2).
+name = "stand.crownRatio100"
+kind = "measured"
+
+# Round 5 (ADR 0029): the physiology only; the nine form parameters are [form], by hand.
+# Free parameters: dotted paths into the species' patch, with bounds (literature review §4,
+# ROADMAP calibration table). log = true searches the bound's log scale. L_h spans 10–200 for
+# every species: the hyperbolic discount needs larger values than the exponential (ADR 0021).
+# r2.hJ is the juvenile height (ADR 0022): shoots lengthen as the tree grows to it.
+[[param]]
+path = "c3.alpha"
+lo = 2.5
+hi = 6
+[[param]]
+path = "c6.r0"   # ADR 0027's 3D units: the 2D bounds 0.015–0.05 ÷ 8
+lo = 0.001875
+hi = 0.00625
+[[param]]
+path = "r1.Lh"
+lo = 10
+hi = 200
+log = true
+[[param]]
+path = "r1.mf"
+lo = 0.02
+hi = 0.15
+[[param]]
+path = "r3.c"
+lo = 0.01
+hi = 0.3
+log = true
+[[param]]
+path = "r6.qMin"
+lo = 0.01
+hi = 0.2
+log = true
+[[param]]
+path = "r6.leafArea"
+lo = 1
+hi = 3
+[[param]]
+path = "r2.hJ"
+lo = 2
+hi = 150
+log = true
+
+# The form parameters' ranges (round 4's search bounds): the span the form sheet sweeps, never
+# searched (ADR 0029).
+[[formRange]]
+path = "r2.levels.0.lambda"
+lo = 0.5
+hi = 0.6
+[[formRange]]
+path = "r2.levels.1.lambda"
+lo = 0.48
+hi = 0.58
+[[formRange]]
+path = "r2.levels.1.setPoint"
+lo = 20
+hi = 90
+[[formRange]]
+path = "r2.levels.1.postureSetPoint"
+lo = 20
+hi = 90
+[[formRange]]
+path = "r2.levels.1.branchAngle"
+lo = 25
+hi = 70
+[[formRange]]
+path = "r2.levels.1.eta"
+lo = 0.05
+hi = 1
+log = true
+[[formRange]]
+path = "r2.levels.2.setPoint"
+lo = 40
+hi = 160
+[[formRange]]
+path = "r2.aC"
+lo = 0
+hi = 40
+[[formRange]]
+path = "r2.dLambda"
+lo = 0
+hi = 0.12
+[[formRange]]
+path = "r2.kappa"
+lo = 0
+hi = 4
+
+# Assignments every candidate carries unchanged (analysis/treesim/fit.py).
+[fixed]
+"r1.hydraulic" = "hyperbolic"   # 1/(1 + L_path/L_h): height keeps rising slowly (ADR 0021)
+# ADR 0032: T_rel fixed from the lowest shade leaves' light (Hagemeier & Leuschner 2019, % of
+# incident PAR; estimated: 4.4% by the score regression; ln(%) = 5.00 − 1.108 × shadeScore over birch, oak, hornbeam, beech),
+# and the acclimated leaf cost with one global c. Not fitted.
+"c5.Trel" = 0.044
+"r1.leafCost" = "acclimated"
+"r1.leafCostShade" = 0.3
+
+# The form, by hand (ADR 0029), applied to every candidate like [fixed]. Round 2's adopted
+# values (FLORA) as of 2026-10-31, the form sheet's reference cell: the user's picks from the
+# sheet replace them, each with a dated comment.
+[form]
+# 2026-11-01 pick: grid cell 0-0-0 of the ADR 0032 grid (form-grid.py --tag=-adr32), provisional, chosen by the user
+# under repick.py (2026-11-01): the guard (lone W/H 0.3-2.5, H < 190, stand limb crown ratio >= 0.2), then LAI in band, floor nearest, alive >= 0.8; crown and outline break ties; the user's choice (2026-11-01), cell 0-0-0.
+# The lines marked "pick"; the rest are round 2's.
+"r2.levels.0.lambda" = 0.55  # pick, 2026-11-01, provisional
+"r2.levels.1.lambda" = 0.5039
+"r2.levels.1.setPoint" = 51.12
+# "r2.levels.1.postureSetPoint": unset in FLORA, so the limbs straighten toward
+# levels.1.setPoint (R3, ADR 0011); a pick sets it here.
+"r2.levels.1.branchAngle" = 44.65
+"r2.levels.1.eta" = 0.1405
+"r2.levels.2.setPoint" = 45.87
+"r2.aC" = 5  # pick, 2026-11-01, provisional
+"r2.dLambda" = 0.04  # pick, 2026-11-01, provisional
+"r2.kappa" = 1.708
+
+# Held out: never in the loss, checked after the fit (analysis/experiments/m27_holdout.py).
+[holdout]
+# The floor of the species' own wood planted per area at τ 0, at season 100 (m27_holdout.py): the
+# one-row stand trial lights its floor through the empty depth beside the row (species plan §0.3).
+floor = { target = 0.045, band = 0.02, kind = "described", source = "4.5% (2.5–8%), estimated from Hagemeier & Leuschner 2019's five measured species: ln(floor %) = 4.92 − 1.08 × Niinemets & Valladares score, cross-checked by LAI and Beer–Lambert (user's research, analysis/fit/sources/floor_light_targets.csv)" }
+survivalLight = [0.05, 0.1]   # lowest light all seedlings survive (saplings estimated to need 8% (score regression, floor_light_targets.csv))
+shadeScore = 3.18   # Niinemets & Valladares 2006, Appendix A
+
+[level1]
+# Level 1 (ADR 0049): sycamore (Wytham) as field maple's proxy (decision 6). Read by phase 1c and later;
+# fit.py ignores this table.
+wytham_excluded = ["junctionDelta", "ldSlope", "taper", "leaderDominance"]
+wytham_reason = "TreeQSM 2.0 radii are taper-corrected (no UnmodRadius): H1, the user's ruling for oak, extended to the same dataset (1c; the user's to confirm)"
+# Gate c v1 (phase 1c, 2026-11-03; docs/experiments/2026-11-03-phase1-converter.md): the degradation test against
+# the tolerances pre-registered in analysis/fit/sources/phase1-tolerances.json (commit e74063c).
+gate_c_survive = ['widestAt', 'profileCentre', 'crownFullness', 'branchAngle2', 'limbElevation', 'p0', 'p1', 'p2', 'p3', 'tortuosity', 'tortuosity05', 'pendulousFraction']
+gate_c_held_out_noise = ['forkHeight', 'limbDroop', 'limbUpturn', 'bifurcationRatio', 'bifurcationRatio2', 'length2']
+gate_c_held_out_resolution = ['length0', 'length1', 'length3', 'centroidHeight']
+gate_c_held_out_tolerance_uncertain = []
+gate_c = "12 of 22 gated descriptors survive with H1 extended to maple; 12 of 26 without (a stop): the user's to rule"
+# Gate c v2 (3f13c29) stopped before any simulated tree: no d_min at Wytham (the re-cut moved the tortuosities),
+# beech's repeat floor held out 13 of 24. Superseded by v3; its standings are in that commit.
+# Gate c v3 (session 1d-i, 2026-11-03; the note's "v2 and v3"): standings before any simulated tree, from
+# analysis/fit/sources/phase1-tolerances.json v3 (commit 6610fb4). Coarsening is prune only; segment-length-dependent
+# descriptors at the 0.5 m step. Tier rules: that file's rules.tier_a, tier_b, assign (treesim/tiers.py).
+gate_c_v3_dataset = "wytham"
+gate_c_v3_d_min_mm = 5.0  # p20 of its terminal diameters
+gate_c_v3_report_only = ['junctionDelta', 'ldSlope', 'limbElevation', 'tortuosity', 'pendulousFraction']
+gate_c_v3_excluded_h1 = ['leaderDominance', 'taper']
+gate_c_v3_noise_limited = ['forkHeight', 'limbDroop', 'limbUpturn', 'bifurcationRatio', 'bifurcationRatio2', 'length2']  # at wytham
+gate_c_v3_candidate_a_or_b = ['widestAt', 'profileCentre', 'crownFullness', 'branchAngle2', 'p0', 'p1', 'p2', 'p3', 'tortuosity05', 'length0', 'length1', 'length3', 'centroidHeight', 'limbElevation05', 'pendulousFraction05']
+gate_c_v3_candidate_a_only = []  # control not neutral at d_min
+gate_c_v3_size_match_dbh_m = 0.247  # the median measured DBH of wytham ACERPS (39 trees)
+gate_c_v3 = "15 descriptors pass the floor; amendment E stops the species if fewer than 8 reach a tier (1d-ii)"
+# Gate c v3.1 run (session 1d-ii, 2026-11-04; the note's "Gate c v3.1"): the registered tiers (phase1-tolerances.json v3.1) on this
+# species' closed stand at its size-matched season, 20 seeds, the shipped params (the Level 0 fit is not accepted).
+gate_c_v3_1_stand_season = 150  # median DBH 0.251 m, height 20.9 m (reference 0.247 m, 18.2 m)
+gate_c_v3_1_lone_season = 50  # lone tree, reported only
+gate_c_v3_1_points = "dmin 5.0 mm, upper 12.1 mm; inflation at d_min"
+gate_c_v3_1_tier_a = ['widestAt', 'profileCentre', 'crownFullness', 'branchAngle2', 'p0', 'p1', 'p2', 'p3', 'tortuosity05', 'centroidHeight', 'limbElevation05', 'pendulousFraction05']
+gate_c_v3_1_tier_b = []
+gate_c_v3_1_held_out_resolution = ['length0', 'length1', 'length3']
+gate_c_v3_1_noise_limited = ['forkHeight', 'limbDroop', 'limbUpturn', 'bifurcationRatio', 'bifurcationRatio2', 'length2']
+gate_c_v3_1 = "12 of 15 floor-clear descriptors reach a tier (amendment E stops below 8): proceed"
+
+[level0]
+# Level 0 (reference-fidelity phase 2, the plan's §k): the physiology knobs fitted against Tallo's H–DBH and CR–DBH
+# bands; bounds from [[param]] above. Not r3.c (posture: form), not the form knobs, not c5.Trel, not the cell size.
+knobs = ["c3.alpha", "r1.Lh", "r1.mf", "r2.hJ", "c6.r0", "r6.qMin", "r6.leafArea"]

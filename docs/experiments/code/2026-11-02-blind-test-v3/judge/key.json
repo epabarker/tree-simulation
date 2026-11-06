@@ -1,0 +1,1632 @@
+{
+ "namer-1": {
+  "plate-01.png": {
+   "source": "today",
+   "species": "beech (today)",
+   "trial": "lone60",
+   "seed": 6
+  },
+  "plate-02.png": {
+   "source": "today",
+   "species": "beech (today)",
+   "trial": "stand100",
+   "seed": 6
+  },
+  "plate-03.png": {
+   "source": "today",
+   "species": "beech (today)",
+   "trial": "lone100",
+   "seed": 6
+  },
+  "plate-04.png": {
+   "source": "fir",
+   "species": "silver fir",
+   "trial": "lone60",
+   "seed": 6
+  },
+  "plate-05.png": {
+   "source": "hornbeam",
+   "species": "hornbeam",
+   "trial": "lone60",
+   "seed": 5
+  },
+  "plate-06.png": {
+   "source": "today",
+   "species": "beech (today)",
+   "trial": "stand100",
+   "seed": 5
+  },
+  "plate-07.png": {
+   "source": "beech",
+   "species": "beech (accepted build, measured bark, clearBole)",
+   "trial": "lone100",
+   "seed": 4
+  },
+  "plate-08.png": {
+   "source": "fir",
+   "species": "silver fir",
+   "trial": "lone100",
+   "seed": 5
+  },
+  "plate-09.png": {
+   "source": "beech",
+   "species": "beech (accepted build, measured bark, clearBole)",
+   "trial": "stand100",
+   "seed": 5
+  },
+  "plate-10.png": {
+   "source": "fir",
+   "species": "silver fir",
+   "trial": "lone100",
+   "seed": 6
+  },
+  "plate-11.png": {
+   "source": "birch",
+   "species": "birch",
+   "trial": "lone100",
+   "seed": 5
+  },
+  "plate-12.png": {
+   "source": "hornbeam",
+   "species": "hornbeam",
+   "trial": "stand100",
+   "seed": 6
+  },
+  "plate-13.png": {
+   "source": "oak",
+   "species": "oak",
+   "trial": "lone60",
+   "seed": 5
+  },
+  "plate-14.png": {
+   "source": "fir",
+   "species": "silver fir",
+   "trial": "stand100",
+   "seed": 5
+  },
+  "plate-15.png": {
+   "source": "today",
+   "species": "beech (today)",
+   "trial": "lone60",
+   "seed": 5
+  },
+  "plate-16.png": {
+   "source": "beech",
+   "species": "beech (accepted build, measured bark, clearBole)",
+   "trial": "lone100",
+   "seed": 5
+  },
+  "plate-17.png": {
+   "source": "hornbeam",
+   "species": "hornbeam",
+   "trial": "lone100",
+   "seed": 6
+  },
+  "plate-18.png": {
+   "source": "fir",
+   "species": "silver fir",
+   "trial": "lone100",
+   "seed": 4
+  },
+  "plate-19.png": {
+   "source": "birch",
+   "species": "birch",
+   "trial": "stand100",
+   "seed": 4
+  },
+  "plate-20.png": {
+   "source": "today",
+   "species": "beech (today)",
+   "trial": "lone100",
+   "seed": 5
+  },
+  "plate-21.png": {
+   "source": "beech",
+   "species": "beech (accepted build, measured bark, clearBole)",
+   "trial": "stand100",
+   "seed": 6
+  },
+  "plate-22.png": {
+   "source": "oak",
+   "species": "oak",
+   "trial": "lone100",
+   "seed": 6
+  },
+  "plate-23.png": {
+   "source": "hornbeam",
+   "species": "hornbeam",
+   "trial": "stand100",
+   "seed": 5
+  },
+  "plate-24.png": {
+   "source": "hornbeam",
+   "species": "hornbeam",
+   "trial": "stand100",
+   "seed": 4
+  },
+  "plate-25.png": {
+   "source": "birch",
+   "species": "birch",
+   "trial": "lone100",
+   "seed": 6
+  },
+  "plate-26.png": {
+   "source": "oak",
+   "species": "oak",
+   "trial": "lone100",
+   "seed": 5
+  },
+  "plate-27.png": {
+   "source": "today",
+   "species": "beech (today)",
+   "trial": "lone60",
+   "seed": 4
+  },
+  "plate-28.png": {
+   "source": "birch",
+   "species": "birch",
+   "trial": "stand100",
+   "seed": 5
+  },
+  "plate-29.png": {
+   "source": "birch",
+   "species": "birch",
+   "trial": "lone60",
+   "seed": 4
+  },
+  "plate-30.png": {
+   "source": "fir",
+   "species": "silver fir",
+   "trial": "stand100",
+   "seed": 6
+  },
+  "plate-31.png": {
+   "source": "hornbeam",
+   "species": "hornbeam",
+   "trial": "lone100",
+   "seed": 5
+  },
+  "plate-32.png": {
+   "source": "beech",
+   "species": "beech (accepted build, measured bark, clearBole)",
+   "trial": "lone60",
+   "seed": 4
+  },
+  "plate-33.png": {
+   "source": "birch",
+   "species": "birch",
+   "trial": "stand100",
+   "seed": 6
+  },
+  "plate-34.png": {
+   "source": "today",
+   "species": "beech (today)",
+   "trial": "lone100",
+   "seed": 4
+  },
+  "plate-35.png": {
+   "source": "birch",
+   "species": "birch",
+   "trial": "lone60",
+   "seed": 6
+  },
+  "plate-36.png": {
+   "source": "birch",
+   "species": "birch",
+   "trial": "lone60",
+   "seed": 5
+  },
+  "plate-37.png": {
+   "source": "oak",
+   "species": "oak",
+   "trial": "stand100",
+   "seed": 6
+  },
+  "plate-38.png": {
+   "source": "oak",
+   "species": "oak",
+   "trial": "lone100",
+   "seed": 4
+  },
+  "plate-39.png": {
+   "source": "beech",
+   "species": "beech (accepted build, measured bark, clearBole)",
+   "trial": "lone100",
+   "seed": 6
+  },
+  "plate-40.png": {
+   "source": "oak",
+   "species": "oak",
+   "trial": "stand100",
+   "seed": 5
+  },
+  "plate-41.png": {
+   "source": "hornbeam",
+   "species": "hornbeam",
+   "trial": "lone100",
+   "seed": 4
+  },
+  "plate-42.png": {
+   "source": "hornbeam",
+   "species": "hornbeam",
+   "trial": "lone60",
+   "seed": 4
+  },
+  "plate-43.png": {
+   "source": "birch",
+   "species": "birch",
+   "trial": "lone100",
+   "seed": 4
+  },
+  "plate-44.png": {
+   "source": "fir",
+   "species": "silver fir",
+   "trial": "lone60",
+   "seed": 5
+  },
+  "plate-45.png": {
+   "source": "oak",
+   "species": "oak",
+   "trial": "lone60",
+   "seed": 6
+  },
+  "plate-46.png": {
+   "source": "beech",
+   "species": "beech (accepted build, measured bark, clearBole)",
+   "trial": "stand100",
+   "seed": 4
+  },
+  "plate-47.png": {
+   "source": "fir",
+   "species": "silver fir",
+   "trial": "lone60",
+   "seed": 4
+  },
+  "plate-48.png": {
+   "source": "fir",
+   "species": "silver fir",
+   "trial": "stand100",
+   "seed": 4
+  },
+  "plate-49.png": {
+   "source": "oak",
+   "species": "oak",
+   "trial": "stand100",
+   "seed": 4
+  },
+  "plate-50.png": {
+   "source": "beech",
+   "species": "beech (accepted build, measured bark, clearBole)",
+   "trial": "lone60",
+   "seed": 6
+  },
+  "plate-51.png": {
+   "source": "oak",
+   "species": "oak",
+   "trial": "lone60",
+   "seed": 4
+  },
+  "plate-52.png": {
+   "source": "beech",
+   "species": "beech (accepted build, measured bark, clearBole)",
+   "trial": "lone60",
+   "seed": 5
+  },
+  "plate-53.png": {
+   "source": "today",
+   "species": "beech (today)",
+   "trial": "stand100",
+   "seed": 4
+  },
+  "plate-54.png": {
+   "source": "hornbeam",
+   "species": "hornbeam",
+   "trial": "lone60",
+   "seed": 6
+  }
+ },
+ "namer-2": {
+  "plate-01.png": {
+   "source": "oak",
+   "species": "oak",
+   "trial": "lone100",
+   "seed": 4
+  },
+  "plate-02.png": {
+   "source": "today",
+   "species": "beech (today)",
+   "trial": "lone100",
+   "seed": 4
+  },
+  "plate-03.png": {
+   "source": "today",
+   "species": "beech (today)",
+   "trial": "lone100",
+   "seed": 6
+  },
+  "plate-04.png": {
+   "source": "beech",
+   "species": "beech (accepted build, measured bark, clearBole)",
+   "trial": "lone100",
+   "seed": 5
+  },
+  "plate-05.png": {
+   "source": "fir",
+   "species": "silver fir",
+   "trial": "lone60",
+   "seed": 6
+  },
+  "plate-06.png": {
+   "source": "beech",
+   "species": "beech (accepted build, measured bark, clearBole)",
+   "trial": "lone60",
+   "seed": 6
+  },
+  "plate-07.png": {
+   "source": "birch",
+   "species": "birch",
+   "trial": "stand100",
+   "seed": 5
+  },
+  "plate-08.png": {
+   "source": "beech",
+   "species": "beech (accepted build, measured bark, clearBole)",
+   "trial": "lone100",
+   "seed": 4
+  },
+  "plate-09.png": {
+   "source": "fir",
+   "species": "silver fir",
+   "trial": "stand100",
+   "seed": 4
+  },
+  "plate-10.png": {
+   "source": "fir",
+   "species": "silver fir",
+   "trial": "lone60",
+   "seed": 5
+  },
+  "plate-11.png": {
+   "source": "hornbeam",
+   "species": "hornbeam",
+   "trial": "lone60",
+   "seed": 6
+  },
+  "plate-12.png": {
+   "source": "beech",
+   "species": "beech (accepted build, measured bark, clearBole)",
+   "trial": "lone100",
+   "seed": 6
+  },
+  "plate-13.png": {
+   "source": "today",
+   "species": "beech (today)",
+   "trial": "stand100",
+   "seed": 6
+  },
+  "plate-14.png": {
+   "source": "oak",
+   "species": "oak",
+   "trial": "lone60",
+   "seed": 6
+  },
+  "plate-15.png": {
+   "source": "oak",
+   "species": "oak",
+   "trial": "lone100",
+   "seed": 5
+  },
+  "plate-16.png": {
+   "source": "birch",
+   "species": "birch",
+   "trial": "lone100",
+   "seed": 5
+  },
+  "plate-17.png": {
+   "source": "hornbeam",
+   "species": "hornbeam",
+   "trial": "lone100",
+   "seed": 5
+  },
+  "plate-18.png": {
+   "source": "hornbeam",
+   "species": "hornbeam",
+   "trial": "lone100",
+   "seed": 4
+  },
+  "plate-19.png": {
+   "source": "oak",
+   "species": "oak",
+   "trial": "stand100",
+   "seed": 6
+  },
+  "plate-20.png": {
+   "source": "today",
+   "species": "beech (today)",
+   "trial": "stand100",
+   "seed": 5
+  },
+  "plate-21.png": {
+   "source": "beech",
+   "species": "beech (accepted build, measured bark, clearBole)",
+   "trial": "stand100",
+   "seed": 6
+  },
+  "plate-22.png": {
+   "source": "oak",
+   "species": "oak",
+   "trial": "lone60",
+   "seed": 5
+  },
+  "plate-23.png": {
+   "source": "fir",
+   "species": "silver fir",
+   "trial": "stand100",
+   "seed": 6
+  },
+  "plate-24.png": {
+   "source": "birch",
+   "species": "birch",
+   "trial": "stand100",
+   "seed": 6
+  },
+  "plate-25.png": {
+   "source": "today",
+   "species": "beech (today)",
+   "trial": "lone100",
+   "seed": 5
+  },
+  "plate-26.png": {
+   "source": "today",
+   "species": "beech (today)",
+   "trial": "lone60",
+   "seed": 5
+  },
+  "plate-27.png": {
+   "source": "birch",
+   "species": "birch",
+   "trial": "stand100",
+   "seed": 4
+  },
+  "plate-28.png": {
+   "source": "fir",
+   "species": "silver fir",
+   "trial": "lone100",
+   "seed": 4
+  },
+  "plate-29.png": {
+   "source": "birch",
+   "species": "birch",
+   "trial": "lone60",
+   "seed": 5
+  },
+  "plate-30.png": {
+   "source": "oak",
+   "species": "oak",
+   "trial": "stand100",
+   "seed": 4
+  },
+  "plate-31.png": {
+   "source": "oak",
+   "species": "oak",
+   "trial": "lone100",
+   "seed": 6
+  },
+  "plate-32.png": {
+   "source": "hornbeam",
+   "species": "hornbeam",
+   "trial": "lone60",
+   "seed": 5
+  },
+  "plate-33.png": {
+   "source": "today",
+   "species": "beech (today)",
+   "trial": "lone60",
+   "seed": 4
+  },
+  "plate-34.png": {
+   "source": "fir",
+   "species": "silver fir",
+   "trial": "lone100",
+   "seed": 6
+  },
+  "plate-35.png": {
+   "source": "birch",
+   "species": "birch",
+   "trial": "lone100",
+   "seed": 6
+  },
+  "plate-36.png": {
+   "source": "today",
+   "species": "beech (today)",
+   "trial": "stand100",
+   "seed": 4
+  },
+  "plate-37.png": {
+   "source": "beech",
+   "species": "beech (accepted build, measured bark, clearBole)",
+   "trial": "lone60",
+   "seed": 4
+  },
+  "plate-38.png": {
+   "source": "hornbeam",
+   "species": "hornbeam",
+   "trial": "stand100",
+   "seed": 6
+  },
+  "plate-39.png": {
+   "source": "hornbeam",
+   "species": "hornbeam",
+   "trial": "lone100",
+   "seed": 6
+  },
+  "plate-40.png": {
+   "source": "birch",
+   "species": "birch",
+   "trial": "lone60",
+   "seed": 4
+  },
+  "plate-41.png": {
+   "source": "fir",
+   "species": "silver fir",
+   "trial": "lone100",
+   "seed": 5
+  },
+  "plate-42.png": {
+   "source": "beech",
+   "species": "beech (accepted build, measured bark, clearBole)",
+   "trial": "stand100",
+   "seed": 4
+  },
+  "plate-43.png": {
+   "source": "fir",
+   "species": "silver fir",
+   "trial": "lone60",
+   "seed": 4
+  },
+  "plate-44.png": {
+   "source": "oak",
+   "species": "oak",
+   "trial": "lone60",
+   "seed": 4
+  },
+  "plate-45.png": {
+   "source": "oak",
+   "species": "oak",
+   "trial": "stand100",
+   "seed": 5
+  },
+  "plate-46.png": {
+   "source": "hornbeam",
+   "species": "hornbeam",
+   "trial": "lone60",
+   "seed": 4
+  },
+  "plate-47.png": {
+   "source": "hornbeam",
+   "species": "hornbeam",
+   "trial": "stand100",
+   "seed": 5
+  },
+  "plate-48.png": {
+   "source": "fir",
+   "species": "silver fir",
+   "trial": "stand100",
+   "seed": 5
+  },
+  "plate-49.png": {
+   "source": "hornbeam",
+   "species": "hornbeam",
+   "trial": "stand100",
+   "seed": 4
+  },
+  "plate-50.png": {
+   "source": "birch",
+   "species": "birch",
+   "trial": "lone60",
+   "seed": 6
+  },
+  "plate-51.png": {
+   "source": "beech",
+   "species": "beech (accepted build, measured bark, clearBole)",
+   "trial": "lone60",
+   "seed": 5
+  },
+  "plate-52.png": {
+   "source": "beech",
+   "species": "beech (accepted build, measured bark, clearBole)",
+   "trial": "stand100",
+   "seed": 5
+  },
+  "plate-53.png": {
+   "source": "birch",
+   "species": "birch",
+   "trial": "lone100",
+   "seed": 4
+  },
+  "plate-54.png": {
+   "source": "today",
+   "species": "beech (today)",
+   "trial": "lone60",
+   "seed": 6
+  }
+ },
+ "namer-3": {
+  "plate-01.png": {
+   "source": "oak",
+   "species": "oak",
+   "trial": "lone60",
+   "seed": 5
+  },
+  "plate-02.png": {
+   "source": "beech",
+   "species": "beech (accepted build, measured bark, clearBole)",
+   "trial": "lone100",
+   "seed": 4
+  },
+  "plate-03.png": {
+   "source": "oak",
+   "species": "oak",
+   "trial": "lone60",
+   "seed": 4
+  },
+  "plate-04.png": {
+   "source": "beech",
+   "species": "beech (accepted build, measured bark, clearBole)",
+   "trial": "lone100",
+   "seed": 5
+  },
+  "plate-05.png": {
+   "source": "birch",
+   "species": "birch",
+   "trial": "lone100",
+   "seed": 5
+  },
+  "plate-06.png": {
+   "source": "fir",
+   "species": "silver fir",
+   "trial": "lone100",
+   "seed": 5
+  },
+  "plate-07.png": {
+   "source": "hornbeam",
+   "species": "hornbeam",
+   "trial": "lone60",
+   "seed": 6
+  },
+  "plate-08.png": {
+   "source": "hornbeam",
+   "species": "hornbeam",
+   "trial": "stand100",
+   "seed": 4
+  },
+  "plate-09.png": {
+   "source": "beech",
+   "species": "beech (accepted build, measured bark, clearBole)",
+   "trial": "stand100",
+   "seed": 4
+  },
+  "plate-10.png": {
+   "source": "beech",
+   "species": "beech (accepted build, measured bark, clearBole)",
+   "trial": "stand100",
+   "seed": 5
+  },
+  "plate-11.png": {
+   "source": "hornbeam",
+   "species": "hornbeam",
+   "trial": "lone60",
+   "seed": 4
+  },
+  "plate-12.png": {
+   "source": "oak",
+   "species": "oak",
+   "trial": "lone100",
+   "seed": 4
+  },
+  "plate-13.png": {
+   "source": "today",
+   "species": "beech (today)",
+   "trial": "lone60",
+   "seed": 6
+  },
+  "plate-14.png": {
+   "source": "hornbeam",
+   "species": "hornbeam",
+   "trial": "lone60",
+   "seed": 5
+  },
+  "plate-15.png": {
+   "source": "today",
+   "species": "beech (today)",
+   "trial": "lone100",
+   "seed": 4
+  },
+  "plate-16.png": {
+   "source": "fir",
+   "species": "silver fir",
+   "trial": "stand100",
+   "seed": 5
+  },
+  "plate-17.png": {
+   "source": "birch",
+   "species": "birch",
+   "trial": "stand100",
+   "seed": 5
+  },
+  "plate-18.png": {
+   "source": "today",
+   "species": "beech (today)",
+   "trial": "stand100",
+   "seed": 5
+  },
+  "plate-19.png": {
+   "source": "fir",
+   "species": "silver fir",
+   "trial": "lone60",
+   "seed": 4
+  },
+  "plate-20.png": {
+   "source": "hornbeam",
+   "species": "hornbeam",
+   "trial": "stand100",
+   "seed": 5
+  },
+  "plate-21.png": {
+   "source": "oak",
+   "species": "oak",
+   "trial": "stand100",
+   "seed": 6
+  },
+  "plate-22.png": {
+   "source": "birch",
+   "species": "birch",
+   "trial": "lone60",
+   "seed": 6
+  },
+  "plate-23.png": {
+   "source": "beech",
+   "species": "beech (accepted build, measured bark, clearBole)",
+   "trial": "lone60",
+   "seed": 5
+  },
+  "plate-24.png": {
+   "source": "beech",
+   "species": "beech (accepted build, measured bark, clearBole)",
+   "trial": "stand100",
+   "seed": 6
+  },
+  "plate-25.png": {
+   "source": "hornbeam",
+   "species": "hornbeam",
+   "trial": "lone100",
+   "seed": 6
+  },
+  "plate-26.png": {
+   "source": "fir",
+   "species": "silver fir",
+   "trial": "stand100",
+   "seed": 6
+  },
+  "plate-27.png": {
+   "source": "today",
+   "species": "beech (today)",
+   "trial": "lone60",
+   "seed": 5
+  },
+  "plate-28.png": {
+   "source": "birch",
+   "species": "birch",
+   "trial": "stand100",
+   "seed": 6
+  },
+  "plate-29.png": {
+   "source": "hornbeam",
+   "species": "hornbeam",
+   "trial": "lone100",
+   "seed": 5
+  },
+  "plate-30.png": {
+   "source": "oak",
+   "species": "oak",
+   "trial": "stand100",
+   "seed": 4
+  },
+  "plate-31.png": {
+   "source": "birch",
+   "species": "birch",
+   "trial": "stand100",
+   "seed": 4
+  },
+  "plate-32.png": {
+   "source": "fir",
+   "species": "silver fir",
+   "trial": "lone60",
+   "seed": 6
+  },
+  "plate-33.png": {
+   "source": "hornbeam",
+   "species": "hornbeam",
+   "trial": "lone100",
+   "seed": 4
+  },
+  "plate-34.png": {
+   "source": "fir",
+   "species": "silver fir",
+   "trial": "lone100",
+   "seed": 6
+  },
+  "plate-35.png": {
+   "source": "fir",
+   "species": "silver fir",
+   "trial": "stand100",
+   "seed": 4
+  },
+  "plate-36.png": {
+   "source": "beech",
+   "species": "beech (accepted build, measured bark, clearBole)",
+   "trial": "lone100",
+   "seed": 6
+  },
+  "plate-37.png": {
+   "source": "birch",
+   "species": "birch",
+   "trial": "lone60",
+   "seed": 4
+  },
+  "plate-38.png": {
+   "source": "fir",
+   "species": "silver fir",
+   "trial": "lone100",
+   "seed": 4
+  },
+  "plate-39.png": {
+   "source": "hornbeam",
+   "species": "hornbeam",
+   "trial": "stand100",
+   "seed": 6
+  },
+  "plate-40.png": {
+   "source": "today",
+   "species": "beech (today)",
+   "trial": "lone100",
+   "seed": 5
+  },
+  "plate-41.png": {
+   "source": "beech",
+   "species": "beech (accepted build, measured bark, clearBole)",
+   "trial": "lone60",
+   "seed": 6
+  },
+  "plate-42.png": {
+   "source": "oak",
+   "species": "oak",
+   "trial": "stand100",
+   "seed": 5
+  },
+  "plate-43.png": {
+   "source": "beech",
+   "species": "beech (accepted build, measured bark, clearBole)",
+   "trial": "lone60",
+   "seed": 4
+  },
+  "plate-44.png": {
+   "source": "today",
+   "species": "beech (today)",
+   "trial": "lone60",
+   "seed": 4
+  },
+  "plate-45.png": {
+   "source": "oak",
+   "species": "oak",
+   "trial": "lone100",
+   "seed": 6
+  },
+  "plate-46.png": {
+   "source": "fir",
+   "species": "silver fir",
+   "trial": "lone60",
+   "seed": 5
+  },
+  "plate-47.png": {
+   "source": "today",
+   "species": "beech (today)",
+   "trial": "lone100",
+   "seed": 6
+  },
+  "plate-48.png": {
+   "source": "oak",
+   "species": "oak",
+   "trial": "lone60",
+   "seed": 6
+  },
+  "plate-49.png": {
+   "source": "birch",
+   "species": "birch",
+   "trial": "lone100",
+   "seed": 4
+  },
+  "plate-50.png": {
+   "source": "today",
+   "species": "beech (today)",
+   "trial": "stand100",
+   "seed": 4
+  },
+  "plate-51.png": {
+   "source": "oak",
+   "species": "oak",
+   "trial": "lone100",
+   "seed": 5
+  },
+  "plate-52.png": {
+   "source": "birch",
+   "species": "birch",
+   "trial": "lone100",
+   "seed": 6
+  },
+  "plate-53.png": {
+   "source": "birch",
+   "species": "birch",
+   "trial": "lone60",
+   "seed": 5
+  },
+  "plate-54.png": {
+   "source": "today",
+   "species": "beech (today)",
+   "trial": "stand100",
+   "seed": 6
+  }
+ },
+ "namer-4": {
+  "plate-01.png": {
+   "source": "today",
+   "species": "beech (today)",
+   "trial": "lone100",
+   "seed": 5
+  },
+  "plate-02.png": {
+   "source": "hornbeam",
+   "species": "hornbeam",
+   "trial": "stand100",
+   "seed": 4
+  },
+  "plate-03.png": {
+   "source": "oak",
+   "species": "oak",
+   "trial": "lone100",
+   "seed": 5
+  },
+  "plate-04.png": {
+   "source": "today",
+   "species": "beech (today)",
+   "trial": "stand100",
+   "seed": 4
+  },
+  "plate-05.png": {
+   "source": "hornbeam",
+   "species": "hornbeam",
+   "trial": "lone100",
+   "seed": 6
+  },
+  "plate-06.png": {
+   "source": "fir",
+   "species": "silver fir",
+   "trial": "lone100",
+   "seed": 5
+  },
+  "plate-07.png": {
+   "source": "today",
+   "species": "beech (today)",
+   "trial": "lone60",
+   "seed": 5
+  },
+  "plate-08.png": {
+   "source": "oak",
+   "species": "oak",
+   "trial": "stand100",
+   "seed": 6
+  },
+  "plate-09.png": {
+   "source": "beech",
+   "species": "beech (accepted build, measured bark, clearBole)",
+   "trial": "stand100",
+   "seed": 6
+  },
+  "plate-10.png": {
+   "source": "today",
+   "species": "beech (today)",
+   "trial": "lone60",
+   "seed": 4
+  },
+  "plate-11.png": {
+   "source": "beech",
+   "species": "beech (accepted build, measured bark, clearBole)",
+   "trial": "stand100",
+   "seed": 4
+  },
+  "plate-12.png": {
+   "source": "fir",
+   "species": "silver fir",
+   "trial": "lone60",
+   "seed": 6
+  },
+  "plate-13.png": {
+   "source": "oak",
+   "species": "oak",
+   "trial": "lone60",
+   "seed": 4
+  },
+  "plate-14.png": {
+   "source": "birch",
+   "species": "birch",
+   "trial": "stand100",
+   "seed": 5
+  },
+  "plate-15.png": {
+   "source": "fir",
+   "species": "silver fir",
+   "trial": "lone100",
+   "seed": 6
+  },
+  "plate-16.png": {
+   "source": "today",
+   "species": "beech (today)",
+   "trial": "stand100",
+   "seed": 6
+  },
+  "plate-17.png": {
+   "source": "birch",
+   "species": "birch",
+   "trial": "lone100",
+   "seed": 6
+  },
+  "plate-18.png": {
+   "source": "fir",
+   "species": "silver fir",
+   "trial": "lone60",
+   "seed": 4
+  },
+  "plate-19.png": {
+   "source": "oak",
+   "species": "oak",
+   "trial": "lone60",
+   "seed": 5
+  },
+  "plate-20.png": {
+   "source": "hornbeam",
+   "species": "hornbeam",
+   "trial": "lone100",
+   "seed": 5
+  },
+  "plate-21.png": {
+   "source": "beech",
+   "species": "beech (accepted build, measured bark, clearBole)",
+   "trial": "lone60",
+   "seed": 4
+  },
+  "plate-22.png": {
+   "source": "fir",
+   "species": "silver fir",
+   "trial": "stand100",
+   "seed": 5
+  },
+  "plate-23.png": {
+   "source": "hornbeam",
+   "species": "hornbeam",
+   "trial": "lone60",
+   "seed": 6
+  },
+  "plate-24.png": {
+   "source": "birch",
+   "species": "birch",
+   "trial": "lone60",
+   "seed": 6
+  },
+  "plate-25.png": {
+   "source": "birch",
+   "species": "birch",
+   "trial": "lone60",
+   "seed": 4
+  },
+  "plate-26.png": {
+   "source": "today",
+   "species": "beech (today)",
+   "trial": "lone100",
+   "seed": 4
+  },
+  "plate-27.png": {
+   "source": "fir",
+   "species": "silver fir",
+   "trial": "lone60",
+   "seed": 5
+  },
+  "plate-28.png": {
+   "source": "oak",
+   "species": "oak",
+   "trial": "lone100",
+   "seed": 6
+  },
+  "plate-29.png": {
+   "source": "birch",
+   "species": "birch",
+   "trial": "lone100",
+   "seed": 5
+  },
+  "plate-30.png": {
+   "source": "oak",
+   "species": "oak",
+   "trial": "lone100",
+   "seed": 4
+  },
+  "plate-31.png": {
+   "source": "fir",
+   "species": "silver fir",
+   "trial": "stand100",
+   "seed": 4
+  },
+  "plate-32.png": {
+   "source": "birch",
+   "species": "birch",
+   "trial": "lone100",
+   "seed": 4
+  },
+  "plate-33.png": {
+   "source": "today",
+   "species": "beech (today)",
+   "trial": "lone60",
+   "seed": 6
+  },
+  "plate-34.png": {
+   "source": "beech",
+   "species": "beech (accepted build, measured bark, clearBole)",
+   "trial": "stand100",
+   "seed": 5
+  },
+  "plate-35.png": {
+   "source": "hornbeam",
+   "species": "hornbeam",
+   "trial": "stand100",
+   "seed": 5
+  },
+  "plate-36.png": {
+   "source": "beech",
+   "species": "beech (accepted build, measured bark, clearBole)",
+   "trial": "lone100",
+   "seed": 6
+  },
+  "plate-37.png": {
+   "source": "beech",
+   "species": "beech (accepted build, measured bark, clearBole)",
+   "trial": "lone100",
+   "seed": 4
+  },
+  "plate-38.png": {
+   "source": "today",
+   "species": "beech (today)",
+   "trial": "lone100",
+   "seed": 6
+  },
+  "plate-39.png": {
+   "source": "hornbeam",
+   "species": "hornbeam",
+   "trial": "lone60",
+   "seed": 4
+  },
+  "plate-40.png": {
+   "source": "birch",
+   "species": "birch",
+   "trial": "lone60",
+   "seed": 5
+  },
+  "plate-41.png": {
+   "source": "fir",
+   "species": "silver fir",
+   "trial": "stand100",
+   "seed": 6
+  },
+  "plate-42.png": {
+   "source": "beech",
+   "species": "beech (accepted build, measured bark, clearBole)",
+   "trial": "lone60",
+   "seed": 6
+  },
+  "plate-43.png": {
+   "source": "fir",
+   "species": "silver fir",
+   "trial": "lone100",
+   "seed": 4
+  },
+  "plate-44.png": {
+   "source": "hornbeam",
+   "species": "hornbeam",
+   "trial": "lone100",
+   "seed": 4
+  },
+  "plate-45.png": {
+   "source": "birch",
+   "species": "birch",
+   "trial": "stand100",
+   "seed": 4
+  },
+  "plate-46.png": {
+   "source": "beech",
+   "species": "beech (accepted build, measured bark, clearBole)",
+   "trial": "lone60",
+   "seed": 5
+  },
+  "plate-47.png": {
+   "source": "oak",
+   "species": "oak",
+   "trial": "stand100",
+   "seed": 4
+  },
+  "plate-48.png": {
+   "source": "hornbeam",
+   "species": "hornbeam",
+   "trial": "lone60",
+   "seed": 5
+  },
+  "plate-49.png": {
+   "source": "birch",
+   "species": "birch",
+   "trial": "stand100",
+   "seed": 6
+  },
+  "plate-50.png": {
+   "source": "hornbeam",
+   "species": "hornbeam",
+   "trial": "stand100",
+   "seed": 6
+  },
+  "plate-51.png": {
+   "source": "oak",
+   "species": "oak",
+   "trial": "lone60",
+   "seed": 6
+  },
+  "plate-52.png": {
+   "source": "beech",
+   "species": "beech (accepted build, measured bark, clearBole)",
+   "trial": "lone100",
+   "seed": 5
+  },
+  "plate-53.png": {
+   "source": "today",
+   "species": "beech (today)",
+   "trial": "stand100",
+   "seed": 5
+  },
+  "plate-54.png": {
+   "source": "oak",
+   "species": "oak",
+   "trial": "stand100",
+   "seed": 5
+  }
+ },
+ "namer-5": {
+  "plate-01.png": {
+   "source": "birch",
+   "species": "birch",
+   "trial": "lone100",
+   "seed": 5
+  },
+  "plate-02.png": {
+   "source": "beech",
+   "species": "beech (accepted build, measured bark, clearBole)",
+   "trial": "stand100",
+   "seed": 5
+  },
+  "plate-03.png": {
+   "source": "beech",
+   "species": "beech (accepted build, measured bark, clearBole)",
+   "trial": "lone100",
+   "seed": 5
+  },
+  "plate-04.png": {
+   "source": "fir",
+   "species": "silver fir",
+   "trial": "lone60",
+   "seed": 6
+  },
+  "plate-05.png": {
+   "source": "fir",
+   "species": "silver fir",
+   "trial": "stand100",
+   "seed": 6
+  },
+  "plate-06.png": {
+   "source": "fir",
+   "species": "silver fir",
+   "trial": "lone60",
+   "seed": 4
+  },
+  "plate-07.png": {
+   "source": "today",
+   "species": "beech (today)",
+   "trial": "lone100",
+   "seed": 6
+  },
+  "plate-08.png": {
+   "source": "fir",
+   "species": "silver fir",
+   "trial": "stand100",
+   "seed": 5
+  },
+  "plate-09.png": {
+   "source": "hornbeam",
+   "species": "hornbeam",
+   "trial": "lone100",
+   "seed": 6
+  },
+  "plate-10.png": {
+   "source": "today",
+   "species": "beech (today)",
+   "trial": "stand100",
+   "seed": 6
+  },
+  "plate-11.png": {
+   "source": "today",
+   "species": "beech (today)",
+   "trial": "lone60",
+   "seed": 4
+  },
+  "plate-12.png": {
+   "source": "beech",
+   "species": "beech (accepted build, measured bark, clearBole)",
+   "trial": "lone60",
+   "seed": 4
+  },
+  "plate-13.png": {
+   "source": "beech",
+   "species": "beech (accepted build, measured bark, clearBole)",
+   "trial": "stand100",
+   "seed": 6
+  },
+  "plate-14.png": {
+   "source": "oak",
+   "species": "oak",
+   "trial": "lone60",
+   "seed": 5
+  },
+  "plate-15.png": {
+   "source": "hornbeam",
+   "species": "hornbeam",
+   "trial": "stand100",
+   "seed": 5
+  },
+  "plate-16.png": {
+   "source": "birch",
+   "species": "birch",
+   "trial": "lone60",
+   "seed": 5
+  },
+  "plate-17.png": {
+   "source": "oak",
+   "species": "oak",
+   "trial": "lone100",
+   "seed": 5
+  },
+  "plate-18.png": {
+   "source": "oak",
+   "species": "oak",
+   "trial": "lone60",
+   "seed": 4
+  },
+  "plate-19.png": {
+   "source": "today",
+   "species": "beech (today)",
+   "trial": "lone60",
+   "seed": 5
+  },
+  "plate-20.png": {
+   "source": "hornbeam",
+   "species": "hornbeam",
+   "trial": "lone100",
+   "seed": 4
+  },
+  "plate-21.png": {
+   "source": "hornbeam",
+   "species": "hornbeam",
+   "trial": "lone60",
+   "seed": 4
+  },
+  "plate-22.png": {
+   "source": "oak",
+   "species": "oak",
+   "trial": "lone100",
+   "seed": 6
+  },
+  "plate-23.png": {
+   "source": "fir",
+   "species": "silver fir",
+   "trial": "lone60",
+   "seed": 5
+  },
+  "plate-24.png": {
+   "source": "birch",
+   "species": "birch",
+   "trial": "lone60",
+   "seed": 6
+  },
+  "plate-25.png": {
+   "source": "today",
+   "species": "beech (today)",
+   "trial": "stand100",
+   "seed": 4
+  },
+  "plate-26.png": {
+   "source": "birch",
+   "species": "birch",
+   "trial": "lone100",
+   "seed": 4
+  },
+  "plate-27.png": {
+   "source": "oak",
+   "species": "oak",
+   "trial": "stand100",
+   "seed": 6
+  },
+  "plate-28.png": {
+   "source": "beech",
+   "species": "beech (accepted build, measured bark, clearBole)",
+   "trial": "lone100",
+   "seed": 6
+  },
+  "plate-29.png": {
+   "source": "birch",
+   "species": "birch",
+   "trial": "stand100",
+   "seed": 5
+  },
+  "plate-30.png": {
+   "source": "oak",
+   "species": "oak",
+   "trial": "stand100",
+   "seed": 4
+  },
+  "plate-31.png": {
+   "source": "today",
+   "species": "beech (today)",
+   "trial": "lone60",
+   "seed": 6
+  },
+  "plate-32.png": {
+   "source": "hornbeam",
+   "species": "hornbeam",
+   "trial": "lone100",
+   "seed": 5
+  },
+  "plate-33.png": {
+   "source": "fir",
+   "species": "silver fir",
+   "trial": "lone100",
+   "seed": 4
+  },
+  "plate-34.png": {
+   "source": "today",
+   "species": "beech (today)",
+   "trial": "lone100",
+   "seed": 5
+  },
+  "plate-35.png": {
+   "source": "birch",
+   "species": "birch",
+   "trial": "lone60",
+   "seed": 4
+  },
+  "plate-36.png": {
+   "source": "beech",
+   "species": "beech (accepted build, measured bark, clearBole)",
+   "trial": "lone100",
+   "seed": 4
+  },
+  "plate-37.png": {
+   "source": "oak",
+   "species": "oak",
+   "trial": "lone60",
+   "seed": 6
+  },
+  "plate-38.png": {
+   "source": "hornbeam",
+   "species": "hornbeam",
+   "trial": "lone60",
+   "seed": 6
+  },
+  "plate-39.png": {
+   "source": "hornbeam",
+   "species": "hornbeam",
+   "trial": "stand100",
+   "seed": 6
+  },
+  "plate-40.png": {
+   "source": "fir",
+   "species": "silver fir",
+   "trial": "stand100",
+   "seed": 4
+  },
+  "plate-41.png": {
+   "source": "birch",
+   "species": "birch",
+   "trial": "lone100",
+   "seed": 6
+  },
+  "plate-42.png": {
+   "source": "oak",
+   "species": "oak",
+   "trial": "stand100",
+   "seed": 5
+  },
+  "plate-43.png": {
+   "source": "beech",
+   "species": "beech (accepted build, measured bark, clearBole)",
+   "trial": "lone60",
+   "seed": 6
+  },
+  "plate-44.png": {
+   "source": "fir",
+   "species": "silver fir",
+   "trial": "lone100",
+   "seed": 5
+  },
+  "plate-45.png": {
+   "source": "today",
+   "species": "beech (today)",
+   "trial": "stand100",
+   "seed": 5
+  },
+  "plate-46.png": {
+   "source": "beech",
+   "species": "beech (accepted build, measured bark, clearBole)",
+   "trial": "lone60",
+   "seed": 5
+  },
+  "plate-47.png": {
+   "source": "today",
+   "species": "beech (today)",
+   "trial": "lone100",
+   "seed": 4
+  },
+  "plate-48.png": {
+   "source": "beech",
+   "species": "beech (accepted build, measured bark, clearBole)",
+   "trial": "stand100",
+   "seed": 4
+  },
+  "plate-49.png": {
+   "source": "fir",
+   "species": "silver fir",
+   "trial": "lone100",
+   "seed": 6
+  },
+  "plate-50.png": {
+   "source": "birch",
+   "species": "birch",
+   "trial": "stand100",
+   "seed": 4
+  },
+  "plate-51.png": {
+   "source": "hornbeam",
+   "species": "hornbeam",
+   "trial": "stand100",
+   "seed": 4
+  },
+  "plate-52.png": {
+   "source": "hornbeam",
+   "species": "hornbeam",
+   "trial": "lone60",
+   "seed": 5
+  },
+  "plate-53.png": {
+   "source": "birch",
+   "species": "birch",
+   "trial": "stand100",
+   "seed": 6
+  },
+  "plate-54.png": {
+   "source": "oak",
+   "species": "oak",
+   "trial": "lone100",
+   "seed": 4
+  }
+ }
+}

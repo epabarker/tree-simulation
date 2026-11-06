@@ -1,26 +1,28 @@
 /**
- * Benchmark: per-phase cost of a season for fixed presets, as the worker runs them (one season,
- * then a snapshot for the page). Each case also records its final state hash, so `--compare`
- * shows at once whether an optimisation left behaviour bit-identical (M13).
+ * Benchmark: per-phase cost of a season for fixed presets, in the Rust core (I1, ADR 0024). Each
+ * case runs twice: natively (rust/cli `--bench`: the per-phase split and the final state hash) and
+ * in WASM as the page's worker runs it (one season, then a snapshot out of linear memory: the
+ * per-season distribution and snapshotMs). The two hashes must agree. `--compare` shows at once
+ * whether an optimisation left behaviour bit-identical (M13).
  *
  *   npm run bench                                   all cases, 100 seasons, best of 3
  *   npm run bench -- --case forest --seasons 50     one case
  *   npm run bench -- --compare runs/bench/abc1234.json
  *   npm run bench -- --snapshot lean                 snapshots as the home page asks for them
  *
- * Writes runs/bench/<commit>[-dirty].json unless --out names another file.
+ * Writes runs/bench/<commit>[-dirty].json unless --out names another file. Benches made before
+ * I1 ran the TypeScript core, whose hashes the archived 2D build reproduces (tag golden-2d-ts).
  */
 
 import { execFileSync } from "node:child_process";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { parseArgs } from "node:util";
-import { hashWorld } from "../src/core/hash.ts";
 import { mergeParams, type Params } from "../src/core/params.ts";
 import { presetParams } from "../src/core/presets.ts";
-import { PHASES, type Phase } from "../src/core/season.ts";
-import { FULL_SNAPSHOT, SnapshotBuilder, type SnapshotOptions } from "../src/core/snapshot.ts";
-import { World } from "../src/core/world.ts";
+import { FULL_SNAPSHOT, type SnapshotOptions } from "../src/core/types.ts";
+import { coreWasm, loadWorldsSync, RustWorld } from "../src/wasm/world.ts";
 
 const { values } = parseArgs({
   options: {
@@ -33,6 +35,7 @@ const { values } = parseArgs({
   },
 });
 
+loadWorldsSync(readFileSync(coreWasm));
 /** The forest preset on a ring twice as wide, with twice the trees (M18's bigger worlds). */
 function wideForest(): Params {
   const base = presetParams("forest");
@@ -57,14 +60,26 @@ function panorama(): Params {
 const CASES: Record<string, () => Params> = {
   skyTree: () => presetParams("skyTree"),
   skyStand: () => presetParams("skyStand"),
-  coniferStand: () => presetParams("coniferStand"),
+  firWood: () => presetParams("firWood"),
   thinning: () => presetParams("thinning"),
   forest: () => presetParams("forest"),
   wideForest,
   panorama,
 };
 
-type Bucket = Phase | "snapshot";
+/** The season loop's phases (§6; rust/core/src/season.rs PHASES), then the snapshot. */
+const PHASES = [
+  "light",
+  "sample",
+  "allocate",
+  "grow",
+  "shed",
+  "girth",
+  "mechanics",
+  "commit",
+  "deaths",
+] as const;
+type Bucket = (typeof PHASES)[number] | "snapshot";
 const BUCKETS: Bucket[] = [...PHASES, "snapshot"];
 
 interface CaseResult {
@@ -73,12 +88,14 @@ interface CaseResult {
   trees: number;
   metamers: number;
   hash: string;
-  /** Milliseconds per season (simulation plus snapshot): mean, median, 95th percentile, last 20. */
+  /** Milliseconds per season in WASM (simulation plus snapshot): mean, median, p95, last 20. */
   mean: number;
   p50: number;
   p95: number;
   late: number;
-  /** Mean milliseconds per season spent in each phase. */
+  /** Mean milliseconds per season natively, the whole season. */
+  native: number;
+  /** Mean milliseconds per season in each phase (natively), and the snapshot (in WASM). */
   phases: Record<Bucket, number>;
 }
 
@@ -88,6 +105,8 @@ interface BenchFile {
   node: string;
   repeat: number;
   snapshot: string;
+  /** The core: "rust"; before I1, "ts" or "rust" (G2's sky sweep in the TypeScript core). */
+  light: string;
   cases: Record<string, CaseResult>;
 }
 
@@ -114,46 +133,64 @@ const SNAPSHOTS: Record<string, SnapshotOptions> = {
 const snapshotOptions = SNAPSHOTS[values.snapshot];
 if (!snapshotOptions) throw new Error(`--snapshot must be full or lean`);
 
+const rust = fileURLToPath(new URL("../rust", import.meta.url));
+
+/** The native binary's per-phase means and hash (cli/run.ts builds it when stale). */
+function native(params: Params, seasons: number): Record<string, number | string> {
+  const out = execFileSync(
+    process.execPath,
+    [
+      fileURLToPath(new URL("./run.ts", import.meta.url)),
+      "--bench",
+      "--params",
+      "-",
+      "--seasons",
+      String(seasons),
+    ],
+    { input: JSON.stringify(params), encoding: "utf8", cwd: rust },
+  );
+  return JSON.parse(out) as Record<string, number | string>;
+}
+
 function runOnce(params: Params, seasons: number): CaseResult {
-  const world = new World(params);
-  const builder = new SnapshotBuilder();
-  const totals = Object.fromEntries(BUCKETS.map((b) => [b, 0])) as Record<Bucket, number>;
-  let last = 0;
-  const mark = (phase: Phase): void => {
-    const now = performance.now();
-    totals[phase] += now - last;
-    last = now;
-  };
+  const world = RustWorld.create(params);
+  let snapshotMs = 0;
   const perSeason: number[] = [];
   for (let s = 0; s < seasons; s++) {
     const t0 = performance.now();
-    last = t0;
-    world.step(mark);
+    world.step();
     const t1 = performance.now();
-    builder.build(world, t1 - t0, snapshotOptions);
+    world.snapshot(t1 - t0, snapshotOptions);
     const t2 = performance.now();
-    totals.snapshot += t2 - t1;
+    snapshotMs += t2 - t1;
     perSeason.push(t2 - t0);
   }
   const live = world.trees.filter((t) => t.alive);
+  const hash = world.hash();
+  const n = native(params, seasons);
+  if (n.hash !== hash) throw new Error(`native hash ${n.hash} is not WASM's ${hash}`);
   const sorted = [...perSeason].sort((a, b) => a - b);
   const late = perSeason.slice(-20);
-  const phases = Object.fromEntries(BUCKETS.map((b) => [b, totals[b] / seasons])) as Record<
+  const phases = Object.fromEntries(PHASES.map((p) => [p, n[p] as number])) as Record<
     Bucket,
     number
   >;
-  return {
+  phases.snapshot = snapshotMs / seasons;
+  const result: CaseResult = {
     grid: `${params.world.width}×${params.world.height}${params.world.sides === "periodic" ? " ring" : ""}`,
     seasons,
     trees: live.length,
-    metamers: live.reduce((n, t) => n + t.m.length, 0),
-    hash: hashWorld(world),
+    metamers: live.reduce((k, t) => k + t.m.length, 0),
+    hash,
     mean: perSeason.reduce((a, b) => a + b, 0) / seasons,
     p50: quantile(sorted, 0.5),
     p95: quantile(sorted, 0.95),
     late: late.reduce((a, b) => a + b, 0) / late.length,
+    native: n.mean as number,
     phases,
   };
+  world.dispose();
+  return result;
 }
 
 const f1 = (x: number): string => x.toFixed(1);
@@ -184,7 +221,7 @@ for (const name of names) {
 }
 process.stderr.write("\n");
 
-const dirty = git(["status", "--porcelain", "--", "src", "cli"]) !== "";
+const dirty = git(["status", "--porcelain", "--", "src", "cli", "rust"]) !== "";
 const commit = `${git(["rev-parse", "--short", "HEAD"]) || "unknown"}${dirty ? "-dirty" : ""}`;
 const file: BenchFile = {
   commit,
@@ -192,6 +229,7 @@ const file: BenchFile = {
   node: process.version,
   repeat,
   snapshot: values.snapshot,
+  light: "rust",
   cases: results,
 };
 const out = values.out ?? join("runs", "bench", `${commit}.json`);
@@ -199,10 +237,10 @@ mkdirSync(dirname(out), { recursive: true });
 writeFileSync(out, `${JSON.stringify(file, null, 2)}\n`);
 
 console.log(
-  `\n${commit}, ${seasons} seasons, best of ${repeat}, ${values.snapshot} snapshots (ms per season)\n`,
+  `\n${commit}, ${seasons} seasons, best of ${repeat}, ${values.snapshot} snapshots (ms per season: WASM, then native)\n`,
 );
 printTable([
-  ["case", "grid", "trees", "metamers", "mean", "p50", "p95", "last 20", "hash"],
+  ["case", "grid", "trees", "metamers", "mean", "p50", "p95", "last 20", "native", "hash"],
   ...names.map((n) => {
     const r = results[n] as CaseResult;
     return [
@@ -214,11 +252,12 @@ printTable([
       f1(r.p50),
       f1(r.p95),
       f1(r.late),
+      f1(r.native),
       r.hash,
     ];
   }),
 ]);
-console.log("\nmean ms per season by phase\n");
+console.log("\nmean ms per season by phase (natively; the snapshot in WASM)\n");
 printTable([
   ["case", ...BUCKETS],
   ...names.map((n) => [n, ...BUCKETS.map((b) => f1((results[n] as CaseResult).phases[b]))]),

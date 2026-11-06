@@ -37,6 +37,41 @@ export const CATEGORICAL = [
 export const BUD_ACTIVE = "#4caf50";
 export const BUD_DORMANT = "#d08a2e";
 
+/** An sRGB byte at `m` (0–1) times its luminance, scaled in linear light, as illumination scales it. */
+export function dimByte(v: number, m: number): number {
+  const x = toLinear(v) * m;
+  return Math.round(255 * (x <= 0.0031308 ? 12.92 * x : 1.055 * x ** (1 / 2.4) - 0.055));
+}
+
+function toLinear(v: number): number {
+  const c = v / 255;
+  return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+}
+
+/** CIE L* (0 black … 100 white) of sRGB bytes. */
+export function lightness(r: number, g: number, b: number): number {
+  const y = 0.2126 * toLinear(r) + 0.7152 * toLinear(g) + 0.0722 * toLinear(b);
+  return y > 216 / 24389 ? 116 * Math.cbrt(y) - 16 : (24389 / 27) * y;
+}
+
+/**
+ * `css`, darkened in linear light if need be so that its L* stays at least `dL` below a light
+ * `sky`'s (round 2's judging): white birch against the pale lower sky drew at ΔL* ≈ 3 and vanished.
+ * A painter's rule, not a model's: a white stem against a white sky is painted a light grey.
+ * Unchanged against a dark sky (L* < 50), with dL ≤ 0, or when already dark enough.
+ */
+export function keepContrast(css: string, sky: string, dL: number): string {
+  const [r, g, b] = parseColor(css);
+  const [sr, sg, sb] = parseColor(sky);
+  const ls = lightness(sr, sg, sb);
+  const l = lightness(r, g, b);
+  const target = ls - dL;
+  if (!(dL > 0) || ls < 50 || l <= target) return css;
+  const lum = (L: number): number => (L > 8 ? ((L + 16) / 116) ** 3 : (L * 27) / 24389);
+  const m = lum(Math.max(0, target)) / lum(l);
+  return `rgb(${dimByte(r, m)}, ${dimByte(g, m)}, ${dimByte(b, m)})`;
+}
+
 /** RGB triples of the shadow heatmap ramp (transparent at zero shade). */
 export function shadowRgb(t: number): [number, number, number] {
   const u = Math.min(1, Math.max(0, t));

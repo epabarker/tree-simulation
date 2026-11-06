@@ -1,0 +1,5 @@
+# The Rust toolchain for rust/ (ADR 0024). wasm-bindgen-cli must match rust/wasm's wasm-bindgen.
+[toolchain]
+channel = "1.97.0"
+targets = ["wasm32-unknown-unknown"]
+components = ["rustfmt", "clippy"]

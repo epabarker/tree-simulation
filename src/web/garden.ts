@@ -13,12 +13,13 @@
  */
 
 import * as Comlink from "comlink";
-import type { TreeMetrics } from "../core/metrics.ts";
 import type { Obstacle, Params, ParamsPatch } from "../core/params.ts";
+import type { Planting } from "../core/presets.ts";
 import { forestParams, specimenParams } from "../core/presets.ts";
-import type { Snapshot, SnapshotOptions } from "../core/snapshot.ts";
-import type { RunRecord } from "../core/world.ts";
+import type { RunRecord, Snapshot, SnapshotOptions, TreeMetrics } from "../core/types.ts";
 import type { SimApi } from "../worker/api.ts";
+import { PLATE_HEIGHT, plateWidth } from "./plate.ts";
+import { type Coverage, measureCoverage } from "./render/coverage.ts";
 import { createRenderer } from "./render/create.ts";
 import { attachInput } from "./render/input.ts";
 import {
@@ -27,6 +28,7 @@ import {
   type LeafStyle,
   leafStudyPath,
 } from "./render/leaf-styles.ts";
+import { createLoupe } from "./render/loupe.ts";
 import { governor, judge, type QualityLevel, qualityLevels } from "./render/quality.ts";
 import { MAX_DPR, type Renderer } from "./render/renderer.ts";
 import sceneTokens from "./render/scene.css?inline";
@@ -48,7 +50,7 @@ export interface Stats {
   /** Frames per second while animating, and CPU milliseconds per draw. */
   fps: number;
   drawMs: number;
-  /** The adaptive quality level in use: device pixel ratio, and "lite" without back leaves. */
+  /** The adaptive quality level in use: its device pixel ratio. */
   quality: string;
 }
 
@@ -70,6 +72,13 @@ export interface BenchResult {
   /** Worker time per season, simulation plus snapshot. */
   workerMean: number;
   workerMax: number;
+  /** The worker's WASM linear memory at the end, MB of 10⁶ bytes: its peak (ADR 0026). */
+  memoryMB: number;
+  /** I3 step 4: how much of the canopy the leaves cover at the end of the run (render/coverage.ts). */
+  coverage: Coverage;
+  /** The foliage knobs it was measured at. */
+  leafOpacity?: number;
+  leafMinPx?: number;
 }
 
 /** Seasons per second: `intro` until the world reaches `introSeasons`, then `ambient`. */
@@ -84,6 +93,8 @@ export interface GardenOptions {
   params?: Params;
   /** Seed of the default run (ignored with `params`). Default: a new one per visit. */
   seed?: number;
+  /** How the default run is planted (ignored with `params`): `forestParams`' Planting (I3). */
+  planting?: Partial<Planting>;
   /** View settings; an object passed here is used (and filled in) by reference. */
   view?: Partial<ViewOptions>;
   /** WebGL2 with a Canvas 2D fallback, or Canvas 2D only. */
@@ -95,7 +106,7 @@ export interface GardenOptions {
   /** "fell": tap a tree to fell it (default). "full": also pan, pinch, zoom (the lab). */
   interaction?: "none" | "fell" | "full";
   /** What the camera fits (Scene.frame). Default "world". */
-  frame?: "trees" | "world";
+  frame?: "trees" | "world" | "height";
   /**
    * "forest" (default): the frame above. "specimen": one tree alone, the broadest crown among the
    * taller trees when chosen, kept
@@ -178,6 +189,12 @@ export interface GardenOptions {
   onEmptyTap?(x: number, at: { x: number; y: number }): void;
   /** Bench mode (`?bench`): play to `seasons`, sampling every animated frame, then report. */
   bench?: { seasons: number; onDone(result: BenchResult): void };
+  /**
+   * The loupe (M26, render/loupe.ts): hold a finger or the mouse still on the forest to see the
+   * spot under it four times nearer, leaves at their true length. Default on, unless
+   * `interaction` is "none". It is drawn only while held, so it costs nothing otherwise.
+   */
+  loupe?: boolean;
 }
 
 export interface Garden {
@@ -217,6 +234,11 @@ export interface Garden {
   leafStudy(tree: number): { path: string; cm: number; common?: string; latin?: string } | null;
   /** Seed of the specimen's own world (option `specimen`) while it is shown, else 0. */
   readonly specimenSeed: number;
+  /**
+   * The foliage coverage of a frame drawn now (I3 step 4, render/coverage.ts): set
+   * `view.leafOpacity` or `view.leafMinPx`, then measure.
+   */
+  coverage(): Coverage;
   /** Each live tree's crown top and trunk base in canvas pixels, for labels (Scene.anchors). */
   anchors(): { tree: number; x: number; y: number; baseX: number; baseY: number }[];
   /** The latest metrics of a live tree, or undefined. */
@@ -235,23 +257,10 @@ const SLOWDOWN = 12;
 /** Seasons (M17) show once a year lasts at least this long; spring is this share of a year. */
 const SEASONS_FROM_MS = 3000;
 const SPRING = 0.3;
-/** Rows of sky above the forest's ground in its preset (130): the ring's width follows the host. */
-const WORLD_HEIGHT = 130;
-
-/**
- * The ring's width for a host of this size: a share of what the host's aspect would give the
- * world's full height. The plate fits the ring's width, so the share sets how large the trees are
- * drawn: two thirds on a portrait host (a phone; M21 art pass) and 0.7 on a landscape one (M24:
- * with the site's wide plate, about as many trees as before, 1.7 times larger). Crowns taller than
- * the plate ease the camera out, as ever.
- */
-export function plateWidth(width: number, height: number): number {
-  const aspect = width / Math.max(1, height);
-  return WORLD_HEIGHT * aspect * (aspect < 1 ? 0.65 : 0.7);
-}
 
 // The home forest and Plate II's oak live with the presets, so the CLI can grow them too (M21).
 export { forestParams, specimenParams } from "../core/presets.ts";
+export { PLATE_HEIGHT, PLATE_MAX, plateWidth } from "./plate.ts";
 
 /** Puts the scene's colour tokens first in <head>, once: their cascade layer then loses to any host. */
 function injectSceneTokens(): void {
@@ -290,22 +299,30 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
     maxDpr: options.maxDpr,
   });
   const { scene } = renderer;
+  const loupe =
+    (options.loupe ?? true) && interaction !== "none"
+      ? createLoupe(scene, renderer.canvas, host, options.transparent)
+      : null;
   let focus = options.focus ?? "forest";
   // Motion (M16): off with reduced motion.
   const wind = (options.wind ?? true) && !reduceMotion ? createWind() : null;
   scene.wind = wind;
   scene.physics = (options.physics ?? true) && !reduceMotion;
   scene.frame = focus === "specimen" ? "tree" : (options.frame ?? "world");
+  scene.frameHeight = 0.5 * PLATE_HEIGHT;
   if (options.headroom !== undefined) scene.headroom = options.headroom;
   const rect = renderer.canvas.getBoundingClientRect();
   const params =
     options.params ??
-    forestParams(plateWidth(rect.width, rect.height), options.seed ?? dailySeed(options.seeds));
+    forestParams(
+      plateWidth(rect.width, rect.height, scene.headroom),
+      options.seed ?? dailySeed(options.seeds),
+      options.planting,
+    );
 
   const view = Object.assign(options.view ?? {}, {
     colorMode: "natural",
     showLeaves: true,
-    depth: true,
     leafAge: LEAF_STYLES.broadleaf.leafAge,
     leafStyle: "broadleaf",
     showBuds: false,
@@ -324,17 +341,15 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
     quality: "",
   };
 
-  // Adaptive quality (render/quality.ts): fewer pixels, then fewer leaves, when frames run slow.
+  // Adaptive quality (render/quality.ts): fewer pixels when frames run slow.
   const adaptive = (options.adaptive ?? true) && !options.bench;
   const quality = governor(qualityLevels(window.devicePixelRatio, options.maxDpr ?? MAX_DPR));
-  const describeQuality = (level: QualityLevel): string =>
-    `dpr ${level.dpr}${level.lite ? ", lite" : ""}`;
+  const describeQuality = (level: QualityLevel): string => `dpr ${level.dpr}`;
   stats.quality = describeQuality(quality.levels[0] as QualityLevel);
   const judgeFrame = (dt: number, now: number): void => {
     const next = judge(quality, dt, now);
     if (next === null) return;
     const level = quality.levels[next] as QualityLevel;
-    view.lite = level.lite;
     renderer.setMaxDpr(level.dpr);
     stats.quality = describeQuality(level);
     dirty = true;
@@ -393,6 +408,7 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
 
   function accept(s: Snapshot, animate: boolean, fresh: boolean): void {
     renderer.setSnapshot(s);
+    loupe?.setSnapshot(s, animate);
     if (focus === "specimen") chooseSpecimen(s);
     if (wind) wind.target = s.storm ? GALE : CALM;
     if (!animate) scene.clearHistory();
@@ -551,6 +567,14 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
               scene.fit();
               dirty = true;
             },
+            onHold: loupe
+              ? (phase, sx, sy) => {
+                  if (phase === "start" && scene.next) loupe.show(sx, sy, scene.next);
+                  else if (phase === "move") loupe.move(sx, sy);
+                  else if (phase === "end") loupe.hide();
+                  dirty = true;
+                }
+              : undefined,
           },
           { panZoom: interaction === "full" },
         );
@@ -568,7 +592,9 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
     const t = Math.min(1, (now - tweenStart) / tweenMs);
     if (dirty || t < 1) {
       const t0 = performance.now();
-      renderer.draw(continuous ? t : t * t * (3 - 2 * t), view);
+      const eased = continuous ? t : t * t * (3 - 2 * t);
+      renderer.draw(eased, view);
+      loupe?.draw(eased, view);
       const ms = performance.now() - t0;
       // Smoothed CPU cost of a draw, and frame rate while drawing every frame.
       stats.drawMs += (ms - stats.drawMs) * 0.1;
@@ -579,7 +605,7 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
         if (drewLastFrame) samples.frame.push(dt);
       }
       drewLastFrame = true;
-      dirty = t < 1;
+      dirty = t < 1 || !!loupe?.open;
     } else {
       drewLastFrame = false;
     }
@@ -621,6 +647,10 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
       longFrames: samples.frame.filter((dt) => dt > 33).length,
       workerMean: round(w.reduce((a, b) => a + b, 0) / Math.max(1, w.length)),
       workerMax: round(Math.max(0, ...w)),
+      memoryMB: Math.round((scene.next?.memoryBytes ?? 0) / 1e5) / 10,
+      coverage: measureCoverage(renderer, view),
+      leafOpacity: view.leafOpacity,
+      leafMinPx: view.leafMinPx,
     };
   }
 
@@ -779,7 +809,7 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
       const s = await sim.restore(Comlink.transfer(bytes, [bytes]));
       if (mine !== generation || destroyed) return true;
       // The run it came from, for obstacle events and for sharing (?forest=seed regrows it).
-      current = forestParams(at.width, at.seed);
+      current = forestParams(at.width, at.seed, options.planting);
       seedNow = at.seed;
       sentObstacles = JSON.stringify(current.world.obstacles ?? []);
       inFlight = false;
@@ -805,18 +835,22 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
       specimenSeed = randomSeed();
       await swapWorld(specimenParams(specimenSeed));
     }
+    // Drawing starts before the still forest is grown: reduced motion shows the plate at once and
+    // the grown forest replaces it when the worker has it (I3 step 5: until then the page drew
+    // nothing for the 2–5 s that growStill takes).
+    frameId = requestAnimationFrame(frame);
     if (reduceMotion) {
       if (reducedMode === "still") await growStill();
     } else if (options.autoplay ?? true) {
       playback.playing = true;
     }
-    frameId = requestAnimationFrame(frame);
   });
 
   return {
     renderer,
     scene,
     view,
+    coverage: () => measureCoverage(renderer, view),
     playback,
     stats,
     ready,
@@ -894,6 +928,7 @@ export function mountGarden(host: HTMLElement, options: GardenOptions = {}): Gar
       worker.terminate();
       renderer.canvas.removeEventListener("pointermove", onPointerMove);
       renderer.canvas.removeEventListener("pointerleave", onPointerLeave);
+      loupe?.destroy();
       if (ownCanvas) renderer.canvas.remove();
     },
   };

@@ -1,0 +1,12 @@
+ 66-9  topology same; 2 of 4 trees and 124 of 568 metamers differ; largest tip shift 1.63e-14 cells, radius 2.78e-17
+ 66-10 topology same; 2 of 8 trees and 316 of 532 metamers differ; largest tip shift 4.14e-14 cells, radius 7.63e-17
+ 66-12 topology same; 2 of 8 trees and 473 of 666 metamers differ; largest tip shift 4.28e-14 cells, radius 5.55e-17
+100-9  topology same; 4 of 8 trees and 429 of 782 metamers differ; largest tip shift 4.26e-14 cells, radius 1.39e-16
+100-10 topology same; 3 of 11 trees and 186 of 909 metamers differ; largest tip shift 1.78e-14 cells, radius 8.33e-17
+100-12 topology same; 4 of 17 trees and 499 of 836 metamers differ; largest tip shift 7.11e-14 cells, radius 1.25e-16
+160-9  topology same; 4 of 16 trees and 602 of 1385 metamers differ; largest tip shift 7.42e-14 cells, radius 1.46e-16
+160-10 topology same; 9 of 34 trees and 343 of 1408 metamers differ; largest tip shift 8.88e-14 cells, radius 2.29e-16
+160-12 topology same; 7 of 25 trees and 737 of 1336 metamers differ; largest tip shift 9.95e-14 cells, radius 2.19e-16
+220-9  topology same; 5 of 30 trees and 492 of 1889 metamers differ; largest tip shift 5.12e-14 cells, radius 1.25e-16
+220-10 topology same; 10 of 27 trees and 1074 of 1956 metamers differ; largest tip shift 1.01e-12 cells, radius 9.78e-16
+220-12 topology same; 11 of 27 trees and 1020 of 1780 metamers differ; largest tip shift 2.99e-13 cells, radius 5.90e-16

@@ -1,0 +1,4 @@
+{"label":"before","seasons":40,"wallS":50.707,"renderer":"WebGL2","dpr":2,"metamers":11027,"frames":1734,"drawP50":3,"drawP95":5,"frameP50":16.46,"frameP95":17.28,"longFrames":5,"workerMean":25.53,"workerMax":40}
+{"label":"after","seasons":40,"wallS":51.307,"renderer":"WebGL2","dpr":2,"metamers":12157,"frames":1670,"drawP50":4,"drawP95":7,"frameP50":16.52,"frameP95":17.36,"longFrames":62,"workerMean":32.1,"workerMax":45}
+{"label":"before","seasons":100,"wallS":1012.382,"renderer":"WebGL2","dpr":2,"metamers":12654,"frames":18930,"drawP50":4,"drawP95":5,"frameP50":16.44,"frameP95":17.28,"longFrames":72,"workerMean":37.64,"workerMax":67}
+{"label":"after","seasons":100,"wallS":1011.756,"renderer":"WebGL2","dpr":2,"metamers":12325,"frames":18914,"drawP50":4,"drawP95":6,"frameP50":16.46,"frameP95":17.26,"longFrames":91,"workerMean":40.69,"workerMax":87}

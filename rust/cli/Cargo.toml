@@ -1,0 +1,14 @@
+[package]
+name = "treesim"
+version = "0.1.0"
+description = "The headless runner (I1): the Rust core natively, writing the files the analysis reads"
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[features]
+threads = ["tree-core/threads"]
+
+[dependencies]
+tree-core = { path = "../core" }
+flate2 = "1"

@@ -1,0 +1,66 @@
+{
+ "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/153.0.8010.12 Safari/537.36",
+ "cores": 4,
+ "goldens TypeScript core": {
+  "pass": 7,
+  "of": 27,
+  "failed": [
+   "direction:seed1:s30",
+   "wall:seed1:s30",
+   "pruned:seed1:s40",
+   "pruned:seed2:s40",
+   "pair:seed1:s35",
+   "late:seed1:s45",
+   "stand:seed1:s30",
+   "skyStand:seed1:s30",
+   "skyTree:seed1:s40",
+   "obliqueSun:seed1:s30",
+   "skyLate:seed1:s40",
+   "overcast:seed1:s30",
+   "conifer:seed1:s30",
+   "birch:seed1:s30",
+   "tropical:seed1:s30",
+   "weeping:seed1:s40",
+   "troll:seed1:s40",
+   "forest:seed1:s50",
+   "thinning:seed1:s30",
+   "clearing:seed1:s50"
+  ]
+ },
+ "goldens Rust, parity build": {
+  "pass": 27,
+  "of": 27,
+  "failed": []
+ },
+ "goldens Rust, production build": {
+  "pass": 27,
+  "of": 27,
+  "failed": []
+ },
+ "season ms forest (seed 1)": {
+  "TypeScript": 4.605000000010477,
+  "Rust parity": 4.944999999995344,
+  "Rust production": 3.410000000009313
+ },
+ "season ms mixed wood, 220 cells (seed 9)": {
+  "TypeScript": 6.520000000001164,
+  "Rust parity": 7.724999999994179,
+  "Rust production": 5.020000000012805
+ },
+ "snapshot ms forest (seed 1) lab (full)": {
+  "ts": 2.439999999990687,
+  "rust": 1.113333333345751
+ },
+ "snapshot ms forest (seed 1) garden": {
+  "ts": 0.6066666666573535,
+  "rust": 0.4666666666744277
+ },
+ "snapshot ms mixed wood, 220 cells (seed 9) lab (full)": {
+  "ts": 0.9733333333550642,
+  "rust": 0.7666666666511446
+ },
+ "snapshot ms mixed wood, 220 cells (seed 9) garden": {
+  "ts": 1.1333333333255724,
+  "rust": 0.5866666666775321
+ }
+}

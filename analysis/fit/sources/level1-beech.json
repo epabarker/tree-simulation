@@ -1,0 +1,3396 @@
+{
+ "version": 6,
+ "status": "superseded",
+ "superseded": {
+  "on": "2026-11-05",
+  "why": "ADR 0054 (a per-tree azimuth for the seedling's frame) changes every simulated realisation, and analysis/treesim/describe.py gains leanAngle, so this registration's hash check refuses by design. Never launched.",
+  "next": "v7, registered after the re-run (version numbers are never reused): docs/plans/2026-11-03-reference-fidelity.md, State"
+ },
+ "species": "beech",
+ "provisional": "phase 3 pilot (the user, 2026-11-04): pending Level 0's pass and ADR 0052; nothing from it is accepted into species params (the plan's \u00a7g)",
+ "written": "2026-11-05, from real QSMs only, before any simulated tree was scored on this loss; seeds_per_candidate kept at v3's (the user); registered, not launched (the user)",
+ "dataset": "biodiv",
+ "code": "Fagus_sylvatica",
+ "d_min_m": 0.008621381595730782,
+ "size_match": {
+  "dbh": 0.291206434977993,
+  "seasons": [
+   50,
+   60,
+   70,
+   80,
+   90,
+   100,
+   110,
+   120,
+   130,
+   140,
+   150
+  ],
+  "dump_seasons": [
+   50,
+   60,
+   70,
+   80,
+   90,
+   100
+  ],
+  "rule": "per candidate on its own seeds: the first season at which the median over seeds of the per-seed median DBH of the live measured trees (cli/allometry.ts) reaches dbh; a match at the first season counts and is flagged; none by the last, or outside dump_seasons: unmatched, every Level 1 term costs MISSING_PENALTY and the candidate is flagged"
+ },
+ "descriptors": {
+  "boleSway": "A",
+  "centroidHeight": "A",
+  "crownBase80": "A",
+  "crownFullness": "A",
+  "forkHeight": "A",
+  "leaderDominance": "A",
+  "length0": "A",
+  "limbDroop": "B",
+  "limbElevation05": "A",
+  "limbUpturn": "A",
+  "p0": "A",
+  "p1": "A",
+  "p2": "A",
+  "p3": "A",
+  "pendulousFraction05": "A",
+  "profileCentre": "A",
+  "tortuosity05": "A",
+  "widestAt": "A"
+ },
+ "correlation": {
+  "names": [
+   "boleSway",
+   "centroidHeight",
+   "crownBase80",
+   "crownFullness",
+   "forkHeight",
+   "leaderDominance",
+   "length0",
+   "limbDroop",
+   "limbElevation05",
+   "limbUpturn",
+   "p0",
+   "p1",
+   "p2",
+   "p3",
+   "pendulousFraction05",
+   "profileCentre",
+   "tortuosity05",
+   "widestAt"
+  ],
+  "r": [
+   [
+    1.0,
+    0.2658336296458845,
+    0.18472253058471505,
+    -0.09982690341504592,
+    -0.09949999057102335,
+    -0.05255282179627723,
+    0.11900257616094301,
+    -0.06190051738984387,
+    0.013044147150370182,
+    0.17180248162545564,
+    0.10633986293629687,
+    -0.14201002456979994,
+    -0.3065686263173255,
+    0.09311358028284071,
+    0.06424007827772744,
+    -0.06337301032440587,
+    0.16188694792621852,
+    -0.11060195072966797
+   ],
+   [
+    0.2658336296458845,
+    1.0,
+    0.9466376301118908,
+    -0.14206698419287964,
+    -0.19283569970985126,
+    -0.509481671234869,
+    0.07226907675498938,
+    0.30560232660774195,
+    0.3466661597647115,
+    -0.05976816835779061,
+    -0.31709398427507307,
+    -0.011762657985623039,
+    0.11902918145218251,
+    0.1006723629374493,
+    -0.07990894418223653,
+    0.2729856596579016,
+    0.22233869034900183,
+    0.1478540259890629
+   ],
+   [
+    0.18472253058471505,
+    0.9466376301118908,
+    1.0,
+    -0.10231371029005104,
+    -0.11113853361560008,
+    -0.48485695705528864,
+    -0.08720933550622838,
+    0.35921399894439054,
+    0.27300902740756017,
+    -0.014745226142400876,
+    -0.32348837033977473,
+    0.1288016197661946,
+    0.17929625615276093,
+    -0.028885358016016757,
+    -0.028981995198639806,
+    0.20691103903701263,
+    0.25525234741964103,
+    0.11747424929651482
+   ],
+   [
+    -0.09982690341504592,
+    -0.14206698419287964,
+    -0.10231371029005104,
+    1.0,
+    0.07325412902114008,
+    -0.011966842081379063,
+    -0.4467006625191256,
+    0.18696509426162478,
+    -0.30009490673166145,
+    -0.19954135912181462,
+    0.630719095707976,
+    0.5725701547654136,
+    0.4040648102196631,
+    0.15779100419674175,
+    0.06669182619444909,
+    -0.40121786336847615,
+    -0.09174167593801864,
+    -0.0021116299921764728
+   ],
+   [
+    -0.09949999057102335,
+    -0.19283569970985126,
+    -0.11113853361560008,
+    0.07325412902114008,
+    1.0,
+    0.06320705211835792,
+    0.03422619083236747,
+    -0.1710663106721227,
+    -0.3630872002365906,
+    0.10954116647235891,
+    0.2438222521339814,
+    0.10676668023799088,
+    -0.12641221959508958,
+    -0.2713197691776881,
+    0.013839668495172885,
+    -0.2888837723968062,
+    0.10265704108374799,
+    -0.18072609165374706
+   ],
+   [
+    -0.05255282179627723,
+    -0.509481671234869,
+    -0.48485695705528864,
+    -0.011966842081379063,
+    0.06320705211835792,
+    1.0,
+    -0.14286599553877635,
+    -0.21320473730194978,
+    -0.17614641942834333,
+    0.002582904108224231,
+    0.09596268206176832,
+    -0.09112875788948434,
+    0.002304569606164697,
+    -0.06687000378082962,
+    0.030636321858800646,
+    -0.1122732918854057,
+    -0.26702055469920527,
+    -0.05132339022967642
+   ],
+   [
+    0.11900257616094301,
+    0.07226907675498938,
+    -0.08720933550622838,
+    -0.4467006625191256,
+    0.03422619083236747,
+    -0.14286599553877635,
+    1.0,
+    -0.2181836921443461,
+    0.5725452703716435,
+    -0.1578809897627665,
+    -0.014575668718356652,
+    -0.51672848162707,
+    -0.5681008189017529,
+    0.22119941699596207,
+    -0.24162867162007004,
+    0.1338248304406102,
+    -0.22189538162241976,
+    -0.0636211599047445
+   ],
+   [
+    -0.06190051738984387,
+    0.30560232660774195,
+    0.35921399894439054,
+    0.18696509426162478,
+    -0.1710663106721227,
+    -0.21320473730194978,
+    -0.2181836921443461,
+    1.0,
+    0.10127843989841359,
+    -0.18254602094562072,
+    -0.10150824423636054,
+    -0.022105474045927886,
+    0.3241132057529114,
+    0.22888031004598738,
+    0.3845028600901091,
+    0.22383962815169833,
+    0.4104540236394893,
+    0.07981836682446218
+   ],
+   [
+    0.013044147150370182,
+    0.3466661597647115,
+    0.27300902740756017,
+    -0.30009490673166145,
+    -0.3630872002365906,
+    -0.17614641942834333,
+    0.5725452703716435,
+    0.10127843989841359,
+    1.0,
+    -0.22628253238409343,
+    -0.28756571451917934,
+    -0.25666902710705697,
+    -0.12322558957062632,
+    0.26209042286316164,
+    -0.488856903300463,
+    0.3135276009109202,
+    -0.23793659946015464,
+    0.10840006918641985
+   ],
+   [
+    0.17180248162545564,
+    -0.05976816835779061,
+    -0.014745226142400876,
+    -0.19954135912181462,
+    0.10954116647235891,
+    0.002582904108224231,
+    -0.1578809897627665,
+    -0.18254602094562072,
+    -0.22628253238409343,
+    1.0,
+    0.03504713645068056,
+    0.08841445319545169,
+    -0.18674223176485524,
+    -0.3793885524293587,
+    -0.14120245873662526,
+    -0.2669098338696381,
+    0.22583864690506952,
+    -0.18851198623579526
+   ],
+   [
+    0.10633986293629687,
+    -0.31709398427507307,
+    -0.32348837033977473,
+    0.630719095707976,
+    0.2438222521339814,
+    0.09596268206176832,
+    -0.014575668718356652,
+    -0.10150824423636054,
+    -0.28756571451917934,
+    0.03504713645068056,
+    1.0,
+    0.30596405863210185,
+    -0.28754930716676363,
+    -0.22371861135031373,
+    0.1393561803462061,
+    -0.8464987872292038,
+    -0.07318240415080417,
+    -0.43053576645771624
+   ],
+   [
+    -0.14201002456979994,
+    -0.011762657985623039,
+    0.1288016197661946,
+    0.5725701547654136,
+    0.10676668023799088,
+    -0.09112875788948434,
+    -0.51672848162707,
+    -0.022105474045927886,
+    -0.25666902710705697,
+    0.08841445319545169,
+    0.30596405863210185,
+    1.0,
+    0.081038307366944,
+    -0.4591905116217332,
+    0.04033996555306744,
+    -0.5562185766945028,
+    -0.08793662086986116,
+    -0.397721869905378
+   ],
+   [
+    -0.3065686263173255,
+    0.11902918145218251,
+    0.17929625615276093,
+    0.4040648102196631,
+    -0.12641221959508958,
+    0.002304569606164697,
+    -0.5681008189017529,
+    0.3241132057529114,
+    -0.12322558957062632,
+    -0.18674223176485524,
+    -0.28754930716676363,
+    0.081038307366944,
+    1.0,
+    0.2532862058583613,
+    -0.02990979660357763,
+    0.42082181096647603,
+    -0.0718440956517327,
+    0.5451615335364967
+   ],
+   [
+    0.09311358028284071,
+    0.1006723629374493,
+    -0.028885358016016757,
+    0.15779100419674175,
+    -0.2713197691776881,
+    -0.06687000378082962,
+    0.22119941699596207,
+    0.22888031004598738,
+    0.26209042286316164,
+    -0.3793885524293587,
+    -0.22371861135031373,
+    -0.4591905116217332,
+    0.2532862058583613,
+    1.0,
+    -0.127715055688687,
+    0.6589350763466628,
+    0.041421318479533245,
+    0.584601209485136
+   ],
+   [
+    0.06424007827772744,
+    -0.07990894418223653,
+    -0.028981995198639806,
+    0.06669182619444909,
+    0.013839668495172885,
+    0.030636321858800646,
+    -0.24162867162007004,
+    0.3845028600901091,
+    -0.488856903300463,
+    -0.14120245873662526,
+    0.1393561803462061,
+    0.04033996555306744,
+    -0.02990979660357763,
+    -0.127715055688687,
+    1.0,
+    -0.16102913974155406,
+    0.252387489088985,
+    -0.12046717594819853
+   ],
+   [
+    -0.06337301032440587,
+    0.2729856596579016,
+    0.20691103903701263,
+    -0.40121786336847615,
+    -0.2888837723968062,
+    -0.1122732918854057,
+    0.1338248304406102,
+    0.22383962815169833,
+    0.3135276009109202,
+    -0.2669098338696381,
+    -0.8464987872292038,
+    -0.5562185766945028,
+    0.42082181096647603,
+    0.6589350763466628,
+    -0.16102913974155406,
+    1.0,
+    0.058096516039187404,
+    0.6550911079546692
+   ],
+   [
+    0.16188694792621852,
+    0.22233869034900183,
+    0.25525234741964103,
+    -0.09174167593801864,
+    0.10265704108374799,
+    -0.26702055469920527,
+    -0.22189538162241976,
+    0.4104540236394893,
+    -0.23793659946015464,
+    0.22583864690506952,
+    -0.07318240415080417,
+    -0.08793662086986116,
+    -0.0718440956517327,
+    0.041421318479533245,
+    0.252387489088985,
+    0.058096516039187404,
+    1.0,
+    0.028979223053047065
+   ],
+   [
+    -0.11060195072966797,
+    0.1478540259890629,
+    0.11747424929651482,
+    -0.0021116299921764728,
+    -0.18072609165374706,
+    -0.05132339022967642,
+    -0.0636211599047445,
+    0.07981836682446218,
+    0.10840006918641985,
+    -0.18851198623579526,
+    -0.43053576645771624,
+    -0.397721869905378,
+    0.5451615335364967,
+    0.584601209485136,
+    -0.12046717594819853,
+    0.6550911079546692,
+    0.028979223053047065,
+    1.0
+   ]
+  ],
+  "n": [
+   [
+    52,
+    52,
+    52,
+    52,
+    52,
+    51,
+    52,
+    51,
+    52,
+    51,
+    52,
+    52,
+    52,
+    52,
+    52,
+    52,
+    51,
+    52
+   ],
+   [
+    52,
+    53,
+    53,
+    53,
+    53,
+    52,
+    53,
+    52,
+    53,
+    52,
+    53,
+    53,
+    53,
+    53,
+    53,
+    53,
+    52,
+    53
+   ],
+   [
+    52,
+    53,
+    53,
+    53,
+    53,
+    52,
+    53,
+    52,
+    53,
+    52,
+    53,
+    53,
+    53,
+    53,
+    53,
+    53,
+    52,
+    53
+   ],
+   [
+    52,
+    53,
+    53,
+    53,
+    53,
+    52,
+    53,
+    52,
+    53,
+    52,
+    53,
+    53,
+    53,
+    53,
+    53,
+    53,
+    52,
+    53
+   ],
+   [
+    52,
+    53,
+    53,
+    53,
+    53,
+    52,
+    53,
+    52,
+    53,
+    52,
+    53,
+    53,
+    53,
+    53,
+    53,
+    53,
+    52,
+    53
+   ],
+   [
+    51,
+    52,
+    52,
+    52,
+    52,
+    52,
+    52,
+    52,
+    52,
+    52,
+    52,
+    52,
+    52,
+    52,
+    52,
+    52,
+    52,
+    52
+   ],
+   [
+    52,
+    53,
+    53,
+    53,
+    53,
+    52,
+    53,
+    52,
+    53,
+    52,
+    53,
+    53,
+    53,
+    53,
+    53,
+    53,
+    52,
+    53
+   ],
+   [
+    51,
+    52,
+    52,
+    52,
+    52,
+    52,
+    52,
+    52,
+    52,
+    52,
+    52,
+    52,
+    52,
+    52,
+    52,
+    52,
+    52,
+    52
+   ],
+   [
+    52,
+    53,
+    53,
+    53,
+    53,
+    52,
+    53,
+    52,
+    53,
+    52,
+    53,
+    53,
+    53,
+    53,
+    53,
+    53,
+    52,
+    53
+   ],
+   [
+    51,
+    52,
+    52,
+    52,
+    52,
+    52,
+    52,
+    52,
+    52,
+    52,
+    52,
+    52,
+    52,
+    52,
+    52,
+    52,
+    52,
+    52
+   ],
+   [
+    52,
+    53,
+    53,
+    53,
+    53,
+    52,
+    53,
+    52,
+    53,
+    52,
+    53,
+    53,
+    53,
+    53,
+    53,
+    53,
+    52,
+    53
+   ],
+   [
+    52,
+    53,
+    53,
+    53,
+    53,
+    52,
+    53,
+    52,
+    53,
+    52,
+    53,
+    53,
+    53,
+    53,
+    53,
+    53,
+    52,
+    53
+   ],
+   [
+    52,
+    53,
+    53,
+    53,
+    53,
+    52,
+    53,
+    52,
+    53,
+    52,
+    53,
+    53,
+    53,
+    53,
+    53,
+    53,
+    52,
+    53
+   ],
+   [
+    52,
+    53,
+    53,
+    53,
+    53,
+    52,
+    53,
+    52,
+    53,
+    52,
+    53,
+    53,
+    53,
+    53,
+    53,
+    53,
+    52,
+    53
+   ],
+   [
+    52,
+    53,
+    53,
+    53,
+    53,
+    52,
+    53,
+    52,
+    53,
+    52,
+    53,
+    53,
+    53,
+    53,
+    53,
+    53,
+    52,
+    53
+   ],
+   [
+    52,
+    53,
+    53,
+    53,
+    53,
+    52,
+    53,
+    52,
+    53,
+    52,
+    53,
+    53,
+    53,
+    53,
+    53,
+    53,
+    52,
+    53
+   ],
+   [
+    51,
+    52,
+    52,
+    52,
+    52,
+    52,
+    52,
+    52,
+    52,
+    52,
+    52,
+    52,
+    52,
+    52,
+    52,
+    52,
+    52,
+    52
+   ],
+   [
+    52,
+    53,
+    53,
+    53,
+    53,
+    52,
+    53,
+    52,
+    53,
+    52,
+    53,
+    53,
+    53,
+    53,
+    53,
+    53,
+    52,
+    53
+   ]
+  ],
+  "rule": "Pearson r between every two descriptors over the real trees, pairwise complete, on the values detrended to size_match.dbh by each descriptor's registered slope (as the targets are); level1.correlation"
+ },
+ "clusters": {
+  "method": "average",
+  "distance": "1 \u2212 |r|",
+  "cut_r": 0.5,
+  "list": [
+   [
+    "boleSway"
+   ],
+   [
+    "centroidHeight",
+    "crownBase80"
+   ],
+   [
+    "crownFullness",
+    "p1"
+   ],
+   [
+    "forkHeight"
+   ],
+   [
+    "leaderDominance"
+   ],
+   [
+    "length0",
+    "limbElevation05"
+   ],
+   [
+    "limbDroop"
+   ],
+   [
+    "limbUpturn"
+   ],
+   [
+    "p0",
+    "profileCentre"
+   ],
+   [
+    "p2"
+   ],
+   [
+    "p3",
+    "widestAt"
+   ],
+   [
+    "pendulousFraction05"
+   ],
+   [
+    "tortuosity05"
+   ]
+  ],
+  "draw_order": [
+   [
+    "p3",
+    "widestAt"
+   ],
+   [
+    "pendulousFraction05"
+   ],
+   [
+    "tortuosity05"
+   ],
+   [
+    "centroidHeight",
+    "crownBase80"
+   ],
+   [
+    "p0",
+    "profileCentre"
+   ],
+   [
+    "leaderDominance"
+   ],
+   [
+    "limbDroop"
+   ],
+   [
+    "length0",
+    "limbElevation05"
+   ],
+   [
+    "crownFullness",
+    "p1"
+   ],
+   [
+    "limbUpturn"
+   ],
+   [
+    "p2"
+   ],
+   [
+    "forkHeight"
+   ],
+   [
+    "boleSway"
+   ]
+  ],
+  "taken": 4,
+  "rule": "scipy linkage(method) on the condensed 1 \u2212 |r|, fcluster at distance 1 \u2212 cut_r; canonical order: members sorted, clusters by their first member. np.random.default_rng(held_out_seed).choice(len(list), len(list), replace=False) is the draw order; clusters are taken whole in that order until the held-out descriptors number >= round(n/3)",
+  "straddling": [
+   {
+    "held_out": "length0",
+    "fitted": "p1",
+    "r": -0.51672848162707
+   },
+   {
+    "held_out": "length0",
+    "fitted": "p2",
+    "r": -0.5681008189017529
+   },
+   {
+    "held_out": "p3",
+    "fitted": "profileCentre",
+    "r": 0.6589350763466628
+   },
+   {
+    "held_out": "widestAt",
+    "fitted": "p2",
+    "r": 0.5451615335364967
+   },
+   {
+    "held_out": "widestAt",
+    "fitted": "profileCentre",
+    "r": 0.6550911079546692
+   }
+  ],
+  "straddling_note": "pairs at |r| >= cut_r across clusters (average linkage does not separate them) that the draw left on both sides of the fitted/held-out line; within a cluster none can straddle",
+  "near_cut": [
+   {
+    "pair": [
+     "centroidHeight",
+     "leaderDominance"
+    ],
+    "r": -0.509481671234869
+   },
+   {
+    "pair": [
+     "crownBase80",
+     "leaderDominance"
+    ],
+    "r": -0.48485695705528864
+   },
+   {
+    "pair": [
+     "length0",
+     "p1"
+    ],
+    "r": -0.51672848162707
+   },
+   {
+    "pair": [
+     "limbElevation05",
+     "pendulousFraction05"
+    ],
+    "r": -0.488856903300463
+   }
+  ]
+ },
+ "held_out_seed": 20261104,
+ "held_out_rule": "whole clusters to a third (`clusters`); redrawn once in v3, for independence (the user, 2026-11-04), never again",
+ "held_out": [
+  "length0",
+  "limbElevation05",
+  "limbUpturn",
+  "p3",
+  "widestAt"
+ ],
+ "held_out_note": "never written by the fit (the user, 2026-11-04); only level1_gate.py computes and writes them",
+ "fitted": [
+  "boleSway",
+  "centroidHeight",
+  "crownBase80",
+  "crownFullness",
+  "forkHeight",
+  "leaderDominance",
+  "limbDroop",
+  "p0",
+  "p1",
+  "p2",
+  "pendulousFraction05",
+  "profileCentre",
+  "tortuosity05"
+ ],
+ "location_weights": {
+  "boleSway": 0.7653635483492244,
+  "centroidHeight": 0.27038226467585186,
+  "crownBase80": 0.2952285762263389,
+  "crownFullness": 0.26628552379516346,
+  "forkHeight": 0.519942189841948,
+  "leaderDominance": 0.5014193606916936,
+  "length0": 0.322157140147133,
+  "limbDroop": 0.3592100577808798,
+  "limbElevation05": 0.2534627585769627,
+  "limbUpturn": 0.7249588944600235,
+  "p0": 0.22576344301942086,
+  "p1": 0.2625778979406763,
+  "p2": 0.2593105375336073,
+  "p3": 0.29820168409285847,
+  "pendulousFraction05": 0.5338002980218342,
+  "profileCentre": 0.18470016748692794,
+  "tortuosity05": 0.7089915610433247,
+  "widestAt": 0.2767697602202623
+ },
+ "weights": {
+  "rule": "w_k = 1 / \u03a3_j |r_kj| over all the descriptors, self included (|r_kk| = 1), every |r| below r_crit set to 0 first; the fitted descriptors' w_k weigh their location terms",
+  "r_crit": 0.270627777234994,
+  "alpha": 0.05,
+  "n": 53,
+  "r_crit_rule": "two-sided critical value of Pearson's r at n = the real trees: t / sqrt(t\u00b2 + n \u2212 2), t the (1 \u2212 alpha/2) quantile of Student's t on n \u2212 2",
+  "near_r_crit": [
+   {
+    "pair": [
+     "boleSway",
+     "centroidHeight"
+    ],
+    "r": 0.2658336296458845,
+    "n": 52
+   },
+   {
+    "pair": [
+     "centroidHeight",
+     "profileCentre"
+    ],
+    "r": 0.2729856596579016,
+    "n": 53
+   },
+   {
+    "pair": [
+     "crownBase80",
+     "limbElevation05"
+    ],
+    "r": 0.27300902740756017,
+    "n": 53
+   },
+   {
+    "pair": [
+     "forkHeight",
+     "p3"
+    ],
+    "r": -0.2713197691776881,
+    "n": 53
+   },
+   {
+    "pair": [
+     "leaderDominance",
+     "tortuosity05"
+    ],
+    "r": -0.26702055469920527,
+    "n": 52
+   },
+   {
+    "pair": [
+     "limbElevation05",
+     "p3"
+    ],
+    "r": 0.26209042286316164,
+    "n": 53
+   },
+   {
+    "pair": [
+     "limbUpturn",
+     "profileCentre"
+    ],
+    "r": -0.2669098338696381,
+    "n": 52
+   }
+  ],
+  "fitted_total": 5.152975426406891,
+  "level0_total": 7.0,
+  "level0_scored_total": 6.0
+ },
+ "real": {
+  "boleSway": {
+   "n": 52,
+   "slope": -0.003740424622992941,
+   "sd": 0.008169866101056336,
+   "sd_lo95": 0.006835801208872346,
+   "sd_hi95": 0.010155782136553182,
+   "median": 0.018188871154365505,
+   "noise_rms": 0.0028188221194567235,
+   "sd_noise_corrected": 0.007668178008370109
+  },
+  "centroidHeight": {
+   "n": 53,
+   "slope": 0.12445837238321965,
+   "sd": 0.07875282868920688,
+   "sd_lo95": 0.06599865908361208,
+   "sd_hi95": 0.09766350162712695,
+   "median": 0.6647917523718143,
+   "noise_rms": 0.01192332217872814,
+   "sd_noise_corrected": 0.07784498965748417
+  },
+  "crownBase80": {
+   "n": 53,
+   "slope": 0.180678721872101,
+   "sd": 0.1376491651973056,
+   "sd_lo95": 0.11535662246308406,
+   "sd_hi95": 0.17070243308050387,
+   "median": 0.5002486299268075,
+   "noise_rms": 0.01101856944806728,
+   "sd_noise_corrected": 0.13720744807346738
+  },
+  "crownFullness": {
+   "n": 53,
+   "slope": 0.003286965935552796,
+   "sd": 0.07661851088192825,
+   "sd_lo95": 0.06420999808332511,
+   "sd_hi95": 0.09501667669253853,
+   "median": 0.8364500392244416,
+   "noise_rms": 0.020064009865980045,
+   "sd_noise_corrected": 0.07394478830764217
+  },
+  "forkHeight": {
+   "n": 53,
+   "slope": -0.1982590225058166,
+   "sd": 0.13466936771533147,
+   "sd_lo95": 0.11285940882105562,
+   "sd_hi95": 0.1670071060545024,
+   "median": 0.7845944777445735,
+   "noise_rms": 0.04105644641566344,
+   "sd_noise_corrected": 0.12825835960499776
+  },
+  "leaderDominance": {
+   "n": 52,
+   "slope": 0.01521982617798197,
+   "sd": 0.651117561999683,
+   "sd_lo95": 0.5447959810332705,
+   "sd_hi95": 0.8093900222058047,
+   "median": 1.5894598031049139,
+   "noise_rms": 0.17584251624362973,
+   "sd_noise_corrected": 0.6269238303219298
+  },
+  "length0": {
+   "n": 53,
+   "slope": -0.07924958268956608,
+   "sd": 0.07765572480361596,
+   "sd_lo95": 0.0650792332479996,
+   "sd_hi95": 0.09630295358207341,
+   "median": 0.050020711073186744,
+   "noise_rms": 0.0020424427820303027,
+   "sd_noise_corrected": 0.07762886075588812
+  },
+  "limbDroop": {
+   "n": 52,
+   "slope": 21.1944975830118,
+   "sd": 17.953504420631415,
+   "sd_lo95": 15.02186029783023,
+   "sd_hi95": 22.31760927636283,
+   "median": 40.15963805771365,
+   "noise_rms": 4.927351509890448,
+   "sd_noise_corrected": 17.26411098434009
+  },
+  "limbElevation05": {
+   "n": 53,
+   "slope": 18.191179508059577,
+   "sd": 13.969694335559874,
+   "sd_lo95": 11.707275907427068,
+   "sd_hi95": 17.324193786811875,
+   "median": 27.89731184114733,
+   "noise_rms": 1.2202007753966218,
+   "sd_noise_corrected": 13.916302306887959
+  },
+  "limbUpturn": {
+   "n": 52,
+   "slope": -0.2662890033050158,
+   "sd": 10.813153042883583,
+   "sd_lo95": 9.047463413471137,
+   "sd_hi95": 13.44159440979503,
+   "median": 13.685748983055044,
+   "noise_rms": 4.284229881340806,
+   "sd_noise_corrected": 9.92822507060799
+  },
+  "p0": {
+   "n": 53,
+   "slope": -0.17362192003799246,
+   "sd": 0.21763517418994305,
+   "sd_lo95": 0.18238874596682425,
+   "sd_hi95": 0.2698952347794533,
+   "median": 0.7308567924441862,
+   "noise_rms": 0.04056853170820401,
+   "sd_noise_corrected": 0.2138206334284119
+  },
+  "p1": {
+   "n": 53,
+   "slope": 0.027276025474032968,
+   "sd": 0.1662417183768256,
+   "sd_lo95": 0.13931855755842387,
+   "sd_hi95": 0.20616082753376205,
+   "median": 0.9598590186318907,
+   "noise_rms": 0.025696534818110683,
+   "sd_noise_corrected": 0.164243712291282
+  },
+  "p2": {
+   "n": 53,
+   "slope": 0.0849734982007928,
+   "sd": 0.1341586476111416,
+   "sd_lo95": 0.11243140080401541,
+   "sd_hi95": 0.16637374831285992,
+   "median": 0.9548252636312051,
+   "noise_rms": 0.036786842186528994,
+   "sd_noise_corrected": 0.12901655308833002
+  },
+  "p3": {
+   "n": 53,
+   "slope": 0.07804024511505338,
+   "sd": 0.13844949485648897,
+   "sd_lo95": 0.11602733721974887,
+   "sd_hi95": 0.17169494342296227,
+   "median": 0.814554225336925,
+   "noise_rms": 0.03563564155741496,
+   "sd_noise_corrected": 0.1337847662359523
+  },
+  "pendulousFraction05": {
+   "n": 53,
+   "slope": 0.048167615200851374,
+   "sd": 0.10303875215633271,
+   "sd_lo95": 0.08635143129657008,
+   "sd_hi95": 0.12778112870828584,
+   "median": 0.3668084854056019,
+   "noise_rms": 0.01368006703505264,
+   "sd_noise_corrected": 0.10212658915214307
+  },
+  "profileCentre": {
+   "n": 53,
+   "slope": 0.034045285156433104,
+   "sd": 0.0426827352161267,
+   "sd_lo95": 0.035770185492667916,
+   "sd_hi95": 0.05293200827974475,
+   "median": 0.5124374395864754,
+   "noise_rms": 0.01076634625418022,
+   "sd_noise_corrected": 0.04130256255809174
+  },
+  "tortuosity05": {
+   "n": 52,
+   "slope": -0.01966954721134653,
+   "sd": 0.1381302366689401,
+   "sd_lo95": 0.11557482425339603,
+   "sd_hi95": 0.1717066807127849,
+   "median": 1.2697795948576047,
+   "noise_rms": 0.03775193775695393,
+   "sd_noise_corrected": 0.13287119130124664
+  },
+  "widestAt": {
+   "n": 53,
+   "slope": 0.07613289222347455,
+   "sd": 0.19252632401168576,
+   "sd_lo95": 0.1613463215805697,
+   "sd_hi95": 0.23875707414376313,
+   "median": 0.5776279371720581,
+   "noise_rms": 0.048564293117863214,
+   "sd_noise_corrected": 0.18630054984195532
+  }
+ },
+ "real_rule": "each tree the median over its repeats (tolerance.median_of; NaN under 3); OLS on ln measured DBH: slope, residual SD (df n \u2212 2, 95% CI), the median of y \u2212 slope (ln d \u2212 ln dbh). noise_rms is the repeat floor (phase1-tolerances.json); the gate reads the raw SD",
+ "real_dbh_range_m": [
+  0.108562965356004,
+  0.665000415693888
+ ],
+ "real_trees": 53,
+ "real_trees_by_gap": {
+  "G": {
+   "trees": 23,
+   "boleSway": 0.01909087778050279,
+   "centroidHeight": 0.6800081839734411,
+   "crownBase80": 0.5470626270561708,
+   "crownFullness": 0.8532423729068859,
+   "forkHeight": 0.774488707979295,
+   "leaderDominance": 1.6306206696515717,
+   "length0": 0.05231743683130049,
+   "limbDroop": 44.91927175389156,
+   "limbElevation05": 27.80795744924969,
+   "limbUpturn": 12.73596521343375,
+   "p0": 0.7237464718241359,
+   "p1": 0.9598590186318907,
+   "p2": 0.9558697813244693,
+   "p3": 0.8901897256134008,
+   "pendulousFraction05": 0.38932354555987686,
+   "profileCentre": 0.5256901765611591,
+   "tortuosity05": 1.3024983723687542,
+   "widestAt": 0.5854610701764519
+  },
+  "GD": {
+   "trees": 30,
+   "boleSway": 0.017778764448849627,
+   "centroidHeight": 0.6303318623270614,
+   "crownBase80": 0.47298905432808547,
+   "crownFullness": 0.8312639470602052,
+   "forkHeight": 0.8226809574223228,
+   "leaderDominance": 1.5613189854406906,
+   "length0": 0.049554368396071864,
+   "limbDroop": 38.516235136687776,
+   "limbElevation05": 28.436827282273185,
+   "limbUpturn": 17.72495174592826,
+   "p0": 0.7756592216545658,
+   "p1": 0.9526830263691459,
+   "p2": 0.9389696886377601,
+   "p3": 0.8016380386241038,
+   "pendulousFraction05": 0.342786111638009,
+   "profileCentre": 0.5031823439428615,
+   "tortuosity05": 1.2636334116189873,
+   "widestAt": 0.43582642511177205
+  }
+ },
+ "demol": {
+  "trees": 15,
+  "dbh_range_m": [
+   0.2546479089,
+   0.38515496229999996
+  ],
+  "dbh_median_m": 0.3087605896,
+  "descriptors": {
+   "boleSway": {
+    "n": 15,
+    "median": 0.022103789178810736,
+    "sd": 0.014548972654942411
+   },
+   "centroidHeight": {
+    "n": 15,
+    "median": 0.8040662110241521,
+    "sd": 0.07194657737068495
+   },
+   "crownBase80": {
+    "n": 15,
+    "median": 0.75466597118777,
+    "sd": 0.14554071758367504
+   },
+   "crownFullness": {
+    "n": 15,
+    "median": 0.7476637364796505,
+    "sd": 0.10264385613147166
+   },
+   "forkHeight": {
+    "n": 15,
+    "median": 0.7095542087040333,
+    "sd": 0.11778841737985843
+   },
+   "leaderDominance": {
+    "n": 15,
+    "median": 1.732322812691462,
+    "sd": 0.42862841878575675
+   },
+   "length0": {
+    "n": 15,
+    "median": 0.042145771907990556,
+    "sd": 0.016789666050728236
+   },
+   "limbElevation05": {
+    "n": 15,
+    "median": 43.1566073447233,
+    "sd": 10.384001365073209
+   },
+   "limbUpturn": {
+    "n": 15,
+    "median": 14.673479118136772,
+    "sd": 10.207565760959124
+   },
+   "p0": {
+    "n": 15,
+    "median": 0.6865388290962592,
+    "sd": 0.32054272508220266
+   },
+   "p1": {
+    "n": 15,
+    "median": 0.7924510301679127,
+    "sd": 0.21312309261470128
+   },
+   "p2": {
+    "n": 15,
+    "median": 0.9899262404291824,
+    "sd": 0.09954266817639185
+   },
+   "p3": {
+    "n": 15,
+    "median": 0.8657367653651359,
+    "sd": 0.13650985004516097
+   },
+   "pendulousFraction05": {
+    "n": 15,
+    "median": 0.2414224252820644,
+    "sd": 0.050175886135144766
+   },
+   "profileCentre": {
+    "n": 15,
+    "median": 0.5367307713114857,
+    "sd": 0.06179670755938848
+   },
+   "tortuosity05": {
+    "n": 15,
+    "median": 1.289316261315764,
+    "sd": 0.09977216961788829
+   },
+   "widestAt": {
+    "n": 15,
+    "median": 0.6197627976566613,
+    "sd": 0.24906736133974086
+   }
+  }
+ },
+ "sim_rule": "the stand's live measured trees at the matched season: coarsen.coarsen(inflated=True) at d_min_m, describe(), detrended with the registered slope on cylinders.dbh of the uncoarsened tree; trees outside real_dbh_range_m are counted and reported, never excluded; fine values never enter the loss",
+ "loss": {
+  "level0": "fit.contributions(load_spec(species, level=0)): Level 0's scored traits and death penalties at their Level 0 weights",
+  "terms": "Level 0's contributions less the level0_reported traits (at level0_band where given) + \u03a3 over fitted k of location_weights[k] \u00b7 (z_k\u00b2 + spread_penalty(s_k))",
+  "spread_in_loss": true,
+  "z": "(median of the detrended simulated trees \u2212 real median) / real SD",
+  "s": "ln(simulated SD (ddof 1) / real SD) / ln 2; computed and reported per descriptor, never scored",
+  "min_trees": 10,
+  "missing_penalty": 4.0,
+  "missing": "w_k \u00b7 missing_penalty in place of w_k \u00b7 z_k\u00b2: a descriptor with fewer than min_trees finite trees, or every descriptor of an unmatched candidate",
+  "trials": [
+   "lone",
+   "stand150",
+   "shade"
+  ],
+  "seeds_per_candidate": 10,
+  "seeds_rule": "v3's 10, kept by the user for pilots v3 and v4, not re-decided; the noise check (level1_noise_v4.py: the hand on the three 10-seed draws) is reported only",
+  "spread_floor": 0.65,
+  "spread_penalty": "level1.spread_penalty: (ln(min(1, r / spread_floor)) / ln 2)\u00b2, r = simulated SD / real SD = 2^s; 0 at r >= spread_floor; w_k \u00b7 missing_penalty where s cannot be read (fewer than min_trees finite trees, a zero SD, unmatched)",
+  "level0_reported": [
+   "stand.height100"
+  ],
+  "level0_reported_rule": "reported, not scored, in the Level 1 loss (fit_level1.level1_spec); summary() writes the terms they would add at their Level 0 weights under `reported`; they stay in the Level 0 gate",
+  "level0_band": {
+   "stand.lateShare": 0.12
+  },
+  "level0_band_rule": "the band of a scored Level 0 trait in the Level 1 loss only (fit_level1.level1_spec); Level 0's targets file, fit and gate keep their own"
+ },
+ "gate": {
+  "seeds": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9,
+   10,
+   11,
+   12,
+   13,
+   14,
+   15,
+   16,
+   17,
+   18,
+   19,
+   20
+  ],
+  "z": 2.0,
+  "pass_seeds": 15,
+  "held_out": "a seed passes when every held-out descriptor's |z| <= z, on the median of that seed's live measured trees, detrended; the species on >= pass_seeds",
+  "spread": "every descriptor's simulated SD, fitted and held out (level1.spread_names), over all the gate's trees within \u00d72 of the real SD",
+  "shape_flag": "gallery.shape_flag clear, the hand = the Level 0 fit with the targets file's [form]",
+  "size_match": "over the gate's seeds, by the size_match rule"
+ },
+ "control": {
+  "seed": 20261105,
+  "sets": 2000,
+  "rule": "20 pseudo-seeds of 4 real trees (without replacement within a seed), judged by the gate's held-out and spread rules (spread on every descriptor); then the pass count over `sets` such draws. In sample. Demol's trees as pseudo-seeds on the tier A held-out descriptors: the out-of-sample check"
+ },
+ "seeds": {
+  "search": {
+   "numpy_seed": 20261107,
+   "list": [
+    7191,
+    2325,
+    9999,
+    2831,
+    4712,
+    8068,
+    9165,
+    2863,
+    2488,
+    5615
+   ],
+   "pool": "1000\u20139999 less 1001\u20131006 (the gallery's) and the noise check's 60 (level1.noise_draws)",
+   "rule": "the first loss.seeds_per_candidate of the list, the same for every candidate in every generation (level1.fit_seeds)"
+  },
+  "noise": {
+   "numpy_seed": 20261106,
+   "draws5": [
+    [
+     3046,
+     4395,
+     9388,
+     8411,
+     4398
+    ],
+    [
+     1536,
+     7852,
+     3830,
+     4571,
+     7270
+    ],
+    [
+     6785,
+     2909,
+     7779,
+     6609,
+     4456
+    ],
+    [
+     2201,
+     3520,
+     4298,
+     7574,
+     8689
+    ],
+    [
+     1418,
+     5716,
+     1163,
+     7917,
+     8122
+    ],
+    [
+     6358,
+     4178,
+     3872,
+     5893,
+     4019
+    ]
+   ],
+   "draws10": [
+    [
+     7346,
+     6397,
+     9457,
+     5967,
+     8897,
+     3268,
+     9557,
+     9413,
+     5306,
+     8525
+    ],
+    [
+     7009,
+     3410,
+     3493,
+     7085,
+     6212,
+     1772,
+     1424,
+     1050,
+     7182,
+     6727
+    ],
+    [
+     6456,
+     1483,
+     3789,
+     1822,
+     6562,
+     7785,
+     3205,
+     4404,
+     3804,
+     2254
+    ]
+   ]
+  },
+  "finalists": [
+   101,
+   102,
+   103,
+   104,
+   105,
+   106,
+   107,
+   108,
+   109,
+   110
+  ],
+  "gate": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9,
+   10,
+   11,
+   12,
+   13,
+   14,
+   15,
+   16,
+   17,
+   18,
+   19,
+   20
+  ]
+ },
+ "fixed": {
+  "r1.hydraulic": "hyperbolic",
+  "c5.Trel": 0.008,
+  "r1.leafCost": "acclimated",
+  "r1.leafCostShade": 0.3,
+  "c3.alpha": 3.312,
+  "r1.Lh": 51.16,
+  "r1.mf": 0.0618,
+  "r2.hJ": 77.63,
+  "c6.r0": 0.004689,
+  "r6.qMin": 0.03103,
+  "r6.leafArea": 2.417,
+  "r3.c": 0.04879
+ },
+ "frozen_level0": {
+  "c3.alpha": 3.312,
+  "r1.Lh": 51.16,
+  "r1.mf": 0.0618,
+  "r2.hJ": 77.63,
+  "c6.r0": 0.004689,
+  "r6.qMin": 0.03103,
+  "r6.leafArea": 2.417
+ },
+ "frozen_level0_source": "docs/experiments/fits/level0/beech.json fit.assign (v2, night 1; not accepted)",
+ "knobs": [
+  {
+   "path": "r2.levels.0.lambda",
+   "lo": 0.5,
+   "hi": 0.6
+  },
+  {
+   "path": "r2.levels.1.lambda",
+   "lo": 0.48,
+   "hi": 0.58
+  },
+  {
+   "path": "r2.levels.1.setPoint",
+   "lo": 20,
+   "hi": 90
+  },
+  {
+   "path": "r2.levels.1.postureSetPoint",
+   "lo": 20,
+   "hi": 90
+  },
+  {
+   "path": "r2.levels.1.branchAngle",
+   "lo": 25,
+   "hi": 70
+  },
+  {
+   "path": "r2.levels.1.eta",
+   "lo": 0.05,
+   "hi": 1,
+   "log": true
+  },
+  {
+   "path": "r2.levels.2.setPoint",
+   "lo": 40,
+   "hi": 160
+  },
+  {
+   "path": "r2.aC",
+   "lo": 0,
+   "hi": 40
+  },
+  {
+   "path": "r2.dLambda",
+   "lo": 0,
+   "hi": 0.12
+  },
+  {
+   "path": "r2.kappa",
+   "lo": 0,
+   "hi": 4
+  }
+ ],
+ "knobs_rule": "ADR 0029's ten form knobs (bounds: [[formRange]]) and r3.c ([[param]]), less `frozen_form`; no knob added",
+ "frozen_form": {
+  "r3.c": 0.04879
+ },
+ "frozen_form_source": "the species' own values (cli/fit-eval.ts describe): what Level 0 and the hand grow by",
+ "start": {
+  "r2.levels.0.lambda": 0.5308,
+  "r2.levels.1.lambda": 0.5124,
+  "r2.levels.1.setPoint": 34.32,
+  "r2.levels.1.branchAngle": 50.07,
+  "r2.levels.1.eta": 0.5696,
+  "r2.levels.2.setPoint": 94.59,
+  "r2.aC": 14.44,
+  "r2.dLambda": 0.01384,
+  "r2.kappa": 0.4314,
+  "r2.levels.1.postureSetPoint": 34.32
+ },
+ "start_note": "the targets file's [form]; a knob it leaves unset (r3.c in v1) at the species' own value (cli/fit-eval.ts describe)",
+ "expected": {
+  "question": "whether form knobs can lower the crown base toward BioDiv's (and straighten the bole) while keeping v4's gains; the limb-loss probe moved crownBase80 the other way",
+  "source": "docs/experiments/2026-11-05-crown-base-and-bole.md"
+ },
+ "changes": [
+  {
+   "change": "crownBase80 (gate c v3.2, tier A) joins the fitted descriptors; the weights (1 / \u03a3|r|) and the clusters are recomputed over the larger set; v5's hold-outs are kept",
+   "motivation": "the render (2026-11-05) suggested low, wide crowns; the crown base and bole note found the simulated crown base above BioDiv's (hand z +1.31, v4 +1.03 on 101-110) and limb loss raising it further, so the fit must reach it, if at all, by form. It is r 0.95 with centroidHeight: the pair weighs about 1.56x centroidHeight's v5 weight (stated, accepted by the user)"
+  },
+  {
+   "change": "boleSway (gate c v3.2) joins the fitted descriptors if it passed at tier A or B (`--add`)",
+   "motivation": "the user's ruling: the simulated boles sway about twice the real (Troll's arching leader, R3's straightening), which path over chord (trunkTortuosity05, held out on noise) cannot read"
+  },
+  {
+   "change": "the one-sided spread penalty's floor 0.5 -> 0.65 (`loss.spread_floor`)",
+   "motivation": "pilots v3 and v4: the floor at 0.5 equalled the gate's x2 edge, so a fitted descriptor held at the floor (limbDroop 0.48x, tortuosity05 0.48x) cost nothing and failed the gate on noise"
+  },
+  {
+   "change": "stand.lateShare's band in the Level 1 loss 0.10 -> 0.12 (`loss.level0_band`; Level 0's own unchanged)",
+   "motivation": "the provenance audit: the per-seed SD is 0.137 on ten seeds; pilot v4 missed by 0.04 past 0.10"
+  }
+ ],
+ "unchanged": [
+  "the ten form knobs, their bounds and the start",
+  "Level 0's seven knobs and r3.c frozen",
+  "the ten fixed search seeds",
+  "the coarsened-simulation rule",
+  "the size match",
+  "32 generations (the wrapper's argument)",
+  "the finalists (101-110) and the hand beside them",
+  "the gate: held out |z| 2 on 15 of 20, spread within x2 on all 16, shapeFlag",
+  "every v5 target (real distributions, Demol, gap strata) and the correlations among v5's 16",
+  "v5's hold-outs (no redraw)",
+  "height at 100 reported, not scored (v4)",
+  "the gate: spread within x2 on every descriptor, the added ones included"
+ ],
+ "added": {
+  "descriptors": [
+   "crownBase80",
+   "boleSway"
+  ],
+  "tiers": {
+   "crownBase80": "A",
+   "boleSway": "A"
+  },
+  "source": "analysis/fit/sources/phase1-tolerances-v3.2.json; docs/experiments/fits/crown-base/gate-c-v32.json",
+  "redraw_would_hold_out": [
+   "centroidHeight",
+   "crownBase80",
+   "p3",
+   "pendulousFraction05",
+   "tortuosity05",
+   "widestAt"
+  ],
+  "redraw_note": "the cluster draw over the larger set, recorded and not applied (v5's hold-outs kept)"
+ },
+ "reason": "the user, 2026-11-05, after the crown base and bole note: crownBase80 and boleSway (gate c v3.2, tier A) join the fitted set with v5's hold-outs kept; spread floor 0.65; lateShare's Level 1 band 0.12; registered, not launched",
+ "prior": {
+  "version": 5,
+  "commit": "edbd327",
+  "knobs": [
+   "r2.levels.0.lambda",
+   "r2.levels.1.lambda",
+   "r2.levels.1.setPoint",
+   "r2.levels.1.postureSetPoint",
+   "r2.levels.1.branchAngle",
+   "r2.levels.1.eta",
+   "r2.levels.2.setPoint",
+   "r2.aC",
+   "r2.dLambda",
+   "r2.kappa"
+  ],
+  "fixed": {
+   "r1.hydraulic": "hyperbolic",
+   "c5.Trel": 0.008,
+   "r1.leafCost": "acclimated",
+   "r1.leafCostShade": 0.3,
+   "c3.alpha": 3.312,
+   "r1.Lh": 51.16,
+   "r1.mf": 0.0618,
+   "r2.hJ": 77.63,
+   "c6.r0": 0.004689,
+   "r6.qMin": 0.03103,
+   "r6.leafArea": 2.417,
+   "r3.c": 0.04879
+  },
+  "held_out": [
+   "length0",
+   "limbElevation05",
+   "limbUpturn",
+   "p3",
+   "widestAt"
+  ],
+  "fitted": [
+   "centroidHeight",
+   "crownFullness",
+   "forkHeight",
+   "leaderDominance",
+   "limbDroop",
+   "p0",
+   "p1",
+   "p2",
+   "pendulousFraction05",
+   "profileCentre",
+   "tortuosity05"
+  ],
+  "weights": {
+   "rule": "w_k = 1 / \u03a3_j |r_kj| over all the descriptors, self included (|r_kk| = 1), every |r| below r_crit set to 0 first; the fitted descriptors' w_k weigh their location terms",
+   "r_crit": 0.270627777234994,
+   "alpha": 0.05,
+   "n": 53,
+   "r_crit_rule": "two-sided critical value of Pearson's r at n = the real trees: t / sqrt(t\u00b2 + n \u2212 2), t the (1 \u2212 alpha/2) quantile of Student's t on n \u2212 2",
+   "near_r_crit": [
+    {
+     "pair": [
+      "centroidHeight",
+      "profileCentre"
+     ],
+     "r": 0.2729856596579016,
+     "n": 53
+    },
+    {
+     "pair": [
+      "forkHeight",
+      "p3"
+     ],
+     "r": -0.2713197691776881,
+     "n": 53
+    },
+    {
+     "pair": [
+      "leaderDominance",
+      "tortuosity05"
+     ],
+     "r": -0.26702055469920527,
+     "n": 52
+    },
+    {
+     "pair": [
+      "limbElevation05",
+      "p3"
+     ],
+     "r": 0.26209042286316164,
+     "n": 53
+    },
+    {
+     "pair": [
+      "limbUpturn",
+      "profileCentre"
+     ],
+     "r": -0.2669098338696381,
+     "n": 52
+    }
+   ],
+   "fitted_total": 4.439853590765789,
+   "level0_total": 7.0,
+   "level0_scored_total": 6.0
+  },
+  "location_weights": {
+   "centroidHeight": 0.3633945672949193,
+   "crownFullness": 0.26628552379516346,
+   "forkHeight": 0.519942189841948,
+   "leaderDominance": 0.6624790608963971,
+   "length0": 0.322157140147133,
+   "limbDroop": 0.4124268471748795,
+   "limbElevation05": 0.2723056626741574,
+   "limbUpturn": 0.7249588944600235,
+   "p0": 0.24355037721282602,
+   "p1": 0.2625778979406763,
+   "p2": 0.281705100056892,
+   "p3": 0.29820168409285847,
+   "pendulousFraction05": 0.5338002980218342,
+   "profileCentre": 0.18470016748692794,
+   "tortuosity05": 0.7089915610433247,
+   "widestAt": 0.2767697602202623
+  },
+  "clusters": {
+   "method": "average",
+   "distance": "1 \u2212 |r|",
+   "cut_r": 0.5,
+   "list": [
+    [
+     "centroidHeight",
+     "leaderDominance"
+    ],
+    [
+     "crownFullness",
+     "p1"
+    ],
+    [
+     "forkHeight"
+    ],
+    [
+     "length0",
+     "limbElevation05"
+    ],
+    [
+     "limbDroop"
+    ],
+    [
+     "limbUpturn"
+    ],
+    [
+     "p0",
+     "profileCentre"
+    ],
+    [
+     "p2"
+    ],
+    [
+     "p3",
+     "widestAt"
+    ],
+    [
+     "pendulousFraction05"
+    ],
+    [
+     "tortuosity05"
+    ]
+   ],
+   "draw_order": [
+    [
+     "p3",
+     "widestAt"
+    ],
+    [
+     "limbUpturn"
+    ],
+    [
+     "length0",
+     "limbElevation05"
+    ],
+    [
+     "tortuosity05"
+    ],
+    [
+     "crownFullness",
+     "p1"
+    ],
+    [
+     "limbDroop"
+    ],
+    [
+     "p0",
+     "profileCentre"
+    ],
+    [
+     "forkHeight"
+    ],
+    [
+     "pendulousFraction05"
+    ],
+    [
+     "centroidHeight",
+     "leaderDominance"
+    ],
+    [
+     "p2"
+    ]
+   ],
+   "taken": 3,
+   "rule": "scipy linkage(method) on the condensed 1 \u2212 |r|, fcluster at distance 1 \u2212 cut_r; canonical order: members sorted, clusters by their first member. np.random.default_rng(held_out_seed).choice(len(list), len(list), replace=False) is the draw order; clusters are taken whole in that order until the held-out descriptors number >= round(n/3)",
+   "straddling": [
+    {
+     "held_out": "length0",
+     "fitted": "p1",
+     "r": -0.51672848162707
+    },
+    {
+     "held_out": "length0",
+     "fitted": "p2",
+     "r": -0.5681008189017529
+    },
+    {
+     "held_out": "p3",
+     "fitted": "profileCentre",
+     "r": 0.6589350763466628
+    },
+    {
+     "held_out": "widestAt",
+     "fitted": "p2",
+     "r": 0.5451615335364967
+    },
+    {
+     "held_out": "widestAt",
+     "fitted": "profileCentre",
+     "r": 0.6550911079546692
+    }
+   ],
+   "straddling_note": "pairs at |r| >= cut_r across clusters (average linkage does not separate them) that the draw left on both sides of the fitted/held-out line; within a cluster none can straddle",
+   "near_cut": [
+    {
+     "pair": [
+      "centroidHeight",
+      "leaderDominance"
+     ],
+     "r": -0.509481671234869
+    },
+    {
+     "pair": [
+      "length0",
+      "p1"
+     ],
+     "r": -0.51672848162707
+    },
+    {
+     "pair": [
+      "limbElevation05",
+      "pendulousFraction05"
+     ],
+     "r": -0.488856903300463
+    }
+   ]
+  },
+  "loss": {
+   "level0": "fit.contributions(load_spec(species, level=0)): Level 0's scored traits and death penalties at their Level 0 weights",
+   "terms": "Level 0's contributions less the level0_reported traits (at level0_band where given) + \u03a3 over fitted k of location_weights[k] \u00b7 (z_k\u00b2 + spread_penalty(s_k))",
+   "spread_in_loss": true,
+   "z": "(median of the detrended simulated trees \u2212 real median) / real SD",
+   "s": "ln(simulated SD (ddof 1) / real SD) / ln 2; computed and reported per descriptor, never scored",
+   "min_trees": 10,
+   "missing_penalty": 4.0,
+   "missing": "w_k \u00b7 missing_penalty in place of w_k \u00b7 z_k\u00b2: a descriptor with fewer than min_trees finite trees, or every descriptor of an unmatched candidate",
+   "trials": [
+    "lone",
+    "stand150",
+    "shade"
+   ],
+   "seeds_per_candidate": 10,
+   "seeds_rule": "v3's 10, kept by the user for pilots v3 and v4, not re-decided; the noise check (level1_noise_v4.py: the hand on the three 10-seed draws) is reported only",
+   "spread_floor": 0.5,
+   "spread_penalty": "level1.spread_penalty: (ln(min(1, r / spread_floor)) / ln 2)\u00b2, r = simulated SD / real SD = 2^s; 0 at r >= spread_floor; w_k \u00b7 missing_penalty where s cannot be read (fewer than min_trees finite trees, a zero SD, unmatched)",
+   "level0_reported": [
+    "stand.height100"
+   ],
+   "level0_reported_rule": "reported, not scored, in the Level 1 loss (fit_level1.level1_spec); summary() writes the terms they would add at their Level 0 weights under `reported`; they stay in the Level 0 gate",
+   "level0_band": {
+    "stand.lateShare": 0.1
+   },
+   "level0_band_rule": "the band of a scored Level 0 trait in the Level 1 loss only (fit_level1.level1_spec); Level 0's targets file, fit and gate keep their own"
+  },
+  "seeds": {
+   "search": {
+    "numpy_seed": 20261107,
+    "list": [
+     7191,
+     2325,
+     9999,
+     2831,
+     4712,
+     8068,
+     9165,
+     2863,
+     2488,
+     5615
+    ],
+    "pool": "1000\u20139999 less 1001\u20131006 (the gallery's) and the noise check's 60 (level1.noise_draws)",
+    "rule": "the first loss.seeds_per_candidate of the list, the same for every candidate in every generation (level1.fit_seeds)"
+   },
+   "noise": {
+    "numpy_seed": 20261106,
+    "draws5": [
+     [
+      3046,
+      4395,
+      9388,
+      8411,
+      4398
+     ],
+     [
+      1536,
+      7852,
+      3830,
+      4571,
+      7270
+     ],
+     [
+      6785,
+      2909,
+      7779,
+      6609,
+      4456
+     ],
+     [
+      2201,
+      3520,
+      4298,
+      7574,
+      8689
+     ],
+     [
+      1418,
+      5716,
+      1163,
+      7917,
+      8122
+     ],
+     [
+      6358,
+      4178,
+      3872,
+      5893,
+      4019
+     ]
+    ],
+    "draws10": [
+     [
+      7346,
+      6397,
+      9457,
+      5967,
+      8897,
+      3268,
+      9557,
+      9413,
+      5306,
+      8525
+     ],
+     [
+      7009,
+      3410,
+      3493,
+      7085,
+      6212,
+      1772,
+      1424,
+      1050,
+      7182,
+      6727
+     ],
+     [
+      6456,
+      1483,
+      3789,
+      1822,
+      6562,
+      7785,
+      3205,
+      4404,
+      3804,
+      2254
+     ]
+    ]
+   },
+   "finalists": [
+    101,
+    102,
+    103,
+    104,
+    105,
+    106,
+    107,
+    108,
+    109,
+    110
+   ],
+   "gate": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20
+   ]
+  },
+  "gate": {
+   "seeds": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20
+   ],
+   "z": 2.0,
+   "pass_seeds": 15,
+   "held_out": "a seed passes when every held-out descriptor's |z| <= z, on the median of that seed's live measured trees, detrended; the species on >= pass_seeds",
+   "spread": "every descriptor's simulated SD, fitted and held out (level1.spread_names), over all the gate's trees within \u00d72 of the real SD",
+   "shape_flag": "gallery.shape_flag clear, the hand = the Level 0 fit with the targets file's [form]",
+   "size_match": "over the gate's seeds, by the size_match rule"
+  },
+  "hashes": {
+   "analysis/treesim/level1.py": "76fc0a3c43afa40545e05ce58963fc689f6b3c62e5abf7b47927fe907bd212d7",
+   "analysis/experiments/level1_eval.ts": "19d97301ce99d2a9843fca1980d0c12e6ce09c89318922cefae6f3cb4ebd48f1",
+   "analysis/experiments/level1_targets.py": "999b8cfd020ba78de056ebddd9443966ef9ae20d0bbeaef19def1f74c937aabd",
+   "analysis/treesim/describe.py": "671f92d71131525cb1dcf5fdb771ed98b3c5ac05aea900366925ef61d5cc2bee",
+   "analysis/treesim/form.py": "23c5e1c035c9bbb625a8a002476fc12fd98f85438af4bba5adbb97c10ec6b48d",
+   "analysis/treesim/cylinders.py": "0e262dce2e55193c3f8ed775ec92c7fbe29df9f9be0d738daed7623cb5629254",
+   "analysis/treesim/coarsen.py": "b5e57ca6ebff39f9ec8a2b0364e621a549e5d6b6d8426cbbcbfb05cd87b34bc9",
+   "analysis/treesim/simtree.py": "e69c7a26140b272f1274b07f3d6ae51acdba6abbfc655b27d3b8a02bb901ff6b",
+   "analysis/treesim/tolerance.py": "7ec6553f51cee1734e68b3b1f5949d7c6996e820d61a6e53a3fc3fcd5c647b7c",
+   "analysis/fit/sources/phase1-tolerances.json": "896e1be07fbfd876e50792191e6aa8a1530d6f629818a26f7404871d90c38043",
+   "cli/trials.ts": "2660df8f06f210369a8f80f6b8e02435fe87ea605cdc80884d3827011118dac4",
+   "cli/allometry.ts": "b7f9c86322a68aafaf0258ef07834ba7ea2c806cb415159924e08d78e1d0f93c",
+   "analysis/fit/targets/beech.toml": "f3a4be24845aac1c59ccc8a22dc8ee6a5721ccd04d5ad06243b5d523417978ad",
+   "docs/experiments/fits/level0/beech.json": "4794cfd86a29da8c64ea317813e0981df7ac1fa1f0c1522e675ca6994241f5b2"
+  },
+  "prior": {
+   "version": 4,
+   "commit": "8e7594b",
+   "knobs": [
+    "r2.levels.0.lambda",
+    "r2.levels.1.lambda",
+    "r2.levels.1.setPoint",
+    "r2.levels.1.postureSetPoint",
+    "r2.levels.1.branchAngle",
+    "r2.levels.1.eta",
+    "r2.levels.2.setPoint",
+    "r2.aC",
+    "r2.dLambda",
+    "r2.kappa"
+   ],
+   "fixed": {
+    "r1.hydraulic": "hyperbolic",
+    "c5.Trel": 0.008,
+    "r1.leafCost": "acclimated",
+    "r1.leafCostShade": 0.3,
+    "c3.alpha": 3.312,
+    "r1.Lh": 51.16,
+    "r1.mf": 0.0618,
+    "r2.hJ": 77.63,
+    "c6.r0": 0.004689,
+    "r6.qMin": 0.03103,
+    "r6.leafArea": 2.417,
+    "r3.c": 0.04879
+   },
+   "held_out": [
+    "length0",
+    "limbElevation05",
+    "limbUpturn",
+    "p3",
+    "widestAt"
+   ],
+   "fitted": [
+    "centroidHeight",
+    "crownFullness",
+    "forkHeight",
+    "leaderDominance",
+    "limbDroop",
+    "p0",
+    "p1",
+    "p2",
+    "pendulousFraction05",
+    "profileCentre",
+    "tortuosity05"
+   ],
+   "weights": {
+    "rule": "w_k = 1 / \u03a3_j |r_kj| over all the descriptors, self included (|r_kk| = 1), every |r| below r_crit set to 0 first; the fitted descriptors' w_k weigh their location terms",
+    "r_crit": 0.270627777234994,
+    "alpha": 0.05,
+    "n": 53,
+    "r_crit_rule": "two-sided critical value of Pearson's r at n = the real trees: t / sqrt(t\u00b2 + n \u2212 2), t the (1 \u2212 alpha/2) quantile of Student's t on n \u2212 2",
+    "near_r_crit": [
+     {
+      "pair": [
+       "centroidHeight",
+       "profileCentre"
+      ],
+      "r": 0.2729856596579016,
+      "n": 53
+     },
+     {
+      "pair": [
+       "forkHeight",
+       "p3"
+      ],
+      "r": -0.2713197691776881,
+      "n": 53
+     },
+     {
+      "pair": [
+       "leaderDominance",
+       "tortuosity05"
+      ],
+      "r": -0.26702055469920527,
+      "n": 52
+     },
+     {
+      "pair": [
+       "limbElevation05",
+       "p3"
+      ],
+      "r": 0.26209042286316164,
+      "n": 53
+     },
+     {
+      "pair": [
+       "limbUpturn",
+       "profileCentre"
+      ],
+      "r": -0.2669098338696381,
+      "n": 52
+     }
+    ],
+    "fitted_total": 4.439853590765789,
+    "level0_total": 7.0,
+    "level0_scored_total": 5.0
+   },
+   "location_weights": {
+    "centroidHeight": 0.3633945672949193,
+    "crownFullness": 0.26628552379516346,
+    "forkHeight": 0.519942189841948,
+    "leaderDominance": 0.6624790608963971,
+    "length0": 0.322157140147133,
+    "limbDroop": 0.4124268471748795,
+    "limbElevation05": 0.2723056626741574,
+    "limbUpturn": 0.7249588944600235,
+    "p0": 0.24355037721282602,
+    "p1": 0.2625778979406763,
+    "p2": 0.281705100056892,
+    "p3": 0.29820168409285847,
+    "pendulousFraction05": 0.5338002980218342,
+    "profileCentre": 0.18470016748692794,
+    "tortuosity05": 0.7089915610433247,
+    "widestAt": 0.2767697602202623
+   },
+   "clusters": {
+    "method": "average",
+    "distance": "1 \u2212 |r|",
+    "cut_r": 0.5,
+    "list": [
+     [
+      "centroidHeight",
+      "leaderDominance"
+     ],
+     [
+      "crownFullness",
+      "p1"
+     ],
+     [
+      "forkHeight"
+     ],
+     [
+      "length0",
+      "limbElevation05"
+     ],
+     [
+      "limbDroop"
+     ],
+     [
+      "limbUpturn"
+     ],
+     [
+      "p0",
+      "profileCentre"
+     ],
+     [
+      "p2"
+     ],
+     [
+      "p3",
+      "widestAt"
+     ],
+     [
+      "pendulousFraction05"
+     ],
+     [
+      "tortuosity05"
+     ]
+    ],
+    "draw_order": [
+     [
+      "p3",
+      "widestAt"
+     ],
+     [
+      "limbUpturn"
+     ],
+     [
+      "length0",
+      "limbElevation05"
+     ],
+     [
+      "tortuosity05"
+     ],
+     [
+      "crownFullness",
+      "p1"
+     ],
+     [
+      "limbDroop"
+     ],
+     [
+      "p0",
+      "profileCentre"
+     ],
+     [
+      "forkHeight"
+     ],
+     [
+      "pendulousFraction05"
+     ],
+     [
+      "centroidHeight",
+      "leaderDominance"
+     ],
+     [
+      "p2"
+     ]
+    ],
+    "taken": 3,
+    "rule": "scipy linkage(method) on the condensed 1 \u2212 |r|, fcluster at distance 1 \u2212 cut_r; canonical order: members sorted, clusters by their first member. np.random.default_rng(held_out_seed).choice(len(list), len(list), replace=False) is the draw order; clusters are taken whole in that order until the held-out descriptors number >= round(n/3)",
+    "straddling": [
+     {
+      "held_out": "length0",
+      "fitted": "p1",
+      "r": -0.51672848162707
+     },
+     {
+      "held_out": "length0",
+      "fitted": "p2",
+      "r": -0.5681008189017529
+     },
+     {
+      "held_out": "p3",
+      "fitted": "profileCentre",
+      "r": 0.6589350763466628
+     },
+     {
+      "held_out": "widestAt",
+      "fitted": "p2",
+      "r": 0.5451615335364967
+     },
+     {
+      "held_out": "widestAt",
+      "fitted": "profileCentre",
+      "r": 0.6550911079546692
+     }
+    ],
+    "straddling_note": "pairs at |r| >= cut_r across clusters (average linkage does not separate them) that the draw left on both sides of the fitted/held-out line; within a cluster none can straddle",
+    "near_cut": [
+     {
+      "pair": [
+       "centroidHeight",
+       "leaderDominance"
+      ],
+      "r": -0.509481671234869
+     },
+     {
+      "pair": [
+       "length0",
+       "p1"
+      ],
+      "r": -0.51672848162707
+     },
+     {
+      "pair": [
+       "limbElevation05",
+       "pendulousFraction05"
+      ],
+      "r": -0.488856903300463
+     }
+    ]
+   },
+   "loss": {
+    "level0": "fit.contributions(load_spec(species, level=0)): Level 0's scored traits and death penalties at their Level 0 weights",
+    "terms": "Level 0's contributions less the level0_reported traits + \u03a3 over fitted k of location_weights[k] \u00b7 (z_k\u00b2 + spread_penalty(s_k))",
+    "spread_in_loss": true,
+    "z": "(median of the detrended simulated trees \u2212 real median) / real SD",
+    "s": "ln(simulated SD (ddof 1) / real SD) / ln 2; computed and reported per descriptor, never scored",
+    "min_trees": 10,
+    "missing_penalty": 4.0,
+    "missing": "w_k \u00b7 missing_penalty in place of w_k \u00b7 z_k\u00b2: a descriptor with fewer than min_trees finite trees, or every descriptor of an unmatched candidate",
+    "trials": [
+     "lone",
+     "stand150",
+     "shade"
+    ],
+    "seeds_per_candidate": 10,
+    "seeds_rule": "v3's 10, kept by the user for pilot v3 (2026-11-04), not re-decided; the v4 noise check (the hand on the three 10-seed draws) is reported only",
+    "spread_floor": 0.5,
+    "spread_penalty": "level1.spread_penalty: (ln(min(1, r / spread_floor)) / ln 2)\u00b2, r = simulated SD / real SD = 2^s; 0 at r >= spread_floor; w_k \u00b7 missing_penalty where s cannot be read (fewer than min_trees finite trees, a zero SD, unmatched)",
+    "level0_reported": [
+     "stand.lateShare",
+     "stand.height100"
+    ],
+    "level0_reported_rule": "reported, not scored, in the Level 1 loss (fit_level1.level1_spec); summary() writes the terms they would add at their Level 0 weights under `reported`; they stay in the Level 0 gate"
+   },
+   "seeds": {
+    "search": {
+     "numpy_seed": 20261107,
+     "list": [
+      7191,
+      2325,
+      9999,
+      2831,
+      4712,
+      8068,
+      9165,
+      2863,
+      2488,
+      5615
+     ],
+     "pool": "1000\u20139999 less 1001\u20131006 (the gallery's) and the noise check's 60 (level1.noise_draws)",
+     "rule": "the first loss.seeds_per_candidate of the list, the same for every candidate in every generation (level1.fit_seeds)"
+    },
+    "noise": {
+     "numpy_seed": 20261106,
+     "draws5": [
+      [
+       3046,
+       4395,
+       9388,
+       8411,
+       4398
+      ],
+      [
+       1536,
+       7852,
+       3830,
+       4571,
+       7270
+      ],
+      [
+       6785,
+       2909,
+       7779,
+       6609,
+       4456
+      ],
+      [
+       2201,
+       3520,
+       4298,
+       7574,
+       8689
+      ],
+      [
+       1418,
+       5716,
+       1163,
+       7917,
+       8122
+      ],
+      [
+       6358,
+       4178,
+       3872,
+       5893,
+       4019
+      ]
+     ],
+     "draws10": [
+      [
+       7346,
+       6397,
+       9457,
+       5967,
+       8897,
+       3268,
+       9557,
+       9413,
+       5306,
+       8525
+      ],
+      [
+       7009,
+       3410,
+       3493,
+       7085,
+       6212,
+       1772,
+       1424,
+       1050,
+       7182,
+       6727
+      ],
+      [
+       6456,
+       1483,
+       3789,
+       1822,
+       6562,
+       7785,
+       3205,
+       4404,
+       3804,
+       2254
+      ]
+     ]
+    },
+    "finalists": [
+     101,
+     102,
+     103,
+     104,
+     105,
+     106,
+     107,
+     108,
+     109,
+     110
+    ],
+    "gate": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     17,
+     18,
+     19,
+     20
+    ]
+   },
+   "gate": {
+    "seeds": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     17,
+     18,
+     19,
+     20
+    ],
+    "z": 2.0,
+    "pass_seeds": 15,
+    "held_out": "a seed passes when every held-out descriptor's |z| <= z, on the median of that seed's live measured trees, detrended; the species on >= pass_seeds",
+    "spread": "every descriptor's simulated SD, fitted and held out (level1.spread_names), over all the gate's trees within \u00d72 of the real SD",
+    "shape_flag": "gallery.shape_flag clear, the hand = the Level 0 fit with the targets file's [form]",
+    "size_match": "over the gate's seeds, by the size_match rule"
+   },
+   "hashes": {
+    "analysis/treesim/level1.py": "76fc0a3c43afa40545e05ce58963fc689f6b3c62e5abf7b47927fe907bd212d7",
+    "analysis/experiments/level1_eval.ts": "19d97301ce99d2a9843fca1980d0c12e6ce09c89318922cefae6f3cb4ebd48f1",
+    "analysis/experiments/level1_targets.py": "6035c08c056bcd3f8d45ac0a8acdcb8f35618b6901fec56e4f887a3fddbd2beb",
+    "analysis/treesim/describe.py": "671f92d71131525cb1dcf5fdb771ed98b3c5ac05aea900366925ef61d5cc2bee",
+    "analysis/treesim/form.py": "23c5e1c035c9bbb625a8a002476fc12fd98f85438af4bba5adbb97c10ec6b48d",
+    "analysis/treesim/cylinders.py": "0e262dce2e55193c3f8ed775ec92c7fbe29df9f9be0d738daed7623cb5629254",
+    "analysis/treesim/coarsen.py": "b5e57ca6ebff39f9ec8a2b0364e621a549e5d6b6d8426cbbcbfb05cd87b34bc9",
+    "analysis/treesim/simtree.py": "e69c7a26140b272f1274b07f3d6ae51acdba6abbfc655b27d3b8a02bb901ff6b",
+    "analysis/treesim/tolerance.py": "7ec6553f51cee1734e68b3b1f5949d7c6996e820d61a6e53a3fc3fcd5c647b7c",
+    "analysis/fit/sources/phase1-tolerances.json": "896e1be07fbfd876e50792191e6aa8a1530d6f629818a26f7404871d90c38043",
+    "cli/trials.ts": "2660df8f06f210369a8f80f6b8e02435fe87ea605cdc80884d3827011118dac4",
+    "cli/allometry.ts": "b7f9c86322a68aafaf0258ef07834ba7ea2c806cb415159924e08d78e1d0f93c",
+    "analysis/fit/targets/beech.toml": "de36af98bf37e8d5d6d572c2f26062833a6a0825ab6d6965e5d5178896d3efbe",
+    "docs/experiments/fits/level0/beech.json": "4794cfd86a29da8c64ea317813e0981df7ac1fa1f0c1522e675ca6994241f5b2"
+   },
+   "prior": {
+    "version": 3,
+    "commit": "81b157a",
+    "knobs": [
+     "r2.levels.0.lambda",
+     "r2.levels.1.lambda",
+     "r2.levels.1.setPoint",
+     "r2.levels.1.postureSetPoint",
+     "r2.levels.1.branchAngle",
+     "r2.levels.1.eta",
+     "r2.levels.2.setPoint",
+     "r2.aC",
+     "r2.dLambda",
+     "r2.kappa"
+    ],
+    "fixed": {
+     "r1.hydraulic": "hyperbolic",
+     "c5.Trel": 0.008,
+     "r1.leafCost": "acclimated",
+     "r1.leafCostShade": 0.3,
+     "c3.alpha": 3.312,
+     "r1.Lh": 51.16,
+     "r1.mf": 0.0618,
+     "r2.hJ": 77.63,
+     "c6.r0": 0.004689,
+     "r6.qMin": 0.03103,
+     "r6.leafArea": 2.417,
+     "r3.c": 0.04879
+    },
+    "held_out": [
+     "length0",
+     "limbElevation05",
+     "limbUpturn",
+     "p3",
+     "widestAt"
+    ],
+    "fitted": [
+     "centroidHeight",
+     "crownFullness",
+     "forkHeight",
+     "leaderDominance",
+     "limbDroop",
+     "p0",
+     "p1",
+     "p2",
+     "pendulousFraction05",
+     "profileCentre",
+     "tortuosity05"
+    ],
+    "weights": {
+     "rule": "w_k = 1 / \u03a3_j |r_kj| over all the descriptors, self included (|r_kk| = 1), every |r| below r_crit set to 0 first; the fitted descriptors' w_k weigh their location terms",
+     "r_crit": 0.270627777234994,
+     "alpha": 0.05,
+     "n": 53,
+     "r_crit_rule": "two-sided critical value of Pearson's r at n = the real trees: t / sqrt(t\u00b2 + n \u2212 2), t the (1 \u2212 alpha/2) quantile of Student's t on n \u2212 2",
+     "near_r_crit": [
+      {
+       "pair": [
+        "centroidHeight",
+        "profileCentre"
+       ],
+       "r": 0.2729856596579016,
+       "n": 53
+      },
+      {
+       "pair": [
+        "forkHeight",
+        "p3"
+       ],
+       "r": -0.2713197691776881,
+       "n": 53
+      },
+      {
+       "pair": [
+        "leaderDominance",
+        "tortuosity05"
+       ],
+       "r": -0.26702055469920527,
+       "n": 52
+      },
+      {
+       "pair": [
+        "limbElevation05",
+        "p3"
+       ],
+       "r": 0.26209042286316164,
+       "n": 53
+      },
+      {
+       "pair": [
+        "limbUpturn",
+        "profileCentre"
+       ],
+       "r": -0.2669098338696381,
+       "n": 52
+      }
+     ],
+     "fitted_total": 4.439853590765789,
+     "level0_total": 7.0
+    },
+    "location_weights": {
+     "centroidHeight": 0.3633945672949193,
+     "crownFullness": 0.26628552379516346,
+     "forkHeight": 0.519942189841948,
+     "leaderDominance": 0.6624790608963971,
+     "length0": 0.322157140147133,
+     "limbDroop": 0.4124268471748795,
+     "limbElevation05": 0.2723056626741574,
+     "limbUpturn": 0.7249588944600235,
+     "p0": 0.24355037721282602,
+     "p1": 0.2625778979406763,
+     "p2": 0.281705100056892,
+     "p3": 0.29820168409285847,
+     "pendulousFraction05": 0.5338002980218342,
+     "profileCentre": 0.18470016748692794,
+     "tortuosity05": 0.7089915610433247,
+     "widestAt": 0.2767697602202623
+    },
+    "clusters": {
+     "method": "average",
+     "distance": "1 \u2212 |r|",
+     "cut_r": 0.5,
+     "list": [
+      [
+       "centroidHeight",
+       "leaderDominance"
+      ],
+      [
+       "crownFullness",
+       "p1"
+      ],
+      [
+       "forkHeight"
+      ],
+      [
+       "length0",
+       "limbElevation05"
+      ],
+      [
+       "limbDroop"
+      ],
+      [
+       "limbUpturn"
+      ],
+      [
+       "p0",
+       "profileCentre"
+      ],
+      [
+       "p2"
+      ],
+      [
+       "p3",
+       "widestAt"
+      ],
+      [
+       "pendulousFraction05"
+      ],
+      [
+       "tortuosity05"
+      ]
+     ],
+     "draw_order": [
+      [
+       "p3",
+       "widestAt"
+      ],
+      [
+       "limbUpturn"
+      ],
+      [
+       "length0",
+       "limbElevation05"
+      ],
+      [
+       "tortuosity05"
+      ],
+      [
+       "crownFullness",
+       "p1"
+      ],
+      [
+       "limbDroop"
+      ],
+      [
+       "p0",
+       "profileCentre"
+      ],
+      [
+       "forkHeight"
+      ],
+      [
+       "pendulousFraction05"
+      ],
+      [
+       "centroidHeight",
+       "leaderDominance"
+      ],
+      [
+       "p2"
+      ]
+     ],
+     "taken": 3,
+     "rule": "scipy linkage(method) on the condensed 1 \u2212 |r|, fcluster at distance 1 \u2212 cut_r; canonical order: members sorted, clusters by their first member. np.random.default_rng(held_out_seed).choice(len(list), len(list), replace=False) is the draw order; clusters are taken whole in that order until the held-out descriptors number >= round(n/3)",
+     "straddling": [
+      {
+       "held_out": "length0",
+       "fitted": "p1",
+       "r": -0.51672848162707
+      },
+      {
+       "held_out": "length0",
+       "fitted": "p2",
+       "r": -0.5681008189017529
+      },
+      {
+       "held_out": "p3",
+       "fitted": "profileCentre",
+       "r": 0.6589350763466628
+      },
+      {
+       "held_out": "widestAt",
+       "fitted": "p2",
+       "r": 0.5451615335364967
+      },
+      {
+       "held_out": "widestAt",
+       "fitted": "profileCentre",
+       "r": 0.6550911079546692
+      }
+     ],
+     "straddling_note": "pairs at |r| >= cut_r across clusters (average linkage does not separate them) that the draw left on both sides of the fitted/held-out line; within a cluster none can straddle",
+     "near_cut": [
+      {
+       "pair": [
+        "centroidHeight",
+        "leaderDominance"
+       ],
+       "r": -0.509481671234869
+      },
+      {
+       "pair": [
+        "length0",
+        "p1"
+       ],
+       "r": -0.51672848162707
+      },
+      {
+       "pair": [
+        "limbElevation05",
+        "pendulousFraction05"
+       ],
+       "r": -0.488856903300463
+      }
+     ]
+    },
+    "loss": {
+     "level0": "fit.contributions(load_spec(species, level=0)): Level 0's scored traits and death penalties at their Level 0 weights",
+     "terms": "location only: Level 0's contributions + \u03a3 over fitted k of location_weights[k] \u00b7 z_k\u00b2",
+     "spread_in_loss": false,
+     "z": "(median of the detrended simulated trees \u2212 real median) / real SD",
+     "s": "ln(simulated SD (ddof 1) / real SD) / ln 2; computed and reported per descriptor, never scored",
+     "min_trees": 10,
+     "missing_penalty": 4.0,
+     "missing": "w_k \u00b7 missing_penalty in place of w_k \u00b7 z_k\u00b2: a descriptor with fewer than min_trees finite trees, or every descriptor of an unmatched candidate",
+     "trials": [
+      "lone",
+      "stand150",
+      "shade"
+     ],
+     "seeds_per_candidate": 10,
+     "seeds_rule": "set once by analysis/experiments/level1_noise.py on this registration, before any fit: the hand on six 5-seed and three 10-seed draws (level1.noise_draws, numpy seed 20261106: the pilot's own draws, so paired with its noise floor); 10 if the SD of the v3 loss over the six 5-seed draws exceeds 0.25 \u00d7 the mean of the hand's Level 1 location loss over those draws, else 5",
+     "noise": {
+      "file": "docs/experiments/fits/level1-pilot-v2/noise.json",
+      "sha256": "692f80bb0d8c92fbb459b2514a138df5530411cafc7437bee224ed5704aaecda",
+      "sd5": 0.8337863507698148,
+      "gap": 2.358436720003651,
+      "threshold": 0.5896091800009128,
+      "measured": "2026-11-04, on the v3 registration before any fit",
+      "sd10": 0.3997216037794837,
+      "pilot_sd5": 6.380746675432385,
+      "pilot_location_only_sd5": 0.8384023042669094
+     }
+    },
+    "seeds": {
+     "search": {
+      "numpy_seed": 20261107,
+      "list": [
+       7191,
+       2325,
+       9999,
+       2831,
+       4712,
+       8068,
+       9165,
+       2863,
+       2488,
+       5615
+      ],
+      "pool": "1000\u20139999 less 1001\u20131006 (the gallery's) and the noise check's 60 (level1.noise_draws)",
+      "rule": "the first loss.seeds_per_candidate of the list, the same for every candidate in every generation (level1.fit_seeds)"
+     },
+     "noise": {
+      "numpy_seed": 20261106,
+      "draws5": [
+       [
+        3046,
+        4395,
+        9388,
+        8411,
+        4398
+       ],
+       [
+        1536,
+        7852,
+        3830,
+        4571,
+        7270
+       ],
+       [
+        6785,
+        2909,
+        7779,
+        6609,
+        4456
+       ],
+       [
+        2201,
+        3520,
+        4298,
+        7574,
+        8689
+       ],
+       [
+        1418,
+        5716,
+        1163,
+        7917,
+        8122
+       ],
+       [
+        6358,
+        4178,
+        3872,
+        5893,
+        4019
+       ]
+      ],
+      "draws10": [
+       [
+        7346,
+        6397,
+        9457,
+        5967,
+        8897,
+        3268,
+        9557,
+        9413,
+        5306,
+        8525
+       ],
+       [
+        7009,
+        3410,
+        3493,
+        7085,
+        6212,
+        1772,
+        1424,
+        1050,
+        7182,
+        6727
+       ],
+       [
+        6456,
+        1483,
+        3789,
+        1822,
+        6562,
+        7785,
+        3205,
+        4404,
+        3804,
+        2254
+       ]
+      ]
+     },
+     "finalists": [
+      101,
+      102,
+      103,
+      104,
+      105,
+      106,
+      107,
+      108,
+      109,
+      110
+     ],
+     "gate": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20
+     ]
+    },
+    "gate": {
+     "seeds": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20
+     ],
+     "z": 2.0,
+     "pass_seeds": 15,
+     "held_out": "a seed passes when every held-out descriptor's |z| <= z, on the median of that seed's live measured trees, detrended; the species on >= pass_seeds",
+     "spread": "every descriptor's simulated SD, fitted and held out (level1.spread_names), over all the gate's trees within \u00d72 of the real SD",
+     "shape_flag": "gallery.shape_flag clear, the hand = the Level 0 fit with the targets file's [form]",
+     "size_match": "over the gate's seeds, by the size_match rule"
+    },
+    "hashes": {
+     "analysis/treesim/level1.py": "834c636ee2bab1aad318c390d2134e4f7083203dd8d9f95ea074a7802b1233ed",
+     "analysis/experiments/level1_eval.ts": "19d97301ce99d2a9843fca1980d0c12e6ce09c89318922cefae6f3cb4ebd48f1",
+     "analysis/experiments/level1_targets.py": "2cc832de1b87dd959655850c310216084b390acac8cb1fb868e86e46014e3afb",
+     "analysis/treesim/describe.py": "671f92d71131525cb1dcf5fdb771ed98b3c5ac05aea900366925ef61d5cc2bee",
+     "analysis/treesim/form.py": "23c5e1c035c9bbb625a8a002476fc12fd98f85438af4bba5adbb97c10ec6b48d",
+     "analysis/treesim/cylinders.py": "0e262dce2e55193c3f8ed775ec92c7fbe29df9f9be0d738daed7623cb5629254",
+     "analysis/treesim/coarsen.py": "b5e57ca6ebff39f9ec8a2b0364e621a549e5d6b6d8426cbbcbfb05cd87b34bc9",
+     "analysis/treesim/simtree.py": "e69c7a26140b272f1274b07f3d6ae51acdba6abbfc655b27d3b8a02bb901ff6b",
+     "analysis/treesim/tolerance.py": "7ec6553f51cee1734e68b3b1f5949d7c6996e820d61a6e53a3fc3fcd5c647b7c",
+     "analysis/fit/sources/phase1-tolerances.json": "896e1be07fbfd876e50792191e6aa8a1530d6f629818a26f7404871d90c38043",
+     "cli/trials.ts": "2660df8f06f210369a8f80f6b8e02435fe87ea605cdc80884d3827011118dac4",
+     "cli/allometry.ts": "b7f9c86322a68aafaf0258ef07834ba7ea2c806cb415159924e08d78e1d0f93c",
+     "analysis/fit/targets/beech.toml": "177610247e34b0df516c32527bbee5a4c44d86c1f8322cdfcf20c6bd4f7e7466",
+     "docs/experiments/fits/level0/beech.json": "4794cfd86a29da8c64ea317813e0981df7ac1fa1f0c1522e675ca6994241f5b2"
+    },
+    "prior": {
+     "version": 2,
+     "commit": "44a21ba",
+     "knobs": [
+      "r2.levels.0.lambda",
+      "r2.levels.1.lambda",
+      "r2.levels.1.setPoint",
+      "r2.levels.1.postureSetPoint",
+      "r2.levels.1.branchAngle",
+      "r2.levels.1.eta",
+      "r2.levels.2.setPoint",
+      "r2.aC",
+      "r2.dLambda",
+      "r2.kappa"
+     ],
+     "fixed": {
+      "r1.hydraulic": "hyperbolic",
+      "c5.Trel": 0.008,
+      "r1.leafCost": "acclimated",
+      "r1.leafCostShade": 0.3,
+      "c3.alpha": 3.312,
+      "r1.Lh": 51.16,
+      "r1.mf": 0.0618,
+      "r2.hJ": 77.63,
+      "c6.r0": 0.004689,
+      "r6.qMin": 0.03103,
+      "r6.leafArea": 2.417,
+      "r3.c": 0.04879
+     },
+     "held_out": [
+      "length0",
+      "p1",
+      "pendulousFraction05",
+      "tortuosity05",
+      "widestAt"
+     ],
+     "fitted": [
+      "centroidHeight",
+      "crownFullness",
+      "forkHeight",
+      "leaderDominance",
+      "limbDroop",
+      "limbElevation05",
+      "limbUpturn",
+      "p0",
+      "p2",
+      "p3",
+      "profileCentre"
+     ],
+     "groups": {
+      "outline": [
+       "centroidHeight",
+       "crownFullness",
+       "p0",
+       "p2",
+       "p3",
+       "profileCentre"
+      ],
+      "forkHeight": [
+       "forkHeight"
+      ],
+      "leaderDominance": [
+       "leaderDominance"
+      ],
+      "limbDroop": [
+       "limbDroop"
+      ],
+      "limbElevation05": [
+       "limbElevation05"
+      ],
+      "limbUpturn": [
+       "limbUpturn"
+      ]
+     },
+     "weights": "correlated summaries of a single measurement share one unit of weight (the user, 2026-11-04, a general rule): OUTLINE is one group whatever members the draw leaves in the loss; every other descriptor is its own group. A group's location term is the mean of its members' z\u00b2, its spread term the mean of their s\u00b2, each at weight 1",
+     "loss": {
+      "level0": "fit.contributions(load_spec(species, level=0)): Level 0's scored traits and death penalties at their Level 0 weights",
+      "z": "(median of the detrended simulated trees \u2212 real median) / real SD",
+      "s": "ln(simulated SD (ddof 1) / real SD) / ln 2",
+      "min_trees": 10,
+      "missing_penalty": 4.0,
+      "trials": [
+       "lone",
+       "stand150",
+       "shade"
+      ],
+      "seeds_per_candidate": 5
+     },
+     "seeds": {
+      "fit": "drawn each generation from 1000\u20139999 less 1001\u20131003 (the gallery's)",
+      "finalists": [
+       101,
+       102,
+       103,
+       104,
+       105,
+       106,
+       107,
+       108,
+       109,
+       110
+      ],
+      "gate": [
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       7,
+       8,
+       9,
+       10,
+       11,
+       12,
+       13,
+       14,
+       15,
+       16,
+       17,
+       18,
+       19,
+       20
+      ]
+     },
+     "gate": {
+      "seeds": [
+       1,
+       2,
+       3,
+       4,
+       5,
+       6,
+       7,
+       8,
+       9,
+       10,
+       11,
+       12,
+       13,
+       14,
+       15,
+       16,
+       17,
+       18,
+       19,
+       20
+      ],
+      "z": 2.0,
+      "pass_seeds": 15,
+      "held_out": "a seed passes when every held-out descriptor's |z| <= z, on the median of that seed's live measured trees, detrended; the species on >= pass_seeds",
+      "spread": "every fitted descriptor's simulated SD over all the gate's trees within \u00d72 of the real SD",
+      "shape_flag": "gallery.shape_flag clear, the hand = the Level 0 fit with the targets file's [form]",
+      "size_match": "over the gate's seeds, by the size_match rule"
+     },
+     "hashes": {
+      "analysis/treesim/level1.py": "d2ad448a6a1a587c16196f22b106cdfe697729b6897f956374e5da0cddc1caa8",
+      "analysis/experiments/level1_eval.ts": "19d97301ce99d2a9843fca1980d0c12e6ce09c89318922cefae6f3cb4ebd48f1",
+      "analysis/experiments/level1_targets.py": "d9020bd8fe81b2cb8f316527c8c04508689cb0a2827b55b774e8a6147368961d",
+      "analysis/treesim/describe.py": "671f92d71131525cb1dcf5fdb771ed98b3c5ac05aea900366925ef61d5cc2bee",
+      "analysis/treesim/form.py": "23c5e1c035c9bbb625a8a002476fc12fd98f85438af4bba5adbb97c10ec6b48d",
+      "analysis/treesim/cylinders.py": "0e262dce2e55193c3f8ed775ec92c7fbe29df9f9be0d738daed7623cb5629254",
+      "analysis/treesim/coarsen.py": "b5e57ca6ebff39f9ec8a2b0364e621a549e5d6b6d8426cbbcbfb05cd87b34bc9",
+      "analysis/treesim/simtree.py": "e69c7a26140b272f1274b07f3d6ae51acdba6abbfc655b27d3b8a02bb901ff6b",
+      "analysis/treesim/tolerance.py": "7ec6553f51cee1734e68b3b1f5949d7c6996e820d61a6e53a3fc3fcd5c647b7c",
+      "analysis/fit/sources/phase1-tolerances.json": "896e1be07fbfd876e50792191e6aa8a1530d6f629818a26f7404871d90c38043",
+      "cli/trials.ts": "2660df8f06f210369a8f80f6b8e02435fe87ea605cdc80884d3827011118dac4",
+      "cli/allometry.ts": "b7f9c86322a68aafaf0258ef07834ba7ea2c806cb415159924e08d78e1d0f93c",
+      "analysis/fit/targets/beech.toml": "c40c562828e4cd626090b4f66c57551b4e2cb46122cea89ecbb20314982728ea",
+      "docs/experiments/fits/level0/beech.json": "4794cfd86a29da8c64ea317813e0981df7ac1fa1f0c1522e675ca6994241f5b2"
+     },
+     "prior": {
+      "version": 1,
+      "commit": "3c64f48",
+      "knobs": [
+       "r2.levels.0.lambda",
+       "r2.levels.1.lambda",
+       "r2.levels.1.setPoint",
+       "r2.levels.1.postureSetPoint",
+       "r2.levels.1.branchAngle",
+       "r2.levels.1.eta",
+       "r2.levels.2.setPoint",
+       "r2.aC",
+       "r2.dLambda",
+       "r2.kappa",
+       "r3.c"
+      ],
+      "fixed": {
+       "r1.hydraulic": "hyperbolic",
+       "c5.Trel": 0.008,
+       "r1.leafCost": "acclimated",
+       "r1.leafCostShade": 0.3,
+       "c3.alpha": 3.312,
+       "r1.Lh": 51.16,
+       "r1.mf": 0.0618,
+       "r2.hJ": 77.63,
+       "c6.r0": 0.004689,
+       "r6.qMin": 0.03103,
+       "r6.leafArea": 2.417
+      },
+      "hashes": {
+       "analysis/treesim/level1.py": "d2ad448a6a1a587c16196f22b106cdfe697729b6897f956374e5da0cddc1caa8",
+       "analysis/experiments/level1_eval.ts": "19d97301ce99d2a9843fca1980d0c12e6ce09c89318922cefae6f3cb4ebd48f1",
+       "analysis/experiments/level1_targets.py": "a4f45c4310db8863a0eed29312dbbc36dd70b7620c68296fc48775174740f49e",
+       "analysis/treesim/describe.py": "671f92d71131525cb1dcf5fdb771ed98b3c5ac05aea900366925ef61d5cc2bee",
+       "analysis/treesim/form.py": "23c5e1c035c9bbb625a8a002476fc12fd98f85438af4bba5adbb97c10ec6b48d",
+       "analysis/treesim/cylinders.py": "0e262dce2e55193c3f8ed775ec92c7fbe29df9f9be0d738daed7623cb5629254",
+       "analysis/treesim/coarsen.py": "b5e57ca6ebff39f9ec8a2b0364e621a549e5d6b6d8426cbbcbfb05cd87b34bc9",
+       "analysis/treesim/simtree.py": "e69c7a26140b272f1274b07f3d6ae51acdba6abbfc655b27d3b8a02bb901ff6b",
+       "analysis/treesim/tolerance.py": "7ec6553f51cee1734e68b3b1f5949d7c6996e820d61a6e53a3fc3fcd5c647b7c",
+       "analysis/fit/sources/phase1-tolerances.json": "896e1be07fbfd876e50792191e6aa8a1530d6f629818a26f7404871d90c38043",
+       "cli/trials.ts": "2660df8f06f210369a8f80f6b8e02435fe87ea605cdc80884d3827011118dac4",
+       "cli/allometry.ts": "b7f9c86322a68aafaf0258ef07834ba7ea2c806cb415159924e08d78e1d0f93c",
+       "analysis/fit/targets/beech.toml": "2f3f39bb5693061f6db3fd0a03f865ecebcf2e871f37cf6592a7ec038370b77a",
+       "docs/experiments/fits/level0/beech.json": "4794cfd86a29da8c64ea317813e0981df7ac1fa1f0c1522e675ca6994241f5b2"
+      }
+     }
+    }
+   }
+  }
+ },
+ "hashes": {
+  "analysis/treesim/level1.py": "76fc0a3c43afa40545e05ce58963fc689f6b3c62e5abf7b47927fe907bd212d7",
+  "analysis/experiments/level1_eval.ts": "19d97301ce99d2a9843fca1980d0c12e6ce09c89318922cefae6f3cb4ebd48f1",
+  "analysis/experiments/level1_targets.py": "2ee09b11a0b1527815a5644484f5ce0ff7b8554485ba117521eb378ce3310a66",
+  "analysis/treesim/describe.py": "4d6deca8aa58b23b288d6a346d50c0343a893f2e484bf0b334f73c4557a396ff",
+  "analysis/treesim/form.py": "23c5e1c035c9bbb625a8a002476fc12fd98f85438af4bba5adbb97c10ec6b48d",
+  "analysis/treesim/cylinders.py": "0e262dce2e55193c3f8ed775ec92c7fbe29df9f9be0d738daed7623cb5629254",
+  "analysis/treesim/coarsen.py": "b5e57ca6ebff39f9ec8a2b0364e621a549e5d6b6d8426cbbcbfb05cd87b34bc9",
+  "analysis/treesim/simtree.py": "e69c7a26140b272f1274b07f3d6ae51acdba6abbfc655b27d3b8a02bb901ff6b",
+  "analysis/treesim/tolerance.py": "7ec6553f51cee1734e68b3b1f5949d7c6996e820d61a6e53a3fc3fcd5c647b7c",
+  "analysis/fit/sources/phase1-tolerances.json": "896e1be07fbfd876e50792191e6aa8a1530d6f629818a26f7404871d90c38043",
+  "cli/trials.ts": "2660df8f06f210369a8f80f6b8e02435fe87ea605cdc80884d3827011118dac4",
+  "cli/allometry.ts": "b7f9c86322a68aafaf0258ef07834ba7ea2c806cb415159924e08d78e1d0f93c",
+  "analysis/fit/targets/beech.toml": "847608d4c9cf18dee828fcfbdcee1598b7a22e2deac8bd1a71c8e21a7d51b539",
+  "docs/experiments/fits/level0/beech.json": "4794cfd86a29da8c64ea317813e0981df7ac1fa1f0c1522e675ca6994241f5b2",
+  "analysis/fit/sources/phase1-tolerances-v3.2.json": "f302d60057d9d4a78f97d567c423d895fa4e04c7c6cda525400b83fe15477b81"
+ }
+}

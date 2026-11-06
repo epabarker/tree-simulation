@@ -25,8 +25,12 @@
  *
  * Labels are the field guide's: a common name, a Latin name and the leaf style the page draws.
  * Fir and pine are lab species; the home forest (`mixedWood`) mixes the other nine.
+ *
+ * M27b (ADR 0023): these hand-tuned species are kept as HAND_FLORA; the woodland now grows FLORA,
+ * the species fitted to literature traits by CMA-ES with hand adjustments (flora-fitted.ts).
  */
 
+import { FITTED_FLORA } from "./flora-fitted.ts";
 import type { PaLevel, SpeciesPatch } from "./params.ts";
 
 /** One R2 table row (ADR 0009); unspecified fields take baseline values. */
@@ -41,7 +45,11 @@ export const level = (row: Partial<PaLevel>): PaLevel => ({
   ...row,
 });
 
-export const FLORA = {
+/**
+ * The hand-tuned species of M19 and M25, as they were before M27 adopted the fitted ones (FLORA,
+ * below). Kept for comparison and as a record of the reasoning in their comments.
+ */
+export const HAND_FLORA = {
   /** Pioneer: fast, light-demanding, short-lived, a light open crown (§9 "pioneer"). */
   birch: {
     common: "Silver birch",
@@ -51,7 +59,7 @@ export const FLORA = {
     // Sheds limbs that get under 40% of the crown top's light, and wakes dormant buds only in
     // strong light: a clean bole in a stand, yet a lone birch keeps branches down its stem.
     c5: { enabled: true, T: 0.1, Trel: 0.4 },
-    c6: { enabled: true, r0: 0.033 },
+    c6: { enabled: true, r0: 0.004125 },
     // A short hydraulic scale: birch levels off lower than oak and beech.
     r1: { mf: 0.1, Lh: 45 },
     r2: {
@@ -129,7 +137,7 @@ export const FLORA = {
     leaf: "needle",
     c5: { enabled: true, T: 0.02, Trel: 0.25 },
     // Whorls carry few tips, so the pipe model needs thicker tips for a realistic H/D (M7).
-    c6: { enabled: true, r0: 0.035 },
+    c6: { enabled: true, r0: 0.004375 },
     r1: { mf: 0.05, Lh: 50 },
     r2: {
       enabled: true,
@@ -176,7 +184,7 @@ export const FLORA = {
     c5: { enabled: true, T: 0.02, Trel: 0.06 },
     // A lighter crown than beech's (fewer short-shoot leaves, M25 follow-up): its floor sits
     // between oak's and beech's; cheaper leaves and thicker tips keep saplings and stems as before.
-    c6: { enabled: true, r0: 0.024 },
+    c6: { enabled: true, r0: 0.003 },
     r1: { mf: 0.04, Lh: 45, maturity: 30 },
     // Maple's buds are opposite and decussate: each pair turns 90° from the last, so only every
     // other pair lies in the plane. That is one bud a node, as distichous gives; the "opposite"
@@ -204,7 +212,7 @@ export const FLORA = {
     leaf: "holly",
     c3: { mode: "bh", lambda: 0.5, alpha: 2.6 },
     c5: { enabled: true, T: 0.01, Trel: 0.02 },
-    c6: { enabled: true, r0: 0.026 },
+    c6: { enabled: true, r0: 0.00325 },
     // Evergreen leaves live several years, so their yearly cost is low; a short tree.
     r1: { mf: 0.03, Lh: 25, maturity: 30 },
     r2: {
@@ -228,7 +236,7 @@ export const FLORA = {
     leaf: "rowan",
     c3: { mode: "bh", lambda: 0.5, alpha: 3.6 },
     c5: { enabled: true, T: 0.05, Trel: 0.2 },
-    c6: { enabled: true, r0: 0.026 },
+    c6: { enabled: true, r0: 0.00325 },
     r1: { mf: 0.08, Lh: 38, maturity: 25 },
     r2: {
       enabled: true,
@@ -254,7 +262,7 @@ export const FLORA = {
     c3: { mode: "bh", lambda: 0.5, alpha: 5.5 },
     // Sheds less than birch: limbs stay low on a short, stout stem.
     c5: { enabled: true, T: 0.1, Trel: 0.25 },
-    c6: { enabled: true, r0: 0.03 },
+    c6: { enabled: true, r0: 0.00375 },
     r1: { mf: 0.12, Lh: 30, maturity: 20 },
     // Weak apical control from early on: the stem soon divides into several spreading limbs.
     r2: {
@@ -283,7 +291,7 @@ export const FLORA = {
     c3: { mode: "bh", lambda: 0.5, alpha: 3.8 },
     // Sheds hard in a stand (a high crown on a clean bole), yet keeps low limbs in the open.
     c5: { enabled: true, T: 0.1, Trel: 0.3 },
-    c6: { enabled: true, r0: 0.03 },
+    c6: { enabled: true, r0: 0.00375 },
     r1: { mf: 0.09, Lh: 60 },
     // Strong apical control while young, fading late: old pines' crowns flatten.
     r2: {
@@ -303,5 +311,14 @@ export const FLORA = {
     o4: { cSeed: 3, d: 40, qEst: 0.3, pEst: 0.3, m0: 0.003 },
   },
 } satisfies Record<string, SpeciesPatch>;
+
+/**
+ * The species the woodland presets grow (M27b, ADR 0023): the round-2 CMA-ES fits to literature
+ * traits with hand adjustments (flora-fitted.ts, generated). They grow with the hyperbolic
+ * hydraulic discount (ADR 0021) and a juvenile phase (ADR 0022), set in each patch, and as they
+ * grow in 3D (ADR 0025): each species' phyllotaxis and wood's own E, which the generator
+ * (analysis/experiments/m27_adopt.py) writes into the file.
+ */
+export const FLORA = FITTED_FLORA;
 
 export type FloraName = keyof typeof FLORA;

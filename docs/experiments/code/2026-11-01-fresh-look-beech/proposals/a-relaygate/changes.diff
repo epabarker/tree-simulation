@@ -1,0 +1,208 @@
+--- a/rust/core/src/params.rs
++++ b/rust/core/src/params.rs
+@@ -236,6 +236,10 @@
+     /// From this tree age (seasons) a pa-0 terminal ends with probability `relay_p_term`.
+     pub relay_age: f64,
+     pub relay_p_term: f64,
++    /// The relay's neighbour gate (r2.relayCrowd, k): a pa-0 apex ends by `relay_p_term`·max(0,
++    /// 1 − k·s̄), s̄ the tree's mean R5 neighbour shade over its metamers (0 alone in the open).
++    /// Absent: off, the relay fires by age alone.
++    pub relay_crowd: Option<f64>,
+ }
+ 
+ #[derive(Clone, Debug)]
+@@ -279,6 +283,9 @@
+     pub d_a: f64,
+     /// `r5.signal === "neighbours"`.
+     pub neighbours: bool,
++    /// `r5.posture === true`: the set-point scale (1 − δ_A·s) also acts on R3's posture
++    /// set point (the gravitropic set-point angle), not only on the growth direction. Absent: off.
++    pub posture: bool,
+ }
+ 
+ #[derive(Clone, Debug)]
+@@ -523,6 +530,7 @@
+                 relay: opt(r2, "relay").unwrap_or(0.0),
+                 relay_age: opt(r2, "relayAge").unwrap_or(0.0),
+                 relay_p_term: opt(r2, "relayPTerm").unwrap_or(0.0),
++                relay_crowd: opt(r2, "relayCrowd"),
+             },
+             r3: R3 {
+                 enabled: flag(r3, "enabled"),
+@@ -560,6 +568,7 @@
+                 d_b: num(r5, "dB"),
+                 d_a: num(r5, "dA"),
+                 neighbours: text(r5, "signal") == "neighbours",
++                posture: flag(r5, "posture"),
+             },
+             o2: O2 {
+                 enabled: flag(o2, "enabled"),
+--- a/rust/core/src/tree.rs
++++ b/rust/core/src/tree.rs
+@@ -336,6 +336,9 @@
+     pub broken: f64,
+     /// Rows that took part in this season's passes (set before growth; C5 sheds among them).
+     pub evaluated: usize,
++    /// R2's relay gate: the tree's mean R5 neighbour shade this season (set in phase 2; read
++    /// when a pa-0 terminal bud forms). Not checkpointed: recomputed every season.
++    pub relay_crowd: f64,
+ }
+ 
+ /// Grows a scratch array to at least `n` elements (contents beyond the rows a pass writes are
+--- a/rust/core/src/season.rs
++++ b/rust/core/src/season.rs
+@@ -28,7 +28,7 @@
+ use crate::principles::r5::{elongation, neighbour_share, set_point_scale, shade_of};
+ use crate::principles::r6::{deposit_area, resting_state};
+ use crate::rng::{normal, purpose, uniform};
+-use crate::tree::{Tree, bud, slot, store_i32};
++use crate::tree::{Tree, bud, ensure, slot, store_i32};
+ use crate::world::World;
+ 
+ /// The phases as they end within a season (`PHASES` in season.ts; `npm run bench` times them).
+@@ -229,6 +229,15 @@
+     if params.r5.enabled {
+         sample_nodes(wp, params, light, owner, tree);
+     }
++    // R2's relay gate (r2.relayCrowd): the tree's shade-avoidance state, the mean of R5's
++    // neighbour shade over its metamers (0 for a tree without neighbours).
++    tree.relay_crowd = if params.r2.relay_crowd.is_some() && params.r5.enabled {
++        let nm = tree.m.len();
++        let sum: f64 = tree.node_shade[..nm].iter().sum();
++        if nm > 0 { sum / nm as f64 } else { 0.0 }
++    } else {
++        0.0
++    };
+     if (params.c5.enabled || carbon_shedding) && params.c5.t_rel > 0.0 {
+         tree.q_top = crown_top_light(tree, params.c5.top_quantile);
+     }
+@@ -321,9 +330,21 @@
+ /// R3 mechanics (girth first, §6 rule 2), then obstacles again for limbs that sagged into one.
+ pub fn phase_mechanics(world: &mut World, i: usize) {
+     let (season, storm) = (world.season, world.storm);
+-    let World { rules, trees, .. } = world;
++    let World {
++        rules,
++        trees,
++        light,
++        owner,
++        ..
++    } = world;
+     let tree = &mut trees[i];
+     let params = rules.of(&tree.species);
++    if params.r3.enabled && params.r5.enabled && params.r5.posture {
++        // The shade at every metamer as the tree now stands (growth and shedding have changed
++        // the rows since phase 2), from the season's light field.
++        ensure(&mut tree.node_shade, tree.m.len());
++        sample_nodes(&rules.params, params, light, owner, tree);
++    }
+     if params.r3.enabled {
+         update_mechanics(tree, params, storm, season);
+     }
+--- a/rust/core/src/principles/r2.rs
++++ b/rust/core/src/principles/r2.rs
+@@ -145,13 +145,19 @@
+ /// The probability that a shoot of physiological age `order` ends in its terminal bud, on a tree
+ /// of age `tree_age`: the row's p_term, and with the relay on, at least `relayPTerm` for pa 0 from
+ /// `relayAge` on (the leader stops after an age, Troll's and Leeuwenberg's modules).
+-pub fn p_term_at(order: f64, tree_age: f64, params: &Params) -> f64 {
++pub fn p_term_at(order: f64, tree_age: f64, crowd: f64, params: &Params) -> f64 {
+     let Some(level) = pa_level(order, &params.r2) else {
+         return 0.0;
+     };
+     let r2 = &params.r2;
+     if relay_on(params) && order == 0.0 && tree_age >= r2.relay_age {
+-        return math::max(level.p_term, r2.relay_p_term);
++        // The crowding gate: a leader beside other crowns keeps growing (shade avoidance
++        // keeps apical dominance); a free-standing one ends at relay_p_term.
++        let gate = match r2.relay_crowd {
++            Some(k) => math::max(0.0, 1.0 - k * crowd),
++            None => 1.0,
++        };
++        return math::max(level.p_term, r2.relay_p_term * gate);
+     }
+     level.p_term
+ }
+@@ -164,9 +170,10 @@
+     birth_id: f64,
+     season: f64,
+     tree_age: f64,
++    crowd: f64,
+     params: &Params,
+ ) -> bool {
+-    let p_term = p_term_at(order, tree_age, params);
++    let p_term = p_term_at(order, tree_age, crowd, params);
+     if p_term <= 0.0 {
+         return false;
+     }
+@@ -435,11 +442,11 @@
+             "",
+         );
+         let ids: Vec<f64> = (0..2000).map(|i| i as f64).collect();
+-        assert!(!ids.iter().any(|&id| terminates(0.0, 0.0, id, 3.0, 0.0, &p)));
+-        assert!(ids.iter().all(|&id| terminates(1.0, 0.0, id, 3.0, 0.0, &p)));
++        assert!(!ids.iter().any(|&id| terminates(0.0, 0.0, id, 3.0, 0.0, 0.0, &p)));
++        assert!(ids.iter().all(|&id| terminates(1.0, 0.0, id, 3.0, 0.0, 0.0, &p)));
+         let half = ids
+             .iter()
+-            .filter(|&&id| terminates(2.0, 0.0, id, 3.0, 0.0, &p))
++            .filter(|&&id| terminates(2.0, 0.0, id, 3.0, 0.0, 0.0, &p))
+             .count() as f64
+             / ids.len() as f64;
+         assert!(half > 0.45 && half < 0.55, "{half}");
+@@ -463,15 +470,15 @@
+     fn ends_the_leader_from_relay_age_with_relay_p_term() {
+         let rows = [r#"{"pTerm":0}"#, r#"{"pTerm":0.2}"#];
+         let p = with_r2(&rows, r#""relay":2,"relayAge":30,"relayPTerm":0.7"#);
+-        assert_eq!(p_term_at(0.0, 29.0, &p), 0.0);
+-        assert_eq!(p_term_at(0.0, 30.0, &p), 0.7);
+-        assert_eq!(p_term_at(1.0, 30.0, &p), 0.2); // only pa 0 relays
++        assert_eq!(p_term_at(0.0, 29.0, 0.0, &p), 0.0);
++        assert_eq!(p_term_at(0.0, 30.0, 0.0, &p), 0.7);
++        assert_eq!(p_term_at(1.0, 30.0, 0.0, &p), 0.2); // only pa 0 relays
+         let off = with_r2(&rows, r#""relayAge":30,"relayPTerm":0.7"#); // relay absent: off
+-        assert_eq!(p_term_at(0.0, 50.0, &off), 0.0);
++        assert_eq!(p_term_at(0.0, 50.0, 0.0, &off), 0.0);
+         let ids: Vec<f64> = (0..2000).map(|i| i as f64).collect();
+         let ended = ids
+             .iter()
+-            .filter(|&&id| terminates(0.0, 0.0, id, 3.0, 40.0, &p))
++            .filter(|&&id| terminates(0.0, 0.0, id, 3.0, 40.0, 0.0, &p))
+             .count() as f64
+             / ids.len() as f64;
+         assert!(ended > 0.65 && ended < 0.75, "{ended}");
+--- a/rust/core/src/principles/r3.rs
++++ b/rust/core/src/principles/r3.rs
+@@ -14,6 +14,7 @@
+ use super::c4::{horizontal_heading, set_point_direction};
+ use super::c5::remove_branches;
+ use super::r2::{aged_offset, curve_offset, hangs, pa_level, pendulous_set_point};
++use super::r5::set_point_scale;
+ use super::r6::deposit_area;
+ use crate::geom::{
+     IDENTITY, M3, V3, add, angle_between, apply, compose, cross, norm, normalize_or, reject,
+@@ -217,6 +218,13 @@
+             } else {
+                 set_point
+             };
++            // R5 on the posture set point (r5.posture): shade avoidance makes the gravitropic
++            // set point more upright under neighbours, as it does the growth direction.
++            let set_point = if params.r5.enabled && params.r5.posture && i < tree.node_shade.len() {
++                set_point * set_point_scale(tree.node_shade[i], &params.r5)
++            } else {
++                set_point
++            };
+             post = posture_turn(h, lref, set_point, prev, dr, r3);
+         }
+         turn[i] = add(sag, post);
+--- a/rust/core/src/principles/c1.rs
++++ b/rust/core/src/principles/c1.rs
+@@ -161,7 +161,7 @@
+     let i = add_bud(tree, m, slot::MAIN, h, l, 0.0, order);
+     let pa = order - tree.m.pa_shift[m] as f64;
+     let birth = tree.m.birth_id[m] as f64;
+-    if terminates(pa, tree.id as f64, birth, season, tree.age, params) {
++    if terminates(pa, tree.id as f64, birth, season, tree.age, tree.relay_crowd, params) {
+         tree.b.state[i] = bud::TERMINATED;
+     }
+ }

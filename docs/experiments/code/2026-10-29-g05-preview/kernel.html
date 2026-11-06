@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>Light kernel (G1)</title>
+    <style>
+      :root { color-scheme: light dark; }
+      body { margin: 0; font: 15px/1.45 Georgia, serif; }
+      main { max-width: 860px; margin: 0 auto; padding: 16px; }
+      table { border-collapse: collapse; width: 100%; font: 13px/1.4 ui-monospace, Menlo, monospace; }
+      td, th { border-bottom: 1px solid #8884; padding: 4px 6px; text-align: right; }
+      td:first-child, th:first-child { text-align: left; }
+      button { font: inherit; padding: 0.5rem 0.9rem; }
+      pre { white-space: pre-wrap; font-size: 12px; }
+      .verdict { font-weight: bold; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>G1: the slab light kernel on this device</h1>
+      <p>
+        The 3D-port review's measured kernel, on the <code>forest</code> field at season 96 (210 × 130
+        ring), K = 16, Float32, open in z, at slab depths D = 32, 48 and 64, and at D = 64 in cells
+        twice the size. One light computation is one season's light. Rule: if <b>4-lane SIMD at
+        D = 32</b> (the review's recommendation) takes more than <b>150 ms</b>, the port stops; the
+        other depths are for the record. Keep the screen on and the phone cool; it takes about two
+        minutes and up to about 200 MB.
+      </p>
+      <p id="env"></p>
+      <button id="run">Run</button>
+      <table id="out"><thead><tr><th>kernel</th><th>slab</th><th>median ms</th><th>min ms</th><th>runs</th></tr></thead><tbody></tbody></table>
+      <p class="verdict" id="verdict"></p>
+      <p>Copy this to the session:</p>
+      <pre id="json"></pre>
+    </main>
+    <script type="module" src="./kernel.ts"></script>
+  </body>
+</html>

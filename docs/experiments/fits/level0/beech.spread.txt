@@ -1,0 +1,10 @@
+beech: control trees 3060; real between-pseudo-seed SD of the median z of 4: H 0.432, CR 0.421
+
+| trait | season | seeds | sim mean of median z | sim SD | real SD | ratio | within ×2 |
+|---|---|---|---|---|---|---|---|
+| H | 60 | 20 | -0.73 | 0.247 | 0.432 | 0.57 | yes |
+| H | 100 | 20 | +0.17 | 0.550 | 0.432 | 1.27 | yes |
+| H | 150 | 20 | +0.54 | 0.743 | 0.432 | 1.72 | yes |
+| CR | 60 | 20 | +0.67 | 0.310 | 0.421 | 0.74 | yes |
+| CR | 100 | 20 | +0.60 | 0.377 | 0.421 | 0.90 | yes |
+| CR | 150 | 20 | +0.64 | 0.420 | 0.421 | 1.00 | yes |

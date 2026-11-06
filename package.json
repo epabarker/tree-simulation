@@ -2,7 +2,7 @@
   "name": "tree-simulation",
   "version": "0.1.0",
   "private": true,
-  "description": "Self-organizing trees in a 2D world: an interactive procedural growth simulator",
+  "description": "Self-organizing trees grown in a 3D slab and drawn as a flat illustration: an interactive growth simulator",
   "license": "MIT",
   "author": "Edward Barker",
   "type": "module",

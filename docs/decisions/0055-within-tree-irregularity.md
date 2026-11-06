@@ -1,6 +1,6 @@
 # 0055: Within-tree irregularity: stochastic lateral break, shoot length, and per-axis angle offsets
 
-- **Status:** proposed (the overnight run, 2026-11-06; the user rules on merge).
+- **Status:** accepted (the user, 2026-11-06). Proposed by the overnight run; merged as PR #49 and shipped in garden 0.16.0. RNG purposes 15–17 are now permanent.
 - **Spec:** §R4.4 ("optional stochastic break [RNG]"), §C1 (shoots and internodes), §C4 (the set point), §R2 (β).
   ADR 0002 (keyed randomness), 0053 (between-tree variation; deferred by the user), 0049 §b (the principle line).
 - **Evidence:**
@@ -26,7 +26,7 @@
   repeat reconstructions (curvPersist is noise-dominated and dropped). Real hornbeam: TreeML lone n 23, BioDiv
   stand n 38.
 
-## Decision (proposed)
+## Decision
 Four local rules, each off by default (goldens unchanged at off; test `golden.rs`), each drawing only from
 `rng.rs`:
 
@@ -73,7 +73,7 @@ These are within-tree draws. They are not ADR 0053's per-tree draw, which stays 
 - **No visual gate.** A simulated-against-simulated judge was gated on the user's past picks against gallery
   rejects and passed only on lone trees (69% overall, 79% lone, 58% stand; the gate was 75%). Its verdicts are
   advisory only.
-- **Purposes 15–17 are provisional** until merged. They are appended, never renumbered.
+- **Purposes 15–17 are registered** (merged in PR #49). They are appended, never renumbered.
 
 ## Not decided here
 - **The flat cap** (ADR 0031) is a size effect: lone hornbeam is a dome to about 20 m and flattens as k falls

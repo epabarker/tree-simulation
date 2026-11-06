@@ -5,6 +5,7 @@ really close. Be ambitious." The overseer (this session) orchestrates the agents
 Nothing needs the user before morning._
 
 ## State (rewritten after every agent report; read this first after any compaction)
+- **Closed (2026-11-06, morning):** the user merged #48 and #49 into `3d-port` (39eaaab), tagged `garden-v0.16.0` and merged the site's PR #8; 0.16.0 is live with the height commit. ADR 0055 accepted. The next box: [STATUS](../STATUS.md).
 - **Phase:** done (05:00). The morning report is published; the RC is pushed as draft PR #49; the preview is redeployed.
 - (started 00:15)
 - **The user's approvals (00:12):**

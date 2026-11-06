@@ -529,9 +529,13 @@ export interface Planting {
 
 /**
  * The garden's planting: one row, as the 2D garden had, each tree a 3D crown, a tree every 28
- * cells (the user's phone check, I3: 21 read as cluttered; a second row at 24 mildly so).
+ * cells (the user's phone check, I3: 21 read as cluttered; a second row at 24 mildly so). Recruits
+ * at a quarter of the ring's density (2026-11-06, the user found 0.16.0 cluttered): at 1 every
+ * opening forest filled its cap (229 at 160 cells) by season 80, mostly with suppressed saplings;
+ * at 0.25 it holds 57, and the garden's 20-seed checks hold against their base
+ * (`experiments/2026-11-06-garden-recruits.md`).
  */
-export const GARDEN_PLANTING: Planting = { rows: 1, spacing: 28, recruits: 1 };
+export const GARDEN_PLANTING: Planting = { rows: 1, spacing: 28, recruits: 0.25 };
 
 /**
  * The `mixedWood` woodland (M25) on a ring `width` cells wide: about as wide as the host is wide

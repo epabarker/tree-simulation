@@ -27,6 +27,7 @@
     "pregolden:update": "node cli/require-node.mjs",
     "golden:update": "node tests/update-golden.ts",
     "bench": "node cli/bench.ts",
+    "regressions": "node cli/regressions.ts",
     "build:garden": "vite build -c vite.garden.config.ts && node cli/garden-size.ts && node cli/first-paint.ts"
   },
   "dependencies": {

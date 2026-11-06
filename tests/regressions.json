@@ -1,0 +1,31 @@
+{
+  "phoneSeed3": {
+    "issue": 54,
+    "note": "the phone's ring (forestParams(66, 3)) is nearly empty by 150; canopy = live trees >= 40 cells",
+    "vector": {
+      "live50": 24,
+      "planted50": 1,
+      "canopy50": 2,
+      "metamers50": 15269,
+      "live100": 23,
+      "planted100": 1,
+      "canopy100": 2,
+      "metamers100": 15017,
+      "live150": 24,
+      "planted150": 1,
+      "canopy150": 1,
+      "metamers150": 11270
+    }
+  },
+  "forestRegeneration": {
+    "issue": 55,
+    "note": "`forest` (tau 0) cannot regenerate under its own floor: recruits reaching 20 cells by 300",
+    "vector": {
+      "recruitsBorn": 687,
+      "recruitsReaching20": 23,
+      "live300": 300,
+      "plantedAlive300": 16,
+      "metamers300": 86909
+    }
+  }
+}

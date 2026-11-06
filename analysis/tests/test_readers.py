@@ -10,7 +10,7 @@ import pytest
 import scipy.io as sio
 
 from treesim import cylinders as cy
-from treesim import qsm
+from treesim import qsm, qsm_gate
 from treesim.fetch import DATA, lower_median
 
 # A trunk of three cylinders up z (0.5 m each, radius 0.10 → 0.08), a branch of two from the second, and an
@@ -135,14 +135,25 @@ REAL = {
 def test_real_files_are_z_up_metres(source):
     if not REAL[source]:
         pytest.skip(f"no {source} QSMs under data/reference/ (python -I -m treesim.fetch {source})")
+    failing = {}
     for path in REAL[source]:
         c = qsm.read(path).cylinders
         rise = c.tip[:, 2].max() - c.start[0, 2]
         spread = np.ptp(np.concatenate([c.start, c.tip])[:, :2], axis=0)
-        assert c.axis[0, 2] > 0.5, f"{path.name}: the root does not head up z"
-        assert 2.0 < rise < 60.0, f"{path.name}: a height of {rise:.1f} is not a tree in metres"
-        assert rise > 0.5 * spread.max(), f"{path.name}: wider than tall twice over: is z up?"
-        assert all(cy.internal_checks(c).values()), path.name
+        bad = [k for k, v in cy.internal_checks(c).items() if not v]
+        if not c.axis[0, 2] > 0.5:
+            bad.append("the root does not head up z")
+        if not 2.0 < rise < 60.0:
+            bad.append(f"a height of {rise:.1f} is not a tree in metres")
+        if not rise > 0.5 * spread.max():
+            bad.append("wider than tall twice over: is z up?")
+        if bad:
+            failing[path.stem.removeprefix("OptQSM_")] = bad
+    # Only TreeML's recorded exclusions may fail (qsm_gate.TREEML_EXCLUDED), and each still does (never stale).
+    excluded = set(qsm_gate.TREEML_EXCLUDED) if source == "treeml" else set()
+    present = {p.stem.removeprefix("OptQSM_") for p in REAL[source]}
+    assert {k: v for k, v in failing.items() if k not in excluded} == {}
+    assert excluded & present <= set(failing), sorted((excluded & present) - set(failing))
 
 
 def test_treeqsm_2_4_takes_treeqsms_default_optimum(tmp_path):

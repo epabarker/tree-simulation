@@ -8,7 +8,7 @@ _Last updated: 2026-11-06 (0.16.0 released; ADR 0055 accepted; the overseer's bo
 
 ## The box: 0.17.0, the species at the right size and shape, on a stable base (from 2026-11-06; [plan](plans/2026-11-06-box-0.17.md))
 - **Rules:** gates fixed before results; G-forest against B0 (2/3/11/11, each ≥ base − 2); measures labelled hard, soft or advisory, and no visual fix counts as validation without an independent gate; no new mechanism without a measured mismatch ([external review](reviews/2026-11-06-external-review.md), folded in).
-- **A0 (the review; defects are issues #52–56; `main` catches up by draft PR #51 after #50):** README, `package.json`, branches section and the Pages build done; the 142 Python tests in CI (two fail locally on one TreeML QSM below its root); phone seed 3 and `forest`'s regeneration as named regressions; the validation policy.
+- **A0, done (the review; defects are issues #52–56; `main` catches up by draft PR #51):** docs truth and the Pages build (#50); Python tests in CI (six bad TreeML QSMs excluded, G-reg unaffected); `npm run regressions` for #54 and #55; the [validation policy](background/validation-policy.md) (hard, soft, advisory).
 - **A1, birch:** trunk λ 0.588 → 0.53 fixes the poles (18 of 20) and lone height (39 m) and passes G-forest at the margin (0/1/9/11); 0.55 fails crown base. Uncommitted on `claude/birch`; the leafless-looking crown comes next.
 - **A2–A3:** young trees' trunk (check the street-tree reference first); heights for beech, willow and holly.
 - **The night:** oak's decurrent form; the flat cap; a sensitivity sweep of the adopted species params. **B:** the RC with a fresh-process budget smoke as a release gate.
@@ -28,7 +28,7 @@ _Last updated: 2026-11-06 (0.16.0 released; ADR 0055 accepted; the overseer's bo
 - **Open questions (user):** `levels.2.setPoint` ≥ 80 collapses every broadleaf. Birch's pick stops growing after 60: form or fit?
 
 ## Notes for the next session
-- **Rust:** put `~/.cargo/bin` on PATH. `npm run golden:update` needs `npm run build:wasm` first. **Python tests (142, not in CI yet):** `uv run --project analysis --with pytest pytest analysis/tests -q`.
+- **Rust:** put `~/.cargo/bin` on PATH. `npm run golden:update` needs `npm run build:wasm` first. **Python tests (142; CI runs those without reference data):** `uv run --project analysis --with pytest pytest analysis/tests -q`.
 - **Gate:** `npm run check:stamp` in the foreground only (ADR 0047; [harness principles](background/harness-principles.md)). **Memory:** one fresh process per measurement; WASM memory never shrinks.
 - **Panels:** headless Firefox through puppeteer-core against `npm run dev`. Species trees ignore world patches; use `--species-patch`.
 - **Deploys:** a push to the site's `main` is production. Never merge `preview-3d`. Tags are the user's.

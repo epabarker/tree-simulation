@@ -35,6 +35,7 @@ npm run format             # Biome auto-fix
 npm run build              # static site in dist/ (the lab, and garden.html)
 npm run build:garden       # garden.js + worker in dist-garden/ for a host page, size-gated (ADR 0014)
 npm run bench              # per phase (native), per season and snapshot (WASM), hashes; --compare runs/bench/<sha>.json
+npm run regressions        # known defects as outcome vectors (tests/regressions.json; ~80 s native; --update with a devlog reason)
 npm run sim -- --preset explosion --seasons 12 --out runs/x   # native headless run → CSV
 npm run golden:update      # regenerate golden hashes (intended behaviour changes only)
 node cli/export-presets.ts # regenerate rust/presets.json after changing params, presets or species

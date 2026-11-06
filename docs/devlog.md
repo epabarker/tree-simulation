@@ -2,6 +2,17 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-06: F, why shade strips foliage: production, not shedding; today's garden is denser than real woods
+
+[Note](experiments/2026-11-06-crown-base.md#f-why-shade-strips-the-gardens-foliage-2026-11-06-afternoon-agent-f-plan-plans2026-11-06-day2md)
+(agent F).
+- **The shaded strip grows a quarter of the metamers;** it does not shed more.
+- **Today's garden** sits at LAI 9.5–10.3 against real stands' 5–9.
+- **The faces' τ stacked on `faceWood`** over-darkens.
+- **No candidate meets the 0.5× foliage bar and the crown-base gate;** that bar is likely unrealistic.
+- **Faces τ 1 with `faceWood` 1** on a 7 m slab: 0.32× foliage, hornbeam's crown base passes, beech misses by one
+  seed, G-forest passes. It is a look decision for the user; a sheet was made.
+
 ## 2026-11-06: A5, crown rounding, lever 1: the reproductive sink does not round beech; ADR 0056 written
 
 - **Lone dome D on today's build** (seeds 1–5, at 100 / 150; real lone bands in brackets):

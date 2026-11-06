@@ -2,14 +2,14 @@
 
 An interactive simulator in which tree form emerges from simple local rules. Buds compete for light in a shared grid, resources flow to the best-lit branches (Borchert–Honda), shaded branches are shed, and stems thicken by the pipe model. Several trees share one light field, so they compete, lean away from each other and suppress the small. It follows Palubicki et al. (2009). Since I2 the trees grow in three dimensions, in a slab 64 cells deep, and are drawn as a flat, frontal illustration ([ADR 0024](docs/decisions/0024-3d-slab-port.md), [ADR 0025](docs/decisions/0025-3d-growth.md)); the planar model it grew from is archived at the tag `golden-2d-ts`. The garden on edbarker.dev runs this 3D model (garden 0.15.0 onwards), with its species fitted to measured trees; where it stands and what's next is in [`docs/STATUS.md`](docs/STATUS.md).
 
-**Live demo:** <https://epabarker.github.io/tree-simulation/> (the lab), and `garden.html` there for the view a home page embeds. The garden is the home page of edbarker.dev ([ADR 0014](docs/decisions/0014-home-page-delivery.md)).
+**Live:** the garden is the home page of <https://edbarker.dev> ([ADR 0014](docs/decisions/0014-home-page-delivery.md)), and the full lab is at <https://edbarker.dev/lab/>. Both come from the latest `garden-v*` release. GitHub Pages also serves the lab from `main`, as a preview, at <https://epabarker.github.io/tree-simulation/> (`garden.html` there is the garden on its own).
 
 The design is specified principle by principle in [`docs/spec.md`](docs/spec.md). Progress against its build order is in [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
 ## Branches and releases
 
 - **`3d-port`** is where development happens; work branches open pull requests into it.
-- **`main`** follows `3d-port` by merge. A push to `main` deploys the lab to GitHub Pages.
+- **`main`** follows `3d-port` by merge. A push to `main` deploys the lab to GitHub Pages (epabarker.github.io/tree-simulation; the old barker.garden domain has lapsed and was removed, 2026-11-06).
 - **`garden-v*` tags** on `3d-port` are the garden's releases: the release workflow builds `garden-<version>.tgz`, and the site (edbarker.dev) syncs it.
 - **`golden-2d-ts`** archives the planar TypeScript model and the Rust build that reproduced it bit for bit; CI's `golden-2d` job still checks it.
 

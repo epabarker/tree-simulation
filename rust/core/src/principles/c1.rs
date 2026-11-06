@@ -16,14 +16,16 @@
 //! annual shoots vary many-fold with vigour and weather; the uniform line texture is a cue the
 //! blinded judge names. Off (absent or 0): no draw.
 //!
-//! Per-axis branch angle (prototype, agent R; §C1.6's "branch angle β per order", ADR 0053's
-//! individual variation): with `c1.betaSD` s_β > 0, a lateral bud that breaks into a new axis has
+//! Per-axis branch angle (prototype, agent R; §C1.6's "branch angle β per order"; within-tree
+//! variation, not ADR 0053's between-tree draw): with `c1.betaSD` s_β > 0, a lateral bud that
+//! breaks into a new axis has
 //! its heading turned in the plane of its host's heading by s_β·N(0, 1) degrees [RNG:
 //! branchAngle, keyed by the axis, i.e. the birthId its first metamer takes], so its angle to the
 //! host becomes β + offset (held in [0, 180°]: it never crosses the host's heading). One draw per
 //! axis, at its start, as `c4.axisSD`'s. Why: β is fixed per level, so every limb leaves the trunk
-//! at one angle (within-tree SD of first-order insertion ≈ 6° against 31.5° in real lone
-//! hornbeam); C4's noise is white and R3's posture restores the set point, so nothing else makes
+//! at one angle (within-tree SD of first-order insertion ≈ 6° in today's lone hornbeam, 13° with
+//! A9's three rules, against 31.5° in real lone hornbeam). Relays and fork arms, which start new
+//! axes from lateral buds, take the offset too. C4's noise is white and R3's posture restores the set point, so nothing else makes
 //! one limb leave steeper than its neighbour. Off (absent or 0): no draw, β as before.
 //!
 //! Params: c1.phyllotaxis, c1.divergence (δ), c1.branchAngle (β), c1.internodeLength (l0),

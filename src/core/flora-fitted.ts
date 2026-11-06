@@ -225,6 +225,8 @@ export const FITTED_FLORA = {
           generator: "spiral",
           tierEvery: 0,
           pTerm: 0,
+          curve: 30,
+          curveLength: 30,
         },
         {
           lambda: 0.5607,
@@ -234,7 +236,7 @@ export const FITTED_FLORA = {
           generator: "spiral",
           tierEvery: 0,
           pTerm: 0,
-          agedSetPoint: 85,
+          agedSetPoint: 55,
           agedOver: 50,
         },
         {
@@ -252,6 +254,12 @@ export const FITTED_FLORA = {
       ramp: 15,
       kappa: 0.7488,
       hJ: 22.69,
+      relay: 2,
+      relayAge: 25,
+      relayPTerm: 0.3,
+      relayCrowd: 10,
+      forkAt: 1.3,
+      forkAngle: 35,
     },
     r3: {
       enabled: true,

@@ -141,7 +141,9 @@ assign = { "c1.shootLengthSD" = 0.5, "c4.axisSD" = 50, "c1.betaSD" = 60, "c1.bud
 # when young (35) levelling to 85 with their wood's age over 50 seasons: long, near-level low limbs
 # under a broad crown. Adopted 2026-11-02.
 "r2.levels.1.setPoint" = 35
-"r2.levels.1.agedSetPoint" = 85
+# The aged set point moved 85 -> 55 by oak's form round (2026-11-06, agent O, below): at 85 every limb
+# older than 50 seasons lies near level, so the crown's shoulders sink while its centre stands.
+"r2.levels.1.agedSetPoint" = 55
 "r2.levels.1.agedOver" = 50
 # The zigzag (the user's judging pass, 2026-11-02; docs/experiments/2026-11-02-oak-zigzag.md): the fit's
 # dLambda 0.1154 takes lambda below 0.5 once the ramp ends, so a lateral takes over at nearly every
@@ -159,6 +161,32 @@ assign = { "c1.shootLengthSD" = 0.5, "c4.axisSD" = 50, "c1.betaSD" = 60, "c1.bud
 # levels off instead of climbing past the species' Level 0 band. Oak 33.2 m.
 "r1.fRep" = 0.8
 "r1.maturity" = 130
+# Oak's form round (2026-11-06, agent O; plan 2026-11-06-day2 item O, gates fixed before the result).
+# The lone oak was a spire (dome index D 0.99 at 100, 1.01 at 150 on seeds 1-20; real lone 0.36
+# [0.16-0.59]): it reaches the maturity height (130 cells) by about season 50 while still a young
+# cone, its limbs attached below 0.3 H hold about 75% of its limb wood and reach 0.3-0.65 H out, the
+# limbs above 0.4 H only 0.1-0.2 H, and after maturity the tree is at its carbon balance, so the
+# cone never broadens. Existing rules, no new mechanism: the relay with its neighbour gate and the
+# vigour fork's arm hold (ADR 0033, 0039, 0040; beech's), from age 25, so a free-standing oak loses
+# its leader (decurrent) and its top divides into arms that hold their angle, while a stand oak
+# keeps its trunk; the arms arch out as they lengthen (ADR 0034's curve on the relays, 30 deg over
+# 30 nodes; beech's), where without it an arm born steep climbs to the maturity height as a new
+# leader and the spire comes back; and the aged set point 55 (above). Lone, seeds 1-20 (1-10 chose
+# it, 11-20 held out): D 0.41 / 0.39 at 100 / 150 (13 and 12 of 20 inside the real band), W/H
+# 0.63 / 0.63, H 32.9 / 33.0 m, shapeRatio 0.61 / 0.43 (real 0.41). Thick-path kinks > 20 deg
+# median 6.5 / 7, max 28 (before: 1 / 1.5, max 18 / 23; the rejected zigzag 60-76): the path now
+# follows an arm. The closed stand keeps its trunks (kinks median 1-2, max 5) and its crown base
+# (0.05 / 0.06, real 0.26 [0.12-0.37]: still low; ADR 0032 fixes oak's T_rel at 0.063). G-forest
+# against B0 (20 seeds): floor 0, hd300 4, crown 10, plateau 12 (B0 2, 3, 11, 11; floor at its limit,
+# as before the change).
+"r2.relay" = 2
+"r2.relayAge" = 25
+"r2.relayPTerm" = 0.3
+"r2.relayCrowd" = 10
+"r2.forkAt" = 1.3
+"r2.forkAngle" = 35
+"r2.levels.0.curve" = 30
+"r2.levels.0.curveLength" = 30
 
 [maple]
 # Track B's accepted form (the user, 2026-11-01; picks.toml): the relay from age 10 (ADR 0033), its

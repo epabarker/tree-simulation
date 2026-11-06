@@ -172,10 +172,14 @@ assign = { "c1.shootLengthSD" = 0.5, "c4.axisSD" = 50, "c1.betaSD" = 60, "c1.bud
 # keeps its trunk; the arms arch out as they lengthen (ADR 0034's curve on the relays, 30 deg over
 # 30 nodes; beech's), where without it an arm born steep climbs to the maturity height as a new
 # leader and the spire comes back; and the aged set point 55 (above). Lone, seeds 1-20 (1-10 chose
-# it, 11-20 held out): D 0.41 / 0.39 at 100 / 150 (13 and 12 of 20 inside the real band), W/H
-# 0.63 / 0.63, H 32.9 / 33.0 m, shapeRatio 0.61 / 0.43 (real 0.41). Thick-path kinks > 20 deg
-# median 6.5 / 7, max 28 (before: 1 / 1.5, max 18 / 23; the rejected zigzag 60-76): the path now
-# follows an arm. The closed stand keeps its trunks (kinks median 1-2, max 5) and its crown base
+# it; 11-20 had rejected the same rules without the curve, so they are not a clean hold-out): D
+# 0.41 / 0.39 at 100 / 150 (13 and 12 of 20 inside the real band), W/H 0.63 / 0.63, H 32.9 / 33.0
+# m, shapeRatio 0.61 / 0.43 (real 0.41). Fresh seeds 21-30: D 0.77 / 0.70, outside the band, so a
+# ten-seed median is not robust here; seeds 1-30: D 0.46 / 0.45. Thick-path kinks > 20 deg median
+# 6.5 / 7, max 43 over seeds 1-30 (before: 1 / 1.5, max 18 / 23 on 1-20; the rejected zigzag
+# 60-76): the path now follows an arm. The garden's planted oaks (12 seeds of 1-20, at 100): kinks
+# median 8, 4 of 12 at 15 or more (before: 3, 2 of 12). The closed stand keeps its trunks (kinks
+# median 1-2, max 5) and its crown base
 # (0.05 / 0.06, real 0.26 [0.12-0.37]: still low; ADR 0032 fixes oak's T_rel at 0.063). G-forest
 # against B0 (20 seeds): floor 0, hd300 4, crown 10, plateau 12 (B0 2, 3, 11, 11; floor at its limit,
 # as before the change).

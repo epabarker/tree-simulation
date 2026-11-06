@@ -2,6 +2,27 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-06: A3, mature heights for holly and willow (R1's reproductive sink); beech already in band
+
+Gates fixed before any result (`plans/2026-11-06-box-0.17.md`, "A3's gates"). Lone heights on today's build,
+seeds 1–5:
+- **Beech:** 40.1 m at 150, within Tallo's band (ceiling 44.3). No height change; its flat top is the night's.
+- **Holly:** 22.8 m at 100, against a ceiling of 16.1. At maturity 60 it is 15.2 m, with metamers 0.60× (the
+  soft no-pole line) and W/H 0.40 → 0.62. Its crown top sharpens (D 0.13–0.19 → 0.81–0.92); the user rejected a
+  pointed holly on 2026-11-02, so it is to be looked at. A likely cause: its rounding forks are gated on tree vigour
+  (`vigourTreeLo` 3000), which a smaller holly may not reach.
+- **Willow:** 25.2 m at 150, against a ceiling of 24.7. At maturity 90 it is 22.7 m, with metamers 0.98× and W/H
+  0.75.
+- **G-forest** (20 seeds against B0):
+  - holly alone 0/1/9/13, a pass;
+  - willow alone 0/**0**/11/13, a fail by one planted-H/D count (willow is about 0% of the wood at 300);
+  - both 0/1/9/12, a pass.
+  Committed holly first, then willow: each commit leaves a passing state, and willow stays only with holly.
+- **Goldens (willow):** `mixedWood` s15 b405ce5d → 783b45ca; `beechWood` s30 847fc8e6 → aa6bff66. Holly moves
+  none.
+- **Named regression** `phoneSeed3` (#54), willow: canopy at 150 goes 1 → 2, live at 100 23 → 24, and metamers
+  rise (15245 → 15457, 15620 → 18131, 12259 → 14083). Baseline updated: seed 3 is a little less empty.
+
 ## 2026-11-06: A2, young trees' clear trunk: not ADR 0055; a general low crown base
 
 [Note](experiments/2026-11-06-crown-base.md).

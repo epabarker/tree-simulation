@@ -37,6 +37,12 @@ assign = { "c1.shootLengthSD" = 0.5, "c4.axisSD" = 50, "c1.betaSD" = 60, "c1.bud
 "r2.forkAngle" = 45
 "r2.vigourTreeLo" = 3000
 "r2.vigourTreeHi" = 10000
+# Mature height (box A3, 2026-11-06; docs/plans/2026-11-06-box-0.17.md, "A3's gates"): R1's reproductive
+# sink as a ceiling, as for hornbeam, rowan and oak. Lone holly was 22.8 m at 100 against the Ilex
+# aquifolium anchor of 12.4 m (gate <= 16.1); at maturity 60 it is 15.2 m at 100 and 150, metamers 0.60x.
+# G-forest against B0 passes (0/1/9/13). Its crown top sharpens (D 0.13-0.19 -> 0.81-0.92): to be looked at.
+"r1.fRep" = 0.8
+"r1.maturity" = 60
 
 [rowan]
 # The fit lowered Q_ss to 0.039, so rowan survived 5.4% (band 8–14%, the oak's score): back to M25's.
@@ -168,3 +174,10 @@ assign = { "c1.shootLengthSD" = 0.5, "c4.axisSD" = 50, "c1.betaSD" = 60, "c1.bud
 # 2026-11-02 and withdrawn the same day on the user's judging pass in the real renderer: "wider than
 # tall, flat-topped open fan; worse than before; stand poles cross in X's". Willow ships as its
 # round-2 fit; its form (a dense rounded bush) is on the after-shipping list.
+# Mature height (box A3, 2026-11-06; docs/plans/2026-11-06-box-0.17.md, "A3's gates"): R1's reproductive
+# sink as a ceiling. Lone willow was 25.2 m at 150 against the Salix caprea anchor of 19 m (gate <= 24.7);
+# at maturity 90 it is 22.7 m at 100 and 150, metamers 0.98x, W/H 0.61-0.69 -> 0.75. G-forest: alone it
+# fails planted H/D by one count (0 against >= 1; willow is ~0% of the wood at 300); with holly's ceiling
+# it passes (0/1/9/12). Keep this only with holly's.
+"r1.fRep" = 0.8
+"r1.maturity" = 90

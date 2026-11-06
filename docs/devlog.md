@@ -2,6 +2,20 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-06: Garden 0.16.0 released; ADR 0055 accepted; the overseer's box closed
+
+- **Released:**
+  - the user merged #48 and #49 into `3d-port` (39eaaab) and tagged `garden-v0.16.0`;
+  - the release workflow failed at first because the release already existed, so it was deleted (keeping the
+    tag), the run was re-run, and the user's title was restored;
+  - the site's PR #8 synced 0.16.0; the user merged it, and it is live on edbarker.dev.
+- **ADR 0055 accepted** (the user). Purposes 15–17 are registered for good; `rng.rs` no longer calls them
+  provisional (comments only; goldens unchanged).
+- **The overseer's box** (3 sessions and 1 night) ends with an adopted look. Next is a new box: 2 sessions and
+  1 night toward 0.17.0, heights first, with G-forest against B0 (not re-baselined). See STATUS.
+- **Housekeeping:** the agents' worktrees removed; `claude/overnight-rc` and `-noheights` deleted (merged);
+  `a-crown` and `r-regularity` kept as the rejected prototypes.
+
 ## 2026-11-06: The overnight run: a generic broadleaf (ADR 0055, proposed), natural heights, PLATE_MAX 170; a release candidate (draft PR)
 
 - **The overseer** (the user, 2026-11-05):

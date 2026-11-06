@@ -68,8 +68,14 @@
 //! proximal part of plagiotropic axes, Hallé et al. 1978), so a lit limb rises, then arches; the
 //! lower crown's shaded sprays stay level. A stand member never opens the gate.
 //!
+//! Twigs keep λ (ADR 0057, proposed; the overnight run's K2): a level's `dLambdaShare` is the
+//! share of the ontogenetic fall Δλ it takes, λ = level.lambda − share·Δλ·t. Absent, 1: every
+//! level falls alike (today's). At 0 for the twigs (order 2), the fine shoots keep their apical
+//! control while trunk and limbs lose theirs, so an old crown's surface fills out evenly (the
+//! dome) instead of its scaffold spreading into a flat cap.
+//!
 //! Params: r2.enabled, r2.levels (curve, curveLength, pendulous, pendulousRadius, kappa,
-//! lateralEvery), r2.aC, r2.dLambda, r2.ramp, r2.kappa, r2.relay,
+//! lateralEvery, dLambdaShare), r2.aC, r2.dLambda, r2.ramp, r2.kappa, r2.relay,
 //! r2.relayAge, r2.relayPTerm, r2.relayCrowd, r2.forkAt, r2.forkAngle, r2.vigourShare,
 //! r2.vigourLambda, r2.vigourTreeLo, r2.vigourTreeHi, r2.lightSetPoint, r2.lightLo, r2.lightHi,
 //! r2.lightOver; c1.branchAngle, c3.lambda, c4.setPoint, c4.eta when off.
@@ -104,7 +110,12 @@ pub fn lambda_at(order: f64, tree_age: f64, params: &Params) -> f64 {
     } else {
         math::min(1.0, (tree_age - r2.a_c) / math::max(1.0, r2.ramp))
     };
-    level.lambda - r2.d_lambda * t
+    // Twigs keep λ (ADR 0057): a level takes `dLambdaShare` of the fall. Absent, the full Δλ,
+    // computed exactly as before (bit-identical).
+    match level.d_lambda_share {
+        None => level.lambda - r2.d_lambda * t,
+        Some(share) => level.lambda - share * r2.d_lambda * t,
+    }
 }
 
 /// Branch angle β, degrees, of a new lateral of order `order`.
@@ -578,6 +589,38 @@ mod tests {
         assert!((lambda_at(0.0, 100.0, &p) - 0.5).abs() < 1e-12);
         let off = Params::from_json(&preset("default", "{}"));
         assert_eq!(lambda_at(0.0, 100.0, &off), off.c3.lambda);
+    }
+
+    #[test]
+    fn lets_a_level_keep_its_lambda_by_its_share_of_the_fall() {
+        let r2 = r#""aC":10,"dLambda":0.06,"ramp":20"#;
+        let today = with_r2(
+            &[
+                r#"{"lambda":0.56}"#,
+                r#"{"lambda":0.54}"#,
+                r#"{"lambda":0.52}"#,
+            ],
+            r2,
+        );
+        let shared = with_r2(
+            &[
+                r#"{"lambda":0.56,"dLambdaShare":1}"#,
+                r#"{"lambda":0.54,"dLambdaShare":0.5}"#,
+                r#"{"lambda":0.52,"dLambdaShare":0}"#,
+            ],
+            r2,
+        );
+        for age in [0.0, 5.0, 10.0, 17.0, 20.0, 30.0, 100.0] {
+            // Share 1 is today's, bit for bit; share 0 keeps the level's λ at every age.
+            assert_eq!(
+                lambda_at(0.0, age, &shared).to_bits(),
+                lambda_at(0.0, age, &today).to_bits()
+            );
+            assert_eq!(lambda_at(2.0, age, &shared), 0.52);
+            assert_eq!(lambda_at(5.0, age, &shared), 0.52); // pa capped at the last row
+        }
+        assert!((lambda_at(1.0, 100.0, &shared) - 0.51).abs() < 1e-12); // half the fall
+        assert!((lambda_at(1.0, 100.0, &today) - 0.48).abs() < 1e-12);
     }
 
     #[test]

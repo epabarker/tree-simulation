@@ -2,6 +2,46 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-06: O, oak's form: the spire mostly gone on a candidate (branch `claude/oak-form`), awaiting the user's look
+
+- **The spire's cause:** oak reaches its sink height (33 m) by about 50 as a cone, and nothing grows after it.
+- **The candidate** (existing rules: relay from 25, an arm curve, aged set point 55): lone D 0.46/0.45 over 30 seeds
+  (half in band). It passes on seeds 1–10 but fails on fresh seeds 21–30 (0.77/0.70), with more stem kinks.
+  G-forest passes.
+- **Not adopted;** the user looks first ([plan](plans/2026-11-06-day2.md)).
+
+## 2026-11-06: ADR 0057, twigs keep λ: birch's crown rounds (the user adopted it for birch alone)
+
+- **`r2.levels[k].dLambdaShare`** (agent T; R2, `lambda_at`; bit-identical when absent; unit test).
+- **Birch's twig level at share 0:** lone D at 100/150 goes −0.04/−0.02 → 0.105/0.35 (10 seeds; real band 0.07–0.61),
+  and birch grows more varied by seed. Heights hold; G-forest as HEAD.
+- **Beech is not adopted:** a weak lever, and it fails G-forest's crown check. Willow is not rounded.
+- **Golden** `beechWood` s30 aa6bff66 → 6e6fd6bc.
+- **`phoneSeed3`** (#54) baseline updated: live at 100 24 → 23; metamers 15457 → 15692, 18131 → 16923 and
+  14083 → 12423 at 50/100/150; canopy counts unchanged.
+- **The crown-base gate's redesign goes to the night** (the user).
+
+## 2026-11-06: M, a middle look between today's garden and a real wood's density: none passes; parked
+
+- **Five variants under fixed gates:**
+  - 7 m slab with `faceWood` 0.6, 0.7 or 0.8;
+  - 10 m or 12 m slab with `faceWood` 1, faces τ 1.
+- **Trunks come through in all** (crown base 0.14–0.25 against today's 0.02), but every variant thins the garden.
+- **The best, a 12 m slab,** keeps 0.61× the foliage on six seeds but fails on 20: planted H/D 0, the strict
+  crown-base gate (the lift comes late), and seed 3 drops to 1 canopy tree.
+- **Parked;** the garden is unchanged ([note](experiments/2026-11-06-crown-base.md)).
+
+## 2026-11-06: F, why shade strips foliage: production, not shedding; today's garden is denser than real woods
+
+[Note](experiments/2026-11-06-crown-base.md#f-why-shade-strips-the-gardens-foliage-2026-11-06-afternoon-agent-f-plan-plans2026-11-06-day2md)
+(agent F).
+- **The shaded strip grows a quarter of the metamers;** it does not shed more.
+- **Today's garden** sits at LAI 9.5–10.3 against real stands' 5–9.
+- **The faces' τ stacked on `faceWood`** over-darkens.
+- **No candidate meets the 0.5× foliage bar and the crown-base gate;** that bar is likely unrealistic.
+- **Faces τ 1 with `faceWood` 1** on a 7 m slab: 0.32× foliage, hornbeam's crown base passes, beech misses by one
+  seed, G-forest passes. It is a look decision for the user; a sheet was made.
+
 ## 2026-11-06: A5, crown rounding, lever 1: the reproductive sink does not round beech; ADR 0056 written
 
 - **Lone dome D on today's build** (seeds 1–5, at 100 / 150; real lone bands in brackets):

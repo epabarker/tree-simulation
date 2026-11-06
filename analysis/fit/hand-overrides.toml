@@ -135,6 +135,11 @@ assign = { "c1.shootLengthSD" = 0.5, "c4.axisSD" = 50, "c1.betaSD" = 60, "c1.bud
 # trunk's laterals their share: recruits' H/D about 95 and lone height about 34 m at 150 (Tallo's
 # band 33-42 m), where the fit's was 38-49 m.
 "r2.levels.0.lambda" = 0.53
+# Twigs keep λ (box A5 lever 2, ADR 0057; the user, 2026-11-06): the twig level takes none of the
+# ontogenetic fall of λ. Lone D at 100/150 (10 seeds) -0.04/-0.02 -> 0.105/0.35, inside the real
+# band 0.07-0.61; heights hold (40.6 m at 150); G-forest 0/1/9/12 as HEAD (three checks at their limits).
+# Birch becomes more varied by seed (flat to pointed), not uniformly rounder.
+"r2.levels.2.dLambdaShare" = 0
 
 [oak]
 # Track B's accepted form (the user, 2026-11-01; picks.toml): posture by age (ADR 0038), limbs steep

@@ -82,3 +82,44 @@ Gates: the plan's "A4 and A5's gates", fixed before any result.
 **Parked** with this evidence. `faceWood` stays off, and the garden is unchanged.
 
 **What would resolve it** is the user's question for a later box. Either accept a sparser, forest-like garden, or find out why a darker garden carries so much less foliage than the real closed stands it matches on leaf area index. The second may be R1's carbon shedding in shade (ADR 0032's acclimated leaf cost), or the stand's crown depth.
+
+## F: why shade strips the garden's foliage (2026-11-06 afternoon, agent F; plan `plans/2026-11-06-day2.md`)
+Scripts and numbers: branch `worktree-agent-a28199a6f8557d21d`, `scratch/2026-11-06-F-foliage/` (`notes.txt`). The core was untouched; temporary instrumentation is kept as a patch, not committed. The instrument's shed totals equal `metrics.csv`'s exactly, and it reproduces A4's 20-seed gate exactly.
+
+| six-seed medians, 0–150 | metamers at 150 | per cell of ground | LAI 100 / 150 | births per cell | cumulative P per cell |
+|---|---|---|---|---|---|
+| today | 55.2k | 5.39 | 9.5 / 10.3 | 29.8 | 269 |
+| 7 m slab, `faceWood` 1 (faces τ 0.2) | 7.6k | 1.70 | 3.6 / 2.5 | 17.1 | 157 |
+| 7 m slab, `faceWood` 1, faces τ 1 | 17.9k | 3.99 | 6.2 / 5.7 | 33.2 | 272 |
+| closed stands, beech / hornbeam | – | 3.33 / 4.03 | 6.0 / 5.9 and 8.9 / 8.2 | 53 / 31 | 326 / 378 |
+
+- **The shortfall is production, not shedding.** 0.138 = 0.44 (the strip's ground) × 0.32 (density per cell).
+  - R1's carbon-deficit test does most of the shedding everywhere: 44% of grown metamers today, 60% narrow, 75–86% in closed stands. C5's light test does 5–13%.
+  - Background mortality takes 11% of births in both gardens. Starvation, windthrow and breakage are small.
+- **Today's garden is denser than real woods:** LAI 9.5–10.3 against 5–9, with crowns living to the ground (leaf crown ratio 0.83, against the stands' 0.31–0.33).
+- **ADR 0056's open question is answered:** the faces' τ 0.2 stacked on the virtual wood makes the strip darker than a closed stand. With faces τ 1, the strip carries the model's closed-stand density per cell.
+- **No existing-param candidate reaches the 0.5× foliage bar while the crown-base gate passes.** At a real stand's density a 7 m strip holds about 0.27–0.33× today's foliage; reaching 0.5× needs LAI about 10, above real stands. Every variant near 0.5× keeps its skirts.
+- **Faces τ 1 with `faceWood` 1** is the strongest. On 20 seeds:
+  - crown base: hornbeam 5/6 (83%, passes); beech 5/7 (71%, fails at the limit by one seed);
+  - G-forest's four checks pass (floor 18, H/D 3, crown 13, plateau 12);
+  - metamers 0.26× B0; planted survival 0.36 / 0.19 at 150 / 300, against 0.44 / 0.31.
+- **For the user:** whether a garden at a real wood's density, with about a third of today's foliage, is the look wanted. That is a look decision, not a gate.
+
+## M: a middle look (2026-11-06 afternoon, the user: "between the two"; gates in `plans/2026-11-06-day2.md`)
+
+| six opening seeds, at 150 | metamers vs today (≥ 0.45×) | seeds with < 2 trees ≥ 10 m | beech and hornbeam crown base (≥ 0.10) |
+|---|---|---|---|
+| 7 m slab, faces τ 1, `faceWood` 0.6 / 0.7 / 0.8 | 0.41 / 0.27 / 0.30 | 3 / 1 / 2 | 0.18 / 0.14 / 0.25 |
+| 10 m slab, `faceWood` 1 | 0.47 | 2 | 0.21 |
+| 12 m slab, `faceWood` 1 | 0.61 | 1 (seed 3) | 0.22 |
+| today | 1.00 | 0 | 0.02 |
+
+**The 12 m slab on 20 seeds:**
+- **G-forest fails planted H/D** (0 against ≥ 1). It passes floor (19 against B0's 2), crown (13) and plateau (13). Metamers are 0.48×; planted survival is 0.43 at 150 and 0.24 at 300.
+- **A4's strict crown-base gate fails** (beech 3/8, hornbeam 4/6). Crowns lift late: in band at 150, not yet at 100.
+
+**No middle setting passes; parked.** In this model, forest trunks come only with the loss of the fullness that today's crowns get from being denser than real woods' (LAI about 10 against 5–9) and from living to the ground.
+
+**What might resolve it, for a later box:**
+- trees that grow up crowded while young, then thin, as real forests do;
+- or a look decision by the user.

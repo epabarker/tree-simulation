@@ -8,7 +8,7 @@ _Last updated: 2026-11-06 (0.16.0 released; ADR 0055 accepted; the overseer's bo
 
 ## The box: 0.17.0, the species at the right size and shape, on a stable base (from 2026-11-06; [plan](plans/2026-11-06-box-0.17.md))
 - **Rules:** gates fixed before results; G-forest against B0 (2/3/11/11, each ≥ base − 2); measures labelled hard, soft or advisory, and no visual fix counts as validation without an independent gate; no new mechanism without a measured mismatch ([external review](reviews/2026-11-06-external-review.md), folded in).
-- **A0, next (the review):** README, `package.json` and a branches section made true; the 142 Python tests in CI (two fail locally on one TreeML QSM below its root); phone seed 3 and `forest`'s regeneration as named regressions; the validation policy.
+- **A0 (the review; defects are issues #52–56; `main` catches up by draft PR #51 after #50):** README, `package.json`, branches section and the Pages build done; the 142 Python tests in CI (two fail locally on one TreeML QSM below its root); phone seed 3 and `forest`'s regeneration as named regressions; the validation policy.
 - **A1, birch:** trunk λ 0.588 → 0.53 fixes the poles (18 of 20) and lone height (39 m) and passes G-forest at the margin (0/1/9/11); 0.55 fails crown base. Uncommitted on `claude/birch`; the leafless-looking crown comes next.
 - **A2–A3:** young trees' trunk (check the street-tree reference first); heights for beech, willow and holly.
 - **The night:** oak's decurrent form; the flat cap; a sensitivity sweep of the adopted species params. **B:** the RC with a fresh-process budget smoke as a release gate.

@@ -2,6 +2,16 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-06: M, a middle look between today's garden and a real wood's density: none passes; parked
+
+- **Five variants under fixed gates:**
+  - 7 m slab with `faceWood` 0.6, 0.7 or 0.8;
+  - 10 m or 12 m slab with `faceWood` 1, faces τ 1.
+- **Trunks come through in all** (crown base 0.14–0.25 against today's 0.02), but every variant thins the garden.
+- **The best, a 12 m slab,** keeps 0.61× the foliage on six seeds but fails on 20: planted H/D 0, the strict
+  crown-base gate (the lift comes late), and seed 3 drops to 1 canopy tree.
+- **Parked;** the garden is unchanged ([note](experiments/2026-11-06-crown-base.md)).
+
 ## 2026-11-06: F, why shade strips foliage: production, not shedding; today's garden is denser than real woods
 
 [Note](experiments/2026-11-06-crown-base.md#f-why-shade-strips-the-gardens-foliage-2026-11-06-afternoon-agent-f-plan-plans2026-11-06-day2md)

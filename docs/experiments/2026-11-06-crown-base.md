@@ -104,3 +104,22 @@ Scripts and numbers: branch `worktree-agent-a28199a6f8557d21d`, `scratch/2026-11
   - G-forest's four checks pass (floor 18, H/D 3, crown 13, plateau 12);
   - metamers 0.26× B0; planted survival 0.36 / 0.19 at 150 / 300, against 0.44 / 0.31.
 - **For the user:** whether a garden at a real wood's density, with about a third of today's foliage, is the look wanted. That is a look decision, not a gate.
+
+## M: a middle look (2026-11-06 afternoon, the user: "between the two"; gates in `plans/2026-11-06-day2.md`)
+
+| six opening seeds, at 150 | metamers vs today (≥ 0.45×) | seeds with < 2 trees ≥ 10 m | beech and hornbeam crown base (≥ 0.10) |
+|---|---|---|---|
+| 7 m slab, faces τ 1, `faceWood` 0.6 / 0.7 / 0.8 | 0.41 / 0.27 / 0.30 | 3 / 1 / 2 | 0.18 / 0.14 / 0.25 |
+| 10 m slab, `faceWood` 1 | 0.47 | 2 | 0.21 |
+| 12 m slab, `faceWood` 1 | 0.61 | 1 (seed 3) | 0.22 |
+| today | 1.00 | 0 | 0.02 |
+
+**The 12 m slab on 20 seeds:**
+- **G-forest fails planted H/D** (0 against ≥ 1). It passes floor (19 against B0's 2), crown (13) and plateau (13). Metamers are 0.48×; planted survival is 0.43 at 150 and 0.24 at 300.
+- **A4's strict crown-base gate fails** (beech 3/8, hornbeam 4/6). Crowns lift late: in band at 150, not yet at 100.
+
+**No middle setting passes; parked.** In this model, forest trunks come only with the loss of the fullness that today's crowns get from being denser than real woods' (LAI about 10 against 5–9) and from living to the ground.
+
+**What might resolve it, for a later box:**
+- trees that grow up crowded while young, then thin, as real forests do;
+- or a look decision by the user.

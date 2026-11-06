@@ -351,7 +351,10 @@ export interface Params {
     enabled: boolean;
     /** The pa table, 2–4 rows: row 0 is the trunk. */
     levels: PaLevel[];
-    /** Ontogeny: from tree age a_c (seasons), every λ falls linearly by Δλ over `ramp` seasons. */
+    /**
+     * Ontogeny: from tree age a_c (seasons), every λ falls linearly by Δλ over `ramp` seasons
+     * (each level by its own share of it, PaLevel.dLambdaShare; ADR 0057).
+     */
     aC: number;
     dLambda: number;
     ramp: number;
@@ -632,6 +635,12 @@ export interface PaLevel {
   agedOver?: number;
   /** With agedSetPoint: "wood" (the default), the metamer's own age, or "tree", the tree's. */
   agedBy?: "wood" | "tree";
+  /**
+   * Twigs keep λ (ADR 0057, proposed): the share of r2.dLambda, the ontogenetic fall of λ, that
+   * this level's nodes take: λ = lambda − dLambdaShare·dΛ·t. At 0 a level keeps its λ while the
+   * others lose theirs (fine twigs keep apical control in an old crown: the dome). Absent: 1.
+   */
+  dLambdaShare?: number;
 }
 
 export const defaultParams: Params = {

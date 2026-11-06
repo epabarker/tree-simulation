@@ -48,6 +48,13 @@ pub struct SlabParams {
     pub rotate: bool,
     /// Transmission of the sky beyond the front (z < 0) and back (z ≥ D) faces.
     pub face_tau: [f64; 2],
+    /// A virtual wood beyond both z faces (box A4, ADR 0056): at each height its leaf-area density
+    /// is face_wood × the slab's own mean leaf area per cell at that height (gaps included), so at 1
+    /// it is a wood like the strip, with its canopy, crown base, understorey and leaf area index. A ray leaving through a face at height y has
+    /// also crossed that wood's leaf area above y, along its slant (÷ dy). Side light then falls
+    /// toward the ground as inside the wood the strip was cut from. 0: the faces' constant depth
+    /// alone (bit-identical).
+    pub face_wood: f64,
     /// −1…1: a sky brighter toward +x (an oblique sun, §C2.6), weights × max(0, 1 + tilt·d_x).
     pub sky_tilt: f64,
     pub periodic_x: bool,
@@ -168,6 +175,8 @@ pub struct SlabSweep {
     /// Directions fixed by the caller (tests), never rotated.
     fixed: bool,
     face_g: [f32; 2],
+    /// The virtual wood's leaf area above each line (index = row; `face_wood` > 0 only).
+    wood_above: Vec<f64>,
     pad: usize,
     top: usize,
     /// Open sky above the foliage (Q, V) as `compute_lanes` summed it; there, from row `top` up,
@@ -225,6 +234,7 @@ impl SlabSweep {
             dirs,
             fixed: true,
             face_g: [g(p.face_tau[0]), g(p.face_tau[1])],
+            wood_above: Vec::new(),
             pad: slope + 3,
             top: 0,
             open: None,
@@ -319,6 +329,25 @@ impl SlabSweep {
         }
     }
 
+    /// The virtual wood beyond the faces (`face_wood`): for each line, the leaf area above it of a
+    /// wood whose density at each height is `face_wood` × that row's mean leaf area per cell.
+    fn wood_profile(&mut self) {
+        if self.p.face_wood <= 0.0 {
+            return;
+        }
+        let plane = self.w * self.d;
+        self.wood_above.clear();
+        self.wood_above.resize(self.h + 1, 0.0);
+        for r in (0..self.top).rev() {
+            let sum: f64 = self.lad[r * plane..(r + 1) * plane]
+                .iter()
+                .map(|&v| v as f64)
+                .sum();
+            let density = sum / plane as f64;
+            self.wood_above[r] = self.wood_above[r + 1] + self.p.face_wood * density;
+        }
+    }
+
     /// The season's directions (with rotation), then the whole field.
     pub fn compute(&mut self, season: f64) {
         self.compute_part(season, 0, 1);
@@ -337,6 +366,7 @@ impl SlabSweep {
         let ks: Vec<usize> = (0..self.dirs.w.len())
             .filter(|k| k % lanes == lane)
             .collect();
+        self.wood_profile();
         self.march(&ks);
         let n = self.top * self.w * self.d;
         let (mut q, mut x, mut y, mut z) = (0.0f64, 0.0, 0.0, 0.0);
@@ -567,14 +597,20 @@ impl SlabSweep {
                     Step::new(dx, dy, dz)
                 };
                 let u0 = j * plane;
-                // G on the line above, padded: beyond a z face, the face's depth.
+                // G on the line above, padded: beyond a z face, the face's depth, plus the virtual
+                // wood's leaf area from the foliage top down to that line along this direction.
+                let wood = if self.p.face_wood > 0.0 {
+                    (self.wood_above[row + 1] / dy) as f32
+                } else {
+                    0.0
+                };
                 for zi in 0..nz {
                     let z = zi as isize - pad as isize;
                     let d0 = zi * nx;
                     if z < 0 {
-                        g[d0..d0 + nx].fill(self.face_g[0]);
+                        g[d0..d0 + nx].fill(self.face_g[0] + wood);
                     } else if z >= d as isize {
-                        g[d0..d0 + nx].fill(self.face_g[1]);
+                        g[d0..d0 + nx].fill(self.face_g[1] + wood);
                     } else {
                         pad_line(up, u0 + z as usize * w, w, g, d0, pad, self.p.periodic_x);
                     }
@@ -603,12 +639,21 @@ impl SlabSweep {
                 (col as f64 + 0.5, row as f64 + 1.0 + 1e-9, zc as f64 + 0.5);
             let mut t = 0.0f64;
             while y < top {
+                // Beyond a face: its depth, plus the virtual wood's leaf area above y, along the ray.
+                let wood = if self.p.face_wood > 0.0 {
+                    let (r, f) = (y.floor() as usize, y - y.floor());
+                    let above = self.wood_above[r + 1]
+                        + (1.0 - f) * (self.wood_above[r] - self.wood_above[r + 1]);
+                    above / dy
+                } else {
+                    0.0
+                };
                 if z < 0.0 {
-                    t += self.face_g[0] as f64;
+                    t += self.face_g[0] as f64 + wood;
                     break;
                 }
                 if z >= d {
-                    t += self.face_g[1] as f64;
+                    t += self.face_g[1] as f64 + wood;
                     break;
                 }
                 let mut xi = x.floor();
@@ -867,6 +912,7 @@ pub fn fixture_fingerprint() -> u32 {
         c: 1.0,
         rotate: true,
         face_tau: [1.0, 0.2],
+        face_wood: 0.0,
         sky_tilt: 0.0,
         periodic_x: true,
     };
@@ -888,6 +934,7 @@ mod tests {
             c: 1.0,
             rotate: false,
             face_tau: tau,
+            face_wood: 0.0,
             sky_tilt: 0.0,
             periodic_x: true,
         }
@@ -1018,6 +1065,72 @@ mod tests {
         // Above the foliage the sky is open whatever the faces.
         let above = (24 * 12 + 6) * 30 + 5;
         assert_eq!(dark.q()[above], open.q()[above]);
+    }
+
+    #[test]
+    fn a_virtual_wood_beyond_the_faces_darkens_low_cells_more_than_high_ones() {
+        // Box A4 (ADR 0056): beyond the faces a wood with the slab's own foliage profile.
+        let run = |face_wood: f64| {
+            let mut s = SlabSweep::new(
+                30,
+                26,
+                12,
+                SlabParams {
+                    face_wood,
+                    ..params([0.2, 0.2])
+                },
+            );
+            canopy(&mut s);
+            s.compute(0.0);
+            s
+        };
+        let (none, wood) = (run(0.0), run(1.0));
+        let cell = |row: usize| (row * 12) * 30 + 5; // z 0, the face's own column of cells, x 5
+        let top = none.top;
+        assert!(top > 12, "the fixture's foliage reaches row {top}");
+        let (low, high) = (cell(2), cell(top - 2));
+        // Near the floor the side light is mostly gone; near the foliage top it is barely touched.
+        assert!(
+            wood.q()[low] < 0.5 * none.q()[low],
+            "low {} vs {}",
+            wood.q()[low],
+            none.q()[low]
+        );
+        assert!(
+            wood.q()[high] > 0.8 * none.q()[high],
+            "high {} vs {}",
+            wood.q()[high],
+            none.q()[high]
+        );
+        // Above the foliage the sky is open whatever the wood.
+        let above = (24 * 12 + 6) * 30 + 5;
+        assert_eq!(wood.q()[above], none.q()[above]);
+    }
+
+    #[test]
+    fn with_a_virtual_wood_the_sweep_stays_close_to_the_exact_trace() {
+        let mut s = SlabSweep::new(
+            30,
+            26,
+            12,
+            SlabParams {
+                face_wood: 1.0,
+                ..params([1.0, 0.2])
+            },
+        );
+        canopy(&mut s);
+        s.compute(0.0);
+        let (mut err, mut n) = (0.0, 0);
+        for row in (2..20).step_by(3) {
+            for z in [0, 1, 6, 10, 11] {
+                for x in (0..30).step_by(3) {
+                    let c = (row * 12 + z) * 30 + x;
+                    err += (s.q()[c] as f64 - s.exact_q(x, row, z, 0.01)).abs();
+                    n += 1;
+                }
+            }
+        }
+        assert!(err / (n as f64) < 0.08, "mean |ΔQ|/C {}", err / n as f64);
     }
 
     #[test]

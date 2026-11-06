@@ -62,6 +62,15 @@ export interface Params {
     faces?: [number, number];
     /** Q fades linearly to 0 over this many cells before each z face (0: hard faces). Optional: 0. */
     fade?: number;
+    /**
+     * A virtual wood beyond both z faces (box A4, ADR 0056, proposed): at each height its leaf-area
+     * density is faceWood × the slab's own mean leaf area per cell at that height (gaps included), so
+     * at 1 it is a wood like the strip: its canopy, crown base, understorey and LAI, growing with it. A ray leaving through a
+     * face has also crossed that wood's leaf area above it, so the side light a strip of wood
+     * receives falls toward the ground, as inside the wood it was cut from. 1: as dense as the
+     * strip's own foliage. Optional: 0, the faces' constant τ alone.
+     */
+    faceWood?: number;
     /** Static shade sources (M3 "lean away from a wall"). */
     walls: Wall[];
     /**

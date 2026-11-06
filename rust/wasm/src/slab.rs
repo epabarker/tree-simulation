@@ -35,6 +35,7 @@ impl SlabSweep {
             c,
             rotate,
             face_tau: [tau_front, tau_back],
+            face_wood: 0.0,
             sky_tilt: 0.0,
             periodic_x,
         };

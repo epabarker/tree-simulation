@@ -64,6 +64,7 @@ export const FITTED_FLORA = {
           pendulous: 140,
           pendulousRadius: 0.01,
           lateralEvery: 3,
+          dLambdaShare: 0,
         },
       ],
       aC: 24.32,

@@ -2,6 +2,17 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-06: ADR 0057, twigs keep λ: birch's crown rounds (the user adopted it for birch alone)
+
+- **`r2.levels[k].dLambdaShare`** (agent T; R2, `lambda_at`; bit-identical when absent; unit test).
+- **Birch's twig level at share 0:** lone D at 100/150 goes −0.04/−0.02 → 0.105/0.35 (10 seeds; real band 0.07–0.61),
+  and birch grows more varied by seed. Heights hold; G-forest as HEAD.
+- **Beech is not adopted:** a weak lever, and it fails G-forest's crown check. Willow is not rounded.
+- **Golden** `beechWood` s30 aa6bff66 → 6e6fd6bc.
+- **`phoneSeed3`** (#54) baseline updated: live at 100 24 → 23; metamers 15457 → 15692, 18131 → 16923 and
+  14083 → 12423 at 50/100/150; canopy counts unchanged.
+- **The crown-base gate's redesign goes to the night** (the user).
+
 ## 2026-11-06: M, a middle look between today's garden and a real wood's density: none passes; parked
 
 - **Five variants under fixed gates:**

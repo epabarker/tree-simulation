@@ -271,3 +271,65 @@ hi = 4
 floor = { target = 0.015, band = 0.008, kind = "measured", source = "beech canopies transmit a median 1.3% of PAR, 0.9–2.1% in 100–150-year stands (Hagemeier & Leuschner 2019 (overcast, diffuse PAR)); all-day values run higher (4.2%, Dobrowolska 2008)" }
 survivalLight = [0.025, 0.045]   # lowest light all seedlings survive (Hagemeier & Leuschner 2019: beech saplings need 3.4%)
 shadeScore = 4.56   # Niinemets & Valladares 2006, Appendix A
+
+[level1]
+# Level 1 (ADR 0049). Read by phase 1c and later; fit.py ignores this table.
+# Gate c v1 (phase 1c, 2026-11-03; docs/experiments/2026-11-03-phase1-converter.md): the degradation test against
+# the tolerances pre-registered in analysis/fit/sources/phase1-tolerances.json (commit e74063c).
+gate_c_survive = ['taper']
+gate_c_held_out_noise = []
+gate_c_held_out_resolution = ['crownFullness', 'leaderDominance', 'branchAngle2', 'limbDroop', 'junctionDelta', 'ldSlope', 'limbElevation', 'p2', 'bifurcationRatio', 'bifurcationRatio2', 'tortuosity', 'tortuosity05', 'length0', 'length1', 'length2', 'length3', 'pendulousFraction', 'centroidHeight']
+gate_c_held_out_tolerance_uncertain = ['widestAt', 'profileCentre', 'forkHeight', 'limbUpturn', 'p0', 'p1', 'p3']
+gate_c = "1 of 26 gated descriptors survive: fewer than half, so the plan stops here (amendment E); no Level 1 targets until the user rules"
+# Gate c v2 (3f13c29) stopped before any simulated tree: no d_min at Wytham (the re-cut moved the tortuosities),
+# beech's repeat floor held out 13 of 24. Superseded by v3; its standings are in that commit.
+# Gate c v3 (session 1d-i, 2026-11-03; the note's "v2 and v3"): standings before any simulated tree, from
+# analysis/fit/sources/phase1-tolerances.json v3 (commit 6610fb4). Coarsening is prune only; segment-length-dependent
+# descriptors at the 0.5 m step. Tier rules: that file's rules.tier_a, tier_b, assign (treesim/tiers.py).
+gate_c_v3_dataset = "biodiv"
+gate_c_v3_d_min_mm = 8.62  # p2 of its terminal diameters
+gate_c_v3_report_only = ['junctionDelta', 'ldSlope', 'limbElevation', 'tortuosity', 'pendulousFraction']
+gate_c_v3_excluded_h1 = []
+gate_c_v3_noise_limited = ['branchAngle2', 'taper']  # at biodiv
+gate_c_v3_candidate_a_or_b = ['widestAt', 'profileCentre', 'crownFullness', 'forkHeight', 'leaderDominance', 'limbDroop', 'limbUpturn', 'p0', 'p1', 'p2', 'p3', 'bifurcationRatio', 'bifurcationRatio2', 'tortuosity05', 'length0', 'length1', 'length2', 'length3', 'centroidHeight', 'limbElevation05', 'pendulousFraction05']
+gate_c_v3_candidate_a_only = []  # control not neutral at d_min
+gate_c_v3_size_match_dbh_m = 0.291  # the median measured DBH of biodiv Fagus_sylvatica (53 trees)
+gate_c_v3 = "21 descriptors pass the floor; amendment E stops the species if fewer than 11 reach a tier (1d-ii)"
+# Gate c v3.1 run (session 1d-ii, 2026-11-04; the note's "Gate c v3.1"): the registered tiers (phase1-tolerances.json v3.1) on this
+# species' closed stand at its size-matched season, 20 seeds, the Level 0 fit (docs/experiments/fits/level0/beech.json, not accepted).
+gate_c_v3_1_stand_season = 70  # median DBH 0.296 m, height 22.5 m (reference 0.291 m, 26.8 m)
+gate_c_v3_1_lone_season = 50  # lone tree, reported only
+gate_c_v3_1_points = "dmin 8.6 mm, upper 11.0 mm; inflation at d_min"
+gate_c_v3_1_tier_a = ['widestAt', 'profileCentre', 'crownFullness', 'forkHeight', 'leaderDominance', 'limbUpturn', 'p0', 'p1', 'p2', 'p3', 'tortuosity05', 'length0', 'centroidHeight', 'limbElevation05', 'pendulousFraction05']
+gate_c_v3_1_tier_b = ['limbDroop']
+gate_c_v3_1_held_out_resolution = ['bifurcationRatio', 'bifurcationRatio2', 'length1', 'length2', 'length3']
+gate_c_v3_1_noise_limited = ['branchAngle2', 'taper']
+gate_c_v3_1 = "16 of 21 floor-clear descriptors reach a tier (amendment E stops below 11): proceed"
+# Level 1 pilot (phase 3, 2026-11-04; provisional, pending Level 0 and ADR 0052): registered in
+# analysis/fit/sources/level1-beech.json (analysis/experiments/level1_targets.py) from real QSMs only, before
+# any simulated tree was scored. Held-out values are never written by the fit.
+pilot_registration = "analysis/fit/sources/level1-beech.json"
+pilot_held_out_seed = 20261104
+pilot_held_out = ['length0', 'limbElevation05', 'limbUpturn', 'p3', 'widestAt']
+pilot_fitted = ['boleSway', 'centroidHeight', 'crownBase80', 'crownFullness', 'forkHeight', 'leaderDominance', 'limbDroop', 'p0', 'p1', 'p2', 'pendulousFraction05', 'profileCentre', 'tortuosity05']
+pilot_knobs = ['r2.levels.0.lambda', 'r2.levels.1.lambda', 'r2.levels.1.setPoint', 'r2.levels.1.postureSetPoint', 'r2.levels.1.branchAngle', 'r2.levels.1.eta', 'r2.levels.2.setPoint', 'r2.aC', 'r2.dLambda', 'r2.kappa']
+pilot_version = 6
+pilot_frozen = { "r3.c" = 0.04879 }
+# v6: the user, 2026-11-05, after the crown base and bole note: crownBase80 and boleSway (gate c v3.2, tier A) join the fitted set with v5's hold-outs kept; spread floor 0.65; lateShare's Level 1 band 0.12; registered, not launched
+
+[level0]
+# Level 0 (reference-fidelity phase 2, the plan's §k): the physiology knobs fitted against Tallo's H–DBH and CR–DBH
+# bands; bounds from [[param]] above. Not r3.c (posture: form), not the form knobs, not c5.Trel, not the cell size.
+knobs = ["c3.alpha", "r1.Lh", "r1.mf", "r2.hJ", "c6.r0", "r6.qMin", "r6.leafArea"]
+
+# Level 0 v2's time anchors (the user, 2026-11-03): top height at 100 from the NW-FVA yield tables, classes 1–2 (as
+# stand.lateShare), in the band form of beech's stand.height (target the classes' midpoint in cells; band the same
+# share of it as height at 60's, 18/84). Scored at Level 0 only. Not at 150: class 1's table ends at 145 years (38.2 m, analysis/fit/sources/nwfva_h100.csv:221; class 2
+# 34.1 m at 150, :244), and no table value is extrapolated.
+[[level0.trait]]
+name = "stand.height100"
+target = 122
+band = 26
+weight = 1
+kind = "measured"
+source = "NW-FVA yield tables (Albert et al. 2021, after Schober), beech classes 1–2: top height 28.5–32.5 m at 100 years (analysis/fit/sources/nwfva_h100.csv:212, :234)"

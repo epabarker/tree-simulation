@@ -3,6 +3,17 @@
 # Measured with the hold-out's tests: survival light in the shade house, the mixed wood over 400
 # seasons (12 seeds), and the lab woods over 200 (docs/experiments/2026-10-28-m27-fits.md, M27b).
 
+[broadleaf]
+# The generic irregularity base (overnight 2026-11-06, agent R's r-best0, branch r-regularity):
+# shoot length varies (lognormal, s 0.5), each axis keeps its own set-point offset (SD 50°) and
+# branch-angle offset (SD 60°), and lateral buds break stochastically (a logistic of width 1 through
+# R4's threshold). R's setting 1 (axis 40°, β 50°) failed G-forest (planted H/D 0 of 20); this one
+# passed it, G-reg and G-budget. The four prototype rules are off by default in the core; here they reach every
+# broadleaf, under each species' own overrides (a species' key below wins). Not fir or pine.
+# m27_adopt.py adds exactly these keys to each listed species' patch, nothing else in its groups.
+species = ["beech", "birch", "holly", "hornbeam", "maple", "oak", "rowan", "willow"]
+assign = { "c1.shootLengthSD" = 0.5, "c4.axisSD" = 50, "c1.betaSD" = 60, "c1.budBreak" = { mode = "stochastic", width = 1.0 } }
+
 [holly]
 # The fit raised Q_ss (0.03 → 0.059) and m_f (0.03 → 0.049) chasing an estimated height and floor:
 # holly then needed 8.5% light (band 2–5%) and starved under the fitted beech and hornbeam, whose
@@ -36,6 +47,21 @@
 # pick, with the reservations "a touch dense, the top leans; the stand's stems still snake, accept".
 "r2.levels.1.lambda" = 0.53
 "r2.kappa" = 1.0
+# Natural mature heights (overnight 2026-11-06, agent Y2; G-forest passed on the garden with thin
+# margins): R1's reproductive sink (fRep 0.8, from the species' maturity), so that height
+# levels off instead of climbing past the species' Level 0 band. Rowan 21.6 m.
+"r1.fRep" = 0.8
+"r1.maturity" = 85
+
+[hornbeam]
+# Natural mature heights (overnight 2026-11-06, agent Y2; G-forest passed on the garden with thin
+# margins): R1's reproductive sink (fRep 0.8, from the species' maturity), so that height
+# levels off instead of climbing past the species' Level 0 band.
+# Hornbeam levels at 29.1 m from season 100 (shipped: 37 m at 100, 49 m at 150), with dLambda
+# 0.0725 for its crown (0.62x metamers, W/H 0.65, D 0.34). Fragile: the crown flips within +-0.01.
+"r1.fRep" = 0.8
+"r1.maturity" = 115
+"r2.dLambda" = 0.0725
 
 [pine]
 # The fit lowered Q_ss to 0.096: pine survived 12.7%, as tolerant as birch (band 20–30%).
@@ -81,6 +107,12 @@
 # sources put a beech spur chain at 10–15 years; 15 fails the ecology guard (6 of 20) under the
 # rule's wood-age clock, 20 passes (11 of 20) and clears the trunks. 2026-11-02-beech-round2-stand-diagnosis.md.
 "r6.lifespan" = 20
+# The irregularity base's departure (overnight 2026-11-06, agent S, on beech's own descriptors; ADR
+# 0055): less shoot-length variation, a wider spread of branch angles. Passed G-forest on the garden.
+"c1.shootLengthSD" = 0.35
+"c4.axisSD" = 50
+"c1.betaSD" = 70
+"c1.budBreak" = { mode = "stochastic", width = 1.0 }
 
 [birch]
 # Track B's accepted form (the user, 2026-11-01; docs/experiments/code/2026-11-01-atlas/picks.toml):
@@ -104,6 +136,17 @@
 # node (60-76 kinks a stem: the garden's "lightning bolts"). Held at 0.04 (lambda 0.52) the stems are
 # straight (1-2 kinks); the lone oak is a cone until its form round. The user's override, 2026-11-02.
 "r2.dLambda" = 0.04
+# The irregularity base's departure (overnight 2026-11-06, agent S, on oak's own descriptors; ADR
+# 0055): less variation in shoot length and in both angles. Passed G-forest on the garden.
+"c1.shootLengthSD" = 0.3
+"c4.axisSD" = 35
+"c1.betaSD" = 40
+"c1.budBreak" = { mode = "stochastic", width = 1.0 }
+# Natural mature heights (overnight 2026-11-06, agent Y2; G-forest passed on the garden with thin
+# margins): R1's reproductive sink (fRep 0.8, from the species' maturity), so that height
+# levels off instead of climbing past the species' Level 0 band. Oak 33.2 m.
+"r1.fRep" = 0.8
+"r1.maturity" = 130
 
 [maple]
 # Track B's accepted form (the user, 2026-11-01; picks.toml): the relay from age 10 (ADR 0033), its

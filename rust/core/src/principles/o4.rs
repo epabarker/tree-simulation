@@ -9,7 +9,7 @@
 //!
 //! Params: o4.*, r1.fRep and r1.maturity (the seed supply), c2.C.
 
-use super::c1::plant_seedling;
+use super::c1::{plant_seedling, seedling_azimuth};
 use crate::math;
 use crate::rng::{purpose, uniform};
 use crate::tree::Tree;
@@ -112,7 +112,8 @@ pub fn stand_dynamics(world: &mut World) -> f64 {
             }
             let mut seedling = Tree::new(world.trees.len(), x, z);
             seedling.species = species.clone();
-            plant_seedling(&mut seedling, &own, season + 1.0, 0.0);
+            let azimuth = seedling_azimuth(&own, seedling.id);
+            plant_seedling(&mut seedling, &own, season + 1.0, 0.0, azimuth);
             world.trees.push(seedling);
             live += 1.0;
             recruits += 1.0;
@@ -167,7 +168,8 @@ pub fn stand_dynamics(world: &mut World) -> f64 {
             if let Some(s) = species.as_ref().filter(|s| !s.is_empty()) {
                 seedling.species = s.clone();
             }
-            plant_seedling(&mut seedling, &own, season + 1.0, 0.0);
+            let azimuth = seedling_azimuth(&own, seedling.id);
+            plant_seedling(&mut seedling, &own, season + 1.0, 0.0, azimuth);
             world.trees.push(seedling);
             live += 1.0;
             recruits += 1.0;

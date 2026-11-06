@@ -208,3 +208,8 @@ log = true
 floor = { target = 0.013, band = 0.008, kind = "described", source = "1.3% (0.7–3.0%), estimated from Hagemeier & Leuschner 2019's five measured species: ln(floor %) = 4.92 − 1.08 × Niinemets & Valladares score, cross-checked by LAI and Beer–Lambert (user's research, analysis/fit/sources/floor_light_targets.csv)" }
 survivalLight = [0.015, 0.04]   # lowest light all seedlings survive (beech's band: scored as tolerant as beech (4.6 against 4.56))
 shadeScore = 4.6   # Niinemets & Valladares 2006, Appendix A
+
+[level0]
+# Level 0 (reference-fidelity phase 2, the plan's §k): the physiology knobs fitted against Tallo's H–DBH and CR–DBH
+# bands; bounds from [[param]] above. Not r3.c (posture: form), not the form knobs, not c5.Trel, not the cell size.
+knobs = ["c3.alpha", "r1.Lh", "r1.mf", "r2.hJ", "c6.r0", "r6.qMin", "r6.leafArea"]

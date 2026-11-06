@@ -1,0 +1,1191 @@
+{
+ "experiment": "level1-sensitivity",
+ "species": "beech",
+ "version": 1,
+ "written": "2026-11-04T21:23:30+00:00",
+ "parent_commit": "e443d90eb3b5c174d1bf156d859d84e37918931f",
+ "question": "for each Level 1 descriptor, how far can any single knob move it toward the real target, and at what Level 0 cost (the user, 2026-11-04)",
+ "targets": {
+  "registration": "analysis/fit/sources/level1-beech.json",
+  "version": 3,
+  "note": "v3's real distributions, real data only; unchanged"
+ },
+ "descriptors": [
+  "centroidHeight",
+  "crownFullness",
+  "forkHeight",
+  "leaderDominance",
+  "length0",
+  "limbDroop",
+  "limbElevation05",
+  "limbUpturn",
+  "p0",
+  "p1",
+  "p2",
+  "p3",
+  "pendulousFraction05",
+  "profileCentre",
+  "tortuosity05",
+  "widestAt"
+ ],
+ "fitted": [
+  "centroidHeight",
+  "crownFullness",
+  "forkHeight",
+  "leaderDominance",
+  "limbDroop",
+  "p0",
+  "p1",
+  "p2",
+  "pendulousFraction05",
+  "profileCentre",
+  "tortuosity05"
+ ],
+ "held_out": [
+  "length0",
+  "limbElevation05",
+  "limbUpturn",
+  "p3",
+  "widestAt"
+ ],
+ "seeds": [
+  7191,
+  2325,
+  9999,
+  2831,
+  4712,
+  8068,
+  9165,
+  2863,
+  2488,
+  5615
+ ],
+ "seeds_note": "v3's search seeds (registration seeds.search), the first 10: the same for every condition; pilot v2 grew every candidate on them",
+ "measure": "treesim.fit_level1.Measure, hide=False, names = all 16 descriptors, the spec's trials ['lone', 'stand150', 'shade']; the size match, the coarsened-simulation rule and the scoring of level1.py (score, detrended)",
+ "hand": {
+  "r1.hydraulic": "hyperbolic",
+  "c5.Trel": 0.008,
+  "r1.leafCost": "acclimated",
+  "r1.leafCostShade": 0.3,
+  "c3.alpha": 3.312,
+  "r1.Lh": 51.16,
+  "r1.mf": 0.0618,
+  "r2.hJ": 77.63,
+  "c6.r0": 0.004689,
+  "r6.qMin": 0.03103,
+  "r6.leafArea": 2.417,
+  "r3.c": 0.04879,
+  "r2.levels.0.lambda": 0.5308,
+  "r2.levels.1.lambda": 0.5124,
+  "r2.levels.1.setPoint": 34.32,
+  "r2.levels.1.branchAngle": 50.07,
+  "r2.levels.1.eta": 0.5696,
+  "r2.levels.2.setPoint": 94.59,
+  "r2.aC": 14.44,
+  "r2.dLambda": 0.01384,
+  "r2.kappa": 0.4314,
+  "r2.levels.1.postureSetPoint": 34.32
+ },
+ "knobs": [
+  {
+   "path": "r2.levels.0.lambda",
+   "family": "form",
+   "lo": 0.5,
+   "hi": 0.6,
+   "log": false,
+   "hand": 0.5308,
+   "u_h": 0.30800000000000055,
+   "points": {
+    "lo": 0.5,
+    "lo_mid": 0.5154,
+    "hand": 0.5308,
+    "hi_mid": 0.5654,
+    "hi": 0.6
+   },
+   "u": {
+    "lo": 0.0,
+    "lo_mid": 0.15400000000000028,
+    "hand": 0.30800000000000055,
+    "hi_mid": 0.6540000000000002,
+    "hi": 1.0
+   }
+  },
+  {
+   "path": "r2.levels.1.lambda",
+   "family": "form",
+   "lo": 0.48,
+   "hi": 0.58,
+   "log": false,
+   "hand": 0.5124,
+   "u_h": 0.3239999999999999,
+   "points": {
+    "lo": 0.48,
+    "lo_mid": 0.4962,
+    "hand": 0.5124,
+    "hi_mid": 0.5462,
+    "hi": 0.58
+   },
+   "u": {
+    "lo": 0.0,
+    "lo_mid": 0.16199999999999995,
+    "hand": 0.3239999999999999,
+    "hi_mid": 0.6619999999999999,
+    "hi": 1.0
+   }
+  },
+  {
+   "path": "r2.levels.1.setPoint",
+   "family": "form",
+   "lo": 20,
+   "hi": 90,
+   "log": false,
+   "hand": 34.32,
+   "u_h": 0.20457142857142857,
+   "points": {
+    "lo": 20.0,
+    "lo_mid": 27.16,
+    "hand": 34.32,
+    "hi_mid": 62.16,
+    "hi": 90.0
+   },
+   "u": {
+    "lo": 0.0,
+    "lo_mid": 0.10228571428571429,
+    "hand": 0.20457142857142857,
+    "hi_mid": 0.6022857142857143,
+    "hi": 1.0
+   }
+  },
+  {
+   "path": "r2.levels.1.postureSetPoint",
+   "family": "form",
+   "lo": 20,
+   "hi": 90,
+   "log": false,
+   "hand": 34.32,
+   "u_h": 0.20457142857142857,
+   "points": {
+    "lo": 20.0,
+    "lo_mid": 27.16,
+    "hand": 34.32,
+    "hi_mid": 62.16,
+    "hi": 90.0
+   },
+   "u": {
+    "lo": 0.0,
+    "lo_mid": 0.10228571428571429,
+    "hand": 0.20457142857142857,
+    "hi_mid": 0.6022857142857143,
+    "hi": 1.0
+   }
+  },
+  {
+   "path": "r2.levels.1.branchAngle",
+   "family": "form",
+   "lo": 25,
+   "hi": 70,
+   "log": false,
+   "hand": 50.07,
+   "u_h": 0.5571111111111111,
+   "points": {
+    "lo": 25.0,
+    "lo_mid": 37.53,
+    "hand": 50.07,
+    "hi_mid": 60.03,
+    "hi": 70.0
+   },
+   "u": {
+    "lo": 0.0,
+    "lo_mid": 0.27855555555555556,
+    "hand": 0.5571111111111111,
+    "hi_mid": 0.7785555555555556,
+    "hi": 1.0
+   }
+  },
+  {
+   "path": "r2.levels.1.eta",
+   "family": "form",
+   "lo": 0.05,
+   "hi": 1,
+   "log": true,
+   "hand": 0.5696,
+   "u_h": 0.8121257617535135,
+   "points": {
+    "lo": 0.05,
+    "lo_mid": 0.1688,
+    "hand": 0.5696,
+    "hi_mid": 0.7547,
+    "hi": 1.0
+   },
+   "u": {
+    "lo": 0.0,
+    "lo_mid": 0.40606288087675674,
+    "hand": 0.8121257617535135,
+    "hi_mid": 0.9060628808767568,
+    "hi": 1.0
+   }
+  },
+  {
+   "path": "r2.levels.2.setPoint",
+   "family": "form",
+   "lo": 40,
+   "hi": 160,
+   "log": false,
+   "hand": 94.59,
+   "u_h": 0.4549166666666667,
+   "points": {
+    "lo": 40.0,
+    "lo_mid": 67.3,
+    "hand": 94.59,
+    "hi_mid": 127.3,
+    "hi": 160.0
+   },
+   "u": {
+    "lo": 0.0,
+    "lo_mid": 0.22745833333333335,
+    "hand": 0.4549166666666667,
+    "hi_mid": 0.7274583333333333,
+    "hi": 1.0
+   }
+  },
+  {
+   "path": "r2.aC",
+   "family": "form",
+   "lo": 0,
+   "hi": 40,
+   "log": false,
+   "hand": 14.44,
+   "u_h": 0.361,
+   "points": {
+    "lo": 0.0,
+    "lo_mid": 7.22,
+    "hand": 14.44,
+    "hi_mid": 27.22,
+    "hi": 40.0
+   },
+   "u": {
+    "lo": 0.0,
+    "lo_mid": 0.1805,
+    "hand": 0.361,
+    "hi_mid": 0.6805,
+    "hi": 1.0
+   }
+  },
+  {
+   "path": "r2.dLambda",
+   "family": "form",
+   "lo": 0,
+   "hi": 0.12,
+   "log": false,
+   "hand": 0.01384,
+   "u_h": 0.11533333333333334,
+   "points": {
+    "lo": 0.0,
+    "lo_mid": 0.00692,
+    "hand": 0.01384,
+    "hi_mid": 0.06692,
+    "hi": 0.12
+   },
+   "u": {
+    "lo": 0.0,
+    "lo_mid": 0.05766666666666667,
+    "hand": 0.11533333333333334,
+    "hi_mid": 0.5576666666666666,
+    "hi": 1.0
+   }
+  },
+  {
+   "path": "r2.kappa",
+   "family": "form",
+   "lo": 0,
+   "hi": 4,
+   "log": false,
+   "hand": 0.4314,
+   "u_h": 0.10785,
+   "points": {
+    "lo": 0.0,
+    "lo_mid": 0.2157,
+    "hand": 0.4314,
+    "hi_mid": 2.216,
+    "hi": 4.0
+   },
+   "u": {
+    "lo": 0.0,
+    "lo_mid": 0.053925,
+    "hand": 0.10785,
+    "hi_mid": 0.553925,
+    "hi": 1.0
+   }
+  },
+  {
+   "path": "c3.alpha",
+   "family": "physiology",
+   "lo": 2.5,
+   "hi": 6,
+   "log": false,
+   "hand": 3.312,
+   "u_h": 0.23199999999999996,
+   "points": {
+    "lo": 2.5,
+    "lo_mid": 2.906,
+    "hand": 3.312,
+    "hi_mid": 4.656,
+    "hi": 6.0
+   },
+   "u": {
+    "lo": 0.0,
+    "lo_mid": 0.11599999999999998,
+    "hand": 0.23199999999999996,
+    "hi_mid": 0.616,
+    "hi": 1.0
+   }
+  },
+  {
+   "path": "r1.Lh",
+   "family": "physiology",
+   "lo": 10,
+   "hi": 200,
+   "log": true,
+   "hand": 51.16,
+   "u_h": 0.5448994551772908,
+   "points": {
+    "lo": 10.0,
+    "lo_mid": 22.62,
+    "hand": 51.16,
+    "hi_mid": 101.2,
+    "hi": 200.0
+   },
+   "u": {
+    "lo": 0.0,
+    "lo_mid": 0.2724497275886454,
+    "hand": 0.5448994551772908,
+    "hi_mid": 0.7724497275886454,
+    "hi": 1.0
+   }
+  },
+  {
+   "path": "r1.mf",
+   "family": "physiology",
+   "lo": 0.02,
+   "hi": 0.15,
+   "log": false,
+   "hand": 0.0618,
+   "u_h": 0.32153846153846155,
+   "points": {
+    "lo": 0.02,
+    "lo_mid": 0.0409,
+    "hand": 0.0618,
+    "hi_mid": 0.1059,
+    "hi": 0.15
+   },
+   "u": {
+    "lo": 0.0,
+    "lo_mid": 0.16076923076923078,
+    "hand": 0.32153846153846155,
+    "hi_mid": 0.6607692307692308,
+    "hi": 1.0
+   }
+  },
+  {
+   "path": "r2.hJ",
+   "family": "physiology",
+   "lo": 2,
+   "hi": 150,
+   "log": true,
+   "hand": 77.63,
+   "u_h": 0.847438759214287,
+   "points": {
+    "lo": 2.0,
+    "lo_mid": 12.46,
+    "hand": 77.63,
+    "hi_mid": 107.9,
+    "hi": 150.0
+   },
+   "u": {
+    "lo": 0.0,
+    "lo_mid": 0.4237193796071435,
+    "hand": 0.847438759214287,
+    "hi_mid": 0.9237193796071435,
+    "hi": 1.0
+   }
+  },
+  {
+   "path": "c6.r0",
+   "family": "physiology",
+   "lo": 0.001875,
+   "hi": 0.00625,
+   "log": false,
+   "hand": 0.004689,
+   "u_h": 0.6431999999999999,
+   "points": {
+    "lo": 0.001875,
+    "lo_mid": 0.003282,
+    "hand": 0.004689,
+    "hi_mid": 0.00547,
+    "hi": 0.00625
+   },
+   "u": {
+    "lo": 0.0,
+    "lo_mid": 0.32159999999999994,
+    "hand": 0.6431999999999999,
+    "hi_mid": 0.8215999999999999,
+    "hi": 1.0
+   }
+  },
+  {
+   "path": "r6.qMin",
+   "family": "physiology",
+   "lo": 0.01,
+   "hi": 0.2,
+   "log": true,
+   "hand": 0.03103,
+   "u_h": 0.3779941870849677,
+   "points": {
+    "lo": 0.01,
+    "lo_mid": 0.01762,
+    "hand": 0.03103,
+    "hi_mid": 0.07878,
+    "hi": 0.2
+   },
+   "u": {
+    "lo": 0.0,
+    "lo_mid": 0.18899709354248384,
+    "hand": 0.3779941870849677,
+    "hi_mid": 0.6889970935424838,
+    "hi": 1.0
+   }
+  },
+  {
+   "path": "r6.leafArea",
+   "family": "physiology",
+   "lo": 1,
+   "hi": 3,
+   "log": false,
+   "hand": 2.417,
+   "u_h": 0.7084999999999999,
+   "points": {
+    "lo": 1.0,
+    "lo_mid": 1.708,
+    "hand": 2.417,
+    "hi_mid": 2.708,
+    "hi": 3.0
+   },
+   "u": {
+    "lo": 0.0,
+    "lo_mid": 0.35424999999999995,
+    "hand": 0.7084999999999999,
+    "hi_mid": 0.85425,
+    "hi": 1.0
+   }
+  },
+  {
+   "path": "r3.c",
+   "family": "physiology",
+   "lo": 0.01,
+   "hi": 0.3,
+   "log": true,
+   "hand": 0.04879,
+   "u_h": 0.4659947962382425,
+   "points": {
+    "lo": 0.01,
+    "lo_mid": 0.02209,
+    "hand": 0.04879,
+    "hi_mid": 0.121,
+    "hi": 0.3
+   },
+   "u": {
+    "lo": 0.0,
+    "lo_mid": 0.23299739811912126,
+    "hand": 0.4659947962382425,
+    "hi_mid": 0.7329973981191212,
+    "hi": 1.0
+   }
+  }
+ ],
+ "lopsided": {
+  "r2.levels.1.setPoint": 0.205,
+  "r2.levels.1.postureSetPoint": 0.205,
+  "r2.levels.1.eta": 0.812,
+  "r2.dLambda": 0.115,
+  "r2.kappa": 0.108,
+  "c3.alpha": 0.232,
+  "r2.hJ": 0.847,
+  "r6.leafArea": 0.708
+ },
+ "conditions": [
+  {
+   "id": "hand",
+   "knob": null,
+   "family": null,
+   "point": "hand",
+   "u": null,
+   "value": null
+  },
+  {
+   "id": "r2.levels.0.lambda@lo",
+   "knob": "r2.levels.0.lambda",
+   "family": "form",
+   "point": "lo",
+   "u": 0.0,
+   "value": 0.5
+  },
+  {
+   "id": "r2.levels.0.lambda@lo_mid",
+   "knob": "r2.levels.0.lambda",
+   "family": "form",
+   "point": "lo_mid",
+   "u": 0.15400000000000028,
+   "value": 0.5154
+  },
+  {
+   "id": "r2.levels.0.lambda@hi_mid",
+   "knob": "r2.levels.0.lambda",
+   "family": "form",
+   "point": "hi_mid",
+   "u": 0.6540000000000002,
+   "value": 0.5654
+  },
+  {
+   "id": "r2.levels.0.lambda@hi",
+   "knob": "r2.levels.0.lambda",
+   "family": "form",
+   "point": "hi",
+   "u": 1.0,
+   "value": 0.6
+  },
+  {
+   "id": "r2.levels.1.lambda@lo",
+   "knob": "r2.levels.1.lambda",
+   "family": "form",
+   "point": "lo",
+   "u": 0.0,
+   "value": 0.48
+  },
+  {
+   "id": "r2.levels.1.lambda@lo_mid",
+   "knob": "r2.levels.1.lambda",
+   "family": "form",
+   "point": "lo_mid",
+   "u": 0.16199999999999995,
+   "value": 0.4962
+  },
+  {
+   "id": "r2.levels.1.lambda@hi_mid",
+   "knob": "r2.levels.1.lambda",
+   "family": "form",
+   "point": "hi_mid",
+   "u": 0.6619999999999999,
+   "value": 0.5462
+  },
+  {
+   "id": "r2.levels.1.lambda@hi",
+   "knob": "r2.levels.1.lambda",
+   "family": "form",
+   "point": "hi",
+   "u": 1.0,
+   "value": 0.58
+  },
+  {
+   "id": "r2.levels.1.setPoint@lo",
+   "knob": "r2.levels.1.setPoint",
+   "family": "form",
+   "point": "lo",
+   "u": 0.0,
+   "value": 20.0
+  },
+  {
+   "id": "r2.levels.1.setPoint@lo_mid",
+   "knob": "r2.levels.1.setPoint",
+   "family": "form",
+   "point": "lo_mid",
+   "u": 0.10228571428571429,
+   "value": 27.16
+  },
+  {
+   "id": "r2.levels.1.setPoint@hi_mid",
+   "knob": "r2.levels.1.setPoint",
+   "family": "form",
+   "point": "hi_mid",
+   "u": 0.6022857142857143,
+   "value": 62.16
+  },
+  {
+   "id": "r2.levels.1.setPoint@hi",
+   "knob": "r2.levels.1.setPoint",
+   "family": "form",
+   "point": "hi",
+   "u": 1.0,
+   "value": 90.0
+  },
+  {
+   "id": "r2.levels.1.postureSetPoint@lo",
+   "knob": "r2.levels.1.postureSetPoint",
+   "family": "form",
+   "point": "lo",
+   "u": 0.0,
+   "value": 20.0
+  },
+  {
+   "id": "r2.levels.1.postureSetPoint@lo_mid",
+   "knob": "r2.levels.1.postureSetPoint",
+   "family": "form",
+   "point": "lo_mid",
+   "u": 0.10228571428571429,
+   "value": 27.16
+  },
+  {
+   "id": "r2.levels.1.postureSetPoint@hi_mid",
+   "knob": "r2.levels.1.postureSetPoint",
+   "family": "form",
+   "point": "hi_mid",
+   "u": 0.6022857142857143,
+   "value": 62.16
+  },
+  {
+   "id": "r2.levels.1.postureSetPoint@hi",
+   "knob": "r2.levels.1.postureSetPoint",
+   "family": "form",
+   "point": "hi",
+   "u": 1.0,
+   "value": 90.0
+  },
+  {
+   "id": "r2.levels.1.branchAngle@lo",
+   "knob": "r2.levels.1.branchAngle",
+   "family": "form",
+   "point": "lo",
+   "u": 0.0,
+   "value": 25.0
+  },
+  {
+   "id": "r2.levels.1.branchAngle@lo_mid",
+   "knob": "r2.levels.1.branchAngle",
+   "family": "form",
+   "point": "lo_mid",
+   "u": 0.27855555555555556,
+   "value": 37.53
+  },
+  {
+   "id": "r2.levels.1.branchAngle@hi_mid",
+   "knob": "r2.levels.1.branchAngle",
+   "family": "form",
+   "point": "hi_mid",
+   "u": 0.7785555555555556,
+   "value": 60.03
+  },
+  {
+   "id": "r2.levels.1.branchAngle@hi",
+   "knob": "r2.levels.1.branchAngle",
+   "family": "form",
+   "point": "hi",
+   "u": 1.0,
+   "value": 70.0
+  },
+  {
+   "id": "r2.levels.1.eta@lo",
+   "knob": "r2.levels.1.eta",
+   "family": "form",
+   "point": "lo",
+   "u": 0.0,
+   "value": 0.05
+  },
+  {
+   "id": "r2.levels.1.eta@lo_mid",
+   "knob": "r2.levels.1.eta",
+   "family": "form",
+   "point": "lo_mid",
+   "u": 0.40606288087675674,
+   "value": 0.1688
+  },
+  {
+   "id": "r2.levels.1.eta@hi_mid",
+   "knob": "r2.levels.1.eta",
+   "family": "form",
+   "point": "hi_mid",
+   "u": 0.9060628808767568,
+   "value": 0.7547
+  },
+  {
+   "id": "r2.levels.1.eta@hi",
+   "knob": "r2.levels.1.eta",
+   "family": "form",
+   "point": "hi",
+   "u": 1.0,
+   "value": 1.0
+  },
+  {
+   "id": "r2.levels.2.setPoint@lo",
+   "knob": "r2.levels.2.setPoint",
+   "family": "form",
+   "point": "lo",
+   "u": 0.0,
+   "value": 40.0
+  },
+  {
+   "id": "r2.levels.2.setPoint@lo_mid",
+   "knob": "r2.levels.2.setPoint",
+   "family": "form",
+   "point": "lo_mid",
+   "u": 0.22745833333333335,
+   "value": 67.3
+  },
+  {
+   "id": "r2.levels.2.setPoint@hi_mid",
+   "knob": "r2.levels.2.setPoint",
+   "family": "form",
+   "point": "hi_mid",
+   "u": 0.7274583333333333,
+   "value": 127.3
+  },
+  {
+   "id": "r2.levels.2.setPoint@hi",
+   "knob": "r2.levels.2.setPoint",
+   "family": "form",
+   "point": "hi",
+   "u": 1.0,
+   "value": 160.0
+  },
+  {
+   "id": "r2.aC@lo",
+   "knob": "r2.aC",
+   "family": "form",
+   "point": "lo",
+   "u": 0.0,
+   "value": 0.0
+  },
+  {
+   "id": "r2.aC@lo_mid",
+   "knob": "r2.aC",
+   "family": "form",
+   "point": "lo_mid",
+   "u": 0.1805,
+   "value": 7.22
+  },
+  {
+   "id": "r2.aC@hi_mid",
+   "knob": "r2.aC",
+   "family": "form",
+   "point": "hi_mid",
+   "u": 0.6805,
+   "value": 27.22
+  },
+  {
+   "id": "r2.aC@hi",
+   "knob": "r2.aC",
+   "family": "form",
+   "point": "hi",
+   "u": 1.0,
+   "value": 40.0
+  },
+  {
+   "id": "r2.dLambda@lo",
+   "knob": "r2.dLambda",
+   "family": "form",
+   "point": "lo",
+   "u": 0.0,
+   "value": 0.0
+  },
+  {
+   "id": "r2.dLambda@lo_mid",
+   "knob": "r2.dLambda",
+   "family": "form",
+   "point": "lo_mid",
+   "u": 0.05766666666666667,
+   "value": 0.00692
+  },
+  {
+   "id": "r2.dLambda@hi_mid",
+   "knob": "r2.dLambda",
+   "family": "form",
+   "point": "hi_mid",
+   "u": 0.5576666666666666,
+   "value": 0.06692
+  },
+  {
+   "id": "r2.dLambda@hi",
+   "knob": "r2.dLambda",
+   "family": "form",
+   "point": "hi",
+   "u": 1.0,
+   "value": 0.12
+  },
+  {
+   "id": "r2.kappa@lo",
+   "knob": "r2.kappa",
+   "family": "form",
+   "point": "lo",
+   "u": 0.0,
+   "value": 0.0
+  },
+  {
+   "id": "r2.kappa@lo_mid",
+   "knob": "r2.kappa",
+   "family": "form",
+   "point": "lo_mid",
+   "u": 0.053925,
+   "value": 0.2157
+  },
+  {
+   "id": "r2.kappa@hi_mid",
+   "knob": "r2.kappa",
+   "family": "form",
+   "point": "hi_mid",
+   "u": 0.553925,
+   "value": 2.216
+  },
+  {
+   "id": "r2.kappa@hi",
+   "knob": "r2.kappa",
+   "family": "form",
+   "point": "hi",
+   "u": 1.0,
+   "value": 4.0
+  },
+  {
+   "id": "c3.alpha@lo",
+   "knob": "c3.alpha",
+   "family": "physiology",
+   "point": "lo",
+   "u": 0.0,
+   "value": 2.5
+  },
+  {
+   "id": "c3.alpha@lo_mid",
+   "knob": "c3.alpha",
+   "family": "physiology",
+   "point": "lo_mid",
+   "u": 0.11599999999999998,
+   "value": 2.906
+  },
+  {
+   "id": "c3.alpha@hi_mid",
+   "knob": "c3.alpha",
+   "family": "physiology",
+   "point": "hi_mid",
+   "u": 0.616,
+   "value": 4.656
+  },
+  {
+   "id": "c3.alpha@hi",
+   "knob": "c3.alpha",
+   "family": "physiology",
+   "point": "hi",
+   "u": 1.0,
+   "value": 6.0
+  },
+  {
+   "id": "r1.Lh@lo",
+   "knob": "r1.Lh",
+   "family": "physiology",
+   "point": "lo",
+   "u": 0.0,
+   "value": 10.0
+  },
+  {
+   "id": "r1.Lh@lo_mid",
+   "knob": "r1.Lh",
+   "family": "physiology",
+   "point": "lo_mid",
+   "u": 0.2724497275886454,
+   "value": 22.62
+  },
+  {
+   "id": "r1.Lh@hi_mid",
+   "knob": "r1.Lh",
+   "family": "physiology",
+   "point": "hi_mid",
+   "u": 0.7724497275886454,
+   "value": 101.2
+  },
+  {
+   "id": "r1.Lh@hi",
+   "knob": "r1.Lh",
+   "family": "physiology",
+   "point": "hi",
+   "u": 1.0,
+   "value": 200.0
+  },
+  {
+   "id": "r1.mf@lo",
+   "knob": "r1.mf",
+   "family": "physiology",
+   "point": "lo",
+   "u": 0.0,
+   "value": 0.02
+  },
+  {
+   "id": "r1.mf@lo_mid",
+   "knob": "r1.mf",
+   "family": "physiology",
+   "point": "lo_mid",
+   "u": 0.16076923076923078,
+   "value": 0.0409
+  },
+  {
+   "id": "r1.mf@hi_mid",
+   "knob": "r1.mf",
+   "family": "physiology",
+   "point": "hi_mid",
+   "u": 0.6607692307692308,
+   "value": 0.1059
+  },
+  {
+   "id": "r1.mf@hi",
+   "knob": "r1.mf",
+   "family": "physiology",
+   "point": "hi",
+   "u": 1.0,
+   "value": 0.15
+  },
+  {
+   "id": "r2.hJ@lo",
+   "knob": "r2.hJ",
+   "family": "physiology",
+   "point": "lo",
+   "u": 0.0,
+   "value": 2.0
+  },
+  {
+   "id": "r2.hJ@lo_mid",
+   "knob": "r2.hJ",
+   "family": "physiology",
+   "point": "lo_mid",
+   "u": 0.4237193796071435,
+   "value": 12.46
+  },
+  {
+   "id": "r2.hJ@hi_mid",
+   "knob": "r2.hJ",
+   "family": "physiology",
+   "point": "hi_mid",
+   "u": 0.9237193796071435,
+   "value": 107.9
+  },
+  {
+   "id": "r2.hJ@hi",
+   "knob": "r2.hJ",
+   "family": "physiology",
+   "point": "hi",
+   "u": 1.0,
+   "value": 150.0
+  },
+  {
+   "id": "c6.r0@lo",
+   "knob": "c6.r0",
+   "family": "physiology",
+   "point": "lo",
+   "u": 0.0,
+   "value": 0.001875
+  },
+  {
+   "id": "c6.r0@lo_mid",
+   "knob": "c6.r0",
+   "family": "physiology",
+   "point": "lo_mid",
+   "u": 0.32159999999999994,
+   "value": 0.003282
+  },
+  {
+   "id": "c6.r0@hi_mid",
+   "knob": "c6.r0",
+   "family": "physiology",
+   "point": "hi_mid",
+   "u": 0.8215999999999999,
+   "value": 0.00547
+  },
+  {
+   "id": "c6.r0@hi",
+   "knob": "c6.r0",
+   "family": "physiology",
+   "point": "hi",
+   "u": 1.0,
+   "value": 0.00625
+  },
+  {
+   "id": "r6.qMin@lo",
+   "knob": "r6.qMin",
+   "family": "physiology",
+   "point": "lo",
+   "u": 0.0,
+   "value": 0.01
+  },
+  {
+   "id": "r6.qMin@lo_mid",
+   "knob": "r6.qMin",
+   "family": "physiology",
+   "point": "lo_mid",
+   "u": 0.18899709354248384,
+   "value": 0.01762
+  },
+  {
+   "id": "r6.qMin@hi_mid",
+   "knob": "r6.qMin",
+   "family": "physiology",
+   "point": "hi_mid",
+   "u": 0.6889970935424838,
+   "value": 0.07878
+  },
+  {
+   "id": "r6.qMin@hi",
+   "knob": "r6.qMin",
+   "family": "physiology",
+   "point": "hi",
+   "u": 1.0,
+   "value": 0.2
+  },
+  {
+   "id": "r6.leafArea@lo",
+   "knob": "r6.leafArea",
+   "family": "physiology",
+   "point": "lo",
+   "u": 0.0,
+   "value": 1.0
+  },
+  {
+   "id": "r6.leafArea@lo_mid",
+   "knob": "r6.leafArea",
+   "family": "physiology",
+   "point": "lo_mid",
+   "u": 0.35424999999999995,
+   "value": 1.708
+  },
+  {
+   "id": "r6.leafArea@hi_mid",
+   "knob": "r6.leafArea",
+   "family": "physiology",
+   "point": "hi_mid",
+   "u": 0.85425,
+   "value": 2.708
+  },
+  {
+   "id": "r6.leafArea@hi",
+   "knob": "r6.leafArea",
+   "family": "physiology",
+   "point": "hi",
+   "u": 1.0,
+   "value": 3.0
+  },
+  {
+   "id": "r3.c@lo",
+   "knob": "r3.c",
+   "family": "physiology",
+   "point": "lo",
+   "u": 0.0,
+   "value": 0.01
+  },
+  {
+   "id": "r3.c@lo_mid",
+   "knob": "r3.c",
+   "family": "physiology",
+   "point": "lo_mid",
+   "u": 0.23299739811912126,
+   "value": 0.02209
+  },
+  {
+   "id": "r3.c@hi_mid",
+   "knob": "r3.c",
+   "family": "physiology",
+   "point": "hi_mid",
+   "u": 0.7329973981191212,
+   "value": 0.121
+  },
+  {
+   "id": "r3.c@hi",
+   "knob": "r3.c",
+   "family": "physiology",
+   "point": "hi",
+   "u": 1.0,
+   "value": 0.3
+  }
+ ],
+ "constants": {
+  "close": 0.5,
+  "cost": 2.0,
+  "noise_se": 2.0,
+  "spread_ok": 1.0,
+  "boot_seed": 20261109,
+  "boot_n": 2000,
+  "top_descriptors": 3,
+  "top_knobs": 3
+ },
+ "rules": {
+  "unit": "Δz = z_condition − z_hand: the median of the detrended simulated trees, in real between-tree SDs (v3's real distributions); its SE from a paired bootstrap over the 10 seeds (BOOT_N resamples, numpy seed BOOT_SEED; the same seed draw for every condition; medians and the Level 0 sum recomputed, the matched season held)",
+  "move": "m = −sign(z_hand) · Δz (toward the target is positive); f = m / |z_hand|, the fraction of the hand's gap closed. f ≥ 1 is reported as a bracket: the target crossed between two adjacent grid points on the knob's side, with ΔL0 as the range at those points (a bound may be a regime change: continuity is not assumed). Beside f, its bootstrap 5th percentile",
+  "cost": "ΔL0 = the condition's Level 0 sum (loss − Σ fitted location terms; Level 0's scored traits and death penalties at their Level 0 weights) − the hand's; beside it ΔL0 without stand.lateShare; each with its bootstrap SE",
+  "reach": "per descriptor, over the matched single-knob conditions: the largest f and the ΔL0 of that move. Verdicts: 'at target within noise' if |z_hand| < NOISE_SE · SE(z_hand); else 'unreachable by single-knob moves' if no condition has f > CLOSE; else 'reachable at cost' if the cheapest condition with f > CLOSE raises Level 0 by more than COST; else 'reachable'",
+  "unmatched": "an unmatched or dead condition contributes no descriptor values; it is counted and greyed. Cells of a condition flagged 'matched at the first season' or 'trees outside the real DBH range' are marked",
+  "spread": "per descriptor: s = log2(sim SD / real SD); the largest single-knob rise of s toward 0, −sign(s_hand) · (s − s_hand), and whether any matched condition has |s| ≤ SPREAD_OK",
+  "pairs": "the TOP_DESCRIPTORS descriptors (not at target within noise) with the largest remaining gap max(0, |z_hand| − max(0, m_best)), held out included; for each, its TOP_KNOBS single-knob movers (each knob's best matched non-hand point v* by m; knobs with m > 0, ranked by it); v½ halfway between the hand and v* on the knob's scale (u); for each pair (A ranked above B): (v*_A, v*_B), (v*_A, v½_B), (v½_A, v*_B). Identical conditions are measured once. Reported: the best pair's f and ΔL0, and its departure from additivity (Δz − Δz_A − Δz_B) where both singles are grid points",
+  "envelope": "pilot v2's 120 candidates (registration v3, the same 10 seeds, joint form-knob moves; the checkpoint, read-only): per fitted descriptor the best f, that candidate's ΔL0 and its spread s, flagged when s < −1. Held-out descriptors have no pilot data",
+  "verdict": "'needs a rule rather than a knob' only where the single-knob sweep, the pair check (where run for the descriptor) and the envelope (fitted descriptors) all fall short of f = CLOSE. Elsewhere: 'reached by a single knob' (with the cost verdict), 'reached jointly (pair check | pilot v2 envelope)', or 'not reached by the knobs tested; joint moves untested' where no joint evidence exists",
+  "not_covered": "interactions outside the top-three pairs; compensated reach (a move stopped by a regime boundary that a second knob lifts) across the physiology × form families; nonmonotone responses between the far grid points of the lopsided knobs (u_h near a bound)",
+  "adr_order": "an ADR item ranks higher the more of its evidence is 'needs a rule', the larger the gap that remains, and the more a partial reach costs Level 0",
+  "held_out": "held-out descriptors are measured and written because this is a reachability experiment, not a fit (the user, 2026-11-04); the v3 hold-out rule is unaffected"
+ },
+ "adr_evidence": {
+  "0052 limb loss / crown retreat": {
+   "descriptors": [
+    "centroidHeight",
+    "p0",
+    "p1",
+    "profileCentre",
+    "crownFullness",
+    "widestAt"
+   ],
+   "level0": [
+    "stand.talloCR",
+    "stand.lai"
+   ]
+  },
+  "tip upturn and tortuosity": {
+   "descriptors": [
+    "limbUpturn",
+    "tortuosity05",
+    "limbElevation05",
+    "pendulousFraction05",
+    "limbDroop"
+   ]
+  },
+  "individual variation": {
+   "spread": [
+    "leaderDominance",
+    "centroidHeight",
+    "limbDroop",
+    "tortuosity05",
+    "limbUpturn"
+   ],
+   "spread_all": true
+  },
+  "the trunk increment (ADR 0050 option C)": {
+   "descriptors": [
+    "leaderDominance",
+    "forkHeight",
+    "length0"
+   ],
+   "season_and_dbh": true,
+   "level0": [
+    "stand.talloH",
+    "stand.height",
+    "stand.height100"
+   ]
+  }
+ },
+ "hashes": {
+  "analysis/treesim/level1.py": "834c636ee2bab1aad318c390d2134e4f7083203dd8d9f95ea074a7802b1233ed",
+  "analysis/experiments/level1_eval.ts": "19d97301ce99d2a9843fca1980d0c12e6ce09c89318922cefae6f3cb4ebd48f1",
+  "analysis/experiments/level1_targets.py": "2cc832de1b87dd959655850c310216084b390acac8cb1fb868e86e46014e3afb",
+  "analysis/treesim/describe.py": "671f92d71131525cb1dcf5fdb771ed98b3c5ac05aea900366925ef61d5cc2bee",
+  "analysis/treesim/form.py": "23c5e1c035c9bbb625a8a002476fc12fd98f85438af4bba5adbb97c10ec6b48d",
+  "analysis/treesim/cylinders.py": "0e262dce2e55193c3f8ed775ec92c7fbe29df9f9be0d738daed7623cb5629254",
+  "analysis/treesim/coarsen.py": "b5e57ca6ebff39f9ec8a2b0364e621a549e5d6b6d8426cbbcbfb05cd87b34bc9",
+  "analysis/treesim/simtree.py": "e69c7a26140b272f1274b07f3d6ae51acdba6abbfc655b27d3b8a02bb901ff6b",
+  "analysis/treesim/tolerance.py": "7ec6553f51cee1734e68b3b1f5949d7c6996e820d61a6e53a3fc3fcd5c647b7c",
+  "analysis/fit/sources/phase1-tolerances.json": "896e1be07fbfd876e50792191e6aa8a1530d6f629818a26f7404871d90c38043",
+  "cli/trials.ts": "2660df8f06f210369a8f80f6b8e02435fe87ea605cdc80884d3827011118dac4",
+  "cli/allometry.ts": "b7f9c86322a68aafaf0258ef07834ba7ea2c806cb415159924e08d78e1d0f93c",
+  "analysis/fit/targets/beech.toml": "177610247e34b0df516c32527bbee5a4c44d86c1f8322cdfcf20c6bd4f7e7466",
+  "docs/experiments/fits/level0/beech.json": "4794cfd86a29da8c64ea317813e0981df7ac1fa1f0c1522e675ca6994241f5b2",
+  "analysis/fit/sources/level1-beech.json": "60e8ddfcc5b1a0aa282c4db67303dbff069d7c2a35ed1db3a1a77baf8c3d3960",
+  "analysis/experiments/level1_sensitivity.py": "b543efae760742c26ddd5abbeb1ae4a3e0a14ae4de836030eadf97a28658a889"
+ }
+}

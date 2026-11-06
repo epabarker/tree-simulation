@@ -264,3 +264,45 @@ hi = 4
 floor = { target = 0.045, band = 0.02, kind = "described", source = "4.5% (2.5–8%), estimated from Hagemeier & Leuschner 2019's five measured species: ln(floor %) = 4.92 − 1.08 × Niinemets & Valladares score, cross-checked by LAI and Beer–Lambert (user's research, analysis/fit/sources/floor_light_targets.csv)" }
 survivalLight = [0.05, 0.1]   # lowest light all seedlings survive (saplings estimated to need 8% (score regression, floor_light_targets.csv))
 shadeScore = 3.18   # Niinemets & Valladares 2006, Appendix A
+
+[level1]
+# Level 1 (ADR 0049): sycamore (Wytham) as field maple's proxy (decision 6). Read by phase 1c and later;
+# fit.py ignores this table.
+wytham_excluded = ["junctionDelta", "ldSlope", "taper", "leaderDominance"]
+wytham_reason = "TreeQSM 2.0 radii are taper-corrected (no UnmodRadius): H1, the user's ruling for oak, extended to the same dataset (1c; the user's to confirm)"
+# Gate c v1 (phase 1c, 2026-11-03; docs/experiments/2026-11-03-phase1-converter.md): the degradation test against
+# the tolerances pre-registered in analysis/fit/sources/phase1-tolerances.json (commit e74063c).
+gate_c_survive = ['widestAt', 'profileCentre', 'crownFullness', 'branchAngle2', 'limbElevation', 'p0', 'p1', 'p2', 'p3', 'tortuosity', 'tortuosity05', 'pendulousFraction']
+gate_c_held_out_noise = ['forkHeight', 'limbDroop', 'limbUpturn', 'bifurcationRatio', 'bifurcationRatio2', 'length2']
+gate_c_held_out_resolution = ['length0', 'length1', 'length3', 'centroidHeight']
+gate_c_held_out_tolerance_uncertain = []
+gate_c = "12 of 22 gated descriptors survive with H1 extended to maple; 12 of 26 without (a stop): the user's to rule"
+# Gate c v2 (3f13c29) stopped before any simulated tree: no d_min at Wytham (the re-cut moved the tortuosities),
+# beech's repeat floor held out 13 of 24. Superseded by v3; its standings are in that commit.
+# Gate c v3 (session 1d-i, 2026-11-03; the note's "v2 and v3"): standings before any simulated tree, from
+# analysis/fit/sources/phase1-tolerances.json v3 (commit 6610fb4). Coarsening is prune only; segment-length-dependent
+# descriptors at the 0.5 m step. Tier rules: that file's rules.tier_a, tier_b, assign (treesim/tiers.py).
+gate_c_v3_dataset = "wytham"
+gate_c_v3_d_min_mm = 5.0  # p20 of its terminal diameters
+gate_c_v3_report_only = ['junctionDelta', 'ldSlope', 'limbElevation', 'tortuosity', 'pendulousFraction']
+gate_c_v3_excluded_h1 = ['leaderDominance', 'taper']
+gate_c_v3_noise_limited = ['forkHeight', 'limbDroop', 'limbUpturn', 'bifurcationRatio', 'bifurcationRatio2', 'length2']  # at wytham
+gate_c_v3_candidate_a_or_b = ['widestAt', 'profileCentre', 'crownFullness', 'branchAngle2', 'p0', 'p1', 'p2', 'p3', 'tortuosity05', 'length0', 'length1', 'length3', 'centroidHeight', 'limbElevation05', 'pendulousFraction05']
+gate_c_v3_candidate_a_only = []  # control not neutral at d_min
+gate_c_v3_size_match_dbh_m = 0.247  # the median measured DBH of wytham ACERPS (39 trees)
+gate_c_v3 = "15 descriptors pass the floor; amendment E stops the species if fewer than 8 reach a tier (1d-ii)"
+# Gate c v3.1 run (session 1d-ii, 2026-11-04; the note's "Gate c v3.1"): the registered tiers (phase1-tolerances.json v3.1) on this
+# species' closed stand at its size-matched season, 20 seeds, the shipped params (the Level 0 fit is not accepted).
+gate_c_v3_1_stand_season = 150  # median DBH 0.251 m, height 20.9 m (reference 0.247 m, 18.2 m)
+gate_c_v3_1_lone_season = 50  # lone tree, reported only
+gate_c_v3_1_points = "dmin 5.0 mm, upper 12.1 mm; inflation at d_min"
+gate_c_v3_1_tier_a = ['widestAt', 'profileCentre', 'crownFullness', 'branchAngle2', 'p0', 'p1', 'p2', 'p3', 'tortuosity05', 'centroidHeight', 'limbElevation05', 'pendulousFraction05']
+gate_c_v3_1_tier_b = []
+gate_c_v3_1_held_out_resolution = ['length0', 'length1', 'length3']
+gate_c_v3_1_noise_limited = ['forkHeight', 'limbDroop', 'limbUpturn', 'bifurcationRatio', 'bifurcationRatio2', 'length2']
+gate_c_v3_1 = "12 of 15 floor-clear descriptors reach a tier (amendment E stops below 8): proceed"
+
+[level0]
+# Level 0 (reference-fidelity phase 2, the plan's §k): the physiology knobs fitted against Tallo's H–DBH and CR–DBH
+# bands; bounds from [[param]] above. Not r3.c (posture: form), not the form knobs, not c5.Trel, not the cell size.
+knobs = ["c3.alpha", "r1.Lh", "r1.mf", "r2.hJ", "c6.r0", "r6.qMin", "r6.leafArea"]

@@ -208,3 +208,19 @@ log = true
 floor = { target = 0.17, band = 0.06, kind = "described", source = "all-day relative light under pine 1.15 times that under birch (12.8% against 11.1%; Dobrowolska 2008), applied to birch's 14.8% (Hagemeier & Leuschner 2019); 2–59% across stand ages (Walter & Himmler 1996)" }
 survivalLight = [0.2, 0.3]   # lowest light all seedlings survive (less tolerant than birch, whose saplings need 21%)
 shadeScore = 1.67   # Niinemets & Valladares 2006, Appendix A
+
+[level0]
+# Level 0 (reference-fidelity phase 2, the plan's §k): the physiology knobs fitted against Tallo's H–DBH and CR–DBH
+# bands; bounds from [[param]] above. Not r3.c (posture: form), not the form knobs, not c5.Trel, not the cell size.
+knobs = ["c3.alpha", "r1.Lh", "r1.mf", "r2.hJ", "c6.r0", "r6.qMin", "r6.leafArea"]
+
+# Level 0 v2's time anchors (the user, 2026-11-03): top height at 100 from the NW-FVA yield tables, classes 1–2, the
+# band form of stand.height (target the classes' midpoint in cells, band a sixth of it). Scored at Level 0 only. Not
+# at 150: the pine tables of classes 1–2 end at 120 years (analysis/fit/sources/nwfva_h100.csv:322, :341).
+[[level0.trait]]
+name = "stand.height100"
+target = 108
+band = 18
+weight = 1
+kind = "measured"
+source = "NW-FVA yield tables (Albert et al. 2021, after Schober), pine classes 1–2: top height 25.0–29.0 m at 100 years (analysis/fit/sources/nwfva_h100.csv:318, :337)"

@@ -4,7 +4,7 @@
 # so the reviewer also ends with `git status --short` (detector). Exit 2 blocks the call (stderr is the reason).
 set -u
 cmd=$(jq -r '.tool_input.command // empty')
-deny() { echo "reviewer-bash-guard: blocked ($1). Allowed: git diff/status/log/show, npm run test, npx vitest run, cargo test, node cli/run.ts --out /tmp/review-*, grep/ls/cat/head/tail/wc." >&2; exit 2; }
+deny() { echo "reviewer-bash-guard: blocked ($1). Allowed: git diff/status/log/show, npm run test, npx vitest run, cargo test, uv run --project analysis --with pytest python -I -m pytest analysis/tests -q, node cli/run.ts --out /tmp/review-*, grep/ls/cat/head/tail/wc." >&2; exit 2; }
 [ -n "$cmd" ] || exit 0
 case "$cmd" in *'>'*|*'<'*|*'|'*|*'`'*|*'$('*|*$'\n'*|*'--output'*|*' -u'*|*'--update'*) deny "redirect, pipe, substitution or a writing flag";; esac
 IFS=$'&;' read -ra parts <<<"${cmd//&&/;}"
@@ -14,6 +14,8 @@ for p in "${parts[@]}"; do
     'export PATH="$HOME/.cargo/bin:$PATH"'|'git diff'*|'git status'*|'git log'*|'git show'*) ;;
     'npm run test'|'npx vitest run'*|'cargo test'*|'cd rust'|'cd '"${CLAUDE_PROJECT_DIR:-.}"|'cd '"${CLAUDE_PROJECT_DIR:-.}"/rust) ;;
     'node cli/run.ts '*'--out /tmp/review-'*) ;;
+    # The Python suite, exactly: python -I keeps the reviewer's cwd off sys.path (no planted module runs).
+    'uv run --project analysis --with pytest python -I -m pytest analysis/tests -q') ;;
     grep\ *|ls|ls\ *|cat\ *|head\ *|tail\ *|wc\ *) ;;
     *) deny "$p";;
   esac

@@ -1,0 +1,1669 @@
+{
+ "maple_norway": {
+  "lone": {
+   "spacingCV": {
+    "median": 0.4169518340099069,
+    "p10": 0.3555738485244383,
+    "p90": 0.5337221927071251,
+    "n": 30,
+    "usable": true
+   },
+   "attachPerM": {
+    "median": 1.5742836361230959,
+    "p10": 1.0622121042538635,
+    "p90": 1.8476734258156946,
+    "n": 30,
+    "usable": true
+   },
+   "insertSD": {
+    "median": 21.55411397808163,
+    "p10": 15.439359840818826,
+    "p90": 35.85382371356323,
+    "n": 30,
+    "usable": true
+   },
+   "elevSD": {
+    "median": 26.51762819217459,
+    "p10": 19.119582843527546,
+    "p90": 34.32457255518768,
+    "n": 30,
+    "usable": true
+   },
+   "curvPersist": {
+    "median": -0.1107559983751215,
+    "p10": -0.16870696233260607,
+    "p90": -0.021964145876134204,
+    "n": 30,
+    "usable": true
+   },
+   "earlyFork": {
+    "median": 0.34782608695652173,
+    "p10": 0.24807692307692308,
+    "p90": 0.4531481481481482,
+    "n": 30,
+    "usable": true
+   },
+   "D": {
+    "median": 0.3633387847581374,
+    "p10": 0.10595015939852707,
+    "p90": 0.6965358808220141,
+    "n": 30,
+    "usable": true
+   },
+   "shapeRatio": {
+    "median": 0.3479534715100228,
+    "p10": 0.04251236218048035,
+    "p90": 0.6741735944464893,
+    "n": 29,
+    "usable": true
+   },
+   "WH": {
+    "median": 0.6104181007432319,
+    "p10": 0.4430580128627018,
+    "p90": 0.8345608997100896,
+    "n": 30,
+    "usable": true
+   },
+   "cbH": {
+    "median": 0.22911342242992272,
+    "p10": 0.09531677122343779,
+    "p90": 0.3157642213554052,
+    "n": 30,
+    "usable": true
+   },
+   "_provenance": "lone = Munich street trees (TreeML, pruned, urban) plus Belgian hedgerow/tree-row oak and birch: lone crown and crown-base values may reflect pruning and light wells, not open-grown growth",
+   "_meta": {
+    "n_trees": 30,
+    "n_catalogued": 50,
+    "sources": {
+     "treeml": 30
+    },
+    "H_median": 16.58891000381763,
+    "dbh_median": 0.34658
+   }
+  }
+ },
+ "ash": {
+  "lone": {
+   "spacingCV": {
+    "median": 0.4274962272299886,
+    "p10": 0.3591066994901967,
+    "p90": 0.5410232496987472,
+    "n": 52,
+    "usable": true
+   },
+   "attachPerM": {
+    "median": 1.449836036299995,
+    "p10": 1.0438585596279235,
+    "p90": 1.8607778323667654,
+    "n": 52,
+    "usable": true
+   },
+   "insertSD": {
+    "median": 17.727076997640218,
+    "p10": 11.243557097460375,
+    "p90": 32.792694126778294,
+    "n": 52,
+    "usable": true
+   },
+   "elevSD": {
+    "median": 24.130639717276146,
+    "p10": 14.153725697229921,
+    "p90": 35.340498677433956,
+    "n": 52,
+    "usable": true
+   },
+   "curvPersist": {
+    "median": -0.0716044060412413,
+    "p10": -0.15804993298027897,
+    "p90": 0.018782724216257162,
+    "n": 52,
+    "usable": true
+   },
+   "earlyFork": {
+    "median": 0.31009615384615385,
+    "p10": 0.1111111111111111,
+    "p90": 0.4961538461538461,
+    "n": 52,
+    "usable": true
+   },
+   "D": {
+    "median": 0.292722572381091,
+    "p10": 0.057040425114990655,
+    "p90": 0.5489574708984387,
+    "n": 52,
+    "usable": true
+   },
+   "shapeRatio": {
+    "median": 0.3979387210843045,
+    "p10": -0.1289284922921855,
+    "p90": 0.5773326727932576,
+    "n": 48,
+    "usable": true
+   },
+   "WH": {
+    "median": 0.6277703303017039,
+    "p10": 0.45071087677073307,
+    "p90": 0.8163076885321335,
+    "n": 52,
+    "usable": true
+   },
+   "cbH": {
+    "median": 0.22869608012954493,
+    "p10": 0.13853028709847703,
+    "p90": 0.3752203210262729,
+    "n": 52,
+    "usable": true
+   },
+   "_provenance": "lone = Munich street trees (TreeML, pruned, urban) plus Belgian hedgerow/tree-row oak and birch: lone crown and crown-base values may reflect pruning and light wells, not open-grown growth",
+   "_meta": {
+    "n_trees": 52,
+    "n_catalogued": 84,
+    "sources": {
+     "treeml": 52
+    },
+    "H_median": 15.656756810361557,
+    "dbh_median": 0.36191
+   }
+  },
+  "stand": {
+   "spacingCV": {
+    "median": 0.45002781520606805,
+    "p10": 0.37600274830835156,
+    "p90": 0.5225743044643266,
+    "n": 15,
+    "usable": true
+   },
+   "attachPerM": {
+    "median": 1.388226872742289,
+    "p10": 1.0591523538649708,
+    "p90": 1.488774908635897,
+    "n": 16,
+    "usable": true
+   },
+   "insertSD": {
+    "median": 12.625711289487594,
+    "p10": 8.193514589479607,
+    "p90": 21.18750218735457,
+    "n": 12,
+    "usable": true
+   },
+   "elevSD": {
+    "median": 15.337547086935112,
+    "p10": 8.839244513584111,
+    "p90": 26.44144803119544,
+    "n": 12,
+    "usable": true
+   },
+   "curvPersist": {
+    "median": -0.08411410551411837,
+    "p10": -0.2015288653815938,
+    "p90": 0.08280781487899791,
+    "n": 16,
+    "usable": true
+   },
+   "earlyFork": {
+    "median": 0.13392857142857142,
+    "p10": 0.005882352941176476,
+    "p90": 0.32222222222222224,
+    "n": 12,
+    "usable": true
+   },
+   "D": {
+    "median": 0.16998687923428246,
+    "p10": -1.2628810699357809,
+    "p90": 0.6046444687198806,
+    "n": 16,
+    "usable": false,
+    "reason": "stand crowns have no clean upper envelope: drop(0.75R) is near zero, bands cross zero (ratios of near-zero drops); report the median only"
+   },
+   "shapeRatio": {
+    "median": 0.1600151661199067,
+    "p10": -0.24316477319737856,
+    "p90": 0.7415666352886762,
+    "n": 11,
+    "usable": false,
+    "reason": "stand crowns have no clean upper envelope: drop(0.75R) is near zero, bands cross zero (ratios of near-zero drops); report the median only"
+   },
+   "WH": {
+    "median": 0.2870713688933907,
+    "p10": 0.21609566106656658,
+    "p90": 0.4185492470114975,
+    "n": 16,
+    "usable": true
+   },
+   "cbH": {
+    "median": 0.4075415406472984,
+    "p10": 0.14575265003444954,
+    "p90": 0.5153669325611694,
+    "n": 16,
+    "usable": true
+   },
+   "_provenance": "stand = BioDiv (beech, hornbeam), Wytham (oak, sycamore), DEMOL (ash, beech)",
+   "_meta": {
+    "n_trees": 16,
+    "n_catalogued": 16,
+    "sources": {
+     "demol": 16
+    },
+    "H_median": 20.356038812923583,
+    "dbh_median": 0.23987416177988052
+   }
+  }
+ },
+ "birch": {
+  "lone": {
+   "spacingCV": {
+    "median": 0.466317819478494,
+    "p10": 0.3272086374209469,
+    "p90": 0.520959845792255,
+    "n": 17,
+    "usable": true
+   },
+   "attachPerM": {
+    "median": 1.6025797106699637,
+    "p10": 1.2039413329326545,
+    "p90": 1.9338777195786852,
+    "n": 17,
+    "usable": true
+   },
+   "insertSD": {
+    "median": 30.457477172909407,
+    "p10": 19.05738804907579,
+    "p90": 42.343558797804505,
+    "n": 16,
+    "usable": true
+   },
+   "elevSD": {
+    "median": 30.42016772377744,
+    "p10": 19.908750194577163,
+    "p90": 36.98610089623705,
+    "n": 16,
+    "usable": true
+   },
+   "curvPersist": {
+    "median": -0.17547447376386688,
+    "p10": -0.26742320447155865,
+    "p90": -0.09244157517466266,
+    "n": 17,
+    "usable": true
+   },
+   "earlyFork": {
+    "median": 0.27350427350427353,
+    "p10": 0.16041666666666665,
+    "p90": 0.47413793103448276,
+    "n": 16,
+    "usable": true
+   },
+   "D": {
+    "median": 0.3685567674797116,
+    "p10": 0.07096430127502781,
+    "p90": 0.6061668753667714,
+    "n": 17,
+    "usable": true
+   },
+   "shapeRatio": {
+    "median": 0.24385999113037776,
+    "p10": 0.09127005827122783,
+    "p90": 0.6429614057015762,
+    "n": 15,
+    "usable": true
+   },
+   "WH": {
+    "median": 0.5176030456242938,
+    "p10": 0.3831810075569726,
+    "p90": 0.6629888347654338,
+    "n": 17,
+    "usable": true
+   },
+   "cbH": {
+    "median": 0.17252553361439882,
+    "p10": 0.09476051823782447,
+    "p90": 0.30634045130667503,
+    "n": 17,
+    "usable": true
+   },
+   "_provenance": "lone = Munich street trees (TreeML, pruned, urban) plus Belgian hedgerow/tree-row oak and birch: lone crown and crown-base values may reflect pruning and light wells, not open-grown growth",
+   "_meta": {
+    "n_trees": 17,
+    "n_catalogued": 23,
+    "sources": {
+     "treeml": 11,
+     "belgian": 6
+    },
+    "H_median": 15.922657576952457,
+    "dbh_median": 0.30464
+   },
+   "_bySource": {
+    "treeml": {
+     "spacingCV": {
+      "median": 0.49850853295484027,
+      "p10": 0.4102554851659897,
+      "p90": 0.5232759774339285,
+      "n": 11
+     },
+     "attachPerM": {
+      "median": 1.4547660855337998,
+      "p10": 1.1296013736660995,
+      "p90": 1.6356451395651606,
+      "n": 11
+     },
+     "insertSD": {
+      "median": 34.804964019539675,
+      "p10": 19.734942176236824,
+      "p90": 42.141002315028956,
+      "n": 11
+     },
+     "elevSD": {
+      "median": 31.88494287978057,
+      "p10": 23.95647104627998,
+      "p90": 37.45542762869016,
+      "n": 11
+     },
+     "curvPersist": {
+      "median": -0.1666672726695897,
+      "p10": -0.21866020040453593,
+      "p90": -0.10858133754371346,
+      "n": 11
+     },
+     "earlyFork": {
+      "median": 0.2777777777777778,
+      "p10": 0.1875,
+      "p90": 0.4074074074074074,
+      "n": 11
+     },
+     "D": {
+      "median": 0.35783294290745343,
+      "p10": 0.15092852474660318,
+      "p90": 0.5078422021058501,
+      "n": 11
+     },
+     "shapeRatio": {
+      "median": 0.18482786320818553,
+      "p10": -0.007262852341114276,
+      "p90": 0.5414107723224576,
+      "n": 10
+     },
+     "WH": {
+      "median": 0.5379546797183512,
+      "p10": 0.45573727983019124,
+      "p90": 0.649050570838605,
+      "n": 11
+     },
+     "cbH": {
+      "median": 0.17252553361439882,
+      "p10": 0.11132064463847334,
+      "p90": 0.27775336071351,
+      "n": 11
+     },
+     "n_trees": 11
+    },
+    "belgian": {
+     "spacingCV": {
+      "median": 0.4030672701497253,
+      "p10": 0.3016020287696604,
+      "p90": 0.44348747686277573,
+      "n": 6
+     },
+     "attachPerM": {
+      "median": 1.8851667551289042,
+      "p10": 1.627819822131106,
+      "p90": 2.03207629570498,
+      "n": 6
+     },
+     "insertSD": {
+      "median": 24.029638927496887,
+      "p10": 19.126177342507383,
+      "p90": 39.61098180073283,
+      "n": 5
+     },
+     "elevSD": {
+      "median": 24.946451211836095,
+      "p10": 17.816541305298763,
+      "p90": 30.498409245402144,
+      "n": 5
+     },
+     "curvPersist": {
+      "median": -0.18136861196152682,
+      "p10": -0.2870399558086578,
+      "p90": -0.09210330946176194,
+      "n": 6
+     },
+     "earlyFork": {
+      "median": 0.2608695652173913,
+      "p10": 0.07692307692307693,
+      "p90": 0.6793103448275862,
+      "n": 5
+     },
+     "D": {
+      "median": 0.38510364039989203,
+      "p10": -0.042681724493458584,
+      "p90": 1.2713286350270505,
+      "n": 6
+     },
+     "shapeRatio": {
+      "median": 0.3778875590963493,
+      "p10": 0.17247404065730693,
+      "p90": 0.6513739639025699,
+      "n": 5
+     },
+     "WH": {
+      "median": 0.4296088232957776,
+      "p10": 0.30531802425983773,
+      "p90": 0.6134896297095384,
+      "n": 6
+     },
+     "cbH": {
+      "median": 0.16820100534462457,
+      "p10": 0.08817358172885127,
+      "p90": 0.47883027055112015,
+      "n": 6
+     },
+     "n_trees": 6
+    }
+   }
+  }
+ },
+ "sycamore": {
+  "lone": {
+   "spacingCV": {
+    "median": 0.46898170108303483,
+    "p10": 0.40320248375320733,
+    "p90": 0.5832412017834642,
+    "n": 25,
+    "usable": true
+   },
+   "attachPerM": {
+    "median": 1.412123561997372,
+    "p10": 0.9544917913321861,
+    "p90": 1.831380477222659,
+    "n": 25,
+    "usable": true
+   },
+   "insertSD": {
+    "median": 27.078994095215307,
+    "p10": 19.103592266074692,
+    "p90": 39.62210911213724,
+    "n": 25,
+    "usable": true
+   },
+   "elevSD": {
+    "median": 27.711872900189313,
+    "p10": 19.28029357193855,
+    "p90": 38.93788997303188,
+    "n": 25,
+    "usable": true
+   },
+   "curvPersist": {
+    "median": -0.08624529845463304,
+    "p10": -0.14711638138109503,
+    "p90": -0.0005385432839128974,
+    "n": 25,
+    "usable": true
+   },
+   "earlyFork": {
+    "median": 0.35294117647058826,
+    "p10": 0.2537037037037037,
+    "p90": 0.5,
+    "n": 25,
+    "usable": true
+   },
+   "D": {
+    "median": 0.5147743535147811,
+    "p10": 0.24812852322322354,
+    "p90": 0.7408729916202164,
+    "n": 25,
+    "usable": true
+   },
+   "shapeRatio": {
+    "median": 0.4282047625618001,
+    "p10": 0.25166329998042464,
+    "p90": 0.5811077000710236,
+    "n": 24,
+    "usable": true
+   },
+   "WH": {
+    "median": 0.6339136762733351,
+    "p10": 0.5340182571407515,
+    "p90": 0.7955084318675163,
+    "n": 25,
+    "usable": true
+   },
+   "cbH": {
+    "median": 0.19885309706265206,
+    "p10": 0.08976114277684161,
+    "p90": 0.28381598400333785,
+    "n": 25,
+    "usable": true
+   },
+   "_provenance": "lone = Munich street trees (TreeML, pruned, urban) plus Belgian hedgerow/tree-row oak and birch: lone crown and crown-base values may reflect pruning and light wells, not open-grown growth",
+   "_meta": {
+    "n_trees": 25,
+    "n_catalogued": 33,
+    "sources": {
+     "treeml": 25
+    },
+    "H_median": 15.55469822418533,
+    "dbh_median": 0.37216
+   }
+  },
+  "stand": {
+   "spacingCV": {
+    "median": 0.4608308490859549,
+    "p10": 0.31549522623982734,
+    "p90": 0.6113819952493275,
+    "n": 35,
+    "usable": true
+   },
+   "attachPerM": {
+    "median": 1.4761341651423694,
+    "p10": 1.260889340409375,
+    "p90": 1.7751824964046372,
+    "n": 37,
+    "usable": true
+   },
+   "insertSD": {
+    "median": 18.44273211524315,
+    "p10": 9.788805165266504,
+    "p90": 30.326455554609517,
+    "n": 31,
+    "usable": true
+   },
+   "elevSD": {
+    "median": 19.501696971577662,
+    "p10": 12.686668380297691,
+    "p90": 29.06251712276811,
+    "n": 31,
+    "usable": true
+   },
+   "curvPersist": {
+    "median": -0.0678271094717779,
+    "p10": -0.17001350166588647,
+    "p90": 0.09279069519286375,
+    "n": 35,
+    "usable": true
+   },
+   "earlyFork": {
+    "median": 0.25,
+    "p10": 0.0,
+    "p90": 0.5,
+    "n": 31,
+    "usable": true
+   },
+   "D": {
+    "median": 0.0786818104860026,
+    "p10": -0.793364186354839,
+    "p90": 0.3285780202184387,
+    "n": 37,
+    "usable": false,
+    "reason": "stand crowns have no clean upper envelope: drop(0.75R) is near zero, bands cross zero (ratios of near-zero drops); report the median only"
+   },
+   "shapeRatio": {
+    "median": 0.09242592399632453,
+    "p10": -3.0479542361257153,
+    "p90": 0.4640150409945874,
+    "n": 20,
+    "usable": false,
+    "reason": "stand crowns have no clean upper envelope: drop(0.75R) is near zero, bands cross zero (ratios of near-zero drops); report the median only"
+   },
+   "WH": {
+    "median": 0.45426920972586465,
+    "p10": 0.37010113910022285,
+    "p90": 0.6399663583710529,
+    "n": 37,
+    "usable": true
+   },
+   "cbH": {
+    "median": 0.46216155548389054,
+    "p10": 0.29082212020411535,
+    "p90": 0.6214075394789083,
+    "n": 37,
+    "usable": true
+   },
+   "_provenance": "stand = BioDiv (beech, hornbeam), Wytham (oak, sycamore), DEMOL (ash, beech)",
+   "_meta": {
+    "n_trees": 37,
+    "n_catalogued": 40,
+    "sources": {
+     "wytham": 37
+    },
+    "H_median": 18.85478567629537,
+    "dbh_median": 0.25145974045940295
+   }
+  }
+ },
+ "hornbeam": {
+  "lone": {
+   "spacingCV": {
+    "median": 0.4697199697617497,
+    "p10": 0.3990213429223292,
+    "p90": 0.5027566252199304,
+    "n": 23,
+    "usable": true
+   },
+   "attachPerM": {
+    "median": 1.35436784240323,
+    "p10": 1.0947930538590611,
+    "p90": 1.6265588114428908,
+    "n": 23,
+    "usable": true
+   },
+   "insertSD": {
+    "median": 31.530610236352093,
+    "p10": 23.67510338581657,
+    "p90": 40.16317975817894,
+    "n": 23,
+    "usable": true
+   },
+   "elevSD": {
+    "median": 31.519586642887404,
+    "p10": 24.345181955042865,
+    "p90": 40.186981931988086,
+    "n": 23,
+    "usable": true
+   },
+   "curvPersist": {
+    "median": -0.15041836967091998,
+    "p10": -0.24704911051066192,
+    "p90": -0.10103205513002347,
+    "n": 23,
+    "usable": true
+   },
+   "earlyFork": {
+    "median": 0.3684210526315789,
+    "p10": 0.20545454545454547,
+    "p90": 0.49411764705882355,
+    "n": 23,
+    "usable": true
+   },
+   "D": {
+    "median": 0.5452531198611252,
+    "p10": 0.07231811540491118,
+    "p90": 1.0399748322733011,
+    "n": 23,
+    "usable": true
+   },
+   "shapeRatio": {
+    "median": 0.5332794288488003,
+    "p10": 0.07586461354840733,
+    "p90": 0.6944755684659387,
+    "n": 21,
+    "usable": true
+   },
+   "WH": {
+    "median": 0.6210291077115522,
+    "p10": 0.511469549780823,
+    "p90": 0.7271519041558868,
+    "n": 23,
+    "usable": true
+   },
+   "cbH": {
+    "median": 0.12488884939182385,
+    "p10": 0.056508164342358266,
+    "p90": 0.21724887794125605,
+    "n": 23,
+    "usable": true
+   },
+   "_provenance": "lone = Munich street trees (TreeML, pruned, urban) plus Belgian hedgerow/tree-row oak and birch: lone crown and crown-base values may reflect pruning and light wells, not open-grown growth",
+   "_meta": {
+    "n_trees": 23,
+    "n_catalogued": 41,
+    "sources": {
+     "treeml": 23
+    },
+    "H_median": 15.077076071587175,
+    "dbh_median": 0.2638
+   }
+  },
+  "stand": {
+   "spacingCV": {
+    "median": 0.4048834513838283,
+    "p10": 0.3200979318199315,
+    "p90": 0.49228334813106667,
+    "n": 34,
+    "usable": true
+   },
+   "attachPerM": {
+    "median": 1.8037013404228124,
+    "p10": 1.0637212744601539,
+    "p90": 2.244137053121522,
+    "n": 36,
+    "usable": true
+   },
+   "insertSD": {
+    "median": 27.269528972976673,
+    "p10": 18.551274175013198,
+    "p90": 38.05917250586602,
+    "n": 36,
+    "usable": true
+   },
+   "elevSD": {
+    "median": 26.889111370701254,
+    "p10": 19.04538250617156,
+    "p90": 37.10615813310726,
+    "n": 36,
+    "usable": true
+   },
+   "curvPersist": {
+    "median": -0.08653365056984608,
+    "p10": -0.1806255457644283,
+    "p90": 0.024524277494636204,
+    "n": 36,
+    "usable": true
+   },
+   "earlyFork": {
+    "median": 0.30368906455862976,
+    "p10": 0.1375,
+    "p90": 0.5333333333333333,
+    "n": 36,
+    "usable": true
+   },
+   "D": {
+    "median": 0.1374394376315923,
+    "p10": -0.12404330336798823,
+    "p90": 0.5836988589758593,
+    "n": 36,
+    "usable": false,
+    "reason": "stand crowns have no clean upper envelope: drop(0.75R) is near zero, bands cross zero (ratios of near-zero drops); report the median only"
+   },
+   "shapeRatio": {
+    "median": -0.0030465848017171993,
+    "p10": -1.378562035618581,
+    "p90": 0.6735377304968153,
+    "n": 25,
+    "usable": false,
+    "reason": "stand crowns have no clean upper envelope: drop(0.75R) is near zero, bands cross zero (ratios of near-zero drops); report the median only"
+   },
+   "WH": {
+    "median": 0.44444982888834467,
+    "p10": 0.32307310923224897,
+    "p90": 0.5675813595011687,
+    "n": 36,
+    "usable": true
+   },
+   "cbH": {
+    "median": 0.22118769471403135,
+    "p10": 0.08655447683854695,
+    "p90": 0.3389746793146933,
+    "n": 36,
+    "usable": true
+   },
+   "_provenance": "stand = BioDiv (beech, hornbeam), Wytham (oak, sycamore), DEMOL (ash, beech)",
+   "_meta": {
+    "n_trees": 36,
+    "n_catalogued": 38,
+    "sources": {
+     "biodiv": 36
+    },
+    "H_median": 21.46928618603812,
+    "dbh_median": 0.19362426549196243
+   }
+  }
+ },
+ "oak": {
+  "lone": {
+   "spacingCV": {
+    "median": 0.39145997208326816,
+    "p10": 0.3138277505785465,
+    "p90": 0.45474611005227605,
+    "n": 25,
+    "usable": true
+   },
+   "attachPerM": {
+    "median": 1.8584098592800578,
+    "p10": 1.4627183820600091,
+    "p90": 2.100116113038225,
+    "n": 25,
+    "usable": true
+   },
+   "insertSD": {
+    "median": 23.028940366975085,
+    "p10": 19.684510920976457,
+    "p90": 30.4964192276849,
+    "n": 25,
+    "usable": true
+   },
+   "elevSD": {
+    "median": 25.667975330492112,
+    "p10": 18.36845998197168,
+    "p90": 31.247350580038034,
+    "n": 25,
+    "usable": true
+   },
+   "curvPersist": {
+    "median": -0.12011689415921001,
+    "p10": -0.15463656059753686,
+    "p90": -0.03918873288801418,
+    "n": 25,
+    "usable": true
+   },
+   "earlyFork": {
+    "median": 0.34615384615384615,
+    "p10": 0.21746031746031746,
+    "p90": 0.5433333333333333,
+    "n": 25,
+    "usable": true
+   },
+   "D": {
+    "median": 0.36305251363366864,
+    "p10": 0.16463395056779453,
+    "p90": 0.5883053059263137,
+    "n": 25,
+    "usable": true
+   },
+   "shapeRatio": {
+    "median": 0.413576706156493,
+    "p10": 0.12737065804734596,
+    "p90": 0.5704013361819281,
+    "n": 23,
+    "usable": true
+   },
+   "WH": {
+    "median": 0.6432476822225531,
+    "p10": 0.5523494443340012,
+    "p90": 0.8198209222923535,
+    "n": 25,
+    "usable": true
+   },
+   "cbH": {
+    "median": 0.17771327287754363,
+    "p10": 0.07205914062195941,
+    "p90": 0.3054457523769957,
+    "n": 25,
+    "usable": true
+   },
+   "_provenance": "lone = Munich street trees (TreeML, pruned, urban) plus Belgian hedgerow/tree-row oak and birch: lone crown and crown-base values may reflect pruning and light wells, not open-grown growth",
+   "_meta": {
+    "n_trees": 25,
+    "n_catalogued": 43,
+    "sources": {
+     "treeml": 4,
+     "belgian": 21
+    },
+    "H_median": 16.622041950810598,
+    "dbh_median": 0.3910999369537079
+   },
+   "_bySource": {
+    "treeml": {
+     "spacingCV": {
+      "median": 0.43802254908780325,
+      "p10": 0.39680900670863783,
+      "p90": 0.4792684985643789,
+      "n": 4
+     },
+     "attachPerM": {
+      "median": 1.4205414149731,
+      "p10": 1.209393863214796,
+      "p90": 1.4776890211384583,
+      "n": 4
+     },
+     "insertSD": {
+      "median": 23.98839297492181,
+      "p10": 22.315582044005858,
+      "p90": 29.971716404767747,
+      "n": 4
+     },
+     "elevSD": {
+      "median": 26.6993580448364,
+      "p10": 23.975008096493006,
+      "p90": 28.10624828309413,
+      "n": 4
+     },
+     "curvPersist": {
+      "median": -0.13517062452891937,
+      "p10": -0.17871654761562555,
+      "p90": -0.09059652308591536,
+      "n": 4
+     },
+     "earlyFork": {
+      "median": 0.25043478260869567,
+      "p10": 0.1955294117647059,
+      "p90": 0.2691699604743083,
+      "n": 4
+     },
+     "D": {
+      "median": 0.38858401890975414,
+      "p10": 0.17312801074997045,
+      "p90": 0.8616364045808733,
+      "n": 4
+     },
+     "shapeRatio": {
+      "median": 0.289143529314008,
+      "p10": 0.13389144988224935,
+      "p90": 0.6827568465325986,
+      "n": 4
+     },
+     "WH": {
+      "median": 0.6029070470988993,
+      "p10": 0.5732873067398411,
+      "p90": 0.6655550575135918,
+      "n": 4
+     },
+     "cbH": {
+      "median": 0.16632883337459406,
+      "p10": 0.13183204984313787,
+      "p90": 0.27178624519752953,
+      "n": 4
+     },
+     "n_trees": 4
+    },
+    "belgian": {
+     "spacingCV": {
+      "median": 0.38244500773576745,
+      "p10": 0.3112040069531897,
+      "p90": 0.4338776373499448,
+      "n": 21
+     },
+     "attachPerM": {
+      "median": 1.924405016177502,
+      "p10": 1.6309936921448283,
+      "p90": 2.102534725837807,
+      "n": 21
+     },
+     "insertSD": {
+      "median": 23.028940366975085,
+      "p10": 19.237802391179255,
+      "p90": 29.58975160470199,
+      "n": 21
+     },
+     "elevSD": {
+      "median": 25.626476325729588,
+      "p10": 18.026183051471264,
+      "p90": 31.654616589773212,
+      "n": 21
+     },
+     "curvPersist": {
+      "median": -0.12011689415921001,
+      "p10": -0.14884177507488422,
+      "p90": -0.0148821344249703,
+      "n": 21
+     },
+     "earlyFork": {
+      "median": 0.3888888888888889,
+      "p10": 0.2222222222222222,
+      "p90": 0.55,
+      "n": 21
+     },
+     "D": {
+      "median": 0.36305251363366864,
+      "p10": 0.19320281073558782,
+      "p90": 0.5375017853260623,
+      "n": 21
+     },
+     "shapeRatio": {
+      "median": 0.4225363314271592,
+      "p10": 0.06042404137646576,
+      "p90": 0.5607606748477383,
+      "n": 19
+     },
+     "WH": {
+      "median": 0.6831464597208267,
+      "p10": 0.5476818347614939,
+      "p90": 0.8293479531794232,
+      "n": 21
+     },
+     "cbH": {
+      "median": 0.19872590133951412,
+      "p10": 0.06075293766752585,
+      "p90": 0.2954595309404898,
+      "n": 21
+     },
+     "n_trees": 21
+    }
+   }
+  },
+  "stand": {
+   "spacingCV": {
+    "median": 0.4141047077973764,
+    "p10": 0.3619178607468734,
+    "p90": 0.5511847422692389,
+    "n": 36,
+    "usable": true
+   },
+   "attachPerM": {
+    "median": 1.4892369470411255,
+    "p10": 1.1511552969039847,
+    "p90": 1.8101986540224442,
+    "n": 37,
+    "usable": true
+   },
+   "insertSD": {
+    "median": 26.27165566043128,
+    "p10": 18.96856364632223,
+    "p90": 34.96114315933024,
+    "n": 36,
+    "usable": true
+   },
+   "elevSD": {
+    "median": 23.941364618789134,
+    "p10": 18.795470831474823,
+    "p90": 30.641046558786023,
+    "n": 36,
+    "usable": true
+   },
+   "curvPersist": {
+    "median": -0.06673302647288701,
+    "p10": -0.1688878857338989,
+    "p90": 0.01594585495420115,
+    "n": 37,
+    "usable": true
+   },
+   "earlyFork": {
+    "median": 0.23026315789473684,
+    "p10": 0.07417582417582418,
+    "p90": 0.44155844155844154,
+    "n": 36,
+    "usable": true
+   },
+   "D": {
+    "median": 0.09271069768795465,
+    "p10": -0.3411235003578756,
+    "p90": 0.41641560739690175,
+    "n": 36,
+    "usable": false,
+    "reason": "stand crowns have no clean upper envelope: drop(0.75R) is near zero, bands cross zero (ratios of near-zero drops); report the median only"
+   },
+   "shapeRatio": {
+    "median": 0.2418211770124623,
+    "p10": -0.2520944213541519,
+    "p90": 0.58303863306576,
+    "n": 26,
+    "usable": false,
+    "reason": "stand crowns have no clean upper envelope: drop(0.75R) is near zero, bands cross zero (ratios of near-zero drops); report the median only"
+   },
+   "WH": {
+    "median": 0.6203449684420843,
+    "p10": 0.4269487406724937,
+    "p90": 0.803005041651396,
+    "n": 37,
+    "usable": true
+   },
+   "cbH": {
+    "median": 0.26487406736867614,
+    "p10": 0.12443710743155617,
+    "p90": 0.3682737741850488,
+    "n": 37,
+    "usable": true
+   },
+   "_provenance": "stand = BioDiv (beech, hornbeam), Wytham (oak, sycamore), DEMOL (ash, beech)",
+   "_meta": {
+    "n_trees": 37,
+    "n_catalogued": 37,
+    "sources": {
+     "wytham": 37
+    },
+    "H_median": 19.872611856022473,
+    "dbh_median": 0.6838204746456045
+   }
+  }
+ },
+ "maple_field": {
+  "lone": {
+   "spacingCV": {
+    "median": 0.45270193936668385,
+    "p10": 0.45000063211671365,
+    "p90": 0.45540324661665404,
+    "n": 2,
+    "usable": false,
+    "reason": "n < 8"
+   },
+   "attachPerM": {
+    "median": 1.2821376269854095,
+    "p10": 1.183971163943175,
+    "p90": 1.3803040900276442,
+    "n": 2,
+    "usable": false,
+    "reason": "n < 8"
+   },
+   "insertSD": {
+    "median": 32.973690390348494,
+    "p10": 31.101062196853388,
+    "p90": 34.84631858384361,
+    "n": 2,
+    "usable": false,
+    "reason": "n < 8"
+   },
+   "elevSD": {
+    "median": 29.48885309009122,
+    "p10": 26.616533845619244,
+    "p90": 32.36117233456319,
+    "n": 2,
+    "usable": false,
+    "reason": "n < 8"
+   },
+   "curvPersist": {
+    "median": -0.11396813309086208,
+    "p10": -0.12054941942484647,
+    "p90": -0.1073868467568777,
+    "n": 2,
+    "usable": false,
+    "reason": "n < 8"
+   },
+   "earlyFork": {
+    "median": 0.24000000000000002,
+    "p10": 0.20800000000000002,
+    "p90": 0.272,
+    "n": 2,
+    "usable": false,
+    "reason": "n < 8"
+   },
+   "D": {
+    "median": 0.5885758264861336,
+    "p10": 0.3768576529333222,
+    "p90": 0.8002940000389451,
+    "n": 2,
+    "usable": false,
+    "reason": "n < 8"
+   },
+   "shapeRatio": {
+    "median": 0.1539722114414602,
+    "p10": 0.10300405769801159,
+    "p90": 0.20494036518490882,
+    "n": 2,
+    "usable": false,
+    "reason": "n < 8"
+   },
+   "WH": {
+    "median": 0.6858129395758228,
+    "p10": 0.6297155814715586,
+    "p90": 0.741910297680087,
+    "n": 2,
+    "usable": false,
+    "reason": "n < 8"
+   },
+   "cbH": {
+    "median": 0.1941926293120862,
+    "p10": 0.16585400479544798,
+    "p90": 0.2225312538287244,
+    "n": 2,
+    "usable": false,
+    "reason": "n < 8"
+   },
+   "_provenance": "lone = Munich street trees (TreeML, pruned, urban) plus Belgian hedgerow/tree-row oak and birch: lone crown and crown-base values may reflect pruning and light wells, not open-grown growth",
+   "_meta": {
+    "n_trees": 2,
+    "n_catalogued": 6,
+    "sources": {
+     "treeml": 2
+    },
+    "H_median": 16.63135432069891,
+    "dbh_median": 0.40435
+   }
+  }
+ },
+ "lime": {
+  "lone": {
+   "spacingCV": {
+    "median": 0.3945314332418628,
+    "p10": 0.34233693291833356,
+    "p90": 0.4557125290870182,
+    "n": 55,
+    "usable": true
+   },
+   "attachPerM": {
+    "median": 1.922297058342293,
+    "p10": 1.486920183894108,
+    "p90": 2.107386830662137,
+    "n": 55,
+    "usable": true
+   },
+   "insertSD": {
+    "median": 28.39384788113097,
+    "p10": 20.70547039580849,
+    "p90": 35.3000091758396,
+    "n": 55,
+    "usable": true
+   },
+   "elevSD": {
+    "median": 29.750672294796317,
+    "p10": 22.643531674159814,
+    "p90": 39.23311277697649,
+    "n": 55,
+    "usable": true
+   },
+   "curvPersist": {
+    "median": -0.11518962632983346,
+    "p10": -0.17810021899160347,
+    "p90": -0.0277600162201267,
+    "n": 55,
+    "usable": true
+   },
+   "earlyFork": {
+    "median": 0.3793103448275862,
+    "p10": 0.2537037037037037,
+    "p90": 0.4829090909090909,
+    "n": 55,
+    "usable": true
+   },
+   "D": {
+    "median": 0.671595811144718,
+    "p10": 0.35507510142387694,
+    "p90": 1.1056112859514196,
+    "n": 55,
+    "usable": true
+   },
+   "shapeRatio": {
+    "median": 0.49607821267812274,
+    "p10": 0.30579284871472434,
+    "p90": 0.6362798917576898,
+    "n": 55,
+    "usable": true
+   },
+   "WH": {
+    "median": 0.5661520215569791,
+    "p10": 0.48120362926320026,
+    "p90": 0.6812371970601163,
+    "n": 55,
+    "usable": true
+   },
+   "cbH": {
+    "median": 0.23125897869995124,
+    "p10": 0.16511497678143275,
+    "p90": 0.32628387670593223,
+    "n": 55,
+    "usable": true
+   },
+   "_provenance": "lone = Munich street trees (TreeML, pruned, urban) plus Belgian hedgerow/tree-row oak and birch: lone crown and crown-base values may reflect pruning and light wells, not open-grown growth",
+   "_meta": {
+    "n_trees": 55,
+    "n_catalogued": 69,
+    "sources": {
+     "treeml": 55
+    },
+    "H_median": 16.14180437157396,
+    "dbh_median": 0.36822
+   }
+  }
+ },
+ "whitebeam": {
+  "lone": {
+   "spacingCV": {
+    "median": 0.49395072761640935,
+    "p10": 0.4363045577786198,
+    "p90": 0.5836073006674103,
+    "n": 4,
+    "usable": false,
+    "reason": "n < 8"
+   },
+   "attachPerM": {
+    "median": 1.1189035305680894,
+    "p10": 0.8674851191218139,
+    "p90": 1.5026119641675428,
+    "n": 4,
+    "usable": false,
+    "reason": "n < 8"
+   },
+   "insertSD": {
+    "median": 31.9228936442192,
+    "p10": 21.731470328046946,
+    "p90": 46.22882774963765,
+    "n": 4,
+    "usable": false,
+    "reason": "n < 8"
+   },
+   "elevSD": {
+    "median": 34.92955590064565,
+    "p10": 29.11047778212808,
+    "p90": 44.29913646886756,
+    "n": 4,
+    "usable": false,
+    "reason": "n < 8"
+   },
+   "curvPersist": {
+    "median": -0.0816691490662187,
+    "p10": -0.13972313938917474,
+    "p90": -0.03761177411860497,
+    "n": 4,
+    "usable": false,
+    "reason": "n < 8"
+   },
+   "earlyFork": {
+    "median": 0.31666666666666665,
+    "p10": 0.23,
+    "p90": 0.52,
+    "n": 4,
+    "usable": false,
+    "reason": "n < 8"
+   },
+   "D": {
+    "median": 0.33452506775248925,
+    "p10": 0.16780386971604916,
+    "p90": 0.4124706427918106,
+    "n": 4,
+    "usable": false,
+    "reason": "n < 8"
+   },
+   "shapeRatio": {
+    "median": 0.4017983206524841,
+    "p10": -0.24425351395642803,
+    "p90": 0.697137307815641,
+    "n": 4,
+    "usable": false,
+    "reason": "n < 8"
+   },
+   "WH": {
+    "median": 0.6454131667068501,
+    "p10": 0.540656080151549,
+    "p90": 0.8098551155751698,
+    "n": 4,
+    "usable": false,
+    "reason": "n < 8"
+   },
+   "cbH": {
+    "median": 0.14253283871264277,
+    "p10": 0.12459747530896437,
+    "p90": 0.20408164672883802,
+    "n": 4,
+    "usable": false,
+    "reason": "n < 8"
+   },
+   "_provenance": "lone = Munich street trees (TreeML, pruned, urban) plus Belgian hedgerow/tree-row oak and birch: lone crown and crown-base values may reflect pruning and light wells, not open-grown growth",
+   "_meta": {
+    "n_trees": 4,
+    "n_catalogued": 26,
+    "sources": {
+     "treeml": 4
+    },
+    "H_median": 13.46981749719166,
+    "dbh_median": 0.22738
+   }
+  }
+ },
+ "beech": {
+  "lone": {
+   "spacingCV": {
+    "median": 0.4663509672098834,
+    "p10": 0.4250266358311628,
+    "p90": 0.5018473337953373,
+    "n": 9,
+    "usable": true
+   },
+   "attachPerM": {
+    "median": 1.4906397443771713,
+    "p10": 1.2749320814249006,
+    "p90": 1.7164412124929365,
+    "n": 9,
+    "usable": true
+   },
+   "insertSD": {
+    "median": 36.99749342036577,
+    "p10": 32.46330394369373,
+    "p90": 42.42263025351711,
+    "n": 9,
+    "usable": true
+   },
+   "elevSD": {
+    "median": 29.026184237777603,
+    "p10": 26.80624808269023,
+    "p90": 41.576375981333015,
+    "n": 9,
+    "usable": true
+   },
+   "curvPersist": {
+    "median": -0.08592110851718678,
+    "p10": -0.16486213428113558,
+    "p90": -0.05951008334787148,
+    "n": 9,
+    "usable": true
+   },
+   "earlyFork": {
+    "median": 0.3,
+    "p10": 0.2130952380952381,
+    "p90": 0.3671957671957672,
+    "n": 9,
+    "usable": true
+   },
+   "D": {
+    "median": 0.3846632379037087,
+    "p10": 0.21783216484067922,
+    "p90": 0.7650246282625509,
+    "n": 9,
+    "usable": true
+   },
+   "shapeRatio": {
+    "median": 0.3732650133617557,
+    "p10": 0.2437164451102659,
+    "p90": 0.6272432551226784,
+    "n": 9,
+    "usable": true
+   },
+   "WH": {
+    "median": 0.621792515215753,
+    "p10": 0.5544626382166234,
+    "p90": 0.7349959060423489,
+    "n": 9,
+    "usable": true
+   },
+   "cbH": {
+    "median": 0.13837983877407287,
+    "p10": 0.04230199990258013,
+    "p90": 0.24638465918874677,
+    "n": 9,
+    "usable": true
+   },
+   "_provenance": "lone = Munich street trees (TreeML, pruned, urban) plus Belgian hedgerow/tree-row oak and birch: lone crown and crown-base values may reflect pruning and light wells, not open-grown growth",
+   "_meta": {
+    "n_trees": 9,
+    "n_catalogued": 14,
+    "sources": {
+     "treeml": 9
+    },
+    "H_median": 18.207641361424923,
+    "dbh_median": 0.42656
+   }
+  },
+  "stand": {
+   "spacingCV": {
+    "median": 0.40943813375849347,
+    "p10": 0.3269483922452037,
+    "p90": 0.5157331235897556,
+    "n": 63,
+    "usable": true
+   },
+   "attachPerM": {
+    "median": 1.521689505049932,
+    "p10": 1.022996482099436,
+    "p90": 1.9591136829346976,
+    "n": 66,
+    "usable": true
+   },
+   "insertSD": {
+    "median": 24.945853118637203,
+    "p10": 17.42819808941402,
+    "p90": 39.406170533406815,
+    "n": 62,
+    "usable": true
+   },
+   "elevSD": {
+    "median": 24.82140265120346,
+    "p10": 18.620581296151638,
+    "p90": 37.32676874163445,
+    "n": 62,
+    "usable": true
+   },
+   "curvPersist": {
+    "median": -0.06634309704092137,
+    "p10": -0.20946984198552673,
+    "p90": 0.030209784318092694,
+    "n": 64,
+    "usable": true
+   },
+   "earlyFork": {
+    "median": 0.23973727422003283,
+    "p10": 0.13167701863354037,
+    "p90": 0.45694444444444443,
+    "n": 62,
+    "usable": true
+   },
+   "D": {
+    "median": 0.177321296102494,
+    "p10": -0.1757760441634933,
+    "p90": 0.825421698608753,
+    "n": 65,
+    "usable": false,
+    "reason": "stand crowns have no clean upper envelope: drop(0.75R) is near zero, bands cross zero (ratios of near-zero drops); report the median only"
+   },
+   "shapeRatio": {
+    "median": 0.22832329027822132,
+    "p10": -0.30823532863019726,
+    "p90": 0.5898799150618736,
+    "n": 49,
+    "usable": false,
+    "reason": "stand crowns have no clean upper envelope: drop(0.75R) is near zero, bands cross zero (ratios of near-zero drops); report the median only"
+   },
+   "WH": {
+    "median": 0.3105990536917431,
+    "p10": 0.2280726345498757,
+    "p90": 0.4084712174426923,
+    "n": 66,
+    "usable": true
+   },
+   "cbH": {
+    "median": 0.3785076299148724,
+    "p10": 0.10424241901240613,
+    "p90": 0.5635109681770605,
+    "n": 66,
+    "usable": true
+   },
+   "_provenance": "stand = BioDiv (beech, hornbeam), Wytham (oak, sycamore), DEMOL (ash, beech)",
+   "_meta": {
+    "n_trees": 66,
+    "n_catalogued": 68,
+    "sources": {
+     "demol": 15,
+     "biodiv": 51
+    },
+    "H_median": 24.000501069533854,
+    "dbh_median": 0.2840617746114731
+   },
+   "_bySource": {
+    "demol": {
+     "spacingCV": {
+      "median": 0.4160202263326823,
+      "p10": 0.3319687920978683,
+      "p90": 0.5227968006715095,
+      "n": 15
+     },
+     "attachPerM": {
+      "median": 1.5390556121745769,
+      "p10": 1.3795364628210545,
+      "p90": 1.6997925611692817,
+      "n": 15
+     },
+     "insertSD": {
+      "median": 18.37710505133548,
+      "p10": 15.403974121436868,
+      "p90": 28.633793221530173,
+      "n": 15
+     },
+     "elevSD": {
+      "median": 24.74244744774811,
+      "p10": 16.882840272676397,
+      "p90": 37.404720810096215,
+      "n": 15
+     },
+     "curvPersist": {
+      "median": -0.0376545738446585,
+      "p10": -0.10868493678184742,
+      "p90": 0.010671402259642967,
+      "n": 15
+     },
+     "earlyFork": {
+      "median": 0.3,
+      "p10": 0.1746031746031746,
+      "p90": 0.48333333333333334,
+      "n": 15
+     },
+     "D": {
+      "median": 0.16714294078718878,
+      "p10": -0.013710019228310817,
+      "p90": 0.7296774356657338,
+      "n": 15
+     },
+     "shapeRatio": {
+      "median": 0.22351041148284384,
+      "p10": -0.18518011636464146,
+      "p90": 0.5265535342897131,
+      "n": 12
+     },
+     "WH": {
+      "median": 0.33764600365206615,
+      "p10": 0.22790716386997018,
+      "p90": 0.3929794342732422,
+      "n": 15
+     },
+     "cbH": {
+      "median": 0.44233329221004974,
+      "p10": 0.2605715017403716,
+      "p90": 0.5877719829533675,
+      "n": 15
+     },
+     "n_trees": 15
+    },
+    "biodiv": {
+     "spacingCV": {
+      "median": 0.40410022579406873,
+      "p10": 0.32720334050628813,
+      "p90": 0.5025674180518633,
+      "n": 48
+     },
+     "attachPerM": {
+      "median": 1.4973909385450224,
+      "p10": 1.0045439643762986,
+      "p90": 2.042973028495704,
+      "n": 51
+     },
+     "insertSD": {
+      "median": 27.810029369390627,
+      "p10": 19.78773836141534,
+      "p90": 42.19187607027241,
+      "n": 47
+     },
+     "elevSD": {
+      "median": 24.90035785465881,
+      "p10": 18.79077560800326,
+      "p90": 36.36160552094613,
+      "n": 47
+     },
+     "curvPersist": {
+      "median": -0.07177310274139621,
+      "p10": -0.22986264367865555,
+      "p90": 0.03402372387800629,
+      "n": 49
+     },
+     "earlyFork": {
+      "median": 0.2222222222222222,
+      "p10": 0.12531969309462915,
+      "p90": 0.4321428571428571,
+      "n": 47
+     },
+     "D": {
+      "median": 0.24841556311394392,
+      "p10": -0.4945459857193962,
+      "p90": 0.8165336007498586,
+      "n": 50
+     },
+     "shapeRatio": {
+      "median": 0.22832329027822132,
+      "p10": -0.31514449609270945,
+      "p90": 0.5928233154683593,
+      "n": 37
+     },
+     "WH": {
+      "median": 0.2948989544730393,
+      "p10": 0.2338228759646003,
+      "p90": 0.4112380412164205,
+      "n": 51
+     },
+     "cbH": {
+      "median": 0.34409691430461226,
+      "p10": 0.09325758771488574,
+      "p90": 0.5187898034789207,
+      "n": 51
+     },
+     "n_trees": 51
+    }
+   }
+  }
+ }
+}

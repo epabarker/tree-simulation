@@ -12,6 +12,10 @@ A profile trait (`profile = [t0 … t9]` and one `band` in place of `target`: th
 height bands, species plan of 2026-10-31, step B.3) adds weight/10 · ((p_k − t_k) / band)² per band,
 so the vector weighs as one trait.
 
+Level 0 (reference-fidelity phase 2, the plan's §k): `load_spec(species, level=0)` scores each stand tree's place in
+Tallo's H–DBH and CR–DBH bands (`stand.talloH`, `stand.talloCR`: per season 60, 100, 150, the median z of the measured
+trees inside the support; analysis/treesim/tallo.py) with the time anchors Tallo cannot give, and reports the rest.
+
 `[[report]]` traits (the crown's shape: ADR 0029) are read from the same replies and written beside
 the fit, never scored. Each is reported at 60 and, where the lone tree is run on (`lone100`), at 100
 as `<name>100`; a report's target, band or profile is the description it is judged against by eye.
@@ -54,6 +58,16 @@ STARVE_SEASONS = 4
 DEATH_PENALTY = 25.0
 #: Loss for a trait that could not be measured (a tree with no limbs to measure, say).
 MISSING_PENALTY = 4.0
+#: Level 0's scored traits besides Tallo's (the user, 2026-11-03): the time anchors Tallo cannot give (height at 60,
+#: 100 over 60; an exception to ADR 0049 §1), the stand's LAI and the shade house. Every other trait is reported.
+#: v2 (the user, 2026-11-03): a targets file's `[level0] reported` moves some of these to the reports (birch's
+#: lateShare, described, not measured), and its `[[level0.trait]]` adds the yield tables' heights at 100 and 150
+#: (`stand.height100`, `stand.height150`), scored at Level 0 only.
+LEVEL0_SCORED = ("stand.height", "stand.lateShare", "stand.lai", "shade.survivalLight")
+#: The stand's seasons Level 0 reads (cli/trials.ts runStand to 150), in a Tallo trait's entry order.
+LEVEL0_SEASONS = (60, 100, 150)
+#: Metres a cell (tallo-level0.json's measurement): stand.height150 is in cells, as stand.height and height100 are.
+CELL_M = 0.25
 
 
 @dataclass
@@ -68,6 +82,8 @@ class Spec:
     form: dict = field(default_factory=dict)
     #: Traits read and written, never scored (ADR 0029): the crown's shape.
     reports: list[dict] = field(default_factory=list)
+    #: Level 0: the species' Tallo curves (tallo-level0.json's entry), read by seed_traits for z.
+    tallo: dict | None = None
 
     @property
     def paths(self) -> list[str]:
@@ -78,16 +94,42 @@ class Spec:
         """The trials its traits need: the stand runs on to season 100 for stand.lateShare, and the
         shade house runs only for shade.survivalLight (each costs time)."""
         names = {t["name"] for t in self.traits}
-        trials = ["lone", "stand100" if "stand.lateShare" in names else "stand"]
+        if any(n.startswith("stand.tallo") for n in names):
+            stand = "stand150"
+        else:
+            stand = "stand100" if "stand.lateShare" in names else "stand"
+        trials = ["lone", stand]
         if any(n.startswith("shade.") for n in names):
             trials.append("shade")
         return trials
 
 
-def load_spec(species: str) -> Spec:
+def load_spec(species: str, level: int | None = None) -> Spec:
+    """The species' targets. level=0: Level 0 (the plan's §k): Tallo's two traits and LEVEL0_SCORED scored, every
+    other trait reported, the params `[level0] knobs` only."""
     data = tomllib.loads((TARGETS / f"{species}.toml").read_text())
-    return Spec(data["species"], data["trait"], data["param"], data.get("holdout", {}), data.get("fixed", {}),
+    spec = Spec(data["species"], data["trait"], data["param"], data.get("holdout", {}), data.get("fixed", {}),
                 data.get("form", {}), data.get("report", []))
+    if level != 0:
+        return spec
+    from treesim import tallo
+
+    entry = tallo.load_targets()["species"][species]
+    if not entry["gated"]:
+        raise ValueError(f"{species} is not gated at Level 0: {entry.get('not_gated_reason', 'reference only')}")
+    knobs = data["level0"]["knobs"]
+    by_path = {p["path"]: p for p in spec.params}
+    spec.params = [by_path[k] for k in knobs]
+    scored = [n for n in LEVEL0_SCORED if n not in data["level0"].get("reported", [])]
+    spec.reports = spec.reports + [t for t in spec.traits if t["name"] not in scored]
+    spec.tallo = entry
+    spec.traits = [t for t in spec.traits if t["name"] in scored] + data["level0"].get("trait", []) + [
+        {"name": f"stand.tallo{k}", "profile": [0.0] * len(LEVEL0_SEASONS), "band": 1.0, "weight": 1.0,
+         "partial": True, "kind": "measured",
+         "source": f"Tallo {k}–DBH band (analysis/fit/sources/tallo-level0.json): median z of the measured trees"}
+        for k in tallo.TRAITS
+    ]
+    return spec
 
 
 def report_names(spec: Spec, seasons: tuple[str, ...] = ("", "100")) -> list[str]:
@@ -223,7 +265,24 @@ def survival_light(reply: dict, k: int = 0) -> tuple[float, float]:
     return math.exp(log_light), (min(lit) if lit else NO_SURVIVAL_LIGHT)
 
 
-def seed_traits(reply: dict) -> dict[str, float | None]:
+def tallo_traits(allometry: list[dict], curves: dict) -> dict[str, float | None]:
+    """`stand.talloH.k`, `stand.talloCR.k`: at LEVEL0_SEASONS[k], the median z of the measured trees inside the
+    support (None where none is); `stand.dbh.k`, `stand.H.k`, `stand.CR.k`: their median measurements, metres."""
+    from treesim import tallo
+
+    out: dict[str, float | None] = {}
+    for k, season in enumerate(LEVEL0_SEASONS):
+        trees = [a for a in allometry if a["season"] == season]
+        for name, key in (("dbh", "dbh"), ("H", "height"), ("CR", "crownRadius")):
+            out[f"stand.{name}.{k}"] = float(np.median([a[key] for a in trees])) if trees else None
+        for trait, key in (("H", "height"), ("CR", "crownRadius")):
+            zs = [tallo.z_score(curves[trait], 100 * a["dbh"], a[key]) for a in trees]
+            zs = [z for z in zs if z is not None]
+            out[f"stand.tallo{trait}.{k}"] = float(np.median(zs)) if zs else None
+    return out
+
+
+def seed_traits(reply: dict, tallo_curves: dict | None = None) -> dict[str, float | None]:
     """Flat traits of one seed's reply, `trial.trait` (a vector's entries `trial.trait.k`, as
     lone.profile.0 … lone.profile.9), with derived ones: lone.earlyShare (H30/H60),
     stand.lateShare (H100/H60), and shade.survivalLight (the light the seedling survives down to,
@@ -232,7 +291,16 @@ def seed_traits(reply: dict) -> dict[str, float | None]:
     flat: dict[str, float | None] = {}
     for trial in TRIALS:
         for rec in reply.get(trial, []):
+            if trial == "stand" and "allometry" in rec:
+                if tallo_curves is not None:
+                    flat.update(tallo_traits(rec["allometry"], tallo_curves))
+                # The live measured trees' mean height at 150, in cells: the same reading as height and height100
+                # (metrics' height is the allometry's highest point; equal at 60 and 100 on four species, 2026-11-03).
+                hs = [a["height"] for a in rec["allometry"] if a["season"] == LEVEL0_SEASONS[-1]]
+                flat["stand.height150"] = float(np.mean(hs)) / CELL_M if hs else None
             for k, v in rec.items():
+                if k == "allometry":
+                    continue
                 if isinstance(v, list):
                     for i, x in enumerate(v):
                         flat[f"{trial}.{k}.{i}"] = None if x is None else float(x)
@@ -268,6 +336,9 @@ def value_of(t: dict, traits: dict) -> float | list[float] | None:
     if "profile" not in t:
         return traits.get(t["name"])
     vs = [traits.get(f"{t['name']}.{k}") for k in range(len(t["profile"]))]
+    if t.get("partial"):
+        # Level 0's Tallo traits: a season with no tree inside the support is left out, not missing.
+        return None if all(v is None for v in vs) else vs
     return None if any(v is None for v in vs) else vs
 
 
@@ -277,28 +348,30 @@ def scaled(t: dict, traits: dict) -> list[float] | None:
     if v is None:
         return None
     vs = v if isinstance(v, list) else [v]
-    return [(x - g) / t["band"] for x, g in zip(vs, targets_of(t))]
+    return [(x - g) / t["band"] for x, g in zip(vs, targets_of(t)) if x is not None]
 
 
-def loss(spec: Spec, traits: dict[str, float | None]) -> float:
-    total = 0.0
+def contributions(spec: Spec, traits: dict[str, float | None]) -> dict[str, float]:
+    """Each scored trait's share of the loss, and the death penalties' (`death.lone`, `death.stand`)."""
+    out: dict[str, float] = {}
     for t in spec.traits:
         z = scaled(t, traits)
-        if z is None:
-            total += t["weight"] * MISSING_PENALTY
-        else:
-            # A profile's bands share the trait's weight.
-            total += t["weight"] * float(np.mean(np.square(z)))
+        # A profile's bands share the trait's weight.
+        out[t["name"]] = t["weight"] * (MISSING_PENALTY if z is None else float(np.mean(np.square(z))))
     lone_alive = traits.get("lone.alive")
-    if lone_alive is not None:
-        total += DEATH_PENALTY * (1 - lone_alive)
+    out["death.lone"] = DEATH_PENALTY * (1 - lone_alive) if lone_alive is not None else 0.0
     # The stand's survival at 60, and at 100 where the stand runs on (stand.lateShare): a stand
     # whose measured row dies after 60 is penalised as one that dies before it.
+    out["death.stand"] = 0.0
     for key in ("stand.alive", "stand.alive100"):
         stand_alive = traits.get(key)
         if stand_alive is not None:
-            total += DEATH_PENALTY * 5 * max(0.0, 0.8 - stand_alive)
-    return total
+            out["death.stand"] += DEATH_PENALTY * 5 * max(0.0, 0.8 - stand_alive)
+    return out
+
+
+def loss(spec: Spec, traits: dict[str, float | None]) -> float:
+    return float(sum(contributions(spec, traits).values()))
 
 
 def measure(pool: Pool, spec: Spec, assigns: list[dict], seeds: list[int]) -> list[dict]:
@@ -310,7 +383,8 @@ def measure(pool: Pool, spec: Spec, assigns: list[dict], seeds: list[int]) -> li
     ]
     replies = pool.map(requests)
     n = len(seeds)
-    return [mean_traits([seed_traits(r) for r in replies[i * n : (i + 1) * n]]) for i in range(len(assigns))]
+    return [mean_traits([seed_traits(r, spec.tallo) for r in replies[i * n : (i + 1) * n]])
+            for i in range(len(assigns))]
 
 
 # --- The search --------------------------------------------------------------------------------

@@ -37,6 +37,7 @@ import {
 } from "../src/core/params.ts";
 import { perArea, presetParams, TOP } from "../src/core/presets.ts";
 import { coreWasm, loadWorldsSync, RustWorld, type TreeView as Tree } from "../src/wasm/world.ts";
+import { type Allometry, allometry } from "./allometry.ts";
 
 loadWorldsSync(readFileSync(coreWasm));
 /** A trial's world: the Rust core. */
@@ -294,6 +295,11 @@ export interface StandTraits {
   lai100?: number;
   /** The limb crown ratio at season 100, when run on; else absent (reported, not scored). */
   crownRatio100?: number;
+  /**
+   * Level 0 (reference-fidelity phase 2): each live measured tree's DBH, height and crown radius in metres
+   * (cli/allometry.ts) at 60, 100 and 150, when the stand is run on to 150; else absent.
+   */
+  allometry?: (Allometry & { season: number; tree: number })[];
 }
 
 const mean = (xs: number[]): number =>
@@ -303,10 +309,18 @@ export function runStand(
   species: string,
   seed: number,
   assign: Record<string, unknown> = {},
-  seasons: 60 | 100 = 60,
+  seasons: 60 | 100 | 150 = 60,
 ): StandTraits {
   const world = newWorld(withAssign(standParams(species, seed), species, assign));
+  const measured: StandTraits["allometry"] = [];
+  const measure = (season: number): void => {
+    for (const k of STAND_MEASURED) {
+      const t = world.trees[k] as Tree;
+      if (t.alive) measured.push({ season, tree: k, ...allometry(t.m.cols, t.b.cols) });
+    }
+  };
   world.run(60);
+  if (seasons === 150) measure(60);
   const interior = STAND_MEASURED.map((k) => world.trees[k] as Tree);
   const live = interior.filter((t) => t.alive);
   const ms = live.map((t) => world.metricsOf(t));
@@ -321,13 +335,19 @@ export function runStand(
     lai: world.lai(0, STAND_WIDTH),
     widestAt: mean(live.map((t) => world.formOf(t).widestAt)),
   };
-  if (seasons === 100) {
+  if (seasons >= 100) {
     world.run(40);
     const still = interior.filter((t) => t.alive);
     traits.height100 = mean(still.map((t) => world.metricsOf(t).height));
     traits.crownRatio100 = mean(still.map((t) => world.metricsOf(t).limbCrownRatio));
     traits.alive100 = still.length / interior.length;
     traits.lai100 = world.lai(0, STAND_WIDTH);
+  }
+  if (seasons === 150) {
+    measure(100);
+    world.run(50);
+    measure(150);
+    traits.allometry = measured;
   }
   world.dispose();
   return traits;

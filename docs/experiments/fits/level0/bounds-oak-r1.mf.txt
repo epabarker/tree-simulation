@@ -1,0 +1,11 @@
+oak: r1.mf (fit 0.02258), seeds [1, 2, 3, 4, 5]
+| r1.mf | loss | stand.height | stand.height100 | stand.height150 | stand.lateShare | stand.lai | shade.survivalLight | stand.alive | stand.alive100 | stand.talloH.0 | stand.talloH.1 | stand.talloH.2 | stand.talloCR.0 | stand.talloCR.1 | stand.talloCR.2 | stand.dbh.0 | stand.dbh.1 | stand.dbh.2 | stand.H.0 | stand.H.1 | stand.H.2 | stand.CR.0 | stand.CR.1 | stand.CR.2 |
+| 0.01 | 3.56 | 82.9 | 104 | 125 | 1.26 | 5.22 | 0.109 | — | — | 0.154 | 0.103 | 0.942 | 1.96 | 1.18 | 1.12 | 0.218 | 0.31 | 0.314 | 20.6 | 25.8 | 30.8 | 5 | 4.81 | 4.98 |
+| 0.0226 | 2.76 | 81.4 | 105 | 119 | 1.29 | 5.21 | 0.109 | — | — | 0.149 | 0.369 | 0.908 | 1.86 | 1.31 | 1.17 | 0.208 | 0.291 | 0.31 | 20.2 | 25.9 | 29.3 | 4.71 | 4.57 | 4.47 |
+| 0.04 | 2.98 | 82 | 104 | 121 | 1.27 | 5.16 | 0.109 | — | — | 0.149 | 0.456 | 0.92 | 1.79 | 1.23 | 1.1 | 0.217 | 0.28 | 0.312 | 20.4 | 26.1 | 30.4 | 4.74 | 4.59 | 4.7 |
+| 0.06 | 3.36 | 79.3 | 100 | 114 | 1.26 | 5.13 | 0.109 | — | — | 0.228 | 0.21 | 0.792 | 1.92 | 1.3 | 1.26 | 0.2 | 0.281 | 0.293 | 19.9 | 25.1 | 29.1 | 4.63 | 4.61 | 4.69 |
+contributions:
+  0.01: stand.height 0.14, stand.lai 0.03, stand.lateShare 0.77, shade.survivalLight 0.03, stand.height100 0.02, stand.height150 0.09, stand.talloH 0.31, stand.talloCR 2.17
+  0.0226: stand.height 0.07, stand.lai 0.04, stand.lateShare 0.10, shade.survivalLight 0.03, stand.height100 0.03, stand.talloH 0.33, stand.talloCR 2.18
+  0.04: stand.height 0.10, stand.lai 0.05, stand.lateShare 0.45, shade.survivalLight 0.03, stand.height100 0.02, stand.height150 0.01, stand.talloH 0.36, stand.talloCR 1.98
+  0.06: stand.height 0.01, stand.lai 0.06, stand.lateShare 0.64, shade.survivalLight 0.03, stand.height100 0.01, stand.height150 0.05, stand.talloH 0.24, stand.talloCR 2.32

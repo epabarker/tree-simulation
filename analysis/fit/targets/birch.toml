@@ -272,3 +272,11 @@ hi = 4
 floor = { target = 0.15, band = 0.05, kind = "measured", source = "birch canopies transmit a median 14.8% of PAR (6.4–19.8%; Hagemeier & Leuschner 2019 (overcast, diffuse PAR))" }
 survivalLight = [0.15, 0.25]   # lowest light all seedlings survive (Hagemeier & Leuschner 2019: birch saplings need 21%; Kobe et al. 1995)
 shadeScore = 2.03   # Niinemets & Valladares 2006, Appendix A
+
+[level0]
+# Level 0 (reference-fidelity phase 2, the plan's §k): the physiology knobs fitted against Tallo's H–DBH and CR–DBH
+# bands; bounds from [[param]] above. Not r3.c (posture: form), not the form knobs, not c5.Trel, not the cell size.
+knobs = ["c3.alpha", "r1.Lh", "r1.mf", "r2.hJ", "c6.r0", "r6.qMin", "r6.leafArea"]
+# v2 (the user, 2026-11-03): stand.lateShare is "described" (an estimate from a site-index curve's shape), not
+# measured, so at Level 0 it is reported, not scored.
+reported = ["stand.lateShare"]

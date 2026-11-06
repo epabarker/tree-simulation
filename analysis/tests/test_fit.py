@@ -90,3 +90,43 @@ def test_a_stand_that_dies_after_60_is_penalised_at_100_as_at_60():
     assert loss(spec, alive) == 0.0
     assert math.isclose(loss(spec, dead_late), DEATH_PENALTY * 5 * 0.8)
     assert math.isclose(loss(spec, dead_late), loss(spec, dead_early))
+
+
+def test_level0_tallo_traits_skip_trees_outside_the_support():
+    from treesim.fit import tallo_traits
+
+    curves = {
+        k: {"support": [5.0, 50.0], "band": "own",
+            "coef": {"0.1": [-0.2, 1.0], "0.5": [0.0, 1.0], "0.9": [0.3, 1.0]}}
+        for k in ("H", "CR")
+    }
+    # At 60 one tree is inside the support (20 cm: y = 0.2 m sits at its median), one below it (3 cm).
+    allometry = [
+        {"season": 60, "dbh": 0.20, "height": 20.0, "crownRadius": 20.0},
+        {"season": 60, "dbh": 0.03, "height": 3.0, "crownRadius": 3.0},
+    ]
+    t = tallo_traits(allometry, curves)
+    assert t["stand.talloH.0"] == 0.0 and t["stand.talloCR.0"] == 0.0
+    assert t["stand.talloH.1"] is None and t["stand.dbh.1"] is None
+
+
+def test_level0_partial_traits_leave_out_a_season_with_no_comparable_tree():
+    t = {"name": "stand.talloH", "profile": [0.0, 0.0, 0.0], "band": 1.0, "weight": 1.0, "partial": True}
+    assert scaled(t, {"stand.talloH.0": 0.5, "stand.talloH.1": None, "stand.talloH.2": -1.0}) == [0.5, -1.0]
+    assert scaled(t, {"stand.talloH.0": None, "stand.talloH.1": None, "stand.talloH.2": None}) is None
+
+
+def test_level0_height150_is_the_live_measured_trees_mean_in_cells():
+    allometry = [{"season": 150, "dbh": 0.4, "height": h, "crownRadius": 4.0} for h in (30.0, 32.0)] + [
+        {"season": 100, "dbh": 0.3, "height": 99.0, "crownRadius": 3.0}]
+    assert seed_traits({"stand": [{"allometry": allometry}]})["stand.height150"] == 31.0 / 0.25
+
+
+def test_level0_v2_scores_the_time_anchors_and_reports_birch_late_share():
+    from treesim.fit import load_spec
+
+    oak = {t["name"] for t in load_spec("oak", level=0).traits}
+    assert {"stand.height100", "stand.height150", "stand.lateShare"} <= oak
+    birch = load_spec("birch", level=0)
+    assert "stand.lateShare" not in {t["name"] for t in birch.traits}
+    assert "stand.lateShare" in {r["name"] for r in birch.reports}

@@ -2,6 +2,414 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-06: The overnight run: a generic broadleaf (ADR 0055, proposed), natural heights, PLATE_MAX 170; a release candidate (draft PR)
+
+- **The overseer** (the user, 2026-11-05):
+  - The 3D garden was live as 0.15.0 since 2026-11-02, but STATUS said 0.14.0.
+  - Reference fidelity had churned through gate c v1–v3.2 and registrations v1–v6 with nothing adopted.
+  - The two tracks, the plan and the rulings are in `plans/2026-11-05-overseer.md`. The overnight plan and its
+    State block are in `plans/2026-11-06-overnight.md`.
+- **The judge** ([note](experiments/2026-11-06-overnight-generic-broadleaf.md)):
+  - A blinded "which is real?" judge caught every simulated broadleaf (144/144), on regularity cues.
+  - It then saturated: it caught the user's gallery rejects at 100% too, so it was retired.
+  - A simulated-against-simulated judge failed its gate on the user's past picks (69% against 75%). **No visual
+    gate was used overnight.**
+- **The objective instrument:** six within-tree descriptors on coarsened sims and real QSMs, with a scan-noise
+  floor from BioDiv's repeats. Four are usable.
+- **Data fetched:** TreeML (342 QSMs, CC0), Belgian hedgerows (68, CC-BY), BioDiv hornbeam (38). The manifest is
+  updated.
+- **ADR 0055 (proposed):** four off-by-default rules, purposes 5 (now drawn), 15, 16 and 17:
+  - stochastic lateral break (§R4.4);
+  - a lognormal shoot length;
+  - a per-axis set-point offset;
+  - a per-axis branch-angle offset.
+
+  **Adopted** as the `[broadleaf]` base in hand-overrides.toml: shootLengthSD 0.5, axisSD 50, betaSD 60,
+  budBreak width 1. Beech and oak have their own values. Hornbeam's summed |z| falls 23 → about 5, with all four
+  usable descriptors in the real bands, lone and stand.
+- **Heights (a separate commit):** R1's reproductive sink as a ceiling. Hornbeam is 29 m flat from 100, against
+  49 m at 150, and keeps a rounded crown; rowan 21.6 m, oak 33.2 m.
+  - L_h was rejected: it starves crowns into poles.
+  - The flat cap is a size effect.
+- **Garden evidence** (`forestParams(160)`, 20 seeds), against the base (2/3/11/11):
+  - the final RC: floor 1, planted H/D 1, crown base 12, plateau 13, metamers 0.96×;
+  - all-tree H/D 16/20;
+  - composition: hornbeam 0.43 → 0.20, beech 0.25 → 0.37.
+- **Memory:** PR #48's "regression" was a measuring artefact (many worlds in one process). The 200-cell plate
+  peaks at 247 MB with the specimen, so **PLATE_MAX is now 170**.
+- **Goldens (intended):** 4 of 16, all from the broadleaves' new species params (ADR 0055), then the separate height commit: `mixedWood:seed1:s15` c95b46b9 → 3ee70704 (stage 2) → 93042bbc (heights); `oakOpen:seed1:s15` 0877b79b → 29e5921a; `beechOpen:seed1:s40` 200f5a55 → ef0a754d; `beechWood:seed1:s30` f8b1fe35 → 6b8af072. The other 12 are unchanged; `golden.rs`'s off test now switches the species-level rules off too and reproduces 0.16.0's oakOpen and beechOpen bit for bit.
+- **Check:** green at 7b105ae (99/99, on a quiet machine). Review: the Fable spec-reviewer had no credits, so an Opus stand-in ran it. Its one demonstrated item (the off test never reached species rules) is fixed in ce7ebb3; its open questions are in PR #49.
+- **Preview:** the site's `preview-3d` carries the RC as 0.16.0 (main merged in, pushed without force): https://preview-3d-edbarker-dev.edbarker.workers.dev/
+- **PRs:** #48 (0.16.0, draft; CI green), #49 (this RC, draft, stacked on #48). The alternative is `claude/overnight-rc-noheights` (the height commit reverted; local check green). Nothing merged or tagged.
+- **The advisory lone judge:** RC preferred 79% at season 100, but 42% when young (the RC's young hornbeam and beech lose their clear trunk; rowan is disputed).
+- **Code and summaries** are kept in `experiments/code/2026-11-06-overnight/` (the scratchpad was in /tmp).
+
+## 2026-11-05: garden 0.16.0 prepared (for the user to tag)
+
+- **Release notes:**
+  - The plate shows one lap of the forest and draws trees larger; on the phone, no crowns are cropped. (`plateWidth` = 140·w/(h−18−headroom), clamped to [40, 200]; a young garden is framed at most 1.5× closer.)
+  - Trees no longer all lean one way (ADR 0054; goldens re-baselined).
+- **How it ships:** there is no version file; the version is the tag (`release.yml` reads `GITHUB_REF_NAME`). After the PR merges into `3d-port`, the user tags the merge commit `garden-v0.16.0` and pushes the tag. The site then pins 0.16.0 with its `sync-garden.mjs`.
+- **Speed and memory:** see the PR body.
+
+## 2026-11-05: ADR 0054, a per-tree seedling azimuth; goldens re-baselined; leanAngle; v6 superseded
+
+- **What changed:**
+  - **Core:** `seedling_azimuth` (c1.rs), drawn from a new purpose `SEEDLING_AZIMUTH` (14), keyed by tree id.
+    `plant_seedling` takes the azimuth; every planting path passes it (world.rs, o4.rs); unit tests pass 0.
+  - **describe():** `leanAngle`, with two tests. Bit-identity holds on the 21 (9,765 values).
+  - **Gate c v3.2 amended for leanAngle:** the real-data parts only; the first five rows reproduce 557ce5a.
+  - **v6 marked superseded;** its test asserts the hash guard.
+  - `lean_geometry.py`, and the after figure.
+- **Goldens:** all 16 changed, because every seedling's L (and with it the phyllotaxis plane and the noise's azimuth
+  origin) now turns per tree. With φ forced to 0, the old `tests/golden.json` passes natively and in WASM, so the
+  change is the azimuth alone.
+- **Surprises:**
+  - The lone trials' three assigns share their 20 φ draws (keyed by seed and tree id), so they are one sample, not
+    three.
+  - The face rows damp depth leans: the slab limitation above.
+  - BioDiv's leanAngle (below crownBase80, 3.6°) sits just under the audit's whole-tree chord (4.1°).
+
+## 2026-11-05: lean audit: the one-way lean is the seedling's frame (L = +x), carried by Troll's set point
+
+- **What changed:**
+  - `analysis/experiments/lean_dump.ts` and `lean_audit.py`.
+  - The note `experiments/2026-11-05-lean-audit.md`, with a figure.
+  - Nothing under `src/`, `rust/`, `cli/` or `tests/`. Nothing launched; v6 stays registered and unlaunched.
+- **The finding:**
+  - The cause: every seedling is planted with L = +x (`c1.rs:179–182`). Beech's trunk set point (40°) takes its
+    azimuth from L when the leader is vertical (`c4.rs:13–19`), and after that from its own lean.
+  - The test: flip only L's sign (lean −1e-6°) and the stand's lean and crown centroid flip with it. Ages 2–10 flip
+    near exactly; at 70 the means mirror (+1.1 m ↔ −1.1 m centroid x).
+  - Ruled out: the sky (net ≤ 1.8%, and toward −x), the planting's mirror and the sky's phase.
+  - This explains ADR 0051's "+x reach" (logged as a suspected bug).
+- **Surprises:**
+  - The lean's magnitude is model behaviour, independent of its side. The stand leans ≈ 9–10° (BioDiv 4.1°, max 14.7°).
+  - The bent-over suppressed trees carry boleSway's whole spread excess (×1.2–1.4 without them), but not its z.
+- **Proposed, not done:** a per-tree seedling azimuth (new RNG purpose, ADR). Every golden changes. Then the re-run
+  order: goldens → Level 0 (all species) → gate c's simulated rows → Level 1. Also lean angle as a gate c candidate,
+  and a Troll relay (an erect relay that overtakes the arch) as the remedy for the magnitude.
+
+## 2026-11-05: boleSway, the like-for-like sheet, Level 1 v6 registered (not launched)
+
+- **What changed:**
+  - describe(): `boleSway`, with two tests. Bit-identity holds on the 16 and the four (9,300 values).
+  - The v3.2 supplement amended for boleSway (tier A); its first four rows reproduce exactly.
+  - ADR 0052 accepted (no rule for beech; open for oak's CR).
+  - The like-for-like sheet.
+  - v6 registered: `level1_targets.py --add`, v5's hold-outs kept, floor 0.65, lateShare band 0.12. The registration
+    test is now v6's.
+  - Nothing under `src/`, `rust/`, `cli/` or `tests/`.
+- **Surprises:**
+  - Coarsening at 8.6 mm removes almost nothing from simulated beech: inflated twigs are all above it.
+  - boleSway's simulated spread is too wide (2.7–6.5×), not too narrow.
+  - R3's straightening is capped at c·Δr/r, so a slow stand stem keeps its bends.
+
+## 2026-11-05: crownBase80, trunkTortuosity05, the bole's sway, ADR 0052's probe
+
+- **What changed:**
+  - `analysis/treesim/describe.py`: crownBase80, 70 and 90, trunkTortuosity05, and three diagnostics, with eight
+    synthetic tests. The 16 registered descriptors are bit-identical (7,440 values).
+  - Gate c v3.2 as a supplement, with d_min frozen.
+  - Probe scripts and a contact sheet; [the note](experiments/2026-11-05-crown-base-and-bole.md).
+  - ADR 0052 created (proposed).
+  - Nothing under `src/`, `rust/`, `cli/` or `tests/`.
+- **Results:**
+  - crownBase80 is tier A; trunkTortuosity05 is held out on noise.
+  - Simulated crown bases sit above BioDiv's (hand +1.31, v4 +1.03).
+  - More limb loss raises it further, so beech makes no case for ADR 0052.
+- **Surprise:** the render's "low crowns" did not survive 53 trees. Two of the three QSMs drawn were high-crowned. What
+  differs is crown width and density, and a bole that sways twice the real (path over chord cannot see it).
+- **Side effect:** `test_level1.py::test_registration_v5…` failed at HEAD on the registration's own hash refusal
+  (describe.py moved); cleared the same day by v6's registration (the test is now v6's).
+
+## 2026-11-05: pilot v4's result and write-up
+
+- **What changed:** docs only. [The note](experiments/2026-11-05-level1-beech-pilot-v4.md); the gate files copied to
+  `docs/experiments/fits/level1-pilot-v4/` with a README; the plan's State and STATUS.
+- **Result:** 6.88 → 3.31 on 101–110 (hand SD 1.31); held out 20/20. The gate fails on spread only:
+  tortuosity05 0.48×, limbUpturn 0.36×.
+- **The question** (tortuosity05 and late growth together?): both partly off. tortuosity05 is in band (z −0.81) and
+  lateShare is one band short (1.326 against 1.43). The price is about a third of v3's per unit z.
+- **Surprises:**
+  - The route was not dLambda (0.0165, near the hand's) but kappa 0.43 → 0.22 and branchAngle (1) 50° → 40°.
+  - The search-seed best (3.24, generation 30) re-measured at 4.24; generation 16's (3.57) held at 3.31.
+  - Late height is lost outright here (H100 104 against 109, H150 112 against 119), not front-loaded as in v3.
+
+## 2026-11-05: ADR 0053, individual variation (proposed)
+
+- **What changed:** docs only. [ADR 0053](decisions/0053-individual-variation.md), drafted from reading, with no
+  probe. The plan's State and STATUS are updated.
+- **Finding:** no RNG purpose is per tree (`rng.rs:9–21`). R3's posture loop pulls every limb to a per-order set
+  point, and the descriptors are per-tree medians over limbs. So per-metamer noise reaches the outline, not
+  posture.
+- **Surprise:** limbUpturn is floored at 0° (27 of 40 hand trees). Across 69 sweep conditions, its spread tracks its
+  median (r 0.58), but only to ≈ 0.55× real at the real median. Part of the 0.47× is location.
+- **Literature** (abstract level only): crown plasticity toward neighbours is well supported (Schröter 2012,
+  Juchheim 2017). No heritability of branch posture in beech was found.
+- **Advisor:** the σ_A-from-limbElevation route made limbElevation05 circular. The hold-out is now limbUpturn and
+  Demol, and the stop rule is read at pilot v3's best.
+
+## 2026-11-05: provenance audit of the Level 0 targets (ruling 3)
+
+- **What changed:** docs only, read-only on targets and sources (pilot v4 running).
+  - [The note](experiments/2026-11-05-target-provenance-audit.md): every scored Level 0 trait × species, with its
+    provenance, the band's own provenance, and per-seed SD from outputs on disk.
+  - The crown note gains a pointer; the plan's ruling 3 is marked done, its proposals pending.
+- **Findings:**
+  - LAI and the shade house are measured (H&L 2019) for beech, birch, hornbeam and oak. Maple's scored LAI is a
+    described proxy.
+  - Every band but Tallo's is a convention.
+  - Only beech lateShare's bands (0.06 at Level 0, 0.10 at Level 1) are under its per-seed SD (0.137–0.161).
+- **Surprise:** oak fit's Trel×10 is LAI z −1.47 against the measured band, so its "collapse" was read against the
+  base. The verdict that no lever passes oak stands.
+- The shade house's SD is 0 on 10 seeds: roof-ladder quantisation, not precision.
+
+## 2026-11-05: pilot v4 registered (registration v5) and launched
+
+- **What changed:** no code under src/rust/cli/tests.
+  - `fit_level1.level1_spec` reads `loss.level0_band`, a Level 0 trait's band in the Level 1 loss only.
+  - `level1_targets.py` handles version 5; `level1_noise_v4.py` handles v5, rescaling the re-banded term in its
+    cross-check.
+  - Python tests: 130 passed.
+- **Registration v5 (edbd327):** lateShare scored again at band 0.10; height at 100 reported; else v4.
+- **Noise:** the hand's SD is 1.31. Launched 07:49 UTC, tmux `level1v4`, ≈ 7 h.
+
+## 2026-11-05: pilot v3's result and write-up
+
+- **What changed:** docs only. [The note](experiments/2026-11-05-level1-beech-pilot-v3.md); the gate files copied to
+  `docs/experiments/fits/level1-pilot-v3/`.
+- **Result:** the first real Level 1 fit, 6.70 → 1.62 on 101–110 (SD 1.38).
+  - Fourteen in band; held out 19/20; the spread penalty held.
+  - The gate fails on limbDroop (0.48×) and limbUpturn (0.47×) spread only.
+- **Surprises:**
+  - tortuosity05 came into band via dLambda 0.027, a value the sensitivity sweep's grid skipped (it has no point
+    between 0.0069 and 0.067). The price was unscored lateShare (10.1): one λ offset for every order.
+  - limbDroop sat exactly at the penalty's floor, which is also the gate's edge.
+
+## 2026-11-04 (night): pilot v3 registered (registration v4) and launched, unattended
+
+- **What changed:** no code under src/rust/cli/tests; nothing accepted into species params.
+  - `analysis/treesim/level1.py`: `spread_penalty` and the `l1.<k>.spr` term, read where `loss.spread_floor` is set.
+  - `analysis/treesim/fit_level1.py`: `loss.level0_reported` traits move to the reports; `summary()` writes their
+    would-be terms under `reported`.
+  - `analysis/experiments/level1_targets.py`: version 4; `level1_noise_v4.py`, the reported-only noise check.
+  - Python tests: 129 passed (2 new, the registration test moved to v4).
+- **Registration v4 (8e7594b):**
+  - lateShare and height at 100 unscored in the Level 1 loss;
+  - a one-sided spread penalty below 0.5× real, weighted like the location term;
+  - everything else as v3.
+- **Noise:** the hand's 10-seed SD under v4 is 1.38 (v3's 0.40), mostly leaderDominance's spread term. Over the
+  user's 0.6, so noted; the seeds are unchanged. The cross-check against v3's stored terms matches to 9e-16.
+- **Launched** 23:49 UTC in tmux `level1v3`, ≈ 7 h.
+- **Surprises:**
+  - The brief's penalty formula, read literally, is zero at 0.5× and 1 at 1×. It was implemented as its stated
+    intent (the plan's State, reading 1).
+  - Pilot v2 is no longer resumable from HEAD (a `level1.py` hash).
+
+## 2026-11-04: Level 1 sensitivity, what the knobs can reach (beech); pilot v2's record reworded
+
+- **What changed:** no code under src/rust/cli/tests.
+  - **New:** `analysis/experiments/level1_sensitivity.py` (register, run, pairs [--cost], envelope, report) and
+    `analysis/tests/test_level1_sensitivity.py` (10 tests; the Python suite has 127);
+    `docs/experiments/fits/level1-sensitivity/` (registration, conditions, reach, pairs, envelope); two heat maps in
+    `figures/`; [the note](experiments/2026-11-04-level1-sensitivity.md).
+  - **Pilot v2's note** now reads "stopped early by the user, checkpoint kept, resumable", with the generation table.
+    The call came after 8 generations: median 15 → 9, best unmoved. Generation 8's best is an in-run reading, not a
+    result (e443d90).
+- **Registration first** (9e304db): 73 conditions (18 knobs × 4 non-hand points + the hand), the rules as reporting
+  conventions, the ADR → evidence map, hashes. The advisor reviewed it once: the bracket rule in place of
+  continuity, the pilot v2 envelope, the three-source verdict, ΔL0 without lateShare.
+- **Results:**
+  - **No descriptor is unreachable by single knobs.** tortuosity05 is reached only by wrecking the tree (ΔL0 +21 to
+    +76; affordable single and pairs ≤ 33%).
+  - **limbUpturn:** its median closes ≤ 69% and its spread ≤ 0.46×.
+  - **The outline is cheap by posture**, and leaderDominance's spread is cheap via r0 (frozen in v3).
+  - **Proposed ADR order:** tip upturn and tortuosity; individual variation (limb tips); the trunk increment; 0052.
+- **Surprises:**
+  - **The registered pair rule degenerated.** Its remaining gap ignores cost, and some knob crosses every target at
+    some cost. The user approved a cost-aware supplement, labelled as added after the registration.
+  - **lateShare's per-seed SD (0.137) is more than twice its band (0.06).** The hand's term has a bootstrap SE of
+    1.74, and form knobs "gain" up to −1.53 from it. ΔL0's SE is 2–4.
+  - **Forkserver:** under Python 3.14's forkserver, a driver script without a `__main__` guard re-runs itself in the
+    describe pool's children. The scratch drivers needed one; the committed script has it.
+- **Goldens:** unchanged.
+
+## 2026-11-04: Reference fidelity, phase 3 pilot v2: stopped at generation 10 (the user); checkpoint kept, resumable
+
+- **What changed** (docs and committed partial results only; no code under src/rust/cli/tests/analysis):
+  - the note's section "The stop";
+  - the fits README;
+  - the plan's State and STATUS;
+  - committed as the run wrote them: `fits/level1-pilot-v2/{beech-best.json, beech-progress.csv}`;
+  - `hand-search-seeds.json` and its script, `code/2026-11-04-level1-pilot-v2/hand_on_search_seeds.py`.
+- **Result:** 10 of 32 generations ran (1,200 evaluations); no finalists, no gate. The hand on the ten search seeds
+  scores 6.68.
+  - **The call:** the user stopped the run on the generation-7 status. The best had not moved since generation 0
+    (5.14, Level 1 2.47 against the hand's 2.60), and its gain was Level 0.
+  - **After the call:** generation 8's best (3.94) gained Level 1 (2.60 → 1.47) while its spread collapsed to
+    0.13–0.38× real on six fitted descriptors. The loss reads only medians, so the collapse was free, and the
+    candidate could not pass the spread gate.
+  - Both readings support stopping.
+- **Surprises:**
+  - **The gain came from medians** (tortuosity05, p0, centroidHeight). The two most collapsed descriptors
+    (leaderDominance and p1) gained little or lost, and collapse's direct reward is bounded at ≈ 0.17.
+  - **The hand fails the spread gate on these seeds** too: leaderDominance 0.26×.
+  - **The matched season drifted** to the window's first (season 50) in half the candidates from generation 4 on.
+- **For the next registration (the user):** a one-sided spread penalty below 0.5× the real SD. Its form and its noise
+  are to be measured before the seed rule is applied again.
+
+## 2026-11-04: Reference fidelity, phase 3 pilot v2: registration v3, its noise floor, the launch
+
+- **What changed** (analysis/ and docs only; no src/rust/cli/tests; goldens untouched):
+  - **Registration v3** (81b157a), from BioDiv's 53 real trees:
+    - location terms weighted by 1/Σ|r| (|r| under the p < 0.05 critical value zeroed);
+    - whole clusters held out to a third;
+    - spread out of the loss and gated on all 16;
+    - fixed search seeds; seeds per candidate by a rule.
+  - **New code:** `level1.py`'s correlation, weight, cluster and seed rules; `level1_noise.py` (the noise floor and
+    the seed decision); the gate's spread on all descriptors; the wrapper's commit line.
+  - **Results:** `fits/level1-pilot-v2/` (noise, correlation, control, the weights' bootstrap); 117 Python tests pass.
+- **Result:** on the pilot's own draws (the same trees), the 5-seed SD falls from 6.38 to 0.84 once the spread terms
+  go, and to 0.83 on v3's loss. The rule (SD > ¼ of the hand's Level 1 location loss, 2.36) gives 10 seeds. The run
+  was launched at 17:02 UTC: 32 generations, ≈ 6.6 h.
+- **Surprises:**
+  - The literal "one held out per cluster" would have held out every singleton (the user ruled whole clusters).
+  - Average linkage leaves five cross-cluster pairs at |r| ≥ 0.5 straddling the line, and the clusters come back in
+    0.05% of bootstrap resamples.
+  - The draw holds out limbUpturn and fits pendulousFraction05: v3's held-out test is weaker than v1's, and
+    limbElevation05 is its one live out-of-sample check.
+  - The simulated hand's correlations differ from the real ones: mean |Δr| 0.24.
+- **Not restored but added:** the plan's Darwin launch line. No commit's plan ever carried it; 3d64117's message
+  names the plan, but its diff touches only the note.
+
+## 2026-11-04: Reference fidelity, phase 3 pilot: the overnight fit and its post-fit write-up (failed; nothing accepted)
+
+- **What changed** (docs and committed results only; no code under src/rust/cli/tests/analysis):
+  - `docs/experiments/fits/level1-pilot/`: the run's files as written, the gates, Level 0's gate, `postfit.json`, and a
+    README naming registration v2 (44a21ba);
+  - `docs/experiments/code/2026-11-04-level1-pilot/postfit.py`;
+  - the note's result sections.
+- **Result:** on fresh seeds no finalist beats the hand (18.52 against 19.94, 21.58, 22.59). The gate on the finalist
+  fails: held out 0/20 on pendulousFraction05, spread outside ×2. Level 0's gate: 4/20 (the hand's 9). Gallery: not
+  flagged, but beech's hand and spindle stay inseparable.
+- **Surprises:**
+  - The noise floor: the hand's loss SD is 6.4 on 5-seed draws, and no smaller on 10 (13.2 over three draws). It comes
+    from the spread terms of near-degenerate simulated distributions (limbUpturn ≈ 0° on most trees). The in-run bests
+    were selection on noise.
+  - The held-out rule does discriminate (the hand 20/20, the fit 0/20): the earlier line in the note is corrected.
+- **For the ADR list:** limbs and the leader vary too little between trees (0.22–0.65× real, unchanged by fitting);
+  order-2 shoots droop with nothing in the rules to limit them.
+- **No mac replication** folder (`fits/level1-pilot-mac/`) was present, so none is recorded.
+
+## 2026-11-04: Reference fidelity, phase 3 pilot: Level 1 beech registered, controlled and dry-run (fit not launched)
+
+- **What changed** (analysis/ and docs only; no src/rust/cli/tests; goldens and gate c's hashed files unchanged):
+  - **Registration first** (3c64f48), from real QSMs only: `analysis/fit/sources/level1-beech.json` and beech.toml's
+    `[level1] pilot_*`.
+  - **New code:**
+    - `treesim/level1.py` (the rules) and `treesim/fit_level1.py` (resumable CMA-ES);
+    - `analysis/experiments/level1_eval.ts`, which grows the stand once for both levels and dumps skeletons to
+      /dev/shm;
+    - `level1_targets.py`, `level1_fit.py`, `level1_gate.py` (gate and real-tree control) and `level1_fit_gate.sh`;
+    - tests.
+  - **Parity:** the evaluator's reply equals `cli/fit-eval.ts`'s, and its dump at 150 is byte-identical to
+    `cli/dump-trees.ts --gate-c`'s. The describe path, serial and pooled, equals gate c's values exactly.
+- **The user's rulings in session:**
+  - correlated summaries of one measurement share one unit of weight (the outline group), as a general rule;
+  - the held-out draw stands (p1 and widestAt are outline, so the out-of-sample test rests on three);
+  - held-out values are never written by the fit;
+  - the budget is a generation count;
+  - the dry run reports memory.
+- **Surprises:**
+  - **r3.c is a girth knob.** Alone, it moves the size-matched season from 50 to 80 (stress wood; at 0.022 the stand is
+    0.46 m at 50).
+  - **The held-out rule is lenient:** the hand passes it 20/20, and the gate fails the hand on spread alone
+    (leaderDominance 0.38, limbUpturn 0.26).
+  - **The first two generations traded Level 0's lateShare** (0.51 → 6.80) for Level 1 terms.
+  - **A held-out name leaked:** the simulator's `stand.widestAt` from Level 0's trials sat in the dry run's rows. The
+    fit now drops every held-out-named trait.
+- **The user's ruling, (b):** r3.c frozen at the species' value (0.04879). Registration v2 (44a21ba):
+  `level1_targets.py --version 2 --freeze r3.c` refuses unless every target is identical to v1's, and keeps v1 in
+  `prior`. Launched 11:46 UTC: tmux `level1`, 32 generations.
+
+## 2026-11-03: Reference fidelity, phase 2: Level 0 targets from Tallo, the measurement, the gate, the fitter (no sweep run)
+
+- **What changed** (Python, `cli/`, targets `[level0]`, docs; no src/rust/presets/species; goldens unchanged; gate c's
+  registration untouched):
+  - pre-registered first (9b1f4c0): `treesim/tallo.py` → `analysis/fit/sources/tallo-level0.{json,csv}` (Tallo v1.0.0,
+    CC-BY 4.0: H–DBH and CR–DBH quantile curves, support, T, coverage), the plan's §k with the knobs;
+  - `cli/allometry.ts` (phase 1's DBH and height ported, parity 1e-9 on 67 stand trees; CR the mean of the four largest
+    live-bud tip offsets), `runStand` to 150 (`stand150`), `cli/level0-dump.ts` (parity only, in no build);
+  - `fit.py`: `load_spec(species, level=0)`, `stand.talloH`/`talloCR`, per-trait loss contributions (existing callers
+    unchanged); `treesim/fit_level0.py` (resumable CMA-ES, budget in evaluations, best-so-far each generation);
+    `level0_fit.py`, `level0_gate.py`, `level0_sweep.sh` (not launched).
+- **The user's rulings in session:** thin species (willow, rowan, holly) borrow the band width from the broadleaves'
+  pooled residuals about their own median; the budget in evaluations with a max-hours safety stop and a checkpoint;
+  ten gated, sycamore reference; scored traits are Tallo's two plus height at 60, lateShare, LAI, shade (an exception
+  to ADR 0049 §1 for the two time anchors); CR by the largest tip offset; T from a real-data control, joint over H and
+  CR, drawn from the whole support; coverage per tercile as the conditionality diagnostic.
+- **Numbers:** T 0.81–0.87 for the well-sampled species (willow 0.97, rowan 0.96, holly 0.51); control
+  self-consistency 15–20 of 20; coverage 0.75–0.87 per tercile (the thin three's terciles hold 6–11 trees: noise).
+  Dry run (beech, 78 evaluations): 8.8 s wall an evaluation on 12 workers (96 s CPU, against 18.8 s alone; 6 workers
+  slower). Shipped beech's gate: **0 of 20**: too tall for its DBH (median z_H +1.5 to +1.7; CR inside, +0.3 to +0.5),
+  and too tall for its age (127 cells at 60 against 84).
+- **Surprises:**
+  - The rule as first registered (per-trait T at 90%, both traits) passes a Tallo-drawn seed with p ≈ 0.81, so its
+    18/20 self-consistency could not hold; ruled to a joint T. The first binned control's T was not flat in DBH
+    (25-tree bins: noise); ruled to whole-support draws, with coverage as the diagnostic.
+  - A bug in the Step 0 commit: the `>= 100` edit landed in `runLone` (harmless) instead of `runStand`, so the first
+    dry run read 60, 60, 110; fixed and re-run.
+  - The parity dump read simulated DBH, H and CR before the pre-registration commit (recorded there; no z computed).
+  - Metamer coordinates are continuous across the ring; 7 of 210 beech readings carry a limb longer than half of it.
+    No codominant stem below 1.3 m in 210 readings: no √Σd² question.
+- **Before the sweep (the user's three asks):** thin species borrow T (0.84, pooled; 06915ac). Scaling: 1/2/4/6/8/12
+  workers give 26.2/19.1/13.4/10.6/9.2/8.6 s an evaluation; the core's seasons are over 99% of it, so no Pool change.
+  Sweep presets night1–3 (deep on three). **A surprise:** cmaes drops its RandomState on pickle and reseeds from the OS,
+  so a resumed generation drew other candidates; the checkpoint now keeps the state, and a SIGKILL 20 s into a
+  generation resumes to identical candidates and exactly the budgeted evaluations (28 of 28).
+
+## 2026-11-03: Reference fidelity, phase 1c: coarsen(), the pre-registered tolerances, gate c (stops oak and beech)
+
+- **What changed** (Python, `cli/dump-trees.ts --gate-c`, and docs; no src/rust/presets/species; goldens unchanged):
+  - `treesim/coarsen.py` (idempotent) and `treesim/tolerance.py`;
+  - `analysis/fit/sources/phase1-tolerances.json`, committed (e74063c) before any run, with hashes the gate asserts;
+  - `tortuosity05` in describe() (H3);
+  - Wytham's 10-model noise sets under `wytham/qsm-noise/`;
+  - `analysis/experiments/phase1_degradation.py`;
+  - held-out lists in the oak, beech and maple targets files;
+  - ADR 0049 accepted, plan §g reordered (beech 3, oak 4);
+  - [the note](experiments/2026-11-03-phase1-converter.md).
+- **Gate c:** oak 5 of 22 and beech 1 of 26 survive (amendment E's stop); maple 12 of 22. Nothing loosened. Maple passes only under
+  H1's extension to it (the spec-reviewer: 12 of 26 without it, a stop).
+- **Surprises:**
+  - The pre-registered control finds the coarsening not neutral on the datasets' own QSMs (Demol 20 of 26 over
+    tolerance): d_min as the median terminal diameter prunes half of a QSM's own tips. Demol's d_min is 43 mm.
+  - H2 is reversed: inflating twigs raises ldSlope.
+  - H4: the DBH bias signs disagree (Wytham oak +6.8%, BioDiv beech −7.4%).
+  - The simulated oak and beech stands at 150 are 41 m and 50 m tall, above every reference.
+  - A deviation: the simulated trees were not DBH-matched (the fixed choices' "DBH-matched"); only the
+    tolerance is detrended on ln DBH. Recorded as the note's decision 5.
+- **Advisor** (one consult, at the plan):
+  - keep the noise models out of every one-model glob;
+  - beech's noise floor "not measured", not BioDiv's;
+  - a hash guard;
+  - the dead-tree rule, MIN_TREES and the H2 criterion written down before the run;
+  - χ² bounds for σ, read as "tolerance uncertain" against "resolution-sensitive";
+  - per-cylinder pruning for idempotence;
+  - the real-QSM control.
+
+  All adopted.
+
+## 2026-11-03: Reference fidelity, phase 0: reconcile, audit, plan (branch `claude/reference-fidelity`, from `3d-port`)
+
+- **What changed** (docs only; no src/rust/tests/presets/species; goldens unchanged): the user's reference document saved byte for byte (`research/2026-11-03-reference-data-and-evaluation.md`); a nine-dataset audit (`plans/reference-audit/`, counts by `count_species.py` from metadata in git-ignored `data/reference/`); [the plan](plans/2026-11-03-reference-fidelity.md); ADR 0049 proposed; ROADMAP M28.
+- **Audit design:** nine `doc-lookup` agents (Haiku) found links, licences and metadata URLs; the main session downloaded only metadata (≈ 100 MB) and counted with one script, since `doc-lookup` cannot write files and WebFetch summarises large CSVs. They cost ≈ 309k tokens against a 300k cap (estimate 135–270k).
+- **Surprises:** FOR-species20K is GPL-3.0 and Weiser CC-BY-SA, not CC-BY. FOR-species20K has no QSMs and contains Wytham and Weiser. Tallo's garden broadleaves are all forest-grown. TreeML has ≤ 41 trees per garden species, and 101 of its 3,755 DBHs are > 1.5 m. **BioDiv-3DTrees is the main Level 1 source** (1,659 valid beech QSMs, 88 oak, 38 hornbeam). Wytham has no beech or birch, and its 37 oaks are ≥ 39 cm.
+- **Measured** (oak, seed 1, one core): stand to 150 seasons 8.9 s (167 cells); lone to 150 27.9 s, hitting the 200-cell world top. DetailView falls back to CPU (read, not run).
+- **Advisor** (one consult, measurement design): leaf-dependent metrics need wood-only versions; continuation and order by geometry on both sides; a degradation test in phase 1; rTwig radii are partly modelled; the gate on held-out descriptors and between-tree spread; the classifier's real-tree control; the metres-per-cell scale is not identifiable from Tallo. All folded into the plan.
+- **Merge note:** this branch's STATUS is `3d-port`'s, which predates `claude/stems-bark`; its "Direction" lines will conflict when that branch merges. Keep both.
+
 ## 2026-11-02: The harness, runs 2 and 2b: one lock and stamp for the check, `doc-lookup`, the reviewer's guard (on `3d-port`)
 
 - **What changed** (no src/rust/tests edits in 2b, goldens unchanged): `check-stamped.sh` + `check-lib.sh` (`npm run check:stamp`) put the Stop hook and humans behind one `flock` and one green stamp; the hook is now the fast path plus that script, with `red`/`red-shown` so a manual red cannot lift the block. CLAUDE.md: never background the check; AGENTS.md and `/wrap-up` point at `check:stamp`; the principles doc is saved at `docs/background/harness-principles.md`. Run 2's five items ([ADR 0047](decisions/0047-harness.md), "Run 2") are committed with it.

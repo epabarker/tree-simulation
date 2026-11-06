@@ -6,17 +6,40 @@
 //! (δ = 180°), and with R2 the level's generator: opposite (decussate: two at 180°, δ = 90°),
 //! whorled (n = the level's `whorl`, alternate whorls offset by π/n) or none. Shoot size follows
 //! ADR 0004: v' = min(v, cap), n = ⌊v'⌋, l = v'/n · l0. A shoot's frames are carried from bud to
-//! metamer to metamer by parallel transport, so phyllotaxis follows the axis as it bends.
+//! metamer to metamer by parallel transport, so phyllotaxis follows the axis as it bends. A
+//! seedling's L is turned about its heading by a per-tree azimuth [RNG: seedlingAzimuth] (ADR 0054).
+//!
+//! Variable shoot length (prototype, agent A9): with `c1.shootLengthSD` s > 0, each shoot's
+//! internode length is multiplied by exp(s·z − s²/2), z ~ N(0, 1) [RNG: shootLength, keyed by the
+//! bud's birthId and the season], a lognormal of mean 1, so the mean extension is kept. Why: ADR
+//! 0004's l = v'/n·l0 lies in [1, 2)·l0 by construction (CV ≈ 0.19 in lone hornbeam), where real
+//! annual shoots vary many-fold with vigour and weather; the uniform line texture is a cue the
+//! blinded judge names. Off (absent or 0): no draw.
+//!
+//! Per-axis branch angle (prototype, agent R; §C1.6's "branch angle β per order"; within-tree
+//! variation, not ADR 0053's between-tree draw): with `c1.betaSD` s_β > 0, a lateral bud that
+//! breaks into a new axis has
+//! its heading turned in the plane of its host's heading by s_β·N(0, 1) degrees [RNG:
+//! branchAngle, keyed by the axis, i.e. the birthId its first metamer takes], so its angle to the
+//! host becomes β + offset (held in [0, 180°]: it never crosses the host's heading). One draw per
+//! axis, at its start, as `c4.axisSD`'s. Why: β is fixed per level, so every limb leaves the trunk
+//! at one angle (within-tree SD of first-order insertion ≈ 6° in today's lone hornbeam, 13° with
+//! A9's three rules, against 31.5° in real lone hornbeam). Relays and fork arms, which start new
+//! axes from lateral buds, take the offset too. C4's noise is white and R3's posture restores the set point, so nothing else makes
+//! one limb leave steeper than its neighbour. Off (absent or 0): no draw, β as before.
 //!
 //! Params: c1.phyllotaxis, c1.divergence (δ), c1.branchAngle (β), c1.internodeLength (l0),
-//! c1.maxMetamersPerShoot, c6.r0; with R2 the levels' generator, whorl, β and p_term.
+//! c1.maxMetamersPerShoot, c1.shootLengthSD (s), c1.betaSD (s_β), c6.r0; with R2 the levels'
+//! generator, whorl, β and p_term.
 
 use super::obstacles::inside_obstacle;
 use super::r2::{branch_angle_of, laterals, terminates};
-use crate::geom::{V3, any_perpendicular, normalize_or, reject, tilt, transport};
+use crate::geom::{
+    V3, angle_between, any_perpendicular, cross, normalize_or, reject, rotate, tilt, transport,
+};
 use crate::math;
 use crate::params::{DEG, Params};
-use crate::rng::{purpose, uniform};
+use crate::rng::{normal, purpose, uniform};
 use crate::tree::{Tree, bud, slot, store_i32, store_u8};
 
 /// Appends a metamer at `slot` of `parent`'s upper node (parent −1 = root) with heading `h` and
@@ -174,12 +197,34 @@ pub fn form_terminal_bud(tree: &mut Tree, m: usize, params: &Params, season: f64
     }
 }
 
+/// The azimuth (radians) a seedling's reference L is turned by about its heading (ADR 0054): one
+/// draw per tree [RNG: seedlingAzimuth, keyed by the tree's id, which is never reused], so the
+/// trunk's set point (`c4::set_point_direction`, which takes a vertical leader's side from L) and
+/// the phyllotaxis plane face a different way in every tree instead of all toward +x.
+pub fn seedling_azimuth(params: &Params, tree_id: usize) -> f64 {
+    2.0 * std::f64::consts::PI
+        * uniform(
+            params.seed,
+            purpose::SEEDLING_AZIMUTH,
+            tree_id as f64,
+            0.0,
+            0.0,
+            0.0,
+        )
+}
+
 /// Plants a seedling at its root: one metamer, vertical unless `lean` tilts it (degrees, toward
-/// +x).
-pub fn plant_seedling(tree: &mut Tree, params: &Params, season: f64, lean: f64) {
+/// +x: a world lean, ADR 0054), its reference turned about the heading by `azimuth` (radians;
+/// `seedling_azimuth` on every planting path, 0 the old frame exactly).
+pub fn plant_seedling(tree: &mut Tree, params: &Params, season: f64, lean: f64, azimuth: f64) {
     let a = lean * DEG;
     let h = [math::sin(a), math::cos(a), 0.0];
-    let l = [math::cos(a), -math::sin(a), 0.0];
+    let l0 = [math::cos(a), -math::sin(a), 0.0];
+    let l = if azimuth == 0.0 {
+        l0
+    } else {
+        rotate(l0, h, azimuth)
+    };
     let m = add_metamer(
         tree,
         -1,
@@ -205,6 +250,45 @@ pub fn shoot_size(v: f64, params: &Params, length: &mut f64, cap: f64) -> f64 {
     }
     *length = (capped / n) * params.c1.internode_length;
     n
+}
+
+/// The multiplier on the internode length of the shoot bud `bud_id` grows this season: lognormal
+/// with mean 1, exp(s·z − s²/2) [RNG: shootLength], and exactly 1 when s = 0 (no draw).
+pub fn shoot_length_factor(params: &Params, tree_id: f64, bud_id: f64, season: f64) -> f64 {
+    let s = params.c1.shoot_length_sd;
+    if s <= 0.0 {
+        return 1.0;
+    }
+    let z = normal(
+        params.seed,
+        purpose::SHOOT_LENGTH,
+        tree_id,
+        bud_id,
+        season,
+        0.0,
+    );
+    math::exp(s * z - 0.5 * s * s)
+}
+
+/// The offset, degrees, to β of the axis `axis` (the birthId its first metamer takes): s_β·N(0, 1)
+/// [RNG: branchAngle, keyed by the axis only]; 0 when s_β = 0 (no draw).
+pub fn beta_offset(params: &Params, tree_id: f64, axis: f64) -> f64 {
+    let s = params.c1.beta_sd;
+    if s <= 0.0 {
+        return 0.0;
+    }
+    s * normal(params.seed, purpose::BRANCH_ANGLE, tree_id, axis, 0.0, 0.0)
+}
+
+/// A lateral's frame (`h`, `l`) turned by `offset` radians in the plane of its host's heading
+/// `host`, away from it for offset > 0, so the angle between them becomes β + offset, held in
+/// [0, π]. The reference is carried by parallel transport.
+pub fn offset_frame(host: V3, h: V3, l: V3, offset: f64) -> (V3, V3) {
+    let beta = angle_between(host, h);
+    let to = math::max(0.0, math::min(std::f64::consts::PI, beta + offset));
+    let axis = normalize_or(cross(host, h), any_perpendicular(h));
+    let turned = normalize_or(rotate(h, axis, to - beta), h);
+    (turned, transport(l, h, turned))
 }
 
 /// The juvenile cap on a shoot (ADR 0022), by the tree's height at the start of the season.
@@ -305,6 +389,69 @@ mod tests {
         Params::from_json(&preset("default", patch))
     }
 
+    #[test]
+    fn a_branch_angle_offset_is_drawn_once_per_axis_and_turns_away_from_the_host() {
+        let off = params("{}");
+        assert_eq!(beta_offset(&off, 0.0, 12.0), 0.0);
+        let on = params(r#"{"c1":{"betaSD":20}}"#);
+        // Keyed by the axis only: the same axis gets the same offset, another axis not.
+        let a = beta_offset(&on, 1.0, 12.0);
+        assert_eq!(a, beta_offset(&on, 1.0, 12.0));
+        assert_ne!(a, beta_offset(&on, 1.0, 13.0));
+        let n = 20_000;
+        let (mut s1, mut s2) = (0.0f64, 0.0f64);
+        for k in 0..n {
+            let x = beta_offset(&on, 2.0, k as f64);
+            s1 += x;
+            s2 += x * x;
+        }
+        let mean = s1 / n as f64;
+        let sd = (s2 / n as f64 - mean * mean).sqrt();
+        assert!(mean.abs() < 0.5, "mean {mean}");
+        assert!((sd - 20.0).abs() < 0.5, "sd {sd}");
+        // The frame: a lateral at 45° from a vertical host turned by +15° sits at 60°, by -15° at
+        // 30°, in the same azimuthal plane; a turn past the host stops on it; L stays a frame.
+        let host = UP;
+        let h = tilt(UP, [1.0, 0.0, 0.0], 45f64.to_radians(), 0.3);
+        let l = normalize_or(reject(UP, h), any_perpendicular(h));
+        for (by, want) in [(15.0, 60.0), (-15.0, 30.0), (-80.0, 0.0), (0.0, 45.0)] {
+            let (th, tl) = offset_frame(host, h, l, f64::to_radians(by));
+            assert!(
+                close(angle_between(th, host), f64::to_radians(want)),
+                "{by}"
+            );
+            assert!(close(norm(th), 1.0) && close(norm(tl), 1.0) && dot(th, tl).abs() < 1e-9);
+            if want > 0.0 {
+                // The same side of the host: the horizontal parts point the same way.
+                assert!(th[0] * h[0] + th[2] * h[2] > 0.0);
+            }
+        }
+    }
+
+    #[test]
+    fn a_shoot_length_factor_is_lognormal_with_mean_one_and_off_at_zero() {
+        let off = params("{}");
+        assert_eq!(shoot_length_factor(&off, 0.0, 5.0, 3.0), 1.0);
+        let on = params(r#"{"c1":{"shootLengthSD":0.4}}"#);
+        // Keyed by the bud and the season: the same pair gives the same factor, another season not.
+        let f = shoot_length_factor(&on, 0.0, 5.0, 3.0);
+        assert_eq!(f, shoot_length_factor(&on, 0.0, 5.0, 3.0));
+        assert_ne!(f, shoot_length_factor(&on, 0.0, 5.0, 4.0));
+        let n = 20_000;
+        let (mut mean, mut s1, mut s2) = (0.0f64, 0.0f64, 0.0f64);
+        for id in 0..n {
+            let x = shoot_length_factor(&on, 1.0, id as f64, 7.0);
+            assert!(x > 0.0);
+            mean += x;
+            s1 += x.ln();
+            s2 += x.ln() * x.ln();
+        }
+        let n = n as f64;
+        let sd = (s2 / n - (s1 / n).powi(2)).sqrt();
+        assert!((mean / n - 1.0).abs() < 0.01, "mean {}", mean / n);
+        assert!((sd - 0.4).abs() < 0.01, "sd {sd}");
+    }
+
     fn close(a: f64, b: f64) -> bool {
         (a - b).abs() < 1e-12
     }
@@ -397,10 +544,46 @@ mod tests {
     }
 
     #[test]
+    fn a_seedling_faces_its_own_azimuth_and_zero_is_the_old_frame() {
+        // ADR 0054: the reference turns about the heading by a per-tree draw; h stays vertical.
+        let p = params(r#"{"c1":{"phyllotaxis":"distichous"}}"#);
+        let frame = |id: usize, lean: f64, az: f64| {
+            let mut t = Tree::new(id, 10.0, 32.0);
+            plant_seedling(&mut t, &p, 0.0, lean, az);
+            (t.heading(0), t.reference(0))
+        };
+        let (h, l) = frame(0, 0.0, 0.0);
+        assert_eq!((h, l), ([0.0, 1.0, 0.0], [1.0, -0.0, 0.0])); // the old frame, bit for bit
+        let az = seedling_azimuth(&p, 3);
+        assert_eq!(az, seedling_azimuth(&p, 3)); // the same tree and seed: the same draw
+        assert!((0.0..2.0 * std::f64::consts::PI).contains(&az));
+        let (h, l) = frame(3, 0.0, az);
+        assert_eq!(h, UP);
+        assert!(close(norm(l), 1.0) && dot(h, l).abs() < 1e-12);
+        assert!(close(l[0], az.cos()) && close(l[2], -az.sin()));
+        // A world lean keeps its heading in the x–y plane; only L turns, about it.
+        let (h0, _) = frame(3, 10.0, 0.0);
+        let (h1, l1) = frame(3, 10.0, az);
+        assert_eq!(h0, h1);
+        assert!(close(norm(l1), 1.0) && dot(h1, l1).abs() < 1e-12);
+        // Different trees draw different azimuths (twenty ids, all distinct, spread round the circle).
+        let draws: Vec<f64> = (0..20).map(|i| seedling_azimuth(&p, i)).collect();
+        for i in 0..draws.len() {
+            for j in 0..i {
+                assert_ne!(draws[i], draws[j]);
+            }
+        }
+        let (c, s) = draws
+            .iter()
+            .fold((0.0, 0.0), |(c, s), a| (c + a.cos(), s + a.sin()));
+        assert!(math::hypot(c, s) / 20.0 < 0.5);
+    }
+
+    #[test]
     fn a_shoot_carries_its_frame_by_parallel_transport_as_it_bends() {
         let p = params(r#"{"c1":{"phyllotaxis":"spiral"}}"#);
         let mut t = Tree::new(0, 10.0, 32.0);
-        plant_seedling(&mut t, &p, 0.0, 0.0);
+        plant_seedling(&mut t, &p, 0.0, 0.0, 0.0);
         let terminal = (0..t.b.len()).find(|&j| t.b.slot[j] == slot::MAIN).unwrap();
         // Each new metamer turns 10° further toward +z.
         let turn = 10f64.to_radians();

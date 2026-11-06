@@ -176,9 +176,14 @@ export interface Leaves {
 }
 
 /** Ground sits this many CSS pixels above the bottom edge when the view is fitted. */
-const GROUND_MARGIN = 18;
+export const GROUND_MARGIN = 18;
 /** Room kept free above the crowns for the lab's title and hint, CSS pixels. */
-const HEADER_MARGIN = 52;
+export const HEADER_MARGIN = 52;
+/**
+ * On a ring framed whole ("world"), how much closer than one lap across the canvas a young garden
+ * may be framed (`frameHeight`): at 1.5 it shows two thirds of the ring.
+ */
+export const WORLD_ZOOM_MAX = 1.5;
 /** Time constant of the camera's easing toward its fitted target, ms. */
 const CAMERA_EASE_MS = 380;
 /** Default (broadleaf) leaf length in world units (one unit = one internode), and width over length. */
@@ -629,10 +634,16 @@ export class Scene {
     const first = this.target === null;
     // "height" ignores the width, so a world wider than the plate is cut at its sides.
     const scale = fitH / spanY;
-    this.target = {
-      cx,
-      scale: this.frame === "height" ? scale : Math.min(this.width / spanX, scale),
-    };
+    const wide = this.width / spanX;
+    let fitted = this.frame === "height" ? scale : Math.min(wide, scale);
+    if (this.frame === "world" && s.periodic) {
+      // A ring shows one lap and no more (the garden): the scale never falls below the width's, so
+      // the canvas is never wider than the ring and no tree is drawn twice. Crowns taller than the
+      // canvas crop at the top rather than shrink the lap. A young garden is framed closer, but at
+      // most WORLD_ZOOM_MAX times the lap's scale, so the sides do not cut away most of the ring.
+      fitted = Math.min(Math.max(wide, scale), wide * WORLD_ZOOM_MAX);
+    }
+    this.target = { cx, scale: fitted };
     if (snap || first) {
       this.camera.cx = this.target.cx;
       this.camera.scale = this.target.scale;

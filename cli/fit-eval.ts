@@ -9,7 +9,8 @@
  *     → {"id": 1, "lone": [traits per seed], "stand": [...], "shade": {"2.6": [alive per seed]},
  *        "survived": {"2.6": [seasons per seed]}, "light": {"2.6": light}, "ms": 812}
  *   "release" adds the felled-gap trial (M10), "wood" the species' own wood's floor (the hold-out);
- *   "stand100" is "stand" with standSeasons 100; "lone100" is "lone" run on to 100 (its shape there
+ *   "stand100" is "stand" with standSeasons 100, "stand150" runs on to 150
+ *   and adds each measured tree's Level 0 allometry (cli/allometry.ts) at 60, 100 and 150; "lone100" is "lone" run on to 100 (its shape there
  *   as lone.spread100, …, reported and never scored). `seeds` may instead give each trial its own,
  *   {"lone": [1, 2, 3], "stand": [1, 2], "shade": [1, 2, 3]} (the least-squares fit's counts).
  *   {"id": 2, "describe": "birch", "paths": ["c3.alpha", "r2.levels.1.setPoint"]}
@@ -34,7 +35,7 @@ import {
   runWood,
 } from "./trials.ts";
 
-type Trial = "lone" | "lone100" | "stand" | "stand100" | "shade" | "release" | "wood";
+type Trial = "lone" | "lone100" | "stand" | "stand100" | "stand150" | "shade" | "release" | "wood";
 
 interface Request {
   id: number;
@@ -43,7 +44,7 @@ interface Request {
   seeds?: number[] | Partial<Record<Trial, number[]>>;
   trials?: Trial[];
   roofs?: number[];
-  standSeasons?: 60 | 100;
+  standSeasons?: 60 | 100 | 150;
   describe?: string;
   paths?: string[];
   amend?: string;
@@ -68,7 +69,12 @@ function handle(req: Request): Record<string, unknown> {
   const seedsOf = (trial: Trial): number[] => {
     const seeds = req.seeds ?? [1];
     if (Array.isArray(seeds)) return seeds;
-    const base = trial === "stand100" ? seeds.stand : trial === "lone100" ? seeds.lone : undefined;
+    const base =
+      trial === "stand100" || trial === "stand150"
+        ? seeds.stand
+        : trial === "lone100"
+          ? seeds.lone
+          : undefined;
     return seeds[trial] ?? base ?? [];
   };
   const trials = req.trials ?? ["lone", "stand", "shade"];
@@ -81,9 +87,9 @@ function handle(req: Request): Record<string, unknown> {
     out.lone = seedsOf(t).map((s) => runLone(species, s, assign, seasons));
   }
   // The stand at 60, or run on to season 100: its traits at 60, and height100 (ADR 0021, 0022).
-  for (const t of ["stand", "stand100"] as const) {
+  for (const t of ["stand", "stand100", "stand150"] as const) {
     if (!trials.includes(t)) continue;
-    const seasons = t === "stand100" ? 100 : (req.standSeasons ?? 60);
+    const seasons = t === "stand150" ? 150 : t === "stand100" ? 100 : (req.standSeasons ?? 60);
     out.stand = seedsOf(t).map((s) => runStand(species, s, assign, seasons));
   }
   if (trials.includes("release")) {

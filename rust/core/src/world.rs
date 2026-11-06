@@ -7,7 +7,7 @@
 use crate::json::{self, Value};
 use crate::light::{Light, make_light};
 use crate::params::{Params, species_params};
-use crate::principles::c1::plant_seedling;
+use crate::principles::c1::{plant_seedling, seedling_azimuth};
 use crate::tree::Tree;
 
 /// The typed params a season reads: the world's, and each species' (ADR 0016).
@@ -244,7 +244,8 @@ impl World {
                 };
                 let season = self.season;
                 let params = self.rules.of(&tree.species).clone();
-                plant_seedling(&mut tree, &params, season, 0.0);
+                let azimuth = seedling_azimuth(&params, tree.id);
+                plant_seedling(&mut tree, &params, season, 0.0, azimuth);
                 self.trees.push(tree);
             }
             _ => {
@@ -276,7 +277,7 @@ impl World {
                 let params = self.rules.of(&tree.species).clone();
                 let tree = &mut self.trees[id];
                 tree.alive = true;
-                plant_seedling(tree, &params, season, lean);
+                plant_seedling(tree, &params, season, lean, seedling_azimuth(&params, id));
             }
         }
     }

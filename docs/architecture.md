@@ -172,6 +172,7 @@ G2 moved the sky sweep (`rust/core/src/light/sky_sweep.rs`) into Rust behind the
 | Draw | Key (tree, entity, season) |
 |---|---|
 | C1 phyllotaxis: the axis's first azimuth (`sideSequence`) | (tree id, axis id, 0) |
+| C1 seedling: its reference L's azimuth about the heading (`seedlingAzimuth`, 14; ADR 0054) | (tree id, 0, 0) |
 | C4 direction noise: the turn's size (keys 0–1, a normal) and its axis's azimuth (key 2) | (tree id, new metamer's birthId, season) |
 | R2 sympodial termination | (tree id, shoot's last metamer birthId, season) |
 | O2 abrasion | (tree id, bud birthId, season) |

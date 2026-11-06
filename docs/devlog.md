@@ -2,6 +2,20 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-06 evening: A6, a periodic depth (ADR 0058, off) and what keeps the garden's crowns low
+
+- **`world.sidesZ` "periodic"** (C2, O2, O4, planting; tests; bit-identical off).
+- **Screens:**
+  - **A periodic depth alone** doesn't lift crowns.
+  - **The cause is the equal nine-species ring:** at a real wood's density the mix stays at crown base 0.02,
+    while all-beech lifts to 0.41.
+  - **A layered wood** (canopy of beech, oak, hornbeam and birch at 5.25 m, depth 6 m, understorey between)
+    puts hornbeam and oak on the real medians (0.21) with a real floor (3.7–5.4% light). Planted beech
+    starves at 3–5% light as etiolated whips.
+  - **Today's garden floor** is 14–18%, too bright.
+- **The B0 re-run reproduces its record exactly;** crown v2 on B0 is 15.
+- **Not adopted.** Beech's shade carbon balance goes to the night.
+
 ## 2026-11-06: O, oak's form: the spire mostly gone on a candidate (branch `claude/oak-form`), awaiting the user's look
 
 - **The spire's cause:** oak reaches its sink height (33 m) by about 50 as a cone, and nothing grows after it.

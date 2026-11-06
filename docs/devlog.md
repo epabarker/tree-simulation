@@ -13,6 +13,8 @@ Newest first. One entry per session or milestone: what changed, why, surprises, 
   provisional (comments only; goldens unchanged).
 - **The overseer's box** (3 sessions and 1 night) ends with an adopted look. Next is a new box: 2 sessions and
   1 night toward 0.17.0, heights first, with G-forest against B0 (not re-baselined). See STATUS.
+- **The phone soak passed** (the user): no stutter, no empty forests, no tree unlike its kind. The user finds the
+  forest cluttered; the cause is the garden's recruit cap, under test.
 - **Housekeeping:** the agents' worktrees removed; `claude/overnight-rc` and `-noheights` deleted (merged);
   `a-crown` and `r-regularity` kept as the rejected prototypes.
 

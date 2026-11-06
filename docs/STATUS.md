@@ -2,7 +2,7 @@
 
 _Last updated: 2026-11-06 (0.16.0 released; ADR 0055 accepted; the overseer's box closed: [plan](plans/2026-11-05-overseer.md), [night](plans/2026-11-06-overnight.md))._
 
-**Live:** garden **0.16.0** on edbarker.dev since 2026-11-06 (`3d-port` 39eaaab, tag `garden-v0.16.0`, site PR #8). It adds within-tree irregularity (ADR 0055) and natural heights for hornbeam, rowan and oak (R1's reproductive sink), with `PLATE_MAX` at 170. **The phone soak is still to do** (the user).
+**Live:** garden **0.16.0** on edbarker.dev since 2026-11-06 (`3d-port` 39eaaab, tag `garden-v0.16.0`, site PR #8). It adds within-tree irregularity (ADR 0055) and natural heights for hornbeam, rowan and oak (R1's reproductive sink), with `PLATE_MAX` at 170. **Phone soak passed** (the user, 2026-11-06): no stutter, no empty forests, no tree unlike its kind. **The user finds the forest cluttered:** the recruit cap (229 on the laptop, 94 on the phone, sized for the old three rows) fills with suppressed saplings by about season 80; cutting the garden's `recruits` is being tested.
 
 **Direction (the user, 2026-11-05): trees look like trees and like their species.** Species are chosen by data. Variation between trees (ADR 0053) can wait. Agents judge against objective measures; no visual judge has passed its calibration (the sim-vs-sim judge reached 69% against 75%, so its lone reads are advisory only).
 
@@ -11,7 +11,7 @@ _Last updated: 2026-11-06 (0.16.0 released; ADR 0055 accepted; the overseer's bo
 - **Session A:**
   - **Heights through the reproductive sink,** one commit per species: beech (39 m, flat top, now 37% of the garden), then birch (45–49 m column), willow and holly (above 1.3× their Level 0 band). Pass: lone height at 150 in the Level 0 band, D and W/H no worse than 0.16.0, G-forest and the budget.
   - **Young trees' clear trunk:** check before fixing. The advisory judge's reference was TreeML's street trees, which are crown-lifted. If the stand at about 40 seasons is fine against BioDiv and Wytham, record it as a reference artefact.
-  - **Phone, seed 3:** find why it empties by 150. Swap the seed if the cause isn't quick.
+  - **Phone, seed 3:** find why it empties by 150 in native runs (the soak saw no empty forest). Swap the seed if the cause isn't quick.
 - **The night:** prototypes, off by default, each with a gate fixed before the run. **Oak's decurrent form:** count the lone oak references first (TreeML about 4, plus the Belgian hedgerows). **The flat cap:** λ's fall by level, with twigs keeping λ; pass is a lone dome without `dLambdaTrunk`'s tiered column.
 - **Session B:** an RC, sheets, `preview-3d`; the user merges and tags.
 - **After the box:** sycamore and ash enter the garden (Wytham, FOR-species20K); then lime and Norway maple, lone only.

@@ -193,9 +193,12 @@ fn deposit_buds(
 fn tag_foliage(params: &Params, owner: &mut [i32], tree: &Tree, x: f64, y: f64, z: f64) {
     let (w, h, d) = (params.world.width, params.world.height, depth_of(params));
     let mut col = x.floor();
-    let (row, layer) = (y.floor(), z.floor());
+    let (row, mut layer) = (y.floor(), z.floor());
     if params.world.periodic {
         col = ((col % w) + w) % w;
+    }
+    if params.world.periodic_z {
+        layer = ((layer % d) + d) % d;
     }
     if col < 0.0 || col >= w || row < 0.0 || row >= h || layer < 0.0 || layer >= d {
         return;

@@ -2,6 +2,23 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-06: The external review folded into the 0.17.0 box; birch's poles traced to trunk λ
+
+- **The review** (from the user; [kept verbatim](reviews/2026-11-06-external-review.md)) was checked against the
+  repo. Its documentation claims hold: the README and `package.json` still describe the 2D line, `main` is the
+  default branch, and CI has no Python job. Its "59 Python tests" is stale: there are 142.
+- **Found while checking:** two of the 142 fail locally, both on one TreeML QSM fetched overnight whose cylinder
+  dips below its root. They skip in CI, since `data/reference/` is ignored.
+- **Folded in** ([the box's plan](plans/2026-11-06-box-0.17.md)):
+  - A0 (docs truth, Python CI, named regressions for seed 3 and regeneration, a hard/soft/advisory validation
+    policy) goes ahead of the rest of the birch work;
+  - a budget smoke joins the release gate;
+  - a sensitivity sweep joins the night.
+  - Default branch and GitHub issues are the user's to decide.
+- **Birch** (A1, not yet adopted): the poles are birch's leader taking its growth (trunk λ 0.588). 0.53 passes
+  every hard gate (poles 18 of 20, lone height 39 m, G-forest 0/1/9/11 against B0, at the margin); 0.55 fails
+  crown base (6). Its crowns look leafless in the garden; that is next.
+
 ## 2026-11-06: Garden 0.16.0 released; ADR 0055 accepted; the overseer's box closed
 
 - **Released:**

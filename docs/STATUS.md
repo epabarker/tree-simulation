@@ -6,16 +6,13 @@ _Last updated: 2026-11-06 (0.16.0 released; ADR 0055 accepted; the overseer's bo
 
 **Direction (the user, 2026-11-05): trees look like trees and like their species.** Species are chosen by data. Variation between trees (ADR 0053) can wait. Agents judge against objective measures; no visual judge has passed its calibration (the sim-vs-sim judge reached 69% against 75%, so its lone reads are advisory only).
 
-## The box: 0.17.0, the garden's species at the right size and shape (2 sessions and 1 night, from 2026-11-06)
-- **Gates, fixed now:** **G-forest** against B0, not re-baselined (`forestParams(160)`, 20 seeds, 300 seasons, each count ≥ base − 2; B0 is floor 2, planted H/D 3, crown base 11, plateau 11; 0.16.0 sits at 1/1/12/13, so planted H/D has no headroom). **Budget:** under 230 MB with the specimen; phone time ≤ 1.3×. Scripts: `experiments/code/2026-11-06-overnight/`.
-- **Session A:**
-  - **Birch first** (the user, 2026-11-06): its 45–49 m column and its recruits' thin poles (H/D 150–320; pass: ≤ about 120 at 100), via seed rain, seeding size and the reproductive sink.
-  - **Heights through the reproductive sink,** one commit per species: beech (39 m, flat top, now 37% of the garden), then willow and holly (above 1.3× their Level 0 band). Pass: lone height at 150 in the Level 0 band, D and W/H no worse than 0.16.0, G-forest and the budget.
-  - **Young trees' clear trunk:** check before fixing. The advisory judge's reference was TreeML's street trees, which are crown-lifted. If the stand at about 40 seasons is fine against BioDiv and Wytham, record it as a reference artefact.
-  - **Phone, seed 3:** find why it empties by 150 in native runs (the soak saw no empty forest). Swap the seed if the cause isn't quick.
-- **The night:** prototypes, off by default, each with a gate fixed before the run. **Oak's decurrent form:** count the lone oak references first (TreeML about 4, plus the Belgian hedgerows). **The flat cap:** λ's fall by level, with twigs keeping λ; pass is a lone dome without `dLambdaTrunk`'s tiered column.
-- **Session B:** an RC, sheets, `preview-3d`; the user merges and tags.
-- **After the box:** sycamore and ash enter the garden (Wytham, FOR-species20K); then lime and Norway maple, lone only.
+## The box: 0.17.0, the species at the right size and shape, on a stable base (from 2026-11-06; [plan](plans/2026-11-06-box-0.17.md))
+- **Rules:** gates fixed before results; G-forest against B0 (2/3/11/11, each ≥ base − 2); measures labelled hard, soft or advisory, and no visual fix counts as validation without an independent gate; no new mechanism without a measured mismatch ([external review](reviews/2026-11-06-external-review.md), folded in).
+- **A0, next (the review):** README, `package.json` and a branches section made true; the 142 Python tests in CI (two fail locally on one TreeML QSM below its root); phone seed 3 and `forest`'s regeneration as named regressions; the validation policy.
+- **A1, birch:** trunk λ 0.588 → 0.53 fixes the poles (18 of 20) and lone height (39 m) and passes G-forest at the margin (0/1/9/11); 0.55 fails crown base. Uncommitted on `claude/birch`; the leafless-looking crown comes next.
+- **A2–A3:** young trees' trunk (check the street-tree reference first); heights for beech, willow and holly.
+- **The night:** oak's decurrent form; the flat cap; a sensitivity sweep of the adopted species params. **B:** the RC with a fresh-process budget smoke as a release gate.
+- **After the box:** one species end to end on held-out data (beech or oak); sycamore and ash into the garden.
 
 ## Works
 - **Core** (`rust/core`): C1–C6, R1–R6, O2, O4 in 3D. Slab sweep in fixed lanes; checkpoints v2. Girth by the pipe model (ADR 0027).
@@ -31,7 +28,7 @@ _Last updated: 2026-11-06 (0.16.0 released; ADR 0055 accepted; the overseer's bo
 - **Open questions (user):** `levels.2.setPoint` ≥ 80 collapses every broadleaf. Birch's pick stops growing after 60: form or fit?
 
 ## Notes for the next session
-- **Rust:** put `~/.cargo/bin` on PATH. `npm run golden:update` needs `npm run build:wasm` first. **Python tests:** `uv run --project analysis --with pytest pytest analysis/tests -q`.
+- **Rust:** put `~/.cargo/bin` on PATH. `npm run golden:update` needs `npm run build:wasm` first. **Python tests (142, not in CI yet):** `uv run --project analysis --with pytest pytest analysis/tests -q`.
 - **Gate:** `npm run check:stamp` in the foreground only (ADR 0047; [harness principles](background/harness-principles.md)). **Memory:** one fresh process per measurement; WASM memory never shrinks.
 - **Panels:** headless Firefox through puppeteer-core against `npm run dev`. Species trees ignore world patches; use `--species-patch`.
 - **Deploys:** a push to the site's `main` is production. Never merge `preview-3d`. Tags are the user's.

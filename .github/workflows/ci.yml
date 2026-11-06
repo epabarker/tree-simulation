@@ -26,6 +26,24 @@ jobs:
         run: npm run build:garden
       - name: Headless smoke run
         run: npm run sim -- --seasons 10 --out runs/ci
+      - name: "Named regressions: known defects as outcome vectors (#54, #55; tests/regressions.json)"
+        run: node cli/regressions.ts
+
+  # The analysis suite (analysis/tests: the QSM readers, describe(), coarsen(), the fits and gates): added
+  # 2026-11-06 at the external review's suggestion. A separate job, so a calibration failure reads apart from
+  # the core's. Tests that need git-ignored reference data (data/reference/) or simulator dumps skip here, and
+  # -rs lists each skip with its reason: a green run does not cover them. Run them locally with the data fetched
+  # (python -I -m treesim.fetch).
+  analysis:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0 # level1's registrations are read from their commits (git show <sha>:...)
+      - name: uv
+        run: pipx install uv
+      - name: "The analysis tests (reference-data tests skip; see the -rs list)"
+        run: uv run --project analysis --with pytest pytest analysis/tests -q -rs
 
   # The 2D proof (I1, ADR 0024): the TypeScript core and the Rust core's parity build, archived at
   # the tag golden-2d-ts, still reproduce the 2D goldens bit for bit on this runner. It checks out

@@ -46,5 +46,6 @@ def test_every_tree_passes_the_internal_checks(rows, source):
     r = rows[source]
     if not r:
         pytest.skip(f"no {source} QSMs under data/reference/")
-    failed = [(x["tree"], k) for x in r for k, v in x.items() if k.startswith("check_") and not v]
-    assert not failed, failed
+    failed = {x["tree"] for x in r for k, v in x.items() if k.startswith("check_") and not v}
+    # Every failure is a recorded exclusion (test_readers checks that each exclusion still fails something).
+    assert failed <= set(gate.TREEML_EXCLUDED), sorted(failed - set(gate.TREEML_EXCLUDED))

@@ -2,6 +2,21 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-06: A0, the review's hygiene: Python tests in CI, named regressions, the validation policy
+
+- **Python tests in CI** (a separate `analysis` job, full history, `-rs` listing skips). A full local run found six
+  TreeML QSMs failing a reader check: five with cylinders below the root, one with a root leaning 63°. Recorded
+  in `qsm_gate.TREEML_EXCLUDED`; only recorded trees may fail, and each must still fail.
+  - **G-reg holds:** its real lone-hornbeam band included two of the six; without them every band moves by 2% or
+    less.
+  - **A clean clone exposed more:** three gate readers failed instead of skipping without data, and a Level 1 test
+    needed git history. Both are fixed. Clean: 127 pass, 15 skip; with the data: 142 pass.
+- **Named regressions** (`npm run regressions`; a CI step): phone seed 3 (#54) and `forest`'s regeneration (#55)
+  as exact outcome vectors in `tests/regressions.json`. Baselines recorded at this commit: seed 3 has 24 live but
+  1 canopy tree at 150; `forest` gets 23 of 687 recruits to 20 cells by 300.
+- **[Validation policy](background/validation-policy.md):** hard, soft and advisory labels. No visual fix counts as
+  validation without an independent gate, and a gate at its limit is reported as at its limit.
+
 ## 2026-11-06: The external review folded into the 0.17.0 box; birch's poles traced to trunk λ
 
 - **The review** (from the user; [kept verbatim](reviews/2026-11-06-external-review.md)) was checked against the

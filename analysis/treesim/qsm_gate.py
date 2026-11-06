@@ -72,6 +72,8 @@ def _num(s: str) -> float:
 
 
 def demol_rows() -> list[dict]:
+    if not any((DATA / "demol" / "qsm").glob("*.mat")):
+        return []  # not fetched (data/reference/ is git-ignored): the tests skip
     table = {r["tree_name"]: r for r in _csv(DATA / "demol" / "Destructive_and_qsm_data_DEMOL.csv")}
     out = []
     for path in sorted((DATA / "demol" / "qsm").glob("*.mat")):
@@ -89,6 +91,8 @@ def demol_rows() -> list[dict]:
 
 
 def wytham_rows() -> list[dict]:
+    if not any((DATA / "wytham" / "qsm").glob("wytham_winter_*.mat")):
+        return []
     tls = {r["Tree_ID"]: r for r in _csv(DATA / "wytham" / "analysis_and_figures" / "tls_summary.csv")}
     species = {r["TLS_ID"]: r["species"] for r in _csv(DATA / "wytham" / "analysis_and_figures" / "trees_summary.csv")}
     out = []
@@ -106,6 +110,8 @@ def wytham_rows() -> list[dict]:
 
 
 def biodiv_rows() -> list[dict]:
+    if not any((DATA / "biodiv" / "qsm-all").rglob("*_all.mat")):
+        return []
     labels = {r["treeID"]: r for r in _csv(DATA / "biodiv" / "labels.csv")}
     out = []
     for path in sorted((DATA / "biodiv" / "qsm-all").rglob("*_all.mat")):
@@ -118,6 +124,21 @@ def biodiv_rows() -> list[dict]:
                         ceiling_dbh_err=_err(q.meta["dbh_qsm"], dtls),
                         ceiling_height_err=_err(q.meta["height_qsm"], _num(r["hTLS"]))))
     return out
+
+
+# TreeML QSMs that fail the reader's checks (found 2026-11-06 among the 342 fetched for the overnight run, when
+# the external review prompted a full run of these tests): in four the trunk's first cylinders tilt below the
+# root, in one a branch hangs below it, in one the root cylinder leans 63° from vertical. Kept out of any use of
+# TreeML as reference. The overnight run's lone hornbeam bands (ADR 0055's G-reg) included the two hornbeams;
+# without them each band moves by 2% or less.
+TREEML_EXCLUDED = {
+    "2023-01-09_5_1_37_000247": "Carpinus betulus: a trunk cylinder 0.18 m below the root",
+    "2023-01-09_tum_campus_000005": "Fraxinus excelsior: a trunk cylinder 0.64 m below the root",
+    "2023-01-12_30_000006": "Acer platanoides: the root cylinder leans 63° from vertical",
+    "2023-01-12_35_34_000135": "Acer platanoides: the first cylinder heads down, 0.16 m below the root",
+    "2023-01-12_65_64_000313": "Carpinus betulus: a branch 1.96 m below the root",
+    "2023-01-16_23_000062": "Acer pseudoplatanus: a trunk cylinder 0.19 m below the root",
+}
 
 
 def treeml_rows() -> list[dict]:

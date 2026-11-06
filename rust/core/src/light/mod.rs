@@ -59,6 +59,7 @@ pub fn make_light(params: &Params) -> Light {
             c: c2.c,
             rotate: c2.rotate,
             face_tau: params.world.faces,
+            face_wood: params.world.face_wood,
             sky_tilt: c2.sky_tilt,
             periodic_x: params.world.periodic,
         };

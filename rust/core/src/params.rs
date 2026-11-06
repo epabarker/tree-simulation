@@ -63,6 +63,9 @@ pub struct WorldP {
     pub faces: [f64; 2],
     /// Q fades linearly to 0 over this many cells before each face (0: hard faces).
     pub fade: f64,
+    /// `world.faceWood`: a virtual wood beyond the z faces with the slab's own foliage profile, at
+    /// this share of its density (box A4, ADR 0056). 0: off.
+    pub face_wood: f64,
     pub walls: Vec<Rect>,
     /// `world.obstacles`: None when absent (growth then skips the check, as `!== undefined`).
     pub obstacles: Option<Vec<Rect>>,
@@ -425,6 +428,7 @@ impl Params {
                     None => [1.0, 1.0],
                 },
                 fade: opt(w, "fade").unwrap_or(0.0),
+                face_wood: opt(w, "faceWood").unwrap_or(0.0),
                 walls: rects(w.get("walls"), true),
                 obstacles: w.get("obstacles").map(|o| rects(Some(o), false)),
                 periodic: text(w, "sides") == "periodic",

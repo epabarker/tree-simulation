@@ -76,5 +76,14 @@ These are within-tree draws. They are not ADR 0053's per-tree draw, which stays 
     not adopted.
   - L_h lowers height but starves the crown into a pole.
   - The next mechanism to try: λ's fall by level, with twigs keeping λ.
-- **Mature height:** lone hornbeam is 49 m at 150, rowan 1.75× its band, oak 1.35×. No existing parameter
-  tested so far lowers height without starving the crown.
+- **Mature height is adopted in a separate commit (7b105ae), revertible alone.** It uses an existing mechanism,
+  R1's reproductive sink, as a ceiling: hornbeam `{"r1.fRep":0.8,"r1.maturity":115,"r2.dLambda":0.0725}` (29 m
+  flat from 100, against 49 m at 150; 0.62× metamers; a rounded crown, D 0.34), rowan
+  `{"r1.fRep":0.8,"r1.maturity":85}` (21.6 m), oak `{"r1.fRep":0.8,"r1.maturity":130}` (33.2 m).
+  - The garden's evidence with it is at the margin (floor 1, planted H/D 1, crown base 12, plateau 13, against
+    2/3/11/11).
+  - The composition shifts: hornbeam 0.43 → 0.20, beech 0.25 → 0.37, oak 0.01 → 0.06.
+  - Hornbeam's dLambda is fragile: the crown flips within ±0.01.
+- **The review's open questions** (PR #49): relay leaders take axisSD; stochastic break can refuse a relay's
+  lateral; about 6% of beech's laterals leave within 5° of their host; ADR 0049 §3–4.
+- **`PLATE_MAX` 200 → 170:** the irregular broadleaves' 200-cell plate peaked at 247 MB with the specimen.

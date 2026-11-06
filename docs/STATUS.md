@@ -1,17 +1,26 @@
 # Status
 
-_Last updated: 2026-11-05 (the overseer's review: [plan](plans/2026-11-05-overseer.md). Read it before anything else.)_
+_Last updated: 2026-11-06, the overnight run ([note](experiments/2026-11-06-overnight-generic-broadleaf.md), [plan and State](plans/2026-11-06-overnight.md), ADR 0055 proposed)._
 
-**Live:** the 3D garden, **garden 0.15.0**, has been on edbarker.dev since 2026-11-02. It was released from `3d-port` (a417437), the site's PR #7. The done-means bar below was met and shipped. The hour-long phone soak is still to do. Work branches open PRs into `3d-port`. `claude/reference-fidelity` (60 commits, including ADR 0054's lean fix) is not merged yet.
+**Live:** garden 0.15.0 (the 3D garden) since 2026-11-02. **Waiting on the user:**
+- **draft PR #48:** 0.16.0, one lap of the plate plus ADR 0054's lean fix;
+- **draft PR #49**, stacked on it: the release candidate.
+  - Within-tree irregularity for the 8 broadleaves (ADR 0055).
+  - Natural heights, in a separate, revertible commit.
+  - `PLATE_MAX` 170.
+  - Preview: https://preview-3d-edbarker-dev.edbarker.workers.dev/
+
+Nothing is merged or tagged; tag pushes are the user's.
 
 **Done means** (the user, met 2026-11-02): the mixed wood looks right in the garden in depth, within the phone's budget, with floor, H/D and crown base as 20-seed evidence.
 
-**Direction (the user, 2026-11-05): trees should look like their species; variation between trees can wait.** The overseer's plan has two tracks:
-- **G, the garden:** stop the plate drawing wrapped copies; fit the plate to its width without cropping crowns; ADR 0054; release 0.16.0.
-- **F, the look:** one good generic broadleaf first, then the species as departures from it. Agents judge, using a "which is real?" test calibrated on real QSMs, never the user's eye. The umbrella crowns are ADR 0031's flat cap. Lone trees are compared as well as the stand (TreeML).
-- **Exit:** 3 sessions and 1 overnight fit, from 2026-11-05, to an adopted look or a recorded pause.
-- **Rule:** no new descriptor, registration, ADR or audit without the overseer's OK.
-- Reference fidelity's detail (gate c v3.2, Level 0 v2, pilots v1–v4, ADR 0050–0054) lives in [its plan's State](plans/2026-11-03-reference-fidelity.md#state). ADR 0053 (individual variation) is deferred by the user.
+**Direction (the user, 2026-11-05): trees look like trees and like their species**, species chosen by data (beech, sycamore, oak first; then ash, hornbeam). Variation between trees (ADR 0053) can wait.
+- **Instrument:** six within-tree descriptors on coarsened sims and real QSMs, with a scan-noise floor from
+  BioDiv's repeats. Four are usable: spacingCV, attachPerM, insertSD, elevSD.
+- **The judge:** the "which is real?" judge saturates. The sim-vs-sim judge failed its gate on the user's picks
+  (69% against 75%).
+- **The garden's evidence:** `forestParams(160)`, 20 seeds, via the overnight scripts.
+- **Rule:** no new descriptor, registration, ADR or audit without a reason the user can see in the garden.
 
 ## Works
 - **Core** (`rust/core`): C1–C6, R1–R6, O2, O4 in 3D; slab sweep in fixed lanes; checkpoints v2. O4's `band` keeps recruits near a row (the garden).
@@ -29,15 +38,16 @@ _Last updated: 2026-11-05 (the overseer's review: [plan](plans/2026-11-05-overse
 - **Still to measure (§5):** 3b's hit rate; 3c's token delta; the 3g A/B; a Stop hook's `systemMessage` over Remote Control (asked).
 
 ## Next
-1. The overseer's plan, tracks G and F ([plan](plans/2026-11-05-overseer.md) §5).
-2. After that, the form list: lone beech's rise-then-arch, oak's arms, maple's flat top (ADR 0031), willow's bush, hornbeam's clear trunk; C3–C6 as hold-outs.
+1. **The user:** merge #48, then #49 (or #49 alone), then tag. Phone soak. Rule on ADR 0055 and on the height commit.
+2. **The flat cap:** λ's fall by level, with twigs keeping λ (ADR 0055, "Not decided here"). Oak's stand branch density.
+3. **Species by data:** sycamore and ash enter the garden (Wytham, TreeML), then lime and Norway maple (lone only).
 
 ## Open questions (user)
 **`levels.2.setPoint` ≥ 80** collapses every broadleaf (C3/R3, after shipping). **Birch's pick stops growing after 60**: form or fit?
 
 ## Known issues
 - **The slab damps depth leans** in the stand's face rows (ADR 0054's note). This bears on front-view reads (Level 0's lone width).
-- **The plate draws wrapped copies** of the ring on wide screens once crowns grow tall (`scene.ts:667`; the overseer's plan, track G).
+- **Phone, seed 3:** nearly empty by season 150, in 0.16.0 and the RC alike.
 - **Regeneration:** `forest` cannot regenerate under its own floor at τ 0 (C5's). **The lab stutters** from season ≈ 75 on the phone. **The preview deploy** (`preview-3d`) has the old `i2.ts`: redeploy only when asked.
 
 ## Notes for the next session

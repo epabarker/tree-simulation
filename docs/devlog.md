@@ -2,6 +2,46 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-06: The overnight run: a generic broadleaf (ADR 0055, proposed), natural heights, PLATE_MAX 170; a release candidate (draft PR)
+
+- **The overseer** (the user, 2026-11-05):
+  - The 3D garden was live as 0.15.0 since 2026-11-02, but STATUS said 0.14.0.
+  - Reference fidelity had churned through gate c v1–v3.2 and registrations v1–v6 with nothing adopted.
+  - The two tracks, the plan and the rulings are in `plans/2026-11-05-overseer.md`. The overnight plan and its
+    State block are in `plans/2026-11-06-overnight.md`.
+- **The judge** ([note](experiments/2026-11-06-overnight-generic-broadleaf.md)):
+  - A blinded "which is real?" judge caught every simulated broadleaf (144/144), on regularity cues.
+  - It then saturated: it caught the user's gallery rejects at 100% too, so it was retired.
+  - A simulated-against-simulated judge failed its gate on the user's past picks (69% against 75%). **No visual
+    gate was used overnight.**
+- **The objective instrument:** six within-tree descriptors on coarsened sims and real QSMs, with a scan-noise
+  floor from BioDiv's repeats. Four are usable.
+- **Data fetched:** TreeML (342 QSMs, CC0), Belgian hedgerows (68, CC-BY), BioDiv hornbeam (38). The manifest is
+  updated.
+- **ADR 0055 (proposed):** four off-by-default rules, purposes 5 (now drawn), 15, 16 and 17:
+  - stochastic lateral break (§R4.4);
+  - a lognormal shoot length;
+  - a per-axis set-point offset;
+  - a per-axis branch-angle offset.
+
+  **Adopted** as the `[broadleaf]` base in hand-overrides.toml: shootLengthSD 0.5, axisSD 50, betaSD 60,
+  budBreak width 1. Beech and oak have their own values. Hornbeam's summed |z| falls 23 → about 5, with all four
+  usable descriptors in the real bands, lone and stand.
+- **Heights (a separate commit):** R1's reproductive sink as a ceiling. Hornbeam is 29 m flat from 100, against
+  49 m at 150, and keeps a rounded crown; rowan 21.6 m, oak 33.2 m.
+  - L_h was rejected: it starves crowns into poles.
+  - The flat cap is a size effect.
+- **Garden evidence** (`forestParams(160)`, 20 seeds), against the base (2/3/11/11):
+  - the final RC: floor 1, planted H/D 1, crown base 12, plateau 13, metamers 0.96×;
+  - all-tree H/D 16/20;
+  - composition: hornbeam 0.43 → 0.20, beech 0.25 → 0.37.
+- **Memory:** PR #48's "regression" was a measuring artefact (many worlds in one process). The 200-cell plate
+  peaks at 247 MB with the specimen, so **PLATE_MAX is now 170**.
+- **Goldens (intended):** 4 of 16, all from the broadleaves' new species params (ADR 0055), then the separate height commit: `mixedWood:seed1:s15` c95b46b9 → 3ee70704 (stage 2) → 93042bbc (heights); `oakOpen:seed1:s15` 0877b79b → 29e5921a; `beechOpen:seed1:s40` 200f5a55 → ef0a754d; `beechWood:seed1:s30` f8b1fe35 → 6b8af072. The other 12 are unchanged; `golden.rs`'s off test now switches the species-level rules off too and reproduces 0.16.0's oakOpen and beechOpen bit for bit.
+- **Check:** green at 7b105ae (99/99, on a quiet machine). Review: the Fable spec-reviewer had no credits, so an Opus stand-in ran it. Its one demonstrated item (the off test never reached species rules) is fixed in ce7ebb3; its open questions are in PR #49.
+- **Preview:** the site's `preview-3d` carries the RC as 0.16.0 (main merged in, pushed without force): https://preview-3d-edbarker-dev.edbarker.workers.dev/
+- **PRs:** #48 (0.16.0, draft), #49 (this RC, draft, stacked on #48). Nothing merged or tagged.
+
 ## 2026-11-05: garden 0.16.0 prepared (for the user to tag)
 
 - **Release notes:**

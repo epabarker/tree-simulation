@@ -2,6 +2,22 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-06: Birch's trunk λ 0.53: the garden's poles fixed; leafier birch blocked by the crown-base gate
+
+[Note](experiments/2026-11-06-birch-poles.md).
+- **Adopted:** `r2.levels.0.lambda` 0.5882 → 0.53 (`hand-overrides.toml`).
+  - Poles: 18 of 20 seeds pass (H/D ≤ 120), against 13.
+  - Lone birch: 39 m at 150, inside Tallo's 33–42 m (it was 48).
+  - G-forest against B0: 0/1/9/11. Planted H/D and crown base are exactly at their limits.
+- **Not adopted:** leafier birch (twig laterals every node, every 2nd, and with λ 0.55 or 0.588). It carries
+  0.66–0.71 leafy buds per metamer against 0.30, but every variant fails crown base (5–6). The lone birch
+  comparator (one tree, seed 1) gets shallower and lowers the bar for every seed with birch, while the stand
+  crowns don't deepen. The user ruled the test ("every node, test it"); the gate held. The gate's design is
+  the user's question.
+- **Goldens:** `mixedWood` s15 → b405ce5d and `beechWood` s30 → 847fc8e6 (birch grows in both).
+- **Named regression** `phoneSeed3` (#54) moved: canopy at 100 went 2 → 3, metamers rose (15269 → 15245 at 50,
+  15017 → 15620 at 100, 11270 → 12259 at 150). Baseline updated; still 1 canopy tree at 150.
+
 ## 2026-11-06: A0, the review's hygiene: Python tests in CI, named regressions, the validation policy
 
 - **Python tests in CI** (a separate `analysis` job, full history, `-rs` listing skips). A full local run found six

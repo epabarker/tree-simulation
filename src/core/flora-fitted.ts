@@ -35,7 +35,7 @@ export const FITTED_FLORA = {
       enabled: true,
       levels: [
         {
-          lambda: 0.5882,
+          lambda: 0.53,
           setPoint: 0,
           eta: 0.3,
           branchAngle: 45,

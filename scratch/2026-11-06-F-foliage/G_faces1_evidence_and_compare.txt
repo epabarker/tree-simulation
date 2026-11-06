@@ -1,0 +1,52 @@
+# Evidence: faces1
+
+Worktree `/home/edbarker/Documents/Projects/tree-simulation/.claude/worktrees/agent-a28199a6f8557d21d`, width 160, seeds 1-20 (N=20), 300 seasons. Patch: `{}`
+
+| check | pass (of N) | distribution |
+|---|---|---|
+| floor at 100 in 2-10% (faces 0.2: out of band by construction) | 18 | median 0.0455 (p10 0.0334, p90 0.0734; range 0.02-0.14) |
+| H/D at 300 in 60-80 | 3 | median 44.3 (p10 31.9, p90 77.2; range 25.2-111) |
+| H/D at 300 over ALL live trees incl. recruits (extra) | 5 | median 134 (p10 75, p90 163; range 68.9-194) |
+| crown base: stand LCR < lone's at 150 and 300 | 13 | stand-lone at 300: median -0.412 (p10 -0.462, p90 -0.062; range -0.508-0.155) |
+| plateau: gain 250-300 < 2, tallest < 180 | 12 | gain median 0.457 (p10 -4.51, p90 9.26; range -10.6-29.4); tallest median 131 (p10 85.4, p90 162; range 60.7-178) |
+| floor at 150 (reported) | - | median 0.0651 (p10 0.0306, p90 0.294; range 0.0268-0.91) |
+
+## Survival and composition
+
+- planted trees alive: at 150 35.8%, at 300 19.2% (count at 300 per seed: median 1 (p10 0, p90 3; range 0-4))
+- all live trees (with recruits): at 150 median 57 (p10 37, p90 57; range 19-57); at 300 median 52.5 (p10 27.5, p90 57; range 20-57)
+- composition at 300 (mean share of live trees per species): beech 0.38, birch 0.01, holly 0.07, hornbeam 0.32, maple 0.13, oak 0.04, rowan 0.04, willow 0.01
+
+| species | planted trees alive at 300 | median height | median H/D | median LCR |
+|---|---|---|---|---|
+| beech | 7 | 157 | 37.7 | 0.221 |
+| birch | 1 | 121 | 50.4 | 0.394 |
+| holly | 5 | 55 | 86.8 | 0.9 |
+| hornbeam | 3 | 115 | 47.9 | 0.205 |
+| maple | 2 | 74.8 | 61.2 | 0.345 |
+| oak | 2 | 123 | 59 | 0.546 |
+| rowan | 3 | 85.4 | 55 | 0.617 |
+
+## Budget
+
+- metamers at 200 (sum over live trees): median 1.8e+04 (p10 1.27e+04, p90 2.88e+04; range 9.76e+03-3.1e+04)
+- native wall s/season (machine was loaded, 3 parallel runs): median 0.35 (p10 0.32, p90 0.392; range 0.279-0.429); CPU s/season: median 0.343 (p10 0.313, p90 0.386; range 0.276-0.419)
+
+G-forest: faces1 against base-d2c4f53 (each count >= base - 2)
+  floor100: 18 vs base 2  ok
+  hd300: 3 vs base 3  ok
+  crown: 13 vs base 11  ok
+  plateau: 12 vs base 11  ok
+  hd300_all: 5 vs base 20  FAIL
+  planted_survival150: 0.358 vs base 0.442
+  planted_survival300: 0.192 vs base 0.308
+  share beech: 0.38 vs 0.25
+  share birch: 0.01 vs 0.00
+  share holly: 0.07 vs 0.08
+  share hornbeam: 0.32 vs 0.43
+  share maple: 0.13 vs 0.16
+  share oak: 0.04 vs 0.01
+  share rowan: 0.04 vs 0.07
+  share willow: 0.01 vs 0.00
+  metamers200 median 18016 vs 70143 (0.26x; G-budget <= 1.25x)
+  VERDICT (four checks): FAIL

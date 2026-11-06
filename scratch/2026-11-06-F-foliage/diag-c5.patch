@@ -1,0 +1,130 @@
+diff --git a/rust/core/src/principles/c5.rs b/rust/core/src/principles/c5.rs
+index ba584f4..cc94f25 100644
+--- a/rust/core/src/principles/c5.rs
++++ b/rust/core/src/principles/c5.rs
+@@ -86,6 +86,10 @@ pub fn shed_branches(tree: &mut Tree, params: &Params, season: f64, evaluated: u
+             any = true;
+         }
+     }
++    // DIAG (temporary, agent F; never committed): metamers shed by cause of their root.
++    if std::env::var_os("TREESIM_DIAG").is_some() {
++        diag_shed(tree, params, season, evaluated, &dead, carbon, own);
++    }
+     let removed = if any {
+         remove_branches(tree, &mut dead, params, &mut [])
+     } else {
+@@ -95,6 +99,114 @@ pub fn shed_branches(tree: &mut Tree, params: &Params, season: f64, evaluated: u
+     removed
+ }
+ 
++/// DIAG (temporary): one stderr line per tree and season.
++#[allow(clippy::too_many_arguments)]
++fn diag_shed(
++    tree: &Tree,
++    params: &Params,
++    season: f64,
++    evaluated: usize,
++    dead: &[u8],
++    carbon: bool,
++    own: f64,
++) {
++    let nm = tree.m.len();
++    let mut height: f64 = 0.0;
++    let base = if nm > 0 { tree.m.base_y[0] } else { 0.0 };
++    for j in 0..nm {
++        height = height.max(tree.tip_y(j) - base);
++    }
++    // cause of each root: 1 deficit only, 2 light only, 3 both, 4 other (own/T)
++    let mut cause = vec![0u8; nm];
++    let mut low = vec![0u8; nm];
++    let c = &tree.m;
++    let mut roots = [0.0f64; 5];
++    for i in 0..nm {
++        let p = c.parent[i];
++        if p >= 0 && cause[p as usize] != 0 {
++            cause[i] = cause[p as usize];
++            low[i] = low[p as usize];
++        } else if i < evaluated && dead[i] != 0 {
++            let n_b = c.n_sum[i] as f64;
++            let light = if n_b > 0.0 { c.q_sum[i] / n_b } else { 0.0 };
++            let lit = light < params.c5.t_rel * tree.q_top;
++            let def = carbon && tree.deficit[i] >= params.r1.k_shed;
++            cause[i] = match (def, lit) {
++                (true, false) => 1,
++                (false, true) => 2,
++                (true, true) => 3,
++                _ => 4,
++            };
++            roots[cause[i] as usize] += 1.0;
++            let y = if p >= 0 { tree.tip_y(p as usize) - base } else { 0.0 };
++            low[i] = (y < 0.5 * height) as u8;
++        }
++    }
++    let mut n = [0.0f64; 5];
++    let mut n_low = 0.0;
++    let depth = crate::light::depth_of(params);
++    let mut n_out = 0.0;
++    for i in 0..nm {
++        n[cause[i] as usize] += 1.0;
++        let z = tree.tip_z(i);
++        if cause[i] != 0 && !(0.0..depth).contains(&z) {
++            n_out += 1.0;
++        }
++        if cause[i] != 0 && low[i] != 0 {
++            n_low += 1.0;
++        }
++    }
++    // foliage: leaf area of live buds and its light
++    let mut area = 0.0;
++    let mut aq = 0.0;
++    let mut a_lo = 0.0;
++    let mut a_q = 0.0;
++    let mut a_out = 0.0;
++    for j in 0..tree.b.len() {
++        if !super::c3::is_live_bud(tree.b.state[j]) {
++            continue;
++        }
++        let a = super::r6::deposit_area(tree.b.state[j], &params.r6);
++        area += a;
++        if tree.b.q[j] > 0.0 {
++            aq += a * tree.b.q[j];
++            a_q += a;
++        }
++        let m = tree.b.metamer[j] as usize;
++        if m < nm && tree.tip_y(m) - base < 0.5 * height {
++            a_lo += a;
++        }
++        if m < nm && !(0.0..depth).contains(&tree.tip_z(m)) {
++            a_out += a;
++        }
++    }
++    let _ = own;
++    eprintln!(
++        "SHED {} {} {} {:.1} {} {} {} {} {} {} {} {} {} {:.2} {:.4} {:.2} {:.4} {:.3} {:.3} {} {:.2}",
++        season,
++        tree.id,
++        tree.species,
++        height,
++        nm,
++        n[1],
++        n[2],
++        n[3],
++        n[4],
++        roots[1],
++        roots[2],
++        roots[3],
++        n_low,
++        area,
++        if a_q > 0.0 { aq / a_q } else { 0.0 },
++        a_lo,
++        tree.q_top,
++        tree.production,
++        tree.maintenance,
++        n_out,
++        a_out
++    );
++}
++
+ /// Removes every metamer marked in `dead` with its subtree and buds, recording scars and
+ /// remapping indices; arrays in `carry` are compacted alongside. Returns metamers removed.
+ pub fn remove_branches(

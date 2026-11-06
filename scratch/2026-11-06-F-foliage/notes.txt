@@ -1,0 +1,88 @@
+F: why shade strips foliage (plan 2026-11-06-day2, item F). Agent F, 2026-11-06. Diagnostics only: nothing here changes the core.
+
+Setting: forestParams(160), quarter cap; "narrow" = world.depth 28, trees z 14, o4.band 28, world.faceWood 1 (faces tau 0.2 as the garden);
+"today" = the garden as shipped (depth 64). Six seeds 2,3,6,9,10,12, 150 seasons. Closed stands: cli/trials.ts standParams
+(width 84, depth 64, faces [0,0], O4 off), seeds 2,3,6. Per-area measures use the band (160 x 28 cells) for gardens and the whole
+slab (84 x 64) for stands. "LAI" = leaf area of live buds (r6 deposit_area, the light grid's units) per cell column, the measure
+behind ADR 0056's 3.6-9.5.
+
+Instrument: diag-c5.patch (temporary, env TREESIM_DIAG; reverted, never committed to the core). One stderr line per tree and
+season from c5::shed_branches: metamers shed by the cause of their shed root (R1 carbon deficit only / C5 T_rel*Q_top light only /
+both), shed below half height, shed with tips outside the slab's depth, leaf area, leaf-weighted light, P, M. Its shed totals equal
+metrics.csv's `shed` exactly (chk1 = 0; diag season s = metrics season s+1). Births are computed independently from metrics.csv
+(delta metamers + shed + broken + abraded per live tree-season); deaths from the row where `alive` flips (starved >= kStarve:
+starvation; broken = metamers: windthrow; else O4's background m0).
+
+1. Where the foliage goes (six-seed medians, 0-150; per cell of each world's own ground: today 160 x 64, narrow 160 x 28,
+   stands 84 x 64; today's canopy crowns span 55-62 of its 64 cells in z, so its whole slab is its ground):
+                 m150    m/cell  LAI100 LAI150  born/cell  P cum/cell  lost/born  deficit  light(+both)  m0     R3 breaks
+   today        55,207   5.39    9.5    10.3     29.8       269         0.81      0.44     0.06         0.11   0.06
+   narrow        7,622   1.70    3.6    2.5     17.1       157         0.90      0.60     0.08         0.11   0.03
+   faces 1      17,851   3.99    6.2    5.7     33.2       272         0.90      0.51     0.19         0.12   0.04
+   stand beech     -     3.33    6.0    5.9     53.1       326         0.91      0.86     0.05         0      0
+   stand hornbeam  -     4.03    8.9    8.2     31.1       378         0.87      0.75     0.13         0      0
+   (deficit, light, m0, R3 breaks: metamers lost by that cause / metamers born.)
+ - narrow / today = 0.138 = ground area 0.44 (a 7 m strip against today's 16 m, which today's crowns fill) x density per cell 0.32.
+ - Births: 4.0x fewer in narrow (76.5k vs 305k); retention 10% vs 18% of births standing at 150 (0.25 x 0.55 = 0.14).
+ - Shedding is not the anomaly: the closed stands shed a larger share of what they grow (87-91%) than the narrow garden (90%) or
+   today (81%). R1's carbon-deficit test does most of it everywhere (44-86% of births); C5's light test alone or with the deficit
+   5-19%. Starvation deaths are recruits (0.1% of births); windthrow < 1%; shoots shed outside the slab's depth 2.5%; foliage held
+   outside the slab 0.1%.
+ - Background mortality m0 takes 11% of births in both gardens (large planted trees; the stands run with O4 off). With m0 = 0 the
+   narrow garden rises only to 9.9k (more survivors, each smaller: the total is light-limited).
+ - r1.kShed 2 (patience before deficit shedding): 8.0k. Not the lever.
+ - The production deficit is the cause: cumulative P per cell 157 (narrow) vs 269 (today), 272 (faces 1), 326-378 (stands).
+ - Canopy trees (alive, H >= 10 m = 40 cells; not A4's "canopy trees" count) per seed at 150: narrow 2.3, today 5.0, faces 1 3.3.
+   Leaf area per canopy tree: narrow 2,965, today 6,891, faces 1 4,652, stand beech 8,437, stand hornbeam 743 (10 trees/seed).
+ - Crown geometry of canopy trees at 150 (median): z-depth narrow 30 cells (the slab), faces 1 31, today 55, stands 30-48;
+   x-width 43 / 45 / 54 / 28-51; leaf crown ratio 0.63 / 0.48 / 0.83 / 0.31-0.33; limbBase/H 0.24 / 0.26 / 0.07 / 0.57-0.67.
+   The strip halves each crown's z-extent against today's; vertically, narrow crowns are already shallower than today's.
+ - Today is LAI 9.5-10.3 over its whole slab: at or above the top of real closed stands (5-9) and above the model's (5.9-8.2), its
+   crowns live to the ground (LCR 0.83).
+ - The narrow garden is NOT at a closed stand's LAI: 3.6 at 100, 2.5 at 150 (seed range 0.4-4.7), under half the model's closed
+   stands. ADR 0056's 3.6-9.5 holds only at its top seeds/seasons.
+
+2. Why the narrow garden is darker than a closed stand: the faces' tau 0.2 stacked on the wood (ADR 0056's open question).
+   The sweep adds the face's depth to every ray leaving through a face below the foliage top, at every height, crown tops
+   included; the wood adds its leaf area on top. With faces [1,1] (the wood alone):
+   faces1: m150 17,851 (0.32x today), 3.99 metamers/cell, LAI 6.2/5.7, P cum 272/cell: the model's closed stand, per area.
+   faces 0.5: 10,612 (0.19x).
+
+3. Candidates (existing params only; depth 28 and faceWood as stated; six-seed metamers ratio = median m150 / today's 55,207):
+   variant                          ratio   LAI150  crown-base gate (planted beech / hornbeam; counted seeds in band)
+   narrow (A4)                      0.14    2.5     20 seeds: beech 2/7, hornbeam 4/6 FAIL (reproduces A4)
+   faces 0.5                        0.19    4.5     6 seeds: beech 2/3, hornbeam 1/1
+   faces 1                          0.32    5.7     20 seeds: beech 5/7 (71%) FAIL by one seed, hornbeam 5/6 (83%) PASS
+   faces 1, faceWood 1.25           0.27    4.8     6: beech 0/1, hornbeam 1/1
+   faces 1, faceWood 0.9            0.34    6.2     6: beech 0/1, hornbeam 0/1
+   faces 1, faceWood 0.75           0.36    6.9     6: beech 1/3, hornbeam 0/1
+   faces 1, faceWood 0.5            0.47    9.0     6: beech 0/3, hornbeam 0/1 (skirts back: 0.01-0.06)
+   faces 1, kShed 2                 0.39    6.5     6: beech 0/1, hornbeam 1/1
+   faces 1, kShed 3                 0.31    6.2     6: beech 1/2, hornbeam 0/1
+   faces 1, kShed 2, faceWood 0.9   0.38    6.5     6: beech 1/2, hornbeam 0/1
+   faces 1, recruits 0.5            0.33    5.7     6: beech 1/2, hornbeam 1/1
+   faces 1, spacing 21              0.22    4.3     6: beech 0/0, hornbeam 1/1
+   faces 1, m0 0 (diagnostic)       0.32    5.7     6: beech 1/1, hornbeam 3/4
+   m0 0 (diagnostic)                0.18    4.2     6: beech 1/3, hornbeam 4/4
+   kShed 2                          0.15    3.2     6: beech 0/3, hornbeam 1/1
+   None found in this screen. The closest (faceWood 0.5: 0.47x) gets there at LAI 9.0, the top of the real band, and keeps its
+   skirts (beech crown base 0.01-0.06). An inference, not a proof: at the closed stands' density (3.3-4.0 metamers/cell) the 7 m
+   strip holds 15-18k metamers = 0.27-0.33x today; 0.5x (27.6k) needs 6.2/cell, 1.15x today's own density and 1.5-1.9x the
+   closed stands', at LAI ~10.
+   Six-seed gate counts (1-4 counted seeds) cannot decide the gate; only narrow and faces 1 were run on 20.
+
+4. G-forest against B0, faces 1 (informational: faces 1 fails the metamers bar, so it is not a candidate). 20 seeds, 300 seasons,
+   depth 28, faceWood 1, faces [1,1]; the lone comparators inherit the same world, as in A4's run (G_faces1_evidence_and_compare.txt):
+     floor100 18 vs B0 2 ok | hd300 3 vs 3 ok | crown 13 vs 11 ok | plateau 12 vs 11 ok  -> the four gated checks pass.
+     hd300_all 5 vs 20 (warning only; A4's narrow run: 7). evidence.py's compare prints "VERDICT FAIL" because it loops over every
+     key in base["pass"], hd300_all included.
+     Planted survival 0.36 / 0.19 at 150 / 300 (B0 0.44 / 0.31). Metamers at 200: 18.0k vs B0 70.1k (0.26x).
+     A4's narrow run for comparison (faces 0.2): floor 18, hd300 9, crown 9, plateau 11; metamers at 200 10.3k.
+
+5. Branch: the worktree started at main's tip (972adfb) and was reset to claude/day2 (c298c8a, which carries faceWood) before work.
+
+Reproduce: fillF.sh / standF.sh (absolute paths to agent F's worktree and scratchpad; edit R and D), jobs*.txt / mkjobs*.py with
+runjobs.py (4 at a time), then an.sh diag.py RUNS; an.sh six.py RUNS/diag_summary.csv; an.sh pertree.py RUNS KIND...;
+an.sh crown.py RUNS...; an.sh gatekind.py RUNS KIND... (gate.py and limbs_rows.py as A4's, recruits excluded for every non-stand kind). The diag lines need
+diag-c5.patch applied and treesim rebuilt; G-forest needs it reverted. gforest.sh LABEL FACES runs evidence.py with dump.ts's
+FACES env (added here).

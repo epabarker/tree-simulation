@@ -9,7 +9,9 @@ analysis/fit/hand-overrides.toml.
 Each species' patch is the fit's assignments, then the overrides, applied by `cli/fit-eval.ts`'s
 `amend` over the species' current patch, so the result is whole: its labels, and every group the
 fit or an override touched, filled in from the effective params. Then the 3D overlay (ADR 0025):
-each species' phyllotaxis and wood's own E, which the 2D fits could not hold.
+each species' phyllotaxis and wood's own E, which the 2D fits could not hold. Last, the overrides'
+[broadleaf] table: the generic irregularity base, its keys only, on the species it lists (as with
+any override, a species taken off the list keeps its keys until they are stripped by hand).
 """
 
 import argparse
@@ -69,6 +71,20 @@ def in3d(sp: str, patch: dict) -> dict:
     return patch
 
 
+def broadleaf(sp: str, patch: dict, own: dict) -> dict:
+    """The generic irregularity base (hand-overrides.toml's [broadleaf]) on a listed species: each
+    `group.key` set in its group, unless the species' own overrides set that key. Added after the
+    amend so that only these keys land (the amend would fill each touched group whole)."""
+    base = overrides.get("broadleaf", {})
+    if sp not in base.get("species", []):
+        return patch
+    for path, value in base["assign"].items():
+        group, key = path.split(".")
+        if path not in own:
+            patch.setdefault(group, {})[key] = value
+    return patch
+
+
 overrides = tomllib.loads((REPO / "analysis" / "fit" / "hand-overrides.toml").read_text())
 
 pool = Pool(1)
@@ -82,7 +98,8 @@ try:
         assign["c5.Trel"] = TREL[sp]
         assign["r1.leafCost"] = "acclimated"
         assign["r1.leafCostShade"] = LEAF_COST_SHADE
-        patches[sp] = in3d(sp, pool.ask({"amend": sp, "assign": assign})["patch"])
+        patch = in3d(sp, pool.ask({"amend": sp, "assign": assign})["patch"])
+        patches[sp] = broadleaf(sp, patch, overrides.get(sp, {}))
 finally:
     pool.close()
 

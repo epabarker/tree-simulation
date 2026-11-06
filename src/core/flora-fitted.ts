@@ -91,6 +91,8 @@ export const FITTED_FLORA = {
     r4: { qRel: 0.3 },
     r6: { enabled: true, qMin: 0.144, leafArea: 2.439 },
     o4: { cSeed: 2, d: 40, qEst: 0.25, pEst: 0.3, m0: 0.008, rain: 0.2 },
+    c1: { shootLengthSD: 0.5, betaSD: 60, budBreak: { mode: "stochastic", width: 1.0 } },
+    c4: { axisSD: 50 },
   },
   beech: {
     common: "Beech",
@@ -187,6 +189,8 @@ export const FITTED_FLORA = {
     o4: { cSeed: 10, d: 12, qEst: 0.03, pEst: 0.3, m0: 0.002 },
     c3: { mode: "bh", lambda: 0.5, alpha: 2.959 },
     c6: { enabled: true, n: 2, r0: 0.003096 },
+    c1: { shootLengthSD: 0.5, betaSD: 60, budBreak: { mode: "stochastic", width: 1.0 } },
+    c4: { axisSD: 50 },
   },
   oak: {
     common: "Pedunculate oak",
@@ -268,6 +272,8 @@ export const FITTED_FLORA = {
     r6: { enabled: true, qMin: 0.1134, leafArea: 1.547 },
     o4: { cSeed: 10, d: 25, qEst: 0.1, pEst: 0.3, m0: 0.002 },
     c6: { enabled: true, n: 2, r0: 0.002824 },
+    c1: { shootLengthSD: 0.5, betaSD: 60, budBreak: { mode: "stochastic", width: 1.0 } },
+    c4: { axisSD: 50 },
   },
   fir: {
     common: "Silver fir",
@@ -427,6 +433,8 @@ export const FITTED_FLORA = {
     o4: { cSeed: 5, d: 20, qEst: 0.04, pEst: 0.3, m0: 0.003 },
     c3: { mode: "bh", lambda: 0.5, alpha: 2.811 },
     c6: { enabled: true, n: 2, r0: 0.003114 },
+    c1: { shootLengthSD: 0.5, betaSD: 60, budBreak: { mode: "stochastic", width: 1.0 } },
+    c4: { axisSD: 50 },
   },
   maple: {
     common: "Field maple",
@@ -511,6 +519,8 @@ export const FITTED_FLORA = {
     },
     r6: { enabled: true, qMin: 0.06993, leafArea: 2.845 },
     o4: { cSeed: 5, d: 25, qEst: 0.05, pEst: 0.3, m0: 0.004 },
+    c1: { shootLengthSD: 0.5, betaSD: 60, budBreak: { mode: "stochastic", width: 1.0 } },
+    c4: { axisSD: 50 },
   },
   holly: {
     common: "Holly",
@@ -607,6 +617,8 @@ export const FITTED_FLORA = {
       maxTrees: 300,
       rain: 0,
     },
+    c1: { shootLengthSD: 0.5, betaSD: 60, budBreak: { mode: "stochastic", width: 1.0 } },
+    c4: { axisSD: 50 },
   },
   rowan: {
     common: "Rowan",
@@ -687,6 +699,8 @@ export const FITTED_FLORA = {
       sigmaBreak: 7000,
       ground: true,
     },
+    c1: { shootLengthSD: 0.5, betaSD: 60, budBreak: { mode: "stochastic", width: 1.0 } },
+    c4: { axisSD: 50 },
   },
   willow: {
     common: "Goat willow",
@@ -767,6 +781,8 @@ export const FITTED_FLORA = {
       sigmaBreak: 7000,
       ground: true,
     },
+    c1: { shootLengthSD: 0.5, betaSD: 60, budBreak: { mode: "stochastic", width: 1.0 } },
+    c4: { axisSD: 50 },
   },
   pine: {
     common: "Scots pine",

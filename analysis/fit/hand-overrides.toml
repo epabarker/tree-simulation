@@ -3,6 +3,17 @@
 # Measured with the hold-out's tests: survival light in the shade house, the mixed wood over 400
 # seasons (12 seeds), and the lab woods over 200 (docs/experiments/2026-10-28-m27-fits.md, M27b).
 
+[broadleaf]
+# The generic irregularity base (overnight 2026-11-06, agent R's r-best0, branch r-regularity):
+# shoot length varies (lognormal, s 0.5), each axis keeps its own set-point offset (SD 50°) and
+# branch-angle offset (SD 60°), and lateral buds break stochastically (a logistic of width 1 through
+# R4's threshold). R's setting 1 (axis 40°, β 50°) failed G-forest (planted H/D 0 of 20); this one
+# passed it, G-reg and G-budget. The four prototype rules are off by default in the core; here they reach every
+# broadleaf, under each species' own overrides (a species' key below wins). Not fir or pine.
+# m27_adopt.py adds exactly these keys to each listed species' patch, nothing else in its groups.
+species = ["beech", "birch", "holly", "hornbeam", "maple", "oak", "rowan", "willow"]
+assign = { "c1.shootLengthSD" = 0.5, "c4.axisSD" = 50, "c1.betaSD" = 60, "c1.budBreak" = { mode = "stochastic", width = 1.0 } }
+
 [holly]
 # The fit raised Q_ss (0.03 → 0.059) and m_f (0.03 → 0.049) chasing an estimated height and floor:
 # holly then needed 8.5% light (band 2–5%) and starved under the fitted beech and hornbeam, whose

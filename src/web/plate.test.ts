@@ -7,7 +7,7 @@ import { Scene, WORLD_ZOOM_MAX } from "./render/scene.ts";
 
 describe("the garden's plate (I3)", () => {
   it("sizes the ring so the canvas shows PLATE_HEIGHT cells under the headroom, within the cap", () => {
-    expect(PLATE_MAX).toBe(200);
+    expect(PLATE_MAX).toBe(170);
     // The phone (garden.html's 140 px headroom): 140 × 390 / (844 − 18 − 140) cells.
     expect(plateWidth(390, 844, 140)).toBeCloseTo((PLATE_HEIGHT * 390) / 686, 9);
     expect(plateWidth(390, 844, 140)).toBeGreaterThan(PLATE_MIN);

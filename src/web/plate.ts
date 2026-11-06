@@ -12,9 +12,13 @@ export const PLATE_HEIGHT = 140;
  * The widest ring (I3, ADR 0026), set by the worker's 256 MB with the specimen beside the forest at
  * 200 seasons (`memory-worker.ts` swap, seed 10): 160 cells reach 187 MB, 200 reach 211 MB, 240 reach
  * 290 MB. The 160-cell cap held 146–160 cells in practice; 200 leaves about 45 MB for a seed that
- * grows more (the browser's laptop runs spread ±20 MB across seeds 9, 10 and 12).
+ * grows more (the browser's laptop runs spread ±20 MB across seeds 9, 10 and 12). With the generic
+ * irregularity base on the broadleaves (overnight RC, 2026-11-06; one process per run, seeds 9, 10,
+ * 12, the swap): 200 cells reach 231–247 MB, 180 reach 221–240 MB, 170 reach 210–216 MB. The
+ * budget is now 230 MB, so the cap is 170. The peak is the garden's at season 200, not the
+ * specimen's, and it does not fall monotonically with width (seed 9: 231 MB at 200, 240 at 180).
  */
-export const PLATE_MAX = 200;
+export const PLATE_MAX = 170;
 /** The narrowest ring: a tall, narrow host still gets a few trees. */
 export const PLATE_MIN = 40;
 

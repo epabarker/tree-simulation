@@ -234,6 +234,9 @@ pub struct PaLevel {
     pub aged_set_point: Option<f64>,
     pub aged_over: Option<f64>,
     pub aged_by_tree: bool,
+    /// Twigs keep λ (ADR 0057, proposed): the share of r2.dLambda, the ontogenetic fall of λ,
+    /// that this level takes. Absent: 1, every level falls by the full Δλ (today's).
+    pub d_lambda_share: Option<f64>,
 }
 
 #[derive(Clone, Debug)]
@@ -570,6 +573,7 @@ impl Params {
                         aged_set_point: opt(l, "agedSetPoint"),
                         aged_over: opt(l, "agedOver"),
                         aged_by_tree: text(l, "agedBy") == "tree",
+                        d_lambda_share: opt(l, "dLambdaShare"),
                     })
                     .collect(),
                 a_c: num(r2, "aC"),

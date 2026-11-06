@@ -195,7 +195,7 @@ Nothing needs the user before morning._
 - (Earlier: G-forest on the species patches: the first run failed at 03:20 when /tmp (a 16 GB tmpfs) filled. The bulky intermediates of finished agents were deleted (to 43%), and the run restarted at 03:25 → `i0/ev-species`. **Rule from now on:** delete raw run outputs after extraction; Y2 was told.)
 - **S (02:15, done):** beech, oak and birch departures on the r-best0 base plus Y's oak height, using the i0/wt build (read-only), hard stop 05:15 → `s/results.md`.
 - **Next:** pick setting 1 or r-best0 by G-forest → RC stage 2 (S's species patches, when S reports) → stage 3 (push, draft PR, preview-3d, sheets).
-- **Artifacts** (scratchpad `/tmp/claude-1000/-home-edbarker-Documents-Projects-tree-simulation/0d08166a-77f7-4440-a296-cafcc1cf2019/scratchpad/`):
+- **Artifacts:** the scratchpad (in /tmp) is gone after a reboot. The code and summaries are kept in `docs/experiments/code/2026-11-06-overnight/`; its README maps the folder names. Originally (scratchpad `/tmp/claude-1000/-home-edbarker-Documents-Projects-tree-simulation/0d08166a-77f7-4440-a296-cafcc1cf2019/scratchpad/`):
   - `a6/` the pair pipeline;
   - `a7/flat-cap.md`;
   - `a11/targets.md`;

@@ -38,7 +38,8 @@ Nothing is merged or tagged; tag pushes are the user's.
 - **Still to measure (§5):** 3b's hit rate; 3c's token delta; the 3g A/B; a Stop hook's `systemMessage` over Remote Control (asked).
 
 ## Next
-1. **The user:** merge #48, then #49 (or #49 alone), then tag. Phone soak. Rule on ADR 0055 and on the height commit.
+1. **The user:** merge #48, then **either** #49 (with heights) **or** `claude/overnight-rc-noheights` (#49 minus the height commit, check green; its docs still describe heights), then tag. Phone soak. Rule on ADR 0055.
+   - **Next look:** young trees under the RC lose their clear trunk, per the advisory judge.
 2. **The flat cap:** λ's fall by level, with twigs keeping λ (ADR 0055, "Not decided here"). Oak's stand branch density.
 3. **Species by data:** sycamore and ash enter the garden (Wytham, TreeML), then lime and Norway maple (lone only).
 

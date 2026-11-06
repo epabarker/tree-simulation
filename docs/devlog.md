@@ -40,7 +40,9 @@ Newest first. One entry per session or milestone: what changed, why, surprises, 
 - **Goldens (intended):** 4 of 16, all from the broadleaves' new species params (ADR 0055), then the separate height commit: `mixedWood:seed1:s15` c95b46b9 → 3ee70704 (stage 2) → 93042bbc (heights); `oakOpen:seed1:s15` 0877b79b → 29e5921a; `beechOpen:seed1:s40` 200f5a55 → ef0a754d; `beechWood:seed1:s30` f8b1fe35 → 6b8af072. The other 12 are unchanged; `golden.rs`'s off test now switches the species-level rules off too and reproduces 0.16.0's oakOpen and beechOpen bit for bit.
 - **Check:** green at 7b105ae (99/99, on a quiet machine). Review: the Fable spec-reviewer had no credits, so an Opus stand-in ran it. Its one demonstrated item (the off test never reached species rules) is fixed in ce7ebb3; its open questions are in PR #49.
 - **Preview:** the site's `preview-3d` carries the RC as 0.16.0 (main merged in, pushed without force): https://preview-3d-edbarker-dev.edbarker.workers.dev/
-- **PRs:** #48 (0.16.0, draft), #49 (this RC, draft, stacked on #48). Nothing merged or tagged.
+- **PRs:** #48 (0.16.0, draft; CI green), #49 (this RC, draft, stacked on #48). The alternative is `claude/overnight-rc-noheights` (the height commit reverted; local check green). Nothing merged or tagged.
+- **The advisory lone judge:** RC preferred 79% at season 100, but 42% when young (the RC's young hornbeam and beech lose their clear trunk; rowan is disputed).
+- **Code and summaries** are kept in `experiments/code/2026-11-06-overnight/` (the scratchpad was in /tmp).
 
 ## 2026-11-05: garden 0.16.0 prepared (for the user to tag)
 

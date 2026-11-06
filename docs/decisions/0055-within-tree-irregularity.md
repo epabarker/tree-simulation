@@ -48,10 +48,12 @@ These are within-tree draws. They are not ADR 0053's per-tree draw, which stays 
 ## Consequences
 - **Regularity (G-reg), hornbeam, seeds 101–108 and held-out 109–116:** the summed |z| falls 23 → about 5, and
   all four descriptors sit in the real bands, lone and stand.
-- **Look** (the lone sheet, the overseer's reading):
-  - **Clearly better:** hornbeam, a compact, rounded, irregular crown at 29 m (it was a flat-topped cone at 38–50 m), and rowan.
-  - **Slightly better:** beech is fuller but still a flat "table" crown at 39 m.
-  - **Still wrong:** oak is a spire-like leader over sprawling low limbs in both builds, and birch is a pale column at 45–49 m in both.
+- **Look** (the lone sheet and the advisory lone judge):
+  - **Better at maturity:** hornbeam, beech and oak (the judge preferred the RC 12/12, 12/12 and 10/12 at season
+    100).
+  - **Disputed:** rowan (shorter and rounder, but the judge preferred 0.16.0's).
+  - **Worse when young:** hornbeam and beech at about 16 m lose their clear trunk ("branches to the ground").
+  - **Unchanged and wrong:** oak's spire-like form, and birch's column.
 - **The garden's evidence** (`forestParams(160)`, 20 seeds, 300 seasons, against the base at d2c4f53):
 
   | check | adopted | base |

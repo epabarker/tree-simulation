@@ -1,19 +1,22 @@
 # The overnight run: a generic broadleaf that reads as a tree (2026-11-06)
 
-_Unattended, 00:05–07:30, orchestrated by the overseer.
+_Unattended, 00:05–05:30, orchestrated by the overseer. **Code and summaries:** [code/2026-11-06-overnight/](code/2026-11-06-overnight/README.md), which maps the scratchpad folder names cited below and in the plan's State.
 - **Plans:** [overseer](../plans/2026-11-05-overseer.md), [overnight](../plans/2026-11-06-overnight.md); the
   overnight plan's State block holds every number below.
 - **ADR:** [0055](../decisions/0055-within-tree-irregularity.md).
 - **Figures:** [lone trees, 0.16.0 against the RC](figures/2026-11-06-lone-016-vs-rc.jpg); [hornbeam R0 against the milder setting 1, which was not adopted](figures/2026-11-06-hornbeam-irregularity.jpg); [the garden, 0.16.0 against the RC](figures/2026-11-06-garden-rc-sheet.jpg) (seeds 12, 9, 10, 2, 3, 6; laptop and phone; seasons 40, 80, 150).
 - **The release candidate:** branch `claude/overnight-rc`, [draft PR #49](https://github.com/epabarker/tree-simulation/pull/49) into `3d-port`, stacked on #48; preview at https://preview-3d-edbarker-dev.edbarker.workers.dev/._
 
-**The overseer's look at the lone sheet:**
-- **Clearly better:** hornbeam (a compact, rounded, irregular crown, 29 m flat) and rowan (21 m, rounded).
-- **Slightly better:** beech is fuller but still a flat "table" crown at 39 m.
-- **Unchanged and wrong:** oak is a spire-like leader over sprawling low limbs, more conifer than oak, and birch
-  is a pale column at 45–49 m.
-- **Lone heights at 150:** hornbeam 28.9, beech 39–40, oak 33–35, birch 45–49 and rowan 21.5 m. Beech and birch
-  have no height fix.
+**The look, the overseer's reading checked against the advisory lone judge:**
+- **Better at maturity:** hornbeam, beech and oak (the judge preferred the RC 12/12, 12/12 and 10/12 at season
+  100). Hornbeam is a rounded, irregular 29 m tree instead of a flat-topped 38–50 m cone.
+- **Disputed:** rowan is shorter and rounder, but the judge preferred 0.16.0's in both regimes (RC 4/12 mature,
+  2/16 young).
+- **Worse when young:** at about 16 m, the RC's hornbeam and beech "branch to the ground" and lose their clear
+  trunk (RC hornbeam 1/16, beech 8/16).
+- **Still wrong in both builds:** oak's spire-like leader over low limbs, and birch's pale 45–49 m column.
+- **Lone heights at 150:** hornbeam 28.9, beech 39–40, oak 33–35, birch 45–49 and rowan 21.5 m. **Not fixed:**
+  beech, birch, and willow and holly (T flagged both above 1.3× their Level 0 band).
 - **Memory at the final commit, with the specimen:** at most 211 MB on the 170-cell plate and 117 MB on the
   80-cell phone plate (seeds 9, 10, 12). Both pass.
 

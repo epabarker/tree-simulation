@@ -1,0 +1,74 @@
+{
+ "beech": {
+  "c1.shootLengthSD": 0.5,
+  "c4.axisSD": 40.0,
+  "c1.betaSD": 50.0,
+  "c1.budBreak": {
+   "mode": "stochastic",
+   "width": 1.0
+  }
+ },
+ "birch": {
+  "c1.shootLengthSD": 0.5,
+  "c4.axisSD": 40.0,
+  "c1.betaSD": 50.0,
+  "c1.budBreak": {
+   "mode": "stochastic",
+   "width": 1.0
+  }
+ },
+ "holly": {
+  "c1.shootLengthSD": 0.5,
+  "c4.axisSD": 40.0,
+  "c1.betaSD": 50.0,
+  "c1.budBreak": {
+   "mode": "stochastic",
+   "width": 1.0
+  }
+ },
+ "hornbeam": {
+  "c1.shootLengthSD": 0.5,
+  "c4.axisSD": 40.0,
+  "c1.betaSD": 50.0,
+  "c1.budBreak": {
+   "mode": "stochastic",
+   "width": 1.0
+  }
+ },
+ "maple": {
+  "c1.shootLengthSD": 0.5,
+  "c4.axisSD": 40.0,
+  "c1.betaSD": 50.0,
+  "c1.budBreak": {
+   "mode": "stochastic",
+   "width": 1.0
+  }
+ },
+ "oak": {
+  "c1.shootLengthSD": 0.5,
+  "c4.axisSD": 40.0,
+  "c1.betaSD": 50.0,
+  "c1.budBreak": {
+   "mode": "stochastic",
+   "width": 1.0
+  }
+ },
+ "rowan": {
+  "c1.shootLengthSD": 0.5,
+  "c4.axisSD": 40.0,
+  "c1.betaSD": 50.0,
+  "c1.budBreak": {
+   "mode": "stochastic",
+   "width": 1.0
+  }
+ },
+ "willow": {
+  "c1.shootLengthSD": 0.5,
+  "c4.axisSD": 40.0,
+  "c1.betaSD": 50.0,
+  "c1.budBreak": {
+   "mode": "stochastic",
+   "width": 1.0
+  }
+ }
+}

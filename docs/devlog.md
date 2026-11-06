@@ -2,6 +2,17 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-06: A4, the crown base through the garden's light boundary: `world.faceWood` (off), parked
+
+[Note](experiments/2026-11-06-crown-base.md).
+- **C5 prunes when there is shade:** the closed stand lifts beech and hornbeam crowns into or above the real band.
+  The garden's lower limbs get 5–20% of the top's light and earn 3–8× their keep.
+- **Added `world.faceWood`** (C2, `light/slab_sweep.rs`; sweep and exact rays; two tests): a virtual wood beyond
+  the depth faces with the strip's own foliage profile. Off by default; goldens unchanged.
+- **With a 7 m slab,** it passes G-forest (floor 18/20, planted H/D 9/20, a third of the CPU). It fails the hard
+  crown-base gate (beech 2/7, hornbeam 4/6) and thins the garden to 0.15× metamers. Four fills (half wood, more
+  recruits, closer planting) don't keep it full. Parked; the garden is unchanged.
+
 ## 2026-11-06: A3, mature heights for holly and willow (R1's reproductive sink); beech already in band
 
 Gates fixed before any result (`plans/2026-11-06-box-0.17.md`, "A3's gates"). Lone heights on today's build,

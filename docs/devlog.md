@@ -2,6 +2,15 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-06: A2, young trees' clear trunk: not ADR 0055; a general low crown base
+
+[Note](experiments/2026-11-06-crown-base.md).
+- **The advisory judge's "branches to the ground" (#53) is not ADR 0055's doing.** With irregularity off, garden
+  beech and hornbeam have a *lower* crown base at 8–24 m, not a higher one.
+- **There is a real, pre-existing gap.** Garden crowns of every species reach about 5% of H. Real stands sit at
+  22–38%, and hedgerow oaks, a single row like the garden, at 20%. It is a self-pruning question (C5),
+  recorded for a later box.
+
 ## 2026-11-06: Birch's trunk λ 0.53: the garden's poles fixed; leafier birch blocked by the crown-base gate
 
 [Note](experiments/2026-11-06-birch-poles.md).

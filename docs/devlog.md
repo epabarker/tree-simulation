@@ -13,8 +13,12 @@ Newest first. One entry per session or milestone: what changed, why, surprises, 
   provisional (comments only; goldens unchanged).
 - **The overseer's box** (3 sessions and 1 night) ends with an adopted look. Next is a new box: 2 sessions and
   1 night toward 0.17.0, heights first, with G-forest against B0 (not re-baselined). See STATUS.
-- **The phone soak passed** (the user): no stutter, no empty forests, no tree unlike its kind. The user finds the
-  forest cluttered; the cause is the garden's recruit cap, under test.
+- **The phone soak passed** (the user): no stutter, no empty forests, no tree unlike its kind.
+- **The garden's clutter** ([note](experiments/2026-11-06-garden-recruits.md)): the garden kept round 2's
+  recruit cap (229 at 160 cells) for one row of 6 trees, and every opening forest filled it with suppressed
+  saplings. `GARDEN_PLANTING.recruits` 1 → 0.25: G-forest holds (0/3/12/12 against B0's 2/3/11/11), planted H/D
+  gets its headroom back, CPU per season −10%. Goldens unchanged (they don't use `forestParams`). The rest of the
+  clutter is birch recruits as thin poles (H/D 150–320), which go to the birch work.
 - **Housekeeping:** the agents' worktrees removed; `claude/overnight-rc` and `-noheights` deleted (merged);
   `a-crown` and `r-regularity` kept as the rejected prototypes.
 

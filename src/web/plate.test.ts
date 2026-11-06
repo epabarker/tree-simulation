@@ -37,10 +37,11 @@ describe("the garden's plate (I3)", () => {
     expect(forestParams(160, 1).trees).toHaveLength(6);
     expect(p.trees.every((t) => t.z === D / 2)).toBe(true);
     expect(p.o4.band).toBe(28);
-    // Recruits per cell of width: the ring's 300 on 210 cells.
-    expect(forestParams(210, 1).o4.maxTrees).toBe(300);
-    expect(p.o4.maxTrees).toBe(94);
-    expect(forestParams(160, 1).o4.maxTrees).toBe(229);
+    // Recruits per cell of width: a quarter of the ring's 300 on 210 cells (the garden's clutter).
+    expect(forestParams(210, 1).o4.maxTrees).toBe(75);
+    expect(p.o4.maxTrees).toBe(24);
+    expect(forestParams(160, 1).o4.maxTrees).toBe(57);
+    expect(forestParams(160, 1, { recruits: 1 }).o4.maxTrees).toBe(229);
     expect(forestParams(66, 1, { recruits: 0.5 }).o4.maxTrees).toBe(47);
     expect(presetParams("mixedWood").o4.maxTrees).toBe(300);
     expect(presetParams("mixedWood").o4.band).toBeUndefined();
@@ -51,7 +52,7 @@ describe("the garden's plate (I3)", () => {
     expect(p.trees).toHaveLength(9);
     expect(new Set(p.trees.map((t) => t.z)).size).toBe(3);
     expect(p.o4.band).toBe(64);
-    expect(p.o4.maxTrees).toBe(283);
+    expect(p.o4.maxTrees).toBe(71);
   });
 
   it("frames a young garden for half the plate's height, not half the 200-cell top", () => {

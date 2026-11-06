@@ -16,13 +16,25 @@
 //! annual shoots vary many-fold with vigour and weather; the uniform line texture is a cue the
 //! blinded judge names. Off (absent or 0): no draw.
 //!
+//! Per-axis branch angle (prototype, agent R; §C1.6's "branch angle β per order", ADR 0053's
+//! individual variation): with `c1.betaSD` s_β > 0, a lateral bud that breaks into a new axis has
+//! its heading turned in the plane of its host's heading by s_β·N(0, 1) degrees [RNG:
+//! branchAngle, keyed by the axis, i.e. the birthId its first metamer takes], so its angle to the
+//! host becomes β + offset (held in [0, 180°]: it never crosses the host's heading). One draw per
+//! axis, at its start, as `c4.axisSD`'s. Why: β is fixed per level, so every limb leaves the trunk
+//! at one angle (within-tree SD of first-order insertion ≈ 6° against 31.5° in real lone
+//! hornbeam); C4's noise is white and R3's posture restores the set point, so nothing else makes
+//! one limb leave steeper than its neighbour. Off (absent or 0): no draw, β as before.
+//!
 //! Params: c1.phyllotaxis, c1.divergence (δ), c1.branchAngle (β), c1.internodeLength (l0),
-//! c1.maxMetamersPerShoot, c1.shootLengthSD (s), c6.r0; with R2 the levels' generator, whorl, β
-//! and p_term.
+//! c1.maxMetamersPerShoot, c1.shootLengthSD (s), c1.betaSD (s_β), c6.r0; with R2 the levels'
+//! generator, whorl, β and p_term.
 
 use super::obstacles::inside_obstacle;
 use super::r2::{branch_angle_of, laterals, terminates};
-use crate::geom::{V3, any_perpendicular, normalize_or, reject, rotate, tilt, transport};
+use crate::geom::{
+    V3, angle_between, any_perpendicular, cross, normalize_or, reject, rotate, tilt, transport,
+};
 use crate::math;
 use crate::params::{DEG, Params};
 use crate::rng::{normal, purpose, uniform};
@@ -256,6 +268,27 @@ pub fn shoot_length_factor(params: &Params, tree_id: f64, bud_id: f64, season: f
     math::exp(s * z - 0.5 * s * s)
 }
 
+/// The offset, degrees, to β of the axis `axis` (the birthId its first metamer takes): s_β·N(0, 1)
+/// [RNG: branchAngle, keyed by the axis only]; 0 when s_β = 0 (no draw).
+pub fn beta_offset(params: &Params, tree_id: f64, axis: f64) -> f64 {
+    let s = params.c1.beta_sd;
+    if s <= 0.0 {
+        return 0.0;
+    }
+    s * normal(params.seed, purpose::BRANCH_ANGLE, tree_id, axis, 0.0, 0.0)
+}
+
+/// A lateral's frame (`h`, `l`) turned by `offset` radians in the plane of its host's heading
+/// `host`, away from it for offset > 0, so the angle between them becomes β + offset, held in
+/// [0, π]. The reference is carried by parallel transport.
+pub fn offset_frame(host: V3, h: V3, l: V3, offset: f64) -> (V3, V3) {
+    let beta = angle_between(host, h);
+    let to = math::max(0.0, math::min(std::f64::consts::PI, beta + offset));
+    let axis = normalize_or(cross(host, h), any_perpendicular(h));
+    let turned = normalize_or(rotate(h, axis, to - beta), h);
+    (turned, transport(l, h, turned))
+}
+
 /// The juvenile cap on a shoot (ADR 0022), by the tree's height at the start of the season.
 pub fn juvenile_cap(height: f64, params: &Params) -> f64 {
     let max = params.c1.max_metamers_per_shoot;
@@ -352,6 +385,45 @@ mod tests {
 
     fn params(patch: &str) -> Params {
         Params::from_json(&preset("default", patch))
+    }
+
+    #[test]
+    fn a_branch_angle_offset_is_drawn_once_per_axis_and_turns_away_from_the_host() {
+        let off = params("{}");
+        assert_eq!(beta_offset(&off, 0.0, 12.0), 0.0);
+        let on = params(r#"{"c1":{"betaSD":20}}"#);
+        // Keyed by the axis only: the same axis gets the same offset, another axis not.
+        let a = beta_offset(&on, 1.0, 12.0);
+        assert_eq!(a, beta_offset(&on, 1.0, 12.0));
+        assert_ne!(a, beta_offset(&on, 1.0, 13.0));
+        let n = 20_000;
+        let (mut s1, mut s2) = (0.0f64, 0.0f64);
+        for k in 0..n {
+            let x = beta_offset(&on, 2.0, k as f64);
+            s1 += x;
+            s2 += x * x;
+        }
+        let mean = s1 / n as f64;
+        let sd = (s2 / n as f64 - mean * mean).sqrt();
+        assert!(mean.abs() < 0.5, "mean {mean}");
+        assert!((sd - 20.0).abs() < 0.5, "sd {sd}");
+        // The frame: a lateral at 45° from a vertical host turned by +15° sits at 60°, by -15° at
+        // 30°, in the same azimuthal plane; a turn past the host stops on it; L stays a frame.
+        let host = UP;
+        let h = tilt(UP, [1.0, 0.0, 0.0], 45f64.to_radians(), 0.3);
+        let l = normalize_or(reject(UP, h), any_perpendicular(h));
+        for (by, want) in [(15.0, 60.0), (-15.0, 30.0), (-80.0, 0.0), (0.0, 45.0)] {
+            let (th, tl) = offset_frame(host, h, l, f64::to_radians(by));
+            assert!(
+                close(angle_between(th, host), f64::to_radians(want)),
+                "{by}"
+            );
+            assert!(close(norm(th), 1.0) && close(norm(tl), 1.0) && dot(th, tl).abs() < 1e-9);
+            if want > 0.0 {
+                // The same side of the host: the horizontal parts point the same way.
+                assert!(th[0] * h[0] + th[2] * h[2] > 0.0);
+            }
+        }
     }
 
     #[test]

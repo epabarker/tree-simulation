@@ -11,7 +11,8 @@ use crate::light::{Light, depth_of};
 use crate::math;
 use crate::params::{DEG, Params};
 use crate::principles::c1::{
-    grow_shoot, juvenile_cap, lateral_frame, shoot_length_factor, shoot_size,
+    beta_offset, grow_shoot, juvenile_cap, lateral_frame, offset_frame, shoot_length_factor,
+    shoot_size,
 };
 use crate::principles::c3::{allocate, gather_light, is_live_bud};
 use crate::principles::c4::{axis_offset, shoot_direction};
@@ -578,6 +579,17 @@ pub fn grow_buds(tree: &mut Tree, params: &Params, season: f64) {
             };
             let first_new_bud = tree.b.len();
             let first_new_metamer = tree.m.len();
+            // A new axis leaves at its own branch angle (c1.betaSD): the bud's frame is turned
+            // away from its host's heading before it grows, and restored if nothing grew.
+            let unturned = if params.c1.beta_sd > 0.0 && tree.b.slot[i] != slot::MAIN {
+                let (h, l) = (tree.bud_heading(i), tree.bud_reference(i));
+                let off = beta_offset(params, tree.id as f64, tree.next_metamer_id) * DEG;
+                let (th, tl) = offset_frame(tree.heading(host), h, l, off);
+                tree.set_bud_frame(i, th, tl);
+                Some((h, l))
+            } else {
+                None
+            };
             grow_shoot(
                 tree,
                 i,
@@ -589,6 +601,11 @@ pub fn grow_buds(tree: &mut Tree, params: &Params, season: f64) {
                 pa_shift,
                 first_order,
             );
+            if let Some((h, l)) = unturned
+                && tree.b.state[i] != bud::GONE
+            {
+                tree.set_bud_frame(i, h, l);
+            }
             // The vigour fork: a pa-0 shoot grown at full vigour ends its apex; next season the
             // relay makes the laterals on its top nodes co-dominant arms.
             if vigour_forks(pa, v, cap, tree.age, params) {

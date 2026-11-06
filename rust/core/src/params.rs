@@ -88,6 +88,8 @@ pub struct C1 {
     pub bud_break_width: Option<f64>,
     /// c1.shootLengthSD (prototype): SD s of ln(shoot length); 0 when absent (off).
     pub shoot_length_sd: f64,
+    /// c1.betaSD (prototype): SD, degrees, of a per-axis offset to β; 0 when absent (off).
+    pub beta_sd: f64,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -456,6 +458,7 @@ impl Params {
                         (text(b, "mode") == "stochastic").then(|| num(b, "width"))
                     },
                     shoot_length_sd: opt(g, "shootLengthSD").unwrap_or(0.0),
+                    beta_sd: opt(g, "betaSD").unwrap_or(0.0),
                 }
             },
             c2: C2 {

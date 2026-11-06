@@ -113,6 +113,13 @@ export interface Params {
      * length is unchanged. Absent or 0: off. Prototype (agent A9), not an ADR.
      */
     shootLengthSD?: number;
+    /**
+     * s_β: SD, degrees, of a per-axis offset to the branch angle β: a lateral bud that breaks into
+     * a new axis is turned in its host's plane so that it leaves at β + s_β·N(0, 1) (held in
+     * [0, 180°]) [RNG: branchAngle, keyed by the axis's first birthId]. Absent or 0: off.
+     * Prototype (agent R), not an ADR.
+     */
+    betaSD?: number;
   };
 
   /** C2 Shared light field: the Beer–Lambert sky sweep over the slab (§C2.4, G3; ADR 0024). */

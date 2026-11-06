@@ -54,14 +54,14 @@ fn every_golden() {
     assert!(wrong.is_empty(), "goldens differ:\n{}", wrong.join("\n"));
 }
 
-/// The prototype rules of agent A9 (c1.budBreak, c1.shootLengthSD, c4.axisSD) written out as off
-/// give the goldens' bits: off is the old model, not merely close to it.
+/// The prototype rules of agents A9 and R (c1.budBreak, c1.shootLengthSD, c1.betaSD, c4.axisSD)
+/// written out as off give the goldens' bits: off is the old model, not merely close to it.
 #[test]
 fn the_prototype_rules_written_as_off_keep_the_goldens() {
     let presets = read("../presets.json");
     let cases = read("../../tests/golden.json");
     let off = json::parse(
-        r#"{"c1":{"budBreak":{"mode":"deterministic","width":0.25},"shootLengthSD":0},"c4":{"axisSD":0}}"#,
+        r#"{"c1":{"budBreak":{"mode":"deterministic","width":0.25},"shootLengthSD":0,"betaSD":0},"c4":{"axisSD":0}}"#,
     )
     .unwrap();
     for key in [

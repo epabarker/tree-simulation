@@ -27,6 +27,9 @@ pub mod purpose {
     /// An axis's offset to its set point (c4.axisSD), keyed by the axis's first birthId.
     /// Prototype (agent A9): provisional, as SHOOT_LENGTH.
     pub const AXIS_OFFSET: u32 = 16;
+    /// An axis's offset to its branch angle β (c1.betaSD), keyed by the axis's first birthId.
+    /// Prototype (agent R): provisional, as SHOOT_LENGTH.
+    pub const BRANCH_ANGLE: u32 = 17;
 }
 
 const TWO_POW_32: f64 = 4294967296.0;

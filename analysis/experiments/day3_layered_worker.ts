@@ -5,10 +5,11 @@ import { newWorld } from "../../cli/trials.ts";
 import { RustWorld, wasmMemoryBytes } from "../../src/wasm/world.ts";
 import { layeredParams } from "./day3_layered_params.ts";
 const [mode,condition,seedText,widthText,out]=process.argv.slice(2);
-if(!["snapshots","budget"].includes(mode)||!["current","base"].includes(condition))throw new Error("bad mode/condition");
+if(!["snapshots","budget","params"].includes(mode)||!["current","base"].includes(condition))throw new Error("bad mode/condition");
 const seed=Number(seedText),width=Number(widthText);
 if(![160,66].includes(width))throw new Error("unregistered width");
 const p=condition==="current"?forestParams(width,seed):layeredParams(width,seed);
+if(mode==="params"){writeFileSync(out,JSON.stringify(p)+"\n");process.exit(0);}
 const w=newWorld(p);
 if(mode==="budget") {
   if(![2,3,9].includes(seed))throw new Error("unregistered budget seed");

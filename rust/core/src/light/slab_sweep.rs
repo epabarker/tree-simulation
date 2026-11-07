@@ -58,6 +58,10 @@ pub struct SlabParams {
     /// −1…1: a sky brighter toward +x (an oblique sun, §C2.6), weights × max(0, 1 + tilt·d_x).
     pub sky_tilt: f64,
     pub periodic_x: bool,
+    /// The depth wraps as the width does (box A6, ADR 0058): beyond a z face lie the slab's own
+    /// rows from the other side, so a row of trees stands among its images one depth away. The
+    /// faces' τ and `face_wood` are then unused. false: open faces (bit-identical).
+    pub periodic_z: bool,
 }
 
 /// Unit vectors toward the sky and their weights.
@@ -312,7 +316,10 @@ impl SlabSweep {
         if self.p.periodic_x {
             i = ((i % w) + w) % w;
         }
-        let (j, l) = (y.floor(), z.floor());
+        let (j, mut l) = (y.floor(), z.floor());
+        if self.p.periodic_z {
+            l = ((l % d) + d) % d;
+        }
         if !(i >= 0.0 && i < w && j >= 0.0 && j < h && l >= 0.0 && l < d) {
             return None;
         }
@@ -565,9 +572,10 @@ impl SlabSweep {
             for zi in 0..nz {
                 let z = zi as isize - pad as isize;
                 let d0 = zi * nx;
-                if z < 0 || z >= d as isize {
+                if (z < 0 || z >= d as isize) && !self.p.periodic_z {
                     l[d0..d0 + nx].fill(0.0);
                 } else {
+                    let z = z.rem_euclid(d as isize);
                     pad_line(
                         &self.lad,
                         base + z as usize * w,
@@ -607,7 +615,10 @@ impl SlabSweep {
                 for zi in 0..nz {
                     let z = zi as isize - pad as isize;
                     let d0 = zi * nx;
-                    if z < 0 {
+                    if self.p.periodic_z {
+                        let z = z.rem_euclid(d as isize);
+                        pad_line(up, u0 + z as usize * w, w, g, d0, pad, self.p.periodic_x);
+                    } else if z < 0 {
                         g[d0..d0 + nx].fill(self.face_g[0] + wood);
                     } else if z >= d as isize {
                         g[d0..d0 + nx].fill(self.face_g[1] + wood);
@@ -640,6 +651,9 @@ impl SlabSweep {
             let mut t = 0.0f64;
             while y < top {
                 // Beyond a face: its depth, plus the virtual wood's leaf area above y, along the ray.
+                if self.p.periodic_z {
+                    z = ((z % d) + d) % d;
+                }
                 let wood = if self.p.face_wood > 0.0 {
                     let (r, f) = (y.floor() as usize, y - y.floor());
                     let above = self.wood_above[r + 1]
@@ -913,6 +927,7 @@ pub fn fixture_fingerprint() -> u32 {
         rotate: true,
         face_tau: [1.0, 0.2],
         face_wood: 0.0,
+        periodic_z: false,
         sky_tilt: 0.0,
         periodic_x: true,
     };
@@ -935,6 +950,7 @@ mod tests {
             rotate: false,
             face_tau: tau,
             face_wood: 0.0,
+            periodic_z: false,
             sky_tilt: 0.0,
             periodic_x: true,
         }
@@ -1155,6 +1171,94 @@ mod tests {
         for (s, q) in sum.iter().zip(whole.q()) {
             assert!((s - *q as f64).abs() < 1e-6);
         }
+    }
+
+    #[test]
+    fn a_periodic_depth_shifts_the_field_with_the_canopy() {
+        // Box A6 (ADR 0058): with the depth wrapped, moving every deposit k cells in z (round
+        // the ring) moves the light field k cells with it: no face distinguishes one layer.
+        let (w, h, d, k) = (24usize, 26usize, 10usize, 3usize);
+        let p = SlabParams {
+            periodic_z: true,
+            ..params([0.2, 0.2])
+        };
+        let run = |shift: usize| {
+            let mut s = SlabSweep::new(w, h, d, p);
+            let mut seed: u64 = 11;
+            for y in 8..20 {
+                for z in 0..d {
+                    for x in 0..w {
+                        seed = (seed * 1103515245 + 12345) % 2147483648;
+                        if seed % 5 < 2 {
+                            let a = 0.5 + (seed % 7) as f32 / 4.0;
+                            let zz = (z + shift) % d;
+                            s.deposit(x as f64 + 0.5, y as f64 + 0.5, zz as f64 + 0.5, a);
+                        }
+                    }
+                }
+            }
+            s.compute(0.0);
+            s
+        };
+        let (a, b) = (run(0), run(k));
+        let mut worst = 0.0f32;
+        for y in 0..h {
+            for z in 0..d {
+                for x in 0..w {
+                    let ca = (y * d + z) * w + x;
+                    let cb = (y * d + (z + k) % d) * w + x;
+                    worst = worst.max((a.q()[ca] - b.q()[cb]).abs());
+                }
+            }
+        }
+        assert!(worst < 1e-5, "worst |ΔQ| {worst}");
+        // Open faces do not have this symmetry: the same shift moves light near the faces.
+        let open = |shift: usize| {
+            let mut s = SlabSweep::new(w, h, d, params([0.2, 0.2]));
+            let mut seed: u64 = 11;
+            for y in 8..20 {
+                for z in 0..d {
+                    for x in 0..w {
+                        seed = (seed * 1103515245 + 12345) % 2147483648;
+                        if seed % 5 < 2 {
+                            let a = 0.5 + (seed % 7) as f32 / 4.0;
+                            let zz = (z + shift) % d;
+                            s.deposit(x as f64 + 0.5, y as f64 + 0.5, zz as f64 + 0.5, a);
+                        }
+                    }
+                }
+            }
+            s.compute(0.0);
+            s
+        };
+        let (oa, ob) = (open(0), open(k));
+        let mut moved = 0.0f32;
+        for y in 0..h {
+            for z in 0..d {
+                for x in 0..w {
+                    let ca = (y * d + z) * w + x;
+                    let cb = (y * d + (z + k) % d) * w + x;
+                    moved = moved.max((oa.q()[ca] - ob.q()[cb]).abs());
+                }
+            }
+        }
+        assert!(
+            moved > 1e-3,
+            "open faces should break the symmetry ({moved})"
+        );
+    }
+
+    #[test]
+    fn a_deposit_beyond_a_periodic_face_lands_wrapped() {
+        let p = SlabParams {
+            periodic_z: true,
+            ..params([1.0, 1.0])
+        };
+        let mut s = SlabSweep::new(10, 10, 8, p);
+        s.deposit(3.5, 4.5, 8.5, 1.0); // z 8.5 on a depth of 8 → layer 0
+        s.deposit(3.5, 4.5, -0.5, 2.0); // z −0.5 → layer 7
+        assert_eq!(s.lad()[(4 * 8) * 10 + 3], 1.0);
+        assert_eq!(s.lad()[(4 * 8 + 7) * 10 + 3], 2.0);
     }
 
     #[test]

@@ -60,12 +60,18 @@ pub fn make_light(params: &Params) -> Light {
             rotate: c2.rotate,
             face_tau: params.world.faces,
             face_wood: params.world.face_wood,
+            periodic_z: params.world.periodic_z,
             sky_tilt: c2.sky_tilt,
             periodic_x: params.world.periodic,
         };
         return Light::Slab(Slab {
             sweep: SlabSweep::new(w as usize, h as usize, d as usize, p),
-            fade: params.world.fade,
+            // A periodic depth has no faces to fade toward (ADR 0058).
+            fade: if params.world.periodic_z {
+                0.0
+            } else {
+                params.world.fade
+            },
             depth: d,
         });
     }

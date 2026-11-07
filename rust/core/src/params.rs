@@ -70,6 +70,8 @@ pub struct WorldP {
     /// `world.obstacles`: None when absent (growth then skips the check, as `!== undefined`).
     pub obstacles: Option<Vec<Rect>>,
     pub periodic: bool,
+    /// `world.sidesZ` "periodic": the depth wraps as the width does (box A6, ADR 0058).
+    pub periodic_z: bool,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -435,6 +437,7 @@ impl Params {
                 walls: rects(w.get("walls"), true),
                 obstacles: w.get("obstacles").map(|o| rects(Some(o), false)),
                 periodic: text(w, "sides") == "periodic",
+                periodic_z: text(w, "sidesZ") == "periodic",
             },
             trees: v
                 .get("trees")

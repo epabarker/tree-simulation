@@ -217,7 +217,12 @@ impl World {
                 let p = &self.rules.params;
                 let (w, d) = (p.world.width, crate::light::depth_of(p));
                 let x0 = e.get("x").and_then(Value::as_f64).unwrap_or(f64::NAN);
-                let z = e.get("z").and_then(Value::as_f64).unwrap_or(d / 2.0);
+                let z0 = e.get("z").and_then(Value::as_f64).unwrap_or(d / 2.0);
+                let z = if p.world.periodic_z {
+                    ((z0 % d) + d) % d
+                } else {
+                    z0
+                };
                 let x = if p.world.periodic {
                     ((x0 % w) + w) % w
                 } else {

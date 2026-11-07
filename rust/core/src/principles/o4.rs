@@ -43,6 +43,7 @@ pub fn stand_dynamics(world: &mut World) -> f64 {
         params.c2.c,
     );
     let depth = crate::light::depth_of(params);
+    let periodic_z = params.world.periodic_z;
     let max_trees = params.o4.max_trees;
     let band = params.o4.band;
     let mid = depth / 2.0;
@@ -83,7 +84,7 @@ pub fn stand_dynamics(world: &mut World) -> f64 {
             let around = 2.0 * PI * uniform(seed, purpose::DISPERSAL, pid, k, season, 1.0);
             let r = laplace(u, d);
             let mut x = root + r * math::cos(around);
-            let z = root_z + r * math::sin(around);
+            let mut z = root_z + r * math::sin(around);
             let kk = k;
             k += 1.0;
             if periodic {
@@ -91,7 +92,9 @@ pub fn stand_dynamics(world: &mut World) -> f64 {
             } else if x < 0.0 || x >= w {
                 continue;
             }
-            if z < 0.0 || z >= depth {
+            if periodic_z {
+                z = ((z % depth) + depth) % depth; // round a periodic depth (ADR 0058)
+            } else if z < 0.0 || z >= depth {
                 continue; // beyond an open face
             }
             if band.is_some_and(|b| (z - mid).abs() > b / 2.0) {

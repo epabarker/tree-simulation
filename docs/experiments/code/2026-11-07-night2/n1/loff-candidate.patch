@@ -1,0 +1,126 @@
+diff --git a/analysis/fit/hand-overrides.toml b/analysis/fit/hand-overrides.toml
+index 993424b..8c9381c 100644
+--- a/analysis/fit/hand-overrides.toml
++++ b/analysis/fit/hand-overrides.toml
+@@ -112,7 +112,13 @@ assign = { "c1.shootLengthSD" = 0.5, "c4.axisSD" = 50, "c1.betaSD" = 60, "c1.bud
+ # stand's boles lose the spur tufts they kept for ever (the "leafy sprouts" of the blind test). The
+ # sources put a beech spur chain at 10–15 years; 15 fails the ecology guard (6 of 20) under the
+ # rule's wood-age clock, 20 passes (11 of 20) and clears the trunks. 2026-11-02-beech-round2-stand-diagnosis.md.
+-"r6.lifespan" = 20
++# N1, night of 2026-11-06 (CANDIDATE, reverses ADR 0044 for beech; the user's ruling): the lifespan is
++# removed (absent: off; strip `lifespan` from flora-fitted.ts's beech r6 by hand, as the adopt keeps old
++# keys). Under shade a sapling stops extending, so all its spurs sit on wood born in its first ~15 seasons
++# and the wood-age clock takes them all within ~20 more: in the layered wood 22 of 24 planted beech died
++# at 34-90 (2 of 24 alive at 150; 6 of 40 on seeds 1-20, 7 of 40 on fresh 21-40). L 40 and 60 only delay
++# it (2, 5 of 24). Off: 15 of 24, 27 of 40, fresh 26 of 40. Lone H150 42.1 m, D150 0.246 (10 seeds).
++# The trunk spurs come back mainly on suppressed stand trees; the dominant boles stay near clean.
+ # The irregularity base's departure (overnight 2026-11-06, agent S, on beech's own descriptors; ADR
+ # 0055): less shoot-length variation, a wider spread of branch angles. Passed G-forest on the garden.
+ "c1.shootLengthSD" = 0.35
+diff --git a/rust/presets.json b/rust/presets.json
+index 2aeed0d..0d314f7 100644
+--- a/rust/presets.json
++++ b/rust/presets.json
+@@ -3660,8 +3660,7 @@
+      "r6": {
+       "enabled": true,
+       "qMin": 0.01257,
+-      "leafArea": 2.474,
+-      "lifespan": 20
++      "leafArea": 2.474
+      },
+      "o4": {
+       "cSeed": 10,
+@@ -4979,8 +4978,7 @@
+      "r6": {
+       "enabled": true,
+       "qMin": 0.01257,
+-      "leafArea": 2.474,
+-      "lifespan": 20
++      "leafArea": 2.474
+      },
+      "o4": {
+       "cSeed": 10,
+@@ -6444,8 +6442,7 @@
+      "r6": {
+       "enabled": true,
+       "qMin": 0.01257,
+-      "leafArea": 2.474,
+-      "lifespan": 20
++      "leafArea": 2.474
+      },
+      "o4": {
+       "cSeed": 10,
+@@ -7909,8 +7906,7 @@
+      "r6": {
+       "enabled": true,
+       "qMin": 0.01257,
+-      "leafArea": 2.474,
+-      "lifespan": 20
++      "leafArea": 2.474
+      },
+      "o4": {
+       "cSeed": 10,
+@@ -9374,8 +9370,7 @@
+      "r6": {
+       "enabled": true,
+       "qMin": 0.01257,
+-      "leafArea": 2.474,
+-      "lifespan": 20
++      "leafArea": 2.474
+      },
+      "o4": {
+       "cSeed": 10,
+@@ -10839,8 +10834,7 @@
+      "r6": {
+       "enabled": true,
+       "qMin": 0.01257,
+-      "leafArea": 2.474,
+-      "lifespan": 20
++      "leafArea": 2.474
+      },
+      "o4": {
+       "cSeed": 10,
+@@ -12304,8 +12298,7 @@
+      "r6": {
+       "enabled": true,
+       "qMin": 0.01257,
+-      "leafArea": 2.474,
+-      "lifespan": 20
++      "leafArea": 2.474
+      },
+      "o4": {
+       "cSeed": 10,
+@@ -13770,8 +13763,7 @@
+      "r6": {
+       "enabled": true,
+       "qMin": 0.01257,
+-      "leafArea": 2.474,
+-      "lifespan": 20
++      "leafArea": 2.474
+      },
+      "o4": {
+       "cSeed": 10,
+@@ -15236,8 +15228,7 @@
+      "r6": {
+       "enabled": true,
+       "qMin": 0.01257,
+-      "leafArea": 2.474,
+-      "lifespan": 20
++      "leafArea": 2.474
+      },
+      "o4": {
+       "cSeed": 10,
+diff --git a/src/core/flora-fitted.ts b/src/core/flora-fitted.ts
+index eaa2e68..95fde46 100644
+--- a/src/core/flora-fitted.ts
++++ b/src/core/flora-fitted.ts
+@@ -186,7 +186,7 @@ export const FITTED_FLORA = {
+       sigmaBreak: 7000,
+       ground: true,
+     },
+-    r6: { enabled: true, qMin: 0.01257, leafArea: 2.474, lifespan: 20 },
++    r6: { enabled: true, qMin: 0.01257, leafArea: 2.474 },
+     o4: { cSeed: 10, d: 12, qEst: 0.03, pEst: 0.3, m0: 0.002 },
+     c3: { mode: "bh", lambda: 0.5, alpha: 2.959 },
+     c6: { enabled: true, n: 2, r0: 0.003096 },

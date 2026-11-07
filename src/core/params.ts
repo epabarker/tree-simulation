@@ -71,6 +71,13 @@ export interface Params {
      * strip's own foliage. Optional: 0, the faces' constant τ alone.
      */
     faceWood?: number;
+    /**
+     * "periodic": the depth wraps as the width does with `sides: "periodic"` (box A6, ADR 0058,
+     * proposed). Beyond a z face lie the slab's own rows from the other side, so a row of trees
+     * stands among its own images one depth away: a wood of the density its spacing and depth give,
+     * with no open sides. The faces' τ, `fade` and `faceWood` are then unused. Optional: "open".
+     */
+    sidesZ?: "open" | "periodic";
     /** Static shade sources (M3 "lean away from a wall"). */
     walls: Wall[];
     /**

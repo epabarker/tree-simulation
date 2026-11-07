@@ -12,7 +12,7 @@ Newest first. One entry per session or milestone: what changed, why, surprises, 
 - **N3, oak:** the spire is gone on fresh seeds 31–50 (D 0.31/0.30, kinks 2), on `claude/n3-oak`.
   - It reads as a fan, not a dome.
   - Oak's share of the wood rises from HEAD's 0.12 to 0.20.
-  - Correction to the morning's chat report: hornbeam's fall to 0.13 was already at HEAD (B0 0.43); the drift is untraced.
+  - Correction to the morning's chat report: hornbeam's fall to 0.13 was already at HEAD (B0 0.43). B0 ran before #50's recruit cap (229 live trees against 57), and composition counts every live tree, so the cap is the likely cause.
 - **N4:** crown v2 passes all four conditions that v1 blocked.
 - **N5:** most ±10% single-knob effects are within seed noise at 3 seeds.
 - **N6:** the [model DAG](background/model-dag.md). `c5.T` is dead in every species; holly's vigour keys have no reader.

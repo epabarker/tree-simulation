@@ -11,7 +11,11 @@ Copied out of a session scratchpad, which is gone. Shell scripts and some Python
 - **Baselines:**
   - `B0-v1.json` (B0 = d2c4f53, 2/3/11/11);
   - `B0-v2.json` (B0 under v2; crown 15).
-- **Results:** `v2-*.json` / `.md` (HEAD, beech twigs, birch every node, oak's candidate).
+  - **Their config:** width 160, 20 seeds, 300 seasons, faces 0.2 (the garden's), and recruits at 1, B0's default before #50 (229 live trees).
+  - **The night's HEAD runs** set `RECRUITS=0.25` (57 live trees, the garden since #50).
+  - `dump.ts` now uses the worktree's own planting when `RECRUITS` is unset. To reproduce B0, set `RECRUITS=1`.
+  - A baseline and a run should share a config; B1 should be run at the garden's own.
+- **Results:** `v2-*.json` / `.md` (HEAD, beech twigs, birch every node, and oak-form's afternoon candidate, not N3's).
 
 ```bash
 export PATH=$HOME/.cargo/bin:$PATH

@@ -1,0 +1,243 @@
+flowchart LR
+  subgraph Light
+    OBST["Obstacles: shed branches inside obstacles"]
+    STORM["O2 storm draw (one per season)"]
+    C2_LIGHT["C2 deposit foliage + Beer-Lambert sky sweep"]
+    O2_TAG["O2 owner grid (whose foliage is where)"]
+  end
+  subgraph Sample
+    C2_SAMPLE["C2 sample Q, V at every live bud"]
+    R5_SHADE["R5 shade s = 1 - Q/C (x neighbours' share)"]
+    R2_CROWD["R2 relay gate signal s-bar (mean neighbour shade)"]
+    C5_QTOP["C5 crown-top light Q_top (quantile of bud Q)"]
+  end
+  subgraph Allocate
+    C3_BASI["C3 basipetal light sum Q_sum, n_b, Q_base"]
+    R1_CARBON["R1 carbon balance P - M -> reserve, seeds, v_base"]
+    C3_ACRO["C3 Borchert-Honda split (lambda by R2/R5/vigour drop)"]
+  end
+  subgraph Grow
+    R4_FATE["R4 bud fate: threshold, light release, stochastic break"]
+    R2_FORM["R2 form: pa, relay, fork, set-point modifiers, p_term"]
+    C4_DIR["C4 shoot direction (tropism, light, noise)"]
+    C1_SHOOT["C1 shoot size, phyllotaxis, new metamers + buds"]
+    R6_REST["R6 resting fate: short shoot / dormant / abort"]
+  end
+  subgraph Shed
+    C5_SHED["C5 self-pruning (carbon deficit or light)"]
+  end
+  subgraph Girth
+    C6_GIRTH["C6 pipe-model girth with scars"]
+  end
+  subgraph Mechanics
+    R3_MECH["R3 sag, posture, stress wood, breakage, windthrow"]
+  end
+  subgraph Commit
+    COMMIT["Commit: compact buds, tree age + 1"]
+  end
+  subgraph Deaths
+    O2_ABRADE["O2 abrasion (crown shyness)"]
+    R1_STARVE["R1 starvation death (k_starve empty seasons)"]
+    O4_STAND["O4 stand dynamics: m0, seeds, establishment"]
+  end
+  C2_LIGHT --> R5_SHADE
+  C2_LIGHT --> O4_STAND
+  C2_LIGHT --> C2_SAMPLE
+  O2_TAG --> O2_ABRADE
+  O2_TAG --> R5_SHADE
+  STORM --> R3_MECH
+  C2_SAMPLE --> R4_FATE
+  C2_SAMPLE --> O2_ABRADE
+  C2_SAMPLE --> R1_CARBON
+  C2_SAMPLE --> C5_QTOP
+  C2_SAMPLE --> C4_DIR
+  C2_SAMPLE --> R6_REST
+  C2_SAMPLE --> R2_FORM
+  C2_SAMPLE --> C3_BASI
+  R5_SHADE --> C3_ACRO
+  R5_SHADE --> R4_FATE
+  R5_SHADE --> C1_SHOOT
+  R5_SHADE --> C4_DIR
+  R5_SHADE --> R2_CROWD
+  R2_CROWD --> R2_FORM
+  C5_QTOP --> C5_SHED
+  C3_BASI --> C3_ACRO
+  C3_BASI --> C5_SHED
+  R1_CARBON --> C5_SHED
+  R1_CARBON --> R4_FATE
+  R4_FATE -.-> R1_CARBON
+  R1_CARBON --> R1_STARVE
+  R1_CARBON --> O4_STAND
+  R1_CARBON --> C3_ACRO
+  R1_CARBON --> R2_FORM
+  C3_ACRO --> R4_FATE
+  C3_ACRO --> C1_SHOOT
+  C3_ACRO --> R2_FORM
+  R2_FORM --> C4_DIR
+  R2_FORM --> R3_MECH
+  R4_FATE -.-> C2_SAMPLE
+  R4_FATE -.-> C2_LIGHT
+  R4_FATE --> C1_SHOOT
+  R4_FATE -.-> O2_TAG
+  R4_FATE -.-> C5_QTOP
+  R4_FATE --> O2_ABRADE
+  R4_FATE --> R6_REST
+  R4_FATE --> R2_FORM
+  R4_FATE --> COMMIT
+  R4_FATE --> R3_MECH
+  R4_FATE -.-> C3_BASI
+  C5_SHED -.-> R4_FATE
+  C5_SHED -.-> C2_SAMPLE
+  C5_SHED -.-> C2_LIGHT
+  C5_SHED -.-> C1_SHOOT
+  C5_SHED -.-> O2_TAG
+  C5_SHED -.-> R1_CARBON
+  C5_SHED -.-> C5_QTOP
+  C5_SHED --> O2_ABRADE
+  C5_SHED -.-> R6_REST
+  C5_SHED -.-> R2_FORM
+  C5_SHED --> COMMIT
+  C5_SHED --> R3_MECH
+  C5_SHED -.-> C3_BASI
+  C1_SHOOT -.-> R4_FATE
+  C1_SHOOT -.-> C2_SAMPLE
+  C1_SHOOT -.-> C2_LIGHT
+  C1_SHOOT -.-> O2_TAG
+  C1_SHOOT -.-> R1_CARBON
+  C1_SHOOT -.-> C5_QTOP
+  C1_SHOOT --> O2_ABRADE
+  C1_SHOOT --> R6_REST
+  C1_SHOOT -.-> R2_FORM
+  C1_SHOOT --> COMMIT
+  C1_SHOOT --> R3_MECH
+  C1_SHOOT -.-> C3_BASI
+  OBST --> R4_FATE
+  OBST --> C2_SAMPLE
+  OBST --> C2_LIGHT
+  OBST --> C1_SHOOT
+  OBST --> O2_TAG
+  OBST --> R1_CARBON
+  OBST --> C5_QTOP
+  OBST --> O2_ABRADE
+  OBST --> R6_REST
+  OBST --> R2_FORM
+  OBST --> COMMIT
+  OBST --> R3_MECH
+  OBST --> C3_BASI
+  O2_ABRADE -.-> R4_FATE
+  O2_ABRADE -.-> C2_SAMPLE
+  O2_ABRADE -.-> C2_LIGHT
+  O2_ABRADE -.-> C1_SHOOT
+  O2_ABRADE -.-> O2_TAG
+  O2_ABRADE -.-> R1_CARBON
+  O2_ABRADE -.-> C5_QTOP
+  O2_ABRADE -.-> R6_REST
+  O2_ABRADE -.-> R2_FORM
+  O2_ABRADE -.-> COMMIT
+  O2_ABRADE -.-> R3_MECH
+  O2_ABRADE -.-> C3_BASI
+  R6_REST -.-> R4_FATE
+  R6_REST -.-> C2_SAMPLE
+  R6_REST -.-> C2_LIGHT
+  R6_REST -.-> C1_SHOOT
+  R6_REST -.-> O2_TAG
+  R6_REST -.-> R1_CARBON
+  R6_REST -.-> C5_QTOP
+  R6_REST --> O2_ABRADE
+  R6_REST -.-> R2_FORM
+  R6_REST --> COMMIT
+  R6_REST --> R3_MECH
+  R6_REST -.-> C3_BASI
+  R2_FORM -.-> R4_FATE
+  R2_FORM -.-> C2_SAMPLE
+  R2_FORM -.-> C2_LIGHT
+  R2_FORM --> C1_SHOOT
+  R2_FORM -.-> O2_TAG
+  R2_FORM -.-> R1_CARBON
+  R2_FORM -.-> C5_QTOP
+  R2_FORM --> O2_ABRADE
+  R2_FORM --> R6_REST
+  R2_FORM --> COMMIT
+  R2_FORM -.-> C3_BASI
+  R3_MECH -.-> R4_FATE
+  R3_MECH -.-> C2_SAMPLE
+  R3_MECH -.-> C2_LIGHT
+  R3_MECH -.-> C1_SHOOT
+  R3_MECH -.-> O2_TAG
+  R3_MECH -.-> R1_CARBON
+  R3_MECH -.-> C5_QTOP
+  R3_MECH --> O2_ABRADE
+  R3_MECH -.-> R6_REST
+  R3_MECH -.-> R2_FORM
+  R3_MECH --> COMMIT
+  R3_MECH -.-> C3_BASI
+  COMMIT -.-> R4_FATE
+  COMMIT -.-> C2_SAMPLE
+  COMMIT -.-> C2_LIGHT
+  COMMIT -.-> C1_SHOOT
+  COMMIT -.-> O2_TAG
+  COMMIT -.-> R1_CARBON
+  COMMIT -.-> C5_QTOP
+  COMMIT --> O2_ABRADE
+  COMMIT -.-> R6_REST
+  COMMIT -.-> R2_FORM
+  COMMIT -.-> R3_MECH
+  COMMIT -.-> C3_BASI
+  C5_SHED -.-> C3_ACRO
+  C5_SHED -.-> OBST
+  C5_SHED --> C6_GIRTH
+  C5_SHED -.-> C4_DIR
+  C5_SHED --> O4_STAND
+  C5_SHED -.-> R5_SHADE
+  C1_SHOOT -.-> C3_ACRO
+  C1_SHOOT --> C5_SHED
+  C1_SHOOT -.-> OBST
+  C1_SHOOT --> C6_GIRTH
+  C1_SHOOT -.-> C4_DIR
+  C1_SHOOT --> O4_STAND
+  C1_SHOOT -.-> R5_SHADE
+  OBST --> C3_ACRO
+  OBST --> C5_SHED
+  OBST --> C6_GIRTH
+  OBST --> C4_DIR
+  OBST --> O4_STAND
+  OBST --> R5_SHADE
+  C4_DIR -.-> C3_ACRO
+  C4_DIR -.-> C2_SAMPLE
+  C4_DIR -.-> C2_LIGHT
+  C4_DIR --> C5_SHED
+  C4_DIR -.-> OBST
+  C4_DIR --> C1_SHOOT
+  C4_DIR -.-> O2_TAG
+  C4_DIR -.-> R1_CARBON
+  C4_DIR --> C6_GIRTH
+  C4_DIR --> O2_ABRADE
+  C4_DIR --> R6_REST
+  C4_DIR --> O4_STAND
+  C4_DIR -.-> R2_FORM
+  C4_DIR -.-> R5_SHADE
+  C4_DIR --> R3_MECH
+  C4_DIR -.-> C3_BASI
+  R2_FORM -.-> C3_ACRO
+  R2_FORM --> C5_SHED
+  R2_FORM -.-> OBST
+  R2_FORM --> C6_GIRTH
+  R2_FORM --> O4_STAND
+  R2_FORM -.-> R5_SHADE
+  R3_MECH -.-> C3_ACRO
+  R3_MECH -.-> C5_SHED
+  R3_MECH -.-> OBST
+  R3_MECH -.-> C6_GIRTH
+  R3_MECH -.-> C4_DIR
+  R3_MECH --> O4_STAND
+  R3_MECH -.-> R5_SHADE
+  C6_GIRTH -.-> C5_SHED
+  C6_GIRTH --> O2_ABRADE
+  C6_GIRTH -.-> R2_FORM
+  C6_GIRTH --> R3_MECH
+  COMMIT -.-> C3_ACRO
+  R1_STARVE --> O4_STAND
+  R1_STARVE -.-> C1_SHOOT
+  R1_STARVE -.-> C2_LIGHT
+  O4_STAND -.-> C1_SHOOT
+  O4_STAND -.-> C2_LIGHT

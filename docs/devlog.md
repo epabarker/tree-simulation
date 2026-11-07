@@ -2,6 +2,26 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-07: the night of 6–7 Nov reported; nothing adopted; the handover
+
+[Note](experiments/2026-11-07-night2.md); [handover](plans/2026-11-07-handover.md), with the user's eight rulings and the plan.
+- **N1, beech in the layered wood:** planted beech starves through ADR 0044's spur lifespan, not through etiolation.
+  - With `r6.lifespan` off, 27 of 40 live (6 today), and the lone gates hold.
+  - G-forest misses hd300 against B0 by one.
+  - Found on the way: R1's deficit counts are not checkpointed (`kShed` > 1 breaks restore).
+- **N3, oak:** the spire is gone on fresh seeds 31–50 (D 0.31/0.30, kinks 2), on `claude/n3-oak`.
+  - It reads as a fan, not a dome.
+  - Oak's share of the wood rises from HEAD's 0.12 to 0.20.
+  - Correction to the morning's chat report: hornbeam's fall to 0.13 was already at HEAD (B0 0.43); the drift is untraced.
+- **N4:** crown v2 passes all four conditions that v1 blocked.
+- **N5:** most ±10% single-knob effects are within seed noise at 3 seeds.
+- **N6:** the [model DAG](background/model-dag.md). `c5.T` is dead in every species; holly's vigour keys have no reader.
+- **The night's gate tools and baselines** are now in `docs/experiments/code/2026-11-07-night2/` (the scratchpad is gone), with the lone cache in `runs/lonecache/`.
+- **Branches pushed for safekeeping:**
+  - `claude/species-round5` (2 commits);
+  - `claude/gallant-brown-5k4g33-local` (diverged from its remote);
+  - `claude/day2-f-foliage` (agent F's diagnostics).
+
 ## 2026-11-06 evening: A6, a periodic depth (ADR 0058, off) and what keeps the garden's crowns low
 
 - **`world.sidesZ` "periodic"** (C2, O2, O4, planting; tests; bit-identical off).

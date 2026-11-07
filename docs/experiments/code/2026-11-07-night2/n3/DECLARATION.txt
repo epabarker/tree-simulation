@@ -1,0 +1,13 @@
+N3 declaration, written 2026-11-06 22:27 GMT, before any run on seeds 31-50 and before seeds 21-30 results for T55p25.
+
+Primary finalist: T55p25 = oak overrides
+  r2.relay 2, relayAge 25, relayPTerm 0.25, relayCrowd 10, forkAt 1.3, forkAngle 35,
+  levels.0.curve 30, levels.0.curveLength 30, levels.2.lambda 0.55, levels.2.dLambdaShare 0
+  (aged set point 85 and dLambda 0.04 untouched).
+Chosen on tuning seeds 1-20 (D 0.33/0.31, in band 10/15 of 20; kinks median 2.5/2.5, max 4; W/H 0.70/0.69).
+
+Seeds 21-30 (semi-burned internal hold-out) switch the finalist to T53p10 only if T55p25's pooled 1-30 median D
+falls outside 0.2-0.5 at either season.
+Fallback T53p10 (relayPTerm 0.10, levels.2.lambda 0.53) runs garden/G-forest/fresh only if T55p25 fails
+G-forest or garden planted-oak kinks.
+Fresh seeds 31-50 are run once per finalist actually tested; every fresh result is reported.

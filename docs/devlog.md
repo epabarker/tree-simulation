@@ -2,6 +2,38 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-07: day-3 step 1 — durable instruments, no simulation change
+
+The user approved the eight day-3 rulings and the full post-box programme (beech first;
+sycamore and ash adopted only through gates, at unchanged planting density). PR #64 was
+already merged and issue #52 closed. Registration commit **4c0be28** fixed step 1's gates
+and knob cards after a foreground green check, before any instrument run.
+
+- **G-forest:** promoted `evidence2.py` plus its garden dumper to `analysis/treesim/`.
+  VERDICT now uses exactly floor100, planted hd300, selected crown and plateau; all-tree H/D
+  stays diagnostic and G-budget is separate. Bars print counts/N and **at its limit** at equality.
+  Crown v1 remains the default until step 2; v2 is selectable and both counts stay in outputs.
+  Run/compare/reaggregate and dotted/nested species patches remain; caches use binary SHA-256.
+- **DAG and sweep:** promoted tools regenerate missing effective JSON, evaluate separate lone
+  and actual garden stand params, and record source/input provenance. A lexical Rust-read
+  guard catches stale table coverage (not incorrect gate semantics); the principle checklist
+  now requires DAG updates. Sweep analysis never invents producer provenance from analysis HEAD.
+- **E3:** explicit prepare/execute commands, source/manifest guards, numeric perturbations of
+  effective values (not pre-export override values), boolean toggles, unsupported-leaf report,
+  species-isolated stand patches, and failed/incomplete-run handling. Preparation smoke enumerated
+  **179 perturbations × 2 contexts × 20 seeds**; **no E3 simulations executed** and no new deadness
+  finding claimed. Prepare again on committed source before a real execution.
+- **Cleanup:** five named agent worktrees and sheet removed only after clean-state and remote
+  commit audits. Sheet diff and inventory preserved in ignored `runs/day3-step1/`. Kept b0 and
+  unrelated siblings; detached sibling oak has no remote commit coverage and was retained.
+- **Verification:** foreground `npm run check:stamp` green (Rust checks, 19 Vitest files / 99 tests,
+  lint and TypeScript); full analysis suite **166 passed**; final focused instrument suite **24 passed**;
+  actual DAG (including figures) regenerated; E3 prepare smoke passed. Missing pinned Python 3.14
+  restored locally. No visual garden change, so no garden build/sheet required for this step.
+- **Goldens, simulation source and exported presets unchanged.** No behaviour-change regression or
+  golden update was needed. STATUS rewritten to 35 lines; ROADMAP records instrumentation only.
+- **Next:** PR into `3d-port`; wait for the user's merge before step 2. No tag, deployment or merge.
+
 ## 2026-11-07: the night of 6–7 Nov reported; nothing adopted; the handover
 
 [Note](experiments/2026-11-07-night2.md); [handover](plans/2026-11-07-handover.md), with the user's eight rulings and the plan.

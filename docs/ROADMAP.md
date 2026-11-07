@@ -67,6 +67,14 @@ From the [2026-10-27 literature review](research/2026-10-27-literature-review.md
 | M19 | Yun et al. 2025 (branch angles); Roychoudhry et al. 2017 (shade and GSA); Schneider et al. 2019 (R:FR) |
 | M20 | Kothari et al. 2025; Kobe et al. 1995; Petritan et al. 2007 (shade tolerance); Reynolds & Ford 2005 (pattern-oriented calibration) |
 
+## Day-3 instrument maintenance (2026-11-07)
+
+Step 1 of the [0.17.0 day-3 plan](plans/2026-11-07-day3.md) is implemented, awaiting PR merge:
+G-forest's explicit four-check verdict, provenance-labelled lone/garden DAG, sweep analyser and on-demand
+dead-override experiment. `analysis/tests/test_day3_instruments.py` covers thresholds, diagnostics,
+candidate gate evaluation and lexical Rust-read staleness. `/implement-principle` now requires DAG
+updates when reads/gates change. No principle implementation, calibration status or goldens changed.
+
 ## Principles: from spec to code
 
 Code is in `rust/core/src/` (I1; the TypeScript files these rows named until then are at the tag `golden-2d-ts`), in 3D since I2 (ADR 0025). "Unit tests" are the `#[cfg(test)]` module in the code's own file; the `*.test.ts` files are the milestone tests, calibrated in 2D and now `tests/evidence-2d/` (calibration's backlog, not in `npm test`), except checkpoints, obstacles and trials, which run in `tests/`.

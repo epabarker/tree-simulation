@@ -31,6 +31,7 @@ _Last updated: 2026-11-07 (the night of 6–7 Nov reported, nothing adopted; **s
 - **Rust:** put `~/.cargo/bin` on PATH. `npm run golden:update` needs `npm run build:wasm` first. **Python tests (142; CI runs those without reference data):** `uv run --project analysis --with pytest pytest analysis/tests -q`.
 - **Gate:** `npm run check:stamp` in the foreground only (ADR 0047; [harness principles](background/harness-principles.md)). **Memory:** one fresh process per measurement; WASM memory never shrinks.
 - **Panels:** headless Firefox through puppeteer-core against `npm run dev`. Species trees ignore world patches; use `--species-patch` (one level deep) or the gate tool's dotted `--patch`.
+- **Choosing a knob:** check the [model DAG](background/model-dag.md) for dead levers and the sweep for sign and size first; record both in the step's plan.
 - **G-forest:** `docs/experiments/code/2026-11-07-night2/gates/evidence2.py` (README there); its VERDICT line wrongly counts `hd300_all`.
 - **Deploys:** a push to the site's `main` is production. Never merge `preview-3d`. Tags are the user's.
 - **Reference data:** `data/reference/` is git-ignored; re-fetch by the URLs in the audit files and the manifest. Keep /tmp clean; it filled once.

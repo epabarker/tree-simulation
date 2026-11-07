@@ -69,7 +69,7 @@ From the [2026-10-27 literature review](research/2026-10-27-literature-review.md
 
 ## Day-3 instrument maintenance (2026-11-07)
 
-Step 1 of the [0.17.0 day-3 plan](plans/2026-11-07-day3.md) is implemented, awaiting PR merge:
+Step 1 of the [0.17.0 day-3 plan](plans/2026-11-07-day3.md) is merged (#65):
 G-forest's explicit four-check verdict, provenance-labelled lone/garden DAG, sweep analyser and on-demand
 dead-override experiment. `analysis/tests/test_day3_instruments.py` covers thresholds, diagnostics,
 candidate gate evaluation and lexical Rust-read staleness. `/implement-principle` now requires DAG
@@ -196,4 +196,10 @@ No published value exists for these. Calibrate on *patterns*: several weak targe
   - **R3 ground contact** for limbs that sag to the ground → M16. **Breakage** is built (M10) but needs wind → M16 (O2 storms).
   - **§R5's far-red field**, so self-shade does not make open-grown trees taller and slenderer → M19. Headroom for `skyTree` (it reaches its 100-cell top by season ≈ 100) → M18.
 
-Day-3 step 3 (2026-11-07): beech lifespan-off, ADR 0060; N1 gates pass, G-forest retains known hd300 miss vs B0; soft crown-base gap remains. See day-3 step-3 experiment note. PR pending user merge.
+Day-3 step 3 (2026-11-07): beech lifespan-off, ADR 0060; N1 gates pass, G-forest retains known hd300 miss vs B0; soft crown-base gap remains. See day-3 step-3 experiment note. Merged (#67).
+
+Day-3 step 4 (2026-11-07): ADR0061 freezes B1 at actual garden recruits0.25,
+width160,20seeds,300seasons,crownv2. Counts0/0/14/12; relative bars−2/−2/12/10
+(first two vacuous; absolute misses retained). Historical B0 cap-only control
+reduces hornbeam share42.64%→20.35%; B1 is12.54%, including later changes.
+177 analysis tests; no growth changes. See day-3 step-4 experiment note. PR awaits user merge.

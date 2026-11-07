@@ -2,6 +2,28 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-07: day-3 step 4 — freeze B1 and isolate the recruit cap
+
+User merged #67. Registered ADR0061/gates/knob card at **8487d61** before runs,
+on merged growth source **a903d11**. Fresh20 garden stands at width160,
+recruits0.25, 300 seasons, crown v2 freeze B1 counts **0/0/14/12**, bars
+**−2/−2/12/10**. First two constraints are vacuous; absolute-band misses remain.
+Against historical B0, hd300 still fails and floor is at its limit. Median
+metamers20066,923, future separate budget≤83,653.75. All20 inputs match; all20
+outcomes reproduce step3, not independent validation. B1 summary pins provenance.
+
+Historical B0 build at quarter cap,20seeds, isolates maxTrees229→57: hornbeam
+mean share42.64%→20.35%, rowan7.01%→18.51%; B1 hornbeam12.54%. The latter
+contrast includes other changes. Planted survivors37/120→34/120→36/120 remain low.
+B1 CPU cost4,347.572s gives an E2 proxy10.869CPUh, not measured layered cost.
+[Full methods/results](experiments/2026-11-07-day3-step4.md). Maintained control
+script and B1 contract test added; the timing label no longer hardcodes3workers.
+
+177 analysis tests and foreground stamped check green; engine/species/presets/
+goldens unchanged, so no regression/golden update or visual build applies.
+STATUS/ROADMAP/instrument guide/policy updated; /wrap-up completed. Step5 waits
+for user merge. No merge, tag or deployment.
+
 ## 2026-11-07: step-3 results and wrap-up
 
 N1 passes its fixed gates: survival27/40≥20/40 (control6/40), H15042.622m in26–44.3,

@@ -316,7 +316,7 @@ def markdown(g):
         L.append(f"| {sp} | {d['n_trees']} | {f3(d['height'])} | {f3(d['hd'])} | {f3(d['lcr'])} |")
     L += ["", "## Budget", "",
           f"- metamers at 200 (sum over live trees): {ds(D['metamers200'])}",
-          f"- native wall s/season (machine was loaded, 3 parallel runs): {ds(D['wall_per_season'])}; CPU s/season: {ds(D['cpu_per_season'])}"]
+          f"- native wall s/season (recorded per run; concurrency in run configuration): {ds(D['wall_per_season'])}; CPU s/season: {ds(D['cpu_per_season'])}"]
     return "\n".join(L) + "\n"
 
 

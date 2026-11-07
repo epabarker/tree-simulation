@@ -11,7 +11,7 @@ Build WASM with `npm run build:wasm` before effective-parameter dumps: the share
 
 ```bash
 uv run --project analysis python -m treesim.gforest run --worktree . --seeds 1-20 --jobs 3 --out runs/gforest --label head
-uv run --project analysis python -m treesim.gforest compare docs/experiments/code/2026-11-07-night2/gates/B0-v2.json runs/gforest/evidence.json --crown-version 2
+uv run --project analysis python -m treesim.gforest compare analysis/treesim/baselines/B1-v2.json runs/gforest/evidence.json --crown-version 2
 uv run --project analysis python -m treesim.gforest reaggregate runs/gforest/evidence.json
 ```
 
@@ -36,8 +36,12 @@ params are hashed. Register any configuration change before running it.
 
 The run builds the native binary first. Cached lone results in `runs/lonecache/`
 (or `EVIDENCE_LONE_CACHE`) are keyed by exact params, seasons and binary SHA-256.
-Do not compare a changed garden configuration to B0 without recording that mismatch.
-B1 is created only in step 4; none is manufactured by this promotion.
+B1 is frozen in `baselines/B1-v2.json` under ADR 0061: width160, recruits0.25,
+seeds1–20, 300 seasons, crown v2. Counts are 0/0/14/12; relative bars −2/−2/12/10.
+The first two relative constraints are vacuous; zero absolute-band counts remain
+reported defects, not validation. The metamer reference at200 is 66,923.
+Original B0 remains in `docs/experiments/code/2026-11-07-night2/gates/B0-v2.json`;
+use it explicitly for historical comparisons and record its recruits1 mismatch.
 
 ## DAG and sweep
 

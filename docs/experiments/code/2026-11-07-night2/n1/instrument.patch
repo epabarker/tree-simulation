@@ -1,0 +1,70 @@
+diff --git a/rust/core/src/principles/c5.rs b/rust/core/src/principles/c5.rs
+index ba584f4..c3039f7 100644
+--- a/rust/core/src/principles/c5.rs
++++ b/rust/core/src/principles/c5.rs
+@@ -66,6 +66,8 @@ pub fn shed_branches(tree: &mut Tree, params: &Params, season: f64, evaluated: u
+     ensure(&mut dead, nm.max(tree.b.len()));
+     dead[..nm].fill(0);
+     let mut any = false;
++    let mut n1_cnt = [0.0f64; 3];
++    let mut n1_w = [0.0f64; 3];
+     let c = &tree.m;
+     for i in 0..evaluated {
+         if c.slot[i] == slot::MAIN || c.parent[i] < 0 {
+@@ -84,13 +86,28 @@ pub fn shed_branches(tree: &mut Tree, params: &Params, season: f64, evaluated: u
+         if shed {
+             dead[i] = 1;
+             any = true;
++            // N1 TEMP instrumentation
++            if carbon && dead[c.parent[i] as usize] == 0 {
++                let d = tree.deficit[i] >= params.r1.k_shed;
++                let r = light < params.c5.t_rel * tree.q_top;
++                let k = if d && r { 2 } else if d { 0 } else { 1 };
++                n1_cnt[k] += 1.0;
++                n1_w[k] += n_b;
++            }
+         }
+     }
++    let n1_m0 = tree.m.len();
+     let removed = if any {
+         remove_branches(tree, &mut dead, params, &mut [])
+     } else {
+         0.0
+     };
++    if carbon {
++        eprintln!(
++            "N1SHED {} {} {} {} {} {} {} {} {} {:.4}",
++            season, tree.id, n1_m0, n1_cnt[0], n1_cnt[1], n1_cnt[2], n1_w[0], n1_w[1], n1_w[2], tree.q_top
++        );
++    }
+     tree.scratch_u = dead;
+     removed
+ }
+diff --git a/rust/core/src/season.rs b/rust/core/src/season.rs
+index 2d56b6c..66d4bde 100644
+--- a/rust/core/src/season.rs
++++ b/rust/core/src/season.rs
+@@ -431,6 +431,8 @@ pub fn grow_buds(tree: &mut Tree, params: &Params, season: f64) {
+         Vec::new()
+     };
+     let mut shoot_length = 0.0;
++    let n1_m0 = tree.m.len();
++    let mut n1_out = 0usize;
+     for i in 0..count {
+         if !is_live_bud(tree.b.state[i]) {
+             continue;
+@@ -633,6 +635,7 @@ pub fn grow_buds(tree: &mut Tree, params: &Params, season: f64) {
+             // ADR 0044: a short shoot on wood past its lifespan rests leafless, and R4 ages it.
+             let wood = season - tree.m.birth_season[tree.b.metamer[i] as usize] as f64;
+             if outlived(tree.b.state[i], wood, &params.r6) {
++                n1_out += 1;
+                 tree.b.state[i] = bud::DORMANT;
+             }
+             // R4's age counts the seasons a bud rests dormant (§R4: dormant buds have a finite
+@@ -646,4 +649,6 @@ pub fn grow_buds(tree: &mut Tree, params: &Params, season: f64) {
+             }
+         }
+     }
++    // N1 TEMP
++    eprintln!("N1GROW {} {} {} {} {} {}", season, tree.id, n1_m0, tree.m.len(), n1_out, (0..tree.b.len()).filter(|&j| tree.b.state[j] == bud::SHORT_SHOOT).count());
+ }

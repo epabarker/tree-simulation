@@ -23,6 +23,8 @@ pub struct Grid {
     pub h: f64,
     pub d: f64,
     pub periodic: bool,
+    /// The depth wraps too (`world.sidesZ` "periodic", ADR 0058).
+    pub periodic_z: bool,
 }
 
 impl Grid {
@@ -32,6 +34,7 @@ impl Grid {
             h: params.world.height,
             d: crate::light::depth_of(params),
             periodic: params.world.periodic,
+            periodic_z: params.world.periodic_z,
         }
     }
 
@@ -41,6 +44,11 @@ impl Grid {
             ((col % self.w) + self.w) % self.w
         } else {
             col
+        };
+        let layer = if self.periodic_z {
+            ((layer % self.d) + self.d) % self.d
+        } else {
+            layer
         };
         if col < 0.0
             || col >= self.w
@@ -129,6 +137,25 @@ pub fn abrade(tree: &mut Tree, owner: &[i32], grid: &Grid, params: &Params, seas
 
 #[cfg(test)]
 mod tests {
+    #[test]
+    fn the_grid_wraps_its_depth_when_the_depth_is_periodic() {
+        // Box A6 (ADR 0058): a periodic depth wraps O2's layers as a periodic width wraps columns.
+        let open = Grid {
+            w: 10.0,
+            h: 5.0,
+            d: 4.0,
+            periodic: true,
+            periodic_z: false,
+        };
+        let ring = Grid {
+            periodic_z: true,
+            ..open
+        };
+        assert_eq!(open.index(2.0, 1.0, 4.0), None);
+        assert_eq!(ring.index(2.0, 1.0, 4.0), ring.index(2.0, 1.0, 0.0));
+        assert_eq!(ring.index(2.0, 1.0, -1.0), ring.index(2.0, 1.0, 3.0));
+    }
+
     use super::*;
 
     fn o2() -> O2 {

@@ -16,7 +16,7 @@ and knob cards after a foreground green check, before any instrument run.
   Run/compare/reaggregate and dotted/nested species patches remain; caches use binary SHA-256.
 - **DAG and sweep:** promoted tools regenerate missing effective JSON, evaluate separate lone
   and actual garden stand params, and record source/input provenance. A lexical Rust-read
-  guard catches stale table coverage (not incorrect gate semantics); the principle checklist
+  guard catches stale table coverage, including existing per-level aliases (not incorrect gate semantics); the principle checklist
   now requires DAG updates. Sweep analysis never invents producer provenance from analysis HEAD.
 - **E3:** explicit prepare/execute commands, source/manifest guards, numeric perturbations of
   effective values (not pre-export override values), boolean toggles, unsupported-leaf report,
@@ -27,7 +27,7 @@ and knob cards after a foreground green check, before any instrument run.
   commit audits. Sheet diff and inventory preserved in ignored `runs/day3-step1/`. Kept b0 and
   unrelated siblings; detached sibling oak has no remote commit coverage and was retained.
 - **Verification:** foreground `npm run check:stamp` green (Rust checks, 19 Vitest files / 99 tests,
-  lint and TypeScript); full analysis suite **166 passed**; final focused instrument suite **24 passed**;
+  lint and TypeScript); full analysis suite **168 passed**; final focused instrument suite **26 passed**;
   actual DAG (including figures) regenerated; E3 prepare smoke passed. Missing pinned Python 3.14
   restored locally. No visual garden change, so no garden build/sheet required for this step.
 - **Goldens, simulation source and exported presets unchanged.** No behaviour-change regression or

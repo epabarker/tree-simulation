@@ -189,3 +189,16 @@ def test_sweep_analyser_retains_cli_and_writes_input_provenance(tmp_path):
     metadata = json.loads(out.with_suffix('.csv.provenance.json').read_text())
     assert metadata['source_commit'] == 'fixture-producer'
     assert metadata['inputs_sha256']['values.json'] == file_hash(sweep / 'values.json')
+
+
+def test_coverage_guard_checks_option_and_borrowed_level_aliases():
+    names = {('r2.levels[k]', 'new_knob'): 'newKnob'}
+    for source in ('let Some(row) = pa_level(pa, &params.r2) else { return; }; row.new_knob;',
+                   'let row = &r2.levels[0]; row.new_knob;',
+                   'pa_level(pa, &params.r2).map(|l| l.new_knob);'):
+        assert 'r2.levels[k].newKnob' in parameter_reads(source, names)
+
+
+def test_coverage_removing_an_existing_level_read_is_detected():
+    reduced = [row for row in build_dag.PARAMS if row[0] != 'r2.levels[k].dLambdaShare']
+    assert any('r2.levels[k].dLambdaShare' in rows for rows in missing_reads(ROOT, reduced).values())

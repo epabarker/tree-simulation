@@ -7,7 +7,7 @@ exception. Per-level shorthand is checked conservatively against PaLevel fields.
 import re
 from pathlib import Path
 
-TYPES = {'WorldP': 'world', 'PaLevel': 'r2.levels[*]',
+TYPES = {'WorldP': 'world', 'PaLevel': 'r2.levels[k]',
          **{f'{p.upper()}{i}': f'{p}{i}' for p, n in [('c', 6), ('r', 6), ('o', 4)] for i in range(1, n + 1)}}
 
 
@@ -27,7 +27,7 @@ def field_names(source):
                    ('r1', 'shed_carbon'): 'shed', ('r3', 'c'): 'c',
                    ('c1', 'bud_break_width'): 'budBreak.width',
                    ('c1', 'bud_break_stochastic'): 'budBreak.mode', ('r3', 'sag_increment'): 'sag',
-                   ('r2.levels[*]', 'aged_by_tree'): 'agedBy'})
+                   ('r2.levels[k]', 'aged_by_tree'): 'agedBy'})
     return result
 
 
@@ -40,6 +40,14 @@ def parameter_reads(source, names):
     aliases = {name: TYPES[typ] for name, typ in re.findall(r'\b(\w+):\s*&(?:mut\s+)?(\w+)\b', source) if typ in TYPES}
     for name, group in re.findall(r'let\s+(\w+)\s*=\s*&\w+\.(world|c[1-6]|r[1-6]|o[1-4])\s*;', source):
         aliases[name] = group
+    # The core's per-level access patterns: pa_level() Option bindings,
+    # direct borrowed rows, and the |l| shorthand in level iterators/map closures.
+    for alias in re.findall(r'let\s+Some\((\w+)\)\s*=\s*pa_level\(', source):
+        aliases[alias] = 'r2.levels[k]'
+    for alias in re.findall(r'let\s+(\w+)\s*=\s*&[\w.]+\.levels\[', source):
+        aliases[alias] = 'r2.levels[k]'
+    if 'pa_level(' in source or '.levels.iter()' in source:
+        aliases['l'] = 'r2.levels[k]'
     for alias, group in aliases.items():
         for field in re.findall(r'\b' + alias + r'\.(\w+)', source):
             if (group, field) in names:

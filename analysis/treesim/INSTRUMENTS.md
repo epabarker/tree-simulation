@@ -57,6 +57,17 @@ Stand o2/o4/storm settings come from those params rather than the old assumed fo
 preset. Patches use G-forest's species assignments, applied to each effective root.
 An opened candidate gate requires a new DAG; a baseline dead-lever table is insufficient.
 
+For an experiment's exact prepared stand, add `--stand-params runs/experiment/base/s1/params.json`.
+Its seed and width must match `--seed` / `--width`; the dumper computes stand effective
+params from this full world while preserving the ordinary lone worlds. Provenance records
+the prepared input hash. A periodic/deeper stand must not silently replace lone inputs.
+
+The step6 adapter `analysis/experiments/day3_layered.py` composes the same maintained
+G-forest `summarise`, `aggregate`, `compare` and exact-key lone cache with already-executed
+prepared stands. Its comparator worlds are the unchanged current garden's open lone
+worlds. The 180-run screen and its base20 adoption sample share those base outcomes;
+it does not fork verdict definitions or rerun/select a favourable base sample.
+
 Outputs include `dag.json`, textual graphs, reach tables, figures and provenance:
 selected source commit, dirty flag, source hashes, patch and effective-input hashes.
 The hand-written table remains an approximation. The lexical coverage guard catches

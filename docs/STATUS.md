@@ -1,36 +1,38 @@
 # Status
 
-_Last updated: 2026-11-07; day-3 step 4 implemented, PR awaiting user merge._
+_Last updated: 2026-11-07; day-3 step5 measurements complete; user look decision pending._
 
-**Live:** garden 0.16.0; 0.17.0 remains unreleased.
-**Direction:** species chosen by data; looks are not biological validation.
+**Live:** garden0.16.0;0.17.0 unreleased. Looks are not biological validation.
 
-## Day 3
-- Steps1–3 (#65–#67) merged by user; all eight rulings approved.
-- Step4: codex/day3-b1-baseline, growth source a903d11; registration8487d61, ADR0061.
-- Fresh B1: actual garden width160, recruits0.25, seeds1–20, 300 seasons, crown v2.
-- Frozen counts floor100/hd300/crown_v2/plateau **0/0/14/12**; future bars **−2/−2/12/10**.
-- First two relative constraints are vacuous; absolute floor/H-D failures remain, not validation.
-- Versus old B0 bars0/1/13/9: still FAIL hd300; floor at its limit.
-- All20 executed inputs match; all20 outcomes reproduce step3 (examined seeds, not held-out).
-- B1 median metamers20066,923; candidate budget≤83,653.75 (1.25×), separate from verdict.
-- Historical B0 quarter-cap control20/20: live300229→57, hornbeam share42.64%→20.35%.
-- B1 hornbeam12.54%; later contrast includes other changes. Planted alive30037/120→34/120→36/120.
-- B1 CPU4,347.572s; E2 nine-condition proxy10.869CPUh; layered cost remains unmeasured.
-- 177 analysis tests and foreground check:stamp green. No engine/params/preset/golden changes.
-- Beech N1 passes27/40 survival, H15042.622m, D150.238928 near lower edge; soft crown-base gap remains.
-- Checkpoint v3 retains v1/v2 readers; crown v2 default; holly dead keys removed.
+## Day3
+- Steps1–4 (#65–#68) merged by user; all eight rulings approved conditionally as recorded.
+- Step5 branch codex/day3-oak-n3, basefe1c049; gates7e08e75; fixed T55p25, no tuning.
+- Production oak remains current until user prefers N3's fan; then adoption/integration checks are required.
+- Fresh lone10001–10020: N3 D medians.219915/.174370 at100/150, bar.16–.59.
+- Age150 D near lower edge; per-seed D coverage14/20 and11/20, not held-out descriptor validation.
+- W/H.723886/.731511 in.55–.82; H33.024/33.184m≤42.9/48.4; all20 survive.
+- Lone kink medians2.5/3.0≤3: age150 **at its limit**. Examined31–50 remains separate evidence.
+- Garden150 kinks2.5≤4 among10/12 planted oaks,10/20 eligible seeds; current1.5, worst34 vs N3 6.
+- G-forest vs B1:0/1/14/12 vs bars−2/−2/12/10 PASS; first two constraints remain vacuous.
+- Separate metamers20063,852.5/66,923=.954119×≤1.25×. Absolute floor band still0/20.
+- Corrected worker-swap memory12/12<230MB; N3 max224.920MB, current225.837MB; all restored hashes match.
+- Two invalid coexistence readings retained; actual save-free/swap/restore protocol registeredb83eb59 before reruns.
+- Specimen cost flags+21.8%/28.7% metamers on canonical seeds2/9; fresh20 lone median+18% at150.
+- Phone garden timing+27.5% did not repeat (1.020×/.920×); no phone-soak/performance validation claim.
+- Four fixed shared-scale sheets at100/150 leaf-on/off; all8 rendering repeat hashes match.
+- 180 analysis tests, foreground stamped check green; named regressions unchanged; no goldens changed.
 
 ## Next, serially, user merges each PR
-1. Merge step4; step5 oak N3: candidate DAG, fresh gates and user sheet preference.
-2. Step6 layered wood/E2: registered gates then user adoption decision.
-3. Step7 RC: fresh-process budget, notes and user phone soak.
-4. Step8 beech held-out programme; gated sycamore/ash adoption at unchanged planting density.
+1. User chooses current vs N3 on sheets; finish step5 PR, then user merges it.
+2. Step6 layered wood/E2: registered gates, then user adoption decision.
+3. Step7 RC: fresh-process budget, release notes and user's phone soak; no tag/deploy.
+4. Step8 beech held-out programme; gated sycamore/ash adoption at unchanged density.
 
 ## Gotchas
-- Frozen reference: analysis/treesim/baselines/B1-v2.json; ADR0061; step4 experiment note.
-- Historical b0 worktree retained; raw records runs/day3-step4; no tuning in this step.
-- CLI params are patches: omitted optional fields do not clear inherited preset values.
-- Before runs commit gates/cards; check DAG/sweep before tuning; ≥20 seeds per effect claim.
-- Foreground check:stamp before commits; regressions after behaviour changes; intended goldens need reasons.
-- No agent merge/tag/deploy or site-main push; never merge preview-3d. Next step waits for user merge.
+- Fixed reference analysis/treesim/baselines/B1-v2.json (ADR0061); never fit/rebaseline to a candidate.
+- Results docs/experiments/2026-11-07-day3-step5.md; raw records runs/day3-step5; b0 retained.
+- Use worker intoCheckpoint/free before specimen; two live worlds mismeasure ADR0026's budget.
+- CLI params are patches; missing optional keys do not clear inherited preset values.
+- Commit gates/cards before runs; candidate DAG before tuning; effect claims≥20seeds.
+- Foreground check:stamp before every commit; regressions after behaviour changes; intended goldens need reasons.
+- No agent merge/tag/deploy/site-main push; never merge preview-3d. Step6 waits for user merge.

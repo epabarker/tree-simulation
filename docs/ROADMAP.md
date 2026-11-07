@@ -202,4 +202,10 @@ Day-3 step 4 (2026-11-07): ADR0061 freezes B1 at actual garden recruits0.25,
 width160,20seeds,300seasons,crownv2. Counts0/0/14/12; relative bars−2/−2/12/10
 (first two vacuous; absolute misses retained). Historical B0 cap-only control
 reduces hornbeam share42.64%→20.35%; B1 is12.54%, including later changes.
-177 analysis tests; no growth changes. See day-3 step-4 experiment note. PR awaits user merge.
+177 analysis tests; no growth changes. See day-3 step-4 experiment note. Merged (#68).
+
+Day-3 step5 (2026-11-07): fixed N3 passes fresh20 lone median gates (kinks150 at
+its limit; D150 near lower edge), examined garden kink gate, G-forest vs frozenB1
+and corrected worker-swap memory12/12<230MB.180 analysis tests pass. User sheet
+preference pending; current oak remains unchanged, no species-validation claim.
+See the day-3 step-5 experiment note for per-seed coverage and specimen cost flags.

@@ -30,4 +30,5 @@ Replace `X` with the principle id (e.g. `C2`).
    - Add a colour mode or overlay if §8 lists a diagnostic for it.
    - Expose any new per-metamer field through `rust/core/src/snapshot.rs` and `Snapshot` in `src/core/types.ts`.
 8. **CLI and analysis.** If there are new metrics, add them to `rust/core/src/metrics.rs` and `METRIC_COLUMNS` (`types.ts`). Add an `analysis/experiments/` script if the milestone has an analysis check.
-9. **Docs.** Update the ROADMAP tracing row, then use `/wrap-up`.
+9. **DAG.** When parameter reads or gates change, update `analysis/treesim/build_dag.py`, run its parameter-read coverage test, and regenerate the DAG on the candidate's actual lone and garden stand parameters before choosing a tuning knob. Record source/input hashes and sweep sign/size in the step's knob card.
+10. **Docs.** Update the ROADMAP tracing row, then use `/wrap-up`.

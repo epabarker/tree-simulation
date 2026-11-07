@@ -1,6 +1,6 @@
 """Batch runs and analysis for the tree simulation.
 
-The simulation itself lives in TypeScript (src/core); this package runs it headless through
+The simulation itself lives in Rust (rust/core); this package runs it headless through
 `node cli/run.ts` and loads the CSV it writes into polars.
 """
 

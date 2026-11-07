@@ -2,6 +2,13 @@
 
 Copied out of a session scratchpad, which is gone. Shell scripts and some Python files still name that scratchpad (`/tmp/claude-1000/...`) or agent worktrees. Treat them as a record and edit the paths before reuse. The gate tools in `gates/` are the exception: they run from here.
 
+## Maintained successors (day-3 step 1)
+
+The originals below are historical records. Maintained G-forest, DAG, sweep and on-demand E3 tools
+are now in [analysis/treesim](../../../../analysis/treesim/INSTRUMENTS.md). G-forest's successor fixes
+the four-check VERDICT and leaves all-tree H/D diagnostic. Both crown versions remain available;
+crown v1 remains the default until day-3 step 2. Existing baseline JSON is unchanged.
+
 ## gates/: G-forest and crown v2
 
 - **`evidence2.py`:** G-forest (floor100, hd300, crown, plateau) with crown v1 and v2 side by side.

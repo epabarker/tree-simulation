@@ -4,6 +4,21 @@ _Built on the night of 6–7 Nov 2026 (N6, [night plan](../plans/2026-11-06-nigh
 
 ![The model DAG: params, principles in §6 order, state and outcomes](../experiments/figures/2026-11-07-model-dag.png)
 
+## Durable tools (day-3 step 1, 2026-11-07)
+
+The historical analysis below remains the night2 result at c6b60df. The maintained tools now live in
+`analysis/treesim/`: `build_dag.py`, `dump_effective.ts`, `sweep_effects.py`, and `dead_overrides.py`.
+See [usage and limitations](../../analysis/treesim/INSTRUMENTS.md). The builder regenerates missing
+inputs and evaluates **separate lone and actual garden stand params**, recording source commits,
+dirty status, source/input hashes and candidate patches. It no longer substitutes assumed forest
+settings for the garden's O2/O4 settings. Its lexical parameter-read coverage test catches stale
+entries but does not prove the hand-written gates correct. Re-evaluate after a candidate opens a gate.
+
+An unchanged hash in E3 means **no observed effect at this setting**, never a proof of deadness.
+E3 uses 20 seeds per perturbation/context, 150-season lone trials and 300-season garden stands;
+it runs only on demand, outside the regular checks. No E3 simulation result was produced by the
+promotion. The old three-seed sweep remains a probe selector, not adoption evidence.
+
 ## What it is
 
 - **One season is a DAG.** It has 23 steps of `run_season` in spec §6's phase order:

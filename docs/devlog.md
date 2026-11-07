@@ -2,6 +2,35 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-07: day-3 step5 — N3 evaluated; user retains current oak
+
+User merged #68. Gates/patch committed7e08e75 on merged fe1c049; exact candidate
+DAG evaluated before simulation. Fresh unused lone10001–10020;31–50 labelled
+previously examined. N3 passes all8 median gates: D.219915/.174370, W/H.723886/
+.731511, H33.024/33.184m, kinks2.5/3.0 (150 **at its limit**). D150 near lower
+bar; per-seed D coverage14/20 and11/20 remains descriptive. Garden150 median
+2.5≤4,10/12 planted oak alive across10/20 eligible seeds; current median1.5,
+maximum34 versusN3 6. No tuning or new mechanism. [Full methods/results](experiments/2026-11-07-day3-step5.md).
+
+G-forest0/1/14/12 against B1 bars−2/−2/12/10 passes; first two bars vacuous,
+absolute floor remains0. Separate metamers63,852.5/66,923=.954119×. Exact-hash
+cache correctly regenerated40 lone comparators under the new binary digest.
+
+Corrected memory12/12<230MB, N3 maximum224.920MB; all restored hashes match.
+Initial helper wrongly retained two live worlds; two readings discarded and an
+in-flight case stopped. Protocol correctionb83eb59 committed before all12 reruns;
+raw invalid outputs retained. Correct worker intoCheckpoint/free→specimen→restore,
+with unchanged seeds/seasons/bar, reproduces the invalid cases' growth hashes2/2.
+Specimen metamers+21.8%/+28.7% on canonical seeds2/9, a recorded structural cost.
+Phone garden timing+27.5% did not repeat in two preregistered exact-case pairs.
+
+180 analysis tests, stamped checks green; named regressions unchanged. Four
+shared-scale WebGL2 sheets, all8 capture repeat hashes match. Production params,
+presets and goldens unchanged. **The user chose retain current oak** on the fixed
+sheets. N3 is not adopted despite meeting the quantitative gates: a look decision,
+not a quantitative failure or species validation. No further tuning in this step.
+STATUS/ROADMAP updated; no merge, tag or deployment. Step6 awaits step5's user merge.
+
 ## 2026-11-07: day-3 step 4 — freeze B1 and isolate the recruit cap
 
 User merged #67. Registered ADR0061/gates/knob card at **8487d61** before runs,

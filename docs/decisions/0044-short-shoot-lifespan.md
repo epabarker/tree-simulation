@@ -1,6 +1,6 @@
 # 0044: A lifespan for short shoots (r6.lifespan)
 
-- **Status:** accepted (the user, 2026-11-02) for beech at `r6.lifespan` 20; proposed earlier the same day. No other species sets it.
+- **Status:** optional mechanism retained; the beech age-20 setting is superseded by [ADR 0060](0060-beech-lifespan-off.md) (the user, day-3 ruling 1, 2026-11-07). Originally accepted for beech on 2026-11-02. The evidence below is historical.
 - **Date:** 2026-11-02
 - **Spec:** §R6 (short shoots), §R4 (dormant buds' lifespan, L_dorm), §C5 (shedding)
 - **Round:** [the brief](../plans/2026-11-02-beech-round2.md), Part 2; [the diagnosis](../experiments/2026-11-02-beech-round2-stand-diagnosis.md)

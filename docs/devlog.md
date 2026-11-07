@@ -2,6 +2,38 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-07: step-3 results and wrap-up
+
+N1 passes its fixed gates: survival27/40≥20/40 (control6/40), H15042.622m in26–44.3,
+D1500.238928 in.22–.77, near lower edge. G-forest **FAILS** only the approved interim
+H/D miss: counts0/0/14/12 vs bars0/1/13/9; floor at its limit. Budget0.954×≤1.25×.
+Soft cbG remains below band; starvation-consistent deaths28→1. No look validation claim.
+
+Discarded all40 invalid native lone trials after finding periodic-width preset leakage;
+replacement full-precision WASM trials reproduce historical first-ten H42.1/D.246.
+The correction was committed before replacement runs; no gate/parameter changes.
+176 analysis tests, full stamped check (103 Vitest tests), build green; both named
+regressions unchanged. Exactly two intended beech goldens updated. Historical prototype-off
+fixture restores its original lifespan20, preserving that historical expected hash.
+STATUS/ROADMAP/ADR0060 updated. Full results: experiments/2026-11-07-day3-step3.md.
+Step4 awaits the user's merge. No merge, tag or deployment.
+
+## 2026-11-07: day-3 step 3 — beech lifespan off
+
+Step 2 (#66) merged by the user. Registered gates/knob card at **8a04b10** before
+runs on merged `3d-port` **2c1a2cb**. The user approved ruling 1: remove only beech's
+`r6.lifespan` 20, amending ADR 0044. R6 stays enabled with its existing qMin/leafArea;
+R4's dormancy clock and all branch-carbon/light shedding stay active.
+
+**Intended golden change:** beech can retain sufficiently lit short shoots on old
+wood, so its `beechOpen:seed1:s40` and `beechWood:seed1:s30` trajectories may change.
+Rebuild WASM before `npm run golden:update`; audit every changed case and retain
+only intended changes. No Rust growth-rule modification or new mechanism is proposed.
+
+The adopter explicitly strips beech's legacy key so its whole-patch merge does not
+resurrect it. Only nine exported copies lose the beech lifespan leaf. N1's before/
+candidate runs and G-forest against B0 are being measured; B1 belongs to step 4.
+
 ## 2026-11-07: day-3 step 2 — checkpoint v3, crown v2 and holly's dead keys
 
 Step 1 (#65) merged by the user. Step-2 gates/knob cards committed at **7c66114**

@@ -59,6 +59,8 @@ fn every_golden() {
 /// broadleaves take the rules as species params (ADR 0055), which a world patch does not reach, so
 /// the off patch goes onto every species too, and the presets with species are held to their
 /// hashes before the adoption (0.16.0, d2c4f53); forest has no species and keeps its golden.
+/// That historical beech had lifespan 20 (ADR 0044), restored only in this historical fixture
+/// after its approved removal (ADR 0060). The ordinary golden above checks today's params.
 /// mixedWood is left out: its hornbeam also takes the height patch (r2.dLambda, R1's sink), which
 /// is not one of these rules; oakOpen's 15 seasons fall before oak's new maturity.
 #[test]
@@ -83,7 +85,16 @@ fn the_prototype_rules_written_as_off_keep_the_goldens() {
         let species = params.get("species").and_then(Value::as_object).map(|t| {
             Value::Obj(
                 t.iter()
-                    .map(|(name, patch)| (name.clone(), json::merge(patch, &off)))
+                    .map(|(name, patch)| {
+                        let mut patch = json::merge(patch, &off);
+                        if parts[0] == "beechOpen" && name == "beech" {
+                            patch = json::merge(
+                                &patch,
+                                &json::parse(r#"{"r6":{"lifespan":20}}"#).unwrap(),
+                            );
+                        }
+                        (name.clone(), patch)
+                    })
                     .collect(),
             )
         });

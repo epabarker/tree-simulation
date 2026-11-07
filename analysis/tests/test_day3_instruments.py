@@ -235,3 +235,15 @@ def test_holly_cleanup_leaves_all_vigour_consumers_closed():
         assert not build_dag.vig_drop(p, context)
         assert not build_dag.light_ortho(p, context)
         assert not build_dag.tvig(p, context)
+
+
+def test_beech_lifespan_removal_keeps_short_shoots_enabled():
+    import tomllib
+    data = json.loads((ROOT / 'rust/presets.json').read_text())
+    beech = data['presets']['mixedWood']['species']['beech']
+    assert beech['r6']['enabled']
+    assert 'lifespan' not in beech['r6']
+    assert beech['r6']['qMin'] == pytest.approx(.01257)
+    assert beech['r6']['leafArea'] == pytest.approx(2.474)
+    overrides = tomllib.loads((ROOT / 'analysis/fit/hand-overrides.toml').read_text())['beech']
+    assert 'r6.lifespan' not in overrides

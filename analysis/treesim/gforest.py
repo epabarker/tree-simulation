@@ -300,7 +300,7 @@ def markdown(g):
     L = [f"# Evidence: {g['label']}", "",
          f"Worktree `{g['worktree']}`, width {g['width']}, seeds {g['seeds'][0]}-{g['seeds'][-1]} (N={N}), {g['seasons']} seasons. Patch: `{json.dumps(g['patch'])}`", "",
          "| check | pass (of N) | distribution |", "|---|---|---|",
-         f"| floor at 100 in 2-10% (faces 0.2: out of band by construction) | {P['floor100']} | {ds(D['floor100'])} |",
+         f"| floor at 100 in 2-10% | {P['floor100']} | {ds(D['floor100'])} |",
          f"| H/D at 300 in 60-80 | {P['hd300']} | {ds(D['hd300'])} |",
          f"| H/D at 300 over ALL live trees incl. recruits (extra) | {P['hd300_all']} | {ds(D['hd300_all'])} |",
          f"| crown base: stand LCR < lone's at 150 and 300 | {P['crown']} | stand-lone at 300: {ds(D['lcr300_minus_lone'])} |",

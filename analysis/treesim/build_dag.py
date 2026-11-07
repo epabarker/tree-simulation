@@ -882,11 +882,14 @@ def main():
     ap.add_argument("--width", type=int, default=160)
     ap.add_argument("--seed", type=int, default=1)
     ap.add_argument("--no-figures", action="store_true")
+    ap.add_argument("--stand-params", type=Path, help="full prepared stand JSON; actual lone worlds remain unchanged")
     a = ap.parse_args()
     OUT = a.out.resolve()
     OUT.mkdir(parents=True, exist_ok=True)
     repo = a.worktree.resolve()
     cmd = ["node", str(Path(__file__).with_name("dump_effective.ts")), str(repo), str(OUT), str(a.width), str(a.seed)]
+    if a.stand_params:
+        cmd.append(str(a.stand_params.resolve()))
     subprocess.run(cmd, check=True)
     from .gforest import apply_patch
     patch = json.loads(a.patch.read_text()) if a.patch else {}
@@ -903,7 +906,8 @@ def main():
     EFF = EFFECTIVE["lone"]
     PROVENANCE = {**provenance(repo), "width": a.width, "seed": a.seed, "patch": patch,
                   "effective_sha256": {c: file_hash(OUT / f"species_effective_{c}.json") for c in CONTEXTS},
-                  "edge_table_sha256": file_hash(Path(__file__)), "hand_written": True}
+                  "edge_table_sha256": file_hash(Path(__file__)), "hand_written": True,
+                  "stand_params_sha256": file_hash(a.stand_params) if a.stand_params else None}
     MAKE_FIGURES = not a.no_figures
     render()
     (OUT / "provenance.json").write_text(json.dumps(PROVENANCE, indent=2) + "\n")

@@ -206,6 +206,6 @@ reduces hornbeam share42.64%→20.35%; B1 is12.54%, including later changes.
 
 Day-3 step5 (2026-11-07): fixed N3 passes fresh20 lone median gates (kinks150 at
 its limit; D150 near lower edge), examined garden kink gate, G-forest vs frozenB1
-and corrected worker-swap memory12/12<230MB.180 analysis tests pass. User sheet
-preference pending; current oak remains unchanged, no species-validation claim.
+and corrected worker-swap memory12/12<230MB.180 analysis tests pass. User chose **retain current oak** on the sheets; N3 is not adopted. This is a look
+decision, with no species-validation claim. Step5 PR #69 awaits user merge.
 See the day-3 step-5 experiment note for per-seed coverage and specimen cost flags.

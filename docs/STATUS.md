@@ -1,13 +1,13 @@
 # Status
 
-_Last updated: 2026-11-07; day-3 step5 measurements complete; user look decision pending._
+_Last updated: 2026-11-07; day-3 step5 complete; PR #69 awaiting user merge._
 
 **Live:** garden0.16.0;0.17.0 unreleased. Looks are not biological validation.
 
 ## Day3
 - Steps1–4 (#65–#68) merged by user; all eight rulings approved conditionally as recorded.
 - Step5 branch codex/day3-oak-n3, basefe1c049; gates7e08e75; fixed T55p25, no tuning.
-- Production oak remains current until user prefers N3's fan; then adoption/integration checks are required.
+- User chose **retain current oak** on the fixed sheets; N3 is not adopted. This is a look decision.
 - Fresh lone10001–10020: N3 D medians.219915/.174370 at100/150, bar.16–.59.
 - Age150 D near lower edge; per-seed D coverage14/20 and11/20, not held-out descriptor validation.
 - W/H.723886/.731511 in.55–.82; H33.024/33.184m≤42.9/48.4; all20 survive.
@@ -23,7 +23,7 @@ _Last updated: 2026-11-07; day-3 step5 measurements complete; user look decision
 - 180 analysis tests, foreground stamped check green; named regressions unchanged; no goldens changed.
 
 ## Next, serially, user merges each PR
-1. User chooses current vs N3 on sheets; finish step5 PR, then user merges it.
+1. User merges step5 PR #69; then step6 starts with current oak.
 2. Step6 layered wood/E2: registered gates, then user adoption decision.
 3. Step7 RC: fresh-process budget, release notes and user's phone soak; no tag/deploy.
 4. Step8 beech held-out programme; gated sycamore/ash adoption at unchanged density.

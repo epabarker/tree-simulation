@@ -23,7 +23,7 @@ def evidence():
 def test_diagnostic_counts_cannot_fail_gforest(capsys):
     base, new = evidence(), evidence()
     new['pass']['hd300_all'] = 0
-    new['pass']['crown_v2'] = 0  # v1 remains authoritative until step 2
+    new['pass']['crown'] = 0  # v1 is diagnostic under the v2 default
     new['dist']['metamers200']['median'] *= 2
     assert gforest.compare(base, new)
     output = capsys.readouterr().out
@@ -49,6 +49,7 @@ def test_selected_crown_version_is_the_only_crown_gate():
     base, new = evidence(), evidence()
     new['pass']['crown'] = 0
     assert not gforest.compare(base, new, 1)
+    assert gforest.compare(base, new)
     assert gforest.compare(base, new, 2)
 
 
@@ -202,3 +203,35 @@ def test_coverage_guard_checks_option_and_borrowed_level_aliases():
 def test_coverage_removing_an_existing_level_read_is_detected():
     reduced = [row for row in build_dag.PARAMS if row[0] != 'r2.levels[k].dLambdaShare']
     assert any('r2.levels[k].dLambdaShare' in rows for rows in missing_reads(ROOT, reduced).values())
+
+
+def test_crown_v2_is_cli_default_and_v1_is_explicitly_available(tmp_path):
+    base, new = evidence(), evidence()
+    new['pass']['crown'] = 0
+    base_path, new_path = tmp_path / 'base.json', tmp_path / 'new.json'
+    base_path.write_text(json.dumps(base))
+    new_path.write_text(json.dumps(new))
+    cmd = [sys.executable, '-m', 'treesim.gforest', 'compare', str(base_path), str(new_path)]
+    default = subprocess.run(cmd, text=True, capture_output=True)
+    legacy = subprocess.run(cmd + ['--crown-version', '1'], text=True, capture_output=True)
+    assert default.returncode == 0
+    assert 'crown v2' in default.stdout
+    assert legacy.returncode == 1
+    assert 'crown v1' in legacy.stdout
+
+
+def test_holly_cleanup_leaves_all_vigour_consumers_closed():
+    import tomllib
+    from treesim.gforest import deep_merge
+    data = json.loads((ROOT / 'rust/presets.json').read_text())
+    p = copy.deepcopy(data['presets']['mixedWood'])
+    holly = p['species']['holly']
+    keys = {'vigourTreeLo', 'vigourTreeHi'}
+    assert not keys.intersection(holly['r2'])
+    overrides = tomllib.loads((ROOT / 'analysis/fit/hand-overrides.toml').read_text())['holly']
+    assert not {'r2.' + key for key in keys}.intersection(overrides)
+    deep_merge(p, holly)
+    for context in build_dag.CONTEXTS.values():
+        assert not build_dag.vig_drop(p, context)
+        assert not build_dag.light_ortho(p, context)
+        assert not build_dag.tvig(p, context)

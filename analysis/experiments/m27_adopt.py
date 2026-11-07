@@ -102,6 +102,11 @@ try:
         assign["r1.leafCostShade"] = LEAF_COST_SHADE
         patch = in3d(sp, pool.ask({"amend": sp, "assign": assign})["patch"])
         patches[sp] = broadleaf(sp, patch, overrides.get(sp, {}))
+        # Day-3 ruling 7: amend starts from the current whole species patch, so simply
+        # deleting overrides would otherwise retain these unread legacy thresholds forever.
+        if sp == "holly":
+            for key in ("vigourTreeLo", "vigourTreeHi"):
+                patches[sp].get("r2", {}).pop(key, None)
 finally:
     pool.close()
 

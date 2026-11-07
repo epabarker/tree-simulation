@@ -19,6 +19,12 @@ E3 uses 20 seeds per perturbation/context, 150-season lone trials and 300-season
 it runs only on demand, outside the regular checks. No E3 simulation result was produced by the
 promotion. The old three-seed sweep remains a probe selector, not adoption evidence.
 
+Day-3 step 2 removes holly's unused vigour thresholds with **20/20** unchanged lone hashes
+(seeds 1–20, 150 seasons). All reader gates remain closed in both dumped contexts. L4's deficit
+memory now persists in checkpoint v3 (ADR 0059); the growth graph and hash schema are unchanged.
+The night2 statements below describe their historical inputs; holly's measured deletion awaits
+the user's merge of the step-2 PR.
+
 ## What it is
 
 - **One season is a DAG.** It has 23 steps of `run_season` in spec §6's phase order:

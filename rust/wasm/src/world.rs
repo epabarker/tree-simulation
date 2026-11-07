@@ -85,7 +85,6 @@ impl World {
                 &mut t.load_s,
                 &mut t.stress,
                 &mut t.node_shade,
-                &mut t.deficit,
             ] {
                 *v = Vec::new();
             }

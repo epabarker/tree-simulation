@@ -2,7 +2,7 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { loneParams, newWorld } from "../../cli/trials.ts";
 import { forestParams, specimenParams } from "../../src/core/presets.ts";
-import { wasmMemoryBytes } from "../../src/wasm/world.ts";
+import { RustWorld, wasmMemoryBytes } from "../../src/wasm/world.ts";
 const [mode, condition, seedText, widthText, output] = process.argv.slice(2);
 if (!["lone", "garden", "budget", "params"].includes(mode) || !["current", "n3"].includes(condition)) throw new Error("bad trial");
 const seed = Number(seedText), width = Number(widthText);
@@ -22,12 +22,21 @@ if (mode === "budget") {
   const start = performance.now();
   for (let s = 0; s < 300; s++) { world.step(1, true); world.snapshot(0, { junctions: false, field: false }); }
   const gardenMs = performance.now() - start;
+  const gardenHash = world.hash();
+  const gardenMetamers = world.trees.reduce((n, t) => n + t.m.length, 0);
+  // Exact worker swap (ADR0026): save-and-free before creating the specimen.
+  const aside = world.intoCheckpoint();
   const specimen = newWorld(apply(specimenParams(seed)));
   for (let s = 0; s < 150; s++) { specimen.step(1, true); specimen.snapshot(0, { junctions: false, field: false }); }
+  const specimenHash = specimen.hash(), specimenMetamers = specimen.trees.reduce((n, t) => n + t.m.length, 0);
+  specimen.dispose();
+  const restored = RustWorld.load(aside);
+  restored.resetSnapshots(); restored.snapshot(0, { junctions: false, field: false });
+  if (restored.hash() !== gardenHash) throw new Error("worker swap round-trip hash changed");
   writeFileSync(output, JSON.stringify({ seed, width, condition, gardenMs, totalMs: performance.now() - start,
-    memoryMB: wasmMemoryBytes() / 1e6, gardenMetamers: world.trees.reduce((n, t) => n + t.m.length, 0),
-    specimenMetamers: specimen.trees.reduce((n, t) => n + t.m.length, 0), gardenHash: world.hash(), specimenHash: specimen.hash() }));
-  specimen.dispose(); world.dispose(); process.exit(0);
+    memoryMB: wasmMemoryBytes() / 1e6, checkpointMB: aside.byteLength / 1e6, gardenMetamers,
+    specimenMetamers, gardenHash, specimenHash, restoredHash: restored.hash(), protocol: "worker-save-free-swap-restore" }));
+  restored.dispose(); process.exit(0);
 }
 const columns = ["parent", "slot", "order", "axis", "baseX", "baseY", "baseZ", "hx", "hy", "hz", "length", "radius", "stressWood"] as const;
 const trees = [], survival = [];

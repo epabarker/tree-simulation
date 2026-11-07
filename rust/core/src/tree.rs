@@ -327,8 +327,8 @@ pub struct Tree {
     pub stress: Vec<f64>,
     pub node_shade: Vec<f64>,
     /// Consecutive seasons each metamer's subtree has run P_b < M_b (R1's `kShed`). Kept beside
-    /// the table, not in it, so the state hash and checkpoints are unchanged; a restored
-    /// checkpoint starts it at 0.
+    /// the table so the existing state-hash schema stays unchanged. Checkpoint v3 persists it
+    /// separately (ADR 0059); old v1/v2 checkpoints initialise the missing history to zero.
     pub deficit: Vec<f64>,
     pub released: f64,
     pub epicormic: f64,

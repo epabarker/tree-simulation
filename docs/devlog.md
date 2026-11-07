@@ -2,6 +2,42 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-07: day-3 step 2 — checkpoint v3, crown v2 and holly's dead keys
+
+Step 1 (#65) merged by the user. Step-2 gates/knob cards committed at **7c66114**
+before runs, on merged `3d-port` **8995f73**. User rulings 3, 6 and 7.
+[Results and reproduction](experiments/2026-11-07-day3-step2.md); ADR **0059**.
+
+- **Checkpoint v3:** aligned float64 deficit counters after each tree's bud columns.
+  Keep v1's planar and v2's original readers; their omitted history starts at zero.
+  New rows without allocated counters write zero. The worker's freeing swap now retains
+  the counters until save; it previously cleared them as disposable scratch.
+- **Tests go beyond the old hash:** native tests compare streaks, surplus resets, future
+  shedding, compaction/remapping, multiple trees, full saved bytes, v2 migration and
+  truncated input. WASM tests cover the same persistence paths and the freeing swap;
+  existing shipped-v1 loading stays green. No growth rule, kShed setting or hash-schema change.
+- **Compatibility fixture:** freeze the original v2 bytes before changing the writer.
+  Its 45 metamers add exactly **360 bytes** (16,584 → 16,944), the registered 8 bytes/metamer.
+- **Crown v2** is authoritative by default in Python and CLI; explicit v1 and both raw counts
+  remain. Tests verify version selection. No new G-forest result or B1 is claimed here.
+- **Holly's vigour thresholds:** delete only r2.vigourTreeLo/Hi. All consumers remain gated
+  off in actual lone/stand DAGs. **20/20** lone final hashes at 150, seeds 1–20, match the
+  frozen pre-change binary/params (**bar 20/20; at its limit by design**). This is deletion
+  at the existing setting, not arbitrary opened-gate settings. Goldens unchanged.
+- **Generator gotcha:** the adopter starts from a whole existing patch; deleting the
+  overrides alone would leave legacy keys behind. The generator now strips those holly-only
+  keys. Export audit: exactly 18 leaf deletions across nine holly copies, no unrelated
+  changes. A second adoption/export is byte-identical and keeps the deletion.
+- **Verification:** foreground `npm run check:stamp` green (Rust checks including the
+  unchanged native goldens; **20 Vitest files / 103 tests**); focused native checkpoint
+  tests **5 passed**, focused WASM checkpoint tests **12 passed**, Python analysis **170 passed**.
+  Both named regressions unchanged (phoneSeed3, forestRegeneration). The first full check
+  hit the existing mixed-wood test's 30-second timeout during concurrent verification;
+  the isolated full retry passed, with **no timeout or gate changes**.
+- **Wrap-up:** STATUS is 36 lines; ROADMAP and architecture updated. No visual change, so no
+  garden sheet/build required locally. Push only the feature branch and open one PR into
+  `3d-port`; step 3 waits for the user's merge. No merge, tag or deployment.
+
 ## 2026-11-07: day-3 step 1 — durable instruments, no simulation change
 
 The user approved the eight day-3 rulings and the full post-box programme (beech first;

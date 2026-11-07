@@ -15,8 +15,8 @@ uv run --project analysis python -m treesim.gforest compare docs/experiments/cod
 uv run --project analysis python -m treesim.gforest reaggregate runs/gforest/evidence.json
 ```
 
-Step 1 retains crown v1 as the CLI default; `--crown-version 2` selects v2.
-Step 2 will change the default. Both counts remain in the JSON and Markdown.
+Crown v2 is authoritative by default (day-3 ruling 3). `--crown-version 1`
+selects the historical v1 comparison explicitly. Both counts remain in JSON and Markdown.
 V2 uses five lone comparator seeds per species, then tests the stand outcome over
 20 seeds; it is not a claim about a population from five seeds. Comparison requires
 matching N ≥20. Seeds/configuration used for tuning are not independent evidence.

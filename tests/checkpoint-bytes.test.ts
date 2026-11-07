@@ -62,7 +62,7 @@ describe("checkpoints round-trip and grow on alike", () => {
     for (const t of trees) {
       for (let i = 0; i < t.m.length; i++) expect(t.m.cols.hz[i]).toBe(0); // in the plane
     }
-    // Saved again it is version 2, which loads back to the same bytes.
+    // Saved again it is version 3, which loads back to the same bytes.
     const again = a.save();
     expect(same(RustWorld.load(again).save(), again)).toBe(true);
     const b = RustWorld.load(bytes);

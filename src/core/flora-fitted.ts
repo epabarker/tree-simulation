@@ -588,8 +588,6 @@ export const FITTED_FLORA = {
       relayCrowd: 10,
       forkAt: 1.3,
       forkAngle: 45,
-      vigourTreeLo: 3000,
-      vigourTreeHi: 10000,
     },
     r3: {
       enabled: true,

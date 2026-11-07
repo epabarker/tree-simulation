@@ -17,6 +17,8 @@ nested dict is deep-merged (arrays replaced whole). Applied to the dumped params
 so it reaches the stand AND the lone comparators. (treesim's own --species-patch merges one level
 only: {"r2": {...}} replaces the species' whole r2 incl. levels, so dotted paths via this script are safer.)
 
+Comparison defaults to crown v2 (species-matched, five lone seeds); v1 stays explicitly selectable.
+
 Checks (thresholds from docs/experiments/code/2026-10-30-form/evidence.py, same measures):
   floor100  1 - mean shade of light.csv row 0 at season 100 in [0.02, 0.10]
   hd300     median slenderness of planted trees alive at 300 in [60, 80]
@@ -318,7 +320,7 @@ def markdown(g):
     return "\n".join(L) + "\n"
 
 
-def compare(base, new, crown_version=1):
+def compare(base, new, crown_version=2):
     """Four hard counts only. All-tree H/D and composition never change the verdict."""
     crown = "crown_v2" if crown_version == 2 else "crown"
     checks = ("floor100", "hd300", crown, "plateau")
@@ -357,7 +359,7 @@ def main():
     r.add_argument("--out", required=True); r.add_argument("--label", default="run")
     ra = sub.add_parser("reaggregate"); ra.add_argument("json")
     c = sub.add_parser("compare"); c.add_argument("base"); c.add_argument("new")
-    c.add_argument("--crown-version", type=int, choices=(1, 2), default=1)
+    c.add_argument("--crown-version", type=int, choices=(1, 2), default=2)
     a = ap.parse_args()
     if a.cmd == "reaggregate":  # recompute pass/dist/md from an evidence.json's per_seed
         g = json.load(open(a.json))

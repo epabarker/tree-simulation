@@ -4,7 +4,9 @@
 //! flags, event log and queue, each tree's root, scalar fields and table lengths), padding to 8
 //! bytes, then for each tree its metamer columns and its bud columns in schema order, each the
 //! rows in use, padded to 8 bytes. The light field, the owner grid and the per-season scratch are
-//! rebuilt by the season that reads them.
+//! rebuilt by the season that reads them. Version 3 (ADR 0059) appends one little-endian f64
+//! deficit counter per metamer after each tree's bud columns. These counters persist across
+//! seasons (R1/C5's kShed); absent counters in versions 1 and 2 start at zero.
 //!
 //! **Version 2** (I2, ADR 0025) is the 3D schema. **Version 1**, the 2D core's (the TypeScript
 //! core's, and garden 0.14.0's opening forests), still loads: each angle becomes a heading in the
@@ -16,7 +18,7 @@ use crate::json::{self, Value};
 use crate::tree::{ColMut, NUMBERS, SCALARS, Tree};
 use crate::world::World;
 
-const VERSION: f64 = 2.0;
+const VERSION: f64 = 3.0;
 
 /// The 2D schema (version 1): (name, size in bytes) of each column, in its order.
 const METAMERS_V1: [(&str, usize); 19] = [
@@ -114,6 +116,11 @@ pub fn save_world(world: &World) -> Vec<u8> {
             out.extend_from_slice(&col.bytes());
             out.resize(pad8(out.len()), 0);
         }
+        // Newly grown rows may not have taken part in carbon shedding yet.
+        for i in 0..t.m.len() {
+            out.extend_from_slice(&t.deficit.get(i).copied().unwrap_or(0.0).to_le_bytes());
+        }
+        out.resize(pad8(out.len()), 0);
     }
     out
 }
@@ -179,7 +186,7 @@ pub fn load_world(bytes: &[u8]) -> Result<World, CheckpointError> {
     let header = json::parse(text).map_err(|e| CheckpointError(e.to_string()))?;
     let num = |v: &Value, k: &str| v.get(k).and_then(Value::as_f64).unwrap_or(0.0);
     let version = num(&header, "version");
-    if version != VERSION && version != 1.0 {
+    if version != VERSION && version != 2.0 && version != 1.0 {
         return Err(CheckpointError(format!("unknown version {version}")));
     }
     let mut at = pad8(4 + len);
@@ -206,6 +213,7 @@ pub fn load_world(bytes: &[u8]) -> Result<World, CheckpointError> {
         let (nm, nb) = (num(h, "metamers") as usize, num(h, "buds") as usize);
         if version == 1.0 {
             load_v1(&mut tree, nm, nb, bytes, &mut at)?;
+            tree.deficit.resize(nm, 0.0);
             trees.push(tree);
             continue;
         }
@@ -216,6 +224,10 @@ pub fn load_world(bytes: &[u8]) -> Result<World, CheckpointError> {
         tree.b.set_len(nb);
         for col in tree.b.columns_mut() {
             fill(col, nb, bytes, &mut at)?;
+        }
+        tree.deficit.resize(nm, 0.0);
+        if version == VERSION {
+            fill(ColMut::F64(&mut tree.deficit), nm, bytes, &mut at)?;
         }
         trees.push(tree);
     }
@@ -342,4 +354,123 @@ fn load_v1(
         b.v[i] = c("v", i);
     }
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::hash::hash_world;
+    use crate::params::Params;
+    use crate::principles::c5::tests::small_tree;
+    use crate::principles::c5::{remove_branches, shed_branches};
+    use crate::testing::{LEFT, metamer, preset};
+    use crate::tree::slot;
+
+    fn carbon_world() -> World {
+        let params = preset(
+            "default",
+            r#"{"r1":{"enabled":true,"shed":"carbon","kShed":3},"c5":{"enabled":true,"Trel":0,"g":0},"r4":{"enabled":false}}"#,
+        );
+        let p = Params::from_json(&params);
+        let mut w = World::new(params);
+        w.trees = vec![small_tree(&p)];
+        w.season = 4.0;
+        w
+    }
+
+    fn carbon_season(w: &mut World, deficit: bool) -> f64 {
+        w.season += 1.0;
+        let p = w.rules.params.clone();
+        let t = &mut w.trees[0];
+        let n = t.m.len();
+        t.ensure_scratch();
+        t.p_sum = (0..n)
+            .map(|i| if i >= 2 && deficit { 1.0 } else { 10.0 })
+            .collect();
+        t.m_sum = vec![2.0; n];
+        shed_branches(t, &p, w.season, n)
+    }
+
+    #[test]
+    fn deficit_streak_survives_a_checkpoint_and_sheds_on_the_same_season() {
+        let mut straight = carbon_world();
+        assert_eq!(carbon_season(&mut straight, true), 0.0);
+        assert_eq!(carbon_season(&mut straight, true), 0.0);
+        assert_eq!(straight.trees[0].deficit, vec![0.0, 0.0, 2.0, 2.0]);
+        let mut restored = load_world(&save_world(&straight)).unwrap();
+        assert_eq!(restored.trees[0].deficit, straight.trees[0].deficit);
+        assert_eq!(carbon_season(&mut straight, true), 2.0);
+        assert_eq!(carbon_season(&mut restored, true), 2.0);
+        assert_eq!(hash_world(&restored), hash_world(&straight));
+        assert_eq!(save_world(&restored), save_world(&straight));
+    }
+
+    #[test]
+    fn surplus_resets_restored_deficits_and_the_next_streak_restarts() {
+        let mut straight = carbon_world();
+        carbon_season(&mut straight, true);
+        carbon_season(&mut straight, true);
+        let mut restored = load_world(&save_world(&straight)).unwrap();
+        for w in [&mut straight, &mut restored] {
+            assert_eq!(carbon_season(w, false), 0.0);
+            assert_eq!(w.trees[0].deficit, vec![0.0; 4]);
+            assert_eq!(carbon_season(w, true), 0.0);
+            assert_eq!(carbon_season(w, true), 0.0);
+            assert_eq!(carbon_season(w, true), 2.0);
+        }
+        assert_eq!(save_world(&restored), save_world(&straight));
+    }
+
+    #[test]
+    fn counters_follow_compaction_and_round_trip_for_multiple_trees() {
+        let mut w = carbon_world();
+        let p = w.rules.params.clone();
+        let t = &mut w.trees[0];
+        let lat = metamer(t, 0, LEFT, 1.0, 1.0, p.c6.r0, 0.0);
+        metamer(t, lat as i32, slot::MAIN, 1.0, 1.0, p.c6.r0, 0.0);
+        t.deficit = vec![0.0, 0.0, 7.0, 8.0, 1.0, 2.0];
+        let mut dead = vec![0, 0, 1, 0, 0, 0];
+        assert_eq!(remove_branches(t, &mut dead, &p, &mut []), 2.0);
+        assert_eq!(t.deficit, vec![0.0, 0.0, 1.0, 2.0]);
+        let mut other = small_tree(&p);
+        other.id = 1;
+        // A counter vector can be shorter than newly appended rows or entirely unallocated.
+        other.deficit = vec![1.0];
+        w.trees.push(other);
+        let mut inactive = small_tree(&p);
+        inactive.id = 2;
+        w.trees.push(inactive);
+        let bytes = save_world(&w);
+        let restored = load_world(&bytes).unwrap();
+        assert_eq!(restored.trees[0].deficit, vec![0.0, 0.0, 1.0, 2.0]);
+        assert_eq!(restored.trees[1].deficit, vec![1.0, 0.0, 0.0, 0.0]);
+        assert_eq!(restored.trees[2].deficit, vec![0.0; 4]);
+        assert_eq!(save_world(&restored), bytes);
+    }
+
+    #[test]
+    fn pre_change_v2_fixture_loads_with_zero_deficits_and_migrates_to_v3() {
+        let bytes = include_bytes!("../../../tests/fixtures/checkpoint-v2.bin");
+        let loaded = load_world(bytes).unwrap();
+        assert_eq!(loaded.season, 3.0);
+        assert_eq!(hash_world(&loaded), "f46fef77");
+        for t in &loaded.trees {
+            assert_eq!(t.deficit, vec![0.0; t.m.len()]);
+        }
+        let migrated = save_world(&loaded);
+        assert_eq!(save_world(&load_world(&migrated).unwrap()), migrated);
+    }
+
+    #[test]
+    fn truncated_v3_counter_column_is_rejected() {
+        let mut bytes = save_world(&carbon_world());
+        bytes.pop();
+        assert!(
+            load_world(&bytes)
+                .err()
+                .unwrap()
+                .0
+                .contains("truncated columns")
+        );
+    }
 }

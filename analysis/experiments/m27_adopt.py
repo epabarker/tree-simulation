@@ -104,6 +104,10 @@ try:
         patches[sp] = broadleaf(sp, patch, overrides.get(sp, {}))
         # Day-3 ruling 7: amend starts from the current whole species patch, so simply
         # deleting overrides would otherwise retain these unread legacy thresholds forever.
+        # Day-3 ruling 1: absence means lifespan off. The whole-patch amend must
+        # not retain beech's former age-20 key when its override is removed.
+        if sp == "beech":
+            patches[sp].get("r6", {}).pop("lifespan", None)
         if sp == "holly":
             for key in ("vigourTreeLo", "vigourTreeHi"):
                 patches[sp].get("r2", {}).pop(key, None)

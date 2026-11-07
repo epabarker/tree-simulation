@@ -1,36 +1,34 @@
 # Status
 
-_Last updated: 2026-11-07, day-3 step 2 implemented; PR awaiting the user's merge into `3d-port`._
+_Last updated: 2026-11-07; day-3 step 3 implemented, PR awaiting user merge._
 
-**Live:** garden **0.16.0** on edbarker.dev (garden-v0.16.0); 0.17.0 is unreleased.
-**Direction:** trees look like trees and their species; data choose species. A look is never biological validation.
+**Live:** garden 0.16.0; 0.17.0 remains unreleased.
+**Direction:** species chosen by data; looks are not biological validation.
 
 ## Day 3
-- All eight [rulings](plans/2026-11-07-day3.md) approved. #64 and step-1 #65 merged; #52 closed.
-- Step 2: `codex/day3-checkpoints`, based on merged `3d-port` 8995f73; gates registered at 7c66114 before runs.
-- G-forest crown v2 is now authoritative by default; explicit v1 and both raw counts remain. No B1 exists yet.
-- Checkpoint v3 (ADR 0059) persists per-metamer deficit streaks, including the worker's freeing swap.
-- Existing v1 planar and v2 readers remain; their missing history starts at zero. Frozen pre-change v2 fixture retained.
-- Holly's unread keys removed; 20/20 hashes identical (bar 20/20). Generator preserves deletion; goldens unchanged.
-- Checks: 170 Python tests pass; named regressions unchanged; full stamped check recorded in devlog/PR.
-- Maintained G-forest/DAG/sweep/E3 tools: [usage](../analysis/treesim/INSTRUMENTS.md).
-- Step-1 cleanup archive: `runs/day3-step1/sheet.patch` and inventory. Keep `.claude/worktrees/b0` through B1.
-- Unrelated sibling worktrees retained; detached sibling oak lacks remote coverage.
+- Steps 1 (#65) and 2 (#66) merged; all eight rulings approved.
+- Step 3: codex/day3-beech-lifespan, base 2c1a2cb; gates 8a04b10, transport correction 72d5ad5.
+- Beech lifespan removed; R6 enabled, leaf/light settings, R4 dormancy and shedding unchanged (ADR 0060).
+- Layered survival 27/40 vs control6/40 (bar≥20/40); lone H15042.622m and D1500.238928 pass.
+- D is near its lower edge. Seeds1–20 are previously examined confirmation, not held-out validation.
+- G-forest vs B0: 0/0/14/12 against bars0/1/13/9: **FAIL hd300**, the known interim miss.
+- Floor at its limit; metamer budget0.954×≤1.25×. No B1 yet.
+- Soft cbG remains low (.0422/.0350 at100/150); residual starvation-consistent death1/40.
+- Initial40 native lone trials invalid (preset leaked periodic width); discarded and fully rerun via original WASM path.
+- Checks:176 analysis tests; stamped Rust/static/103 Vitest tests green; build passes; regressions unchanged.
+- Two intended beech goldens updated with devlog reason; historical prototype-off fixture pins its original age20.
+- Checkpoint v3 retains v1/v2 readers; crown v2 default; holly dead keys removed (step2).
 
-## Next, serially (the user merges each PR)
-1. Merge step 2, then step 3: beech lifespan off, ADR 0044 amendment, N1 gates; record interim B0 hd300 miss.
-2. Step 4: register B1 ADR, measure at recruits 0.25; B0-at-quarter composition control.
-3. Step 5: N3 oak DAG and fresh gates, then user's fan-versus-spire decision.
-4. Step 6: layered wood and E2, then user's adoption decision.
-5. Step 7: RC budget smoke, notes and user phone soak.
+## Next, serially, user merges each PR
+1. Merge step3; step4 register B1 ADR, measure B1, run B0 at recruits0.25 control.
+2. Step5 oak N3: fresh gates and user sheet preference.
+3. Step6 layered wood/E2: fixed gates then user adoption decision.
+4. Step7 RC: fresh-process budget, notes and user phone soak.
+5. Step8 beech held-out programme; gated sycamore/ash adoption at unchanged planting density.
 
-**After RC (step 8):** beech first with a fresh instrument registration; full gated sycamore and ash adoption
-in the canopy rotation at unchanged density. Self-pruning only if the wood is rejected.
-
-## Rules and gotchas
-- Register gates/knob cards before runs; foreground `npm run check:stamp` before every commit.
-- Check DAG gates and sweep sign/size before tuning; ≥20 seeds per effect claim, fresh held-out seeds.
-- Behaviour changes need regressions; intended golden changes need devlog reasons. Memory: fresh process per run.
-- At most 12 simulations concurrently; bulky output in `runs/`. E3 remains explicit/on-demand.
-- State hashes exclude deficit counters: checkpoint tests compare full saved state and future shedding too.
-- No agent merges, tags, site-main pushes or `preview-3d` merge. Every next step waits for the user's merge.
+## Gotchas
+- Keep b0 worktree through B1. Full records: docs/experiments/2026-11-07-day3-step3.md.
+- CLI params are patches: omitted optional fields do not clear inherited preset values.
+- Before runs commit gates/cards; check DAG/sweep before tuning; ≥20 seeds per effect claim.
+- Foreground check:stamp before commits; regressions after behaviour changes; intentional goldens need reasons.
+- No agent merge/tag/deploy or site-main push; never merge preview-3d. Next step waits for user merge.

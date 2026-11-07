@@ -195,3 +195,5 @@ No published value exists for these. Calibrate on *patterns*: several weak targe
   - **Oak, willow and beech** (user, 2026-10-27; ADR 0009). M9's `weeping` and `troll` presets show the forms but are not calibrated species → M20.
   - **R3 ground contact** for limbs that sag to the ground → M16. **Breakage** is built (M10) but needs wind → M16 (O2 storms).
   - **§R5's far-red field**, so self-shade does not make open-grown trees taller and slenderer → M19. Headroom for `skyTree` (it reaches its 100-cell top by season ≈ 100) → M18.
+
+Day-3 step 3 (2026-11-07): beech lifespan-off, ADR 0060; N1 gates pass, G-forest retains known hd300 miss vs B0; soft crown-base gap remains. See day-3 step-3 experiment note. PR pending user merge.

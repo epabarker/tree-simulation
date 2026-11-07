@@ -1,0 +1,319 @@
+{
+  "label": "B1",
+  "worktree": "/home/edbarker/Documents/Projects/tree-simulation",
+  "patch": {},
+  "seeds": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20
+  ],
+  "width": 160,
+  "seasons": 300,
+  "N": 20,
+  "pass": {
+    "floor100": 0,
+    "hd300": 0,
+    "hd300_all": 11,
+    "crown": 11,
+    "crown_v2": 14,
+    "plateau": 12
+  },
+  "dist": {
+    "floor100": {
+      "median": 0.11956728587499998,
+      "min": 0.1056123618125,
+      "max": 0.1681828796874999,
+      "p10": 0.10715527605,
+      "p90": 0.1566856844250001
+    },
+    "floor150": {
+      "median": 0.1302954838125,
+      "min": 0.07421531987499996,
+      "max": 0.5225070900000001,
+      "p10": 0.1035810335,
+      "p90": 0.2885670735937501
+    },
+    "hd300": {
+      "median": 47.75396375,
+      "min": 19.813482,
+      "max": 117.52145,
+      "p10": 34.2971233,
+      "p90": 70.18795930000003
+    },
+    "hd300_all": {
+      "median": 66.12673749999999,
+      "min": 50.400008,
+      "max": 135.67337,
+      "p10": 56.311868600000004,
+      "p90": 86.6881057
+    },
+    "lcr300_minus_lone": {
+      "median": -0.017322530000000058,
+      "min": -0.2727583,
+      "max": 0.10513924000000008,
+      "p10": -0.06162556649999999,
+      "p90": 0.052498446000000004
+    },
+    "plateau_gain": {
+      "median": 0.06360550000000131,
+      "min": -4.201669999999993,
+      "max": 20.344499999999982,
+      "p10": -2.0495053000000008,
+      "p90": 7.895158999999997
+    },
+    "tallest300": {
+      "median": 147.36837500000001,
+      "min": 61.002716,
+      "max": 193.33419,
+      "p10": 82.3035591,
+      "p90": 177.771144
+    },
+    "planted_alive150": {
+      "median": 3.0,
+      "min": 0,
+      "max": 5,
+      "p10": 1.0,
+      "p90": 4.0
+    },
+    "planted_alive300": {
+      "median": 2.0,
+      "min": 0,
+      "max": 3,
+      "p10": 0.9000000000000001,
+      "p90": 3.0
+    },
+    "live150": {
+      "median": 57.0,
+      "min": 55,
+      "max": 57,
+      "p10": 57.0,
+      "p90": 57.0
+    },
+    "live300": {
+      "median": 57.0,
+      "min": 57,
+      "max": 57,
+      "p10": 57.0,
+      "p90": 57.0
+    },
+    "metamers200": {
+      "median": 66923.0,
+      "min": 27273.0,
+      "max": 87108.0,
+      "p10": 31051.5,
+      "p90": 80146.5
+    },
+    "wall_per_season": {
+      "median": 0.7415857390562692,
+      "min": 0.4285159635543823,
+      "max": 1.0178043826421102,
+      "p10": 0.5205577258268993,
+      "p90": 0.9666201813220978
+    },
+    "cpu_per_season": {
+      "median": 0.7236929266666667,
+      "min": 0.42112601,
+      "max": 0.9893595566666666,
+      "p10": 0.5107202203333333,
+      "p90": 0.9379047073333333
+    }
+  },
+  "planted_survival300": 0.3,
+  "planted_survival150": 0.44166666666666665,
+  "composition300_mean_share": {
+    "beech": 0.387719298245614,
+    "birch": 0.023684210526315787,
+    "holly": 0.12192982456140351,
+    "hornbeam": 0.12543859649122807,
+    "maple": 0.21403508771929824,
+    "oak": 0.08070175438596491,
+    "rowan": 0.04649122807017544
+  },
+  "per_species300": {
+    "beech": {
+      "n_trees": 9,
+      "height": 173.84165,
+      "hd": 35.575909,
+      "lcr": 0.84921433
+    },
+    "birch": {
+      "n_trees": 1,
+      "height": 149.86812,
+      "hd": 105.42764,
+      "lcr": 0.60666932
+    },
+    "holly": {
+      "n_trees": 6,
+      "height": 59.0031515,
+      "hd": 94.8856585,
+      "lcr": 0.99118001
+    },
+    "hornbeam": {
+      "n_trees": 4,
+      "height": 113.41304,
+      "hd": 42.268431,
+      "lcr": 0.8470354849999999
+    },
+    "maple": {
+      "n_trees": 4,
+      "height": 63.009894,
+      "hd": 29.832236,
+      "lcr": 0.7382423
+    },
+    "oak": {
+      "n_trees": 7,
+      "height": 130.40978,
+      "hd": 51.057543,
+      "lcr": 0.86458918
+    },
+    "rowan": {
+      "n_trees": 5,
+      "height": 82.44743,
+      "hd": 53.978967,
+      "lcr": 0.91833131
+    }
+  },
+  "provenance": {
+    "repository": "/home/edbarker/Documents/Projects/tree-simulation",
+    "commit": "8487d61501f61c5194de7fd10881826602d3f1e0",
+    "dirty": false,
+    "source_sha256": {
+      "analysis/fit/hand-overrides.toml": "9496e96f98de3197e5c6b87410345389fa4b2edd46c0b89e8761687cfd9addaa",
+      "cli/trials.ts": "2660df8f06f210369a8f80f6b8e02435fe87ea605cdc80884d3827011118dac4",
+      "rust/Cargo.lock": "c8d21d41d982377048aa301868f54771037ef1aed885fadf67b459c7e447cf01",
+      "rust/cli/src/main.rs": "2cdd950f116768f1a87d4994591f8b5b29d351b256518435ba5ee9098566a11c",
+      "rust/core/src/checkpoint.rs": "ec89d43914c693df71d03491adf7e8a653d212159096d5133d913e716994f712",
+      "rust/core/src/form.rs": "60aaccdd568995046837b8a66c69953afe1226fca42294387e9cdf2e9357e3f8",
+      "rust/core/src/geom.rs": "924d0f347b35be12c36c5ee9e20776e212a3be6e30ab69c7e83f2a7cbfd0c852",
+      "rust/core/src/hash.rs": "0ef04807417b33a11a7dd2e03553811d101c3deaef5b392b2ebde8a3edbb2bba",
+      "rust/core/src/json.rs": "a165cb9b117e91a72e509c5ae7075f5b3d899fd182086061d85432d59b95c810",
+      "rust/core/src/lib.rs": "4151df036a18678b0d56a9e2d4d4acb2585da06e5ac199ec1f3d9a6a30d2a99c",
+      "rust/core/src/light/mod.rs": "22083f62f47d71ecbc6e12908f15e2884f56543d638a6601a47f65e5d49dcb9a",
+      "rust/core/src/light/slab_sweep.rs": "3d85fc2cc0792dd056ad50199ed1a7f997a53f9974efeaf724c3e54be878f04d",
+      "rust/core/src/math/mod.rs": "6d254cb4f427bac6291ddb20a278883c706f770a9166123e4f8383568a763b68",
+      "rust/core/src/metrics.rs": "3c7c872c99fa3cc012ae8d0075cbe5faf2524a5a3def72bda9a306997d32ca14",
+      "rust/core/src/params.rs": "99454964496be20772860a2b30379bae52de475f1bf96847863181a1ba1458d3",
+      "rust/core/src/principles/c1.rs": "da905133fe2c404292ebda8cecc8de0b042e7d5f44dfa2e4b9f154797cb3013d",
+      "rust/core/src/principles/c3.rs": "428788d65a62189fc6f9aa8757d4d2b66436d0160316f8e280e4c9f704873aaf",
+      "rust/core/src/principles/c4.rs": "4e103cac2c003c4139e8180b1bfe66e4b9adee56d4a7973d550bb632c713cb04",
+      "rust/core/src/principles/c5.rs": "e0823c573e1dcb8322ff0f72a17998f794ea6afbbbfad26ed05d1ffcaed19b7d",
+      "rust/core/src/principles/c6.rs": "827249da126fea9738534676d42768dd2a72d0b8d0c732a13ea0d39bc4dce7ea",
+      "rust/core/src/principles/mod.rs": "7aad23a5189869d873ce6535c0e26a865b10e37dbf468c08a1985de6dfc7a2c2",
+      "rust/core/src/principles/o2.rs": "c4d8d974d6db7bd0f9569a3583b12a5c25b9bc0947265f240899831455e2ba0d",
+      "rust/core/src/principles/o4.rs": "6688aaa246a8d5c1b7b90be04be0c94b85000623a2be175bb86f8016ec02d5c5",
+      "rust/core/src/principles/obstacles.rs": "7b05cf58977606afcd027583e6d0582205491a0c0980a8da83ab7c79a9ffcc3e",
+      "rust/core/src/principles/r1.rs": "ebd7c042706b7dedcc0df843eb14ffb52dea27336d4a64a19dc5220191520647",
+      "rust/core/src/principles/r2.rs": "698b3b232ca3a7e63bfdf5826d02c50f643aef495b0c124b424cd0eb9ac35d5d",
+      "rust/core/src/principles/r3.rs": "b48722a59ce55b6f90c3bc3245aa3c209b14b32f98def0c89f6c0836af85a688",
+      "rust/core/src/principles/r4.rs": "9851695dec5050ea1f814e46fc4656c9dcca63a75e61ea633e860e3a365b3cc0",
+      "rust/core/src/principles/r5.rs": "0c25e8fe113e8371ecd18a0cbd8552ee5cf78402b879b91342063c9178a3d001",
+      "rust/core/src/principles/r6.rs": "23135d35486824239eea0fa85b9e156fed46f515627fce8ce94cde674f9d84f4",
+      "rust/core/src/rng.rs": "02516b3d96ddea640e0648995158536556dab0d07a3dbdeb1664546b5159ed5b",
+      "rust/core/src/season.rs": "cd397640034af6067f814e43ec11712027357a61d634eec2f05324cfd57cc211",
+      "rust/core/src/snapshot.rs": "a38aee72ee934915024ad72466a6521a1775b2bb8b230da90ae2b142b700ed30",
+      "rust/core/src/tree.rs": "758935825dc7a13a5de33fc138cb473a9dd0b5cc75a6aef56c187700131a97ab",
+      "rust/core/src/world.rs": "119a6efa6d9d0e812a78fecc91d63f50739209734a702166aa619d6fd71d5c46",
+      "rust/presets.json": "689745e215d00c98803577de80e15f5496c30f646ee4a6e32ac39e9feb21158b",
+      "src/core/fixtures.ts": "5e64df9b6161d1ede29d98eea74febb309bf7b9b8091f9eb73eb0de62b6ac88a",
+      "src/core/flora-fitted.ts": "d06bcf6a37c54dbb6bed7c8055d25f4242049699b5f67cd36b26005aa99e2f7b",
+      "src/core/flora.ts": "0146f73ee6b0fc799f4b0d6c68e919dc88e7109728a498adc68a13a652351fe6",
+      "src/core/params.ts": "61cba881b6195a04d63a6909a244900fed51fde011b850aa388738541a913aa4",
+      "src/core/presets.ts": "628b3def57580296907ba620f52c7d9feeecce3ed21109e3281ce2c5c6366087",
+      "src/core/tsconfig.json": "88f188c0708190ca3ec4b6cca204f2cd69295bb96b6ee76e8d3fdf404dc212a0",
+      "src/core/types.ts": "8b3e8baa688611465ac3cbd042a8da745af7457e1c02ee36a38306c29db78b20"
+    }
+  },
+  "binary_sha256": "3c6e23486de50649a2945993b1d1bb6046182a470170a1ca76bc661a22d9d218",
+  "params_sha256": {
+    "1": "28cf69c915b8dbf9bbd57010b657bcda4253d956dfaf811a575b0607058287c4",
+    "2": "013a7b6e99a5b4947c76150238684aa78bdf7ba101f152c7e43239c89db6b03d",
+    "3": "3a8cb1d7e27d0a7bd478450f9f72a84fd71aea54063b8ff8e4ee50987a140212",
+    "4": "7299c0d9711402d78d378c8771256998a9e9265bac993b9f66faddf7a44f7cbe",
+    "5": "8c78faeccffc1cde482dd1f02645cb7251a8d07c2e2b6e3c4fb1590ffd2f7acf",
+    "6": "4a0a156573c36c3d5c90fe0fd8fa50502844370e0e079ec001071afb47f49748",
+    "7": "e1b25ef4a8a1e7c7298b8334633bf9f39ca63a43451c38ee1b54ea5dc7bf479c",
+    "8": "acab9f5e66b3e350c69d47ecb45979d56328395880917fc1bda2ee961e4ba9a2",
+    "9": "739a211978acbba48f2ccee065384481cdc8174b9617a26790e588102000295f",
+    "10": "a55c299178093b1d1c59839e04700489585a3209eb60320bd74c8a6e31e81228",
+    "11": "e4a0c92002e61993a26b0a4a2a9945ded60743e6d2e9f25df37e0ee13eb94fee",
+    "12": "b47a7afb406ef896fa8e783e37ed52966123b00951245917fad1a3741d422b6b",
+    "13": "3f09b33b6e8efdfb98ee132a4d81e9f71e0e40a4b1e8ff83c7c29cc06050f0b9",
+    "14": "3d58e8be9820852d9e94b433afe9655f20f3cdf2713fbc60c87c3e3ed5ad2b07",
+    "15": "a18d163f5a2bf219b3c9b9d0e1ac81c83df15007da36f99c4e92cbef1ba32e7f",
+    "16": "f9e6ae6a84eefad938da9f004120a335d4a1d5febc0705a609bd0974f60de366",
+    "17": "ba325144ffcb5cdf12fa89c798b8101e79d48e219fb44d9fdde28fc21103f41f",
+    "18": "8f6cff74bdf3416db989560f2677a8eacd4331c9e8c59596d1fa60550f5c17da",
+    "19": "117f309c1f1b979c0cc4dd3c5782aa0ed2ae254e13ea9fe84c4f1611ab377ef4",
+    "20": "ba522c231af4029f7adc99b5cb090a311ee753458b5ec8985ea1a7711e6be24d"
+  },
+  "baseline_schema": 1,
+  "authoritative_checks": [
+    "floor100",
+    "hd300",
+    "crown_v2",
+    "plateau"
+  ],
+  "bars": {
+    "floor100": -2,
+    "hd300": -2,
+    "crown_v2": 12,
+    "plateau": 10
+  },
+  "configuration": {
+    "width": 160,
+    "seasons": 300,
+    "recruits": 0.25,
+    "crown_version": 2,
+    "stand_seeds": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20
+    ],
+    "lone_comparator_seeds": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "workers": 8
+  },
+  "growth_source_commit": "a903d11ae04ca5239bd51f4ae53dc45cf0d0ca18",
+  "registration_commit": "8487d61",
+  "raw_evidence_sha256": "157baadfbe1833f0f3d066dafab288889009cdc113cbc7d27e719109d7f17d69",
+  "reproduces_step3_outcomes": true
+}

@@ -32,3 +32,13 @@ parameter is tuned in this step. Current and historical source trees stay untouc
 Later PRs use the actual garden's frozen B1 comparator, while reporting absolute
 misses and soft/advisory limitations. The control is evidence about configuration,
 not a fix. Timing is native compute cost, not a fresh-process memory or phone gate.
+
+## Measured B1 (registered at 8487d61)
+
+All20 fresh stands complete; executed params match all20 dumps. Counts are
+floor100 **0/20**, planted hd300 **0/20**, crown_v2 **14/20**, plateau **12/20**.
+Freeze bars **−2/−2/12/10** in `analysis/treesim/baselines/B1-v2.json`. The first
+two constraints are vacuous; their absolute-band failures remain visible. Median
+metamers at200 is **66,923**. All20 outcomes reproduce step3, which is repeatability
+on examined seeds rather than independent biological validation. See the step4
+experiment note for the historical cap control and native cost.

@@ -7,7 +7,7 @@ Every measure that a plan, a PR or an experiment note cites carries one of three
 
 | label | what it may do | examples |
 |---|---|---|
-| **hard** | Adopts or blocks a change. Fixed before the results are seen, never loosened afterwards, with a stated pass rate over ≥ 20 seeds (AGENTS.md's seed rule). | G-forest against B0 (each count ≥ base − 2); the birch-pole gate (≥ 15 of 20); G-reg's descriptor bands; the budget (memory, metamers, phone time); `npm run check`; the goldens |
+| **hard** | Adopts or blocks a change. Fixed before the results are seen, never loosened afterwards, with a stated pass rate over ≥ 20 seeds (AGENTS.md's seed rule). | G-forest against frozen B1 (each count ≥ base − 2; ADR 0061; B0 retained historically); the birch-pole gate (≥ 15 of 20); G-reg's descriptor bands; the budget (memory, metamers, phone time); `npm run check`; the goldens |
 | **soft** | Reported beside the hard gates. It may block a change with a written reason, but never adopts one alone. | width/height and the dome index D against real bands at n 5 seeds; garden composition; all-tree H/D; floor light where it is out of band by construction |
 | **advisory** | Never evidence. A reader of the result may use it to find what to measure next. | the simulated-against-simulated judge (failed its 75% calibration: 69%); the "which is real?" judge once it saturates; anyone's eye on a sheet, the user's included |
 

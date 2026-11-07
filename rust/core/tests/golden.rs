@@ -60,7 +60,8 @@ fn every_golden() {
 /// the off patch goes onto every species too, and the presets with species are held to their
 /// hashes before the adoption (0.16.0, d2c4f53); forest has no species and keeps its golden.
 /// mixedWood is left out: its hornbeam also takes the height patch (r2.dLambda, R1's sink), which
-/// is not one of these rules; oakOpen's 15 seasons fall before oak's new maturity.
+/// is not one of these rules. oakOpen is left out since oak's form round on fresh seeds (2026-11-07):
+/// its twigs' λ (level 2, 0.5 → 0.55) acts from the first season, and it is not one of these rules.
 #[test]
 fn the_prototype_rules_written_as_off_keep_the_goldens() {
     let presets = read("../presets.json");
@@ -71,7 +72,6 @@ fn the_prototype_rules_written_as_off_keep_the_goldens() {
     .unwrap();
     for (key, before) in [
         ("forest:seed1:s20", None),
-        ("oakOpen:seed1:s15", Some("0877b79b")),
         ("beechOpen:seed1:s40", Some("200f5a55")),
     ] {
         let parts: Vec<&str> = key.split(':').collect();

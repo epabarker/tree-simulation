@@ -164,6 +164,33 @@ assign = { "c1.shootLengthSD" = 0.5, "c4.axisSD" = 50, "c1.betaSD" = 60, "c1.bud
 # levels off instead of climbing past the species' Level 0 band. Oak 33.2 m.
 "r1.fRep" = 0.8
 "r1.maturity" = 130
+# Oak's form on fresh seeds (night 2026-11-06/07, agent N3; plan 2026-11-06-night2 item N3, gates fixed
+# before the results). The lone oak was a spire (dome index D 0.99 / 1.01 at 100 / 150, real 0.36
+# [0.16-0.59]). Existing rules only: beech's relay with its neighbour gate and the fork arm hold from
+# age 25 (ADR 0033, 0039, 0040; relayPTerm 0.25), the relays' curve (ADR 0034), so a free-standing
+# oak loses its leader and divides into arms while a stand oak keeps its trunk. The relay alone traded
+# the dome against kinks (relayPTerm 0.05 / 0.15: D 0.80 / 0.38, kinks 1.5 / 7): the thick path,
+# leaving the trunk into a limb, ended in twigs whose lambda (0.5 - dLambda 0.04 = 0.46) sits below the
+# 0.5 cliff, so laterals took over at nearly every tip node. The twigs are held above it as the user's
+# zigzag override holds trunk and limbs (dLambda 0.04, above): level 2's lambda 0.55, kept for life
+# (dLambdaShare 0, ADR 0057). Posture by age (85) and dLambda untouched.
+# Lone, tuning seeds 1-20: D 0.33 / 0.31 (10 and 15 of 20 in band), W/H 0.70 / 0.69, H 33.2 m (max
+# 36.1), thick-path kinks > 20 deg median 2.5 / 2.5 (max 4). FRESH seeds 31-50 (never tuned on): D
+# 0.31 / 0.30 (16 and 12 of 20 in band), W/H 0.68 / 0.69, H max 34.8 m, kinks median 2 / 2 (max 6).
+# Garden planted oaks (12 seeds of 1-20): kinks median 3.5 / 4.0 (gate <= 4: at its limit at 150;
+# today 2.0 / 2.5). G-forest against B0 (20 seeds): floor 0, hd300 1, crown 11, plateau 13 (B0 2, 3,
+# 11, 11: floor and hd300 at their limits); the composition at 300 shifts (oak 0.01 -> 0.20, hornbeam
+# 0.43 -> 0.13, maple 0.16 -> 0.22).
+"r2.relay" = 2
+"r2.relayAge" = 25
+"r2.relayPTerm" = 0.25
+"r2.relayCrowd" = 10
+"r2.forkAt" = 1.3
+"r2.forkAngle" = 35
+"r2.levels.0.curve" = 30
+"r2.levels.0.curveLength" = 30
+"r2.levels.2.lambda" = 0.55
+"r2.levels.2.dLambdaShare" = 0
 
 [maple]
 # Track B's accepted form (the user, 2026-11-01; picks.toml): the relay from age 10 (ADR 0033), its

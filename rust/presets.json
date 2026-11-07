@@ -3734,7 +3734,9 @@
         "branchAngle": 45,
         "generator": "spiral",
         "tierEvery": 0,
-        "pTerm": 0
+        "pTerm": 0,
+        "curve": 30,
+        "curveLength": 30
        },
        {
         "lambda": 0.5607,
@@ -3748,20 +3750,27 @@
         "agedOver": 50
        },
        {
-        "lambda": 0.5,
+        "lambda": 0.55,
         "setPoint": 49.63,
         "eta": 0.2,
         "branchAngle": 50,
         "generator": "spiral",
         "tierEvery": 0,
-        "pTerm": 0
+        "pTerm": 0,
+        "dLambdaShare": 0
        }
       ],
       "aC": 13.51,
       "dLambda": 0.04,
       "ramp": 15,
       "kappa": 0.7488,
-      "hJ": 22.69
+      "hJ": 22.69,
+      "relay": 2,
+      "relayAge": 25,
+      "relayPTerm": 0.25,
+      "relayCrowd": 10,
+      "forkAt": 1.3,
+      "forkAngle": 35
      },
      "r3": {
       "enabled": true,
@@ -5053,7 +5062,9 @@
         "branchAngle": 45,
         "generator": "spiral",
         "tierEvery": 0,
-        "pTerm": 0
+        "pTerm": 0,
+        "curve": 30,
+        "curveLength": 30
        },
        {
         "lambda": 0.5607,
@@ -5067,20 +5078,27 @@
         "agedOver": 50
        },
        {
-        "lambda": 0.5,
+        "lambda": 0.55,
         "setPoint": 49.63,
         "eta": 0.2,
         "branchAngle": 50,
         "generator": "spiral",
         "tierEvery": 0,
-        "pTerm": 0
+        "pTerm": 0,
+        "dLambdaShare": 0
        }
       ],
       "aC": 13.51,
       "dLambda": 0.04,
       "ramp": 15,
       "kappa": 0.7488,
-      "hJ": 22.69
+      "hJ": 22.69,
+      "relay": 2,
+      "relayAge": 25,
+      "relayPTerm": 0.25,
+      "relayCrowd": 10,
+      "forkAt": 1.3,
+      "forkAngle": 35
      },
      "r3": {
       "enabled": true,
@@ -6518,7 +6536,9 @@
         "branchAngle": 45,
         "generator": "spiral",
         "tierEvery": 0,
-        "pTerm": 0
+        "pTerm": 0,
+        "curve": 30,
+        "curveLength": 30
        },
        {
         "lambda": 0.5607,
@@ -6532,20 +6552,27 @@
         "agedOver": 50
        },
        {
-        "lambda": 0.5,
+        "lambda": 0.55,
         "setPoint": 49.63,
         "eta": 0.2,
         "branchAngle": 50,
         "generator": "spiral",
         "tierEvery": 0,
-        "pTerm": 0
+        "pTerm": 0,
+        "dLambdaShare": 0
        }
       ],
       "aC": 13.51,
       "dLambda": 0.04,
       "ramp": 15,
       "kappa": 0.7488,
-      "hJ": 22.69
+      "hJ": 22.69,
+      "relay": 2,
+      "relayAge": 25,
+      "relayPTerm": 0.25,
+      "relayCrowd": 10,
+      "forkAt": 1.3,
+      "forkAngle": 35
      },
      "r3": {
       "enabled": true,
@@ -7983,7 +8010,9 @@
         "branchAngle": 45,
         "generator": "spiral",
         "tierEvery": 0,
-        "pTerm": 0
+        "pTerm": 0,
+        "curve": 30,
+        "curveLength": 30
        },
        {
         "lambda": 0.5607,
@@ -7997,20 +8026,27 @@
         "agedOver": 50
        },
        {
-        "lambda": 0.5,
+        "lambda": 0.55,
         "setPoint": 49.63,
         "eta": 0.2,
         "branchAngle": 50,
         "generator": "spiral",
         "tierEvery": 0,
-        "pTerm": 0
+        "pTerm": 0,
+        "dLambdaShare": 0
        }
       ],
       "aC": 13.51,
       "dLambda": 0.04,
       "ramp": 15,
       "kappa": 0.7488,
-      "hJ": 22.69
+      "hJ": 22.69,
+      "relay": 2,
+      "relayAge": 25,
+      "relayPTerm": 0.25,
+      "relayCrowd": 10,
+      "forkAt": 1.3,
+      "forkAngle": 35
      },
      "r3": {
       "enabled": true,
@@ -9448,7 +9484,9 @@
         "branchAngle": 45,
         "generator": "spiral",
         "tierEvery": 0,
-        "pTerm": 0
+        "pTerm": 0,
+        "curve": 30,
+        "curveLength": 30
        },
        {
         "lambda": 0.5607,
@@ -9462,20 +9500,27 @@
         "agedOver": 50
        },
        {
-        "lambda": 0.5,
+        "lambda": 0.55,
         "setPoint": 49.63,
         "eta": 0.2,
         "branchAngle": 50,
         "generator": "spiral",
         "tierEvery": 0,
-        "pTerm": 0
+        "pTerm": 0,
+        "dLambdaShare": 0
        }
       ],
       "aC": 13.51,
       "dLambda": 0.04,
       "ramp": 15,
       "kappa": 0.7488,
-      "hJ": 22.69
+      "hJ": 22.69,
+      "relay": 2,
+      "relayAge": 25,
+      "relayPTerm": 0.25,
+      "relayCrowd": 10,
+      "forkAt": 1.3,
+      "forkAngle": 35
      },
      "r3": {
       "enabled": true,
@@ -10913,7 +10958,9 @@
         "branchAngle": 45,
         "generator": "spiral",
         "tierEvery": 0,
-        "pTerm": 0
+        "pTerm": 0,
+        "curve": 30,
+        "curveLength": 30
        },
        {
         "lambda": 0.5607,
@@ -10927,20 +10974,27 @@
         "agedOver": 50
        },
        {
-        "lambda": 0.5,
+        "lambda": 0.55,
         "setPoint": 49.63,
         "eta": 0.2,
         "branchAngle": 50,
         "generator": "spiral",
         "tierEvery": 0,
-        "pTerm": 0
+        "pTerm": 0,
+        "dLambdaShare": 0
        }
       ],
       "aC": 13.51,
       "dLambda": 0.04,
       "ramp": 15,
       "kappa": 0.7488,
-      "hJ": 22.69
+      "hJ": 22.69,
+      "relay": 2,
+      "relayAge": 25,
+      "relayPTerm": 0.25,
+      "relayCrowd": 10,
+      "forkAt": 1.3,
+      "forkAngle": 35
      },
      "r3": {
       "enabled": true,
@@ -12378,7 +12432,9 @@
         "branchAngle": 45,
         "generator": "spiral",
         "tierEvery": 0,
-        "pTerm": 0
+        "pTerm": 0,
+        "curve": 30,
+        "curveLength": 30
        },
        {
         "lambda": 0.5607,
@@ -12392,20 +12448,27 @@
         "agedOver": 50
        },
        {
-        "lambda": 0.5,
+        "lambda": 0.55,
         "setPoint": 49.63,
         "eta": 0.2,
         "branchAngle": 50,
         "generator": "spiral",
         "tierEvery": 0,
-        "pTerm": 0
+        "pTerm": 0,
+        "dLambdaShare": 0
        }
       ],
       "aC": 13.51,
       "dLambda": 0.04,
       "ramp": 15,
       "kappa": 0.7488,
-      "hJ": 22.69
+      "hJ": 22.69,
+      "relay": 2,
+      "relayAge": 25,
+      "relayPTerm": 0.25,
+      "relayCrowd": 10,
+      "forkAt": 1.3,
+      "forkAngle": 35
      },
      "r3": {
       "enabled": true,
@@ -13844,7 +13907,9 @@
         "branchAngle": 45,
         "generator": "spiral",
         "tierEvery": 0,
-        "pTerm": 0
+        "pTerm": 0,
+        "curve": 30,
+        "curveLength": 30
        },
        {
         "lambda": 0.5607,
@@ -13858,20 +13923,27 @@
         "agedOver": 50
        },
        {
-        "lambda": 0.5,
+        "lambda": 0.55,
         "setPoint": 49.63,
         "eta": 0.2,
         "branchAngle": 50,
         "generator": "spiral",
         "tierEvery": 0,
-        "pTerm": 0
+        "pTerm": 0,
+        "dLambdaShare": 0
        }
       ],
       "aC": 13.51,
       "dLambda": 0.04,
       "ramp": 15,
       "kappa": 0.7488,
-      "hJ": 22.69
+      "hJ": 22.69,
+      "relay": 2,
+      "relayAge": 25,
+      "relayPTerm": 0.25,
+      "relayCrowd": 10,
+      "forkAt": 1.3,
+      "forkAngle": 35
      },
      "r3": {
       "enabled": true,
@@ -15310,7 +15382,9 @@
         "branchAngle": 45,
         "generator": "spiral",
         "tierEvery": 0,
-        "pTerm": 0
+        "pTerm": 0,
+        "curve": 30,
+        "curveLength": 30
        },
        {
         "lambda": 0.5607,
@@ -15324,20 +15398,27 @@
         "agedOver": 50
        },
        {
-        "lambda": 0.5,
+        "lambda": 0.55,
         "setPoint": 49.63,
         "eta": 0.2,
         "branchAngle": 50,
         "generator": "spiral",
         "tierEvery": 0,
-        "pTerm": 0
+        "pTerm": 0,
+        "dLambdaShare": 0
        }
       ],
       "aC": 13.51,
       "dLambda": 0.04,
       "ramp": 15,
       "kappa": 0.7488,
-      "hJ": 22.69
+      "hJ": 22.69,
+      "relay": 2,
+      "relayAge": 25,
+      "relayPTerm": 0.25,
+      "relayCrowd": 10,
+      "forkAt": 1.3,
+      "forkAngle": 35
      },
      "r3": {
       "enabled": true,

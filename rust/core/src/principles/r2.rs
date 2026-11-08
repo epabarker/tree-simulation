@@ -364,6 +364,63 @@ pub fn relay_depth(tree: &Tree, nm: usize, nb: usize) -> Vec<f64> {
     depth
 }
 
+/// The overtop relay (wayfinder #94, exploratory; r2.relayOvertop): a lateral whose branch
+/// reaches above its host's main continuation has taken the lead there, so it takes the host
+/// axis's level, as a relay does (ADR 0033's substitution: one order less over its whole subtree,
+/// metamers and buds, so its pa is the host's and its laterals' one more). The oak's takeovers are
+/// of this kind: its main bud stays alive and growing, and a lateral on the top nodes outgrows it
+/// (wayfinder #94's step 1), so the ended-apex relay never sees them. Only promotes; the outgrown
+/// axis keeps its level. Read on the tips as the season began. Returns the laterals promoted.
+pub fn relay_overtopped(tree: &mut Tree) -> usize {
+    let nm = tree.m.len();
+    if nm < 2 {
+        return 0;
+    }
+    // Each metamer's subtree top (highest tip) and its main child.
+    let mut top: Vec<f64> = (0..nm).map(|k| tree.tip_y(k)).collect();
+    let mut main = vec![usize::MAX; nm];
+    for k in (1..nm).rev() {
+        let p = tree.m.parent[k] as usize;
+        if top[k] > top[p] {
+            top[p] = top[k];
+        }
+        if tree.m.slot[k] == slot::MAIN {
+            main[p] = k;
+        }
+    }
+    // Promote: a lateral one level younger than its host whose branch tops the host's main one.
+    let mut drop = vec![0u8; nm];
+    let mut promoted = 0;
+    for k in 1..nm {
+        let p = tree.m.parent[k] as usize;
+        let d = drop[p];
+        let pa = |j: usize| tree.m.order[j] as i32 - tree.m.pa_shift[j] as i32;
+        drop[k] = d;
+        if tree.m.slot[k] != slot::MAIN
+            && main[p] != usize::MAX
+            && top[k] > top[main[p]]
+            && pa(k) == pa(p) + 1
+        {
+            drop[k] = d + 1;
+            promoted += 1;
+        }
+    }
+    if promoted == 0 {
+        return 0;
+    }
+    // Parents come first, so `drop` already holds the sum along each path; apply it.
+    for k in 0..nm {
+        tree.m.order[k] = tree.m.order[k].saturating_sub(drop[k]);
+    }
+    for j in 0..tree.b.len() {
+        let m = tree.b.metamer[j];
+        if m >= 0 && (m as usize) < nm {
+            tree.b.order[j] = tree.b.order[j].saturating_sub(drop[m as usize]);
+        }
+    }
+    promoted
+}
+
 /// The paShift, against the bud's own order, that makes bud `b`'s shoot a relay at its axis's
 /// physiological age, if it is a lateral on one of the top `relay_nodes` nodes below its axis's
 /// ended apex (`depth` from `relay_depth`); else None. The shoot itself is stored at the order of
@@ -698,6 +755,36 @@ mod tests {
         let end = bud(&mut t, limb, slot::MAIN, 2.5, 1.0);
         t.b.state[end] = bud::TERMINATED;
         (t, laterals, twig)
+    }
+
+    #[test]
+    fn a_lateral_that_tops_its_hosts_main_branch_takes_the_hosts_level() {
+        use crate::testing::{LEFT, RIGHT, bud, metamer};
+        use std::f64::consts::FRAC_PI_2;
+        let mut t = Tree::new(0, 10.0, 0.5);
+        // A trunk of two upright metamers (top 2), its main bud alive.
+        let base = metamer(&mut t, -1, slot::MAIN, FRAC_PI_2, 1.0, 0.02, 0.0);
+        let next = metamer(&mut t, base as i32, slot::MAIN, FRAC_PI_2, 1.0, 0.02, 0.0);
+        let apex = bud(&mut t, next, slot::MAIN, FRAC_PI_2, 0.0);
+        // On the base node: an upright lateral of length 3 (top 4, above the trunk's 2) and a
+        // level one of length 1, which stays below.
+        let lead = metamer(&mut t, base as i32, LEFT, FRAC_PI_2, 3.0, 0.02, 0.0);
+        let flat = metamer(&mut t, base as i32, RIGHT, 0.0, 1.0, 0.02, 0.0);
+        let on_lead = bud(&mut t, lead, LEFT, 1.0, 2.0);
+        let on_flat = bud(&mut t, flat, LEFT, 1.0, 2.0);
+        let twig = metamer(&mut t, lead as i32, LEFT, 1.0, 0.5, 0.02, 0.0);
+        let before = (t.m.order[lead], t.m.order[twig], t.b.order[on_lead]);
+        assert_eq!(before, (1, 2, 2));
+        assert_eq!(relay_overtopped(&mut t), 1);
+        // The leader-taking lateral is the trunk's level (order 0, shift 0); its subtree one less.
+        assert_eq!((t.m.order[lead], t.m.pa_shift[lead]), (0, 0));
+        assert_eq!(t.m.order[twig], 1);
+        assert_eq!(t.b.order[on_lead], 1);
+        // The level lateral, the trunk and its apex are untouched.
+        assert_eq!((t.m.order[flat], t.b.order[on_flat]), (1, 2));
+        assert_eq!((t.m.order[next], t.b.order[apex]), (0, 0));
+        // Promotion happens once: the lateral is now at its host's level.
+        assert_eq!(relay_overtopped(&mut t), 0);
     }
 
     #[test]

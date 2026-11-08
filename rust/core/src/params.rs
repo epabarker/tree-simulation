@@ -268,6 +268,10 @@ pub struct R2 {
     /// From this tree age (seasons) a pa-0 terminal ends with probability `relay_p_term`.
     pub relay_age: f64,
     pub relay_p_term: f64,
+    /// The overtop relay (wayfinder #94, exploratory): a lateral whose branch reaches above its
+    /// host's main continuation takes the host axis's level (ADR 0033's substitution: order − 1
+    /// over its subtree). Absent or false: off.
+    pub relay_overtop: bool,
     /// The vigour fork (Nicolini & Caraglio 1994: beech forks where growth is fastest): a pa-0
     /// shoot whose bud received v ≥ `forkAt`·c1.maxMetamersPerShoot ends its terminal bud, so the
     /// relay (r2.relay nodes) turns the season's apex into co-dominant arms. 0 or absent: off.
@@ -604,6 +608,7 @@ impl Params {
                 relay: opt(r2, "relay").unwrap_or(0.0),
                 relay_age: opt(r2, "relayAge").unwrap_or(0.0),
                 relay_p_term: opt(r2, "relayPTerm").unwrap_or(0.0),
+                relay_overtop: r2.get("relayOvertop").and_then(Value::as_bool) == Some(true),
                 fork_at: opt(r2, "forkAt").unwrap_or(0.0),
                 fork_angle: opt(r2, "forkAngle"),
                 relay_crowd: opt(r2, "relayCrowd"),

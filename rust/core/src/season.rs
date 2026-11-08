@@ -24,7 +24,8 @@ use crate::principles::obstacles::clear_obstacles;
 use crate::principles::r1::{carbon_balance, starved_to_death};
 use crate::principles::r2::{
     aged_offset, arm_set_point, curve_offset, curved, direction_params, light_set_point,
-    pendulous_set_point, relay_depth, relay_nodes, relay_on, relay_shift, vigour_forks,
+    pendulous_set_point, relay_depth, relay_nodes, relay_on, relay_overtopped, relay_shift,
+    vigour_forks,
 };
 use crate::principles::r3::update_mechanics;
 use crate::principles::r4::{aborts, breaks, growth_threshold, light_releases, released_shift};
@@ -303,6 +304,9 @@ pub fn phase_grow(world: &mut World, i: usize) {
     let tree = &mut trees[i];
     tree.evaluated = tree.m.len(); // rows that took part in this season's passes
     let params = rules.of(&tree.species);
+    if params.r2.enabled && params.r2.relay_overtop {
+        relay_overtopped(tree);
+    }
     grow_buds(tree, params, season);
 }
 

@@ -2,6 +2,31 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-08: day3 step7 — RC prepared, phone soak deferred
+
+User merged #70. Registered step7 at360a25a before six NEW fresh-process memory
+cases on current garden/oak, widths160/66 × seeds2/3/9. Garden300 → save/free →
+specimen150 → dispose/restore; hashes/counts match6/6. WASM max225.837MB<230,
+4.163MB headroom; external checkpoint max23.675MB separate from the WASM gate.
+No total-browser/phone-memory claim. No model, param, golden or baseline changes.
+
+One time flag:66/seed9 +35.12% total. Registered exact repeat atcfba6b3 after
+observing system updatedb at90%CPU; after its exit repeat34.801s,7.31% below
+reference. First outlier retained; hashes/counts identical, transient timing
+consistent with contention, indexer causality not proved. No persistent excess.
+
+187 analysis tests pass; stamped check, explicit WASM rebuild and both builds
+pass. Bundle54.7kB≤60, WASM173.0≤200 gzip. Both shipping regressions unchanged.
+Four RC-only sheets use audited unchanged current tiles. Local rc1 archive built
+without sourcemaps; source/asset/archive hashes recorded. Laptop browser switches
+garden/specimen/back successfully; not a phone soak or biological validation.
+
+**User deferred the required phone soak; draft PR#71 remains pending, not release-ready.**
+Stopped local server; durable review page in analysis/experiments/day3_rc_soak.html.
+Release notes and [full evidence](experiments/2026-11-08-day3-step7.md) prepared.
+/wrap-up applied; no ADR needed for unchanged model or deferred readiness.
+No tag, deploy, site-main push or preview merge; step8 waits for completion/merge.
+
 ## 2026-11-08: step6 CI integration coverage
 
 The new prepared-stand fixture initially failed in the analysis-only CI job, which

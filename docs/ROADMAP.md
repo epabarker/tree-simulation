@@ -215,4 +215,12 @@ hornbeam4/18 vs≥14 and legacy LAI11.663/11.821 vs5–9 fail. G-forest vs froze
 and resource gates pass; birch19/20 is19empty-recruit cases. E2 all180stands
 measured; no clean±10%floor direction, no variant selected. Current garden and
 oak unchanged; ADR0058 stays proposed.187 analysis tests/build/stamped checks
-green. See step6 experiment note and sheets; PR awaits user merge before RC.
+green. See step6 experiment note and sheets; merged (#70).
+
+Day3 step7 (2026-11-08): RC prepared on unchanged garden/oak. Six fresh worker-swap
+cases<230MB, max225.837; all hashes/counts match references. One +35.12% time
+outlier investigated with registered repeat below reference, original retained.
+187 analysis tests, stamped check, both builds and shipping regressions green.
+Local package/release notes/four sheets prepared. **User deferred real-phone soak;
+RC not release-ready, step7 pending.** No tag/deploy; step8 waits for completion
+and user merge. See step7 experiment note and docs/releases/0.17.0-rc.md.

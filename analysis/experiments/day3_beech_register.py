@@ -46,7 +46,7 @@ def main():
     reg['day3_seeds']={'training':list(range(21001,21021)),'selection':list(range(21021,21041)),'confirmation':list(range(21041,21061)),'treeml':list(range(21061,21081))}
     reg['candidate_protocol']={'current_assign':{},'physiology':'shipping species defaults pinned by model hashes; no historical fixed/form overlay','training_only':True}
     input_path=OUT/'current-inputs.json'
-    subprocess.run(['node','analysis/experiments/day3_beech_params.ts',str(input_path)],cwd=ROOT,check=True)
+    subprocess.run(['node','analysis/experiments/day3_species_beech_params.ts',str(input_path)],cwd=ROOT,check=True)
     data=json.loads(input_path.read_text());eff=data['effective'];start={}
     for knob in reg['knobs']:
         value=eff
@@ -59,7 +59,7 @@ def main():
     reg['fixed']={};reg['start']=start;reg['frozen_level0']={}
     reg['frozen_form_source']='Shipping effective current params; assign={} baseline, source-hashed default physiology.'
     reg['current_effective']=eff;reg['current_input_sha256']=file_hash(input_path)
-    reg['hashes']['analysis/experiments/day3_beech_params.ts']=file_hash(ROOT/'analysis/experiments/day3_beech_params.ts')
+    reg['hashes']['analysis/experiments/day3_species_beech_params.ts']=file_hash(ROOT/'analysis/experiments/day3_species_beech_params.ts')
     REG.write_text(json.dumps(reg,indent=1,default=float)+'\n')
     (OUT/'reference-identity.json').write_text(json.dumps({'registration_sha256':file_hash(REG),'identity':reg['target_identity'],'reference_inputs_sha256':inputs},indent=2)+'\n')
     print('v7:18 exact real target distributions; five unchanged holdouts;53 BioDiv/15 Demol; no model run',flush=True)

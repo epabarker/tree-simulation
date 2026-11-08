@@ -3366,8 +3366,8 @@
   "analysis/fit/targets/beech.toml": "847608d4c9cf18dee828fcfbdcee1598b7a22e2deac8bd1a71c8e21a7d51b539",
   "docs/experiments/fits/level0/beech.json": "4794cfd86a29da8c64ea317813e0981df7ac1fa1f0c1522e675ca6994241f5b2",
   "analysis/fit/sources/phase1-tolerances-v3.2.json": "e7004cf08abc026a41f945ce7225c2a3b677345500754bfa678a9972fb89f37c",
-  "analysis/experiments/day3_beech_register.py": "e067b6423b8958d7139effc82d59c8d7bfd5bd8ae4451f0d120d79b4e12083de",
-  "analysis/experiments/day3_beech_params.ts": "cf10ba0fdcf36050fef96e1180669c991ec90d713da4810f6c0a62e1f3be390a"
+  "analysis/experiments/day3_beech_register.py": "80688193f55ab7daef8f092ce18c06cc587b424a38da509e04497bc43224fb0c",
+  "analysis/experiments/day3_species_beech_params.ts": "cf10ba0fdcf36050fef96e1180669c991ec90d713da4810f6c0a62e1f3be390a"
  },
  "parent": {
   "path": "analysis/fit/sources/level1-beech.json",
@@ -3375,7 +3375,7 @@
  },
  "source": {
   "repository": "/home/edbarker/Documents/Projects/tree-simulation",
-  "commit": "8d6ec9298edf94054153d47c16eadc012f833c61",
+  "commit": "dd3e1a42b17625543dd8ee51d17809ae2c488ce6",
   "dirty": true,
   "source_sha256": {
    "analysis/fit/hand-overrides.toml": "9496e96f98de3197e5c6b87410345389fa4b2edd46c0b89e8761687cfd9addaa",

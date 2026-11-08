@@ -45,7 +45,11 @@ fn main() {
         file("new"),
         file("shoots"),
     );
-    writeln!(fsh, "season,tree,species,hostH,hostPath,n,leader,order,dx").unwrap();
+    writeln!(
+        fsh,
+        "season,tree,species,hostH,hostPath,n,leader,order,dx,ext"
+    )
+    .unwrap();
     writeln!(
         fs_,
         "season,tree,species,height,qTop,metamers,leaf,newMetamers,shedMetamers,trel,kShed,carbon,outside,maxDx,maxDz,buds,rDbh,leaderN"
@@ -146,16 +150,18 @@ fn main() {
                     if leader {
                         leader_n = n;
                     }
+                    // The shoot's extension (m): its metamers' summed length (wayfinder #89).
+                    let ext: f64 = (k..k + n).map(|q| tree.m.length[q]).sum::<f64>() * 0.25;
                     if dump {
                         writeln!(
                             fsh,
-                            "{s},{},{sp},{},{},{n},{},{},{}",
+                            "{s},{},{sp},{},{},{n},{},{},{},{ext}",
                             tree.id,
                             (tree.tip_y(h) - y0) * 0.25,
                             path[h] * 0.25,
                             leader as u8,
                             tree.m.order[k],
-                            (tree.tip_x(h) - x0) * 0.25
+                            (tree.tip_x(h) - x0) * 0.25,
                         )
                         .unwrap();
                     }

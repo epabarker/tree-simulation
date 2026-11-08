@@ -433,7 +433,7 @@ pub fn grow_buds(tree: &mut Tree, params: &Params, season: f64) {
     let mut shoot_length = 0.0;
     // The sink limit's inputs, as the season began: path length from the root (R1's, or summed
     // here without R1) and the root's height.
-    let path: Vec<f64> = if !params.c3.sink_turgor {
+    let path: Vec<f64> = if !(params.c3.sink_turgor || params.c3.sink_length) {
         Vec::new()
     } else if params.r1.enabled && tree.path_len.len() >= tree.m.len() {
         tree.path_len[..tree.m.len()].to_vec()
@@ -473,6 +473,8 @@ pub fn grow_buds(tree: &mut Tree, params: &Params, season: f64) {
                 season,
                 params,
             );
+        // The length form's scale on this shoot's internodes (1 when off).
+        let mut sink_s = 1.0;
         let mut n = if v >= threshold && !refused {
             if params.c3.sink_turgor {
                 // The sink limit (wayfinder #87): the tip uses a share s of what C3 gave it; the
@@ -482,6 +484,26 @@ pub fn grow_buds(tree: &mut Tree, params: &Params, season: f64) {
                 let s = turgor_scale(h, path[host] * CELL_M, &params.c3);
                 let full = math::min(v, cap);
                 let n = shoot_size(full * s, params, &mut shoot_length, cap);
+                let unused = if n > 0.0 { full * (1.0 - s) } else { full };
+                if params.r1.enabled && unused > 0.0 {
+                    let store = params.r1.store * tree.maintenance;
+                    tree.reserve = math::max(tree.reserve, math::min(tree.reserve + unused, store));
+                }
+                n
+            } else if params.c3.sink_length {
+                // The length form (wayfinder #89): the shoot keeps its metamers and buds, and its
+                // internodes are s as long; the carbon of the missing length goes to R1's reserve.
+                // At s = 0 the bud does not grow and all of it goes there.
+                let host = tree.b.metamer[i] as usize;
+                let h = (tree.tip_y(host) - root_y) * CELL_M;
+                let s = turgor_scale(h, path[host] * CELL_M, &params.c3);
+                let full = math::min(v, cap);
+                let n = if s > 0.0 {
+                    sink_s = s;
+                    shoot_size(v, params, &mut shoot_length, cap)
+                } else {
+                    0.0
+                };
                 let unused = if n > 0.0 { full * (1.0 - s) } else { full };
                 if params.r1.enabled && unused > 0.0 {
                     let store = params.r1.store * tree.maintenance;
@@ -504,6 +526,7 @@ pub fn grow_buds(tree: &mut Tree, params: &Params, season: f64) {
                 }
                 n = 1.0;
                 shoot_length = params.c1.internode_length;
+                sink_s = 1.0;
             }
         }
         if n > 0.0 {
@@ -549,7 +572,7 @@ pub fn grow_buds(tree: &mut Tree, params: &Params, season: f64) {
             } else {
                 0.0
             };
-            let mut length = shoot_length * elongation(shade, r5);
+            let mut length = shoot_length * elongation(shade, r5) * sink_s;
             if params.c1.shoot_length_sd > 0.0 {
                 length *=
                     shoot_length_factor(params, tree.id as f64, tree.b.birth_id[i] as f64, season);

@@ -133,6 +133,9 @@ pub struct C3 {
     /// c3.sink (exploratory, wayfinder #87): "turgor" caps each shoot's extension by its water
     /// status; "off" (the default, or absent) leaves C3 as it was.
     pub sink_turgor: bool,
+    /// c3.sink "turgorLength" (exploratory, wayfinder #89): the same Ψ scales each shoot's
+    /// internode length instead of its metamer count.
+    pub sink_length: bool,
     /// c3.sinkG: Ψ's gravity term per metre of the shoot's height above the root (MPa/m).
     pub sink_g: f64,
     /// c3.sinkR: Ψ's friction term per metre of path length from the root (MPa/m).
@@ -503,6 +506,7 @@ impl Params {
                 lambda: num(c3, "lambda"),
                 alpha: num(c3, "alpha"),
                 sink_turgor: c3.get("sink").and_then(Value::as_str) == Some("turgor"),
+                sink_length: c3.get("sink").and_then(Value::as_str) == Some("turgorLength"),
                 sink_g: opt(c3, "sinkG").unwrap_or(0.0),
                 sink_r: opt(c3, "sinkR").unwrap_or(0.0),
                 psi_crit: opt(c3, "psiCrit").unwrap_or(-1.0),

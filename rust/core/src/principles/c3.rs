@@ -6,7 +6,9 @@
 //! Exploratory (wayfinder #87, off by default): with c3.sink "turgor" a sink limit caps each
 //! shoot's extension by its water status Ψ = −(g·height + r·path length), Lockhart-linear to
 //! Ψ_crit (`turgor_scale`); C3 still allocates on light, and what a tip cannot use goes to R1's
-//! reserve (season.rs, grow_buds). Params c3.sink, c3.sinkG, c3.sinkR, c3.psiCrit.
+//! reserve (season.rs, grow_buds). Params c3.sink, c3.sinkG, c3.sinkR, c3.psiCrit. With c3.sink
+//! "turgorLength" (wayfinder #89) the same scale shortens the shoot's internodes and keeps its
+//! metamer count: shoots are one metamer from mid-life, so a count cap is only a gate.
 //!
 //! Params: c3.mode, c3.lambda (λ), c3.alpha (α); with R2 λ by pa and age and acrotony κ, and λ
 //! falls in weak wood of a vigorous tree (R2's vigour drop: r2.vigourShare, r2.vigourLambda,
@@ -234,6 +236,11 @@ mod tests {
         assert!(close(turgor_scale(20.0, 20.0, &p.c3), 0.4));
         assert!(close(turgor_scale(40.0, 40.0, &p.c3), 0.0));
         assert!(!Params::from_json(&preset("default", "{}")).c3.sink_turgor);
+        let p = Params::from_json(&crate::json::merge(
+            &preset("default", "{}"),
+            &crate::json::parse(r#"{"c3":{"sink":"turgorLength"}}"#).unwrap(),
+        ));
+        assert!(p.c3.sink_length && !p.c3.sink_turgor);
     }
 
     #[test]

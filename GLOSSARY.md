@@ -33,3 +33,19 @@ _Avoid_: visibility cut-off.
 **Gap phase**
 A stretch of a stand's life when the canopy trees have died and nothing has yet grown tall enough to replace them, leaving the stand without a canopy.
 _Avoid_: empty forest (that is the regression where no trees grow at all).
+
+**Rounded crown**
+A Form feature: a crown whose outline is full at the top, lying between a cone of the same width-to-height ratio and an ellipse, with its leaf spread down the crown rather than piled in a layer at the top. It is judged while the tree is still growing taller; a widening crown relative to height is one species' way of showing it, not the definition.
+_Avoid_: dome (when it means only W/H), wide crown.
+
+**Flat cap**
+A dense layer of leaf on a flat top over a thinner crown below. It is the defect when it appears on a tree still growing taller; on an old tree whose height growth has stalled, a flattened top is realistic.
+_Avoid_: lid (that is a closed stand's crown recession under its neighbours).
+
+**Vigorous phase**
+The part of a tree's life while its leader still extends strongly each year. The rounded crown is expected in this phase; the phases after it, as height growth stalls, flatten, thin and fragment the top.
+_Avoid_: young (a tree's phase follows its growth, not its age).
+
+**Sink limit**
+A limit on how much a shoot can grow that comes from the growing tip itself, not from a shortage of carbon: the tip cannot use what the tree has made, because it lacks the water pressure to expand. Higher and farther from the root, the limit is stronger.
+_Avoid_: hydraulic limit (which also names the carbon-supply reading), path-length cost.

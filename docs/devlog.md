@@ -21,7 +21,7 @@ Four RC-only sheets use audited unchanged current tiles. Local rc1 archive built
 without sourcemaps; source/asset/archive hashes recorded. Laptop browser switches
 garden/specimen/back successfully; not a phone soak or biological validation.
 
-**User deferred the required phone soak; RC remains pending, not release-ready.**
+**User deferred the required phone soak; draft PR#71 remains pending, not release-ready.**
 Stopped local server; durable review page in analysis/experiments/day3_rc_soak.html.
 Release notes and [full evidence](experiments/2026-11-08-day3-step7.md) prepared.
 /wrap-up applied; no ADR needed for unchanged model or deferred readiness.

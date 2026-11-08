@@ -6,7 +6,7 @@ _Last updated: 2026-11-08; day3 step7 RC prepared, phone soak deferred by user._
 
 ## Day3
 - Steps1–6 (#65–#70) merged by user. Current oak and current garden retained.
-- Step7 branch codex/day3-017-rc, base9ca76b2; gates360a25a, timing diagnosticcfba6b3.
+- Step7 draft PR#71: codex/day3-017-rc, base9ca76b2; gates360a25a, diagnosticcfba6b3.
 - Six NEW sequential budget cases: widths160/66 × seeds2/3/9; garden300/specimen150.
 - Worker save/free/specimen/restore protocol; all hashes/counts match references6/6.
 - WASM memory6/6<230MB, max225.837MB (4.163MB headroom); external checkpoint max23.675MB.

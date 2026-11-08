@@ -24,3 +24,17 @@
   - floor light 3.7–5.4% (real 2–10%);
   - **planted beech starves** (22 of 24 dead, as etiolated 4–10 m whips at about 3–5% of open light, where real beech saplings live at 1–3%).
 - **Not adopted.** The next question is beech's shade carbon balance (R1), for the night.
+
+## Day3 reevaluation (2026-11-08)
+
+Fixed A6b after beech lifespan-off, with current oak retained, fails the registered
+A4 crown gates: beech2/6 eligible seeds (needs≥5), hornbeam4/18 (needs≥14). The
+legacy LAI medians11.663/11.821 also miss5–9; their model-unit limitation remains.
+Beech survival27/40 and G-forest against approved B1 pass, but do not override
+these failures. All9 E2 conditions×20seeds are sensitivity evidence, not alternative
+adoption candidates. See [step6 results](../experiments/2026-11-07-day3-step6.md).
+
+**Still proposed and not adopted.** The shipping garden does not set periodic
+depth or change planting. No user look approval is sought for the blocked candidate.
+Post-box pruning diagnosis must use existing live levers before proposing a new
+mechanism with a measured unresolved mismatch and approved ADR.

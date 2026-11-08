@@ -16,7 +16,7 @@ def main():
             for row,c in enumerate(['current','base']):
                 for col,seed in enumerate(seeds):
                     img=Image.open(p.render/f'w{w}'/f'{c}-w{w}-s{seed}-{age}-on.png').convert('RGB')
-                    img=img.resize((tw,th),Image.Resampling.LANCZOS);x=col*tw;y=35+row*(th+10);sheet.paste(img,(x,y));d.text((x+5,y+4),f'{c} seed {seed}',font=font,fill='#202020')
+                    img=img.resize((tw,th),Image.Resampling.LANCZOS);x=col*tw;y=35+row*(th+10);sheet.paste(img,(x,y));label=f'{"Current" if c=="current" else "Layered"} seed {seed}';box=d.textbbox((x+5,y+4),label,font=font);d.rectangle((box[0]-3,y+2,box[2]+3,box[3]+3),fill='white');d.text((x+5,y+4),label,font=font,fill='#202020')
             d.text((10,th*2+58),'Fixed opening seeds; one periodic lap at common mature zoom. Tops may crop as in the garden. Look is not validation.',font=font,fill='#555555')
             sheet.save(p.out/f'layered-w{w}-age{age}.jpg',quality=88)
 if __name__=='__main__':main()

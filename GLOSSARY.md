@@ -49,3 +49,11 @@ _Avoid_: young (a tree's phase follows its growth, not its age).
 **Sink limit**
 A limit on how much a shoot can grow that comes from the growing tip itself, not from a shortage of carbon: the tip cannot use what the tree has made, because it lacks the water pressure to expand. Higher and farther from the root, the limit is stronger.
 _Avoid_: hydraulic limit (which also names the carbon-supply reading), path-length cost.
+
+**Bare bole**
+A Form feature: a trunk clear of living limbs for a large share of its height, as beech and hornbeam grow in a closed stand, where their lower limbs die as the canopy closes above them. It is judged in the stand; an open-grown tree keeping its low limbs is not the defect.
+_Avoid_: clear trunk (when dead stubs are meant too), self-pruning (that is the process, not the feature).
+
+**Live crown base**
+The height of a tree's lowest living limb, measured as a share of the tree's height. Dead stubs below it do not count.
+_Avoid_: crown base (when it is unclear whether dead limbs count), bole length.

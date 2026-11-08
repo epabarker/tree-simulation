@@ -1,5 +1,5 @@
 """Registered legacy and completeness denominators, empty stands and exact bars."""
-import json,subprocess,sys,importlib.util
+import json,subprocess,sys,importlib.util,shutil
 from pathlib import Path
 import pytest
 from treesim.layered_gates import crown_gate,birch_poles
@@ -31,6 +31,8 @@ def test_poles_uses_recruits_at100_inclusive_height_and_hd_boundaries():
 
 @pytest.fixture(scope='module')
 def prepared(tmp_path_factory):
+    if not shutil.which('node') or not (ROOT/'src/wasm/pkg/core_bg.wasm').exists():
+        pytest.skip('instrument integration needs Node 24 and built WASM; analysis-only CI has neither')
     p=tmp_path_factory.mktemp('layered')
     subprocess.run(['node','analysis/experiments/day3_layered_params.ts','prepare',str(p)],cwd=ROOT,check=True)
     return p

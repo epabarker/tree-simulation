@@ -2,6 +2,14 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-08: step6 CI integration coverage
+
+The new prepared-stand fixture initially failed in the analysis-only CI job, which
+has no built WASM. It now explicitly skips there, matching the existing instrument
+tests. Both instrument files also run in the Node24/WASM-enabled check job, so
+the integration coverage is required in CI rather than silently omitted. No model,
+experiment inputs, measured outputs or goldens changed.
+
 ## 2026-11-08: day-3 step6 — layered wood fails; current garden retained
 
 User merged #69; current oak remains the user's choice. Registered fixed A6b,

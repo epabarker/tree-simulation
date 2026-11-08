@@ -3,6 +3,16 @@
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
 
+## 2026-11-08: branch and issue cleanup; the engineering skills' setup
+
+- **Engineering skills** (mattpocock-skills): `docs/agents/` and CLAUDE.md's "Agent skills": GitHub Issues, the five default triage labels, ADRs in `docs/decisions/`.
+- **Branches:** only `main` and `3d-port` remain. Work found in neither (by hash or by patch) is kept as tags, pushed:
+  `archive/claude/stems-bark` (draft PR #47, ADR 0048 proposed), `archive/claude/blind-v2`, `archive/claude/n3-oak`,
+  `archive/claude/oak-form`, `archive/a-crown`, `archive/claude/species-round5`, `archive/claude/gallant-brown-5k4g33-local`,
+  `archive/claude/day2-f-foliage` (was `worktree-agent-a28199a6…`) and `archive/claude/c1-calibration-ustbkz`.
+  `claude/day2-twigs-lambda` is 7f946e1 on `3d-port`. Older entries name the branches; read them as these tags.
+- **Issues #53–56 closed** before the wayfinder map; #54 and #55 stay named regressions in `tests/regressions.json`.
+
 ## 2026-11-08: checkpoint for user assessment; step8 unfinished
 
 User requests a pause to assess progress. Completed the registered allocation/pipe

@@ -1,7 +1,7 @@
 # The blind naming test, v3: one scale (round 2's baseline, 2026-11-02)
 
 Round 2's measure ([brief](../plans/2026-11-02-beech-round2.md), "The measure" and Part 1's
-baseline): [v2](https://github.com/epabarker/tree-simulation/blob/claude/blind-v2/docs/experiments/2026-11-02-blind-test-v2.md)'s
+baseline): [v2](https://github.com/epabarker/tree-simulation/blob/2b6e6a4c6fed46461edd00291365e8264af54a57/docs/experiments/2026-11-02-blind-test-v2.md)'s
 protocol, with every plate drawn at one scale. A measurement only: no species, preset or core
 change. Seeds 1–3 are development seeds; any claim waits for fresh namers at seeds 4–6.
 
@@ -68,7 +68,7 @@ cells (50 m)._
   [`tally.md`](code/2026-11-02-blind-test-v3/tally.md)): v2's normalisation and pass rule,
   unchanged, on first guesses. Per namer, a source passes when it is named on ≥ 2 of 3 seeds in lone
   60, lone 100 and stand 100. Pooled, a seed counts when ≥ 2 of 3 namers name it. tally.py reads v2's
-  key and replies (from `claude/blind-v2`) for the tables beside v2.
+  key and replies (from the tag `archive/claude/blind-v2`) for the tables beside v2.
 
 ## Results
 
@@ -508,7 +508,7 @@ npm ci && npm run build:wasm && npm run dev -- --port 5181
 # playwright-core 1.64.1 in any scratch folder; PW_FROM points node's require at it
 PW_FROM=<scratch>/pw/x.js node docs/experiments/code/2026-11-02-blind-test-v3/shots.mjs http://localhost:5181/ <renders> 3
 python3 docs/experiments/code/2026-11-02-blind-test-v3/shuffle.py <renders> ~/blind-plates-v3
-# v2's key.json and namer-N.md: git show origin/claude/blind-v2:docs/experiments/code/2026-11-02-blind-test-v2/<file>
+# v2's key.json and namer-N.md: git show archive/claude/blind-v2:docs/experiments/code/2026-11-02-blind-test-v2/<file>
 python3 docs/experiments/code/2026-11-02-blind-test-v3/tally.py docs/experiments/code/2026-11-02-blind-test-v3 <v2-dir>
 uv run --project analysis python docs/experiments/code/2026-11-02-blind-test-v3/sheet.py <renders> docs/experiments/figures/2026-11-02-blind-test-v3-sheet.jpg
 # the addendum (set 2)

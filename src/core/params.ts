@@ -221,6 +221,11 @@ export interface Params {
     /** Quantile of the tree's live-bud Q that stands for the light at its crown top. */
     topQuantile: number;
     /**
+     * Accumulating relative test (exploratory, wayfinder "bare bole"): shed by Trel·Q_top only
+     * after kRel consecutive dark seasons; a season above resets the count. 1 or absent: as before.
+     */
+    kRel?: number;
+    /**
      * Own-crown pruning (fresh-look beech, repair): a vigorous tree (R2's vigour gate g by its
      * production, r2.vigourTreeLo/Hi) also sheds a lateral whose Q_b/n_b < g·Tvig·Q_top, so an
      * open-grown crown clears its first limbs under itself (branch autonomy; Sprugel et al. 1991, unread: ADR 0043, rejected).

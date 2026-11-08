@@ -156,6 +156,10 @@ pub struct C5 {
     /// g·Tvig·Q_top is shed too, g the tree's vigour gate (r2.vigourTreeLo/Hi; 1 when unset).
     /// 0 or absent: off.
     pub t_vig: f64,
+    /// Accumulating relative test (wayfinder "bare bole"): a lateral is shed by T_rel·Q_top only
+    /// after this many consecutive dark seasons; a season above resets the count. 1 or absent:
+    /// this season alone, as before.
+    pub k_rel: f64,
 }
 
 #[derive(Clone, Debug)]
@@ -513,6 +517,7 @@ impl Params {
                     t_rel: num(g, "Trel"),
                     top_quantile: num(g, "topQuantile"),
                     t_vig: opt(g, "Tvig").unwrap_or(0.0),
+                    k_rel: opt(g, "kRel").unwrap_or(1.0),
                 }
             },
             c6: {

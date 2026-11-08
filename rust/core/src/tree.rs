@@ -330,6 +330,10 @@ pub struct Tree {
     /// the table so the existing state-hash schema stays unchanged. Checkpoint v3 persists it
     /// separately (ADR 0059); old v1/v2 checkpoints initialise the missing history to zero.
     pub deficit: Vec<f64>,
+    /// Consecutive seasons each metamer's subtree has been dark by C5's relative test (light per
+    /// metamer < T_rel·Q_top), read when `c5.kRel` > 1. Not checkpointed (exploratory, wayfinder
+    /// "bare bole" probe): a restored world restarts its dark runs at 0.
+    pub dark: Vec<f64>,
     pub released: f64,
     pub epicormic: f64,
     pub aborted: f64,
@@ -398,6 +402,7 @@ impl Tree {
             &mut self.stress,
             &mut self.node_shade,
             &mut self.deficit,
+            &mut self.dark,
         ] {
             *v = Vec::new();
         }

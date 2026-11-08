@@ -12,7 +12,10 @@
 //! young dome and the lower trunk clears (the photographs: the open-grown beech's trunk bare for
 //! its lowest 1/8–1/6). A stand member never opens the gate, so its shedding is C5's own.
 //!
-//! Params: c5.T, c5.g, c5.Trel, c5.topQuantile, c5.Tvig; c6.n; r1.shed; r4.bank;
+//! With `c5.kRel` > 1 the relative test accumulates: a lateral goes only after kRel consecutive
+//! dark seasons (a per-row counter like R1's deficit run; wayfinder "bare bole", exploratory).
+//!
+//! Params: c5.T, c5.g, c5.Trel, c5.kRel, c5.topQuantile, c5.Tvig; c6.n; r1.shed; r4.bank;
 //! r2.vigourTreeLo, r2.vigourTreeHi.
 
 use super::c1::{add_bud, bud_frame};
@@ -62,6 +65,30 @@ pub fn shed_branches(tree: &mut Tree, params: &Params, season: f64, evaluated: u
             };
         }
     }
+    // C5's accumulating relative test: a lateral must be dark (light per metamer < T_rel·Q_top)
+    // k_rel seasons in a row; a season above resets it. Branch death follows light relative to
+    // the crown over several seasons (Henriksson 2001; Sprugel 2002). k_rel 1 needs no counter.
+    let rel = params.c5.t_rel * tree.q_top;
+    let k_rel = params.c5.k_rel;
+    if k_rel > 1.0 {
+        ensure(&mut tree.dark, nm);
+        for i in 0..evaluated {
+            let n_b = tree.m.n_sum[i] as f64;
+            let light = if n_b > 0.0 {
+                tree.m.q_sum[i] / n_b
+            } else {
+                0.0
+            };
+            tree.dark[i] = if light < rel { tree.dark[i] + 1.0 } else { 0.0 };
+        }
+    }
+    let dim = |tree: &Tree, i: usize, light: f64| {
+        if k_rel > 1.0 {
+            tree.dark[i] >= k_rel
+        } else {
+            light < rel
+        }
+    };
     let mut dead = std::mem::take(&mut tree.scratch_u);
     ensure(&mut dead, nm.max(tree.b.len()));
     dead[..nm].fill(0);
@@ -77,7 +104,9 @@ pub fn shed_branches(tree: &mut Tree, params: &Params, season: f64, evaluated: u
         let n_b = c.n_sum[i] as f64;
         let light = if n_b > 0.0 { c.q_sum[i] / n_b } else { 0.0 };
         let shed = if carbon {
-            tree.deficit[i] >= params.r1.k_shed || light < params.c5.t_rel * tree.q_top
+            tree.deficit[i] >= params.r1.k_shed || dim(tree, i, light)
+        } else if k_rel > 1.0 {
+            n_b > 0.0 && (light < params.c5.t || dim(tree, i, light))
         } else {
             n_b > 0.0 && light < t
         } || (own > 0.0 && n_b > 0.0 && light < own);
@@ -187,6 +216,15 @@ pub fn remove_branches(
             }
         }
         tree.deficit.truncate(tree.m.len());
+    }
+    if !tree.dark.is_empty() {
+        ensure(&mut tree.dark, nm);
+        for i in 0..nm {
+            if keep[i] != 0 {
+                tree.dark[old_to_new[i] as usize] = tree.dark[i];
+            }
+        }
+        tree.dark.truncate(tree.m.len());
     }
     // R4's bud bank: a dormant bud where each branch was, at its azimuth around the parent as
     // the parent now lies.
@@ -331,6 +369,30 @@ pub(crate) mod tests {
         assert_eq!(dim_lateral(1.0, &relative), 2.0); // bright top: T_eff = 0.3 > 0.15, shed
         assert_eq!(dim_lateral(0.4, &relative), 0.0); // dim top: T_eff = 0.12 < 0.15, kept
         assert_eq!(dim_lateral(1.0, &params("{}")), 0.0); // T_rel = 0 ignores the top
+    }
+
+    #[test]
+    fn an_accumulating_relative_test_sheds_after_k_dark_seasons_and_a_bright_one_resets() {
+        // kRel 3: the lateral (0.15 per metamer, under T_rel·Q_top = 0.3) must be dark three
+        // seasons in a row; a bright season in between restarts the count.
+        let p = params(r#"{"c5":{"Trel":0.3,"kRel":3}}"#);
+        let mut t = small_tree(&p);
+        t.q_top = 1.0;
+        let season = |t: &mut Tree, q: f64| {
+            t.m.q_sum[2] = q;
+            t.m.n_sum[2] = 2;
+            t.m.q_sum[1] = 1.0;
+            t.m.n_sum[1] = 1;
+            let nm = t.m.len();
+            shed_branches(t, &p, 5.0, nm)
+        };
+        assert_eq!(season(&mut t, 0.3), 0.0); // dark 1
+        assert_eq!(season(&mut t, 0.3), 0.0); // dark 2
+        assert_eq!(season(&mut t, 1.0), 0.0); // bright: reset
+        assert_eq!(season(&mut t, 0.3), 0.0); // dark 1
+        assert_eq!(season(&mut t, 0.3), 0.0); // dark 2
+        assert_eq!(season(&mut t, 0.3), 2.0); // dark 3: shed with its tip
+        assert_eq!(t.dark.len(), t.m.len());
     }
 
     #[test]

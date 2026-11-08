@@ -21,6 +21,10 @@ jobs:
       - run: npm ci
       - name: "Check: the WASM build, Rust fmt, clippy and tests (with threads), lint, typecheck, vitest (goldens in WASM and natively)"
         run: npm run check
+      - name: Instrument integration (Node 24 and built WASM)
+        run: |
+          pipx install uv
+          uv run --project analysis --with pytest pytest analysis/tests/test_day3_instruments.py analysis/tests/test_layered_gates.py -q -rs
       - run: npm run build
       - name: Garden build, within its size budget (ADR 0014)
         run: npm run build:garden

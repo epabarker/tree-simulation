@@ -207,5 +207,12 @@ reduces hornbeam share42.64%→20.35%; B1 is12.54%, including later changes.
 Day-3 step5 (2026-11-07): fixed N3 passes fresh20 lone median gates (kinks150 at
 its limit; D150 near lower edge), examined garden kink gate, G-forest vs frozenB1
 and corrected worker-swap memory12/12<230MB.180 analysis tests pass. User chose **retain current oak** on the sheets; N3 is not adopted. This is a look
-decision, with no species-validation claim. Step5 PR #69 awaits user merge.
+decision, with no species-validation claim. Step5 merged (#69).
 See the day-3 step-5 experiment note for per-seed coverage and specimen cost flags.
+
+Day-3 step6 (2026-11-08): fixed A6b not adopted. Crown gates beech2/6 vs≥5,
+hornbeam4/18 vs≥14 and legacy LAI11.663/11.821 vs5–9 fail. G-forest vs frozenB1
+and resource gates pass; birch19/20 is19empty-recruit cases. E2 all180stands
+measured; no clean±10%floor direction, no variant selected. Current garden and
+oak unchanged; ADR0058 stays proposed.187 analysis tests/build/stamped checks
+green. See step6 experiment note and sheets; PR awaits user merge before RC.

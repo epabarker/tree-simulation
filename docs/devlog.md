@@ -2,6 +2,48 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-08: step6 CI integration coverage
+
+The new prepared-stand fixture initially failed in the analysis-only CI job, which
+has no built WASM. It now explicitly skips there, matching the existing instrument
+tests. Both instrument files also run in the Node24/WASM-enabled check job, so
+the integration coverage is required in CI rather than silently omitted. No model,
+experiment inputs, measured outputs or goldens changed.
+
+## 2026-11-08: day-3 step6 — layered wood fails; current garden retained
+
+User merged #69; current oak remains the user's choice. Registered fixed A6b,
+A4/N2 gates and all9 E2 conditions at8319306 before runs on0ec8d6d. **No adoption:**
+beech crown2/6 eligible seeds vs≥5, hornbeam4/18 vs≥14; legacy LAI11.663/11.821
+vs5–9 fails. Its leaf units remain unverified m²/m²; no unit refit or gate change.
+Height-complete eligibility gives the same crown failures. [Full results](experiments/2026-11-07-day3-step6.md).
+
+G-forest18/1/19/11 vs B1 bars−2/−2/12/10 passes, first two constraints vacuous.
+Separate metamers.365741×B1. Birch19/20 passes, all19empty-recruit cases; sole
+qualifying recruit fails193.03>120. Beech27/40 reproduces N1 first150 metrics
+exactly, not held-out evidence. Floor18/20 and20/20 in band at100/150 does not
+replace the hard misses. Canopy density150median125/ha vs soft289.
+
+E2 all180stands audited. Every probe changes20/20hashes, but both signs raise
+floor medians slightly (+.00170–.00687 vs base spread.05750), no clean monotone
+response; survival27–28/40. No probe selected as a new candidate. Cost30.24wallmin,
+5.25waited-childCPUh. Prepared-stand DAG input added; actual lone worlds isolated.
+All160 lone-input pairs identical. Twenty-four view worlds, fixed laptop/phone
+sheets rendered in WebGL2 at100/150; look materials are not biological validation.
+
+Six fresh candidate actual worker-swap memory cases pass<230MB, max121.176MB;
+all restored/specimen hashes match. Current references reused only after exact
+source/WASM/protocol/parameter identity proof; missing references fall back fresh.
+Both shipping regressions unchanged. Candidate phone case has fewer canopy trees
+at50/100 and the same two at150; shipping baselines unchanged.
+
+Provenance correction: step5's cache misses came from full N3 parameter JSON,
+including unused species definitions, not a new binary digest. B1/N3/current
+digests match; previous prose corrected, data/verdicts unchanged. Canonical step6
+comparators all40exact cache hits.187 analysis tests, stamped check and build pass;
+no production/core/species/preset/golden changes. ADR0058 remains proposed. /wrap-up
+complete; step7 waits for user merge. No merge, tag or deployment.
+
 ## 2026-11-07: day-3 step5 — N3 evaluated; user retains current oak
 
 User merged #68. Gates/patch committed7e08e75 on merged fe1c049; exact candidate
@@ -14,7 +56,9 @@ maximum34 versusN3 6. No tuning or new mechanism. [Full methods/results](experim
 
 G-forest0/1/14/12 against B1 bars−2/−2/12/10 passes; first two bars vacuous,
 absolute floor remains0. Separate metamers63,852.5/66,923=.954119×. Exact-hash
-cache correctly regenerated40 lone comparators under the new binary digest.
+cache correctly regenerated40 lone comparators because the full parameter world
+changed (including unused oak definitions). Step6 corrected the earlier mistaken
+new-binary explanation: the binary digest is the same as B1.
 
 Corrected memory12/12<230MB, N3 maximum224.920MB; all restored hashes match.
 Initial helper wrongly retained two live worlds; two readings discarded and an

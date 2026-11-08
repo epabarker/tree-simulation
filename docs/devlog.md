@@ -14,7 +14,9 @@ maximum34 versusN3 6. No tuning or new mechanism. [Full methods/results](experim
 
 G-forest0/1/14/12 against B1 bars−2/−2/12/10 passes; first two bars vacuous,
 absolute floor remains0. Separate metamers63,852.5/66,923=.954119×. Exact-hash
-cache correctly regenerated40 lone comparators under the new binary digest.
+cache correctly regenerated40 lone comparators because the full parameter world
+changed (including unused oak definitions). Step6 corrected the earlier mistaken
+new-binary explanation: the binary digest is the same as B1.
 
 Corrected memory12/12<230MB, N3 maximum224.920MB; all restored hashes match.
 Initial helper wrongly retained two live worlds; two readings discarded and an

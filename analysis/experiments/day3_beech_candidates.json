@@ -1,0 +1,30 @@
+{
+  "source": "Only ten form knobs from prior-v3/v4 finalists; all physiology/defaults remain shipping-current",
+  "candidates": {
+    "current": {},
+    "prior-v3": {
+      "r2.levels.0.lambda": 0.5462,
+      "r2.levels.1.lambda": 0.5177,
+      "r2.levels.1.setPoint": 66.91,
+      "r2.levels.1.postureSetPoint": 33.74,
+      "r2.levels.1.branchAngle": 41.29,
+      "r2.levels.1.eta": 0.3413,
+      "r2.levels.2.setPoint": 88.11,
+      "r2.aC": 18.04,
+      "r2.dLambda": 0.02691,
+      "r2.kappa": 0.5554
+    },
+    "prior-v4": {
+      "r2.levels.0.lambda": 0.54,
+      "r2.levels.1.lambda": 0.5109,
+      "r2.levels.1.setPoint": 28.54,
+      "r2.levels.1.postureSetPoint": 33.62,
+      "r2.levels.1.branchAngle": 40.31,
+      "r2.levels.1.eta": 0.5673,
+      "r2.levels.2.setPoint": 87.02,
+      "r2.aC": 15.46,
+      "r2.dLambda": 0.01648,
+      "r2.kappa": 0.2243
+    }
+  }
+}

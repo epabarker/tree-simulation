@@ -22,3 +22,17 @@
 - **Red at the end.** If a turn ends while the check is still red (the hook let it through, shown as a warning), the final report must say so and name the log.
 - **Experiments** with ≥ 3 conditions fan out one `experiment-worker` per condition (`/run-experiment`, step 4). Only the main session writes `docs/`.
 - Harness principles and run log: docs/background/harness-principles.md — read the relevant P-section before changing hooks, agents or model tiers
+
+## Agent skills
+
+### Issue tracker
+
+GitHub Issues on `epabarker/tree-simulation`, via the `gh` CLI. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+The five default role labels: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context: a root `GLOSSARY.md` (not written yet) and the ADRs in `docs/decisions/`. See `docs/agents/domain.md`.

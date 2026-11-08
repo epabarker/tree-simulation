@@ -38,7 +38,10 @@ From the [open-box note](https://github.com/epabarker/tree-simulation/blob/wayfi
 ## Species expressions
 
 - **Ψ_crit** is the species knob: a tree's tolerance of low water status.
-- **Oak:** a dome, plus W/H rising with DBH. Its spire (the leader's stall over the low limbs) is part of this feature.
+- **Oak:** a dome, plus W/H rising with DBH. Its young spire (the leader over the low limbs) and its wide low limbs are both required (decided in [Which open-grown oak does the rounded-crown page take…](https://github.com/epabarker/tree-simulation/issues/93)). The oak rounds through C3's λ, not the length cap: a falling λ (`r2.dLambda`) divides its top and fills its flank ([oak-λ note](https://github.com/epabarker/tree-simulation/blob/wayfinder/oak-lambda/docs/experiments/2026-11-08-oak-lambda.md)). No λ schedule alone keeps the spire and the limbs as well ([oak-schedule note](https://github.com/epabarker/tree-simulation/blob/wayfinder/oak-schedule/docs/experiments/2026-11-08-oak-schedule.md)), because the oak's leader above 0.5 H is a pa-1 lateral that took over, on the same level as the limbs.
+  - **Target, pending its probe: a takeover is a relay.** When a lateral replaces a lost main bud (died, shed or dormant, not only ended), it takes the host axis's level through ADR 0033's substitution (the host's order and shift). Then a per-level `dLambdaShare` can spare pa 1 (the limbs) while the top's λ falls. It is a general R2 rule behind a param (name provisional, e.g. `r2.relayOnLoss`), off by default; the probe checks first how the oak's pa-1 leader arises at HEAD, and falls back to a vigour-overtaking trigger only if loss does not catch it.
+  - **The late-dividing box is a defect.** A λ fall that is late or slow (`a13r40`) keeps the young form but gives a flat-topped, straight-sided box by 100 while the tree is still growing taller. That is this page's defect, not the old-tree flattening, which comes only after the stall.
+  - **Fallback: the early dome** (`d12a13`: dLambda 0.12 from aC 13.5). A rounded dome by 100, at the cost of a squat young bush (15–16 m at 30) and a low reach of 12–14 m. The page takes it if the takeover relay fails its probe.
 - **Maple (sycamore):** an outline dome. Its W/H need not rise (Pretzsch: α_cr − α_h = −0.05).
 - **Birch, the contrast:** stays an excurrent ovoid, with W/H ≤ 0.7 at season 100. There is no birch-specific rule; if the cap alone leaves birch a dome, its expression is stronger apical control through the existing λ.
 - **Beech posture** (level plates, ADR 0045) is not part of this feature.
@@ -47,7 +50,7 @@ From the [open-box note](https://github.com/epabarker/tree-simulation/blob/wayfi
 
 Exploratory: the feature probe ([prototype](https://github.com/epabarker/tree-simulation/tree/wayfinder/feature-probe)), a lone open-grown tree (60 m box), seeds 1–3, at seasons 30/60/100, HEAD against patch, run friction-heavy and gravity-heavy. **The contact sheet decides**; the numbers explain:
 
-1. **Top-fifth leaf share** 0.15–0.30 (ADR 0031: 22–24% rounded, 38–46% cap).
+1. **w90**, the outline's width at 0.9 of the crown's depth over its widest width (an ellipse gives 0.6): a spire ≤ 0.49, a divided crown 0.38–0.85. It does not separate a dome from a box, so the season-100 contact sheet is checked by eye for a flat top and the verdict recorded. The **top-fifth leaf share** (0.15–0.30, ADR 0031) stays for maple only, whose crown is raised; a filled ellipsoid reaching the ground scores 0.10, so it fails a ground-reaching dome by construction.
 2. **Upper-flank share of new metamers** ≥ 5% in oak and maple (oak: 0.1–0.3% today).
 3. **Extension against path length and against height**: the fingerprint that the mechanism is acting, falling together at the leader and the long lateral tips.
 4. **Leader extension rate**, to mark the vigorous phase against the stall.

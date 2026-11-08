@@ -224,3 +224,12 @@ outlier investigated with registered repeat below reference, original retained.
 Local package/release notes/four sheets prepared. **User deferred real-phone soak;
 RC not release-ready, step7 pending.** No tag/deploy; step8 waits for completion
 and user merge. See step7 experiment note and docs/releases/0.17.0-rc.md.
+User merged preparation (#71); phone soak remains deferred, so no release-readiness claim.
+
+Step8 paused for user assessment (2026-11-08), not complete. Beech's bounded
+assessment is complete: candidate BioDiv19/20 but spread fails; Demol11/20<15
+and spread fails. TreeML unmatched within the registered window; retain current.
+Separate sycamore/ash targets and prototypes are registered. Latest160-stand
+allocation/pipe grid best3/20 and1/20 against15/20; neither qualifies. Fresh
+new-species confirmation blocks untouched. No garden adoption or production
+behaviour change; fitting, confirmation and garden/resource gates remain.

@@ -247,3 +247,18 @@ def test_beech_lifespan_removal_keeps_short_shoots_enabled():
     assert beech['r6']['leafArea'] == pytest.approx(2.474)
     overrides = tomllib.loads((ROOT / 'analysis/fit/hand-overrides.toml').read_text())['beech']
     assert 'r6.lifespan' not in overrides
+
+@pytest.mark.skipif(not shutil.which('node') or not (ROOT / 'src/wasm/pkg/core_bg.wasm').exists(),
+                    reason='instrument integration needs Node 24 and built WASM; analysis-only CI has neither')
+def test_dag_can_resolve_candidate_only_species_without_changing_the_default_roster(tmp_path):
+    patch=tmp_path/'patch.json';patch.write_text(json.dumps({'candidate':{'r1.fRep':.8,'r1.maturity':110}}))
+    dest=tmp_path/'dag'
+    subprocess.run([sys.executable,'-m','treesim.build_dag',str(dest),'--worktree',str(ROOT),'--species','candidate','--patch',str(patch),'--no-figures'],check=True)
+    for context in ['lone','stand']:
+        effective=json.loads((dest/f'species_effective_{context}.json').read_text())
+        assert list(effective)==['candidate']
+        assert effective['candidate']['r1']['fRep']==.8
+        assert effective['candidate']['r1']['maturity']==110
+    dag=json.loads((dest/'dag.json').read_text())
+    assert dag['provenance']['selected_species']==['candidate']
+    assert 'candidate' in dag['per_species']['lone']

@@ -1,0 +1,636 @@
+{
+  "registration_commit": "859aae3",
+  "tool_commit": "af1a3ee",
+  "conditions": [
+    {
+      "species": "sycamore",
+      "condition": "l20-p20",
+      "lambda": 0.6656399999999999,
+      "r0": 0.0030887999999999996,
+      "mw": 44.44444444444444,
+      "pipe_scale": 1.2,
+      "passed": 3,
+      "N": 20,
+      "bar": 15,
+      "T": 1.01637477235648,
+      "median_stat": 1.3250122520781775,
+      "changes": {
+        "stand.H.0": {
+          "median": 23.56891847422921,
+          "base_median": 18.082793683162354,
+          "shift": 5.486124791066857,
+          "base_p90_p10": 3.673710488057811,
+          "beyond_spread": true
+        },
+        "stand.H.1": {
+          "median": 24.86468967325296,
+          "base_median": 20.30358756781835,
+          "shift": 4.56110210543461,
+          "base_p90_p10": 5.723359374158498,
+          "beyond_spread": false
+        },
+        "stand.H.2": {
+          "median": 27.283048206183548,
+          "base_median": 22.014520413690708,
+          "shift": 5.26852779249284,
+          "base_p90_p10": 7.726671325565633,
+          "beyond_spread": false
+        },
+        "stand.CR.0": {
+          "median": 4.032948265209889,
+          "base_median": 4.651043137599364,
+          "shift": -0.6180948723894755,
+          "base_p90_p10": 1.4178555720852182,
+          "beyond_spread": false
+        },
+        "stand.CR.1": {
+          "median": 3.949391538966232,
+          "base_median": 4.440014865484583,
+          "shift": -0.4906233265183513,
+          "base_p90_p10": 2.035850391090652,
+          "beyond_spread": false
+        },
+        "stand.CR.2": {
+          "median": 3.8979579765921395,
+          "base_median": 4.641064058236451,
+          "shift": -0.7431060816443118,
+          "base_p90_p10": 2.717869785375384,
+          "beyond_spread": false
+        },
+        "stand.dbh.0": {
+          "median": 0.21572464571278843,
+          "base_median": 0.2485762395131226,
+          "shift": -0.03285159380033417,
+          "base_p90_p10": 0.09385110255750972,
+          "beyond_spread": false
+        },
+        "stand.dbh.1": {
+          "median": 0.2304748189422598,
+          "base_median": 0.2731748693100581,
+          "shift": -0.04270005036779828,
+          "base_p90_p10": 0.14267307079850797,
+          "beyond_spread": false
+        },
+        "stand.dbh.2": {
+          "median": 0.2582629604167147,
+          "base_median": 0.3074306150140124,
+          "shift": -0.049167654597297716,
+          "base_p90_p10": 0.14414571870281007,
+          "beyond_spread": false
+        }
+      }
+    },
+    {
+      "species": "sycamore",
+      "condition": "l20-p30",
+      "lambda": 0.6656399999999999,
+      "r0": 0.0033462,
+      "mw": 37.869822485207095,
+      "pipe_scale": 1.3,
+      "passed": 0,
+      "N": 20,
+      "bar": 15,
+      "T": 1.01637477235648,
+      "median_stat": 1.4792478081318814,
+      "changes": {
+        "stand.H.0": {
+          "median": 25.05774731497486,
+          "base_median": 18.082793683162354,
+          "shift": 6.974953631812507,
+          "base_p90_p10": 3.673710488057811,
+          "beyond_spread": true
+        },
+        "stand.H.1": {
+          "median": 27.800828411705005,
+          "base_median": 20.30358756781835,
+          "shift": 7.4972408438866545,
+          "base_p90_p10": 5.723359374158498,
+          "beyond_spread": true
+        },
+        "stand.H.2": {
+          "median": 27.91488918781332,
+          "base_median": 22.014520413690708,
+          "shift": 5.900368774122612,
+          "base_p90_p10": 7.726671325565633,
+          "beyond_spread": false
+        },
+        "stand.CR.0": {
+          "median": 4.286239238583842,
+          "base_median": 4.651043137599364,
+          "shift": -0.3648038990155227,
+          "base_p90_p10": 1.4178555720852182,
+          "beyond_spread": false
+        },
+        "stand.CR.1": {
+          "median": 4.180186063326346,
+          "base_median": 4.440014865484583,
+          "shift": -0.25982880215823734,
+          "base_p90_p10": 2.035850391090652,
+          "beyond_spread": false
+        },
+        "stand.CR.2": {
+          "median": 4.166963668671277,
+          "base_median": 4.641064058236451,
+          "shift": -0.47410038956517386,
+          "base_p90_p10": 2.717869785375384,
+          "beyond_spread": false
+        },
+        "stand.dbh.0": {
+          "median": 0.2255730873862638,
+          "base_median": 0.2485762395131226,
+          "shift": -0.0230031521268588,
+          "base_p90_p10": 0.09385110255750972,
+          "beyond_spread": false
+        },
+        "stand.dbh.1": {
+          "median": 0.24854612715626928,
+          "base_median": 0.2731748693100581,
+          "shift": -0.024628742153788796,
+          "base_p90_p10": 0.14267307079850797,
+          "beyond_spread": false
+        },
+        "stand.dbh.2": {
+          "median": 0.26627890866934156,
+          "base_median": 0.3074306150140124,
+          "shift": -0.04115170634467086,
+          "base_p90_p10": 0.14414571870281007,
+          "beyond_spread": false
+        }
+      }
+    },
+    {
+      "species": "sycamore",
+      "condition": "l30-p20",
+      "lambda": 0.72111,
+      "r0": 0.0030887999999999996,
+      "mw": 44.44444444444444,
+      "pipe_scale": 1.2,
+      "passed": 1,
+      "N": 20,
+      "bar": 15,
+      "T": 1.01637477235648,
+      "median_stat": 1.4523240607548622,
+      "changes": {
+        "stand.H.0": {
+          "median": 27.588723395329637,
+          "base_median": 18.082793683162354,
+          "shift": 9.505929712167283,
+          "base_p90_p10": 3.673710488057811,
+          "beyond_spread": true
+        },
+        "stand.H.1": {
+          "median": 28.010437506120734,
+          "base_median": 20.30358756781835,
+          "shift": 7.706849938302383,
+          "base_p90_p10": 5.723359374158498,
+          "beyond_spread": true
+        },
+        "stand.H.2": {
+          "median": 28.0609597727738,
+          "base_median": 22.014520413690708,
+          "shift": 6.046439359083092,
+          "base_p90_p10": 7.726671325565633,
+          "beyond_spread": false
+        },
+        "stand.CR.0": {
+          "median": 4.579831780403901,
+          "base_median": 4.651043137599364,
+          "shift": -0.07121135719546334,
+          "base_p90_p10": 1.4178555720852182,
+          "beyond_spread": false
+        },
+        "stand.CR.1": {
+          "median": 4.499041653016858,
+          "base_median": 4.440014865484583,
+          "shift": 0.05902678753227519,
+          "base_p90_p10": 2.035850391090652,
+          "beyond_spread": false
+        },
+        "stand.CR.2": {
+          "median": 4.296768455353438,
+          "base_median": 4.641064058236451,
+          "shift": -0.34429560288301353,
+          "base_p90_p10": 2.717869785375384,
+          "beyond_spread": false
+        },
+        "stand.dbh.0": {
+          "median": 0.25176090590715916,
+          "base_median": 0.2485762395131226,
+          "shift": 0.003184666394036556,
+          "base_p90_p10": 0.09385110255750972,
+          "beyond_spread": false
+        },
+        "stand.dbh.1": {
+          "median": 0.2704609153098917,
+          "base_median": 0.2731748693100581,
+          "shift": -0.0027139540001663853,
+          "base_p90_p10": 0.14267307079850797,
+          "beyond_spread": false
+        },
+        "stand.dbh.2": {
+          "median": 0.2846559589675458,
+          "base_median": 0.3074306150140124,
+          "shift": -0.022774656046466613,
+          "base_p90_p10": 0.14414571870281007,
+          "beyond_spread": false
+        }
+      }
+    },
+    {
+      "species": "sycamore",
+      "condition": "l30-p30",
+      "lambda": 0.72111,
+      "r0": 0.0033462,
+      "mw": 37.869822485207095,
+      "pipe_scale": 1.3,
+      "passed": 0,
+      "N": 20,
+      "bar": 15,
+      "T": 1.01637477235648,
+      "median_stat": 1.475155092204278,
+      "changes": {
+        "stand.H.0": {
+          "median": 28.00474269110533,
+          "base_median": 18.082793683162354,
+          "shift": 9.921949007942978,
+          "base_p90_p10": 3.673710488057811,
+          "beyond_spread": true
+        },
+        "stand.H.1": {
+          "median": 28.25467726784304,
+          "base_median": 20.30358756781835,
+          "shift": 7.9510897000246885,
+          "base_p90_p10": 5.723359374158498,
+          "beyond_spread": true
+        },
+        "stand.H.2": {
+          "median": 28.27339594556117,
+          "base_median": 22.014520413690708,
+          "shift": 6.258875531870462,
+          "base_p90_p10": 7.726671325565633,
+          "beyond_spread": false
+        },
+        "stand.CR.0": {
+          "median": 4.692274049859217,
+          "base_median": 4.651043137599364,
+          "shift": 0.041230912259852204,
+          "base_p90_p10": 1.4178555720852182,
+          "beyond_spread": false
+        },
+        "stand.CR.1": {
+          "median": 4.543741379731815,
+          "base_median": 4.440014865484583,
+          "shift": 0.10372651424723145,
+          "base_p90_p10": 2.035850391090652,
+          "beyond_spread": false
+        },
+        "stand.CR.2": {
+          "median": 4.43435871687562,
+          "base_median": 4.641064058236451,
+          "shift": -0.20670534136083152,
+          "base_p90_p10": 2.717869785375384,
+          "beyond_spread": false
+        },
+        "stand.dbh.0": {
+          "median": 0.26648867373993645,
+          "base_median": 0.2485762395131226,
+          "shift": 0.01791243422681385,
+          "base_p90_p10": 0.09385110255750972,
+          "beyond_spread": false
+        },
+        "stand.dbh.1": {
+          "median": 0.28534818642402404,
+          "base_median": 0.2731748693100581,
+          "shift": 0.012173317113965965,
+          "base_p90_p10": 0.14267307079850797,
+          "beyond_spread": false
+        },
+        "stand.dbh.2": {
+          "median": 0.3048920038242137,
+          "base_median": 0.3074306150140124,
+          "shift": -0.0025386111897987007,
+          "base_p90_p10": 0.14414571870281007,
+          "beyond_spread": false
+        }
+      }
+    },
+    {
+      "species": "ash",
+      "condition": "l20-p20",
+      "lambda": 0.6656399999999999,
+      "r0": 0.0030887999999999996,
+      "mw": 44.44444444444444,
+      "pipe_scale": 1.2,
+      "passed": 0,
+      "N": 20,
+      "bar": 15,
+      "T": 0.9895606957130446,
+      "median_stat": 1.605534827349307,
+      "changes": {
+        "stand.H.0": {
+          "median": 25.94758391600292,
+          "base_median": 17.977289393428215,
+          "shift": 7.970294522574704,
+          "base_p90_p10": 4.519926576721009,
+          "beyond_spread": true
+        },
+        "stand.H.1": {
+          "median": 30.02385607162886,
+          "base_median": 20.642407948067948,
+          "shift": 9.381448123560912,
+          "base_p90_p10": 7.489120966204116,
+          "beyond_spread": true
+        },
+        "stand.H.2": {
+          "median": 31.961057107858718,
+          "base_median": 21.603697615493054,
+          "shift": 10.357359492365664,
+          "base_p90_p10": 8.340427604235991,
+          "beyond_spread": true
+        },
+        "stand.CR.0": {
+          "median": 4.424859822306596,
+          "base_median": 4.666765998103098,
+          "shift": -0.24190617579650198,
+          "base_p90_p10": 1.806663665002815,
+          "beyond_spread": false
+        },
+        "stand.CR.1": {
+          "median": 4.3304015339032995,
+          "base_median": 4.605692380046044,
+          "shift": -0.27529084614274435,
+          "base_p90_p10": 2.2479431933941623,
+          "beyond_spread": false
+        },
+        "stand.CR.2": {
+          "median": 4.430487258766892,
+          "base_median": 4.733710138968447,
+          "shift": -0.3032228802015551,
+          "base_p90_p10": 1.895493445696327,
+          "beyond_spread": false
+        },
+        "stand.dbh.0": {
+          "median": 0.24863296815562536,
+          "base_median": 0.25361107014198425,
+          "shift": -0.004978101986358896,
+          "base_p90_p10": 0.09154449850709978,
+          "beyond_spread": false
+        },
+        "stand.dbh.1": {
+          "median": 0.2652980847545508,
+          "base_median": 0.2759448420891507,
+          "shift": -0.01064675733459991,
+          "base_p90_p10": 0.12097940212472577,
+          "beyond_spread": false
+        },
+        "stand.dbh.2": {
+          "median": 0.28086897721788884,
+          "base_median": 0.2998680634472723,
+          "shift": -0.018999086229383455,
+          "base_p90_p10": 0.11638495400828047,
+          "beyond_spread": false
+        }
+      }
+    },
+    {
+      "species": "ash",
+      "condition": "l20-p30",
+      "lambda": 0.6656399999999999,
+      "r0": 0.0033462,
+      "mw": 37.869822485207095,
+      "pipe_scale": 1.3,
+      "passed": 0,
+      "N": 20,
+      "bar": 15,
+      "T": 0.9895606957130446,
+      "median_stat": 1.5613612220663953,
+      "changes": {
+        "stand.H.0": {
+          "median": 23.21685695725053,
+          "base_median": 17.977289393428215,
+          "shift": 5.239567563822316,
+          "base_p90_p10": 4.519926576721009,
+          "beyond_spread": true
+        },
+        "stand.H.1": {
+          "median": 25.101782222000864,
+          "base_median": 20.642407948067948,
+          "shift": 4.459374273932916,
+          "base_p90_p10": 7.489120966204116,
+          "beyond_spread": false
+        },
+        "stand.H.2": {
+          "median": 25.792650956927755,
+          "base_median": 21.603697615493054,
+          "shift": 4.188953341434701,
+          "base_p90_p10": 8.340427604235991,
+          "beyond_spread": false
+        },
+        "stand.CR.0": {
+          "median": 4.2591284925099,
+          "base_median": 4.666765998103098,
+          "shift": -0.4076375055931978,
+          "base_p90_p10": 1.806663665002815,
+          "beyond_spread": false
+        },
+        "stand.CR.1": {
+          "median": 3.911156903072019,
+          "base_median": 4.605692380046044,
+          "shift": -0.6945354769740248,
+          "base_p90_p10": 2.2479431933941623,
+          "beyond_spread": false
+        },
+        "stand.CR.2": {
+          "median": 3.7280393349047767,
+          "base_median": 4.733710138968447,
+          "shift": -1.0056708040636702,
+          "base_p90_p10": 1.895493445696327,
+          "beyond_spread": false
+        },
+        "stand.dbh.0": {
+          "median": 0.2313171281523965,
+          "base_median": 0.25361107014198425,
+          "shift": -0.022293941989587757,
+          "base_p90_p10": 0.09154449850709978,
+          "beyond_spread": false
+        },
+        "stand.dbh.1": {
+          "median": 0.2527692331707563,
+          "base_median": 0.2759448420891507,
+          "shift": -0.02317560891839443,
+          "base_p90_p10": 0.12097940212472577,
+          "beyond_spread": false
+        },
+        "stand.dbh.2": {
+          "median": 0.26711329887772406,
+          "base_median": 0.2998680634472723,
+          "shift": -0.032754764569548234,
+          "base_p90_p10": 0.11638495400828047,
+          "beyond_spread": false
+        }
+      }
+    },
+    {
+      "species": "ash",
+      "condition": "l30-p20",
+      "lambda": 0.72111,
+      "r0": 0.0030887999999999996,
+      "mw": 44.44444444444444,
+      "pipe_scale": 1.2,
+      "passed": 0,
+      "N": 20,
+      "bar": 15,
+      "T": 0.9895606957130446,
+      "median_stat": 1.776550138814739,
+      "changes": {
+        "stand.H.0": {
+          "median": 29.06482572880269,
+          "base_median": 17.977289393428215,
+          "shift": 11.087536335374473,
+          "base_p90_p10": 4.519926576721009,
+          "beyond_spread": true
+        },
+        "stand.H.1": {
+          "median": 32.05448316834897,
+          "base_median": 20.642407948067948,
+          "shift": 11.412075220281025,
+          "base_p90_p10": 7.489120966204116,
+          "beyond_spread": true
+        },
+        "stand.H.2": {
+          "median": 32.16057509058491,
+          "base_median": 21.603697615493054,
+          "shift": 10.55687747509186,
+          "base_p90_p10": 8.340427604235991,
+          "beyond_spread": true
+        },
+        "stand.CR.0": {
+          "median": 4.605614410351232,
+          "base_median": 4.666765998103098,
+          "shift": -0.06115158775186558,
+          "base_p90_p10": 1.806663665002815,
+          "beyond_spread": false
+        },
+        "stand.CR.1": {
+          "median": 4.411066235428457,
+          "base_median": 4.605692380046044,
+          "shift": -0.19462614461758676,
+          "base_p90_p10": 2.2479431933941623,
+          "beyond_spread": false
+        },
+        "stand.CR.2": {
+          "median": 4.29195659528868,
+          "base_median": 4.733710138968447,
+          "shift": -0.44175354367976727,
+          "base_p90_p10": 1.895493445696327,
+          "beyond_spread": false
+        },
+        "stand.dbh.0": {
+          "median": 0.2555055462044885,
+          "base_median": 0.25361107014198425,
+          "shift": 0.0018944760625042578,
+          "base_p90_p10": 0.09154449850709978,
+          "beyond_spread": false
+        },
+        "stand.dbh.1": {
+          "median": 0.2829873701648784,
+          "base_median": 0.2759448420891507,
+          "shift": 0.007042528075727694,
+          "base_p90_p10": 0.12097940212472577,
+          "beyond_spread": false
+        },
+        "stand.dbh.2": {
+          "median": 0.302928648838129,
+          "base_median": 0.2998680634472723,
+          "shift": 0.003060585390856685,
+          "base_p90_p10": 0.11638495400828047,
+          "beyond_spread": false
+        }
+      }
+    },
+    {
+      "species": "ash",
+      "condition": "l30-p30",
+      "lambda": 0.72111,
+      "r0": 0.0033462,
+      "mw": 37.869822485207095,
+      "pipe_scale": 1.3,
+      "passed": 1,
+      "N": 20,
+      "bar": 15,
+      "T": 0.9895606957130446,
+      "median_stat": 1.6591132800856503,
+      "changes": {
+        "stand.H.0": {
+          "median": 28.332256981302642,
+          "base_median": 17.977289393428215,
+          "shift": 10.354967587874427,
+          "base_p90_p10": 4.519926576721009,
+          "beyond_spread": true
+        },
+        "stand.H.1": {
+          "median": 31.513044321004678,
+          "base_median": 20.642407948067948,
+          "shift": 10.87063637293673,
+          "base_p90_p10": 7.489120966204116,
+          "beyond_spread": true
+        },
+        "stand.H.2": {
+          "median": 32.09909307536499,
+          "base_median": 21.603697615493054,
+          "shift": 10.495395459871936,
+          "base_p90_p10": 8.340427604235991,
+          "beyond_spread": true
+        },
+        "stand.CR.0": {
+          "median": 4.372093532601548,
+          "base_median": 4.666765998103098,
+          "shift": -0.2946724655015496,
+          "base_p90_p10": 1.806663665002815,
+          "beyond_spread": false
+        },
+        "stand.CR.1": {
+          "median": 4.45766607484554,
+          "base_median": 4.605692380046044,
+          "shift": -0.14802630520050375,
+          "base_p90_p10": 2.2479431933941623,
+          "beyond_spread": false
+        },
+        "stand.CR.2": {
+          "median": 4.427542331567785,
+          "base_median": 4.733710138968447,
+          "shift": -0.3061678074006622,
+          "base_p90_p10": 1.895493445696327,
+          "beyond_spread": false
+        },
+        "stand.dbh.0": {
+          "median": 0.26798759070687,
+          "base_median": 0.25361107014198425,
+          "shift": 0.014376520564885753,
+          "base_p90_p10": 0.09154449850709978,
+          "beyond_spread": false
+        },
+        "stand.dbh.1": {
+          "median": 0.29151429495084036,
+          "base_median": 0.2759448420891507,
+          "shift": 0.015569452861689648,
+          "base_p90_p10": 0.12097940212472577,
+          "beyond_spread": false
+        },
+        "stand.dbh.2": {
+          "median": 0.3150066279439758,
+          "base_median": 0.2998680634472723,
+          "shift": 0.015138564496703533,
+          "base_p90_p10": 0.11638495400828047,
+          "beyond_spread": false
+        }
+      }
+    }
+  ],
+  "training_winners": {
+    "sycamore": null,
+    "ash": null
+  },
+  "raw_results": "runs/day3-step8/species/pipe/results.json",
+  "status": "No qualifying training candidate; paused for user assessment"
+}

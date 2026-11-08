@@ -84,7 +84,7 @@ Gates: the plan's "A4 and A5's gates", fixed before any result.
 **What would resolve it** is the user's question for a later box. Either accept a sparser, forest-like garden, or find out why a darker garden carries so much less foliage than the real closed stands it matches on leaf area index. The second may be R1's carbon shedding in shade (ADR 0032's acclimated leaf cost), or the stand's crown depth.
 
 ## F: why shade strips the garden's foliage (2026-11-06 afternoon, agent F; plan `plans/2026-11-06-day2.md`)
-Scripts and numbers: branch `worktree-agent-a28199a6f8557d21d`, `scratch/2026-11-06-F-foliage/` (`notes.txt`). The core was untouched; temporary instrumentation is kept as a patch, not committed. The instrument's shed totals equal `metrics.csv`'s exactly, and it reproduces A4's 20-seed gate exactly.
+Scripts and numbers: the tag `archive/claude/day2-f-foliage` (0a4de33; was branch `worktree-agent-a28199a6f8557d21d`), `scratch/2026-11-06-F-foliage/` (`notes.txt`). The core was untouched; temporary instrumentation is kept as a patch, not committed. The instrument's shed totals equal `metrics.csv`'s exactly, and it reproduces A4's 20-seed gate exactly.
 
 | six-seed medians, 0–150 | metamers at 150 | per cell of ground | LAI 100 / 150 | births per cell | cumulative P per cell |
 |---|---|---|---|---|---|

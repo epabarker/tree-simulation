@@ -1,0 +1,41 @@
+{
+  "winner": "prior-v4",
+  "assign": {
+    "r2.levels.0.lambda": 0.54,
+    "r2.levels.1.lambda": 0.5109,
+    "r2.levels.1.setPoint": 28.54,
+    "r2.levels.1.postureSetPoint": 33.62,
+    "r2.levels.1.branchAngle": 40.31,
+    "r2.levels.1.eta": 0.5673,
+    "r2.levels.2.setPoint": 87.02,
+    "r2.aC": 15.46,
+    "r2.dLambda": 0.01648,
+    "r2.kappa": 0.2243
+  },
+  "training_loss": 17.047798154949255,
+  "training_results_sha256": "0e439f4f72d04897fef68de7fba516130f5bcd97e0888214fb808144338d84bf",
+  "selection": "preregistered minimum full-trial training loss; ties current/v3/v4",
+  "held_out_scored": false,
+  "confirmation_seeds": [
+    21041,
+    21042,
+    21043,
+    21044,
+    21045,
+    21046,
+    21047,
+    21048,
+    21049,
+    21050,
+    21051,
+    21052,
+    21053,
+    21054,
+    21055,
+    21056,
+    21057,
+    21058,
+    21059,
+    21060
+  ]
+}

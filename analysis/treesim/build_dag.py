@@ -879,6 +879,7 @@ def main():
     ap.add_argument("out", type=Path)
     ap.add_argument("--worktree", type=Path, default=Path(__file__).resolve().parents[2])
     ap.add_argument("--patch", type=Path, help="same species dotted patch as gforest")
+    ap.add_argument("--species", help="explicit comma-separated species identifiers, including candidate-only names")
     ap.add_argument("--width", type=int, default=160)
     ap.add_argument("--seed", type=int, default=1)
     ap.add_argument("--no-figures", action="store_true")
@@ -888,8 +889,10 @@ def main():
     OUT.mkdir(parents=True, exist_ok=True)
     repo = a.worktree.resolve()
     cmd = ["node", str(Path(__file__).with_name("dump_effective.ts")), str(repo), str(OUT), str(a.width), str(a.seed)]
-    if a.stand_params:
-        cmd.append(str(a.stand_params.resolve()))
+    if a.stand_params or a.species:
+        cmd.append(str(a.stand_params.resolve()) if a.stand_params else "")
+    if a.species:
+        cmd.append(a.species)
     subprocess.run(cmd, check=True)
     from .gforest import apply_patch
     patch = json.loads(a.patch.read_text()) if a.patch else {}
@@ -904,7 +907,7 @@ def main():
         path.write_text(json.dumps(params, indent=1) + "\n")
         EFFECTIVE[context] = params
     EFF = EFFECTIVE["lone"]
-    PROVENANCE = {**provenance(repo), "width": a.width, "seed": a.seed, "patch": patch,
+    PROVENANCE = {**provenance(repo), "width": a.width, "seed": a.seed, "patch": patch, "selected_species": list(EFFECTIVE["lone"]),
                   "effective_sha256": {c: file_hash(OUT / f"species_effective_{c}.json") for c in CONTEXTS},
                   "edge_table_sha256": file_hash(Path(__file__)), "hand_written": True,
                   "stand_params_sha256": file_hash(a.stand_params) if a.stand_params else None}

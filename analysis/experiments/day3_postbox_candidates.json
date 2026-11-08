@@ -1,0 +1,1248 @@
+[
+ {
+  "name": "sycamore",
+  "latin": "Acer pseudoplatanus",
+  "leaf": "maple",
+  "prior": "current field maple generic opposite-branching starting prior; not a relabel",
+  "assign": {
+   "c3": {
+    "mode": "bh",
+    "lambda": 0.5,
+    "alpha": 3.779
+   },
+   "c5": {
+    "enabled": true,
+    "T": 0.02,
+    "g": 3,
+    "Trel": 0.044,
+    "topQuantile": 0.9
+   },
+   "c6": {
+    "enabled": true,
+    "n": 2,
+    "r0": 0.002574
+   },
+   "r1": {
+    "enabled": true,
+    "mw": 64,
+    "mf": 0.02623,
+    "Lh": 12.69,
+    "hydraulic": "hyperbolic",
+    "sr": 0.1,
+    "fRep": 0.8,
+    "maturity": 110.31771466565935,
+    "kStarve": 3,
+    "reserve0": 2,
+    "store": 2,
+    "shed": "carbon",
+    "leafCost": "acclimated",
+    "leafCostShade": 0.3
+   },
+   "r2": {
+    "enabled": true,
+    "levels": [
+     {
+      "lambda": 0.5547,
+      "setPoint": 0,
+      "eta": 0.25,
+      "branchAngle": 45,
+      "generator": "opposite",
+      "tierEvery": 0,
+      "pTerm": 0,
+      "curve": 30,
+      "curveLength": 30
+     },
+     {
+      "lambda": 0.5039,
+      "setPoint": 51.12,
+      "eta": 0.1405,
+      "branchAngle": 44.65,
+      "generator": "opposite",
+      "tierEvery": 0,
+      "pTerm": 0
+     },
+     {
+      "lambda": 0.5,
+      "setPoint": 45.87,
+      "eta": 0.25,
+      "branchAngle": 45,
+      "generator": "opposite",
+      "tierEvery": 0,
+      "pTerm": 0
+     }
+    ],
+    "aC": 7.176,
+    "dLambda": 0.07811,
+    "ramp": 15,
+    "kappa": 1.708,
+    "hJ": 16.71,
+    "relay": 2,
+    "relayAge": 10,
+    "relayPTerm": 0.6
+   },
+   "r3": {
+    "enabled": true,
+    "rho": 1,
+    "leafMass": 0.002,
+    "E": 4000000,
+    "sag": "increment",
+    "phi": 1,
+    "posture": true,
+    "betaG": 0.2,
+    "gamma": 0.2,
+    "c": 0.1173,
+    "sigmaTarget": 3000,
+    "girthGain": 0.3,
+    "sigmaBreak": 7000,
+    "ground": true
+   },
+   "r6": {
+    "enabled": true,
+    "qMin": 0.06993,
+    "leafArea": 2.845
+   },
+   "o4": {
+    "cSeed": 5,
+    "d": 25,
+    "qEst": 0.05,
+    "pEst": 0.3,
+    "m0": 0.004
+   },
+   "c1": {
+    "shootLengthSD": 0.5,
+    "betaSD": 60,
+    "budBreak": {
+     "mode": "stochastic",
+     "width": 1
+    }
+   },
+   "c4": {
+    "axisSD": 50
+   }
+  },
+  "patch": {
+   "c3": {
+    "mode": "bh",
+    "lambda": 0.5,
+    "alpha": 3.779
+   },
+   "c5": {
+    "enabled": true,
+    "T": 0.02,
+    "g": 3,
+    "Trel": 0.044,
+    "topQuantile": 0.9
+   },
+   "c6": {
+    "enabled": true,
+    "n": 2,
+    "r0": 0.002574
+   },
+   "r1": {
+    "enabled": true,
+    "mw": 64,
+    "mf": 0.02623,
+    "Lh": 12.69,
+    "hydraulic": "hyperbolic",
+    "sr": 0.1,
+    "fRep": 0.8,
+    "maturity": 110.31771466565935,
+    "kStarve": 3,
+    "reserve0": 2,
+    "store": 2,
+    "shed": "carbon",
+    "leafCost": "acclimated",
+    "leafCostShade": 0.3
+   },
+   "r2": {
+    "enabled": true,
+    "levels": [
+     {
+      "lambda": 0.5547,
+      "setPoint": 0,
+      "eta": 0.25,
+      "branchAngle": 45,
+      "generator": "opposite",
+      "tierEvery": 0,
+      "pTerm": 0,
+      "curve": 30,
+      "curveLength": 30
+     },
+     {
+      "lambda": 0.5039,
+      "setPoint": 51.12,
+      "eta": 0.1405,
+      "branchAngle": 44.65,
+      "generator": "opposite",
+      "tierEvery": 0,
+      "pTerm": 0
+     },
+     {
+      "lambda": 0.5,
+      "setPoint": 45.87,
+      "eta": 0.25,
+      "branchAngle": 45,
+      "generator": "opposite",
+      "tierEvery": 0,
+      "pTerm": 0
+     }
+    ],
+    "aC": 7.176,
+    "dLambda": 0.07811,
+    "ramp": 15,
+    "kappa": 1.708,
+    "hJ": 16.71,
+    "relay": 2,
+    "relayAge": 10,
+    "relayPTerm": 0.6
+   },
+   "r3": {
+    "enabled": true,
+    "rho": 1,
+    "leafMass": 0.002,
+    "E": 4000000,
+    "sag": "increment",
+    "phi": 1,
+    "posture": true,
+    "betaG": 0.2,
+    "gamma": 0.2,
+    "c": 0.1173,
+    "sigmaTarget": 3000,
+    "girthGain": 0.3,
+    "sigmaBreak": 7000,
+    "ground": true
+   },
+   "r6": {
+    "enabled": true,
+    "qMin": 0.06993,
+    "leafArea": 2.845
+   },
+   "o4": {
+    "cSeed": 5,
+    "d": 25,
+    "qEst": 0.05,
+    "pEst": 0.3,
+    "m0": 0.004
+   },
+   "c1": {
+    "shootLengthSD": 0.5,
+    "betaSD": 60,
+    "budBreak": {
+     "mode": "stochastic",
+     "width": 1
+    }
+   },
+   "c4": {
+    "axisSD": 50
+   },
+   "common": "Sycamore",
+   "latin": "Acer pseudoplatanus",
+   "leaf": "maple"
+  },
+  "trainingSeeds": [
+   22001,
+   22002,
+   22003,
+   22004,
+   22005,
+   22006,
+   22007,
+   22008,
+   22009,
+   22010,
+   22011,
+   22012,
+   22013,
+   22014,
+   22015,
+   22016,
+   22017,
+   22018,
+   22019,
+   22020
+  ],
+  "confirmationSeeds": [
+   22021,
+   22022,
+   22023,
+   22024,
+   22025,
+   22026,
+   22027,
+   22028,
+   22029,
+   22030,
+   22031,
+   22032,
+   22033,
+   22034,
+   22035,
+   22036,
+   22037,
+   22038,
+   22039,
+   22040
+  ],
+  "effective_groups": {
+   "lone": {
+    "c1": {
+     "phyllotaxis": "spiral",
+     "divergence": 137.5,
+     "branchAngle": 45,
+     "internodeLength": 1,
+     "maxMetamersPerShoot": 3,
+     "shootLengthSD": 0.5,
+     "betaSD": 60,
+     "budBreak": {
+      "mode": "stochastic",
+      "width": 1
+     }
+    },
+    "c2": {
+     "enabled": true,
+     "model": "slab",
+     "C": 1,
+     "K": 16,
+     "kExt": 0.5,
+     "skyExponent": 1,
+     "skyTilt": 0,
+     "minElevation": 15,
+     "rotate": true
+    },
+    "c3": {
+     "mode": "bh",
+     "lambda": 0.5,
+     "alpha": 3.779
+    },
+    "c4": {
+     "enabled": true,
+     "wd": 1,
+     "xi": 0.3,
+     "eta": 0.15,
+     "setPoint": 0,
+     "epsilon": 0.5,
+     "sigma": 20,
+     "axisSD": 50
+    },
+    "c5": {
+     "enabled": true,
+     "T": 0.02,
+     "g": 3,
+     "Trel": 0.044,
+     "topQuantile": 0.9
+    },
+    "c6": {
+     "enabled": true,
+     "n": 2,
+     "r0": 0.002574
+    },
+    "r1": {
+     "enabled": true,
+     "mw": 64,
+     "mf": 0.02623,
+     "Lh": 12.69,
+     "hydraulic": "hyperbolic",
+     "sr": 0.1,
+     "fRep": 0.8,
+     "maturity": 110.31771466565935,
+     "kStarve": 3,
+     "reserve0": 2,
+     "store": 2,
+     "shed": "carbon",
+     "leafCost": "acclimated",
+     "leafCostShade": 0.3
+    },
+    "r2": {
+     "enabled": true,
+     "levels": [
+      {
+       "lambda": 0.5547,
+       "setPoint": 0,
+       "eta": 0.25,
+       "branchAngle": 45,
+       "generator": "opposite",
+       "tierEvery": 0,
+       "pTerm": 0,
+       "curve": 30,
+       "curveLength": 30
+      },
+      {
+       "lambda": 0.5039,
+       "setPoint": 51.12,
+       "eta": 0.1405,
+       "branchAngle": 44.65,
+       "generator": "opposite",
+       "tierEvery": 0,
+       "pTerm": 0
+      },
+      {
+       "lambda": 0.5,
+       "setPoint": 45.87,
+       "eta": 0.25,
+       "branchAngle": 45,
+       "generator": "opposite",
+       "tierEvery": 0,
+       "pTerm": 0
+      }
+     ],
+     "aC": 7.176,
+     "dLambda": 0.07811,
+     "ramp": 15,
+     "kappa": 1.708,
+     "hJ": 16.71,
+     "relay": 2,
+     "relayAge": 10,
+     "relayPTerm": 0.6
+    },
+    "r3": {
+     "enabled": true,
+     "rho": 1,
+     "leafMass": 0.002,
+     "E": 4000000,
+     "sag": "increment",
+     "phi": 1,
+     "posture": true,
+     "betaG": 0.2,
+     "gamma": 0.2,
+     "c": 0.1173,
+     "sigmaTarget": 3000,
+     "girthGain": 0.3,
+     "sigmaBreak": 7000,
+     "ground": true
+    },
+    "r4": {
+     "enabled": true,
+     "vBreak": 2,
+     "qRel": 0.1,
+     "vCont": 1,
+     "delta": 0.02,
+     "lDorm": 40,
+     "juvenile": 1,
+     "bank": true
+    },
+    "r5": {
+     "enabled": true,
+     "eS": 0.1,
+     "dLambda": 0.02,
+     "dB": 1,
+     "dA": 0.5,
+     "signal": "neighbours"
+    },
+    "r6": {
+     "enabled": true,
+     "qMin": 0.06993,
+     "leafArea": 2.845
+    },
+    "o2": {
+     "enabled": false,
+     "sway": 0.0005,
+     "maxSway": 3,
+     "pAbr": 0.5,
+     "stormP": 0,
+     "stormLoad": 1.5
+    },
+    "o4": {
+     "enabled": false,
+     "cSeed": 5,
+     "d": 25,
+     "qEst": 0.05,
+     "pEst": 0.3,
+     "m0": 0.004,
+     "maxTrees": 300,
+     "rain": 0
+    }
+   },
+   "stand": {
+    "c1": {
+     "phyllotaxis": "spiral",
+     "divergence": 137.5,
+     "branchAngle": 45,
+     "internodeLength": 1,
+     "maxMetamersPerShoot": 3,
+     "shootLengthSD": 0.5,
+     "betaSD": 60,
+     "budBreak": {
+      "mode": "stochastic",
+      "width": 1
+     }
+    },
+    "c2": {
+     "enabled": true,
+     "model": "slab",
+     "C": 1,
+     "K": 16,
+     "kExt": 0.5,
+     "skyExponent": 1,
+     "skyTilt": 0,
+     "minElevation": 15,
+     "rotate": true
+    },
+    "c3": {
+     "mode": "bh",
+     "lambda": 0.5,
+     "alpha": 3.779
+    },
+    "c4": {
+     "enabled": true,
+     "wd": 1,
+     "xi": 0.3,
+     "eta": 0.15,
+     "setPoint": 0,
+     "epsilon": 0.5,
+     "sigma": 20,
+     "axisSD": 50
+    },
+    "c5": {
+     "enabled": true,
+     "T": 0.02,
+     "g": 3,
+     "Trel": 0.044,
+     "topQuantile": 0.9
+    },
+    "c6": {
+     "enabled": true,
+     "n": 2,
+     "r0": 0.002574
+    },
+    "r1": {
+     "enabled": true,
+     "mw": 64,
+     "mf": 0.02623,
+     "Lh": 12.69,
+     "hydraulic": "hyperbolic",
+     "sr": 0.1,
+     "fRep": 0.8,
+     "maturity": 110.31771466565935,
+     "kStarve": 3,
+     "reserve0": 2,
+     "store": 2,
+     "shed": "carbon",
+     "leafCost": "acclimated",
+     "leafCostShade": 0.3
+    },
+    "r2": {
+     "enabled": true,
+     "levels": [
+      {
+       "lambda": 0.5547,
+       "setPoint": 0,
+       "eta": 0.25,
+       "branchAngle": 45,
+       "generator": "opposite",
+       "tierEvery": 0,
+       "pTerm": 0,
+       "curve": 30,
+       "curveLength": 30
+      },
+      {
+       "lambda": 0.5039,
+       "setPoint": 51.12,
+       "eta": 0.1405,
+       "branchAngle": 44.65,
+       "generator": "opposite",
+       "tierEvery": 0,
+       "pTerm": 0
+      },
+      {
+       "lambda": 0.5,
+       "setPoint": 45.87,
+       "eta": 0.25,
+       "branchAngle": 45,
+       "generator": "opposite",
+       "tierEvery": 0,
+       "pTerm": 0
+      }
+     ],
+     "aC": 7.176,
+     "dLambda": 0.07811,
+     "ramp": 15,
+     "kappa": 1.708,
+     "hJ": 16.71,
+     "relay": 2,
+     "relayAge": 10,
+     "relayPTerm": 0.6
+    },
+    "r3": {
+     "enabled": true,
+     "rho": 1,
+     "leafMass": 0.002,
+     "E": 4000000,
+     "sag": "increment",
+     "phi": 1,
+     "posture": true,
+     "betaG": 0.2,
+     "gamma": 0.2,
+     "c": 0.1173,
+     "sigmaTarget": 3000,
+     "girthGain": 0.3,
+     "sigmaBreak": 7000,
+     "ground": true
+    },
+    "r4": {
+     "enabled": true,
+     "vBreak": 2,
+     "qRel": 0.1,
+     "vCont": 1,
+     "delta": 0.02,
+     "lDorm": 40,
+     "juvenile": 1,
+     "bank": true
+    },
+    "r5": {
+     "enabled": true,
+     "eS": 0.1,
+     "dLambda": 0.02,
+     "dB": 1,
+     "dA": 0.5,
+     "signal": "neighbours"
+    },
+    "r6": {
+     "enabled": true,
+     "qMin": 0.06993,
+     "leafArea": 2.845
+    },
+    "o2": {
+     "enabled": false,
+     "sway": 0.0005,
+     "maxSway": 3,
+     "pAbr": 0.5,
+     "stormP": 0,
+     "stormLoad": 1.5
+    },
+    "o4": {
+     "enabled": false,
+     "cSeed": 5,
+     "d": 25,
+     "qEst": 0.05,
+     "pEst": 0.3,
+     "m0": 0.004,
+     "maxTrees": 300,
+     "rain": 0
+    }
+   }
+  }
+ },
+ {
+  "name": "ash",
+  "latin": "Fraxinus excelsior",
+  "leaf": "rowan",
+  "prior": "current field maple generic opposite-branching starting prior; not a relabel",
+  "assign": {
+   "c3": {
+    "mode": "bh",
+    "lambda": 0.5,
+    "alpha": 3.779
+   },
+   "c5": {
+    "enabled": true,
+    "T": 0.02,
+    "g": 3,
+    "Trel": 0.044,
+    "topQuantile": 0.9
+   },
+   "c6": {
+    "enabled": true,
+    "n": 2,
+    "r0": 0.002574
+   },
+   "r1": {
+    "enabled": true,
+    "mw": 64,
+    "mf": 0.02623,
+    "Lh": 12.69,
+    "hydraulic": "hyperbolic",
+    "sr": 0.1,
+    "fRep": 0.8,
+    "maturity": 127.119644971901,
+    "kStarve": 3,
+    "reserve0": 2,
+    "store": 2,
+    "shed": "carbon",
+    "leafCost": "acclimated",
+    "leafCostShade": 0.3
+   },
+   "r2": {
+    "enabled": true,
+    "levels": [
+     {
+      "lambda": 0.5547,
+      "setPoint": 0,
+      "eta": 0.25,
+      "branchAngle": 45,
+      "generator": "opposite",
+      "tierEvery": 0,
+      "pTerm": 0,
+      "curve": 30,
+      "curveLength": 30
+     },
+     {
+      "lambda": 0.5039,
+      "setPoint": 51.12,
+      "eta": 0.1405,
+      "branchAngle": 44.65,
+      "generator": "opposite",
+      "tierEvery": 0,
+      "pTerm": 0
+     },
+     {
+      "lambda": 0.5,
+      "setPoint": 45.87,
+      "eta": 0.25,
+      "branchAngle": 45,
+      "generator": "opposite",
+      "tierEvery": 0,
+      "pTerm": 0
+     }
+    ],
+    "aC": 7.176,
+    "dLambda": 0.07811,
+    "ramp": 15,
+    "kappa": 1.708,
+    "hJ": 16.71,
+    "relay": 2,
+    "relayAge": 10,
+    "relayPTerm": 0.6
+   },
+   "r3": {
+    "enabled": true,
+    "rho": 1,
+    "leafMass": 0.002,
+    "E": 4000000,
+    "sag": "increment",
+    "phi": 1,
+    "posture": true,
+    "betaG": 0.2,
+    "gamma": 0.2,
+    "c": 0.1173,
+    "sigmaTarget": 3000,
+    "girthGain": 0.3,
+    "sigmaBreak": 7000,
+    "ground": true
+   },
+   "r6": {
+    "enabled": true,
+    "qMin": 0.06993,
+    "leafArea": 2.845
+   },
+   "o4": {
+    "cSeed": 5,
+    "d": 25,
+    "qEst": 0.05,
+    "pEst": 0.3,
+    "m0": 0.004
+   },
+   "c1": {
+    "shootLengthSD": 0.5,
+    "betaSD": 60,
+    "budBreak": {
+     "mode": "stochastic",
+     "width": 1
+    }
+   },
+   "c4": {
+    "axisSD": 50
+   }
+  },
+  "patch": {
+   "c3": {
+    "mode": "bh",
+    "lambda": 0.5,
+    "alpha": 3.779
+   },
+   "c5": {
+    "enabled": true,
+    "T": 0.02,
+    "g": 3,
+    "Trel": 0.044,
+    "topQuantile": 0.9
+   },
+   "c6": {
+    "enabled": true,
+    "n": 2,
+    "r0": 0.002574
+   },
+   "r1": {
+    "enabled": true,
+    "mw": 64,
+    "mf": 0.02623,
+    "Lh": 12.69,
+    "hydraulic": "hyperbolic",
+    "sr": 0.1,
+    "fRep": 0.8,
+    "maturity": 127.119644971901,
+    "kStarve": 3,
+    "reserve0": 2,
+    "store": 2,
+    "shed": "carbon",
+    "leafCost": "acclimated",
+    "leafCostShade": 0.3
+   },
+   "r2": {
+    "enabled": true,
+    "levels": [
+     {
+      "lambda": 0.5547,
+      "setPoint": 0,
+      "eta": 0.25,
+      "branchAngle": 45,
+      "generator": "opposite",
+      "tierEvery": 0,
+      "pTerm": 0,
+      "curve": 30,
+      "curveLength": 30
+     },
+     {
+      "lambda": 0.5039,
+      "setPoint": 51.12,
+      "eta": 0.1405,
+      "branchAngle": 44.65,
+      "generator": "opposite",
+      "tierEvery": 0,
+      "pTerm": 0
+     },
+     {
+      "lambda": 0.5,
+      "setPoint": 45.87,
+      "eta": 0.25,
+      "branchAngle": 45,
+      "generator": "opposite",
+      "tierEvery": 0,
+      "pTerm": 0
+     }
+    ],
+    "aC": 7.176,
+    "dLambda": 0.07811,
+    "ramp": 15,
+    "kappa": 1.708,
+    "hJ": 16.71,
+    "relay": 2,
+    "relayAge": 10,
+    "relayPTerm": 0.6
+   },
+   "r3": {
+    "enabled": true,
+    "rho": 1,
+    "leafMass": 0.002,
+    "E": 4000000,
+    "sag": "increment",
+    "phi": 1,
+    "posture": true,
+    "betaG": 0.2,
+    "gamma": 0.2,
+    "c": 0.1173,
+    "sigmaTarget": 3000,
+    "girthGain": 0.3,
+    "sigmaBreak": 7000,
+    "ground": true
+   },
+   "r6": {
+    "enabled": true,
+    "qMin": 0.06993,
+    "leafArea": 2.845
+   },
+   "o4": {
+    "cSeed": 5,
+    "d": 25,
+    "qEst": 0.05,
+    "pEst": 0.3,
+    "m0": 0.004
+   },
+   "c1": {
+    "shootLengthSD": 0.5,
+    "betaSD": 60,
+    "budBreak": {
+     "mode": "stochastic",
+     "width": 1
+    }
+   },
+   "c4": {
+    "axisSD": 50
+   },
+   "common": "Ash",
+   "latin": "Fraxinus excelsior",
+   "leaf": "rowan"
+  },
+  "trainingSeeds": [
+   23001,
+   23002,
+   23003,
+   23004,
+   23005,
+   23006,
+   23007,
+   23008,
+   23009,
+   23010,
+   23011,
+   23012,
+   23013,
+   23014,
+   23015,
+   23016,
+   23017,
+   23018,
+   23019,
+   23020
+  ],
+  "confirmationSeeds": [
+   23021,
+   23022,
+   23023,
+   23024,
+   23025,
+   23026,
+   23027,
+   23028,
+   23029,
+   23030,
+   23031,
+   23032,
+   23033,
+   23034,
+   23035,
+   23036,
+   23037,
+   23038,
+   23039,
+   23040
+  ],
+  "effective_groups": {
+   "lone": {
+    "c1": {
+     "phyllotaxis": "spiral",
+     "divergence": 137.5,
+     "branchAngle": 45,
+     "internodeLength": 1,
+     "maxMetamersPerShoot": 3,
+     "shootLengthSD": 0.5,
+     "betaSD": 60,
+     "budBreak": {
+      "mode": "stochastic",
+      "width": 1
+     }
+    },
+    "c2": {
+     "enabled": true,
+     "model": "slab",
+     "C": 1,
+     "K": 16,
+     "kExt": 0.5,
+     "skyExponent": 1,
+     "skyTilt": 0,
+     "minElevation": 15,
+     "rotate": true
+    },
+    "c3": {
+     "mode": "bh",
+     "lambda": 0.5,
+     "alpha": 3.779
+    },
+    "c4": {
+     "enabled": true,
+     "wd": 1,
+     "xi": 0.3,
+     "eta": 0.15,
+     "setPoint": 0,
+     "epsilon": 0.5,
+     "sigma": 20,
+     "axisSD": 50
+    },
+    "c5": {
+     "enabled": true,
+     "T": 0.02,
+     "g": 3,
+     "Trel": 0.044,
+     "topQuantile": 0.9
+    },
+    "c6": {
+     "enabled": true,
+     "n": 2,
+     "r0": 0.002574
+    },
+    "r1": {
+     "enabled": true,
+     "mw": 64,
+     "mf": 0.02623,
+     "Lh": 12.69,
+     "hydraulic": "hyperbolic",
+     "sr": 0.1,
+     "fRep": 0.8,
+     "maturity": 127.119644971901,
+     "kStarve": 3,
+     "reserve0": 2,
+     "store": 2,
+     "shed": "carbon",
+     "leafCost": "acclimated",
+     "leafCostShade": 0.3
+    },
+    "r2": {
+     "enabled": true,
+     "levels": [
+      {
+       "lambda": 0.5547,
+       "setPoint": 0,
+       "eta": 0.25,
+       "branchAngle": 45,
+       "generator": "opposite",
+       "tierEvery": 0,
+       "pTerm": 0,
+       "curve": 30,
+       "curveLength": 30
+      },
+      {
+       "lambda": 0.5039,
+       "setPoint": 51.12,
+       "eta": 0.1405,
+       "branchAngle": 44.65,
+       "generator": "opposite",
+       "tierEvery": 0,
+       "pTerm": 0
+      },
+      {
+       "lambda": 0.5,
+       "setPoint": 45.87,
+       "eta": 0.25,
+       "branchAngle": 45,
+       "generator": "opposite",
+       "tierEvery": 0,
+       "pTerm": 0
+      }
+     ],
+     "aC": 7.176,
+     "dLambda": 0.07811,
+     "ramp": 15,
+     "kappa": 1.708,
+     "hJ": 16.71,
+     "relay": 2,
+     "relayAge": 10,
+     "relayPTerm": 0.6
+    },
+    "r3": {
+     "enabled": true,
+     "rho": 1,
+     "leafMass": 0.002,
+     "E": 4000000,
+     "sag": "increment",
+     "phi": 1,
+     "posture": true,
+     "betaG": 0.2,
+     "gamma": 0.2,
+     "c": 0.1173,
+     "sigmaTarget": 3000,
+     "girthGain": 0.3,
+     "sigmaBreak": 7000,
+     "ground": true
+    },
+    "r4": {
+     "enabled": true,
+     "vBreak": 2,
+     "qRel": 0.1,
+     "vCont": 1,
+     "delta": 0.02,
+     "lDorm": 40,
+     "juvenile": 1,
+     "bank": true
+    },
+    "r5": {
+     "enabled": true,
+     "eS": 0.1,
+     "dLambda": 0.02,
+     "dB": 1,
+     "dA": 0.5,
+     "signal": "neighbours"
+    },
+    "r6": {
+     "enabled": true,
+     "qMin": 0.06993,
+     "leafArea": 2.845
+    },
+    "o2": {
+     "enabled": false,
+     "sway": 0.0005,
+     "maxSway": 3,
+     "pAbr": 0.5,
+     "stormP": 0,
+     "stormLoad": 1.5
+    },
+    "o4": {
+     "enabled": false,
+     "cSeed": 5,
+     "d": 25,
+     "qEst": 0.05,
+     "pEst": 0.3,
+     "m0": 0.004,
+     "maxTrees": 300,
+     "rain": 0
+    }
+   },
+   "stand": {
+    "c1": {
+     "phyllotaxis": "spiral",
+     "divergence": 137.5,
+     "branchAngle": 45,
+     "internodeLength": 1,
+     "maxMetamersPerShoot": 3,
+     "shootLengthSD": 0.5,
+     "betaSD": 60,
+     "budBreak": {
+      "mode": "stochastic",
+      "width": 1
+     }
+    },
+    "c2": {
+     "enabled": true,
+     "model": "slab",
+     "C": 1,
+     "K": 16,
+     "kExt": 0.5,
+     "skyExponent": 1,
+     "skyTilt": 0,
+     "minElevation": 15,
+     "rotate": true
+    },
+    "c3": {
+     "mode": "bh",
+     "lambda": 0.5,
+     "alpha": 3.779
+    },
+    "c4": {
+     "enabled": true,
+     "wd": 1,
+     "xi": 0.3,
+     "eta": 0.15,
+     "setPoint": 0,
+     "epsilon": 0.5,
+     "sigma": 20,
+     "axisSD": 50
+    },
+    "c5": {
+     "enabled": true,
+     "T": 0.02,
+     "g": 3,
+     "Trel": 0.044,
+     "topQuantile": 0.9
+    },
+    "c6": {
+     "enabled": true,
+     "n": 2,
+     "r0": 0.002574
+    },
+    "r1": {
+     "enabled": true,
+     "mw": 64,
+     "mf": 0.02623,
+     "Lh": 12.69,
+     "hydraulic": "hyperbolic",
+     "sr": 0.1,
+     "fRep": 0.8,
+     "maturity": 127.119644971901,
+     "kStarve": 3,
+     "reserve0": 2,
+     "store": 2,
+     "shed": "carbon",
+     "leafCost": "acclimated",
+     "leafCostShade": 0.3
+    },
+    "r2": {
+     "enabled": true,
+     "levels": [
+      {
+       "lambda": 0.5547,
+       "setPoint": 0,
+       "eta": 0.25,
+       "branchAngle": 45,
+       "generator": "opposite",
+       "tierEvery": 0,
+       "pTerm": 0,
+       "curve": 30,
+       "curveLength": 30
+      },
+      {
+       "lambda": 0.5039,
+       "setPoint": 51.12,
+       "eta": 0.1405,
+       "branchAngle": 44.65,
+       "generator": "opposite",
+       "tierEvery": 0,
+       "pTerm": 0
+      },
+      {
+       "lambda": 0.5,
+       "setPoint": 45.87,
+       "eta": 0.25,
+       "branchAngle": 45,
+       "generator": "opposite",
+       "tierEvery": 0,
+       "pTerm": 0
+      }
+     ],
+     "aC": 7.176,
+     "dLambda": 0.07811,
+     "ramp": 15,
+     "kappa": 1.708,
+     "hJ": 16.71,
+     "relay": 2,
+     "relayAge": 10,
+     "relayPTerm": 0.6
+    },
+    "r3": {
+     "enabled": true,
+     "rho": 1,
+     "leafMass": 0.002,
+     "E": 4000000,
+     "sag": "increment",
+     "phi": 1,
+     "posture": true,
+     "betaG": 0.2,
+     "gamma": 0.2,
+     "c": 0.1173,
+     "sigmaTarget": 3000,
+     "girthGain": 0.3,
+     "sigmaBreak": 7000,
+     "ground": true
+    },
+    "r4": {
+     "enabled": true,
+     "vBreak": 2,
+     "qRel": 0.1,
+     "vCont": 1,
+     "delta": 0.02,
+     "lDorm": 40,
+     "juvenile": 1,
+     "bank": true
+    },
+    "r5": {
+     "enabled": true,
+     "eS": 0.1,
+     "dLambda": 0.02,
+     "dB": 1,
+     "dA": 0.5,
+     "signal": "neighbours"
+    },
+    "r6": {
+     "enabled": true,
+     "qMin": 0.06993,
+     "leafArea": 2.845
+    },
+    "o2": {
+     "enabled": false,
+     "sway": 0.0005,
+     "maxSway": 3,
+     "pAbr": 0.5,
+     "stormP": 0,
+     "stormLoad": 1.5
+    },
+    "o4": {
+     "enabled": false,
+     "cSeed": 5,
+     "d": 25,
+     "qEst": 0.05,
+     "pEst": 0.3,
+     "m0": 0.004,
+     "maxTrees": 300,
+     "rain": 0
+    }
+   }
+  }
+ }
+]

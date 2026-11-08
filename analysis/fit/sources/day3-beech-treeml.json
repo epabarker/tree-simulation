@@ -1,0 +1,272 @@
+{
+ "source": {
+  "N": 14,
+  "source": "Yazdi et al.2024 TreeML-Data, doi10.6084/m9.figshare.c.6788358.v1",
+  "metadata_sha256": "5bbe4b9bb7b3638c99b3ff48eb4b939108511fd119c042b06c5297e340a6653f",
+  "qsm_sha256": {
+   "data/reference/treeml/optcsv/OptQSM_2023-01-09_5_1_37_000044.csv": "73e5de06a285161c33978777a36e10a30c0134b3ac217d6e68e52b7da79a7918",
+   "data/reference/treeml/optcsv/OptQSM_2023-01-09_5_1_37_000045.csv": "1b13e9704d1d4f6947543baa9765a8d179005c5fbbf1923bc198ab73fe42daf9",
+   "data/reference/treeml/optcsv/OptQSM_2023-01-12_65_64_000016.csv": "18b67ff2b919973784c5f65b4b0574e41f90b9455194ee6e1a494141a5297d77",
+   "data/reference/treeml/optcsv/OptQSM_2023-01-12_65_64_000186.csv": "8baba46e779d157e8a43eded5b14ad942a19a0fde641eff4b38a7b17fed37f4c",
+   "data/reference/treeml/optcsv/OptQSM_2023-01-12_65_64_000196.csv": "773bfc68d29b6b14900f1465940ae33d0087665ef61b7dc021c090e33c73d6e6",
+   "data/reference/treeml/optcsv/OptQSM_2023-01-13_20_000021.csv": "2f1ead7cc56b5c765669b85bd647da9c55ac49af5ed9e2f29667545f71b67ca7",
+   "data/reference/treeml/optcsv/OptQSM_2023-01-13_20_000022.csv": "5ec479d97e4af278aafe9c50997d10b15b6dda43c19387141c57b8eadf5dc23f",
+   "data/reference/treeml/optcsv/OptQSM_2023-01-13_20_000023.csv": "cff337889daa0dda6cf064d896ffe848d59e96ed6cdc545eb058f10182248be6",
+   "data/reference/treeml/optcsv/OptQSM_2023-01-13_74_000036.csv": "5c676ca08eca47273cc91e76e830c145ad312dc926e5b3c1e44ccc9dcdda6030",
+   "data/reference/treeml/optcsv/OptQSM_2023-01-13_74_000045.csv": "11e3723a73988d505b2c7f517639c773b1381b516c104feeb3bf4b9cd4eb67b2",
+   "data/reference/treeml/optcsv/OptQSM_2023-01-13_74_000056.csv": "1e1486000c42ac9768504ba1a14c920ca051073ba3c4f2add8385088ef0e3ee2",
+   "data/reference/treeml/optcsv/OptQSM_2023-01-13_74_000068.csv": "14009f64977d7f1055cd667ea7f655383c04966b3ca3913c8701dcb1d24a501f",
+   "data/reference/treeml/optcsv/OptQSM_2023-01-13_74_000138.csv": "6dbed4fd960da196e5b48ea4204f61e6a44400c32032c7347edcc65bfebb7296",
+   "data/reference/treeml/optcsv/OptQSM_2023-01-13_74_000164.csv": "0fc9afad2b4b50cddc613314976f8a486e76e0bfc8ce5d4ea0587d74c8f41fed"
+  },
+  "controls": {
+   "boleSway": {
+    "dmin": 14,
+    "upper": 14
+   },
+   "centroidHeight": {
+    "dmin": 14,
+    "upper": 14
+   },
+   "crownBase80": {
+    "dmin": 14,
+    "upper": 14
+   },
+   "crownFullness": {
+    "dmin": 14,
+    "upper": 14
+   },
+   "forkHeight": {
+    "dmin": 14,
+    "upper": 14
+   },
+   "leaderDominance": {
+    "dmin": 14,
+    "upper": 14
+   },
+   "limbDroop": {
+    "dmin": 14,
+    "upper": 14
+   },
+   "p0": {
+    "dmin": 14,
+    "upper": 14
+   },
+   "p1": {
+    "dmin": 14,
+    "upper": 14
+   },
+   "p2": {
+    "dmin": 14,
+    "upper": 14
+   },
+   "pendulousFraction05": {
+    "dmin": 14,
+    "upper": 14
+   },
+   "profileCentre": {
+    "dmin": 14,
+    "upper": 14
+   },
+   "tortuosity05": {
+    "dmin": 14,
+    "upper": 14
+   },
+   "length0": {
+    "dmin": 14,
+    "upper": 14
+   },
+   "limbElevation05": {
+    "dmin": 14,
+    "upper": 14
+   },
+   "limbUpturn": {
+    "dmin": 13,
+    "upper": 11
+   },
+   "p3": {
+    "dmin": 14,
+    "upper": 14
+   },
+   "widestAt": {
+    "dmin": 14,
+    "upper": 14
+   }
+  },
+  "control_bar": 13,
+  "controls_pass": false,
+  "no_refit": true,
+  "limitations": "Borrowed BioDiv tolerance/resolution; no independent TreeML repeat-noise floor; urban management/size/site confounds.",
+  "finite_reference": true
+ },
+ "d_min_m": 0.008621381595730782,
+ "target_dbh_m": 0.960916675,
+ "fitted": [
+  "boleSway",
+  "centroidHeight",
+  "crownBase80",
+  "crownFullness",
+  "forkHeight",
+  "leaderDominance",
+  "limbDroop",
+  "p0",
+  "p1",
+  "p2",
+  "pendulousFraction05",
+  "profileCentre",
+  "tortuosity05"
+ ],
+ "held_out": [
+  "length0",
+  "limbElevation05",
+  "limbUpturn",
+  "p3",
+  "widestAt"
+ ],
+ "real": {
+  "boleSway": {
+   "n": 14,
+   "slope": 0.00542301765998806,
+   "sd": 0.030246513216722393,
+   "sd_lo95": 0.021689350739104364,
+   "sd_hi95": 0.04992898220066158,
+   "median": 0.03802311724959114
+  },
+  "centroidHeight": {
+   "n": 14,
+   "slope": -0.008974171787412704,
+   "sd": 0.05942880356082041,
+   "sd_lo95": 0.04261556217076069,
+   "sd_hi95": 0.09810121430969865,
+   "median": 0.5947139678772938
+  },
+  "crownBase80": {
+   "n": 14,
+   "slope": -0.023577769547904172,
+   "sd": 0.07274575641561154,
+   "sd_lo95": 0.05216496243300293,
+   "sd_hi95": 0.12008397633220877,
+   "median": 0.41637105086430515
+  },
+  "crownFullness": {
+   "n": 14,
+   "slope": 0.004202394885966129,
+   "sd": 0.09799197081946438,
+   "sd_lo95": 0.07026866896989577,
+   "sd_hi95": 0.16175878957670375,
+   "median": 0.8660881674184224
+  },
+  "forkHeight": {
+   "n": 14,
+   "slope": -0.13514529142419737,
+   "sd": 0.20547620184849494,
+   "sd_lo95": 0.1473441047071523,
+   "sd_hi95": 0.3391867866303689,
+   "median": 0.4110136846927104
+  },
+  "leaderDominance": {
+   "n": 14,
+   "slope": 0.059892976175917954,
+   "sd": 0.532020392414798,
+   "sd_lo95": 0.381504367421129,
+   "sd_hi95": 0.8782247564516436,
+   "median": 1.5803431527242444
+  },
+  "limbDroop": {
+   "n": 14,
+   "slope": 2.765562890144182,
+   "sd": 25.752287545947407,
+   "sd_lo95": 18.46660449474608,
+   "sd_hi95": 42.51020596308121,
+   "median": 60.42587075676096
+  },
+  "p0": {
+   "n": 14,
+   "slope": -0.008474222621947977,
+   "sd": 0.20521975986665028,
+   "sd_lo95": 0.1471602137558679,
+   "sd_hi95": 0.3387634688398096,
+   "median": 0.8629875754849812
+  },
+  "p1": {
+   "n": 14,
+   "slope": 0.000633504059862475,
+   "sd": 0.15891766466909402,
+   "sd_lo95": 0.11395763018864963,
+   "sd_hi95": 0.2623309732854463,
+   "median": 0.9817365774188493
+  },
+  "p2": {
+   "n": 14,
+   "slope": -0.0015997682801406545,
+   "sd": 0.06858218416711068,
+   "sd_lo95": 0.049179323123827626,
+   "sd_hi95": 0.11321102131762428,
+   "median": 0.9685716330795209
+  },
+  "pendulousFraction05": {
+   "n": 14,
+   "slope": 0.037693861558182586,
+   "sd": 0.12042337113319629,
+   "sd_lo95": 0.08635391177086772,
+   "sd_hi95": 0.1987870902927358,
+   "median": 0.39633425030905634
+  },
+  "profileCentre": {
+   "n": 14,
+   "slope": 0.003925206196309184,
+   "sd": 0.03493765652086017,
+   "sd_lo95": 0.025053303858652433,
+   "sd_hi95": 0.05767281729513298,
+   "median": 0.48960255250373286
+  },
+  "tortuosity05": {
+   "n": 14,
+   "slope": 0.06086474212647284,
+   "sd": 0.1880465711107664,
+   "sd_lo95": 0.1348455607720232,
+   "sd_hi95": 0.31041508271088963,
+   "median": 1.4962422069334966
+  },
+  "length0": {
+   "n": 14,
+   "slope": -0.011713476952458371,
+   "sd": 0.020138382911909523,
+   "sd_lo95": 0.014440952157530152,
+   "sd_hi95": 0.03324313631638483,
+   "median": 0.012496228453119566
+  },
+  "limbElevation05": {
+   "n": 14,
+   "slope": -4.141846026488404,
+   "sd": 14.206397391778134,
+   "sd_lo95": 10.187208474629031,
+   "sd_hi95": 23.45099937395292,
+   "median": 22.047483342507398
+  },
+  "limbUpturn": {
+   "n": 14,
+   "slope": 2.3104437698859983,
+   "sd": 11.584324705586923,
+   "sd_lo95": 8.30695689829909,
+   "sd_hi95": 19.12265185370713,
+   "median": 34.5502557775942
+  },
+  "p3": {
+   "n": 14,
+   "slope": 0.026250066386090204,
+   "sd": 0.17063401847407544,
+   "sd_lo95": 0.12235926330380772,
+   "sd_hi95": 0.2816715702129014,
+   "median": 0.721935568033439
+  },
+  "widestAt": {
+   "n": 14,
+   "slope": -0.009139439701575621,
+   "sd": 0.2373764842583333,
+   "sd_lo95": 0.17021935015795478,
+   "sd_hi95": 0.39184570374998956,
+   "median": 0.39216736649422884
+  }
+ }
+}

@@ -103,3 +103,9 @@ setting**. Missing/failed runs are incomplete, never identical. An unchanged has
 does not prove a lever is dead; thresholds may open at other settings. Preserve
 and report newly found candidates; never delete keys automatically. Outputs stay
 in ignored `runs/`; commit only permitted summaries.
+
+Candidate-only species (step8): pass `--species sycamore,ash` to build_dag.
+The default eight-species roster is unchanged. Supply exact species patches and
+`--stand-params` as usual; otherwise an unknown identifier resolves root defaults.
+The explicit roster is recorded in provenance. This permits live/dead gate checks
+before a candidate is added to shipping FLORA; it does not create/adopt a species.

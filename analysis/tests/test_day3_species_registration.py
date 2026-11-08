@@ -30,3 +30,21 @@ def test_historical_candidates_change_only_registered_form_not_physiology():
         assert set(candidates[name])==set(reg['start'])
         assert candidates[name]=={k:source[k] for k in reg['start']}
         assert all(k.startswith('r2.') for k in candidates[name])
+
+def test_registered_site_gate_inclusive_count_zero_spread_and_missing_seeds(monkeypatch):
+    import importlib,math
+    monkeypatch.syspath_prepend(str(ROOT/'analysis/experiments'))
+    gate=importlib.import_module('day3_beech_holdout').site_gate
+    names=[f'h{k}' for k in range(5)];seeds=list(range(1,21))
+    reg={'held_out':names,'size_match':{'dbh':1.},'real':{k:{'median':0.,'sd':1.,'slope':0.} for k in names}}
+    rows=[{'seed':s,'dbh':1.,**{k:0. if s<=15 else 3. for k in names}} for s in seeds]
+    result=gate(reg,rows,seeds,names)
+    assert result['passed']==15 and result['pass']
+    for k in names:rows[0][k]=3.
+    assert gate(reg,rows,seeds,names)['passed']==14
+    assert not gate(reg,rows,seeds,names)['pass']
+    assert gate(reg,[],seeds,names)['passed']==0
+    assert not gate(reg,[],seeds,names)['pass']
+    flat=[{'seed':s,'dbh':1.,**{k:0. for k in names}} for s in seeds]
+    assert gate(reg,flat,seeds,names)['passed']==20
+    assert not gate(reg,flat,seeds,names)['spread_ok']

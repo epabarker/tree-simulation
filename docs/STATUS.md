@@ -1,37 +1,40 @@
 # Status
 
-_Last updated: 2026-11-08; day3 step7 RC prepared, phone soak deferred by user._
+_Last updated: 2026-11-08; day3 step8 in progress: beech held-out programme._
 
-**Live:** garden0.16.0;0.17.0 unreleased. No tag/deploy. Looks are not validation.
+**Live:** garden0.16.0;0.17.0 RC unreleased. Phone soak deferred by user; no readiness waiver.
 
 ## Day3
-- Steps1–6 (#65–#70) merged by user. Current oak and current garden retained.
-- Step7 draft PR#71: codex/day3-017-rc, base9ca76b2; gates360a25a, diagnosticcfba6b3.
-- Six NEW sequential budget cases: widths160/66 × seeds2/3/9; garden300/specimen150.
-- Worker save/free/specimen/restore protocol; all hashes/counts match references6/6.
-- WASM memory6/6<230MB, max225.837MB (4.163MB headroom); external checkpoint max23.675MB.
-- This is WASM allocation, not total browser/RSS memory or a real-phone result.
-- Width66/seed9 total time+35.12% flagged; first value retained and investigated.
-- Preregistered repeat after system indexer exited:34.801s,7.31% below reference.
-- Identical hashes/counts; transient timing outlier, indexer causality plausible not proved.
-- No metamer increases. Three canonical seeds are smoke, not effect/biological evidence.
-- check:stamp/build:wasm/build/build:garden green; analysis187passed.
-- JS/worker54.7kB gzip≤60; WASM173.0≤200; rebuilt WASM unchanged.
-- Shipping regressions both unchanged; no model/parameter/golden/baseline changes.
-- Four RC sheets inspected; unchanged current tiles reused with source/input checks.
-- Local rc1 garden/lab package prepared without maps; release notes docs/releases/0.17.0-rc.md.
-- User deferred required real-phone soak. RC NOT release-ready; step7 remains pending.
-- Local soak server stopped; review page preserved in analysis/experiments/day3_rc_soak.html.
+- Steps1–7 (#65–#71) merged by user; current garden/oak retained. No tag/deploy.
+- Step8 branch codex/day3-species-programme, base470aa3c; initial gates8d6ec92.
+- User preserves five historical beech holdouts (5/18), not a redrawn third.
+- Separate day3-beech-v7 registration; superseded old v6 unchanged.
+- Current-code real targets reproduce exactly:18BioDiv distributions, applicable Demol summaries.
+- Reference53BioDiv/15Demol; raw inputs/code/WASM pinned. leanAngle diagnostic only.
+- Seed audit3,890metadata JSONs+run filenames: no reserved-block hits; deleted/external runs unknown.
+- Training21001–21020; selection21021–21040 unused; confirmation21041–21060 running.
+- TreeML block21061–21080 unused. Sycamore22001–22040/ash23001–23040 reserved.
+- Current baseline uses assign={} over actual shipping params; old --hand is not current.
+- Initial20stands match at70;79trees. Training location12/13, spread11/13; no holdout scoring.
+- Fixed current/prior-v3/prior-v4 full-trial screen60candidate-seeds complete.
+- Losses21.7972/17.9150/17.0478; prior-v4 wins registered training rule, frozen ate7a1f1c.
+- Only10form knobs over current physiology; all live in exact-context DAG; sweep limitations recorded.
+- Winner training spread still fails boleSway2.4775×/tortuosity05.2748×. No adoption.
+- Current raw stand dumps identical120/120 across stand-only/full-trial protocols.
+- Fresh current/winner confirmation40stands: BioDiv/Demol held-out+spread gates next.
+- Existing coarsening tiers and gallery shapeFlag must be checked; TreeML no refit still required.
+- Four registration/gate-integrity tests pass; no model/preset/golden/garden changes.
+- Historical N1 commands restored unchanged after naming collision; new species tools have distinct paths.
 
-## Next, serially
-1. Resume user phone soak; record device/browser,1hour, garden/specimen/back, background/resume.
-2. Record soak result, finish step7 RC PR; user merges it. No agent tag/deploy/merge.
-3. Step8: beech held-out programme, then gated sycamore/ash at unchanged planting density.
-4. Pruning diagnosis uses existing live levers first; new mechanism needs measured mismatch/approved ADR.
+## Next, serially within step8
+1. Finish/audit frozen beech confirmation, resolution tiers and gallery; no held-out refitting.
+2. Register/run TreeML without refit; report failures and retain current if gates miss.
+3. Separate source-backed sycamore/ash candidates,20seeds/species gates/G-forest/budget/regressions.
+4. Adopt only through gates at unchanged planting density; one step8 PR, user merges.
 
 ## Gotchas
-- B1 counts0/0/14/12; bars−2/−2/12/10 (first2vacuous); unchanged, no new G-forest run.
-- Layered wood failed crown/LAI gates; ADR0058 remains proposed/off. LAI unit limitation persists.
-- Results docs/experiments/2026-11-08-day3-step7.md; raw runs/day3-step7.
-- check:stamp foreground before every commit; register before runs; effects≥20seeds.
-- Never merge/tag/deploy/push site main or merge preview-3d. Step8 waits for step7 completion/merge.
+- Raw runs/day3-step8; experiment tools day3_species_beech*, day3_beech_screen/holdout/resolution.
+- B1 bars−2/−2/12/10; first2vacuous. Layered wood not adopted; ADR0058 proposed/off.
+- RC memory max225.837MB<230; phone soak deferred, server stopped, review page preserved.
+- check:stamp foreground before commits; register before runs; effects≥20seeds; cap12simulators.
+- Never agent merge/tag/deploy/site-main push or preview-3d merge; no restricted reference tables committed.

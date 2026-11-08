@@ -2,6 +2,31 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-08: step8 underway — current beech instrument and sealed training
+
+User merged #71 while deferring phone soak; RC remains unready, post-box research
+starts from470aa3c. User explicitly preserves five historical held-outs (5/18).
+Registered gates8d6ec92; separate v7 reconstructs all18 real distributions exactly
+(BioDiv53, Demol15 applicable summaries), pinning raw inputs and current code.
+Old v6 remains superseded; leanAngle stays diagnostic until resolution recheck.
+Current assign={} avoids accidentally using historical --hand physiology.
+
+Audited3,890metadata files and run filenames for unused21001–21080/22001–22040/
+23001–23040 blocks: no hits; deleted/external evidence not covered. Initial current
+training20stands match at70,79trees, location12/13 and spread11/13. Historical
+N1 filenames were initially reused accidentally; restored byte-for-byte and moved
+new tools to day3_species_beech*. Pilot registration preserved; core/input unchanged.
+Full-trial current stand dumps identical120/120. Summed evaluator ms are elapsed
+request time, not measured CPU; initial timing-key misnomer recorded in plan.
+
+After exact-context DAGs and night2 sweep reading, registered three fixed current-
+physiology form bundles at6cf3a57, all20training seeds each, no held-out scoring.
+Total losses21.7972/17.9150/17.0478: prior-v4 frozen ate7a1f1c by minimum training
+loss, despite two training spread misses. Current physiology/lifespan retained.
+Fresh confirmation21041–21060, both conditions, is in progress; no candidate
+adopted. Gate tests cover15/20 equality, zero spread and missing evidence. Four
+focused tests pass. No model, presets, goldens or garden changes; step8 unfinished.
+
 ## 2026-11-08: day3 step7 — RC prepared, phone soak deferred
 
 User merged #70. Registered step7 at360a25a before six NEW fresh-process memory

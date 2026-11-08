@@ -226,8 +226,10 @@ RC not release-ready, step7 pending.** No tag/deploy; step8 waits for completion
 and user merge. See step7 experiment note and docs/releases/0.17.0-rc.md.
 User merged preparation (#71); phone soak remains deferred, so no release-readiness claim.
 
-Step8 in progress (2026-11-08): user preserves five historical beech hold-outs5/18;
-current instrument real-target identity18/18, source-pinned v7 separate from oldv6.
-Training-only three-bundle screen on20seeds selects prior-v4; fresh held-out and
-site/spread/instrument/gallery tests in progress, no beech or garden change.
-Sycamore/ash still require source-backed separate candidates and all adoption gates.
+Step8 paused for user assessment (2026-11-08), not complete. Beech's bounded
+assessment is complete: candidate BioDiv19/20 but spread fails; Demol11/20<15
+and spread fails. TreeML unmatched within the registered window; retain current.
+Separate sycamore/ash targets and prototypes are registered. Latest160-stand
+allocation/pipe grid best3/20 and1/20 against15/20; neither qualifies. Fresh
+new-species confirmation blocks untouched. No garden adoption or production
+behaviour change; fitting, confirmation and garden/resource gates remain.

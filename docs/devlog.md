@@ -2,6 +2,21 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+
+## 2026-11-08: checkpoint for user assessment; step8 unfinished
+
+User requests a pause to assess progress. Completed the registered allocation/pipe
+160-stand grid: in condition order l20-p20/l20-p30/l30-p20/l30-p30, sycamore passes
+3/0/1/0 of20 and ash0/0/0/1 of20, each against15/20. Neither has a qualifying
+training winner; no fresh confirmation or garden adoption follows. Remaining79
+sycamore runs took266.869s wall; ash80 took288.465s. These are elapsed timings,
+not CPU measurements. Exact inputs, hashes and raw outputs remain in ignored runs/.
+Committed aggregate summary accompanies the experiment note. Beech assessment is
+complete with current beech retained; step8 overall remains unfinished. No model,
+presets, garden, goldens or regression baselines changed. No simulations running;
+no next grid registered. RC phone soak remains explicitly deferred. Checkpoint is
+local: no push, PR, merge, tag or deployment requested by this wrap-up.
+
 ## 2026-11-08: beech attempt complete; new-species calibration active
 
 Beech fixed candidate is rejected: fresh BioDiv19/20count but spread fails,

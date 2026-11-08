@@ -2,6 +2,30 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-08: beech attempt complete; new-species calibration active
+
+Beech fixed candidate is rejected: fresh BioDiv19/20count but spread fails,
+Demol11/20<15/spread fails. Existing gallery clear, not biological validation.
+Independent resolution audit finds missing limbs, not converter error/large
+coarsening shifts. TreeML40runs complete but cohort matches110/120 lie outside
+registered50–100window; no z invented. Real transfer17/18, upper limbUpturn11/14
+fails13bar (d_min13atlimit). Current beech/garden retained. Full step8 note/figure.
+No held-out retune. Screen's prose lone100 discrepancy retained: evaluator lone60,
+no scored lone100 term; source/source-result provenance preserved.
+
+Separate sycamore/ash source targets/control frozen before runs. Initial20seed
+height medians27.80/31.87m,20/20design bands, but standard H/CR–DBH0/20each.
+Finite data, primarily wide crowns for stem size. All80 λ±10% stand probes run;
+sycamore best3/20,ash0/20, no qualifying choice. Fresh blocks untouched.
+
+Registered next fixed2×2 allocation/pipe grid at859aae3: λ0+20/+30%, r0×1.2/
+1.3,mw÷scale². Same-topology ideal wood-charge normalisation only, not behaviour
+invariance; mechanics/topology can change. Eight exact DAGs checked and160input
+identity pairs; pilot7.17s. First80case stage is running, ash80 follows. No new
+mechanism or garden/FLORA change, no gate/planting-density relaxation. Existing
+adopter's unconditional mw64 must be handled before any future materialisation.
+Step8 remains unfinished; no adoption or release-readiness claim.
+
 ## 2026-11-08: step8 underway — current beech instrument and sealed training
 
 User merged #71 while deferring phone soak; RC remains unready, post-box research

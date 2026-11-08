@@ -1,40 +1,42 @@
 # Status
 
-_Last updated: 2026-11-08; day3 step8 in progress: beech held-out programme._
+_Last updated: 2026-11-08; day3 step8 active: species fitting, no adoption._
 
-**Live:** garden0.16.0;0.17.0 RC unreleased. Phone soak deferred by user; no readiness waiver.
+**Live:** garden0.16.0. RC prepared/merged#71; phone soak deferred, no release-readiness waiver.
 
-## Day3
-- Steps1–7 (#65–#71) merged by user; current garden/oak retained. No tag/deploy.
-- Step8 branch codex/day3-species-programme, base470aa3c; initial gates8d6ec92.
-- User preserves five historical beech holdouts (5/18), not a redrawn third.
-- Separate day3-beech-v7 registration; superseded old v6 unchanged.
-- Current-code real targets reproduce exactly:18BioDiv distributions, applicable Demol summaries.
-- Reference53BioDiv/15Demol; raw inputs/code/WASM pinned. leanAngle diagnostic only.
-- Seed audit3,890metadata JSONs+run filenames: no reserved-block hits; deleted/external runs unknown.
-- Training21001–21020; selection21021–21040 unused; confirmation21041–21060 running.
-- TreeML block21061–21080 unused. Sycamore22001–22040/ash23001–23040 reserved.
-- Current baseline uses assign={} over actual shipping params; old --hand is not current.
-- Initial20stands match at70;79trees. Training location12/13, spread11/13; no holdout scoring.
-- Fixed current/prior-v3/prior-v4 full-trial screen60candidate-seeds complete.
-- Losses21.7972/17.9150/17.0478; prior-v4 wins registered training rule, frozen ate7a1f1c.
-- Only10form knobs over current physiology; all live in exact-context DAG; sweep limitations recorded.
-- Winner training spread still fails boleSway2.4775×/tortuosity05.2748×. No adoption.
-- Current raw stand dumps identical120/120 across stand-only/full-trial protocols.
-- Fresh current/winner confirmation40stands: BioDiv/Demol held-out+spread gates next.
-- Existing coarsening tiers and gallery shapeFlag must be checked; TreeML no refit still required.
-- Four registration/gate-integrity tests pass; no model/preset/golden/garden changes.
-- Historical N1 commands restored unchanged after naming collision; new species tools have distinct paths.
+## Completed within step8
+- Branch codex/day3-species-programme, base470aa3c; steps1–7 merged by user.
+- Beech: user preserves five historical holdouts5/18; separate current day3-v7, oldv6 untouched.
+- Real target identity18/18;53BioDiv/15Demol; all data/model/WASM/code hashes pinned.
+- Fixed training screen60candidate-seeds selected prior-v4; no new CMA-ES fit.
+- Fresh candidate BioDiv19/20≥15 but spread fails; Demol11/20<15 and spread fails.
+- Current13/20 and9/20; both spread fail. Gallery clear on known3seeds, not biology.
+- Tier recheck10/18retain; missing limbs reduce measurability to8–9/20, not large shifts.
+- TreeML40runs complete; targetDBH.960917m reached110/120 outside registered50–100dumpwindow.
+- No TreeML descriptor scoring; transfer control17/18, limbUpturn upper11/14<13.
+- Retain current beech. G-forest/budget unrun for rejected beech, not passed.
+- Full evidence docs/experiments/2026-11-08-day3-step8.md; aggregate figure inspected.
 
-## Next, serially within step8
-1. Finish/audit frozen beech confirmation, resolution tiers and gallery; no held-out refitting.
-2. Register/run TreeML without refit; report failures and retain current if gates miss.
-3. Separate source-backed sycamore/ash candidates,20seeds/species gates/G-forest/budget/regressions.
-4. Adopt only through gates at unchanged planting density; one step8 PR, user merges.
+## Sycamore/ash ongoing
+- Separate source curves: sycamore H447/CR440/control19/20; ash921/857/control17/20, bar15.
+- Independent initial priors use current maple groups, fRep.8, maturity110.318/127.120.
+-20training seeds each: lone height20/20 in design band, medians27.80/31.87m.
+- Standard allometry0/20 each; true finite CR-at-DBH mismatch, no missing-support shortcut.
+- λ0±10% probe80stands: sycamore0/20minus,3/20plus; ash0/20both. No qualifying variant.
+- New fixed2×2 grid: λ0+20/+30%, pipe r0×1.2/1.3, mw÷scale²; gates unchanged.
+- Exact8DAGs/no new reader switches;160input identity checks, single pilot7.17s.
+- First species80-case stage running (pilot+79), then ash80; ≤8active models.
+- No fresh confirmation used:22021–22040/23021–23040 untouched. No garden/FLORA changes.
+
+## Next
+1. Finish/audit bounded grid; selected variants must pass20-seed lone-height recheck.
+2. Freeze before fresh20confirmations; only then gardenG-forest/B1,budget,regressions at unchanged density.
+3. Materialise qualified candidates with proven exact3D params; one step8 PR, user merges.
+4. Phone soak remains a separate deferred release gate; no tag/deploy/production push.
 
 ## Gotchas
-- Raw runs/day3-step8; experiment tools day3_species_beech*, day3_beech_screen/holdout/resolution.
-- B1 bars−2/−2/12/10; first2vacuous. Layered wood not adopted; ADR0058 proposed/off.
-- RC memory max225.837MB<230; phone soak deferred, server stopped, review page preserved.
-- check:stamp foreground before commits; register before runs; effects≥20seeds; cap12simulators.
-- Never agent merge/tag/deploy/site-main push or preview-3d merge; no restricted reference tables committed.
+- m27_adopt resets mw=64; any adopter extension must preserve selected coupled mw/r0.
+- Same-skeleton mw*r0² normalisation is NOT behaviour/bit invariance; R3/topology change.
+- Beech screen prose100 corrected: existing evaluator lone60, no lone100 scored term.
+- Raw runs/day3-step8; stamp foreground before commits; ≥20seeds; cap12simulators.
+- Never agent merge/tag/deploy/site-main push or preview-3d merge. B1bars−2/−2/12/10 fixed.

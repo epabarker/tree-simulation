@@ -14,7 +14,7 @@ use crate::principles::c1::{
     beta_offset, grow_shoot, juvenile_cap, lateral_frame, offset_frame, shoot_length_factor,
     shoot_size,
 };
-use crate::principles::c3::{allocate, gather_light, is_live_bud};
+use crate::principles::c3::{CELL_M, allocate, gather_light, is_live_bud, turgor_scale};
 use crate::principles::c4::{axis_offset, shoot_direction};
 use crate::principles::c5::{crown_top_light, shed_branches};
 use crate::principles::c6::update_girth;
@@ -431,6 +431,21 @@ pub fn grow_buds(tree: &mut Tree, params: &Params, season: f64) {
         Vec::new()
     };
     let mut shoot_length = 0.0;
+    // The sink limit's inputs, as the season began: path length from the root (R1's, or summed
+    // here without R1) and the root's height.
+    let path: Vec<f64> = if !params.c3.sink_turgor {
+        Vec::new()
+    } else if params.r1.enabled && tree.path_len.len() >= tree.m.len() {
+        tree.path_len[..tree.m.len()].to_vec()
+    } else {
+        let mut p = vec![0.0; tree.m.len()];
+        for j in 0..tree.m.len() {
+            let up = tree.m.parent[j];
+            p[j] = tree.m.length[j] + if up >= 0 { p[up as usize] } else { 0.0 };
+        }
+        p
+    };
+    let root_y = tree.m.base_y.first().copied().unwrap_or(0.0);
     for i in 0..count {
         if !is_live_bud(tree.b.state[i]) {
             continue;
@@ -459,7 +474,23 @@ pub fn grow_buds(tree: &mut Tree, params: &Params, season: f64) {
                 params,
             );
         let mut n = if v >= threshold && !refused {
-            shoot_size(v, params, &mut shoot_length, cap)
+            if params.c3.sink_turgor {
+                // The sink limit (wayfinder #87): the tip uses a share s of what C3 gave it; the
+                // rest goes to R1's reserve, up to its cap, and is never re-split.
+                let host = tree.b.metamer[i] as usize;
+                let h = (tree.tip_y(host) - root_y) * CELL_M;
+                let s = turgor_scale(h, path[host] * CELL_M, &params.c3);
+                let full = math::min(v, cap);
+                let n = shoot_size(full * s, params, &mut shoot_length, cap);
+                let unused = if n > 0.0 { full * (1.0 - s) } else { full };
+                if params.r1.enabled && unused > 0.0 {
+                    let store = params.r1.store * tree.maintenance;
+                    tree.reserve = math::max(tree.reserve, math::min(tree.reserve + unused, store));
+                }
+                n
+            } else {
+                shoot_size(v, params, &mut shoot_length, cap)
+            }
         } else {
             0.0
         };

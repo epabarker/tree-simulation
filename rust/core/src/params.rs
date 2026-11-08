@@ -130,6 +130,15 @@ pub struct C3 {
     pub mode: C3Mode,
     pub lambda: f64,
     pub alpha: f64,
+    /// c3.sink (exploratory, wayfinder #87): "turgor" caps each shoot's extension by its water
+    /// status; "off" (the default, or absent) leaves C3 as it was.
+    pub sink_turgor: bool,
+    /// c3.sinkG: Ψ's gravity term per metre of the shoot's height above the root (MPa/m).
+    pub sink_g: f64,
+    /// c3.sinkR: Ψ's friction term per metre of path length from the root (MPa/m).
+    pub sink_r: f64,
+    /// c3.psiCrit: Ψ at which extension stops (MPa, < 0).
+    pub psi_crit: f64,
 }
 
 #[derive(Clone, Copy, Debug)]
@@ -493,6 +502,10 @@ impl Params {
                 },
                 lambda: num(c3, "lambda"),
                 alpha: num(c3, "alpha"),
+                sink_turgor: c3.get("sink").and_then(Value::as_str) == Some("turgor"),
+                sink_g: opt(c3, "sinkG").unwrap_or(0.0),
+                sink_r: opt(c3, "sinkR").unwrap_or(0.0),
+                psi_crit: opt(c3, "psiCrit").unwrap_or(-1.0),
             },
             c4: C4 {
                 enabled: flag(c4, "enabled"),

@@ -11,7 +11,10 @@
 //!
 //!     cargo run --release --example cap_probe -- params.json 150 10 out/prefix
 //!
-//! Writes prefix_season.csv, prefix_sheds.csv, prefix_buds.csv and prefix_new.csv. Positions are
+//! Writes prefix_season.csv, prefix_sheds.csv, prefix_buds.csv, prefix_new.csv and (wayfinder
+//! #87) prefix_shoots.csv: every shoot grown in a dump season, by its host's height and path length
+//! from the root (m), its metamer count, and whether it extends the leader. season.csv gains the
+//! trunk's radius at 1.3 m (cells) and the leader shoot's metamers that season. Positions are
 //! in cells (4 cells = 1 m): dx, dz from the root, dy above the root's base.
 
 use std::env;
@@ -35,11 +38,17 @@ fn main() {
     let out = &args[4];
     let mut world = World::new(params);
     let file = |s: &str| BufWriter::new(fs::File::create(format!("{out}_{s}.csv")).unwrap());
-    let (mut fs_, mut fx, mut fb, mut fnw) =
-        (file("season"), file("sheds"), file("buds"), file("new"));
+    let (mut fs_, mut fx, mut fb, mut fnw, mut fsh) = (
+        file("season"),
+        file("sheds"),
+        file("buds"),
+        file("new"),
+        file("shoots"),
+    );
+    writeln!(fsh, "season,tree,species,hostH,hostPath,n,leader,order,dx").unwrap();
     writeln!(
         fs_,
-        "season,tree,species,height,qTop,metamers,leaf,newMetamers,shedMetamers,trel,kShed,carbon,outside,maxDx,maxDz,buds"
+        "season,tree,species,height,qTop,metamers,leaf,newMetamers,shedMetamers,trel,kShed,carbon,outside,maxDx,maxDz,buds,rDbh,leaderN"
     )
     .unwrap();
     writeln!(fx, "season,tree,species,order,dx,dy,dz,metamers,leaf,ratio,pm,run,why,buds,bank,budQmax,budAgeMax,born").unwrap();
@@ -111,9 +120,48 @@ fn main() {
             }
             let (trel, kshed, carbon) = (p.c5.t_rel, p.r1.k_shed, p.r1.enabled && p.r1.shed_carbon);
             let before = tree.m.len();
+            // Path length from the root to every node, as the season began (cells).
+            let mut path = vec![0.0f64; before];
+            for k in 0..before {
+                let up = tree.m.parent[k];
+                path[k] = tree.m.length[k] + if up >= 0 { path[up as usize] } else { 0.0 };
+            }
+            let trunk_axis = tree.m.axis.first().copied();
             phase_grow(&mut world, i);
             let tree = &world.trees[i];
             let grown = tree.m.len() - before;
+            // Shoots: a new metamer whose parent is old starts one; the chain after it is its
+            // metamers (grow_shoot appends a shoot's metamers in order).
+            let mut leader_n = 0usize;
+            let mut k = before;
+            while k < tree.m.len() {
+                let host = tree.m.parent[k];
+                let mut n = 1;
+                while k + n < tree.m.len() && tree.m.parent[k + n] == (k + n - 1) as i32 {
+                    n += 1;
+                }
+                if host >= 0 && (host as usize) < before {
+                    let h = host as usize;
+                    let leader = tree.m.slot[k] == slot::MAIN && Some(tree.m.axis[h]) == trunk_axis;
+                    if leader {
+                        leader_n = n;
+                    }
+                    if dump {
+                        writeln!(
+                            fsh,
+                            "{s},{},{sp},{},{},{n},{},{},{}",
+                            tree.id,
+                            (tree.tip_y(h) - y0) * 0.25,
+                            path[h] * 0.25,
+                            leader as u8,
+                            tree.m.order[k],
+                            (tree.tip_x(h) - x0) * 0.25
+                        )
+                        .unwrap();
+                    }
+                }
+                k += n;
+            }
             if dump {
                 for k in before..tree.m.len() {
                     writeln!(
@@ -156,9 +204,13 @@ fn main() {
                 mdx = mdx.max((tree.tip_x(k) - tree.root_x).abs());
                 mdz = mdz.max((tree.tip_z(k) - tree.root_z).abs());
             }
+            let y0 = tree.m.base_y.first().copied().unwrap_or(0.0);
+            let r_dbh = (0..tree.m.len())
+                .find(|&k| Some(tree.m.axis[k]) == trunk_axis && tree.tip_y(k) - y0 >= 5.2)
+                .map_or(f64::NAN, |k| tree.m.radius[k]);
             writeln!(
                 fs_,
-                "{s},{},{sp},{},{qt},{},{leaf},{grown},{shed_m},{trel},{kshed},{carbon},{outside},{mdx},{mdz},{nbud}",
+                "{s},{},{sp},{},{qt},{},{leaf},{grown},{shed_m},{trel},{kshed},{carbon},{outside},{mdx},{mdz},{nbud},{r_dbh},{leader_n}",
                 tree.id,
                 height(tree),
                 tree.m.len()

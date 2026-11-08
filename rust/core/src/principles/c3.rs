@@ -3,6 +3,11 @@
 //! flows into its parent's node. Acropetal: v_base = α·Q_base enters the root and splits at each
 //! node, main share v·λQ_m / (λQ_m + (1 − λ)Q_l).
 //!
+//! Exploratory (wayfinder #87, off by default): with c3.sink "turgor" a sink limit caps each
+//! shoot's extension by its water status Ψ = −(g·height + r·path length), Lockhart-linear to
+//! Ψ_crit (`turgor_scale`); C3 still allocates on light, and what a tip cannot use goes to R1's
+//! reserve (season.rs, grow_buds). Params c3.sink, c3.sinkG, c3.sinkR, c3.psiCrit.
+//!
 //! Params: c3.mode, c3.lambda (λ), c3.alpha (α); with R2 λ by pa and age and acrotony κ, and λ
 //! falls in weak wood of a vigorous tree (R2's vigour drop: r2.vigourShare, r2.vigourLambda,
 //! r2.vigourTreeLo, r2.vigourTreeHi); with R5 λ rises at shaded nodes; with R1, v_base is the
@@ -11,7 +16,8 @@
 use super::r2::{acrotony_weights, lambda_at, vigour, vigour_drop_on, vigour_gate};
 use super::r5::shaded_lambda;
 use super::r6::light_weight;
-use crate::params::{C3Mode, Params, R6};
+use crate::math;
+use crate::params::{C3, C3Mode, Params, R6};
 use crate::tree::{SLOTS, Tree, bud, ensure};
 
 /// True for buds that still take part in growth (not consumed, aborted or terminated).
@@ -48,6 +54,24 @@ pub fn gather_light(tree: &mut Tree, r6: &R6) {
         }
     }
     tree.q_base = if nm > 0 { tree.m.q_sum[0] } else { 0.0 };
+}
+
+/// Metres per cell (the grid's 0.25 m), for the sink limit's per-metre terms.
+pub const CELL_M: f64 = 0.25;
+
+/// The sink limit's scale on a shoot's metamer count (wayfinder #87): Ψ = −(g·h + r·L) with h
+/// the shoot's height above the root and L its path length from the root, both in metres, and
+/// max(0, (Ψ − Ψ_crit)/(0 − Ψ_crit)), at most 1. Turgor, not carbon, tracks elongation in tall
+/// trees (Woodruff 2004; Woodruff & Meinzer 2011: NSC rises with height while extension falls).
+pub fn turgor_scale(height_m: f64, path_m: f64, c3: &C3) -> f64 {
+    let psi = -(c3.sink_g * height_m + c3.sink_r * path_m);
+    if c3.psi_crit >= 0.0 {
+        return 1.0;
+    }
+    math::max(
+        0.0,
+        math::min(1.0, (psi - c3.psi_crit) / (0.0 - c3.psi_crit)),
+    )
 }
 
 /// The Borchert–Honda split at one node: the main axis's share; 0 when the node gathered nothing.
@@ -193,6 +217,23 @@ mod tests {
 
     fn close(a: f64, b: f64) -> bool {
         (a - b).abs() < 1e-12
+    }
+
+    #[test]
+    fn turgor_scale_is_lockhart_linear_to_psi_crit() {
+        let p = Params::from_json(&crate::json::merge(
+            &preset("default", "{}"),
+            &crate::json::parse(
+                r#"{"c3":{"sink":"turgor","sinkG":0.01,"sinkR":0.005,"psiCrit":-0.5}}"#,
+            )
+            .unwrap(),
+        ));
+        assert!(p.c3.sink_turgor);
+        assert!(close(turgor_scale(0.0, 0.0, &p.c3), 1.0));
+        // Ψ = −(0.01·20 + 0.005·20) = −0.3: 0.2/0.5 of full extension.
+        assert!(close(turgor_scale(20.0, 20.0, &p.c3), 0.4));
+        assert!(close(turgor_scale(40.0, 40.0, &p.c3), 0.0));
+        assert!(!Params::from_json(&preset("default", "{}")).c3.sink_turgor);
     }
 
     #[test]

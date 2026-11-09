@@ -35,7 +35,7 @@ import {
   type SpeciesPatch,
   speciesParams,
 } from "../src/core/params.ts";
-import { perArea, presetParams, TOP } from "../src/core/presets.ts";
+import { OPEN_BOX, openGrown, perArea, presetParams, TOP } from "../src/core/presets.ts";
 import { coreWasm, loadWorldsSync, RustWorld, type TreeView as Tree } from "../src/wasm/world.ts";
 import { type Allometry, allometry } from "./allometry.ts";
 
@@ -64,6 +64,15 @@ export function loneParams(species: string, seed: number): Params {
     world: { width: 160, height: TOP, walls: [] },
     trees: [{ x: 80, species }],
   });
+}
+
+/**
+ * The lone tree open-grown (ADR 0062): the trials' rules in `openGrown`'s square box, τ = 1 on all
+ * four sides. The feature probe's lone stage. `loneParams` stays the half-walled lone trial the fits
+ * were calibrated on (160 × 64 cells, τ 0.2 faces).
+ */
+export function openLoneParams(species: string, seed: number, side: number = OPEN_BOX): Params {
+  return trialBase(seed, openGrown(species, side) as Partial<Params>);
 }
 
 /** The one-row stand of M19–M27 (ten trees between τ 0.2 faces): now the release trial's. */

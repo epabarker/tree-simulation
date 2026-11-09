@@ -276,6 +276,12 @@ export interface TreeMetrics {
   limbBase: number;
   /** (height − limbBase)/height: the crown ratio by limbs. */
   limbCrownRatio: number;
+  /**
+   * Live buds past the light's box W × H × D at a side or the top, where Q is 0 (a wrapped side is
+   * never passed; a limb resting on the ground is not counted). The open-grown box's hard check: 0
+   * in every season (ADR 0062). NaN without a world.
+   */
+  budsOutside: number;
 }
 
 export const METRIC_COLUMNS: readonly (keyof TreeMetrics)[] = [
@@ -320,6 +326,7 @@ export const METRIC_COLUMNS: readonly (keyof TreeMetrics)[] = [
   "leafCrownRatio",
   "limbBase",
   "limbCrownRatio",
+  "budsOutside",
 ];
 
 /** A change applied at the start of `season` (before that season runs). */

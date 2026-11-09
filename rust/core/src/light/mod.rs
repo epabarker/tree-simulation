@@ -170,6 +170,21 @@ impl Light {
     }
 
     /// (Q, V) at (x, y, z).
+    /// Whether (x, y, z) lies in the light's box, by the rule `sample` uses: outside it Q is 0. A
+    /// periodic side wraps, so nothing lies beyond it.
+    pub fn contains(&self, x: f64, y: f64, z: f64) -> bool {
+        match self {
+            Light::Uniform {
+                width,
+                height,
+                depth,
+                ..
+            } => inside(x, y, z, *width, *height, *depth),
+            Light::Pooled(p) => inside(x, y, z, p.width, p.height, p.depth),
+            Light::Slab(s) => s.sweep.cell(x, y, z).is_some(),
+        }
+    }
+
     pub fn sample(&self, x: f64, y: f64, z: f64) -> (f64, V3) {
         match self {
             Light::Uniform {

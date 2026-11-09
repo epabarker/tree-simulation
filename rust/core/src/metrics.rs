@@ -13,7 +13,7 @@ const PI: f64 = std::f64::consts::PI;
 
 /// metrics.csv's columns (METRIC_COLUMNS), in order. `alive` and `sown` are flags (1/0) and
 /// `species` a string; every other column is a number.
-pub const METRIC_COLUMNS: [&str; 41] = [
+pub const METRIC_COLUMNS: [&str; 42] = [
     "tree",
     "alive",
     "species",
@@ -55,11 +55,12 @@ pub const METRIC_COLUMNS: [&str; 41] = [
     "leafCrownRatio",
     "limbBase",
     "limbCrownRatio",
+    "budsOutside",
 ];
 
 /// The numeric fields of TreeMetrics, in this order (`sown` among them, as a flag), which the
 /// snapshot carries as a block: everything but `species`.
-pub const METRIC_NUMBERS: [&str; 41] = [
+pub const METRIC_NUMBERS: [&str; 42] = [
     "tree",
     "alive",
     "rootX",
@@ -101,11 +102,12 @@ pub const METRIC_NUMBERS: [&str; 41] = [
     "leafCrownRatio",
     "limbBase",
     "limbCrownRatio",
+    "budsOutside",
 ];
 
 pub struct TreeMetrics {
     /// By METRIC_NUMBERS.
-    pub values: [f64; 41],
+    pub values: [f64; 42],
     pub species: String,
 }
 
@@ -310,12 +312,23 @@ pub fn tree_metrics(tree: &Tree, world: Option<&World>) -> TreeMetrics {
         }
     }
     let (mut buds, mut dormant, mut short) = (0.0, 0.0, 0.0);
+    // Live buds past the light's box (ADR 0062's hard check for the open-grown box): at their
+    // metamer's tip, where `sample_buds` samples them, past a side or the top, where Q is 0. The
+    // ground is not a bound the box is sized for: a limb R3 rests on it lies a rounding error below
+    // y = 0, so y is clamped to it here (as the open-box note's probe counted).
+    let mut outside = if world.is_some() { 0.0 } else { f64::NAN };
     for i in 0..tree.b.len() {
         let s = tree.b.state[i];
         if !is_live_bud(s) {
             continue;
         }
         buds += 1.0;
+        if let Some(w) = world {
+            let [x, y, z] = tree.tip(tree.b.metamer[i] as usize);
+            if !w.light.contains(x, math::max(0.0, y), z) {
+                outside += 1.0;
+            }
+        }
         if s == bud::DORMANT {
             dormant += 1.0;
         } else if s == bud::SHORT_SHOOT {
@@ -394,6 +407,7 @@ pub fn tree_metrics(tree: &Tree, world: Option<&World>) -> TreeMetrics {
             } else {
                 0.0
             },
+            outside,
         ],
         species: tree.species.clone(),
     }
@@ -485,6 +499,46 @@ mod tests {
         let m = tree_metrics(&t, None);
         assert_eq!(m.get("limbBase"), 2.0);
         assert!((m.get("limbCrownRatio") - 39.0 / 41.0).abs() < 1e-12);
+    }
+
+    #[test]
+    fn buds_past_a_bound_count_as_outside_and_a_wrapped_side_has_none() {
+        // A 12-cell trunk in a 20 × 10 × 4 box (root at x 18, z 2): buds at heights 5, 9.5 and
+        // 12 (one past the top); a limb reaching x 22, past the open right side, with one bud; and
+        // a limb lying on the ground.
+        let grow = |sides: &str| {
+            let world = World::new(crate::testing::preset(
+                "default",
+                &format!(
+                    r#"{{"world":{{"width":20,"height":10,"depth":4,"walls":[],"sides":"{sides}"}},"c2":{{"enabled":true,"model":"slab"}}}}"#
+                ),
+            ));
+            let mut t = Tree::new(0, 18.0, 2.0);
+            let mut trunk = vec![metamer(&mut t, -1, slot::MAIN, UP, 1.0, 0.1, 0.0)];
+            for _ in 1..12 {
+                let p = *trunk.last().unwrap() as i32;
+                trunk.push(metamer(&mut t, p, slot::MAIN, UP, 1.0, 0.1, 0.0));
+            }
+            let half = metamer(&mut t, trunk[8] as i32, RIGHT, UP, 0.5, 0.1, 0.0);
+            bud(&mut t, trunk[4], RIGHT, 0.0, 1.0);
+            bud(&mut t, half, slot::MAIN, UP, 0.0);
+            bud(&mut t, trunk[11], slot::MAIN, UP, 0.0);
+            let limb = metamer(&mut t, trunk[2] as i32, RIGHT, 0.0, 4.0, 0.05, 0.0);
+            bud(&mut t, limb, slot::MAIN, 0.0, 1.0);
+            // A limb resting on the ground (R3), its tip a rounding error below it: not past a bound.
+            let rest = metamer(&mut t, trunk[0] as i32, 3, PI + 1e-15, 3.0, 0.05, 0.0);
+            t.m.base_y[rest] = 0.0;
+            bud(&mut t, rest, slot::MAIN, 0.0, 1.0);
+            assert!(t.tip_y(rest) < 0.0);
+            (tree_metrics(&t, Some(&world)), tree_metrics(&t, None))
+        };
+        let (open, none) = grow("open");
+        assert_eq!(open.get("buds"), 5.0);
+        assert_eq!(open.get("budsOutside"), 2.0);
+        assert!(none.get("budsOutside").is_nan());
+        // On a ring the limb's tip wraps to x 2: only the top bud is past a bound.
+        let (ring, _) = grow("periodic");
+        assert_eq!(ring.get("budsOutside"), 1.0);
     }
 
     #[test]

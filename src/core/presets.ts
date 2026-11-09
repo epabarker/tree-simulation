@@ -140,6 +140,28 @@ const flora = (name: FloraName, xs: number[], width: number) =>
  */
 export const TOP = 200;
 
+/**
+ * The open-grown box's side, cells (60 m; ADR 0062). Each exemplar's crown at season 100 reaches at
+ * most 25.8–27.8 m from its root (beech; the others 9–27 m), so 240 holds them all with ≥ 2.2 m to
+ * spare (the open-box note, 2026-11-08).
+ */
+export const OPEN_BOX = 240;
+
+/**
+ * The open-grown lone-tree stage (ADR 0062, GLOSSARY "Open-grown"): open sky on all four sides
+ * (τ = 1 on both z faces, open x sides) in a square box of `side` cells, `TOP` tall, with the tree
+ * at its centre, sized so that no bud grows past a bound (metrics' `budsOutside` stays 0). The τ
+ * faces' half-walled box let 100–500 buds a season sit past a face with Q = 0. The garden does not
+ * use it: in WASM it costs ≈ 0.9 s a season late on and 530–700 MB (ADR 0026's budget binds the
+ * garden, not the lab).
+ */
+export function openGrown(species: string, side: number = OPEN_BOX): ParamsPatch {
+  return {
+    world: { width: side, depth: side, height: TOP, walls: [], faces: [1, 1], sidesZ: "open" },
+    trees: [{ x: side / 2, z: side / 2, species }],
+  };
+}
+
 const RING = { width: 210, height: TOP, walls: [], sides: "periodic" } satisfies Params["world"];
 /** One row of the ring's stand: a tree every 21 cells. */
 const RING_X = [10, 31, 52, 73, 94, 115, 136, 157, 178, 199];

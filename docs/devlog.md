@@ -3,6 +3,14 @@
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
 
+## 2026-11-09: the feature playbook, assembled and handed off (wayfinder map #73)
+
+- **Docs only; no code, goldens or regressions changed.** The map's decisions were on four docs branches cut from the old `main`, 103 commits behind `3d-port`. `bare-bole.md` existed only on one of them, and the latest `rounded-crown.md` only on another. This brings them together on `3d-port`: ADRs 0062 (light entry) and 0063 (garden demography), `docs/features/` (three pages and a README), and `GLOSSARY.md`.
+- **The map's notes come with it:** 12 experiment notes, 4 research notes, their figures and their probe scripts under `docs/experiments/code/`, taken from the `research/*` and `wayfinder/*` branches. Each file had one version across all the branches. The links that pointed at the branches are now relative.
+- **The rounded-crown page is brought up to the closed tickets.** The version on its branch still described the turgor sink limit on the metamer count, which its probe rejected. The page now takes the oak's early λ fall (`d12a13`, after the relay failed) and defers maple's length cap. The bare-bole page notes that its probe moves into build (d).
+- **The handoff** (`docs/features/README.md`, decided in #95): four builds merged one after another, a → b → c → d. Each is one `/implement-principle` PR: a default-off, bit-identical commit, then a preset commit that updates goldens and regressions once, with ≥ 20 seeds on the page's diagnostic.
+- **Surprise:** the probe code was never meant to merge, but the decided docs had also been left on branches. Nothing at `3d-port` held the destination until this PR.
+
 ## 2026-11-08: branch and issue cleanup; the engineering skills' setup
 
 - **Engineering skills** (mattpocock-skills): `docs/agents/` and CLAUDE.md's "Agent skills": GitHub Issues, the five default triage labels, ADRs in `docs/decisions/`.

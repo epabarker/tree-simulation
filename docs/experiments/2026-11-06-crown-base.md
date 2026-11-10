@@ -1,5 +1,7 @@
 # Young trees' clear trunk: not ADR 0055; a general low crown base (2026-11-06, box step A2)
 
+> **Evidence, not a baseline** (ADR 0062, ticket #115, 2026-11-10). Measured in the world of the slab's τ 0.2 walls: a half-walled lone tree, or a stand lit through its faces. The lone-tree stage is now open-grown (a square 60 m box, open on all four sides) and the garden's depth is to become periodic, so re-measure before using these numbers as a baseline.
+
 **Question (#53):** the advisory lone-tree judge said ADR 0055's irregularity costs young hornbeam and beech their clear trunk ("branches to the ground"). Is that real, and is ADR 0055 the cause? The plan said to check before fixing, because the lone references (TreeML) are crown-lifted street trees.
 
 **Answer.**

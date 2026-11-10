@@ -140,6 +140,38 @@ const flora = (name: FloraName, xs: number[], width: number) =>
  */
 export const TOP = 200;
 
+/**
+ * The open-grown lone tree's box (ADR 0062, spec §C2): open sky on all four sides (τ = 1 on both z
+ * faces, open x sides) in a square 60 m box (240 cells of 0.25 m), sized from the crown so that no
+ * bud grows past a bound. The open-box note (2026-11-08) found the widest of the six exemplars at
+ * season 100 (beech) needed ≥ 56 m. The top stays the woods' 50 m. Every species sees this light;
+ * none carries a light-entry setting.
+ */
+export const OPEN_GROWN = {
+  width: 240,
+  depth: 240,
+  height: TOP,
+  faces: [1, 1],
+  sidesZ: "open",
+  walls: [],
+} satisfies Params["world"];
+/** The open-grown tree's root: the box's centre. */
+export const OPEN_GROWN_ROOT = { x: 120, z: 120 };
+
+/**
+ * The half-walled world the lone tree had before ADR 0062 (160 wide, the slab's 16 m depth between
+ * τ 0.2 faces): kept for the species trials' stands and shade house, which were calibrated in it,
+ * and for the garden's specimen, whose worker budget (ADR 0026, plate.ts) was set in it.
+ * Calibrations made in it are evidence, not baselines (ADR 0062).
+ */
+export const HALF_WALLED = {
+  width: 160,
+  height: TOP,
+  depth: 64,
+  faces: [0.2, 0.2],
+  walls: [],
+} satisfies Params["world"];
+
 const RING = { width: 210, height: TOP, walls: [], sides: "periodic" } satisfies Params["world"];
 /** One row of the ring's stand: a tree every 21 cells. */
 const RING_X = [10, 31, 52, 73, 94, 115, 136, 157, 178, 199];
@@ -370,9 +402,10 @@ export const presets = {
       "Quercus robur alone in a field: wide-angled limbs, a broad decurrent crown and a squat trunk (Plate II).",
     // A specimen: no seedlings around it, and no storms, which throw tall trees by height alone.
     // The woods' top (C1 round 3): at 120 the lone oak reached it and its crown was clipped flat.
+    // Open-grown (ADR 0062): it was 160 wide in the slab's 16 m between τ 0.2 faces.
     patch: {
-      world: { width: 160, height: TOP, walls: [] },
-      trees: [{ x: 80, species: "oak" }],
+      world: OPEN_GROWN,
+      trees: [{ ...OPEN_GROWN_ROOT, species: "oak" }],
       ...WOODLAND,
       o2: { stormP: 0 },
       o4: { enabled: false },
@@ -384,10 +417,11 @@ export const presets = {
       "Fagus sylvatica alone in a field: the fresh-look round's lone tree (ADR 0039–0043, proposed), in a world wide enough for its crown.",
     // oakOpen's specimen with the beech: 240 wide, as the fresh-look round's repair measured it
     // (160 clipped a broad crown at the world's sides). A golden case: the open-grown beech is
-    // where the round's vigour-gated rules act.
+    // where the round's vigour-gated rules act. Open-grown (ADR 0062): it was 240 wide in the
+    // slab's 16 m between τ 0.2 faces.
     patch: {
-      world: { width: 240, height: TOP, walls: [] },
-      trees: [{ x: 120, species: "beech" }],
+      world: OPEN_GROWN,
+      trees: [{ ...OPEN_GROWN_ROOT, species: "beech" }],
       ...WOODLAND,
       o2: { stormP: 0 },
       o4: { enabled: false },
@@ -577,16 +611,34 @@ export function forestParams(width = 210, seed?: number, planting: Partial<Plant
  * The lone-tree stage: one tree of `species` alone, under the woodland's growth rules without
  * recruitment or storms (`oakOpen`'s world, its oak swapped for `species`). The one source the
  * species trials (cli/trials.ts) and the feature probe (cli/probe.ts) both read, so a change to
- * the stage (the open-grown box, ADR 0062) reaches both.
+ * the stage reaches both. It is open-grown (ADR 0062): `oakOpen`'s square 60 m box, open on all
+ * four sides, the tree at its centre.
  */
 export function loneTreeParams(species: string, seed?: number): Params {
   return mergeParams(presetParams("oakOpen", seed), {
-    world: { width: 160, height: TOP, walls: [] },
-    trees: [{ x: 80, species }],
+    trees: [{ ...OPEN_GROWN_ROOT, species }],
   });
 }
 
-/** Plate II (M19): an oak grown alone in the open, a new one for each seed. */
+/**
+ * `oakOpen`'s rules in the half-walled world it had before ADR 0062 (`HALF_WALLED`), its oak at
+ * x 80: the species trials' base (cli/trials.ts), whose stands and shade house were calibrated
+ * there.
+ */
+export function halfWalledParams(seed?: number): Params {
+  return {
+    ...presetParams("oakOpen", seed),
+    world: { ...HALF_WALLED },
+    trees: [{ x: 80, species: "oak" }],
+  };
+}
+
+/**
+ * Plate II (M19): an oak grown alone in the open, a new one for each seed. The garden swaps it
+ * into its own worker, whose budget (ADR 0026, plate.ts) was set with this half-walled world; the
+ * lab's open-grown box (about 530 MB in WASM, the open-box note) would not fit it. Whether the
+ * garden's specimen takes the open-grown box is not decided (ADR 0062, ticket #115).
+ */
 export function specimenParams(seed: number): Params {
-  return presetParams("oakOpen", seed);
+  return halfWalledParams(seed);
 }

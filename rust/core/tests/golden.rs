@@ -101,6 +101,20 @@ fn the_prototype_rules_written_as_off_keep_the_goldens() {
         if let Some(species) = species {
             params.set("species", species);
         }
+        // Those hashes predate the open-grown box (ADR 0062): the two lone trees stood then in
+        // the slab's 16 m between τ 0.2 faces, 160 (oak) and 240 (beech) wide, at the width's middle.
+        let walled = match parts[0] {
+            "oakOpen" => Some((160, r#"[{"x":80,"species":"oak"}]"#)),
+            "beechOpen" => Some((240, r#"[{"x":120,"species":"beech"}]"#)),
+            _ => None,
+        };
+        if let Some((width, trees)) = walled {
+            let world = format!(
+                r#"{{"width":{width},"height":200,"depth":64,"faces":[0.2,0.2],"walls":[]}}"#
+            );
+            params.set("world", json::parse(&world).unwrap());
+            params.set("trees", json::parse(trees).unwrap());
+        }
         params.set("seed", Value::Num(1.0));
         let seasons: usize = parts[2].trim_start_matches('s').parse().unwrap();
         let mut world = World::new(params);

@@ -9,6 +9,10 @@
  *   npm run bench -- --case forest --seasons 50     one case
  *   npm run bench -- --compare runs/bench/abc1234.json
  *   npm run bench -- --snapshot lean                 snapshots as the home page asks for them
+ *   npm run bench -- --case oakOpen --repeat 1       the open-grown lone tree (opt-in, ADR 0062)
+ *
+ * `memoryMB` is the WASM linear memory after the case: it never shrinks, so it is the process's
+ * peak so far, and a case's own only when it is benched alone.
  *
  * Writes runs/bench/<commit>[-dirty].json unless --out names another file. Benches made before
  * I1 ran the TypeScript core, whose hashes the archived 2D build reproduces (tag golden-2d-ts).
@@ -22,7 +26,7 @@ import { parseArgs } from "node:util";
 import { mergeParams, type Params } from "../src/core/params.ts";
 import { presetParams } from "../src/core/presets.ts";
 import { FULL_SNAPSHOT, type SnapshotOptions } from "../src/core/types.ts";
-import { coreWasm, loadWorldsSync, RustWorld } from "../src/wasm/world.ts";
+import { coreWasm, loadWorldsSync, RustWorld, wasmMemoryBytes } from "../src/wasm/world.ts";
 
 const { values } = parseArgs({
   options: {
@@ -66,6 +70,14 @@ const CASES: Record<string, () => Params> = {
   wideForest,
   panorama,
 };
+/**
+ * Benched only when named (`--case`): the lab's open-grown lone trees (ADR 0062), a 60 m box open
+ * on all four sides, about 1 s a season late on, so the default run stays as quick as it was.
+ */
+const OPT_IN: Record<string, () => Params> = {
+  oakOpen: () => presetParams("oakOpen"),
+  beechOpen: () => presetParams("beechOpen"),
+};
 
 /** The season loop's phases (§6; rust/core/src/season.rs PHASES), then the snapshot. */
 const PHASES = [
@@ -97,6 +109,8 @@ interface CaseResult {
   native: number;
   /** Mean milliseconds per season in each phase (natively), and the snapshot (in WASM). */
   phases: Record<Bucket, number>;
+  /** WASM linear memory after the case, MB (the process's peak so far; see the header). */
+  memoryMB: number;
 }
 
 interface BenchFile {
@@ -177,7 +191,7 @@ function runOnce(params: Params, seasons: number): CaseResult {
   >;
   phases.snapshot = snapshotMs / seasons;
   const result: CaseResult = {
-    grid: `${params.world.width}×${params.world.height}${params.world.sides === "periodic" ? " ring" : ""}`,
+    grid: `${params.world.width}×${params.world.height}×${params.world.depth ?? 64}${params.world.sides === "periodic" ? " ring" : ""}`,
     seasons,
     trees: live.length,
     metamers: live.reduce((k, t) => k + t.m.length, 0),
@@ -188,6 +202,7 @@ function runOnce(params: Params, seasons: number): CaseResult {
     late: late.reduce((a, b) => a + b, 0) / late.length,
     native: n.mean as number,
     phases,
+    memoryMB: wasmMemoryBytes() / 2 ** 20,
   };
   world.dispose();
   return result;
@@ -202,14 +217,15 @@ function printTable(rows: string[][]): void {
   for (const r of rows) console.log(r.map((c, j) => c.padStart(widths[j] as number)).join("  "));
 }
 
+const ALL: Record<string, () => Params> = { ...CASES, ...OPT_IN };
 const names = values.case ?? Object.keys(CASES);
-for (const n of names) if (!CASES[n]) throw new Error(`Unknown case '${n}'`);
+for (const n of names) if (!ALL[n]) throw new Error(`Unknown case '${n}'`);
 const seasons = Number(values.seasons);
 const repeat = Math.max(1, Number(values.repeat));
 
 const results: Record<string, CaseResult> = {};
 for (const name of names) {
-  const make = CASES[name] as () => Params;
+  const make = ALL[name] as () => Params;
   let best: CaseResult | null = null;
   for (let r = 0; r < repeat; r++) {
     const res = runOnce(make(), seasons);
@@ -240,7 +256,7 @@ console.log(
   `\n${commit}, ${seasons} seasons, best of ${repeat}, ${values.snapshot} snapshots (ms per season: WASM, then native)\n`,
 );
 printTable([
-  ["case", "grid", "trees", "metamers", "mean", "p50", "p95", "last 20", "native", "hash"],
+  ["case", "grid", "trees", "metamers", "mean", "p50", "p95", "last 20", "native", "MB", "hash"],
   ...names.map((n) => {
     const r = results[n] as CaseResult;
     return [
@@ -253,6 +269,7 @@ printTable([
       f1(r.p95),
       f1(r.late),
       f1(r.native),
+      r.memoryMB.toFixed(0),
       r.hash,
     ];
   }),

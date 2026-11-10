@@ -493,10 +493,16 @@ fn upper_flank_new(tree: &Tree, world: Option<&World>, frame: Option<&CrownFrame
     if new > 0.0 { flank / new } else { f64::NAN }
 }
 
+/// How far below the ground a resting tip may sit by rounding, cells (1e-9: R3's residue is
+/// ≈ 1e-16; a nanometre-scale band hides no bud a picture could show).
+pub const GROUND_EPS: f64 = 1e-9;
+
 /// Live buds outside the world's bounds (ADR 0062: an open-grown lone tree's box must hold its
 /// crown, so this is zero there): a bud at its metamer's tip below the ground, at or above the
 /// world's height, or past a width or depth face that is not periodic. A periodic side wraps a
-/// crown round and is no bound. NaN without a world.
+/// crown round and is no bound. NaN without a world. The ground is a bound a limb may rest on:
+/// R3's ground rest (`r3.ground`) leaves its tip at y ≈ −1e-16 by rounding, so only a tip more
+/// than `GROUND_EPS` below it counts (#115). The other bounds stay exact.
 pub fn buds_outside(tree: &Tree, world: Option<&World>) -> f64 {
     let Some(w) = world else {
         return f64::NAN;
@@ -511,7 +517,7 @@ pub fn buds_outside(tree: &Tree, world: Option<&World>) -> f64 {
         let [x, y, z] = tree.tip(tree.b.metamer[j] as usize);
         let past_x = !p.periodic && !(0.0..width).contains(&x);
         let past_z = !p.periodic_z && !(0.0..depth).contains(&z);
-        if past_x || past_z || !(0.0..height).contains(&y) {
+        if past_x || past_z || y < -GROUND_EPS || y >= height {
             out += 1.0;
         }
     }
@@ -1020,6 +1026,31 @@ mod tests {
             0.0
         );
         assert!(tree_metrics(&t, None).get("budsOutside").is_nan());
+    }
+
+    #[test]
+    fn a_bud_resting_on_the_ground_is_on_the_bound_not_past_it() {
+        // R3's ground rest leaves a limb's tip at y ≈ −1e-17 (the open-grown oak, #115): on the
+        // ground. A tip a millimetre below it is past the bound.
+        let world = World::new(crate::testing::preset(
+            "bh",
+            r#"{"world":{"width":30,"height":30,"walls":[]}}"#,
+        ));
+        let at = |y: f64| {
+            let mut t = outlined();
+            let j = (0..t.b.len()).find(|&j| is_live_bud(t.b.state[j])).unwrap();
+            let m = t.b.metamer[j] as usize;
+            // Every live bud on this metamer moves with its tip.
+            let on = (0..t.b.len())
+                .filter(|&k| is_live_bud(t.b.state[k]) && t.b.metamer[k] as usize == m)
+                .count() as f64;
+            t.m.base_y[m] -= t.tip(m)[1] - y;
+            (tree_metrics(&t, Some(&world)).get("budsOutside"), on)
+        };
+        assert_eq!(at(-1e-15).0, 0.0);
+        let (past, on) = at(-1e-3);
+        assert_eq!(past, on);
+        assert!(on >= 1.0);
     }
 
     #[test]

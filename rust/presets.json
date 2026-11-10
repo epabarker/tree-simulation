@@ -54,7 +54,8 @@
    "T": 0.1,
    "g": 3,
    "Trel": 0,
-   "topQuantile": 0.9
+   "topQuantile": 0.9,
+   "kRel": 1
   },
   "c6": {
    "enabled": false,
@@ -201,7 +202,8 @@
     "T": 0.1,
     "g": 3,
     "Trel": 0,
-    "topQuantile": 0.9
+    "topQuantile": 0.9,
+    "kRel": 1
    },
    "c6": {
     "enabled": false,
@@ -347,7 +349,8 @@
     "T": 0.1,
     "g": 3,
     "Trel": 0,
-    "topQuantile": 0.9
+    "topQuantile": 0.9,
+    "kRel": 1
    },
    "c6": {
     "enabled": false,
@@ -493,7 +496,8 @@
     "T": 0.1,
     "g": 3,
     "Trel": 0,
-    "topQuantile": 0.9
+    "topQuantile": 0.9,
+    "kRel": 1
    },
    "c6": {
     "enabled": false,
@@ -639,7 +643,8 @@
     "T": 0.1,
     "g": 3,
     "Trel": 0,
-    "topQuantile": 0.9
+    "topQuantile": 0.9,
+    "kRel": 1
    },
    "c6": {
     "enabled": false,
@@ -785,7 +790,8 @@
     "T": 0.1,
     "g": 3,
     "Trel": 0,
-    "topQuantile": 0.9
+    "topQuantile": 0.9,
+    "kRel": 1
    },
    "c6": {
     "enabled": false,
@@ -931,7 +937,8 @@
     "T": 0.1,
     "g": 3,
     "Trel": 0,
-    "topQuantile": 0.9
+    "topQuantile": 0.9,
+    "kRel": 1
    },
    "c6": {
     "enabled": false,
@@ -1085,7 +1092,8 @@
     "T": 0.1,
     "g": 3,
     "Trel": 0,
-    "topQuantile": 0.9
+    "topQuantile": 0.9,
+    "kRel": 1
    },
    "c6": {
     "enabled": false,
@@ -1231,7 +1239,8 @@
     "T": 0.1,
     "g": 3,
     "Trel": 0,
-    "topQuantile": 0.9
+    "topQuantile": 0.9,
+    "kRel": 1
    },
    "c6": {
     "enabled": true,
@@ -1380,7 +1389,8 @@
     "T": 0.1,
     "g": 3,
     "Trel": 0,
-    "topQuantile": 0.9
+    "topQuantile": 0.9,
+    "kRel": 1
    },
    "c6": {
     "enabled": true,
@@ -1533,7 +1543,8 @@
     "T": 0.1,
     "g": 3,
     "Trel": 0,
-    "topQuantile": 0.9
+    "topQuantile": 0.9,
+    "kRel": 1
    },
    "c6": {
     "enabled": true,
@@ -1688,7 +1699,8 @@
     "T": 0.1,
     "g": 3,
     "Trel": 0,
-    "topQuantile": 0.9
+    "topQuantile": 0.9,
+    "kRel": 1
    },
    "c6": {
     "enabled": true,
@@ -1861,7 +1873,8 @@
     "T": 0.1,
     "g": 3,
     "Trel": 0,
-    "topQuantile": 0.9
+    "topQuantile": 0.9,
+    "kRel": 1
    },
    "c6": {
     "enabled": true,
@@ -2014,7 +2027,8 @@
     "T": 0.03,
     "g": 3,
     "Trel": 0.12,
-    "topQuantile": 0.9
+    "topQuantile": 0.9,
+    "kRel": 1
    },
    "c6": {
     "enabled": true,
@@ -2187,7 +2201,8 @@
     "T": 0.03,
     "g": 3,
     "Trel": 0.12,
-    "topQuantile": 0.9
+    "topQuantile": 0.9,
+    "kRel": 1
    },
    "c6": {
     "enabled": true,
@@ -2342,7 +2357,8 @@
     "T": 0.03,
     "g": 3,
     "Trel": 0.12,
-    "topQuantile": 0.9
+    "topQuantile": 0.9,
+    "kRel": 1
    },
    "c6": {
     "enabled": true,
@@ -2488,7 +2504,8 @@
     "T": 0.03,
     "g": 3,
     "Trel": 0.12,
-    "topQuantile": 0.9
+    "topQuantile": 0.9,
+    "kRel": 1
    },
    "c6": {
     "enabled": true,
@@ -2661,7 +2678,8 @@
     "T": 0.03,
     "g": 3,
     "Trel": 0.12,
-    "topQuantile": 0.9
+    "topQuantile": 0.9,
+    "kRel": 1
    },
    "c6": {
     "enabled": true,
@@ -2807,7 +2825,8 @@
     "T": 0.03,
     "g": 3,
     "Trel": 0.12,
-    "topQuantile": 0.9
+    "topQuantile": 0.9,
+    "kRel": 1
    },
    "c6": {
     "enabled": true,
@@ -3071,7 +3090,8 @@
     "T": 0.03,
     "g": 3,
     "Trel": 0.0155,
-    "topQuantile": 0.9
+    "topQuantile": 0.9,
+    "kRel": 1
    },
    "c6": {
     "enabled": true,
@@ -3346,7 +3366,8 @@
     "T": 0.03,
     "g": 3,
     "Trel": 0.0155,
-    "topQuantile": 0.9
+    "topQuantile": 0.9,
+    "kRel": 1
    },
    "c6": {
     "enabled": true,
@@ -3496,7 +3517,8 @@
     "T": 0.03,
     "g": 3,
     "Trel": 0.0155,
-    "topQuantile": 0.9
+    "topQuantile": 0.9,
+    "kRel": 1
    },
    "c6": {
     "enabled": true,
@@ -4829,7 +4851,8 @@
     "T": 0.03,
     "g": 3,
     "Trel": 0.0155,
-    "topQuantile": 0.9
+    "topQuantile": 0.9,
+    "kRel": 1
    },
    "c6": {
     "enabled": true,
@@ -6308,7 +6331,8 @@
     "T": 0.03,
     "g": 3,
     "Trel": 0.0155,
-    "topQuantile": 0.9
+    "topQuantile": 0.9,
+    "kRel": 1
    },
    "c6": {
     "enabled": true,
@@ -7787,7 +7811,8 @@
     "T": 0.03,
     "g": 3,
     "Trel": 0.0155,
-    "topQuantile": 0.9
+    "topQuantile": 0.9,
+    "kRel": 1
    },
    "c6": {
     "enabled": true,
@@ -9266,7 +9291,8 @@
     "T": 0.03,
     "g": 3,
     "Trel": 0.0155,
-    "topQuantile": 0.9
+    "topQuantile": 0.9,
+    "kRel": 1
    },
    "c6": {
     "enabled": true,
@@ -10745,7 +10771,8 @@
     "T": 0.03,
     "g": 3,
     "Trel": 0.0155,
-    "topQuantile": 0.9
+    "topQuantile": 0.9,
+    "kRel": 1
    },
    "c6": {
     "enabled": true,
@@ -12224,7 +12251,8 @@
     "T": 0.03,
     "g": 3,
     "Trel": 0.0155,
-    "topQuantile": 0.9
+    "topQuantile": 0.9,
+    "kRel": 1
    },
    "c6": {
     "enabled": true,
@@ -13704,7 +13732,8 @@
     "T": 0.03,
     "g": 3,
     "Trel": 0.0155,
-    "topQuantile": 0.9
+    "topQuantile": 0.9,
+    "kRel": 1
    },
    "c6": {
     "enabled": true,
@@ -15184,7 +15213,8 @@
     "T": 0.03,
     "g": 3,
     "Trel": 0.0155,
-    "topQuantile": 0.9
+    "topQuantile": 0.9,
+    "kRel": 1
    },
    "c6": {
     "enabled": true,
@@ -16694,7 +16724,8 @@
     "T": 0.03,
     "g": 3,
     "Trel": 0.12,
-    "topQuantile": 0.9
+    "topQuantile": 0.9,
+    "kRel": 1
    },
    "c6": {
     "enabled": true,
@@ -16842,7 +16873,8 @@
     "T": 0.02,
     "g": 3,
     "Trel": 0.12,
-    "topQuantile": 0.9
+    "topQuantile": 0.9,
+    "kRel": 1
    },
    "c6": {
     "enabled": true,
@@ -17043,7 +17075,8 @@
     "T": 0.02,
     "g": 3,
     "Trel": 0.12,
-    "topQuantile": 0.9
+    "topQuantile": 0.9,
+    "kRel": 1
    },
    "c6": {
     "enabled": true,
@@ -17217,7 +17250,8 @@
     "T": 0.08,
     "g": 3,
     "Trel": 0.2,
-    "topQuantile": 0.9
+    "topQuantile": 0.9,
+    "kRel": 1
    },
    "c6": {
     "enabled": true,
@@ -17418,7 +17452,8 @@
     "T": 0.08,
     "g": 3,
     "Trel": 0.2,
-    "topQuantile": 0.9
+    "topQuantile": 0.9,
+    "kRel": 1
    },
    "c6": {
     "enabled": true,
@@ -17592,7 +17627,8 @@
     "T": 0.03,
     "g": 3,
     "Trel": 0.12,
-    "topQuantile": 0.9
+    "topQuantile": 0.9,
+    "kRel": 1
    },
    "c6": {
     "enabled": true,
@@ -17757,7 +17793,8 @@
     "T": 0.03,
     "g": 3,
     "Trel": 0.12,
-    "topQuantile": 0.9
+    "topQuantile": 0.9,
+    "kRel": 1
    },
    "c6": {
     "enabled": true,
@@ -17933,7 +17970,8 @@
     "T": 0.03,
     "g": 3,
     "Trel": 0.12,
-    "topQuantile": 0.9
+    "topQuantile": 0.9,
+    "kRel": 1
    },
    "c6": {
     "enabled": true,

@@ -6,7 +6,7 @@
  * claim (AGENTS.md), so the sheet says so.
  *
  *   node cli/probe.ts [--species beech] [--patch patch.json] [--label name] [--seeds 1,2,3]
- *        [--lone 30,60,100] [--garden 50,100,150 | none] [--width 160] [--box 240] [--walled]
+ *        [--lone 30,60,100] [--garden 50,100,150 | none] [--width 160] [--box 288] [--walled]
  *
  * patch.json: { "params": <a Params patch for every world>,
  *               "species": { "<name>": { "<dotted.path>": value } } }  (trials.ts' amendSpecies)

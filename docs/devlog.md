@@ -3,6 +3,16 @@
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
 
+## 2026-11-10: the open-grown box is 72 m (#103, ADR 0062)
+
+- **Triage first:** #103 was split. Birch's runaway leaders (to 66 m) and its transient 40 m limbs are a defect, now #106; the box is sized for beech and oak, the species with an open-grown preset.
+- **The change:** `OPEN_BOX` 240 → 288 cells (72 m). `TOP` stays 200 (50 m). `oakOpen`, `beechOpen`, `openLoneParams` and the probe's lone stage follow it.
+- **Evidence ([note](experiments/2026-11-10-open-box-72.md), beech and oak, seeds 1–20, 100 seasons):** zero buds outside in every season in 20 of 20 of each. The farthest crown reaches 31.4 m from its root in both species, 4.6 m short of the side; the tallest is 36.8 m.
+- **#104 did not push the crowns further out:** in the 80 m box the farthest reach was 31.6 m (beech) and 32.8 m (oak) before it and 31.4 m after, though 13 of 20 crowns in each species reach a little further.
+- **Goldens** (`npm run golden:update`, WASM = native), because both presets moved into the larger box: `oakOpen:seed1:s15` 6011ec46 → db9e6d56, `beechOpen:seed1:s40` 105d2e07 → e0b0fb9a. No other case moved, and the historical beechOpen hash in `golden.rs` (its own 240-cell box) kept 228f23fd. **Regressions:** both unchanged.
+- **Cost (WASM, seed 1):** beech 0.85 s/season late on and 934 MB (749 MB at 60 m); oak 0.84 s and 733 MB (546 MB). The lab ran `beechOpen` to season 100 in headless Firefox in 86 s.
+- **Surprises:** the 72 m and 80 m boxes grow the same crowns (each seed's reach agrees to 0.1 m), so once nothing touches a bound the box's size stops mattering. And the Stop hook's check ran beside the 12 simulators and timed out 11 tests; it was green on the idle machine.
+
 ## 2026-11-10: the light serves a limb resting on the ground (#104, ADR 0011's addendum)
 
 - **The defect:** with `r3.ground` on, R3 rests a limb on y = 0, but its derived tips land a rounding error below (to −4·10⁻¹⁶). The light counted them outside its box, so their buds read Q = 0, their leaves cast no shade and R5's node shade read full shade. Build (a) found it.

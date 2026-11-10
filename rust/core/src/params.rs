@@ -343,8 +343,8 @@ pub struct O2 {
 }
 
 /// O4's mortality (ADR 0063). `SizeBlind`, the default and the §8-style ablation: the background
-/// risk m₀ alone. `TwoPart`: a canopy rate that rises with height (and, with #117, a suppression
-/// rate from low vigour).
+/// risk m₀ alone. `TwoPart`: a canopy rate that rises with height plus a suppression rate from low
+/// vigour (R1's P/M), scaled by shade tolerance.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Mortality {
     SizeBlind,
@@ -362,6 +362,14 @@ pub struct O4 {
     pub h_canopy: f64,
     /// γ_c: how steeply the canopy rate rises with height (absent: 1).
     pub gamma_canopy: f64,
+    /// m_s: the suppression rate per season of a tree that pays none of its maintenance (P = 0),
+    /// at shade tolerance 1 (two-part mode; absent: 0, so no suppression deaths).
+    pub m_suppression: f64,
+    /// β_s: how fast the suppression rate falls with each unit of shade tolerance (absent: 1).
+    pub suppression_slope: f64,
+    /// T: the species' shade tolerance, Niinemets & Valladares's (2006) score, 1 (intolerant) to
+    /// 5 (absent: 1, where the suppression rate is m_s itself).
+    pub shade_tolerance: f64,
     pub c_seed: f64,
     pub d: f64,
     pub q_est: f64,
@@ -683,6 +691,9 @@ impl Params {
                 m_canopy: opt(o4, "mCanopy").unwrap_or(0.0),
                 h_canopy: opt(o4, "hCanopy").unwrap_or(f64::INFINITY),
                 gamma_canopy: opt(o4, "gammaCanopy").unwrap_or(1.0),
+                m_suppression: opt(o4, "mSuppression").unwrap_or(0.0),
+                suppression_slope: opt(o4, "suppressionSlope").unwrap_or(1.0),
+                shade_tolerance: opt(o4, "shadeTolerance").unwrap_or(1.0),
                 c_seed: num(o4, "cSeed"),
                 d: num(o4, "d"),
                 q_est: num(o4, "qEst"),

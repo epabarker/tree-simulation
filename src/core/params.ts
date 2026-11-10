@@ -534,7 +534,9 @@ export interface Params {
      * Mortality's mode (ADR 0063), the world's. "sizeBlind" (absent: the default, and the old
      * behaviour kept as the ablation): every tree dies with the background risk m₀. "twoPart": a
      * canopy rate m_c·(H/H_c)^γ_c that rises with the tree's height H, so old canopy trees are
-     * replaced gradually (a suppression rate from low vigour joins it, #117). m₀ is not read.
+     * replaced gradually, plus a suppression rate m_s·(1 − P/M)₊·e^(−β_s(T − 1)) from R1's
+     * carbon balance (P/M this season, read only with R1 on) and the species' shade tolerance T,
+     * so suppressed trees die of low vigour and the stand self-thins. m₀ is not read.
      * Read from the world's params, never a species'. Absent (old params, checkpoints): sizeBlind.
      */
     mortality: "sizeBlind" | "twoPart";
@@ -549,6 +551,23 @@ export interface Params {
     hCanopy: number;
     /** γ_c: how steeply the canopy rate rises with height, > 0 (calibrate). Absent: 1. */
     gammaCanopy: number;
+    /**
+     * m_s: the two-part mode's suppression rate per season for a tree that pays none of its
+     * maintenance (P = 0) at shade tolerance 1. 1 makes a birch below its survival light last
+     * 1–2 seasons (Walters & Reich 1996; an order of magnitude, calibrate). Absent: 0.
+     */
+    mSuppression: number;
+    /**
+     * β_s: how fast the suppression rate falls per unit of shade tolerance, e^(−β_s(T − 1)).
+     * 0.92 (≈ ln 10 / 2.5) puts beech at a tenth of birch, near the 3–5% a year of shade-tolerant
+     * juveniles in deep shade (Petrovska et al. 2022; an order of magnitude, calibrate). Absent: 1.
+     */
+    suppressionSlope: number;
+    /**
+     * T: shade tolerance, Niinemets & Valladares's (2006) score, 1 (intolerant) to 5 (tolerant),
+     * per species (flora.ts). Scales the suppression rate only. Absent: 1.
+     */
+    shadeTolerance: number;
     /** Cap on live trees, so a page cannot run away. */
     maxTrees: number;
     /**
@@ -761,6 +780,9 @@ export const defaultParams: Params = {
     mCanopy: 0.01,
     hCanopy: 120,
     gammaCanopy: 2,
+    mSuppression: 1,
+    suppressionSlope: 0.92,
+    shadeTolerance: 3,
     maxTrees: 300,
     rain: 0,
   },

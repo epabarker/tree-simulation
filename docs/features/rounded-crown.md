@@ -1,6 +1,6 @@
 # Rounded crown
 
-A **Form feature** (GLOSSARY): a crown whose outline is full at the top while the tree is still growing taller. Decided by the ticket [Which mechanism rounds a crown?](https://github.com/epabarker/tree-simulation/issues/83). **Status: decided for the oak (exploratory, seeds 1–3); maple's part deferred.** The oak takes the early λ fall (the fallback named by [Which open-grown oak does the rounded-crown page take…](https://github.com/epabarker/tree-simulation/issues/93), taken when the relay failed in [Does treating a takeover as a relay…](https://github.com/epabarker/tree-simulation/issues/94)). It is build (c) of the [handoff](README.md). The ADR that supersedes ADR 0031's Decision 4 is written when build (c) adopts it with ≥ 20 seeds. Not yet implemented; hand off through `/implement-principle`.
+A **Form feature** (GLOSSARY): a crown whose outline is full at the top while the tree is still growing taller. Decided by the ticket [Which mechanism rounds a crown?](https://github.com/epabarker/tree-simulation/issues/83). **Status: decided for the oak (exploratory, seeds 1–3); maple's part deferred.** The oak takes the early λ fall (the fallback named by [Which open-grown oak does the rounded-crown page take…](https://github.com/epabarker/tree-simulation/issues/93), taken when the relay failed in [Does treating a takeover as a relay…](https://github.com/epabarker/tree-simulation/issues/94)). The ADR that supersedes ADR 0031's Decision 4 is written when the oak's setting is adopted with ≥ 20 seeds. Not yet implemented; hand off through `/implement-principle`.
 
 ## What it should look like
 
@@ -24,9 +24,9 @@ From the [open-box note](../experiments/2026-11-08-open-box.md):
 
 | Part | Decision |
 |---|---|
-| Oak (build c) | **C3's λ falls with age** through the existing ontogenetic fall: `r2.dLambda` 0.12 from `r2.aC` 13.5 (`d12a13`; HEAD 0.04 from 13.51). A species expression, not a new rule. It divides the top (34–80 axis switches against 0–5) and fills the flank (5.5–7.3% on all three seeds): a rounded dome at 33 m by season 100 ([oak-λ note](../experiments/2026-11-08-oak-lambda.md)) |
+| Oak | **C3's λ falls with age** through the existing ontogenetic fall: `r2.dLambda` 0.12 from `r2.aC` 13.5 (`d12a13`; HEAD 0.04 from 13.51). A species expression, not a new rule. It divides the top (34–80 axis switches against 0–5) and fills the flank (5.5–7.3% on all three seeds): a rounded dome at 33 m by season 100 ([oak-λ note](../experiments/2026-11-08-oak-lambda.md)) |
 | Its cost | A squat young bush (15–16 m at season 30, no spire) and a low reach of 12–14 m. Accepted: no setting kept the young spire and the wide low limbs while dividing the top ([oak-schedule note](../experiments/2026-11-08-oak-schedule.md), [oak-relay note](../experiments/2026-11-08-oak-relay.md)) |
-| Maple (deferred) | A **sink limit on internode length** (`c3.sink: "turgorLength"`, probe only): Ψ = −(g·height + r·path length), Lockhart-linear to Ψ_crit; each shoot keeps its metamers, its internodes are s times as long, and (1 − s) of its share goes to R1's reserve. It fills maple's top (top-fifth leaf 0.08–0.24 against 0.03–0.11) at 18–24 m against 25–27 m ([turgor-length note](../experiments/2026-11-08-turgor-length.md)). Not part of build (c): it waits for the combined run after the bole build, with the friction/gravity split, birch's runaway leaders and `phoneSeed3`'s canopy loss still to settle |
+| Maple (deferred) | A **sink limit on internode length** (`c3.sink: "turgorLength"`, probe only): Ψ = −(g·height + r·path length), Lockhart-linear to Ψ_crit; each shoot keeps its metamers, its internodes are s times as long, and (1 − s) of its share goes to R1's reserve. It fills maple's top (top-fifth leaf 0.08–0.24 against 0.03–0.11) at 18–24 m against 25–27 m ([turgor-length note](../experiments/2026-11-08-turgor-length.md)). Not yet in this page's mechanism: it waits for a combined run with the bare bole's re-anchored T_rel, with the friction/gravity split, birch's runaway leaders and `phoneSeed3`'s canopy loss still to settle |
 | Allocation | C3 stays on light (Borchert–Honda) |
 | R1's `d(L)` | Untouched by this feature |
 
@@ -39,7 +39,7 @@ From the [open-box note](../experiments/2026-11-08-open-box.md):
   - **The early dome is taken** (`d12a13`: dLambda 0.12 from aC 13.5). The young spire and the wide low limbs were the target, but a takeover relay failed its probe ([oak-relay note](../experiments/2026-11-08-oak-relay.md)), so the page takes the dome at the cost of a squat young bush (15–16 m at 30) and a low reach of 12–14 m.
   - **The late-dividing box is a defect.** A λ fall that is late or slow (`a13r40`) keeps the young form but gives a flat-topped, straight-sided box by 100 while the tree is still growing taller. That is this page's defect, not the old-tree flattening, which comes only after the stall.
 - **Maple (sycamore):** an outline dome. Its W/H need not rise (Pretzsch: α_cr − α_h = −0.05).
-- **Birch, the contrast:** stays an excurrent ovoid, with W/H ≤ 0.7 at season 100. There is no birch-specific rule. The oak's λ fall leaves birch untouched (its twigs keep λ, ADR 0057); its broad open-grown dome (W/H 0.87–1.17) is a species question beyond this feature's build.
+- **Birch, the contrast:** stays an excurrent ovoid, with W/H ≤ 0.7 at season 100. There is no birch-specific rule. The oak's λ fall leaves birch untouched (its twigs keep λ, ADR 0057); its broad open-grown dome (W/H 0.87–1.17) is a species question beyond this feature.
 - **Beech posture** (level plates, ADR 0045) is not part of this feature.
 
 ## Cheap diagnostic

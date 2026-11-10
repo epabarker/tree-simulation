@@ -309,6 +309,15 @@ pub struct R3 {
     pub ground: bool,
 }
 
+impl R3 {
+    /// Whether the tree's limbs rest on the ground: R3 runs, with ground contact (ADR 0011's M16
+    /// addendum). R3's position pass then turns every tip that would end below y = 0 onto it, and
+    /// the light serves those tips in its bottom row (`light::rest_height`).
+    pub fn rests(&self) -> bool {
+        self.enabled && self.ground
+    }
+}
+
 #[derive(Clone, Debug)]
 pub struct R4 {
     pub enabled: bool,

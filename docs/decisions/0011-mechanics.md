@@ -38,3 +38,10 @@
   - Calm seasons break nothing: stress wood holds σ ≤ σ_target < σ_break.
   - `forest` sets σ_break 4500, `stormP` 0.05 and `stormLoad` 1.5 ([M16 note](../experiments/2026-10-27-m16-storms.md)).
 - **The page shows storms:** snapshots carry `storm`, which turns the page's wind into a gale (page only; the simulation never sees the page's wind or the pointer).
+
+## Addendum (2026-11-10, issue #104): the light serves a resting limb
+- **The defect.** A resting limb's tips are derived (base + length·H), so they land a rounding error below y = 0 (to −4·10⁻¹⁶ seen), and every level metamer beyond inherits that. The light counted them outside its box: their buds read Q = 0, their leaves were never deposited and cast no shade, and R5's node shade read full shade. "Still alive" did not hold: the limb starved.
+- **The decision** (user's choice: fix it in the light's lookup, not in R3's geometry). For a tree with `r3.enabled` and `r3.ground`, a tip below the ground is read, and deposits, at y = 0: the bottom row (`light::rest_height`, by `R3::rests`). R3's geometry is unchanged, and tips may still sit a rounding error below 0.
+- **No threshold.** With ground contact R3's position pass turns every tip that would end below the ground onto it, each season, after growth. So any tip below 0 at the next light phase is such a residue, and the tree's flags decide. A fixed tolerance would have to guess the residue's size. One season differs (by reading the phase order, not tested): when ground contact is switched on mid-run, a tip that sank while it was off is served in the bottom row for the one light phase before R3 rests it.
+- **Unchanged without ground contact.** A limb that sinks below the ground (R3 off, or `ground` off) still gets no light and deposits nothing, as above.
+- Evidence and the moved goldens: [note](../experiments/2026-11-10-ground-rest-light.md).

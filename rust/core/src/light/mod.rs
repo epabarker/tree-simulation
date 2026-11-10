@@ -9,6 +9,10 @@
 //! - **Uniform**: C2 off, Q = C everywhere inside.
 //!
 //! With `world.fade` > 0, Q falls linearly to 0 over that many cells before each z face.
+//!
+//! The ground is the box's floor, with one exception: a limb that R3 rests on it (`r3.ground`)
+//! lies a rounding error below y = 0, and its tips are served in the bottom row (`rest_height`,
+//! by the tree's `r3.enabled` and `r3.ground`).
 
 pub mod slab_sweep;
 
@@ -81,6 +85,18 @@ pub fn make_light(params: &Params) -> Light {
         depth: d,
         q: c2.c,
     }
+}
+
+/// The height at which the light serves a metamer's tip: its own, or the ground's for a limb
+/// lying on it. R3's ground contact (`r3.ground`, ADR 0011's M16 addendum) rests a limb on
+/// y = 0, alive, but a tip is derived (base + length·H), so it lands a rounding error below
+/// (to −4·10⁻¹⁶ seen, issue #104) and every level metamer beyond inherits that. Read as it stood,
+/// such a tip was outside the box: its buds sampled Q = 0 and its leaves shaded nothing. So for a
+/// tree whose limbs rest (`rests`: `R3::rests`) a tip below the ground reads, and deposits into,
+/// the bottom row; there is no threshold, because R3 has brought every such tip to the ground.
+/// Without ground contact a limb that sinks below the ground stays outside (ADR 0011).
+pub fn rest_height(y: f64, rests: bool) -> f64 {
+    if rests && y < 0.0 { 0.0 } else { y }
 }
 
 fn inside(x: f64, y: f64, z: f64, w: f64, h: f64, d: f64) -> bool {

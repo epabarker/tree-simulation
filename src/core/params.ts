@@ -547,6 +547,13 @@ export interface Params {
      * Local seeds landing outside it are lost; seed rain lands inside it. Absent: anywhere.
      */
     band?: number;
+    /**
+     * Planting at a density (ADR 0063, decision 5): the world starts from `density` saplings per
+     * hectare (a cell is 0.25 m) over the whole width × depth instead of `trees`, at positions from
+     * the keyed RNG, none closer than `spacing` cells to another (measured across the x and z wraps
+     * that are periodic). Tree k takes `species[(k + seed) mod n]`. Absent: `trees`, as before.
+     */
+    planting?: { density: number; spacing: number; species?: string[] };
   };
 
   /** R6 Short shoots (spec §R6, ADR 0006). Off = baseline: every live bud is one unit of leaf area. */

@@ -11,8 +11,12 @@
  * - **The crown is round in plan:** at season 100, min(crownWidth, crownDepth) ÷ max(…) ≥ 0.75
  *   (the extents of all tips in x and in z), in ≥ 18 of seeds 1–20 per species.
  *
- * The counts each build reached (AGENTS.md's seeds rule), at the commit that made the stage:
- *   see docs/devlog.md, 2026-11-10, "The open-grown lone-tree stage".
+ * The counts the build reached (AGENTS.md's seeds rule), at e5cef16 (#115; docs/devlog.md, 2026-11-10):
+ *   box held:  oak 19, maple 20, birch 16, beech 18, hornbeam 20, holly 20 of 20 (bar: 20 of 20)
+ *              fails: oak s15, birch s3 (the 50 m top), s5, s13, s18, beech s11, s15 (the sides)
+ *   round:     oak 15, maple 19, birch 20, beech 20, hornbeam 20, holly 19 of 20 (bar: 18)
+ *              below 0.75: oak s1, s5, s6, s15, s17; maple s18; holly s15
+ *   So the check is red at that commit: reported, not hidden (ADR 0062).
  *
  *   node cli/open-grown.ts                 all six exemplars, seeds 1–20, 6 simulators
  *   node cli/open-grown.ts -j 3 --species birch --seeds 1-20 --out runs/open-grown

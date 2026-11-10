@@ -4,8 +4,9 @@
  * the same worlds. They are M19's and M25's (docs/experiments/2026-10-28-m25-species.md): the
  * woodland's growth rules without recruitment or storms (`oakOpen`), and
  *
- * - lone: one tree on 160 wide, open-grown, measured at seasons 30 and 60 (and, when asked, its
- *   shape again at 100: reported, not fitted);
+ * - lone: one tree in the open-grown box (presets.ts' `loneTreeParams`, ADR 0062: 60 m square,
+ *   open on all four sides), measured at seasons 30 and 60 (and, when asked, its shape again at
+ *   100: reported, not fitted);
  * - stand: a closed stand, three rows of four 21 cells apart on an 84-cell periodic ring between
  *   opaque faces (τ 0), as the 20-seed evidence read H/D 70 (ADR 0027); the middle row's four
  *   trees measured at season 60 (and, when asked, again at 100: how much height they gain late,

@@ -207,20 +207,16 @@ pub fn lai(light: &Light, x0: f64, x1: f64, z0: f64, z1: f64) -> f64 {
 pub const CROWN_BASE_SHARE: f64 = 0.05;
 
 pub fn leaf_base(tree: &Tree, world: Option<&World>, height: f64) -> f64 {
-    let r6 = world.map(|w| &w.params_of(tree).r6);
+    leaf_base_of(&leaves(tree, world), height)
+}
+
+/// `leaf_base` from the tree's `leaves` (the same buds in the same order; `tree_metrics` makes
+/// them once for every leaf measure).
+fn leaf_base_of(leaves: &[(f64, f64, f64)], height: f64) -> f64 {
     let bins = math::max(0.0, height).floor() as usize + 1;
     let mut area = vec![0.0; bins];
     let mut total = 0.0;
-    for j in 0..tree.b.len() {
-        let s = tree.b.state[j];
-        if !is_live_bud(s) {
-            continue;
-        }
-        let leaf = r6.map_or(1.0, |r6| deposit_area(s, r6));
-        if leaf <= 0.0 {
-            continue;
-        }
-        let y = tree.tip_y(tree.b.metamer[j] as usize);
+    for &(_, y, leaf) in leaves {
         let k = (math::max(0.0, y).floor() as usize).min(bins - 1);
         area[k] += leaf;
         total += leaf;
@@ -272,16 +268,27 @@ fn limbs_of(tree: &Tree) -> Vec<i32> {
 /// gone is a dead stub and does not count (the model sheds limbs outright, so these are rare).
 /// 1 when no limb lives (the whole stem is bare); NaN for a tree of no height.
 pub fn live_crown_base(tree: &Tree, height: f64) -> f64 {
+    live_crown_base_of(tree, height, &limbs_of(tree))
+}
+
+/// `live_crown_base` with the tree's `limbs_of` already made (`tree_metrics` makes it once).
+fn live_crown_base_of(tree: &Tree, height: f64, limb: &[i32]) -> f64 {
     if height <= 0.0 {
         return f64::NAN;
     }
-    math::min(1.0, math::min(height, lowest_living_limb(tree)) / height)
+    math::min(
+        1.0,
+        math::min(height, lowest_living_limb_of(tree, limb)) / height,
+    )
 }
 
 /// The height where the lowest living first-order limb leaves the trunk (`live_crown_base`'s
 /// numerator); infinite when no limb lives. R4's count of sprouts on the bole reads it too.
 pub fn lowest_living_limb(tree: &Tree) -> f64 {
-    let limb = limbs_of(tree);
+    lowest_living_limb_of(tree, &limbs_of(tree))
+}
+
+fn lowest_living_limb_of(tree: &Tree, limb: &[i32]) -> f64 {
     let mut base = f64::INFINITY;
     for j in 0..tree.b.len() {
         if !is_live_bud(tree.b.state[j]) {
@@ -334,14 +341,22 @@ pub fn leaf_shares(leaves: &[(f64, f64, f64)], height: f64) -> (f64, f64) {
     (top / total, low / total)
 }
 
-/// The q-quantile of `xs` by the nearest rank (polars' default, which the playbook's scripts
-/// used): the sorted value at round(q·(n − 1)). Sorts `xs`; NaN when it is empty.
+/// The nearest rank of the q-quantile among `n` values (polars' default, which the playbook's
+/// scripts used): round(q·(n − 1)).
+fn rank(q: f64, n: usize) -> usize {
+    math::round(q * (n - 1) as f64) as usize
+}
+
+/// The q-quantile of `xs` by the nearest rank: the value a sort would put at `rank(q, n)`. It
+/// selects rather than sorts (linear, not n log n: the metrics run per tree per season and per
+/// snapshot); under `total_cmp`, a total order, the k-th value is the same bits either way.
+/// Reorders `xs` so that the values before that rank are the smaller ones; NaN when it is empty.
 fn quantile(xs: &mut [f64], q: f64) -> f64 {
     if xs.is_empty() {
         return f64::NAN;
     }
-    xs.sort_by(f64::total_cmp);
-    xs[math::round(q * (xs.len() - 1) as f64) as usize]
+    let k = rank(q, xs.len());
+    *xs.select_nth_unstable_by(k, f64::total_cmp).1
 }
 
 /// The leafy crown's frame, in the picture's plane: its base (the 5th percentile of the leafy
@@ -381,23 +396,48 @@ fn w90(leaves: &[(f64, f64, f64)], frame: Option<&CrownFrame>) -> f64 {
     let Some(f) = frame else {
         return f64::NAN;
     };
-    let mut slices: Vec<Vec<f64>> = vec![Vec::new(); 20];
-    for &(x, y, _) in leaves {
-        if y < f.base || y > f.top {
-            continue;
+    // The slices' x, bucketed into one buffer (slice k at start[k]..start[k + 1]): a quantile
+    // reads a slice's values, not their order.
+    let slice_of = |y: f64| {
+        #[allow(clippy::nonminimal_bool)] // as written, a NaN height falls in slice 0
+        (!(y < f.base || y > f.top))
+            .then(|| ((20.0 * (y - f.base) / (f.top - f.base)).floor() as usize).min(19))
+    };
+    let mut start = [0usize; 21];
+    for &(_, y, _) in leaves {
+        if let Some(k) = slice_of(y) {
+            start[k + 1] += 1;
         }
-        let k = ((20.0 * (y - f.base) / (f.top - f.base)).floor() as usize).min(19);
-        slices[k].push(x);
+    }
+    for k in 0..20 {
+        start[k + 1] += start[k];
+    }
+    let mut fill = start;
+    let mut flat = vec![0.0; start[20]];
+    for &(x, y, _) in leaves {
+        if let Some(k) = slice_of(y) {
+            flat[fill[k]] = x;
+            fill[k] += 1;
+        }
     }
     let mut widest = f64::NAN;
     let mut at = 0.0;
-    for (k, xs) in slices.iter_mut().enumerate() {
+    for k in 0..20 {
+        let xs = &mut flat[start[k]..start[k + 1]];
         let n = xs.len();
         let w = if n == 0 {
             0.0
         } else {
+            // The 98th, then the 2nd among the values below it (they are the smaller ones, so
+            // its rank there is its rank in the whole slice).
             let hi = quantile(xs, 0.98);
-            hi - xs[math::round(0.02 * (n - 1) as f64) as usize]
+            let (lo, top) = (rank(0.02, n), rank(0.98, n));
+            let lo = if lo < top {
+                *xs[..top].select_nth_unstable_by(lo, f64::total_cmp).1
+            } else {
+                hi
+            };
+            hi - lo
         };
         if k == 17 {
             at = w;
@@ -469,10 +509,14 @@ pub fn buds_outside(tree: &Tree, world: Option<&World>) -> f64 {
 }
 
 pub fn limb_base(tree: &Tree, world: Option<&World>, height: f64) -> f64 {
+    limb_base_of(tree, world, height, &limbs_of(tree))
+}
+
+/// `limb_base` with the tree's `limbs_of` already made (`tree_metrics` makes it once).
+fn limb_base_of(tree: &Tree, world: Option<&World>, height: f64, limb: &[i32]) -> f64 {
     let r6 = world.map(|w| &w.params_of(tree).r6);
     let c = &tree.m;
     let nm = c.len();
-    let limb = limbs_of(tree);
     let mut area = vec![0.0; nm];
     let mut total = 0.0;
     for j in 0..tree.b.len() {
@@ -561,9 +605,11 @@ pub fn tree_metrics(tree: &Tree, world: Option<&World>) -> TreeMetrics {
     let n = nm as f64;
     let trunk = if nm > 0 { c.radius[0] } else { 0.0 };
     let bole_height = if bole.is_finite() { bole } else { height };
-    let leaf_base = leaf_base(tree, world, height);
-    let limb_base = limb_base(tree, world, height);
+    // Made once and shared: every leaf measure reads `leafy`, both limb measures `limb`.
     let leafy = leaves(tree, world);
+    let limb = limbs_of(tree);
+    let leaf_base = leaf_base_of(&leafy, height);
+    let limb_base = limb_base_of(tree, world, height, &limb);
     let (top_fifth, below_sixth) = leaf_shares(&leafy, height);
     let frame = crown_frame(&leafy, tree.root_x, height);
     let ground = match world {
@@ -633,7 +679,7 @@ pub fn tree_metrics(tree: &Tree, world: Option<&World>) -> TreeMetrics {
             } else {
                 0.0
             },
-            live_crown_base(tree, height),
+            live_crown_base_of(tree, height, &limb),
             top_fifth,
             below_sixth,
             w90(&leafy, frame.as_ref()),
@@ -940,6 +986,43 @@ mod tests {
             0.0
         );
         assert!(tree_metrics(&t, None).get("budsOutside").is_nan());
+    }
+
+    #[test]
+    fn the_selected_quantiles_are_the_sorted_ones_bit_for_bit() {
+        // quantile and w90's slice width select rather than sort (cost only): the same bits as
+        // a full sort, with ties, signed zeros and NaN among the values.
+        let sorted_at = |xs: &[f64], q: f64| {
+            let mut s = xs.to_vec();
+            s.sort_by(f64::total_cmp);
+            s[rank(q, s.len())]
+        };
+        for n in 1..60usize {
+            let mut xs: Vec<f64> = (0..n)
+                .map(|k| match k % 11 {
+                    0 => 0.0,
+                    1 => -0.0,
+                    2 => 3.0,
+                    3 if n > 40 => f64::NAN,
+                    _ => crate::rng::uniform(7.0, 0, n as f64, k as f64, 0.0, 0.0) * 10.0 - 5.0,
+                })
+                .collect();
+            for q in [0.02, 0.05, 0.5, 0.95, 0.98] {
+                let want = sorted_at(&xs, q);
+                assert_eq!(
+                    quantile(&mut xs, q).to_bits(),
+                    want.to_bits(),
+                    "n {n}, q {q}"
+                );
+            }
+            // w90's 2nd percentile, read among the values below the 98th after selecting it.
+            let (lo, top) = (rank(0.02, n), rank(0.98, n));
+            quantile(&mut xs, 0.98);
+            if lo < top {
+                let got = *xs[..top].select_nth_unstable_by(lo, f64::total_cmp).1;
+                assert_eq!(got.to_bits(), sorted_at(&xs, 0.02).to_bits(), "n {n}");
+            }
+        }
     }
 
     #[test]

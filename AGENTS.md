@@ -39,6 +39,7 @@ npm run regressions        # known defects as outcome vectors (tests/regressions
 npm run sim -- --preset explosion --seasons 12 --out runs/x   # native headless run → CSV
 npm run golden:update      # regenerate golden hashes (intended behaviour changes only)
 node cli/export-presets.ts # regenerate rust/presets.json after changing params, presets or species
+node cli/probe.ts --species beech --patch p.json   # feature probe: lone open-grown tree + garden, HEAD vs patch → runs/probe/<label>/sheet.html
 uv run --project analysis python analysis/experiments/m0_growth.py runs/x
 ```
 

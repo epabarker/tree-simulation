@@ -60,22 +60,22 @@ LEAN_SEASONS = 30
 runs = []
 for sp in SPECIES:
     for seed in SEEDS:
-        runs.append(Run(f"{EXPERIMENT}/lone/{sp}_s{seed}", "oakOpen", seed, 60,
+        runs.append(Run(f"{EXPERIMENT}/lone/{sp}_s{seed}", "oakOpenWalled", seed, 60,
                         {"world": {"width": 160, "height": 160, "walls": []}, "trees": [{"x": 80, "species": sp}]},
                         snapshots=[30]))
-        runs.append(Run(f"{EXPERIMENT}/stand/{sp}_s{seed}", "oakOpen", seed, 60,
+        runs.append(Run(f"{EXPERIMENT}/stand/{sp}_s{seed}", "oakOpenWalled", seed, 60,
                         {"world": {"width": 230, "height": 160, "walls": []},
                          "trees": [{"x": x, "species": sp} for x in STAND]}))
 for sp in PAIR_SPECIES:
     for d in SPACINGS:
         for seed in SEEDS:
-            runs.append(Run(f"{EXPERIMENT}/pair/{sp}_d{d}_s{seed}", "oakOpen", seed, 40,
+            runs.append(Run(f"{EXPERIMENT}/pair/{sp}_d{d}_s{seed}", "oakOpenWalled", seed, 40,
                             {"world": {"width": 200, "height": 160, "walls": []},
                              "trees": [{"x": 100 - d / 2, "species": sp}, {"x": 100 + d / 2, "species": sp}]}))
 for sp in LEAN_SPECIES:
     for posture in [True, False]:
         for seed in SEEDS:
-            runs.append(Run(f"{EXPERIMENT}/lean/{sp}_{'post' if posture else 'nopost'}_s{seed}", "oakOpen", seed,
+            runs.append(Run(f"{EXPERIMENT}/lean/{sp}_{'post' if posture else 'nopost'}_s{seed}", "oakOpenWalled", seed,
                             LEAN_SEASONS,
                             {"world": {"width": 160, "height": 160, "walls": []},
                              "trees": [{"x": 80, "species": sp, "lean": 40}]},

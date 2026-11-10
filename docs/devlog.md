@@ -3,6 +3,16 @@
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
 
+## 2026-11-09: build (a), the open-grown lone-tree box (#98, ADR 0062)
+
+- **Step 1, default off and bit-identical (9628462):** the metric `budsOutside` (live buds past a side or the top of the light's box, by `Light::contains`, the rule `sample` uses), `OPEN_BOX`/`openGrown`, and the feature probe merged as `cli/probe.ts` + `probe.html`, shaped as #81 resolved it. Its lone stage is open-grown, and it exits 1 if a bud leaves the box. Goldens and `npm run regressions` were unchanged.
+- **Step 2, the preset:** `oakOpen` and `beechOpen` are open-grown (τ 1 on all four sides, 240 × 240 cells, the tree at the centre). `WALLED_LONE` keeps the trials, the garden's specimen and the historical scripts in the half-walled world (the fixture `oakOpenWalled`). The pin reproduces the pre-0062 hashes.
+- **Goldens:** `oakOpen:seed1:s15` 29e5921a → 5ff7c085 and `beechOpen:seed1:s40` 7d65af5d → e7cb78a9, because both presets moved into the open box. No other case moved. **Regressions:** `npm run regressions -- --update` left both unchanged (`phoneSeed3`, `forestRegeneration`; neither uses a lone preset), so none got worse.
+- **Evidence ([note](experiments/2026-11-09-open-box-build.md), 20 seeds × 6 species):** zero buds outside in every season in 113 of 120, and at season 100 in 116 of 120. **The issue's acceptance check fails at 20 seeds.** Beech s11/s15 and oak s15 press past a side at 30 m from the root, and birch's runaways leave it (s3's leader past the 50 m top; s13's limbs sideways). In an 80 m × 65 m box beech and oak never leave (reach ≤ 32.8 m), but birch still does: leaders to 66 m, limbs 40 m sideways. The user kept the 60 m box; the resize is a follow-up.
+- **Cost (WASM, seed 1, late seasons):** beech 0.79–1.44 s/season and 749 MB; oak 1.00–1.22 s and 546 MB (walled: 0.38 s/220 MB, 0.19 s/110 MB). Accepted by the issue.
+- **Re-check of the half-walled findings:** the low limbs and the oak's stall survive in all seeds, maple's flat cap stays weakened, and birch's column was the walls.
+- **Surprises:** a bud on a limb R3 rests on the ground sits at y ≈ −1e−17 and gets Q = 0 (a follow-up). And a preset's world merges one level deep, so patching `oakOpen`'s width silently kept the open box's depth (found by the spec review).
+
 ## 2026-11-09: the feature playbook, assembled and handed off (wayfinder map #73)
 
 - **Docs only; no code, goldens or regressions changed.** The map's decisions were on four docs branches cut from the old `main`, 103 commits behind `3d-port`. `bare-bole.md` existed only on one of them, and the latest `rounded-crown.md` only on another. This brings them together on `3d-port`: ADRs 0062 (light entry) and 0063 (garden demography), `docs/features/` (three pages and a README), and `GLOSSARY.md`.

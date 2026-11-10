@@ -82,6 +82,20 @@ fn the_prototype_rules_written_as_off_keep_the_goldens() {
             .and_then(|t| t.get(parts[0]))
             .unwrap();
         let mut params = json::merge(base, &off);
+        // Those hashes were the half-walled box's (before ADR 0062's open box): 64 deep between
+        // τ 0.2 faces, the tree at the middle of the width.
+        if parts[0] != "forest" {
+            let (width, sp) = if parts[0] == "beechOpen" {
+                (240, "beech")
+            } else {
+                (160, "oak")
+            };
+            let walled = format!(
+                r#"{{"world":{{"width":{width},"depth":64,"faces":[0.2,0.2]}},"trees":[{{"x":{},"species":"{sp}"}}]}}"#,
+                width / 2
+            );
+            params = json::merge(&params, &json::parse(&walled).unwrap());
+        }
         let species = params.get("species").and_then(Value::as_object).map(|t| {
             Value::Obj(
                 t.iter()

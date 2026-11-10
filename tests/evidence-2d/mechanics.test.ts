@@ -164,7 +164,7 @@ describe("M9: mechanics (§R3, ADR 0011)", () => {
     };
     for (const seed of SEEDS) {
       for (const posture of [true, false]) {
-        const base = mergeParams(presetParams("oakOpen", seed), {
+        const base = mergeParams(fixtureParams("oakOpenWalled", seed), {
           world: { width: 160, height: 160, walls: [] },
           trees: [{ x: 80, species: "oak", lean: 40 }],
         });

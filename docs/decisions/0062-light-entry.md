@@ -1,6 +1,6 @@
 # 0062: How light enters the slab
 
-- **Status:** accepted (user, 2026-11-08). A decision of the feature-playbook map, not yet implemented. It amends ADR 0024's default look, accepts ADR 0058 as the garden's default, and supersedes ADR 0056.
+- **Status:** accepted (user, 2026-11-08). A decision of the feature-playbook map. Decision 2 (the open-grown lone box) is implemented by build (a), [#98](https://github.com/epabarker/tree-simulation/issues/98): 60 m, kept by the user although 7 of 120 trees leave it at 20 seeds ([note](../experiments/2026-11-09-open-box-build.md)). Decisions 3 and 4 wait for build (b). It amends ADR 0024's default look, accepts ADR 0058 as the garden's default, and supersedes ADR 0056.
 - **Spec:** §C2 (light, the slab), §C2.8, §C5, §O4. ADRs 0024, 0056, 0058.
 - **Ticket:** [Should the slab admit side light from its front and back?](https://github.com/epabarker/tree-simulation/issues/82)
 - **Evidence:** [the slab-light note](../experiments/2026-11-08-slab-light.md) (exploratory, seed 1).

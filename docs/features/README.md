@@ -42,7 +42,7 @@ Build (a) accepts the open box's cost in the lab, measured at ≈ 0.9 s/season a
 
 ### Probe code
 
-The probe branches (`wayfinder/*`) are never merged. A build re-implements its mechanism through `/implement-principle` and may cherry-pick from its probe branch: `c5.kRel` from `wayfinder/bole-probe`. The oak's `r2.dLambda` and `r2.aC` already exist, so (c) only changes the species entry. The probe-only switches (`r2.relayOvertop`, the metamer cap and `c3.sink`) are not merged. The feature-probe tool (`wayfinder/feature-probe`) merges with build (a), as the instrument every later build uses.
+The probe branches (`wayfinder/*`) are never merged. A build re-implements its mechanism through `/implement-principle` and may cherry-pick from its probe branch: `c5.kRel` from `wayfinder/bole-probe`. The oak's `r2.dLambda` and `r2.aC` already exist, so (c) only changes the species entry. The probe-only switches (`r2.relayOvertop`, the metamer cap and `c3.sink`) are not merged. The feature-probe tool merged with build (a) as `cli/probe.ts` (`node cli/probe.ts --species <sp> --patch p.json`), the instrument every later build uses. Its lone stage is the open box, and it fails if a bud leaves it.
 
 ### After the builds
 

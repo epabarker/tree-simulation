@@ -140,6 +140,42 @@ const flora = (name: FloraName, xs: number[], width: number) =>
  */
 export const TOP = 200;
 
+/**
+ * The open-grown box's side, cells (60 m; ADR 0062). Each exemplar's crown at season 100 reaches at
+ * most 25.8–27.8 m from its root (beech; the others 9–27 m), so 240 holds them all with ≥ 2.2 m to
+ * spare (the open-box note, 2026-11-08).
+ */
+export const OPEN_BOX = 240;
+
+/**
+ * The open-grown lone-tree stage (ADR 0062, GLOSSARY "Open-grown"): open sky on all four sides
+ * (τ = 1 on both z faces, open x sides) in a square box of `side` cells, `TOP` tall, with the tree
+ * at its centre, sized so that no bud grows past a bound (metrics' `budsOutside` stays 0). The τ
+ * faces' half-walled box let 100–500 buds a season sit past a face with Q = 0. The garden does not
+ * use it: in WASM it costs ≈ 0.9 s a season late on and 530–700 MB (ADR 0026's budget binds the
+ * garden, not the lab).
+ */
+export function openGrown(species: string, side: number = OPEN_BOX): ParamsPatch {
+  return {
+    world: { width: side, depth: side, height: TOP, walls: [], faces: [1, 1], sidesZ: "open" },
+    trees: [{ x: side / 2, z: side / 2, species }],
+  };
+}
+
+/**
+ * The lone trees' world before the open box (ADR 0062): 160 × 64 cells between τ 0.2 faces, the
+ * half-walled box. The garden's specimen keeps it (the open box's 530–700 MB is past the worker's
+ * 256 MB, ADR 0026), and so do the trials the fits were calibrated on (`cli/trials.ts`).
+ */
+export const WALLED_LONE = {
+  width: 160,
+  height: TOP,
+  depth: 64,
+  faces: [0.2, 0.2],
+  sidesZ: "open",
+  walls: [],
+} satisfies Params["world"];
+
 const RING = { width: 210, height: TOP, walls: [], sides: "periodic" } satisfies Params["world"];
 /** One row of the ring's stand: a tree every 21 cells. */
 const RING_X = [10, 31, 52, 73, 94, 115, 136, 157, 178, 199];
@@ -370,9 +406,9 @@ export const presets = {
       "Quercus robur alone in a field: wide-angled limbs, a broad decurrent crown and a squat trunk (Plate II).",
     // A specimen: no seedlings around it, and no storms, which throw tall trees by height alone.
     // The woods' top (C1 round 3): at 120 the lone oak reached it and its crown was clipped flat.
+    // Open-grown (ADR 0062): τ 1 on all four sides in the 60 m box, which holds its crown.
     patch: {
-      world: { width: 160, height: TOP, walls: [] },
-      trees: [{ x: 80, species: "oak" }],
+      ...openGrown("oak"),
       ...WOODLAND,
       o2: { stormP: 0 },
       o4: { enabled: false },
@@ -382,12 +418,11 @@ export const presets = {
     label: "A beech grown in the open",
     description:
       "Fagus sylvatica alone in a field: the fresh-look round's lone tree (ADR 0039–0043, proposed), in a world wide enough for its crown.",
-    // oakOpen's specimen with the beech: 240 wide, as the fresh-look round's repair measured it
-    // (160 clipped a broad crown at the world's sides). A golden case: the open-grown beech is
-    // where the round's vigour-gated rules act.
+    // oakOpen's specimen with the beech, open-grown (ADR 0062): the 60 m box holds the broadest
+    // exemplar crown, with 2.2 m to spare at season 100. A golden case: the open-grown beech is
+    // where the fresh-look round's vigour-gated rules act.
     patch: {
-      world: { width: 240, height: TOP, walls: [] },
-      trees: [{ x: 120, species: "beech" }],
+      ...openGrown("beech"),
       ...WOODLAND,
       o2: { stormP: 0 },
       o4: { enabled: false },
@@ -575,5 +610,8 @@ export function forestParams(width = 210, seed?: number, planting: Partial<Plant
 
 /** Plate II (M19): an oak grown alone in the open, a new one for each seed. */
 export function specimenParams(seed: number): Params {
-  return presetParams("oakOpen", seed);
+  return mergeParams(presetParams("oakOpen", seed), {
+    world: WALLED_LONE,
+    trees: [{ x: 80, species: "oak" }],
+  });
 }

@@ -250,6 +250,45 @@ mod tests {
     }
 
     #[test]
+    fn counts_a_sprout_from_a_scar_on_the_bole_below_the_lowest_living_limb() {
+        use crate::testing::{LEFT, RIGHT, bud as add, metamer};
+        use crate::tree::slot;
+        let up = std::f64::consts::FRAC_PI_2;
+        let p = params(r#"{"r4":{"qRel":0.1}}"#);
+        // A four-cell trunk with one living limb off its third cell (its base at 3 m), and a
+        // dormant lateral bud on the first trunk cell (tip at 1 m), lit enough to be released.
+        // `scarred` gives that cell a scar; `limb_low` puts the living limb off the first cell.
+        let sprouts = |scarred: bool, limb_low: bool| {
+            let mut t = Tree::new(0, 10.0, 0.5);
+            let mut trunk = vec![metamer(&mut t, -1, slot::MAIN, up, 1.0, 0.1, 0.0)];
+            for _ in 1..4 {
+                let k = *trunk.last().unwrap() as i32;
+                trunk.push(metamer(&mut t, k, slot::MAIN, up, 1.0, 0.1, 0.0));
+            }
+            let host = trunk[if limb_low { 0 } else { 2 }];
+            let limb = metamer(&mut t, host as i32, LEFT, 0.0, 1.0, 0.01, 0.0);
+            add(&mut t, limb, slot::MAIN, 0.0, 1.0);
+            add(&mut t, trunk[3], slot::MAIN, up, 0.0);
+            let dormant = add(&mut t, trunk[0], RIGHT, 0.0, 1.0);
+            t.ensure_scratch();
+            for j in 0..t.b.len() {
+                t.b.v[j] = 0.0;
+            }
+            t.b.state[dormant] = bud::DORMANT;
+            t.b.q[dormant] = 0.5;
+            if scarred {
+                t.m.scar_sum_n[trunk[0]] = 1e-4;
+            }
+            grow_buds(&mut t, &p, 20.0);
+            assert_eq!(t.released, 1.0);
+            t.bole_sprouts
+        };
+        assert_eq!(sprouts(true, false), 1.0);
+        assert_eq!(sprouts(false, false), 0.0); // an unscarred node: an ordinary release
+        assert_eq!(sprouts(true, true), 0.0); // not below the lowest living limb: in the crown
+    }
+
+    #[test]
     fn looks_up_r2_rows_by_order_minus_pa_shift() {
         let row = |g: &str| {
             format!(

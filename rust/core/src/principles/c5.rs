@@ -12,8 +12,16 @@
 //! young dome and the lower trunk clears (the photographs: the open-grown beech's trunk bare for
 //! its lowest 1/8–1/6). A stand member never opens the gate, so its shedding is C5's own.
 //!
-//! Params: c5.T, c5.g, c5.Trel, c5.topQuantile, c5.Tvig; c6.n; r1.shed; r4.bank;
-//! r2.vigourTreeLo, r2.vigourTreeHi.
+//! The relative test's k (`c5.kRel`; the bare-bole page, #125): a lateral is shed by T_rel·Q_top
+//! only after kRel consecutive seasons below it, and a season above resets the count, so the rule
+//! is about sustained relative shade (Henriksson 2001; Sprugel 2002). The count is a per-row
+//! `dark` column beside R1's `deficit`, compacted with the rows and checkpointed (v4). The
+//! absolute T stays this season's; the relative test and R1's carbon test stay either-or. kRel 1
+//! keeps no count and is bit-identical to the rule without it. Each first-order limb shed records
+//! its cause (relative, carbon, both) for the run's output.
+//!
+//! Params: c5.T, c5.g, c5.Trel, c5.kRel, c5.topQuantile, c5.Tvig; c6.n; r1.shed, r1.kShed;
+//! r4.bank; r2.vigourTreeLo, r2.vigourTreeHi.
 
 use super::c1::{add_bud, bud_frame};
 use super::c3::is_live_bud;
@@ -62,6 +70,26 @@ pub fn shed_branches(tree: &mut Tree, params: &Params, season: f64, evaluated: u
             };
         }
     }
+    // The relative test's k (c5.kRel): a lateral must be dark (light per metamer < T_rel·Q_top)
+    // k_rel seasons in a row, and a season above resets it, as R1's deficit run does for carbon.
+    // Branch death follows sustained light relative to the crown (Henriksson 2001; Sprugel
+    // 2002). Every evaluated row counts, whatever its age; the grace period gates the shedding.
+    // k_rel 1 keeps no count: the test is this season's alone.
+    let rel = params.c5.t_rel * tree.q_top;
+    let k_rel = params.c5.k_rel;
+    let counting = k_rel > 1.0;
+    if counting {
+        ensure(&mut tree.dark, nm);
+        for i in 0..evaluated {
+            let n_b = tree.m.n_sum[i] as f64;
+            let light = if n_b > 0.0 {
+                tree.m.q_sum[i] / n_b
+            } else {
+                0.0
+            };
+            tree.dark[i] = if light < rel { tree.dark[i] + 1.0 } else { 0.0 };
+        }
+    }
     let mut dead = std::mem::take(&mut tree.scratch_u);
     ensure(&mut dead, nm.max(tree.b.len()));
     dead[..nm].fill(0);
@@ -76,14 +104,36 @@ pub fn shed_branches(tree: &mut Tree, params: &Params, season: f64, evaluated: u
         }
         let n_b = c.n_sum[i] as f64;
         let light = if n_b > 0.0 { c.q_sum[i] / n_b } else { 0.0 };
+        let relative = if counting {
+            tree.dark[i] >= k_rel
+        } else {
+            light < rel
+        };
         let shed = if carbon {
-            tree.deficit[i] >= params.r1.k_shed || light < params.c5.t_rel * tree.q_top
+            tree.deficit[i] >= params.r1.k_shed || relative
+        } else if counting {
+            // T_eff = max(T, T_rel·Q_top) split in two: the absolute T stays this season's.
+            n_b > 0.0 && (light < params.c5.t || relative)
         } else {
             n_b > 0.0 && light < t
         } || (own > 0.0 && n_b > 0.0 && light < own);
         if shed {
             dead[i] = 1;
             any = true;
+            // The shed cause of a first-order limb (off the trunk), for the bole probe: C5's
+            // relative test, R1's carbon test, or both. A limb shed only by the absolute T or by
+            // Tvig counts in none, so the three sum to at most the first-order limbs shed.
+            let p = c.parent[i] as usize;
+            if c.order[i] == 1 && c.order[p] == 0 {
+                let by_carbon = carbon && tree.deficit[i] >= params.r1.k_shed;
+                let by_relative = relative && (carbon || n_b > 0.0);
+                match (by_relative, by_carbon) {
+                    (true, true) => tree.shed_both += 1.0,
+                    (true, false) => tree.shed_relative += 1.0,
+                    (false, true) => tree.shed_carbon += 1.0,
+                    _ => {}
+                }
+            }
         }
     }
     let removed = if any {
@@ -187,6 +237,16 @@ pub fn remove_branches(
             }
         }
         tree.deficit.truncate(tree.m.len());
+    }
+    // C5's relative-test counts (c5.kRel) likewise.
+    if !tree.dark.is_empty() {
+        ensure(&mut tree.dark, nm);
+        for i in 0..nm {
+            if keep[i] != 0 {
+                tree.dark[old_to_new[i] as usize] = tree.dark[i];
+            }
+        }
+        tree.dark.truncate(tree.m.len());
     }
     // R4's bud bank: a dormant bud where each branch was, at its azimuth around the parent as
     // the parent now lies.
@@ -331,6 +391,127 @@ pub(crate) mod tests {
         assert_eq!(dim_lateral(1.0, &relative), 2.0); // bright top: T_eff = 0.3 > 0.15, shed
         assert_eq!(dim_lateral(0.4, &relative), 0.0); // dim top: T_eff = 0.12 < 0.15, kept
         assert_eq!(dim_lateral(1.0, &params("{}")), 0.0); // T_rel = 0 ignores the top
+    }
+
+    /// One season of the C5 test tree with the lateral (row 2) at `q` per metamer over two
+    /// metamers and Q_top 1; returns metamers removed.
+    fn relative_season(t: &mut Tree, p: &Params, season: f64, q: f64) -> f64 {
+        t.q_top = 1.0;
+        t.m.q_sum[0] = 4.0;
+        t.m.n_sum[0] = 4;
+        t.m.q_sum[2] = 2.0 * q;
+        t.m.n_sum[2] = 2;
+        t.m.q_sum[1] = 1.0;
+        t.m.n_sum[1] = 1;
+        let nm = t.m.len();
+        shed_branches(t, p, season, nm)
+    }
+
+    #[test]
+    fn with_k_rel_three_a_limb_held_below_the_relative_threshold_sheds_in_its_third_season() {
+        // T_rel·Q_top = 0.3; the lateral's 0.15 per metamer passes T = 0.1, so only the
+        // relative test can shed it.
+        let p = params(r#"{"c5":{"Trel":0.3,"kRel":3}}"#);
+        let mut t = small_tree(&p);
+        assert_eq!(relative_season(&mut t, &p, 5.0, 0.15), 0.0);
+        assert_eq!(relative_season(&mut t, &p, 6.0, 0.15), 0.0);
+        assert_eq!(relative_season(&mut t, &p, 7.0, 0.15), 2.0); // with its tip
+        assert_eq!(t.m.len(), 2);
+    }
+
+    #[test]
+    fn one_bright_season_resets_the_relative_count() {
+        let p = params(r#"{"c5":{"Trel":0.3,"kRel":3}}"#);
+        let mut t = small_tree(&p);
+        assert_eq!(relative_season(&mut t, &p, 5.0, 0.15), 0.0); // dark 1
+        assert_eq!(relative_season(&mut t, &p, 6.0, 0.15), 0.0); // dark 2
+        assert_eq!(relative_season(&mut t, &p, 7.0, 0.5), 0.0); // bright: back to 0
+        assert_eq!(relative_season(&mut t, &p, 8.0, 0.15), 0.0); // dark 1
+        assert_eq!(relative_season(&mut t, &p, 9.0, 0.15), 0.0); // dark 2
+        assert_eq!(relative_season(&mut t, &p, 10.0, 0.15), 2.0); // dark 3
+    }
+
+    #[test]
+    fn with_k_rel_one_the_relative_test_sheds_at_once_and_keeps_no_count() {
+        let p = params(r#"{"c5":{"Trel":0.3}}"#);
+        assert_eq!(p.c5.k_rel, 1.0);
+        let mut t = small_tree(&p);
+        assert_eq!(relative_season(&mut t, &p, 5.0, 0.15), 2.0);
+        assert!(t.dark.is_empty());
+    }
+
+    #[test]
+    fn the_relative_count_waits_out_the_grace_period_and_follows_compaction() {
+        // A dark lateral younger than g counts its dark seasons but is not shed until it is old
+        // enough; its count then moves with its row when another branch is removed.
+        let p = params(r#"{"c5":{"Trel":0.3,"kRel":2,"g":2}}"#);
+        let mut t = small_tree(&p);
+        let other = metamer(&mut t, 0, LEFT, UP + 0.7, 1.0, p.c6.r0, 0.0); // row 4, bright
+        bud(&mut t, other, slot::MAIN, UP + 0.7, 1.0);
+        t.ensure_scratch();
+        t.m.q_sum[other] = 1.0;
+        t.m.n_sum[other] = 1;
+        assert_eq!(relative_season(&mut t, &p, 1.0, 0.15), 0.0); // age 1 < g, dark 1
+        assert_eq!(t.dark[2], 1.0);
+        // Remove row 4's sibling subtree by hand: row 2 keeps its index, row 4's count goes.
+        t.dark[other] = 9.0;
+        let mut dead = vec![0, 0, 0, 0, 1];
+        remove_branches(&mut t, &mut dead, &p, &mut []);
+        assert_eq!(t.dark, vec![0.0, 0.0, 1.0, 1.0]);
+        assert_eq!(relative_season(&mut t, &p, 2.0, 0.15), 2.0); // age 2, dark 2: shed
+        assert_eq!(t.dark.len(), t.m.len());
+    }
+
+    #[test]
+    fn a_shed_first_order_limb_records_its_cause_relative_carbon_or_both() {
+        // Carbon shedding with kShed 1 and T_rel·Q_top = 0.3: the lateral (row 2, off the
+        // trunk) is shed for a deficit, for relative shade, or for both.
+        let p = params(r#"{"r1":{"enabled":true,"shed":"carbon"},"c5":{"Trel":0.3}}"#);
+        let cause = |deficit: bool, q: f64| {
+            let mut t = small_tree(&p);
+            t.p_sum = vec![10.0, 10.0, if deficit { 1.0 } else { 10.0 }, 10.0];
+            t.m_sum = vec![2.0; 4];
+            assert_eq!(relative_season(&mut t, &p, 5.0, q), 2.0);
+            (t.shed_relative, t.shed_carbon, t.shed_both)
+        };
+        assert_eq!(cause(true, 0.5), (0.0, 1.0, 0.0));
+        assert_eq!(cause(false, 0.15), (1.0, 0.0, 0.0));
+        assert_eq!(cause(true, 0.15), (0.0, 0.0, 1.0));
+        // Without carbon shedding the relative test is C5's own.
+        let light = params(r#"{"c5":{"Trel":0.3}}"#);
+        let mut t = small_tree(&light);
+        assert_eq!(relative_season(&mut t, &light, 5.0, 0.15), 2.0);
+        assert_eq!(
+            (t.shed_relative, t.shed_carbon, t.shed_both),
+            (1.0, 0.0, 0.0)
+        );
+    }
+
+    #[test]
+    fn only_first_order_limbs_and_the_relative_test_record_a_cause() {
+        // A second-order shoot shed off a lit limb counts in no cause; nor does a limb shed by the
+        // absolute T alone (0.05 < T = 0.1 with T_rel 0).
+        let p = params(r#"{"c5":{"Trel":0.3}}"#);
+        let mut t = small_tree(&p);
+        let twig = metamer(&mut t, 3, RIGHT, UP - 1.4, 1.0, p.c6.r0, 0.0);
+        bud(&mut t, twig, slot::MAIN, UP - 1.4, 2.0);
+        t.ensure_scratch();
+        t.m.q_sum[twig] = 0.1;
+        t.m.n_sum[twig] = 1;
+        t.m.q_sum[3] = 2.0;
+        t.m.n_sum[3] = 2;
+        assert_eq!(relative_season(&mut t, &p, 5.0, 1.0), 1.0);
+        assert_eq!(
+            (t.shed_relative, t.shed_carbon, t.shed_both),
+            (0.0, 0.0, 0.0)
+        );
+        let absolute = params("{}");
+        let mut t = small_tree(&absolute);
+        assert_eq!(relative_season(&mut t, &absolute, 5.0, 0.05), 2.0);
+        assert_eq!(
+            (t.shed_relative, t.shed_carbon, t.shed_both),
+            (0.0, 0.0, 0.0)
+        );
     }
 
     #[test]

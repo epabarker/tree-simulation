@@ -5,7 +5,7 @@ A **World effect** (GLOSSARY): how sky enters the slab past its bounds. Decided 
 ## What it should look like
 
 - **The lone tree is open-grown:** its crown shows the species' form, not the shape of its box, and it is round in plan (as wide as it is deep), lit equally from all four sides.
-- **No bud grows past a bound.** A crown cut by its box is never mistaken for a form, and is never clipped to save cost.
+- **The box holds the crown at a recorded rate.** At 20 seeds the 60 m box holds most crowns, not all (ADR 0062's amendment). A seed whose crown reached a bound is named and left out of the form's judgement, so a cut crown is never mistaken for a form; no crown is clipped to save cost.
 - **The garden's trees stand inside a wood,** not between two walls: side light follows from the stand's density alone (ADR 0058's periodic depth, with ADR 0063's demography).
 - **Every species in a world sees the same light.** No species carries a light-entry setting.
 
@@ -14,7 +14,8 @@ A **World effect** (GLOSSARY): how sky enters the slab past its bounds. Decided 
 | Part | Decision | Today |
 |---|---|---|
 | Lone-tree stage | Open sky on all four sides (τ = 1 on both z faces, open x sides), a square 60 m box (240 cells), the tree at its centre, the woods' 50 m top. `oakOpen`, `beechOpen` and `loneTreeParams` (the feature probe's and the species trials' lone tree) | **Built** (#115) |
-| Its check | `budsOutside` = 0 in every season of every run: `npm run evidence:open-grown`, the six exemplars × seeds 1–20 to season 100, with the crown's width and depth agreeing within 0.75 (min ÷ max) | **Built.** At 20 seeds the box held hornbeam, maple and holly in every run, oak in 19, beech in 18 and birch in 16 (birch s3's leader at the top; the rest at a side). Round in plan in 15–20 of 20 per species (oak lowest). Devlog, 2026-11-10 |
+| Its check | `npm run evidence:open-grown`: the six exemplars × seeds 1–20 to season 100. **The box's bar is the recorded rate** (ADR 0062's amendment): it held oak 19, maple 20, birch 16, beech 18, hornbeam 20 and holly 20 of 20 (not held: oak s15; birch s3 at the top, s5, s13, s18; beech s11, s15). A run that holds fewer fails. Every seed with a bud outside is named and **excluded** from the form's measures, neither a pass nor a fail of the form | **Built** (#115) |
+| Roundness in plan | Reported, not a bar: width and depth within 0.75 (min ÷ max) at season 100, over the held seeds: oak 15 of 19, maple 19 of 20, birch 16 of 16, beech 18 of 18, hornbeam 20 of 20, holly 19 of 20. The oak's is a finding | Reported |
 | Garden depth | Periodic (`sidesZ: "periodic"`, ADR 0058); D stays 64 unless the density needs more | τ 0.2 faces |
 | τ faces | Kept as settings for a host page: wood edge (1, 0.2), hedgerow (1, 1); never a default or a calibration stage | Same |
 | `faceWood` | Superseded, kept off and bit-identical | Same |

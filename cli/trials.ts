@@ -240,18 +240,21 @@ function loneShape(world: RustWorld, tree: Tree): LoneShape {
 /**
  * The lone tree at 30 and 60, and, when asked, run on to 100: its shape there as `…100` (the
  * round-5 plan, §3.1: a crown can pass at 60 and turn at 100, as round 4's birch did).
+ * `stages` moves the two measurements (`height30` and the rest are read at its first and second
+ * season); only a test asks for earlier ones, as the open-grown box made 60 seasons slow (#115).
  */
 export function runLone(
   species: string,
   seed: number,
   assign: Record<string, unknown> = {},
   seasons: 60 | 100 = 60,
+  stages: [number, number] = [30, 60],
 ): LoneTraits {
   const world = newWorld(withAssign(loneParams(species, seed), species, assign));
-  world.run(30);
+  world.run(stages[0]);
   const tree = world.trees[0] as Tree;
   const height30 = world.metricsOf(tree).height;
-  world.run(30);
+  world.run(stages[1] - stages[0]);
   const m = world.metricsOf(tree);
   const f = world.formOf(tree);
   const traits: LoneTraits = {

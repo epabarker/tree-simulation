@@ -19,7 +19,7 @@ _Last updated: 2026-11-09; build (a) (#98), the open-grown lone box, in a PR int
 - Evidence docs/experiments/2026-11-09-open-box-build.md.
 ## Next
 1. User reviews/merges build (a)'s PR; then build (b).
-2. Follow-ups to open: box resize + birch runaway leaders/limbs; ground-resting buds get Q=0.
+2. Follow-ups #103 (box resize, birch runaways) and #104 (ground-resting buds get Q=0), needs-triage.
 3. Phone soak remains a separate deferred release gate; no tag/deploy/production push.
 ## Step8 (frozen; no adoption, nothing deleted)
 - Branch codex/day3-species-programme; evidence docs/experiments/2026-11-08-day3-step8.md.

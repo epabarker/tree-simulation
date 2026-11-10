@@ -38,7 +38,7 @@ The per-seed table is in `runs/oak-crown/report.txt`.
 
 ## The by-eye verdict (season-100 contact sheet)
 
-**Sheet:** `runs/probe/oak124-sheet/sheet.html` (119 MB; HEAD beside patch, seeds 1–20, at 30/60/100; not committed). Row crops: `runs/probe/oak124-sheet/png/rows-{01,05,09,13,17}.png`. In each crop the top of the first HEAD row is cut off. The other HEAD rows show the same spire.
+**Sheet:** `runs/probe/oak124-sheet/sheet.html` (119 MB; HEAD beside patch, seeds 1–20, at 30/60/100; not committed). Row crops: `runs/probe/oak124-sheet/png/rows-{01,05,09,13,17}.png`. In each crop the top of the first HEAD row is cut off. The other HEAD rows show the same spire. The sheet's runs are the scored runs: their `hash.txt` matches `runs/oak-crown/` (checked for seeds 1, 7 and 15, in both arms).
 
 **This is the agent's reading. The user should confirm it.**
 
@@ -92,7 +92,7 @@ This guard ran against the garden as it stands on this base, the pre-#121 garden
 
 **Unclear, and for the user to weigh:**
 
-- **The flank's aggregation.** A mean of seasonal shares counts the stall seasons, which have few new metamers and flank shares near 0 (every patch seed shows 0.00 at season 100), as much as the vigorous ones. A pooled share, like the note's, would weight the vigorous seasons and could lift the near misses (seeds 4, 17 and 18 at 3.8–4.8%). Computing it needs a per-season count of new metamers in metrics.csv. The bar was fixed before the run and is not re-scored here.
+- **The flank's aggregation.** A mean of seasonal shares counts the stall seasons, which have few new metamers and flank shares near 0 (every patch seed shows 0.00 at season 100), as much as the vigorous ones. A pooled share, like the note's, would weight the vigorous seasons instead. The direction of that difference is not known. On seeds 1–3, the only comparison there is, this mean (7.7, 7.5, 10.5%) came out *higher* than the note's pooled 5.5–7.3%, though on a different build. So there is no evidence that pooling would rescue the near misses (seeds 4, 17 and 18 at 3.8–4.8%). Computing it needs a per-season count of new metamers in metrics.csv. The bar was fixed before the run and is not re-scored here.
 - **w90 is a weak judge of dome against box.** It fails peaked domes and passes some boxes. If the user reads the sheet differently, the eye's count, not w90's, is the one to weigh.
 - **The phone garden's seed 1** loses its oak recruits under the patch. Re-check it in the 0062/0063 garden.
 
@@ -101,7 +101,7 @@ This guard ran against the garden as it stands on this base, the pre-#121 garden
 ```
 npm run evidence:oak-crown            # node cli/oak-crown.ts: 80 runs, about 75 min on 6 simulators → runs/oak-crown/
 npm run probe -- --patch runs/oak-d12a13.json --species oak --label oak124-sheet \
-  --seeds 1,2,...,20 --widths "" --jobs 4          # the season-100 contact sheet (lone only)
+  --seeds 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20 --widths "" --jobs 4   # the sheet (lone only)
 npm run probe -- --patch runs/oak-d12a13.json --species oak --label oak124-guard --jobs 2   # garden guard
 ```
 

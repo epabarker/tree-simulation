@@ -95,6 +95,17 @@ describe("the 3D core's structure (I2)", () => {
     expect(hashWorld(c)).not.toBe(hashWorld(a));
   });
 
+  it("draws the lab's seedling below 1.3 m; the garden's snapshot hides it", () => {
+    const world = new World(presetParams("skyTree"));
+    world.step();
+    expect(world.metricsOf(world.trees[0] as Tree).height).toBeLessThan(1.3 / 0.25);
+    const garden = world.snapshot(0, { junctions: false, field: false });
+    const lab = world.snapshot(0, { junctions: false, field: false, seedlings: true });
+    expect(garden.metrics).toHaveLength(0);
+    expect(lab.metrics).toHaveLength(1);
+    expect(lab.metamerCount).toBe((world.trees[0] as Tree).m.length);
+  });
+
   it("lists the snapshot's rows far to near (zOrder, I3): a permutation, z0 descending", () => {
     const world = new World(presetParams("skyStand", 3));
     world.run(10);

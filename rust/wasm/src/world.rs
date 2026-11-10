@@ -204,9 +204,10 @@ impl World {
         self.snap.reset();
     }
 
-    /// Builds the season's snapshot into the buffer at `snapshot_ptr`.
-    pub fn snapshot(&mut self, junctions: bool, field: bool) {
-        self.snap.build(&mut self.core, junctions, field);
+    /// Builds the season's snapshot into the buffer at `snapshot_ptr`; `seedlings` draws the
+    /// trees below the display threshold too (the lab).
+    pub fn snapshot(&mut self, junctions: bool, field: bool, seedlings: bool) {
+        self.snap.build(&mut self.core, junctions, field, seedlings);
     }
 
     pub fn snapshot_ptr(&self) -> *const u8 {

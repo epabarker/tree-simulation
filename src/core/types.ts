@@ -187,9 +187,18 @@ export interface Snapshot {
 export interface SnapshotOptions {
   junctions: boolean;
   field: boolean;
+  /**
+   * Draw the seedling bank too: every live tree, not only those at or above the display threshold
+   * (`stand::is_drawn`, 1.3 m). The lab sets it, so its lone tree shows from the first season; the
+   * garden leaves it off (the default). The stand's `drawn` count is the threshold's either way.
+   */
+  seedlings?: boolean;
 }
 
 export const FULL_SNAPSHOT: SnapshotOptions = { junctions: true, field: true };
+
+/** The lab's snapshots: full, and the seedling bank drawn (the lab is exempt from the threshold). */
+export const LAB_SNAPSHOT: SnapshotOptions = { ...FULL_SNAPSHOT, seedlings: true };
 
 export interface TreeMetrics {
   tree: number;

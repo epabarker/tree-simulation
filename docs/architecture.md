@@ -183,7 +183,7 @@ G2 moved the sky sweep (`rust/core/src/light/sky_sweep.rs`) into Rust behind the
 
 ## Direct manipulation
 
-Tapping a tree on the page fells it. `Scene.pickTree` finds the nearest drawn segment within 14 px, and the page calls `removeTree(id)`. That is an event at the next season boundary: the tree stops depositing shade, so the next season's light reaches its neighbours. Its branches fade out as ghosts. Snapshots and charts show only drawn trees (live, from the display threshold); the CLI's metrics.csv keeps rows for dead trees, with `alive = 0`.
+Tapping a tree on the page fells it. `Scene.pickTree` finds the nearest drawn segment within 14 px, and the page calls `removeTree(id)`. That is an event at the next season boundary: the tree stops depositing shade, so the next season's light reaches its neighbours. Its branches fade out as ghosts. Snapshots and charts show only drawn trees (live, from the display threshold; in the lab every live tree); the CLI's metrics.csv keeps rows for dead trees, with `alive = 0`.
 
 ## Events and replay
 
@@ -201,7 +201,7 @@ Tapping a tree on the page fells it. `Scene.pickTree` finds the nearest drawn se
 | `setSnapshotOptions({junctions, field})` | Which optional parts later snapshots carry: the Δ histogram's junction exponents and the shade field. Both default to on (the lab); the home page turns both off (M13) |
 | `record()` | Returns the run record |
 
-**Snapshot** (`rust/core/src/snapshot.rs`; the shape is `Snapshot` in `src/core/types.ts`). Flat arrays over all drawn trees, concatenated in tree-id order. A tree is drawn when it is live and at or above the display threshold (1.3 m, ADR 0063): `stand::is_drawn` on `stand::stem_height`, the rule stand.csv's `drawn` count uses, applied in Rust so the page never restates it. The seedling bank below it is simulated and not in the snapshot (nor in its metrics or species); a tree crossing the threshold has no rows in the previous snapshot, so it grows in from zero over one tween:
+**Snapshot** (`rust/core/src/snapshot.rs`; the shape is `Snapshot` in `src/core/types.ts`). Flat arrays over all drawn trees, concatenated in tree-id order. A tree is drawn when it is live and at or above the display threshold (1.3 m, ADR 0063): `stand::is_drawn` on `stand::stem_height`, the rule stand.csv's `drawn` count uses, applied in Rust so the page never restates it. The seedling bank below it is simulated and not in the snapshot (nor in its metrics or species); a tree crossing the threshold has no rows in the previous snapshot, so it grows in from zero over one tween. The lab is exempt: it asks for `seedlings` (`SnapshotOptions`, `LAB_SNAPSHOT` in `src/web/main.ts`), one switch that draws every live tree, so its lone tree shows from the first season; the garden leaves it off (the default), and stand.csv's `drawn` count is the threshold's either way:
 
 - **Metamers:** `parent` (row in the snapshot), `x0`, `y0`, `angle`, `length`, `radius`, `z0`, `dirX`…`dirZ` (H), `tree`, `birthId`, `order`, `light` (Q_sum/n_b), `resource` (vIn), `age`, `stress` (σ/σ_target, R3), `prevIndex`, `zOrder`. `angle` and `length` are the segment as drawn in the picture's plane (projected along z), so the renderer rebuilds (x, y) positions from them as it always did. `zOrder` lists the rows far to near (`z0` descending, row ascending on ties), sorted in Rust so the main thread never sorts (I3). The frame's reference L is not carried: nothing on the page reads it.
 - **Buds:** `budMetamer`, `budState`, `budQ`.

@@ -10,7 +10,7 @@ import {
   presetParams,
   presets,
 } from "../core/presets.ts";
-import { FULL_SNAPSHOT } from "../core/types.ts";
+import { LAB_SNAPSHOT } from "../core/types.ts";
 import { mountGarden } from "./garden.ts";
 import { isLeafStyleName, LEAF_STYLES, type LeafStyleName } from "./render/leaf-styles.ts";
 import type { ViewOptions } from "./render/scene.ts";
@@ -99,7 +99,7 @@ const garden = mountGarden(element("stage"), {
   speed: 3,
   maxTweenMs: 450,
   reducedMotion: "pause",
-  snapshot: FULL_SNAPSHOT,
+  snapshot: LAB_SNAPSHOT, // the lab draws every tree, its seedling bank too
   // `?bench[&preset=forest][&seasons=60][&tau=0.95]`: play at the panel's speed, then report frame costs.
   bench: query.has("bench")
     ? {

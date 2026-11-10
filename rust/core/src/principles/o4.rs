@@ -15,12 +15,14 @@
 //! and established where the ground light is at least Q_est with probability p_est [RNG:
 //! establishment], no live trunk within a cell; seed rain from beyond the world per species,
 //! anywhere on the ground [RNG: seedRain]. Seedlings start next season; live trees capped at
-//! maxTrees. With `band` (I3, the garden's one row) seedlings establish only within band/2 of the
-//! slab's middle in z: local seeds beyond it are lost, and seed rain lands inside it.
+//! maxTrees. Local seeds and seed rain establish anywhere in the depth (ADR 0063, decision 4: the
+//! garden's establishment band is gone), so pioneers arrive in gaps wherever they open. Seeding
+//! starts at R1's maturity height alone (R1 feeds the seed pool only above it), with no start
+//! season: a species whose trees stay below maturity (goat willow, 22.5 m) recruits by rain alone.
 //!
 //! Params: o4.mortality; sizeBlind reads o4.m0, twoPart reads o4.mCanopy, o4.hCanopy,
 //! o4.gammaCanopy, o4.mSuppression, o4.suppressionSlope and o4.shadeTolerance (per species, as m₀
-//! is) and r1.enabled; then o4.cSeed, d, qEst, pEst, maxTrees, rain, band, r1.fRep and
+//! is) and r1.enabled; then o4.cSeed, d, qEst, pEst, maxTrees, rain, r1.fRep and
 //! r1.maturity (the seed supply), c2.C.
 
 use super::c1::{plant_seedling, seedling_azimuth};
@@ -94,8 +96,6 @@ pub fn stand_dynamics(world: &mut World) -> f64 {
     let depth = crate::light::depth_of(params);
     let periodic_z = params.world.periodic_z;
     let max_trees = params.o4.max_trees;
-    let band = params.o4.band;
-    let mid = depth / 2.0;
     let mortality = params.o4.mortality;
     for i in 0..world.trees.len() {
         let t = &world.trees[i];
@@ -178,9 +178,6 @@ pub fn stand_dynamics(world: &mut World) -> f64 {
             } else if z < 0.0 || z >= depth {
                 continue; // beyond an open face
             }
-            if band.is_some_and(|b| (z - mid).abs() > b / 2.0) {
-                continue; // outside the row's band
-            }
             if live >= max_trees {
                 return recruits;
             }
@@ -233,11 +230,7 @@ pub fn stand_dynamics(world: &mut World) -> f64 {
                 return recruits;
             }
             let x = uniform(seed, purpose::SEED_RAIN, key, 1.0, season, kk) * w;
-            let u = uniform(seed, purpose::SEED_RAIN, key, 3.0, season, kk);
-            let z = match band {
-                Some(b) => mid + (u - 0.5) * b.min(depth),
-                None => u * depth,
-            };
+            let z = uniform(seed, purpose::SEED_RAIN, key, 3.0, season, kk) * depth;
             let (q, _) = world.light.sample(x, 0.5, z);
             if c <= 0.0 || q / c < q_est {
                 continue;
@@ -353,33 +346,113 @@ pub(crate) mod tests {
         assert!(open.trees.len() < ring.trees.len());
     }
 
+    /// The recruits' depths, as quarters of the depth they fall in, from a run of `patch`.
+    fn quarters(patch: &str, pool: f64) -> [usize; 4] {
+        let mut w = world(patch);
+        w.trees[0].seed_pool = pool;
+        stand_dynamics(&mut w);
+        let depth = crate::light::depth_of(w.params());
+        let mut q = [0; 4];
+        for t in &w.trees[1..] {
+            assert!((0.0..depth).contains(&t.root_z), "{}", t.root_z);
+            q[((4.0 * t.root_z / depth) as usize).min(3)] += 1;
+        }
+        q
+    }
+
     #[test]
-    fn keeps_seedlings_to_the_band_around_the_slab_middle() {
-        let band = |patch: &str| {
-            let mut w = world(patch);
-            w.trees[0].seed_pool = 400.0;
-            stand_dynamics(&mut w);
-            let mid = crate::light::depth_of(w.params()) / 2.0;
-            let zs: Vec<f64> = w.trees[1..]
-                .iter()
-                .map(|t| (t.root_z - mid).abs())
-                .collect();
-            zs
-        };
-        let free = band(r#"{"o4":{"d":30}}"#);
-        assert!(free.iter().any(|&dz| dz > 5.0));
-        let kept = band(r#"{"o4":{"d":30,"band":10}}"#);
-        assert!(!kept.is_empty() && kept.len() < free.len());
-        assert!(kept.iter().all(|&dz| dz <= 5.0));
-        let mut rain = world(r#"{"o4":{"rain":40,"band":10}}"#);
-        stand_dynamics(&mut rain);
-        let mid = crate::light::depth_of(rain.params()) / 2.0;
-        assert!(rain.trees.len() > 10);
-        assert!(
-            rain.trees[1..]
-                .iter()
-                .all(|t| (t.root_z - mid).abs() <= 5.0)
+    fn local_seedlings_establish_across_the_whole_depth() {
+        // ADR 0063, decision 4: no band. A parent in the slab's middle (64 deep) with a long
+        // dispersal spreads recruits into every quarter of the depth; a `band` key, once the
+        // garden's one row (I3), is no longer read.
+        for patch in [r#"{"o4":{"d":30}}"#, r#"{"o4":{"d":30,"band":10}}"#] {
+            let q = quarters(patch, 400.0);
+            assert!(q.iter().all(|&n| n > 0), "{patch} {q:?}");
+        }
+        // Round a periodic depth (ADR 0058) seeds that cross a z face come back in on the other.
+        let q = quarters(
+            r#"{"trees":[{"x":50,"z":1}],"o4":{"d":30},
+                "world":{"width":100,"height":50,"walls":[],"sidesZ":"periodic"}}"#,
+            400.0,
         );
+        assert!(q[3] > 0, "{q:?}");
+    }
+
+    #[test]
+    fn holly_carries_no_species_flag_and_recruits_from_its_seed() {
+        // ADR 0063, decision 7: holly's species-level `o4.enabled: false` was never read; it is
+        // deleted, and a holly with seed in a stand (mixedWood's species table) sets seedlings.
+        let wood = preset("mixedWood", "{}");
+        let holly = wood.get("species").and_then(|s| s.get("holly")).unwrap();
+        assert!(holly.get("o4").unwrap().get("enabled").is_none());
+        let mut w = World::new(merge(
+            &wood,
+            &parse(
+                r#"{"world":{"width":100,"height":50,"walls":[]},"trees":[{"x":50,"species":"holly"}],
+                    "o4":{"maxTrees":100}}"#,
+            )
+            .unwrap(),
+        ));
+        w.step(&mut |_| {}); // a season, so the ground has a light field
+        w.trees[0].seed_pool = 800.0; // a hundred seeds at holly's c_seed of 8
+        stand_dynamics(&mut w);
+        assert!(w.trees[1..].iter().filter(|t| t.species == "holly").count() > 5);
+    }
+
+    /// Willows recruited in 15 seasons of three planted willows in mixedWood's wood, with willow's
+    /// rain at `rain`; asserts on the way that no willow reaches R1's maturity or sets seed.
+    fn willow_recruits(rain: f64) -> usize {
+        let wood = preset("mixedWood", "{}");
+        let mut willow = wood.get("species").unwrap().get("willow").unwrap().clone();
+        let o4 = merge(
+            willow.get("o4").unwrap(),
+            &parse(&format!(r#"{{"rain":{rain}}}"#)).unwrap(),
+        );
+        willow.set("o4", o4);
+        let mut patch = parse(
+            r#"{"world":{"width":100,"height":120,"walls":[]},"o4":{"maxTrees":100},
+                "trees":[{"x":15,"species":"willow"},{"x":50,"species":"willow"},
+                         {"x":85,"species":"willow"}]}"#,
+        )
+        .unwrap();
+        let mut species = wood.get("species").unwrap().clone();
+        species.set("willow", willow);
+        patch.set("species", species);
+        let mut w = World::new(merge(&wood, &patch));
+        let maturity = w.rules.of("willow").r1.maturity;
+        assert!(w.rules.of("willow").r1.enabled && maturity > 0.0);
+        for _ in 0..15 {
+            w.step(&mut |_| {});
+            for t in w.trees.iter().filter(|t| t.alive && t.species == "willow") {
+                assert!(
+                    tree_height(t) < maturity,
+                    "a willow matured: {}",
+                    tree_height(t)
+                );
+                assert_eq!(t.seeds, 0.0, "an immature willow set seed");
+            }
+        }
+        w.trees[3..]
+            .iter()
+            .filter(|t| t.species == "willow")
+            .count()
+    }
+
+    #[test]
+    fn willow_recruits_only_by_rain_while_its_planted_trees_are_immature() {
+        // ADR 0063 / the stand-density page: goat willow's maturity (22.5 m) is above what its
+        // planted trees reach for many seasons, and R1 feeds no seed pool below it, so every willow
+        // recruit in that time came in as rain: with rain there are some, without it none.
+        assert!(willow_recruits(1.0) > 0);
+        assert_eq!(willow_recruits(0.0), 0);
+    }
+
+    #[test]
+    fn seed_rain_lands_across_the_whole_depth() {
+        for patch in [r#"{"o4":{"rain":40}}"#, r#"{"o4":{"rain":40,"band":10}}"#] {
+            let q = quarters(patch, 0.0);
+            assert!(q.iter().all(|&n| n > 0), "{patch} {q:?}");
+        }
     }
 
     #[test]

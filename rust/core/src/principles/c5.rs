@@ -89,6 +89,9 @@ pub fn shed_branches(tree: &mut Tree, params: &Params, season: f64, evaluated: u
             };
             tree.dark[i] = if light < rel { tree.dark[i] + 1.0 } else { 0.0 };
         }
+    } else {
+        // Not counting this season: a count kept from before would not be seasons in a row.
+        tree.dark.clear();
     }
     let mut dead = std::mem::take(&mut tree.scratch_u);
     ensure(&mut dead, nm.max(tree.b.len()));
@@ -429,6 +432,22 @@ pub(crate) mod tests {
         assert_eq!(relative_season(&mut t, &p, 8.0, 0.15), 0.0); // dark 1
         assert_eq!(relative_season(&mut t, &p, 9.0, 0.15), 0.0); // dark 2
         assert_eq!(relative_season(&mut t, &p, 10.0, 0.15), 2.0); // dark 3
+    }
+
+    #[test]
+    fn a_season_without_counting_clears_the_relative_count() {
+        // kRel patched to 1 and back mid-run: the count kept before is not k seasons in a row,
+        // so the limb starts again from nothing.
+        let p3 = params(r#"{"c5":{"Trel":0.3,"kRel":3}}"#);
+        let p1 = params(r#"{"c5":{"Trel":0.3}}"#);
+        let mut t = small_tree(&p3);
+        assert_eq!(relative_season(&mut t, &p3, 5.0, 0.15), 0.0); // dark 1
+        assert_eq!(relative_season(&mut t, &p3, 6.0, 0.15), 0.0); // dark 2
+        assert_eq!(relative_season(&mut t, &p1, 7.0, 0.5), 0.0); // k 1, bright: no count kept
+        assert!(t.dark.is_empty());
+        assert_eq!(relative_season(&mut t, &p3, 8.0, 0.15), 0.0); // dark 1, not 3
+        assert_eq!(relative_season(&mut t, &p3, 9.0, 0.15), 0.0); // dark 2
+        assert_eq!(relative_season(&mut t, &p3, 10.0, 0.15), 2.0); // dark 3
     }
 
     #[test]

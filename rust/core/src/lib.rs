@@ -18,6 +18,7 @@ pub mod principles;
 pub mod rng;
 pub mod season;
 pub mod snapshot;
+pub mod stand;
 pub mod tree;
 pub mod world;
 

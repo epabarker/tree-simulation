@@ -28,6 +28,8 @@ pub mod purpose {
     /// An axis's offset to its branch angle β (c1.betaSD), keyed by the axis's first birthId
     /// (ADR 0055).
     pub const BRANCH_ANGLE: u32 = 17;
+    /// A planted tree's position (o4.planting, ADR 0063): x and z of the dart, keyed by the attempt.
+    pub const PLANTING: u32 = 18;
 }
 
 const TWO_POW_32: f64 = 4294967296.0;

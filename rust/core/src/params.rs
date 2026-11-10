@@ -355,6 +355,19 @@ pub struct O4 {
     /// The band of depth seedlings establish in, cells, centred on the slab's middle (the
     /// garden's one row, I3); None: anywhere.
     pub band: Option<f64>,
+    /// Planting at a density (ADR 0063, decision 5; `principles::planting`); None: `trees`.
+    pub planting: Option<Planting>,
+}
+
+/// `o4.planting`: saplings per hectare at keyed positions with a minimum spacing.
+#[derive(Clone, Debug)]
+pub struct Planting {
+    /// Stems per hectare over width × depth.
+    pub density: f64,
+    /// The least distance between two planted trees, cells (across the wraps that are periodic).
+    pub spacing: f64,
+    /// Species cycled in planting order, turned by the seed; empty: the world's own params.
+    pub species: Vec<String>,
 }
 
 #[derive(Clone, Debug)]
@@ -654,6 +667,17 @@ impl Params {
                 max_trees: num(o4, "maxTrees"),
                 rain: opt(o4, "rain"),
                 band: opt(o4, "band"),
+                planting: o4.get("planting").map(|g| Planting {
+                    density: num(g, "density"),
+                    spacing: num(g, "spacing"),
+                    species: g
+                        .get("species")
+                        .and_then(Value::as_array)
+                        .unwrap_or(&[])
+                        .iter()
+                        .filter_map(|s| s.as_str().map(str::to_string))
+                        .collect(),
+                }),
             },
             r6: {
                 let g = group(v, "r6");

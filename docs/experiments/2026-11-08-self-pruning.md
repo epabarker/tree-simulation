@@ -1,5 +1,7 @@
 # Is self-pruning happening in the model, and by which rule? (exploratory)
 
+> **Evidence, not a baseline** (ADR 0062, ticket #115, 2026-11-10). Measured in the world of the slab's τ 0.2 walls: a half-walled lone tree, or a stand lit through its faces. The lone-tree stage is now open-grown (a square 60 m box, open on all four sides) and the garden's depth is to become periodic, so re-measure before using these numbers as a baseline.
+
 _2026-11-08. Wayfinder ticket [#78](https://github.com/epabarker/tree-simulation/issues/78), map [#73](https://github.com/epabarker/tree-simulation/issues/73). HEAD d2c45c8. **Exploratory: seeds 1 and 2, 150 seasons.** Facts and pictures only; no adoption claim._
 
 ## Method

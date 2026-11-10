@@ -4,8 +4,9 @@
  * the same worlds. They are M19's and M25's (docs/experiments/2026-10-28-m25-species.md): the
  * woodland's growth rules without recruitment or storms (`oakOpen`), and
  *
- * - lone: one tree on 160 wide, open-grown, measured at seasons 30 and 60 (and, when asked, its
- *   shape again at 100: reported, not fitted);
+ * - lone: one tree in the open-grown box (presets.ts' `loneTreeParams`, ADR 0062: 60 m square,
+ *   open on all four sides), measured at seasons 30 and 60 (and, when asked, its shape again at
+ *   100: reported, not fitted);
  * - stand: a closed stand, three rows of four 21 cells apart on an 84-cell periodic ring between
  *   opaque faces (τ 0), as the 20-seed evidence read H/D 70 (ADR 0027); the middle row's four
  *   trees measured at season 60 (and, when asked, again at 100: how much height they gain late,
@@ -35,7 +36,13 @@ import {
   type SpeciesPatch,
   speciesParams,
 } from "../src/core/params.ts";
-import { loneTreeParams, perArea, presetParams, TOP } from "../src/core/presets.ts";
+import {
+  halfWalledParams,
+  loneTreeParams,
+  perArea,
+  presetParams,
+  TOP,
+} from "../src/core/presets.ts";
 import { coreWasm, loadWorldsSync, RustWorld, type TreeView as Tree } from "../src/wasm/world.ts";
 import { type Allometry, allometry } from "./allometry.ts";
 
@@ -54,9 +61,13 @@ export const ROOFS = [1, 1.2, 1.5, 1.75, 2, 2.6, 3.3, 4, 4.8, 5.6];
 /** Seasons a shade-house seedling is followed: alive at 30 is survival (M19). */
 export const SHADE_SEASONS = 30;
 
-/** The woodland's growth rules (oakOpen's: no recruitment, no storms) with `patch` on top. */
+/**
+ * The woodland's growth rules (oakOpen's: no recruitment, no storms) with `patch` on top, in the
+ * half-walled world the trials were calibrated in (presets.ts' `halfWalledParams`): `oakOpen`'s own
+ * world is the open-grown box (ADR 0062), which a partial world patch would otherwise inherit.
+ */
 export function trialBase(seed: number, patch: Partial<Params>): Params {
-  return mergeParams(presetParams("oakOpen", seed), patch);
+  return mergeParams(halfWalledParams(seed), patch);
 }
 
 /** The lone-tree stage (presets.ts' `loneTreeParams`, which the feature probe reads too). */
@@ -229,18 +240,21 @@ function loneShape(world: RustWorld, tree: Tree): LoneShape {
 /**
  * The lone tree at 30 and 60, and, when asked, run on to 100: its shape there as `…100` (the
  * round-5 plan, §3.1: a crown can pass at 60 and turn at 100, as round 4's birch did).
+ * `stages` moves the two measurements (`height30` and the rest are read at its first and second
+ * season); only a test asks for earlier ones, as the open-grown box made 60 seasons slow (#115).
  */
 export function runLone(
   species: string,
   seed: number,
   assign: Record<string, unknown> = {},
   seasons: 60 | 100 = 60,
+  stages: [number, number] = [30, 60],
 ): LoneTraits {
   const world = newWorld(withAssign(loneParams(species, seed), species, assign));
-  world.run(30);
+  world.run(stages[0]);
   const tree = world.trees[0] as Tree;
   const height30 = world.metricsOf(tree).height;
-  world.run(30);
+  world.run(stages[1] - stages[0]);
   const m = world.metricsOf(tree);
   const f = world.formOf(tree);
   const traits: LoneTraits = {

@@ -276,6 +276,28 @@ export interface TreeMetrics {
   limbBase: number;
   /** (height − limbBase)/height: the crown ratio by limbs. */
   limbCrownRatio: number;
+  /**
+   * The feature measures (docs/features/; GLOSSARY), computed once here so the probe, the
+   * evidence tests and the analysis read the same numbers. Live crown base: where the lowest
+   * first-order limb carrying a live bud leaves the trunk, over the height (1 with no living limb).
+   */
+  liveCrownBase: number;
+  /** Shares of the leaf area at or above 0.8 H, and below H/6. NaN without leaf. */
+  topFifthLeaf: number;
+  leafBelowSixth: number;
+  /**
+   * The leafy outline's width in the slice at 0.85–0.90 of the crown's depth (leaf base to top,
+   * 20 slices) over its widest slice of ≥ 20 leafy buds: an ellipse ≈ 0.6, a spire low, a flat
+   * cap near 1. NaN when no slice holds 20 leafy buds.
+   */
+  w90: number;
+  /**
+   * The share of this season's new metamers in the crown's upper flank: the outer shell
+   * (ρ ≥ 0.7) 30–60° from vertical about the leafy crown's centre. NaN without new growth or a world.
+   */
+  upperFlankNew: number;
+  /** Live buds past a bound of the world (ground, top, or a non-periodic side). NaN without a world. */
+  budsOutside: number;
 }
 
 export const METRIC_COLUMNS: readonly (keyof TreeMetrics)[] = [
@@ -320,6 +342,12 @@ export const METRIC_COLUMNS: readonly (keyof TreeMetrics)[] = [
   "leafCrownRatio",
   "limbBase",
   "limbCrownRatio",
+  "liveCrownBase",
+  "topFifthLeaf",
+  "leafBelowSixth",
+  "w90",
+  "upperFlankNew",
+  "budsOutside",
 ];
 
 /** A change applied at the start of `season` (before that season runs). */

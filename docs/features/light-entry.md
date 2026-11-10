@@ -14,7 +14,7 @@ A **World effect** (GLOSSARY): how sky enters the slab past its bounds. Decided 
 | Part | Decision | Today |
 |---|---|---|
 | Lone-tree stage | Open sky on all four sides (τ = 1 on both z faces, open x sides), a square 60 m box (240 cells), the tree at its centre, the woods' 50 m top. `oakOpen`, `beechOpen` and `loneTreeParams` (the feature probe's and the species trials' lone tree) | **Built** (#115) |
-| Its check | `budsOutside` = 0 in every season of every run: `npm run evidence:open-grown`, the six exemplars × seeds 1–20 to season 100, with the crown's width and depth agreeing within 0.75 (min ÷ max) | **Built**; results in the devlog (2026-11-10) |
+| Its check | `budsOutside` = 0 in every season of every run: `npm run evidence:open-grown`, the six exemplars × seeds 1–20 to season 100, with the crown's width and depth agreeing within 0.75 (min ÷ max) | **Built.** At 20 seeds the box held hornbeam, maple and holly in every run, oak in 19, beech in 18 and birch in 16 (birch s3's leader at the top; the rest at a side). Round in plan in 15–20 of 20 per species (oak lowest). Devlog, 2026-11-10 |
 | Garden depth | Periodic (`sidesZ: "periodic"`, ADR 0058); D stays 64 unless the density needs more | τ 0.2 faces |
 | τ faces | Kept as settings for a host page: wood edge (1, 0.2), hedgerow (1, 1); never a default or a calibration stage | Same |
 | `faceWood` | Superseded, kept off and bit-identical | Same |

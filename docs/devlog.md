@@ -3,6 +3,30 @@
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
 
+## 2026-11-10: The open-grown lone-tree stage (#115, ADR 0062)
+
+- **What changed.** `oakOpen`, `beechOpen` and `loneTreeParams` (the feature probe's and the species trials' lone tree) are open-grown: τ = 1 on both z faces, open x sides, a square 60 m box (`OPEN_GROWN`, 240 × 200 × 240 cells), the tree at its centre (120, 120). Spec §C2.13; a [light-entry page](features/light-entry.md); the τ-wall calibration notes (species-3d, C1 rounds 1–3, the two crown-base notes, self-pruning, flat-cap) carry an "evidence, not a baseline" banner.
+- **Kept half-walled on purpose** (`HALF_WALLED`, `halfWalledParams`): the species trials' stands, shade house, row and woods (`trialBase`), whose params are byte-identical to before (JSON hashes of row/stand/shade/wood/base params for three species × two seeds unchanged), and the garden's specimen (`specimenParams`), whose worker budget (ADR 0026, `plate.ts`, 230 MB) the open box (≈ 550 MB) would not fit. Whether the garden's specimen takes the box is not decided.
+- **Goldens:** only `oakOpen:seed1:s15` (29e5921a → 5ff7c085) and `beechOpen:seed1:s40` (7d65af5d → e7cb78a9), because their world changed. The other 14 hashes are unchanged. The native test that holds the prototype rules' off-patch to the pre-adoption hashes (`golden.rs`) now runs those two presets in the half-walled world they had then, and still reproduces 0877b79b and 200f5a55.
+- **`budsOutside` corrected for the ground.** The first 20-seed run counted buds outside in every oak (seeds 1–13, 22–65 seasons each, up to 51 buds a season, from seasons 9–22). Every one was a limb resting on the ground (R3's `ground`) with its tip at y between −4.4e-16 and −9e-19 by rounding (seeds 1 and 6 checked at ten snapshots each). The ground bound now takes a 1e-9-cell tolerance (`GROUND_EPS`, with a unit test); the width, depth and top stay exact. The open-box note's probe did not count these, which is why it saw 0 there. Metrics are not hashed: goldens unchanged by this.
+- **The evidence check** (`npm run evidence:open-grown`, `cli/open-grown.ts`): the six exemplars × seeds 1–20 to season 100, natively, 6 simulators. The bars were fixed before the run: zero buds outside in every season of every run, and min ÷ max of crown width and depth ≥ 0.75 at season 100 in ≥ 18 of 20.
+
+  | | box held (0 outside) | round ≥ 0.75 | min/max range | H (m) | widest extent (m) |
+  |---|---|---|---|---|---|
+  | oak | **19 of 20** (fails: s15) | **15 of 20** (fails the bar: s1, 5, 6, 15, 17) | 0.67–0.95 | 33–35 | 34–58 |
+  | maple | 20 of 20 | 19 of 20 (s18) | 0.74–1.00 | 24–28 | 28–36 |
+  | birch | **16 of 20** (fails: s3, 5, 13, 18) | 20 of 20 | 0.78–1.00 | 30–38 | 46–55 |
+  | beech | **18 of 20** (fails: s11, 15) | 20 of 20 | 0.84–0.99 | 32–38 | 48–56 |
+  | hornbeam | 20 of 20 | 20 of 20 | 0.88–1.00 | 29–30 | 28–40 |
+  | holly | 20 of 20 | 19 of 20 (s15) | 0.68–1.00 | 15–16 | 12–30 |
+
+  **The failures, reported, not hidden** (the box is not enlarged and no crown is clipped):
+  - **birch s3: the top.** The runaway leader the open-box note saw: past 50 m from season 78 (to 53.8 m), up to 141 buds outside over 17 seasons, then broken back to 30.5 m by 100.
+  - **The sides, in 7 runs:** oak s15 (12 buds, season 81, crown 57 m wide), birch s5 (≤ 2 buds, seasons 90–100, 51 m wide), birch s13 (≤ 165 buds, seasons 55–95, 50–54 m deep), birch s18 (1 bud, season 100, 55 m deep), beech s11 (≤ 18 buds, seasons 89–100, 53–55 m deep), beech s15 (4 buds, season 100, 56 m deep). The crowns are lopsided about the root, so a 46–57 m crown reaches a face 30 m away. The note's "60 m holds all six" came from 3 seeds; at 20 seeds birch and beech reach the box's sides by season 100.
+  - **The oak is not reliably round in plan:** 15 of 20 at 0.75 (its worst 0.67, s6: 42 × 28 m).
+- **Cost** (`npm run bench -- --case oakOpen|beechOpen --repeat 1`, 100 seasons, one case per process, laptop at load ≈ 2–3 from other work): oakOpen 412 ms/season mean in WASM (p95 577, last 20 seasons 543), 739 natively (light 658), **546 MB** WASM memory; beechOpen 753 ms/season (p95 1315, last 20 833), 806 natively (light 595), **761 MB**. The open-box note measured the half-walled oak at 0.26 s and 141 MB, the beech at 0.38 s and 202 MB. Not optimised here; the lab's choice (as is, a cheaper light field over empty air, or headless only) is not decided.
+- **Tests:** `tests/lone-tree.test.ts` (the stage's world and root; the trials' and specimen's worlds unchanged). `tests/trials.test.ts`'s "measures a lone tree at seasons 30 and 60" now runs birch in the 60 m box: 26 s alone, against the 30 s timeout.
+
 ## 2026-11-10: the playbook's build planning removed
 
 - **Docs only.** The playbook's README, two of its pages and STATUS carried build planning that a map ticket had written inside the wayfinder map. Slicing and ordering the build belong to `/to-spec` and `/to-tickets`, so that text is removed. The decided mechanisms, the ADRs and the notes are unchanged.

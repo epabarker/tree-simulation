@@ -70,7 +70,7 @@ function bounds(rs, kind, width) {
   const pad = 2; return { x0: x0 - pad, x1: x1 + pad, y1: Math.max(4, y1 + pad) };
 }
 
-/** The frontal picture: wood, leafy buds, and each crown's outline (its leaves' upper and lower edge per metre). */
+/** The frontal picture: wood, leafy buds, and each crown's outline (its leaves' upper and lower edge per cell). */
 function drawFrame(cv, r, f, b) {
   const dpr = devicePixelRatio || 1, w = cv.clientWidth || 300;
   const h = Math.min(360, Math.max(60, Math.round((w * b.y1) / (b.x1 - b.x0))));
@@ -122,8 +122,8 @@ function drawFloor(cv, f, b, { s, ox }) {
   }
 }
 
-const LONE_CAP = [["height", "H m", 1], ["crownWidth", "W m", 1], ["liveCrownBase", "live crown base", 2], ["w90", "w90", 2], ["topFifthLeaf", "top-fifth leaf", 2], ["upperFlankNew", "upper flank", 2], ["budsOutside", "buds outside", 0]];
-const STAND_CAP = [["live", "live", 0], ["drawn", "drawn", 0], ["canopy", "canopy", 0], ["topHeight", "top m", 1], ["capReached", "cap reached", 0]];
+const LONE_CAP = [["height", "H", 1], ["crownWidth", "W", 1], ["liveCrownBase", "live crown base", 2], ["w90", "w90", 2], ["topFifthLeaf", "top-fifth leaf", 2], ["upperFlankNew", "upper flank", 2], ["budsOutside", "buds outside", 0]];
+const STAND_CAP = [["live", "live", 0], ["drawn", "drawn", 0], ["canopy", "canopy", 0], ["topHeight", "top height", 1], ["capReached", "cap reached", 0]];
 const colIdx = (name) => M.columns.indexOf(name);
 const loneVal = (f, k) => f?.trees[0]?.values[colIdx(k)] ?? null;
 
@@ -211,7 +211,7 @@ function render() {
   <div class="meta">commit ${esc(M.commit)} · seeds ${M.seeds.join(", ")} · lone tree at ${M.stages.lone.join("/")} · garden ${M.stages.widths.join(" and ")} cells at ${M.stages.garden.join("/")} · ${esc(M.date)} · ${M.wall.toFixed(0)} s</div>
   <div class="meta">patch: <code>${M.patch ? esc(JSON.stringify(M.patch)) : "none (HEAD only)"}</code></div>
   ${M.warnings.map((w) => `<div class="warn">⚠ ${esc(w)}</div>`).join("")}
-  <div class="meta">Each frame: the crown seen from the front (wood, leafy buds, each crown's outline), and under it the floor light in plan (ground.csv's q/C, dark = shade, depth downwards). Numbers are the core's metrics.csv / stand.csv columns as written; a patched value unlike HEAD's is in red. Heights in m (one cell is 1 m).</div>
+  <div class="meta">Each frame: the crown seen from the front (wood, leafy buds, each crown's outline), and under it the floor light in plan (ground.csv's q/C, dark = shade, depth downwards). Numbers are the core's metrics.csv / stand.csv columns as written; a patched value unlike HEAD's is in red. Lengths in cells, as the core writes them (a cell is 0.25 m: stand.rs' CELL_METRES).</div>
   <div class="meta legend">${NAMES.map((n) => `<span><i class="sw" style="background:${spColor(n, 1)}"></i>${esc(n)}</span>`).join("")}</div>
   <h2>Contact sheet</h2>`);
   stageSheet(el, "lone", 0);

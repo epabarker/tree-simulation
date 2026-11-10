@@ -118,9 +118,9 @@ const TREE_COLUMNS = [
 
 type Frame = {
   season: number;
-  /** x0,y0,x1,y1,radius per drawn metamer (m). */
+  /** x0,y0,x1,y1,radius per drawn metamer (cells). */
   wood: number[];
-  /** x,y,tree per leafy bud at its metamer's tip, deduplicated on a half-metre grid. */
+  /** x,y,tree per leafy bud at its metamer's tip, deduplicated on a half-cell grid. */
   leaves: number[];
   /** The ground's light (q/C) per (x, z), row-major in z: ground.csv's `q`. */
   floor: { w: number; d: number; q: (number | null)[] };

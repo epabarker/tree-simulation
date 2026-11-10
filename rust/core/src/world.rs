@@ -64,6 +64,17 @@ fn grid(params: &Params) -> Vec<i32> {
     vec![0; (params.world.width * params.world.height * d) as usize]
 }
 
+/// A planted tree as `trees` holds it.
+fn tree_json(t: &crate::params::TreeSpec) -> Value {
+    let mut v = Value::obj();
+    v.set("x", Value::Num(t.x));
+    v.set("z", Value::Num(t.z));
+    if !t.species.is_empty() {
+        v.set("species", Value::Str(t.species.clone()));
+    }
+    v
+}
+
 fn event(season: f64, kind: &str) -> Value {
     Value::Obj(vec![
         ("season".into(), Value::Num(season)),
@@ -72,8 +83,17 @@ fn event(season: f64, kind: &str) -> Value {
 }
 
 impl World {
-    pub fn new(params: Value) -> World {
-        let rules = Rules::new(&params);
+    pub fn new(initial: Value) -> World {
+        let mut params = initial.clone();
+        let mut rules = Rules::new(&params);
+        // O4's planting at a density replaces `trees` once, here: the record keeps the schedule
+        // (a pure function of the seed, so a replay plants the same stand), and the running
+        // params hold the planted trees, which a params patch cannot change.
+        if rules.params.o4.planting.is_some() {
+            let planted = crate::principles::planting::plant(&rules.params);
+            params.set("trees", Value::Arr(planted.iter().map(tree_json).collect()));
+            rules = Rules::new(&params);
+        }
         let trees = rules
             .params
             .trees
@@ -87,7 +107,7 @@ impl World {
             })
             .collect();
         let mut world = World {
-            initial_params: params.clone(),
+            initial_params: initial,
             light: make_light(&rules.params),
             owner: grid(&rules.params),
             params_json: params,

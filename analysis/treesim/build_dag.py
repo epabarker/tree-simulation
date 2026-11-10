@@ -171,13 +171,14 @@ r2on = on("r2.enabled")
 always = lambda p, c: True  # noqa: E731
 obstacles = lambda p, c: bool(p["world"].get("obstacles"))  # noqa: E731
 stochastic = lambda p, c: (p["c1"].get("budBreak") or {}).get("mode") == "stochastic"  # noqa: E731
+two_part = lambda p, c: p["o4"].get("mortality") == "twoPart"  # noqa: E731
 
 GATE_TEXT = {
     carbon: "r1.shed = carbon", shade_live: "R5 shade varies (r5.enabled; signal 'neighbours' needs neighbours)",
     relay_on: "relay on (r2.relay >= 1 or a level's relay)", vig_drop: "vigour drop on (r2.vigourShare > 0, vigourLambda != 0)",
     light_ortho: "r2.lightSetPoint set", tvig: "c5.Tvig > 0", storms: "o2.stormP > 0", o4on: "o4.enabled",
     o2on: "o2.enabled", r2on: "r2.enabled", always: "", obstacles: "world.obstacles non-empty",
-    stochastic: "c1.budBreak.mode = stochastic",
+    stochastic: "c1.budBreak.mode = stochastic", two_part: "o4.mortality = twoPart",
 }
 
 
@@ -346,7 +347,9 @@ PARAMS = [
     ("o2.stormP", "o2", [("STORM", always)]),
     ("o2.stormLoad", "o2", [("R3_MECH", storms)]),
     # O4
-    ("o4.m0", "o4", [("O4_STAND", o4on)]),
+    ("o4.mortality", "o4", [("O4_STAND", o4on)]),
+    ("o4.m0", "o4", [("O4_STAND", AND(o4on, NOT(two_part)))]),
+    ("o4.mCanopy / hCanopy / gammaCanopy", "o4", [("O4_STAND", AND(o4on, two_part))]),
     ("o4.cSeed / d", "o4", [("O4_STAND", o4on)]),
     ("o4.qEst / pEst", "o4", [("O4_STAND", o4on)]),
     ("o4.maxTrees / rain / band", "o4", [("O4_STAND", o4on)]),

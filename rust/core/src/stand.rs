@@ -1,7 +1,7 @@
 //! The stand's measures, per world and season (ADR 0063, docs/features/stand-density-and-demography.md).
 //!
 //! The display threshold is the rule for which stems are **drawn**: a tree is drawn from
-//! DISPLAY_THRESHOLD (1.3 m, the forestry convention for counting a stem; one cell is 1 m).
+//! DISPLAY_THRESHOLD (1.3 m, the forestry convention for counting a stem; a cell is CELL_METRES).
 //! Below it is the seedling bank, simulated and not drawn. It is stated here once: the stand's
 //! counts use it, and the snapshot or the page must call `is_drawn`, never re-state it.
 
@@ -10,8 +10,13 @@ use crate::tree::Tree;
 use crate::world::World;
 use std::collections::BTreeMap;
 
-/// The height from which a stem is drawn and counted (ADR 0063, decision 6), in cells (1 m).
-pub const DISPLAY_THRESHOLD: f64 = 1.3;
+/// Metres per cell, the one scale between the grid and the playbook's metres and hectares. ADR 0062
+/// reads the garden's 64-cell depth as 16 m and the stand-density page the 160-cell garden as
+/// ≈ 0.064 ha: a cell is 0.25 m.
+pub const CELL_METRES: f64 = 0.25;
+
+/// The height from which a stem is drawn and counted (ADR 0063, decision 6): 1.3 m, in cells.
+pub const DISPLAY_THRESHOLD: f64 = 1.3 / CELL_METRES;
 
 /// Whether a stem of this height is drawn: at or above the display threshold.
 pub fn is_drawn(height: f64) -> bool {
@@ -100,9 +105,11 @@ mod tests {
 
     #[test]
     fn a_stem_is_drawn_from_the_display_threshold_and_not_just_below_it() {
-        assert!(is_drawn(1.3));
-        assert!(!is_drawn(1.299_999));
+        // 1.3 m is 5.2 cells.
+        assert!(is_drawn(5.2));
+        assert!(!is_drawn(5.199_999));
         assert!(!is_drawn(0.0));
+        assert!(!is_drawn(1.3));
         assert!(is_drawn(20.0));
     }
 
@@ -131,21 +138,22 @@ mod tests {
 
     #[test]
     fn a_fixed_stand_gives_its_live_drawn_and_canopy_counts_and_species_shares() {
-        // Live heights 0.5, 1.29, 1.3, 5 (exactly half the top: not canopy), 6 and 10; a dead 30 m
+        // Live heights in cells: 2, 5.16 (1.29 m), 5.2 (1.3 m), 20 (exactly half the top: not canopy),
+        // 24 and 40; a dead 120-cell
         // stem sets neither the top height nor any count; a planted seedling with no metamer yet
         // is live and not drawn.
-        let mut dead = stem(6, "oak", 30.0);
+        let mut dead = stem(6, "oak", 120.0);
         dead.alive = false;
         let mut seedling = Tree::new(7, 21.0, 0.5);
         seedling.species = "beech".into();
         let w = stand(
             vec![
-                stem(0, "beech", 0.5),
-                stem(1, "beech", 1.29),
-                stem(2, "beech", 1.3),
-                stem(3, "oak", 5.0),
-                stem(4, "oak", 6.0),
-                stem(5, "beech", 10.0),
+                stem(0, "beech", 2.0),
+                stem(1, "beech", 5.16),
+                stem(2, "beech", 5.2),
+                stem(3, "oak", 20.0),
+                stem(4, "oak", 24.0),
+                stem(5, "beech", 40.0),
                 dead,
                 seedling,
             ],
@@ -155,7 +163,7 @@ mod tests {
         assert_eq!(s.live, 7.0);
         assert_eq!(s.drawn, 4.0);
         assert_eq!(s.canopy, 2.0);
-        assert_eq!(s.top_height, 10.0);
+        assert_eq!(s.top_height, 40.0);
         assert!(!s.cap_reached);
         let by: Vec<(&str, f64, f64, f64)> = s
             .species
@@ -167,14 +175,14 @@ mod tests {
 
     #[test]
     fn the_cap_is_reached_when_the_live_stems_fill_it_seedling_bank_included() {
-        let trees = || vec![stem(0, "oak", 0.5), stem(1, "oak", 8.0)];
+        let trees = || vec![stem(0, "oak", 2.0), stem(1, "oak", 32.0)];
         assert!(stand_metrics(&stand(trees(), 2.0)).cap_reached);
         assert!(!stand_metrics(&stand(trees(), 3.0)).cap_reached);
     }
 
     #[test]
     fn a_stand_with_nothing_drawn_has_no_canopy_and_zero_shares() {
-        let s = stand_metrics(&stand(vec![stem(0, "oak", 1.0)], 100.0));
+        let s = stand_metrics(&stand(vec![stem(0, "oak", 4.0)], 100.0));
         assert_eq!((s.live, s.drawn, s.canopy), (1.0, 0.0, 0.0));
         assert_eq!(s.species[0].share, 0.0);
     }

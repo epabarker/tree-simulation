@@ -342,9 +342,26 @@ pub struct O2 {
     pub storm_load: Option<f64>,
 }
 
+/// O4's mortality (ADR 0063). `SizeBlind`, the default and the §8-style ablation: the background
+/// risk m₀ alone. `TwoPart`: a canopy rate that rises with height (and, with #117, a suppression
+/// rate from low vigour).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum Mortality {
+    SizeBlind,
+    TwoPart,
+}
+
 #[derive(Clone, Debug)]
 pub struct O4 {
     pub enabled: bool,
+    /// Read from the world's params: one mortality rule per world.
+    pub mortality: Mortality,
+    /// m_c: the canopy rate per season at height H_c (two-part mode; absent: 0).
+    pub m_canopy: f64,
+    /// H_c: the canopy rate's reference height, cells (absent: ∞, so no canopy deaths).
+    pub h_canopy: f64,
+    /// γ_c: how steeply the canopy rate rises with height (absent: 1).
+    pub gamma_canopy: f64,
     pub c_seed: f64,
     pub d: f64,
     pub q_est: f64,
@@ -355,6 +372,19 @@ pub struct O4 {
     /// The band of depth seedlings establish in, cells, centred on the slab's middle (the
     /// garden's one row, I3); None: anywhere.
     pub band: Option<f64>,
+    /// Planting at a density (ADR 0063, decision 5; `principles::planting`); None: `trees`.
+    pub planting: Option<Planting>,
+}
+
+/// `o4.planting`: saplings per hectare at keyed positions with a minimum spacing.
+#[derive(Clone, Debug)]
+pub struct Planting {
+    /// Stems per hectare over width × depth.
+    pub density: f64,
+    /// The least distance between two planted trees, cells (across the wraps that are periodic).
+    pub spacing: f64,
+    /// Species cycled in planting order, turned by the seed; empty: the world's own params.
+    pub species: Vec<String>,
 }
 
 #[derive(Clone, Debug)]
@@ -646,6 +676,13 @@ impl Params {
             },
             o4: O4 {
                 enabled: flag(o4, "enabled"),
+                mortality: match text(o4, "mortality").as_str() {
+                    "twoPart" => Mortality::TwoPart,
+                    _ => Mortality::SizeBlind,
+                },
+                m_canopy: opt(o4, "mCanopy").unwrap_or(0.0),
+                h_canopy: opt(o4, "hCanopy").unwrap_or(f64::INFINITY),
+                gamma_canopy: opt(o4, "gammaCanopy").unwrap_or(1.0),
                 c_seed: num(o4, "cSeed"),
                 d: num(o4, "d"),
                 q_est: num(o4, "qEst"),
@@ -654,6 +691,17 @@ impl Params {
                 max_trees: num(o4, "maxTrees"),
                 rain: opt(o4, "rain"),
                 band: opt(o4, "band"),
+                planting: o4.get("planting").map(|g| Planting {
+                    density: num(g, "density"),
+                    spacing: num(g, "spacing"),
+                    species: g
+                        .get("species")
+                        .and_then(Value::as_array)
+                        .unwrap_or(&[])
+                        .iter()
+                        .filter_map(|s| s.as_str().map(str::to_string))
+                        .collect(),
+                }),
             },
             r6: {
                 let g = group(v, "r6");

@@ -28,6 +28,11 @@ pub mod purpose {
     /// An axis's offset to its branch angle β (c1.betaSD), keyed by the axis's first birthId
     /// (ADR 0055).
     pub const BRANCH_ANGLE: u32 = 17;
+    /// A planted tree's position (o4.planting, ADR 0063): x and z of the dart, keyed by the attempt.
+    pub const PLANTING: u32 = 18;
+    /// O4's two-part mortality (ADR 0063): one death draw per tree and season, keyed by the tree's
+    /// id, compared with the season's summed rate.
+    pub const STAND_MORTALITY: u32 = 19;
 }
 
 const TWO_POW_32: f64 = 4294967296.0;

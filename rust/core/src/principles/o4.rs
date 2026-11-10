@@ -1,5 +1,8 @@
-//! O4. Stand dynamics (spec §O4, ADR 0013, ADR 0018; on the ground plane, ADR 0025). Background
-//! deaths m₀ [RNG: mortality]; R1's reproductive pool turned into seeds (c_seed each), dispersed
+//! O4. Stand dynamics (spec §O4, ADR 0013, ADR 0018; on the ground plane, ADR 0025). Deaths by
+//! `o4.mortality` (the world's): `sizeBlind` (the default, the ablation) kills each tree with the
+//! background risk m₀ [RNG: mortality]; `twoPart` (ADR 0063) with a canopy rate
+//! m_c·(H/H_c)^γ_c that rises with the tree's height H [RNG: standMortality]; #117 adds a
+//! suppression rate to it. R1's reproductive pool turned into seeds (c_seed each), dispersed
 //! a Laplace(0, d) distance at a random azimuth [RNG: dispersal; seeds beyond a z face are lost]
 //! and established where the ground light is at least Q_est with probability p_est [RNG:
 //! establishment], no live trunk within a cell; seed rain from beyond the world per species,
@@ -7,10 +10,13 @@
 //! maxTrees. With `band` (I3, the garden's one row) seedlings establish only within band/2 of the
 //! slab's middle in z: local seeds beyond it are lost, and seed rain lands inside it.
 //!
-//! Params: o4.*, r1.fRep and r1.maturity (the seed supply), c2.C.
+//! Params: o4.mortality; sizeBlind reads o4.m0, twoPart reads o4.mCanopy, o4.hCanopy and
+//! o4.gammaCanopy (per species, as m₀ is); then o4.cSeed, d, qEst, pEst, maxTrees, rain, band,
+//! r1.fRep and r1.maturity (the seed supply), c2.C.
 
 use super::c1::{plant_seedling, seedling_azimuth};
 use crate::math;
+use crate::params::Mortality;
 use crate::rng::{purpose, uniform};
 use crate::tree::Tree;
 use crate::world::World;
@@ -32,6 +38,28 @@ pub fn laplace(u: f64, d: f64) -> f64 {
     -d * math::sign(v) * math::ln(1.0 - 2.0 * v.abs())
 }
 
+/// The canopy rate (ADR 0063): m_c·(H/H_c)^γ_c a season, clamped to a probability. Zero on the
+/// ground, m_c at the reference height H_c, and rising with height, so a seedling is not killed
+/// by it and an old canopy tree is replaced gradually (senescence).
+pub fn canopy_rate(height: f64, m_c: f64, h_c: f64, gamma: f64) -> f64 {
+    if !(height > 0.0 && m_c > 0.0 && h_c > 0.0) {
+        return 0.0;
+    }
+    math::min(m_c * math::pow(height / h_c, gamma), 1.0)
+}
+
+/// A tree's height in cells: its highest metamer tip (as R1's maturity reads it).
+pub fn tree_height(t: &Tree) -> f64 {
+    let mut height = 0.0;
+    for i in 0..t.m.len() {
+        let y = t.tip_y(i);
+        if y > height {
+            height = y;
+        }
+    }
+    height
+}
+
 /// Background deaths, seeds, dispersal and establishment. Returns the season's recruits.
 pub fn stand_dynamics(world: &mut World) -> f64 {
     let season = world.season;
@@ -47,13 +75,31 @@ pub fn stand_dynamics(world: &mut World) -> f64 {
     let max_trees = params.o4.max_trees;
     let band = params.o4.band;
     let mid = depth / 2.0;
+    let mortality = params.o4.mortality;
     for i in 0..world.trees.len() {
         let t = &world.trees[i];
         if !(t.alive && t.age > 0.0) {
             continue;
         }
-        let m0 = world.rules.of(&t.species).o4.m0;
-        if uniform(seed, purpose::MORTALITY, t.id as f64, 0.0, season, 0.0) < m0 {
+        let own = &world.rules.of(&t.species).o4;
+        let dies = match mortality {
+            Mortality::SizeBlind => {
+                uniform(seed, purpose::MORTALITY, t.id as f64, 0.0, season, 0.0) < own.m0
+            }
+            Mortality::TwoPart => {
+                // #117 adds the suppression rate to this sum.
+                let p = canopy_rate(tree_height(t), own.m_canopy, own.h_canopy, own.gamma_canopy);
+                uniform(
+                    seed,
+                    purpose::STAND_MORTALITY,
+                    t.id as f64,
+                    0.0,
+                    season,
+                    0.0,
+                ) < p
+            }
+        };
+        if dies {
             world.trees[i].alive = false;
         }
     }
@@ -298,6 +344,71 @@ pub(crate) mod tests {
         assert!(w.trees[1..].iter().all(|t| t.species == "willow"));
         let mut shaded = world(r#"{"o4":{"rain":3,"qEst":2}}"#);
         assert_eq!(stand_dynamics(&mut shaded), 0.0);
+    }
+
+    #[test]
+    fn the_canopy_rate_is_zero_on_the_ground_and_rises_with_height() {
+        // m_c = 0.01 at H_c = 120 cells (30 m), γ = 2: a worked table, not the formula again.
+        let rate = |h: f64| canopy_rate(h, 0.01, 120.0, 2.0);
+        assert_eq!(rate(0.0), 0.0);
+        assert!((rate(60.0) - 0.0025).abs() < 1e-15);
+        assert!((rate(120.0) - 0.01).abs() < 1e-15);
+        assert!((rate(240.0) - 0.04).abs() < 1e-15);
+        let rates: Vec<f64> = [1.0, 10.0, 40.0, 80.0, 120.0, 200.0]
+            .iter()
+            .map(|&h| rate(h))
+            .collect();
+        assert!(rates.windows(2).all(|p| p[0] < p[1]), "{rates:?}");
+        assert_eq!(canopy_rate(1e6, 0.5, 1.0, 2.0), 1.0); // a probability
+    }
+
+    /// Tree 0 grown `n` more cells straight up (one-cell metamers on its main axis), one season old.
+    fn tall(w: &mut World, n: usize) {
+        let t = &mut w.trees[0];
+        t.age = 1.0;
+        for _ in 0..n {
+            let top = t.m.len() as i32 - 1;
+            crate::testing::metamer(t, top, 0, PI / 2.0, 1.0, 0.1, 0.0);
+        }
+    }
+
+    #[test]
+    fn tall_grows_the_tree_to_about_its_height() {
+        let mut w = world("{}");
+        tall(&mut w, 40);
+        let t = &w.trees[0];
+        assert!((tree_height(t) - 40.0).abs() < 2.0, "{}", tree_height(t));
+    }
+
+    #[test]
+    fn in_the_two_part_mode_tall_trees_die_more_often_than_short_ones() {
+        // One tree over 2,000 seasons, revived after each: the death rate climbs with height.
+        let deaths = |n: usize| {
+            let mut w = world(
+                r#"{"o4":{"m0":1,"mortality":"twoPart","mCanopy":0.2,"hCanopy":40,"gammaCanopy":2}}"#,
+            );
+            tall(&mut w, n);
+            (1..=2000)
+                .filter(|&s| {
+                    w.season = s as f64;
+                    w.trees[0].alive = true;
+                    stand_dynamics(&mut w);
+                    !w.trees[0].alive
+                })
+                .count()
+        };
+        let (short, mid, high) = (deaths(5), deaths(20), deaths(40));
+        // Expected about 2000·0.2·(h/40)² ≈ 3, 50, 400; m₀ = 1 is ignored in this mode.
+        assert!(short < mid && mid < high, "{short} {mid} {high}");
+        assert!(short < 30 && (300..500).contains(&high), "{short} {high}");
+    }
+
+    #[test]
+    fn the_size_blind_mode_is_the_default_and_ignores_the_canopy_rate() {
+        let mut w = world(r#"{"o4":{"m0":0,"mCanopy":1,"hCanopy":1}}"#);
+        tall(&mut w, 10);
+        stand_dynamics(&mut w);
+        assert!(w.trees[0].alive);
     }
 
     #[test]

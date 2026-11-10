@@ -92,6 +92,12 @@ const METRIC_NUMBERS = [
   "leafCrownRatio",
   "limbBase",
   "limbCrownRatio",
+  "liveCrownBase",
+  "topFifthLeaf",
+  "leafBelowSixth",
+  "w90",
+  "upperFlankNew",
+  "budsOutside",
 ] as const;
 const FLAGS = new Set(["alive", "sown"]);
 

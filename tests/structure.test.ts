@@ -49,6 +49,21 @@ describe("the 3D core's structure (I2)", () => {
     expect(m.crownDepth).toBeGreaterThan(0.5 * m.crownWidth);
   });
 
+  it("reads the core's feature measures in their places (METRIC_NUMBERS mirrored)", () => {
+    const world = new World(presetParams("skyTree"));
+    world.run(20);
+    const m = world.metricsOf(world.trees[0] as Tree);
+    const share = (x: number) => expect(x >= 0 && x <= 1).toBe(true);
+    share(m.limbCrownRatio);
+    share(m.liveCrownBase);
+    expect(m.liveCrownBase).toBeGreaterThanOrEqual(m.boleHeight / m.height);
+    share(m.topFifthLeaf);
+    share(m.leafBelowSixth);
+    expect(m.w90).toBeGreaterThanOrEqual(0);
+    share(m.upperFlankNew);
+    expect(Number.isInteger(m.budsOutside) && m.budsOutside >= 0).toBe(true);
+  });
+
   it("explodes exponentially when every bud grows, at one metamer a season on the leader", () => {
     const world = new World(presetParams("explosion"));
     let prev = (world.trees[0] as Tree).m.length;

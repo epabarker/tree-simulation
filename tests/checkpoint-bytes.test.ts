@@ -15,9 +15,7 @@ beforeAll(() => loadWorldsSync(readFileSync(coreWasm)));
 
 /** Run, then c3.alpha + 0.1 and a tree planted at 17.25 (events in the queue), then saved. */
 const RUNS: [string, Params, number][] = [
-  // 120 cells: the garden plants per hectare since #121 (35 saplings and their seedlings at 220
-  // cells ran near the 30 s limit); the bytes, not the stand's size, are under test.
-  ["mixed wood", forestParams(120, 12), 30],
+  ["mixed wood", forestParams(220, 12), 30],
   ["succession", presetParams("succession" as PresetName), 25],
   [
     "obstacles",

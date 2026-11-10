@@ -60,7 +60,7 @@ Counts are over the 6 runs (3 seeds × 2 widths) or the 18 judged frames (6 runs
 ![Live, drawn and canopy stems per ha over seasons, r0 and r6; target band shaded](figures/2026-11-10-garden-schedule.png)
 
 **What the rounds did.**
-- **m_c = 0.003 is the one rate with a clear effect.** At 0.01, 14–18 canopy trees per desktop run died of O4. At 0.003 it is 1–5, so the planted canopy lasts. Two runs stay in band at season 100 (160 s1 and s2), where r0 had one.
+- **m_c = 0.003 is the one rate with a clear effect.** At 0.01, 14–18 canopy trees per desktop run died of O4. At 0.003 it is 1–5, so the planted canopy lasts. Two frames are in band at season 100 (160 s2 at 250/ha, 66 s3 at 303), where r0 had one.
 - **m_s 0.3 changed nothing visible.** r2 against r6 is within seed noise, so it was dropped.
 - **Cutting establishment does not cap the stand.** r1 and r3 cut p_est to a tenth and a hundredth, and the stand still fills, because the seed supply is vast. Under r6, hornbeam alone makes 0.2–0.6 million seeds per run over 300 seasons. Even at p_est 0.003, 474 hornbeam recruits established in one desktop run.
 - **Gap-only establishment (r5) only delays the flood.** Raising Q_est to 0.2 is also a flora change, and it contradicts user story 23: beech and holly wait in the seedling bank.

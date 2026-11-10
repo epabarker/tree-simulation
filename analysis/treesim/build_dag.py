@@ -132,7 +132,7 @@ RW = {
     "COMMIT": (["S_budstate"], ["S_budstate", "S_age"]),
     "O2_ABRADE": (["S_owner", "S_budq", "S_geom", "S_radius", "S_budstate"], ["S_budstate"]),
     "R1_STARVE": (["S_starved"], ["S_alive"]),
-    "O4_STAND": (["S_alive", "S_seedpool", "S_light", "S_geom", "S_trees"], ["S_alive", "S_trees", "S_seedpool"]),
+    "O4_STAND": (["S_alive", "S_seedpool", "S_light", "S_geom", "S_trees", "S_PM"], ["S_alive", "S_trees", "S_seedpool"]),
 }
 
 # ---------------------------------------------------------------- gates
@@ -350,6 +350,7 @@ PARAMS = [
     ("o4.mortality", "o4", [("O4_STAND", o4on)]),
     ("o4.m0", "o4", [("O4_STAND", AND(o4on, NOT(two_part)))]),
     ("o4.mCanopy / hCanopy / gammaCanopy", "o4", [("O4_STAND", AND(o4on, two_part))]),
+    ("o4.mSuppression / suppressionSlope / shadeTolerance", "o4", [("O4_STAND", AND(o4on, two_part))]),
     ("o4.cSeed / d", "o4", [("O4_STAND", o4on)]),
     ("o4.qEst / pEst", "o4", [("O4_STAND", o4on)]),
     ("o4.maxTrees / rain / band", "o4", [("O4_STAND", o4on)]),

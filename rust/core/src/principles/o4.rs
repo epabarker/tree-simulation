@@ -1,8 +1,16 @@
 //! O4. Stand dynamics (spec §O4, ADR 0013, ADR 0018; on the ground plane, ADR 0025). Deaths by
 //! `o4.mortality` (the world's): `sizeBlind` (the default, the ablation) kills each tree with the
 //! background risk m₀ [RNG: mortality]; `twoPart` (ADR 0063) with a canopy rate
-//! m_c·(H/H_c)^γ_c that rises with the tree's height H [RNG: standMortality]; #117 adds a
-//! suppression rate to it. R1's reproductive pool turned into seeds (c_seed each), dispersed
+//! m_c·(H/H_c)^γ_c that rises with the tree's height H, plus a suppression rate
+//! m_s·(1 − P/M)₊·e^(−β_s(T − 1)) from R1's carbon balance this season (P/M, read only with R1 on)
+//! and the species' shade tolerance T, one draw against the sum [RNG: standMortality]. A tree that
+//! pays its maintenance is never suppressed; a starved one dies the faster the less tolerant it is.
+//! The anchors (docs/research/2026-11-08-regeneration.md): below its survival light a birch
+//! seedling lasts 1–2 seasons (Walters & Reich 1996), so m_s = 1 at T = 1 gives birch (T 2.03)
+//! about 0.39 a season fully starved; shade-tolerant juveniles die at 3–5% a year in deep shade
+//! (Petrovska et al. 2022), so β_s = 0.92 (≈ ln 10 / 2.5, a tenth over the 2.5 units from birch to
+//! beech) gives beech (T 4.56) about 0.04. An order of magnitude and a ranking, not a fit.
+//! R1's reproductive pool turned into seeds (c_seed each), dispersed
 //! a Laplace(0, d) distance at a random azimuth [RNG: dispersal; seeds beyond a z face are lost]
 //! and established where the ground light is at least Q_est with probability p_est [RNG:
 //! establishment], no live trunk within a cell; seed rain from beyond the world per species,
@@ -10,9 +18,10 @@
 //! maxTrees. With `band` (I3, the garden's one row) seedlings establish only within band/2 of the
 //! slab's middle in z: local seeds beyond it are lost, and seed rain lands inside it.
 //!
-//! Params: o4.mortality; sizeBlind reads o4.m0, twoPart reads o4.mCanopy, o4.hCanopy and
-//! o4.gammaCanopy (per species, as m₀ is); then o4.cSeed, d, qEst, pEst, maxTrees, rain, band,
-//! r1.fRep and r1.maturity (the seed supply), c2.C.
+//! Params: o4.mortality; sizeBlind reads o4.m0, twoPart reads o4.mCanopy, o4.hCanopy,
+//! o4.gammaCanopy, o4.mSuppression, o4.suppressionSlope and o4.shadeTolerance (per species, as m₀
+//! is) and r1.enabled; then o4.cSeed, d, qEst, pEst, maxTrees, rain, band, r1.fRep and
+//! r1.maturity (the seed supply), c2.C.
 
 use super::c1::{plant_seedling, seedling_azimuth};
 use crate::math;
@@ -48,6 +57,18 @@ pub fn canopy_rate(height: f64, m_c: f64, h_c: f64, gamma: f64) -> f64 {
     math::min(m_c * math::pow(height / h_c, gamma), 1.0)
 }
 
+/// The suppression rate (ADR 0063): m_s·(1 − P/M)₊·e^(−β_s(T − 1)) a season, clamped to a
+/// probability. Zero for a tree whose production P meets its maintenance M, and for M ≤ 0 (R1 off:
+/// no vigour to read); for a starved tree it rises with the share of M left unpaid and falls with
+/// shade tolerance T, so at equal starvation a light-demander dies first.
+pub fn suppression_rate(p: f64, m: f64, m_s: f64, slope: f64, tolerance: f64) -> f64 {
+    if !(m > 0.0 && m_s > 0.0) {
+        return 0.0;
+    }
+    let deficit = math::max(1.0 - p / m, 0.0);
+    math::min(m_s * deficit * math::exp(-slope * (tolerance - 1.0)), 1.0)
+}
+
 /// A tree's height in cells: its highest metamer tip (as R1's maturity reads it).
 pub fn tree_height(t: &Tree) -> f64 {
     let mut height = 0.0;
@@ -81,14 +102,28 @@ pub fn stand_dynamics(world: &mut World) -> f64 {
         if !(t.alive && t.age > 0.0) {
             continue;
         }
-        let own = &world.rules.of(&t.species).o4;
+        let rules = world.rules.of(&t.species);
+        let own = &rules.o4;
         let dies = match mortality {
             Mortality::SizeBlind => {
                 uniform(seed, purpose::MORTALITY, t.id as f64, 0.0, season, 0.0) < own.m0
             }
             Mortality::TwoPart => {
-                // #117 adds the suppression rate to this sum.
-                let p = canopy_rate(tree_height(t), own.m_canopy, own.h_canopy, own.gamma_canopy);
+                let canopy =
+                    canopy_rate(tree_height(t), own.m_canopy, own.h_canopy, own.gamma_canopy);
+                // R1 ran this season (allocate precedes deaths), so P and M are this season's.
+                let suppression = if rules.r1.enabled {
+                    suppression_rate(
+                        t.production,
+                        t.maintenance,
+                        own.m_suppression,
+                        own.suppression_slope,
+                        own.shade_tolerance,
+                    )
+                } else {
+                    0.0
+                };
+                let p = math::min(canopy + suppression, 1.0);
                 uniform(
                     seed,
                     purpose::STAND_MORTALITY,
@@ -401,6 +436,93 @@ pub(crate) mod tests {
         // Expected about 2000·0.2·(h/40)² ≈ 3, 50, 400; m₀ = 1 is ignored in this mode.
         assert!(short < mid && mid < high, "{short} {mid} {high}");
         assert!(short < 30 && (300..500).contains(&high), "{short} {high}");
+    }
+
+    /// A two-part world with no canopy deaths, R1 on, and the suppression rate set by `o4`.
+    fn starving(o4: &str, rest: &str) -> World {
+        world(&format!(
+            r#"{{"r1":{{"enabled":true}},
+                 "o4":{{"mortality":"twoPart","mCanopy":0,{o4}}}{rest}}}"#
+        ))
+    }
+
+    /// Tree `i` this season: one season old, producing `p` against a maintenance of 1.
+    fn vigour(w: &mut World, i: usize, p: f64) {
+        let t = &mut w.trees[i];
+        t.age = 1.0;
+        t.production = p;
+        t.maintenance = 1.0;
+    }
+
+    #[test]
+    fn the_suppression_rate_is_the_deficit_share_scaled_down_by_shade_tolerance() {
+        // m_s = 0.5, β = 1: a worked table, not the formula again.
+        let rate = |p: f64, m: f64, tol: f64| suppression_rate(p, m, 0.5, 1.0, tol);
+        assert_eq!(rate(1.0, 1.0, 1.0), 0.0); // pays its way
+        assert_eq!(rate(3.0, 1.0, 1.0), 0.0);
+        assert!((rate(0.0, 1.0, 1.0) - 0.5).abs() < 1e-15); // fully starved, least tolerant
+        assert!((rate(0.5, 1.0, 1.0) - 0.25).abs() < 1e-15); // half the cost paid
+        assert!((rate(0.0, 1.0, 2.0) - 0.5 * (-1.0f64).exp()).abs() < 1e-15);
+        assert_eq!(rate(0.0, 0.0, 1.0), 0.0); // no maintenance (R1 off): no vigour to read
+        assert_eq!(suppression_rate(0.0, 1.0, 5.0, 0.0, 1.0), 1.0); // a probability
+    }
+
+    #[test]
+    fn in_the_two_part_mode_a_starved_tree_dies_and_one_that_pays_its_way_does_not() {
+        let o4 = r#""mSuppression":1,"suppressionSlope":1,"shadeTolerance":1"#;
+        let mut starved = starving(o4, "");
+        vigour(&mut starved, 0, 0.0); // P = 0: the rate is 1
+        stand_dynamics(&mut starved);
+        assert!(!starved.trees[0].alive);
+        for s in 1..=500 {
+            let mut paying = starving(o4, "");
+            paying.season = s as f64;
+            vigour(&mut paying, 0, 1.2);
+            stand_dynamics(&mut paying);
+            assert!(paying.trees[0].alive, "season {s}");
+        }
+        // R1 off: P/M is not read, so the same starved numbers kill nothing.
+        let mut off = world(&format!(
+            r#"{{"o4":{{"mortality":"twoPart","mCanopy":0,{o4}}}}}"#
+        ));
+        vigour(&mut off, 0, 0.0);
+        stand_dynamics(&mut off);
+        assert!(off.trees[0].alive);
+    }
+
+    #[test]
+    fn at_equal_starvation_birch_dies_sooner_than_beech_and_holly() {
+        // Three trees at P/M = 0.5 over 1,000 seasons, revived after each: deaths per species, with
+        // the flora's tolerances (Niinemets & Valladares 2006) and the default rate and slope.
+        let mut w = starving(
+            r#""mSuppression":1,"suppressionSlope":0.92"#,
+            r#","trees":[{"x":20,"species":"birch"},{"x":50,"species":"beech"},
+                         {"x":80,"species":"holly"}],
+               "species":{"birch":{"o4":{"shadeTolerance":2.03}},
+                          "beech":{"o4":{"shadeTolerance":4.56}},
+                          "holly":{"o4":{"shadeTolerance":3.86}}}"#,
+        );
+        let mut deaths = [0; 3];
+        for s in 1..=1000 {
+            w.season = s as f64;
+            w.trees.truncate(3);
+            for i in 0..3 {
+                w.trees[i].alive = true;
+                vigour(&mut w, i, 0.5);
+            }
+            stand_dynamics(&mut w);
+            for (i, d) in deaths.iter_mut().enumerate() {
+                *d += !w.trees[i].alive as usize;
+            }
+        }
+        let [birch, beech, holly] = deaths;
+        // Expected about 1000·0.5·e^(−0.92(T−1)): birch ≈ 194, holly ≈ 36, beech ≈ 19.
+        assert!(
+            birch > 2 * holly && birch > 2 * beech,
+            "{birch} {beech} {holly}"
+        );
+        assert!((150..240).contains(&birch), "{birch}");
+        assert!(beech < holly, "{beech} {holly}");
     }
 
     #[test]

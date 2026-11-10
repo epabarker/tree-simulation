@@ -7,7 +7,7 @@
 //! TypeScript core (the bridge in `rust/wasm`) and so that `bench` can time them.
 
 use crate::geom::V3;
-use crate::light::{Light, depth_of};
+use crate::light::{Light, depth_of, rest_height};
 use crate::math;
 use crate::params::{DEG, Params};
 use crate::principles::c1::{
@@ -172,6 +172,7 @@ fn deposit_buds(
     tree: &Tree,
 ) {
     let b = &tree.b;
+    let rests = own.r3.rests();
     for i in 0..b.len() {
         if !is_live_bud(b.state[i]) {
             continue;
@@ -182,6 +183,7 @@ fn deposit_buds(
         }
         let m = b.metamer[i] as usize;
         let [x, y, z] = tree.tip(m);
+        let y = rest_height(y, rests);
         light.deposit(x, y, z, area);
         if owners {
             tag_foliage(world_params, owner, tree, x, y, z);
@@ -231,7 +233,7 @@ pub fn phase_sample(world: &mut World, i: usize) {
     tree.epicormic = 0.0;
     tree.aborted = 0.0;
     tree.broken = 0.0;
-    sample_buds(light, tree);
+    sample_buds(light, tree, params.r3.rests());
     if params.r5.enabled {
         sample_nodes(wp, params, light, owner, tree);
     }
@@ -249,7 +251,9 @@ pub fn phase_sample(world: &mut World, i: usize) {
     }
 }
 
-fn sample_buds(light: &Light, tree: &mut Tree) {
+/// Q and V at every live bud, read at its metamer's tip (on the ground, where the limb `rests`
+/// there: `rest_height`).
+fn sample_buds(light: &Light, tree: &mut Tree, rests: bool) {
     let mut sum = 0.0;
     let mut count = 0.0;
     for i in 0..tree.b.len() {
@@ -258,7 +262,7 @@ fn sample_buds(light: &Light, tree: &mut Tree) {
         }
         let m = tree.b.metamer[i] as usize;
         let [x, y, z] = tree.tip(m);
-        let (q, v) = light.sample(x, y, z);
+        let (q, v) = light.sample(x, rest_height(y, rests), z);
         tree.b.q[i] = q;
         (tree.b.vx[i], tree.b.vy[i], tree.b.vz[i]) = (v[0], v[1], v[2]);
         sum += q;
@@ -273,8 +277,10 @@ fn sample_nodes(wp: &Params, own: &Params, light: &Light, owner: &[i32], tree: &
     let c = wp.c2.c;
     let by_neighbours = own.r5.neighbours;
     let grid = Grid::of(wp);
+    let rests = own.r3.rests();
     for i in 0..tree.m.len() {
         let [x, y, z] = tree.tip(i);
+        let y = rest_height(y, rests);
         let (q, _) = light.sample(x, y, z);
         let mut s = shade_of(q, c);
         if by_neighbours && s > 0.0 {
@@ -644,6 +650,117 @@ pub fn grow_buds(tree: &mut Tree, params: &Params, season: f64) {
                 tree.b.state[i] = bud::GONE;
                 tree.aborted += 1.0;
             }
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::testing::{RIGHT, bud as add_bud, metamer};
+
+    const UP: f64 = std::f64::consts::FRAC_PI_2;
+
+    /// A 20 × 10 × 4 world holding one hand-built tree: a 3-cell trunk without buds and a level
+    /// limb whose tip, with the tree's one bud, lies at (13, `dip`, 2). The season's light and
+    /// sample phases have run.
+    fn limb_at(dip: f64, r3: &str, c2: &str) -> World {
+        let mut world = World::new(crate::testing::preset(
+            "default",
+            &format!(
+                r#"{{"world":{{"width":20,"height":10,"depth":4,"walls":[]}},"c2":{c2},"r3":{r3},"r5":{{"enabled":true,"signal":"light"}}}}"#
+            ),
+        ));
+        let mut t = Tree::new(0, 10.0, 2.0);
+        let mut trunk = vec![metamer(&mut t, -1, slot::MAIN, UP, 1.0, 0.1, 0.0)];
+        for _ in 1..3 {
+            let p = *trunk.last().unwrap() as i32;
+            trunk.push(metamer(&mut t, p, slot::MAIN, UP, 1.0, 0.1, 0.0));
+        }
+        let limb = metamer(&mut t, trunk[0] as i32, RIGHT, 0.0, 3.0, 0.05, 0.0);
+        t.m.base_y[limb] = dip;
+        add_bud(&mut t, limb, slot::MAIN, 0.0, 1.0);
+        assert_eq!(t.tip(limb), [13.0, dip, 2.0]);
+        world.trees = vec![t];
+        let live = phase_light(&mut world);
+        assert_eq!(live, [0]);
+        phase_sample(&mut world, 0);
+        world
+    }
+
+    const SLAB: &str = r#"{"enabled":true,"model":"slab"}"#;
+    const RESTS: &str = r#"{"enabled":true,"ground":true}"#;
+
+    /// The leaf area in the cell of column 13, layer 2 at `row`, and in the whole field.
+    fn leaf_area(world: &World, row: usize) -> (f32, f32) {
+        let Light::Slab(s) = &world.light else {
+            panic!("not the slab")
+        };
+        let (w, _, d) = s.sweep.dims();
+        let lad = s.sweep.lad();
+        (lad[(row * d + 2) * w + 13], lad.iter().sum())
+    }
+
+    #[test]
+    fn a_bud_on_a_limb_resting_on_the_ground_reads_and_shades_the_bottom_row() {
+        // R3's ground rest leaves tips a rounding error below y = 0 (#104: to −4.4e−16 seen).
+        for dip in [-1e-17, -5e-16] {
+            let world = limb_at(dip, RESTS, SLAB);
+            let t = &world.trees[0];
+            let (q, v) = world.light.sample(13.0, 0.0, 2.0);
+            assert!(q > 0.0);
+            assert_eq!(t.b.q[0], q, "dip {dip}");
+            assert_eq!([t.b.vx[0], t.b.vy[0], t.b.vz[0]], v);
+            // Its leaf is in the bottom row, and nowhere else.
+            assert_eq!(leaf_area(&world, 0), (1.0, 1.0), "dip {dip}");
+            // R5's shade at the limb's node is the bottom row's too, not the full shade of Q = 0.
+            let limb = t.b.metamer[0] as usize;
+            assert_eq!(t.node_shade[limb], shade_of(q, world.rules.params.c2.c));
+            assert!(t.node_shade[limb] < 1.0);
+        }
+    }
+
+    #[test]
+    fn a_limb_on_the_ground_itself_reads_the_bottom_row_either_way() {
+        for r3 in [RESTS, r#"{"enabled":true}"#] {
+            let world = limb_at(0.0, r3, SLAB);
+            assert_eq!(world.trees[0].b.q[0], world.light.sample(13.0, 0.0, 2.0).0);
+            assert_eq!(leaf_area(&world, 0), (1.0, 1.0));
+        }
+    }
+
+    #[test]
+    fn a_limb_sunk_below_the_ground_without_ground_contact_stays_outside_the_light() {
+        // ADR 0011: without `r3.ground` a limb can sink below the ground; its buds get no light.
+        // The same holds where R3 is off, so nothing rests a limb, whatever `ground` says.
+        for r3 in [
+            r#"{"enabled":true}"#,
+            r#"{"enabled":true,"ground":false}"#,
+            r#"{"enabled":false,"ground":true}"#,
+        ] {
+            for dip in [-1e-17, -5e-16, -0.5] {
+                let world = limb_at(dip, r3, SLAB);
+                let t = &world.trees[0];
+                assert_eq!(t.b.q[0], 0.0, "{r3} dip {dip}");
+                assert_eq!(leaf_area(&world, 0), (0.0, 0.0), "{r3} dip {dip}");
+                assert_eq!(t.node_shade[t.b.metamer[0] as usize], 1.0, "{r3} dip {dip}");
+            }
+        }
+    }
+
+    #[test]
+    fn every_light_model_serves_a_resting_limb() {
+        // Uniform (C2 off) and pooled: Q inside the box, which a resting tip now counts as.
+        for c2 in [
+            r#"{"enabled":false}"#,
+            r#"{"enabled":true,"model":"pooled"}"#,
+        ] {
+            let rests = limb_at(-5e-16, RESTS, c2);
+            let q = rests.light.sample(13.0, 0.0, 2.0).0;
+            assert!(q > 0.0);
+            assert_eq!(rests.trees[0].b.q[0], q, "{c2}");
+            let sunk = limb_at(-5e-16, r#"{"enabled":true}"#, c2);
+            assert_eq!(sunk.trees[0].b.q[0], 0.0, "{c2}");
         }
     }
 }

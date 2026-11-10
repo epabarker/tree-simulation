@@ -117,8 +117,8 @@ One function per phase (`phase_light` … `phase_deaths`, in `PHASES` order); `W
 
 | §6 step | Code | Milestone |
 |---|---|---|
-| Phase 1 `ENV.clear`, `deposit`, `compute_light` | `light.clear()`, `addWall`, `depositBuds` (only when C2 is on), `light.compute()` | M1, M6 |
-| Phase 2 sample (Q, V) | `sampleBuds` → `LightModel.sample`; with R5, `sampleNodes` also stores each metamer's shade s = 1 − Q/C at its tip in `tree.nodeShade` (λ in `allocate`) | M0 (uniform), M1, M10 |
+| Phase 1 `ENV.clear`, `deposit`, `compute_light` | `light.clear()`, `addWall`, `depositBuds` (only when C2 is on; a tip on a limb resting on the ground deposits into the bottom row, `light::rest_height`), `light.compute()` | M1, M6 |
+| Phase 2 sample (Q, V) | `sampleBuds` → `LightModel.sample`; with R5, `sampleNodes` also stores each metamer's shade s = 1 − Q/C at its tip in `tree.nodeShade` (λ in `allocate`). Both read a resting limb's tips in the bottom row (`light::rest_height`) | M0 (uniform), M1, M10 |
 | BASIPETAL | `gatherLight` (C3): Q_sum, n_b, Q_base | M0 |
 | CARBON (R1, M8, ADR 0010) | `carbonBalance` after `gatherLight` when `r1.enabled`: acropetal `pathLen`; per-node production from live buds' leaf area (`depositArea`) and Q, discounted by exp(−L_path/L_h); basipetal live-pipe sapwood cost plus foliage cost into `tree.pSum`/`mSum` (per-metamer scratch, not hashed); tree totals set `production`, `maintenance`, `reserve` (capped at `store`·M), `reproduction`, `starved` and `vBase`, which `allocate` then splits instead of α·Q_base. Phase 3 kills trees with `starvedToDeath` | M8 |
 | ACROPETAL | `allocate` (C3, by `c3.mode`): `bh` splits by λ at every node; `equal` shares α·Q_base over live buds; `none` gives v = 1 to any bud with Q > 0. Every mode fills `vIn` | M0 `none`, M2 `bh`/`equal` |
@@ -136,6 +136,8 @@ One function per phase (`phase_light` … `phase_deaths`, in `PHASES` order); `W
 **Milestone scaffold.** Until C3 lands at M2, `c3.mode: "none"` gives each bud with Q > 0 exactly one metamer of length l0. With C2 off (M0) that is "all buds grow". In 3D it no longer regulates under light (I2): Beer–Lambert light never reaches 0 inside the slab, where the shadow triangle's did, so `shadow` grows as `explosion` does.
 
 **The world is a closed box.** In every light model, everything outside the W × H × D slab is opaque to growth: below the ground, beyond the sides, above the top and beyond the z faces (light still passes the faces, through τ). A bud there gets Q = 0 and never grows, and V never points out of the box. A shoot can overshoot the edge by one metamer, which then stops. The renderer draws the ground over stubs that pushed below it.
+
+**One exception: a limb resting on the ground** (issue #104). R3's ground contact (`r3.ground`, ADR 0011) rests a limb on y = 0, but a tip is derived (base + length·H) and lands a rounding error below it (to −4·10⁻¹⁶ seen). For a tree whose R3 is on with `ground`, every tip-level use of the light (the leaf-area deposit, the owner tag, the buds' Q and V, R5's node shade and neighbour share) takes a tip below the ground at y = 0, the bottom row: `light::rest_height`, by the tree's own params (`R3::rests`). There is no threshold, because R3's position pass has brought every such tip to the ground. Without ground contact a limb that sinks below the ground stays outside, as ADR 0011 intends. `Light::sample` itself is unchanged: y < 0 is outside for any caller that does not rest it.
 
 Before this rule, shoots that left the grid saw unshaded sky and grew exponentially (found at M1). Make the world large enough for the trees it holds.
 

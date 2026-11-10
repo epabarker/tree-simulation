@@ -322,7 +322,8 @@ PARAMS = [
     ("r3.posture / betaG / gamma / c", "r3", [("R3_MECH", on("r3.enabled"))]),
     ("r3.sigmaTarget / girthGain", "r3", [("R3_MECH", on("r3.enabled"))]),
     ("r3.sigmaBreak", "r3", [("R3_MECH", on("r3.enabled"))]),
-    ("r3.ground", "r3", [("R3_MECH", on("r3.enabled"))]),
+    # The light serves a resting limb's tips in its bottom row (light::rest_height, issue #104).
+    ("r3.ground", "r3", [("R3_MECH", on("r3.enabled")), ("C2_LIGHT", on("r3.enabled")), ("O2_TAG", AND(OR(o2on, on("r5.enabled")), on("r3.enabled"))), ("C2_SAMPLE", on("r3.enabled")), ("R5_SHADE", AND(shade_live, on("r3.enabled")))]),
     # R4
     ("r4.vBreak", "r4", [("R4_FATE", on("r4.enabled"))]),
     ("r4.vCont", "r4", [("R4_FATE", on("r4.enabled"))]),

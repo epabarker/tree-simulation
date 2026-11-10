@@ -63,6 +63,11 @@ fn every_golden() {
 /// after its approved removal (ADR 0060). The ordinary golden above checks today's params.
 /// mixedWood is left out: its hornbeam also takes the height patch (r2.dLambda, R1's sink), which
 /// is not one of these rules; oakOpen's 15 seasons fall before oak's new maturity.
+/// beechOpen's hash was 200f5a55 until issue #104: its limbs rest on the ground, and the light now
+/// serves a resting limb (`light::rest_height`), which the old bits did not. That is a fix to the
+/// old model and the new one alike, so the hash moved with it (228f23fd, the off patch at the fix's
+/// own commit, whose parent gave 200f5a55). The walled oak under the off patch kept 0877b79b across
+/// the fix (today's open-box oakOpen golden moved with it).
 #[test]
 fn the_prototype_rules_written_as_off_keep_the_goldens() {
     let presets = read("../presets.json");
@@ -74,7 +79,7 @@ fn the_prototype_rules_written_as_off_keep_the_goldens() {
     for (key, before) in [
         ("forest:seed1:s20", None),
         ("oakOpen:seed1:s15", Some("0877b79b")),
-        ("beechOpen:seed1:s40", Some("200f5a55")),
+        ("beechOpen:seed1:s40", Some("228f23fd")),
     ] {
         let parts: Vec<&str> = key.split(':').collect();
         let base = presets

@@ -263,6 +263,7 @@ PARAMS = [
     ("c5.Trel", "c5", [("C5_SHED", always), ("C5_QTOP", always)]),
     ("c5.topQuantile", "c5", [("C5_QTOP", always)]),
     ("c5.Tvig", "c5", [("C5_SHED", always)]),
+    ("c5.kRel", "c5", [("C5_SHED", always)]),
     # C6
     ("c6.n", "c6", [("C6_GIRTH", always), ("R1_CARBON", on("r1.enabled")), ("C5_SHED", always)]),
     ("c6.r0", "c6", [("C6_GIRTH", always), ("R1_CARBON", on("r1.enabled")), ("C1_SHOOT", always)]),

@@ -256,6 +256,10 @@ pub const SCALARS: &[&str] = &[
     "epicormic",
     "aborted",
     "broken",
+    "shedRelative",
+    "shedCarbon",
+    "shedBoth",
+    "boleSprouts",
 ];
 
 /// The numeric scalars (every SCALARS entry but the three flags and the species).
@@ -280,6 +284,10 @@ pub const NUMBERS: &[&str] = &[
     "epicormic",
     "aborted",
     "broken",
+    "shedRelative",
+    "shedCarbon",
+    "shedBoth",
+    "boleSprouts",
 ];
 
 #[derive(Clone, Debug, Default)]
@@ -330,10 +338,23 @@ pub struct Tree {
     /// the table so the existing state-hash schema stays unchanged. Checkpoint v3 persists it
     /// separately (ADR 0059); old v1/v2 checkpoints initialise the missing history to zero.
     pub deficit: Vec<f64>,
+    /// Consecutive seasons each metamer's subtree has been dark by C5's relative test (light per
+    /// metamer < T_rel·Q_top), kept while `c5.kRel` > 1 (#125). Like `deficit`: beside the table
+    /// (the state hash is unchanged), compacted with the rows, persisted by checkpoint v4; v1–v3
+    /// checkpoints start it at zero.
+    pub dark: Vec<f64>,
     pub released: f64,
     pub epicormic: f64,
     pub aborted: f64,
     pub broken: f64,
+    /// This season's first-order limbs shed by C5's relative test alone, by R1's carbon test
+    /// alone, and by both (`shed_branches`; the bole probe's shed cause, #125).
+    pub shed_relative: f64,
+    pub shed_carbon: f64,
+    pub shed_both: f64,
+    /// This season's shoots released from a dormant lateral bud on a scarred trunk node below
+    /// the lowest living first-order limb: re-clothing of the bole (`grow_buds`, #125).
+    pub bole_sprouts: f64,
     /// Rows that took part in this season's passes (set before growth; C5 sheds among them).
     pub evaluated: usize,
     /// R2's relay gate: the tree's mean R5 neighbour shade this season (set in phase 2; read
@@ -398,6 +419,7 @@ impl Tree {
             &mut self.stress,
             &mut self.node_shade,
             &mut self.deficit,
+            &mut self.dark,
         ] {
             *v = Vec::new();
         }
@@ -479,6 +501,10 @@ impl Tree {
             "epicormic" => self.epicormic,
             "aborted" => self.aborted,
             "broken" => self.broken,
+            "shedRelative" => self.shed_relative,
+            "shedCarbon" => self.shed_carbon,
+            "shedBoth" => self.shed_both,
+            "boleSprouts" => self.bole_sprouts,
             _ => f64::NAN,
         }
     }
@@ -505,6 +531,10 @@ impl Tree {
             "epicormic" => &mut self.epicormic,
             "aborted" => &mut self.aborted,
             "broken" => &mut self.broken,
+            "shedRelative" => &mut self.shed_relative,
+            "shedCarbon" => &mut self.shed_carbon,
+            "shedBoth" => &mut self.shed_both,
+            "boleSprouts" => &mut self.bole_sprouts,
             _ => return,
         };
         *slot = x;

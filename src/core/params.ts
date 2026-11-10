@@ -221,6 +221,14 @@ export interface Params {
     /** Quantile of the tree's live-bud Q that stands for the light at its crown top. */
     topQuantile: number;
     /**
+     * The relative test's k (bare bole page, #125): a lateral is shed by Trel·Q_top only after
+     * kRel consecutive seasons below it, and a season above resets the count, so the rule is about
+     * sustained relative shade (Henriksson 2001; Sprugel 2002). Either-or with R1's carbon test,
+     * as before. 1 or absent: this season alone, bit-identical to the rule without it (calibrate;
+     * the bole probe sweeps it from about 3 for beech and hornbeam).
+     */
+    kRel?: number;
+    /**
      * Own-crown pruning (fresh-look beech, repair): a vigorous tree (R2's vigour gate g by its
      * production, r2.vigourTreeLo/Hi) also sheds a lateral whose Q_b/n_b < g·Tvig·Q_top, so an
      * open-grown crown clears its first limbs under itself (branch autonomy; Sprugel et al. 1991, unread: ADR 0043, rejected).
@@ -717,7 +725,7 @@ export const defaultParams: Params = {
   },
   c3: { mode: "none", lambda: 0.5, alpha: 2 },
   c4: { enabled: false, wd: 1, xi: 0.3, eta: 0.15, setPoint: 0, epsilon: 0.5, sigma: 20 },
-  c5: { enabled: false, T: 0.1, g: 3, Trel: 0, topQuantile: 0.9 }, // T, Trel: calibrate
+  c5: { enabled: false, T: 0.1, g: 3, Trel: 0, topQuantile: 0.9, kRel: 1 }, // T, Trel, kRel: calibrate
   c6: { enabled: false, n: 2, r0: 0.0025 },
   // M8 calibration (docs/experiments/2026-10-27-m8-carbon.md). With R1 on, the sky presets
   // also raise c3.alpha to 3, since costs and the L_h discount take ≈ 40% of the resource.

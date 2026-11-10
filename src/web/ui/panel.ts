@@ -115,6 +115,7 @@ const SECTIONS: SectionSpec[] = [
       { key: "g", label: "g grace (seasons)", min: 0, max: 15, step: 1 },
       { key: "Trel", label: "T_rel × crown-top light", min: 0, max: 1, step: 0.01 },
       { key: "topQuantile", label: "crown-top quantile", min: 0.5, max: 1, step: 0.01 },
+      { key: "kRel", label: "k_rel dark seasons", min: 1, max: 10, step: 1 },
     ],
   },
   {

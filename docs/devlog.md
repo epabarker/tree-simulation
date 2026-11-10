@@ -2,6 +2,14 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-10: the garden flips to the 0062/0063 garden; its schedule probed (#121)
+
+- **The garden presets** (`mixedWood`, and `forestParams` built on it) take the periodic depth (`sidesZ: "periodic"`, ADR 0062 decision 3; D stays 64), `o4.planting` (400 saplings/ha, spacing 12 cells, today's `MIXED` list cycled by the seed: 26 at 160 cells, 11 at 66, 34 at 210) instead of the one planted row, and `o4.mortality: "twoPart"` (ADR 0063). `trees` is empty in both. The cap is a guard of 2,500 stems/ha (`Planting.cap`; 160 at 160 cells, 66 at 66). A host page can still choose `faces: "woodEdge"` (τ 1, 0.2) or `"hedgerow"` (1, 1), which set `sidesZ: "open"` (decision 5). `faceWood` stays off; written as 0 it is bit-identical (plate.test.ts).
+- **`forestParams`' `Planting` changed shape** (host-page API through `GardenOptions.planting`): `{rows, spacing, recruits}` became `{density, spacing, cap, faces}`.
+- **Goldens:** only `mixedWood:seed1:s15` moved (783b45ca → 2addbf32), natively and in WASM: its world and schedule are the garden's now. Every other hash is unchanged, so the new params stay inert at their defaults.
+- **The schedule's rates:** see the experiment note (`experiments/2026-11-10-garden-schedule.md`, exploratory, seeds 1–3) for what was tuned and where the criteria fail.
+- **Named regressions** move (the garden changed) and are not re-baselined here; `phoneSeed3`'s `planted*` reads `p.trees.length`, now 0 (a definition question for the re-baseline ticket).
+
 ## 2026-11-10: establishment and seed rain over the whole depth (#119, ADR 0063)
 
 - **`o4.band` is removed** (params.ts, params.rs, o4.rs; ADR 0063 decision 4). Local seeds and seed rain establish anywhere in the depth; the rain's z draw (seedRain, k = 3) is unchanged, now always `u·depth`. `forestParams` no longer sets a band, so the **garden's recruits use the whole (still open) depth from here**, ahead of #121's flip; the named regression `phoneSeed3` (`forestParams(66, 3)`) is expected to move and is not re-baselined.

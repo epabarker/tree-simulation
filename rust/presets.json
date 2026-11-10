@@ -13661,7 +13661,7 @@
     "pEst": 0.3,
     "mortality": "twoPart",
     "m0": 0.002,
-    "mCanopy": 0.01,
+    "mCanopy": 0.003,
     "hCanopy": 120,
     "gammaCanopy": 2,
     "mSuppression": 1,

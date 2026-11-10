@@ -38,6 +38,11 @@ describe("the garden's plate (I3)", () => {
       expect(p.world.faceWood ?? 0).toBe(0);
       // ADR 0063: density from establishment and the two-part mortality, no band.
       expect(p.o4.mortality).toBe("twoPart");
+      // The probed schedule (experiments/2026-11-10-garden-schedule.md): a canopy rate a third of
+      // the bare params' 0.01, the other rates at their defaults.
+      expect(p.o4.mCanopy).toBe(0.003);
+      expect([p.o4.hCanopy, p.o4.gammaCanopy, p.o4.mSuppression]).toEqual([120, 2, 1]);
+      expect(p.o4.suppressionSlope).toBe(0.92);
       expect("band" in p.o4).toBe(false);
       expect(p.o4.planting?.density).toBe(400);
       // Today's mix (user story 29), cycled by the seed in the core.

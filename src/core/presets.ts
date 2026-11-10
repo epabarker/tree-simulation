@@ -167,13 +167,16 @@ export const STAND_X = [20, 41, 62, 83, 104, 125, 146, 167, 188, 209].map((x) =>
  * The 0062/0063 garden (#121): the depth is periodic (ADR 0062, decision 3; ADR 0058), so side
  * light follows from the stand's own density; the stand starts from `o4.planting`'s saplings per
  * hectare over the whole width × depth (ADR 0063, decision 5), `MIXED` cycled by the seed, and
- * thins by the two-part mortality (decision 3). The schedule's rates were tuned on the feature
- * probe, seeds 1–3, exploratory (`experiments/2026-11-10-garden-schedule.md`).
+ * thins by the two-part mortality (decision 3). Its rates were probed on seeds 1–3, exploratory
+ * (`experiments/2026-11-10-garden-schedule.md`): no rate meets the mature-forest criteria, because
+ * understorey trees that pay their maintenance are never suppressed; m_c = 0.003 (a third of the
+ * bare params' 0.01) keeps the canopy trees, which 0.01 killed, and every other rate is the default.
  */
 const GARDEN_WORLD = { ...RING, sidesZ: "periodic" } satisfies Params["world"];
 const GARDEN_O4 = {
   ...WOODLAND.o4,
   mortality: "twoPart",
+  mCanopy: 0.003,
   planting: { density: 400, spacing: 12, species: [...MIXED] },
 } satisfies ParamsPatch["o4"];
 

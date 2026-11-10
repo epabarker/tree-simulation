@@ -842,7 +842,7 @@ mod tests {
             (18, UP, 1.0),
             (13, 0.0, 1.5),
         ] {
-            metamer(&mut t, node as i32, RIGHT, angle, length, 0.01, 5.0);
+            metamer(&mut t, node, RIGHT, angle, length, 0.01, 5.0);
         }
         let m = tree_metrics(&t, Some(&world));
         assert_eq!(m.get("height"), 21.0);

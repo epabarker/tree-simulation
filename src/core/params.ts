@@ -530,8 +530,25 @@ export interface Params {
     qEst: number;
     /** p_est: probability that a seed on lit ground establishes (calibrate). */
     pEst: number;
-    /** m₀: background mortality per tree per season (calibrate). */
+    /**
+     * Mortality's mode (ADR 0063), the world's. "sizeBlind" (absent: the default, and the old
+     * behaviour kept as the ablation): every tree dies with the background risk m₀. "twoPart": a
+     * canopy rate m_c·(H/H_c)^γ_c that rises with the tree's height H, so old canopy trees are
+     * replaced gradually (a suppression rate from low vigour joins it, #117). m₀ is not read.
+     * Read from the world's params, never a species'. Absent (old params, checkpoints): sizeBlind.
+     */
+    mortality: "sizeBlind" | "twoPart";
+    /** m₀: background mortality per tree per season, the size-blind mode's (calibrate). */
     m0: number;
+    /**
+     * m_c: the two-part mode's canopy rate per season at height H_c (calibrate; 0.01 is the order
+     * of a mature canopy tree's yearly death rate, not a fit). Absent: 0.
+     */
+    mCanopy: number;
+    /** H_c: the canopy rate's reference height, in cells (0.25 m; 120 is 30 m) (calibrate). Absent: ∞. */
+    hCanopy: number;
+    /** γ_c: how steeply the canopy rate rises with height, > 0 (calibrate). Absent: 1. */
+    gammaCanopy: number;
     /** Cap on live trees, so a page cannot run away. */
     maxTrees: number;
     /**
@@ -733,7 +750,20 @@ export const defaultParams: Params = {
   r6: { enabled: false, qMin: 0.2, leafArea: 1 }, // calibrate (M6d)
   // M11 calibration (docs/experiments/2026-10-27-m11-stand-dynamics.md).
   o2: { enabled: false, sway: 0.0005, maxSway: 3, pAbr: 0.5, stormP: 0, stormLoad: 1.5 },
-  o4: { enabled: false, cSeed: 5, d: 20, qEst: 0.1, pEst: 0.3, m0: 0.002, maxTrees: 300, rain: 0 },
+  o4: {
+    enabled: false,
+    cSeed: 5,
+    d: 20,
+    qEst: 0.1,
+    pEst: 0.3,
+    mortality: "sizeBlind",
+    m0: 0.002,
+    mCanopy: 0.01,
+    hCanopy: 120,
+    gammaCanopy: 2,
+    maxTrees: 300,
+    rain: 0,
+  },
 };
 
 /** A partial set of overrides, merged one level deep into each section. */

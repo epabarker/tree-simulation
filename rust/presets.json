@@ -134,7 +134,11 @@
    "d": 20,
    "qEst": 0.1,
    "pEst": 0.3,
+   "mortality": "sizeBlind",
    "m0": 0.002,
+   "mCanopy": 0.01,
+   "hCanopy": 120,
+   "gammaCanopy": 2,
    "maxTrees": 300,
    "rain": 0
   }
@@ -274,7 +278,11 @@
     "d": 20,
     "qEst": 0.1,
     "pEst": 0.3,
+    "mortality": "sizeBlind",
     "m0": 0.002,
+    "mCanopy": 0.01,
+    "hCanopy": 120,
+    "gammaCanopy": 2,
     "maxTrees": 300,
     "rain": 0
    }
@@ -413,7 +421,11 @@
     "d": 20,
     "qEst": 0.1,
     "pEst": 0.3,
+    "mortality": "sizeBlind",
     "m0": 0.002,
+    "mCanopy": 0.01,
+    "hCanopy": 120,
+    "gammaCanopy": 2,
     "maxTrees": 300,
     "rain": 0
    }
@@ -552,7 +564,11 @@
     "d": 20,
     "qEst": 0.1,
     "pEst": 0.3,
+    "mortality": "sizeBlind",
     "m0": 0.002,
+    "mCanopy": 0.01,
+    "hCanopy": 120,
+    "gammaCanopy": 2,
     "maxTrees": 300,
     "rain": 0
    }
@@ -691,7 +707,11 @@
     "d": 20,
     "qEst": 0.1,
     "pEst": 0.3,
+    "mortality": "sizeBlind",
     "m0": 0.002,
+    "mCanopy": 0.01,
+    "hCanopy": 120,
+    "gammaCanopy": 2,
     "maxTrees": 300,
     "rain": 0
    }
@@ -830,7 +850,11 @@
     "d": 20,
     "qEst": 0.1,
     "pEst": 0.3,
+    "mortality": "sizeBlind",
     "m0": 0.002,
+    "mCanopy": 0.01,
+    "hCanopy": 120,
+    "gammaCanopy": 2,
     "maxTrees": 300,
     "rain": 0
    }
@@ -969,7 +993,11 @@
     "d": 20,
     "qEst": 0.1,
     "pEst": 0.3,
+    "mortality": "sizeBlind",
     "m0": 0.002,
+    "mCanopy": 0.01,
+    "hCanopy": 120,
+    "gammaCanopy": 2,
     "maxTrees": 300,
     "rain": 0
    }
@@ -1116,7 +1144,11 @@
     "d": 20,
     "qEst": 0.1,
     "pEst": 0.3,
+    "mortality": "sizeBlind",
     "m0": 0.002,
+    "mCanopy": 0.01,
+    "hCanopy": 120,
+    "gammaCanopy": 2,
     "maxTrees": 300,
     "rain": 0
    }
@@ -1255,7 +1287,11 @@
     "d": 20,
     "qEst": 0.1,
     "pEst": 0.3,
+    "mortality": "sizeBlind",
     "m0": 0.002,
+    "mCanopy": 0.01,
+    "hCanopy": 120,
+    "gammaCanopy": 2,
     "maxTrees": 300,
     "rain": 0
    }
@@ -1397,7 +1433,11 @@
     "d": 20,
     "qEst": 0.1,
     "pEst": 0.3,
+    "mortality": "sizeBlind",
     "m0": 0.002,
+    "mCanopy": 0.01,
+    "hCanopy": 120,
+    "gammaCanopy": 2,
     "maxTrees": 300,
     "rain": 0
    }
@@ -1543,7 +1583,11 @@
     "d": 20,
     "qEst": 0.1,
     "pEst": 0.3,
+    "mortality": "sizeBlind",
     "m0": 0.002,
+    "mCanopy": 0.01,
+    "hCanopy": 120,
+    "gammaCanopy": 2,
     "maxTrees": 300,
     "rain": 0
    }
@@ -1691,7 +1735,11 @@
     "d": 20,
     "qEst": 0.1,
     "pEst": 0.3,
+    "mortality": "sizeBlind",
     "m0": 0.002,
+    "mCanopy": 0.01,
+    "hCanopy": 120,
+    "gammaCanopy": 2,
     "maxTrees": 300,
     "rain": 0
    }
@@ -1857,7 +1905,11 @@
     "d": 20,
     "qEst": 0.1,
     "pEst": 0.3,
+    "mortality": "sizeBlind",
     "m0": 0.002,
+    "mCanopy": 0.01,
+    "hCanopy": 120,
+    "gammaCanopy": 2,
     "maxTrees": 300,
     "rain": 0
    }
@@ -2003,7 +2055,11 @@
     "d": 20,
     "qEst": 0.1,
     "pEst": 0.3,
+    "mortality": "sizeBlind",
     "m0": 0.002,
+    "mCanopy": 0.01,
+    "hCanopy": 120,
+    "gammaCanopy": 2,
     "maxTrees": 300,
     "rain": 0
    }
@@ -2169,7 +2225,11 @@
     "d": 20,
     "qEst": 0.1,
     "pEst": 0.3,
+    "mortality": "sizeBlind",
     "m0": 0.002,
+    "mCanopy": 0.01,
+    "hCanopy": 120,
+    "gammaCanopy": 2,
     "maxTrees": 300,
     "rain": 0
    }
@@ -2317,7 +2377,11 @@
     "d": 20,
     "qEst": 0.1,
     "pEst": 0.3,
+    "mortality": "sizeBlind",
     "m0": 0.002,
+    "mCanopy": 0.01,
+    "hCanopy": 120,
+    "gammaCanopy": 2,
     "maxTrees": 300,
     "rain": 0
    }
@@ -2456,7 +2520,11 @@
     "d": 20,
     "qEst": 0.1,
     "pEst": 0.3,
+    "mortality": "sizeBlind",
     "m0": 0.002,
+    "mCanopy": 0.01,
+    "hCanopy": 120,
+    "gammaCanopy": 2,
     "maxTrees": 300,
     "rain": 0
    }
@@ -2622,7 +2690,11 @@
     "d": 20,
     "qEst": 0.1,
     "pEst": 0.3,
+    "mortality": "sizeBlind",
     "m0": 0.002,
+    "mCanopy": 0.01,
+    "hCanopy": 120,
+    "gammaCanopy": 2,
     "maxTrees": 300,
     "rain": 0
    }
@@ -2761,7 +2833,11 @@
     "d": 20,
     "qEst": 0.1,
     "pEst": 0.3,
+    "mortality": "sizeBlind",
     "m0": 0.002,
+    "mCanopy": 0.01,
+    "hCanopy": 120,
+    "gammaCanopy": 2,
     "maxTrees": 300,
     "rain": 0
    }
@@ -3021,7 +3097,11 @@
     "d": 20,
     "qEst": 0.1,
     "pEst": 0.3,
+    "mortality": "sizeBlind",
     "m0": 0.002,
+    "mCanopy": 0.01,
+    "hCanopy": 120,
+    "gammaCanopy": 2,
     "maxTrees": 300,
     "rain": 0
    }
@@ -3289,7 +3369,11 @@
     "d": 20,
     "qEst": 0.1,
     "pEst": 0.3,
+    "mortality": "sizeBlind",
     "m0": 0.002,
+    "mCanopy": 0.01,
+    "hCanopy": 120,
+    "gammaCanopy": 2,
     "maxTrees": 300,
     "rain": 0
    }
@@ -3432,7 +3516,11 @@
     "d": 20,
     "qEst": 0.1,
     "pEst": 0.3,
+    "mortality": "sizeBlind",
     "m0": 0.002,
+    "mCanopy": 0.01,
+    "hCanopy": 120,
+    "gammaCanopy": 2,
     "maxTrees": 300,
     "rain": 0
    },
@@ -4748,7 +4836,11 @@
     "d": 20,
     "qEst": 0.1,
     "pEst": 0.3,
+    "mortality": "sizeBlind",
     "m0": 0.002,
+    "mCanopy": 0.01,
+    "hCanopy": 120,
+    "gammaCanopy": 2,
     "maxTrees": 300,
     "rain": 0
    },
@@ -6210,7 +6302,11 @@
     "d": 20,
     "qEst": 0.1,
     "pEst": 0.3,
+    "mortality": "sizeBlind",
     "m0": 0.002,
+    "mCanopy": 0.01,
+    "hCanopy": 120,
+    "gammaCanopy": 2,
     "maxTrees": 300,
     "rain": 0
    },
@@ -7672,7 +7768,11 @@
     "d": 20,
     "qEst": 0.1,
     "pEst": 0.3,
+    "mortality": "sizeBlind",
     "m0": 0.002,
+    "mCanopy": 0.01,
+    "hCanopy": 120,
+    "gammaCanopy": 2,
     "maxTrees": 300,
     "rain": 0
    },
@@ -9134,7 +9234,11 @@
     "d": 20,
     "qEst": 0.1,
     "pEst": 0.3,
+    "mortality": "sizeBlind",
     "m0": 0.002,
+    "mCanopy": 0.01,
+    "hCanopy": 120,
+    "gammaCanopy": 2,
     "maxTrees": 300,
     "rain": 0
    },
@@ -10596,7 +10700,11 @@
     "d": 20,
     "qEst": 0.1,
     "pEst": 0.3,
+    "mortality": "sizeBlind",
     "m0": 0.002,
+    "mCanopy": 0.01,
+    "hCanopy": 120,
+    "gammaCanopy": 2,
     "maxTrees": 300,
     "rain": 0
    },
@@ -12058,7 +12166,11 @@
     "d": 20,
     "qEst": 0.1,
     "pEst": 0.3,
+    "mortality": "sizeBlind",
     "m0": 0.002,
+    "mCanopy": 0.01,
+    "hCanopy": 120,
+    "gammaCanopy": 2,
     "maxTrees": 300,
     "rain": 0
    },
@@ -13521,7 +13633,11 @@
     "d": 20,
     "qEst": 0.1,
     "pEst": 0.3,
+    "mortality": "sizeBlind",
     "m0": 0.002,
+    "mCanopy": 0.01,
+    "hCanopy": 120,
+    "gammaCanopy": 2,
     "maxTrees": 300,
     "rain": 0
    },
@@ -14984,7 +15100,11 @@
     "d": 20,
     "qEst": 0.1,
     "pEst": 0.3,
+    "mortality": "sizeBlind",
     "m0": 0.002,
+    "mCanopy": 0.01,
+    "hCanopy": 120,
+    "gammaCanopy": 2,
     "maxTrees": 300,
     "rain": 0
    },
@@ -16474,7 +16594,11 @@
     "d": 20,
     "qEst": 0.1,
     "pEst": 0.3,
+    "mortality": "sizeBlind",
     "m0": 0.002,
+    "mCanopy": 0.01,
+    "hCanopy": 120,
+    "gammaCanopy": 2,
     "maxTrees": 300,
     "rain": 0
    }
@@ -16643,7 +16767,11 @@
     "d": 20,
     "qEst": 0.1,
     "pEst": 0.3,
+    "mortality": "sizeBlind",
     "m0": 0.002,
+    "mCanopy": 0.01,
+    "hCanopy": 120,
+    "gammaCanopy": 2,
     "maxTrees": 300,
     "rain": 0
    }
@@ -16837,7 +16965,11 @@
     "d": 20,
     "qEst": 0.1,
     "pEst": 0.3,
+    "mortality": "sizeBlind",
     "m0": 0.002,
+    "mCanopy": 0.01,
+    "hCanopy": 120,
+    "gammaCanopy": 2,
     "maxTrees": 300,
     "rain": 0
    }
@@ -17004,7 +17136,11 @@
     "d": 20,
     "qEst": 0.1,
     "pEst": 0.3,
+    "mortality": "sizeBlind",
     "m0": 0.002,
+    "mCanopy": 0.01,
+    "hCanopy": 120,
+    "gammaCanopy": 2,
     "maxTrees": 300,
     "rain": 0
    }
@@ -17198,7 +17334,11 @@
     "d": 20,
     "qEst": 0.1,
     "pEst": 0.3,
+    "mortality": "sizeBlind",
     "m0": 0.002,
+    "mCanopy": 0.01,
+    "hCanopy": 120,
+    "gammaCanopy": 2,
     "maxTrees": 300,
     "rain": 0
    }
@@ -17356,7 +17496,11 @@
     "d": 20,
     "qEst": 0.1,
     "pEst": 0.3,
+    "mortality": "sizeBlind",
     "m0": 0.002,
+    "mCanopy": 0.01,
+    "hCanopy": 120,
+    "gammaCanopy": 2,
     "maxTrees": 300,
     "rain": 0
    }
@@ -17525,7 +17669,11 @@
     "d": 20,
     "qEst": 0.1,
     "pEst": 0.3,
+    "mortality": "sizeBlind",
     "m0": 0.002,
+    "mCanopy": 0.01,
+    "hCanopy": 120,
+    "gammaCanopy": 2,
     "maxTrees": 300,
     "rain": 0
    }
@@ -17684,7 +17832,11 @@
     "d": 20,
     "qEst": 0.1,
     "pEst": 0.3,
+    "mortality": "sizeBlind",
     "m0": 0.002,
+    "mCanopy": 0.01,
+    "hCanopy": 120,
+    "gammaCanopy": 2,
     "maxTrees": 300,
     "rain": 0
    }

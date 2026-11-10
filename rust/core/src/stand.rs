@@ -110,7 +110,15 @@ mod tests {
     fn stem(id: usize, species: &str, height: f64) -> Tree {
         let mut t = Tree::new(id, id as f64 * 3.0, 0.5);
         t.species = species.into();
-        metamer(&mut t, -1, slot::MAIN, std::f64::consts::FRAC_PI_2, height, 0.1, 0.0);
+        metamer(
+            &mut t,
+            -1,
+            slot::MAIN,
+            std::f64::consts::FRAC_PI_2,
+            height,
+            0.1,
+            0.0,
+        );
         t
     }
 

@@ -30,13 +30,14 @@ describe("the garden's plate (I3)", () => {
     }
   });
 
-  it("plants one row down the slab's middle, a tree every 28 cells, recruits kept to its band", () => {
+  it("plants one row down the slab's middle, a tree every 28 cells, recruits over the whole depth", () => {
     const p = forestParams(66, 1);
     const D = p.world.depth ?? 64;
     expect(p.trees).toHaveLength(2);
     expect(forestParams(160, 1).trees).toHaveLength(6);
     expect(p.trees.every((t) => t.z === D / 2)).toBe(true);
-    expect(p.o4.band).toBe(28);
+    // No establishment band (ADR 0063, decision 4): recruits use the whole depth.
+    expect("band" in p.o4).toBe(false);
     // Recruits per cell of width: a quarter of the ring's 300 on 210 cells (the garden's clutter).
     expect(forestParams(210, 1).o4.maxTrees).toBe(75);
     expect(p.o4.maxTrees).toBe(24);
@@ -44,14 +45,12 @@ describe("the garden's plate (I3)", () => {
     expect(forestParams(160, 1, { recruits: 1 }).o4.maxTrees).toBe(229);
     expect(forestParams(66, 1, { recruits: 0.5 }).o4.maxTrees).toBe(47);
     expect(presetParams("mixedWood").o4.maxTrees).toBe(300);
-    expect(presetParams("mixedWood").o4.band).toBeUndefined();
   });
 
-  it("plants rows across the depth when asked, staggered, the band widening with them", () => {
+  it("plants rows across the depth when asked, staggered", () => {
     const p = forestParams(66, 1, { rows: 3, spacing: 22 });
     expect(p.trees).toHaveLength(9);
     expect(new Set(p.trees.map((t) => t.z)).size).toBe(3);
-    expect(p.o4.band).toBe(64);
     expect(p.o4.maxTrees).toBe(71);
   });
 

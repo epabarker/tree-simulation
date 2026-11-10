@@ -586,12 +586,6 @@ export interface Params {
      */
     rain?: number;
     /**
-     * The band of depth, in cells, that seedlings establish in, centred on the slab's middle (I3):
-     * the garden plants one row of trees, and its recruits stay about a crown's depth around it.
-     * Local seeds landing outside it are lost; seed rain lands inside it. Absent: anywhere.
-     */
-    band?: number;
-    /**
      * Planting at a density (ADR 0063, decision 5): the world starts from `density` saplings per
      * hectare (a cell is 0.25 m) over the whole width × depth instead of `trees`, at positions from
      * the keyed RNG, none closer than `spacing` cells to another (measured across the x and z wraps

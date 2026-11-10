@@ -606,8 +606,9 @@ export const FITTED_FLORA = {
       ground: true,
     },
     r6: { enabled: true, qMin: 0.013, leafArea: 2.609 },
+    // Holly recruits (ADR 0063, decision 7): it regenerates under shade and forms a beech
+    // wood's understorey. The species-level `enabled: false` it carried was never read; deleted.
     o4: {
-      enabled: false,
       cSeed: 8,
       d: 40,
       qEst: 0.01,

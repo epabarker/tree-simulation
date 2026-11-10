@@ -544,9 +544,9 @@ export const GARDEN_PLANTING: Planting = { rows: 1, spacing: 28, recruits: 0.25 
  *
  * The garden plants one row down the slab's middle (I3, the user's phone check): round 2's three
  * staggered rows (`perArea`) projected 21 crowns plus recruits onto one strip where the 2D garden
- * had 7, and no tree read as in front of another. Its recruits follow the row: capped per cell of
- * width, and established only in a band about a crown's depth (`spacing` per row) around it
- * (O4's `band`), so the depth does not fill with seedlings. The calibration's forest and the
+ * had 7, and no tree read as in front of another. Its recruits are capped per cell of width and
+ * establish anywhere in the depth (ADR 0063, decision 4: the band that kept them to the row is
+ * gone). The calibration's forest and the
  * woods keep round 2's planting per area; `mixedWood` itself keeps 300 trees.
  */
 export function forestParams(width = 210, seed?: number, planting: Partial<Planting> = {}): Params {
@@ -569,7 +569,7 @@ export function forestParams(width = 210, seed?: number, planting: Partial<Plant
   return mergeParams(base, {
     world: { ...base.world, width: W },
     trees,
-    o4: { ...base.o4, maxTrees, band: Math.min(D, R * spacing) },
+    o4: { ...base.o4, maxTrees },
   });
 }
 

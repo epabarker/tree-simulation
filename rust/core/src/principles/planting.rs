@@ -169,7 +169,8 @@ mod tests {
 
     #[test]
     fn absent_it_plants_todays_trees() {
-        let params = crate::testing::params("mixedWood");
+        // `succession` has no `o4.planting` (mixedWood has since #121).
+        let params = crate::testing::params("succession");
         let trees = plant(&params);
         assert_eq!(trees.len(), params.trees.len());
         assert!(

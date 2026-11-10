@@ -381,8 +381,10 @@ pub(crate) mod tests {
     #[test]
     fn holly_carries_no_species_flag_and_recruits_from_its_seed() {
         // ADR 0063, decision 7: holly's species-level `o4.enabled: false` was never read; it is
-        // deleted, and a holly with seed in a stand (mixedWood's species table) sets seedlings.
-        let wood = preset("mixedWood", "{}");
+        // deleted, and a holly with seed in a stand (the woodland's species table) sets seedlings.
+        // `succession`: mixedWood's world and species before #121, whose `o4.planting` would
+        // replace this test's `trees`.
+        let wood = preset("succession", "{}");
         let holly = wood.get("species").and_then(|s| s.get("holly")).unwrap();
         assert!(holly.get("o4").unwrap().get("enabled").is_none());
         let mut w = World::new(merge(
@@ -399,10 +401,12 @@ pub(crate) mod tests {
         assert!(w.trees[1..].iter().filter(|t| t.species == "holly").count() > 5);
     }
 
-    /// Willows recruited in 15 seasons of three planted willows in mixedWood's wood, with willow's
-    /// rain at `rain`; asserts on the way that no willow reaches R1's maturity or sets seed.
+    /// Willows recruited in 15 seasons of three planted willows in the woodland (`succession`:
+    /// mixedWood's world and species before #121, whose `o4.planting` would replace these
+    /// `trees`), with willow's rain at `rain`; asserts on the way that no willow reaches R1's
+    /// maturity or sets seed.
     fn willow_recruits(rain: f64) -> usize {
-        let wood = preset("mixedWood", "{}");
+        let wood = preset("succession", "{}");
         let mut willow = wood.get("species").unwrap().get("willow").unwrap().clone();
         let o4 = merge(
             willow.get("o4").unwrap(),

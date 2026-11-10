@@ -15,10 +15,7 @@ use crate::light::depth_of;
 use crate::math;
 use crate::params::{Params, TreeSpec};
 use crate::rng::{purpose, uniform};
-
-/// Metres per cell for the density's hectares. ADR 0062 reads the garden's 64-cell depth as
-/// 16 m and the playbook page the 160-cell garden as ≈ 0.064 ha: a cell is 0.25 m.
-pub const CELL_METRES: f64 = 0.25;
+use crate::stand::CELL_METRES;
 
 /// The planted stand's trees, in planting order.
 pub fn plant(params: &Params) -> Vec<TreeSpec> {

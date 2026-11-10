@@ -62,6 +62,9 @@ describe("the 3D core's structure (I2)", () => {
     expect(m.w90).toBeGreaterThanOrEqual(0);
     share(m.upperFlankNew);
     expect(Number.isInteger(m.budsOutside) && m.budsOutside >= 0).toBe(true);
+    // The live crown's vertical length: the height less liveCrownBase's numerator.
+    expect(m.crownLength).toBeCloseTo(m.height * (1 - m.liveCrownBase), 9);
+    expect(m.crownLength).toBeGreaterThan(0);
   });
 
   it("explodes exponentially when every bud grows, at one metamer a season on the leader", () => {

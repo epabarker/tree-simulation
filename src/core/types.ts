@@ -320,6 +320,12 @@ export interface TreeMetrics {
    * below the lowest living first-order limb as the season began: re-clothing of the bole (#125).
    */
   boleSprouts: number;
+  /**
+   * The live crown's vertical length, in cells: the height less where the lowest living first-order
+   * limb leaves the trunk (liveCrownBase's numerator); 0 when no limb lives. The bare-bole page's
+   * crown depth; `crownDepth` is the crown's extent in z.
+   */
+  crownLength: number;
 }
 
 export const METRIC_COLUMNS: readonly (keyof TreeMetrics)[] = [
@@ -374,6 +380,7 @@ export const METRIC_COLUMNS: readonly (keyof TreeMetrics)[] = [
   "shedCarbon",
   "shedBoth",
   "boleSprouts",
+  "crownLength",
 ];
 
 /** A change applied at the start of `season` (before that season runs). */

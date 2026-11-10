@@ -102,6 +102,7 @@ const METRIC_NUMBERS = [
   "shedCarbon",
   "shedBoth",
   "boleSprouts",
+  "crownLength",
 ] as const;
 const FLAGS = new Set(["alive", "sown"]);
 

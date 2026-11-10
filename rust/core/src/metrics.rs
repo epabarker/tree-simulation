@@ -19,7 +19,7 @@ const PI: f64 = std::f64::consts::PI;
 /// metrics.csv's columns (METRIC_COLUMNS), in order. `alive` and `sown` are flags (1/0) and
 /// `species` a string; every other column is a number.
 /// How many numbers a tree's metrics hold: METRIC_COLUMNS' and METRIC_NUMBERS' length.
-pub const METRIC_COUNT: usize = 51;
+pub const METRIC_COUNT: usize = 52;
 
 pub const METRIC_COLUMNS: [&str; METRIC_COUNT] = [
     "tree",
@@ -73,6 +73,7 @@ pub const METRIC_COLUMNS: [&str; METRIC_COUNT] = [
     "shedCarbon",
     "shedBoth",
     "boleSprouts",
+    "crownLength",
 ];
 
 /// The numeric fields of TreeMetrics, in this order (`sown` among them, as a flag), which the
@@ -129,6 +130,7 @@ pub const METRIC_NUMBERS: [&str; METRIC_COUNT] = [
     "shedCarbon",
     "shedBoth",
     "boleSprouts",
+    "crownLength",
 ];
 
 pub struct TreeMetrics {
@@ -268,18 +270,26 @@ fn limbs_of(tree: &Tree) -> Vec<i32> {
 /// gone is a dead stub and does not count (the model sheds limbs outright, so these are rare).
 /// 1 when no limb lives (the whole stem is bare); NaN for a tree of no height.
 pub fn live_crown_base(tree: &Tree, height: f64) -> f64 {
-    live_crown_base_of(tree, height, &limbs_of(tree))
+    live_crown_base_of(height, lowest_living_limb(tree))
 }
 
-/// `live_crown_base` with the tree's `limbs_of` already made (`tree_metrics` makes it once).
-fn live_crown_base_of(tree: &Tree, height: f64, limb: &[i32]) -> f64 {
+/// `live_crown_base` from the lowest living limb's height (`tree_metrics` finds it once).
+fn live_crown_base_of(height: f64, lowest: f64) -> f64 {
     if height <= 0.0 {
         return f64::NAN;
     }
-    math::min(
-        1.0,
-        math::min(height, lowest_living_limb_of(tree, limb)) / height,
-    )
+    math::min(1.0, math::min(height, lowest) / height)
+}
+
+/// The live crown's vertical length (the bare-bole page's crown depth; `crownDepth` is the
+/// crown's z extent): the height less where the lowest living first-order limb leaves the trunk,
+/// the same limb `live_crown_base` reads. In cells; 0 when no limb lives.
+fn crown_length(height: f64, lowest: f64) -> f64 {
+    if lowest.is_finite() {
+        height - math::min(height, lowest)
+    } else {
+        0.0
+    }
 }
 
 /// The height where the lowest living first-order limb leaves the trunk (`live_crown_base`'s
@@ -608,6 +618,7 @@ pub fn tree_metrics(tree: &Tree, world: Option<&World>) -> TreeMetrics {
     // Made once and shared: every leaf measure reads `leafy`, both limb measures `limb`.
     let leafy = leaves(tree, world);
     let limb = limbs_of(tree);
+    let lowest = lowest_living_limb_of(tree, &limb);
     let leaf_base = leaf_base_of(&leafy, height);
     let limb_base = limb_base_of(tree, world, height, &limb);
     let (top_fifth, below_sixth) = leaf_shares(&leafy, height);
@@ -679,7 +690,7 @@ pub fn tree_metrics(tree: &Tree, world: Option<&World>) -> TreeMetrics {
             } else {
                 0.0
             },
-            live_crown_base_of(tree, height, &limb),
+            live_crown_base_of(height, lowest),
             top_fifth,
             below_sixth,
             w90(&leafy, frame.as_ref()),
@@ -689,6 +700,7 @@ pub fn tree_metrics(tree: &Tree, world: Option<&World>) -> TreeMetrics {
             tree.shed_carbon,
             tree.shed_both,
             tree.bole_sprouts,
+            crown_length(height, lowest),
         ],
         species: tree.species.clone(),
     }
@@ -719,8 +731,8 @@ mod tests {
         t.bole_sprouts = 2.0;
         let m = tree_metrics(&t, None);
         let tail = ["shedRelative", "shedCarbon", "shedBoth", "boleSprouts"];
-        assert_eq!(METRIC_COLUMNS[METRIC_COUNT - 4..], tail);
-        assert_eq!(METRIC_NUMBERS[METRIC_COUNT - 4..], tail);
+        assert_eq!(METRIC_COLUMNS[47..51], tail);
+        assert_eq!(METRIC_NUMBERS[47..51], tail);
         assert_eq!(METRIC_COLUMNS[46], "budsOutside"); // the existing columns keep their places
         let got: Vec<f64> = tail.iter().map(|k| m.get(k)).collect();
         assert_eq!(got, vec![1.0, 0.0, 0.0, 2.0]);
@@ -834,6 +846,28 @@ mod tests {
         let m = tree_metrics(&t, None);
         assert_eq!(m.get("boleHeight"), 2.0);
         assert_eq!(m.get("liveCrownBase"), 0.25);
+    }
+
+    #[test]
+    fn the_crown_length_is_the_height_above_the_lowest_living_limb_and_0_with_none() {
+        // A 20-cell trunk; a dead limb at 2 (its bud terminated) and a live one at 6: the crown
+        // runs from 6 to 20 (14 cells), the vertical length, not the crown's z extent.
+        let mut t = Tree::new(0, 10.0, 0.5);
+        let trunk = stem(&mut t, 20);
+        let dead = metamer(&mut t, trunk[1] as i32, RIGHT, 0.0, 1.0, 0.01, 0.0);
+        let b = bud(&mut t, dead, slot::MAIN, 0.0, 1.0);
+        t.b.state[b] = crate::tree::bud::TERMINATED;
+        let live = metamer(&mut t, trunk[5] as i32, RIGHT, 0.0, 1.0, 0.01, 0.0);
+        let leaf = bud(&mut t, live, slot::MAIN, 0.0, 1.0);
+        let m = tree_metrics(&t, None);
+        assert_eq!(m.get("height"), 20.0);
+        assert_eq!(m.get("crownLength"), 14.0);
+        assert_eq!(m.get("crownDepth"), 0.0); // a picture-plane tree has no z extent
+        assert_eq!(METRIC_COLUMNS[METRIC_COUNT - 1], "crownLength");
+        assert_eq!(METRIC_NUMBERS[METRIC_COUNT - 1], "crownLength");
+        // No living limb: a bare stem has no live crown.
+        t.b.state[leaf] = crate::tree::bud::TERMINATED;
+        assert_eq!(tree_metrics(&t, None).get("crownLength"), 0.0);
     }
 
     #[test]

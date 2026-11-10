@@ -56,6 +56,10 @@ pub struct World {
     /// Events applied so far, as JSON ({season, type, …}).
     pub log: Vec<Value>,
     pub pending: Vec<Value>,
+    /// What the run did, as JSON ({season, type}), not replayed: `capReached` the first season
+    /// the cap holds (stand.rs; the season as stand.csv numbers it, after the season ran). Kept
+    /// apart from `log`, which is the replay's input, and out of the checkpoint's bytes.
+    pub notices: Vec<Value>,
 }
 
 /// The owner grid (O2, R5): one cell per light cell, W × H × D.
@@ -119,6 +123,7 @@ impl World {
             owners_tagged: false,
             log: Vec::new(),
             pending: Vec::new(),
+            notices: Vec::new(),
         };
         world.plant_due();
         world
@@ -169,6 +174,10 @@ impl World {
         self.plant_due();
         crate::season::run_season(self, mark);
         self.season += 1.0;
+        let noticed = |e: &Value| e.get("type").and_then(Value::as_str) == Some("capReached");
+        if !self.notices.iter().any(noticed) && crate::stand::cap_reached(self) {
+            self.notices.push(event(self.season, "capReached"));
+        }
     }
 
     /// Runs `seasons` seasons, applying recorded events at their seasons (CLI replay).
@@ -199,12 +208,14 @@ impl World {
         n
     }
 
-    /// `record()`: the initial params, every applied event and the season count.
+    /// `record()`: the initial params, every applied event and the season count, then the run's
+    /// notices (an output: a replay ignores them and raises them again).
     pub fn record(&self) -> Value {
         Value::Obj(vec![
             ("params".into(), self.initial_params.clone()),
             ("events".into(), Value::Arr(self.log.clone())),
             ("seasons".into(), Value::Num(self.season)),
+            ("notices".into(), Value::Arr(self.notices.clone())),
         ])
     }
 

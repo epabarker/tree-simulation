@@ -282,6 +282,25 @@ pub(crate) mod tests {
     }
 
     #[test]
+    fn the_seedling_bank_counts_against_the_cap() {
+        // A parent and two seedlings, all below the display threshold (none is drawn): with the
+        // cap at three nothing more establishes; with room for a fourth, something does.
+        let recruits = |max_trees: f64| {
+            let mut w = world(&format!(r#"{{"o4":{{"maxTrees":{max_trees}}}}}"#));
+            for (id, x) in [(1, 10.0), (2, 90.0)] {
+                let mut t = w.trees[0].clone();
+                (t.id, t.root_x) = (id, x);
+                w.trees.push(t);
+            }
+            assert_eq!(crate::stand::stand_metrics(&w).drawn, 0.0);
+            w.trees[0].seed_pool = 20.0;
+            stand_dynamics(&mut w)
+        };
+        assert_eq!(recruits(3.0), 0.0);
+        assert!(recruits(4.0) > 0.0);
+    }
+
+    #[test]
     fn wraps_seeds_round_periodic_sides_and_loses_them_beyond_open_ones() {
         let mut ring = world(
             r#"{"trees":[{"x":99}],"o4":{"d":30},

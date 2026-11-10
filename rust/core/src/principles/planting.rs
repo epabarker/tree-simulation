@@ -24,7 +24,7 @@ pub fn plant(params: &Params) -> Vec<TreeSpec> {
     };
     let (w, d) = (params.world.width, depth_of(params));
     let hectares = w * d * CELL_METRES * CELL_METRES / 10_000.0;
-    let n = math::max(0.0, (p.density * hectares).round()) as usize;
+    let n = math::max(0.0, math::round(p.density * hectares)) as usize;
     // Distance along one axis, the short way round when that axis wraps.
     let along = |a: f64, b: f64, size: f64, wraps: bool| {
         let gap = (a - b).abs();

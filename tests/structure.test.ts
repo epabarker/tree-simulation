@@ -62,6 +62,9 @@ describe("the 3D core's structure (I2)", () => {
     expect(m.w90).toBeGreaterThanOrEqual(0);
     share(m.upperFlankNew);
     expect(Number.isInteger(m.budsOutside) && m.budsOutside >= 0).toBe(true);
+    // The live crown's vertical length: the height less liveCrownBase's numerator.
+    expect(m.crownLength).toBeCloseTo(m.height * (1 - m.liveCrownBase), 9);
+    expect(m.crownLength).toBeGreaterThan(0);
   });
 
   it("explodes exponentially when every bud grows, at one metamer a season on the leader", () => {
@@ -93,6 +96,17 @@ describe("the 3D core's structure (I2)", () => {
     replay.run(record.seasons, record.events);
     expect(hashWorld(replay)).toBe(hashWorld(c));
     expect(hashWorld(c)).not.toBe(hashWorld(a));
+  });
+
+  it("draws the lab's seedling below 1.3 m; the garden's snapshot hides it", () => {
+    const world = new World(presetParams("skyTree"));
+    world.step();
+    expect(world.metricsOf(world.trees[0] as Tree).height).toBeLessThan(1.3 / 0.25);
+    const garden = world.snapshot(0, { junctions: false, field: false });
+    const lab = world.snapshot(0, { junctions: false, field: false, seedlings: true });
+    expect(garden.metrics).toHaveLength(0);
+    expect(lab.metrics).toHaveLength(1);
+    expect(lab.metamerCount).toBe((world.trees[0] as Tree).m.length);
   });
 
   it("lists the snapshot's rows far to near (zOrder, I3): a permutation, z0 descending", () => {

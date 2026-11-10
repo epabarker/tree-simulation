@@ -187,9 +187,18 @@ export interface Snapshot {
 export interface SnapshotOptions {
   junctions: boolean;
   field: boolean;
+  /**
+   * Draw the seedling bank too: every live tree, not only those at or above the display threshold
+   * (`stand::is_drawn`, 1.3 m). The lab sets it, so its lone tree shows from the first season; the
+   * garden leaves it off (the default). The stand's `drawn` count is the threshold's either way.
+   */
+  seedlings?: boolean;
 }
 
 export const FULL_SNAPSHOT: SnapshotOptions = { junctions: true, field: true };
+
+/** The lab's snapshots: full, and the seedling bank drawn (the lab is exempt from the threshold). */
+export const LAB_SNAPSHOT: SnapshotOptions = { ...FULL_SNAPSHOT, seedlings: true };
 
 export interface TreeMetrics {
   tree: number;
@@ -311,6 +320,12 @@ export interface TreeMetrics {
    * below the lowest living first-order limb as the season began: re-clothing of the bole (#125).
    */
   boleSprouts: number;
+  /**
+   * The live crown's vertical length, in cells: the height less where the lowest living first-order
+   * limb leaves the trunk (liveCrownBase's numerator); 0 when no limb lives. The bare-bole page's
+   * crown depth; `crownDepth` is the crown's extent in z.
+   */
+  crownLength: number;
 }
 
 export const METRIC_COLUMNS: readonly (keyof TreeMetrics)[] = [
@@ -365,6 +380,7 @@ export const METRIC_COLUMNS: readonly (keyof TreeMetrics)[] = [
   "shedCarbon",
   "shedBoth",
   "boleSprouts",
+  "crownLength",
 ];
 
 /** A change applied at the start of `season` (before that season runs). */

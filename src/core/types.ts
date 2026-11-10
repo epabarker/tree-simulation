@@ -356,9 +356,17 @@ export type RunEvent =
   | { season: number; type: "removeTree"; tree: number }
   | { season: number; type: "plantTree"; x: number; species?: string };
 
-/** Everything needed to reproduce a run: initial params plus the event log. */
+/**
+ * What the run did, not replayed: `capReached` the first season the stand's live trees (the
+ * seedling bank included) fill `o4.maxTrees`, numbered as stand.csv numbers seasons (ADR 0063).
+ */
+export type RunNotice = { season: number; type: "capReached" };
+
+/** Everything needed to reproduce a run: initial params plus the event log; then its notices. */
 export interface RunRecord {
   params: Params;
   events: RunEvent[];
   seasons: number;
+  /** An output of the run; a replay raises them again. Absent in records saved before #120. */
+  notices?: RunNotice[];
 }

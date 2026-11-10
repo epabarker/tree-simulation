@@ -32,6 +32,14 @@ pub fn stem_height(tree: &Tree) -> f64 {
     height
 }
 
+/// Whether the cap is reached: O4 on and the live trees, the seedling bank included, fill
+/// `o4.maxTrees` (the test establishment stops at). The cap is a compute guard only (ADR 0063,
+/// decision 2): a run that reaches it fails the schedule, so it is a measure and a notice.
+pub fn cap_reached(world: &World) -> bool {
+    let o4 = &world.params().o4;
+    o4.enabled && world.trees.iter().filter(|t| t.alive).count() as f64 >= o4.max_trees
+}
+
 /// One species' stems in the stand.
 pub struct SpeciesStems {
     pub species: String,
@@ -78,13 +86,12 @@ pub fn stand_metrics(world: &World) -> StandMetrics {
             e.1 += 1.0;
         }
     }
-    let o4 = &world.params().o4;
     StandMetrics {
         live: live.len() as f64,
         drawn,
         canopy,
         top_height: top,
-        cap_reached: o4.enabled && live.len() as f64 >= o4.max_trees,
+        cap_reached: cap_reached(world),
         species: by
             .into_iter()
             .map(|(s, (l, d))| SpeciesStems {
@@ -178,6 +185,45 @@ mod tests {
         let trees = || vec![stem(0, "oak", 2.0), stem(1, "oak", 32.0)];
         assert!(stand_metrics(&stand(trees(), 2.0)).cap_reached);
         assert!(!stand_metrics(&stand(trees(), 3.0)).cap_reached);
+    }
+
+    /// The seasons (as stand.csv numbers them, after the season ran) with a capReached notice,
+    /// and the first season stand_metrics flags the cap, over `seasons` seasons.
+    fn cap_run(patch: &str, seasons: usize) -> (Vec<f64>, Option<f64>) {
+        let mut w = crate::principles::o4::tests::world(patch);
+        let mut first = None;
+        for _ in 0..seasons {
+            w.step(&mut |_| {});
+            if first.is_none() && stand_metrics(&w).cap_reached {
+                first = Some(w.season);
+            }
+        }
+        let record = w.record();
+        let notices = match record.get("notices") {
+            Some(crate::json::Value::Arr(n)) => n.clone(),
+            other => panic!("no notices in the record: {other:?}"),
+        };
+        let seasons = notices
+            .iter()
+            .map(|e| {
+                assert_eq!(e.get("type").and_then(|t| t.as_str()), Some("capReached"));
+                e.get("season").and_then(|s| s.as_f64()).unwrap()
+            })
+            .collect();
+        (seasons, first)
+    }
+
+    #[test]
+    fn reaching_the_cap_emits_one_notice_at_the_season_the_measure_first_flags_it() {
+        // One tree, planted at season 3, fills a cap of one from then on.
+        let (notices, first) = cap_run(
+            r#"{"trees":[{"x":50,"plantSeason":3}],"o4":{"maxTrees":1}}"#,
+            8,
+        );
+        assert_eq!(first, Some(4.0));
+        assert_eq!(notices, vec![4.0]);
+        // Never reached, never noticed.
+        assert_eq!(cap_run("{}", 8), (vec![], None));
     }
 
     #[test]

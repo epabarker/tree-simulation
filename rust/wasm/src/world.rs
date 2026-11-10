@@ -226,7 +226,7 @@ impl World {
             .collect()
     }
 
-    /// The live trees' species, in the snapshot's metrics order.
+    /// The drawn trees' species, in the snapshot's metrics order.
     pub fn snapshot_species(&self) -> Vec<String> {
         self.snap.species.clone()
     }

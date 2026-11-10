@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { productionWorld } from "../../../tests/production-world.ts";
-import { presetParams, presets } from "../../core/presets.ts";
+import { forestParams, presetParams, presets } from "../../core/presets.ts";
 import { BudState } from "../../core/types.ts";
 import type { RustWorld, TreeView as Tree } from "../../wasm/world.ts";
 import { BARK_PALETTES } from "./bark-styles.ts";
@@ -275,7 +275,10 @@ describe("one scale (the lab's `&frame=height`, round 2's blind test)", () => {
 
 describe("clear boles (the lab's `&clearBole`, round 2)", () => {
   it("draws no rosettes on a trunk below its limb crown base, and every other leaf as before", () => {
-    const world = productionWorld(presetParams("forest", 1));
+    // The phone's garden: the forest's bole rosettes at season 40 were all on recruits under
+    // 1.3 m, which are no longer drawn (the seedling bank, ADR 0063); the garden's planted trees
+    // carry some.
+    const world = productionWorld(forestParams(66, 1));
     world.run(40);
     const scene = new Scene();
     scene.setSize(800, 600, 1);

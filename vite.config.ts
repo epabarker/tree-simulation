@@ -15,7 +15,9 @@ export default defineConfig({
     // The 2D-calibrated milestone tests: calibration's backlog (C1–C8), `npm run evidence:2d`.
     exclude: ["tests/evidence-2d/**", "**/node_modules/**"],
     environment: "node",
-    // Visible-test checks grow several 5-seed stands inside one test; 5 s is too tight under load.
-    testTimeout: 30_000,
+    // Visible-test checks grow several 5-seed stands inside one test. The longest take 5–17 s on a
+    // quiet machine and passed 30 s when other suites or simulators ran beside them (2026-11-10,
+    // load 10–15), so the limit leaves room for that; a hung test still fails.
+    testTimeout: 90_000,
   },
 });

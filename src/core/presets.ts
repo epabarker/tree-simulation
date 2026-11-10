@@ -573,6 +573,19 @@ export function forestParams(width = 210, seed?: number, planting: Partial<Plant
   });
 }
 
+/**
+ * The lone-tree stage: one tree of `species` alone, under the woodland's growth rules without
+ * recruitment or storms (`oakOpen`'s world, its oak swapped for `species`). The one source the
+ * species trials (cli/trials.ts) and the feature probe (cli/probe.ts) both read, so a change to
+ * the stage (the open-grown box, ADR 0062) reaches both.
+ */
+export function loneTreeParams(species: string, seed?: number): Params {
+  return mergeParams(presetParams("oakOpen", seed), {
+    world: { width: 160, height: TOP, walls: [] },
+    trees: [{ x: 80, species }],
+  });
+}
+
 /** Plate II (M19): an oak grown alone in the open, a new one for each seed. */
 export function specimenParams(seed: number): Params {
   return presetParams("oakOpen", seed);

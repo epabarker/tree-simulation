@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Feature probe (exploratory)</title>
+<!-- The feature probe's sheet (cli/probe.ts fills DATA). Generated under runs/probe/, never committed.
+     Every number here is a column of the core's output; the probe computes none of its own. -->
+<style>
+:root {
+  --bg: #f6f4ee; --fg: #222; --muted: #6b6b6b; --panel: #fff; --rule: #ddd;
+  --sky: #eef3f6; --ground: #b9a98a; --wood: #5b4636; --leaf: #4f8a3c; --outline: #1f3d16;
+  --head: #8a8a8a; --accent: #c0392b; --warn-bg: #fff3cd; --warn-fg: #6b4e00;
+  --floor-dark: 20, 22, 30; --floor-lit: 250, 225, 120;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #17181a; --fg: #e8e6e1; --muted: #a0a0a0; --panel: #212326; --rule: #333;
+    --sky: #1d2328; --ground: #5a5040; --wood: #b49a80; --leaf: #7cbc5f; --outline: #c6e8b4;
+    --head: #6d6d6d; --accent: #ff7a66; --warn-bg: #3a3014; --warn-fg: #ffd77a;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; padding: 16px; background: var(--bg); color: var(--fg); font: 14px/1.4 system-ui, sans-serif; }
+h1 { font-size: 18px; margin: 0 0 4px; } h2 { font-size: 16px; margin: 28px 0 8px; } h3 { font-size: 14px; margin: 16px 0 6px; }
+.meta { color: var(--muted); font-size: 12px; margin-bottom: 6px; }
+.badge { display: inline-block; background: var(--accent); color: #fff; border-radius: 4px; padding: 1px 6px; font-size: 12px; font-weight: 600; letter-spacing: .03em; }
+.warn { background: var(--warn-bg); color: var(--warn-fg); border-radius: 6px; padding: 8px 10px; margin: 8px 0; font-size: 13px; }
+code { font-size: 12px; word-break: break-all; }
+.scroll { overflow-x: auto; }
+.grid { display: grid; gap: 8px; min-width: 0; }
+.cell { background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; padding: 6px; min-width: 0; }
+.cell canvas { width: 100%; display: block; border-radius: 3px; }
+.cell canvas.frame { background: var(--sky); }
+.cap { font-size: 12px; color: var(--muted); margin-top: 4px; font-variant-numeric: tabular-nums; }
+.cap b { color: var(--fg); font-weight: 600; } .cap b.changed { color: var(--accent); }
+.rowlab { font-size: 12px; color: var(--muted); align-self: center; }
+details { font-size: 12px; margin-top: 4px; } summary { cursor: pointer; color: var(--muted); }
+table { border-collapse: collapse; font-variant-numeric: tabular-nums; font-size: 11px; }
+td, th { padding: 2px 5px; border-bottom: 1px solid var(--rule); text-align: right; }
+th:first-child, td:first-child, th:nth-child(2), td:nth-child(2) { text-align: left; }
+.legend span { display: inline-block; margin-right: 12px; font-size: 12px; }
+.sw { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 4px; vertical-align: -1px; }
+.charts { display: grid; gap: 8px; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+const DATA = /*DATA*/null;
+const css = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const HUES = [120, 35, 200, 280, 0, 60, 160, 320, 90, 15];
+const R = DATA.results, M = DATA.meta;
+const hasPatch = !!M.patch;
+const ARMS = hasPatch ? ["head", "patch"] : ["head"];
+const NAMES = [...new Set(R.flatMap((r) => Object.values(r.species)))].sort();
+const spColor = (name, a = 0.8) => `hsla(${HUES[NAMES.indexOf(name) % HUES.length]}, 45%, 45%, ${a})`;
+const get = (kind, width, seed, arm) => R.find((r) => r.kind === kind && (kind === "lone" || r.width === width) && r.seed === seed && r.arm === arm);
+const fmt = (x, d = 2) => (x == null ? "–" : Number.isInteger(x) ? String(x) : (+x).toFixed(d));
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+
+// One scale per stage (kind and width), so every frame of a stage compares directly.
+function bounds(rs, kind, width) {
+  let x0 = Infinity, x1 = -Infinity, y1 = 0;
+  for (const r of rs) for (const f of r.frames) {
+    for (let i = 0; i < f.leaves.length; i += 3) { x0 = Math.min(x0, f.leaves[i]); x1 = Math.max(x1, f.leaves[i]); y1 = Math.max(y1, f.leaves[i + 1]); }
+    for (let i = 0; i < f.wood.length; i += 5) { x0 = Math.min(x0, f.wood[i + 2]); x1 = Math.max(x1, f.wood[i + 2]); y1 = Math.max(y1, f.wood[i + 3]); }
+  }
+  if (kind === "garden" || !Number.isFinite(x0)) { x0 = 0; x1 = width; }
+  const pad = 2; return { x0: x0 - pad, x1: x1 + pad, y1: Math.max(4, y1 + pad) };
+}
+
+/** The frontal picture: wood, leafy buds, and each crown's outline (its leaves' upper and lower edge per metre). */
+function drawFrame(cv, r, f, b) {
+  const dpr = devicePixelRatio || 1, w = cv.clientWidth || 300;
+  const h = Math.min(360, Math.max(60, Math.round((w * b.y1) / (b.x1 - b.x0))));
+  cv.width = w * dpr; cv.height = h * dpr; cv.style.height = `${h}px`;
+  const g = cv.getContext("2d"); g.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const s = Math.min(w / (b.x1 - b.x0), h / b.y1), ox = (w - (b.x1 - b.x0) * s) / 2;
+  const X = (x) => ox + (x - b.x0) * s, Y = (y) => h - y * s;
+  g.fillStyle = css("--ground"); g.fillRect(0, h - 2, w, 2);
+  g.lineCap = "round"; g.strokeStyle = css("--wood");
+  for (let i = 0; i < f.wood.length; i += 5) {
+    g.lineWidth = Math.max(0.4, 2 * f.wood[i + 4] * s);
+    g.beginPath(); g.moveTo(X(f.wood[i]), Y(f.wood[i + 1])); g.lineTo(X(f.wood[i + 2]), Y(f.wood[i + 3])); g.stroke();
+  }
+  const d = Math.max(1, 0.5 * s), byTree = new Map();
+  for (let i = 0; i < f.leaves.length; i += 3) {
+    const t = f.leaves[i + 2], sp = r.species[t];
+    g.fillStyle = r.kind === "lone" ? css("--leaf") : spColor(sp, 0.7);
+    g.fillRect(X(f.leaves[i]) - d / 2, Y(f.leaves[i + 1]) - d / 2, d, d);
+    let e = byTree.get(t); if (!e) { e = new Map(); byTree.set(t, e); }
+    const k = Math.round(f.leaves[i]), v = e.get(k), y = f.leaves[i + 1];
+    e.set(k, v ? [Math.min(v[0], y), Math.max(v[1], y)] : [y, y]);
+  }
+  g.lineWidth = 1.2;
+  for (const [t, e] of byTree) {
+    const ks = [...e.keys()].sort((a, c) => a - c); if (ks.length < 2) continue;
+    g.strokeStyle = r.kind === "lone" ? css("--outline") : spColor(r.species[t], 1);
+    g.beginPath();
+    ks.forEach((k, i) => { (i ? g.lineTo : g.moveTo).call(g, X(k), Y(e.get(k)[1])); });
+    for (const k of [...ks].reverse()) g.lineTo(X(k), Y(e.get(k)[0]));
+    g.closePath(); g.stroke();
+  }
+  return { s, ox };
+}
+
+/** Floor light in plan: ground.csv's q per (x, z), x as the frame's, depth downwards; dark is shade. */
+function drawFloor(cv, f, b, { s, ox }) {
+  const { w: W, d: D, q } = f.floor;
+  const dpr = devicePixelRatio || 1, w = cv.clientWidth || 300;
+  const h = Math.max(12, Math.min(80, Math.round(D * s)));
+  cv.width = w * dpr; cv.height = h * dpr; cv.style.height = `${h}px`;
+  const g = cv.getContext("2d"); g.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const dark = css("--floor-dark").split(",").map(Number), lit = css("--floor-lit").split(",").map(Number);
+  const cw = s, ch = h / Math.max(1, D);
+  for (let z = 0; z < D; z++) for (let x = 0; x < W; x++) {
+    const v = q[z * W + x]; if (v == null) continue;
+    const t = Math.max(0, Math.min(1, v));
+    g.fillStyle = `rgb(${dark.map((c, k) => Math.round(c + (lit[k] - c) * t)).join(",")})`;
+    g.fillRect(ox + (x - b.x0) * s, z * ch, Math.ceil(cw), Math.ceil(ch));
+  }
+}
+
+const LONE_CAP = [["height", "H m", 1], ["crownWidth", "W m", 1], ["liveCrownBase", "live crown base", 2], ["w90", "w90", 2], ["topFifthLeaf", "top-fifth leaf", 2], ["upperFlankNew", "upper flank", 2], ["budsOutside", "buds outside", 0]];
+const STAND_CAP = [["live", "live", 0], ["drawn", "drawn", 0], ["canopy", "canopy", 0], ["topHeight", "top m", 1], ["capReached", "cap reached", 0]];
+const colIdx = (name) => M.columns.indexOf(name);
+const loneVal = (f, k) => f?.trees[0]?.values[colIdx(k)] ?? null;
+
+function caption(kind, f, base) {
+  const pairs = kind === "lone"
+    ? LONE_CAP.map(([k, l, d]) => [l, loneVal(f, k), base ? loneVal(base, k) : undefined, d])
+    : STAND_CAP.map(([k, l, d]) => [l, f.stand[k] ?? null, base ? base.stand[k] ?? null : undefined, d]);
+  // A patched value that differs from HEAD's is shown in the accent colour: both are the core's numbers.
+  return pairs.map(([l, v, o, d]) => `${l} <b class="${o !== undefined && o !== v ? "changed" : ""}">${fmt(v, d)}</b>`).join(" · ");
+}
+
+function treeTable(f) {
+  const rows = [...f.trees].sort((a, c) => (c.values[0] ?? 0) - (a.values[0] ?? 0));
+  return `<details><summary>${rows.length} live trees (metrics.csv)</summary><div class="scroll"><table><tr><th>tree</th><th>species</th>${M.columns.map((c) => `<th>${c}</th>`).join("")}</tr>${rows.map((t) => `<tr><td>${t.tree}</td><td>${esc(t.species)}</td>${t.values.map((v) => `<td>${fmt(v)}</td>`).join("")}</tr>`).join("")}</table></div></details>`;
+}
+
+function stageSheet(el, kind, width) {
+  const rs = R.filter((r) => r.kind === kind && (kind === "lone" || r.width === width));
+  const b = bounds(rs, kind, kind === "lone" ? rs[0].width : width);
+  const seasons = rs[0].frames.map((f) => f.season);
+  el.insertAdjacentHTML("beforeend", `<h3>${kind === "lone" ? `Lone tree: ${esc(M.species)}` : `Garden, ${width} cells`}</h3>`);
+  const wrap = document.createElement("div"); wrap.className = "scroll";
+  const grid = document.createElement("div"); grid.className = "grid";
+  grid.style.gridTemplateColumns = `56px repeat(${seasons.length}, minmax(${kind === "lone" ? 150 : 220}px, 1fr))`;
+  grid.insertAdjacentHTML("beforeend", `<div></div>${seasons.map((s) => `<div class="rowlab">season ${s}</div>`).join("")}`);
+  for (const seed of M.seeds) for (const arm of ARMS) {
+    grid.insertAdjacentHTML("beforeend", `<div class="rowlab">seed ${seed}<br>${arm === "patch" ? "patch" : "HEAD"}</div>`);
+    const r = get(kind, width, seed, arm), base = arm === "patch" ? get(kind, width, seed, "head") : null;
+    r.frames.forEach((f, k) => {
+      const c = document.createElement("div"); c.className = "cell";
+      const fr = document.createElement("canvas"); fr.className = "frame";
+      const fl = document.createElement("canvas"); fl.title = "floor light (ground.csv q), plan view";
+      c.append(fr, fl);
+      requestAnimationFrame(() => { drawFloor(fl, f, b, drawFrame(fr, r, f, b)); });
+      c.insertAdjacentHTML("beforeend", `<div class="cap">${caption(kind, f, base?.frames[k])}</div>${kind === "garden" ? treeTable(f) : ""}`);
+      grid.append(c);
+    });
+  }
+  wrap.append(grid); el.append(wrap);
+}
+
+/** A number over seasons, one line per seed and arm: HEAD grey, patch in the accent colour. */
+function chart(el, title, lines) {
+  const c = document.createElement("div"); c.className = "cell";
+  c.insertAdjacentHTML("beforeend", `<div class="cap"><b>${esc(title)}</b></div>`);
+  const cv = document.createElement("canvas"); c.append(cv); el.append(c);
+  requestAnimationFrame(() => {
+    const dpr = devicePixelRatio || 1, w = cv.clientWidth || 240, h = 130;
+    cv.width = w * dpr; cv.height = h * dpr; cv.style.height = `${h}px`;
+    const g = cv.getContext("2d"); g.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const pts = lines.flatMap((l) => l.points).filter((p) => p[1] != null);
+    if (!pts.length) { g.fillStyle = css("--muted"); g.font = "11px system-ui"; g.fillText("no values (NaN throughout)", 8, 20); return; }
+    const s1 = Math.max(...pts.map((p) => p[0])), lo = Math.min(0, ...pts.map((p) => p[1])), hi = Math.max(lo + 1e-9, ...pts.map((p) => p[1]));
+    const X = (x) => 34 + (x / s1) * (w - 40), Y = (y) => h - 16 - ((y - lo) / (hi - lo)) * (h - 26);
+    g.fillStyle = css("--muted"); g.font = "10px system-ui";
+    g.fillText(fmt(hi), 0, Y(hi) + 4); g.fillText(fmt(lo), 0, Y(lo)); g.fillText(`season ${s1}`, w - 62, h - 2);
+    for (const l of lines) {
+      g.strokeStyle = l.arm === "patch" ? css("--accent") : css("--head"); g.lineWidth = 1.4; g.beginPath();
+      let on = false;
+      for (const [x, y] of l.points) { if (y == null) { on = false; continue; } on ? g.lineTo(X(x), Y(y)) : g.moveTo(X(x), Y(y)); on = true; }
+      g.stroke();
+    }
+  });
+}
+
+function charts(el) {
+  el.insertAdjacentHTML("beforeend", `<h2>Numbers over seasons</h2><div class="meta">Every season, one line per seed${hasPatch ? ": HEAD grey, patch red" : ""}. Lone tree: its metrics.csv row. Garden: stand.csv and stand-species.csv.</div>`);
+  el.insertAdjacentHTML("beforeend", `<h3>Lone tree: ${esc(M.species)}</h3>`);
+  let box = document.createElement("div"); box.className = "charts"; el.append(box);
+  M.columns.forEach((name, k) => { chart(box, name, R.filter((r) => r.kind === "lone").map((r) => ({ arm: r.arm, points: r.series.map((row) => [row[0], row[k + 1]]) }))); });
+  for (const width of M.stages.widths) {
+    const rs = R.filter((r) => r.kind === "garden" && r.width === width);
+    el.insertAdjacentHTML("beforeend", `<h3>Garden, ${width} cells</h3>`);
+    box = document.createElement("div"); box.className = "charts"; el.append(box);
+    for (const k of ["live", "drawn", "canopy", "topHeight", "capReached"]) chart(box, `stand: ${k}`, rs.map((r) => ({ arm: r.arm, points: r.stand.map((row) => [row.season, row[k]]) })));
+    const names = [...new Set(rs.flatMap((r) => r.standSpecies.map((x) => x.species)))].sort();
+    for (const n of names) chart(box, `share of drawn: ${n}`, rs.map((r) => ({ arm: r.arm, points: r.stand.map((row) => [row.season, r.standSpecies.find((x) => x.season === row.season && x.species === n)?.share ?? null]) })));
+  }
+}
+
+function render() {
+  const el = document.getElementById("app"); el.innerHTML = "";
+  el.insertAdjacentHTML("beforeend", `<h1>Feature probe: ${esc(M.label)} <span class="badge">EXPLORATORY</span></h1>
+  <div class="meta"><b>${esc(M.note)}</b></div>
+  <div class="meta">commit ${esc(M.commit)} · seeds ${M.seeds.join(", ")} · lone tree at ${M.stages.lone.join("/")} · garden ${M.stages.widths.join(" and ")} cells at ${M.stages.garden.join("/")} · ${esc(M.date)} · ${M.wall.toFixed(0)} s</div>
+  <div class="meta">patch: <code>${M.patch ? esc(JSON.stringify(M.patch)) : "none (HEAD only)"}</code></div>
+  ${M.warnings.map((w) => `<div class="warn">⚠ ${esc(w)}</div>`).join("")}
+  <div class="meta">Each frame: the crown seen from the front (wood, leafy buds, each crown's outline), and under it the floor light in plan (ground.csv's q/C, dark = shade, depth downwards). Numbers are the core's metrics.csv / stand.csv columns as written; a patched value unlike HEAD's is in red. Heights in m (one cell is 1 m).</div>
+  <div class="meta legend">${NAMES.map((n) => `<span><i class="sw" style="background:${spColor(n, 1)}"></i>${esc(n)}</span>`).join("")}</div>
+  <h2>Contact sheet</h2>`);
+  stageSheet(el, "lone", 0);
+  for (const w of M.stages.widths) stageSheet(el, "garden", w);
+  charts(el);
+}
+let last = innerWidth;
+addEventListener("resize", () => { if (innerWidth !== last) { last = innerWidth; render(); } });
+render();
+</script>
+</body>
+</html>

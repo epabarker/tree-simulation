@@ -78,6 +78,7 @@ I found no study testing a vertical-plane tree model against 3D. Forestry reduce
 10. **Emergent signature.** Hollow interior, dense shell, lean toward gaps.
 11. **Cost.** O(B·(q_max+1)²) or O(K·W·H).
 12. **Baseline.** In baseline; sky sweep new.
+13. **Light entry (a World effect, ADR 0062).** How sky enters the slab past its bounds is set per world, never per species: every species in a world sees the same light and differs only in its response. The sky stays at 15–90°. **The lone-tree stage is open-grown:** open sky on all four sides (τ = 1 on both z faces, open x sides) in a square box sized from the crown, 60 m (240 cells) for the six exemplars to season 100, the tree at its centre (`oakOpen`, `beechOpen`, `loneTreeParams`). **Zero buds outside the box** (`budsOutside`) is a hard check on every lone-tree run (`cli/open-grown.ts`, ≥ 20 seeds); a crown is never clipped to save cost, and a bud past a bound is reported with its seed. The garden's depth is to become periodic (ADR 0058), so its side light follows from the stand's density; the τ faces (wood edge 1/0.2, hedgerow 1/1) stay as settings for a host page, and `faceWood` stays off and bit-identical. Calibrations made between the old τ 0.2 walls are evidence, not baselines.
 
 #### C3. Basipetal light summation and acropetal Borchert–Honda allocation
 1. **Statement.** Light sums tips-to-base; v = α·Q_base flows back up and splits at each node between axis and lateral by light, biased by λ.

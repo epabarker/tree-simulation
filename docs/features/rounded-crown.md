@@ -8,7 +8,7 @@ A **Form feature** (GLOSSARY): a crown whose outline is full at the top while th
 - **After the stall, a flattening top is realistic.** Once height growth has stalled, a flattened top with thickened limbs is what old trees do (Ryan & Yoder 1997; Roloff's phases in beech, via Innes 1998).
 - **The defect** is a flat cap or a spire on a tree that is still growing taller.
 - **W/H rising with DBH** is a species expression, not the definition. Pretzsch 2015 has it for oak and lime only. Beech, hornbeam and sycamore keep broad crowns while their W/H falls slightly.
-- Judged on a lone **open-grown** tree in the lab (ADR 0062). The garden is only a guard: no bare-bole species loses its lid or crown depth, and no named regression gets worse.
+- Judged on a lone **open-grown** tree in the lab (ADR 0062). That stage is built ([#115](https://github.com/epabarker/tree-simulation/issues/115)): `loneTreeParams`, `oakOpen` and `beechOpen` are a square 60 m box open on all four sides, which the feature probe reads ([light entry](light-entry.md)). The garden is only a guard: no bare-bole species loses its lid or crown depth, and no named regression gets worse.
 
 ## Today (open-grown box, seeds 1–3, season 100)
 

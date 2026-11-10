@@ -35,7 +35,13 @@ import {
   type SpeciesPatch,
   speciesParams,
 } from "../src/core/params.ts";
-import { loneTreeParams, perArea, presetParams, TOP } from "../src/core/presets.ts";
+import {
+  halfWalledParams,
+  loneTreeParams,
+  perArea,
+  presetParams,
+  TOP,
+} from "../src/core/presets.ts";
 import { coreWasm, loadWorldsSync, RustWorld, type TreeView as Tree } from "../src/wasm/world.ts";
 import { type Allometry, allometry } from "./allometry.ts";
 
@@ -54,9 +60,13 @@ export const ROOFS = [1, 1.2, 1.5, 1.75, 2, 2.6, 3.3, 4, 4.8, 5.6];
 /** Seasons a shade-house seedling is followed: alive at 30 is survival (M19). */
 export const SHADE_SEASONS = 30;
 
-/** The woodland's growth rules (oakOpen's: no recruitment, no storms) with `patch` on top. */
+/**
+ * The woodland's growth rules (oakOpen's: no recruitment, no storms) with `patch` on top, in the
+ * half-walled world the trials were calibrated in (presets.ts' `halfWalledParams`): `oakOpen`'s own
+ * world is the open-grown box (ADR 0062), which a partial world patch would otherwise inherit.
+ */
 export function trialBase(seed: number, patch: Partial<Params>): Params {
-  return mergeParams(presetParams("oakOpen", seed), patch);
+  return mergeParams(halfWalledParams(seed), patch);
 }
 
 /** The lone-tree stage (presets.ts' `loneTreeParams`, which the feature probe reads too). */

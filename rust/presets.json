@@ -3381,18 +3381,20 @@
   "oakOpen": {
    "seed": 1,
    "world": {
-    "width": 160,
+    "width": 240,
     "height": 200,
-    "depth": 64,
+    "depth": 240,
     "faces": [
-     0.2,
-     0.2
+     1,
+     1
     ],
-    "walls": []
+    "walls": [],
+    "sidesZ": "open"
    },
    "trees": [
     {
-     "x": 80,
+     "x": 120,
+     "z": 120,
      "species": "oak"
     }
    ],
@@ -4703,16 +4705,18 @@
    "world": {
     "width": 240,
     "height": 200,
-    "depth": 64,
+    "depth": 240,
     "faces": [
-     0.2,
-     0.2
+     1,
+     1
     ],
-    "walls": []
+    "walls": [],
+    "sidesZ": "open"
    },
    "trees": [
     {
      "x": 120,
+     "z": 120,
      "species": "beech"
     }
    ],

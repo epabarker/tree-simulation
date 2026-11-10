@@ -13534,160 +13534,10 @@
      0.2
     ],
     "walls": [],
-    "sides": "periodic"
+    "sides": "periodic",
+    "sidesZ": "periodic"
    },
-   "trees": [
-    {
-     "species": "birch",
-     "x": 10,
-     "z": 10.666666666666666
-    },
-    {
-     "species": "oak",
-     "x": 31,
-     "z": 10.666666666666666
-    },
-    {
-     "species": "willow",
-     "x": 52,
-     "z": 10.666666666666666
-    },
-    {
-     "species": "beech",
-     "x": 73,
-     "z": 10.666666666666666
-    },
-    {
-     "species": "birch",
-     "x": 94,
-     "z": 10.666666666666666
-    },
-    {
-     "species": "hornbeam",
-     "x": 115,
-     "z": 10.666666666666666
-    },
-    {
-     "species": "rowan",
-     "x": 136,
-     "z": 10.666666666666666
-    },
-    {
-     "species": "birch",
-     "x": 157,
-     "z": 10.666666666666666
-    },
-    {
-     "species": "holly",
-     "x": 178,
-     "z": 10.666666666666666
-    },
-    {
-     "species": "maple",
-     "x": 199,
-     "z": 10.666666666666666
-    },
-    {
-     "species": "beech",
-     "x": 17,
-     "z": 32
-    },
-    {
-     "species": "birch",
-     "x": 38,
-     "z": 32
-    },
-    {
-     "species": "hornbeam",
-     "x": 59,
-     "z": 32
-    },
-    {
-     "species": "rowan",
-     "x": 80,
-     "z": 32
-    },
-    {
-     "species": "birch",
-     "x": 101,
-     "z": 32
-    },
-    {
-     "species": "holly",
-     "x": 122,
-     "z": 32
-    },
-    {
-     "species": "maple",
-     "x": 143,
-     "z": 32
-    },
-    {
-     "species": "birch",
-     "x": 164,
-     "z": 32
-    },
-    {
-     "species": "oak",
-     "x": 185,
-     "z": 32
-    },
-    {
-     "species": "willow",
-     "x": 206,
-     "z": 32
-    },
-    {
-     "species": "rowan",
-     "x": 24,
-     "z": 53.333333333333336
-    },
-    {
-     "species": "birch",
-     "x": 45,
-     "z": 53.333333333333336
-    },
-    {
-     "species": "holly",
-     "x": 66,
-     "z": 53.333333333333336
-    },
-    {
-     "species": "maple",
-     "x": 87,
-     "z": 53.333333333333336
-    },
-    {
-     "species": "birch",
-     "x": 108,
-     "z": 53.333333333333336
-    },
-    {
-     "species": "oak",
-     "x": 129,
-     "z": 53.333333333333336
-    },
-    {
-     "species": "willow",
-     "x": 150,
-     "z": 53.333333333333336
-    },
-    {
-     "species": "beech",
-     "x": 171,
-     "z": 53.333333333333336
-    },
-    {
-     "species": "birch",
-     "x": 192,
-     "z": 53.333333333333336
-    },
-    {
-     "species": "hornbeam",
-     "x": 3,
-     "z": 53.333333333333336
-    }
-   ],
+   "trees": [],
    "c1": {
     "phyllotaxis": "spiral",
     "divergence": 137.5,
@@ -13809,7 +13659,7 @@
     "d": 20,
     "qEst": 0.1,
     "pEst": 0.3,
-    "mortality": "sizeBlind",
+    "mortality": "twoPart",
     "m0": 0.002,
     "mCanopy": 0.01,
     "hCanopy": 120,
@@ -13818,7 +13668,23 @@
     "suppressionSlope": 0.92,
     "shadeTolerance": 3,
     "maxTrees": 300,
-    "rain": 0
+    "rain": 0,
+    "planting": {
+     "density": 400,
+     "spacing": 12,
+     "species": [
+      "birch",
+      "oak",
+      "willow",
+      "beech",
+      "birch",
+      "hornbeam",
+      "rowan",
+      "birch",
+      "holly",
+      "maple"
+     ]
+    }
    },
    "species": {
     "birch": {

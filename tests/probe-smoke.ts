@@ -24,7 +24,7 @@ const dir = join(ROOT, "runs", "probe", label);
 
 // A species the 54-cell garden of seed 1 does not plant: its patch must be flagged, not read as
 // "no change". Chosen from the planting itself, so the test follows the garden when it changes.
-const planted = new Set(forestParams(54, 1).trees.map((t) => t.species));
+const planted = new Set(forestParams(54, 1).o4.planting?.species ?? []);
 const absent = Object.keys(FLORA).find((s) => !planted.has(s));
 assert.ok(absent, "every species is planted in the 54-cell garden: pick a narrower one");
 

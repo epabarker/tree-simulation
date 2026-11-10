@@ -30,28 +30,90 @@ describe("the garden's plate (I3)", () => {
     }
   });
 
-  it("plants one row down the slab's middle, a tree every 28 cells, recruits over the whole depth", () => {
-    const p = forestParams(66, 1);
-    const D = p.world.depth ?? 64;
-    expect(p.trees).toHaveLength(2);
-    expect(forestParams(160, 1).trees).toHaveLength(6);
-    expect(p.trees.every((t) => t.z === D / 2)).toBe(true);
-    // No establishment band (ADR 0063, decision 4): recruits use the whole depth.
-    expect("band" in p.o4).toBe(false);
-    // Recruits per cell of width: a quarter of the ring's 300 on 210 cells (the garden's clutter).
-    expect(forestParams(210, 1).o4.maxTrees).toBe(75);
-    expect(p.o4.maxTrees).toBe(24);
-    expect(forestParams(160, 1).o4.maxTrees).toBe(57);
-    expect(forestParams(160, 1, { recruits: 1 }).o4.maxTrees).toBe(229);
-    expect(forestParams(66, 1, { recruits: 0.5 }).o4.maxTrees).toBe(47);
-    expect(presetParams("mixedWood").o4.maxTrees).toBe(300);
+  it("is the 0062/0063 garden: a periodic depth, planted per area, the two-part mortality", () => {
+    for (const p of [forestParams(160, 1), forestParams(66, 3), presetParams("mixedWood")]) {
+      // ADR 0062, decision 3: beyond each face lies the stand's own depth, D kept at 64.
+      expect(p.world.sidesZ).toBe("periodic");
+      expect(p.world.depth).toBe(64);
+      expect(p.world.faceWood ?? 0).toBe(0);
+      // ADR 0063: density from establishment and the two-part mortality, no band.
+      expect(p.o4.mortality).toBe("twoPart");
+      expect("band" in p.o4).toBe(false);
+      expect(p.o4.planting?.density).toBe(400);
+      // Today's mix (user story 29), cycled by the seed in the core.
+      expect(p.o4.planting?.species).toEqual([
+        "birch",
+        "oak",
+        "willow",
+        "beech",
+        "birch",
+        "hornbeam",
+        "rowan",
+        "birch",
+        "holly",
+        "maple",
+      ]);
+      // The planting replaces the row: no misleading `trees` left beside it.
+      expect(p.trees).toEqual([]);
+    }
   });
 
-  it("plants rows across the depth when asked, staggered", () => {
-    const p = forestParams(66, 1, { rows: 3, spacing: 22 });
-    expect(p.trees).toHaveLength(9);
-    expect(new Set(p.trees.map((t) => t.z)).size).toBe(3);
-    expect(p.o4.maxTrees).toBe(71);
+  it("plants about 400 saplings a hectare over the whole width × depth at every width", () => {
+    // 160 × 64 cells at 0.25 m is 0.064 ha: 26 saplings; 66 × 64 is 0.0264 ha: 11.
+    for (const [width, n] of [
+      [160, 26],
+      [66, 11],
+    ] as const) {
+      for (const seed of [1, 2, 3]) {
+        const world = productionWorld(forestParams(width, seed));
+        const trees = world.trees;
+        expect(trees).toHaveLength(n);
+        // Spread over the depth, not one row down the middle.
+        const zs = trees.map((t) => t.rootZ);
+        expect(Math.max(...zs) - Math.min(...zs)).toBeGreaterThan(32);
+        world.dispose();
+      }
+    }
+  });
+
+  it("keeps the cap a guard well above the planting, the same per area at every width", () => {
+    const at160 = forestParams(160, 1).o4.maxTrees;
+    const at66 = forestParams(66, 1).o4.maxTrees;
+    expect(at160).toBeGreaterThan(2 * 26);
+    expect(at160 / 160).toBeCloseTo(at66 / 66, 1);
+  });
+
+  it("leaves the superseded faceWood off and bit-identical (ADR 0062, decision 7)", () => {
+    const hashOf = (p: ReturnType<typeof forestParams>) => {
+      const world = productionWorld(p);
+      world.step(4);
+      const h = world.hash();
+      world.dispose();
+      return h;
+    };
+    for (const p of [forestParams(66, 1, { faces: "woodEdge" }), presetParams("skyStand")]) {
+      expect(hashOf({ ...p, world: { ...p.world, faceWood: 0 } })).toBe(hashOf(p));
+    }
+  });
+
+  it("keeps the wood-edge and hedgerow faces selectable for a host page (ADR 0062, decision 5)", () => {
+    const edge = forestParams(160, 1, { faces: "woodEdge" });
+    expect(edge.world.sidesZ).toBe("open");
+    expect(edge.world.faces).toEqual([1, 0.2]);
+    const hedge = forestParams(66, 1, { faces: "hedgerow" });
+    expect(hedge.world.sidesZ).toBe("open");
+    expect(hedge.world.faces).toEqual([1, 1]);
+    // An open-faced garden still runs, and differs from the periodic one.
+    const hashes = [forestParams(66, 1), hedge, forestParams(66, 1, { faces: "woodEdge" })].map(
+      (p) => {
+        const world = productionWorld(p);
+        world.step(3);
+        const h = world.hash();
+        world.dispose();
+        return h;
+      },
+    );
+    expect(new Set(hashes).size).toBe(3);
   });
 
   it("frames a young garden for half the plate's height, not half the 200-cell top", () => {

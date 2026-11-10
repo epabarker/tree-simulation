@@ -163,6 +163,20 @@ const MIXED = [
 
 export const STAND_X = [20, 41, 62, 83, 104, 125, 146, 167, 188, 209].map((x) => ({ x }));
 
+/**
+ * The 0062/0063 garden (#121): the depth is periodic (ADR 0062, decision 3; ADR 0058), so side
+ * light follows from the stand's own density; the stand starts from `o4.planting`'s saplings per
+ * hectare over the whole width × depth (ADR 0063, decision 5), `MIXED` cycled by the seed, and
+ * thins by the two-part mortality (decision 3). The schedule's rates were tuned on the feature
+ * probe, seeds 1–3, exploratory (`experiments/2026-11-10-garden-schedule.md`).
+ */
+const GARDEN_WORLD = { ...RING, sidesZ: "periodic" } satisfies Params["world"];
+const GARDEN_O4 = {
+  ...WOODLAND.o4,
+  mortality: "twoPart",
+  planting: { density: 400, spacing: 12, species: [...MIXED] },
+} satisfies ParamsPatch["o4"];
+
 export const presets = {
   explosion: {
     label: "M0: unchecked growth",
@@ -469,12 +483,11 @@ export const presets = {
     description:
       "Nine native species around a ring: birch and goat willow pioneer, rowan and field maple fill gaps, holly and hornbeam wait beneath, and beech and oak take the canopy.",
     patch: {
-      world: RING,
-      // Each row turns the mix by three, so no two of a kind stand side by side in depth either.
-      trees: perArea(RING_X, RING.width, (i, r) => ({
-        species: MIXED[(i + 3 * r) % MIXED.length] as string,
-      })),
+      // The garden's world and schedule at the ring's width (#121): `o4.planting` plants it.
+      world: GARDEN_WORLD,
+      trees: [],
       ...WOODLAND,
+      o4: GARDEN_O4,
     },
   },
   succession: {
@@ -517,59 +530,51 @@ export function isPresetName(name: string): name is PresetName {
 }
 
 /**
- * How the garden plants its ring (I3; the picture sets it, not the calibration): `rows` rows of
- * trees across the slab's depth, a tree every `spacing` cells along each, and the recruits capped
- * at `recruits` × the ring's density per cell of width (300 on 210 cells) per row.
+ * How the garden is planted and bounded (ADR 0063; a host page may override any of it):
+ * `density` saplings per hectare over the whole width × depth, none closer than `spacing` cells
+ * (`o4.planting`); the cap on live trees, seedlings included, at `cap` stems per hectare, a compute
+ * guard that a settled garden never reaches (decision 2); and the depth's `faces`: "wood" (the
+ * default, a periodic depth, ADR 0062 decision 3), or the open faces a host page may still show
+ * (decision 5), "woodEdge" (τ 1 in front, 0.2 behind) and "hedgerow" (1, 1).
  */
 export interface Planting {
-  rows: number;
+  density: number;
   spacing: number;
-  recruits: number;
+  cap: number;
+  faces: "wood" | "woodEdge" | "hedgerow";
 }
 
-/**
- * The garden's planting: one row, as the 2D garden had, each tree a 3D crown, a tree every 28
- * cells (the user's phone check, I3: 21 read as cluttered; a second row at 24 mildly so). Recruits
- * at a quarter of the ring's density (2026-11-06, the user found 0.16.0 cluttered): at 1 every
- * opening forest filled its cap (229 at 160 cells) by season 80, mostly with suppressed saplings;
- * at 0.25 it holds 57, and the garden's 20-seed checks hold against their base
- * (`experiments/2026-11-06-garden-recruits.md`).
- */
-export const GARDEN_PLANTING: Planting = { rows: 1, spacing: 28, recruits: 0.25 };
+/** The garden's planting: about 400 saplings a hectare (ADR 0063, decision 5). */
+export const GARDEN_PLANTING: Planting = { density: 400, spacing: 12, cap: 2500, faces: "wood" };
+
+/** A cell's side in metres (ADR 0064; the core's `stand::CELL_METRES`). */
+const CELL_METRES = 0.25;
+
+/** The open faces' τ (front, back), ADR 0024's looks. */
+const OPEN_FACES = { woodEdge: [1, 0.2], hedgerow: [1, 1] } as const;
 
 /**
- * The `mixedWood` woodland (M25) on a ring `width` cells wide: about as wide as the host is wide
- * relative to the world's height, so a phone gets a narrower forest. The seed turns the planting
- * pattern (`MIXED`), so each forest starts from a different mix.
- *
- * The garden plants one row down the slab's middle (I3, the user's phone check): round 2's three
- * staggered rows (`perArea`) projected 21 crowns plus recruits onto one strip where the 2D garden
- * had 7, and no tree read as in front of another. Its recruits are capped per cell of width and
- * establish anywhere in the depth (ADR 0063, decision 4: the band that kept them to the row is
- * gone). The calibration's forest and the
- * woods keep round 2's planting per area; `mixedWood` itself keeps 300 trees.
+ * The `mixedWood` woodland (M25), the 0062/0063 garden, on a ring `width` cells wide: about as
+ * wide as the host is wide relative to the world's height, so a phone gets a narrower forest at
+ * the same density per area (user story 15). The seed turns the planting's positions and its mix
+ * (`MIXED`), so each forest starts differently.
  */
 export function forestParams(width = 210, seed?: number, planting: Partial<Planting> = {}): Params {
-  const { rows, spacing, recruits } = { ...GARDEN_PLANTING, ...planting };
+  const { density, spacing, cap, faces } = { ...GARDEN_PLANTING, ...planting };
   const base = presetParams("mixedWood", seed);
-  // A phone in portrait gets a narrow ring of two or three trees, drawn large (D1).
+  // A phone in portrait gets a narrow ring, drawn large (D1).
   const W = Math.round(Math.min(520, Math.max(54, width)));
   const D = base.world.depth ?? 64;
-  const n = Math.max(2, Math.round(W / spacing));
-  const R = Math.max(1, Math.round(rows));
-  const trees = Array.from({ length: R }, (_, r) =>
-    Array.from({ length: n }, (_, k) => ({
-      species: MIXED[(k + 3 * r + base.seed) % MIXED.length] as string,
-      // Rows after the first shift along x a fraction of the spacing, staggered as perArea's.
-      x: (((k + 0.5) * W) / n + (r * spacing) / R) % W,
-      z: (D * (r + 0.5)) / R,
-    })),
-  ).flat();
-  const maxTrees = Math.max(20, Math.round(((300 * W) / RING.width) * R * recruits));
+  const hectares = (W * D * CELL_METRES * CELL_METRES) / 10_000;
+  const maxTrees = Math.max(20, Math.round(cap * hectares));
+  const world: Params["world"] =
+    faces === "wood"
+      ? { ...base.world, width: W }
+      : { ...base.world, width: W, sidesZ: "open", faces: [...OPEN_FACES[faces]] };
   return mergeParams(base, {
-    world: { ...base.world, width: W },
-    trees,
-    o4: { ...base.o4, maxTrees },
+    world,
+    trees: [],
+    o4: { ...base.o4, maxTrees, planting: { ...GARDEN_O4.planting, density, spacing } },
   });
 }
 

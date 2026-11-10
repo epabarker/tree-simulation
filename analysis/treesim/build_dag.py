@@ -132,7 +132,7 @@ RW = {
     "COMMIT": (["S_budstate"], ["S_budstate", "S_age"]),
     "O2_ABRADE": (["S_owner", "S_budq", "S_geom", "S_radius", "S_budstate"], ["S_budstate"]),
     "R1_STARVE": (["S_starved"], ["S_alive"]),
-    "O4_STAND": (["S_alive", "S_seedpool", "S_light", "S_geom", "S_trees"], ["S_alive", "S_trees", "S_seedpool"]),
+    "O4_STAND": (["S_alive", "S_seedpool", "S_light", "S_geom", "S_trees", "S_PM"], ["S_alive", "S_trees", "S_seedpool"]),
 }
 
 # ---------------------------------------------------------------- gates
@@ -263,6 +263,7 @@ PARAMS = [
     ("c5.Trel", "c5", [("C5_SHED", always), ("C5_QTOP", always)]),
     ("c5.topQuantile", "c5", [("C5_QTOP", always)]),
     ("c5.Tvig", "c5", [("C5_SHED", always)]),
+    ("c5.kRel", "c5", [("C5_SHED", always)]),
     # C6
     ("c6.n", "c6", [("C6_GIRTH", always), ("R1_CARBON", on("r1.enabled")), ("C5_SHED", always)]),
     ("c6.r0", "c6", [("C6_GIRTH", always), ("R1_CARBON", on("r1.enabled")), ("C1_SHOOT", always)]),
@@ -350,6 +351,7 @@ PARAMS = [
     ("o4.mortality", "o4", [("O4_STAND", o4on)]),
     ("o4.m0", "o4", [("O4_STAND", AND(o4on, NOT(two_part)))]),
     ("o4.mCanopy / hCanopy / gammaCanopy", "o4", [("O4_STAND", AND(o4on, two_part))]),
+    ("o4.mSuppression / suppressionSlope / shadeTolerance", "o4", [("O4_STAND", AND(o4on, two_part))]),
     ("o4.cSeed / d", "o4", [("O4_STAND", o4on)]),
     ("o4.qEst / pEst", "o4", [("O4_STAND", o4on)]),
     ("o4.maxTrees / rain / band", "o4", [("O4_STAND", o4on)]),

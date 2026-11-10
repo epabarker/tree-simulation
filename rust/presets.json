@@ -54,7 +54,8 @@
    "T": 0.1,
    "g": 3,
    "Trel": 0,
-   "topQuantile": 0.9
+   "topQuantile": 0.9,
+   "kRel": 1
   },
   "c6": {
    "enabled": false,
@@ -139,6 +140,9 @@
    "mCanopy": 0.01,
    "hCanopy": 120,
    "gammaCanopy": 2,
+   "mSuppression": 1,
+   "suppressionSlope": 0.92,
+   "shadeTolerance": 3,
    "maxTrees": 300,
    "rain": 0
   }
@@ -198,7 +202,8 @@
     "T": 0.1,
     "g": 3,
     "Trel": 0,
-    "topQuantile": 0.9
+    "topQuantile": 0.9,
+    "kRel": 1
    },
    "c6": {
     "enabled": false,
@@ -283,6 +288,9 @@
     "mCanopy": 0.01,
     "hCanopy": 120,
     "gammaCanopy": 2,
+    "mSuppression": 1,
+    "suppressionSlope": 0.92,
+    "shadeTolerance": 3,
     "maxTrees": 300,
     "rain": 0
    }
@@ -341,7 +349,8 @@
     "T": 0.1,
     "g": 3,
     "Trel": 0,
-    "topQuantile": 0.9
+    "topQuantile": 0.9,
+    "kRel": 1
    },
    "c6": {
     "enabled": false,
@@ -426,6 +435,9 @@
     "mCanopy": 0.01,
     "hCanopy": 120,
     "gammaCanopy": 2,
+    "mSuppression": 1,
+    "suppressionSlope": 0.92,
+    "shadeTolerance": 3,
     "maxTrees": 300,
     "rain": 0
    }
@@ -484,7 +496,8 @@
     "T": 0.1,
     "g": 3,
     "Trel": 0,
-    "topQuantile": 0.9
+    "topQuantile": 0.9,
+    "kRel": 1
    },
    "c6": {
     "enabled": false,
@@ -569,6 +582,9 @@
     "mCanopy": 0.01,
     "hCanopy": 120,
     "gammaCanopy": 2,
+    "mSuppression": 1,
+    "suppressionSlope": 0.92,
+    "shadeTolerance": 3,
     "maxTrees": 300,
     "rain": 0
    }
@@ -627,7 +643,8 @@
     "T": 0.1,
     "g": 3,
     "Trel": 0,
-    "topQuantile": 0.9
+    "topQuantile": 0.9,
+    "kRel": 1
    },
    "c6": {
     "enabled": false,
@@ -712,6 +729,9 @@
     "mCanopy": 0.01,
     "hCanopy": 120,
     "gammaCanopy": 2,
+    "mSuppression": 1,
+    "suppressionSlope": 0.92,
+    "shadeTolerance": 3,
     "maxTrees": 300,
     "rain": 0
    }
@@ -770,7 +790,8 @@
     "T": 0.1,
     "g": 3,
     "Trel": 0,
-    "topQuantile": 0.9
+    "topQuantile": 0.9,
+    "kRel": 1
    },
    "c6": {
     "enabled": false,
@@ -855,6 +876,9 @@
     "mCanopy": 0.01,
     "hCanopy": 120,
     "gammaCanopy": 2,
+    "mSuppression": 1,
+    "suppressionSlope": 0.92,
+    "shadeTolerance": 3,
     "maxTrees": 300,
     "rain": 0
    }
@@ -913,7 +937,8 @@
     "T": 0.1,
     "g": 3,
     "Trel": 0,
-    "topQuantile": 0.9
+    "topQuantile": 0.9,
+    "kRel": 1
    },
    "c6": {
     "enabled": false,
@@ -998,6 +1023,9 @@
     "mCanopy": 0.01,
     "hCanopy": 120,
     "gammaCanopy": 2,
+    "mSuppression": 1,
+    "suppressionSlope": 0.92,
+    "shadeTolerance": 3,
     "maxTrees": 300,
     "rain": 0
    }
@@ -1064,7 +1092,8 @@
     "T": 0.1,
     "g": 3,
     "Trel": 0,
-    "topQuantile": 0.9
+    "topQuantile": 0.9,
+    "kRel": 1
    },
    "c6": {
     "enabled": false,
@@ -1149,6 +1178,9 @@
     "mCanopy": 0.01,
     "hCanopy": 120,
     "gammaCanopy": 2,
+    "mSuppression": 1,
+    "suppressionSlope": 0.92,
+    "shadeTolerance": 3,
     "maxTrees": 300,
     "rain": 0
    }
@@ -1207,7 +1239,8 @@
     "T": 0.1,
     "g": 3,
     "Trel": 0,
-    "topQuantile": 0.9
+    "topQuantile": 0.9,
+    "kRel": 1
    },
    "c6": {
     "enabled": true,
@@ -1292,6 +1325,9 @@
     "mCanopy": 0.01,
     "hCanopy": 120,
     "gammaCanopy": 2,
+    "mSuppression": 1,
+    "suppressionSlope": 0.92,
+    "shadeTolerance": 3,
     "maxTrees": 300,
     "rain": 0
    }
@@ -1353,7 +1389,8 @@
     "T": 0.1,
     "g": 3,
     "Trel": 0,
-    "topQuantile": 0.9
+    "topQuantile": 0.9,
+    "kRel": 1
    },
    "c6": {
     "enabled": true,
@@ -1438,6 +1475,9 @@
     "mCanopy": 0.01,
     "hCanopy": 120,
     "gammaCanopy": 2,
+    "mSuppression": 1,
+    "suppressionSlope": 0.92,
+    "shadeTolerance": 3,
     "maxTrees": 300,
     "rain": 0
    }
@@ -1503,7 +1543,8 @@
     "T": 0.1,
     "g": 3,
     "Trel": 0,
-    "topQuantile": 0.9
+    "topQuantile": 0.9,
+    "kRel": 1
    },
    "c6": {
     "enabled": true,
@@ -1588,6 +1629,9 @@
     "mCanopy": 0.01,
     "hCanopy": 120,
     "gammaCanopy": 2,
+    "mSuppression": 1,
+    "suppressionSlope": 0.92,
+    "shadeTolerance": 3,
     "maxTrees": 300,
     "rain": 0
    }
@@ -1655,7 +1699,8 @@
     "T": 0.1,
     "g": 3,
     "Trel": 0,
-    "topQuantile": 0.9
+    "topQuantile": 0.9,
+    "kRel": 1
    },
    "c6": {
     "enabled": true,
@@ -1740,6 +1785,9 @@
     "mCanopy": 0.01,
     "hCanopy": 120,
     "gammaCanopy": 2,
+    "mSuppression": 1,
+    "suppressionSlope": 0.92,
+    "shadeTolerance": 3,
     "maxTrees": 300,
     "rain": 0
    }
@@ -1825,7 +1873,8 @@
     "T": 0.1,
     "g": 3,
     "Trel": 0,
-    "topQuantile": 0.9
+    "topQuantile": 0.9,
+    "kRel": 1
    },
    "c6": {
     "enabled": true,
@@ -1910,6 +1959,9 @@
     "mCanopy": 0.01,
     "hCanopy": 120,
     "gammaCanopy": 2,
+    "mSuppression": 1,
+    "suppressionSlope": 0.92,
+    "shadeTolerance": 3,
     "maxTrees": 300,
     "rain": 0
    }
@@ -1975,7 +2027,8 @@
     "T": 0.03,
     "g": 3,
     "Trel": 0.12,
-    "topQuantile": 0.9
+    "topQuantile": 0.9,
+    "kRel": 1
    },
    "c6": {
     "enabled": true,
@@ -2060,6 +2113,9 @@
     "mCanopy": 0.01,
     "hCanopy": 120,
     "gammaCanopy": 2,
+    "mSuppression": 1,
+    "suppressionSlope": 0.92,
+    "shadeTolerance": 3,
     "maxTrees": 300,
     "rain": 0
    }
@@ -2145,7 +2201,8 @@
     "T": 0.03,
     "g": 3,
     "Trel": 0.12,
-    "topQuantile": 0.9
+    "topQuantile": 0.9,
+    "kRel": 1
    },
    "c6": {
     "enabled": true,
@@ -2230,6 +2287,9 @@
     "mCanopy": 0.01,
     "hCanopy": 120,
     "gammaCanopy": 2,
+    "mSuppression": 1,
+    "suppressionSlope": 0.92,
+    "shadeTolerance": 3,
     "maxTrees": 300,
     "rain": 0
    }
@@ -2297,7 +2357,8 @@
     "T": 0.03,
     "g": 3,
     "Trel": 0.12,
-    "topQuantile": 0.9
+    "topQuantile": 0.9,
+    "kRel": 1
    },
    "c6": {
     "enabled": true,
@@ -2382,6 +2443,9 @@
     "mCanopy": 0.01,
     "hCanopy": 120,
     "gammaCanopy": 2,
+    "mSuppression": 1,
+    "suppressionSlope": 0.92,
+    "shadeTolerance": 3,
     "maxTrees": 300,
     "rain": 0
    }
@@ -2440,7 +2504,8 @@
     "T": 0.03,
     "g": 3,
     "Trel": 0.12,
-    "topQuantile": 0.9
+    "topQuantile": 0.9,
+    "kRel": 1
    },
    "c6": {
     "enabled": true,
@@ -2525,6 +2590,9 @@
     "mCanopy": 0.01,
     "hCanopy": 120,
     "gammaCanopy": 2,
+    "mSuppression": 1,
+    "suppressionSlope": 0.92,
+    "shadeTolerance": 3,
     "maxTrees": 300,
     "rain": 0
    }
@@ -2610,7 +2678,8 @@
     "T": 0.03,
     "g": 3,
     "Trel": 0.12,
-    "topQuantile": 0.9
+    "topQuantile": 0.9,
+    "kRel": 1
    },
    "c6": {
     "enabled": true,
@@ -2695,6 +2764,9 @@
     "mCanopy": 0.01,
     "hCanopy": 120,
     "gammaCanopy": 2,
+    "mSuppression": 1,
+    "suppressionSlope": 0.92,
+    "shadeTolerance": 3,
     "maxTrees": 300,
     "rain": 0
    }
@@ -2753,7 +2825,8 @@
     "T": 0.03,
     "g": 3,
     "Trel": 0.12,
-    "topQuantile": 0.9
+    "topQuantile": 0.9,
+    "kRel": 1
    },
    "c6": {
     "enabled": true,
@@ -2838,6 +2911,9 @@
     "mCanopy": 0.01,
     "hCanopy": 120,
     "gammaCanopy": 2,
+    "mSuppression": 1,
+    "suppressionSlope": 0.92,
+    "shadeTolerance": 3,
     "maxTrees": 300,
     "rain": 0
    }
@@ -3014,7 +3090,8 @@
     "T": 0.03,
     "g": 3,
     "Trel": 0.0155,
-    "topQuantile": 0.9
+    "topQuantile": 0.9,
+    "kRel": 1
    },
    "c6": {
     "enabled": true,
@@ -3102,6 +3179,9 @@
     "mCanopy": 0.01,
     "hCanopy": 120,
     "gammaCanopy": 2,
+    "mSuppression": 1,
+    "suppressionSlope": 0.92,
+    "shadeTolerance": 3,
     "maxTrees": 300,
     "rain": 0
    }
@@ -3286,7 +3366,8 @@
     "T": 0.03,
     "g": 3,
     "Trel": 0.0155,
-    "topQuantile": 0.9
+    "topQuantile": 0.9,
+    "kRel": 1
    },
    "c6": {
     "enabled": true,
@@ -3374,6 +3455,9 @@
     "mCanopy": 0.01,
     "hCanopy": 120,
     "gammaCanopy": 2,
+    "mSuppression": 1,
+    "suppressionSlope": 0.92,
+    "shadeTolerance": 3,
     "maxTrees": 300,
     "rain": 0
    }
@@ -3435,7 +3519,8 @@
     "T": 0.03,
     "g": 3,
     "Trel": 0.0155,
-    "topQuantile": 0.9
+    "topQuantile": 0.9,
+    "kRel": 1
    },
    "c6": {
     "enabled": true,
@@ -3523,6 +3608,9 @@
     "mCanopy": 0.01,
     "hCanopy": 120,
     "gammaCanopy": 2,
+    "mSuppression": 1,
+    "suppressionSlope": 0.92,
+    "shadeTolerance": 3,
     "maxTrees": 300,
     "rain": 0
    },
@@ -3636,7 +3724,8 @@
       "qEst": 0.25,
       "pEst": 0.3,
       "m0": 0.008,
-      "rain": 0.2
+      "rain": 0.2,
+      "shadeTolerance": 2.03
      },
      "c1": {
       "shootLengthSD": 0.5,
@@ -3757,7 +3846,8 @@
       "d": 12,
       "qEst": 0.03,
       "pEst": 0.3,
-      "m0": 0.002
+      "m0": 0.002,
+      "shadeTolerance": 4.56
      },
      "c3": {
       "mode": "bh",
@@ -3878,7 +3968,8 @@
       "d": 25,
       "qEst": 0.1,
       "pEst": 0.3,
-      "m0": 0.002
+      "m0": 0.002,
+      "shadeTolerance": 2.45
      },
      "c6": {
       "enabled": true,
@@ -3976,7 +4067,8 @@
       "d": 25,
       "qEst": 0.02,
       "pEst": 0.3,
-      "m0": 0.002
+      "m0": 0.002,
+      "shadeTolerance": 4.6
      },
      "c3": {
       "mode": "bh",
@@ -4091,7 +4183,8 @@
       "d": 20,
       "qEst": 0.04,
       "pEst": 0.3,
-      "m0": 0.003
+      "m0": 0.003,
+      "shadeTolerance": 3.97
      },
      "c3": {
       "mode": "bh",
@@ -4220,7 +4313,8 @@
       "d": 25,
       "qEst": 0.05,
       "pEst": 0.3,
-      "m0": 0.004
+      "m0": 0.004,
+      "shadeTolerance": 3.18
      },
      "c1": {
       "shootLengthSD": 0.5,
@@ -4336,14 +4430,14 @@
       "leafArea": 2.609
      },
      "o4": {
-      "enabled": false,
       "cSeed": 8,
       "d": 40,
       "qEst": 0.01,
       "pEst": 0.3,
       "m0": 0.003,
       "maxTrees": 300,
-      "rain": 0
+      "rain": 0,
+      "shadeTolerance": 3.86
      },
      "c1": {
       "shootLengthSD": 0.5,
@@ -4444,7 +4538,8 @@
       "d": 50,
       "qEst": 0.06,
       "pEst": 0.3,
-      "m0": 0.006
+      "m0": 0.006,
+      "shadeTolerance": 2.73
      },
      "r3": {
       "enabled": true,
@@ -4562,7 +4657,8 @@
       "qEst": 0.3,
       "pEst": 0.3,
       "m0": 0.012,
-      "rain": 1
+      "rain": 1,
+      "shadeTolerance": 2.16
      },
      "r3": {
       "enabled": true,
@@ -4679,7 +4775,8 @@
       "d": 40,
       "qEst": 0.3,
       "pEst": 0.3,
-      "m0": 0.003
+      "m0": 0.003,
+      "shadeTolerance": 1.67
      },
      "r3": {
       "enabled": true,
@@ -4757,7 +4854,8 @@
     "T": 0.03,
     "g": 3,
     "Trel": 0.0155,
-    "topQuantile": 0.9
+    "topQuantile": 0.9,
+    "kRel": 1
    },
    "c6": {
     "enabled": true,
@@ -4845,6 +4943,9 @@
     "mCanopy": 0.01,
     "hCanopy": 120,
     "gammaCanopy": 2,
+    "mSuppression": 1,
+    "suppressionSlope": 0.92,
+    "shadeTolerance": 3,
     "maxTrees": 300,
     "rain": 0
    },
@@ -4958,7 +5059,8 @@
       "qEst": 0.25,
       "pEst": 0.3,
       "m0": 0.008,
-      "rain": 0.2
+      "rain": 0.2,
+      "shadeTolerance": 2.03
      },
      "c1": {
       "shootLengthSD": 0.5,
@@ -5079,7 +5181,8 @@
       "d": 12,
       "qEst": 0.03,
       "pEst": 0.3,
-      "m0": 0.002
+      "m0": 0.002,
+      "shadeTolerance": 4.56
      },
      "c3": {
       "mode": "bh",
@@ -5200,7 +5303,8 @@
       "d": 25,
       "qEst": 0.1,
       "pEst": 0.3,
-      "m0": 0.002
+      "m0": 0.002,
+      "shadeTolerance": 2.45
      },
      "c6": {
       "enabled": true,
@@ -5298,7 +5402,8 @@
       "d": 25,
       "qEst": 0.02,
       "pEst": 0.3,
-      "m0": 0.002
+      "m0": 0.002,
+      "shadeTolerance": 4.6
      },
      "c3": {
       "mode": "bh",
@@ -5413,7 +5518,8 @@
       "d": 20,
       "qEst": 0.04,
       "pEst": 0.3,
-      "m0": 0.003
+      "m0": 0.003,
+      "shadeTolerance": 3.97
      },
      "c3": {
       "mode": "bh",
@@ -5542,7 +5648,8 @@
       "d": 25,
       "qEst": 0.05,
       "pEst": 0.3,
-      "m0": 0.004
+      "m0": 0.004,
+      "shadeTolerance": 3.18
      },
      "c1": {
       "shootLengthSD": 0.5,
@@ -5658,14 +5765,14 @@
       "leafArea": 2.609
      },
      "o4": {
-      "enabled": false,
       "cSeed": 8,
       "d": 40,
       "qEst": 0.01,
       "pEst": 0.3,
       "m0": 0.003,
       "maxTrees": 300,
-      "rain": 0
+      "rain": 0,
+      "shadeTolerance": 3.86
      },
      "c1": {
       "shootLengthSD": 0.5,
@@ -5766,7 +5873,8 @@
       "d": 50,
       "qEst": 0.06,
       "pEst": 0.3,
-      "m0": 0.006
+      "m0": 0.006,
+      "shadeTolerance": 2.73
      },
      "r3": {
       "enabled": true,
@@ -5884,7 +5992,8 @@
       "qEst": 0.3,
       "pEst": 0.3,
       "m0": 0.012,
-      "rain": 1
+      "rain": 1,
+      "shadeTolerance": 2.16
      },
      "r3": {
       "enabled": true,
@@ -6001,7 +6110,8 @@
       "d": 40,
       "qEst": 0.3,
       "pEst": 0.3,
-      "m0": 0.003
+      "m0": 0.003,
+      "shadeTolerance": 1.67
      },
      "r3": {
       "enabled": true,
@@ -6223,7 +6333,8 @@
     "T": 0.03,
     "g": 3,
     "Trel": 0.0155,
-    "topQuantile": 0.9
+    "topQuantile": 0.9,
+    "kRel": 1
    },
    "c6": {
     "enabled": true,
@@ -6311,6 +6422,9 @@
     "mCanopy": 0.01,
     "hCanopy": 120,
     "gammaCanopy": 2,
+    "mSuppression": 1,
+    "suppressionSlope": 0.92,
+    "shadeTolerance": 3,
     "maxTrees": 300,
     "rain": 0
    },
@@ -6424,7 +6538,8 @@
       "qEst": 0.25,
       "pEst": 0.3,
       "m0": 0.008,
-      "rain": 0.2
+      "rain": 0.2,
+      "shadeTolerance": 2.03
      },
      "c1": {
       "shootLengthSD": 0.5,
@@ -6545,7 +6660,8 @@
       "d": 12,
       "qEst": 0.03,
       "pEst": 0.3,
-      "m0": 0.002
+      "m0": 0.002,
+      "shadeTolerance": 4.56
      },
      "c3": {
       "mode": "bh",
@@ -6666,7 +6782,8 @@
       "d": 25,
       "qEst": 0.1,
       "pEst": 0.3,
-      "m0": 0.002
+      "m0": 0.002,
+      "shadeTolerance": 2.45
      },
      "c6": {
       "enabled": true,
@@ -6764,7 +6881,8 @@
       "d": 25,
       "qEst": 0.02,
       "pEst": 0.3,
-      "m0": 0.002
+      "m0": 0.002,
+      "shadeTolerance": 4.6
      },
      "c3": {
       "mode": "bh",
@@ -6879,7 +6997,8 @@
       "d": 20,
       "qEst": 0.04,
       "pEst": 0.3,
-      "m0": 0.003
+      "m0": 0.003,
+      "shadeTolerance": 3.97
      },
      "c3": {
       "mode": "bh",
@@ -7008,7 +7127,8 @@
       "d": 25,
       "qEst": 0.05,
       "pEst": 0.3,
-      "m0": 0.004
+      "m0": 0.004,
+      "shadeTolerance": 3.18
      },
      "c1": {
       "shootLengthSD": 0.5,
@@ -7124,14 +7244,14 @@
       "leafArea": 2.609
      },
      "o4": {
-      "enabled": false,
       "cSeed": 8,
       "d": 40,
       "qEst": 0.01,
       "pEst": 0.3,
       "m0": 0.003,
       "maxTrees": 300,
-      "rain": 0
+      "rain": 0,
+      "shadeTolerance": 3.86
      },
      "c1": {
       "shootLengthSD": 0.5,
@@ -7232,7 +7352,8 @@
       "d": 50,
       "qEst": 0.06,
       "pEst": 0.3,
-      "m0": 0.006
+      "m0": 0.006,
+      "shadeTolerance": 2.73
      },
      "r3": {
       "enabled": true,
@@ -7350,7 +7471,8 @@
       "qEst": 0.3,
       "pEst": 0.3,
       "m0": 0.012,
-      "rain": 1
+      "rain": 1,
+      "shadeTolerance": 2.16
      },
      "r3": {
       "enabled": true,
@@ -7467,7 +7589,8 @@
       "d": 40,
       "qEst": 0.3,
       "pEst": 0.3,
-      "m0": 0.003
+      "m0": 0.003,
+      "shadeTolerance": 1.67
      },
      "r3": {
       "enabled": true,
@@ -7689,7 +7812,8 @@
     "T": 0.03,
     "g": 3,
     "Trel": 0.0155,
-    "topQuantile": 0.9
+    "topQuantile": 0.9,
+    "kRel": 1
    },
    "c6": {
     "enabled": true,
@@ -7777,6 +7901,9 @@
     "mCanopy": 0.01,
     "hCanopy": 120,
     "gammaCanopy": 2,
+    "mSuppression": 1,
+    "suppressionSlope": 0.92,
+    "shadeTolerance": 3,
     "maxTrees": 300,
     "rain": 0
    },
@@ -7890,7 +8017,8 @@
       "qEst": 0.25,
       "pEst": 0.3,
       "m0": 0.008,
-      "rain": 0.2
+      "rain": 0.2,
+      "shadeTolerance": 2.03
      },
      "c1": {
       "shootLengthSD": 0.5,
@@ -8011,7 +8139,8 @@
       "d": 12,
       "qEst": 0.03,
       "pEst": 0.3,
-      "m0": 0.002
+      "m0": 0.002,
+      "shadeTolerance": 4.56
      },
      "c3": {
       "mode": "bh",
@@ -8132,7 +8261,8 @@
       "d": 25,
       "qEst": 0.1,
       "pEst": 0.3,
-      "m0": 0.002
+      "m0": 0.002,
+      "shadeTolerance": 2.45
      },
      "c6": {
       "enabled": true,
@@ -8230,7 +8360,8 @@
       "d": 25,
       "qEst": 0.02,
       "pEst": 0.3,
-      "m0": 0.002
+      "m0": 0.002,
+      "shadeTolerance": 4.6
      },
      "c3": {
       "mode": "bh",
@@ -8345,7 +8476,8 @@
       "d": 20,
       "qEst": 0.04,
       "pEst": 0.3,
-      "m0": 0.003
+      "m0": 0.003,
+      "shadeTolerance": 3.97
      },
      "c3": {
       "mode": "bh",
@@ -8474,7 +8606,8 @@
       "d": 25,
       "qEst": 0.05,
       "pEst": 0.3,
-      "m0": 0.004
+      "m0": 0.004,
+      "shadeTolerance": 3.18
      },
      "c1": {
       "shootLengthSD": 0.5,
@@ -8590,14 +8723,14 @@
       "leafArea": 2.609
      },
      "o4": {
-      "enabled": false,
       "cSeed": 8,
       "d": 40,
       "qEst": 0.01,
       "pEst": 0.3,
       "m0": 0.003,
       "maxTrees": 300,
-      "rain": 0
+      "rain": 0,
+      "shadeTolerance": 3.86
      },
      "c1": {
       "shootLengthSD": 0.5,
@@ -8698,7 +8831,8 @@
       "d": 50,
       "qEst": 0.06,
       "pEst": 0.3,
-      "m0": 0.006
+      "m0": 0.006,
+      "shadeTolerance": 2.73
      },
      "r3": {
       "enabled": true,
@@ -8816,7 +8950,8 @@
       "qEst": 0.3,
       "pEst": 0.3,
       "m0": 0.012,
-      "rain": 1
+      "rain": 1,
+      "shadeTolerance": 2.16
      },
      "r3": {
       "enabled": true,
@@ -8933,7 +9068,8 @@
       "d": 40,
       "qEst": 0.3,
       "pEst": 0.3,
-      "m0": 0.003
+      "m0": 0.003,
+      "shadeTolerance": 1.67
      },
      "r3": {
       "enabled": true,
@@ -9155,7 +9291,8 @@
     "T": 0.03,
     "g": 3,
     "Trel": 0.0155,
-    "topQuantile": 0.9
+    "topQuantile": 0.9,
+    "kRel": 1
    },
    "c6": {
     "enabled": true,
@@ -9243,6 +9380,9 @@
     "mCanopy": 0.01,
     "hCanopy": 120,
     "gammaCanopy": 2,
+    "mSuppression": 1,
+    "suppressionSlope": 0.92,
+    "shadeTolerance": 3,
     "maxTrees": 300,
     "rain": 0
    },
@@ -9356,7 +9496,8 @@
       "qEst": 0.25,
       "pEst": 0.3,
       "m0": 0.008,
-      "rain": 0.2
+      "rain": 0.2,
+      "shadeTolerance": 2.03
      },
      "c1": {
       "shootLengthSD": 0.5,
@@ -9477,7 +9618,8 @@
       "d": 12,
       "qEst": 0.03,
       "pEst": 0.3,
-      "m0": 0.002
+      "m0": 0.002,
+      "shadeTolerance": 4.56
      },
      "c3": {
       "mode": "bh",
@@ -9598,7 +9740,8 @@
       "d": 25,
       "qEst": 0.1,
       "pEst": 0.3,
-      "m0": 0.002
+      "m0": 0.002,
+      "shadeTolerance": 2.45
      },
      "c6": {
       "enabled": true,
@@ -9696,7 +9839,8 @@
       "d": 25,
       "qEst": 0.02,
       "pEst": 0.3,
-      "m0": 0.002
+      "m0": 0.002,
+      "shadeTolerance": 4.6
      },
      "c3": {
       "mode": "bh",
@@ -9811,7 +9955,8 @@
       "d": 20,
       "qEst": 0.04,
       "pEst": 0.3,
-      "m0": 0.003
+      "m0": 0.003,
+      "shadeTolerance": 3.97
      },
      "c3": {
       "mode": "bh",
@@ -9940,7 +10085,8 @@
       "d": 25,
       "qEst": 0.05,
       "pEst": 0.3,
-      "m0": 0.004
+      "m0": 0.004,
+      "shadeTolerance": 3.18
      },
      "c1": {
       "shootLengthSD": 0.5,
@@ -10056,14 +10202,14 @@
       "leafArea": 2.609
      },
      "o4": {
-      "enabled": false,
       "cSeed": 8,
       "d": 40,
       "qEst": 0.01,
       "pEst": 0.3,
       "m0": 0.003,
       "maxTrees": 300,
-      "rain": 0
+      "rain": 0,
+      "shadeTolerance": 3.86
      },
      "c1": {
       "shootLengthSD": 0.5,
@@ -10164,7 +10310,8 @@
       "d": 50,
       "qEst": 0.06,
       "pEst": 0.3,
-      "m0": 0.006
+      "m0": 0.006,
+      "shadeTolerance": 2.73
      },
      "r3": {
       "enabled": true,
@@ -10282,7 +10429,8 @@
       "qEst": 0.3,
       "pEst": 0.3,
       "m0": 0.012,
-      "rain": 1
+      "rain": 1,
+      "shadeTolerance": 2.16
      },
      "r3": {
       "enabled": true,
@@ -10399,7 +10547,8 @@
       "d": 40,
       "qEst": 0.3,
       "pEst": 0.3,
-      "m0": 0.003
+      "m0": 0.003,
+      "shadeTolerance": 1.67
      },
      "r3": {
       "enabled": true,
@@ -10621,7 +10770,8 @@
     "T": 0.03,
     "g": 3,
     "Trel": 0.0155,
-    "topQuantile": 0.9
+    "topQuantile": 0.9,
+    "kRel": 1
    },
    "c6": {
     "enabled": true,
@@ -10709,6 +10859,9 @@
     "mCanopy": 0.01,
     "hCanopy": 120,
     "gammaCanopy": 2,
+    "mSuppression": 1,
+    "suppressionSlope": 0.92,
+    "shadeTolerance": 3,
     "maxTrees": 300,
     "rain": 0
    },
@@ -10822,7 +10975,8 @@
       "qEst": 0.25,
       "pEst": 0.3,
       "m0": 0.008,
-      "rain": 0.2
+      "rain": 0.2,
+      "shadeTolerance": 2.03
      },
      "c1": {
       "shootLengthSD": 0.5,
@@ -10943,7 +11097,8 @@
       "d": 12,
       "qEst": 0.03,
       "pEst": 0.3,
-      "m0": 0.002
+      "m0": 0.002,
+      "shadeTolerance": 4.56
      },
      "c3": {
       "mode": "bh",
@@ -11064,7 +11219,8 @@
       "d": 25,
       "qEst": 0.1,
       "pEst": 0.3,
-      "m0": 0.002
+      "m0": 0.002,
+      "shadeTolerance": 2.45
      },
      "c6": {
       "enabled": true,
@@ -11162,7 +11318,8 @@
       "d": 25,
       "qEst": 0.02,
       "pEst": 0.3,
-      "m0": 0.002
+      "m0": 0.002,
+      "shadeTolerance": 4.6
      },
      "c3": {
       "mode": "bh",
@@ -11277,7 +11434,8 @@
       "d": 20,
       "qEst": 0.04,
       "pEst": 0.3,
-      "m0": 0.003
+      "m0": 0.003,
+      "shadeTolerance": 3.97
      },
      "c3": {
       "mode": "bh",
@@ -11406,7 +11564,8 @@
       "d": 25,
       "qEst": 0.05,
       "pEst": 0.3,
-      "m0": 0.004
+      "m0": 0.004,
+      "shadeTolerance": 3.18
      },
      "c1": {
       "shootLengthSD": 0.5,
@@ -11522,14 +11681,14 @@
       "leafArea": 2.609
      },
      "o4": {
-      "enabled": false,
       "cSeed": 8,
       "d": 40,
       "qEst": 0.01,
       "pEst": 0.3,
       "m0": 0.003,
       "maxTrees": 300,
-      "rain": 0
+      "rain": 0,
+      "shadeTolerance": 3.86
      },
      "c1": {
       "shootLengthSD": 0.5,
@@ -11630,7 +11789,8 @@
       "d": 50,
       "qEst": 0.06,
       "pEst": 0.3,
-      "m0": 0.006
+      "m0": 0.006,
+      "shadeTolerance": 2.73
      },
      "r3": {
       "enabled": true,
@@ -11748,7 +11908,8 @@
       "qEst": 0.3,
       "pEst": 0.3,
       "m0": 0.012,
-      "rain": 1
+      "rain": 1,
+      "shadeTolerance": 2.16
      },
      "r3": {
       "enabled": true,
@@ -11865,7 +12026,8 @@
       "d": 40,
       "qEst": 0.3,
       "pEst": 0.3,
-      "m0": 0.003
+      "m0": 0.003,
+      "shadeTolerance": 1.67
      },
      "r3": {
       "enabled": true,
@@ -12087,7 +12249,8 @@
     "T": 0.03,
     "g": 3,
     "Trel": 0.0155,
-    "topQuantile": 0.9
+    "topQuantile": 0.9,
+    "kRel": 1
    },
    "c6": {
     "enabled": true,
@@ -12175,6 +12338,9 @@
     "mCanopy": 0.01,
     "hCanopy": 120,
     "gammaCanopy": 2,
+    "mSuppression": 1,
+    "suppressionSlope": 0.92,
+    "shadeTolerance": 3,
     "maxTrees": 300,
     "rain": 0
    },
@@ -12288,7 +12454,8 @@
       "qEst": 0.25,
       "pEst": 0.3,
       "m0": 0.008,
-      "rain": 0.2
+      "rain": 0.2,
+      "shadeTolerance": 2.03
      },
      "c1": {
       "shootLengthSD": 0.5,
@@ -12409,7 +12576,8 @@
       "d": 12,
       "qEst": 0.03,
       "pEst": 0.3,
-      "m0": 0.002
+      "m0": 0.002,
+      "shadeTolerance": 4.56
      },
      "c3": {
       "mode": "bh",
@@ -12530,7 +12698,8 @@
       "d": 25,
       "qEst": 0.1,
       "pEst": 0.3,
-      "m0": 0.002
+      "m0": 0.002,
+      "shadeTolerance": 2.45
      },
      "c6": {
       "enabled": true,
@@ -12628,7 +12797,8 @@
       "d": 25,
       "qEst": 0.02,
       "pEst": 0.3,
-      "m0": 0.002
+      "m0": 0.002,
+      "shadeTolerance": 4.6
      },
      "c3": {
       "mode": "bh",
@@ -12743,7 +12913,8 @@
       "d": 20,
       "qEst": 0.04,
       "pEst": 0.3,
-      "m0": 0.003
+      "m0": 0.003,
+      "shadeTolerance": 3.97
      },
      "c3": {
       "mode": "bh",
@@ -12872,7 +13043,8 @@
       "d": 25,
       "qEst": 0.05,
       "pEst": 0.3,
-      "m0": 0.004
+      "m0": 0.004,
+      "shadeTolerance": 3.18
      },
      "c1": {
       "shootLengthSD": 0.5,
@@ -12988,14 +13160,14 @@
       "leafArea": 2.609
      },
      "o4": {
-      "enabled": false,
       "cSeed": 8,
       "d": 40,
       "qEst": 0.01,
       "pEst": 0.3,
       "m0": 0.003,
       "maxTrees": 300,
-      "rain": 0
+      "rain": 0,
+      "shadeTolerance": 3.86
      },
      "c1": {
       "shootLengthSD": 0.5,
@@ -13096,7 +13268,8 @@
       "d": 50,
       "qEst": 0.06,
       "pEst": 0.3,
-      "m0": 0.006
+      "m0": 0.006,
+      "shadeTolerance": 2.73
      },
      "r3": {
       "enabled": true,
@@ -13214,7 +13387,8 @@
       "qEst": 0.3,
       "pEst": 0.3,
       "m0": 0.012,
-      "rain": 1
+      "rain": 1,
+      "shadeTolerance": 2.16
      },
      "r3": {
       "enabled": true,
@@ -13331,7 +13505,8 @@
       "d": 40,
       "qEst": 0.3,
       "pEst": 0.3,
-      "m0": 0.003
+      "m0": 0.003,
+      "shadeTolerance": 1.67
      },
      "r3": {
       "enabled": true,
@@ -13554,7 +13729,8 @@
     "T": 0.03,
     "g": 3,
     "Trel": 0.0155,
-    "topQuantile": 0.9
+    "topQuantile": 0.9,
+    "kRel": 1
    },
    "c6": {
     "enabled": true,
@@ -13642,6 +13818,9 @@
     "mCanopy": 0.01,
     "hCanopy": 120,
     "gammaCanopy": 2,
+    "mSuppression": 1,
+    "suppressionSlope": 0.92,
+    "shadeTolerance": 3,
     "maxTrees": 300,
     "rain": 0
    },
@@ -13755,7 +13934,8 @@
       "qEst": 0.25,
       "pEst": 0.3,
       "m0": 0.008,
-      "rain": 0.2
+      "rain": 0.2,
+      "shadeTolerance": 2.03
      },
      "c1": {
       "shootLengthSD": 0.5,
@@ -13876,7 +14056,8 @@
       "d": 12,
       "qEst": 0.03,
       "pEst": 0.3,
-      "m0": 0.002
+      "m0": 0.002,
+      "shadeTolerance": 4.56
      },
      "c3": {
       "mode": "bh",
@@ -13997,7 +14178,8 @@
       "d": 25,
       "qEst": 0.1,
       "pEst": 0.3,
-      "m0": 0.002
+      "m0": 0.002,
+      "shadeTolerance": 2.45
      },
      "c6": {
       "enabled": true,
@@ -14095,7 +14277,8 @@
       "d": 25,
       "qEst": 0.02,
       "pEst": 0.3,
-      "m0": 0.002
+      "m0": 0.002,
+      "shadeTolerance": 4.6
      },
      "c3": {
       "mode": "bh",
@@ -14210,7 +14393,8 @@
       "d": 20,
       "qEst": 0.04,
       "pEst": 0.3,
-      "m0": 0.003
+      "m0": 0.003,
+      "shadeTolerance": 3.97
      },
      "c3": {
       "mode": "bh",
@@ -14339,7 +14523,8 @@
       "d": 25,
       "qEst": 0.05,
       "pEst": 0.3,
-      "m0": 0.004
+      "m0": 0.004,
+      "shadeTolerance": 3.18
      },
      "c1": {
       "shootLengthSD": 0.5,
@@ -14455,14 +14640,14 @@
       "leafArea": 2.609
      },
      "o4": {
-      "enabled": false,
       "cSeed": 8,
       "d": 40,
       "qEst": 0.01,
       "pEst": 0.3,
       "m0": 0.003,
       "maxTrees": 300,
-      "rain": 0
+      "rain": 0,
+      "shadeTolerance": 3.86
      },
      "c1": {
       "shootLengthSD": 0.5,
@@ -14563,7 +14748,8 @@
       "d": 50,
       "qEst": 0.06,
       "pEst": 0.3,
-      "m0": 0.006
+      "m0": 0.006,
+      "shadeTolerance": 2.73
      },
      "r3": {
       "enabled": true,
@@ -14681,7 +14867,8 @@
       "qEst": 0.3,
       "pEst": 0.3,
       "m0": 0.012,
-      "rain": 1
+      "rain": 1,
+      "shadeTolerance": 2.16
      },
      "r3": {
       "enabled": true,
@@ -14798,7 +14985,8 @@
       "d": 40,
       "qEst": 0.3,
       "pEst": 0.3,
-      "m0": 0.003
+      "m0": 0.003,
+      "shadeTolerance": 1.67
      },
      "r3": {
       "enabled": true,
@@ -15021,7 +15209,8 @@
     "T": 0.03,
     "g": 3,
     "Trel": 0.0155,
-    "topQuantile": 0.9
+    "topQuantile": 0.9,
+    "kRel": 1
    },
    "c6": {
     "enabled": true,
@@ -15109,6 +15298,9 @@
     "mCanopy": 0.01,
     "hCanopy": 120,
     "gammaCanopy": 2,
+    "mSuppression": 1,
+    "suppressionSlope": 0.92,
+    "shadeTolerance": 3,
     "maxTrees": 300,
     "rain": 0
    },
@@ -15222,7 +15414,8 @@
       "qEst": 0.25,
       "pEst": 0.3,
       "m0": 0.008,
-      "rain": 0.2
+      "rain": 0.2,
+      "shadeTolerance": 2.03
      },
      "c1": {
       "shootLengthSD": 0.5,
@@ -15343,7 +15536,8 @@
       "d": 12,
       "qEst": 0.03,
       "pEst": 0.3,
-      "m0": 0.002
+      "m0": 0.002,
+      "shadeTolerance": 4.56
      },
      "c3": {
       "mode": "bh",
@@ -15464,7 +15658,8 @@
       "d": 25,
       "qEst": 0.1,
       "pEst": 0.3,
-      "m0": 0.002
+      "m0": 0.002,
+      "shadeTolerance": 2.45
      },
      "c6": {
       "enabled": true,
@@ -15562,7 +15757,8 @@
       "d": 25,
       "qEst": 0.02,
       "pEst": 0.3,
-      "m0": 0.002
+      "m0": 0.002,
+      "shadeTolerance": 4.6
      },
      "c3": {
       "mode": "bh",
@@ -15677,7 +15873,8 @@
       "d": 20,
       "qEst": 0.04,
       "pEst": 0.3,
-      "m0": 0.003
+      "m0": 0.003,
+      "shadeTolerance": 3.97
      },
      "c3": {
       "mode": "bh",
@@ -15806,7 +16003,8 @@
       "d": 25,
       "qEst": 0.05,
       "pEst": 0.3,
-      "m0": 0.004
+      "m0": 0.004,
+      "shadeTolerance": 3.18
      },
      "c1": {
       "shootLengthSD": 0.5,
@@ -15922,14 +16120,14 @@
       "leafArea": 2.609
      },
      "o4": {
-      "enabled": false,
       "cSeed": 8,
       "d": 40,
       "qEst": 0.01,
       "pEst": 0.3,
       "m0": 0.003,
       "maxTrees": 300,
-      "rain": 0
+      "rain": 0,
+      "shadeTolerance": 3.86
      },
      "c1": {
       "shootLengthSD": 0.5,
@@ -16030,7 +16228,8 @@
       "d": 50,
       "qEst": 0.06,
       "pEst": 0.3,
-      "m0": 0.006
+      "m0": 0.006,
+      "shadeTolerance": 2.73
      },
      "r3": {
       "enabled": true,
@@ -16148,7 +16347,8 @@
       "qEst": 0.3,
       "pEst": 0.3,
       "m0": 0.012,
-      "rain": 1
+      "rain": 1,
+      "shadeTolerance": 2.16
      },
      "r3": {
       "enabled": true,
@@ -16265,7 +16465,8 @@
       "d": 40,
       "qEst": 0.3,
       "pEst": 0.3,
-      "m0": 0.003
+      "m0": 0.003,
+      "shadeTolerance": 1.67
      },
      "r3": {
       "enabled": true,
@@ -16518,7 +16719,8 @@
     "T": 0.03,
     "g": 3,
     "Trel": 0.12,
-    "topQuantile": 0.9
+    "topQuantile": 0.9,
+    "kRel": 1
    },
    "c6": {
     "enabled": true,
@@ -16603,6 +16805,9 @@
     "mCanopy": 0.01,
     "hCanopy": 120,
     "gammaCanopy": 2,
+    "mSuppression": 1,
+    "suppressionSlope": 0.92,
+    "shadeTolerance": 3,
     "maxTrees": 300,
     "rain": 0
    }
@@ -16663,7 +16868,8 @@
     "T": 0.02,
     "g": 3,
     "Trel": 0.12,
-    "topQuantile": 0.9
+    "topQuantile": 0.9,
+    "kRel": 1
    },
    "c6": {
     "enabled": true,
@@ -16776,6 +16982,9 @@
     "mCanopy": 0.01,
     "hCanopy": 120,
     "gammaCanopy": 2,
+    "mSuppression": 1,
+    "suppressionSlope": 0.92,
+    "shadeTolerance": 3,
     "maxTrees": 300,
     "rain": 0
    }
@@ -16861,7 +17070,8 @@
     "T": 0.02,
     "g": 3,
     "Trel": 0.12,
-    "topQuantile": 0.9
+    "topQuantile": 0.9,
+    "kRel": 1
    },
    "c6": {
     "enabled": true,
@@ -16974,6 +17184,9 @@
     "mCanopy": 0.01,
     "hCanopy": 120,
     "gammaCanopy": 2,
+    "mSuppression": 1,
+    "suppressionSlope": 0.92,
+    "shadeTolerance": 3,
     "maxTrees": 300,
     "rain": 0
    }
@@ -17032,7 +17245,8 @@
     "T": 0.08,
     "g": 3,
     "Trel": 0.2,
-    "topQuantile": 0.9
+    "topQuantile": 0.9,
+    "kRel": 1
    },
    "c6": {
     "enabled": true,
@@ -17145,6 +17359,9 @@
     "mCanopy": 0.01,
     "hCanopy": 120,
     "gammaCanopy": 2,
+    "mSuppression": 1,
+    "suppressionSlope": 0.92,
+    "shadeTolerance": 3,
     "maxTrees": 300,
     "rain": 0
    }
@@ -17230,7 +17447,8 @@
     "T": 0.08,
     "g": 3,
     "Trel": 0.2,
-    "topQuantile": 0.9
+    "topQuantile": 0.9,
+    "kRel": 1
    },
    "c6": {
     "enabled": true,
@@ -17343,6 +17561,9 @@
     "mCanopy": 0.01,
     "hCanopy": 120,
     "gammaCanopy": 2,
+    "mSuppression": 1,
+    "suppressionSlope": 0.92,
+    "shadeTolerance": 3,
     "maxTrees": 300,
     "rain": 0
    }
@@ -17401,7 +17622,8 @@
     "T": 0.03,
     "g": 3,
     "Trel": 0.12,
-    "topQuantile": 0.9
+    "topQuantile": 0.9,
+    "kRel": 1
    },
    "c6": {
     "enabled": true,
@@ -17505,6 +17727,9 @@
     "mCanopy": 0.01,
     "hCanopy": 120,
     "gammaCanopy": 2,
+    "mSuppression": 1,
+    "suppressionSlope": 0.92,
+    "shadeTolerance": 3,
     "maxTrees": 300,
     "rain": 0
    }
@@ -17563,7 +17788,8 @@
     "T": 0.03,
     "g": 3,
     "Trel": 0.12,
-    "topQuantile": 0.9
+    "topQuantile": 0.9,
+    "kRel": 1
    },
    "c6": {
     "enabled": true,
@@ -17678,6 +17904,9 @@
     "mCanopy": 0.01,
     "hCanopy": 120,
     "gammaCanopy": 2,
+    "mSuppression": 1,
+    "suppressionSlope": 0.92,
+    "shadeTolerance": 3,
     "maxTrees": 300,
     "rain": 0
    }
@@ -17736,7 +17965,8 @@
     "T": 0.03,
     "g": 3,
     "Trel": 0.12,
-    "topQuantile": 0.9
+    "topQuantile": 0.9,
+    "kRel": 1
    },
    "c6": {
     "enabled": true,
@@ -17841,6 +18071,9 @@
     "mCanopy": 0.01,
     "hCanopy": 120,
     "gammaCanopy": 2,
+    "mSuppression": 1,
+    "suppressionSlope": 0.92,
+    "shadeTolerance": 3,
     "maxTrees": 300,
     "rain": 0
    }

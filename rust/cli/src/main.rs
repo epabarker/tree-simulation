@@ -8,7 +8,7 @@
 //!   treesim --preset oakOpen --species-patch '{"oak":{"r3":{"posture":false}}}'
 //!   treesim --preset succession --checkpoint-at 60 --seasons 60 --out runs/c
 //!
-//! Writes to --out: run.json, metrics.csv, metamers.csv, form.csv, hash.txt, stand.csv (live,
+//! Writes to --out: run.json (the record, its `notices` included: `capReached`), metrics.csv, metamers.csv, form.csv, hash.txt, stand.csv (live,
 //! drawn and canopy stems and the cap, per season) and stand-species.csv; with --light,
 //! light.csv (with lad, the leaf area density over depth), buds.csv (every live bud, with its
 //! birthId) and ground.csv (the ground's light and the leaf area above it, per x and z); with

@@ -298,6 +298,19 @@ export interface TreeMetrics {
   upperFlankNew: number;
   /** Live buds past a bound of the world (ground, top, or a non-periodic side). NaN without a world. */
   budsOutside: number;
+  /**
+   * This season's first-order limbs (off the trunk) shed by C5's relative test alone
+   * (Q_b/n_b < Trel·Q_top, kRel seasons in a row), by R1's carbon test alone (P_b < M_b, kShed
+   * seasons), and by both. A limb shed only by the absolute T or by Tvig counts in none (#125).
+   */
+  shedRelative: number;
+  shedCarbon: number;
+  shedBoth: number;
+  /**
+   * This season's shoots released from a dormant lateral bud on a scarred trunk node (scarSumN > 0)
+   * below the lowest living first-order limb as the season began: re-clothing of the bole (#125).
+   */
+  boleSprouts: number;
 }
 
 export const METRIC_COLUMNS: readonly (keyof TreeMetrics)[] = [
@@ -348,6 +361,10 @@ export const METRIC_COLUMNS: readonly (keyof TreeMetrics)[] = [
   "w90",
   "upperFlankNew",
   "budsOutside",
+  "shedRelative",
+  "shedCarbon",
+  "shedBoth",
+  "boleSprouts",
 ];
 
 /** A change applied at the start of `season` (before that season runs). */
@@ -356,9 +373,17 @@ export type RunEvent =
   | { season: number; type: "removeTree"; tree: number }
   | { season: number; type: "plantTree"; x: number; species?: string };
 
-/** Everything needed to reproduce a run: initial params plus the event log. */
+/**
+ * What the run did, not replayed: `capReached` the first season the stand's live trees (the
+ * seedling bank included) fill `o4.maxTrees`, numbered as stand.csv numbers seasons (ADR 0063).
+ */
+export type RunNotice = { season: number; type: "capReached" };
+
+/** Everything needed to reproduce a run: initial params plus the event log; then its notices. */
 export interface RunRecord {
   params: Params;
   events: RunEvent[];
   seasons: number;
+  /** An output of the run; a replay raises them again. Absent in records saved before #120. */
+  notices?: RunNotice[];
 }

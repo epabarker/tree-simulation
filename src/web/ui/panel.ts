@@ -115,6 +115,7 @@ const SECTIONS: SectionSpec[] = [
       { key: "g", label: "g grace (seasons)", min: 0, max: 15, step: 1 },
       { key: "Trel", label: "T_rel × crown-top light", min: 0, max: 1, step: 0.01 },
       { key: "topQuantile", label: "crown-top quantile", min: 0.5, max: 1, step: 0.01 },
+      { key: "kRel", label: "k_rel dark seasons", min: 1, max: 10, step: 1 },
     ],
   },
   {
@@ -239,6 +240,9 @@ const SECTIONS: SectionSpec[] = [
       { key: "mCanopy", label: "m_c canopy death", min: 0, max: 0.05, step: 0.001 },
       { key: "hCanopy", label: "H_c canopy height (cells)", min: 10, max: 200, step: 5 },
       { key: "gammaCanopy", label: "γ_c canopy rise", min: 0, max: 6, step: 0.25 },
+      { key: "mSuppression", label: "m_s suppression death", min: 0, max: 1, step: 0.01 },
+      { key: "suppressionSlope", label: "β_s tolerance slope", min: 0, max: 3, step: 0.02 },
+      { key: "shadeTolerance", label: "T shade tolerance", min: 1, max: 5, step: 0.01 },
       { key: "rain", label: "seed rain /100 cells", min: 0, max: 5, step: 0.1 },
     ],
   },

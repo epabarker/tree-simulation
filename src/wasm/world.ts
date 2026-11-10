@@ -98,6 +98,10 @@ const METRIC_NUMBERS = [
   "w90",
   "upperFlankNew",
   "budsOutside",
+  "shedRelative",
+  "shedCarbon",
+  "shedBoth",
+  "boleSprouts",
 ] as const;
 const FLAGS = new Set(["alive", "sown"]);
 
@@ -140,6 +144,10 @@ const NUMBERS = [
   "epicormic",
   "aborted",
   "broken",
+  "shedRelative",
+  "shedCarbon",
+  "shedBoth",
+  "boleSprouts",
 ] as const;
 
 type Schema = Record<

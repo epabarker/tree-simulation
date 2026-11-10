@@ -313,12 +313,45 @@ export const HAND_FLORA = {
 } satisfies Record<string, SpeciesPatch>;
 
 /**
+ * Each species' shade tolerance (`o4.shadeTolerance`, ADR 0063): Niinemets & Valladares's (2006)
+ * tolerance score, Appendix A, the `shadeScore` each species' fit targets carry
+ * (analysis/fit/targets/<species>.toml), on their 1–5 scale. It scales O4's suppression rate in the
+ * two-part mortality mode only, so birch dies fastest in shade and beech, fir and holly wait
+ * longest; the size-blind mode never reads it. Applied here, not in flora-fitted.ts, which is
+ * generated (analysis/experiments/m27_adopt.py) and would be overwritten.
+ */
+export const SHADE_TOLERANCE = {
+  birch: 2.03,
+  oak: 2.45,
+  beech: 4.56,
+  fir: 4.6,
+  hornbeam: 3.97,
+  maple: 3.18,
+  holly: 3.86,
+  rowan: 2.73,
+  willow: 2.16,
+  pine: 1.67,
+} as const;
+
+/** `flora` with each species' `o4.shadeTolerance` set from SHADE_TOLERANCE. */
+function withShadeTolerance<T extends Record<keyof typeof SHADE_TOLERANCE, SpeciesPatch>>(
+  flora: T,
+): T {
+  const out: Record<string, SpeciesPatch> = {};
+  for (const [name, patch] of Object.entries(flora)) {
+    const shadeTolerance = SHADE_TOLERANCE[name as keyof typeof SHADE_TOLERANCE];
+    out[name] = { ...patch, o4: { ...patch.o4, shadeTolerance } };
+  }
+  return out as T;
+}
+
+/**
  * The species the woodland presets grow (M27b, ADR 0023): the round-2 CMA-ES fits to literature
  * traits with hand adjustments (flora-fitted.ts, generated). They grow with the hyperbolic
  * hydraulic discount (ADR 0021) and a juvenile phase (ADR 0022), set in each patch, and as they
  * grow in 3D (ADR 0025): each species' phyllotaxis and wood's own E, which the generator
- * (analysis/experiments/m27_adopt.py) writes into the file.
+ * (analysis/experiments/m27_adopt.py) writes into the file. Shade tolerance is added here.
  */
-export const FLORA = FITTED_FLORA;
+export const FLORA = withShadeTolerance(FITTED_FLORA);
 
 export type FloraName = keyof typeof FLORA;

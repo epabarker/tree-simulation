@@ -3,6 +3,9 @@
 //! picture's plane); depth and its offset along z (I2).
 //! The feature measures (liveCrownBase … budsOutside, docs/features/ and GLOSSARY) are computed
 //! here once, so the feature probe, the evidence tests and the analysis read the same numbers.
+//! The bare bole's counts (shedRelative … boleSprouts, #125) are this season's, recorded where
+//! they happen: C5's `shed_branches` (first-order limbs shed by the relative test alone, by R1's
+//! carbon test alone, by both) and R4's release in `grow_buds` (sprouts from bole scars).
 
 use crate::light::Light;
 use crate::math;
@@ -16,7 +19,7 @@ const PI: f64 = std::f64::consts::PI;
 /// metrics.csv's columns (METRIC_COLUMNS), in order. `alive` and `sown` are flags (1/0) and
 /// `species` a string; every other column is a number.
 /// How many numbers a tree's metrics hold: METRIC_COLUMNS' and METRIC_NUMBERS' length.
-pub const METRIC_COUNT: usize = 47;
+pub const METRIC_COUNT: usize = 51;
 
 pub const METRIC_COLUMNS: [&str; METRIC_COUNT] = [
     "tree",
@@ -66,6 +69,10 @@ pub const METRIC_COLUMNS: [&str; METRIC_COUNT] = [
     "w90",
     "upperFlankNew",
     "budsOutside",
+    "shedRelative",
+    "shedCarbon",
+    "shedBoth",
+    "boleSprouts",
 ];
 
 /// The numeric fields of TreeMetrics, in this order (`sown` among them, as a flag), which the
@@ -118,6 +125,10 @@ pub const METRIC_NUMBERS: [&str; METRIC_COUNT] = [
     "w90",
     "upperFlankNew",
     "budsOutside",
+    "shedRelative",
+    "shedCarbon",
+    "shedBoth",
+    "boleSprouts",
 ];
 
 pub struct TreeMetrics {
@@ -264,8 +275,14 @@ pub fn live_crown_base(tree: &Tree, height: f64) -> f64 {
     if height <= 0.0 {
         return f64::NAN;
     }
+    math::min(1.0, math::min(height, lowest_living_limb(tree)) / height)
+}
+
+/// The height where the lowest living first-order limb leaves the trunk (`live_crown_base`'s
+/// numerator); infinite when no limb lives. R4's count of sprouts on the bole reads it too.
+pub fn lowest_living_limb(tree: &Tree) -> f64 {
     let limb = limbs_of(tree);
-    let mut base = height;
+    let mut base = f64::INFINITY;
     for j in 0..tree.b.len() {
         if !is_live_bud(tree.b.state[j]) {
             continue;
@@ -275,7 +292,7 @@ pub fn live_crown_base(tree: &Tree, height: f64) -> f64 {
             base = math::min(base, tree.m.base_y[l as usize]);
         }
     }
-    math::min(1.0, base / height)
+    base
 }
 
 /// The leafy buds, as (x, y, leaf area) at their metamer's tip: live buds with a leaf area above 0
@@ -628,6 +645,10 @@ pub fn tree_metrics(tree: &Tree, world: Option<&World>) -> TreeMetrics {
             w90(&leafy, frame.as_ref()),
             upper_flank_new(tree, world, frame.as_ref()),
             buds_outside(tree, world),
+            tree.shed_relative,
+            tree.shed_carbon,
+            tree.shed_both,
+            tree.bole_sprouts,
         ],
         species: tree.species.clone(),
     }
@@ -641,6 +662,29 @@ mod tests {
     use crate::tree::slot;
 
     const UP: f64 = std::f64::consts::FRAC_PI_2;
+
+    #[test]
+    fn a_season_of_relative_shedding_shows_its_causes_in_the_appended_columns() {
+        // The C5 test tree's lateral, a first-order limb, shed by the relative test alone; then a
+        // released sprout on the bole, as R4 records it.
+        let p = crate::principles::c5::tests::params(r#"{"c5":{"Trel":0.3}}"#);
+        let mut t = crate::principles::c5::tests::small_tree(&p);
+        t.q_top = 1.0;
+        t.m.q_sum[2] = 0.3;
+        t.m.n_sum[2] = 2;
+        t.m.q_sum[1] = 1.0;
+        t.m.n_sum[1] = 1;
+        let nm = t.m.len();
+        crate::principles::c5::shed_branches(&mut t, &p, 5.0, nm);
+        t.bole_sprouts = 2.0;
+        let m = tree_metrics(&t, None);
+        let tail = ["shedRelative", "shedCarbon", "shedBoth", "boleSprouts"];
+        assert_eq!(METRIC_COLUMNS[METRIC_COUNT - 4..], tail);
+        assert_eq!(METRIC_NUMBERS[METRIC_COUNT - 4..], tail);
+        assert_eq!(METRIC_COLUMNS[46], "budsOutside"); // the existing columns keep their places
+        let got: Vec<f64> = tail.iter().map(|k| m.get(k)).collect();
+        assert_eq!(got, vec![1.0, 0.0, 0.0, 2.0]);
+    }
 
     #[test]
     fn the_leaf_base_ignores_one_low_twig_that_sets_the_bole() {

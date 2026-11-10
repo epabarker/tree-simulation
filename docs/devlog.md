@@ -2,6 +2,14 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-10: establishment and seed rain over the whole depth (#119, ADR 0063)
+
+- **`o4.band` is removed** (params.ts, params.rs, o4.rs; ADR 0063 decision 4). Local seeds and seed rain establish anywhere in the depth; the rain's z draw (seedRain, k = 3) is unchanged, now always `u·depth`. `forestParams` no longer sets a band, so the **garden's recruits use the whole (still open) depth from here**, ahead of #121's flip; the named regression `phoneSeed3` (`forestParams(66, 3)`) is expected to move and is not re-baselined.
+- **No start-season param existed** in this line: R1 already feeds the seed pool from its maturity height alone (`r1.rs`, `splits_a_surplus_into_reserve_reproduction_and_v_base`). The o4.rs header now says so.
+- **Holly's species-level `o4.enabled: false` is deleted** (flora-fitted.ts, rust/presets.json). It was never read: only the world's `o4.enabled` gates O4.
+- **Willow** recruits only by rain while its planted trees stay below R1's maturity (22.5 m): stated in o4.rs, checked by `willow_recruits_only_by_rain_while_its_planted_trees_are_immature` (planted willows in mixedWood's wood for 15 seasons: no willow matures or sets seed; rain 1 brings recruits, rain 0 none).
+- **Goldens:** none moved, natively or in WASM (no golden case set a band; the holly flag was unread).
+
 
 ## 2026-11-10: The open-grown lone-tree stage (#115, ADR 0062)
 

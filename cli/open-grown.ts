@@ -118,17 +118,17 @@ async function main() {
   // One run first, so the binary is built once and six launchers do not race cargo.
   const queue = species.flatMap((sp) => seeds.map((seed) => [sp, seed] as const));
   const results: Result[] = [];
+  const report = (r: Result) => {
+    results.push(r);
+    console.log(
+      `${r.species} s${r.seed}: H ${r.height.toFixed(0)}, W ${r.width.toFixed(0)}, D ${r.depth.toFixed(0)}, round ${r.round.toFixed(2)}, outside ${r.outsideMax}${r.outsideSeasons.length ? ` in ${r.outsideSeasons.length} seasons` : ""}`,
+    );
+  };
   const first = queue.shift();
-  if (first) results.push(await runOne(...first));
+  if (first) report(await runOne(...first));
   await Promise.all(
     Array.from({ length: jobs }, async () => {
-      for (let next = queue.shift(); next; next = queue.shift()) {
-        const r = await runOne(...next);
-        results.push(r);
-        console.log(
-          `${r.species} s${r.seed}: H ${r.height.toFixed(0)}, W ${r.width.toFixed(0)}, D ${r.depth.toFixed(0)}, round ${r.round.toFixed(2)}, outside ${r.outsideMax}${r.outsideSeasons.length ? ` in ${r.outsideSeasons.length} seasons` : ""}`,
-        );
-      }
+      for (let next = queue.shift(); next; next = queue.shift()) report(await runOne(...next));
     }),
   );
   writeFileSync(join(out, "summary.json"), `${JSON.stringify(results, null, 1)}\n`);

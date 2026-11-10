@@ -8,7 +8,7 @@
 
 import { level } from "./flora.ts";
 import { defaultParams, mergeParams, type Params, type ParamsPatch } from "./params.ts";
-import { type Preset, SKY, STAND_X } from "./presets.ts";
+import { type Preset, presets, SKY, STAND_X, WALLED_LONE } from "./presets.ts";
 
 /**
  * The species keep the M7 resource scale and no carbon balance: under R1 their strong leaders
@@ -167,6 +167,14 @@ export const fixtures = {
     description:
       "Troll's model, as in Fagus: the leader grows out sideways and the trunk rights itself behind it with reaction wood (§9).",
     patch: { world: { width: 120, height: 140, walls: [] }, trees: [{ x: 60 }], ...TROLL },
+  },
+  oakOpenWalled: {
+    label: "M19: an oak in the half-walled box",
+    description:
+      "oakOpen before the open-grown box (ADR 0062): 160 × 64 cells between τ 0.2 faces. The woodland's rules for the milestone scripts and the 2D-calibrated evidence measured there.",
+    // A preset's world patch merges one level deep, so a script that patched oakOpen's width
+    // would now keep its open box's depth and faces: those scripts name this fixture instead.
+    patch: { ...presets.oakOpen.patch, world: WALLED_LONE, trees: [{ x: 80, species: "oak" }] },
   },
 } satisfies Record<string, Preset>;
 

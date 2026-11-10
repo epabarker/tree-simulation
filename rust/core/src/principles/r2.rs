@@ -1032,7 +1032,9 @@ mod tests {
         let world = |xs: &str| {
             let p = crate::testing::preset(
                 "oakOpen",
-                &format!(r#"{{"trees":[{xs}],"species":{{"oak":{{"r2":{{"relayCrowd":10}}}}}}}}"#),
+                &format!(
+                    r#"{{"world":{{"width":160,"depth":64,"faces":[0.2,0.2]}},"trees":[{xs}],"species":{{"oak":{{"r2":{{"relayCrowd":10}}}}}}}}"#
+                ),
             );
             let mut w = World::new(p);
             w.run(25, &[]);

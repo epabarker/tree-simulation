@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { loneParams, shadeParams, standParams } from "../../cli/trials.ts";
+import { fixtureParams } from "../../src/core/fixtures.ts";
 import { type FloraName, HAND_FLORA } from "../../src/core/flora.ts";
 import { mergeParams, type Params } from "../../src/core/params.ts";
 import { presetParams } from "../../src/core/presets.ts";
@@ -9,9 +10,9 @@ const SEEDS = [1, 2, 3];
 const SIX = [1, 2, 3, 4, 5, 6];
 const mean = (a: number[]) => a.reduce((s, x) => s + x, 0) / a.length;
 
-/** The woodland's growth rules without stand dynamics or storms (oakOpen's), for `trees`. */
+/** The woodland's growth rules without stand dynamics or storms (oakOpen's, half-walled), for `trees`. */
 function grown(seed: number, patch: Partial<Params>): World {
-  return new World(mergeParams(presetParams("oakOpen", seed), patch));
+  return new World(mergeParams(fixtureParams("oakOpenWalled", seed), patch));
 }
 
 /** Seedlings that live through 30 seasons under a roof letting through `light` of the sky. */
@@ -130,7 +131,7 @@ describe("calibrated species (M19)", () => {
     // A test of the mechanism on the hand-tuned oak (M19), whose limbs it was measured on.
     const bigLimbs = (kappa: number) =>
       [1, 2, 3, 4, 5].reduce((sum, seed) => {
-        const base = presetParams("oakOpen", seed);
+        const base = fixtureParams("oakOpenWalled", seed);
         const oak = HAND_FLORA.oak as NonNullable<Params["species"]>[string];
         const world = new World(
           mergeParams(base, {
@@ -153,15 +154,19 @@ describe("calibrated species (M19)", () => {
   });
 
   it("throws slender stand trees in storms far more often than a squat open oak", () => {
-    const thrownShare = (preset: "oakOpen" | "oakWood") => {
+    // The open oak as measured, in the half-walled box (before ADR 0062).
+    const thrownShare = (preset: "oakOpenWalled" | "oakWood") => {
       let thrown = 0;
       let trees = 0;
       for (const seed of [1, 2, 3, 4, 5]) {
         const world = new World(
-          mergeParams(presetParams(preset, seed), {
-            o2: { stormP: 0.3, stormLoad: 1.5 },
-            o4: { enabled: false },
-          }),
+          mergeParams(
+            preset === "oakWood" ? presetParams(preset, seed) : fixtureParams(preset, seed),
+            {
+              o2: { stormP: 0.3, stormLoad: 1.5 },
+              o4: { enabled: false },
+            },
+          ),
         );
         world.run(80);
         for (const t of world.trees) {
@@ -174,7 +179,7 @@ describe("calibrated species (M19)", () => {
     };
     // Measured: the fitted oak (M27b), 1 lone oak in 5 against 19 of 50 stand oaks; the hand-tuned
     // one, 1 in 5 against 21 of 50.
-    expect(thrownShare("oakWood")).toBeGreaterThan(1.5 * thrownShare("oakOpen"));
+    expect(thrownShare("oakWood")).toBeGreaterThan(1.5 * thrownShare("oakOpenWalled"));
   });
 });
 

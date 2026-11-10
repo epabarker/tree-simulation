@@ -318,8 +318,8 @@ lone_runs = []
 for sp in FITTED:
     for s in SEEDS:
         world = {"world": {"width": 160, "height": 160, "walls": []}, "trees": [{"x": 80, "species": sp}]}
-        lone_runs.append(Run(f"{lone_dir}/{sp}_hand_s{s}", "oakOpen", s, 60, world))
-        lone_runs.append(Run(f"{lone_dir}/{sp}_fitted_s{s}", "oakOpen", s, 60, {**world, "species": {sp: patch[sp]}}))
+        lone_runs.append(Run(f"{lone_dir}/{sp}_hand_s{s}", "oakOpenWalled", s, 60, world))
+        lone_runs.append(Run(f"{lone_dir}/{sp}_fitted_s{s}", "oakOpenWalled", s, 60, {**world, "species": {sp: patch[sp]}}))
 run_many(lone_runs, workers=args.workers)
 form = load_runs(REPO / lone_dir, "form").filter(pl.col("season") == 60).with_columns(
     pl.col("run").str.extract(r"^(\w+?)_").alias("sp"), pl.col("run").str.extract(r"_(hand|fitted)_").alias("patch")
@@ -357,7 +357,7 @@ links = {}
 for sp in FITTED:
     links[sp] = lab_link(f"{sp}Wood" if sp in WOODS else "mixedWood", {"species": {sp: patch[sp]}})
     links[f"{sp} (open)"] = lab_link(
-        "oakOpen", {"trees": [{"x": 80, "species": sp}], "species": {sp: patch[sp]}}
+        "oakOpenWalled", {"trees": [{"x": 80, "species": sp}], "species": {sp: patch[sp]}}
     )
 if wood_fitted:
     every = {sp: patch[sp] for sp in wood_fitted}

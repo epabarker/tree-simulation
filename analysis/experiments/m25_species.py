@@ -46,17 +46,17 @@ runs = []
 for sp in SPECIES:
     for seed in SEEDS:
         runs.append(
-            Run(f"{EXPERIMENT}/lone/{sp}_s{seed}", "oakOpen", seed, 60,
+            Run(f"{EXPERIMENT}/lone/{sp}_s{seed}", "oakOpenWalled", seed, 60,
                 {"world": {"width": 160, "height": 160, "walls": []}, "trees": [{"x": 80, "species": sp}]})
         )
         runs.append(
-            Run(f"{EXPERIMENT}/stand/{sp}_s{seed}", "oakOpen", seed, 60,
+            Run(f"{EXPERIMENT}/stand/{sp}_s{seed}", "oakOpenWalled", seed, 60,
                 {"world": {"width": 230, "height": 160, "walls": []},
                  "trees": [{"x": x, "species": sp} for x in STAND]})
         )
         for roof in ROOFS:
             runs.append(
-                Run(f"{EXPERIMENT}/shade/{sp}_r{roof}_s{seed}", "oakOpen", seed, 30,
+                Run(f"{EXPERIMENT}/shade/{sp}_r{roof}_s{seed}", "oakOpenWalled", seed, 30,
                     {"world": {"width": 40, "height": 60, "sides": "periodic",
                                "walls": [{"x": 0, "y": 40, "width": 40, "height": 1, "shade": roof}]},
                      "trees": [{"x": 20, "species": sp}]})

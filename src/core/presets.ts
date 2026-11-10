@@ -162,6 +162,20 @@ export function openGrown(species: string, side: number = OPEN_BOX): ParamsPatch
   };
 }
 
+/**
+ * The lone trees' world before the open box (ADR 0062): 160 × 64 cells between τ 0.2 faces, the
+ * half-walled box. The garden's specimen keeps it (the open box's 530–700 MB is past the worker's
+ * 256 MB, ADR 0026), and so do the trials the fits were calibrated on (`cli/trials.ts`).
+ */
+export const WALLED_LONE = {
+  width: 160,
+  height: TOP,
+  depth: 64,
+  faces: [0.2, 0.2],
+  sidesZ: "open",
+  walls: [],
+} satisfies Params["world"];
+
 const RING = { width: 210, height: TOP, walls: [], sides: "periodic" } satisfies Params["world"];
 /** One row of the ring's stand: a tree every 21 cells. */
 const RING_X = [10, 31, 52, 73, 94, 115, 136, 157, 178, 199];
@@ -392,9 +406,9 @@ export const presets = {
       "Quercus robur alone in a field: wide-angled limbs, a broad decurrent crown and a squat trunk (Plate II).",
     // A specimen: no seedlings around it, and no storms, which throw tall trees by height alone.
     // The woods' top (C1 round 3): at 120 the lone oak reached it and its crown was clipped flat.
+    // Open-grown (ADR 0062): τ 1 on all four sides in the 60 m box, which holds its crown.
     patch: {
-      world: { width: 160, height: TOP, walls: [] },
-      trees: [{ x: 80, species: "oak" }],
+      ...openGrown("oak"),
       ...WOODLAND,
       o2: { stormP: 0 },
       o4: { enabled: false },
@@ -404,12 +418,11 @@ export const presets = {
     label: "A beech grown in the open",
     description:
       "Fagus sylvatica alone in a field: the fresh-look round's lone tree (ADR 0039–0043, proposed), in a world wide enough for its crown.",
-    // oakOpen's specimen with the beech: 240 wide, as the fresh-look round's repair measured it
-    // (160 clipped a broad crown at the world's sides). A golden case: the open-grown beech is
-    // where the round's vigour-gated rules act.
+    // oakOpen's specimen with the beech, open-grown (ADR 0062): the 60 m box holds the broadest
+    // exemplar crown, with 2.2 m to spare at season 100. A golden case: the open-grown beech is
+    // where the fresh-look round's vigour-gated rules act.
     patch: {
-      world: { width: 240, height: TOP, walls: [] },
-      trees: [{ x: 120, species: "beech" }],
+      ...openGrown("beech"),
       ...WOODLAND,
       o2: { stormP: 0 },
       o4: { enabled: false },
@@ -597,5 +610,8 @@ export function forestParams(width = 210, seed?: number, planting: Partial<Plant
 
 /** Plate II (M19): an oak grown alone in the open, a new one for each seed. */
 export function specimenParams(seed: number): Params {
-  return presetParams("oakOpen", seed);
+  return mergeParams(presetParams("oakOpen", seed), {
+    world: WALLED_LONE,
+    trees: [{ x: 80, species: "oak" }],
+  });
 }

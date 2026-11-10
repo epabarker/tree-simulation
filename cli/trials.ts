@@ -35,7 +35,7 @@ import {
   type SpeciesPatch,
   speciesParams,
 } from "../src/core/params.ts";
-import { perArea, presetParams, TOP } from "../src/core/presets.ts";
+import { loneTreeParams, perArea, presetParams, TOP } from "../src/core/presets.ts";
 import { coreWasm, loadWorldsSync, RustWorld, type TreeView as Tree } from "../src/wasm/world.ts";
 import { type Allometry, allometry } from "./allometry.ts";
 
@@ -59,11 +59,9 @@ export function trialBase(seed: number, patch: Partial<Params>): Params {
   return mergeParams(presetParams("oakOpen", seed), patch);
 }
 
+/** The lone-tree stage (presets.ts' `loneTreeParams`, which the feature probe reads too). */
 export function loneParams(species: string, seed: number): Params {
-  return trialBase(seed, {
-    world: { width: 160, height: TOP, walls: [] },
-    trees: [{ x: 80, species }],
-  });
+  return loneTreeParams(species, seed);
 }
 
 /** The one-row stand of M19–M27 (ten trees between τ 0.2 faces): now the release trial's. */

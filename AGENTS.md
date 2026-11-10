@@ -36,6 +36,8 @@ npm run build              # static site in dist/ (the lab, and garden.html)
 npm run build:garden       # garden.js + worker in dist-garden/ for a host page, size-gated (ADR 0014)
 npm run bench              # per phase (native), per season and snapshot (WASM), hashes; --compare runs/bench/<sha>.json
 npm run regressions        # known defects as outcome vectors (tests/regressions.json; ~80 s native; --update with a devlog reason)
+npm run probe -- --patch patch.json --species beech   # feature probe: HEAD vs patch, lone tree + garden, seeds 1–3 → runs/probe/<label>/sheet.html (exploratory)
+npm run probe:smoke        # the probe's smoke test (native build; not in `npm test`, as the regressions)
 npm run sim -- --preset explosion --seasons 12 --out runs/x   # native headless run → CSV
 npm run golden:update      # regenerate golden hashes (intended behaviour changes only)
 node cli/export-presets.ts # regenerate rust/presets.json after changing params, presets or species

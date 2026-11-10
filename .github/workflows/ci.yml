@@ -32,6 +32,8 @@ jobs:
         run: npm run sim -- --seasons 10 --out runs/ci
       - name: "Named regressions: known defects as outcome vectors (#54, #55; tests/regressions.json)"
         run: node cli/regressions.ts
+      - name: "Feature probe smoke: it runs and writes its sheet (cli/probe.ts, #114)"
+        run: npm run probe:smoke
 
   # The analysis suite (analysis/tests: the QSM readers, describe(), coarsen(), the fits and gates): added
   # 2026-11-06 at the external review's suggestion. A separate job, so a calibration failure reads apart from

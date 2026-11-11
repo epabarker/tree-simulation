@@ -247,3 +247,85 @@ node cli/oak-crown.ts --patch runs/oak-round2/d16a13.json --seeds 1-20 --species
 node cli/oak-crown.ts --patch runs/oak-round2/d16a13.json --seeds 21-40 --no-head --species oak --out runs/oak-crown-fresh
 uv run --project analysis python docs/experiments/code/2026-11-10-oak-round2/sheet100.py d16a13 d12a9
 ```
+
+## Garden guard for `d16a13` (the adoption gate)
+
+_2026-11-11. The user approved `d16a13` on the round-two sheets ("it actually looks like a split fork happens fairly often. I approve it"), with adoption gated on this guard. It ran against the garden as it stands on `spec/111-feature-playbook` at a9b71fa. **Nothing is adopted: no flora, params, presets, goldens or ADR change.**_
+
+### Answer
+
+**The ticket's two written criteria pass. The item round one flagged does not: the patched oak often fails to regenerate in the garden, and that is systematic, not one seed.** In 12 gardens that plant an oak, the oak is gone by season 150 in 4 under the patch and in none unpatched. Adoption stopped here for the user to decide.
+
+| check | result |
+|---|---|
+| Bare-bole species keep their lid and crown depth | **pass**: beech and hornbeam ≥ 10 m are unchanged within the stand's rearrangement (below) |
+| Named regressions no worse than unpatched | **pass**: both worlds are bit-identical with and without the patch (`phoneSeed3` 597e91e4, `forestRegeneration` 106dd111). Neither ever grows an oak |
+| The phone garden's seed 1 (round one's flag) | **worse**: 23 live trees with 20 oak recruits unpatched; 6 willows and no oak under the patch |
+| The same question on more gardens | **worse**: oak present at 150 in 12 of 12 unpatched, 8 of 12 patched; oak sets seed by 150 in 10 of 12 unpatched, 5 of 12 patched |
+
+### The probe (seeds 1–3, widths 160 and 66; exploratory)
+
+`runs/probe/oak124-guard-d16/sheet.html`. As in round one, only seed 1 plants an oak. Seeds 2 and 3 are bit-identical at both widths.
+
+- **Seed 1, 160 cells.** Beech and hornbeam ≥ 10 m, unpatched against patched:
+  - at 50, live crown base 0.011 / 0.012 against 0.012 / 0.012, crown ratio 0.99 in both;
+  - at 100, hornbeam 0.009 against 0.009, crown ratio 0.99 in both;
+  - at 150, beech ≥ 10 m number 2 against 6, live crown base 0.033 against 0.033, crown ratio 0.97 in both.
+  - Top-fifth leaf (the lid) is 0.22 / 0.35 against 0.36 / 0.45 at 50 and hornbeam 0.55 against 0.48 at 100: kept.
+  - Drawn stems at 150 are 44 against 39 and canopy stems 10 against 8. The cap is reached in both.
+- **Seed 1, 66 cells.** No beech or hornbeam ≥ 10 m in either arm. At 150 the unpatched garden has 23 live trees (20 oaks, 1 birch, 2 willows) and the patched one has 6 willows.
+
+### Why the oak is lost
+
+The planted oak dies in season 114 in both arms, at both widths. R1 feeds the seed pool only above the maturity height (`r1.maturity` 130 cells, 32.5 m).
+
+| seed 1 | arm | height at 60 / 90 / final, m | seeds set | oak recruits |
+|---|---|---|---|---|
+| 66 cells | unpatched | 25.8 / 28.6 / 33.0 | 1693 | 23 |
+| 66 cells | `d16a13` | 19.2 / 25.6 / 29.0 | 0 | 0 |
+| 160 cells | unpatched | 22.9 / 26.3 / 32.4 | 164 | 1 |
+| 160 cells | `d16a13` | 17.4 / 19.6 / 22.4 | 0 | 0 |
+
+The squat young oak is the accepted cost. In the garden that cost also delays the oak's first seed, and an oak that dies before it reaches 32.5 m leaves no offspring.
+
+### More gardens that plant an oak (to 150, unpatched against `d16a13`)
+
+Seven more phone seeds and three more desktop seeds, chosen only because `forestParams` plants an oak there. Not the probe: metrics only.
+
+| garden | planted oak's first seed season | seeds set by 150 | oaks alive at 150 |
+|---|---|---|---|
+| 66, seed 10 | 65 → 147 | 7447 → 801 | 4 → 17 |
+| 66, seed 11 | 74 → 114 | 15017 → 4022 | 20 → 22 |
+| 66, seed 20 | 91 → 122 | 11485 → 4552 | 18 → 19 |
+| 66, seed 21 | 94 → 115 | 15530 → 1850 | 14 → 5 |
+| 66, seed 30 | 81 → never | 9738 → 0 | 18 → **0** |
+| 66, seed 31 | never → never | 0 → 0 | 1 → 1 |
+| 66, seed 40 | 52 → never | 2654 → 0 | 5 → **0** |
+| 160, seed 6 | 83 → 136 | 24332 → 1017 | 12 → 2 |
+| 160, seed 7 | never → never | 0 → 0 | 1 → 1 |
+| 160, seed 8 | 87 → never | 18510 → 0 | 2 → 1 |
+
+- **With seed 1 at both widths, that is 12 gardens.** The oak is alive at 150 in 12 unpatched and 8 patched (lost: 66 cells seeds 1, 30 and 40; 160 cells seed 1). It has set seed by 150 in 10 unpatched and 5 patched.
+- **Where the patched oak does set seed, it starts 21–82 seasons later** and sets 4–40% of the unpatched seed by 150.
+- **It is not uniformly worse.** Seeds 10, 11 and 20 end with as many oaks or more: in seed 10 the unpatched planted oak dies at 92 and the patched one survives to 150.
+- **Bare-bole species in the three extra desktop gardens:** only seed 8 has a beech ≥ 10 m. Its live crown base is 0.024 against 0.017 at 150, crown ratio 0.98 in both, top-fifth leaf 0.49 against 0.54. Kept.
+
+### Limits
+
+- These are 12 gardens to season 150 in the pre-#121 garden (no ADR 0063 demography flip). It is not a ≥ 20-seed claim with a bar fixed beforehand; the counts are reported as found.
+- By 300 some late-seeding oaks would have recruited. That was not run.
+- `npm run regressions` itself takes no patch. The two regression worlds were run directly, unpatched and patched, and compared by `hash.txt`. Their unpatched hashes equal round one's, so `phoneSeed3` still differs from `tests/regressions.json` as round one recorded; it was not re-baselined.
+
+### For the user to decide
+
+1. Accept the oak's weaker regeneration in the garden as part of the cost, and adopt `d16a13` as approved.
+2. Adopt `d16a13` together with a lower oak `r1.maturity`. That is a second change with its own evidence: `maturity` is also where R1's reproductive sink caps the oak's height.
+3. Hold adoption until the 0063 garden (#121) is in, and re-run this guard there.
+
+### Reproduce (the guard)
+
+```
+npm run probe -- --patch runs/oak124-adopt/d16a13.json --species oak --label oak124-guard-d16 --jobs 4
+```
+
+The patch file is `{"species": {"oak": {"r2": {"dLambda": 0.16, "aC": 13.5}}}}`. The regression worlds and the ten extra gardens were scratch scripts under `runs/oak124-adopt/` (`regress-patch.ts`, `more-gardens.ts`; not committed): each writes `forestParams(width, seed)` or `presetParams("forest", 1)`, with and without `patchSpecies(p, "oak", …)`, as a replay record for `cli/run.ts`.

@@ -145,6 +145,19 @@ export function tally(scores: SeedScore[]): Tally {
   };
 }
 
+/** Seeds as a range ("1-20") or a list ("1,6,10"). */
+export function parseSeeds(s: string): number[] {
+  if (s.includes(",")) return s.split(",").map(Number);
+  const [a, b] = s.split("-").map(Number) as [number, number | undefined];
+  return Array.from({ length: (b ?? a) - a + 1 }, (_, k) => a + k);
+}
+
+/** A patch's arm: its file's name, or "patch" for the built-in d12a13 (round one's directory). */
+export function armName(patchFile: string | undefined): string {
+  if (!patchFile) return "patch";
+  return (patchFile.split("/").at(-1) as string).replace(/\.json$/, "");
+}
+
 export function compareHashes(
   head: Map<number, string>,
   patch: Map<number, string>,

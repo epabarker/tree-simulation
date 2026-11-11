@@ -106,3 +106,144 @@ npm run probe -- --patch runs/oak-d12a13.json --species oak --label oak124-guard
 ```
 
 The patch file is `{ "species": { "oak": { "r2": { "dLambda": 0.12, "aC": 13.5 } } } }`. HEAD's oak is `dLambda` 0.04 from `aC` 13.51. The scoring is unit-tested in `tests/oak-crown.test.ts`.
+
+## Round two: neighbouring schedules
+
+_2026-11-11. The user asked for another round: neighbours of `d12a13` aimed at the box-leaning and thin-flank seeds. **Evidence only**: no flora, params, presets, goldens or ADR change. The bars in `cli/oak-crown-score.ts` are unchanged. The screen, its seeds and its ranking rule were committed (458488a, `docs/experiments/code/2026-11-10-oak-round2/conditions.py`) before the first screening run. The garden guard was skipped this round, since the garden is being changed by #121/#122; it must be run before any adoption._
+
+### Answer
+
+**`d16a13` (`r2.dLambda` 0.16 from `aC` 13.5) passes every bar, on seeds 1–20 and on fresh seeds 21–40. It passes by one seed, and only at the bar.** Birch is bit-identical under it. By the agent's eye it still leaves about 4 of 20 crowns flat-topped, about as many as `d12a13` drawn the same way. It costs about 2 m more young height than `d12a13` at season 60.
+
+**Recommendation: unclear, with `d16a13` as the candidate to put to the user.** The measured bars are now met, which round one's setting failed. The box, the page's named defect, is not visibly reduced, and the margin is the smallest possible. Adopt it only if the user's own reading of the sheet accepts its flat-topped seeds (4, 16, 17, 19). Otherwise the result is "still not": no neighbour in this screen fixes the box.
+
+### 1. What separates the failing seeds (round one's `d12a13` arm)
+
+The analysis is `diagnose.py`, reading round one's runs: metrics every season, snapshots at 30/60/100. Medians by group:
+
+| group (round one's eye) | seeds | stall season | flank 30–59 | flank 60–100 | top tips ≥ 0.9 H | spread of the top tips / crown width | top3 |
+|---|---|---|---|---|---|---|---|
+| box-leaning | 1, 6, 9, 10, 16, 18 | 90 | 8% | 6% | 168 | 0.65 | 0.66 |
+| thin-flank dome | 4, 5, 7, 8, 17 | 76 | 9% | 3% | 73 | 0.33 | 0.47 |
+| clean dome | 2, 3, 11, 13, 14, 15, 20 | 83 | 11% | 8% | 143 | 0.40 | 0.56 |
+| HEAD (spire) | all | 52 | 1% | 0% | 107 | 0.18 | 0.17 |
+
+The stall season is the first season within 1 m of final height. Medians are over seeds.
+
+- **When and where the crown divides does not separate the groups.** Under the patch the leader leaves the trunk's axis low (0.5–12 m) on every seed, and the leader path changes axis 58–79 times by 100. Every seed divides early. Top-fifth leaf (0.01–0.09) and crown length / width (0.76–0.92 at 100) overlap across the groups.
+- **The stall separates them.** Thin-flank seeds reach the 33 m ceiling (R1's reproductive sink) earliest, at seasons 74–79. They fill the flank before 60 (8–11%, as the domes do), but after the stall their new growth leaves the top, so the 60–100 mean falls to 2–4%. Their tops are narrow and peaked: few top tips, top3 0.17–0.53. The boxes 1, 9, 10 and 16 are still climbing at 89–94 (6 and 18, which top3 does not call boxes, stall at 79 and 82). Their divided top spreads level as it climbs: many top tips, wide spread (0.6–1.1 on seeds 1, 9, 10 and 16).
+- **The two failures sit at opposite ends of one axis, the stall's timing.** Fixing a box needs the climb to end sooner relative to the division, which means an earlier or deeper fall: the 2026-11-08 notes found later and slower falls give boxes. Fixing a thin flank needs the top to keep taking new metamers after 60, which means a deeper fall (lower λ, more lateral share) or a later stall. **On timing they pull in opposite directions. On depth they agree.** A deeper fall is the lever both could share, so the screen leaned deeper and earlier, with a faster ramp and one shallower control.
+
+### 3. A reported shape measure: top3
+
+top3 is the mean width of the leafy crown's slices 16–18 (0.80–0.95 of its depth, in w90's 20 slices) over its widest slice. It is w90 averaged over three slices, which damps one slice's noise. It is reported, never a bar.
+
+- **On round one's `d12a13` arm, against round one's eye:**
+  - top3 ≥ 0.64 catches the boxes 1 (0.88), 9 (0.67), 10 (0.82) and 16 (0.65), and no dome (domes are 0.17–0.62).
+  - It misses seeds 6 (0.42) and 18 (0.33). A second look at their leaf mass, not the probe's drawn outline polygon, reads them as ragged domes; the outline line made them look square.
+  - Borderline 12 scores 0.82 and borderline 19 scores 0.57.
+- **For the screen it is read from shoot tips**, because `oak-crown.ts` snapshots have no buds.csv. On round one's arm the tips' top3 is the leafy buds' plus 0.00–0.05, with the same split at 0.64 (`runs/oak-round2/tipcheck.py`).
+- **Its limit.** The round-two sheet draws all shoot tips and the wood, with no outline polygon. On it the agent's reading of `d12a13` itself changes: seeds 1, 6, 10 and 18 no longer read as boxes; 9, 12, 13 and 16 do. top3 agrees with that reading on 9, 12 and 16 only. **The eye depends on the drawing, and top3 is a rough guide, not a judge.**
+
+### 2. The screen (8 seeds, 60–100 season means; fixed before running)
+
+The screening set was **1, 10, 16** (the worst boxes), **8, 7, 6** (the worst flanks; 6 also read as a box) and **2, 13** (clean domes).
+
+These neighbours were already tried on seeds 1–3 in the 2026-11-08 notes and were not repeated: `d08a13`, `d08a30`, `d12a30`, `aC` 18 and 22, ramp 40, and the per-level shares. The page rules out a later schedule adopted to keep the young spire.
+
+Rank: seeds of 8 passing both bars, then seeds with no box by top3, then height at season 30.
+
+| candidate | r2 (dLambda / aC / ramp) | flank ≥ 5% | w90 band | both | no box by top3 | flank mean | H30 m | H60 m | reach30 m | reach60 m |
+|---|---|---|---|---|---|---|---|---|---|---|
+| **d16a13** | 0.16 / 13.5 / 15 | 7 | 7 | **6** | **7** | 8.5% | 14.5 | 22.7 | 10.7 | 16.2 |
+| **d12a9** | 0.12 / 9 / 15 | 7 | 7 | **6** | 4 | 7.2% | 14.0 | 24.7 | 10.8 | 16.4 |
+| d12a11 | 0.12 / 11 / 15 | 7 | 7 | 6 | 2 | 9.3% | 14.4 | 24.2 | 10.5 | 16.8 |
+| d14a13 | 0.14 / 13.5 / 15 | 8 | 6 | 6 | 1 | 11.2% | 14.9 | 23.6 | 11.6 | 17.2 |
+| d14a11 | 0.14 / 11 / 15 | 7 | 6 | 5 | 4 | 9.8% | 14.1 | 23.8 | 10.6 | 17.3 |
+| d12a13r8 | 0.12 / 13.5 / 8 | 4 | 7 | 4 | 6 | 6.1% | 14.4 | 24.3 | 10.5 | 16.8 |
+| d10a13 | 0.10 / 13.5 / 15 | 4 | 7 | 3 | 5 | 5.6% | 16.3 | 25.6 | 11.6 | 17.0 |
+| d12a13 (round one) | 0.12 / 13.5 / 15 | 5 | 4 | 3 | 5 | 6.2% | 15.3 | 24.7 | 11.5 | 16.9 |
+
+- **Every deeper or earlier fall fills the flank** (7 or 8 of 8 against 5). The shallower control `d10a13` is worse than `d12a13`, which confirms the direction.
+- **Several of them widen the top** (top3 high: `d14a13`, `d12a11`). `d16a13` is the exception, so the box does not track depth monotonically.
+- **Finalists by the rule:** `d16a13` and `d12a9`. Per-seed values are in `runs/oak-round2/screen.csv`.
+
+### 4. The finalists on seeds 1–20, unchanged command and bars
+
+Run with `node cli/oak-crown.ts --patch runs/oak-round2/<name>.json …`. The oak runs keep season-100 snapshots, and birch was run against HEAD's birch.
+
+| arm | held | bar | flank ≥ 5% | w90 0.38–0.85 | both | verdict | round ≥ 0.75 (reported) | top3 ≥ 0.64 (reported) | birch hash |
+|---|---|---|---|---|---|---|---|---|---|
+| HEAD (round one) | 19 | 15 | 0 | 1 | 0 | FAIL | 15 | — | — |
+| d12a13 (round one) | 20 | 15 | 13 | 14 | 11 | FAIL | 20 | 5 (1, 9, 10, 12, 16) | identical 20/20 |
+| **d16a13** | 20 | 15 | **19** | **17** | **16** | **PASS** | 20 | 5 (4, 7, 15, 19, 20) | identical 20/20 |
+| d12a9 | 20 | 15 | 17 | 17 | 15 | PASS (at the bar) | 20 | 11 | identical 20/20 |
+| **d16a13, fresh seeds 21–40** | 20 | 15 | **19** | **16** | **15** | **PASS (at the bar)** | 20 | — | not run |
+
+- **Excluded seeds:** none in any round-two arm. No bud went outside the box on any seed, in any season, in 1–20 or 21–40.
+- **d16a13's fails on seeds 1–20:**
+  - flank: seed 16 (4.0%);
+  - w90: seeds 10 (0.25), 18 (0.33) and 19 (0.90).
+- **d16a13's fails on seeds 21–40:**
+  - flank: seed 33 (4.6%);
+  - w90: seeds 23 (0.93), 24 (0.87), 26 (just under 0.38) and 29 (0.31).
+- **d12a9's fails on seeds 1–20:**
+  - flank: seeds 5, 7 and 20;
+  - w90: seeds 2, 14 and 20.
+- **The fresh seeds.** The finalists were chosen on 8 of seeds 1–20, so the 1–20 count is not independent of the selection. Seeds 21–40 were run for `d16a13` only, after the choice, and it passes there too, exactly at the bar.
+
+**Sheets** (season 100, front view, HEAD | d12a13 | d16a13 | d12a9, drawn from metamers.csv: wood plus every shoot tip):
+
+- `runs/oak-round2/sheet/seeds-01-04.png`
+- `runs/oak-round2/sheet/seeds-05-08.png`
+- `runs/oak-round2/sheet/seeds-09-12.png`
+- `runs/oak-round2/sheet/seeds-13-16.png`
+- `runs/oak-round2/sheet/seeds-17-20.png`
+- the full sheet: `runs/oak-round2/sheet/all-20.png`
+
+Not committed. Round one's HTML sheet (`runs/probe/oak124-sheet/sheet.html`) remains HEAD and d12a13 at 30/60/100.
+
+**The agent's reading of the round-two sheet, season 100. The user should confirm it.** HEAD is a spire over low limbs on all 20 seeds. No patched seed is a spire.
+
+| reading | d12a13 | d16a13 | d12a9 |
+|---|---|---|---|
+| dome | 1, 2, 3, 4, 6, 7, 8, 10, 11, 14, 15, 17, 18 (13) | 3, 6, 8, 10, 11, 13, 14, 18, 20 (9) | 3, 5, 6, 7, 8, 10, 12, 14, 16, 18, 19, 20 (12) |
+| broad dome, flattish top (borderline) | 19 | 1, 5, 9, 12, 15 (5) | 15, 17 |
+| split top (two lobes with a notch) | 5, 20 | 2, 7 | — |
+| box-leaning (flat top, steep sides) | 9, 12, 13, 16 (4) | 4, 16, 17, 19 (4) | 1, 2, 4, 9, 11, 13 (6) |
+
+- **`d16a13` makes broader, flatter domes than `d12a13`.** It has as many box-leaning seeds and more borderline ones.
+- **`d12a9` has the most box-leaning seeds** (vase-shaped, flat-topped), matching its top3.
+- **On this reading neither neighbour reduces the box.** The bars pass because the flank fills and w90 moves into its band, and w90 does not separate dome from box.
+
+### 5. Cost at seasons 30 and 60 (seeds 1–20, means [min–max])
+
+| arm | H30 m | reach30 m | H60 m | reach60 m |
+|---|---|---|---|---|
+| HEAD | 20.0 [18.4–21.9] | 13.9 [10.4–16.1] | 33.1 [30.8–33.9] | 19.8 [13.9–23.8] |
+| d12a13 | 15.5 [13.8–16.6] | 11.2 [9.0–13.1] | 24.8 [20.9–26.9] | 17.2 [15.1–19.9] |
+| d16a13 | 14.7 [13.3–16.1] | 10.7 [8.9–12.9] | 22.6 [21.5–23.9] | 15.6 [12.2–18.8] |
+| d12a9 | 14.5 [13.0–16.0] | 10.4 [8.6–11.5] | 25.2 [22.9–28.3] | 16.3 [14.7–18.3] |
+
+- **`d16a13` is the squattest young oak:** 5.3 m below HEAD at 30 and 10.5 m below at 60, with 3.2 / 4.2 m less reach.
+- By season 100 all arms are at 31–34 m. Two `d16a13` seeds end lower, 30.8 and 31.4 m (seeds 20 and 1).
+
+### Limits
+
+- **The garden guard was not run this round**, which round one's note asks for after #121/#122.
+- The w90 and flank bars pass at or one seed above the rate, so they are fragile to one seed.
+- The eye verdict depends on how the sheet is drawn (outline polygon or tips), as shown above.
+- top3 is a rough guide, not a judge.
+
+### Reproduce (round two)
+
+```
+uv run --project analysis python docs/experiments/code/2026-11-10-oak-round2/diagnose.py      # step 1, round one's runs
+uv run --project analysis python docs/experiments/code/2026-11-10-oak-round2/conditions.py    # patches → runs/oak-round2/
+node cli/oak-crown.ts --patch runs/oak-round2/<name>.json --seeds 1,2,6,7,8,10,13,16 --no-head --species oak --snapshots 100   # screen
+uv run --project analysis python docs/experiments/code/2026-11-10-oak-round2/screen.py
+node cli/oak-crown.ts --patch runs/oak-round2/d16a13.json --seeds 1-20 --no-head --species oak --snapshots 100
+node cli/oak-crown.ts --patch runs/oak-round2/d16a13.json --seeds 1-20 --species birch      # birch identity (HEAD reused)
+node cli/oak-crown.ts --patch runs/oak-round2/d16a13.json --seeds 21-40 --no-head --species oak --out runs/oak-crown-fresh
+uv run --project analysis python docs/experiments/code/2026-11-10-oak-round2/sheet100.py d16a13 d12a9
+```

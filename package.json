@@ -29,6 +29,7 @@
     "bench": "node cli/bench.ts",
     "regressions": "node cli/regressions.ts",
     "evidence:open-grown": "node cli/open-grown.ts",
+    "evidence:oak-crown": "node cli/oak-crown.ts",
     "probe": "node cli/probe.ts",
     "probe:smoke": "node tests/probe-smoke.ts",
     "build:garden": "vite build -c vite.garden.config.ts && node cli/garden-size.ts && node cli/first-paint.ts"

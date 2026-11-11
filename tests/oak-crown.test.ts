@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { compareHashes, scoreSeed, tally } from "../cli/oak-crown-score.ts";
+import { armName, compareHashes, parseSeeds, scoreSeed, tally } from "../cli/oak-crown-score.ts";
 
 /** A metrics.csv for one lone tree (tree 0), with a second tree's rows that must be ignored. */
 function metrics(
@@ -118,6 +118,15 @@ describe("the oak's rounded-crown evidence (#124)", () => {
     expect(t.pass).toBe(true);
     // Below 15 held seeds there is no verdict: too many crowns reached a bound.
     expect(tally(all.slice(0, 14)).pass).toBe(false);
+  });
+
+  it("reads seeds as a range or a list, and names a patch's arm after its file", () => {
+    expect(parseSeeds("1-4")).toEqual([1, 2, 3, 4]);
+    expect(parseSeeds("1,6,10,18")).toEqual([1, 6, 10, 18]);
+    expect(parseSeeds("7")).toEqual([7]);
+    expect(armName("runs/oak-round2/d14a11.json")).toBe("d14a11");
+    // Without a file the arm is round one's built-in d12a13, kept in its old directory.
+    expect(armName(undefined)).toBe("patch");
   });
 
   it("finds the seeds whose patched hash differs from HEAD's", () => {

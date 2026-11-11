@@ -14,6 +14,14 @@
  *
  *   node cli/oak-crown.ts                      seeds 1–20, 6 simulators, runs/oak-crown
  *   node cli/oak-crown.ts -j 3 --seeds 1-5 --out runs/oak-crown-try
+ *   node cli/oak-crown.ts --patch runs/oak-round2/d14a11.json      another oak patch (round two)
+ *   node cli/oak-crown.ts --patch p.json --seeds 1,6,10 --no-head --species oak --snapshots 100
+ *
+ * --patch takes a file { "species": { "oak": <a species patch> } } (only the oak may be patched:
+ * birch's identity is the check); its arm is named after the file, <out>/<name>/. Without it the
+ * arm is the built-in d12a13, in <out>/patch/ (round one's directory). A run whose record and
+ * options match a finished run in place is reused, not rerun. --snapshots keeps metamers.csv and
+ * buds.csv at those seasons (for round two's outline measures).
  */
 import { spawn } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
@@ -22,10 +30,12 @@ import { fileURLToPath } from "node:url";
 import { type Params, patchSpecies, type SpeciesPatch } from "../src/core/params.ts";
 import { loneTreeParams } from "../src/core/presets.ts";
 import {
+  armName,
   compareHashes,
   FLANK_FROM,
   FLANK_MIN,
   FORM_SEASONS,
+  parseSeeds,
   ROUND,
   SEASONS,
   type SeedScore,
@@ -45,34 +55,56 @@ const arg = (name: string, fallback: string) => {
   return i >= 0 ? (process.argv[i + 1] ?? fallback) : fallback;
 };
 const jobs = Math.min(6, Math.max(1, Number(arg("-j", "6"))));
-const [s0, s1] = arg("--seeds", "1-20").split("-").map(Number) as [number, number];
-const seeds = Array.from({ length: (s1 ?? s0) - s0 + 1 }, (_, k) => s0 + k);
+const seeds = parseSeeds(arg("--seeds", "1-20"));
 const out = arg("--out", "runs/oak-crown");
+const patchFile = process.argv.includes("--patch") ? arg("--patch", "") : undefined;
+const PATCH: Record<string, SpeciesPatch> = patchFile
+  ? JSON.parse(readFileSync(patchFile, "utf8")).species
+  : D12A13;
+if (Object.keys(PATCH).some((name) => name !== "oak"))
+  throw new Error("the patch may change only the oak: birch's identity is the check");
+const ARM = armName(patchFile);
+const withHead = !process.argv.includes("--no-head");
+const species = arg("--species", "oak,birch").split(",");
+const snapshots = arg("--snapshots", "");
 
-type Arm = "head" | "patch";
-const params = (sp: string, seed: number, arm: Arm): Params => {
+const params = (sp: string, seed: number, arm: string): Params => {
   let p = loneTreeParams(sp, seed);
-  if (arm === "patch") for (const [name, s] of Object.entries(D12A13)) p = patchSpecies(p, name, s);
+  if (arm !== "head") for (const [name, s] of Object.entries(PATCH)) p = patchSpecies(p, name, s);
   return p;
 };
 
-function runOne(sp: string, seed: number, arm: Arm): Promise<string> {
+function runOne(sp: string, seed: number, arm: string): Promise<string> {
   const dir = join(out, arm, `${sp}-s${seed}`);
   mkdirSync(dir, { recursive: true });
   const record = join(dir, "record.json");
   // A replay record carries the whole params as they are (as cli/probe.ts runs them).
-  writeFileSync(
-    record,
-    JSON.stringify({ params: params(sp, seed, arm), events: [], seasons: SEASONS }),
-  );
+  const text = JSON.stringify({ params: params(sp, seed, arm), events: [], seasons: SEASONS });
+  const options = join(dir, "options.txt");
+  const has = (f: string) => existsSync(join(dir, f));
+  // A finished run of the same record and options is reused.
+  if (
+    has("hash.txt") &&
+    has("metrics.csv") &&
+    has("record.json") &&
+    readFileSync(record, "utf8") === text &&
+    (has("options.txt") ? readFileSync(options, "utf8") : "") === snapshots &&
+    (!snapshots || has("metamers.csv"))
+  )
+    return Promise.resolve(dir);
+  rmSync(join(dir, "hash.txt"), { force: true });
+  writeFileSync(record, text);
   const args = [RUN, "--replay", record, "--seasons", `${SEASONS}`, "--quiet", "--out", dir];
+  if (snapshots) args.push("--snapshots", snapshots);
   return new Promise((resolve, reject) => {
     const child = spawn(process.execPath, args, { stdio: ["ignore", "ignore", "inherit"] });
     child.on("exit", (code) => {
       if (code !== 0) return reject(new Error(`${arm} ${sp} s${seed}: exit ${code}`));
-      // Keep the metrics and the hash; drop the geometry (generated output).
-      for (const f of ["metamers.csv", "buds.csv", "ground.csv", "form.csv"])
-        rmSync(join(dir, f), { force: true });
+      // Keep the metrics and the hash; drop the geometry (generated output) unless asked.
+      const drop = ["ground.csv", "form.csv", ...(snapshots ? [] : ["metamers.csv", "buds.csv"])];
+      for (const f of drop) rmSync(join(dir, f), { force: true });
+      if (snapshots) writeFileSync(options, snapshots);
+      else rmSync(options, { force: true });
       resolve(dir);
     });
   });
@@ -82,7 +114,7 @@ const pct = (x: number) => (Number.isFinite(x) ? (100 * x).toFixed(1) : "NaN");
 const f2 = (x: number | undefined) => (x !== undefined && Number.isFinite(x) ? x.toFixed(2) : "—");
 const f1 = (x: number | undefined) => (x !== undefined && Number.isFinite(x) ? x.toFixed(1) : "—");
 
-function report(arm: Arm, scores: SeedScore[], lines: string[]) {
+function report(arm: string, scores: SeedScore[], lines: string[]) {
   const t = tally(scores);
   lines.push(
     `${t.pass ? "PASS" : "FAIL"} oak ${arm}: held ${t.held} of ${t.runs}; bar ${t.bar} (⌈0.75 × held⌉, ≥ 15 held); ` +
@@ -108,10 +140,11 @@ function report(arm: Arm, scores: SeedScore[], lines: string[]) {
 }
 
 async function main() {
-  mkdirSync(out, { recursive: true });
-  writeFileSync(join(out, "patch.json"), `${JSON.stringify({ species: D12A13 }, null, 1)}\n`);
-  const queue = (["head", "patch"] as const).flatMap((arm) =>
-    ["oak", "birch"].flatMap((sp) => seeds.map((seed) => [sp, seed, arm] as const)),
+  mkdirSync(join(out, ARM), { recursive: true });
+  writeFileSync(join(out, ARM, "patch.json"), `${JSON.stringify({ species: PATCH }, null, 1)}\n`);
+  const arms = withHead ? ["head", ARM] : [ARM];
+  const queue = arms.flatMap((arm) =>
+    species.flatMap((sp) => seeds.map((seed) => [sp, seed, arm] as const)),
   );
   // One run first, so the binary is built once and six launchers do not race cargo.
   const first = queue.shift();
@@ -124,33 +157,40 @@ async function main() {
       }
     }),
   );
-  const dir = (arm: Arm, sp: string, seed: number) => join(out, arm, `${sp}-s${seed}`);
+  const dir = (arm: string, sp: string, seed: number) => join(out, arm, `${sp}-s${seed}`);
   const lines: string[] = [];
-  const scores: Record<Arm, SeedScore[]> = { head: [], patch: [] };
-  for (const arm of ["head", "patch"] as const) {
+  const scores: Record<string, SeedScore[]> = {};
+  for (const arm of species.includes("oak") ? arms : []) {
     scores[arm] = seeds.map((seed) =>
       scoreSeed(readFileSync(join(dir(arm, "oak", seed), "metrics.csv"), "utf8"), seed),
     );
     report(arm, scores[arm], lines);
   }
-  const hash = (arm: Arm) =>
+  const hash = (arm: string) =>
     new Map(
       seeds.map((seed) => {
         const p = join(dir(arm, "birch", seed), "hash.txt");
         return [seed, existsSync(p) ? readFileSync(p, "utf8").trim() : "missing"] as const;
       }),
     );
-  const birch = compareHashes(hash("head"), hash("patch"));
-  lines.push(
-    `${birch.differing.length ? "FAIL" : "PASS"} birch under the oak's patch: hash identical on ${birch.identical} of ${seeds.length}` +
-      (birch.differing.length ? `; differs on seeds ${birch.differing.join(", ")}` : ""),
-  );
+  const birch =
+    withHead && species.includes("birch") ? compareHashes(hash("head"), hash(ARM)) : undefined;
+  if (birch)
+    lines.push(
+      `${birch.differing.length ? "FAIL" : "PASS"} birch under the oak's patch (${ARM}): hash identical on ${birch.identical} of ${seeds.length}` +
+        (birch.differing.length ? `; differs on seeds ${birch.differing.join(", ")}` : ""),
+    );
   const text = `${lines.join("\n")}\n`;
-  writeFileSync(join(out, "report.txt"), text);
-  writeFileSync(join(out, "summary.json"), `${JSON.stringify({ scores, birch }, null, 1)}\n`);
+  // Round one's report keeps its name; another patch's report sits beside it under its own.
+  const name = ARM === "patch" ? "" : `-${ARM}`;
+  writeFileSync(join(out, `report${name}.txt`), text);
+  writeFileSync(
+    join(out, `summary${name}.json`),
+    `${JSON.stringify({ scores, birch }, null, 1)}\n`,
+  );
   process.stdout.write(text);
-  const t = tally(scores.patch);
-  if (!t.pass || birch.differing.length) process.exitCode = 1;
+  const t = scores[ARM] ? tally(scores[ARM]) : undefined;
+  if ((t && !t.pass) || birch?.differing.length) process.exitCode = 1;
 }
 
 await main();

@@ -329,3 +329,50 @@ npm run probe -- --patch runs/oak124-adopt/d16a13.json --species oak --label oak
 ```
 
 The patch file is `{"species": {"oak": {"r2": {"dLambda": 0.16, "aC": 13.5}}}}`. The regression worlds and the ten extra gardens were scratch scripts under `runs/oak124-adopt/` (`regress-patch.ts`, `more-gardens.ts`; not committed): each writes `forestParams(width, seed)` or `presetParams("forest", 1)`, with and without `patchSpecies(p, "oak", …)`, as a replay record for `cli/run.ts`.
+
+## Garden guard in the 0062/0063 garden
+
+_2026-11-12. The re-run that #124's hold asked for, now that #121's garden has landed. Code at `ticket/124-guard`, from `spec/111-feature-playbook` dc4f944: #121's 0062/0063 garden at round 6's rates (r6), which #122's 20-seed acceptance kept. **Nothing is adopted: no flora, params, presets, goldens or ADR change.** The bars below were committed with the script before any run._
+
+### Bars, fixed before the run
+
+**What runs.** Two arms on the same worlds: HEAD, and HEAD with the patch `{"oak": {"r2": {"dLambda": 0.16, "aC": 13.5}}}` (HEAD's oak: 0.04 from 13.51). The worlds are `forestParams(width, seed)` at widths 160 and 66, 300 seasons, natively, on 4 simulators. One kept command runs both arms, the two regression worlds and the summary: `npm run evidence:oak-garden-guard` ([`cli/oak-garden-guard.ts`](../../cli/oak-garden-guard.ts)).
+
+**Which gardens.** `forestParams` no longer lists trees: O4 plants 400/ha at the start from its species list, so which gardens hold an oak is known only once the core has planted them. A one-season screen of HEAD's garden decides it. At each width the seeds are 1..N, with N the smallest number ≥ 20 such that seeds 1..N hold **≥ 20 gardens that plant an oak**. The regeneration counts are taken over those oak-planting gardens. The patch changes only the oak's R2, so both arms plant the same trees; the summary checks this (same planted tree ids and species at season 1).
+
+**1. Regeneration (pre-registered, the bar #124's hold asked for).** Counts are runs (gardens), not trees, as in #122's oak table. At each width separately:
+- **alive:** the gardens with a live oak at season 150 (any height, metrics.csv `alive` 1). d16a13 must reach at least HEAD's count − 2;
+- **seeding:** the gardens with a seeding oak at season 150 (a live oak with `seeds` > 0 in season 150). d16a13 must reach at least HEAD's count − 2.
+
+d16a13 passes regeneration only if both hold at both widths.
+- The thresholds are as given. One weakness is stated now rather than adjusted. #122 found only 4 (desktop) and 3 (phone) of seeds 1–20 seeding at 150 under r6. At that level, "− 2" lets the patch halve the seeding gardens or more. The thresholds stay unchanged, because a tighter one would be chosen after seeing #122's numbers.
+- **Reported beside it, not gated:**
+  - oak at 300 (live, drawn ≥ 1.3 m, seeding);
+  - seeding in any of seasons 141–150;
+  - gardens whose oaks set any seed by 150 (the measure the last guard showed falling, 10 → 5 of 12);
+  - the planted oak's first seeding season per garden;
+  - oak recruits over the run, and those reaching 1.3 m (5.2 cells).
+- If the gardens that set seed by 150 fall by more than 2 at a width, the write-up flags it for the user even if the gate passes.
+
+**2. Bare-bole species keep their lid and crown depth** (the ticket's first written criterion). Measured on beech and hornbeam stand trees ≥ 10 m (40 cells), alive, at seasons 100, 150 and 300. Pooled over all the seeds run at a width (1..N, oak-planting or not), per species × width × season:
+- **crown depth:** the median `liveCrownBase` (the lowest living limb ÷ height; the crown's length is 1 minus it) under the patch is within **±0.05** of HEAD's. The tolerance is absolute, not relative: HEAD's stand beech and hornbeam are clothed nearly to the ground (live crown base 0.01–0.05 in the last guard), and there a relative band would only measure noise;
+- **lid:** the median `topFifthLeaf` under the patch is within **±25%** of HEAD's (the bare-bole page's tolerance for the same measure).
+
+A cell is judged only when both arms have ≥ 5 such trees; the others are reported as not judged. The criterion passes if every judged cell passes. This replaces the last guard's by-eye reading of seed 1.
+
+**3. The named regressions get no worse** (the ticket's second written criterion). The two worlds of `cli/regressions.ts` are run under each arm with that tool's own commands, the patch through `--species-patch`:
+- `phoneSeed3`: `--preset mixedWood --params forestParams(66, 3)` to 150;
+- `forestRegeneration`: `--preset forest --seed 1` to 300.
+
+Their vectors are computed as that tool computes them. **#123 is re-baselining `tests/regressions.json` in parallel, so the comparison is d16a13 against HEAD, both run here, not against the stored baselines.**
+- **Pass** if the two `hash.txt` files are identical.
+- **Otherwise** the defect's own counts may not fall under the patch: `phoneSeed3`'s `live150`, `planted150` and `canopy150`, and `forestRegeneration`'s `recruitsReaching20` and `live300`. The full vectors are reported.
+
+**Self-check.** HEAD here is #122's r6 (same core and params), so HEAD's oak counts on seeds 1–20 over all gardens must reproduce #122's table:
+- live at 150: 17 (160) and 8 (66);
+- seeding at 150: 4 and 3;
+- live at 300: 7 and 4;
+- seeding at 300: 0 and 4;
+- recruits: 1,350 (4 reaching 1.3 m) and 700 (13).
+
+A mismatch means a wrong build or wrong params, and the run is not used.

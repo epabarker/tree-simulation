@@ -7,6 +7,7 @@
 //! counts use it, and the snapshot or the page must call `is_drawn`, never re-state it.
 
 use crate::math;
+use crate::params::Params;
 use crate::tree::Tree;
 use crate::world::World;
 use std::collections::BTreeMap;
@@ -42,20 +43,42 @@ pub fn cap_reached(world: &World) -> bool {
     o4.enabled && world.trees.iter().filter(|t| t.alive).count() as f64 >= o4.max_trees
 }
 
-/// The canopy's reference height (ADR 0065, decision 3): the 90th percentile of the drawn stems'
-/// `heights`, by nearest rank, the ⌈0.9·n⌉-th smallest (1-based); 0 with none. A canopy stem is
-/// over half of it. Not the single tallest tree: one 40–45 m leader halved the canopy count for
-/// decades (docs/experiments/2026-11-11-garden-pathlength-probe.md §5). Below ten drawn stems
-/// the nearest rank is the tallest, so a small stand (the phone's) reads as before.
-pub fn canopy_height(heights: &[f64]) -> f64 {
+/// The stems a hectare the top height averages: forestry's top height, the mean height of the
+/// 100 tallest stems per hectare (ADR 0065, decision 3).
+pub const TOP_HEIGHT_STEMS_PER_HA: f64 = 100.0;
+
+/// The plot's area in hectares: width × depth × CELL_METRES² / 10⁴ (ADR 0064, decision 3).
+pub fn plot_hectares(params: &Params) -> f64 {
+    params.world.width * crate::light::depth_of(params) * CELL_METRES * CELL_METRES / 10_000.0
+}
+
+/// How many of the tallest drawn stems the top height averages on `hectares`:
+/// max(1, round(100 × ha)), so 6 on the 160-cell garden (0.064 ha) and 3 on the 66-cell one.
+pub fn top_height_count(hectares: f64) -> usize {
+    // round as JavaScript's Math.round: ⌊x + ½⌋ (floor is one of the exact std functions).
+    let n = (TOP_HEIGHT_STEMS_PER_HA * hectares + 0.5).floor();
+    if n >= 1.0 { n as usize } else { 1 }
+}
+
+/// The top height (ADR 0065, decision 3): the mean of the `n` tallest of the drawn stems'
+/// `heights`, or of all of them when fewer are drawn; 0 with none. A canopy stem is over half of
+/// it. Not the single tallest tree: one 40–45 m leader halved the canopy count for decades
+/// (docs/experiments/2026-11-11-garden-pathlength-probe.md §5). Not a percentile of the drawn
+/// stems either: in a flooded frame that is a sapling's height, and the saplings read as canopy
+/// (round 6, desktop seed 2, season 200: the share 0.03 → 0.84). The tallest few per hectare are
+/// what a flood cannot dilute.
+pub fn top_height(heights: &[f64], n: usize) -> f64 {
     if heights.is_empty() {
         return 0.0;
     }
     let mut sorted = heights.to_vec();
-    sorted.sort_by(|a, b| a.total_cmp(b));
-    // ⌈9n/10⌉ in integers, so no float rounding moves the rank.
-    let rank = (9 * sorted.len()).div_ceil(10);
-    sorted[rank - 1]
+    sorted.sort_by(|a, b| b.total_cmp(a));
+    let k = n.min(sorted.len()).max(1);
+    let mut sum = 0.0;
+    for h in &sorted[..k] {
+        sum += h;
+    }
+    sum / k as f64
 }
 
 /// One species' stems in the stand.
@@ -73,10 +96,10 @@ pub struct StandMetrics {
     pub live: f64,
     /// Live trees at or above the display threshold.
     pub drawn: f64,
-    /// Drawn trees over half the canopy height (strictly over; ADR 0065).
+    /// Drawn trees over half the top height (strictly over; ADR 0065).
     pub canopy: f64,
-    /// The canopy's reference height: the drawn stems' 90th-percentile height (`canopy_height`).
-    pub canopy_height: f64,
+    /// The top height: the mean of the 100 tallest drawn stems a hectare (`top_height`).
+    pub top_height_100: f64,
     /// The tallest live tree's height.
     pub top_height: f64,
     /// O4 on and the live trees fill `o4.maxTrees`, the test establishment stops at.
@@ -99,7 +122,10 @@ pub fn stand_metrics(world: &World) -> StandMetrics {
         .filter(|&h| is_drawn(h))
         .collect();
     let drawn = drawn_heights.len() as f64;
-    let reference = canopy_height(&drawn_heights);
+    let reference = top_height(
+        &drawn_heights,
+        top_height_count(plot_hectares(world.params())),
+    );
     let canopy = drawn_heights
         .iter()
         .filter(|&&h| h > 0.5 * reference)
@@ -116,7 +142,7 @@ pub fn stand_metrics(world: &World) -> StandMetrics {
         live: live.len() as f64,
         drawn,
         canopy,
-        canopy_height: reference,
+        top_height_100: reference,
         top_height: top,
         cap_reached: cap_reached(world),
         species: by
@@ -172,8 +198,9 @@ mod tests {
 
     #[test]
     fn a_fixed_stand_gives_its_live_drawn_and_canopy_counts_and_species_shares() {
-        // Live heights in cells: 2, 5.16 (1.29 m), 5.2 (1.3 m), 20 (exactly half the canopy height,
-        // which with four drawn stems is the tallest: not canopy),
+        // Live heights in cells: 2, 5.16 (1.29 m), 5.2 (1.3 m), 20, 24 and 40 (four drawn, fewer
+        // than the 6 the top height counts here, so it is their mean, 22.3: 20, 24 and 40 are
+        // canopy, 5.2 is not),
         // 24 and 40; a dead 120-cell
         // stem sets neither the top height nor any count; a planted seedling with no metamer yet
         // is live and not drawn.
@@ -197,7 +224,7 @@ mod tests {
         let s = stand_metrics(&w);
         assert_eq!(s.live, 7.0);
         assert_eq!(s.drawn, 4.0);
-        assert_eq!(s.canopy, 2.0);
+        assert_eq!(s.canopy, 3.0);
         assert_eq!(s.top_height, 40.0);
         assert!(!s.cap_reached);
         let by: Vec<(&str, f64, f64, f64)> = s
@@ -256,29 +283,65 @@ mod tests {
 
     #[test]
     fn one_tall_outlier_does_not_halve_the_canopy_count() {
-        // ADR 0065: canopy is over half the 90th-percentile height of the drawn stems, not half
-        // the single tallest tree. Nine 20-cell (5 m) stems and one 100-cell (25 m) leader: half
-        // the tallest (50) would leave the leader alone in the canopy; the 90th percentile (the
-        // 9th of 10 by nearest rank) is 20, so every stem over 10 cells is canopy.
+        // ADR 0065: canopy is over half the stand's top height (the mean of its 100 tallest drawn
+        // stems per hectare), not half the single tallest tree. The default world, 160 × 64
+        // cells, is 0.064 ha: the 6 tallest. Nine 20-cell (5 m) stems and one 100-cell (25 m)
+        // leader: half the tallest (50) would leave the leader alone in the canopy; the top
+        // height is (100 + 5 × 20)/6 ≈ 33.3, so every stem over ≈ 16.7 cells is canopy.
         let mut trees: Vec<Tree> = (0..9).map(|i| stem(i, "beech", 20.0)).collect();
         trees.push(stem(9, "oak", 100.0));
-        // The seedling bank does not set the percentile: twenty 2-cell seedlings change nothing.
-        trees.extend((10..30).map(|i| stem(i, "hornbeam", 2.0)));
         let s = stand_metrics(&stand(trees, 100.0));
         assert_eq!(s.drawn, 10.0);
-        assert_eq!(s.canopy_height, 20.0);
+        assert!(
+            (s.top_height_100 - 200.0 / 6.0).abs() < 1e-12,
+            "{}",
+            s.top_height_100
+        );
         assert_eq!(s.canopy, 10.0);
         assert_eq!(s.top_height, 100.0);
     }
 
     #[test]
-    fn the_canopy_height_is_the_nearest_rank_90th_percentile_of_drawn_heights() {
-        // Worked: the ⌈0.9·n⌉-th smallest drawn height (1-based). n = 20 → the 18th; n = 5 → the
-        // 5th (the tallest: below ten drawn stems the percentile is the top); none drawn → 0.
-        let heights: Vec<f64> = (1..=20).map(|k| 5.0 + k as f64).collect();
-        assert_eq!(canopy_height(&heights), 23.0);
-        assert_eq!(canopy_height(&[30.0, 6.0, 10.0, 8.0, 7.0]), 30.0);
-        assert_eq!(canopy_height(&[]), 0.0);
+    fn a_flood_of_saplings_under_a_few_tall_trees_does_not_lower_the_top_height() {
+        // Six 40-cell (10 m) trees, then 150 drawn 6-cell (1.5 m) saplings under them, and 20
+        // seedlings below the display threshold. A percentile of the drawn stems would fall to a
+        // sapling's height and count the saplings as canopy (round 6, desktop seed 2, season 200:
+        // the share went 0.03 → 0.84); the top height is still 40 and the canopy still 6.
+        let tall = || {
+            (0..6)
+                .map(|i| stem(i, "beech", 40.0))
+                .collect::<Vec<Tree>>()
+        };
+        let alone = stand_metrics(&stand(tall(), 1000.0));
+        let mut flooded = tall();
+        flooded.extend((6..156).map(|i| stem(i, "hornbeam", 6.0)));
+        flooded.extend((156..176).map(|i| stem(i, "hornbeam", 2.0)));
+        let s = stand_metrics(&stand(flooded, 1000.0));
+        assert_eq!(alone.top_height_100, 40.0);
+        assert_eq!(s.top_height_100, 40.0);
+        assert_eq!((s.drawn, s.canopy), (156.0, 6.0));
+    }
+
+    #[test]
+    fn the_top_height_counts_100_stems_a_hectare_of_the_plot() {
+        // n = max(1, round(100 × ha)), ha = width × depth × 0.25² m / 10⁴: the desktop garden
+        // (160 × 64, 0.064 ha) 6, the phone's (66 × 64, 0.0264 ha) 3, a hectare 100, a tiny
+        // plot 1.
+        assert_eq!(top_height_count(0.064), 6);
+        assert_eq!(top_height_count(0.0264), 3);
+        assert_eq!(top_height_count(1.0), 100);
+        assert_eq!(top_height_count(0.001), 1);
+        let world = |w: f64| {
+            let patch =
+                format!(r#"{{"world":{{"width":{w},"height":120,"depth":64,"walls":[]}}}}"#);
+            World::new(crate::testing::preset("default", &patch))
+        };
+        assert!((plot_hectares(world(160.0).params()) - 0.064).abs() < 1e-12);
+        assert!((plot_hectares(world(66.0).params()) - 0.0264).abs() < 1e-12);
+        // The mean of the n tallest, or of all of them when fewer are drawn; none drawn: 0.
+        assert_eq!(top_height(&[10.0, 30.0, 20.0, 40.0], 2), 35.0);
+        assert_eq!(top_height(&[10.0, 30.0], 6), 20.0);
+        assert_eq!(top_height(&[], 6), 0.0);
     }
 
     #[test]

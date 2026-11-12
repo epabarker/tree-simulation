@@ -10,8 +10,8 @@
 //!
 //! Writes to --out: run.json (the record, its `notices` included: `capReached`; `meta.capSeasons`,
 //! the seasons at the cap, a reported count, ADR 0065), metrics.csv, metamers.csv, form.csv,
-//! hash.txt, stand.csv (live, drawn and canopy stems, the top and canopy heights and the cap, per
-//! season) and stand-species.csv; with --light,
+//! hash.txt, stand.csv (live, drawn and canopy stems, the tallest tree's height, the cap and the
+//! top height `topHeight100`, the mean of the 100 tallest drawn stems a hectare, per season) and stand-species.csv; with --light,
 //! light.csv (with lad, the leaf area density over depth), buds.csv (every live bud, with its
 //! birthId) and ground.csv (the ground's light and the leaf area above it, per x and z); with
 //! --checkpoint-at N, checkpoint-N.bin.gz. Presets come from rust/presets.json
@@ -265,7 +265,7 @@ fn main() {
     let mut bud_lines = vec!["season,tree,metamer,state,age,q,v,y,leaf,birthId".to_string()];
     let mut ground_lines = vec!["season,col,layer,q,lai".to_string()];
     let mut stand_lines =
-        vec!["season,live,drawn,canopy,topHeight,capReached,canopyHeight".to_string()];
+        vec!["season,live,drawn,canopy,topHeight,capReached,topHeight100".to_string()];
     // Seasons the live trees filled the cap: a reported count, not a failure (ADR 0065).
     let mut cap_seasons = 0.0;
     let mut stand_species_lines = vec!["season,species,live,drawn,share".to_string()];
@@ -313,7 +313,7 @@ fn main() {
             num(st.canopy),
             num(st.top_height),
             st.cap_reached as u8,
-            num(st.canopy_height)
+            num(st.top_height_100)
         ));
         if st.cap_reached {
             cap_seasons += 1.0;

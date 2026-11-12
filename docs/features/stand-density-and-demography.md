@@ -4,7 +4,7 @@ A **World effect** (GLOSSARY): how many trees the garden holds, where they stand
 
 ## What it should look like
 
-A **mature high forest**: about 200–400 drawn stems/ha, most of them canopy trees (GLOSSARY: over half the drawn stems' 90th-percentile height), with young trees showing only in gaps that deaths leave. Density is the same per area at every width, so the desktop (160 cells, ≈ 0.064 ha) draws about 13–26 stems and the phone (66 cells, ≈ 0.026 ha) about 5–10. It is judged on the **settled garden** (seasons 100–300, what a visitor sees when the garden opens on a grown checkpoint). Seasons 0–50 only need to avoid failure.
+A **mature high forest**: about 200–400 drawn stems/ha, most of them canopy trees (GLOSSARY: over half the top height, the mean of the 100 tallest drawn stems per hectare), with young trees showing only in gaps that deaths leave. Density is the same per area at every width, so the desktop (160 cells, ≈ 0.064 ha) draws about 13–26 stems and the phone (66 cells, ≈ 0.026 ha) about 5–10. It is judged on the **settled garden** (seasons 100–300, what a visitor sees when the garden opens on a grown checkpoint). Seasons 0–50 only need to avoid failure.
 
 ## Mechanism
 
@@ -35,12 +35,12 @@ Exploratory: the feature probe ([prototype](https://github.com/epabarker/tree-si
 Amended by ADR 0065: items 1, 2, 4 and 5 are **reported with counts**, not gates; items 3 and 3a are the gates (#122: ≥ 18 of seeds 1–20 at both widths).
 
 1. Drawn stems at seasons 100, 200 and 300 within 200–400/ha (reported; #129 gates it).
-2. At least 60% of drawn stems in the canopy (over half the drawn stems' 90th-percentile height, stand.csv's `canopy`) at the same seasons (reported; #129 gates it).
+2. At least 60% of drawn stems in the canopy (over half the top height, stand.csv's `canopy` beside `topHeight100`) at the same seasons (reported; #129 gates it).
 3. No gap phase: at least one canopy tree at every season after 50 (gate).
    3a. At the phone width (66 cells), at least one canopy tree from season 100 (gate).
 4. Seasons at the cap (reported: run.json's `meta.capSeasons`).
 5. No species over 70% of drawn stems, read only in frames with at least 8 drawn stems (reported).
-6. Both named regressions pass: [phoneSeed3](https://github.com/epabarker/tree-simulation/issues/54) and [forestRegeneration](https://github.com/epabarker/tree-simulation/issues/55) (`node cli/regressions.ts`).
+6. Both named regressions pass (phoneSeed3 is expected to fail until #123 re-baselines it after #121's flip): [phoneSeed3](https://github.com/epabarker/tree-simulation/issues/54) and [forestRegeneration](https://github.com/epabarker/tree-simulation/issues/55) (`node cli/regressions.ts`).
 
 ## Evidence
 

@@ -1,7 +1,7 @@
 # 0063: The garden's demography schedule
 
 - **Status:** accepted (user, 2026-11-08). A decision of the feature-playbook map, implemented by spec #111's tickets (the garden flip in #121).
-- **Amended by [0065](0065-garden-demography-reported-targets.md) (2026-11-12):** decisions 1–2's per-hectare bars and the cap are reported counts, not gates (the gate moves to #129); canopy is over half the drawn stems' 90th-percentile height; decision 3's suppression signal is an option (`o4.suppressionSignal`).
+- **Amended by [0065](0065-garden-demography-reported-targets.md) (2026-11-12):** decisions 1–2's per-hectare bars and the cap are reported counts, not gates (the gate moves to #129); canopy is over half the top height (the mean of the 100 tallest drawn stems per hectare); decision 3's suppression signal is an option (`o4.suppressionSignal`).
 - **Spec:** §O4, §R1 (maturity, the carbon balance). ADRs 0013, 0018, 0058, 0062.
 - **Ticket:** [What demography schedule should the garden run?](https://github.com/epabarker/tree-simulation/issues/85)
 - **Playbook page:** [Stand density and demography](../features/stand-density-and-demography.md)

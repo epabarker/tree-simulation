@@ -31,8 +31,12 @@ The height a young tree must pass to be drawn and counted as a stem of the stand
 _Avoid_: visibility cut-off.
 
 **Canopy tree**
-A drawn stem taller than half the canopy height: the height that nine in ten of the stand's drawn stems do not exceed. One tall leader does not set it.
+A drawn stem taller than half the stand's top height.
 _Avoid_: dominant (a crown class), overstorey tree, tall tree.
+
+**Top height**
+The mean height of the 100 tallest drawn stems per hectare, the forestry measure of a stand's height. Neither one tall leader nor a flood of saplings moves it much.
+_Avoid_: stand height (ambiguous), the tallest tree, dominant height.
 
 **Gap phase**
 A stretch of a stand's life when the canopy trees have died and nothing has yet grown tall enough to replace them, leaving the stand without a canopy.

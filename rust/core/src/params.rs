@@ -355,6 +355,19 @@ pub enum Mortality {
     TwoPart,
 }
 
+/// The two-part mode's suppression signal, the world's (ADR 0065, decision 5; spec §O4).
+/// `Carbon` (absent: the default, ADR 0063): R1's P/M this season. `TopLight`, the dark top: the
+/// light at the tree's top (its live buds' `c5.topQuantile` Q) over open sky C, below
+/// `o4.topLightThreshold`. `Growth`, the stalled leader: the height gained over the last
+/// `o4.growthSeasons` seasons, below `o4.growthFloor` cells a season, read from the metamers'
+/// birth seasons (no new state).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum SuppressionSignal {
+    Carbon,
+    TopLight,
+    Growth,
+}
+
 #[derive(Clone, Debug)]
 pub struct O4 {
     pub enabled: bool,
@@ -374,6 +387,14 @@ pub struct O4 {
     /// T: the species' shade tolerance, Niinemets & Valladares's (2006) score, 1 (intolerant) to
     /// 5 (absent: 1, where the suppression rate is m_s itself).
     pub shade_tolerance: f64,
+    /// The suppression signal (the world's, ADR 0065). Absent: `Carbon`, bit-identical.
+    pub suppression_signal: SuppressionSignal,
+    /// θ_q: `TopLight`'s threshold on Q_top / C (absent: 0, so no signal).
+    pub top_light_threshold: f64,
+    /// k: `Growth`'s window, seasons (absent: 5).
+    pub growth_seasons: f64,
+    /// g: `Growth`'s floor, cells a season (absent: 0, so no signal).
+    pub growth_floor: f64,
     pub c_seed: f64,
     pub d: f64,
     pub q_est: f64,
@@ -696,6 +717,14 @@ impl Params {
                 m_suppression: opt(o4, "mSuppression").unwrap_or(0.0),
                 suppression_slope: opt(o4, "suppressionSlope").unwrap_or(1.0),
                 shade_tolerance: opt(o4, "shadeTolerance").unwrap_or(1.0),
+                suppression_signal: match text(o4, "suppressionSignal").as_str() {
+                    "topLight" => SuppressionSignal::TopLight,
+                    "growth" => SuppressionSignal::Growth,
+                    _ => SuppressionSignal::Carbon,
+                },
+                top_light_threshold: opt(o4, "topLightThreshold").unwrap_or(0.0),
+                growth_seasons: opt(o4, "growthSeasons").unwrap_or(5.0),
+                growth_floor: opt(o4, "growthFloor").unwrap_or(0.0),
                 c_seed: num(o4, "cSeed"),
                 d: num(o4, "d"),
                 q_est: num(o4, "qEst"),

@@ -576,6 +576,20 @@ export interface Params {
      * per species (flora.ts). Scales the suppression rate only. Absent: 1.
      */
     shadeTolerance: number;
+    /**
+     * The two-part mode's suppression signal, the world's (ADR 0065, decision 5). "carbon"
+     * (absent): R1's P/M, as above. "topLight", the dark top: (1 − (Q_top/C)/topLightThreshold)₊,
+     * Q_top the light at the tree's top (`c5.topQuantile`) and C open sky. "growth", the stalled
+     * leader: (1 − ΔH/(growthSeasons · growthFloor))₊, ΔH the height gained over the last
+     * growthSeasons seasons. Either deficit is scaled by m_s and shade tolerance as P/M's is.
+     */
+    suppressionSignal?: "carbon" | "topLight" | "growth";
+    /** θ_q: "topLight"'s threshold on Q_top / C. Absent: 0 (no signal). */
+    topLightThreshold?: number;
+    /** k: "growth"'s window, seasons. Absent: 5. */
+    growthSeasons?: number;
+    /** g: "growth"'s floor, cells a season. Absent: 0 (no signal). */
+    growthFloor?: number;
     /** Cap on live trees, so a page cannot run away. */
     maxTrees: number;
     /**
@@ -785,6 +799,10 @@ export const defaultParams: Params = {
     mSuppression: 1,
     suppressionSlope: 0.92,
     shadeTolerance: 3,
+    suppressionSignal: "carbon",
+    topLightThreshold: 0,
+    growthSeasons: 5,
+    growthFloor: 0,
     maxTrees: 300,
     rain: 0,
   },

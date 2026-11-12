@@ -89,11 +89,14 @@ export interface Pace {
 }
 
 export interface GardenOptions {
-  /** The run. Default: the `succession` woodland on a ring shaped to the host (`forestParams`). */
+  /** The run. Default: the mixed wood on a ring shaped to the host (`forestParams`). */
   params?: Params;
   /** Seed of the default run (ignored with `params`). Default: a new one per visit. */
   seed?: number;
-  /** How the default run is planted (ignored with `params`): `forestParams`' Planting (I3). */
+  /**
+   * How the default run is planted (ignored with `params`): `forestParams`' Planting, its density,
+   * spacing, cap and faces ("wood", or a host page's open "woodEdge" or "hedgerow", ADR 0062).
+   */
   planting?: Partial<Planting>;
   /** View settings; an object passed here is used (and filled in) by reference. */
   view?: Partial<ViewOptions>;

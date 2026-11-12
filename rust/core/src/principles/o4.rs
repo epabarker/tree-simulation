@@ -5,6 +5,13 @@
 //! m_s·(1 − P/M)₊·e^(−β_s(T − 1)) from R1's carbon balance this season (P/M, read only with R1 on)
 //! and the species' shade tolerance T, one draw against the sum [RNG: standMortality]. A tree that
 //! pays its maintenance is never suppressed; a starved one dies the faster the less tolerant it is.
+//! The suppression signal is the world's `o4.suppressionSignal` (ADR 0065, decision 5): `carbon`
+//! (the default, the P/M above), `topLight` (the dark top: (1 − (Q_top/C)/θ_q)₊, the light at the
+//! tree's top over open sky against θ_q) or `growth` (the stalled leader: (1 − ΔH/(k·g))₊, the
+//! height gained over the last k seasons against a floor of g cells a season), each deficit scaled
+//! by the same m_s·e^(−β_s(T − 1)). The dark top marks an overtopped tree that still pays its way,
+//! which P/M never does (the understorey sits at P/M 2–15:
+//! docs/experiments/2026-11-10-garden-suppression-probe.md).
 //! The anchors (docs/research/2026-11-08-regeneration.md): below its survival light a birch
 //! seedling lasts 1–2 seasons (Walters & Reich 1996), so m_s = 1 at T = 1 gives birch (T 2.03)
 //! about 0.39 a season fully starved; shade-tolerant juveniles die at 3–5% a year in deep shade
@@ -22,12 +29,13 @@
 //!
 //! Params: o4.mortality; sizeBlind reads o4.m0, twoPart reads o4.mCanopy, o4.hCanopy,
 //! o4.gammaCanopy, o4.mSuppression, o4.suppressionSlope and o4.shadeTolerance (per species, as m₀
-//! is) and r1.enabled; then o4.cSeed, d, qEst, pEst, maxTrees, rain, r1.fRep and
+//! is), o4.suppressionSignal, o4.topLightThreshold, o4.growthSeasons and o4.growthFloor (the
+//! world's) and r1.enabled; then o4.cSeed, d, qEst, pEst, maxTrees, rain, r1.fRep and
 //! r1.maturity (the seed supply), c2.C.
 
 use super::c1::{plant_seedling, seedling_azimuth};
 use crate::math;
-use crate::params::Mortality;
+use crate::params::{Mortality, SuppressionSignal};
 use crate::rng::{purpose, uniform};
 use crate::tree::Tree;
 use crate::world::World;
@@ -71,6 +79,43 @@ pub fn suppression_rate(p: f64, m: f64, m_s: f64, slope: f64, tolerance: f64) ->
     math::min(m_s * deficit * math::exp(-slope * (tolerance - 1.0)), 1.0)
 }
 
+/// The suppression rate of a tree with `deficit` in [0, 1] of its signal unmet (ADR 0065):
+/// m_s·deficit·e^(−β_s(T − 1)), clamped to a probability. The carbon rate's tolerance scaling on
+/// another signal, so at an equal deficit a light-demander still dies first.
+pub fn tolerance_scaled(deficit: f64, m_s: f64, slope: f64, tolerance: f64) -> f64 {
+    if !(deficit > 0.0 && m_s > 0.0) {
+        return 0.0;
+    }
+    math::min(m_s * deficit * math::exp(-slope * (tolerance - 1.0)), 1.0)
+}
+
+/// The dark top's deficit (`topLight`): (1 − (Q_top/C)/θ_q)₊, so a tree whose top sees θ_q of
+/// open sky or more has none and a tree whose top is dark has all of it. θ_q ≤ 0: no signal.
+pub fn top_light_deficit(ratio: f64, threshold: f64) -> f64 {
+    if !(threshold > 0.0) {
+        return 0.0;
+    }
+    math::max(1.0 - ratio / threshold, 0.0)
+}
+
+/// The stalled leader's deficit (`growth`): (1 − ΔH/(k·g))₊, ΔH the height the tree gained over
+/// the last k seasons (its height now less the highest tip among metamers born k or more seasons
+/// ago, as they stand now). A tree younger than k seasons, or g ≤ 0: none. Read from the
+/// metamers' birth seasons, so it needs no state of its own.
+pub fn growth_deficit(t: &Tree, season: f64, k: f64, floor: f64) -> f64 {
+    if !(floor > 0.0 && k >= 1.0) || t.age < k {
+        return 0.0;
+    }
+    let mut before = 0.0;
+    for i in 0..t.m.len() {
+        if season - t.m.birth_season[i] as f64 >= k {
+            before = math::max(before, t.tip_y(i));
+        }
+    }
+    let gained = tree_height(t) - before;
+    math::max(1.0 - gained / (k * floor), 0.0)
+}
+
 /// A tree's height in cells: its highest metamer tip (as R1's maturity reads it).
 pub fn tree_height(t: &Tree) -> f64 {
     let mut height = 0.0;
@@ -97,6 +142,7 @@ pub fn stand_dynamics(world: &mut World) -> f64 {
     let periodic_z = params.world.periodic_z;
     let max_trees = params.o4.max_trees;
     let mortality = params.o4.mortality;
+    let signal = params.o4.suppression_signal;
     for i in 0..world.trees.len() {
         let t = &world.trees[i];
         if !(t.alive && t.age > 0.0) {
@@ -112,7 +158,26 @@ pub fn stand_dynamics(world: &mut World) -> f64 {
                 let canopy =
                     canopy_rate(tree_height(t), own.m_canopy, own.h_canopy, own.gamma_canopy);
                 // R1 ran this season (allocate precedes deaths), so P and M are this season's.
-                let suppression = if rules.r1.enabled {
+                let suppression = if signal != SuppressionSignal::Carbon {
+                    // ADR 0065: another signal's deficit, scaled by tolerance as carbon's is.
+                    let deficit = match signal {
+                        SuppressionSignal::TopLight => {
+                            top_light_deficit(t.q_top / c, params.o4.top_light_threshold)
+                        }
+                        _ => growth_deficit(
+                            t,
+                            season,
+                            params.o4.growth_seasons,
+                            params.o4.growth_floor,
+                        ),
+                    };
+                    tolerance_scaled(
+                        deficit,
+                        own.m_suppression,
+                        own.suppression_slope,
+                        own.shade_tolerance,
+                    )
+                } else if rules.r1.enabled {
                     suppression_rate(
                         t.production,
                         t.maintenance,
@@ -381,8 +446,10 @@ pub(crate) mod tests {
     #[test]
     fn holly_carries_no_species_flag_and_recruits_from_its_seed() {
         // ADR 0063, decision 7: holly's species-level `o4.enabled: false` was never read; it is
-        // deleted, and a holly with seed in a stand (mixedWood's species table) sets seedlings.
-        let wood = preset("mixedWood", "{}");
+        // deleted, and a holly with seed in a stand (the woodland's species table) sets seedlings.
+        // `succession`: mixedWood's world and species before #121, whose `o4.planting` would
+        // replace this test's `trees`.
+        let wood = preset("succession", "{}");
         let holly = wood.get("species").and_then(|s| s.get("holly")).unwrap();
         assert!(holly.get("o4").unwrap().get("enabled").is_none());
         let mut w = World::new(merge(
@@ -399,10 +466,12 @@ pub(crate) mod tests {
         assert!(w.trees[1..].iter().filter(|t| t.species == "holly").count() > 5);
     }
 
-    /// Willows recruited in 15 seasons of three planted willows in mixedWood's wood, with willow's
-    /// rain at `rain`; asserts on the way that no willow reaches R1's maturity or sets seed.
+    /// Willows recruited in 15 seasons of three planted willows in the woodland (`succession`:
+    /// mixedWood's world and species before #121, whose `o4.planting` would replace these
+    /// `trees`), with willow's rain at `rain`; asserts on the way that no willow reaches R1's
+    /// maturity or sets seed.
     fn willow_recruits(rain: f64) -> usize {
-        let wood = preset("mixedWood", "{}");
+        let wood = preset("succession", "{}");
         let mut willow = wood.get("species").unwrap().get("willow").unwrap().clone();
         let o4 = merge(
             willow.get("o4").unwrap(),
@@ -615,6 +684,134 @@ pub(crate) mod tests {
         );
         assert!((150..240).contains(&birch), "{birch}");
         assert!(beech < holly, "{beech} {holly}");
+    }
+
+    /// The `topLight` signal's world at θ_q `theta`, m_s 1, β_s 1, T 1 (so a deficit of 1 kills).
+    fn dark_top(theta: f64) -> World {
+        starving(
+            &format!(
+                r#""mSuppression":1,"suppressionSlope":1,"shadeTolerance":1,
+                   "suppressionSignal":"topLight","topLightThreshold":{theta}"#
+            ),
+            "",
+        )
+    }
+
+    #[test]
+    fn the_top_light_signal_kills_a_dark_topped_tree_that_pays_its_way_and_spares_a_lit_one() {
+        // ADR 0065: the dark-top signal reads the light at the tree's top over open sky, not P/M.
+        // A tree paying its maintenance (P/M 1.2, which the carbon signal never suppresses) with a
+        // top at 0 of open sky is wholly short of θ_q 0.3: rate 1.
+        let mut dark = dark_top(0.3);
+        vigour(&mut dark, 0, 1.2);
+        dark.trees[0].q_top = 0.0;
+        stand_dynamics(&mut dark);
+        assert!(!dark.trees[0].alive);
+        // A starved tree (P = 0, which the carbon signal kills at rate 1) whose top sees θ_q of
+        // open sky or more is never suppressed.
+        for s in 1..=500 {
+            let mut lit = dark_top(0.3);
+            lit.season = s as f64;
+            vigour(&mut lit, 0, 0.0);
+            let c = lit.params().c2.c;
+            lit.trees[0].q_top = 0.3 * c;
+            stand_dynamics(&mut lit);
+            assert!(lit.trees[0].alive, "season {s}");
+        }
+        // θ_q 0: no signal, however dark the top.
+        let mut off = dark_top(0.0);
+        vigour(&mut off, 0, 1.2);
+        off.trees[0].q_top = 0.0;
+        stand_dynamics(&mut off);
+        assert!(off.trees[0].alive);
+    }
+
+    /// The `growth` signal's world (window k 5, floor `floor` cells a season; m_s 1, β_s 1, T 1),
+    /// with tree 0 starved (P = 0, which the carbon signal kills) and grown straight up one cell a
+    /// season, born in seasons 1 to `last`, and seen at season `now`.
+    fn stalled(floor: f64, last: usize, now: f64) -> World {
+        let mut w = starving(
+            &format!(
+                r#""mSuppression":1,"suppressionSlope":1,"shadeTolerance":1,
+                   "suppressionSignal":"growth","growthSeasons":5,"growthFloor":{floor}"#
+            ),
+            "",
+        );
+        vigour(&mut w, 0, 0.0);
+        let t = &mut w.trees[0];
+        for s in 1..=last {
+            let top = t.m.len() as i32 - 1;
+            crate::testing::metamer(t, top, 0, PI / 2.0, 1.0, 0.1, s as f64);
+        }
+        t.age = now;
+        w.season = now;
+        w
+    }
+
+    #[test]
+    fn the_growth_signal_kills_a_stalled_leader_and_spares_a_growing_one() {
+        // ADR 0065: the height gained over the last k seasons against k·g, not P/M. A tree that
+        // gained 5 cells in its last 5 seasons meets a floor of 1 a season: never suppressed,
+        // though starved.
+        for s in 0..300 {
+            let mut growing = stalled(1.0, 30, 30.0);
+            growing.trees[0].id = s; // a fresh draw each time
+            stand_dynamics(&mut growing);
+            assert!(growing.trees[0].alive, "draw {s}");
+        }
+        // The same tree seen 10 seasons after its last growth gained nothing: rate 1.
+        let mut still = stalled(1.0, 30, 40.0);
+        stand_dynamics(&mut still);
+        assert!(!still.trees[0].alive);
+        // No floor: no signal.
+        let mut off = stalled(0.0, 30, 40.0);
+        stand_dynamics(&mut off);
+        assert!(off.trees[0].alive);
+        // A tree younger than the window is not read.
+        let mut young = stalled(1.0, 2, 4.0);
+        stand_dynamics(&mut young);
+        assert!(young.trees[0].alive);
+    }
+
+    #[test]
+    fn the_carbon_signal_is_the_default_and_written_out_is_bit_identical() {
+        // ADR 0065: `carbon` is ADR 0063's P/M signal. Written out, with the other signals'
+        // params set, a run hashes the same as one that leaves the signal absent.
+        let run = |patch: &str| {
+            let mut w = world(patch);
+            w.run(12, &[]);
+            crate::hash::hash_world(&w)
+        };
+        let two = r#"{"o4":{"mortality":"twoPart","mCanopy":0.01,"hCanopy":20,"mSuppression":1}}"#;
+        let carbon = r#"{"o4":{"mortality":"twoPart","mCanopy":0.01,"hCanopy":20,"mSuppression":1,
+                        "suppressionSignal":"carbon","topLightThreshold":0.5,"growthFloor":1}}"#;
+        assert_eq!(run(two), run(carbon));
+        // Under it a tree that pays its way survives however dark its top or stalled its leader.
+        let mut w = starving(
+            r#""mSuppression":1,"suppressionSlope":1,"shadeTolerance":1,
+               "suppressionSignal":"carbon","topLightThreshold":0.3,"growthFloor":1"#,
+            "",
+        );
+        vigour(&mut w, 0, 1.2);
+        w.trees[0].q_top = 0.0;
+        stand_dynamics(&mut w);
+        assert!(w.trees[0].alive);
+    }
+
+    #[test]
+    fn the_signals_deficits_and_their_tolerance_scaling_are_worked_values() {
+        // topLight, θ_q 0.3: a top at 0.06 of open sky is 0.8 short; at 0.3 or above, none.
+        assert!((top_light_deficit(0.06, 0.3) - 0.8).abs() < 1e-12);
+        assert_eq!(top_light_deficit(0.3, 0.3), 0.0);
+        assert_eq!(top_light_deficit(0.0, 0.0), 0.0);
+        // growth, k 5, g 1: 5 cells in the window meet the floor; 2.5 is half short.
+        let w = stalled(1.0, 30, 30.0);
+        assert_eq!(growth_deficit(&w.trees[0], 30.0, 5.0, 1.0), 0.0);
+        assert!((growth_deficit(&w.trees[0], 30.0, 5.0, 2.0) - 0.5).abs() < 1e-9);
+        // The tolerance scaling is the carbon rate's: at deficit 1, m_s·e^(−β_s(T − 1)).
+        assert_eq!(tolerance_scaled(1.0, 1.0, 0.92, 1.0), 1.0);
+        assert!((tolerance_scaled(1.0, 1.0, 0.92, 2.0) - (-0.92f64).exp()).abs() < 1e-12);
+        assert_eq!(tolerance_scaled(0.0, 1.0, 0.92, 1.0), 0.0);
     }
 
     #[test]

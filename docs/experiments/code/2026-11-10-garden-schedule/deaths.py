@@ -22,6 +22,7 @@ for run in sys.argv[1:]:
         elif t in last and t not in dead:
             dead[t] = r
     causes = collections.Counter()
+    o4_species = collections.Counter()
     for t, r in dead.items():
         lv = last[t]
         h = float(lv["height"])
@@ -33,4 +34,7 @@ for run in sys.argv[1:]:
         else:
             cause = "o4"
         causes[(size, cause)] += 1
+        if cause == "o4":
+            o4_species[(size, lv["species"])] += 1
     print(run, dict(sorted(causes.items())))
+    print("  O4 deaths by class and species:", dict(sorted(o4_species.items())))

@@ -25,7 +25,9 @@ const ROOT = fileURLToPath(new URL("../../../../", import.meta.url));
 const argv = process.argv.slice(2);
 const k = argv.indexOf("--jobs");
 const JOBS = k >= 0 ? Number(argv[k + 1]) : 12;
-type Patch = { params?: ParamsPatch; species?: Record<string, SpeciesPatch> };
+// `depth` (the suppression probe, B): the slab's depth period in cells, the cap scaled with it so
+// the guard stays per hectare (the planting is per hectare in the core already).
+type Patch = { params?: ParamsPatch; species?: Record<string, SpeciesPatch>; depth?: number };
 // rounds.json: { "<round>": <patch>, ... }
 const rounds = JSON.parse(readFileSync(argv[0] as string, "utf8")) as Record<string, Patch>;
 const SEEDS = [1, 2, 3];
@@ -47,15 +49,30 @@ const runOne = ({ round, width, seed }: Job) => {
   if (existsSync(join(out, "stand.csv"))) return Promise.resolve();
   mkdirSync(out, { recursive: true });
   let p = forestParams(width, seed);
+  if (patch.depth) {
+    const scale = patch.depth / (p.world.depth ?? 64);
+    p = mergeParams(p, {
+      world: { ...p.world, depth: patch.depth },
+      o4: { ...p.o4, maxTrees: Math.round(p.o4.maxTrees * scale) },
+    });
+  }
   if (patch.params) p = mergeParams(p, patch.params);
   for (const [name, sp] of Object.entries(patch.species ?? {})) p = patchSpecies(p, name, sp);
   const record = join(out, "record.json");
   writeFileSync(record, JSON.stringify({ params: p, events: [], seasons: LAST }));
   const args = [join(ROOT, "cli", "run.ts"), "--replay", record, "--seasons", String(LAST)];
   args.push("--quiet", "--out", out);
+  // The occupancy probe (2026-11-11) reads canopy crowns' metamer tips at 100/200/300 (crowns.py);
+  // set SWEEP_SNAPSHOTS="" for the earlier rounds' season-300 only output.
+  const snaps = process.env.SWEEP_SNAPSHOTS ?? "100,200";
+  if (snaps) args.push("--snapshots", snaps);
+  const t0 = performance.now();
   return new Promise<void>((ok, bad) => {
     const c = spawn(process.execPath, args, { stdio: ["ignore", "ignore", "inherit"] });
-    c.on("exit", (code) => (code === 0 ? ok() : bad(new Error(`${out}: exit ${code}`))));
+    c.on("exit", (code) => {
+      writeFileSync(join(out, "wall.txt"), `${(performance.now() - t0) / 1000}\n`);
+      code === 0 ? ok() : bad(new Error(`${out}: exit ${code}`));
+    });
   });
 };
 let next = 0;
@@ -77,11 +94,20 @@ const AT = [100, 200, 300];
 const summarise = (round: string) => (job: { width: number; seed: number }) => {
   const { width, seed } = job;
   const out = join(dirOf(round), `w${width}-s${seed}`);
-  const cap = JSON.parse(readFileSync(join(out, "record.json"), "utf8")).params.o4.maxTrees;
+  const recorded = JSON.parse(readFileSync(join(out, "record.json"), "utf8")).params;
+  const cap = recorded.o4.maxTrees;
+  const depth = recorded.world.depth ?? 64;
   const stand = csv(join(out, "stand.csv"));
   const spp = csv(join(out, "stand-species.csv"));
   const metrics = csv(join(out, "metrics.csv"));
-  const ha = (width * 64 * 0.25 * 0.25) / 10_000;
+  const ha = (width * depth * 0.25 * 0.25) / 10_000;
+  const wall = existsSync(join(out, "wall.txt"))
+    ? Number(readFileSync(join(out, "wall.txt"), "utf8"))
+    : Number.NaN;
+  const hornbeam = AT.map((s) => {
+    const x = spp.find((r) => Number(r.season) === s && r.species === "hornbeam");
+    return x ? Math.round(100 * Number(x.share)) / 100 : 0;
+  });
   const row = (s: number) => stand.find((r) => Number(r.season) === s);
   const at = AT.map((s) => {
     const r = row(s);
@@ -142,6 +168,9 @@ const summarise = (round: string) => (job: { width: number; seed: number }) => {
     bankMax: Math.max(...bank),
     planted: planted.size,
     species,
+    depth,
+    hornbeam,
+    wallSeconds: Math.round(wall * 10) / 10,
     pass,
   };
 };
@@ -163,7 +192,7 @@ for (const [round, patch] of Object.entries(rounds)) {
     const c = r.at.map((a) => a.canopyShare.toFixed(2)).join(" ");
     const t = r.at.map((a) => a.topSpecies).join(", ");
     console.log(
-      `${r.width} ${r.seed} | ${d} | ${c} | ${t} | ${r.minCanopy} ${r.capSeasons} ${r.maxLive}/${r.cap} ${r.bankMean} | ${r.pass ? "PASS" : "fail"}`,
+      `${r.width} ${r.seed} | ${d} | ${c} | ${t} | ${r.minCanopy} ${r.capSeasons} ${r.maxLive}/${r.cap} ${r.bankMean} | hb ${r.hornbeam.join("/")} | ${r.wallSeconds}s | ${r.pass ? "PASS" : "fail"}`,
     );
   }
 }

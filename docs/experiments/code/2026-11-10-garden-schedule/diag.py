@@ -11,6 +11,7 @@
 """
 
 import collections
+import json
 import csv
 import statistics as st
 import sys
@@ -18,15 +19,16 @@ import sys
 for run in sys.argv[1:]:
     rows = list(csv.DictReader(open(f"{run}/metrics.csv")))
     top = {int(r["season"]): float(r["topHeight"]) for r in csv.DictReader(open(f"{run}/stand.csv"))}
-    width = int(run.rstrip("/").split("/w")[-1].split("-")[0])
-    planted = {str(i) for i in range(round(400 * width * 64 * 0.0625 / 10_000))}  # o4.planting's first n
+    world = json.load(open(f"{run}/record.json"))["params"]["world"]
+    width, depth = world["width"], world.get("depth", 64)
+    planted = {str(i) for i in range(round(400 * width * depth * 0.0625 / 10_000))}  # o4.planting's first n
     print(f"== {run}")
     for s in (100, 150):
         can = [r for r in rows if int(r["season"]) == s and r["alive"] == "1" and float(r["height"]) > top[s] / 2]
         if can:
             w = [float(r["crownWidth"]) for r in can]
             d = [float(r["crownDepth"]) for r in can]
-            print(f"  s{s}: canopy {len(can)}, crownWidth med {st.median(w):.0f} max {max(w):.0f}, crownDepth med {st.median(d):.0f} max {max(d):.0f} (period 64)")
+            print(f"  s{s}: canopy {len(can)}, crownWidth med {st.median(w):.0f} max {max(w):.0f}, crownDepth med {st.median(d):.0f} max {max(d):.0f} (depth {depth})")
     first, seen, life = {}, {}, collections.defaultdict(list)
     alive_seasons = collections.Counter()
     last = {}

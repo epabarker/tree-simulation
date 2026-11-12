@@ -128,3 +128,44 @@ Counts are over the 6 runs (3 seeds × 2 widths) or the 18 judged frames (6 runs
   - narrower canopy crowns in a stand;
   - a lower density target for the 66-cell garden.
 - **Hornbeam's seed supply** (fRep 0.8) dominates every run. It is a flora value, not a schedule rate.
+
+## #121's close (2026-11-12): what landed and why
+
+**Landed:** the flip at **round 6's rates**. The garden presets (`mixedWood`, `forestParams`) run:
+- the periodic depth (D 64);
+- `o4.planting` at 400/ha, spacing 12 cells;
+- `twoPart` mortality, m_c 0.003, every other rate at its default, the `carbon` signal;
+- the 1.3 m display threshold.
+
+`forestParams(w, seed, { faces: "woodEdge" | "hedgerow" })` keeps the open faces for a host page.
+
+**The decision** (user, 2026-11-12; [ADR 0065](../decisions/0065-garden-demography-reported-targets.md), amending ADR 0063):
+- **The per-hectare bars are reported, not gated.** The four probes after this note all hit the same wall: canopy 47–109/ha at 160 cells against ≥ 120 needed. The cause is crown form, not demography ([path-length probe](2026-11-11-garden-pathlength-probe.md) §1). Their gate moves to [#129](https://github.com/epabarker/tree-simulation/issues/129).
+- **Seasons at the cap are a reported count** (run.json's `meta.capSeasons`).
+- **Canopy is over half the drawn stems' 90th-percentile height** (stand.csv's `canopy`, and `canopyHeight` beside it), not half the tallest tree.
+- **"No species above 70%"** is read only in frames with at least 8 drawn stems.
+- **The suppression signal is an option:** `o4.suppressionSignal` (`carbon` | `topLight` | `growth`). Default `carbon`, bit-identical.
+- **d1 is a named patch, not adopted:** [`code/2026-11-10-garden-schedule/d1.patch.json`](code/2026-11-10-garden-schedule/d1.patch.json) (hornbeam `o4.cSeed` 300 + `topLight` θ_q 0.15). [#122](https://github.com/epabarker/tree-simulation/issues/122) runs round 6 and d1 side by side on seeds 1–20.
+
+**The probes that led here** (all exploratory, seeds 1–3; only the signal merged, as an option):
+1. [Suppression signals and a longer depth period](2026-11-10-garden-suppression-probe.md) (`probe/121-suppression`).
+2. [Why the canopy is thin and hornbeam floods; the levers](2026-11-11-garden-canopy-levers.md) (same branch; d1 is its closest condition).
+3. [Crown occupancy](2026-11-11-garden-crown-occupancy.md) (`probe/121-occupancy`, negative).
+4. [A size limit on shoot extension](2026-11-11-garden-pathlength-probe.md) (`probe/121-pathlength`, partial).
+5. [What bounds crown extent](../research/2026-11-11-crown-extent-and-canopy-density.md) (`research/crown-extent`).
+
+The tables above count canopy against half the tallest tree, the definition when they were run.
+
+**Round 6 re-scored under the new canopy definition (exploratory, seeds 1–3; HEAD, `sweep.ts` with the empty patch).** The stand is bit-for-bit round 6: drawn stems, top species and seasons at the cap (184, 230, 252, 174, 231, 172) all equal the table above. Only the canopy share moves (old → new, at seasons 100 / 200 / 300):
+
+| width | seed | canopy share, half the tallest | canopy share, half the 90th percentile | fewest canopy trees after season 50 |
+|---|---|---|---|---|
+| 160 | 1 | 0.55 / 0.33 / 0.14 | 0.55 / 0.33 / 0.18 | 3 |
+| 160 | 2 | 0.69 / 0.03 / 0.05 | 0.69 / **0.84** / 0.38 | 4 |
+| 160 | 3 | 0.08 / 0.06 / 0.10 | 0.17 / 0.31 / 0.17 | 13 |
+| 66 | 1 | 0.33 / 0.07 / 1.00 | 0.33 / 0.14 / 1.00 | 1 |
+| 66 | 2 | 0.33 / 0.06 / 0.02 | 0.33 / 0.11 / **0.80** | 1 |
+| 66 | 3 | 0.38 / 0.22 / 0.50 | unchanged | 2 |
+
+- The gate holds in all six runs: a canopy tree at every season after 50. At the phone width, at least one canopy tree from season 100.
+- **A caveat for #122:** in a flooded frame the 90th percentile is itself a sapling's height. Examples: 160 s2 at season 200, 155 drawn (2,422/ha); 66 s2 at 300, 60 drawn. There, half of it counts most of the understorey as canopy (0.84, 0.80). The share is only read beside the drawn count, never alone.

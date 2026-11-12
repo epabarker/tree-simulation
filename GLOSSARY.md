@@ -30,6 +30,10 @@ _Avoid_: undergrowth, recruits (which also covers those above the threshold).
 The height a young tree must pass to be drawn and counted as a stem of the stand: 1.3 m, the forestry convention for counting a stem.
 _Avoid_: visibility cut-off.
 
+**Canopy tree**
+A drawn stem taller than half the canopy height: the height that nine in ten of the stand's drawn stems do not exceed. One tall leader does not set it.
+_Avoid_: dominant (a crown class), overstorey tree, tall tree.
+
 **Gap phase**
 A stretch of a stand's life when the canopy trees have died and nothing has yet grown tall enough to replace them, leaving the stand without a canopy.
 _Avoid_: empty forest (that is the regression where no trees grow at all).

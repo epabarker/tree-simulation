@@ -1,6 +1,6 @@
 # Light entry
 
-A **World effect** (GLOSSARY): how sky enters the slab past its bounds. Decided by the ticket [Should the slab admit side light from its front and back?](https://github.com/epabarker/tree-simulation/issues/82) and recorded in [ADR 0062](../decisions/0062-light-entry.md); spec §C2.13. **Status: the open-grown lone-tree stage is built ([#115](https://github.com/epabarker/tree-simulation/issues/115)); the garden's periodic depth is not yet.**
+A **World effect** (GLOSSARY): how sky enters the slab past its bounds. Decided by the ticket [Should the slab admit side light from its front and back?](https://github.com/epabarker/tree-simulation/issues/82) and recorded in [ADR 0062](../decisions/0062-light-entry.md); spec §C2.13. **Status: built. The open-grown lone-tree stage by [#115](https://github.com/epabarker/tree-simulation/issues/115); the garden's periodic depth by [#121](https://github.com/epabarker/tree-simulation/issues/121) (the faces stay selectable for a host page: `forestParams`' `faces`).**
 
 ## What it should look like
 
@@ -16,8 +16,8 @@ A **World effect** (GLOSSARY): how sky enters the slab past its bounds. Decided 
 | Lone-tree stage | Open sky on all four sides (τ = 1 on both z faces, open x sides), a square 60 m box (240 cells), the tree at its centre, the woods' 50 m top. `oakOpen`, `beechOpen` and `loneTreeParams` (the feature probe's and the species trials' lone tree) | **Built** (#115) |
 | Its check | `npm run evidence:open-grown`: the six exemplars × seeds 1–20 to season 100. **The box's bar is the recorded rate** (ADR 0062's amendment): it held oak 19, maple 20, birch 16, beech 18, hornbeam 20 and holly 20 of 20 (not held: oak s15; birch s3 at the top, s5, s13, s18; beech s11, s15). A run that holds fewer fails. Every seed with a bud outside is named and **excluded** from the form's measures, neither a pass nor a fail of the form | **Built** (#115) |
 | Roundness in plan | Reported, not a bar: width and depth within 0.75 (min ÷ max) at season 100, over the held seeds: oak 15 of 19, maple 19 of 20, birch 16 of 16, beech 18 of 18, hornbeam 20 of 20, holly 19 of 20. The oak's is a finding | Reported |
-| Garden depth | Periodic (`sidesZ: "periodic"`, ADR 0058); D stays 64 unless the density needs more | τ 0.2 faces |
-| τ faces | Kept as settings for a host page: wood edge (1, 0.2), hedgerow (1, 1); never a default or a calibration stage | Same |
+| Garden depth | Periodic (`sidesZ: "periodic"`, ADR 0058); D stays 64 unless the density needs more | **Built** (#121): periodic, D 64 |
+| τ faces | Kept as settings for a host page: wood edge (1, 0.2), hedgerow (1, 1); never a default or a calibration stage | `forestParams(w, seed, { faces: "woodEdge" \| "hedgerow" })` (#121) |
 | `faceWood` | Superseded, kept off and bit-identical | Same |
 | Sky | 15–90° (K = 16), unchanged | Same |
 

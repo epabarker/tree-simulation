@@ -91,13 +91,13 @@ Frames are seasons 100/200/300 × 20 seeds = 60 per condition × width.
 
 ### The oak (for #124)
 
-Runs of 20 with at least one oak; "seeding" is a live oak with seeds > 0 in that season (in the ten seasons up to it in brackets).
+Counts are runs of 20, not trees: a run counts if it has at least one such oak. Most live oaks in a run are seedlings (r6 desktop seeds 11 and 20 hold 19 and 33 at 150). "Seeding" is a live oak with seeds > 0 in that season (in the ten seasons up to it in brackets).
 
 | | r6, 160 | r6, 66 | d1, 160 | d1, 66 |
 |---|---|---|---|---|
-| live at 150 (all of them drawn) | 17 | 8 | 14 | 6 |
+| runs with a live oak at 150 (each also has a drawn one) | 17 | 8 | 14 | 6 |
 | seeding at 150 | 4 (6) | 3 (4) | 4 (6) | 3 (5) |
-| live at 300 (all drawn) | 7 | 4 | 8 | 2 |
+| runs with a live oak at 300 (each also has a drawn one) | 7 | 4 | 8 | 2 |
 | seeding at 300 | **0** (0) | 4 (4) | 4 (5) | 2 (2) |
 | oak recruits over the run (all seeds); reached 1.3 m | 1,350; 4 | 700; 13 | 4,219; 198 | 2,153; 74 |
 

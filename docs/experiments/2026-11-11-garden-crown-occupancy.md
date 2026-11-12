@@ -1,5 +1,7 @@
 # Crown occupancy: space competition between trees in the garden (2026-11-11)
 
+> **Merged as docs by [#121](https://github.com/epabarker/tree-simulation/issues/121) (2026-11-12). Its rule was not merged.** `c1.occupancy` and its season-loop changes live only on the unmerged branch `probe/121-occupancy`, so its rounds cannot be re-run at HEAD (HEAD ignores the params its patches name). The note is unchanged below this box. Its canopy counts use half the tallest tree, the definition before [ADR 0065](../decisions/0065-garden-demography-reported-targets.md).
+
 **Exploratory: seeds 1–3, widths 160 and 66.** This is the third probe round for [#121](https://github.com/epabarker/tree-simulation/issues/121), on the branch `probe/121-occupancy` (cut from `probe/121-suppression`). Nothing is adopted:
 - the rule is a probe param, off by default and bit-identical;
 - no flora, preset, golden or regression changes.

@@ -1,5 +1,7 @@
 # What bounds a crown's lateral extent, and how many canopy trees a stand holds (issue #121)
 
+> **Merged as docs by [#121](https://github.com/epabarker/tree-simulation/issues/121) (2026-11-12)** from the unmerged branch `research/crown-extent`. The probe notes it cites are now in `docs/experiments/`; the per-hectare targets it weighs are [#129](https://github.com/epabarker/tree-simulation/issues/129)'s ([ADR 0065](../decisions/0065-garden-demography-reported-targets.md)). The note is unchanged below this box.
+
 _Researched 2026-11-11 for the garden's canopy-count problem ([#121](https://github.com/epabarker/tree-simulation/issues/121)). Question: the garden thins to 47–109 canopy trees/ha by season 100 and its dominants' crowns are 12.5–19 m wide, because survivors spread into whatever space dead neighbours leave. What limits lateral crown extent in real closed-canopy broadleaves, what are the numbers, how do other models handle it, and is the thinning itself too fast? This note changes no code._
 
 ## Revision, 2026-11-11 (later the same day): four papers read in full

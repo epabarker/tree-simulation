@@ -7,7 +7,10 @@
  * snapshots (the probe draws the chosen round's sheet). Every number is a column of the core's
  * own stand.csv, stand-species.csv or metrics.csv.
  *
- *   node docs/experiments/code/2026-11-10-garden-schedule/sweep.ts <round>=<patch.json|-> ... [--jobs N]
+ *   node docs/experiments/code/2026-11-10-garden-schedule/sweep.ts rounds.json [--jobs N]
+ *
+ * rounds.json: { "<round>": { params?, species?, depth? }, ... } (the feature probe's patch shape;
+ * `{}` is HEAD's garden). SWEEP_SNAPSHOTS="" skips the 100/200 snapshots.
  *
  * Several rounds share one pool of up to N simulators (default 12).
  *

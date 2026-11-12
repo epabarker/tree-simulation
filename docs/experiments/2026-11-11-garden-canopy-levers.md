@@ -1,5 +1,7 @@
 # Why the garden holds few canopy trees, and why hornbeam floods it (2026-11-11)
 
+> **Merged as docs by [#121](https://github.com/epabarker/tree-simulation/issues/121) (2026-11-12).** The note is unchanged below this box. The dark-top signal it runs on is now in the core as an option (`o4.suppressionSignal: "topLight"`, [ADR 0065](../decisions/0065-garden-demography-reported-targets.md)); no lever here is adopted. **d1** (hornbeam `o4.cSeed` 300 + `topLight` θ_q 0.15) is kept as the named patch [`code/2026-11-10-garden-schedule/d1.patch.json`](code/2026-11-10-garden-schedule/d1.patch.json) for #122's 20-seed run and the feature probe (`npm run probe -- --patch docs/experiments/code/2026-11-10-garden-schedule/d1.patch.json --demography`); the flora is unchanged. The probe's commits stay on the unmerged branch `probe/121-suppression`. Its canopy counts use half the tallest tree, the definition before ADR 0065.
+
 **Exploratory: seeds 1–3, widths 160 and 66.** This is the second round of the [suppression probe](2026-11-10-garden-suppression-probe.md) for [#121](https://github.com/epabarker/tree-simulation/issues/121), on the branch `probe/121-suppression`. Nothing is adopted. Every lever here is a probe patch, and none changes flora, presets, goldens or regressions.
 
 **Question.** The first round left two limits:

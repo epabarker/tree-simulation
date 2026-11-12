@@ -1,5 +1,7 @@
 # The garden's suppression probe: overtopping signals and a longer depth period (2026-11-10)
 
+> **Merged as docs by [#121](https://github.com/epabarker/tree-simulation/issues/121) (2026-11-12).** The note is unchanged below this box. Its signals came in as an option, ported from this branch's commit f04680c: `o4.suppressionSignal` (`carbon` | `topLight` | `growth`, with `topLightThreshold`, `growthSeasons` and `growthFloor`) is in `principles/o4.rs`, default `carbon` and bit-identical, recorded in [ADR 0065](../decisions/0065-garden-demography-reported-targets.md) decision 5. No signal is adopted for the garden: #122 decides on 20 seeds. The rest of the probe (its 96/128-cell depth rounds are sweep.ts's `depth` key) stays on the unmerged branch `probe/121-suppression`. Its canopy counts use half the tallest tree, the definition before ADR 0065.
+
 **Exploratory: seeds 1–3, widths 160 and 66.** One round, approved by the user as a follow-up to [#121](https://github.com/epabarker/tree-simulation/issues/121). Nothing here is adopted. The probe params live only on the branch `probe/121-suppression`.
 
 **Question.** [The schedule note](2026-11-10-garden-schedule.md) found two limits that no rate could move:

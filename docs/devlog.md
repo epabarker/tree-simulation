@@ -2,6 +2,17 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-13: #132's understorey signal designed (ADR 0068); the band counted from 7 cm DBH; #137 and #138 filed
+
+- **The user accepted a Fable review's design** for #132: [ADR 0068](decisions/0068-understorey-signal-design.md). It read HEAD's garden runs offline; no new simulation and no code.
+  - **Light separates the classes:** the crown top's light Q_top/C has medians of 0.34 in the canopy, 0.13 in the understorey and 0.035 in the bank.
+  - **Nothing else does:** P/M < 1 in 5% of understorey tree-seasons; new shoots per bud are 0.055 in the canopy against 0.054 in the understorey; a falling reserve flags the canopy more.
+  - **The signal:** `topLight` with a ramp from one world ceiling θ_hi down to each species' sapling survival light (`o4.survivalLight`), still tolerance-scaled.
+  - **The band** (ADR 0065 decision 1, amended) counts stems ≥ 7 cm DBH, with the ≥ 1.3 m count reported. On 20 seeds, d1 with that floor already reaches a canopy share ≥ 0.6 in 34 of 60 frames.
+- **Surprise: mortality cannot clear the cap.** At the cap 1,200–2,200 seeds arrive a season; clearing the bank would need a death rate of at least 0.6 a season, against a tolerance-scaled maximum of 0.065 for hornbeam. #132 drops its cap bar, and the seedling bank's representation is #137.
+- **Side finding, untraced:** understorey saplings at P/M 4–5 barely grow (a hornbeam went from 1.1 to 1.3 m in 60 seasons): #138.
+- #132 is `ready-for-agent` with its probe and bars. No golden, preset or regression changed.
+
 ## 2026-11-13: the lone triad's measures and #133's wind-load form decided (ADR 0067)
 
 - **The user accepted a Fable review's answers** to the triad re-read's five open points: [ADR 0067](decisions/0067-lone-triad-measures.md).

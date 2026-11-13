@@ -376,3 +376,106 @@ Their vectors are computed as that tool computes them. **#123 is re-baselining `
 - recruits: 1,350 (4 reaching 1.3 m) and 700 (13).
 
 A mismatch means a wrong build or wrong params, and the run is not used.
+
+### Setup (as run)
+
+- **Command:** `npm run evidence:oak-garden-guard -- -j 4`, at cf3edbf (the bars commit; the core is dc4f944's). It writes `runs/oak-garden-guard/` (`summary.json`, not committed).
+- **Wall time:** 66.6 min for the screen, 80 garden runs and 4 regression runs, on 4 simulators, with other agents' work on the laptop. Median per run: 321 s (HEAD) and 305 s (d16a13) at 160 cells; 69 s and 68 s at 66.
+- **The screen:** every one of seeds 1–20 plants an oak at both widths. The planting places 27 trees at 160 cells and 11 at 66, and the species list of ten is used in turn. So N = 20 at each width, which is exactly #122's seed set. Planting is identical in both arms in all 40 garden pairs.
+- **Self-check:** HEAD reproduces #122's r6 oak table exactly:
+  - live at 150: 17 and 8;
+  - seeding at 150: 4 and 3 (6 and 4 in the ten seasons);
+  - live at 300: 7 and 4;
+  - seeding at 300: 0 and 4;
+  - recruits: 1,350 (4 reaching 1.3 m) and 700 (13).
+- **The planted count:** the script takes the planted count as #122's `round(400 × ha)` = 26 at 160 cells, against the 27 trees actually planted. The 27th tree is counted as a recruit if it is an oak. This is the same in both arms and the same as #122.
+
+### Answer
+
+**d16a13 fails the guard in the 0062/0063 garden: all three criteria fail, and regeneration fails by a wide margin.** In this garden the patched oak mostly does not regenerate at all. Adoption should not proceed on this evidence.
+
+| criterion | bar | 160 cells | 66 cells | verdict |
+|---|---|---|---|---|
+| 1. live oak at 150 (gardens of 20) | ≥ HEAD − 2 | 8 against 17 (bar 15) | 1 against 8 (bar 6) | **FAIL** |
+| 1. seeding oak at 150 (gardens of 20) | ≥ HEAD − 2 | 0 against 4 (bar 2) | 0 against 3 (bar 1) | **FAIL** |
+| 2. bare bole (every judged cell) | lcb ±0.05, lid ±25% | 6 of 6 cells pass | 4 of 5 judged pass; beech at 300 fails | **FAIL** (one cell) |
+| 3. named regressions no worse | hash equal, or the defect's counts not lower | phoneSeed3: canopy150 2 → 1 | forestRegeneration: hash identical (106dd111) | **FAIL** (phoneSeed3) |
+
+### Regeneration (criterion 1, and the reported counts)
+
+Counts are gardens of 20, HEAD → d16a13.
+
+| | 160 cells | 66 cells |
+|---|---|---|
+| live oak at 150 (all also drawn) | 17 → **8** | 8 → **1** |
+| seeding at 150 (in 141–150) | 4 (6) → **0 (0)** | 3 (4) → **0 (0)** |
+| live oak at 300 (all also drawn) | 7 → 2 | 4 → 1 |
+| seeding at 300 (in 291–300) | 0 (0) → 0 (0) | 4 (4) → 0 (0) |
+| gardens whose oaks set seed by 150 | 7 → **0** | 5 → **1** |
+| seeds set by oaks by 150, all gardens | 33,305 → 0 | 20,668 → 117 |
+| gardens where an oak ever seeds (to 300) | 9 → 2 | 8 → 1 |
+| oak recruits over the run; reaching 1.3 m | 1,350; 4 → 20; 0 | 700; 13 → 29; 0 |
+
+- **Gardens that set seed by 150 fall by 7 and 4.** That is more than the 2 the bars flagged for the user, and the gate fails anyway.
+- **Why the oak is lost:** the patched planted oak stays short and dies young. Over the planted oaks, the median of each one's peak height is:
+  - at 160 cells (52 oaks): 30.0 m under HEAD, 14.4 m under the patch;
+  - at 66 cells (22 oaks): 26.0 m under HEAD, 14.0 m under the patch.
+- **Reaching `r1.maturity` (32.5 m):** 23 and 8 of the planted oaks under HEAD; 2 and 1 under the patch.
+- **The median last live season:** 138 and 97 under HEAD; 72 and 62 under the patch.
+- **This is the last guard's mechanism, stronger.** The squat young oak no longer reaches seeding height, and here, under a closed garden canopy, it is also overtopped and dies about 60 seasons earlier. Where an oak seeds at all under HEAD (9 desktop gardens, first seed at seasons 76–185), the patch has a seeding oak in 2 (165, 226). On the phone it is 8 gardens (53–273) against 1 (129).
+
+### Bare bole (criterion 2)
+
+Beech and hornbeam ≥ 10 m. Each cell gives the median `liveCrownBase` and the median `topFifthLeaf`, HEAD → d16a13, with the trees counted (n).
+
+| cell | 160 cells | 66 cells |
+|---|---|---|
+| beech 100 | 0.023 → 0.034; 0.19 → 0.20 (n 12/14) pass | n 4/4, not judged |
+| beech 150 | 0.052 → 0.049; 0.27 → 0.31 (30/29) pass | 0.100 → 0.105; 0.45 → 0.42 (6/6) pass |
+| beech 300 | 0.104 → 0.110; 0.36 → 0.31 (69/75) pass | 0.279 → 0.254; **0.53 → 0.86** (10/5) **FAIL** (lid +62%) |
+| hornbeam 100 | 0.022 → 0.034; 0.74 → 0.76 (45/45) pass | 0.135 → 0.131; 0.85 → 0.89 (18/18) pass |
+| hornbeam 150 | 0.048 → 0.088; 0.68 → 0.75 (57/59) pass | 0.399 → 0.378; 0.65 → 0.63 (57/50) pass |
+| hornbeam 300 | 0.243 → 0.226; 0.43 → 0.38 (140/162) pass | 0.461 → 0.434; 0.47 → 0.52 (76/77) pass |
+
+- **Crown depth is kept in every judged cell.** The live crown base moves by at most 0.04.
+- **The lid is kept in 10 of 11 judged cells.** The one failure is the phone's beech at 300, a cell of 5 trees against 10, so it rests on very few trees. It fails the bar as written. The likely reading is a stand that holds fewer beech once the oak is gone, not the patch acting on the beech, but that was not tested.
+
+### Named regressions (criterion 3)
+
+The two worlds were run here under each arm, as the bars say, and compared with each other, not with `tests/regressions.json` (#123 is re-baselining it).
+
+- **`forestRegeneration`** (`forest`, seed 1, to 300): the hash is identical in both arms, 106dd111. **Pass.**
+- **`phoneSeed3`** (`forestParams(66, 3)` on `mixedWood`, to 150): the hashes differ, 64f7effc against 2f0d492c, because this garden plants an oak now.
+
+  | count | HEAD | d16a13 |
+  |---|---|---|
+  | `live150` | 66 | 66 |
+  | `planted150` | 0 | 0 |
+  | `canopy150` | **2** | **1** |
+  | `canopy100` | 3 | 1 |
+  | `metamers150` | 24,945 | 22,584 |
+
+  The phone ring's canopy is thinner, so the defect is worse. **Fail.**
+- **`planted50`–`planted150` are 0 in both arms**, because `cli/regressions.ts` takes the planted count from `forestParams(66, 3).trees`. Since #121 that list is empty, because O4 plants the trees. So those entries no longer measure anything. That is #123's to fix and is noted here only so it is not read as a result.
+
+### Limits
+
+- **One build, one garden.** These counts are for the 0062/0063 garden at round 6's rates. Under d1 (not adopted) the oak would face the dark-top signal as well.
+- **The seeding counts are small under HEAD.** At 4 and 3 seeding gardens at 150, the seeding gate cannot be strong on its own. It does not decide the verdict here, though: the live-oak gate fails by 9 and 7 gardens, and the patch has no seeding garden at 150 at either width.
+- **The bare-bole and regression failures are each a single item.** One cell of 5 trees, and one canopy stem in one world. Regeneration alone would fail the guard.
+- **Nothing was re-scored after the run.** The bars, the thresholds and the seeds are those committed at cf3edbf.
+
+### For the user to decide
+
+The open-grown evidence for `d16a13` stands. In the garden its cost is no longer "weaker regeneration" but close to none: 0 of 40 gardens with a seeding oak at 150, against 7. The last guard's options remain:
+- accept that cost;
+- pair the patch with a second, separately evidenced change: a lower oak `r1.maturity`, or something else that lets a shorter oak survive and seed;
+- do not adopt.
+
+Neither of the first two is tested here.
+
+### Reproduce (this guard)
+
+```
+npm run evidence:oak-garden-guard -- -j 4    # node cli/oak-garden-guard.ts: screen, 80 garden runs, 4 regression runs, summary; resumable
+```

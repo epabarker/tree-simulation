@@ -6,20 +6,21 @@
 //! scaled by the species' shade tolerance T, and makes one draw against the sum [RNG:
 //! standMortality]. The deficit is the world's `o4.suppressionSignal` (ADR 0065, decision 5):
 //! `carbon` (the default) (1 − P/M)₊ from R1's carbon balance this season (read only with R1 on),
-//! `topLight` (1 − (Q_top/C)/θ_q)₊ for the dark top, or `growth` (1 − ΔH/(k·g))₊ for the stalled
-//! leader. R1's reproductive pool, filled above its maturity height alone (no start season), is
-//! turned into seeds (c_seed each), dispersed a Laplace(0, d) distance at a random azimuth [RNG:
-//! dispersal; seeds beyond a z face are lost] and established where the ground light is at least
-//! Q_est with probability p_est [RNG: establishment], with no live trunk within a cell; seed rain
-//! from beyond the world lands per species anywhere on the ground [RNG: seedRain]. Local seeds and
-//! rain establish anywhere in the depth (ADR 0063, decision 4). Seedlings start next season; live
-//! trees, the seedling bank included, are capped at maxTrees.
+//! `topLight` (1 − (Q_top/C)/θ_q)₊ for the dark top (with a species' survival light θ_sp, the
+//! ramp clamp((θ_q − Q_top/C)/(θ_q − θ_sp), 0, 1), ADR 0068), or `growth` (1 − ΔH/(k·g))₊ for the
+//! stalled leader. R1's reproductive pool, filled above its maturity height alone (no start
+//! season), is turned into seeds (c_seed each), dispersed a Laplace(0, d) distance at a random
+//! azimuth [RNG: dispersal; seeds beyond a z face are lost] and established where the ground light
+//! is at least Q_est with probability p_est [RNG: establishment], with no live trunk within a
+//! cell; seed rain from beyond the world lands per species anywhere on the ground [RNG: seedRain].
+//! Local seeds and rain establish anywhere in the depth (ADR 0063, decision 4). Seedlings start
+//! next season; live trees, the seedling bank included, are capped at maxTrees.
 //!
 //! Params: o4.mortality; sizeBlind reads o4.m0, twoPart reads o4.mCanopy, o4.hCanopy,
 //! o4.gammaCanopy, o4.mSuppression, o4.suppressionSlope and o4.shadeTolerance (per species, as m₀
-//! is), o4.suppressionSignal, o4.topLightThreshold, o4.growthSeasons and o4.growthFloor (the
-//! world's) and r1.enabled; then o4.cSeed, d, qEst, pEst, maxTrees, rain, r1.fRep and
-//! r1.maturity (the seed supply), c2.C.
+//! is), o4.topLightThreshold and o4.survivalLight (per species, ADR 0068), o4.suppressionSignal,
+//! o4.growthSeasons and o4.growthFloor (the world's) and r1.enabled; then o4.cSeed, d, qEst,
+//! pEst, maxTrees, rain, r1.fRep and r1.maturity (the seed supply), c2.C.
 
 use super::c1::{plant_seedling, seedling_azimuth};
 use crate::math;
@@ -100,6 +101,27 @@ pub fn top_light_deficit(ratio: f64, threshold: f64) -> f64 {
     math::max(1.0 - ratio / threshold, 0.0)
 }
 
+/// The dark top's deficit against the species' survival light θ_sp (ADR 0068): a ramp
+/// clamp((θ_hi − q)/(θ_hi − θ_sp), 0, 1), with θ_hi := max(θ_hi, θ_sp), so a top at the ceiling
+/// θ_hi or above has none and one at or below the species' sapling survival light has all of it.
+/// A birch (θ_sp 0.21) is suppressed only below 0.21 of open sky, a beech (0.034) fully only near
+/// the floor. θ_sp ≥ θ_hi is a step at θ_sp (no 0/0). θ_sp absent: today's deficit, called as it
+/// is so the default stays bit-identical (it is the ramp at θ_sp = 0). θ_hi ≤ 0: no signal,
+/// whatever θ_sp says, so a survival light alone never turns the signal on.
+pub fn top_light_ramp(ratio: f64, threshold: f64, survival: Option<f64>) -> f64 {
+    let Some(floor) = survival else {
+        return top_light_deficit(ratio, threshold);
+    };
+    if !(threshold > 0.0) {
+        return 0.0;
+    }
+    let ceiling = math::max(threshold, floor);
+    if !(ceiling > floor) {
+        return if ratio < ceiling { 1.0 } else { 0.0 };
+    }
+    math::min(math::max((ceiling - ratio) / (ceiling - floor), 0.0), 1.0)
+}
+
 /// The stalled leader's deficit (`growth`): (1 − ΔH/(k·g))₊, ΔH the height the tree gained over
 /// the last k seasons (its height now less the highest tip among metamers born k or more seasons
 /// ago, as they stand now). A tree younger than k seasons, or g ≤ 0: none. Read from the
@@ -151,8 +173,9 @@ pub fn stand_dynamics(world: &mut World) -> f64 {
                 let suppression = if signal != SuppressionSignal::Carbon {
                     // ADR 0065: another signal's deficit, scaled by tolerance as carbon's is.
                     let deficit = match signal {
+                        // ADR 0068: θ_hi and θ_sp are the species' (merged over the world's).
                         SuppressionSignal::TopLight => {
-                            top_light_deficit(t.q_top / c, params.o4.top_light_threshold)
+                            top_light_ramp(t.q_top / c, own.top_light_threshold, own.survival_light)
                         }
                         _ => growth_deficit(
                             t,
@@ -714,6 +737,101 @@ pub(crate) mod tests {
         off.trees[0].q_top = 0.0;
         stand_dynamics(&mut off);
         assert!(off.trees[0].alive);
+    }
+
+    #[test]
+    fn the_ramp_is_zero_above_the_ceiling_one_below_the_survival_light_and_linear_between() {
+        // ADR 0068: θ_hi 0.25, θ_sp 0.05, so the ramp spans 0.2 of open sky.
+        let ramp = |q: f64| top_light_ramp(q, 0.25, Some(0.05));
+        assert_eq!(ramp(0.3), 0.0);
+        assert_eq!(ramp(0.25), 0.0);
+        assert!((ramp(0.15) - 0.5).abs() < 1e-12);
+        assert!((ramp(0.2) - 0.25).abs() < 1e-12);
+        assert_eq!(ramp(0.05), 1.0);
+        assert_eq!(ramp(0.0), 1.0);
+    }
+
+    #[test]
+    fn the_ramp_without_a_survival_light_is_todays_deficit_bit_for_bit() {
+        for &theta in &[0.0, 0.1, 0.15, 0.25, 0.3, -1.0] {
+            for k in 0..=40 {
+                let q = k as f64 * 0.0137;
+                assert_eq!(
+                    top_light_ramp(q, theta, None).to_bits(),
+                    top_light_deficit(q, theta).to_bits(),
+                    "q {q} θ {theta}"
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn a_survival_light_at_or_above_the_ceiling_makes_the_ramp_a_step_at_the_survival_light() {
+        // θ_hi := max(θ_hi, θ_sp): birch's 0.21 under a ceiling of 0.1 steps at 0.21, no 0/0.
+        let step = |q: f64| top_light_ramp(q, 0.1, Some(0.21));
+        assert_eq!(step(0.2), 1.0);
+        assert_eq!(step(0.21), 0.0);
+        assert_eq!(step(0.5), 0.0);
+        assert_eq!(top_light_ramp(0.1, 0.1, Some(0.1)), 0.0);
+        assert_eq!(top_light_ramp(0.05, 0.1, Some(0.1)), 1.0);
+    }
+
+    #[test]
+    fn without_a_ceiling_a_survival_light_alone_gives_no_signal() {
+        assert_eq!(top_light_ramp(0.0, 0.0, Some(0.21)), 0.0);
+        assert_eq!(top_light_ramp(0.0, -1.0, Some(0.034)), 0.0);
+    }
+
+    #[test]
+    fn the_ramps_deficit_is_scaled_by_shade_tolerance_as_the_others_are() {
+        // Beech (T 4.56) fully below its survival light: m_s·e^(−β_s(T − 1)) ≈ 0.038 a season.
+        let d = top_light_ramp(0.02, 0.15, Some(0.034));
+        assert_eq!(d, 1.0);
+        let rate = tolerance_scaled(d, 1.0, 0.92, 4.56);
+        assert!((rate - (-0.92f64 * 3.56).exp()).abs() < 1e-15, "{rate}");
+        // Halfway down the ramp, half that.
+        let half = tolerance_scaled(top_light_ramp(0.092, 0.15, Some(0.034)), 1.0, 0.92, 4.56);
+        assert!((half - 0.5 * rate).abs() < 1e-12, "{half}");
+    }
+
+    #[test]
+    fn each_species_reads_its_own_survival_light_and_ceiling() {
+        // θ_hi 0.25 for the world; birch's survival light 0.21, beech's 0.034, T 1 for both, so a
+        // deficit of 1 kills. At q 0.2 birch is below its floor (rate 1); beech at q 0.25 is at the
+        // ceiling it sets for itself, 0.3 (rate 0). Then with no world ceiling, only beech's acts.
+        let mk = |world_theta: f64| {
+            starving(
+                &format!(
+                    r#""mSuppression":1,"suppressionSlope":1,"shadeTolerance":1,
+                       "suppressionSignal":"topLight","topLightThreshold":{world_theta}"#
+                ),
+                r#","trees":[{"x":20,"species":"birch"},{"x":50,"species":"beech"}],
+                   "species":{"birch":{"o4":{"survivalLight":0.21}},
+                              "beech":{"o4":{"survivalLight":0.034,"topLightThreshold":0.3}}}"#,
+            )
+        };
+        for s in 1..=200 {
+            let mut w = mk(0.25);
+            w.season = s as f64;
+            let c = w.params().c2.c;
+            vigour(&mut w, 0, 1.2);
+            vigour(&mut w, 1, 1.2);
+            w.trees[0].q_top = 0.2 * c;
+            w.trees[1].q_top = 0.3 * c; // beech's own ceiling, 0.3
+            stand_dynamics(&mut w);
+            assert!(!w.trees[0].alive, "season {s}");
+            assert!(w.trees[1].alive, "season {s}");
+        }
+        // No world ceiling: birch (none of its own) has no signal; beech's own 0.3 still acts.
+        let mut w = mk(0.0);
+        let c = w.params().c2.c;
+        vigour(&mut w, 0, 1.2);
+        vigour(&mut w, 1, 1.2);
+        w.trees[0].q_top = 0.0;
+        w.trees[1].q_top = 0.01 * c;
+        stand_dynamics(&mut w);
+        assert!(w.trees[0].alive);
+        assert!(!w.trees[1].alive);
     }
 
     /// The `growth` signal's world (window k 5, floor `floor` cells a season; m_s 1, β_s 1, T 1),

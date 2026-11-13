@@ -26,6 +26,7 @@ import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { loneTreeParams } from "../src/core/presets.ts";
+import { arg } from "./shared.ts";
 
 const RUN = fileURLToPath(new URL("run.ts", import.meta.url));
 export const EXEMPLARS = ["oak", "maple", "birch", "beech", "hornbeam", "holly"];
@@ -42,10 +43,6 @@ export const BOX_HELD_OF_20: Record<string, number> = {
   holly: 20,
 };
 
-const arg = (name: string, fallback: string) => {
-  const i = process.argv.indexOf(name);
-  return i >= 0 ? (process.argv[i + 1] ?? fallback) : fallback;
-};
 const jobs = Math.min(6, Math.max(1, Number(arg("-j", "6"))));
 const species = arg("--species", EXEMPLARS.join(",")).split(",");
 const [s0, s1] = arg("--seeds", "1-20").split("-").map(Number) as [number, number];
@@ -112,7 +109,7 @@ function runOne(sp: string, seed: number): Promise<Result> {
   writeFileSync(params, JSON.stringify(loneTreeParams(sp, seed)));
   const args = [RUN, "--preset", "oakOpen", "--params", params, "--seasons", `${SEASONS}`];
   return new Promise((resolve, reject) => {
-    const child = spawn("node", [...args, "--quiet", "--out", join(dir, "run")], {
+    const child = spawn(process.execPath, [...args, "--quiet", "--out", join(dir, "run")], {
       stdio: ["ignore", "ignore", "inherit"],
     });
     child.on("exit", (code) => {

@@ -43,6 +43,7 @@ import {
   tally,
   W90_BAND,
 } from "./oak-crown-score.ts";
+import { arg } from "./shared.ts";
 
 const RUN = fileURLToPath(new URL("run.ts", import.meta.url));
 /** The page's `d12a13`: the oak's species patch, and nothing else. */
@@ -50,10 +51,6 @@ export const D12A13: Record<string, SpeciesPatch> = {
   oak: { r2: { dLambda: 0.12, aC: 13.5 } } as unknown as SpeciesPatch,
 };
 
-const arg = (name: string, fallback: string) => {
-  const i = process.argv.indexOf(name);
-  return i >= 0 ? (process.argv[i + 1] ?? fallback) : fallback;
-};
 const jobs = Math.min(6, Math.max(1, Number(arg("-j", "6"))));
 const seeds = parseSeeds(arg("--seeds", "1-20"));
 const out = arg("--out", "runs/oak-crown");

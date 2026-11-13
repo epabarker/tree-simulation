@@ -20,22 +20,14 @@
  * Writes runs/garden-acceptance/<condition>/{w<width>-s<seed>/, summary.json}, prints the tables
  * and the pre-registered choice. Generated, never committed.
  */
-import { spawn } from "node:child_process";
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
-import {
-  mergeParams,
-  type Params,
-  type ParamsPatch,
-  patchSpecies,
-  type SpeciesPatch,
-} from "../src/core/params.ts";
-import { forestParams, loneTreeParams } from "../src/core/presets.ts";
+import type { Params } from "../src/core/params.ts";
+import { DISPLAY_THRESHOLD, forestParams, loneTreeParams } from "../src/core/presets.ts";
+import { arg, median, type Patch, patched, pool, sim } from "./shared.ts";
 
 const ROOT = fileURLToPath(new URL("../", import.meta.url));
-const RUN = join(ROOT, "cli", "run.ts");
-type Patch = { params?: ParamsPatch; species?: Record<string, SpeciesPatch> };
 const D1 = JSON.parse(
   readFileSync(
     join(ROOT, "docs/experiments/code/2026-11-10-garden-schedule/d1.patch.json"),
@@ -51,7 +43,7 @@ export const OAK_AT = [150, 300];
 /** Each hard gate passes at this many of seeds 1–20 (ADR 0065, #122). */
 export const GATE_OF_20 = 18;
 /** The display threshold (stand.rs `is_drawn`): 1.3 m in cells of 0.25 m. */
-const DRAWN = 5.2;
+const DRAWN = DISPLAY_THRESHOLD;
 /** The 70% bar is read only in frames with at least this many drawn stems (ADR 0065, 4). */
 const JUDGED = 8;
 
@@ -70,10 +62,6 @@ export const PRE121_LONE: Record<string, string> = {
 };
 const LONE = { species: ["oak", "hornbeam"], seeds: [1, 2, 3], seasons: 100 };
 
-const arg = (name: string, fallback: string) => {
-  const i = process.argv.indexOf(name);
-  return i >= 0 ? (process.argv[i + 1] ?? fallback) : fallback;
-};
 const jobs = Math.min(8, Math.max(1, Number(arg("-j", "8"))));
 const names = arg("--conditions", Object.keys(CONDITIONS).join(",")).split(",");
 const [s0, s1] = arg("--seeds", "1-20").split("-").map(Number) as [number, number];
@@ -81,36 +69,6 @@ const seeds = Array.from({ length: (s1 ?? s0) - s0 + 1 }, (_, k) => s0 + k);
 const out = join(ROOT, arg("--out", "runs/garden-acceptance"));
 const withTests = !process.argv.includes("--no-tests");
 const seasons = Number(arg("--seasons", String(SEASONS)));
-
-const patched = (base: Params, patch: Patch) => {
-  let p = patch.params ? mergeParams(base, patch.params) : base;
-  for (const [name, sp] of Object.entries(patch.species ?? {})) p = patchSpecies(p, name, sp);
-  return p;
-};
-
-function sim(params: Params, seasons: number, dir: string): Promise<number> {
-  mkdirSync(dir, { recursive: true });
-  const record = join(dir, "record.json");
-  writeFileSync(record, JSON.stringify({ params, events: [], seasons }));
-  const args = [RUN, "--replay", record, "--seasons", String(seasons), "--quiet", "--out", dir];
-  const t0 = performance.now();
-  return new Promise((ok, bad) => {
-    const c = spawn(process.execPath, args, { stdio: ["ignore", "ignore", "inherit"] });
-    c.on("exit", (code) => {
-      const s = (performance.now() - t0) / 1000;
-      writeFileSync(join(dir, "wall.txt"), `${s}\n`);
-      code === 0 ? ok(s) : bad(new Error(`${dir}: exit ${code}`));
-    });
-  });
-}
-
-async function pool<T>(items: T[], n: number, f: (x: T) => Promise<unknown>) {
-  let next = 0;
-  const worker = async () => {
-    while (next < items.length) await f(items[next++] as T);
-  };
-  await Promise.all(Array.from({ length: Math.min(n, items.length) }, worker));
-}
 
 // Build once before the pool, so the simulators do not race to build it.
 await sim(loneTreeParams("oak", 1), 1, join(out, "build"));
@@ -224,11 +182,6 @@ function summarise(j: Job) {
 }
 type Summary = ReturnType<typeof summarise>;
 
-const median = (xs: number[]) => {
-  const s = [...xs].sort((a, b) => a - b);
-  const m = s.length >> 1;
-  return s.length % 2 ? (s[m] as number) : ((s[m - 1] as number) + (s[m] as number)) / 2;
-};
 const counts = (rs: Summary[]) => {
   const fr = rs.flatMap((r) => r.frames);
   const judged = fr.filter((f) => f.judged);

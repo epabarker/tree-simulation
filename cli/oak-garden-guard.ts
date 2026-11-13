@@ -24,15 +24,14 @@
  * Writes runs/oak-garden-guard/{screen/, <arm>/w<width>-s<seed>/, <arm>/regress-*, summary.json}.
  * Generated, never committed.
  */
-import { spawn } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { type Params, patchSpecies, type SpeciesPatch } from "../src/core/params.ts";
-import { forestParams } from "../src/core/presets.ts";
+import type { Params, SpeciesPatch } from "../src/core/params.ts";
+import { DISPLAY_THRESHOLD, forestParams } from "../src/core/presets.ts";
+import { arg, median, runCli as node, patched, pool, sim } from "./shared.ts";
 
 const ROOT = fileURLToPath(new URL("../", import.meta.url));
-const RUN = join(ROOT, "cli", "run.ts");
 /** The user-approved schedule (#124's round two). HEAD's oak: dLambda 0.04 from aC 13.51. */
 export const D16A13: Record<string, SpeciesPatch> = { oak: { r2: { dLambda: 0.16, aC: 13.5 } } };
 export const ARMS: Record<string, Record<string, SpeciesPatch>> = { head: {}, d16a13: D16A13 };
@@ -47,53 +46,16 @@ export const SLACK = 2;
 /** Stand trees for the bare-bole bars: ≥ 10 m (40 cells of 0.25 m). */
 const TALL = 40;
 /** The display threshold (stand.rs `is_drawn`): 1.3 m in cells. */
-const DRAWN = 5.2;
+const DRAWN = DISPLAY_THRESHOLD;
 /** A bare-bole cell (species × width × season) is judged when both arms have this many trees. */
 const BOLE_MIN = 5;
 const LCB_TOL = 0.05;
 const LID_TOL = 0.25;
 
-const arg = (name: string, fallback: string) => {
-  const i = process.argv.indexOf(name);
-  return i >= 0 ? (process.argv[i + 1] ?? fallback) : fallback;
-};
 const jobs = Math.min(8, Math.max(1, Number(arg("-j", "4"))));
 const widths = arg("--widths", "160,66").split(",").map(Number);
 const out = join(ROOT, arg("--out", "runs/oak-garden-guard"));
 
-const patched = (base: Params, sp: Record<string, SpeciesPatch>) => {
-  let p = base;
-  for (const [name, s] of Object.entries(sp)) p = patchSpecies(p, name, s);
-  return p;
-};
-
-function node(args: string[], dir: string): Promise<number> {
-  mkdirSync(dir, { recursive: true });
-  const t0 = performance.now();
-  return new Promise((ok, bad) => {
-    const c = spawn(process.execPath, [RUN, ...args, "--quiet", "--out", dir], {
-      stdio: ["ignore", "ignore", "inherit"],
-    });
-    c.on("exit", (code) => {
-      const s = (performance.now() - t0) / 1000;
-      writeFileSync(join(dir, "wall.txt"), `${s}\n`);
-      code === 0 ? ok(s) : bad(new Error(`${dir}: exit ${code}`));
-    });
-  });
-}
-function sim(params: Params, seasons: number, dir: string) {
-  mkdirSync(dir, { recursive: true });
-  const record = join(dir, "record.json");
-  writeFileSync(record, JSON.stringify({ params, events: [], seasons }));
-  return node(["--replay", record, "--seasons", String(seasons)], dir);
-}
-async function pool<T>(items: T[], n: number, f: (x: T) => Promise<unknown>) {
-  let next = 0;
-  const worker = async () => {
-    while (next < items.length) await f(items[next++] as T);
-  };
-  await Promise.all(Array.from({ length: Math.min(n, items.length) }, worker));
-}
 const done = (dir: string) => existsSync(join(dir, "hash.txt"));
 
 const COLS = [
@@ -177,7 +139,7 @@ const tasks: (() => Promise<unknown>)[] = [
     const base = forestParams(j.width, j.seed);
     return done(runDir(j))
       ? Promise.resolve()
-      : sim(patched(base, ARMS[j.arm] ?? {}), SEASONS, runDir(j));
+      : sim(patched(base, { species: ARMS[j.arm] ?? {} }), SEASONS, runDir(j));
   }),
   ...regs.map((r) => () => {
     const extra = r.arm === "head" ? [] : ["--species-patch", SP];
@@ -250,12 +212,8 @@ function summarise(j: Job) {
   };
 }
 type Summary = ReturnType<typeof summarise>;
-const median = (xs: number[]) => {
-  const s = xs.filter((x) => Number.isFinite(x)).sort((a, b) => a - b);
-  if (!s.length) return Number.NaN;
-  const m = s.length >> 1;
-  return s.length % 2 ? (s[m] as number) : ((s[m - 1] as number) + (s[m] as number)) / 2;
-};
+/** The median of the finite values; NaN with none. */
+const finiteMedian = (xs: number[]) => median(xs.filter((x) => Number.isFinite(x)));
 const runsWith = (rs: Summary[], s: number, k: "live" | "drawn" | "seeding" | "seedingIn10") =>
   rs.filter((r) => (r.oak[s]?.[k] ?? 0) > 0).length;
 function counts(rs: Summary[]) {
@@ -330,8 +288,8 @@ for (const width of widths) {
       const [th, tp] = [trees(head), trees(patch)];
       const m = (ts: { lcb: number; lid: number }[]) => ({
         n: ts.length,
-        lcb: median(ts.map((t) => t.lcb)),
-        lid: median(ts.map((t) => t.lid)),
+        lcb: finiteMedian(ts.map((t) => t.lcb)),
+        lid: finiteMedian(ts.map((t) => t.lid)),
       });
       const [mh, mp] = [m(th), m(tp)];
       const judged = mh.n >= BOLE_MIN && mp.n >= BOLE_MIN;
@@ -366,7 +324,10 @@ for (const width of widths) {
         hashSame: a?.hash === b?.hash,
       };
     }),
-    wallMedian: { head: median(h.map((r) => r.wall)), d16a13: median(p.map((r) => r.wall)) },
+    wallMedian: {
+      head: finiteMedian(h.map((r) => r.wall)),
+      d16a13: finiteMedian(p.map((r) => r.wall)),
+    },
   };
 }
 

@@ -205,8 +205,10 @@ export type LoneShape100 = { [K in keyof LoneShape as `${K}100`]: LoneShape[K] }
 
 export interface LoneTraits extends LoneShape, Partial<LoneShape100> {
   alive: boolean;
-  height30: number;
-  height60: number;
+  /** The height at `stages[0]` (season 30 by default). */
+  heightStage1: number;
+  /** The height at `stages[1]` (season 60 by default), where the shape is read too. */
+  heightStage2: number;
   junctionDelta: number;
   ldSlope: number;
   leafStemSlope: number;
@@ -240,8 +242,9 @@ function loneShape(world: RustWorld, tree: Tree): LoneShape {
 /**
  * The lone tree at 30 and 60, and, when asked, run on to 100: its shape there as `…100` (the
  * round-5 plan, §3.1: a crown can pass at 60 and turn at 100, as round 4's birch did).
- * `stages` moves the two measurements (`height30` and the rest are read at its first and second
- * season); only a test asks for earlier ones, as the open-grown box made 60 seasons slow (#115).
+ * `stages` moves the two measurements (`heightStage1` at its first season, `heightStage2` and the
+ * rest at its second); only a test asks for earlier ones, as the open-grown box made 60 seasons
+ * slow (#115).
  */
 export function runLone(
   species: string,
@@ -253,14 +256,14 @@ export function runLone(
   const world = newWorld(withAssign(loneParams(species, seed), species, assign));
   world.run(stages[0]);
   const tree = world.trees[0] as Tree;
-  const height30 = world.metricsOf(tree).height;
+  const heightStage1 = world.metricsOf(tree).height;
   world.run(stages[1] - stages[0]);
   const m = world.metricsOf(tree);
   const f = world.formOf(tree);
   const traits: LoneTraits = {
     alive: tree.alive,
-    height30,
-    height60: m.height,
+    heightStage1,
+    heightStage2: m.height,
     ...loneShape(world, tree),
     junctionDelta: f.junctionDelta,
     ldSlope: f.ldSlope,

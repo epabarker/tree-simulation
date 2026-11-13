@@ -307,7 +307,8 @@ def seed_traits(reply: dict, tallo_curves: dict | None = None) -> dict[str, floa
                     continue
                 # Booleans (alive) count as 0 or 1; null is a trait that could not be measured.
                 flat[f"{trial}.{k}"] = None if v is None else float(v)
-    h30, h60 = flat.get("lone.height30"), flat.get("lone.height60")
+    # The lone tree at its two stages, seasons 30 and 60 (cli/trials.ts runLone).
+    h30, h60 = flat.get("lone.heightStage1"), flat.get("lone.heightStage2")
     flat["lone.earlyShare"] = h30 / h60 if h30 is not None and h60 else None
     s60, s100 = flat.get("stand.height"), flat.get("stand.height100")
     flat["stand.lateShare"] = s100 / s60 if s100 is not None and s60 else None

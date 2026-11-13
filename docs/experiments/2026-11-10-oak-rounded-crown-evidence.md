@@ -420,7 +420,7 @@ Counts are gardens of 20, HEAD → d16a13.
 - **Why the oak is lost:** the patched planted oak stays short and dies young. Over the planted oaks, the median of each one's peak height is:
   - at 160 cells (52 oaks): 30.0 m under HEAD, 14.4 m under the patch;
   - at 66 cells (22 oaks): 26.0 m under HEAD, 14.0 m under the patch.
-- **Reaching `r1.maturity` (32.5 m):** 23 and 8 of the planted oaks under HEAD; 2 and 1 under the patch.
+- **Peak height ≥ 32.5 m (`r1.maturity`):** 23 and 8 of the planted oaks under HEAD; 2 and 1 under the patch. This counts height only, not seeding: several of these are in the same garden, and some reach the height late. The patch changes the hash in all 40 garden pairs.
 - **The median last live season:** 138 and 97 under HEAD; 72 and 62 under the patch.
 - **This is the last guard's mechanism, stronger.** The squat young oak no longer reaches seeding height, and here, under a closed garden canopy, it is also overtopped and dies about 60 seasons earlier. Where an oak seeds at all under HEAD (9 desktop gardens, first seed at seasons 76–185), the patch has a seeding oak in 2 (165, 226). On the phone it is 8 gardens (53–273) against 1 (129).
 

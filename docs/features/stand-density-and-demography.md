@@ -1,10 +1,10 @@
 # Stand density and demography
 
-A **World effect** (GLOSSARY): how many trees the garden holds, where they stand, how they arrive and how they die. Decided by the ticket [What demography schedule should the garden run?](https://github.com/epabarker/tree-simulation/issues/85) and recorded in [ADR 0063](../decisions/0063-garden-demography.md), amended by [ADR 0065](../decisions/0065-garden-demography-reported-targets.md). **Status: built** (spec #111's tickets; the garden flip in [#121](https://github.com/epabarker/tree-simulation/issues/121), at round 6's rates of [the schedule note](../experiments/2026-11-10-garden-schedule.md)). The per-hectare targets are not met and are now reported, not gated: their gate is [#129](https://github.com/epabarker/tree-simulation/issues/129)'s (crown extent and girth). [#122](https://github.com/epabarker/tree-simulation/issues/122) runs the 20-seed acceptance, round 6 against d1.
+A **World effect** (GLOSSARY): how many trees the garden holds, where they stand, how they arrive and how they die. Decided by the ticket [What demography schedule should the garden run?](https://github.com/epabarker/tree-simulation/issues/85) and recorded in [ADR 0063](../decisions/0063-garden-demography.md), amended by [ADR 0065](../decisions/0065-garden-demography-reported-targets.md). **Status: built** (spec #111's tickets; the garden flip in [#121](https://github.com/epabarker/tree-simulation/issues/121), at round 6's rates of [the schedule note](../experiments/2026-11-10-garden-schedule.md)). The per-hectare targets are not met and are now reported, not gated: their gate is [#129](https://github.com/epabarker/tree-simulation/issues/129)'s (crown extent and girth). **Accepted at round 6 on seeds 1–20** by [#122](https://github.com/epabarker/tree-simulation/issues/122) ([note](../experiments/2026-11-12-garden-acceptance.md), `npm run evidence:garden`): the gates hold 20 of 20 at both widths; d1 was not adopted (18 of 20 on the phone) and is the first lever for #129 to re-test. Round 6 is capped and flooded: a median canopy share of 0.14 at 160 cells and 235 of 300 seasons at the cap.
 
 ## What it should look like
 
-A **mature high forest**: about 200–400 drawn stems/ha, most of them canopy trees (GLOSSARY: over half the top height, the mean of the 100 tallest drawn stems per hectare), with young trees showing only in gaps that deaths leave. Density is the same per area at every width, so the desktop (160 cells, ≈ 0.064 ha) draws about 13–26 stems and the phone (66 cells, ≈ 0.026 ha) about 5–10. It is judged on the **settled garden** (seasons 100–300, what a visitor sees when the garden opens on a grown checkpoint). Seasons 0–50 only need to avoid failure.
+A **mature high forest**: about 200–400 drawn stems/ha, most of them canopy trees (GLOSSARY: over half the top height, the mean of the 100 tallest drawn stems per hectare), with young trees showing only in gaps that deaths leave. Density is the same per area at every width, so the desktop (160 cells, ≈ 0.064 ha) draws about 13–26 stems and the phone (66 cells, ≈ 0.026 ha) about 5–10. It is judged on the **settled garden** (seasons 100–300). The 3D garden ships no grown checkpoint (ADR 0046) and opens on the live intro from season 0, so a visitor reaches the settled garden only by watching it grow; whether it should open there is an open question (#122's note). Seasons 0–50 only need to avoid failure.
 
 ## Mechanism
 
@@ -36,7 +36,7 @@ Amended by ADR 0065: items 1, 2, 4 and 5 are **reported with counts**, not gates
 
 1. Drawn stems at seasons 100, 200 and 300 within 200–400/ha (reported; #129 gates it).
 2. At least 60% of drawn stems in the canopy (over half the top height, stand.csv's `canopy` beside `topHeight100`) at the same seasons (reported; #129 gates it).
-3. No gap phase: at least one canopy tree at every season after 50 (gate).
+3. No gap phase: at least one canopy tree at every season after 50 (gate). Under the top height this means at least one drawn stem; the real canopy target is #129's.
    3a. At the phone width (66 cells), at least one canopy tree from season 100 (gate).
 4. Seasons at the cap (reported: run.json's `meta.capSeasons`).
 5. No species over 70% of drawn stems, read only in frames with at least 8 drawn stems (reported).
@@ -48,4 +48,5 @@ Amended by ADR 0065: items 1, 2, 4 and 5 are **reported with counts**, not gates
 - [Regeneration research](../research/2026-11-08-regeneration.md): seeding ages, masting, the seedling bank, birch's shade death, parkland densities.
 - [ADR 0062](../decisions/0062-light-entry.md): the periodic depth, and trees filling it.
 - [The garden schedule](../experiments/2026-11-10-garden-schedule.md): seven rounds of rates; round 6 landed (#121).
+- [The 20-seed acceptance](../experiments/2026-11-12-garden-acceptance.md) (#122): round 6 against d1, seeds 1–20 at both widths; round 6 kept.
 - The #121 probes, all exploratory: [suppression signals](../experiments/2026-11-10-garden-suppression-probe.md), [canopy levers](../experiments/2026-11-11-garden-canopy-levers.md), [crown occupancy](../experiments/2026-11-11-garden-crown-occupancy.md), [path length](../experiments/2026-11-11-garden-pathlength-probe.md); [crown-extent research](../research/2026-11-11-crown-extent-and-canopy-density.md).

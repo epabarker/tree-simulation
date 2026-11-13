@@ -122,3 +122,23 @@ The fail path does not apply: neither condition fails a hard gate.
 - **Neither condition is a mature high forest** (the per-hectare targets, now #129's). r6's desktop understorey floods after season 100 (median 1,641–1,954 drawn/ha, canopy share 0.08–0.09 at 200/300). d1 floods less (704–821/ha) and keeps more canopy share.
 - **The phone under d1 is sparse:** median 95–133 drawn/ha, mostly one canopy crown (share 0.96). That is why its band count is low and why two seeds lost every drawn stem for two seasons.
 - **d1 halves the cap seasons and gives the 70% bar its best pass rate on the desktop** (54% against 39%), but hornbeam still tops 89 of 120 frames.
+
+## Conclusion (user, 2026-11-12: r6 stands)
+
+**r6 is the garden, as #121 landed it.** The user took the pre-registered pick; the flora, presets, goldens and `rust/presets.json` are unchanged. d1 stays a named patch.
+
+- **The canopy gate is weak.** Under the top height, "a canopy tree at every season after 50" only means "at least one drawn stem at every season after 50": the tallest drawn stem is always over half the mean of the tallest few. Both conditions pass it, and it says nothing about whether the stand has a canopy. **#129 owns the real canopy target** (≥ 120 canopy trees/ha within 200–400 drawn/ha).
+- **r6 ships a capped, flooded garden.** At 160 cells the median canopy share is 0.14 and the median run sits at the cap for 235 of 300 seasons (187 at 66 cells); no run of 40 is cap-free. The desktop understorey reaches 1,641–1,954 drawn/ha at seasons 200–300.
+- **d1 is the first lever for #129 to re-test.** It halved the seasons at the cap (3,459 against 8,263 pooled) and raised the 70% bar's pass rate (46% against 34%), and it let 198 oak recruits reach 1.3 m on the desktop against r6's 4. It lost on the phone: two seeds with no drawn stem for two seasons, and a median of 95–133 drawn/ha. Re-test it once #129's crown extent changes the stand.
+
+**After the pick (Phase 2):**
+- **A checkpoint saved before #121 still loads:** `tests/checkpoint-pre121.test.ts` loads 46f3cf4's own garden (`forestParams(66, 1)`, season 6; [fixture note](../../tests/fixtures/garden-pre121.md)). Ten more seasons at HEAD reach 083d0cb6, the hash 46f3cf4's build reached growing the same garden to 16 from scratch.
+- **No shipped forests to regenerate.** The 3D garden ships none (ADR 0046: `cli/first-paint.ts` writes a manifest with no widths; a 3D checkpoint is 4–16 MB gzipped). The garden opens on the live intro from season 0, not on a settled forest. The stand-density page's "the garden opens on a grown checkpoint" is not what ships; changing that would reopen ADR 0046, so it is left as a question for the user.
+- **Looked at in the browser** (headless Firefox through puppeteer-core, `npm run dev`, `garden.html?seed=2`, stepped by `garden.step()`; WebGL2):
+
+  ![The garden at seasons 100, 200 and 300: desktop 1280 × 800 and phone 390 × 844](figures/2026-11-12-garden-acceptance-browser.png)
+
+  - **Widths:** the page sizes the plot to its viewport (`plateWidth`), so these viewports run **170 cells** (1280 × 800) and **80 cells** (390 × 844), not the acceptance's 160 and 66.
+  - **Desktop:** at 100, a mixed young stand. By 200–300, a few tall stems with their crowns cropped above the frame (the plate shows 140 cells, 35 m), and a low sapling layer at the ground. The flood reads as that layer, not as a thicket.
+  - **Phone:** one or two canopy crowns span the plot from 100 to 300, with saplings below.
+  - **Health:** no console errors and no lost WebGL context. Draw times were 64–113 ms a frame at 170 cells (headless, software GL). One earlier desktop capture at seasons 100–300 came back as a bare background. A re-run with a context-loss listener drew every season and lost no context, so the blank capture did not reproduce.

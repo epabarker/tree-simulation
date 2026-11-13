@@ -39,7 +39,28 @@ function rows(dir: string): Row[] {
   });
 }
 
-function run(args: string[], params?: object): Row[] {
+/**
+ * stand.csv, one row per season: the core's own drawn and canopy counts and its top height
+ * (`stand.rs`), so the display threshold and the canopy cut are read here, never re-stated.
+ */
+type Stand = { season: number; drawn: number; canopy: number; topHeight100: number };
+
+function stand(dir: string): Stand[] {
+  const [head, ...lines] = readFileSync(join(dir, "stand.csv"), "utf8").trim().split("\n");
+  const col = (name: string) => (head as string).split(",").indexOf(name);
+  const [s, d, c, t] = ["season", "drawn", "canopy", "topHeight100"].map(col);
+  return lines.map((line) => {
+    const v = line.split(",");
+    return {
+      season: Number(v[s as number]),
+      drawn: Number(v[d as number]),
+      canopy: Number(v[c as number]),
+      topHeight100: Number(v[t as number]),
+    };
+  });
+}
+
+function run(args: string[], params?: object): { rows: Row[]; stand: Stand[] } {
   const dir = mkdtempSync(join(tmpdir(), "treesim-regression-"));
   try {
     if (params) writeFileSync(join(dir, "params.json"), JSON.stringify(params));
@@ -47,7 +68,7 @@ function run(args: string[], params?: object): Row[] {
     execFileSync("node", [RUN, ...args, ...extra, "--quiet", "--out", join(dir, "run")], {
       stdio: ["ignore", "ignore", "inherit"],
     });
-    return rows(join(dir, "run"));
+    return { rows: rows(join(dir, "run")), stand: stand(join(dir, "run")) };
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }
@@ -61,17 +82,28 @@ const CASES: Record<string, { issue: number; note: string; vector: () => Record<
   {
     phoneSeed3: {
       issue: 54,
-      note: "the phone's ring (forestParams(66, 3)) is nearly empty by 150; canopy = live trees >= 40 cells",
+      note: "the phone's ring (forestParams(66, 3)) is nearly empty by 150; drawn and canopy = stand.csv's (ADR 0065), planted = trees at season 1, tall = live trees >= 40 cells, topHeight = topHeight100 in cells",
       vector() {
-        const p = forestParams(66, 3);
-        const planted = p.trees.length;
-        const r = run(["--preset", "mixedWood", "--seasons", "150"], p);
+        // Re-defined for the 0062/0063 garden (#123, docs/devlog.md 2026-11-12). Live trees
+        // include the seedling bank, which sits at the cap, so emptiness is read as drawn stems.
+        // The planting replaces `trees`, so the planted are the trees present at season 1.
+        // Canopy is the glossary's (over half the top height); the old fixed 10 m count stays
+        // as `tall`, the one count comparable with the world before the flip.
+        const { rows: r, stand: st } = run(
+          ["--preset", "mixedWood", "--seasons", "150"],
+          forestParams(66, 3),
+        );
+        const planted = new Set(r.filter((x) => x.season === 1).map((x) => x.tree)).size;
         const out: Record<string, number> = {};
         for (const s of [50, 100, 150]) {
           const live = at(r, s);
-          out[`live${s}`] = live.length;
+          const row = st.find((x) => x.season === s);
+          if (!row) throw new Error(`phoneSeed3: no stand.csv row for season ${s}`);
+          out[`drawn${s}`] = row.drawn;
           out[`planted${s}`] = live.filter((x) => x.tree < planted).length;
-          out[`canopy${s}`] = live.filter((x) => x.height >= 40).length;
+          out[`canopy${s}`] = row.canopy;
+          out[`tall${s}`] = live.filter((x) => x.height >= 40).length;
+          out[`topHeight${s}`] = Math.round(row.topHeight100);
           out[`metamers${s}`] = sum(live);
         }
         return out;
@@ -81,7 +113,7 @@ const CASES: Record<string, { issue: number; note: string; vector: () => Record<
       issue: 55,
       note: "`forest` (tau 0) cannot regenerate under its own floor: recruits reaching 20 cells by 300",
       vector() {
-        const r = run(["--preset", "forest", "--seed", "1", "--seasons", "300"]);
+        const { rows: r } = run(["--preset", "forest", "--seed", "1", "--seasons", "300"]);
         const planted = new Set(r.filter((x) => x.season === 1).map((x) => x.tree)).size;
         const tallest = new Map<number, number>();
         for (const x of r)

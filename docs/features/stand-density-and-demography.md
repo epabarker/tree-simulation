@@ -40,7 +40,7 @@ Amended by ADR 0065: items 1, 2, 4 and 5 are **reported with counts**, not gates
    3a. At the phone width (66 cells), at least one canopy tree from season 100 (gate).
 4. Seasons at the cap (reported: run.json's `meta.capSeasons`).
 5. No species over 70% of drawn stems, read only in frames with at least 8 drawn stems (reported).
-6. Both named regressions pass (phoneSeed3 is expected to fail until #123 re-baselines it after #121's flip): [phoneSeed3](https://github.com/epabarker/tree-simulation/issues/54) and [forestRegeneration](https://github.com/epabarker/tree-simulation/issues/55) (`node cli/regressions.ts`).
+6. Both named regressions pass (re-defined and re-baselined for the new garden by #123): [phoneSeed3](https://github.com/epabarker/tree-simulation/issues/54) and [forestRegeneration](https://github.com/epabarker/tree-simulation/issues/55) (`node cli/regressions.ts`).
 
 ## Evidence
 

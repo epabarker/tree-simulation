@@ -2,6 +2,20 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-12: the named regressions re-defined and re-baselined for the new garden (#123)
+
+- **Why they moved:** `phoneSeed3` was measured in the world before #121's flip (one planted row, open depth, no display threshold, canopy over half the tallest tree). The flip (round 6: periodic depth, 400 saplings/ha, `twoPart`, the 1.3 m display threshold) and ADR 0065's canopy cut changed what its fields read. `forestRegeneration` did not move. Re-baselined with `node cli/regressions.ts --update`; no code of the core changed, and no golden.
+- **Has #54's defect come back? No.** On the one count comparable across the two worlds, live trees ≥ 40 cells (10 m), seed 3 at 50/100/150 goes 2/3/2 → 6/3/2. Planted survivors go 1/1/1 → 10/7/5 of 11, and the biomass doubles (12,423 → 24,945 metamers at 150). The five drawn stems at 150 are an oak (33 m), a hornbeam (29 m) and three beech and holly of 5–6 m: long-lived species, not #54's willow and birch pioneers. It has a canopy tree in every season after 50 (#122's gate, met by all 20 phone seeds of round 6). **To watch:** drawn stems fall 13 → 8 → 5 while the seedling bank sits at the cap (66) from season 100, and 5 drawn is 189/ha, just under the 200/ha band. That is the thinning ADR 0063 asks for (the phone's 5–10 stems), not emptiness, so the vector now records it.
+- **`phoneSeed3`, field by field** (`cli/regressions.ts`):
+  - `live{s}` → **`drawn{s}`**, stand.csv's `drawn` (the core's `is_drawn`, not re-stated). Live trees now include the seedling bank, which reaches the cap (66 at 100 and 150), so a full count would hide an empty picture.
+  - `planted{s}` read `p.trees.length`, which is 0 under `o4.planting`, so it always read 0. It now counts the planted trees as those present at season 1, `forestRegeneration`'s rule. The core plants the whole stand there (11 at 66 cells, ids 0–10, the planting's count).
+  - `canopy{s}` was live trees ≥ 40 cells. The word now has a fixed meaning (GLOSSARY, ADR 0065 decision 3, the phone's bar), so **`canopy{s}`** is stand.csv's `canopy` (over half the top height). The fixed count stays as **`tall{s}`**.
+  - **`topHeight{s}`** (new): `topHeight100` rounded to cells. A relative canopy count alone would still read ≥ 1 if the stand shrank to saplings.
+  - `metamers{s}` unchanged: the bank is 92 of 25,514 metamers at 100.
+  - New baseline at 50/100/150: drawn 13/8/5, planted 10/7/5, canopy 6/3/2, tall 6/3/2, top height 91/102/91 cells, metamers 34,267/25,514/24,945.
+- **`forestRegeneration` unchanged in definition and baseline** (687 born, 23 reach 20 cells, 300 live, 16 planted at 300). The `forest` preset is RING with explicit `trees` and no `o4.planting`, so the flip does not reach it. Its 20-cell threshold is far above the display threshold, and it has no canopy term. #122's finding that the garden's oak barely regenerates is another preset and another defect.
+- **Docs:** the stand-density page's acceptance item 6 no longer says phoneSeed3 is expected to fail.
+
 ## 2026-11-12: #121 lands at round 6; the suppression signal as an option; canopy at half the top height (ADR 0065)
 
 - **The decision** (user, 2026-11-12, #121's last comment; [ADR 0065](decisions/0065-garden-demography-reported-targets.md), amending ADR 0063 decisions 1–3): the garden flip lands at round 6's rates (periodic depth, 400 saplings/ha, `twoPart` with m_c 0.003, the 1.3 m display threshold). The per-hectare targets (200–400 drawn/ha, ≥ 60% canopy) are reported, not gated; their gate moves to #129. Seasons at the cap are a reported count. "No species above 70%" is read only in frames of ≥ 8 drawn stems. The phone width's bar is ≥ 1 canopy tree from season 100. #122 decides between round 6 and d1 on 20 seeds.

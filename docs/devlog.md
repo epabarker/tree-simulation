@@ -2,6 +2,23 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-13: #132's probe: no arm passes; the ramp stays built and off
+
+- **Note:** [docs/experiments/2026-11-13-understorey-probe.md](experiments/2026-11-13-understorey-probe.md). Bars committed before the runs (3bfd8be); script `cli/understorey-probe.ts` (DBH ≥ 7 cm via `cli/allometry.ts`, metamers kept at 100/200/300). 5 arms × 2 widths × seeds 1–20, 46.8 min on 12 simulators, after a clean pilot on seeds 1–3.
+- **Result:** every `topLight` ramp arm (θ_hi 0.10/0.15/0.25 at m_s 1; 0.15 at m_s 3) raises the ≥ 7 cm canopy share (38–45 of 60 frames at ≥ 0.6 against 21) but fails the band (10–11 of 60 against head's 19), canopy trees/ha (86–102 against 109) and light-demanders in the canopy (45–48 against 53). Canopy deaths rise 1.4–2.2×. Three of four arms fail gate 1 at 66 cells (16–17 of 20).
+- **Surprise:** the cap never clears under any arm; hornbeam's bank nearly doubles (#137).
+- **What limits it: death before release, not #138.** A cohort re-read (`code/2026-11-13-understorey-probe/cohort.ts`): of the drawn sub-7 cm stems at season 200, 60–92% die by 300 under the arms (head 22%), while survivors cross 7 cm two to three times as often as head's. Head's ≥ 7 cm count climbs through the band and overshoots by 300 (median 703/ha). The phone width nearly empties (one ≥ 7 cm stem a plot). Next steps are design questions (a release term, the phone's ceiling, #137's seed supply); the rule needs no change.
+- No default, golden, preset or regression changed. `cli/shared.ts`'s `sim` takes extra runner args.
+
+## 2026-11-13: #132's ramp built (O4 `topLight` against `o4.survivalLight`), off by default
+
+- **The rule** (ADR 0068 decision 1, 2): `principles/o4.rs::top_light_ramp`, the deficit clamp((θ_hi − q)/(θ_hi − θ_sp), 0, 1) with θ_hi := max(θ_hi, θ_sp), still scaled by `tolerance_scaled`. `o4.survivalLight` (θ_sp) is new and per species; `o4.topLightThreshold` (θ_hi) is now read from the species' merged params, so a species may set its own ceiling (identical to the world's when none does).
+- **Off and bit-identical:** θ_sp absent calls today's `top_light_deficit` unchanged (a unit test checks it bit for bit); θ_hi ≤ 0 gives no signal whatever θ_sp says; θ_sp ≥ θ_hi is an explicit step, so no 0/0 reaches the draw. No golden, preset, regression (`phoneSeed3`, `forestRegeneration` unchanged), checkpoint field or RNG purpose changed.
+- **An algebra slip in ADR 0068:** "today's step (1 − q/θ)₊ is the special case θ_sp = θ_hi" should read θ_sp = 0 (θ_sp = θ_hi is a 0/1 step). The code follows the ADR's intent, "absent, the step form, as now".
+- **Decided (user):** θ_hi unset with θ_sp set gives no signal, where the ADR's max(θ_hi, θ_sp) read literally gives a step at θ_sp (spec-reviewer's point): a survival light alone never switches the signal on. Recorded in ADR 0068's erratum.
+- **ADR 0068's check:** C5's relative test (`c5.enabled`, `Trel` > 0) is on for every garden species, so Q_top is computed for all of them.
+- Not on the page's panel: an absent θ_sp is the off state, which a slider cannot show. The probe (#132's 20 seeds) is next.
+
 ## 2026-11-13: #132's understorey signal designed (ADR 0068); the band counted from 7 cm DBH; #137 and #138 filed
 
 - **The user accepted a Fable review's design** for #132: [ADR 0068](decisions/0068-understorey-signal-design.md). It read HEAD's garden runs offline; no new simulation and no code.

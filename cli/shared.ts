@@ -62,12 +62,20 @@ export function runCli(args: string[], dir: string): Promise<number> {
   });
 }
 
-/** Runs `params` for `seasons` into `dir`, as a replay of a record with no events. */
-export function sim(params: Params, seasons: number, dir: string): Promise<number> {
+/**
+ * Runs `params` for `seasons` into `dir`, as a replay of a record with no events; `extra` goes to
+ * the runner as it is (e.g. `["--snapshots", "100,200"]`).
+ */
+export function sim(
+  params: Params,
+  seasons: number,
+  dir: string,
+  extra: string[] = [],
+): Promise<number> {
   mkdirSync(dir, { recursive: true });
   const record = join(dir, "record.json");
   writeFileSync(record, JSON.stringify({ params, events: [], seasons }));
-  return runCli(["--replay", record, "--seasons", String(seasons)], dir);
+  return runCli(["--replay", record, "--seasons", String(seasons), ...extra], dir);
 }
 
 /** The median of `xs`; NaN when empty. Filter non-finite values first if they must not count. */

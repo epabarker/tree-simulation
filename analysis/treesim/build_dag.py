@@ -361,7 +361,7 @@ PARAMS = [
     ("o4.m0", "o4", [("O4_STAND", AND(o4on, NOT(two_part)))]),
     ("o4.mCanopy / hCanopy / gammaCanopy", "o4", [("O4_STAND", AND(o4on, two_part))]),
     ("o4.mSuppression / suppressionSlope / shadeTolerance", "o4", [("O4_STAND", AND(o4on, two_part))]),
-    ("o4.suppressionSignal / topLightThreshold / growthFloor / growthSeasons", "o4", [("O4_STAND", AND(o4on, two_part))]),
+    ("o4.suppressionSignal / topLightThreshold / survivalLight / growthFloor / growthSeasons", "o4", [("O4_STAND", AND(o4on, two_part))]),
     ("o4.planting", "o4", [("O4_STAND", planting)]),
     ("o4.cSeed / d", "o4", [("O4_STAND", o4on)]),
     ("o4.qEst / pEst", "o4", [("O4_STAND", o4on)]),

@@ -1,0 +1,5 @@
+head: drawn < 7 cm at 200: 1277 (63.9 a run); dead by 300: 276 (22%); of 1001 survivors, ≥ 7 cm at 300: 286 (29%); DBH gained, median 1.48 cm
+t10: drawn < 7 cm at 200: 811 (40.5 a run); dead by 300: 490 (60%); of 321 survivors, ≥ 7 cm at 300: 174 (54%); DBH gained, median 3.53 cm
+t15: drawn < 7 cm at 200: 638 (31.9 a run); dead by 300: 502 (79%); of 136 survivors, ≥ 7 cm at 300: 94 (69%); DBH gained, median 6.69 cm
+t25: drawn < 7 cm at 200: 653 (32.6 a run); dead by 300: 604 (92%); of 49 survivors, ≥ 7 cm at 300: 34 (69%); DBH gained, median 9.96 cm
+t15m3: drawn < 7 cm at 200: 310 (15.5 a run); dead by 300: 275 (89%); of 35 survivors, ≥ 7 cm at 300: 34 (97%); DBH gained, median 10.31 cm

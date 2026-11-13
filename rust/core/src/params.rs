@@ -413,8 +413,12 @@ pub struct O4 {
     pub shade_tolerance: f64,
     /// The suppression signal (the world's, ADR 0065). Absent: `Carbon`, bit-identical.
     pub suppression_signal: SuppressionSignal,
-    /// θ_q: `TopLight`'s threshold on Q_top / C (absent: 0, so no signal).
+    /// θ_q (θ_hi, ADR 0068): `TopLight`'s threshold on Q_top / C, the ramp's ceiling; read from
+    /// the species' params where set (absent: 0, so no signal).
     pub top_light_threshold: f64,
+    /// θ_sp: the species' sapling survival light, `TopLight`'s ramp floor (ADR 0068). Absent:
+    /// today's deficit (1 − (Q_top/C)/θ_q)₊, bit-identical.
+    pub survival_light: Option<f64>,
     /// k: `Growth`'s window, seasons (absent: 5).
     pub growth_seasons: f64,
     /// g: `Growth`'s floor, cells a season (absent: 0, so no signal).
@@ -761,6 +765,7 @@ impl Params {
                     _ => SuppressionSignal::Carbon,
                 },
                 top_light_threshold: opt(o4, "topLightThreshold").unwrap_or(0.0),
+                survival_light: opt(o4, "survivalLight"),
                 growth_seasons: opt(o4, "growthSeasons").unwrap_or(5.0),
                 growth_floor: opt(o4, "growthFloor").unwrap_or(0.0),
                 c_seed: num(o4, "cSeed"),

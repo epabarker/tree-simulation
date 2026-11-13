@@ -607,8 +607,18 @@ export interface Params {
      * growthSeasons seasons. Either deficit is scaled by m_s and shade tolerance as P/M's is.
      */
     suppressionSignal?: "carbon" | "topLight" | "growth";
-    /** θ_q: "topLight"'s threshold on Q_top / C. Absent: 0 (no signal). */
+    /**
+     * θ_q (θ_hi, ADR 0068): "topLight"'s threshold on Q_top / C, the ramp's ceiling; per species
+     * where a species sets it. Absent: 0 (no signal).
+     */
     topLightThreshold?: number;
+    /**
+     * θ_sp: the species' sapling survival light, "topLight"'s ramp floor (ADR 0068): the deficit
+     * is clamp((θ_q − Q_top/C)/(θ_q − θ_sp), 0, 1), θ_q raised to θ_sp if below it. Per species,
+     * from its target file's `shade.survivalLight` (Hagemeier & Leuschner 2019: birch 0.21, oak
+     * 0.114, beech 0.034, hornbeam 0.033). Absent: today's (1 − (Q_top/C)/θ_q)₊, bit-identical.
+     */
+    survivalLight?: number;
     /** k: "growth"'s window, seasons. Absent: 5. */
     growthSeasons?: number;
     /** g: "growth"'s floor, cells a season. Absent: 0 (no signal). */

@@ -20,7 +20,7 @@
    - q = Q_top / C, as C5 sets it in phase 2 and O4 reads it in phase 3 (spec §6).
    - The deficit is a ramp: d = clamp((θ_hi − q) / (θ_hi − θ_sp), 0, 1), with θ_hi := max(θ_hi, θ_sp). It is 0 above one world ceiling θ_hi and 1 below the species' floor θ_sp.
    - θ_sp is the species' sapling survival light, from its target file's `shade.survivalLight` (Hagemeier & Leuschner 2019: birch 0.21, beech 0.034, hornbeam 0.033; others by score).
-   - The rate is m_s · d · e^(−β_s(T − 1)), as `tolerance_scaled` scales it now, so it stays a rate and never a kill. Today's step (1 − q/θ)₊ is the special case θ_sp = θ_hi.
+   - The rate is m_s · d · e^(−β_s(T − 1)), as `tolerance_scaled` scales it now, so it stays a rate and never a kill. Today's step (1 − q/θ)₊ is the special case θ_sp = θ_hi. *(Erratum, 2026-11-13: θ_sp = 0, not θ_hi; θ_sp = θ_hi is a 0/1 step at θ_hi. The code keeps today's deficit when `o4.survivalLight` is absent; devlog. Decided (user, 2026-11-13): with θ_hi unset (0) and θ_sp set there is no signal, so a survival light alone never switches suppression on; max(θ_hi, θ_sp) applies only when θ_hi > 0.)*
 2. **Params, off by default and bit-identical:**
    - `o4.survivalLight` per species; absent, the step form, as now.
    - `o4.topLightThreshold` as θ_hi, read from the species' params where set.

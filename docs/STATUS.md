@@ -1,6 +1,6 @@
 # Status
 
-_Last updated: 2026-11-13; ADR 0068 designs #132 (the understorey); #137, #138 filed._
+_Last updated: 2026-11-13; #132's probe: no arm passes; the ramp stays built and off._
 
 **Live:** garden0.16.0. RC prepared/merged#71; phone soak deferred, no release-readiness waiver.
 
@@ -25,7 +25,8 @@ _Last updated: 2026-11-13; ADR 0068 designs #132 (the understorey); #137, #138 f
 - Branch codex/day3-species-programme; beech retained, no sycamore/ash candidate qualified.
 - Confirmation seeds 22021–22040/23021–23040 untouched. docs/experiments/2026-11-08-day3-step8.md.
 ## Next
-1. #132 is ready-for-agent (build, then the 20-seed probe); then #133 (wind in R3), #134.
+1. #132 probed (docs/experiments/2026-11-13-understorey-probe.md): no arm passes; the ramp
+   kills the subcanopy before gaps release it, and the phone empties. Design question open.
 2. #134 carries ADR 0067's fit change (breast-height slenderness, pooled forks).
 3. Phone soak remains a separate deferred release gate; no tag/deploy/production push.
 ## Gotchas

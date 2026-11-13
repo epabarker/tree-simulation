@@ -17,6 +17,11 @@
  *
  *   npm run probe -- --patch patch.json [--species beech] [--label name] [--seeds 1,2,3]
  *        [--lone 30,60,100] [--garden 50,100,150] [--demography] [--widths 160,66] [--jobs N]
+ *        [--head-from label]
+ *
+ * `--widths ""` runs the lone stage alone. `--head-from label` links HEAD's runs from
+ * runs/probe/<label>/head/ where that probe ran the same params to the same seasons, and runs
+ * the rest: several patches against one HEAD pay for HEAD once.
  *
  * patch.json: { "params":  <a Params patch for every world, merged as mergeParams merges>,
  *               "species": { "<name>": <a species patch, merged as patchSpecies merges> } }
@@ -28,9 +33,9 @@
  */
 
 import { spawn } from "node:child_process";
-import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { cpus } from "node:os";
-import { join } from "node:path";
+import { basename, dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   mergeParams,
@@ -63,12 +68,35 @@ function applyPatch(p: Params, patch: Patch): Params {
 type Kind = "lone" | "garden";
 type Job = { kind: Kind; width: number; seed: number; arm: "head" | "patch"; dir: string };
 
-function runJob(job: Job, params: Params, seasons: number[]): Promise<void> {
-  mkdirSync(job.dir, { recursive: true });
+/**
+ * Links `job`'s directory to the same run of an earlier probe (`--head-from`), if that probe ran
+ * these params to these seasons with these snapshots and finished. Returns whether it did.
+ */
+function linkRun(job: Job, from: string, text: string, seasons: number[]): boolean {
+  const old = join(from, job.arm, basename(job.dir));
+  try {
+    const same =
+      readFileSync(join(old, "probe-record.json"), "utf8") === text &&
+      readFileSync(join(old, "probe-snapshots.txt"), "utf8") === seasons.join(",") &&
+      existsSync(join(old, "hash.txt"));
+    if (!same) return false;
+  } catch {
+    return false;
+  }
+  mkdirSync(dirname(job.dir), { recursive: true });
+  symlinkSync(old, job.dir);
+  return true;
+}
+
+function runJob(job: Job, params: Params, seasons: number[], from: string): Promise<void> {
   const last = Math.max(...seasons);
-  const record = join(job.dir, "probe-record.json");
   // A replay record carries the whole params as they are: no merge over a preset in the runner.
-  writeFileSync(record, JSON.stringify({ params, events: [], seasons: last }));
+  const text = JSON.stringify({ params, events: [], seasons: last });
+  if (from && linkRun(job, from, text, seasons)) return Promise.resolve();
+  mkdirSync(job.dir, { recursive: true });
+  const record = join(job.dir, "probe-record.json");
+  writeFileSync(record, text);
+  writeFileSync(join(job.dir, "probe-snapshots.txt"), seasons.join(","));
   const args = [RUN, "--replay", record, "--seasons", String(last)];
   args.push("--snapshots", seasons.join(","), "--light", "--quiet", "--out", job.dir);
   return new Promise((ok, bad) => {
@@ -265,6 +293,9 @@ async function main(): Promise<void> {
   );
   const widths = nums(arg("--widths", "160,66"));
   const limit = Math.max(1, Number(arg("--jobs", String(Math.min(12, cpus().length)))));
+  const headFrom = argv.includes("--head-from")
+    ? join(ROOT, "runs", "probe", arg("--head-from", ""))
+    : "";
 
   rmSync(dir, { recursive: true, force: true });
   mkdirSync(dir, { recursive: true });
@@ -299,7 +330,7 @@ async function main(): Promise<void> {
   const worker = async (): Promise<void> => {
     while (next < jobs.length) {
       const j = jobs[next++] as (typeof jobs)[number];
-      await runJob(j.job, j.params, j.seasons);
+      await runJob(j.job, j.params, j.seasons, j.job.arm === "head" ? headFrom : "");
       process.stderr.write(`probe: ${j.job.arm} ${j.job.kind} ${j.job.width} seed ${j.job.seed}\n`);
     }
   };

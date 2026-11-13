@@ -136,6 +136,27 @@ export interface Params {
      * Prototype (agent R), not an ADR.
      */
     betaSD?: number;
+    /**
+     * Crown-extent limit (probe only, #129; not an ADR). A shoot extends this season with a chance
+     * g(L) = max(g_min, 1 / (1 + (L / L_x)^k)) [RNG: extentLimit, keyed by the bud and season], L
+     * read at the bud's node as the season began; a barred bud rests. 'reach': the node's
+     * horizontal distance from the stem base (an imposed crown radius, #121's yardstick);
+     * 'height': the tree's height (a whole-tree size signal); 'path': the node's path length from
+     * the stem base (local). 'off' or absent: no limit, bit-identical.
+     */
+    extentLimit?: "off" | "reach" | "height" | "path";
+    /**
+     * Upright shoots are spared: the chance is u² + (1 − u²)·g, u the upward part of the bud's
+     * heading (0 for a level or drooping one), so the leader extends and laterals are slowed.
+     * Absent or false: every shoot takes g.
+     */
+    extentSpare?: boolean;
+    /** L_x, cells: the L at which g is one half. Absent: 60. ≤ 0: no limit. */
+    extentScale?: number;
+    /** k: how sharply g falls around L_x. Absent: 2. ≤ 0: no limit. */
+    extentSteepness?: number;
+    /** g_min in [0, 1]: g never falls below it (measured margins level off at 2–3 cm/yr). Absent: 0. */
+    extentFloor?: number;
   };
 
   /** C2 Shared light field: the Beer–Lambert sky sweep over the slab (§C2.4, G3; ADR 0024). */

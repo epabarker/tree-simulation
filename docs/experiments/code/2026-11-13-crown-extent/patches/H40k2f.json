@@ -1,0 +1,1 @@
+{ "params": { "c1": { "extentLimit": "height", "extentSpare": true, "extentScale": 40, "extentSteepness": 2, "extentFloor": 0.1 } } }

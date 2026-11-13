@@ -33,6 +33,11 @@ pub mod purpose {
     /// O4's two-part mortality (ADR 0063): one death draw per tree and season, keyed by the tree's
     /// id, compared with the season's summed rate.
     pub const STAND_MORTALITY: u32 = 19;
+    // 20 is not used here: the unmerged probe/121-occupancy drew c1.occupancy's gate from it.
+    /// Whether a shoot extends under the crown-extent limit (c1.extentLimit; probe, #129), keyed
+    /// by the bud and the season. The number probe/121-pathlength's `PATH_LIMIT` had, so the
+    /// reach yardstick draws as that probe drew.
+    pub const EXTENT_LIMIT: u32 = 21;
 }
 
 const TWO_POW_32: f64 = 4294967296.0;

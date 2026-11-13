@@ -95,6 +95,30 @@ pub struct C1 {
     pub shoot_length_sd: f64,
     /// c1.betaSD (prototype): SD, degrees, of a per-axis offset to β; 0 when absent (off).
     pub beta_sd: f64,
+    /// c1.extentLimit (probe only, #129; not an ADR): what the L of the crown-extent limit is.
+    /// Absent: `Off`, bit-identical.
+    pub extent_limit: ExtentLimit,
+    /// c1.extentSpare: upright shoots are spared, by the upward part of the bud's heading.
+    pub extent_spare: bool,
+    /// c1.extentScale, L_x (cells): the L at which g is one half. Absent: 60. ≤ 0: no limit.
+    pub extent_scale: f64,
+    /// c1.extentSteepness, k: how sharply g falls around L_x. Absent: 2. ≤ 0: no limit.
+    pub extent_steepness: f64,
+    /// c1.extentFloor, g_min: g never falls below it, held in [0, 1]. Absent: 0.
+    pub extent_floor: f64,
+}
+
+/// Probe only (#129, crown extent): the L that g(L) of `c1.extentLimit` reads at a bud's node.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum ExtentLimit {
+    Off,
+    /// The node's horizontal distance from the stem base: an imposed crown radius (#121's
+    /// yardstick, `c1.pathLimit: "reach"` on the unmerged probe/121-pathlength).
+    Reach,
+    /// The tree's height, one L for every bud: a whole-tree size signal.
+    Height,
+    /// The node's path length from the stem base (R1's L_path; #89's variable): a local one.
+    Path,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -529,6 +553,16 @@ impl Params {
                     },
                     shoot_length_sd: opt(g, "shootLengthSD").unwrap_or(0.0),
                     beta_sd: opt(g, "betaSD").unwrap_or(0.0),
+                    extent_limit: match text(g, "extentLimit").as_str() {
+                        "reach" => ExtentLimit::Reach,
+                        "height" => ExtentLimit::Height,
+                        "path" => ExtentLimit::Path,
+                        _ => ExtentLimit::Off,
+                    },
+                    extent_spare: flag(g, "extentSpare"),
+                    extent_scale: opt(g, "extentScale").unwrap_or(60.0),
+                    extent_steepness: opt(g, "extentSteepness").unwrap_or(2.0),
+                    extent_floor: opt(g, "extentFloor").unwrap_or(0.0),
                 }
             },
             c2: C2 {

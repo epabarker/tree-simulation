@@ -290,7 +290,7 @@ pub fn shoot_length_factor(params: &Params, tree_id: f64, bud_id: f64, season: f
 /// Probe (#129, crown extent): g(L) = max(g_min, 1 / (1 + (L / L_x)^k)), the chance a shoot
 /// extends at size `l` (cells): 1 at L = 0, one half at L_x, falling as L^-k beyond until it
 /// meets the floor (held in [0, 1]). Exactly 1 with the rule off, or with L_x or k ≤ 0.
-pub fn extent_scale(l: f64, c1: &C1) -> f64 {
+pub fn extent_g(l: f64, c1: &C1) -> f64 {
     if c1.extent_limit == ExtentLimit::Off || c1.extent_scale <= 0.0 || c1.extent_steepness <= 0.0 {
         return 1.0;
     }
@@ -491,28 +491,28 @@ mod tests {
         // Probe (#129): g(L) = max(g_min, 1 / (1 + (L / L_x)^k)), worked by hand.
         let c1 = |patch: &str| params(&format!(r#"{{"c1":{patch}}}"#)).c1;
         let k2 = c1(r#"{"extentLimit":"height","extentScale":40,"extentSteepness":2}"#);
-        assert_eq!(extent_scale(0.0, &k2), 1.0);
-        assert!(close(extent_scale(40.0, &k2), 0.5));
-        assert!(close(extent_scale(80.0, &k2), 0.2)); // 1 / (1 + 2²)
-        assert!(close(extent_scale(120.0, &k2), 0.1)); // 1 / (1 + 3²)
+        assert_eq!(extent_g(0.0, &k2), 1.0);
+        assert!(close(extent_g(40.0, &k2), 0.5));
+        assert!(close(extent_g(80.0, &k2), 0.2)); // 1 / (1 + 2²)
+        assert!(close(extent_g(120.0, &k2), 0.1)); // 1 / (1 + 3²)
         let k8 = c1(r#"{"extentLimit":"reach","extentScale":16,"extentSteepness":8}"#);
-        assert!(close(extent_scale(16.0, &k8), 0.5));
-        assert!(close(extent_scale(32.0, &k8), 1.0 / 257.0)); // 1 / (1 + 2⁸)
+        assert!(close(extent_g(16.0, &k8), 0.5));
+        assert!(close(extent_g(32.0, &k8), 1.0 / 257.0)); // 1 / (1 + 2⁸)
         // The floor holds g up; above 1 it is no limit, below 0 no floor.
         let floor = |f: f64| {
             c1(&format!(
                 r#"{{"extentLimit":"reach","extentScale":16,"extentSteepness":8,"extentFloor":{f}}}"#
             ))
         };
-        assert_eq!(extent_scale(32.0, &floor(0.1)), 0.1);
-        assert!(close(extent_scale(16.0, &floor(0.1)), 0.5));
-        assert_eq!(extent_scale(32.0, &floor(3.0)), 1.0);
-        assert!(close(extent_scale(32.0, &floor(-1.0)), 1.0 / 257.0));
+        assert_eq!(extent_g(32.0, &floor(0.1)), 0.1);
+        assert!(close(extent_g(16.0, &floor(0.1)), 0.5));
+        assert_eq!(extent_g(32.0, &floor(3.0)), 1.0);
+        assert!(close(extent_g(32.0, &floor(-1.0)), 1.0 / 257.0));
         // A steepness of 0 or less is no limit (g would not fall from 1 at the base); so is off.
         let flat = c1(r#"{"extentLimit":"reach","extentScale":16,"extentSteepness":0}"#);
-        assert_eq!(extent_scale(32.0, &flat), 1.0);
+        assert_eq!(extent_g(32.0, &flat), 1.0);
         let off = c1(r#"{"extentScale":16,"extentSteepness":8}"#);
-        assert_eq!(extent_scale(32.0, &off), 1.0);
+        assert_eq!(extent_g(32.0, &off), 1.0);
     }
 
     #[test]

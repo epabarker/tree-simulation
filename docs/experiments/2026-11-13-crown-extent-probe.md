@@ -14,7 +14,7 @@
 - **The band and the canopy share get worse.** Narrow crowns light the floor: 1,000–2,450 drawn stems/ha from season 100 and the cap reached in 283–284 of 300 seasons, in every run. Both targets hold in 0 of 9 frames (2 and 1 at HEAD). The understorey was out of scope; it is now the first thing in the way.
 - **Its thin stems are thrown.** R3 throws 26 of the 79 planted trees over the three desktop runs (8 at HEAD). The lone birch is 31–34 m tall on a 20–24 cm stem.
 - **Girth is not C6's to recalibrate.** Halving the pipe radius (`C6half`) leaves DBH where it was, because 63% of the bole's radius is R3's stress wood, added until bending stress meets `r3.sigmaTarget`. Raising that target fourfold (`S4`) thins nothing useful: the limbs sag to the ground and the lone beech is 8–10 m tall and 61 m across.
-- **"Stems 2–3× too thick" is the wide crown's doing.** With the crown narrowed the stand hornbeam's stem is in the yield table's range, and the lone trees' stems are, if anything, too thin for their height. A crown rule would need girth moved the other way.
+- **"Stems 2–3× too thick" is the wide crown's doing.** With the crown narrowed the stand hornbeam's stem is 37 cm, a centimetre over the yield table's range, and the lone trees' stems are, if anything, too thin for their height. A crown rule would need girth moved the other way.
 - **Planting 1,000/ha** on top of `H4k8` holds more canopy trees at season 100 (19, 28 and 29 on the plot, against 15, 19 and 20) and no more at season 300 (9–12 against 11–20).
 
 ![Crown diameter against DBH for the lone trees, per arm, over Pretzsch's open-grown edge](figures/2026-11-13-crown-extent-probe.png)
@@ -76,7 +76,7 @@ Written and committed before any arm was run. Nothing below this section changes
 
 ## 1. The rule as built
 
-`c1.extentLimit`, as the section above states it. In `grow_buds`, one pass reads L at every node as the phase begins (`c1::extent_sizes`); each live bud then draws once against p (`extent_chance` of `extent_scale`), from the RNG purpose `EXTENT_LIMIT` (21), keyed by the tree, the bud's birthId and the season. A barred bud takes the resting branch a bud below its threshold takes. Nothing is stored on the tree, so the checkpoint layout is unchanged.
+`c1.extentLimit`, as the section above states it. In `grow_buds`, one pass reads L at every node as the phase begins (`c1::extent_sizes`); each live bud then draws once against p (`extent_chance` of `extent_g`), from the RNG purpose `EXTENT_LIMIT` (21), keyed by the tree, the bud's birthId and the season. A barred bud takes the resting branch a bud below its threshold takes. Nothing is stored on the tree, so the checkpoint layout is unchanged.
 
 - **Why a chance and not a shorter internode:** the path-length note §2. A shoot is one metamer from season ≈ 30, and shorter internodes keep their leaf and buds, which floods a shade-tolerant crown.
 - **Params:** `c1.extentLimit` (absent: `off`), `c1.extentSpare`, `c1.extentScale` (L_x; absent 60), `c1.extentSteepness` (k; absent 2), `c1.extentFloor` (g_min; absent 0, held in [0, 1]). L_x or k at or under 0 is no limit. This closes the path-length note's defect 4 (unchecked params).
@@ -104,6 +104,8 @@ Written and committed before any arm was run. Nothing below this section changes
 - **A girth arm was added: `S4`.** `C6half` did not thin the stems (section 5), so it could not stand as the 2×2's thinned cell. `S4` multiplies every species' `r3.sigmaTarget` and `r3.sigmaBreak` by 4, which on the same load gives a stress-wood radius 0.63 as large. Both crosses were run: `H4k8` × `C6half` (the registered fourth cell) and `H4k8` × `S4`.
 - **The denser planting** (`H4k8d1000`) sets `o4.planting` to 1,000/ha with a spacing of 8 cells, not 12: the planting's darts cannot place 64 trees 3 m apart on the desktop plot. It planted 64, 64 and 65 trees at 160 cells and 26 at 66 (985/ha).
 - **Two slips, both repaired.** A driver call for `C6half`'s lone trees cleared the label that held its garden runs, which were run again (the same table came back). `S4`'s lone birch was run by a direct probe call, because the probe's contact sheet for `S4`'s beech (723,000–811,000 metamers) exceeded Node's string limit and stopped the driver before birch. The beech runs themselves had finished.
+- **Path length ran as an arm, not as #89's control.** `P60k2f` is the lateral rule with a local L (agreed with the user beside the sparing). The unspared path form, which the path-length note already found does nothing to width, was not run again.
+- **Tools.** Every run is `npm run probe`. `npm run evidence:garden` and `npm run evidence:open-grown` were not used: they take conditions and seeds, not a patch, and write no snapshots for the DBH measurement. New here are the driver (`run.sh`, a loop over probe calls), the tables and figures (`table.py`, `figure.py`, which reuse the path-length note's measurement), and the probe's `--head-from`, which has no automated test (it was exercised by every arm).
 - **No contact sheet was judged for adoption.** The probe wrote one per arm and species (`runs/probe/129-<arm>-<species>/sheet.html`); the silhouettes below were looked at.
 
 ## 3. The lone open-grown tree
@@ -180,7 +182,7 @@ Season 100, the minimum and maximum of seeds 1–3 (`table.py lone`). "At DBH 40
 | H4k8S4 | holly | 2.0–2.3 | 5–11 | 10.9–11.6 | – | not reached (0 of 3) | 5.12–5.61 | 2–3 | 0.84–0.88 | 3 of 3 | 0.00–0.01 | 0.00–0.15 | 2–4 |
 
 **Reading the table:**
-- **Every arm leaves every species over the edge** except the yardstick's hornbeam (1.02–1.11 at season 100, 1.14–1.20 at DBH 40). The yardstick's beech is 1.11–1.18 at season 100 and 1.21–1.35 at DBH 40.
+- **Every arm leaves every species over the edge.** The nearest is the yardstick's hornbeam (1.02–1.11 at season 100, 1.14–1.20 at DBH 40: "near" by the bar, not under it). The yardstick's beech is 1.11–1.18 at season 100 and 1.21–1.35 at DBH 40.
 - **`H40k2f`** (Choi's rates): crowns 27 m (hornbeam; 30–39 m at HEAD), 38–46 m (beech; 50–52), 33–37 m (oak; 41–47) and 35–39 m (birch; 46–49). Heights are HEAD's. The ratio at season 100 is no lower (birch 3.35–4.21 against 3.05–3.20), because DBH falls further than the crown does.
 - **`P60k2f`** (path length) is inside HEAD's ranges or wider on every species, and the box no longer holds the oak in 1 seed of 3 (the birch in 1 of 3, as at HEAD). The path-length note found the same of the unspared form: the leader's tip and a limb's tip are the same path from the base.
 - **The height form gets stronger as L_x falls,** and `H4k8` is its limit: crowns of 16–25 m (hornbeam), 23–26 m (beech), 16–19 m (birch), 19–23 m (maple) and 27–33 m (oak), with every height at or above HEAD's. W/H falls from 1.0–1.6 to 0.4–1.0, inside the envelope's own 0.4–1.2 (crown rounding §3).
@@ -336,10 +338,10 @@ Rows: `base`, `R16k8`, `H40k2f`, `H4k8`, `S4`. Axes in metres. **Looked at:**
 | **`C6half`** (pipe radius halved) | lone 110–112 cm, stand 66 cm | lone 39–52 cm, stand 38 cm |
 | **`S4`** (stress target ×4) | lone 130–173 cm on a tree 13–15 m tall and 62 m across | lone 24–29 cm on a tree 3–4 m tall |
 
-- **`C6half` does not thin a stem.** On the same skeleton every pipe radius is half, yet the lone hornbeam's DBH is inside `base`'s range and the stand's is 66 cm against 69. At the base of the lone hornbeam (seed 1, season 100) the radius is 3.09 cells at `base`, of which 1.94 is stress wood (63%); under `C6half` it is 2.04, of which 1.55 is stress wood (76%). R3 adds wood wherever bending stress is over σ_target (`r3.rs`), so a thinner pipe is made up with stress wood.
+- **`C6half` does not thin a stem.** On the same skeleton every pipe radius is half, yet the lone hornbeam's DBH is inside `base`'s range and the stand's is 66 cm against 69 (the stand values in this table are `table.py crowns`, the hornbeam canopy trees' median at season 100). At the base of the lone hornbeam (seed 1, season 100) the radius is 3.09 cells at `base`, of which 1.94 is stress wood (63%); under `C6half` it is 2.04, of which 1.55 is stress wood (76%). R3 adds wood wherever bending stress is over σ_target (`r3.rs`), so a thinner pipe is made up with stress wood.
 - **So the bole's girth is set by the crown's bending moment,** r ≈ (4M / (π·σ_target))^⅓, and not by the pipe sum. This is why DBH follows the crown in every arm, and why "too wide at matched DBH" and "too thick for its age" were one fault (the path-length note §1.2).
 - **Raising the stress target does not give a thinner tree of the same shape.** The same wood holds the limbs up: sag goes as 1/r⁴. Under `S4` the lone beech is 7.6–9.5 m tall and 61–62 m across with 723,000–811,000 metamers, and the box holds it in 0 of 3 seeds.
-- **Girth for age, with the crown narrowed, is in range or low.** The stand hornbeam under `H4k8` is 37 cm at season 100, at the top of Lockow's 26–36 cm for a mean tree. The lone trees are slender: birch 31–34 m on 20–24 cm (H/D about 140), hornbeam 29–30 m on 41–69 cm.
+- **Girth for age, with the crown narrowed, is in range or low.** The stand hornbeam under `H4k8` is 37 cm at season 100, a centimetre over Lockow's 26–36 cm for a mean tree. The lone trees are slender: birch 31–34 m on 20–24 cm (H/D about 140), hornbeam 29–30 m on 41–69 cm.
 - **Verdict on girth:** a C6 recalibration is not the lever, before, with or after a crown rule. With a crown rule the girth would have to rise for a given crown, not fall, both to meet the edge at matched DBH and to stop R3 throwing the canopy (section 4). The static crown load is the only load R3 sees; a real stem is sized by wind.
 
 ## 6. The planting density
@@ -359,11 +361,14 @@ Rows: `base`, `R16k8`, `H40k2f`, `H4k8`, `S4`. Axes in metres. **Looked at:**
 | `P60k2f` | no | no (birch, hornbeam); yes | no (1 of 3); yes (6) | no |
 | `H8k2f02` | no | no (top seeds: hornbeam 1.85 against 1.69, birch 3.33 against 3.20); yes | yes (3 of 3); yes (8) | no |
 | `H4k8` | no (hornbeam 1.18–1.58 and 1.21–1.45; beech 1.32–1.70 and 1.47–1.57) | no, narrowly (birch's top seed 3.32 against 3.20); yes | yes (3 of 3); yes (9) | no |
-| `C6half` | no | no (birch at DBH 40: 3.05–4.31); yes | no (1 of 3); no (3) | no |
+| `C6half` | no | no (birch's top seed 3.34 against 3.20); yes | no (1 of 3); no (3) | no |
 | `S4` | no | no; no (beech 8–10 m) | no (2 of 3); no (4) | no |
+| `H4k8` × `C6half` | no (hornbeam 1.36–1.41 and 1.30–1.50; beech 1.27–1.89 and 1.40–1.87) | no (birch 2.99–3.66); yes | yes (3 of 3); yes (9) | no |
+| `H4k8` × `S4` | no | no; no (every species 2–5 m) | 3 of 3 and 9, of canopy trees 2.7 m tall | no |
 
-- **All arms are rejected.** No arm brings beech and hornbeam to 1.2× the edge at matched DBH. "Further over the edge" is read on the seeds' maximum at season 100.
-- **The closest is `H4k8`.** It passes the garden clause, the first arm to, and fails the lone clause.
+- **All arms are rejected.** No arm brings beech and hornbeam to 1.2× the edge at matched DBH.
+- **Two readings were set after the runs,** because the rule did not fix them: "further over the edge" is read on the seeds' maximum at season 100, and the height clause on the ranges (the table has no medians). Neither changes an outcome: every arm fails the first clause.
+- **The closest is `H4k8`.** It passes the garden clause, as `H8k2f02` and its own cross with `C6half` do and no arm of an earlier probe did, and fails the lone clause.
 - **What it lacks:**
   - the lone envelope at matched DBH, which with R3's girth it cannot reach by narrowing alone (section 5);
   - a stem that stands: R3 throws a third of the planted cohort;
@@ -401,7 +406,7 @@ I do not recommend adopting `c1.extentLimit` in any form tried. If the direction
 2. **Should R3 see wind?** Stems that thin with the crown are then thrown. A load that depends on the tree's height would thicken a narrow-crowned stem. That is a change to §R3.
 3. **A rule, or the species' calibration?** The crowns are too wide by season 25, before any size signal acts. Is the next step a refit of λ and the set points against the open-grown envelope, with no new rule?
 4. **The understorey.** With narrow crowns the cap is reached in 284 of 300 seasons. Is that the next ticket, ahead of any more work on crown form?
-5. **Keep the code?** The rule is off by default and bit-identical. It can be merged as a probe param, or the branch left unmerged as `probe/121-pathlength` was.
+5. **Keep the code?** The rule is off by default and bit-identical. Merging the PR would put `reach` (an imposed limit) and `height` (a whole-tree signal, against §C1.1) in the core as off params, with no ADR. That is the user's call: merge it as a probe param, merge it without those two modes, or leave the branch unmerged as `probe/121-pathlength` was.
 
 ## Limits
 

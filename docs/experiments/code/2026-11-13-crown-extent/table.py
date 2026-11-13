@@ -239,8 +239,10 @@ def main():
         garden(arms, "--runs" in sys.argv)
     elif what == "fates":
         fates(arms)
-    else:
+    elif what == "crowns":
         crowns(arms)
+    else:
+        sys.exit(f"table.py: unknown table {what!r} (lone, garden, crowns or fates)")
 
 
 main()

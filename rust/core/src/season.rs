@@ -12,7 +12,7 @@ use crate::math;
 use crate::metrics::lowest_living_limb;
 use crate::params::{DEG, ExtentLimit, Params};
 use crate::principles::c1::{
-    beta_offset, extends, extent_chance, extent_scale, extent_sizes, grow_shoot, juvenile_cap,
+    beta_offset, extends, extent_chance, extent_g, extent_sizes, grow_shoot, juvenile_cap,
     lateral_frame, offset_frame, shoot_length_factor, shoot_size,
 };
 use crate::principles::c3::{allocate, gather_light, is_live_bud};
@@ -474,7 +474,7 @@ pub fn grow_buds(tree: &mut Tree, params: &Params, season: f64) {
         // upright shoots spared by the bud's own heading (c1.extentSpare), bars the bud from
         // extending this season, by resource or by R4's light release. It rests below.
         let barred = !sizes.is_empty() && {
-            let g = extent_scale(sizes[tree.b.metamer[i] as usize], &params.c1);
+            let g = extent_g(sizes[tree.b.metamer[i] as usize], &params.c1);
             let p = extent_chance(g, tree.b.hy[i], params.c1.extent_spare);
             !extends(p, params, tree.id as f64, tree.b.birth_id[i] as f64, season)
         };

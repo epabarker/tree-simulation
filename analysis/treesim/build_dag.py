@@ -117,7 +117,7 @@ RW = {
     "R1_CARBON": (["S_budq", "S_budstate", "S_geom", "S_reserve", "S_age"],
                   ["S_PM", "S_reserve", "S_seedpool", "S_vbase", "S_starved"]),
     "C3_ACRO": (["S_vbase", "S_qsum", "S_shade", "S_geom", "S_age"], ["S_vin"]),
-    "R4_FATE": (["S_vin", "S_budstate", "S_budage", "S_shade", "S_budq", "S_reserve"],
+    "R4_FATE": (["S_vin", "S_budstate", "S_budage", "S_shade", "S_budq", "S_reserve", "S_geom"],
                 ["S_budstate", "S_reserve"]),
     "R2_FORM": (["S_geom", "S_budq", "S_vbase", "S_age", "S_crowd", "S_budstate", "S_vin", "S_radius"],
                 ["S_setpoint", "S_budstate", "S_geom"]),

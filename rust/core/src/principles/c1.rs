@@ -28,9 +28,26 @@
 //! axes from lateral buds, take the offset too. C4's noise is white and R3's posture restores the set point, so nothing else makes
 //! one limb leave steeper than its neighbour. Off (absent or 0): no draw, β as before.
 //!
+//! Crown-extent limit (probe only, #129; not an ADR): with `c1.extentLimit`, a shoot extends
+//! this season with a chance g(L) = max(g_min, 1 / (1 + (L / L_x)^k)), L read at the bud's node
+//! as the season began: the node's horizontal distance from the stem base ("reach": an imposed
+//! crown radius, #121's yardstick), the tree's height ("height": a whole-tree size signal, which
+//! §C1.1's local signals do not include), or the node's path length from the stem base ("path":
+//! local; R1's L_path, #89's variable). With `c1.extentSpare` the chance is u² + (1 − u²)·g, u the
+//! upward part of the bud's own heading: an upright shoot, the leader whatever its order, is
+//! spared, and a level one takes g in full (lateral shoots slowed by the tree's size: Choi et
+//! al. 2001's crown-margin rates are lateral rates). It acts at the tip after C3's allocation (a
+//! sink limit, #83's reading: C3 still allocates on light; what the shoot does not use is not
+//! returned), as a chance and not on the internode length: a shoot is one metamer from season
+//! ≈ 30, and shorter internodes keep their leaf and buds, which floods a shade-tolerant crown
+//! (the path-length note §2). One draw per live bud and season [RNG: extentLimit, keyed by the
+//! bud and the season]; none at a chance of 1. A barred bud rests as one below its threshold
+//! does. No state: L is one pass in `grow_buds`. Off (absent): no pass, no draw.
+//!
 //! Params: c1.phyllotaxis, c1.divergence (δ), c1.branchAngle (β), c1.internodeLength (l0),
-//! c1.maxMetamersPerShoot, c1.shootLengthSD (s), c1.betaSD (s_β), c6.r0; with R2 the levels'
-//! generator, whorl, β and p_term.
+//! c1.maxMetamersPerShoot, c1.shootLengthSD (s), c1.betaSD (s_β), c1.extentLimit,
+//! c1.extentSpare, c1.extentScale (L_x), c1.extentSteepness (k), c1.extentFloor (g_min), c6.r0;
+//! with R2 the levels' generator, whorl, β and p_term.
 
 use super::obstacles::inside_obstacle;
 use super::r2::{branch_angle_of, laterals, terminates};
@@ -38,7 +55,7 @@ use crate::geom::{
     V3, angle_between, any_perpendicular, cross, normalize_or, reject, rotate, tilt, transport,
 };
 use crate::math;
-use crate::params::{DEG, Params};
+use crate::params::{C1, DEG, ExtentLimit, Params};
 use crate::rng::{normal, purpose, uniform};
 use crate::tree::{Tree, bud, slot, store_i32, store_u8};
 
@@ -270,6 +287,79 @@ pub fn shoot_length_factor(params: &Params, tree_id: f64, bud_id: f64, season: f
     math::exp(s * z - 0.5 * s * s)
 }
 
+/// Probe (#129, crown extent): g(L) = max(g_min, 1 / (1 + (L / L_x)^k)), the chance a shoot
+/// extends at size `l` (cells): 1 at L = 0, one half at L_x, falling as L^-k beyond until it
+/// meets the floor (held in [0, 1]). Exactly 1 with the rule off, or with L_x or k ≤ 0.
+pub fn extent_scale(l: f64, c1: &C1) -> f64 {
+    if c1.extent_limit == ExtentLimit::Off || c1.extent_scale <= 0.0 || c1.extent_steepness <= 0.0 {
+        return 1.0;
+    }
+    let floor = math::max(0.0, math::min(1.0, c1.extent_floor));
+    math::max(
+        floor,
+        1.0 / (1.0 + math::pow(l / c1.extent_scale, c1.extent_steepness)),
+    )
+}
+
+/// Probe (#129): the chance that a shoot extends, from g at its node and `up`, the upward part
+/// of its bud's heading. With `spare`, p = u² + (1 − u²)·g, u = max(0, up): an upright shoot (the
+/// leader, whatever its order) is spared, a level or drooping one takes g in full. Without, p = g.
+pub fn extent_chance(g: f64, up: f64, spare: bool) -> f64 {
+    if !spare {
+        return g;
+    }
+    let u = math::max(0.0, up);
+    u * u + (1.0 - u * u) * g
+}
+
+/// Probe (#129): L (cells) at each metamer's tip, as the season began. One pass; nothing is
+/// stored on the tree. `Reach`: the tip's horizontal distance from the stem base. `Height`: the
+/// tree's height above its base, for every metamer alike. `Path`: the path length from the stem
+/// base (R1's L_path, which is filled only with R1 on).
+pub fn extent_sizes(tree: &Tree, of: ExtentLimit) -> Vec<f64> {
+    let c = &tree.m;
+    let mut size = vec![0.0; c.len()];
+    match of {
+        ExtentLimit::Off => {}
+        ExtentLimit::Reach => {
+            for (i, l) in size.iter_mut().enumerate() {
+                let [x, _, z] = tree.tip(i);
+                *l = math::hypot(x - tree.root_x, z - tree.root_z);
+            }
+        }
+        ExtentLimit::Height => {
+            let mut top = 0.0;
+            for i in 0..c.len() {
+                top = math::max(top, tree.tip_y(i) - c.base_y[0]);
+            }
+            size.fill(top);
+        }
+        ExtentLimit::Path => {
+            // Parent before child: one forward pass.
+            for i in 0..c.len() {
+                let p = c.parent[i];
+                let before = if p >= 0 { size[p as usize] } else { 0.0 };
+                size[i] = before + c.length[i];
+            }
+        }
+    }
+    size
+}
+
+/// Probe (#129): whether the shoot of bud `bud_id` extends this season, with probability `p`
+/// [RNG: extentLimit, keyed by the bud and the season]. No draw at p ≥ 1.
+pub fn extends(p: f64, params: &Params, tree_id: f64, bud_id: f64, season: f64) -> bool {
+    p >= 1.0
+        || uniform(
+            params.seed,
+            purpose::EXTENT_LIMIT,
+            tree_id,
+            bud_id,
+            season,
+            0.0,
+        ) < p
+}
+
 /// The offset, degrees, to β of the axis `axis` (the birthId its first metamer takes): s_β·N(0, 1)
 /// [RNG: branchAngle, keyed by the axis only]; 0 when s_β = 0 (no draw).
 pub fn beta_offset(params: &Params, tree_id: f64, axis: f64) -> f64 {
@@ -387,6 +477,130 @@ mod tests {
 
     fn params(patch: &str) -> Params {
         Params::from_json(&preset("default", patch))
+    }
+
+    /// The state hash of the default lone tree, `patch` on top, after `seasons`.
+    fn hashed(patch: &str, seasons: usize) -> String {
+        let mut w = crate::world::World::new(preset("default", patch));
+        w.run(seasons, &[]);
+        crate::hash::hash_world(&w)
+    }
+
+    #[test]
+    fn the_extent_chance_is_half_at_l_x_falls_as_the_steepness_says_and_keeps_its_floor() {
+        // Probe (#129): g(L) = max(g_min, 1 / (1 + (L / L_x)^k)), worked by hand.
+        let c1 = |patch: &str| params(&format!(r#"{{"c1":{patch}}}"#)).c1;
+        let k2 = c1(r#"{"extentLimit":"height","extentScale":40,"extentSteepness":2}"#);
+        assert_eq!(extent_scale(0.0, &k2), 1.0);
+        assert!(close(extent_scale(40.0, &k2), 0.5));
+        assert!(close(extent_scale(80.0, &k2), 0.2)); // 1 / (1 + 2²)
+        assert!(close(extent_scale(120.0, &k2), 0.1)); // 1 / (1 + 3²)
+        let k8 = c1(r#"{"extentLimit":"reach","extentScale":16,"extentSteepness":8}"#);
+        assert!(close(extent_scale(16.0, &k8), 0.5));
+        assert!(close(extent_scale(32.0, &k8), 1.0 / 257.0)); // 1 / (1 + 2⁸)
+        // The floor holds g up; above 1 it is no limit, below 0 no floor.
+        let floor = |f: f64| {
+            c1(&format!(
+                r#"{{"extentLimit":"reach","extentScale":16,"extentSteepness":8,"extentFloor":{f}}}"#
+            ))
+        };
+        assert_eq!(extent_scale(32.0, &floor(0.1)), 0.1);
+        assert!(close(extent_scale(16.0, &floor(0.1)), 0.5));
+        assert_eq!(extent_scale(32.0, &floor(3.0)), 1.0);
+        assert!(close(extent_scale(32.0, &floor(-1.0)), 1.0 / 257.0));
+        // A steepness of 0 or less is no limit (g would not fall from 1 at the base); so is off.
+        let flat = c1(r#"{"extentLimit":"reach","extentScale":16,"extentSteepness":0}"#);
+        assert_eq!(extent_scale(32.0, &flat), 1.0);
+        let off = c1(r#"{"extentScale":16,"extentSteepness":8}"#);
+        assert_eq!(extent_scale(32.0, &off), 1.0);
+    }
+
+    #[test]
+    fn an_upright_shoot_is_spared_the_extent_limit_and_a_level_one_takes_it_in_full() {
+        // Probe (#129): p = u² + (1 − u²)·g, u the upward part of the bud's heading.
+        let g = 0.2;
+        assert_eq!(extent_chance(g, 1.0, true), 1.0); // the leader
+        assert_eq!(extent_chance(g, 0.0, true), g); // a level limb
+        assert!(close(extent_chance(g, 0.5, true), 0.4)); // 60° off vertical: ¼ + ¾·0.2
+        let diagonal = std::f64::consts::FRAC_1_SQRT_2;
+        assert!(close(extent_chance(g, diagonal, true), 0.6)); // 45°: ½ + ½·0.2
+        // A drooping shoot is as level: it gains no height.
+        assert_eq!(extent_chance(g, -0.8, true), g);
+        // Without sparing every shoot takes g, the leader too (#121's reach, #89's path).
+        assert_eq!(extent_chance(g, 1.0, false), g);
+        assert_eq!(extent_chance(g, 0.0, false), g);
+        // No limit: no chance to take, whatever the heading.
+        assert_eq!(extent_chance(1.0, 0.0, true), 1.0);
+    }
+
+    #[test]
+    fn an_extent_size_is_the_reach_the_tree_height_or_the_path_from_the_base() {
+        // Probe (#129): L on a stem of three metamers with a level limb of two on its first node.
+        // The stem stands at (10, 0, 32); the limb runs along +x at height 1.
+        let mut t = Tree::new(0, 10.0, 32.0);
+        let (up, x, z) = ([0.0, 1.0, 0.0], [1.0, 0.0, 0.0], [0.0, 0.0, 1.0]);
+        let s0 = add_metamer(&mut t, -1, slot::MAIN, up, x, 0.0, 1.0, 0.1, 0.0);
+        let s1 = add_metamer(&mut t, s0 as i32, slot::MAIN, up, x, 0.0, 1.0, 0.1, 0.0);
+        let s2 = add_metamer(&mut t, s1 as i32, slot::MAIN, up, x, 0.0, 1.0, 0.1, 0.0);
+        let l0 = add_metamer(&mut t, s0 as i32, 1, x, z, 0.0, 2.0, 0.1, 0.0);
+        let l1 = add_metamer(&mut t, l0 as i32, slot::MAIN, x, z, 0.0, 1.5, 0.1, 0.0);
+        assert_eq!((s2, l1), (2, 4));
+        assert_eq!(
+            extent_sizes(&t, ExtentLimit::Reach),
+            [0.0, 0.0, 0.0, 2.0, 3.5]
+        );
+        assert_eq!(extent_sizes(&t, ExtentLimit::Height), [3.0; 5]);
+        assert_eq!(
+            extent_sizes(&t, ExtentLimit::Path),
+            [1.0, 2.0, 3.0, 3.0, 4.5]
+        );
+    }
+
+    #[test]
+    fn a_bud_the_extent_limit_bars_rests_alive_and_a_spared_upright_one_grows() {
+        // Probe (#129), in the season loop's bud phase. A seedling whose terminal bud (upright)
+        // and lateral bud (level: β = 90°) each hold resource for one metamer; its node is one
+        // internode along its path, so with L_x tiny g is 0 to rounding.
+        let grown = |extent: &str| {
+            let p = params(&format!(r#"{{"c1":{{"branchAngle":90{extent}}}}}"#));
+            let mut t = Tree::new(0, 10.0, 32.0);
+            plant_seedling(&mut t, &p, 0.0, 0.0, 0.0);
+            let terminal = (0..t.b.len()).find(|&j| t.b.slot[j] == slot::MAIN).unwrap();
+            let lateral = (0..t.b.len()).find(|&j| t.b.slot[j] != slot::MAIN).unwrap();
+            t.b.v.iter_mut().for_each(|v| *v = 1.0);
+            let before = t.m.len();
+            crate::season::grow_buds(&mut t, &p, 1.0);
+            let rests = |j: usize| t.b.state[j] == bud::ACTIVE || t.b.state[j] == bud::DORMANT;
+            (t.m.len() - before, rests(terminal), rests(lateral))
+        };
+        // Off: both grow, and neither bud is left.
+        assert_eq!(grown(""), (2, false, false));
+        let limit = r#","extentLimit":"path","extentScale":1e-6,"extentSteepness":4"#;
+        // Every shoot takes g: both are barred and rest, to try again next season.
+        assert_eq!(grown(limit), (0, true, true));
+        // Upright shoots spared: the leader grows, the level lateral is barred.
+        assert_eq!(
+            grown(&format!(r#"{limit},"extentSpare":true"#)),
+            (1, false, true)
+        );
+        // No limit (L_x huge): both grow.
+        let free = r#","extentLimit":"path","extentScale":1e9,"extentSpare":true"#;
+        assert_eq!(grown(free), (2, false, false));
+    }
+
+    #[test]
+    fn the_extent_limit_is_off_by_default_and_written_out_is_bit_identical() {
+        // Probe (#129): `off` written out, with every other extent param set, hashes as a run
+        // that leaves the rule absent; so does a limit whose L_x is 0 (no limit). A reach limit
+        // of half a cell bars every shoot off the stem, so that run differs.
+        let absent = hashed("{}", 12);
+        let off = r#"{"c1":{"extentLimit":"off","extentSpare":true,"extentScale":0.5,
+                     "extentSteepness":8,"extentFloor":0.1}}"#;
+        assert_eq!(hashed(off, 12), absent);
+        let no_scale = r#"{"c1":{"extentLimit":"reach","extentScale":0}}"#;
+        assert_eq!(hashed(no_scale, 12), absent);
+        let reach = r#"{"c1":{"extentLimit":"reach","extentScale":0.5,"extentSteepness":8}}"#;
+        assert_ne!(hashed(reach, 12), absent);
     }
 
     #[test]

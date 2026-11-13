@@ -173,6 +173,7 @@ obstacles = lambda p, c: bool(p["world"].get("obstacles"))  # noqa: E731
 stochastic = lambda p, c: (p["c1"].get("budBreak") or {}).get("mode") == "stochastic"  # noqa: E731
 two_part = lambda p, c: p["o4"].get("mortality") == "twoPart"  # noqa: E731
 planting = lambda p, c: p["o4"].get("planting") is not None  # noqa: E731
+extent_on = lambda p, c: p["c1"].get("extentLimit", "off") != "off"  # noqa: E731
 
 GATE_TEXT = {
     carbon: "r1.shed = carbon", shade_live: "R5 shade varies (r5.enabled; signal 'neighbours' needs neighbours)",
@@ -180,6 +181,7 @@ GATE_TEXT = {
     light_ortho: "r2.lightSetPoint set", tvig: "c5.Tvig > 0", storms: "o2.stormP > 0", o4on: "o4.enabled",
     o2on: "o2.enabled", r2on: "r2.enabled", always: "", obstacles: "world.obstacles non-empty",
     stochastic: "c1.budBreak.mode = stochastic", two_part: "o4.mortality = twoPart", planting: "o4.planting set",
+    extent_on: "c1.extentLimit set (probe, #129)",
 }
 
 
@@ -246,6 +248,12 @@ PARAMS = [
     ("c1.shootLengthSD", "c1", [("C1_SHOOT", always)]),
     ("c1.betaSD", "c1", [("C1_SHOOT", always)]),
     ("c1.budBreak.width", "c1", [("R4_FATE", stochastic)]),
+    # The crown-extent limit (probe only, #129): a chance of extension drawn in the bud phase.
+    ("c1.extentLimit", "c1", [("R4_FATE", always)]),
+    ("c1.extentSpare", "c1", [("R4_FATE", extent_on)]),
+    ("c1.extentScale", "c1", [("R4_FATE", extent_on)]),
+    ("c1.extentSteepness", "c1", [("R4_FATE", extent_on)]),
+    ("c1.extentFloor", "c1", [("R4_FATE", extent_on)]),
     # C3
     ("c3.mode", "c3", [("C3_ACRO", always)]),
     ("c3.lambda", "c3", [("C3_ACRO", NOT(r2on))]),

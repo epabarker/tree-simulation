@@ -67,7 +67,7 @@ describe("species trials and amended patches (M27)", () => {
   it("measures a lone tree at two stages", () => {
     const t = runLone("birch", 1, {}, 60, [10, 20]);
     expect(t.alive).toBe(true);
-    expect(t.height60).toBeGreaterThan(t.height30);
+    expect(t.heightStage2).toBeGreaterThan(t.heightStage1);
     expect(t.spread).toBeGreaterThan(0);
     expect(t.forkHeight).toBeGreaterThan(0);
   });

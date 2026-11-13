@@ -585,7 +585,13 @@ export interface Planting {
 export const GARDEN_PLANTING: Planting = { density: 400, spacing: 12, cap: 2500, faces: "wood" };
 
 /** A cell's side in metres (ADR 0064; the core's `stand::CELL_METRES`). */
-const CELL_METRES = 0.25;
+export const CELL_METRES = 0.25;
+
+/**
+ * The display threshold in cells, 1.3 m (ADR 0063): the core's `stand::DISPLAY_THRESHOLD`, for
+ * tests and scripts that read heights. The page never applies it: the snapshot does (`is_drawn`).
+ */
+export const DISPLAY_THRESHOLD = 1.3 / CELL_METRES;
 
 /** The open faces' τ (front, back), ADR 0024's looks. */
 const OPEN_FACES = { woodEdge: [1, 0.2], hedgerow: [1, 1] } as const;

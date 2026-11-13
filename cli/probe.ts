@@ -40,6 +40,7 @@ import {
   type SpeciesPatch,
 } from "../src/core/params.ts";
 import { forestParams, loneTreeParams } from "../src/core/presets.ts";
+import { arg } from "./shared.ts";
 
 const ROOT = fileURLToPath(new URL("..", import.meta.url));
 const RUN = join(ROOT, "cli", "run.ts");
@@ -47,10 +48,6 @@ const EXPLORATORY =
   "Exploratory: seeds 1–3 at most. Never quote it as an adoption claim (≥ 20 seeds and a stated pass rate, AGENTS.md).";
 
 const argv = process.argv.slice(2);
-const arg = (name: string, dflt: string): string => {
-  const k = argv.indexOf(`--${name}`);
-  return k >= 0 ? (argv[k + 1] ?? dflt) : dflt;
-};
 const nums = (s: string): number[] => s.split(",").filter(Boolean).map(Number);
 
 type Patch = { params?: ParamsPatch; species?: Record<string, SpeciesPatch> };
@@ -256,18 +253,18 @@ function absences(result: ReturnType<typeof readJob>, patched: string[]): string
 // ---- the driver ----
 
 async function main(): Promise<void> {
-  const label = arg("label", "probe");
+  const label = arg("--label", "probe");
   const dir = join(ROOT, "runs", "probe", label);
-  const patchPath = argv.includes("--patch") ? arg("patch", "") : "";
+  const patchPath = argv.includes("--patch") ? arg("--patch", "") : "";
   const patch: Patch | null = patchPath ? JSON.parse(readFileSync(patchPath, "utf8")) : null;
-  const species = arg("species", "beech");
-  const seeds = nums(arg("seeds", "1,2,3"));
-  const lone = nums(arg("lone", "30,60,100"));
+  const species = arg("--species", "beech");
+  const seeds = nums(arg("--seeds", "1,2,3"));
+  const lone = nums(arg("--lone", "30,60,100"));
   const garden = nums(
-    arg("garden", argv.includes("--demography") ? "50,100,150,300" : "50,100,150"),
+    arg("--garden", argv.includes("--demography") ? "50,100,150,300" : "50,100,150"),
   );
-  const widths = nums(arg("widths", "160,66"));
-  const limit = Math.max(1, Number(arg("jobs", String(Math.min(12, cpus().length)))));
+  const widths = nums(arg("--widths", "160,66"));
+  const limit = Math.max(1, Number(arg("--jobs", String(Math.min(12, cpus().length)))));
 
   rmSync(dir, { recursive: true, force: true });
   mkdirSync(dir, { recursive: true });

@@ -311,7 +311,7 @@ fn main() {
             num(st.live),
             num(st.drawn),
             num(st.canopy),
-            num(st.top_height),
+            num(st.tallest),
             st.cap_reached as u8,
             num(st.top_height_100)
         ));

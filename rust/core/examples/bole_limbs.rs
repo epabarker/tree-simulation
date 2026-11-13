@@ -11,15 +11,17 @@
 //!
 //!     cargo run --release --example bole_limbs -- params.json 150 out.csv [minHeightCells]
 //!
-//! Trees below minHeightCells (default 5.2, the 1.3 m display threshold) are not written.
+//! Trees below minHeightCells (default `stand::DISPLAY_THRESHOLD`, 1.3 m) are not written.
 
 use std::env;
 use std::fs;
 use std::io::{BufWriter, Write};
 
 use tree_core::json;
-use tree_core::metrics::tree_metrics;
+use tree_core::metrics::{limbs_of, tree_metrics};
 use tree_core::principles::c3::is_live_bud;
+use tree_core::principles::c5::light_per_metamer;
+use tree_core::stand::DISPLAY_THRESHOLD;
 use tree_core::tree::Tree;
 use tree_core::world::World;
 
@@ -45,7 +47,9 @@ fn main() {
     let args: Vec<String> = env::args().collect();
     let params = json::parse(&fs::read_to_string(&args[1]).expect("params")).expect("json");
     let seasons: usize = args[2].parse().expect("seasons");
-    let min_h: f64 = args.get(4).map_or(5.2, |s| s.parse().expect("minHeight"));
+    let min_h: f64 = args
+        .get(4)
+        .map_or(DISPLAY_THRESHOLD, |s| s.parse().expect("minHeight"));
     let mut out = BufWriter::new(fs::File::create(&args[3]).expect("out"));
     writeln!(
         out,
@@ -111,21 +115,10 @@ struct Limb {
 }
 
 /// Every living first-order limb (an order-1 metamer off the trunk carrying a live bud somewhere,
-/// as `metrics::live_crown_base` reads it), with C5's light per metamer over Q_top.
+/// as the live crown base reads it), with C5's light per metamer over Q_top.
 fn living_limbs(tree: &Tree) -> Vec<Limb> {
     let c = &tree.m;
-    let mut limb = vec![-1i32; c.len()];
-    for i in 0..c.len() {
-        let p = c.parent[i];
-        if p < 0 {
-            continue;
-        }
-        limb[i] = if c.order[i] == 1 && c.order[p as usize] == 0 {
-            i as i32
-        } else {
-            limb[p as usize]
-        };
-    }
+    let limb = limbs_of(tree);
     let mut living = vec![false; c.len()];
     for j in 0..tree.b.len() {
         if is_live_bud(tree.b.state[j]) {
@@ -139,7 +132,7 @@ fn living_limbs(tree: &Tree) -> Vec<Limb> {
         .filter(|&i| living[i])
         .map(|i| {
             let n = c.n_sum[i];
-            let light = if n > 0 { c.q_sum[i] / n as f64 } else { 0.0 };
+            let (_, light) = light_per_metamer(c, i);
             Limb {
                 base: c.base_y[i],
                 ratio: if tree.q_top > 0.0 {

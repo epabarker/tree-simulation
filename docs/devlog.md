@@ -2,6 +2,13 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-13: code review of spec #111: refactors and doc fixes; no golden or regression moved
+
+- **Docs:** architecture.md's notices no longer say a run at the cap fails: it is a reported count (`meta.capSeasons`, stand.csv's `capReached`, ADR 0065 decision 2). Spec §C5 states `c5.kRel` (k_rel consecutive seasons below T_rel·Q_top, default 1, bit-identical) and the shed-cause recording (#125).
+- **Core (no behaviour change):** o4.rs's header is its rule in one paragraph and its params; the m_s/β_s anchors moved beside the tolerance scaling. One stem height (`stand::stem_height`; `o4::tree_height` gone), one plot area (`stand::plot_hectares` in planting.rs), `math::round` for the top height's count, one scarred-trunk predicate in `grow_buds`, one `c5::light_per_metamer`. metrics.rs's uncalled `leaf_base`/`limb_base`/`live_crown_base` wrappers are gone; `limbs_of` is pub for the bole_limbs example. `StandMetrics.top_height` (the tallest tree) is `tallest`; the CSV column stays `topHeight`.
+- **CLI/TS:** `cli/shared.ts` holds the evidence scripts' `arg`, `pool`, `patched`, runner and `median`. open-grown spawns `process.execPath`. `LoneTraits.height30/height60` are `heightStage1/heightStage2` (fit.py reads them for `earlyShare`): **fit-eval JSON keys changed**. `DISPLAY_THRESHOLD` and `CELL_METRES` are exported from presets.ts, replacing `1.3 / 0.25` and `5.2` in a test and two scripts.
+- **Left as is:** `o4.shadeTolerance` defaults to 3 in params.ts and reads 1 when absent in the core. That is the two-part params' convention (an absent value is neutral), now documented in both files. Same height loops remain in season.rs (R2's cap) and r3.rs, outside the review's scope.
+
 ## 2026-11-12: the named regressions re-defined and re-baselined for the new garden (#123)
 
 - **Why they moved:** `phoneSeed3` was measured in the world before #121's flip (one planted row, open depth, no display threshold, canopy over half the tallest tree). The flip (round 6: periodic depth, 400 saplings/ha, `twoPart`, the 1.3 m display threshold) and ADR 0065's canopy cut changed what its fields read. `forestRegeneration` did not move. Re-baselined with `node cli/regressions.ts --update`; no code of the core changed, and no golden.

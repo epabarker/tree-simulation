@@ -5,7 +5,7 @@
  * calibrated milestone claims are tests/evidence-2d's, for C1–C8 to re-derive in 3D.
  */
 import { describe, expect, it } from "vitest";
-import { presetParams } from "../src/core/presets.ts";
+import { DISPLAY_THRESHOLD, presetParams } from "../src/core/presets.ts";
 import { hashWorld, type Tree, World } from "./world.ts";
 
 function checkInvariants(tree: Tree): void {
@@ -101,7 +101,7 @@ describe("the 3D core's structure (I2)", () => {
   it("draws the lab's seedling below 1.3 m; the garden's snapshot hides it", () => {
     const world = new World(presetParams("skyTree"));
     world.step();
-    expect(world.metricsOf(world.trees[0] as Tree).height).toBeLessThan(1.3 / 0.25);
+    expect(world.metricsOf(world.trees[0] as Tree).height).toBeLessThan(DISPLAY_THRESHOLD);
     const garden = world.snapshot(0, { junctions: false, field: false });
     const lab = world.snapshot(0, { junctions: false, field: false, seedlings: true });
     expect(garden.metrics).toHaveLength(0);

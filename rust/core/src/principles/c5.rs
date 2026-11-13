@@ -28,7 +28,13 @@ use super::c3::is_live_bud;
 use super::r2::vigour_gate;
 use crate::math;
 use crate::params::Params;
-use crate::tree::{Tree, bud, ensure, slot};
+use crate::tree::{Metamers, Tree, bud, ensure, slot};
+
+/// C5's light per metamer, Q_b/n_b, of the branch rooted at row `i`, with its n_b; 0 when n_b is 0.
+pub fn light_per_metamer(m: &Metamers, i: usize) -> (f64, f64) {
+    let n_b = m.n_sum[i] as f64;
+    (n_b, if n_b > 0.0 { m.q_sum[i] / n_b } else { 0.0 })
+}
 
 /// The `quantile` quantile (nearest rank) of the tree's live-bud Q this season.
 pub fn crown_top_light(tree: &Tree, quantile: f64) -> f64 {
@@ -81,12 +87,7 @@ pub fn shed_branches(tree: &mut Tree, params: &Params, season: f64, evaluated: u
     if counting {
         ensure(&mut tree.dark, nm);
         for i in 0..evaluated {
-            let n_b = tree.m.n_sum[i] as f64;
-            let light = if n_b > 0.0 {
-                tree.m.q_sum[i] / n_b
-            } else {
-                0.0
-            };
+            let (_, light) = light_per_metamer(&tree.m, i);
             tree.dark[i] = if light < rel { tree.dark[i] + 1.0 } else { 0.0 };
         }
     } else {
@@ -105,8 +106,7 @@ pub fn shed_branches(tree: &mut Tree, params: &Params, season: f64, evaluated: u
         if season - (c.birth_season[i] as f64) < g {
             continue;
         }
-        let n_b = c.n_sum[i] as f64;
-        let light = if n_b > 0.0 { c.q_sum[i] / n_b } else { 0.0 };
+        let (n_b, light) = light_per_metamer(c, i);
         let relative = if counting {
             tree.dark[i] >= k_rel
         } else {

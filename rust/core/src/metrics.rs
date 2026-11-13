@@ -201,20 +201,16 @@ pub fn lai(light: &Light, x0: f64, x1: f64, z0: f64, z1: f64) -> f64 {
     sum / ((hi - lo + 1) * (far - near + 1)) as f64
 }
 
+/// The share of the leaf area below the crown's base (`leaf_base`, `limb_base`).
+pub const CROWN_BASE_SHARE: f64 = 0.05;
+
 /// The crown's base by leaf area (C1 round 3, plan 2026-10-30-form §3): live buds' leaf area
 /// (R6's `deposit_area`; 1 per live bud without a world) in 1-cell bins of their metamer's tip
 /// height, walked up from the ground until CROWN_BASE_SHARE of it lies below; the height is
 /// interpolated within that bin. Unlike the lowest live first-order branch (`boleHeight`), one
-/// low twig does not hold it down. `height` when the tree carries no leaf.
-pub const CROWN_BASE_SHARE: f64 = 0.05;
-
-pub fn leaf_base(tree: &Tree, world: Option<&World>, height: f64) -> f64 {
-    leaf_base_of(&leaves(tree, world), height)
-}
-
-/// `leaf_base` from the tree's `leaves` (the same buds in the same order; `tree_metrics` makes
-/// them once for every leaf measure).
-fn leaf_base_of(leaves: &[(f64, f64, f64)], height: f64) -> f64 {
+/// low twig does not hold it down. `height` when the tree carries no leaf. From the tree's
+/// `leaves` (`tree_metrics` makes them once for every leaf measure).
+fn leaf_base(leaves: &[(f64, f64, f64)], height: f64) -> f64 {
     let bins = math::max(0.0, height).floor() as usize + 1;
     let mut area = vec![0.0; bins];
     let mut total = 0.0;
@@ -237,17 +233,9 @@ fn leaf_base_of(leaves: &[(f64, f64, f64)], height: f64) -> f64 {
     height
 }
 
-/// The crown's base by limbs (species plan 2026-10-31, step B.2; ADR 0028): first-order limbs (an
-/// order-1 metamer off the trunk, and everything it carries) taken in order of the height they
-/// leave the trunk, the base of the limb at which those from the bottom up first hold
-/// CROWN_BASE_SHARE of the tree's leaf area. It reads where limbs attach, as the field's live crown
-/// base does (the lowest live primary limb of the main crown; Pretzsch 2019), where `leaf_base`
-/// reads where their leaves hang; one low twig does not set it, unlike `boleHeight`. Cumulative,
-/// not a share per limb: a crown of 126 limbs, none holding 5%, read a crown ratio of 0 that way
-/// (the round-2 lone beech at 100). `height` when the limbs hold less than that share.
 /// Each metamer's first-order limb: the order-1 metamer off the trunk it descends from, -1 on the
 /// trunk. Parents come first, so one pass forward fills it.
-fn limbs_of(tree: &Tree) -> Vec<i32> {
+pub fn limbs_of(tree: &Tree) -> Vec<i32> {
     let c = &tree.m;
     let mut limb = vec![-1i32; c.len()];
     for i in 0..c.len() {
@@ -268,13 +256,9 @@ fn limbs_of(tree: &Tree) -> Vec<i32> {
 /// living first-order limb leaves the trunk, over the tree's height. A limb is living while it
 /// carries a live bud (active, dormant or short shoot) anywhere on it; a limb whose buds are all
 /// gone is a dead stub and does not count (the model sheds limbs outright, so these are rare).
-/// 1 when no limb lives (the whole stem is bare); NaN for a tree of no height.
-pub fn live_crown_base(tree: &Tree, height: f64) -> f64 {
-    live_crown_base_of(height, lowest_living_limb(tree))
-}
-
-/// `live_crown_base` from the lowest living limb's height (`tree_metrics` finds it once).
-fn live_crown_base_of(height: f64, lowest: f64) -> f64 {
+/// 1 when no limb lives (the whole stem is bare); NaN for a tree of no height. From the lowest
+/// living limb's height (`tree_metrics` finds it once).
+fn live_crown_base(height: f64, lowest: f64) -> f64 {
     if height <= 0.0 {
         return f64::NAN;
     }
@@ -524,12 +508,16 @@ pub fn buds_outside(tree: &Tree, world: Option<&World>) -> f64 {
     out
 }
 
-pub fn limb_base(tree: &Tree, world: Option<&World>, height: f64) -> f64 {
-    limb_base_of(tree, world, height, &limbs_of(tree))
-}
-
-/// `limb_base` with the tree's `limbs_of` already made (`tree_metrics` makes it once).
-fn limb_base_of(tree: &Tree, world: Option<&World>, height: f64, limb: &[i32]) -> f64 {
+/// The crown's base by limbs (species plan 2026-10-31, step B.2; ADR 0028): first-order limbs (an
+/// order-1 metamer off the trunk, and everything it carries) taken in order of the height they
+/// leave the trunk, the base of the limb at which those from the bottom up first hold
+/// CROWN_BASE_SHARE of the tree's leaf area. It reads where limbs attach, as the field's live crown
+/// base does (the lowest live primary limb of the main crown; Pretzsch 2019), where `leaf_base`
+/// reads where their leaves hang; one low twig does not set it, unlike `boleHeight`. Cumulative,
+/// not a share per limb: a crown of 126 limbs, none holding 5%, read a crown ratio of 0 that way
+/// (the round-2 lone beech at 100). `height` when the limbs hold less than that share. With the
+/// tree's `limbs_of` already made (`tree_metrics` makes it once).
+fn limb_base(tree: &Tree, world: Option<&World>, height: f64, limb: &[i32]) -> f64 {
     let r6 = world.map(|w| &w.params_of(tree).r6);
     let c = &tree.m;
     let nm = c.len();
@@ -625,8 +613,8 @@ pub fn tree_metrics(tree: &Tree, world: Option<&World>) -> TreeMetrics {
     let leafy = leaves(tree, world);
     let limb = limbs_of(tree);
     let lowest = lowest_living_limb_of(tree, &limb);
-    let leaf_base = leaf_base_of(&leafy, height);
-    let limb_base = limb_base_of(tree, world, height, &limb);
+    let leaf_base = leaf_base(&leafy, height);
+    let limb_base = limb_base(tree, world, height, &limb);
     let (top_fifth, below_sixth) = leaf_shares(&leafy, height);
     let frame = crown_frame(&leafy, tree.root_x, height);
     let ground = match world {
@@ -696,7 +684,7 @@ pub fn tree_metrics(tree: &Tree, world: Option<&World>) -> TreeMetrics {
             } else {
                 0.0
             },
-            live_crown_base_of(height, lowest),
+            live_crown_base(height, lowest),
             top_fifth,
             below_sixth,
             w90(&leafy, frame.as_ref()),

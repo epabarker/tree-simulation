@@ -2,6 +2,10 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-13: four choices from spec #111's review kept as built (ADR 0066)
+
+- The user accepted the recommendations: the lab draws the seedling bank (the garden does not); the garden's specimen stays half-walled (the open box does not fit its worker budget); plain-data records are allowed in the core (AGENTS.md's convention now says so); the garden keeps opening on the live intro (ADR 0046). No code, golden or regression changed.
+
 ## 2026-11-13: code review of spec #111: refactors and doc fixes; no golden or regression moved
 
 - **Docs:** architecture.md's notices no longer say a run at the cap fails: it is a reported count (`meta.capSeasons`, stand.csv's `capReached`, ADR 0065 decision 2). Spec §C5 states `c5.kRel` (k_rel consecutive seasons below T_rel·Q_top, default 1, bit-identical) and the shed-cause recording (#125).

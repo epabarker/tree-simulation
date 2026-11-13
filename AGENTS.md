@@ -97,7 +97,7 @@ analysis/            uv project: polars + plotnine; experiments/ holds one scrip
 ## Conventions
 
 - Each principle file starts with a header naming the principle, its spec section, its rule in one paragraph, and the params it reads.
-- Comments explain _why_, citing spec sections or papers. Code reads like the existing files: in Rust, plain loops over column `Vec`s, free functions per rule, and no structs beyond the tables, `Tree`, `World` and the params.
+- Comments explain _why_, citing spec sections or papers. Code reads like the existing files: in Rust, plain loops over column `Vec`s, free functions per rule, and no structs beyond the tables, `Tree`, `World`, the params and plain-data records (values a phase or metric returns, not kept between seasons; ADR 0066).
 - Formatting: `cargo fmt` and clippy with `-D warnings` for Rust; Biome for TypeScript (2 spaces, double quotes, width 100). TypeScript is strict with `erasableSyntaxOnly`: no enums, namespaces or constructor parameter properties. Use `as const` objects instead.
 - Tests: one unit test per local rule (a `#[cfg(test)]` module in the principle's file; `crate::testing::preset` gives a preset's params), plus each milestone's "visible test" from §7 as an automated check where possible. Since I2 the milestone tests calibrated in 2D are `tests/evidence-2d/` (not in `npm test`): re-derive each in 3D at its calibration milestone and move it back.
 - **Seeds in evidence tests:** a claim about all of N seeds needs N ≥ 20 and a stated pass rate ("≥ 15 of seeds 1–20"), with the counts each build reached written beside it. Five fixed seeds test the seeds, not the behaviour: any change of realisation breaks them ([note](docs/experiments/2026-10-30-production-thresholds.md)).

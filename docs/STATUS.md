@@ -1,10 +1,10 @@
 # Status
 
-_Last updated: 2026-11-13; spec #111 built on spec/111-feature-playbook (local, unpushed)._
+_Last updated: 2026-11-13; spec #111 built on spec/111-feature-playbook, PR #128 ready._
 
 **Live:** garden0.16.0. RC prepared/merged#71; phone soak deferred, no release-readiness waiver.
 
-## Feature playbook (spec #111, draft PR #128 → 3d-port)
+## Feature playbook (spec #111, PR #128 → 3d-port)
 - Merged: #112–#123, #125, #126, the #124 guard, a code-review fix-up. Check green, goldens unchanged.
 - Garden: periodic depth + two-part demography at round 6 (r6); ADR 0065 makes the per-ha
   targets reported, not gated; canopy = over half the top height (100 tallest/ha).
@@ -24,8 +24,7 @@ _Last updated: 2026-11-13; spec #111 built on spec/111-feature-playbook (local, 
 - Fresh confirmation seeds 22021–22040/23021–23040 untouched. No garden/FLORA changes.
 - Full evidence docs/experiments/2026-11-08-day3-step8.md; aggregate figure inspected.
 ## Next
-1. User: push spec/111, mark #128 ready. Answer: lab seedlings < 1.3 m, specimen half-walled,
-   new core structs, opening on a settled forest (ADR 0046).
+1. PR #128 ready for the user's review; ADR 0066 keeps the review's four open choices as built.
 2. #129: crown extent and girth; re-test d1 and the oak there.
 3. Phone soak remains a separate deferred release gate; no tag/deploy/production push.
 ## Gotchas

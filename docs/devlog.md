@@ -2,6 +2,30 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-13: the lone triad's measures and #133's wind-load form decided (ADR 0067)
+
+- **The user accepted a Fable review's answers** to the triad re-read's five open points: [ADR 0067](decisions/0067-lone-triad-measures.md).
+  - W/H at season 100 is ADR 0028's reading (0.6–1.2, beech and hornbeam), amending ADR 0041: its 1.50 becomes a panel check.
+  - The lone H/D reads D at 1.3 m, with codominant forks pooled as √Σd². The fit's change (`cli/allometry.ts`, `cli/trials.ts`) goes in #134.
+  - The stand gate keeps the tip measure (ADR 0050's ruling 2), stated as Level 0's |median z| ≤ 1 on at least 8 trees.
+  - Bar 10 becomes a junction test (Σr_c² ≤ 1.3·r_p² at trunk forks below 1.3 m).
+  - #133's wind load is drag on leaf and stem area times a height profile, a moment that cannot cancel, entering stress wood and the storm's check only.
+- **The note's §5 is amended** (still before either probe ran). #133 and #134 are updated. No code, golden or regression changed.
+
+## 2026-11-13: the crown-extent runs re-read (#131): the lone triad, the stand against Tallo, floor light; #129 split into #131–#135
+
+- **Note:** [docs/experiments/2026-11-13-triad-reread.md](experiments/2026-11-13-triad-reread.md). Exploratory, seeds 1–3, no new simulation: the crown-extent probe's runs read with `code/2026-11-13-triad-reread/triad.py`. No core code, golden, preset or regression changed.
+- **Triage of #129:** the user accepted a Fable review's answers to the probe note's §9:
+  - the lone tree is judged on the triad (W at matched DBH, W/H, H/D) as a guard, and the stand's crown against Tallo is the gate;
+  - probe a height-dependent load in R3, beside a σ bracket;
+  - refit the form knobs before any new rule;
+  - the understorey is its own ticket, with targets 2–3.
+  Filed as #131 (this), #132 (understorey), #133 (girth), #134 (species round) and #135 (floored height rule, conditional), a blocking chain under #129.
+- **Surprise 1: two diameters.** The fit's `lone.slenderness` reads the core's `slenderness`, over the root metamer's diameter, against a target computed at 1.3 m (Pretzsch). The matched-DBH anchors read the cylinder at 1.3 m. In lone trees the two differ 0.5–1.9× by seed; in the garden's boles they agree.
+- **Surprise 2: R3 grows inverted forks.** Lone beech seed 1 at season 60: base 73 cm; a fork at 1 m whose children are 120 and 109 cm on an 85 cm parent. R3's moment is the vector sum of the load's first moment, so a balanced crown barely loads its stem, while each limb at a fork carries its own unbalanced moment; stress wood is local (ADR 0011), so the parent never catches up. As specified, not a code bug. #133's wind load may cure it (the note's bar 10); the other cure would reopen ADR 0011.
+- **Surprise 3: the floor is not bright.** Ground light at HEAD is 3–13% of open sky from season 50 (M6e: 2–10%). `H4k8` raises it by a median 1.8×. The understorey floods under shade (P/M 2–15), not light.
+- **The stand gate** passes for hornbeam under `H4k8` (3 of 4 inside Tallo's q10–q90 at season 100) and fails for beech, oak, maple and birch on the tip measure. On the robust measure (5–95% tip spread) the beech is on Tallo's median: the gate depends on the measure. Open for the user.
+
 ## 2026-11-13: the crown-extent probe (#129, criterion 1): every arm rejected; `c1.extentLimit` is a probe param, off and bit-identical
 
 - **Note:** [docs/experiments/2026-11-13-crown-extent-probe.md](experiments/2026-11-13-crown-extent-probe.md). Exploratory, seeds 1–3; the arms, bars and rule for choosing were committed before any arm ran (c0c1d9c). The user's answers to the path-length note's §10 are recorded there: emergent rule only, the reach limit as a yardstick; girth with the crown rule (a 2×2); one denser planting on the leading arm; the understorey out of scope.

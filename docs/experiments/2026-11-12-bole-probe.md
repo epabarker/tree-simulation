@@ -45,7 +45,7 @@ Beech and hornbeam at T_rel 0.1 / 0.25 / 0.4 × kRel 3 / 6; holly at 0.021, kRel
 - **No cell clears the bole.** Beech's live crown base stays 0.02–0.06 in every cell; no beech tree-season ≥ 10 m reaches 0.3. Hornbeam's best cell is 0.25, k3 at a median 0.15, with 3% of its tree-seasons in the band. Seeds agree: per seed, hornbeam reaches 0.14–0.16 at 0.25, k3 and ≤ 0.14 elsewhere.
 - **Beech: the rule never reaches the lowest limbs.** They are lit at 0.6–0.8 of Q_top in every cell, above even 0.4, and C5 takes at most 15% of beech's first-order sheds (0.4, k3). The few beech ≥ 10 m are 10–12 m stems in an open canopy (step 1).
 - **Hornbeam: the rule acts and clears the scaffold, but sprouts re-clothe the bole.** From T_rel 0.25 C5 takes 33–72% of the tall hornbeam's first-order sheds (19% at HEAD). The surviving lowest limbs are lit (0.5–0.7 of Q_top): the dark ones went. But in 57–75% of tall hornbeam tree-seasons at T_rel ≥ 0.25 (16% at HEAD) the lowest living limb is a one- or two-metamer shoot, and sprouts from bole scars rise 3–5× (30 at HEAD, 84–145). Those shoots carry a live bud, so the live crown base reads them.
-- **k 6 sheds less than k 3** at every T_rel (C5's share 0.05–0.37 against 0.26–0.72) and never clears more: a limb must stay dark six seasons in a row, and one bright season resets it.
+- **k 6 sheds less than k 3** at every T_rel (C5's share 0.05–0.37 against 0.26–0.72) and never reaches a higher live crown base: a limb must stay dark six seasons in a row, and one bright season resets it.
 - **Holly stays clothed** (0.04–0.06), as it would in any cell: its T_rel is unchanged.
 - **Lid and crown depth.** Hornbeam's canopy crowns are already a flat lid at HEAD: 73% of their leaf in the top fifth, a 20 m wide layer at 25–28 m over long limbs (the figure's top row). 0.25, k3 deepens that to 85% (1.15× HEAD) and shortens the live crown 28 → 24 m; 0.4, k3 to 21 m. Beech's crowns barely change. The patch does not make the lid; it strips what hangs below it.
 
@@ -113,7 +113,7 @@ Closed hornbeams do not clear either (0.01–0.07), so no cell fails only becaus
 
 - **Beech:** in the 0062/0063 garden its lowest limbs are lit at 0.6–0.8 of Q_top, brighter than in the old garden. Few beech reach 10 m (1–5 per cell over three seeds), and those stand as 10–12 m stems in a canopy of two or three hornbeam crowns. No T_rel up to 0.4 reaches their low limbs.
 - **Hornbeam:** the new stand does darken its lowest limbs (0.17 of Q_top at HEAD), and T_rel 0.25 with k 3 sheds them: C5 does two thirds of the shedding and the scaffold clears to ≈ 0.3 of the height. R4's sprouts from the new scars then re-clothe the bole, so the live crown base stays at 0.15.
-- **k:** 3 beats 6 at every T_rel.
+- **k:** 3 sheds more than 6 at every T_rel. 6 clears hornbeam's scaffold further only at 0.4 (0.25 against 0.20), with no gain in live crown base (0.075 both).
 
 ## For the map's fog
 

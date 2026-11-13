@@ -376,6 +376,19 @@ export interface Params {
      * `forest` preset (the home page's) turns it on.
      */
     ground?: boolean;
+    /**
+     * k_w: the wind load (#133, ADR 0067 decision 5), drag per unit of leaf-and-stem area at
+     * the reference height. Each metamer j carries f_j = k_w·(a_leaf,j + k_s·2·r_j·l_j)·(y_j/100),
+     * and a metamer's wind moment M_w = Σ f_j·max(0, y_j − y_base) over its subtree adds to
+     * gravity's |M| in the stress that grows stress wood and that a storm breaks (never in sag or
+     * posture). 0 or absent = off, bit-identical (probe param, calibrate).
+     */
+    windLoad?: number;
+    /**
+     * k_s: the stem's drag per unit of its silhouette 2·r·l, relative to leaf area's; 0 = leaves
+     * alone. Absent = 1. Read only when `windLoad` > 0 (probe param, calibrate).
+     */
+    windStem?: number;
   };
 
   /**

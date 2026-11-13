@@ -335,6 +335,10 @@ pub struct R3 {
     pub sigma_break: f64,
     /// `r3.ground === true`.
     pub ground: bool,
+    /// k_w, `r3.windLoad` (absent = 0, off): the wind load's drag per unit area (#133).
+    pub wind_load: f64,
+    /// k_s, `r3.windStem` (absent = 1): the stem silhouette's drag relative to leaf area's.
+    pub wind_stem: f64,
 }
 
 #[derive(Clone, Debug)]
@@ -713,6 +717,8 @@ impl Params {
                 girth_gain: num(r3, "girthGain"),
                 sigma_break: num(r3, "sigmaBreak"),
                 ground: flag(r3, "ground"),
+                wind_load: opt(r3, "windLoad").unwrap_or(0.0),
+                wind_stem: opt(r3, "windStem").unwrap_or(1.0),
             },
             r4: {
                 let g = group(v, "r4");

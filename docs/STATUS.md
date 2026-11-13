@@ -1,6 +1,6 @@
 # Status
 
-_Last updated: 2026-11-13; #129 split into #131–#135; #131 (the runs re-read) done on probe/131-triad-reread._
+_Last updated: 2026-11-13; #131 done (PR #136); ADR 0067 settles its open points._
 
 **Live:** garden0.16.0. RC prepared/merged#71; phone soak deferred, no release-readiness waiver.
 
@@ -13,8 +13,9 @@ _Last updated: 2026-11-13; #129 split into #131–#135; #131 (the runs re-read) 
     differ 0.5–1.9×. R3 grows inverted forks (a balanced crown barely loads the stem).
   - Stand gate: hornbeam passes under H4k8, beech/oak/maple/birch fail on the tip measure.
   - Floor light 3–13% of open sky at HEAD (M6e 2–10%): the flood is not a bright floor.
-- Open for the user: W/H at 100 (0.6 vs 1.50, #134); the wind-load form (#133); the stand
-  gate's crown measure (tip vs robust); the note's three proposed thresholds.
+- ADR 0067 (user, 2026-11-13) settles #131's open points: W/H 0.6–1.2 at 100 (ADR 0041's 1.50 a
+  panel check); lone D at 1.3 m, forks pooled; stand gate on the tip measure; #133's wind load
+  drag on leaf + stem area × height, a moment that cannot cancel (stress wood and storms only).
 ## Feature playbook (spec #111, merged to 3d-port as #128)
 - Garden: round 6 (r6), periodic depth, two-part demography; ADR 0065 targets reported, not gated.
 - #124 oak d16a13 not adopted; #126 bare-bole probe failed (repeat if the stand changes).
@@ -23,8 +24,8 @@ _Last updated: 2026-11-13; #129 split into #131–#135; #131 (the runs re-read) 
 - Branch codex/day3-species-programme; beech retained, no sycamore/ash candidate qualified.
 - Confirmation seeds 22021–22040/23021–23040 untouched. docs/experiments/2026-11-08-day3-step8.md.
 ## Next
-1. The user answers #131's open points; then #132 (understorey: a relative suppression signal).
-2. #133 and #134 wait on the user's choices (wind-load form; W/H at season 100).
+1. #132 (understorey: a relative suppression signal), then #133 (wind in R3), #134 (species round).
+2. #134 carries ADR 0067's fit change (breast-height slenderness, pooled forks).
 3. Phone soak remains a separate deferred release gate; no tag/deploy/production push.
 ## Gotchas
 - m27_adopt resets mw=64; any adopter extension must preserve selected coupled mw/r0.

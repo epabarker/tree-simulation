@@ -2,6 +2,16 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-13: the lone triad's measures and #133's wind-load form decided (ADR 0067)
+
+- **The user accepted a Fable review's answers** to the triad re-read's five open points: [ADR 0067](decisions/0067-lone-triad-measures.md).
+  - W/H at season 100 is ADR 0028's reading (0.6–1.2, beech and hornbeam), amending ADR 0041: its 1.50 becomes a panel check.
+  - The lone H/D reads D at 1.3 m, with codominant forks pooled as √Σd². The fit's change (`cli/allometry.ts`, `cli/trials.ts`) goes in #134.
+  - The stand gate keeps the tip measure (ADR 0050's ruling 2), stated as Level 0's |median z| ≤ 1 on at least 8 trees.
+  - Bar 10 becomes a junction test (Σr_c² ≤ 1.3·r_p² at trunk forks below 1.3 m).
+  - #133's wind load is drag on leaf and stem area times a height profile, a moment that cannot cancel, entering stress wood and the storm's check only.
+- **The note's §5 is amended** (still before either probe ran). #133 and #134 are updated. No code, golden or regression changed.
+
 ## 2026-11-13: the crown-extent runs re-read (#131): the lone triad, the stand against Tallo, floor light; #129 split into #131–#135
 
 - **Note:** [docs/experiments/2026-11-13-triad-reread.md](experiments/2026-11-13-triad-reread.md). Exploratory, seeds 1–3, no new simulation: the crown-extent probe's runs read with `code/2026-11-13-triad-reread/triad.py`. No core code, golden, preset or regression changed.

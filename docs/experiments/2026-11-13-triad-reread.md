@@ -147,25 +147,28 @@ The full table, every arm, the six exemplars, the DBH 25/50 anchors and the fit'
 
 ## 5. Bars for #133 and #134
 
-Fixed here, before either probe runs. Exploratory probes judge every seed of 1–3; adoption needs ≥ 20 seeds with stated pass rates (AGENTS.md). The bands come from the target files and ADRs. Three thresholds are this note's own proposals, marked *proposed*, and are open for the user: the taper window in bars 4 and 10, and the "half the trees" in bar 6.
+Fixed here, before either probe runs, and amended the same day by [ADR 0067](../decisions/0067-lone-triad-measures.md), when the user accepted the recommendations on this note's open points (still before either probe ran). Exploratory probes judge every seed of 1–3; adoption needs ≥ 20 seeds with stated pass rates (AGENTS.md).
 
 **The lone guard (beech and hornbeam):**
-1. **H/D** on the fit's definition (the core's `slenderness`, over the root metamer's diameter), in `lone.slenderness`'s band at seasons 60 and 100: beech 40–56, hornbeam 48–68. **The target is a breast-height figure:** Pretzsch's H/D at d 25, 40 and 50 cm, which reads D at 1.3 m. The fit therefore scores a base-diameter H/D against a 1.3 m target, and in lone trees the two diameters disagree by 0.5–1.9× (§1). The 1.3 m H/D is reported beside it.
+1. **H/D with D at 1.3 m** (ADR 0067 decision 2), in `lone.slenderness`'s band at seasons 60 and 100: beech 40–56, hornbeam 48–68.
+   - **The measure:** `cli/allometry.ts`'s trunk cylinder spanning 1.3 m; a codominant fork below it is pooled as √Σd² (Tallo's convention). The root metamer's H/D is reported beside it.
+   - **Why it changed:** the fit's `lone.slenderness` scored the root metamer's diameter against Pretzsch's breast-height target, a defect in a scored trait. In lone trees the two differ by 0.5–1.9× (§1). Until the fit is changed (#134), probes compute the measure themselves.
 2. **W/H at 60** on the fit's measure (`lone.spread`, the core's full extents) in its band: beech 0.4–0.8, hornbeam 0.5–0.9.
-3. **W/H at 100,** two columns until the user chooses:
-   - **(a)** ADR 0028's reading: no number at 100, parkland 0.9–1.3 at about twice the trial's age;
-   - **(b)** ADR 0041's accepted 1.50 for beech.
-4. **W ÷ Pretzsch's 95% edge at DBH 40,** reported at half weight (ADR 0028 §3), not a pass/fail. It is printed beside the taper ratio (§1), and not read where that ratio is outside 0.8–1.25 (a fork artefact; *proposed*).
+3. **W/H at 100** in a described, half-weight band of 0.6–1.2, for beech and hornbeam alike (ADR 0067 decision 1, following ADR 0028). ADR 0041's 1.50 is a panel check, not a target: at DBH 40, Pretzsch's edge with H/D 48 gives W/H 0.60.
+4. **W ÷ Pretzsch's 95% edge at DBH 40,** reported at half weight (ADR 0028 §3), not a pass/fail. It is printed beside the taper ratio (§1), and not read where that ratio is outside 0.8–1.25 (a fork artefact; a window for the simulator, which models no butt swell).
 5. **No species worse than HEAD on any of the three,** birch and holly included (the crown-extent note's second clause, kept).
 
-**The stand gate (160 cells, canopy trees, every species with ≥ 3 trees inside Tallo's support):**
-6. **The crown at the tree's DBH** (dbh.py's tip measure, an upper bound on Level 0's) inside Tallo's q10–q90 for at least half the trees (*proposed*), at seasons 100 and 300. The robust crown is reported beside it.
-7. **The stand H/D** in `stand.slenderness`'s band (beech 70–94, hornbeam 74–98) at seasons 100 and 300.
+**The stand gate (160 cells, canopy trees):**
+6. **The crown at the tree's DBH on the tip measure**, as ADR 0050's ruling 2 decided for Level 0; the robust crown is reported beside it.
+   - **The statistic:** Level 0's, per species, |median z| ≤ 1 at seasons 100 and 300, with z = (ln y − q50)/(q90 − q50) above Tallo's median (below it, with q10). "Half the trees inside q10–q90" is reported beside it.
+   - **The floor:** read only on at least 8 trees inside Tallo's support, pooled over seeds and, where needed, over seasons.
+   - **Why the tip measure:** Tallo's crown radii are field radii or crown projection areas (ADR 0051), which reach the drip line. dbh.py's tip measure reads every tip, Level 0's live-bud tips only, so dbh.py's is an upper bound wherever the runs carry no bud states.
+7. **The stand H/D** in `stand.slenderness`'s band (beech 70–94, hornbeam 74–98) at seasons 100 and 300. This supersedes the generic 60–80 that #133's ticket first quoted (ADR 0028 §3).
 8. **#129's target 1** (≥ 120 canopy trees/ha in every season from 100) and the crown cover reported beside the canopy count.
 
 **For #133 only:**
 9. **Throws ≤ HEAD's** (8 of 79 planted at 160 cells, seeds pooled).
-10. **The taper ratio of lone trees at 60 and 100 inside 0.8–1.25** in every seed (*proposed*): the inverted fork gone.
+10. **No inverted fork:** at every trunk fork below 1.3 m in the lone trees at 60 and 100, Σr_c² ≤ 1.3·r_p², in every seed. The taper ratio stays reported; it cannot tell butt taper from a fork. `c6.rs::junction_exponents`' count of junctions it skips on the bole is a cross-check.
 
 ## 6. Corrections and additions to the crown-extent note
 
@@ -175,20 +178,24 @@ Fixed here, before either probe runs. Exploratory probes judge every seed of 1�
 - **Its canopy count under `H4k8`** counts crowns that, on the tip measure, cover the plot 1.7–3.1 times (§3).
 - **The stand gate passes for the hornbeam only** (§3); the note quoted the hornbeam alone.
 
-## Open for the user
+## Decided (ADR 0067, 2026-11-13)
 
-1. **W/H at season 100:** bar 3's column (a) or (b) (#134).
-2. **Which D the lone H/D reads** (bar 1): the fit's root-metamer diameter against a 1.3 m target, or the 1.3 m cylinder, which a low fork makes fragile. Either way the fit's `lone.slenderness` mixes the two today.
-3. **The crown measure for the stand gate:** the tip measure, which Level 0 fits on, or the robust one. They differ by about 2×, and the beech passes on one and fails on the other.
-4. **The three proposed thresholds** in §5 (the taper window 0.8–1.25; half the trees inside Tallo's band).
-5. **The inverted fork** (§1) is R3 and C6 as ADR 0011 specified, not a bug in the code. #133's height-dependent load may cure it (bar 10). If it does not, the other cure, stress wood passed down the pipe, would reopen ADR 0011 and wants its own ticket.
+The user accepted the recommendations on the five points this note left open:
+1. **W/H at season 100:** ADR 0028's reading, 0.6–1.2 for beech and hornbeam; ADR 0041's 1.50 becomes a panel check (bar 3).
+2. **Which D:** 1.3 m, codominant forks pooled; the fit changes in #134 (bar 1).
+3. **The stand gate's crown measure:** the tip measure, under ADR 0050's ruling (bar 6).
+4. **The thresholds:**
+   - bar 4's taper window kept;
+   - bar 10 a junction test;
+   - bar 6 Level 0's |median z| on at least 8 trees.
+5. **#133's wind load:** drag on leaf and stem area times a height profile, a moment that cannot cancel, in stress wood and the storm's check only. If bar 10 still fails under it, passing stress wood down the pipe (reopening ADR 0011) is the reserve.
 
 ## Limits
 
 - Three seeds, and the counts of canopy trees per species are 3–21.
 - The lone trees ran to season 100 only.
 - Tallo's support stops at DBH 39 cm for hornbeam, so the hornbeam's gate can be read only on narrowed crowns.
-- The robust crown is a 5–95% spread of metamer tips in x and z, not a drip-line radius as measured in the field. The field measure lies between the two.
+- The robust crown is a 5–95% spread of metamer tips in x and z, a statistic of the crown's interior. The field's drip-line radius is closer to the tip measure (ADR 0067 decision 3).
 
 ## Reproduce
 

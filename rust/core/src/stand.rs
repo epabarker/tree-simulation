@@ -55,8 +55,7 @@ pub fn plot_hectares(params: &Params) -> f64 {
 /// How many of the tallest drawn stems the top height averages on `hectares`:
 /// max(1, round(100 × ha)), so 6 on the 160-cell garden (0.064 ha) and 3 on the 66-cell one.
 pub fn top_height_count(hectares: f64) -> usize {
-    // round as JavaScript's Math.round: ⌊x + ½⌋ (floor is one of the exact std functions).
-    let n = (TOP_HEIGHT_STEMS_PER_HA * hectares + 0.5).floor();
+    let n = math::round(TOP_HEIGHT_STEMS_PER_HA * hectares);
     if n >= 1.0 { n as usize } else { 1 }
 }
 
@@ -100,8 +99,9 @@ pub struct StandMetrics {
     pub canopy: f64,
     /// The top height: the mean of the 100 tallest drawn stems a hectare (`top_height`).
     pub top_height_100: f64,
-    /// The tallest live tree's height.
-    pub top_height: f64,
+    /// The tallest live tree's height (stand.csv's `topHeight` column). Not forestry's top height,
+    /// which is `top_height_100`.
+    pub tallest: f64,
     /// O4 on and the live trees fill `o4.maxTrees`, the test establishment stops at.
     pub cap_reached: bool,
     /// By species name, in name order; species with no live tree are left out.
@@ -143,7 +143,7 @@ pub fn stand_metrics(world: &World) -> StandMetrics {
         drawn,
         canopy,
         top_height_100: reference,
-        top_height: top,
+        tallest: top,
         cap_reached: cap_reached(world),
         species: by
             .into_iter()
@@ -225,7 +225,7 @@ mod tests {
         assert_eq!(s.live, 7.0);
         assert_eq!(s.drawn, 4.0);
         assert_eq!(s.canopy, 3.0);
-        assert_eq!(s.top_height, 40.0);
+        assert_eq!(s.tallest, 40.0);
         assert!(!s.cap_reached);
         let by: Vec<(&str, f64, f64, f64)> = s
             .species
@@ -298,7 +298,7 @@ mod tests {
             s.top_height_100
         );
         assert_eq!(s.canopy, 10.0);
-        assert_eq!(s.top_height, 100.0);
+        assert_eq!(s.tallest, 100.0);
     }
 
     #[test]

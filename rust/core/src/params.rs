@@ -711,6 +711,10 @@ impl Params {
                     "twoPart" => Mortality::TwoPart,
                     _ => Mortality::SizeBlind,
                 },
+                // Absent, each two-part param reads its neutral value (no canopy rate, no
+                // suppression, T 1: e^0), so JSON written before it reads as the rule off. The
+                // page's defaults (params.ts) are the calibrated ones and always write the key:
+                // shadeTolerance 3 there, the scale's middle, against 1 absent here.
                 m_canopy: opt(o4, "mCanopy").unwrap_or(0.0),
                 h_canopy: opt(o4, "hCanopy").unwrap_or(f64::INFINITY),
                 gamma_canopy: opt(o4, "gammaCanopy").unwrap_or(1.0),

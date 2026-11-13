@@ -438,14 +438,12 @@ pub fn grow_buds(tree: &mut Tree, params: &Params, season: f64) {
     // Sprouts from scars on the bole (re-clothing, the bare-bole page's measure; #125): the
     // height of the lowest living first-order limb as the season began, read only when a dormant
     // lateral bud rests on a scarred trunk node. Output only: it changes no fate.
-    let scarred = |tree: &Tree, j: usize| {
+    // A lateral bud on a trunk node that carries a scar.
+    let on_scarred_trunk = |tree: &Tree, j: usize| {
         let m = tree.b.metamer[j] as usize;
-        tree.b.state[j] == bud::DORMANT
-            && tree.b.slot[j] != slot::MAIN
-            && tree.m.order[m] == 0
-            && tree.m.scar_sum_n[m] > 0.0
+        tree.b.slot[j] != slot::MAIN && tree.m.order[m] == 0 && tree.m.scar_sum_n[m] > 0.0
     };
-    let bole = if (0..count).any(|j| scarred(tree, j)) {
+    let bole = if (0..count).any(|j| tree.b.state[j] == bud::DORMANT && on_scarred_trunk(tree, j)) {
         lowest_living_limb(tree)
     } else {
         0.0
@@ -503,11 +501,7 @@ pub fn grow_buds(tree: &mut Tree, params: &Params, season: f64) {
                 if tree.m.order[host] == 0 && season - tree.m.birth_season[host] as f64 >= 10.0 {
                     tree.epicormic += 1.0;
                 }
-                if tree.b.slot[i] != slot::MAIN
-                    && tree.m.order[host] == 0
-                    && tree.m.scar_sum_n[host] > 0.0
-                    && tree.tip_y(host) < bole
-                {
+                if on_scarred_trunk(tree, i) && tree.tip_y(host) < bole {
                     tree.bole_sprouts += 1.0;
                 }
             }

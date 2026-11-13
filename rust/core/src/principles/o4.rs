@@ -1,31 +1,19 @@
-//! O4. Stand dynamics (spec §O4, ADR 0013, ADR 0018; on the ground plane, ADR 0025). Deaths by
-//! `o4.mortality` (the world's): `sizeBlind` (the default, the ablation) kills each tree with the
-//! background risk m₀ [RNG: mortality]; `twoPart` (ADR 0063) with a canopy rate
-//! m_c·(H/H_c)^γ_c that rises with the tree's height H, plus a suppression rate
-//! m_s·(1 − P/M)₊·e^(−β_s(T − 1)) from R1's carbon balance this season (P/M, read only with R1 on)
-//! and the species' shade tolerance T, one draw against the sum [RNG: standMortality]. A tree that
-//! pays its maintenance is never suppressed; a starved one dies the faster the less tolerant it is.
-//! The suppression signal is the world's `o4.suppressionSignal` (ADR 0065, decision 5): `carbon`
-//! (the default, the P/M above), `topLight` (the dark top: (1 − (Q_top/C)/θ_q)₊, the light at the
-//! tree's top over open sky against θ_q) or `growth` (the stalled leader: (1 − ΔH/(k·g))₊, the
-//! height gained over the last k seasons against a floor of g cells a season), each deficit scaled
-//! by the same m_s·e^(−β_s(T − 1)). The dark top marks an overtopped tree that still pays its way,
-//! which P/M never does (the understorey sits at P/M 2–15:
-//! docs/experiments/2026-11-10-garden-suppression-probe.md).
-//! The anchors (docs/research/2026-11-08-regeneration.md): below its survival light a birch
-//! seedling lasts 1–2 seasons (Walters & Reich 1996), so m_s = 1 at T = 1 gives birch (T 2.03)
-//! about 0.39 a season fully starved; shade-tolerant juveniles die at 3–5% a year in deep shade
-//! (Petrovska et al. 2022), so β_s = 0.92 (≈ ln 10 / 2.5, a tenth over the 2.5 units from birch to
-//! beech) gives beech (T 4.56) about 0.04. An order of magnitude and a ranking, not a fit.
-//! R1's reproductive pool turned into seeds (c_seed each), dispersed
-//! a Laplace(0, d) distance at a random azimuth [RNG: dispersal; seeds beyond a z face are lost]
-//! and established where the ground light is at least Q_est with probability p_est [RNG:
-//! establishment], no live trunk within a cell; seed rain from beyond the world per species,
-//! anywhere on the ground [RNG: seedRain]. Seedlings start next season; live trees capped at
-//! maxTrees. Local seeds and seed rain establish anywhere in the depth (ADR 0063, decision 4: the
-//! garden's establishment band is gone), so pioneers arrive in gaps wherever they open. Seeding
-//! starts at R1's maturity height alone (R1 feeds the seed pool only above it), with no start
-//! season: a species whose trees stay below maturity (goat willow, 22.5 m) recruits by rain alone.
+//! O4. Stand dynamics (spec §O4, ADR 0013, ADR 0018; on the ground plane, ADR 0025).
+//!
+//! Rule: deaths by `o4.mortality` (the world's): `sizeBlind` (the default, the ablation) kills each
+//! tree with the background risk m₀ [RNG: mortality]; `twoPart` (ADR 0063) sums a canopy rate
+//! m_c·(H/H_c)^γ_c rising with the tree's height H and a suppression rate m_s·deficit·e^(−β_s(T − 1))
+//! scaled by the species' shade tolerance T, and makes one draw against the sum [RNG:
+//! standMortality]. The deficit is the world's `o4.suppressionSignal` (ADR 0065, decision 5):
+//! `carbon` (the default) (1 − P/M)₊ from R1's carbon balance this season (read only with R1 on),
+//! `topLight` (1 − (Q_top/C)/θ_q)₊ for the dark top, or `growth` (1 − ΔH/(k·g))₊ for the stalled
+//! leader. R1's reproductive pool, filled above its maturity height alone (no start season), is
+//! turned into seeds (c_seed each), dispersed a Laplace(0, d) distance at a random azimuth [RNG:
+//! dispersal; seeds beyond a z face are lost] and established where the ground light is at least
+//! Q_est with probability p_est [RNG: establishment], with no live trunk within a cell; seed rain
+//! from beyond the world lands per species anywhere on the ground [RNG: seedRain]. Local seeds and
+//! rain establish anywhere in the depth (ADR 0063, decision 4). Seedlings start next season; live
+//! trees, the seedling bank included, are capped at maxTrees.
 //!
 //! Params: o4.mortality; sizeBlind reads o4.m0, twoPart reads o4.mCanopy, o4.hCanopy,
 //! o4.gammaCanopy, o4.mSuppression, o4.suppressionSlope and o4.shadeTolerance (per species, as m₀
@@ -37,6 +25,7 @@ use super::c1::{plant_seedling, seedling_azimuth};
 use crate::math;
 use crate::params::{Mortality, SuppressionSignal};
 use crate::rng::{purpose, uniform};
+use crate::stand::stem_height;
 use crate::tree::Tree;
 use crate::world::World;
 
@@ -67,16 +56,27 @@ pub fn canopy_rate(height: f64, m_c: f64, h_c: f64, gamma: f64) -> f64 {
     math::min(m_c * math::pow(height / h_c, gamma), 1.0)
 }
 
+/// The tolerance-scaled rate both suppression rates share: m_s·deficit·e^(−β_s(T − 1)), clamped
+/// to a probability. The anchors (docs/research/2026-11-08-regeneration.md): below its survival
+/// light a birch seedling lasts 1–2 seasons (Walters & Reich 1996), so m_s = 1 at T = 1 gives
+/// birch (T 2.03) about 0.39 a season fully starved; shade-tolerant juveniles die at 3–5% a year in
+/// deep shade (Petrovska et al. 2022), so β_s = 0.92 (≈ ln 10 / 2.5, a tenth over the 2.5 units
+/// from birch to beech) gives beech (T 4.56) about 0.04. An order of magnitude and a ranking, not
+/// a fit. Each caller guards its own inputs first.
+fn scaled(deficit: f64, m_s: f64, slope: f64, tolerance: f64) -> f64 {
+    math::min(m_s * deficit * math::exp(-slope * (tolerance - 1.0)), 1.0)
+}
+
 /// The suppression rate (ADR 0063): m_s·(1 − P/M)₊·e^(−β_s(T − 1)) a season, clamped to a
 /// probability. Zero for a tree whose production P meets its maintenance M, and for M ≤ 0 (R1 off:
 /// no vigour to read); for a starved tree it rises with the share of M left unpaid and falls with
-/// shade tolerance T, so at equal starvation a light-demander dies first.
+/// shade tolerance T, so at equal starvation a light-demander dies first. A tree that pays its
+/// maintenance is never suppressed.
 pub fn suppression_rate(p: f64, m: f64, m_s: f64, slope: f64, tolerance: f64) -> f64 {
     if !(m > 0.0 && m_s > 0.0) {
         return 0.0;
     }
-    let deficit = math::max(1.0 - p / m, 0.0);
-    math::min(m_s * deficit * math::exp(-slope * (tolerance - 1.0)), 1.0)
+    scaled(math::max(1.0 - p / m, 0.0), m_s, slope, tolerance)
 }
 
 /// The suppression rate of a tree with `deficit` in [0, 1] of its signal unmet (ADR 0065):
@@ -86,11 +86,13 @@ pub fn tolerance_scaled(deficit: f64, m_s: f64, slope: f64, tolerance: f64) -> f
     if !(deficit > 0.0 && m_s > 0.0) {
         return 0.0;
     }
-    math::min(m_s * deficit * math::exp(-slope * (tolerance - 1.0)), 1.0)
+    scaled(deficit, m_s, slope, tolerance)
 }
 
 /// The dark top's deficit (`topLight`): (1 − (Q_top/C)/θ_q)₊, so a tree whose top sees θ_q of
 /// open sky or more has none and a tree whose top is dark has all of it. θ_q ≤ 0: no signal.
+/// It marks an overtopped tree that still pays its way, which P/M never does (the understorey sits
+/// at P/M 2–15: docs/experiments/2026-11-10-garden-suppression-probe.md).
 pub fn top_light_deficit(ratio: f64, threshold: f64) -> f64 {
     if !(threshold > 0.0) {
         return 0.0;
@@ -112,20 +114,8 @@ pub fn growth_deficit(t: &Tree, season: f64, k: f64, floor: f64) -> f64 {
             before = math::max(before, t.tip_y(i));
         }
     }
-    let gained = tree_height(t) - before;
+    let gained = stem_height(t) - before;
     math::max(1.0 - gained / (k * floor), 0.0)
-}
-
-/// A tree's height in cells: its highest metamer tip (as R1's maturity reads it).
-pub fn tree_height(t: &Tree) -> f64 {
-    let mut height = 0.0;
-    for i in 0..t.m.len() {
-        let y = t.tip_y(i);
-        if y > height {
-            height = y;
-        }
-    }
-    height
 }
 
 /// Background deaths, seeds, dispersal and establishment. Returns the season's recruits.
@@ -156,7 +146,7 @@ pub fn stand_dynamics(world: &mut World) -> f64 {
             }
             Mortality::TwoPart => {
                 let canopy =
-                    canopy_rate(tree_height(t), own.m_canopy, own.h_canopy, own.gamma_canopy);
+                    canopy_rate(stem_height(t), own.m_canopy, own.h_canopy, own.gamma_canopy);
                 // R1 ran this season (allocate precedes deaths), so P and M are this season's.
                 let suppression = if signal != SuppressionSignal::Carbon {
                     // ADR 0065: another signal's deficit, scaled by tolerance as carbon's is.
@@ -494,9 +484,9 @@ pub(crate) mod tests {
             w.step(&mut |_| {});
             for t in w.trees.iter().filter(|t| t.alive && t.species == "willow") {
                 assert!(
-                    tree_height(t) < maturity,
+                    stem_height(t) < maturity,
                     "a willow matured: {}",
-                    tree_height(t)
+                    stem_height(t)
                 );
                 assert_eq!(t.seeds, 0.0, "an immature willow set seed");
             }
@@ -573,7 +563,7 @@ pub(crate) mod tests {
         let mut w = world("{}");
         tall(&mut w, 40);
         let t = &w.trees[0];
-        assert!((tree_height(t) - 40.0).abs() < 2.0, "{}", tree_height(t));
+        assert!((stem_height(t) - 40.0).abs() < 2.0, "{}", stem_height(t));
     }
 
     #[test]

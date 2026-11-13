@@ -15,7 +15,7 @@ use crate::light::depth_of;
 use crate::math;
 use crate::params::{Params, TreeSpec};
 use crate::rng::{purpose, uniform};
-use crate::stand::CELL_METRES;
+use crate::stand::plot_hectares;
 
 /// The planted stand's trees, in planting order.
 pub fn plant(params: &Params) -> Vec<TreeSpec> {
@@ -23,7 +23,7 @@ pub fn plant(params: &Params) -> Vec<TreeSpec> {
         return params.trees.clone();
     };
     let (w, d) = (params.world.width, depth_of(params));
-    let hectares = w * d * CELL_METRES * CELL_METRES / 10_000.0;
+    let hectares = plot_hectares(params);
     let n = math::max(0.0, math::round(p.density * hectares)) as usize;
     // Distance along one axis, the short way round when that axis wraps.
     let along = |a: f64, b: f64, size: f64, wraps: bool| {

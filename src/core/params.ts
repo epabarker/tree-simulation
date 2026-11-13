@@ -573,7 +573,9 @@ export interface Params {
     suppressionSlope: number;
     /**
      * T: shade tolerance, Niinemets & Valladares's (2006) score, 1 (intolerant) to 5 (tolerant),
-     * per species (flora.ts). Scales the suppression rate only. Absent: 1.
+     * per species (flora.ts). Scales the suppression rate only. The default 3 is the scale's
+     * middle, for a species with no score; absent from the JSON the core reads 1 (params.rs), as
+     * it reads every two-part param's absent value as the neutral one. The two differ on purpose.
      */
     shadeTolerance: number;
     /**

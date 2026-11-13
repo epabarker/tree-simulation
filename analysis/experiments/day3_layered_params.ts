@@ -7,7 +7,14 @@ import { loneParams } from "../../cli/trials.ts";
 export const CONDITIONS = ["base", "depth-m10", "depth-p10", "kExt-m10", "kExt-p10", "eS-m10", "eS-p10", "dLambda-m10", "dLambda-p10"];
 export function layeredParams(width: number, seed: number, condition = "base") {
   if (!CONDITIONS.includes(condition)) throw new Error("unregistered condition");
-  const p = forestParams(width, seed, { recruits: .25, spacing: 21 });
+  const p = forestParams(width, seed, { spacing: 21 });
+  // Step 8 is frozen: pin the stand it recorded (before #121's flip), not today's garden. No
+  // planting (it would replace the trees below), size-blind mortality, the old cap
+  // (300 per 210 cells of width × 0.25 recruits) and holly outside O4.
+  delete p.o4.planting;
+  p.o4.mortality = "sizeBlind";
+  p.o4.maxTrees = Math.max(20, Math.round(((300 * p.world.width) / 210) * 0.25));
+  p.species.holly = { ...p.species.holly, o4: { ...p.species.holly?.o4, enabled: false } };
   const W = p.world.width, n = Math.max(2, Math.round(W / 21)), spacing = W / n;
   const canopy = ["beech", "oak", "hornbeam", "birch"], under = ["holly", "maple", "rowan", "willow"];
   p.world.depth = 24; p.world.sidesZ = "periodic"; p.o4.band = 24;

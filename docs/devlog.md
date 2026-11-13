@@ -2,6 +2,11 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-13: CI's instrument tests repaired for the new garden; the Step 8 stand pinned
+
+- **Why CI was red since #115:** the instrument-integration step (pytest after `npm run check`, not in the local stamp) failed three tests. (1) `build_dag.PARAMS` did not list #121's new O4 reads (`suppressionSignal`, `topLightThreshold`, `growthFloor`, `growthSeasons`, `planting`); now listed, gated on two-part mortality and on planting being set. (2) The DAG's lone tree is #115's open-grown box (240 deep, `sidesZ` open), not the half-walled 64; the test's anchor is updated. (3) A real drift: `day3_layered_params.ts` built Step 8's stand from `forestParams`, which since #121 plants (replacing its 12 placed trees), uses two-part mortality and the per-ha cap (160, not 57).
+- **The Step 8 stand is pinned** to what it recorded: no planting, `sizeBlind`, the old cap, holly outside O4. Against the factory at 417f4eb, `base` and `depth-m10` run bit-identically for 40 seasons (hashes 332198ca, fdc7b760); the remaining JSON differences are defaulted fields only two-part mortality reads.
+
 ## 2026-11-13: four choices from spec #111's review kept as built (ADR 0066)
 
 - The user accepted the recommendations: the lab draws the seedling bank (the garden does not); the garden's specimen stays half-walled (the open box does not fit its worker budget); plain-data records are allowed in the core (AGENTS.md's convention now says so); the garden keeps opening on the live intro (ADR 0046). No code, golden or regression changed.

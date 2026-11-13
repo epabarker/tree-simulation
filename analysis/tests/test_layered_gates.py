@@ -54,7 +54,7 @@ def test_dag_prepared_stand_does_not_leak_into_lone(prepared,tmp_path):
     stand=json.loads((tmp_path/'species_effective_stand.json').read_text());lone=json.loads((tmp_path/'species_effective_lone.json').read_text())
     assert stand['beech']['world']['depth']==pytest.approx(21.6)
     assert stand['beech']['world']['sidesZ']=='periodic'
-    assert lone['beech']['world']['depth']==64 and lone['beech']['world'].get('sidesZ')!='periodic'
+    assert lone['beech']['world']['depth']==240 and lone['beech']['world'].get('sidesZ')=='open'  # #115's open-grown box
     assert json.loads((tmp_path/'provenance.json').read_text())['stand_params_sha256']
 
 def test_full_native_reduction_measures_lai_floor_and_planted_crown(tmp_path):

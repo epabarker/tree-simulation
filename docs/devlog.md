@@ -2,6 +2,14 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-13: #132's probe: no arm passes; the ramp stays built and off
+
+- **Note:** [docs/experiments/2026-11-13-understorey-probe.md](experiments/2026-11-13-understorey-probe.md). Bars committed before the runs (3bfd8be); script `cli/understorey-probe.ts` (DBH ≥ 7 cm via `cli/allometry.ts`, metamers kept at 100/200/300). 5 arms × 2 widths × seeds 1–20, 46.8 min on 12 simulators, after a clean pilot on seeds 1–3.
+- **Result:** every `topLight` ramp arm (θ_hi 0.10/0.15/0.25 at m_s 1; 0.15 at m_s 3) raises the ≥ 7 cm canopy share (38–45 of 60 frames at ≥ 0.6 against 21) but fails the band (10–11 of 60 against head's 19), canopy trees/ha (86–102 against 109) and light-demanders in the canopy (45–48 against 53). Canopy deaths rise 1.4–2.2×. Three of four arms fail gate 1 at 66 cells (16–17 of 20).
+- **Surprise:** at head the ≥ 7 cm count is already about in the band (median 266/ha); the suppression thins it below 200 rather than thinning the sub-7 cm flood into it. The cap never clears; hornbeam's bank nearly doubles (#137).
+- **What limits it:** #138 for the band (hundreds of drawn sub-7 cm stems a hectare do not reach 7 cm), #134 for the canopy count. Re-probe after those; the rule needs no change.
+- No default, golden, preset or regression changed. `cli/shared.ts`'s `sim` takes extra runner args.
+
 ## 2026-11-13: #132's ramp built (O4 `topLight` against `o4.survivalLight`), off by default
 
 - **The rule** (ADR 0068 decision 1, 2): `principles/o4.rs::top_light_ramp`, the deficit clamp((θ_hi − q)/(θ_hi − θ_sp), 0, 1) with θ_hi := max(θ_hi, θ_sp), still scaled by `tolerance_scaled`. `o4.survivalLight` (θ_sp) is new and per species; `o4.topLightThreshold` (θ_hi) is now read from the species' merged params, so a species may set its own ceiling (identical to the world's when none does).

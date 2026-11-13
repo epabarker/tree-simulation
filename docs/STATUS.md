@@ -1,6 +1,6 @@
 # Status
 
-_Last updated: 2026-11-13; #132's ramp built, off by default (`o4.survivalLight`); probe next._
+_Last updated: 2026-11-13; #132's probe: no arm passes; the ramp stays built and off._
 
 **Live:** garden0.16.0. RC prepared/merged#71; phone soak deferred, no release-readiness waiver.
 
@@ -25,8 +25,8 @@ _Last updated: 2026-11-13; #132's ramp built, off by default (`o4.survivalLight`
 - Branch codex/day3-species-programme; beech retained, no sycamore/ash candidate qualified.
 - Confirmation seeds 22021–22040/23021–23040 untouched. docs/experiments/2026-11-08-day3-step8.md.
 ## Next
-1. #132: the rule is built (off, bit-identical); next its probe (pilot 1–3, then 20 seeds; the
-   7 cm DBH band in the scorer). Then #133 (wind in R3), #134.
+1. #132 probed (docs/experiments/2026-11-13-understorey-probe.md): no arm passes; the band
+   limited by #138 (sapling growth), the canopy count by #134. Next #133, #134, #138; re-probe after.
 2. #134 carries ADR 0067's fit change (breast-height slenderness, pooled forks).
 3. Phone soak remains a separate deferred release gate; no tag/deploy/production push.
 ## Gotchas

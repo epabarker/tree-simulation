@@ -53,6 +53,42 @@ At both widths: seasons at the cap (median, cap-free runs); drawn stems ≥ 1.3 
 ### Regressions
 `forestRegeneration` must not move (it is unchanged by the rule's build, and the probe changes no default). `phoneSeed3` moves only if an arm is adopted.
 
-## Results
+## Results (seeds 1–20, 3bfd8be)
 
-_Not yet run._
+**No arm passes.** The full output is [`code/2026-11-13-understorey-probe/output.txt`](code/2026-11-13-understorey-probe/output.txt) and the bars [`bars.json`](code/2026-11-13-understorey-probe/bars.json). 200 runs in 46.8 min on 12 simulators; the pilot (seeds 1–3, 8.3 min) ran clean and its runs are part of these.
+
+### Adoption bars (160 cells, 60 frames)
+
+| arm | 1. ≥ 7 cm in 200–400/ha | 2. ≥ 7 cm share ≥ 0.6 | 3. canopy trees/ha | 4. canopy deaths/run | 5. light-demander frames | gates |
+|---|---|---|---|---|---|---|
+| head | 19 (median 266/ha) | 21 (median 0.50) | 109 | 10.3 | 53 | pass |
+| t10 | 11 ✗ (196/ha) | **38** ✓ (0.64) | 102 ✗ | 14.9 ✓ (1.44×) | 45 ✗ | ✗ (66: 17/20) |
+| t15 | 10 ✗ (149/ha) | **39** ✓ (0.75) | 94 ✗ | 17.5 ✗ (1.70×) | 47 ✗ | pass (66: 18/20) |
+| t25 | 10 ✗ (125/ha) | **45** ✓ (0.85) | 94 ✗ | 22.6 ✗ (2.19×) | 45 ✗ | ✗ (66: 16/20) |
+| t15m3 | 11 ✗ (109/ha) | **44** ✓ (0.87) | 86 ✗ | 21.3 ✗ (2.07×) | 48 ✗ | ✗ (66: 17/20) |
+
+Canopy deaths exclude thrown trees (3.4–4.2 a run in every arm, 3.75 at head). Every lone-tree hash equals head's and every checkpoint test passes in every arm; the gates that fail are gate 1 and 2 at 66 cells.
+
+### Reported
+
+| arm | drawn ≥ 1.3 m/ha (median), band frames, share | cap seasons (median; cap-free runs) | bank (median per frame) | bank lifetimes, hornbeam / beech (seasons) | top share |
+|---|---|---|---|---|---|
+| head | 1297, 13/60, 0.14 | 235; 0 | 68 (hornbeam 57, beech 20) | 15.8 / 14.0 | 0.78 |
+| t10 | 664, 13/60, 0.27 | 228; 0 | 118 (hornbeam 82) | 10.0 / 11.5 | 0.71 |
+| t15 | 531, 8/60, 0.23 | 221; 0 | 123 (hornbeam 90) | 10.0 / 10.5 | 0.82 |
+| t25 | 281, 16/60, 0.39 | 210; 0 | 140 (hornbeam 112) | 10.0 / 12.8 | 0.80 |
+| t15m3 | 196, 11/60, 0.59 | 210; 0 | 145 (hornbeam 112) | 5.0 / 7.0 | 0.70 |
+
+- **The phone (66 cells):** the canopy share on ≥ 7 cm stems reaches 1.00 in every arm (54–57 of 60 frames at ≥ 0.6, head 41), but ≥ 7 cm stems fall from a median 114/ha to 38–57/ha. Gate 1 drops to 16–18 of 20: some phone runs lose every drawn stem for a season.
+- **Floor light under the bank** (its stems' `groundLight`, not the plot mean): a median 0.02–0.03 of open sky in every arm, head included.
+
+## Why none passes
+
+1. **The signal thins the wrong layer for bar 1.** At head the ≥ 7 cm count is already in or above the band (median 266/ha, 19 of 60 frames); the flood is sub-7 cm, as ADR 0068 found. Every arm kills the overtopped ≥ 7 cm stems (the share rises because its denominator falls) and leaves too few: medians of 109–196/ha, below the band's floor, in 10–11 frames. The drawn count falls 2–7×, but the ≥ 7 cm band moves away, not into it.
+2. **It costs the canopy.** Canopy trees/ha fall 7–21% and canopy deaths rise 1.4–2.2×: some canopy trees' tops sit below θ_hi (the canopy's Q_top median is 0.34, ADR 0068, with a tail under 0.25), and a canopy tree here is only over half the top height. Light-demanders hold the canopy in fewer frames (45–48 against 53).
+3. **The bank refills.** No arm leaves the cap (cap-free runs: 0 of 20 everywhere; median cap seasons 210–228 against 235). The places suppression frees go to hornbeam seedlings: the bank nearly doubles (68 to 118–145) while its lifetimes shorten. That is ADR 0068's Context (mortality cannot clear a cap fed by this seed supply) and #137's.
+
+**What limits it, #138 or #134.** This probe cannot separate them; it points at both, in different layers.
+- **#138 (sapling growth) limits bar 1.** Under t10 and t15, 470 and 380 drawn stems a hectare sit between 1.3 m and 7 cm DBH (the drawn median less the ≥ 7 cm median, so a rough count), and the ≥ 7 cm count still falls: freed light does not turn the drawn sub-7 cm layer into 7 cm stems within the frames. That is #138's surplus that buys no growth.
+- **#134 (crown width) limits bar 3.** Head holds only 109 canopy trees/ha, and no suppression arm adds any: the canopy's count is set by how much ground each crown takes, which suppression does not change.
+- **Order:** #133 and #134 change crowns and the floor's light (ADR 0068's Consequences), and #138 the saplings' response. The signal's rates are worth re-probing only after #138 and #134; a re-probe needs no code (the rule is built).

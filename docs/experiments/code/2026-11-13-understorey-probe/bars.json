@@ -1,0 +1,62 @@
+{
+ "seeds": [
+  1,
+  2,
+  3,
+  4,
+  5,
+  6,
+  7,
+  8,
+  9,
+  10,
+  11,
+  12,
+  13,
+  14,
+  15,
+  16,
+  17,
+  18,
+  19,
+  20
+ ],
+ "bars": {
+  "t10": {
+   "gates": false,
+   "band7": false,
+   "share7": true,
+   "canopyPerHa": false,
+   "canopyDeaths": true,
+   "lightDemanders": false,
+   "passes": false
+  },
+  "t15": {
+   "gates": true,
+   "band7": false,
+   "share7": true,
+   "canopyPerHa": false,
+   "canopyDeaths": false,
+   "lightDemanders": false,
+   "passes": false
+  },
+  "t25": {
+   "gates": false,
+   "band7": false,
+   "share7": true,
+   "canopyPerHa": false,
+   "canopyDeaths": false,
+   "lightDemanders": false,
+   "passes": false
+  },
+  "t15m3": {
+   "gates": false,
+   "band7": false,
+   "share7": true,
+   "canopyPerHa": false,
+   "canopyDeaths": false,
+   "lightDemanders": false,
+   "passes": false
+  }
+ }
+}

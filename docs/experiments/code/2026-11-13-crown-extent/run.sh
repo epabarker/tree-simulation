@@ -3,7 +3,9 @@
 # (npm run probe), HEAD's runs linked from the `base` arm.
 #
 #   run.sh base                 HEAD alone: the six exemplars' lone trees and the garden
-#   run.sh <arm> [lone|garden]  patches/<arm>.json against it (default: both stages)
+#   run.sh <arm> [lone|garden]  patches/<arm>.json against it (default: both stages; `garden`
+#                               is the garden and hornbeam's lone trees, `lone` the other five)
+#   run.sh <arm> screen         a calibration variant: hornbeam, beech and birch alone
 #
 # Lone: loneTreeParams, seasons 10..100. Garden: forestParams at 160 and 66 cells to season 300
 # (rides on hornbeam's call). Output: runs/probe/129-<arm>-<species>/. At most 12 simulators.
@@ -24,10 +26,16 @@ probe() { # species, then the stage's options
     2> >(grep -v '^probe: \(head\|patch\) ' >&2)
 }
 
+if [ "$stage" = screen ]; then # a calibration variant: three exemplars' lone trees only
+  probe hornbeam --widths "" --jobs 3
+  probe beech --widths "" --jobs 3
+  probe birch --widths "" --jobs 3
+  exit
+fi
+# The garden rides on hornbeam's call, so `lone` leaves hornbeam's label alone: the probe clears
+# a label before it runs, and a lone-only hornbeam call would delete the arm's garden.
 if [ "$stage" != lone ]; then
   probe hornbeam --widths 160,66 --garden "$GARDEN" --jobs 6 &
-elif [ "$stage" = lone ]; then
-  probe hornbeam --widths "" --jobs 3 &
 fi
 if [ "$stage" != garden ]; then
   (probe oak --widths "" --jobs 3; probe maple --widths "" --jobs 3; probe holly --widths "" --jobs 3) &

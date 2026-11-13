@@ -589,6 +589,34 @@ mod tests {
     }
 
     #[test]
+    fn the_extent_draw_bars_a_shoot_at_its_chance_and_is_keyed_by_tree_bud_and_season() {
+        // Probe (#129), in the bud phase. A seedling's node is one internode along its path, so
+        // with L_x = 1 its terminal bud extends with a chance of one half. Over 4,000 seedlings
+        // (tree ids 0..4000) about half grow; the same tree and season always draw alike, and
+        // another season draws afresh.
+        let p = params(r#"{"c1":{"extentLimit":"path","extentScale":1,"extentSteepness":3}}"#);
+        let grows = |id: usize, season: f64| {
+            let mut t = Tree::new(id, 10.0, 32.0);
+            plant_seedling(&mut t, &p, 0.0, 0.0, 0.0);
+            let terminal = (0..t.b.len()).find(|&j| t.b.slot[j] == slot::MAIN).unwrap();
+            t.b.v.iter_mut().for_each(|v| *v = 0.0);
+            t.b.v[terminal] = 1.0;
+            let before = t.m.len();
+            crate::season::grow_buds(&mut t, &p, season);
+            t.m.len() > before
+        };
+        let first: Vec<bool> = (0..4000).map(|id| grows(id, 1.0)).collect();
+        let grown = first.iter().filter(|&&g| g).count();
+        assert!((1880..=2120).contains(&grown), "{grown} of 4000"); // ± 3.8 SD
+        assert!((0..4000).all(|id| grows(id, 1.0) == first[id]));
+        let changed = (0..4000).filter(|&id| grows(id, 2.0) != first[id]).count();
+        assert!(
+            (1880..=2120).contains(&changed),
+            "{changed} of 4000 changed"
+        );
+    }
+
+    #[test]
     fn the_extent_limit_is_off_by_default_and_written_out_is_bit_identical() {
         // Probe (#129): `off` written out, with every other extent param set, hashes as a run
         // that leaves the rule absent; so does a limit whose L_x is 0 (no limit). A reach limit

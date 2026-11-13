@@ -1,0 +1,73 @@
+{
+  "params": {
+    "c1": {
+      "extentLimit": "height",
+      "extentSpare": true,
+      "extentScale": 4,
+      "extentSteepness": 8,
+      "extentFloor": 0
+    }
+  },
+  "species": {
+    "birch": {
+      "r3": {
+        "sigmaTarget": 12000,
+        "sigmaBreak": 28000
+      }
+    },
+    "beech": {
+      "r3": {
+        "sigmaTarget": 12000,
+        "sigmaBreak": 28000
+      }
+    },
+    "oak": {
+      "r3": {
+        "sigmaTarget": 12000,
+        "sigmaBreak": 28000
+      }
+    },
+    "fir": {
+      "r3": {
+        "sigmaTarget": 12000,
+        "sigmaBreak": 28000
+      }
+    },
+    "hornbeam": {
+      "r3": {
+        "sigmaTarget": 12000,
+        "sigmaBreak": 28000
+      }
+    },
+    "maple": {
+      "r3": {
+        "sigmaTarget": 12000,
+        "sigmaBreak": 28000
+      }
+    },
+    "holly": {
+      "r3": {
+        "sigmaTarget": 12000,
+        "sigmaBreak": 28000
+      }
+    },
+    "rowan": {
+      "r3": {
+        "sigmaTarget": 12000,
+        "sigmaBreak": 28000
+      }
+    },
+    "willow": {
+      "r3": {
+        "sigmaTarget": 12000,
+        "sigmaBreak": 28000
+      }
+    },
+    "pine": {
+      "r3": {
+        "sigmaTarget": 12000,
+        "sigmaBreak": 28000
+      }
+    }
+  }
+}

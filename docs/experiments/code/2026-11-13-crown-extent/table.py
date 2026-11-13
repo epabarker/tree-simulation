@@ -6,6 +6,7 @@ and +-z), Pretzsch et al. 2015's open-grown 95% edge (anchors.py), and the core'
     python3 docs/experiments/code/2026-11-13-crown-extent/table.py lone <arm> ...
     python3 docs/experiments/code/2026-11-13-crown-extent/table.py garden <arm> ... [--runs]
     python3 docs/experiments/code/2026-11-13-crown-extent/table.py crowns <arm> ...
+    python3 docs/experiments/code/2026-11-13-crown-extent/table.py fates <arm> ...
 
 lone: per arm and exemplar, the min-max over seeds 1-3 at season 100, and where the tree first
 reaches DBH 40 cm (the bar: crown diameter at or under Pretzsch's edge at matched DBH).
@@ -190,6 +191,45 @@ def crowns(arms):
             )
 
 
+def fates(arms):
+    """The planted cohort's fate at 160 cells, seeds pooled, as the path-length note's section 5
+    reads it: a death is thrown (R3) if the dead row counts a break, starved (R1) if its starved
+    count rose, else the O4 draw; canopy if the tree's last living height was over half the top."""
+    print("| arm | planted | O4 draw, below canopy | O4 draw, canopy | R1 starved | R3 thrown | alive at 300 |")
+    print("|---|---|---|---|---|---|---|")
+    for arm in arms:
+        fate, planted = defaultdict(int), 0
+        for run in runs(arm, "hornbeam", "garden160"):
+            top = {int(r["season"]): float(r["topHeight100"]) for r in csv.DictReader(open(run / "stand.csv"))}
+            n = int(next(csv.DictReader(open(run / "stand.csv")))["live"])
+            planted += n
+            last, dead = {}, {}
+            for r in csv.DictReader(open(run / "metrics.csv")):
+                t = int(r["tree"])
+                if t >= n:
+                    continue
+                if r["alive"] == "1":
+                    last[t] = r
+                elif t in last and t not in dead:
+                    dead[t] = r
+            for t, lv in last.items():
+                if t not in dead:
+                    fate["alive"] += 1
+                    continue
+                d = dead[t]
+                canopy = float(lv["height"]) > top.get(int(lv["season"]), 0) / 2
+                if float(d["broken"] or 0) > 0:
+                    fate["thrown"] += 1
+                elif float(d["starved"] or 0) > float(lv["starved"] or 0):
+                    fate["starved"] += 1
+                else:
+                    fate["o4-canopy" if canopy else "o4-below"] += 1
+        print(
+            f"| {arm} | {planted} | {fate['o4-below']} | {fate['o4-canopy']} | {fate['starved']} | "
+            f"{fate['thrown']} | {fate['alive']} |"
+        )
+
+
 def main():
     argv = [a for a in sys.argv[1:] if not a.startswith("--")]
     what, arms = argv[0], argv[1:]
@@ -197,6 +237,8 @@ def main():
         lone(arms)
     elif what == "garden":
         garden(arms, "--runs" in sys.argv)
+    elif what == "fates":
+        fates(arms)
     else:
         crowns(arms)
 

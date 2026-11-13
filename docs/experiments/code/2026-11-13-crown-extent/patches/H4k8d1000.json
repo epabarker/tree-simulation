@@ -1,0 +1,1 @@
+{"params": {"c1": {"extentLimit": "height", "extentSpare": true, "extentScale": 4, "extentSteepness": 8, "extentFloor": 0}, "o4": {"planting": {"density": 1000, "spacing": 8, "species": ["birch", "oak", "willow", "beech", "birch", "hornbeam", "rowan", "birch", "holly", "maple"]}}}}

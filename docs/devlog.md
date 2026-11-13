@@ -2,6 +2,19 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-12: #122, the garden's 20-seed acceptance: round 6 stays, d1 is #129's first lever
+
+- **The run** (`npm run evidence:garden`, `cli/garden-acceptance.ts`; [note](experiments/2026-11-12-garden-acceptance.md), bars committed before the run at 8671f08): r6 (HEAD's garden) against d1 (hornbeam `o4.cSeed` 300 + `topLight` θ_q 0.15), widths 160 and 66, seeds 1–20, 300 seasons, natively on 8 simulators; 25.5 min.
+- **Gates** (≥ 18 of 20): a canopy tree every season after 50 held in r6 20/20 at both widths, d1 20/20 at 160 and 18/20 at 66 (seeds 7 and 14 lost every drawn stem for two seasons). Both pass the checkpoint and lone-tree tests (oak and hornbeam, seeds 1–3, season 100: the hashes of 46f3cf4's own build).
+- **The pre-registered rule picks r6:** d1 was better on cap seasons (3,459 vs 8,263 pooled) and the 70% bar (46% vs 34% of judged frames), worse on frames in the band (13 vs 23), and its phone gate count was below r6's. The user took the pick: no flora, preset, golden or `rust/presets.json` change.
+- **The canopy gate is weak.** Under the top height, "a canopy tree at every season" only means "at least one drawn stem": the tallest drawn stem is always over half the mean of the tallest few. #129 owns the real canopy target.
+- **r6 ships a capped, flooded garden:** a median canopy share of 0.14 at 160 cells (0.39 at 66), a median 235 of 300 seasons at the cap (187), no run of 40 cap-free; 1,641–1,954 drawn/ha on the desktop at 200–300. d1 helped the cap and the species mix, so it is the first lever for #129 to re-test.
+- **The oak (for #124):** under r6 only 4 of 1,350 desktop oak recruits reach 1.3 m; no desktop run has a seeding oak at 300 (7 hold one). d1: 198 of 4,219, and 4 runs seeding at 300.
+- **Checkpoint test:** `tests/checkpoint-pre121.test.ts` with the fixture `tests/fixtures/garden-pre121-66-1-s6.bin.gz` (43 kB; 46f3cf4's own `forestParams(66, 1)` at season 6, from its own build). It loads at HEAD with the new o4 params at their defaults, and ten seasons reach 083d0cb6, the hash 46f3cf4 reached from scratch.
+- **Shipped forests:** none to regenerate. ADR 0046 ships no 3D checkpoint (`cli/first-paint.ts`' manifest lists no widths); the garden opens on the live intro from season 0. The stand-density page's "opens on a grown checkpoint" is corrected; opening on the settled garden would reopen ADR 0046 and is the user's question.
+- **Looked at** in headless Firefox (puppeteer-core), seed 2, desktop 1280 × 800 and phone 390 × 844 at seasons 100–300 (`figures/2026-11-12-garden-acceptance-browser.png`). Those viewports run 170 and 80 cells (`plateWidth`), not 160 and 66. No console errors and no lost WebGL context. The tall crowns crop above the 35 m plate, and the flood shows as a low sapling layer.
+- **Goldens:** none moved.
+
 ## 2026-11-12: #121 lands at round 6; the suppression signal as an option; canopy at half the top height (ADR 0065)
 
 - **The decision** (user, 2026-11-12, #121's last comment; [ADR 0065](decisions/0065-garden-demography-reported-targets.md), amending ADR 0063 decisions 1–3): the garden flip lands at round 6's rates (periodic depth, 400 saplings/ha, `twoPart` with m_c 0.003, the 1.3 m display threshold). The per-hectare targets (200–400 drawn/ha, ≥ 60% canopy) are reported, not gated; their gate moves to #129. Seasons at the cap are a reported count. "No species above 70%" is read only in frames of ≥ 8 drawn stems. The phone width's bar is ≥ 1 canopy tree from season 100. #122 decides between round 6 and d1 on 20 seeds.

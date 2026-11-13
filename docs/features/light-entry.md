@@ -1,6 +1,6 @@
 # Light entry
 
-A **World effect** (GLOSSARY): how sky enters the slab past its bounds. Decided by the ticket [Should the slab admit side light from its front and back?](https://github.com/epabarker/tree-simulation/issues/82) and recorded in [ADR 0062](../decisions/0062-light-entry.md); spec §C2.13. **Status: built. The open-grown lone-tree stage by [#115](https://github.com/epabarker/tree-simulation/issues/115); the garden's periodic depth by [#121](https://github.com/epabarker/tree-simulation/issues/121) (the faces stay selectable for a host page: `forestParams`' `faces`).**
+A **World effect** (GLOSSARY): how sky enters the slab past its bounds. Decided by the ticket [Should the slab admit side light from its front and back?](https://github.com/epabarker/tree-simulation/issues/82) and recorded in [ADR 0062](../decisions/0062-light-entry.md); spec §C2.13. **Status: built. The open-grown lone-tree stage by [#115](https://github.com/epabarker/tree-simulation/issues/115); the garden's periodic depth by [#121](https://github.com/epabarker/tree-simulation/issues/121), accepted on seeds 1–20 by [#122](https://github.com/epabarker/tree-simulation/issues/122) ([note](../experiments/2026-11-12-garden-acceptance.md)) (the faces stay selectable for a host page: `forestParams`' `faces`).**
 
 ## What it should look like
 

@@ -8,7 +8,10 @@
 //!   treesim --preset oakOpen --species-patch '{"oak":{"r3":{"posture":false}}}'
 //!   treesim --preset succession --checkpoint-at 60 --seasons 60 --out runs/c
 //!
-//! Writes to --out: run.json, metrics.csv, metamers.csv, form.csv, hash.txt; with --light,
+//! Writes to --out: run.json (the record, its `notices` included: `capReached`; `meta.capSeasons`,
+//! the seasons at the cap, a reported count, ADR 0065), metrics.csv, metamers.csv, form.csv,
+//! hash.txt, stand.csv (live, drawn and canopy stems, the tallest tree's height, the cap and the
+//! top height `topHeight100`, the mean of the 100 tallest drawn stems a hectare, per season) and stand-species.csv; with --light,
 //! light.csv (with lad, the leaf area density over depth), buds.csv (every live bud, with its
 //! birthId) and ground.csv (the ground's light and the leaf area above it, per x and z); with
 //! --checkpoint-at N, checkpoint-N.bin.gz. Presets come from rust/presets.json
@@ -23,6 +26,7 @@ use tree_core::form::{FORM_COLUMNS, PROFILE_BANDS, form_metrics};
 use tree_core::hash::hash_world;
 use tree_core::json::{self, Value, number_to_string};
 use tree_core::metrics::{METRIC_COLUMNS, tree_metrics};
+use tree_core::stand::stand_metrics;
 use tree_core::world::World;
 
 const PRESETS: &str = include_str!("../../presets.json");
@@ -260,6 +264,11 @@ fn main() {
     let mut light_lines = vec!["season,col,row,shade,lad".to_string()];
     let mut bud_lines = vec!["season,tree,metamer,state,age,q,v,y,leaf,birthId".to_string()];
     let mut ground_lines = vec!["season,col,layer,q,lai".to_string()];
+    let mut stand_lines =
+        vec!["season,live,drawn,canopy,topHeight,capReached,topHeight100".to_string()];
+    // Seasons the live trees filled the cap: a reported count, not a failure (ADR 0065).
+    let mut cap_seasons = 0.0;
+    let mut stand_species_lines = vec!["season,species,live,drawn,share".to_string()];
 
     let mut world = World::new(params);
     if a.bench {
@@ -293,6 +302,31 @@ fn main() {
                 });
             }
             metrics_lines.push(row.join(","));
+        }
+        // The stand (ADR 0063): live, drawn (the display threshold) and canopy stems, the cap.
+        let st = stand_metrics(&world);
+        stand_lines.push(format!(
+            "{},{},{},{},{},{},{}",
+            num(season),
+            num(st.live),
+            num(st.drawn),
+            num(st.canopy),
+            num(st.tallest),
+            st.cap_reached as u8,
+            num(st.top_height_100)
+        ));
+        if st.cap_reached {
+            cap_seasons += 1.0;
+        }
+        for sp in &st.species {
+            stand_species_lines.push(format!(
+                "{},{},{},{},{}",
+                num(season),
+                sp.species,
+                num(sp.live),
+                num(sp.drawn),
+                num(sp.share)
+            ));
         }
         if checkpoint_at == Some(season) {
             let bytes = save_world(&world);
@@ -463,6 +497,7 @@ fn main() {
             ("commit".into(), Value::Str(git_commit())),
             ("hash".into(), Value::Str(hash.clone())),
             ("ms".into(), Value::Num(ms.round())),
+            ("capSeasons".into(), Value::Num(cap_seasons)),
             ("core".into(), Value::Str("rust".into())),
         ]),
     )]);
@@ -479,6 +514,11 @@ fn main() {
     write("metamers.csv", format!("{}\n", metamer_lines.join("\n")));
     write("form.csv", format!("{}\n", form_lines.join("\n")));
     write("hash.txt", format!("{hash}\n"));
+    write("stand.csv", format!("{}\n", stand_lines.join("\n")));
+    write(
+        "stand-species.csv",
+        format!("{}\n", stand_species_lines.join("\n")),
+    );
     if a.light {
         write("light.csv", format!("{}\n", light_lines.join("\n")));
         write("ground.csv", format!("{}\n", ground_lines.join("\n")));

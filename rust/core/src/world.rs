@@ -56,12 +56,27 @@ pub struct World {
     /// Events applied so far, as JSON ({season, type, …}).
     pub log: Vec<Value>,
     pub pending: Vec<Value>,
+    /// What the run did, as JSON ({season, type}), not replayed: `capReached` the first season
+    /// the cap holds (stand.rs; the season as stand.csv numbers it, after the season ran). Kept
+    /// apart from `log`, which is the replay's input, and out of the checkpoint's bytes.
+    pub notices: Vec<Value>,
 }
 
 /// The owner grid (O2, R5): one cell per light cell, W × H × D.
 fn grid(params: &Params) -> Vec<i32> {
     let d = crate::light::depth_of(params);
     vec![0; (params.world.width * params.world.height * d) as usize]
+}
+
+/// A planted tree as `trees` holds it.
+fn tree_json(t: &crate::params::TreeSpec) -> Value {
+    let mut v = Value::obj();
+    v.set("x", Value::Num(t.x));
+    v.set("z", Value::Num(t.z));
+    if !t.species.is_empty() {
+        v.set("species", Value::Str(t.species.clone()));
+    }
+    v
 }
 
 fn event(season: f64, kind: &str) -> Value {
@@ -72,8 +87,17 @@ fn event(season: f64, kind: &str) -> Value {
 }
 
 impl World {
-    pub fn new(params: Value) -> World {
-        let rules = Rules::new(&params);
+    pub fn new(initial: Value) -> World {
+        let mut params = initial.clone();
+        let mut rules = Rules::new(&params);
+        // O4's planting at a density replaces `trees` once, here: the record keeps the schedule
+        // (a pure function of the seed, so a replay plants the same stand), and the running
+        // params hold the planted trees, which a params patch cannot change.
+        if rules.params.o4.planting.is_some() {
+            let planted = crate::principles::planting::plant(&rules.params);
+            params.set("trees", Value::Arr(planted.iter().map(tree_json).collect()));
+            rules = Rules::new(&params);
+        }
         let trees = rules
             .params
             .trees
@@ -87,7 +111,7 @@ impl World {
             })
             .collect();
         let mut world = World {
-            initial_params: params.clone(),
+            initial_params: initial,
             light: make_light(&rules.params),
             owner: grid(&rules.params),
             params_json: params,
@@ -99,6 +123,7 @@ impl World {
             owners_tagged: false,
             log: Vec::new(),
             pending: Vec::new(),
+            notices: Vec::new(),
         };
         world.plant_due();
         world
@@ -149,6 +174,10 @@ impl World {
         self.plant_due();
         crate::season::run_season(self, mark);
         self.season += 1.0;
+        let noticed = |e: &Value| e.get("type").and_then(Value::as_str) == Some("capReached");
+        if !self.notices.iter().any(noticed) && crate::stand::cap_reached(self) {
+            self.notices.push(event(self.season, "capReached"));
+        }
     }
 
     /// Runs `seasons` seasons, applying recorded events at their seasons (CLI replay).
@@ -179,12 +208,14 @@ impl World {
         n
     }
 
-    /// `record()`: the initial params, every applied event and the season count.
+    /// `record()`: the initial params, every applied event and the season count, then the run's
+    /// notices (an output: a replay ignores them and raises them again).
     pub fn record(&self) -> Value {
         Value::Obj(vec![
             ("params".into(), self.initial_params.clone()),
             ("events".into(), Value::Arr(self.log.clone())),
             ("seasons".into(), Value::Num(self.season)),
+            ("notices".into(), Value::Arr(self.notices.clone())),
         ])
     }
 

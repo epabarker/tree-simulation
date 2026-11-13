@@ -62,10 +62,12 @@ describe("species trials and amended patches (M27)", () => {
     expect(hashWorld(b)).toBe(hashWorld(a));
   });
 
-  it("measures a lone tree at seasons 30 and 60", () => {
-    const t = runLone("birch", 1);
+  // At seasons 10 and 20, not the trials' 30 and 60: the lone tree grows in the open-grown 60 m box
+  // (ADR 0062, #115), where 60 seasons took about 60 s in the full suite.
+  it("measures a lone tree at two stages", () => {
+    const t = runLone("birch", 1, {}, 60, [10, 20]);
     expect(t.alive).toBe(true);
-    expect(t.height60).toBeGreaterThan(t.height30);
+    expect(t.heightStage2).toBeGreaterThan(t.heightStage1);
     expect(t.spread).toBeGreaterThan(0);
     expect(t.forkHeight).toBeGreaterThan(0);
   });

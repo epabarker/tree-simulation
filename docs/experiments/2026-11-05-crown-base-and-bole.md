@@ -1,5 +1,7 @@
 # Crown base and bole: crownBase80 and trunkTortuosity05, the trunk's sinuosity, ADR 0052's probe (2026-11-05)
 
+> **Evidence, not a baseline** (ADR 0062, ticket #115, 2026-11-10). Measured in the world of the slab's τ 0.2 walls: a half-walled lone tree, or a stand lit through its faces. The lone-tree stage is now open-grown (a square 60 m box, open on all four sides) and the garden's depth is to become periodic, so re-measure before using these numbers as a baseline.
+
 _Reference-fidelity plan §g, phase 3 (the user, 2026-11-05, after the render in
 [pilot v3's note](2026-11-05-level1-beech-pilot-v3.md#what-the-fit-looks-like-render-2026-11-05)). Provisional; nothing
 accepted. No core change: nothing under `src/`, `rust/`, `cli/`, `tests/`._

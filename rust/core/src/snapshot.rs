@@ -1,6 +1,7 @@
 //! Per-season snapshots for the renderer, built into one buffer so that the page
-//! takes them out of linear memory in a single copy (I1). Flat arrays over every live tree's
-//! metamers, trees in id order, each tree's rows parent-before-child; `prev_index` maps each
+//! takes them out of linear memory in a single copy (I1). Flat arrays over every drawn tree's
+//! metamers (live and at or above the display threshold, `stand::is_drawn`: the seedling bank is
+//! not drawn, ADR 0063; the lab asks for it with `seedlings`), trees in id order, each tree's rows parent-before-child; `prev_index` maps each
 //! metamer to its row in the previous snapshot (−1 if new), merged by birth id tree by tree.
 //!
 //! In 3D (I2) a metamer's segment runs from (x0, y0, z0) along its heading (dirX, dirY, dirZ).
@@ -18,6 +19,7 @@ use crate::math;
 use crate::metrics::{METRIC_NUMBERS, tree_metrics};
 use crate::principles::c3::is_live_bud;
 use crate::principles::c6::junction_exponents;
+use crate::stand::{is_drawn, stem_height};
 use crate::world::World;
 
 #[derive(Default)]
@@ -60,9 +62,18 @@ impl SnapshotBuilder {
         self.prev_birth.clear();
     }
 
-    pub fn build(&mut self, world: &mut World, junctions: bool, field: bool) {
+    /// `seedlings`: draw the seedling bank too (the lab, whose lone tree is drawn from its first
+    /// season); off, as the garden asks, only the stems `stand::is_drawn` counts.
+    pub fn build(&mut self, world: &mut World, junctions: bool, field: bool, seedlings: bool) {
+        // The drawn trees: live and at or above the display threshold (ADR 0063, decision 6), the
+        // rule the stand's `drawn` count uses. The seedling bank is simulated and not drawn; a
+        // tree crossing the threshold has no rows in the last snapshot, so it grows in from zero.
+        // The lab exempts its trees from the threshold (`seedlings`); the counts keep it.
         let live: Vec<usize> = (0..world.trees.len())
-            .filter(|&i| world.trees[i].alive)
+            .filter(|&i| {
+                let t = &world.trees[i];
+                t.alive && (seedlings || is_drawn(stem_height(t)))
+            })
             .collect();
         let mut deltas = Vec::new();
         if junctions && world.params().c6.enabled {
@@ -225,7 +236,7 @@ impl SnapshotBuilder {
             }
             self.species.push(m.species);
         }
-        debug_assert_eq!(METRIC_NUMBERS.len(), 41);
+        debug_assert_eq!(METRIC_NUMBERS.len(), 52); // src/wasm/world.ts mirrors METRIC_NUMBERS
         put_i32(&mut v, &parent);
         for a in [&x0, &y0, &angle, &length, &radius] {
             put_f32(&mut v, a);
@@ -256,5 +267,66 @@ impl SnapshotBuilder {
         self.junctions = deltas.len();
         self.shadow = shadow.len();
         self.trees = live.len();
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::stand::stand_metrics;
+    use crate::testing::{metamer, preset};
+    use crate::tree::{Tree, slot};
+
+    /// A tree of one upright metamer of `height` cells.
+    fn stem(id: usize, height: f64) -> Tree {
+        let mut t = Tree::new(id, id as f64 * 3.0 + 1.0, 0.5);
+        metamer(
+            &mut t,
+            -1,
+            slot::MAIN,
+            std::f64::consts::FRAC_PI_2,
+            height,
+            0.1,
+            0.0,
+        );
+        t
+    }
+
+    #[test]
+    fn draws_only_the_stems_at_or_above_the_display_threshold() {
+        // 2 cells (0.5 m) and 5.16 (1.29 m) are the seedling bank; 5.2 (1.3 m) and 20 are drawn.
+        let mut w = World::new(preset("default", "{}"));
+        w.trees = vec![stem(0, 2.0), stem(1, 5.16), stem(2, 5.2), stem(3, 20.0)];
+        let mut s = SnapshotBuilder::default();
+        s.build(&mut w, false, false, false);
+        assert_eq!((s.trees, s.metamers), (2, 2));
+        assert_eq!(s.trees as f64, stand_metrics(&w).drawn);
+    }
+
+    #[test]
+    fn the_lab_draws_the_seedling_bank_too_and_the_stand_still_counts_from_the_threshold() {
+        let mut w = World::new(preset("default", "{}"));
+        w.trees = vec![stem(0, 2.0), stem(1, 5.16), stem(2, 5.2), stem(3, 20.0)];
+        let mut s = SnapshotBuilder::default();
+        s.build(&mut w, false, false, true);
+        assert_eq!((s.trees, s.metamers), (4, 4));
+        assert_eq!(stand_metrics(&w).drawn, 2.0);
+        s.build(&mut w, false, false, false);
+        assert_eq!(s.trees as f64, stand_metrics(&w).drawn);
+    }
+
+    #[test]
+    fn a_lone_tree_is_drawn_from_the_season_it_passes_the_threshold_as_the_metrics_count_it() {
+        let mut w = World::new(preset("default", "{}"));
+        let mut s = SnapshotBuilder::default();
+        let mut seen = (false, false); // a season below the threshold, and one above it
+        for _ in 0..16 {
+            w.step(&mut |_| {});
+            s.build(&mut w, false, false, false);
+            let drawn = stand_metrics(&w).drawn;
+            assert_eq!(s.trees as f64, drawn, "season {}", w.season);
+            seen = (seen.0 || drawn == 0.0, seen.1 || drawn == 1.0);
+        }
+        assert_eq!(seen, (true, true));
     }
 }

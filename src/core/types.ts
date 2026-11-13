@@ -187,9 +187,18 @@ export interface Snapshot {
 export interface SnapshotOptions {
   junctions: boolean;
   field: boolean;
+  /**
+   * Draw the seedling bank too: every live tree, not only those at or above the display threshold
+   * (`stand::is_drawn`, 1.3 m). The lab sets it, so its lone tree shows from the first season; the
+   * garden leaves it off (the default). The stand's `drawn` count is the threshold's either way.
+   */
+  seedlings?: boolean;
 }
 
 export const FULL_SNAPSHOT: SnapshotOptions = { junctions: true, field: true };
+
+/** The lab's snapshots: full, and the seedling bank drawn (the lab is exempt from the threshold). */
+export const LAB_SNAPSHOT: SnapshotOptions = { ...FULL_SNAPSHOT, seedlings: true };
 
 export interface TreeMetrics {
   tree: number;
@@ -276,6 +285,47 @@ export interface TreeMetrics {
   limbBase: number;
   /** (height − limbBase)/height: the crown ratio by limbs. */
   limbCrownRatio: number;
+  /**
+   * The feature measures (docs/features/; GLOSSARY), computed once here so the probe, the
+   * evidence tests and the analysis read the same numbers. Live crown base: where the lowest
+   * first-order limb carrying a live bud leaves the trunk, over the height (1 with no living limb).
+   */
+  liveCrownBase: number;
+  /** Shares of the leaf area at or above 0.8 H, and below H/6. NaN without leaf. */
+  topFifthLeaf: number;
+  leafBelowSixth: number;
+  /**
+   * The leafy outline's width in the slice at 0.85–0.90 of the crown's depth (leaf base to top,
+   * 20 slices) over its widest slice of ≥ 20 leafy buds: an ellipse ≈ 0.6, a spire low, a flat
+   * cap near 1. NaN when no slice holds 20 leafy buds.
+   */
+  w90: number;
+  /**
+   * The share of this season's new metamers in the crown's upper flank: the outer shell
+   * (ρ ≥ 0.7) 30–60° from vertical about the leafy crown's centre. NaN without new growth or a world.
+   */
+  upperFlankNew: number;
+  /** Live buds past a bound of the world (ground, top, or a non-periodic side). NaN without a world. */
+  budsOutside: number;
+  /**
+   * This season's first-order limbs (off the trunk) shed by C5's relative test alone
+   * (Q_b/n_b < Trel·Q_top, kRel seasons in a row), by R1's carbon test alone (P_b < M_b, kShed
+   * seasons), and by both. A limb shed only by the absolute T or by Tvig counts in none (#125).
+   */
+  shedRelative: number;
+  shedCarbon: number;
+  shedBoth: number;
+  /**
+   * This season's shoots released from a dormant lateral bud on a scarred trunk node (scarSumN > 0)
+   * below the lowest living first-order limb as the season began: re-clothing of the bole (#125).
+   */
+  boleSprouts: number;
+  /**
+   * The live crown's vertical length, in cells: the height less where the lowest living first-order
+   * limb leaves the trunk (liveCrownBase's numerator); 0 when no limb lives. The bare-bole page's
+   * crown depth; `crownDepth` is the crown's extent in z.
+   */
+  crownLength: number;
 }
 
 export const METRIC_COLUMNS: readonly (keyof TreeMetrics)[] = [
@@ -320,6 +370,17 @@ export const METRIC_COLUMNS: readonly (keyof TreeMetrics)[] = [
   "leafCrownRatio",
   "limbBase",
   "limbCrownRatio",
+  "liveCrownBase",
+  "topFifthLeaf",
+  "leafBelowSixth",
+  "w90",
+  "upperFlankNew",
+  "budsOutside",
+  "shedRelative",
+  "shedCarbon",
+  "shedBoth",
+  "boleSprouts",
+  "crownLength",
 ];
 
 /** A change applied at the start of `season` (before that season runs). */
@@ -328,9 +389,17 @@ export type RunEvent =
   | { season: number; type: "removeTree"; tree: number }
   | { season: number; type: "plantTree"; x: number; species?: string };
 
-/** Everything needed to reproduce a run: initial params plus the event log. */
+/**
+ * What the run did, not replayed: `capReached` the first season the stand's live trees (the
+ * seedling bank included) fill `o4.maxTrees`, numbered as stand.csv numbers seasons (ADR 0063).
+ */
+export type RunNotice = { season: number; type: "capReached" };
+
+/** Everything needed to reproduce a run: initial params plus the event log; then its notices. */
 export interface RunRecord {
   params: Params;
   events: RunEvent[];
   seasons: number;
+  /** An output of the run; a replay raises them again. Absent in records saved before #120. */
+  notices?: RunNotice[];
 }

@@ -1,0 +1,4 @@
+{
+  "params": { "o4": { "suppressionSignal": "topLight", "topLightThreshold": 0.15 } },
+  "species": { "hornbeam": { "o4": { "cSeed": 300 } } }
+}

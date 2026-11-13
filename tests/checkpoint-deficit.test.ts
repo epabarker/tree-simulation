@@ -1,4 +1,4 @@
-/** Checkpoint v3's persistent R1/C5 memory; continuation is checked beyond the old state hash. */
+/** Checkpoint v3/v4's persistent R1/C5 memory; continuation is checked beyond the old state hash. */
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { presetParams } from "../src/core/presets.ts";
@@ -17,7 +17,8 @@ function header(bytes: Uint8Array): Header {
 function deficits(bytes: Uint8Array): number[][] {
   const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
   let at = pad8(4 + view.getUint32(0, true));
-  expect(header(bytes).version).toBe(3);
+  // Version 4 (#125) appends C5's relative-test counts after the deficits.
+  expect(header(bytes).version).toBe(4);
   return header(bytes).trees.map((tree) => {
     for (const column of Object.values(METAMER_SCHEMA))
       at += pad8(tree.metamers * column.BYTES_PER_ELEMENT);
@@ -26,7 +27,7 @@ function deficits(bytes: Uint8Array): number[][] {
     const result = Array.from({ length: tree.metamers }, (_, i) =>
       view.getFloat64(at + i * 8, true),
     );
-    at += pad8(tree.metamers * 8);
+    at += 2 * pad8(tree.metamers * 8);
     return result;
   });
 }
@@ -65,7 +66,7 @@ function partialStreak(): World {
 
 const sameBytes = (a: Uint8Array, b: Uint8Array) => Buffer.from(a).equals(Buffer.from(b));
 
-describe("checkpoint v3 deficit memory in WASM", () => {
+describe("checkpoint deficit memory in WASM", () => {
   it("preserves a partial streak through save and the freeing worker swap, then sheds at the same time", () => {
     const straight = partialStreak();
     const bytes = straight.save();
@@ -130,7 +131,7 @@ describe("checkpoint v3 deficit memory in WASM", () => {
     again.dispose();
   });
 
-  it("rejects a truncated v3 deficit column", () => {
+  it("rejects a truncated counter column", () => {
     const w = partialStreak();
     const bytes = w.save();
     expect(() => RustWorld.load(bytes.subarray(0, bytes.length - 1))).toThrow(/truncated columns/);

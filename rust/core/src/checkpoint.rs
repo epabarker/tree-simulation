@@ -6,7 +6,9 @@
 //! rows in use, padded to 8 bytes. The light field, the owner grid and the per-season scratch are
 //! rebuilt by the season that reads them. Version 3 (ADR 0059) appends one little-endian f64
 //! deficit counter per metamer after each tree's bud columns. These counters persist across
-//! seasons (R1/C5's kShed); absent counters in versions 1 and 2 start at zero.
+//! seasons (R1/C5's kShed); absent counters in versions 1 and 2 start at zero. Version 4 (#125)
+//! appends, after the deficits and padded the same way, one f64 per metamer of C5's relative-test
+//! count (`dark`, c5.kRel); versions 1–3 start it at zero.
 //!
 //! **Version 2** (I2, ADR 0025) is the 3D schema. **Version 1**, the 2D core's (the TypeScript
 //! core's, and garden 0.14.0's opening forests), still loads: each angle becomes a heading in the
@@ -18,7 +20,7 @@ use crate::json::{self, Value};
 use crate::tree::{ColMut, NUMBERS, SCALARS, Tree};
 use crate::world::World;
 
-const VERSION: f64 = 3.0;
+const VERSION: f64 = 4.0;
 
 /// The 2D schema (version 1): (name, size in bytes) of each column, in its order.
 const METAMERS_V1: [(&str, usize); 19] = [
@@ -116,11 +118,13 @@ pub fn save_world(world: &World) -> Vec<u8> {
             out.extend_from_slice(&col.bytes());
             out.resize(pad8(out.len()), 0);
         }
-        // Newly grown rows may not have taken part in carbon shedding yet.
-        for i in 0..t.m.len() {
-            out.extend_from_slice(&t.deficit.get(i).copied().unwrap_or(0.0).to_le_bytes());
+        // Newly grown rows may not have taken part in shedding yet: their counts are 0.
+        for counter in [&t.deficit, &t.dark] {
+            for i in 0..t.m.len() {
+                out.extend_from_slice(&counter.get(i).copied().unwrap_or(0.0).to_le_bytes());
+            }
+            out.resize(pad8(out.len()), 0);
         }
-        out.resize(pad8(out.len()), 0);
     }
     out
 }
@@ -186,7 +190,7 @@ pub fn load_world(bytes: &[u8]) -> Result<World, CheckpointError> {
     let header = json::parse(text).map_err(|e| CheckpointError(e.to_string()))?;
     let num = |v: &Value, k: &str| v.get(k).and_then(Value::as_f64).unwrap_or(0.0);
     let version = num(&header, "version");
-    if version != VERSION && version != 2.0 && version != 1.0 {
+    if version != VERSION && version != 3.0 && version != 2.0 && version != 1.0 {
         return Err(CheckpointError(format!("unknown version {version}")));
     }
     let mut at = pad8(4 + len);
@@ -214,6 +218,7 @@ pub fn load_world(bytes: &[u8]) -> Result<World, CheckpointError> {
         if version == 1.0 {
             load_v1(&mut tree, nm, nb, bytes, &mut at)?;
             tree.deficit.resize(nm, 0.0);
+            tree.dark.resize(nm, 0.0);
             trees.push(tree);
             continue;
         }
@@ -226,8 +231,12 @@ pub fn load_world(bytes: &[u8]) -> Result<World, CheckpointError> {
             fill(col, nb, bytes, &mut at)?;
         }
         tree.deficit.resize(nm, 0.0);
-        if version == VERSION {
+        tree.dark.resize(nm, 0.0);
+        if version >= 3.0 {
             fill(ColMut::F64(&mut tree.deficit), nm, bytes, &mut at)?;
+        }
+        if version >= 4.0 {
+            fill(ColMut::F64(&mut tree.dark), nm, bytes, &mut at)?;
         }
         trees.push(tree);
     }
@@ -449,20 +458,106 @@ mod tests {
     }
 
     #[test]
-    fn pre_change_v2_fixture_loads_with_zero_deficits_and_migrates_to_v3() {
+    fn pre_change_v2_fixture_loads_with_zero_counters_and_migrates_to_v4() {
         let bytes = include_bytes!("../../../tests/fixtures/checkpoint-v2.bin");
         let loaded = load_world(bytes).unwrap();
         assert_eq!(loaded.season, 3.0);
         assert_eq!(hash_world(&loaded), "f46fef77");
         for t in &loaded.trees {
             assert_eq!(t.deficit, vec![0.0; t.m.len()]);
+            assert_eq!(t.dark, vec![0.0; t.m.len()]);
         }
         let migrated = save_world(&loaded);
         assert_eq!(save_world(&load_world(&migrated).unwrap()), migrated);
     }
 
+    /// The C5 test tree with C5's relative test counting (kRel 3, T_rel 0.3) and no carbon test.
+    fn dark_world() -> World {
+        let params = preset(
+            "default",
+            r#"{"r1":{"enabled":false},"c5":{"enabled":true,"T":0.1,"Trel":0.3,"kRel":3,"g":0},"r4":{"enabled":false}}"#,
+        );
+        let p = Params::from_json(&params);
+        let mut w = World::new(params);
+        w.trees = vec![small_tree(&p)];
+        w.season = 4.0;
+        w
+    }
+
+    /// A season with the lateral (rows 2–3) at 0.15 per metamer under Q_top 1: dark by T_rel.
+    fn dark_season(w: &mut World) -> f64 {
+        w.season += 1.0;
+        let p = w.rules.params.clone();
+        let t = &mut w.trees[0];
+        let n = t.m.len();
+        t.ensure_scratch();
+        t.q_top = 1.0;
+        for i in 0..n {
+            (t.m.q_sum[i], t.m.n_sum[i]) = if i >= 2 { (0.3, 2) } else { (4.0, 4) };
+        }
+        shed_branches(t, &p, w.season, n)
+    }
+
     #[test]
-    fn truncated_v3_counter_column_is_rejected() {
+    fn a_relative_streak_survives_a_checkpoint_and_sheds_on_the_same_season() {
+        let mut straight = dark_world();
+        assert_eq!(dark_season(&mut straight), 0.0);
+        assert_eq!(dark_season(&mut straight), 0.0);
+        assert_eq!(straight.trees[0].dark, vec![0.0, 0.0, 2.0, 2.0]);
+        let bytes = save_world(&straight);
+        let mut restored = load_world(&bytes).unwrap();
+        assert_eq!(restored.trees[0].dark, straight.trees[0].dark);
+        assert_eq!(save_world(&restored), bytes);
+        assert_eq!(dark_season(&mut straight), 2.0);
+        assert_eq!(dark_season(&mut restored), 2.0);
+        assert_eq!(restored.trees[0].dark, vec![0.0, 0.0]);
+        assert_eq!(save_world(&restored), save_world(&straight));
+    }
+
+    #[test]
+    fn both_counters_follow_compaction_and_round_trip_side_by_side() {
+        let mut w = carbon_world();
+        let p = w.rules.params.clone();
+        let t = &mut w.trees[0];
+        let lat = metamer(t, 0, LEFT, 1.0, 1.0, p.c6.r0, 0.0);
+        metamer(t, lat as i32, slot::MAIN, 1.0, 1.0, p.c6.r0, 0.0);
+        t.deficit = vec![0.0, 0.0, 7.0, 8.0, 1.0, 2.0];
+        t.dark = vec![1.0, 0.0, 5.0, 6.0, 3.0, 4.0];
+        let mut dead = vec![0, 0, 1, 0, 0, 0];
+        assert_eq!(remove_branches(t, &mut dead, &p, &mut []), 2.0);
+        assert_eq!(t.dark, vec![1.0, 0.0, 3.0, 4.0]);
+        let mut other = small_tree(&p);
+        other.id = 1;
+        other.dark = vec![2.0]; // shorter than the rows: the rest are saved as 0
+        w.trees.push(other);
+        let bytes = save_world(&w);
+        let restored = load_world(&bytes).unwrap();
+        assert_eq!(restored.trees[0].deficit, vec![0.0, 0.0, 1.0, 2.0]);
+        assert_eq!(restored.trees[0].dark, vec![1.0, 0.0, 3.0, 4.0]);
+        assert_eq!(restored.trees[1].dark, vec![2.0, 0.0, 0.0, 0.0]);
+        assert_eq!(save_world(&restored), bytes);
+    }
+
+    #[test]
+    fn pre_change_v3_fixture_keeps_its_deficits_loads_zero_dark_counts_and_migrates_to_v4() {
+        let bytes = include_bytes!("../../../tests/fixtures/checkpoint-v3.bin");
+        let loaded = load_world(bytes).unwrap();
+        assert_eq!(loaded.season, 6.0);
+        assert_eq!(hash_world(&loaded), "46bcca53");
+        assert_eq!(loaded.trees[0].deficit, vec![0.0, 0.0, 2.0, 2.0]);
+        assert_eq!(loaded.trees[0].dark, vec![0.0; 4]);
+        let migrated = save_world(&loaded);
+        let len = u32::from_le_bytes(migrated[..4].try_into().unwrap()) as usize;
+        let header = json::parse(std::str::from_utf8(&migrated[4..4 + len]).unwrap()).unwrap();
+        assert_eq!(header.get("version").and_then(Value::as_f64), Some(4.0));
+        assert_eq!(save_world(&load_world(&migrated).unwrap()), migrated);
+        // It sheds on the season the v3 world would have: the third deficit in a row.
+        let mut on = loaded;
+        assert_eq!(carbon_season(&mut on, true), 2.0);
+    }
+
+    #[test]
+    fn a_truncated_counter_column_is_rejected() {
         let mut bytes = save_world(&carbon_world());
         bytes.pop();
         assert!(

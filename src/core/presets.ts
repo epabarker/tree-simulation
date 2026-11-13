@@ -140,6 +140,38 @@ const flora = (name: FloraName, xs: number[], width: number) =>
  */
 export const TOP = 200;
 
+/**
+ * The open-grown lone tree's box (ADR 0062, spec §C2): open sky on all four sides (τ = 1 on both z
+ * faces, open x sides) in a square 60 m box (240 cells of 0.25 m), sized from the crown so that no
+ * bud grows past a bound. The open-box note (2026-11-08) found the widest of the six exemplars at
+ * season 100 (beech) needed ≥ 56 m. The top stays the woods' 50 m. Every species sees this light;
+ * none carries a light-entry setting.
+ */
+export const OPEN_GROWN = {
+  width: 240,
+  depth: 240,
+  height: TOP,
+  faces: [1, 1],
+  sidesZ: "open",
+  walls: [],
+} satisfies Params["world"];
+/** The open-grown tree's root: the box's centre. */
+export const OPEN_GROWN_ROOT = { x: 120, z: 120 };
+
+/**
+ * The half-walled world the lone tree had before ADR 0062 (160 wide, the slab's 16 m depth between
+ * τ 0.2 faces): kept for the species trials' stands and shade house, which were calibrated in it,
+ * and for the garden's specimen, whose worker budget (ADR 0026, plate.ts) was set in it.
+ * Calibrations made in it are evidence, not baselines (ADR 0062).
+ */
+export const HALF_WALLED = {
+  width: 160,
+  height: TOP,
+  depth: 64,
+  faces: [0.2, 0.2],
+  walls: [],
+} satisfies Params["world"];
+
 const RING = { width: 210, height: TOP, walls: [], sides: "periodic" } satisfies Params["world"];
 /** One row of the ring's stand: a tree every 21 cells. */
 const RING_X = [10, 31, 52, 73, 94, 115, 136, 157, 178, 199];
@@ -162,6 +194,23 @@ const MIXED = [
 ] as const;
 
 export const STAND_X = [20, 41, 62, 83, 104, 125, 146, 167, 188, 209].map((x) => ({ x }));
+
+/**
+ * The 0062/0063 garden (#121): the depth is periodic (ADR 0062, decision 3; ADR 0058), so side
+ * light follows from the stand's own density; the stand starts from `o4.planting`'s saplings per
+ * hectare over the whole width × depth (ADR 0063, decision 5), `MIXED` cycled by the seed, and
+ * thins by the two-part mortality (decision 3). Its rates were probed on seeds 1–3, exploratory
+ * (`experiments/2026-11-10-garden-schedule.md`): no rate meets the mature-forest criteria, because
+ * understorey trees that pay their maintenance are never suppressed; m_c = 0.003 (a third of the
+ * bare params' 0.01) keeps the canopy trees, which 0.01 killed, and every other rate is the default.
+ */
+const GARDEN_WORLD = { ...RING, sidesZ: "periodic" } satisfies Params["world"];
+const GARDEN_O4 = {
+  ...WOODLAND.o4,
+  mortality: "twoPart",
+  mCanopy: 0.003,
+  planting: { density: 400, spacing: 12, species: [...MIXED] },
+} satisfies ParamsPatch["o4"];
 
 export const presets = {
   explosion: {
@@ -370,9 +419,10 @@ export const presets = {
       "Quercus robur alone in a field: wide-angled limbs, a broad decurrent crown and a squat trunk (Plate II).",
     // A specimen: no seedlings around it, and no storms, which throw tall trees by height alone.
     // The woods' top (C1 round 3): at 120 the lone oak reached it and its crown was clipped flat.
+    // Open-grown (ADR 0062): it was 160 wide in the slab's 16 m between τ 0.2 faces.
     patch: {
-      world: { width: 160, height: TOP, walls: [] },
-      trees: [{ x: 80, species: "oak" }],
+      world: OPEN_GROWN,
+      trees: [{ ...OPEN_GROWN_ROOT, species: "oak" }],
       ...WOODLAND,
       o2: { stormP: 0 },
       o4: { enabled: false },
@@ -384,10 +434,11 @@ export const presets = {
       "Fagus sylvatica alone in a field: the fresh-look round's lone tree (ADR 0039–0043, proposed), in a world wide enough for its crown.",
     // oakOpen's specimen with the beech: 240 wide, as the fresh-look round's repair measured it
     // (160 clipped a broad crown at the world's sides). A golden case: the open-grown beech is
-    // where the round's vigour-gated rules act.
+    // where the round's vigour-gated rules act. Open-grown (ADR 0062): it was 240 wide in the
+    // slab's 16 m between τ 0.2 faces.
     patch: {
-      world: { width: 240, height: TOP, walls: [] },
-      trees: [{ x: 120, species: "beech" }],
+      world: OPEN_GROWN,
+      trees: [{ ...OPEN_GROWN_ROOT, species: "beech" }],
       ...WOODLAND,
       o2: { stormP: 0 },
       o4: { enabled: false },
@@ -469,12 +520,11 @@ export const presets = {
     description:
       "Nine native species around a ring: birch and goat willow pioneer, rowan and field maple fill gaps, holly and hornbeam wait beneath, and beech and oak take the canopy.",
     patch: {
-      world: RING,
-      // Each row turns the mix by three, so no two of a kind stand side by side in depth either.
-      trees: perArea(RING_X, RING.width, (i, r) => ({
-        species: MIXED[(i + 3 * r) % MIXED.length] as string,
-      })),
+      // The garden's world and schedule at the ring's width (#121): `o4.planting` plants it.
+      world: GARDEN_WORLD,
+      trees: [],
       ...WOODLAND,
+      o4: GARDEN_O4,
     },
   },
   succession: {
@@ -517,63 +567,92 @@ export function isPresetName(name: string): name is PresetName {
 }
 
 /**
- * How the garden plants its ring (I3; the picture sets it, not the calibration): `rows` rows of
- * trees across the slab's depth, a tree every `spacing` cells along each, and the recruits capped
- * at `recruits` × the ring's density per cell of width (300 on 210 cells) per row.
+ * How the garden is planted and bounded (ADR 0063; a host page may override any of it):
+ * `density` saplings per hectare over the whole width × depth, none closer than `spacing` cells
+ * (`o4.planting`); the cap on live trees, seedlings included, at `cap` stems per hectare, a compute
+ * guard that a settled garden never reaches (decision 2); and the depth's `faces`: "wood" (the
+ * default, a periodic depth, ADR 0062 decision 3), or the open faces a host page may still show
+ * (decision 5), "woodEdge" (τ 1 in front, 0.2 behind) and "hedgerow" (1, 1).
  */
 export interface Planting {
-  rows: number;
+  density: number;
   spacing: number;
-  recruits: number;
+  cap: number;
+  faces: "wood" | "woodEdge" | "hedgerow";
 }
 
-/**
- * The garden's planting: one row, as the 2D garden had, each tree a 3D crown, a tree every 28
- * cells (the user's phone check, I3: 21 read as cluttered; a second row at 24 mildly so). Recruits
- * at a quarter of the ring's density (2026-11-06, the user found 0.16.0 cluttered): at 1 every
- * opening forest filled its cap (229 at 160 cells) by season 80, mostly with suppressed saplings;
- * at 0.25 it holds 57, and the garden's 20-seed checks hold against their base
- * (`experiments/2026-11-06-garden-recruits.md`).
- */
-export const GARDEN_PLANTING: Planting = { rows: 1, spacing: 28, recruits: 0.25 };
+/** The garden's planting: about 400 saplings a hectare (ADR 0063, decision 5). */
+export const GARDEN_PLANTING: Planting = { density: 400, spacing: 12, cap: 2500, faces: "wood" };
+
+/** A cell's side in metres (ADR 0064; the core's `stand::CELL_METRES`). */
+export const CELL_METRES = 0.25;
 
 /**
- * The `mixedWood` woodland (M25) on a ring `width` cells wide: about as wide as the host is wide
- * relative to the world's height, so a phone gets a narrower forest. The seed turns the planting
- * pattern (`MIXED`), so each forest starts from a different mix.
- *
- * The garden plants one row down the slab's middle (I3, the user's phone check): round 2's three
- * staggered rows (`perArea`) projected 21 crowns plus recruits onto one strip where the 2D garden
- * had 7, and no tree read as in front of another. Its recruits follow the row: capped per cell of
- * width, and established only in a band about a crown's depth (`spacing` per row) around it
- * (O4's `band`), so the depth does not fill with seedlings. The calibration's forest and the
- * woods keep round 2's planting per area; `mixedWood` itself keeps 300 trees.
+ * The display threshold in cells, 1.3 m (ADR 0063): the core's `stand::DISPLAY_THRESHOLD`, for
+ * tests and scripts that read heights. The page never applies it: the snapshot does (`is_drawn`).
+ */
+export const DISPLAY_THRESHOLD = 1.3 / CELL_METRES;
+
+/** The open faces' τ (front, back), ADR 0024's looks. */
+const OPEN_FACES = { woodEdge: [1, 0.2], hedgerow: [1, 1] } as const;
+
+/**
+ * The `mixedWood` woodland (M25), the 0062/0063 garden, on a ring `width` cells wide: about as
+ * wide as the host is wide relative to the world's height, so a phone gets a narrower forest at
+ * the same density per area (user story 15). The seed turns the planting's positions and its mix
+ * (`MIXED`), so each forest starts differently.
  */
 export function forestParams(width = 210, seed?: number, planting: Partial<Planting> = {}): Params {
-  const { rows, spacing, recruits } = { ...GARDEN_PLANTING, ...planting };
+  const { density, spacing, cap, faces } = { ...GARDEN_PLANTING, ...planting };
   const base = presetParams("mixedWood", seed);
-  // A phone in portrait gets a narrow ring of two or three trees, drawn large (D1).
+  // A phone in portrait gets a narrow ring, drawn large (D1).
   const W = Math.round(Math.min(520, Math.max(54, width)));
   const D = base.world.depth ?? 64;
-  const n = Math.max(2, Math.round(W / spacing));
-  const R = Math.max(1, Math.round(rows));
-  const trees = Array.from({ length: R }, (_, r) =>
-    Array.from({ length: n }, (_, k) => ({
-      species: MIXED[(k + 3 * r + base.seed) % MIXED.length] as string,
-      // Rows after the first shift along x a fraction of the spacing, staggered as perArea's.
-      x: (((k + 0.5) * W) / n + (r * spacing) / R) % W,
-      z: (D * (r + 0.5)) / R,
-    })),
-  ).flat();
-  const maxTrees = Math.max(20, Math.round(((300 * W) / RING.width) * R * recruits));
+  const hectares = (W * D * CELL_METRES * CELL_METRES) / 10_000;
+  const maxTrees = Math.max(20, Math.round(cap * hectares));
+  const world: Params["world"] =
+    faces === "wood"
+      ? { ...base.world, width: W }
+      : { ...base.world, width: W, sidesZ: "open", faces: [...OPEN_FACES[faces]] };
   return mergeParams(base, {
-    world: { ...base.world, width: W },
-    trees,
-    o4: { ...base.o4, maxTrees, band: Math.min(D, R * spacing) },
+    world,
+    trees: [],
+    o4: { ...base.o4, maxTrees, planting: { ...GARDEN_O4.planting, density, spacing } },
   });
 }
 
-/** Plate II (M19): an oak grown alone in the open, a new one for each seed. */
+/**
+ * The lone-tree stage: one tree of `species` alone, under the woodland's growth rules without
+ * recruitment or storms (`oakOpen`'s world, its oak swapped for `species`). The one source the
+ * species trials (cli/trials.ts) and the feature probe (cli/probe.ts) both read, so a change to
+ * the stage reaches both. It is open-grown (ADR 0062): `oakOpen`'s square 60 m box, open on all
+ * four sides, the tree at its centre.
+ */
+export function loneTreeParams(species: string, seed?: number): Params {
+  return mergeParams(presetParams("oakOpen", seed), {
+    trees: [{ ...OPEN_GROWN_ROOT, species }],
+  });
+}
+
+/**
+ * `oakOpen`'s rules in the half-walled world it had before ADR 0062 (`HALF_WALLED`), its oak at
+ * x 80: the species trials' base (cli/trials.ts), whose stands and shade house were calibrated
+ * there.
+ */
+export function halfWalledParams(seed?: number): Params {
+  return {
+    ...presetParams("oakOpen", seed),
+    world: { ...HALF_WALLED },
+    trees: [{ x: 80, species: "oak" }],
+  };
+}
+
+/**
+ * Plate II (M19): an oak grown alone in the open, a new one for each seed. The garden swaps it
+ * into its own worker, whose budget (ADR 0026, plate.ts) was set with this half-walled world; the
+ * lab's open-grown box (about 530 MB in WASM, the open-box note) would not fit it. Whether the
+ * garden's specimen takes the open-grown box is not decided (ADR 0062, ticket #115).
+ */
 export function specimenParams(seed: number): Params {
-  return presetParams("oakOpen", seed);
+  return halfWalledParams(seed);
 }

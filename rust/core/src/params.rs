@@ -156,6 +156,10 @@ pub struct C5 {
     /// g·Tvig·Q_top is shed too, g the tree's vigour gate (r2.vigourTreeLo/Hi; 1 when unset).
     /// 0 or absent: off.
     pub t_vig: f64,
+    /// The relative test's k (bare bole, #125): a lateral is shed by T_rel·Q_top only after this
+    /// many consecutive seasons below it; a season above resets the count. 1 or absent: this
+    /// season alone, as before.
+    pub k_rel: f64,
 }
 
 #[derive(Clone, Debug)]
@@ -342,9 +346,55 @@ pub struct O2 {
     pub storm_load: Option<f64>,
 }
 
+/// O4's mortality (ADR 0063). `SizeBlind`, the default and the §8-style ablation: the background
+/// risk m₀ alone. `TwoPart`: a canopy rate that rises with height plus a suppression rate from low
+/// vigour (R1's P/M), scaled by shade tolerance.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum Mortality {
+    SizeBlind,
+    TwoPart,
+}
+
+/// The two-part mode's suppression signal, the world's (ADR 0065, decision 5; spec §O4).
+/// `Carbon` (absent: the default, ADR 0063): R1's P/M this season. `TopLight`, the dark top: the
+/// light at the tree's top (its live buds' `c5.topQuantile` Q) over open sky C, below
+/// `o4.topLightThreshold`. `Growth`, the stalled leader: the height gained over the last
+/// `o4.growthSeasons` seasons, below `o4.growthFloor` cells a season, read from the metamers'
+/// birth seasons (no new state).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum SuppressionSignal {
+    Carbon,
+    TopLight,
+    Growth,
+}
+
 #[derive(Clone, Debug)]
 pub struct O4 {
     pub enabled: bool,
+    /// Read from the world's params: one mortality rule per world.
+    pub mortality: Mortality,
+    /// m_c: the canopy rate per season at height H_c (two-part mode; absent: 0).
+    pub m_canopy: f64,
+    /// H_c: the canopy rate's reference height, cells (absent: ∞, so no canopy deaths).
+    pub h_canopy: f64,
+    /// γ_c: how steeply the canopy rate rises with height (absent: 1).
+    pub gamma_canopy: f64,
+    /// m_s: the suppression rate per season of a tree that pays none of its maintenance (P = 0),
+    /// at shade tolerance 1 (two-part mode; absent: 0, so no suppression deaths).
+    pub m_suppression: f64,
+    /// β_s: how fast the suppression rate falls with each unit of shade tolerance (absent: 1).
+    pub suppression_slope: f64,
+    /// T: the species' shade tolerance, Niinemets & Valladares's (2006) score, 1 (intolerant) to
+    /// 5 (absent: 1, where the suppression rate is m_s itself).
+    pub shade_tolerance: f64,
+    /// The suppression signal (the world's, ADR 0065). Absent: `Carbon`, bit-identical.
+    pub suppression_signal: SuppressionSignal,
+    /// θ_q: `TopLight`'s threshold on Q_top / C (absent: 0, so no signal).
+    pub top_light_threshold: f64,
+    /// k: `Growth`'s window, seasons (absent: 5).
+    pub growth_seasons: f64,
+    /// g: `Growth`'s floor, cells a season (absent: 0, so no signal).
+    pub growth_floor: f64,
     pub c_seed: f64,
     pub d: f64,
     pub q_est: f64,
@@ -352,9 +402,19 @@ pub struct O4 {
     pub m0: f64,
     pub max_trees: f64,
     pub rain: Option<f64>,
-    /// The band of depth seedlings establish in, cells, centred on the slab's middle (the
-    /// garden's one row, I3); None: anywhere.
-    pub band: Option<f64>,
+    /// Planting at a density (ADR 0063, decision 5; `principles::planting`); None: `trees`.
+    pub planting: Option<Planting>,
+}
+
+/// `o4.planting`: saplings per hectare at keyed positions with a minimum spacing.
+#[derive(Clone, Debug)]
+pub struct Planting {
+    /// Stems per hectare over width × depth.
+    pub density: f64,
+    /// The least distance between two planted trees, cells (across the wraps that are periodic).
+    pub spacing: f64,
+    /// Species cycled in planting order, turned by the seed; empty: the world's own params.
+    pub species: Vec<String>,
 }
 
 #[derive(Clone, Debug)]
@@ -513,6 +573,7 @@ impl Params {
                     t_rel: num(g, "Trel"),
                     top_quantile: num(g, "topQuantile"),
                     t_vig: opt(g, "Tvig").unwrap_or(0.0),
+                    k_rel: opt(g, "kRel").unwrap_or(1.0),
                 }
             },
             c6: {
@@ -646,6 +707,28 @@ impl Params {
             },
             o4: O4 {
                 enabled: flag(o4, "enabled"),
+                mortality: match text(o4, "mortality").as_str() {
+                    "twoPart" => Mortality::TwoPart,
+                    _ => Mortality::SizeBlind,
+                },
+                // Absent, each two-part param reads its neutral value (no canopy rate, no
+                // suppression, T 1: e^0), so JSON written before it reads as the rule off. The
+                // page's defaults (params.ts) are the calibrated ones and always write the key:
+                // shadeTolerance 3 there, the scale's middle, against 1 absent here.
+                m_canopy: opt(o4, "mCanopy").unwrap_or(0.0),
+                h_canopy: opt(o4, "hCanopy").unwrap_or(f64::INFINITY),
+                gamma_canopy: opt(o4, "gammaCanopy").unwrap_or(1.0),
+                m_suppression: opt(o4, "mSuppression").unwrap_or(0.0),
+                suppression_slope: opt(o4, "suppressionSlope").unwrap_or(1.0),
+                shade_tolerance: opt(o4, "shadeTolerance").unwrap_or(1.0),
+                suppression_signal: match text(o4, "suppressionSignal").as_str() {
+                    "topLight" => SuppressionSignal::TopLight,
+                    "growth" => SuppressionSignal::Growth,
+                    _ => SuppressionSignal::Carbon,
+                },
+                top_light_threshold: opt(o4, "topLightThreshold").unwrap_or(0.0),
+                growth_seasons: opt(o4, "growthSeasons").unwrap_or(5.0),
+                growth_floor: opt(o4, "growthFloor").unwrap_or(0.0),
                 c_seed: num(o4, "cSeed"),
                 d: num(o4, "d"),
                 q_est: num(o4, "qEst"),
@@ -653,7 +736,17 @@ impl Params {
                 m0: num(o4, "m0"),
                 max_trees: num(o4, "maxTrees"),
                 rain: opt(o4, "rain"),
-                band: opt(o4, "band"),
+                planting: o4.get("planting").map(|g| Planting {
+                    density: num(g, "density"),
+                    spacing: num(g, "spacing"),
+                    species: g
+                        .get("species")
+                        .and_then(Value::as_array)
+                        .unwrap_or(&[])
+                        .iter()
+                        .filter_map(|s| s.as_str().map(str::to_string))
+                        .collect(),
+                }),
             },
             r6: {
                 let g = group(v, "r6");

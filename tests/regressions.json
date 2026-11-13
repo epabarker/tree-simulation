@@ -1,20 +1,26 @@
 {
   "phoneSeed3": {
     "issue": 54,
-    "note": "the phone's ring (forestParams(66, 3)) is nearly empty by 150; canopy = live trees >= 40 cells",
+    "note": "the phone's ring (forestParams(66, 3)) is nearly empty by 150; drawn and canopy = stand.csv's (ADR 0065), planted = trees at season 1, tall = live trees >= 40 cells, topHeight = topHeight100 in cells",
     "vector": {
-      "live50": 24,
-      "planted50": 1,
-      "canopy50": 2,
-      "metamers50": 15692,
-      "live100": 23,
-      "planted100": 1,
+      "drawn50": 13,
+      "planted50": 10,
+      "canopy50": 6,
+      "tall50": 6,
+      "topHeight50": 91,
+      "metamers50": 34267,
+      "drawn100": 8,
+      "planted100": 7,
       "canopy100": 3,
-      "metamers100": 16923,
-      "live150": 24,
-      "planted150": 1,
+      "tall100": 3,
+      "topHeight100": 102,
+      "metamers100": 25514,
+      "drawn150": 5,
+      "planted150": 5,
       "canopy150": 2,
-      "metamers150": 12423
+      "tall150": 2,
+      "topHeight150": 91,
+      "metamers150": 24945
     }
   },
   "forestRegeneration": {

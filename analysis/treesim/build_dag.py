@@ -132,7 +132,7 @@ RW = {
     "COMMIT": (["S_budstate"], ["S_budstate", "S_age"]),
     "O2_ABRADE": (["S_owner", "S_budq", "S_geom", "S_radius", "S_budstate"], ["S_budstate"]),
     "R1_STARVE": (["S_starved"], ["S_alive"]),
-    "O4_STAND": (["S_alive", "S_seedpool", "S_light", "S_geom", "S_trees"], ["S_alive", "S_trees", "S_seedpool"]),
+    "O4_STAND": (["S_alive", "S_seedpool", "S_light", "S_geom", "S_trees", "S_PM"], ["S_alive", "S_trees", "S_seedpool"]),
 }
 
 # ---------------------------------------------------------------- gates
@@ -171,13 +171,15 @@ r2on = on("r2.enabled")
 always = lambda p, c: True  # noqa: E731
 obstacles = lambda p, c: bool(p["world"].get("obstacles"))  # noqa: E731
 stochastic = lambda p, c: (p["c1"].get("budBreak") or {}).get("mode") == "stochastic"  # noqa: E731
+two_part = lambda p, c: p["o4"].get("mortality") == "twoPart"  # noqa: E731
+planting = lambda p, c: p["o4"].get("planting") is not None  # noqa: E731
 
 GATE_TEXT = {
     carbon: "r1.shed = carbon", shade_live: "R5 shade varies (r5.enabled; signal 'neighbours' needs neighbours)",
     relay_on: "relay on (r2.relay >= 1 or a level's relay)", vig_drop: "vigour drop on (r2.vigourShare > 0, vigourLambda != 0)",
     light_ortho: "r2.lightSetPoint set", tvig: "c5.Tvig > 0", storms: "o2.stormP > 0", o4on: "o4.enabled",
     o2on: "o2.enabled", r2on: "r2.enabled", always: "", obstacles: "world.obstacles non-empty",
-    stochastic: "c1.budBreak.mode = stochastic",
+    stochastic: "c1.budBreak.mode = stochastic", two_part: "o4.mortality = twoPart", planting: "o4.planting set",
 }
 
 
@@ -262,6 +264,7 @@ PARAMS = [
     ("c5.Trel", "c5", [("C5_SHED", always), ("C5_QTOP", always)]),
     ("c5.topQuantile", "c5", [("C5_QTOP", always)]),
     ("c5.Tvig", "c5", [("C5_SHED", always)]),
+    ("c5.kRel", "c5", [("C5_SHED", always)]),
     # C6
     ("c6.n", "c6", [("C6_GIRTH", always), ("R1_CARBON", on("r1.enabled")), ("C5_SHED", always)]),
     ("c6.r0", "c6", [("C6_GIRTH", always), ("R1_CARBON", on("r1.enabled")), ("C1_SHOOT", always)]),
@@ -346,7 +349,12 @@ PARAMS = [
     ("o2.stormP", "o2", [("STORM", always)]),
     ("o2.stormLoad", "o2", [("R3_MECH", storms)]),
     # O4
-    ("o4.m0", "o4", [("O4_STAND", o4on)]),
+    ("o4.mortality", "o4", [("O4_STAND", o4on)]),
+    ("o4.m0", "o4", [("O4_STAND", AND(o4on, NOT(two_part)))]),
+    ("o4.mCanopy / hCanopy / gammaCanopy", "o4", [("O4_STAND", AND(o4on, two_part))]),
+    ("o4.mSuppression / suppressionSlope / shadeTolerance", "o4", [("O4_STAND", AND(o4on, two_part))]),
+    ("o4.suppressionSignal / topLightThreshold / growthFloor / growthSeasons", "o4", [("O4_STAND", AND(o4on, two_part))]),
+    ("o4.planting", "o4", [("O4_STAND", planting)]),
     ("o4.cSeed / d", "o4", [("O4_STAND", o4on)]),
     ("o4.qEst / pEst", "o4", [("O4_STAND", o4on)]),
     ("o4.maxTrees / rain / band", "o4", [("O4_STAND", o4on)]),

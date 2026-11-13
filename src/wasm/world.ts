@@ -92,6 +92,17 @@ const METRIC_NUMBERS = [
   "leafCrownRatio",
   "limbBase",
   "limbCrownRatio",
+  "liveCrownBase",
+  "topFifthLeaf",
+  "leafBelowSixth",
+  "w90",
+  "upperFlankNew",
+  "budsOutside",
+  "shedRelative",
+  "shedCarbon",
+  "shedBoth",
+  "boleSprouts",
+  "crownLength",
 ] as const;
 const FLAGS = new Set(["alive", "sown"]);
 
@@ -134,6 +145,10 @@ const NUMBERS = [
   "epicormic",
   "aborted",
   "broken",
+  "shedRelative",
+  "shedCarbon",
+  "shedBoth",
+  "boleSprouts",
 ] as const;
 
 type Schema = Record<
@@ -488,7 +503,7 @@ export class RustWorld {
 
   /** The season's snapshot, copied out of linear memory once; its arrays share one buffer. */
   snapshot(seasonMs: number, options: SnapshotOptions = FULL_SNAPSHOT): Snapshot {
-    this.inner.snapshot(options.junctions, options.field);
+    this.inner.snapshot(options.junctions, options.field, options.seedlings ?? false);
     const [trees, nm, nb, nj, ns] = this.inner.snapshot_counts() as unknown as number[];
     const species = this.inner.snapshot_species();
     const buffer = new Uint8Array(

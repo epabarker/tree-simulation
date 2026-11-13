@@ -221,6 +221,14 @@ export interface Params {
     /** Quantile of the tree's live-bud Q that stands for the light at its crown top. */
     topQuantile: number;
     /**
+     * The relative test's k (bare bole page, #125): a lateral is shed by Trel·Q_top only after
+     * kRel consecutive seasons below it, and a season above resets the count, so the rule is about
+     * sustained relative shade (Henriksson 2001; Sprugel 2002). Either-or with R1's carbon test,
+     * as before. 1 or absent: this season alone, bit-identical to the rule without it (calibrate;
+     * the bole probe sweeps it from about 3 for beech and hornbeam).
+     */
+    kRel?: number;
+    /**
      * Own-crown pruning (fresh-look beech, repair): a vigorous tree (R2's vigour gate g by its
      * production, r2.vigourTreeLo/Hi) also sheds a lateral whose Q_b/n_b < g·Tvig·Q_top, so an
      * open-grown crown clears its first limbs under itself (branch autonomy; Sprugel et al. 1991, unread: ADR 0043, rejected).
@@ -530,8 +538,60 @@ export interface Params {
     qEst: number;
     /** p_est: probability that a seed on lit ground establishes (calibrate). */
     pEst: number;
-    /** m₀: background mortality per tree per season (calibrate). */
+    /**
+     * Mortality's mode (ADR 0063), the world's. "sizeBlind" (absent: the default, and the old
+     * behaviour kept as the ablation): every tree dies with the background risk m₀. "twoPart": a
+     * canopy rate m_c·(H/H_c)^γ_c that rises with the tree's height H, so old canopy trees are
+     * replaced gradually, plus a suppression rate m_s·(1 − P/M)₊·e^(−β_s(T − 1)) from R1's
+     * carbon balance (P/M this season, read only with R1 on) and the species' shade tolerance T,
+     * so suppressed trees die of low vigour and the stand self-thins. m₀ is not read.
+     * Read from the world's params, never a species'. Absent (old params, checkpoints): sizeBlind.
+     */
+    mortality: "sizeBlind" | "twoPart";
+    /** m₀: background mortality per tree per season, the size-blind mode's (calibrate). */
     m0: number;
+    /**
+     * m_c: the two-part mode's canopy rate per season at height H_c (calibrate; 0.01 is the order
+     * of a mature canopy tree's yearly death rate, not a fit). Absent: 0.
+     */
+    mCanopy: number;
+    /** H_c: the canopy rate's reference height, in cells (0.25 m; 120 is 30 m) (calibrate). Absent: ∞. */
+    hCanopy: number;
+    /** γ_c: how steeply the canopy rate rises with height, > 0 (calibrate). Absent: 1. */
+    gammaCanopy: number;
+    /**
+     * m_s: the two-part mode's suppression rate per season for a tree that pays none of its
+     * maintenance (P = 0) at shade tolerance 1. 1 makes a birch below its survival light last
+     * 1–2 seasons (Walters & Reich 1996; an order of magnitude, calibrate). Absent: 0.
+     */
+    mSuppression: number;
+    /**
+     * β_s: how fast the suppression rate falls per unit of shade tolerance, e^(−β_s(T − 1)).
+     * 0.92 (≈ ln 10 / 2.5) puts beech at a tenth of birch, near the 3–5% a year of shade-tolerant
+     * juveniles in deep shade (Petrovska et al. 2022; an order of magnitude, calibrate). Absent: 1.
+     */
+    suppressionSlope: number;
+    /**
+     * T: shade tolerance, Niinemets & Valladares's (2006) score, 1 (intolerant) to 5 (tolerant),
+     * per species (flora.ts). Scales the suppression rate only. The default 3 is the scale's
+     * middle, for a species with no score; absent from the JSON the core reads 1 (params.rs), as
+     * it reads every two-part param's absent value as the neutral one. The two differ on purpose.
+     */
+    shadeTolerance: number;
+    /**
+     * The two-part mode's suppression signal, the world's (ADR 0065, decision 5). "carbon"
+     * (absent): R1's P/M, as above. "topLight", the dark top: (1 − (Q_top/C)/topLightThreshold)₊,
+     * Q_top the light at the tree's top (`c5.topQuantile`) and C open sky. "growth", the stalled
+     * leader: (1 − ΔH/(growthSeasons · growthFloor))₊, ΔH the height gained over the last
+     * growthSeasons seasons. Either deficit is scaled by m_s and shade tolerance as P/M's is.
+     */
+    suppressionSignal?: "carbon" | "topLight" | "growth";
+    /** θ_q: "topLight"'s threshold on Q_top / C. Absent: 0 (no signal). */
+    topLightThreshold?: number;
+    /** k: "growth"'s window, seasons. Absent: 5. */
+    growthSeasons?: number;
+    /** g: "growth"'s floor, cells a season. Absent: 0 (no signal). */
+    growthFloor?: number;
     /** Cap on live trees, so a page cannot run away. */
     maxTrees: number;
     /**
@@ -542,11 +602,12 @@ export interface Params {
      */
     rain?: number;
     /**
-     * The band of depth, in cells, that seedlings establish in, centred on the slab's middle (I3):
-     * the garden plants one row of trees, and its recruits stay about a crown's depth around it.
-     * Local seeds landing outside it are lost; seed rain lands inside it. Absent: anywhere.
+     * Planting at a density (ADR 0063, decision 5): the world starts from `density` saplings per
+     * hectare (a cell is 0.25 m) over the whole width × depth instead of `trees`, at positions from
+     * the keyed RNG, none closer than `spacing` cells to another (measured across the x and z wraps
+     * that are periodic). Tree k takes `species[(k + seed) mod n]`. Absent: `trees`, as before.
      */
-    band?: number;
+    planting?: { density: number; spacing: number; species?: string[] };
   };
 
   /** R6 Short shoots (spec §R6, ADR 0006). Off = baseline: every live bud is one unit of leaf area. */
@@ -674,7 +735,7 @@ export const defaultParams: Params = {
   },
   c3: { mode: "none", lambda: 0.5, alpha: 2 },
   c4: { enabled: false, wd: 1, xi: 0.3, eta: 0.15, setPoint: 0, epsilon: 0.5, sigma: 20 },
-  c5: { enabled: false, T: 0.1, g: 3, Trel: 0, topQuantile: 0.9 }, // T, Trel: calibrate
+  c5: { enabled: false, T: 0.1, g: 3, Trel: 0, topQuantile: 0.9, kRel: 1 }, // T, Trel, kRel: calibrate
   c6: { enabled: false, n: 2, r0: 0.0025 },
   // M8 calibration (docs/experiments/2026-10-27-m8-carbon.md). With R1 on, the sky presets
   // also raise c3.alpha to 3, since costs and the L_h discount take ≈ 40% of the resource.
@@ -726,7 +787,27 @@ export const defaultParams: Params = {
   r6: { enabled: false, qMin: 0.2, leafArea: 1 }, // calibrate (M6d)
   // M11 calibration (docs/experiments/2026-10-27-m11-stand-dynamics.md).
   o2: { enabled: false, sway: 0.0005, maxSway: 3, pAbr: 0.5, stormP: 0, stormLoad: 1.5 },
-  o4: { enabled: false, cSeed: 5, d: 20, qEst: 0.1, pEst: 0.3, m0: 0.002, maxTrees: 300, rain: 0 },
+  o4: {
+    enabled: false,
+    cSeed: 5,
+    d: 20,
+    qEst: 0.1,
+    pEst: 0.3,
+    mortality: "sizeBlind",
+    m0: 0.002,
+    mCanopy: 0.01,
+    hCanopy: 120,
+    gammaCanopy: 2,
+    mSuppression: 1,
+    suppressionSlope: 0.92,
+    shadeTolerance: 3,
+    suppressionSignal: "carbon",
+    topLightThreshold: 0,
+    growthSeasons: 5,
+    growthFloor: 0,
+    maxTrees: 300,
+    rain: 0,
+  },
 };
 
 /** A partial set of overrides, merged one level deep into each section. */

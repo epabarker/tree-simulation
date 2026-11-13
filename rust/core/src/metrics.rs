@@ -1,6 +1,11 @@
 //! Per-tree, per-season measurements (spec §8, §10): one row per tree per season in the CLI's
 //! metrics.csv, and the page's charts. Crown width and the centroid's offset are along x (the
 //! picture's plane); depth and its offset along z (I2).
+//! The feature measures (liveCrownBase … budsOutside, docs/features/ and GLOSSARY) are computed
+//! here once, so the feature probe, the evidence tests and the analysis read the same numbers.
+//! The bare bole's counts (shedRelative … boleSprouts, #125) are this season's, recorded where
+//! they happen: C5's `shed_branches` (first-order limbs shed by the relative test alone, by R1's
+//! carbon test alone, by both) and R4's release in `grow_buds` (sprouts from bole scars).
 
 use crate::light::Light;
 use crate::math;
@@ -13,7 +18,10 @@ const PI: f64 = std::f64::consts::PI;
 
 /// metrics.csv's columns (METRIC_COLUMNS), in order. `alive` and `sown` are flags (1/0) and
 /// `species` a string; every other column is a number.
-pub const METRIC_COLUMNS: [&str; 41] = [
+/// How many numbers a tree's metrics hold: METRIC_COLUMNS' and METRIC_NUMBERS' length.
+pub const METRIC_COUNT: usize = 52;
+
+pub const METRIC_COLUMNS: [&str; METRIC_COUNT] = [
     "tree",
     "alive",
     "species",
@@ -55,11 +63,22 @@ pub const METRIC_COLUMNS: [&str; 41] = [
     "leafCrownRatio",
     "limbBase",
     "limbCrownRatio",
+    "liveCrownBase",
+    "topFifthLeaf",
+    "leafBelowSixth",
+    "w90",
+    "upperFlankNew",
+    "budsOutside",
+    "shedRelative",
+    "shedCarbon",
+    "shedBoth",
+    "boleSprouts",
+    "crownLength",
 ];
 
 /// The numeric fields of TreeMetrics, in this order (`sown` among them, as a flag), which the
 /// snapshot carries as a block: everything but `species`.
-pub const METRIC_NUMBERS: [&str; 41] = [
+pub const METRIC_NUMBERS: [&str; METRIC_COUNT] = [
     "tree",
     "alive",
     "rootX",
@@ -101,11 +120,22 @@ pub const METRIC_NUMBERS: [&str; 41] = [
     "leafCrownRatio",
     "limbBase",
     "limbCrownRatio",
+    "liveCrownBase",
+    "topFifthLeaf",
+    "leafBelowSixth",
+    "w90",
+    "upperFlankNew",
+    "budsOutside",
+    "shedRelative",
+    "shedCarbon",
+    "shedBoth",
+    "boleSprouts",
+    "crownLength",
 ];
 
 pub struct TreeMetrics {
     /// By METRIC_NUMBERS.
-    pub values: [f64; 41],
+    pub values: [f64; METRIC_COUNT],
     pub species: String,
 }
 
@@ -171,28 +201,20 @@ pub fn lai(light: &Light, x0: f64, x1: f64, z0: f64, z1: f64) -> f64 {
     sum / ((hi - lo + 1) * (far - near + 1)) as f64
 }
 
+/// The share of the leaf area below the crown's base (`leaf_base`, `limb_base`).
+pub const CROWN_BASE_SHARE: f64 = 0.05;
+
 /// The crown's base by leaf area (C1 round 3, plan 2026-10-30-form §3): live buds' leaf area
 /// (R6's `deposit_area`; 1 per live bud without a world) in 1-cell bins of their metamer's tip
 /// height, walked up from the ground until CROWN_BASE_SHARE of it lies below; the height is
 /// interpolated within that bin. Unlike the lowest live first-order branch (`boleHeight`), one
-/// low twig does not hold it down. `height` when the tree carries no leaf.
-pub const CROWN_BASE_SHARE: f64 = 0.05;
-
-pub fn leaf_base(tree: &Tree, world: Option<&World>, height: f64) -> f64 {
-    let r6 = world.map(|w| &w.params_of(tree).r6);
+/// low twig does not hold it down. `height` when the tree carries no leaf. From the tree's
+/// `leaves` (`tree_metrics` makes them once for every leaf measure).
+fn leaf_base(leaves: &[(f64, f64, f64)], height: f64) -> f64 {
     let bins = math::max(0.0, height).floor() as usize + 1;
     let mut area = vec![0.0; bins];
     let mut total = 0.0;
-    for j in 0..tree.b.len() {
-        let s = tree.b.state[j];
-        if !is_live_bud(s) {
-            continue;
-        }
-        let leaf = r6.map_or(1.0, |r6| deposit_area(s, r6));
-        if leaf <= 0.0 {
-            continue;
-        }
-        let y = tree.tip_y(tree.b.metamer[j] as usize);
+    for &(_, y, leaf) in leaves {
         let k = (math::max(0.0, y).floor() as usize).min(bins - 1);
         area[k] += leaf;
         total += leaf;
@@ -211,22 +233,12 @@ pub fn leaf_base(tree: &Tree, world: Option<&World>, height: f64) -> f64 {
     height
 }
 
-/// The crown's base by limbs (species plan 2026-10-31, step B.2; ADR 0028): first-order limbs (an
-/// order-1 metamer off the trunk, and everything it carries) taken in order of the height they
-/// leave the trunk, the base of the limb at which those from the bottom up first hold
-/// CROWN_BASE_SHARE of the tree's leaf area. It reads where limbs attach, as the field's live crown
-/// base does (the lowest live primary limb of the main crown; Pretzsch 2019), where `leaf_base`
-/// reads where their leaves hang; one low twig does not set it, unlike `boleHeight`. Cumulative,
-/// not a share per limb: a crown of 126 limbs, none holding 5%, read a crown ratio of 0 that way
-/// (the round-2 lone beech at 100). `height` when the limbs hold less than that share.
-pub fn limb_base(tree: &Tree, world: Option<&World>, height: f64) -> f64 {
-    let r6 = world.map(|w| &w.params_of(tree).r6);
+/// Each metamer's first-order limb: the order-1 metamer off the trunk it descends from, -1 on the
+/// trunk. Parents come first, so one pass forward fills it.
+pub fn limbs_of(tree: &Tree) -> Vec<i32> {
     let c = &tree.m;
-    let nm = c.len();
-    // Each metamer's limb (the order-1 metamer it descends from, -1 on the trunk): parents come
-    // first, so one pass forward fills it.
-    let mut limb = vec![-1i32; nm];
-    for i in 0..nm {
+    let mut limb = vec![-1i32; c.len()];
+    for i in 0..c.len() {
         let p = c.parent[i];
         if p < 0 {
             continue;
@@ -237,6 +249,278 @@ pub fn limb_base(tree: &Tree, world: Option<&World>, height: f64) -> f64 {
             limb[p as usize]
         };
     }
+    limb
+}
+
+/// The live crown base (GLOSSARY; the bare-bole page's measure): the height where the lowest
+/// living first-order limb leaves the trunk, over the tree's height. A limb is living while it
+/// carries a live bud (active, dormant or short shoot) anywhere on it; a limb whose buds are all
+/// gone is a dead stub and does not count (the model sheds limbs outright, so these are rare).
+/// 1 when no limb lives (the whole stem is bare); NaN for a tree of no height. From the lowest
+/// living limb's height (`tree_metrics` finds it once).
+fn live_crown_base(height: f64, lowest: f64) -> f64 {
+    if height <= 0.0 {
+        return f64::NAN;
+    }
+    math::min(1.0, math::min(height, lowest) / height)
+}
+
+/// The live crown's vertical length (the bare-bole page's crown depth; `crownDepth` is the
+/// crown's z extent): the height less where the lowest living first-order limb leaves the trunk,
+/// the same limb `live_crown_base` reads. In cells; 0 when no limb lives.
+fn crown_length(height: f64, lowest: f64) -> f64 {
+    if lowest.is_finite() {
+        height - math::min(height, lowest)
+    } else {
+        0.0
+    }
+}
+
+/// The height where the lowest living first-order limb leaves the trunk (`live_crown_base`'s
+/// numerator); infinite when no limb lives. R4's count of sprouts on the bole reads it too.
+pub fn lowest_living_limb(tree: &Tree) -> f64 {
+    lowest_living_limb_of(tree, &limbs_of(tree))
+}
+
+fn lowest_living_limb_of(tree: &Tree, limb: &[i32]) -> f64 {
+    let mut base = f64::INFINITY;
+    for j in 0..tree.b.len() {
+        if !is_live_bud(tree.b.state[j]) {
+            continue;
+        }
+        let l = limb[tree.b.metamer[j] as usize];
+        if l >= 0 {
+            base = math::min(base, tree.m.base_y[l as usize]);
+        }
+    }
+    base
+}
+
+/// The leafy buds, as (x, y, leaf area) at their metamer's tip: live buds with a leaf area above 0
+/// (R6's `deposit_area`; 1 per live bud without a world, as `leaf_base` takes it).
+fn leaves(tree: &Tree, world: Option<&World>) -> Vec<(f64, f64, f64)> {
+    let r6 = world.map(|w| &w.params_of(tree).r6);
+    let mut out = Vec::new();
+    for j in 0..tree.b.len() {
+        let s = tree.b.state[j];
+        if !is_live_bud(s) {
+            continue;
+        }
+        let leaf = r6.map_or(1.0, |r6| deposit_area(s, r6));
+        if leaf > 0.0 {
+            let m = tree.b.metamer[j] as usize;
+            out.push((tree.tip_x(m), tree.tip_y(m), leaf));
+        }
+    }
+    out
+}
+
+/// The shares of the tree's leaf area at or above 0.8 H (the top fifth: ADR 0031's band, the
+/// rounded-crown page's measure) and below H/6 (the lone beech's low leaf, ADR 0043, the bare-bole
+/// page's guard), by the height of each leafy bud. NaN for a tree with no leaf.
+pub fn leaf_shares(leaves: &[(f64, f64, f64)], height: f64) -> (f64, f64) {
+    let (mut total, mut top, mut low) = (0.0, 0.0, 0.0);
+    for &(_, y, leaf) in leaves {
+        total += leaf;
+        if y >= 0.8 * height {
+            top += leaf;
+        }
+        if y < height / 6.0 {
+            low += leaf;
+        }
+    }
+    if total <= 0.0 || height <= 0.0 {
+        return (f64::NAN, f64::NAN);
+    }
+    (top / total, low / total)
+}
+
+/// The nearest rank of the q-quantile among `n` values (polars' default, which the playbook's
+/// scripts used): round(q·(n − 1)).
+fn rank(q: f64, n: usize) -> usize {
+    math::round(q * (n - 1) as f64) as usize
+}
+
+/// The q-quantile of `xs` by the nearest rank: the value a sort would put at `rank(q, n)`. It
+/// selects rather than sorts (linear, not n log n: the metrics run per tree per season and per
+/// snapshot); under `total_cmp`, a total order, the k-th value is the same bits either way.
+/// Reorders `xs` so that the values before that rank are the smaller ones; NaN when it is empty.
+fn quantile(xs: &mut [f64], q: f64) -> f64 {
+    if xs.is_empty() {
+        return f64::NAN;
+    }
+    let k = rank(q, xs.len());
+    *xs.select_nth_unstable_by(k, f64::total_cmp).1
+}
+
+/// The leafy crown's frame, in the picture's plane: its base (the 5th percentile of the leafy
+/// buds' heights), its top (the tree's height) and its half-width (the 95th percentile of the
+/// leafy buds' |x − root x|). `None` without leaf or depth. The flat-cap note's crown box (#79),
+/// which the open-box, oak-λ and oak-schedule summaries share.
+struct CrownFrame {
+    base: f64,
+    top: f64,
+    half_width: f64,
+}
+
+fn crown_frame(leaves: &[(f64, f64, f64)], root_x: f64, height: f64) -> Option<CrownFrame> {
+    let mut ys: Vec<f64> = leaves.iter().map(|l| l.1).collect();
+    let base = quantile(&mut ys, 0.05);
+    if base.is_nan() || height <= base {
+        return None;
+    }
+    let mut dx: Vec<f64> = leaves.iter().map(|l| (l.0 - root_x).abs()).collect();
+    Some(CrownFrame {
+        base,
+        top: height,
+        half_width: quantile(&mut dx, 0.95),
+    })
+}
+
+/// Leafy buds a slice needs for its width to count as the crown's widest (the oak-schedule
+/// summary's rule).
+pub const W90_MIN_BUDS: usize = 20;
+
+/// w90, the rounded-crown page's outline measure (the oak-schedule summary's `outline`): the
+/// leafy crown, from its base to the top, cut into 20 slices of equal depth; a slice's width is
+/// the 2nd to 98th percentile of its leafy buds' x; w90 is slice 17's width (0.85–0.90 of the
+/// depth) over the widest slice holding W90_MIN_BUDS. An ellipse gives about 0.6, a spire is low
+/// and a flat cap near 1. 0 when slice 17 is empty; NaN when no slice holds enough buds.
+fn w90(leaves: &[(f64, f64, f64)], frame: Option<&CrownFrame>) -> f64 {
+    let Some(f) = frame else {
+        return f64::NAN;
+    };
+    // The slices' x, bucketed into one buffer (slice k at start[k]..start[k + 1]): a quantile
+    // reads a slice's values, not their order.
+    let slice_of = |y: f64| {
+        #[allow(clippy::nonminimal_bool)] // as written, a NaN height falls in slice 0
+        (!(y < f.base || y > f.top))
+            .then(|| ((20.0 * (y - f.base) / (f.top - f.base)).floor() as usize).min(19))
+    };
+    let mut start = [0usize; 21];
+    for &(_, y, _) in leaves {
+        if let Some(k) = slice_of(y) {
+            start[k + 1] += 1;
+        }
+    }
+    for k in 0..20 {
+        start[k + 1] += start[k];
+    }
+    let mut fill = start;
+    let mut flat = vec![0.0; start[20]];
+    for &(x, y, _) in leaves {
+        if let Some(k) = slice_of(y) {
+            flat[fill[k]] = x;
+            fill[k] += 1;
+        }
+    }
+    let mut widest = f64::NAN;
+    let mut at = 0.0;
+    for k in 0..20 {
+        let xs = &mut flat[start[k]..start[k + 1]];
+        let n = xs.len();
+        let w = if n == 0 {
+            0.0
+        } else {
+            // The 98th, then the 2nd among the values below it (they are the smaller ones, so
+            // its rank there is its rank in the whole slice).
+            let hi = quantile(xs, 0.98);
+            let (lo, top) = (rank(0.02, n), rank(0.98, n));
+            let lo = if lo < top {
+                *xs[..top].select_nth_unstable_by(lo, f64::total_cmp).1
+            } else {
+                hi
+            };
+            hi - lo
+        };
+        if k == 17 {
+            at = w;
+        }
+        if n >= W90_MIN_BUDS && (widest.is_nan() || w > widest) {
+            widest = w;
+        }
+    }
+    if widest.is_nan() || widest <= 0.0 {
+        return f64::NAN;
+    }
+    at / widest
+}
+
+/// The upper flank's share of this season's new metamers (the rounded-crown page's measure; the
+/// flat-cap note's sectors, #79): each new metamer's tip placed about the leafy crown's centre in
+/// the picture's plane, u = (x − root x)/half-width and v = (y − centre)/half-depth; the flank is
+/// the outer shell (ρ = √(u² + v²) ≥ 0.7) between 30° and 60° from vertical (θ = atan2(|u|, v)).
+/// New means born in the season that last ran (World::step counts the season after running it).
+/// NaN without a world, a leafy crown or new metamers.
+fn upper_flank_new(tree: &Tree, world: Option<&World>, frame: Option<&CrownFrame>) -> f64 {
+    let (Some(w), Some(f)) = (world, frame) else {
+        return f64::NAN;
+    };
+    let season = w.season - 1.0;
+    let centre = (f.base + f.top) / 2.0;
+    let half_depth = (f.top - f.base) / 2.0;
+    let (mut new, mut flank) = (0.0, 0.0);
+    for i in 0..tree.m.len() {
+        if tree.m.birth_season[i] as f64 != season {
+            continue;
+        }
+        new += 1.0;
+        let [x, y, _] = tree.tip(i);
+        let u = (x - tree.root_x) / f.half_width;
+        let v = (y - centre) / half_depth;
+        let rho = math::hypot(u, v);
+        let theta = math::atan2(u.abs(), v) * (180.0 / PI);
+        if rho >= 0.7 && (30.0..60.0).contains(&theta) {
+            flank += 1.0;
+        }
+    }
+    if new > 0.0 { flank / new } else { f64::NAN }
+}
+
+/// How far below the ground a resting tip may sit by rounding, cells (1e-9: R3's residue is
+/// ≈ 1e-16; a nanometre-scale band hides no bud a picture could show).
+pub const GROUND_EPS: f64 = 1e-9;
+
+/// Live buds outside the world's bounds (ADR 0062: an open-grown lone tree's box must hold its
+/// crown, so this is zero there): a bud at its metamer's tip below the ground, at or above the
+/// world's height, or past a width or depth face that is not periodic. A periodic side wraps a
+/// crown round and is no bound. NaN without a world. The ground is a bound a limb may rest on:
+/// R3's ground rest (`r3.ground`) leaves its tip at y ≈ −1e-16 by rounding, so only a tip more
+/// than `GROUND_EPS` below it counts (#115). The other bounds stay exact.
+pub fn buds_outside(tree: &Tree, world: Option<&World>) -> f64 {
+    let Some(w) = world else {
+        return f64::NAN;
+    };
+    let p = &w.params().world;
+    let (width, height, depth) = (p.width, p.height, crate::light::depth_of(w.params()));
+    let mut out = 0.0;
+    for j in 0..tree.b.len() {
+        if !is_live_bud(tree.b.state[j]) {
+            continue;
+        }
+        let [x, y, z] = tree.tip(tree.b.metamer[j] as usize);
+        let past_x = !p.periodic && !(0.0..width).contains(&x);
+        let past_z = !p.periodic_z && !(0.0..depth).contains(&z);
+        if past_x || past_z || y < -GROUND_EPS || y >= height {
+            out += 1.0;
+        }
+    }
+    out
+}
+
+/// The crown's base by limbs (species plan 2026-10-31, step B.2; ADR 0028): first-order limbs (an
+/// order-1 metamer off the trunk, and everything it carries) taken in order of the height they
+/// leave the trunk, the base of the limb at which those from the bottom up first hold
+/// CROWN_BASE_SHARE of the tree's leaf area. It reads where limbs attach, as the field's live crown
+/// base does (the lowest live primary limb of the main crown; Pretzsch 2019), where `leaf_base`
+/// reads where their leaves hang; one low twig does not set it, unlike `boleHeight`. Cumulative,
+/// not a share per limb: a crown of 126 limbs, none holding 5%, read a crown ratio of 0 that way
+/// (the round-2 lone beech at 100). `height` when the limbs hold less than that share. With the
+/// tree's `limbs_of` already made (`tree_metrics` makes it once).
+fn limb_base(tree: &Tree, world: Option<&World>, height: f64, limb: &[i32]) -> f64 {
+    let r6 = world.map(|w| &w.params_of(tree).r6);
+    let c = &tree.m;
+    let nm = c.len();
     let mut area = vec![0.0; nm];
     let mut total = 0.0;
     for j in 0..tree.b.len() {
@@ -325,8 +609,14 @@ pub fn tree_metrics(tree: &Tree, world: Option<&World>) -> TreeMetrics {
     let n = nm as f64;
     let trunk = if nm > 0 { c.radius[0] } else { 0.0 };
     let bole_height = if bole.is_finite() { bole } else { height };
-    let leaf_base = leaf_base(tree, world, height);
-    let limb_base = limb_base(tree, world, height);
+    // Made once and shared: every leaf measure reads `leafy`, both limb measures `limb`.
+    let leafy = leaves(tree, world);
+    let limb = limbs_of(tree);
+    let lowest = lowest_living_limb_of(tree, &limb);
+    let leaf_base = leaf_base(&leafy, height);
+    let limb_base = limb_base(tree, world, height, &limb);
+    let (top_fifth, below_sixth) = leaf_shares(&leafy, height);
+    let frame = crown_frame(&leafy, tree.root_x, height);
     let ground = match world {
         Some(w) if nm > 0 => ground_light(w, min_x, max_x, min_z, max_z),
         _ => f64::NAN,
@@ -394,6 +684,17 @@ pub fn tree_metrics(tree: &Tree, world: Option<&World>) -> TreeMetrics {
             } else {
                 0.0
             },
+            live_crown_base(height, lowest),
+            top_fifth,
+            below_sixth,
+            w90(&leafy, frame.as_ref()),
+            upper_flank_new(tree, world, frame.as_ref()),
+            buds_outside(tree, world),
+            tree.shed_relative,
+            tree.shed_carbon,
+            tree.shed_both,
+            tree.bole_sprouts,
+            crown_length(height, lowest),
         ],
         species: tree.species.clone(),
     }
@@ -407,6 +708,29 @@ mod tests {
     use crate::tree::slot;
 
     const UP: f64 = std::f64::consts::FRAC_PI_2;
+
+    #[test]
+    fn a_season_of_relative_shedding_shows_its_causes_in_the_appended_columns() {
+        // The C5 test tree's lateral, a first-order limb, shed by the relative test alone; then a
+        // released sprout on the bole, as R4 records it.
+        let p = crate::principles::c5::tests::params(r#"{"c5":{"Trel":0.3}}"#);
+        let mut t = crate::principles::c5::tests::small_tree(&p);
+        t.q_top = 1.0;
+        t.m.q_sum[2] = 0.3;
+        t.m.n_sum[2] = 2;
+        t.m.q_sum[1] = 1.0;
+        t.m.n_sum[1] = 1;
+        let nm = t.m.len();
+        crate::principles::c5::shed_branches(&mut t, &p, 5.0, nm);
+        t.bole_sprouts = 2.0;
+        let m = tree_metrics(&t, None);
+        let tail = ["shedRelative", "shedCarbon", "shedBoth", "boleSprouts"];
+        assert_eq!(METRIC_COLUMNS[47..51], tail);
+        assert_eq!(METRIC_NUMBERS[47..51], tail);
+        assert_eq!(METRIC_COLUMNS[46], "budsOutside"); // the existing columns keep their places
+        let got: Vec<f64> = tail.iter().map(|k| m.get(k)).collect();
+        assert_eq!(got, vec![1.0, 0.0, 0.0, 2.0]);
+    }
 
     #[test]
     fn the_leaf_base_ignores_one_low_twig_that_sets_the_bole() {
@@ -485,6 +809,273 @@ mod tests {
         let m = tree_metrics(&t, None);
         assert_eq!(m.get("limbBase"), 2.0);
         assert!((m.get("limbCrownRatio") - 39.0 / 41.0).abs() < 1e-12);
+    }
+
+    /// A 20-cell trunk, up the y axis from (10, 0, 0.5).
+    fn stem(t: &mut Tree, n: usize) -> Vec<usize> {
+        let mut trunk = vec![metamer(t, -1, slot::MAIN, UP, 1.0, 0.1, 0.0)];
+        for _ in 1..n {
+            let p = *trunk.last().unwrap() as i32;
+            trunk.push(metamer(t, p, slot::MAIN, UP, 1.0, 0.1, 0.0));
+        }
+        trunk
+    }
+
+    #[test]
+    fn the_live_crown_base_is_the_lowest_limb_with_a_live_bud_over_the_height() {
+        // A dead limb at 2 (its only bud terminated), a live one-bud limb at 5 carrying a dead
+        // side shoot, and crown limbs at 14–19.
+        let mut t = Tree::new(0, 10.0, 0.5);
+        let trunk = stem(&mut t, 20);
+        let dead = metamer(&mut t, trunk[1] as i32, RIGHT, 0.0, 1.0, 0.01, 0.0);
+        let b = bud(&mut t, dead, slot::MAIN, 0.0, 1.0);
+        t.b.state[b] = crate::tree::bud::TERMINATED;
+        let low = metamer(&mut t, trunk[4] as i32, RIGHT, 0.0, 1.0, 0.01, 0.0);
+        let side = metamer(&mut t, low as i32, RIGHT, 0.0, 1.0, 0.01, 0.0);
+        bud(&mut t, side, slot::MAIN, 0.0, 1.0);
+        for &k in &trunk[13..19] {
+            let limb = metamer(&mut t, k as i32, RIGHT, 0.0, 1.0, 0.01, 0.0);
+            bud(&mut t, limb, slot::MAIN, 0.0, 1.0);
+        }
+        let m = tree_metrics(&t, None);
+        assert_eq!(m.get("boleHeight"), 2.0);
+        assert_eq!(m.get("liveCrownBase"), 0.25);
+    }
+
+    #[test]
+    fn the_crown_length_is_the_height_above_the_lowest_living_limb_and_0_with_none() {
+        // A 20-cell trunk; a dead limb at 2 (its bud terminated) and a live one at 6: the crown
+        // runs from 6 to 20 (14 cells), the vertical length, not the crown's z extent.
+        let mut t = Tree::new(0, 10.0, 0.5);
+        let trunk = stem(&mut t, 20);
+        let dead = metamer(&mut t, trunk[1] as i32, RIGHT, 0.0, 1.0, 0.01, 0.0);
+        let b = bud(&mut t, dead, slot::MAIN, 0.0, 1.0);
+        t.b.state[b] = crate::tree::bud::TERMINATED;
+        let live = metamer(&mut t, trunk[5] as i32, RIGHT, 0.0, 1.0, 0.01, 0.0);
+        let leaf = bud(&mut t, live, slot::MAIN, 0.0, 1.0);
+        let m = tree_metrics(&t, None);
+        assert_eq!(m.get("height"), 20.0);
+        assert_eq!(m.get("crownLength"), 14.0);
+        assert_eq!(m.get("crownDepth"), 0.0); // a picture-plane tree has no z extent
+        assert_eq!(METRIC_COLUMNS[METRIC_COUNT - 1], "crownLength");
+        assert_eq!(METRIC_NUMBERS[METRIC_COUNT - 1], "crownLength");
+        // No living limb: a bare stem has no live crown.
+        t.b.state[leaf] = crate::tree::bud::TERMINATED;
+        assert_eq!(tree_metrics(&t, None).get("crownLength"), 0.0);
+    }
+
+    #[test]
+    fn the_top_fifth_and_the_bottom_sixth_hold_their_share_of_the_leaf() {
+        // A 20-cell trunk; a one-bud twig with its leaf at 2; one-bud limbs with their leaf at
+        // 14–19. Above 0.8 H = 16: the limbs at 16–19, 4 of 7. Below H/6 ≈ 3.3: the twig, 1 of 7.
+        let mut t = Tree::new(0, 10.0, 0.5);
+        let trunk = stem(&mut t, 20);
+        let twig = metamer(&mut t, trunk[1] as i32, RIGHT, 0.0, 1.0, 0.01, 0.0);
+        bud(&mut t, twig, slot::MAIN, 0.0, 1.0);
+        for &k in &trunk[13..19] {
+            let limb = metamer(&mut t, k as i32, RIGHT, 0.0, 1.0, 0.01, 0.0);
+            bud(&mut t, limb, slot::MAIN, 0.0, 1.0);
+        }
+        let m = tree_metrics(&t, None);
+        assert!((m.get("topFifthLeaf") - 4.0 / 7.0).abs() < 1e-12);
+        assert!((m.get("leafBelowSixth") - 1.0 / 7.0).abs() < 1e-12);
+        // A tree with no leaf has no shares.
+        let mut bare = Tree::new(0, 10.0, 0.5);
+        stem(&mut bare, 5);
+        assert!(tree_metrics(&bare, None).get("topFifthLeaf").is_nan());
+    }
+
+    /// A horizontal limb of `length` off trunk node `at`, to the right (+x) or the left, with `n`
+    /// active buds at its tip.
+    fn leafy_limb(t: &mut Tree, at: usize, right: bool, length: f64, n: usize) -> usize {
+        let angle = if right { 0.0 } else { std::f64::consts::PI };
+        let limb = metamer(t, at as i32, RIGHT, angle, length, 0.01, 0.0);
+        for s in 0..n {
+            bud(t, limb, (s % 8) as u8, 0.0, 1.0);
+        }
+        limb
+    }
+
+    /// A 21-cell trunk whose leaf runs from 1 to the top (21): ten leafy buds each side at 1
+    /// (half-width 1), at 6 (half-width 5) and at 18 (half-width 3).
+    fn outlined() -> Tree {
+        let mut t = Tree::new(0, 10.0, 0.5);
+        let trunk = stem(&mut t, 21);
+        for (node, reach) in [(0, 1.0), (5, 5.0), (17, 3.0)] {
+            leafy_limb(&mut t, trunk[node], true, reach, 10);
+            leafy_limb(&mut t, trunk[node], false, reach, 10);
+        }
+        t
+    }
+
+    #[test]
+    fn w90_is_the_outline_width_near_the_top_over_the_widest() {
+        // The crown runs from its leaf base (1) to the top (21) in 20 slices of one cell. The
+        // widest slice (y 6) is 10 wide; slice 17, y 18–19, is 6 wide.
+        let m = tree_metrics(&outlined(), None);
+        assert_eq!(m.get("height"), 21.0);
+        assert!((m.get("w90") - 0.6).abs() < 1e-12, "{}", m.get("w90"));
+        // Nothing in slice 17: the top is empty, w90 0.
+        let mut t = Tree::new(0, 10.0, 0.5);
+        let trunk = stem(&mut t, 21);
+        for (node, reach) in [(0, 1.0), (5, 5.0), (14, 3.0)] {
+            leafy_limb(&mut t, trunk[node], true, reach, 10);
+            leafy_limb(&mut t, trunk[node], false, reach, 10);
+        }
+        assert_eq!(tree_metrics(&t, None).get("w90"), 0.0);
+        // No slice holds 20 leafy buds: no widest slice to measure against.
+        let mut t = Tree::new(0, 10.0, 0.5);
+        let trunk = stem(&mut t, 21);
+        leafy_limb(&mut t, trunk[5], true, 5.0, 4);
+        assert!(tree_metrics(&t, None).get("w90").is_nan());
+    }
+
+    #[test]
+    fn a_season_s_new_metamers_carry_the_season_before_the_world_s_count() {
+        // The metrics run after World::step, which counts the season after running it.
+        let mut world = World::new(crate::testing::preset("bh", "{}"));
+        world.run(8, &[]);
+        let t = &world.trees[0];
+        let born = |s: f64| {
+            (0..t.m.len())
+                .filter(|&i| t.m.birth_season[i] as f64 == s)
+                .count()
+        };
+        assert!(born(world.season - 1.0) > 0);
+        assert_eq!(born(world.season), 0);
+    }
+
+    #[test]
+    fn the_upper_flank_share_counts_this_season_s_new_metamers_between_30_and_60_degrees() {
+        // The outlined crown's frame: centre 11, half-depth 10, half-width 5 (the 95th percentile
+        // of |dx|). Four metamers grown this season end at (u, v): (0.6, 0.6) in the flank shell,
+        // (1, 0) on the side, (0, 0.9) on top and (0.3, 0.3) inside the flank's angle but not in
+        // its shell: 1 of 4.
+        let mut world = World::new(crate::testing::preset("bh", "{}"));
+        world.season = 6.0;
+        let mut t = outlined();
+        for (node, angle, length) in [
+            (16, 0.0, 3.0),
+            (10, 0.0, 5.0),
+            (18, UP, 1.0),
+            (13, 0.0, 1.5),
+        ] {
+            metamer(&mut t, node, RIGHT, angle, length, 0.01, 5.0);
+        }
+        let m = tree_metrics(&t, Some(&world));
+        assert_eq!(m.get("height"), 21.0);
+        assert!(
+            (m.get("upperFlankNew") - 0.25).abs() < 1e-12,
+            "{}",
+            m.get("upperFlankNew")
+        );
+        // The season after, none of them is new.
+        world.season = 7.0;
+        assert!(tree_metrics(&t, Some(&world)).get("upperFlankNew").is_nan());
+    }
+
+    #[test]
+    fn buds_outside_count_live_buds_past_a_bound_but_not_past_a_periodic_side() {
+        // The outlined crown spans x 5–15 and y 0–21 about its root at x 10, z 0.5; its ten
+        // right-hand buds on the widest limb sit at x 15.
+        let world = |w: &str| {
+            World::new(crate::testing::preset(
+                "bh",
+                &format!(r#"{{"world":{{"width":{w},"height":30,"walls":[]}}}}"#),
+            ))
+        };
+        let t = outlined();
+        assert_eq!(tree_metrics(&t, Some(&world("30"))).get("budsOutside"), 0.0);
+        assert_eq!(
+            tree_metrics(&t, Some(&world("14"))).get("budsOutside"),
+            10.0
+        );
+        // Above the world's height: the ten buds each side at 18.
+        let low = World::new(crate::testing::preset(
+            "bh",
+            r#"{"world":{"width":30,"height":15,"walls":[]}}"#,
+        ));
+        assert_eq!(tree_metrics(&t, Some(&low)).get("budsOutside"), 20.0);
+        // A periodic width wraps a crown round; it has no bound to cross.
+        let round = World::new(crate::testing::preset(
+            "bh",
+            r#"{"world":{"width":14,"height":30,"walls":[],"sides":"periodic"}}"#,
+        ));
+        assert!(round.params().world.periodic);
+        assert_eq!(tree_metrics(&t, Some(&round)).get("budsOutside"), 0.0);
+        // A dead bud past the bound does not count; without a world, there are no bounds.
+        let mut dead = outlined();
+        let past = leafy_limb(&mut dead, 3, true, 20.0, 1);
+        let last = dead.b.len() - 1;
+        dead.b.state[last] = crate::tree::bud::GONE;
+        assert_eq!(past, dead.m.len() - 1);
+        assert_eq!(
+            tree_metrics(&dead, Some(&world("30"))).get("budsOutside"),
+            0.0
+        );
+        assert!(tree_metrics(&t, None).get("budsOutside").is_nan());
+    }
+
+    #[test]
+    fn a_bud_resting_on_the_ground_is_on_the_bound_not_past_it() {
+        // R3's ground rest leaves a limb's tip at y ≈ −1e-17 (the open-grown oak, #115): on the
+        // ground. A tip a millimetre below it is past the bound.
+        let world = World::new(crate::testing::preset(
+            "bh",
+            r#"{"world":{"width":30,"height":30,"walls":[]}}"#,
+        ));
+        let at = |y: f64| {
+            let mut t = outlined();
+            let j = (0..t.b.len()).find(|&j| is_live_bud(t.b.state[j])).unwrap();
+            let m = t.b.metamer[j] as usize;
+            // Every live bud on this metamer moves with its tip.
+            let on = (0..t.b.len())
+                .filter(|&k| is_live_bud(t.b.state[k]) && t.b.metamer[k] as usize == m)
+                .count() as f64;
+            t.m.base_y[m] -= t.tip(m)[1] - y;
+            (tree_metrics(&t, Some(&world)).get("budsOutside"), on)
+        };
+        assert_eq!(at(-1e-15).0, 0.0);
+        let (past, on) = at(-1e-3);
+        assert_eq!(past, on);
+        assert!(on >= 1.0);
+    }
+
+    #[test]
+    fn the_selected_quantiles_are_the_sorted_ones_bit_for_bit() {
+        // quantile and w90's slice width select rather than sort (cost only): the same bits as
+        // a full sort, with ties, signed zeros and NaN among the values.
+        let sorted_at = |xs: &[f64], q: f64| {
+            let mut s = xs.to_vec();
+            s.sort_by(f64::total_cmp);
+            s[rank(q, s.len())]
+        };
+        for n in 1..60usize {
+            let mut xs: Vec<f64> = (0..n)
+                .map(|k| match k % 11 {
+                    0 => 0.0,
+                    1 => -0.0,
+                    2 => 3.0,
+                    3 if n > 40 => f64::NAN,
+                    _ => crate::rng::uniform(7.0, 0, n as f64, k as f64, 0.0, 0.0) * 10.0 - 5.0,
+                })
+                .collect();
+            for q in [0.02, 0.05, 0.5, 0.95, 0.98] {
+                let want = sorted_at(&xs, q);
+                assert_eq!(
+                    quantile(&mut xs, q).to_bits(),
+                    want.to_bits(),
+                    "n {n}, q {q}"
+                );
+            }
+            // w90's 2nd percentile, read among the values below the 98th after selecting it.
+            let (lo, top) = (rank(0.02, n), rank(0.98, n));
+            quantile(&mut xs, 0.98);
+            if lo < top {
+                let got = *xs[..top].select_nth_unstable_by(lo, f64::total_cmp).1;
+                assert_eq!(got.to_bits(), sorted_at(&xs, 0.02).to_bits(), "n {n}");
+            }
+        }
     }
 
     #[test]

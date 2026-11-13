@@ -8,7 +8,7 @@
 
 - **Two measurement problems come first, because they change what the bars mean.**
   - **D is two different diameters.** The fit's `lone.slenderness` reads the core's `slenderness`, height over the root metamer's diameter (`cli/trials.ts`). Every matched-DBH anchor (Pretzsch, Tallo, Level 0) reads the trunk cylinder at 1.3 m of stem. In the garden's clean boles they agree (ratio 0.98–1.00). In the lone trees they differ by 0.5–1.9× from seed to seed (§1).
-  - **A low fork can be thicker than its stem.** In lone beech seed 1 at season 60, the stem's base is 73 cm across. At a fork at about 1 m, the two children are 120 and 109 cm across on a parent of 85 cm. This is R3 as built: its moment is the vector sum of the load's first moment, so a balanced crown barely bends the stem below it, while each limb at the fork carries its own unbalanced moment and grows stress wood past its parent (§1).
+  - **A low fork can be thicker than its stem.** In lone beech seed 1 at season 60, the stem's base is 73 cm across. At a fork at about 1 m, the two children are 120 and 109 cm across on a parent of 85 cm. This is R3 as built, and as ADR 0011 decided: its moment is the vector sum of the load's first moment, so a balanced crown barely bends the stem below it, while each limb at the fork carries its own unbalanced moment and grows stress wood past its parent. Stress wood is local (ADR 0011 §3), so C6 passes only the pipe part down and the parent never catches up (§1).
 - **The lone triad at HEAD.**
   - **Beech:** too stout (H/D 18–31 at season 100 against 48 ± 8), with W/H 1.43–1.49 at season 100, ADR 0041's accepted 1.50. At season 60 its W/H is 1.53–1.67, 2.6–2.8× `lone.spread`'s 0.6 ± 0.2.
   - **Hornbeam:** too stout (H/D 19–36 against 58 ± 10), with W/H 1.02–1.36.
@@ -23,7 +23,7 @@
 - **Crown size as measured is an upper bound in the stand.**
   - The canopy trees' crowns, as discs of the mean tip radius, cover the plot 1.3–3.6× at HEAD and 1.7–3.1× under `H4k8`.
   - The robust crown (the 5–95% spread of the tips) is about half as wide. On it, beech under `H4k8` is 1.03× Tallo's median and hornbeam 0.68×.
-  - The tip measure is Level 0's own (`cli/allometry.ts`), so the gate keeps it. The robust crown is reported beside it (§3).
+  - The tip measure is close to Level 0's own (an upper bound on it, §3), so the gate keeps it. The robust crown is reported beside it.
 - **Floor light is already in spec M6e's band:**
   - At HEAD the plot's mean ground light from season 50 is 3–13% of open sky (median 1.5–12%). Under `H4k8` it is 5–17%: higher in all 12 frames from season 100, by a median 1.8×.
   - So narrow crowns light the floor more, but not beyond the band. The understorey's flood (ADR 0065's cap) does not come from a bright floor, which supports [#132](https://github.com/epabarker/tree-simulation/issues/132)'s relative signal (§4).
@@ -45,12 +45,15 @@
 - **Above 1:** the cylinder at 1.3 m is thicker than the base. The inverted fork does this: lone beech seed 1 at season 60 has its base metamer at radius 1.45 cells (0.36 m; stress wood 0.31 cells; stress 0.89 of σ_target). The metamer before the fork is at 1.70 cells, and its two children are at 2.39 and 2.18 cells, with stress wood 1.77 and 1.34. The children's Σr² is 3.6× the parent's.
 - **Below 1:** the chain at 1.3 m is already one stem of a low fork, so DBH reads one stem, not the bole.
 - **Either way, a lone tree's matched DBH is fragile** wherever it forks below about 1.5 m. The garden's trees are lifted clear of this by their bare boles.
-- **Why the base is thin** (code, `r3.rs`): a metamer's moment is (S − W·base) × (−ŷ), with S the summed first moment of everything it carries. Load on opposite sides cancels, so a symmetric crown bends its stem little and the stem grows little stress wood. Spec §R3.4 has no term for a load that does not cancel. A height-dependent wind load is one ([#133](https://github.com/epabarker/tree-simulation/issues/133)).
+- **Why the base is thin** (code, `r3.rs`): a metamer's moment is (S − W·base) × (−ŷ), with S the summed first moment of everything it carries. Load on opposite sides cancels, so a symmetric crown bends its stem little and the stem grows little stress wood.
+- **Why the parent stays thinner than its children** (code, `c6.rs`; ADR 0011 §3): stress wood is local by design. C6 sums only the pipe radius r − stressWood, so a junction reinforced by its children's stress wood is not thickened by it.
+- **Two cures, not one.** A load that does not cancel (a height-dependent wind load, [#133](https://github.com/epabarker/tree-simulation/issues/133)) would thicken the stem itself. Or stress wood could pass down the pipe, which would undo ADR 0011's choice (Minamino & Tateno 2014's Δ > 2 at heavy junctions). #133 tests the first; bar 10 below tells whether it is enough.
 
 ## 2. The lone triad
 
 `triad.py lone`, seeds 1–3 (min–max).
 - **W** = 2 × dbh.py's mean crown radius.
+- **W/H** is 2 × dbh.py's mean crown radius over the height. The fit's `lone.spread` is a different measure: the larger of the core's full crown width and depth, over the height (`cli/trials.ts`). It reads 1–8% higher; both are in `out/lone.md`. HEAD's beech at season 100 is 1.43–1.49 on dbh.py's measure and 1.49–1.59 on the fit's.
 - **H/D, base** is the fit's definition: the core's `slenderness`, which `lone.slenderness` is scored on.
 - **H/D, 1.3 m** uses dbh.py's DBH, which the matched-DBH anchors use.
 - **Targets:**
@@ -87,16 +90,16 @@
 | H4k8C6half | beech | season 100 | 100 | 34.6–35.4 | 42–78 | 21.3–24.3 | 1.40–1.87 | 0.60–0.70 | 47–81 | 45–82 |
 | H4k8C6half | hornbeam | season 100 | 100 | 28.9–29.0 | 39–52 | 17.3–21.2 | 1.30–1.50 | 0.60–0.73 | 54–74 | 55–73 |
 
-The full table, every arm, the six exemplars and the DBH 25/50 anchors, is `triad.py lone <arms>`. Birch and holly are left out of the guard: under `H4k8` the lone birch is H/D 134–162 and the holly 111–151, and at HEAD the birch is 3.05–3.20× the edge.
+The full table, every arm, the six exemplars, the DBH 25/50 anchors and the fit's `lone.spread` column, is committed as `code/2026-11-13-triad-reread/out/lone.md` (and remade by `triad.py lone <arms>`). Birch and holly are left out of the guard: under `H4k8` the lone birch is H/D 134–162 and the holly 111–151, and at HEAD the birch is 3.05–3.20× the edge.
 
 - **W/D = (W/H) × (H/D).** The three ratios are linked, so any two fix the third. Pretzsch's edge pairs a 95% crown radius with a 5% height from different trees, which makes its W/D the strictest of the three. That is why the arms meet H/D and W/H and still miss W ÷ Pretzsch.
-- **HEAD's beech fails on its stem, whichever W/H is read.** At ADR 0041's 1.50 its crown shape is right at season 100 (1.43–1.49) and only its H/D (18–31) is out. At 0.6 ± 0.2 both are out. Which W/H governs is the user's (#134).
+- **HEAD's beech fails on its stem, whichever W/H is read.** At ADR 0041's 1.50 its crown shape is right at season 100 (1.49–1.59 on the fit's measure, the one ADR 0041 read) and only its H/D (18–31) is out. At 0.6 ± 0.2 both are out. Which W/H governs is the user's (#134).
 - **The young crown is the problem, as the crown-extent note found.** At DBH 40 (season 26–27), HEAD's beech is 11 m tall and 18–20 m across: W/H 1.5–1.9 at a quarter of its age.
 
 ## 3. The stand against Tallo
 
 `triad.py stand base H4k8`: the canopy trees (drawn stems over half the top height) at 160 cells, seeds pooled.
-- **Crown:** 2 × the mean tip radius (Level 0's measure). **Robust crown:** the mean of the 5–95% tip spreads in x and z.
+- **Crown:** 2 × the mean tip radius over ±x and ±z, read from every metamer's tip (dbh.py's). Level 0's `cli/allometry.ts` reads the tips of live-bud metamers only, so dbh.py's is an upper bound on Level 0's, close to it because C5 sheds bare limbs. **Robust crown:** the mean of the 5–95% tip spreads in x and z.
 - **Tallo:** the forest-grown CR–DBH quantiles in `analysis/fit/sources/tallo-level0-curves.csv`, read at each tree's DBH. Support (DBH, cm): beech 6–54, hornbeam 8–39, oak 11.5–75, maple 10–54, birch 10.5–52; no holly.
 - **H/D:** the core's `slenderness`. `stand.slenderness`: beech 82 ± 12, hornbeam 86 ± 12.
 
@@ -119,7 +122,7 @@ The full table, every arm, the six exemplars and the DBH 25/50 anchors, is `tria
 "Inside" counts only the trees within Tallo's support; the rest are beyond it. The full table, with seasons 50–300, Hemery's mean and Pretzsch's edge, is `triad.py stand`.
 
 - **Crown cover** (Σ π cr² of the canopy trees ÷ the 640 m² plot): 1.3–3.6 at HEAD and 1.7–3.1 under `H4k8`, per run and season from 100. Every drawn stem's cover is 1.6–5.3. As measured, the crowns interpenetrate two- to threefold. Some of that is real overlap in depth (the plot is periodic in x and z; crowns occupy a 3D slab). Most is the tip measure's reach: one long limb sets a direction's radius.
-- **What the gate reads:**
+- **What the gate reads** (on the tip measure, as Level 0 fits):
   - The hornbeam meets Tallo under `H4k8` on the tip measure, and is narrow on the robust one (0.68× q50).
   - The beech is 1.5–1.9× Tallo on the tip measure and on it (1.03) on the robust one.
   - Oak and birch are wide on both.
@@ -147,8 +150,8 @@ The full table, every arm, the six exemplars and the DBH 25/50 anchors, is `tria
 Fixed here, before either probe runs. Exploratory probes judge every seed of 1–3; adoption needs ≥ 20 seeds with stated pass rates (AGENTS.md). The bands come from the target files and ADRs. Three thresholds are this note's own proposals, marked *proposed*, and are open for the user: the taper window in bars 4 and 10, and the "half the trees" in bar 6.
 
 **The lone guard (beech and hornbeam):**
-1. **H/D** on the fit's definition (the core's `slenderness`), in `lone.slenderness`'s band at seasons 60 and 100: beech 40–56, hornbeam 48–68.
-2. **W/H at 60** in `lone.spread`'s band: beech 0.4–0.8, hornbeam 0.5–0.9.
+1. **H/D** on the fit's definition (the core's `slenderness`, over the root metamer's diameter), in `lone.slenderness`'s band at seasons 60 and 100: beech 40–56, hornbeam 48–68. **The target is a breast-height figure:** Pretzsch's H/D at d 25, 40 and 50 cm, which reads D at 1.3 m. The fit therefore scores a base-diameter H/D against a 1.3 m target, and in lone trees the two diameters disagree by 0.5–1.9× (§1). The 1.3 m H/D is reported beside it.
+2. **W/H at 60** on the fit's measure (`lone.spread`, the core's full extents) in its band: beech 0.4–0.8, hornbeam 0.5–0.9.
 3. **W/H at 100,** two columns until the user chooses:
    - **(a)** ADR 0028's reading: no number at 100, parkland 0.9–1.3 at about twice the trial's age;
    - **(b)** ADR 0041's accepted 1.50 for beech.
@@ -156,7 +159,7 @@ Fixed here, before either probe runs. Exploratory probes judge every seed of 1�
 5. **No species worse than HEAD on any of the three,** birch and holly included (the crown-extent note's second clause, kept).
 
 **The stand gate (160 cells, canopy trees, every species with ≥ 3 trees inside Tallo's support):**
-6. **The crown at the tree's DBH** (Level 0's tip measure) inside Tallo's q10–q90 for at least half the trees (*proposed*), at seasons 100 and 300. The robust crown is reported beside it.
+6. **The crown at the tree's DBH** (dbh.py's tip measure, an upper bound on Level 0's) inside Tallo's q10–q90 for at least half the trees (*proposed*), at seasons 100 and 300. The robust crown is reported beside it.
 7. **The stand H/D** in `stand.slenderness`'s band (beech 70–94, hornbeam 74–98) at seasons 100 and 300.
 8. **#129's target 1** (≥ 120 canopy trees/ha in every season from 100) and the crown cover reported beside the canopy count.
 
@@ -175,9 +178,10 @@ Fixed here, before either probe runs. Exploratory probes judge every seed of 1�
 ## Open for the user
 
 1. **W/H at season 100:** bar 3's column (a) or (b) (#134).
-2. **The crown measure for the stand gate:** the tip measure, which Level 0 fits on, or the robust one. They differ by about 2×, and the beech passes on one and fails on the other.
-3. **The three proposed thresholds** in §5 (the taper window 0.8–1.25; half the trees inside Tallo's band).
-4. **The inverted fork** (§1) is R3 as specified, not a bug in the code. A height-dependent load (#133) is expected to cure it (bar 10). If it does not, it wants its own ticket.
+2. **Which D the lone H/D reads** (bar 1): the fit's root-metamer diameter against a 1.3 m target, or the 1.3 m cylinder, which a low fork makes fragile. Either way the fit's `lone.slenderness` mixes the two today.
+3. **The crown measure for the stand gate:** the tip measure, which Level 0 fits on, or the robust one. They differ by about 2×, and the beech passes on one and fails on the other.
+4. **The three proposed thresholds** in §5 (the taper window 0.8–1.25; half the trees inside Tallo's band).
+5. **The inverted fork** (§1) is R3 and C6 as ADR 0011 specified, not a bug in the code. #133's height-dependent load may cure it (bar 10). If it does not, the other cure, stress wood passed down the pipe, would reopen ADR 0011 and wants its own ticket.
 
 ## Limits
 
@@ -200,3 +204,4 @@ The runs are the crown-extent probe's (local, 39 GB, not committed). If they are
 ## Files
 
 - `code/2026-11-13-triad-reread/triad.py`: every table here. It reuses the path-length note's `anchors.py` and `matched.py`.
+- `code/2026-11-13-triad-reread/out/`: its four outputs in full (`lone.md`, `taper.md`, `stand.md`, `floor.md`), so the tables outlive the uncommitted runs.

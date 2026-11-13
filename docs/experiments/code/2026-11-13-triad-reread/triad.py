@@ -9,7 +9,8 @@ measurement (dbh.py's allometry.csv) and the core's own metrics.csv.
 
 lone: the triad per arm, species and anchor (season 60, season 100, DBH 25/40/50 cm crossed):
   W = 2 x dbh.py's mean crown radius; W / Pretzsch's 95% edge at the tree's DBH; W/H;
-  H/D two ways: over the core's trunkRadius (the root metamer, which the fit's lone.slenderness
+  the fit's own W/H beside it (lone.spread: max of the core's crownWidth and crownDepth, full
+  extents, over height; cli/trials.ts); H/D two ways: over the core's trunkRadius (the root metamer, which the fit's lone.slenderness
   reads, cli/trials.ts) and over dbh.py's DBH (the trunk cylinder at 1.3 m of stem, which the
   matched-DBH anchors read). Seed ranges (min-max of seeds 1-3).
 taper: the ratio of the two diameters, DBH at 1.3 m / the root metamer's, per arm and species.
@@ -54,23 +55,29 @@ def run_dirs(arm, species, stage):
     return [r for r in out if (r / "allometry.csv").exists()]
 
 
-def trunk_d(run):
-    """(tree, season) -> the core's base diameter in cm (2 x trunkRadius), from metrics.csv."""
+def trunk_d(run, spread=None):
+    """(tree, season) -> the core's base diameter in cm (2 x trunkRadius), from metrics.csv. With
+    `spread` (a dict), also fills it with the fit's lone.spread: max(crownWidth, crownDepth) /
+    height, the core's full extents (cli/trials.ts)."""
     out = {}
     for r in csv.DictReader(open(run / "metrics.csv")):
         if r["alive"] == "1":
-            out[(r["tree"], int(r["season"]))] = 2 * float(r["trunkRadius"]) * CELL * 100
+            key = (r["tree"], int(r["season"]))
+            out[key] = 2 * float(r["trunkRadius"]) * CELL * 100
+            if spread is not None and float(r["height"]) > 0:
+                spread[key] = max(float(r["crownWidth"]), float(r["crownDepth"])) / float(r["height"])
     return out
 
 
 def lone_series(run):
     """Tree 0's snapshots, each with the base diameter beside dbh.py's DBH."""
-    base = trunk_d(run)
+    spread = {}
+    base = trunk_d(run, spread)
     out = []
     for s in load(run)["0"]:
-        d0 = base.get(("0", int(s["season"])))
-        if d0:
-            out.append({**s, "d0_cm": d0})
+        key = ("0", int(s["season"]))
+        if key in base:
+            out.append({**s, "d0_cm": base[key], "spread": spread.get(key, 0.0)})
     return out
 
 
@@ -79,7 +86,7 @@ def interp(series, d):
     for a, b in zip(series, series[1:]):
         if a["dbh_cm"] < d <= b["dbh_cm"]:
             f = (d - a["dbh_cm"]) / (b["dbh_cm"] - a["dbh_cm"])
-            return {k: a[k] + f * (b[k] - a[k]) for k in ("season", "height_m", "cr_m", "dbh_cm", "d0_cm")}
+            return {k: a[k] + f * (b[k] - a[k]) for k in ("season", "height_m", "cr_m", "dbh_cm", "d0_cm", "spread")}
     return None
 
 
@@ -93,6 +100,7 @@ def triad(sp, s):
         "W": w,
         "WP": w / p if p else None,
         "WH": w / s["height_m"],
+        "SP": s["spread"],
         "HD0": s["height_m"] / (s["d0_cm"] / 100),
         "HD13": s["height_m"] / (s["dbh_cm"] / 100),
     }
@@ -101,9 +109,9 @@ def triad(sp, s):
 def lone(arms):
     print(
         "| arm | species | anchor | reached | season | H (m) | DBH (cm) | W (m) | W ÷ Pretzsch 95% | W/H | "
-        "H/D, base (the fit's) | H/D, DBH at 1.3 m |"
+        "W/H, the fit's (lone.spread) | H/D, base (the fit's) | H/D, DBH at 1.3 m |"
     )
-    print("|---|---|---|---|---|---|---|---|---|---|---|---|")
+    print("|---|---|---|---|---|---|---|---|---|---|---|---|---|")
     for arm in arms:
         for sp in EXEMPLARS:
             series = [lone_series(r) for r in run_dirs(arm, sp, "lone")]
@@ -115,12 +123,12 @@ def lone(arms):
             for name, pick in anchors:
                 hits = [triad(sp, h) for h in (pick(x) for x in series) if h]
                 if not hits:
-                    print(f"| {arm} | {sp} | {name} | 0 of {len(series)} | | | | | | | | |")
+                    print(f"| {arm} | {sp} | {name} | 0 of {len(series)} | | | | | | | | | |")
                     continue
                 c = lambda k, nd=1: rng([h[k] for h in hits], nd)  # noqa: E731
                 print(
                     f"| {arm} | {sp} | {name} | {len(hits)} of {len(series)} | {c('season', 0)} | {c('H')} | {c('D', 0)} | "
-                    f"{c('W')} | {c('WP', 2)} | {c('WH', 2)} | {c('HD0', 0)} | {c('HD13', 0)} |"
+                    f"{c('W')} | {c('WP', 2)} | {c('WH', 2)} | {c('SP', 2)} | {c('HD0', 0)} | {c('HD13', 0)} |"
                 )
 
 

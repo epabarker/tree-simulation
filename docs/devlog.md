@@ -6,8 +6,8 @@ Newest first. One entry per session or milestone: what changed, why, surprises, 
 
 - **Note:** [docs/experiments/2026-11-13-understorey-probe.md](experiments/2026-11-13-understorey-probe.md). Bars committed before the runs (3bfd8be); script `cli/understorey-probe.ts` (DBH ≥ 7 cm via `cli/allometry.ts`, metamers kept at 100/200/300). 5 arms × 2 widths × seeds 1–20, 46.8 min on 12 simulators, after a clean pilot on seeds 1–3.
 - **Result:** every `topLight` ramp arm (θ_hi 0.10/0.15/0.25 at m_s 1; 0.15 at m_s 3) raises the ≥ 7 cm canopy share (38–45 of 60 frames at ≥ 0.6 against 21) but fails the band (10–11 of 60 against head's 19), canopy trees/ha (86–102 against 109) and light-demanders in the canopy (45–48 against 53). Canopy deaths rise 1.4–2.2×. Three of four arms fail gate 1 at 66 cells (16–17 of 20).
-- **Surprise:** at head the ≥ 7 cm count is already about in the band (median 266/ha); the suppression thins it below 200 rather than thinning the sub-7 cm flood into it. The cap never clears; hornbeam's bank nearly doubles (#137).
-- **What limits it:** #138 for the band (hundreds of drawn sub-7 cm stems a hectare do not reach 7 cm), #134 for the canopy count. Re-probe after those; the rule needs no change.
+- **Surprise:** the cap never clears under any arm; hornbeam's bank nearly doubles (#137).
+- **What limits it: death before release, not #138.** A cohort re-read (`code/2026-11-13-understorey-probe/cohort.ts`): of the drawn sub-7 cm stems at season 200, 60–92% die by 300 under the arms (head 22%), while survivors cross 7 cm two to three times as often as head's. Head's ≥ 7 cm count climbs through the band and overshoots by 300 (median 703/ha). The phone width nearly empties (one ≥ 7 cm stem a plot). Next steps are design questions (a release term, the phone's ceiling, #137's seed supply); the rule needs no change.
 - No default, golden, preset or regression changed. `cli/shared.ts`'s `sim` takes extra runner args.
 
 ## 2026-11-13: #132's ramp built (O4 `topLight` against `o4.survivalLight`), off by default

@@ -25,8 +25,8 @@ _Last updated: 2026-11-13; #132's probe: no arm passes; the ramp stays built and
 - Branch codex/day3-species-programme; beech retained, no sycamore/ash candidate qualified.
 - Confirmation seeds 22021–22040/23021–23040 untouched. docs/experiments/2026-11-08-day3-step8.md.
 ## Next
-1. #132 probed (docs/experiments/2026-11-13-understorey-probe.md): no arm passes; the band
-   limited by #138 (sapling growth), the canopy count by #134. Next #133, #134, #138; re-probe after.
+1. #132 probed (docs/experiments/2026-11-13-understorey-probe.md): no arm passes; the ramp
+   kills the subcanopy before gaps release it, and the phone empties. Design question open.
 2. #134 carries ADR 0067's fit change (breast-height slenderness, pooled forks).
 3. Phone soak remains a separate deferred release gate; no tag/deploy/production push.
 ## Gotchas

@@ -84,11 +84,34 @@ Canopy deaths exclude thrown trees (3.4–4.2 a run in every arm, 3.75 at head).
 
 ## Why none passes
 
-1. **The signal thins the wrong layer for bar 1.** At head the ≥ 7 cm count is already in or above the band (median 266/ha, 19 of 60 frames); the flood is sub-7 cm, as ADR 0068 found. Every arm kills the overtopped ≥ 7 cm stems (the share rises because its denominator falls) and leaves too few: medians of 109–196/ha, below the band's floor, in 10–11 frames. The drawn count falls 2–7×, but the ≥ 7 cm band moves away, not into it.
-2. **It costs the canopy.** Canopy trees/ha fall 7–21% and canopy deaths rise 1.4–2.2×: some canopy trees' tops sit below θ_hi (the canopy's Q_top median is 0.34, ADR 0068, with a tail under 0.25), and a canopy tree here is only over half the top height. Light-demanders hold the canopy in fewer frames (45–48 against 53).
-3. **The bank refills.** No arm leaves the cap (cap-free runs: 0 of 20 everywhere; median cap seasons 210–228 against 235). The places suppression frees go to hornbeam seedlings: the bank nearly doubles (68 to 118–145) while its lifetimes shorten. That is ADR 0068's Context (mortality cannot clear a cap fed by this seed supply) and #137's.
+**The phone first.** At 66 cells every arm leaves a median of 38 ≥ 7 cm stems/ha, one stem in the 0.0264 ha plot, from season 200 (head: 114/ha, three stems); three of four arms fail gate 1 (16–17 of 20 runs keep a drawn stem in every season after 50). The live site's narrow forest nearly empties. That alone blocks adoption, whatever the 160-cell bars say.
 
-**What limits it, #138 or #134.** This probe cannot separate them; it points at both, in different layers.
-- **#138 (sapling growth) limits bar 1.** Under t10 and t15, 470 and 380 drawn stems a hectare sit between 1.3 m and 7 cm DBH (the drawn median less the ≥ 7 cm median, so a rough count), and the ≥ 7 cm count still falls: freed light does not turn the drawn sub-7 cm layer into 7 cm stems within the frames. That is #138's surplus that buys no growth.
-- **#134 (crown width) limits bar 3.** Head holds only 109 canopy trees/ha, and no suppression arm adds any: the canopy's count is set by how much ground each crown takes, which suppression does not change.
-- **Order:** #133 and #134 change crowns and the floor's light (ADR 0068's Consequences), and #138 the saplings' response. The signal's rates are worth re-probing only after #138 and #134; a re-probe needs no code (the rule is built).
+**Bar 1: by frame, head is not in the band either; it crosses it.** ≥ 7 cm stems/ha at 160 cells, runs under 200 / in 200–400 / over 400, of 20 (median):
+
+| arm | season 100 | season 200 | season 300 |
+|---|---|---|---|
+| head | 7 / 13 / 0 (250) | 8 / 5 / 7 (313) | 5 / 1 / 14 (703) |
+| t10 | 13 / 7 / 0 (188) | 11 / 2 / 7 (156) | 6 / 2 / 12 (531) |
+| t15 | 16 / 4 / 0 (141) | 11 / 1 / 8 (141) | 9 / 5 / 6 (266) |
+| t25 | 19 / 1 / 0 (109) | 13 / 5 / 2 (141) | 12 / 4 / 4 (141) |
+| t15m3 | 18 / 2 / 0 (125) | 12 / 3 / 5 (109) | 10 / 6 / 4 (203) |
+
+Head's ≥ 7 cm count climbs through the band and overshoots by season 300 (median 703/ha): the flood reaches 7 cm late. Every arm holds it under the band early and spreads it at 300; none concentrates it in the band.
+
+**The sub-7 cm layer is killed before it is released; #138 is not what limits it.** [`cohort.ts`](code/2026-11-13-understorey-probe/cohort.ts) follows the drawn stems under 7 cm DBH at season 200 (160 cells, seeds 1–20) to season 300 ([output](code/2026-11-13-understorey-probe/cohort.txt)):
+
+| arm | cohort at 200 (a run) | dead by 300 | survivors ≥ 7 cm at 300 | DBH gained by survivors (median) |
+|---|---|---|---|---|
+| head | 63.9 | 22% | 29% | 1.5 cm |
+| t10 | 40.5 | 60% | 54% | 3.5 cm |
+| t15 | 31.9 | 79% | 69% | 6.7 cm |
+| t25 | 32.6 | 92% | 69% | 10.0 cm |
+| t15m3 | 15.5 | 89% | 97% | 10.3 cm |
+
+The survivors grow two to seven times faster than head's and cross 7 cm two to three times as often, so the saplings that stay do respond. Part of that is selection: the survivors are the stems whose tops were bright. What empties the band is death: 60–92% of the cohort dies within 100 seasons. That is the ramp acting as designed, with no release before it acts. #138's stalled saplings (P/M 4–5, ADR 0068) sit below 1.3 m and this cohort does not test them.
+
+**Bar 3 and the canopy deaths.** Canopy trees/ha fall 7–21% and canopy deaths rise 1.4–2.2×. A canopy tree here is any drawn stem over half the top height, so overtopped subcanopy stems count as canopy, and some of these deaths may be the design acting on them. That their tops sit below θ_hi is an inference from ADR 0068's offline reading (canopy Q_top median 0.34), not measured here: metrics.csv does not carry Q_top. Light-demanders hold the canopy in fewer frames (45–48 against 53). Head's canopy count (109/ha) is not raised by any arm; whether crown width (#134) sets it is not tested here.
+
+**The bank refills.** No arm leaves the cap (cap-free runs: 0 of 20 everywhere; median cap seasons 210–228 against 235). The places suppression frees go to hornbeam seedlings: the bank nearly doubles (68 to 118–145) while its lifetimes shorten. That is ADR 0068's Context (mortality cannot clear a cap fed by this seed supply) and #137's.
+
+**What would change the outcome.** The ramp kills the subcanopy faster than gaps release it. A version worth probing would need either a release term (a stem not yet suppressed long enough to have had a gap), a lower ceiling at the phone width, or a seed supply that does not refill the cap (#137). Each is a design question for the user, not a re-tune. The rule stays built and off; a re-probe of its rates needs no code.

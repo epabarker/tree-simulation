@@ -2,6 +2,13 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-15: ADR 0069: an outside bird's-eye report reviewed against the repository
+
+- **What:** a deep-research report proposed a new axis-class state in R2, compiled multiscale structure for speed, and a basin gate. Reviewed against the notes; no simulation, no code.
+- **Decided (user):** identity stays in R2's table, gated by the stand where a transition breaks a species there; compiled structure is not pursued (light is two thirds or more of a season); a basin check is reported from #134 on, not gated; the next experiment may run beside the #129 chain.
+- **What the report missed:** its leader-against-scaffold experiment is #92 and #94, both failed; the oak's open problem is the garden guard, not its form; `H4k8` narrows crowns without λ; ADR 0067 re-read "1.4–4.2× too wide".
+- **Proposed, not run:** a crowd gate on the oak's fall of λ (`r2.dLambdaCrowd`), judged on #124's unchanged guard, with a pilot that can stop it. Bars in the ADR.
+
 ## 2026-11-13: #132's probe: no arm passes; the ramp stays built and off
 
 - **Note:** [docs/experiments/2026-11-13-understorey-probe.md](experiments/2026-11-13-understorey-probe.md). Bars committed before the runs (3bfd8be); script `cli/understorey-probe.ts` (DBH ≥ 7 cm via `cli/allometry.ts`, metamers kept at 100/200/300). 5 arms × 2 widths × seeds 1–20, 46.8 min on 12 simulators, after a clean pilot on seeds 1–3.

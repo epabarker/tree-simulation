@@ -18,7 +18,11 @@ Newest first. One entry per session or milestone: what changed, why, surprises, 
 - **Surprise: species override a world-level `r3` patch.** Every species sets `sigmaTarget` and `sigmaBreak`, so the bracket's first runs were void. They were re-run with σ set per species. `windLoad` is set by no species, so the wind arms were unaffected (all 120 wind runs differ from their no-wind runs).
 - **Surprise: a moved checkout strands cargo's test binaries.** After the repo moved to `~/Projects`, `tests/golden.rs`'s `env!("CARGO_MANIFEST_DIR")` still pointed at the old path, and the goldens failed with "No such file". `cargo clean -p tree-core -p tree-wasm -p treesim` fixed it.
 - No default, golden, preset or regression changed.
-- **Open for the user:** the light-scaled variant ADR 0067 names, and the reserve cure for the fork (ADR 0011 §3).
+- **Who is thrown (a re-read, `code/2026-11-15-wind-load/thrown.py`):** slender canopy trees in storms, far past the stand band (`H4k8`: median H/D 175, 0 of 26 inside 74–98). Narrow crowns grow a big tail over H/D 110 (257 tree-storms against HEAD's 104). The load shrinks the tail only by thickening every stem.
+  - So bars 7 and 9 don't conflict by construction.
+  - A light-scaled load would spare the wrong trees, since the thrown ones are lit.
+  - Recommended: close #133 and carry the slender tail to #134. The fork's reserve cure (ADR 0011 §3) is deferred until after #134's refit.
+- `wind.py` had read `broken` (a per-season count) as cumulative. The limb-break totals are corrected by 2–4%.
 
 ## 2026-11-13: #132's probe: no arm passes; the ramp stays built and off
 

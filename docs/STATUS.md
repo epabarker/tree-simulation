@@ -27,7 +27,8 @@ _Last updated: 2026-11-15; #133's wind-load probe: no arm passes; the load stays
 ## Next
 1. #133 probed (docs/experiments/2026-11-15-wind-load-probe.md, PR #141): no arm passes.
    Throws fall with dose (H4k8 26 → 9; HEAD 8) but every dose over-thickens the stand;
-   beech's inverted fork stays; σ÷2 does as well. Open: light-scaled f_j, or ADR 0011 §3.
+   beech's fork stays; σ÷2 does as well. Thrown = lit canopy trees at H/D>110 (re-read):
+   light-scaling won't help; recommend close #133, report the slender tail in #134.
 2. #134 carries ADR 0067's fit change (breast-height slenderness, pooled forks).
 3. #132's ramp re-probed on #134's stand (rates only). Phone soak deferred; no deploy.
 ## Gotchas

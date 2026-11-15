@@ -175,19 +175,17 @@ def planted_fates(run):
 
 
 def breaks(run, storms):
-    """Limb breaks (metamers) in storm seasons and in all, from the cumulative broken counts of
-    living trees: a throw (the death row) is not a limb break."""
-    prev, storm, total = {}, 0.0, 0.0
+    """Limb breaks (metamers) in storm seasons and in all. metrics.csv's `broken` is the season's
+    own count (season.rs resets it), and a throw sets it to the whole tree on the death row, so
+    only living rows are limb breaks."""
+    storm = total = 0.0
     for r in csv.DictReader(open(run / "metrics.csv")):
         if r["alive"] != "1":
             continue
-        t, b = r["tree"], float(r["broken"] or 0)
-        dx = b - prev.get(t, 0.0)
-        prev[t] = b
-        if dx > 0:
-            total += dx
-            if int(r["season"]) in storms:
-                storm += dx
+        b = float(r["broken"] or 0)
+        total += b
+        if int(r["season"]) in storms:
+            storm += b
     return storm, total
 
 

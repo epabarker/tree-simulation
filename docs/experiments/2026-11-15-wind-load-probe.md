@@ -193,8 +193,9 @@ Lone D at 1.3 m on `H4k8`'s crowns, as a share of D on HEAD's crowns, at season 
   - The cause is the limbs' own stress wood, which sags them less and so spreads them less. That is a side effect, not this ticket's aim.
 - **The lone trees plateau.** The lone hornbeam stops near 29 m by season 50 and holly near 15 m at HEAD. Their seasons 60 and 100 read nearly the same, so bar 1's two seasons are close to one sample.
 - **Limb breaks** happen only in storm seasons, in every arm.
-  - On `H4k8`'s crowns the load doubles them, from 22.6k to 42.6k–47.8k metamers a run.
-  - On HEAD's crowns they fall, from 139k to 98k–120k.
+  - On `H4k8`'s crowns the load doubles them, from 23.5k to 44.3k–49.7k metamers a run.
+  - On HEAD's crowns they fall, from 142k to 101k–124k.
+  - These are corrected numbers. `broken` is a per-season count (season.rs resets it), and the first version of `wind.py` differenced it as if cumulative. That undercounted consecutive break seasons by 2–4%.
 - **Canopy trees/ha (#129's target 1)** holds in 2–3 of 3 runs on every `H4k8` arm. It fails in most runs on HEAD's crowns.
 
 ### A correction during the runs
@@ -210,10 +211,47 @@ Lone D at 1.3 m on `H4k8`'s crowns, as a share of D on HEAD's crowns, at season 
 - **The fix:** it was switched back before resuming, and the rebuild came from sources identical to 0e2a1ea.
 - **The check:** `H4k8W4`'s birch runs, the ones at risk, differ from `H4k8`'s.
 
+### Who is thrown (a re-read of these runs, after the results)
+
+_Added after the results at the user's request, to choose between a light-scaled load and closing the ticket. No new simulation: `code/2026-11-15-wind-load/thrown.py`, full output in `out/thrown.md`._
+
+**The question:** R3's windthrow (ADR 0027) acts only in storm seasons. Its chance is THROW·stormLoad·min(1, H/100 cells)²·ramp(H/D), and the ramp is 0 up to H/D 80. The ramp's lower edge sits inside hornbeam's stand band (74–98). So bars 7 and 9 might conflict by construction, with no girth mechanism able to satisfy both.
+
+**The answer: they don't.** The thrown trees are slender canopy trees far beyond the band:
+
+| arm | thrown | canopy trees among them | H/D at the last living season, median (range) | inside 74–98 |
+|---|---|---|---|---|
+| HEAD | 8 | 8 | 106 (57–188) | 2 |
+| `H4k8` | 26 | 25 | 175 (105–297) | 0 |
+| `H4k8W2` | 15 | 13 | 121 (80–170) | 5 |
+| `H4k8W4` | 9 | 7 | 106 (27–159) | 3 |
+| `H4k8S2` | 16 | 15 | 139 (95–185) | 1 |
+
+- **Every throw falls in a storm season,** in every arm.
+- **A few read H/D under 80 the season before.** These are 1 per arm at most. The core reads H/D after the storm season's stress wood and height, not the season before's.
+
+**Exposure: planted trees going into a storm, by their H/D (throws ÷ tree-storms).**
+
+| arm | under 80 | 80–110 | over 110 |
+|---|---|---|---|
+| HEAD | 1/438 | 4/124 | 3/104 (2.9%) |
+| `H4k8` | 0/294 | 4/152 | 22/257 (8.6%) |
+| `H4k8W2` | 0/387 | 5/133 | 10/173 (5.8%) |
+| `H4k8W4` | 1/472 | 4/205 | 4/53 (7.5%) |
+
+**Reading:**
+- **Narrow crowns grow a large tail of very slender planted stems.** Under `H4k8`, 257 tree-storms come from trees over H/D 110, against HEAD's 104. Those trees are more extreme (median 175 at death), so the ramp sits near its cap of 2.
+- **The wind load cuts throws by shrinking that tail** (257 → 173 → 53). But it thickens every other stem as well, the stand's median included. That is why bar 7 fails first.
+- **A light-scaled load would likely make things worse.** The thrown trees are canopy trees, so they are lit and would keep their drag. The slender intermediates just below the canopy would lose theirs.
+- **What bar 9 counts:** how many very slender stems a stand of narrow crowns grows. That depends on how crowns compete for height, which is #134's refit, more than on R3.
+
+**So the recommendation is to close #133 as rejected and carry bar 9 to #134.** #134's refit should report the H/D-over-110 tail, for example its tree-storms or its share of the canopy, beside the throw count.
+- **A response targeted at slenderness** would be a new rule and a spec change: stress wood answering the stem's own H/D, closer to thigmomorphogenesis than a drag load. It is not proposed here.
+
 ### Conclusion and what would change it
 
 - **Rejected as built.** In this form the load stops throws only at doses that over-thicken every stem that does not need it, and it does not make D independent of crown width.
-- **ADR 0067's own fallback names the next variant:** scale f_j by the metamer's light, since O2.4 lets Q stand for exposure. That would spare the shaded stand stems that over-thicken here. It needs the user's decision and a re-probe.
+- **ADR 0067's own fallback names the next variant:** scale f_j by the metamer's light, since O2.4 lets Q stand for exposure. The re-read above argues against it: the thrown trees are lit canopy trees.
 - **The reserve cure for bar 10:** stress wood passed down the pipe, reopening ADR 0011 §3. Beech's inverted fork survives every load, so this ticket's acceptance puts it to the user.
 - **For #134:** the narrow crowns' throws (26 at `H4k8`) remain the obstacle. Neither the wind load nor more wood (the bracket) brings them to HEAD's 8 without over-thickening the stand.
 - **What this changes:** no default, golden, preset or regression; `r3.windLoad` stays an off probe param.
@@ -225,4 +263,5 @@ node cli/wind-calibrate.ts --species hornbeam,beech --seeds 1,2,3 --at 60
 node docs/experiments/code/2026-11-15-wind-load/storms.ts > runs/probe/133-storms.json
 docs/experiments/code/2026-11-15-wind-load/run.sh all   # about 7.5 min an arm on 12 simulators
 python3 docs/experiments/code/2026-11-15-wind-load/wind.py
+python3 docs/experiments/code/2026-11-15-wind-load/thrown.py
 ```

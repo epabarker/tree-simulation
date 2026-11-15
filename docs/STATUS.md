@@ -1,10 +1,10 @@
 # Status
 
-_Last updated: 2026-11-13; #132's probe: no arm passes; the ramp stays built and off._
+_Last updated: 2026-11-15; #133's wind-load probe: no arm passes; the load stays built and off._
 
 **Live:** garden0.16.0. RC prepared/merged#71; phone soak deferred, no release-readiness waiver.
 
-## Crown extent and girth (#129 → #131–#135, a blocking chain)
+## Crown extent and girth (#129: #131 → #133 → #134 → #132 re-probe → #135, user 2026-11-13)
 - #129's probe (PR #130, merged to 3d-port): every arm rejected; `c1.extentLimit` an off probe param.
 - Decisions (user, 2026-11-13): the lone triad (W at DBH, W/H, H/D) a guard; the stand against
   Tallo the gate; wind in R3 (#133); refit form knobs before a rule (#134); understorey #132.
@@ -25,10 +25,11 @@ _Last updated: 2026-11-13; #132's probe: no arm passes; the ramp stays built and
 - Branch codex/day3-species-programme; beech retained, no sycamore/ash candidate qualified.
 - Confirmation seeds 22021–22040/23021–23040 untouched. docs/experiments/2026-11-08-day3-step8.md.
 ## Next
-1. #132 probed (docs/experiments/2026-11-13-understorey-probe.md): no arm passes; the ramp
-   kills the subcanopy before gaps release it, and the phone empties. Design question open.
+1. #133 probed (docs/experiments/2026-11-15-wind-load-probe.md, PR #141): no arm passes.
+   Throws fall with dose (H4k8 26 → 9; HEAD 8) but every dose over-thickens the stand;
+   beech's inverted fork stays; σ÷2 does as well. Open: light-scaled f_j, or ADR 0011 §3.
 2. #134 carries ADR 0067's fit change (breast-height slenderness, pooled forks).
-3. Phone soak remains a separate deferred release gate; no tag/deploy/production push.
+3. #132's ramp re-probed on #134's stand (rates only). Phone soak deferred; no deploy.
 ## Gotchas
 - m27_adopt resets mw=64; any adopter extension must preserve selected coupled mw/r0.
 - Same-skeleton mw*r0² normalisation is NOT behaviour/bit invariance; R3/topology change.
@@ -36,5 +37,6 @@ _Last updated: 2026-11-13; #132's probe: no arm passes; the ramp stays built and
 - PRs go to 3d-port, not main (main is the live site, far behind).
 - Stamp foreground before commits; ≥20seeds for adoption; cap12simulators.
 - Never agent merge/tag/deploy/site-main push or preview-3d merge. B1bars−2/−2/12/10 fixed.
+- A world-level r3 patch misses fields species set (sigmaTarget/Break): patch per species.
 - Never edit rust/ while a sweep is queued (run.ts rebuilds treesim; the Stop hook's check
   would run beside the simulators). A lone-only probe call clears its label's garden runs.

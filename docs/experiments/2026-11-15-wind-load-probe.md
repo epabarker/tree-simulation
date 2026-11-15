@@ -1,6 +1,6 @@
 # #133's wind-load probe: a height-dependent load in R3 (bars fixed before the runs)
 
-_2026-11-15. EXPLORATORY: seeds 1–3, nothing adopted on these runs. Issue [#133](https://github.com/epabarker/tree-simulation/issues/133), part of [#129](https://github.com/epabarker/tree-simulation/issues/129). This section was committed before any arm ran; results follow in a later commit._
+_2026-11-15. EXPLORATORY: seeds 1–3, nothing adopted on these runs. Issue [#133](https://github.com/epabarker/tree-simulation/issues/133), part of [#129](https://github.com/epabarker/tree-simulation/issues/129). Everything down to "Cost" was committed before any arm ran (50e0220). The results are in "Result" below._
 
 ## Question
 
@@ -125,11 +125,104 @@ Every bar is computed by `code/2026-11-15-wind-load/wind.py`.
 
 `rust/` is not edited while the runs are queued.
 
+## Result
+
+**No arm passes: the probe is rejected, and the wind load stays built and off.**
+
+The full tables are in `code/2026-11-15-wind-load/out/wind.md`; the storm seasons are in `out/storms.json`.
+
+**Every wind run used the wind-load build.** All 120 wind-arm runs hash differently from the same run without wind: 8 arms × (4 species' lone trees + the garden) × 3 seeds, with none identical and none missing.
+
+### The candidates (wind on `H4k8`'s crowns)
+
+| arm (dose) | thrown, bar 9 (HEAD 8 of 79) | lone H/D at 1.3 m in band, bar 1 | stand H/D, bar 7: beech / hornbeam | no inverted fork, bar 10 | runs ≥ 120 canopy trees/ha |
+|---|---|---|---|---|---|
+| `H4k8` (no wind) | 26 | beech 2/6, hornbeam 3/6 | 78 in / 75 in | beech 0/6, hornbeam 6/6 | 3 of 3 |
+| `H4k8W1` (0.5×) | 20 | 2/6, 4/6 | 82 in / 51 out | 0/6, 6/6 | 2 of 3 |
+| `H4k8W2` (1×) | 15 | 1/6, 4/6 | 100 out / 51 out | 1/6, 4/6 | 3 of 3 |
+| `H4k8W4` (2×) | 9 | 0/6, 0/6 | 68 out / 35 out | 2/6, 6/6 | 3 of 3 |
+| `H4k8L2` (1×, leaf only) | 14 | 0/6, 2/6 | 82 in / 48 out | 1/6, 6/6 | 3 of 3 |
+| `H4k8S2` (σ ÷ 2, the bracket) | 16 | 1/6, 4/6 | 78 in / 58 out | 0/6, 2/6 | 3 of 3 |
+
+**Why none passes:**
+- **Throws and girth pull in opposite directions.** The throws fall with the dose (26 → 20 → 15 → 9), but even 2× leaves one over HEAD's 8.
+- **Even the lowest dose over-thickens the stand.** The stand hornbeam's H/D falls from 75, in band, to 51 at 0.5× and 35 at 2×, against a band of 74–98.
+- **No dose meets both bars.** The dose that stops the throws is about four times the one that keeps the stand slender.
+- **The lone beech is too stout at every dose** (H/D 19–38 at season 100 against 40–56). The lone hornbeam is in band at 0.5× and 1× (4 of 6) and too stout at 2×.
+- **The inverted fork stays in beech** at every dose (at most 2 of 6 pass). This was expected before the runs: wind loads each limb at the fork as well as the stem below it, and stress wood is still local (ADR 0011 §3).
+
+**The bracket answers the diagnostic question.**
+- **The comparison:** σ ÷ 2 on the same crowns throws 16, as the 1× wind does (15). Its stand hornbeam is less stout (58 against 51), and bars 1 and 10 read alike.
+- **The answer:** "needs more wood" explains what the load did here. The height dependence bought nothing that more wood everywhere did not.
+- **The caveat:** σ ÷ 2 is not a candidate (ADRs 0011 and 0027 keep σ_target at its physical value).
+
+### The load's job, D independent of crown width: not done
+
+Lone D at 1.3 m on `H4k8`'s crowns, as a share of D on HEAD's crowns, at season 100:
+
+| species | without wind | with wind, every dose and form |
+|---|---|---|
+| beech | 0.35–0.78 | 0.36–0.89 |
+| hornbeam | 0.36–0.76 | 0.26–0.74 |
+| birch | 0.20–0.24 | 0.22–0.64 |
+| holly | 0.35–0.57 | 0.15–0.38 |
+
+- **The ratio does not move toward 1.**
+- **A likely reason, from the form:** a narrow crown carries less leaf area as well as a smaller gravity moment, so f_j shrinks with the crown too. Only the y_j/H_ref factor and the lever are independent of width, and on these trees of a similar height they barely differ.
+
+### On HEAD's crowns (reported, not judged)
+
+| arm | thrown | stand H/D: beech / hornbeam | runs ≥ 120 canopy trees/ha |
+|---|---|---|---|
+| HEAD | 8 | 54 (6 trees) / 45 | 1 of 3 |
+| `W1` | 8 | 78 / 33 | 0 of 3 |
+| `W2` | 5 | 52 / 30 | 0 of 3 |
+| `W4` | 2 | 41 / 21 | 1 of 3 |
+| `L2` | 5 | 68 / 32 | 1 of 3 |
+| `S2` | 5 | 68 / 31 | 1 of 3 |
+
+- Bars 1 and 10 fail for both species in every arm on HEAD's crowns.
+- The stand is too stout already at HEAD, and the load makes it more so, as ADR 0067 predicted for wide crowns.
+
+### Reported beside the bars
+
+- **The lone crown narrows under the load.** On `H4k8`'s crowns at season 100:
+  - W/H falls from 0.52–0.85 to 0.39–0.70;
+  - W ÷ Pretzsch's 95% edge falls from 1.21–1.57 to 0.78–1.39;
+  - `H4k8W2`'s hornbeam reads 1.00–1.04.
+  - The cause is the limbs' own stress wood, which sags them less and so spreads them less. That is a side effect, not this ticket's aim.
+- **The lone trees plateau.** The lone hornbeam stops near 29 m by season 50 and holly near 15 m at HEAD. Their seasons 60 and 100 read nearly the same, so bar 1's two seasons are close to one sample.
+- **Limb breaks** happen only in storm seasons, in every arm.
+  - On `H4k8`'s crowns the load doubles them, from 22.6k to 42.6k–47.8k metamers a run.
+  - On HEAD's crowns they fall, from 139k to 98k–120k.
+- **Canopy trees/ha (#129's target 1)** holds in 2–3 of 3 runs on every `H4k8` arm. It fails in most runs on HEAD's crowns.
+
+### A correction during the runs
+
+**The σ bracket's first runs were void.**
+- **The fault:** every species carries its own `r3.sigmaTarget` and `sigmaBreak` (3000 and 7000), which override a world-level patch. So `S2` and `H4k8S2` first hashed bit-identical to HEAD and to `H4k8`.
+- **The fix:** the patches now set σ on every species, and both arms were re-run. The bracket's numbers above are from the re-run.
+- **The wind arms were not affected:** no species sets `r3.windLoad`, and the hash check above shows every wind run differs.
+- **What this means for later probes:** a world-level `r3` patch reaches only the fields no species sets.
+
+**The sweep was paused and resumed once.**
+- **What happened:** during the pause, the checkout was switched to `3d-port`, which would have rebuilt `treesim` without the wind load on resume.
+- **The fix:** it was switched back before resuming, and the rebuild came from sources identical to 0e2a1ea.
+- **The check:** `H4k8W4`'s birch runs, the ones at risk, differ from `H4k8`'s.
+
+### Conclusion and what would change it
+
+- **Rejected as built.** In this form the load stops throws only at doses that over-thicken every stem that does not need it, and it does not make D independent of crown width.
+- **ADR 0067's own fallback names the next variant:** scale f_j by the metamer's light, since O2.4 lets Q stand for exposure. That would spare the shaded stand stems that over-thicken here. It needs the user's decision and a re-probe.
+- **The reserve cure for bar 10:** stress wood passed down the pipe, reopening ADR 0011 §3. Beech's inverted fork survives every load, so this ticket's acceptance puts it to the user.
+- **For #134:** the narrow crowns' throws (26 at `H4k8`) remain the obstacle. Neither the wind load nor more wood (the bracket) brings them to HEAD's 8 without over-thickening the stand.
+- **What this changes:** no default, golden, preset or regression; `r3.windLoad` stays an off probe param.
+
 ## Reproduce
 
 ```
 node cli/wind-calibrate.ts --species hornbeam,beech --seeds 1,2,3 --at 60
 node docs/experiments/code/2026-11-15-wind-load/storms.ts > runs/probe/133-storms.json
-docs/experiments/code/2026-11-15-wind-load/run.sh all
+docs/experiments/code/2026-11-15-wind-load/run.sh all   # about 7.5 min an arm on 12 simulators
 python3 docs/experiments/code/2026-11-15-wind-load/wind.py
 ```

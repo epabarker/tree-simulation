@@ -20,6 +20,11 @@
  *
  *   node cli/oak-garden-guard.ts                 screen, runs (resumable), regressions, summary
  *   node cli/oak-garden-guard.ts -j 2 --widths 66
+ *   node cli/oak-garden-guard.ts --crowd 10            (writes runs/oak-garden-guard-k10)
+ *
+ * --crowd K (ADR 0069): the patch arm is `d16a13` + the oak's `r2.dLambdaCrowd` K, the neighbour
+ * gate on the fall of λ. The bars, seeds and worlds are unchanged; the arm keeps its key
+ * (`d16a13`) in the summary, and summary.json's `arms` records the patch as run.
  *
  * Writes runs/oak-garden-guard/{screen/, <arm>/w<width>-s<seed>/, <arm>/regress-*, summary.json}.
  * Generated, never committed.
@@ -33,7 +38,11 @@ import { arg, median, runCli as node, patched, pool, sim } from "./shared.ts";
 
 const ROOT = fileURLToPath(new URL("../", import.meta.url));
 /** The user-approved schedule (#124's round two). HEAD's oak: dLambda 0.04 from aC 13.51. */
-export const D16A13: Record<string, SpeciesPatch> = { oak: { r2: { dLambda: 0.16, aC: 13.5 } } };
+const crowd = arg("--crowd", "");
+if (crowd && !Number.isFinite(Number(crowd))) throw new Error(`--crowd ${crowd}: not a number`);
+export const D16A13: Record<string, SpeciesPatch> = {
+  oak: { r2: { dLambda: 0.16, aC: 13.5, ...(crowd ? { dLambdaCrowd: Number(crowd) } : {}) } },
+};
 export const ARMS: Record<string, Record<string, SpeciesPatch>> = { head: {}, d16a13: D16A13 };
 export const SEASONS = 300;
 export const OAK_AT = [150, 300];
@@ -54,7 +63,11 @@ const LID_TOL = 0.25;
 
 const jobs = Math.min(8, Math.max(1, Number(arg("-j", "4"))));
 const widths = arg("--widths", "160,66").split(",").map(Number);
-const out = join(ROOT, arg("--out", "runs/oak-garden-guard"));
+// The gated arm never shares a directory with the plain one: finished runs are reused by path.
+const out = join(
+  ROOT,
+  arg("--out", crowd ? `runs/oak-garden-guard-k${crowd}` : "runs/oak-garden-guard"),
+);
 
 const done = (dir: string) => existsSync(join(dir, "hash.txt"));
 

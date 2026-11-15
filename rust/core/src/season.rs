@@ -240,9 +240,10 @@ pub fn phase_sample(world: &mut World, i: usize) {
     if params.r5.enabled {
         sample_nodes(wp, params, light, owner, tree);
     }
-    // R2's relay gate (r2.relayCrowd): the tree's shade-avoidance state, the mean of R5's
-    // neighbour shade over its metamers (0 for a tree without neighbours).
-    tree.relay_crowd = if params.r2.relay_crowd.is_some() && params.r5.enabled {
+    // R2's neighbour gates (r2.relayCrowd; r2.dLambdaCrowd, ADR 0069): the tree's shade-avoidance
+    // state, the mean of R5's neighbour shade over its metamers (0 for a tree without neighbours).
+    let crowd_read = params.r2.relay_crowd.is_some() || params.r2.d_lambda_crowd.is_some();
+    tree.relay_crowd = if crowd_read && params.r5.enabled {
         let nm = tree.m.len();
         let sum: f64 = tree.node_shade[..nm].iter().sum();
         if nm > 0 { sum / nm as f64 } else { 0.0 }

@@ -111,6 +111,7 @@ pub fn allocate(tree: &mut Tree, params: &Params) {
             ensure(&mut tree.v_slot, SLOTS * nm);
             ensure(&mut tree.node_shade, nm);
             let age = tree.age;
+            let crowd = tree.relay_crowd;
             let v_base = tree.v_base;
             let (q_slot, v_slot, shade, w) = (
                 &tree.q_slot,
@@ -131,7 +132,8 @@ pub fn allocate(tree: &mut Tree, params: &Params) {
                 let q_main = q_slot[at];
                 let q_lat: f64 = q_slot[at + 1..at + SLOTS].iter().sum();
                 let pa = m.order[i] as f64 - m.pa_shift[i] as f64;
-                let mut lambda = shaded_lambda(lambda_at(pa, age, params), shade[i], &params.r5);
+                let mut lambda =
+                    shaded_lambda(lambda_at(pa, age, crowd, params), shade[i], &params.r5);
                 if gate > 0.0 {
                     lambda -=
                         params.r2.vigour_lambda * gate * (1.0 - vigour(v, v_base, &params.r2));

@@ -19,7 +19,8 @@ _Last updated: 2026-11-13; #132's probe: no arm passes; the ramp stays built and
   #138: saplings at P/M 4–5 barely grow (untraced).
 ## Feature playbook (spec #111, merged to 3d-port as #128)
 - Garden: round 6 (r6), periodic depth, two-part demography; ADR 0065 targets reported, not gated.
-- #124 oak d16a13 not adopted; #126 bare-bole probe failed (repeat if the stand changes).
+- #124 held: d16a13 + crowd gate (`r2.dLambdaCrowd`, built, off; ADR 0069) cures the garden oak
+  but fails bare bole at 66 cells. #126 bare-bole probe failed (repeat both if the stand changes).
 - No 3D shipped forests (ADR 0046). Still fog: maple's length cap, C5/R1 shedding, d(L).
 ## Step8 (frozen by the map; no adoption, nothing deleted)
 - Branch codex/day3-species-programme; beech retained, no sycamore/ash candidate qualified.

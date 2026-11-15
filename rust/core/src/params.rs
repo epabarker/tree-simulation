@@ -294,6 +294,9 @@ pub struct R2 {
     /// 1 − k·s̄), s̄ the tree's mean R5 neighbour shade over its metamers (0 alone in the open).
     /// Absent: off, the relay fires by age alone.
     pub relay_crowd: Option<f64>,
+    /// A neighbour gate on the ontogenetic fall of λ (ADR 0069, probe only): Δλ·t acts by
+    /// max(0, 1 − k·s̄), s̄ as `relay_crowd`'s. Absent: off, the fall comes by age alone.
+    pub d_lambda_crowd: Option<f64>,
     /// The vigour drop (fresh-look beech): the share s of the tree's resource v_base at which a
     /// node is fully vigorous, u = min(1, (v_in / v_base) / s). 0 or absent: off.
     pub vigour_share: f64,
@@ -689,6 +692,7 @@ impl Params {
                 fork_at: opt(r2, "forkAt").unwrap_or(0.0),
                 fork_angle: opt(r2, "forkAngle"),
                 relay_crowd: opt(r2, "relayCrowd"),
+                d_lambda_crowd: opt(r2, "dLambdaCrowd"),
                 vigour_share: opt(r2, "vigourShare").unwrap_or(0.0),
                 vigour_lambda: opt(r2, "vigourLambda").unwrap_or(0.0),
                 vigour_tree_lo: opt(r2, "vigourTreeLo").unwrap_or(0.0),

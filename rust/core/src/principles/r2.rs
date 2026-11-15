@@ -74,8 +74,14 @@
 //! control while trunk and limbs lose theirs, so an old crown's surface fills out evenly (the
 //! dome) instead of its scaffold spreading into a flat cap.
 //!
+//! The fall's neighbour gate (ADR 0069, probe only): with `dLambdaCrowd` k, the ontogenetic fall
+//! acts by max(0, 1 − k·s̄), λ = level.lambda − share·Δλ·t·g, s̄ the tree's mean R5 neighbour shade
+//! (the relay gate's signal, phase 2). A free-standing tree (s̄ = 0) loses apical control by age,
+//! as without it; a tree among neighbours keeps it while it is crowded. Neither the fall nor the
+//! gate latches: both are read anew each season.
+//!
 //! Params: r2.enabled, r2.levels (curve, curveLength, pendulous, pendulousRadius, kappa,
-//! lateralEvery, dLambdaShare), r2.aC, r2.dLambda, r2.ramp, r2.kappa, r2.relay,
+//! lateralEvery, dLambdaShare), r2.aC, r2.dLambda, r2.dLambdaCrowd, r2.ramp, r2.kappa, r2.relay,
 //! r2.relayAge, r2.relayPTerm, r2.relayCrowd, r2.forkAt, r2.forkAngle, r2.vigourShare,
 //! r2.vigourLambda, r2.vigourTreeLo, r2.vigourTreeHi, r2.lightSetPoint, r2.lightLo, r2.lightHi,
 //! r2.lightOver; c1.branchAngle, c3.lambda, c4.setPoint, c4.eta when off.
@@ -99,8 +105,9 @@ pub fn pa_level(order: f64, r2: &R2) -> Option<&PaLevel> {
     r2.levels.get(i as usize)
 }
 
-/// λ at a node of an axis of order `order` on a tree of age `tree_age`.
-pub fn lambda_at(order: f64, tree_age: f64, params: &Params) -> f64 {
+/// λ at a node of an axis of order `order` on a tree of age `tree_age`, `crowd` the tree's mean
+/// R5 neighbour shade (read only with `dLambdaCrowd`).
+pub fn lambda_at(order: f64, tree_age: f64, crowd: f64, params: &Params) -> f64 {
     let Some(level) = pa_level(order, &params.r2) else {
         return params.c3.lambda;
     };
@@ -109,6 +116,12 @@ pub fn lambda_at(order: f64, tree_age: f64, params: &Params) -> f64 {
         0.0
     } else {
         math::min(1.0, (tree_age - r2.a_c) / math::max(1.0, r2.ramp))
+    };
+    // The fall's neighbour gate (ADR 0069): it scales the fall, not λ. Absent, t is untouched;
+    // at s̄ = 0 the factor is exactly 1.
+    let t = match r2.d_lambda_crowd {
+        Some(k) => t * math::max(0.0, 1.0 - k * crowd),
+        None => t,
     };
     // Twigs keep λ (ADR 0057): a level takes `dLambdaShare` of the fall. Absent, the full Δλ,
     // computed exactly as before (bit-identical).
@@ -583,12 +596,46 @@ mod tests {
             &[r#"{"lambda":0.56}"#, r#"{"lambda":0.52}"#],
             r#""aC":10,"dLambda":0.06,"ramp":20"#,
         );
-        assert_eq!(lambda_at(0.0, 5.0, &p), 0.56);
-        assert_eq!(lambda_at(3.0, 10.0, &p), 0.52);
-        assert!((lambda_at(0.0, 20.0, &p) - 0.53).abs() < 1e-12);
-        assert!((lambda_at(0.0, 100.0, &p) - 0.5).abs() < 1e-12);
+        assert_eq!(lambda_at(0.0, 5.0, 0.0, &p), 0.56);
+        assert_eq!(lambda_at(3.0, 10.0, 0.0, &p), 0.52);
+        assert!((lambda_at(0.0, 20.0, 0.0, &p) - 0.53).abs() < 1e-12);
+        assert!((lambda_at(0.0, 100.0, 0.0, &p) - 0.5).abs() < 1e-12);
         let off = Params::from_json(&preset("default", "{}"));
-        assert_eq!(lambda_at(0.0, 100.0, &off), off.c3.lambda);
+        assert_eq!(lambda_at(0.0, 100.0, 0.0, &off), off.c3.lambda);
+    }
+
+    #[test]
+    fn a_crowded_tree_keeps_its_lambda_and_a_free_one_falls_as_before() {
+        let levels = [
+            r#"{"lambda":0.56}"#,
+            r#"{"lambda":0.52,"dLambdaShare":0.5}"#,
+        ];
+        let today = with_r2(&levels, r#""aC":10,"dLambda":0.06,"ramp":20"#);
+        let gated = with_r2(
+            &levels,
+            r#""aC":10,"dLambda":0.06,"ramp":20,"dLambdaCrowd":10"#,
+        );
+        for age in [0.0, 5.0, 10.0, 17.0, 20.0, 30.0, 100.0] {
+            for pa in [0.0, 1.0] {
+                // Absent, the crowd is not read; set, a free-standing tree is today's, bit for bit.
+                assert_eq!(
+                    lambda_at(pa, age, 0.3, &today).to_bits(),
+                    lambda_at(pa, age, 0.0, &today).to_bits()
+                );
+                assert_eq!(
+                    lambda_at(pa, age, 0.0, &gated).to_bits(),
+                    lambda_at(pa, age, 0.0, &today).to_bits()
+                );
+            }
+            // At and beyond s̄ = 1/k the fall is off: the level's own λ at every age.
+            assert_eq!(lambda_at(0.0, age, 0.1, &gated), 0.56);
+            assert_eq!(lambda_at(0.0, age, 0.7, &gated), 0.56);
+        }
+        // Between, the gate scales the fall and not λ: half the fall at s̄ = 0.05, and a level's
+        // share applies to what is left.
+        assert!((lambda_at(0.0, 100.0, 0.05, &gated) - 0.53).abs() < 1e-12);
+        assert!((lambda_at(1.0, 100.0, 0.05, &gated) - 0.505).abs() < 1e-12);
+        assert!((lambda_at(0.0, 100.0, 0.0, &gated) - 0.5).abs() < 1e-12);
     }
 
     #[test]
@@ -613,14 +660,14 @@ mod tests {
         for age in [0.0, 5.0, 10.0, 17.0, 20.0, 30.0, 100.0] {
             // Share 1 is today's, bit for bit; share 0 keeps the level's λ at every age.
             assert_eq!(
-                lambda_at(0.0, age, &shared).to_bits(),
-                lambda_at(0.0, age, &today).to_bits()
+                lambda_at(0.0, age, 0.0, &shared).to_bits(),
+                lambda_at(0.0, age, 0.0, &today).to_bits()
             );
-            assert_eq!(lambda_at(2.0, age, &shared), 0.52);
-            assert_eq!(lambda_at(5.0, age, &shared), 0.52); // pa capped at the last row
+            assert_eq!(lambda_at(2.0, age, 0.0, &shared), 0.52);
+            assert_eq!(lambda_at(5.0, age, 0.0, &shared), 0.52); // pa capped at the last row
         }
-        assert!((lambda_at(1.0, 100.0, &shared) - 0.51).abs() < 1e-12); // half the fall
-        assert!((lambda_at(1.0, 100.0, &today) - 0.48).abs() < 1e-12);
+        assert!((lambda_at(1.0, 100.0, 0.0, &shared) - 0.51).abs() < 1e-12); // half the fall
+        assert!((lambda_at(1.0, 100.0, 0.0, &today) - 0.48).abs() < 1e-12);
     }
 
     #[test]

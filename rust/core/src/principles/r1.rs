@@ -114,9 +114,10 @@ pub fn carbon_balance(tree: &mut Tree, params: &Params) {
         tree.reproduction += to_seeds;
         tree.seed_pool += to_seeds;
         tree.v_base = net - to_reserve - to_seeds;
-        if r1.bank_unspent {
+        if r1.bank_unspent && tree.age > 0.0 {
             // #138's bank: what the buds could not spend comes back as growth in a surplus
-            // season, above a buffer of `keep` seasons of maintenance held for deficits.
+            // season, above a buffer of `keep` seasons of maintenance held for deficits. Not in
+            // the seed's first season: reserve0 is the seedling's store (ADR 0028), not a bank.
             let draw = math::max(0.0, tree.reserve - r1.keep * total_m);
             tree.reserve -= draw;
             tree.v_base += draw;
@@ -404,6 +405,18 @@ mod tests {
         assert!(n > 0.0 && 100.0 * m > 5.0);
         assert!(close(t.reserve, m));
         assert!(close(t.v_base, n + 5.0 - m));
+    }
+
+    #[test]
+    fn the_seed_s_store_is_not_drawn_into_growth_in_its_first_season() {
+        let p = params(
+            r#"{"mw":0,"mf":0.1,"sr":0,"store":100,"reserve0":5,"unspent":"banked","keep":1}"#,
+            "{}",
+        );
+        let mut t = seedling(&p, 1.0);
+        carbon_balance(&mut t, &p); // age 0
+        assert!(close(t.v_base, t.production - t.maintenance));
+        assert_eq!(t.reserve, 5.0);
     }
 
     #[test]

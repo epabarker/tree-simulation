@@ -11,11 +11,15 @@ The trace found HEAD's understorey saplings frozen, not starved: C3 splits a 1鈥
 
 ## The bank rule (`r1.unspent: "banked"`, built off by default)
 
-- **At GROW:** the v of every live bud that grew no shoot from it this season (below its threshold, refused by the stochastic break, barred by the extent probe, or released by R4's light trigger, which the reserve pays for) is added to the reserve, up to its cap `store`路M on this season's M.
+- **At GROW:** the v of every live bud that grew no shoot from it this season (below its threshold, refused by the stochastic break, barred by the extent probe, too little for one metamer when `r4.vCont` < 1, or released by R4's light trigger, which the reserve pays for) is added to the reserve, up to its cap `store`路M on this season's M.
 - **At CARBON, in a surplus season (N > 0):** after s_r路N is banked as today, the reserve above `keep`路M is moved into v_base, which C3 then splits as usual. A deficit season draws nothing into growth: the buffer of `keep` seasons of M is what covers it, and the reserve covers deficits as before.
+- **Not in the seed's first season:** the draw skips age 0, so `reserve0` stays the seedling's store (ADR 0028).
+- **Meaningless under `c3.mode` "none"** (every lit bud gets v = 1 whatever the carbon): not used there.
 - **Not banked:** v above the shoot cap (`c1.maxMetamersPerShoot`, ADR 0004's other loss) stays lost; the trace did not find it to matter for saplings.
 - **Params:** `r1.unspent` ("lost", absent, the default; "banked"), `r1.keep` (seasons of M held back; absent: 1). No new checkpoint state (the reserve is already saved), no RNG purpose.
 - **Off is the build:** goldens, regressions and lone hashes must be unchanged at the defaults.
+
+**Review before the runs:** `spec-reviewer` (run on opus: its Fable pin was rate-limited) found no divergences and verified the goldens; its two questions became the age-0 and vCont < 1 clauses above.
 
 **Seams tested** (`rust/core/src/principles/r1.rs`'s tests): `carbon_balance` (no draw by default; the reserve above keep路M funds v_base in a surplus season; nothing is drawn in a deficit) and `bank_unspent` / `grow_buds` (a bud below its threshold banks its v, one that grows spends it, the bank stops at the cap).
 

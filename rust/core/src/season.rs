@@ -500,7 +500,8 @@ pub fn grow_buds(tree: &mut Tree, params: &Params, season: f64) {
         } else {
             0.0
         };
-        if !spends {
+        // Below its threshold, refused, or too little for one metamer (vCont < 1).
+        if n == 0.0 {
             unspent += v;
         }
         if n == 0.0 && !refused && state == bud::DORMANT && light_releases(tree.b.q[i], age, params)

@@ -1,0 +1,1 @@
+{ "params": { "c1": { "extentLimit": "height", "extentSpare": true, "extentScale": 4, "extentSteepness": 8, "extentFloor": 0 }, "r3": { "windLoad": 0.0056, "windStem": 1 } } }

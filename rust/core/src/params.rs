@@ -218,6 +218,11 @@ pub struct R1 {
     pub leaf_acclimated: bool,
     /// c: the acclimated cost's share at Q = 0, m_f·(c + (1 − c)·Q) (read only when acclimated).
     pub leaf_cost_shade: f64,
+    /// `r1.unspent === "banked"` (#138, a probe): a bud's unspent v returns to the reserve, and
+    /// a surplus season's reserve above `keep`·M funds v_base. Absent, "lost" (ADR 0004).
+    pub bank_unspent: bool,
+    /// keep: the seasons of maintenance a banked reserve holds back from growth (absent: 1).
+    pub keep: f64,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -647,6 +652,8 @@ impl Params {
                 k_shed: opt(r1, "kShed").unwrap_or(1.0),
                 leaf_acclimated: text(r1, "leafCost") == "acclimated",
                 leaf_cost_shade: num(r1, "leafCostShade"),
+                bank_unspent: text(r1, "unspent") == "banked",
+                keep: opt(r1, "keep").unwrap_or(1.0),
             },
             r2: R2 {
                 enabled: flag(r2, "enabled"),

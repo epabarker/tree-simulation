@@ -323,6 +323,14 @@ export interface Params {
     leafCost?: "flat" | "acclimated";
     /** c: the acclimated leaf's cost at Q = 0, as a share of m_f. */
     leafCostShade?: number;
+    /**
+     * A bud's unspent v (#138, a probe; ADR 0004's revisit): 'lost' (absent: the default), as
+     * spec §C3.4 has it; 'banked', it returns to the reserve (capped at store·M), and a surplus
+     * season moves the reserve above keep·M into v_base.
+     */
+    unspent?: "lost" | "banked";
+    /** keep: with unspent 'banked', the seasons of maintenance held back for deficits (absent: 1). */
+    keep?: number;
   };
 
   /**

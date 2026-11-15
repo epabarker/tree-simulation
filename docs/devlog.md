@@ -2,6 +2,13 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-15: #138 traced: the saplings are frozen by the one-metamer threshold, and the unspent resource is lost
+
+- **Note:** [docs/experiments/2026-11-15-sapling-growth.md](experiments/2026-11-15-sapling-growth.md). Read-only: `rust/core/examples/sapling_probe.rs`, seeds 1–3, HEAD's garden at 160 cells. Exploratory.
+- **Result:** a 1–5 m hornbeam's surplus (median 4.9 units, P/M 5.8) is split among 15 buds, the largest share 0.70 against a threshold of 1; 61% of sapling-seasons add no metamer, and 64% of the saplings' summed surplus is left at buds below the threshold and discarded (79% for 5–10 m trees).
+- **As specified, not a coding defect:** spec §C3.4 and ADR 0004, whose revisit clause (R1 making the discarded resource matter) is now met. Whether to change the rule is the user's decision; three options in the note.
+- No default, golden, preset or regression changed.
+
 ## 2026-11-13: #132's probe: no arm passes; the ramp stays built and off
 
 - **Note:** [docs/experiments/2026-11-13-understorey-probe.md](experiments/2026-11-13-understorey-probe.md). Bars committed before the runs (3bfd8be); script `cli/understorey-probe.ts` (DBH ≥ 7 cm via `cli/allometry.ts`, metamers kept at 100/200/300). 5 arms × 2 widths × seeds 1–20, 46.8 min on 12 simulators, after a clean pilot on seeds 1–3.

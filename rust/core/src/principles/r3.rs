@@ -8,8 +8,24 @@
 //! with `r3.ground` limbs rest on the ground. E is wood's own, ≈ 4·10⁶ in these units (ADR
 //! 0011: 2D had lowered it to 10⁶ because a planar limb carried less foliage than a real one).
 //!
-//! Params: r3.*, o2.stormLoad, r2 posture set-points (and R2's light orthotropy: r2.lightSetPoint,
-//! r2.lightLo, r2.lightHi, r2.lightOver), c4.setPoint, r6 leaf areas.
+//! The wind load (#133, ADR 0067 decision 5; a probe, off at `r3.windLoad` 0): each metamer j
+//! carries a horizontal drag f_j = k_w·(a_leaf,j + k_s·2·r_j·l_j)·(y_j/H_ref)^β, β = 1 and
+//! H_ref = 100 cells (constants: ADR 0067 fixes them, and with β = 1 H_ref only rescales k_w).
+//! Its lever about metamer i's base is the vertical offset, so M_w,i = Σ_j f_j·max(0, y_j −
+//! y_base,i) over i's subtree. No wind direction or RNG is needed, every term is ≥ 0, and a
+//! parent's M_w is at least the sum of its children's. Conventions: y_j is j's tip height,
+//! clamped at 0 in the profile (so a limb resting below ground carries no drag), where R3's
+//! static load already hangs the leaves; y_base,i is i's base height; both from the start-of-pass
+//! geometry, as gravity's load reads them. j includes i: a metamer's own leaves and stem bend its
+//! own base, as its own weight does in M_g. a_leaf,j is the leaf area R3's static load weighs,
+//! Σ deposit_area (R6) over j's live buds; r_j and l_j are the radii after girth, before this
+//! pass's stress wood. M_w adds to |M_g| only in σ = 4(|M_g| + M_w)/(πr³) for stress wood and
+//! the storm's loaded check (and so the stress shown); sag and posture stay on gravity's M_g,
+//! because wind is transient and the ring locks gravity's increment (ADR 0011).
+//!
+//! Params: r3.* (with r3.windLoad k_w, r3.windStem k_s), o2.stormLoad, r2 posture set-points (and
+//! R2's light orthotropy: r2.lightSetPoint, r2.lightLo, r2.lightHi, r2.lightOver), c4.setPoint,
+//! r6 leaf areas.
 
 use super::c3::is_live_bud;
 use super::c4::{axis_offset, horizontal_heading, set_point_direction};
@@ -38,6 +54,38 @@ const SAFE_SLENDERNESS: f64 = 80.0;
 pub fn slenderness_risk(hd: f64) -> f64 {
     math::min(2.0, math::max(0.0, (hd - SAFE_SLENDERNESS) / 30.0))
 }
+/// The wind load's reference height H_ref in cells (ADR 0067 decision 5: 100 cells, 25 m). A
+/// constant, not a param: with β = 1 the profile y/H_ref is linear, so H_ref only rescales k_w.
+const WIND_HEIGHT: f64 = 100.0;
+
+/// The wind load's bending moment M_w,i = Σ_j f_j·max(0, y_j − y_base,i) at each metamer i's
+/// base, over its subtree j (i included), with f_j = k_w·(a_leaf,j + k_s·2·r_j·l_j)·(y_j/H_ref)
+/// (β = 1; y_j at the tip, clamped at the ground). `leaf_area[j]` is metamer j's leaf area as R3's
+/// static load reads it. The clamp does not separate into running sums, so each loaded metamer
+/// walks its own ancestor chain (parent[i] < i): O(Σ depth).
+pub(crate) fn wind_moments(tree: &Tree, leaf_area: &[f64], r3: &R3) -> Vec<f64> {
+    let nm = tree.m.len();
+    let mut out = vec![0.0; nm];
+    for j in 0..nm {
+        let y = tree.tip_y(j);
+        let area = leaf_area[j] + r3.wind_stem * 2.0 * tree.m.radius[j] * tree.m.length[j];
+        let f = r3.wind_load * area * (math::max(0.0, y) / WIND_HEIGHT);
+        if f <= 0.0 {
+            continue;
+        }
+        let mut i = j as i32;
+        while i >= 0 {
+            let k = i as usize;
+            let lever = y - tree.m.base_y[k];
+            if lever > 0.0 {
+                out[k] += f * lever;
+            }
+            i = tree.m.parent[k];
+        }
+    }
+    out
+}
+
 /// Largest sag a metamer takes in one season, radians.
 pub const MAX_SAG: f64 = 0.2;
 
@@ -100,19 +148,33 @@ pub fn update_mechanics(tree: &mut Tree, params: &Params, storm: bool, season: f
     ensure(&mut tree.scratch_u, nm);
     tree.load_w[..nm].fill(0.0);
     tree.load_s[..3 * nm].fill(0.0);
+    // The wind load (#133) is computed only when on, so k_w = 0 is bit-identical.
+    let wind = r3.wind_load > 0.0;
+    let mut leaf_area = if wind { vec![0.0; nm] } else { Vec::new() };
     for j in 0..tree.b.len() {
         let state = tree.b.state[j];
         if !is_live_bud(state) {
             continue;
         }
         let m = tree.b.metamer[j] as usize;
-        let w = r3.leaf_mass * deposit_area(state, &params.r6);
+        let area = deposit_area(state, &params.r6);
+        let w = r3.leaf_mass * area;
         let tip = tree.tip(m);
         tree.load_w[m] += w;
         for k in 0..3 {
             tree.load_s[3 * m + k] += w * tip[k];
         }
+        if wind {
+            leaf_area[m] += area;
+        }
     }
+    // From the start-of-pass geometry and radii (after girth, before this pass's stress wood),
+    // as gravity's load reads them.
+    let wind_m = if wind {
+        wind_moments(tree, &leaf_area, r3)
+    } else {
+        Vec::new()
+    };
 
     let sigma_t = r3.sigma_target;
     let mut any_break = false;
@@ -160,7 +222,12 @@ pub fn update_mechanics(tree: &mut Tree, params: &Params, storm: bool, season: f
         // bends it (the part along it would twist, which the model leaves out).
         let a = sub(s, scale(base, w));
         let moment = reject([a[2], 0.0, -a[0]], h);
-        let m_abs = norm(moment);
+        // Stress (stress wood, the storm's check) reads |M_g| + M_w; sag and posture, M_g alone.
+        let m_abs = if wind {
+            norm(moment) + wind_m[i]
+        } else {
+            norm(moment)
+        };
 
         let mut r_new = r;
         let mut sigma = (4.0 * m_abs) / (PI * r * r * r);
@@ -574,5 +641,137 @@ mod tests {
         let h = t.heading(0);
         assert!(close(h[1], 0.0, 1e-12)); // level on the ground
         assert!(close(h[0], h[2], 1e-12) && h[0] > 0.0); // the same way as before
+    }
+
+    /// Each metamer's leaf area as R3's static load reads it (the wind tests' a_leaf).
+    fn leaf_areas(t: &Tree, p: &Params) -> Vec<f64> {
+        let mut a = vec![0.0; t.m.len()];
+        for j in 0..t.b.len() {
+            if is_live_bud(t.b.state[j]) {
+                a[t.b.metamer[j] as usize] += deposit_area(t.b.state[j], &p.r6);
+            }
+        }
+        a
+    }
+
+    /// A vertical stem of `n` unit metamers of radius r from the ground.
+    fn stem(n: usize, r: f64) -> Tree {
+        let mut t = Tree::new(0, 10.0, 0.5);
+        let mut parent: i32 = -1;
+        for _ in 0..n {
+            parent = metamer(&mut t, parent, slot::MAIN, PI / 2.0, 1.0, r, 0.0) as i32;
+        }
+        t.ensure_scratch();
+        for i in 0..n {
+            t.prev_radius[i] = r;
+        }
+        t
+    }
+
+    #[test]
+    fn wind_on_a_vertical_stem_is_nothing_above_its_load_and_grows_toward_the_base() {
+        let p = params(r#"{"windLoad":1,"windStem":0}"#, "{}");
+        // Leaves at the top: f = k_w·a·y/100 = 0.03 at y = 3, its lever 1, 2, 3 cells.
+        let mut t = stem(3, 0.1);
+        bud(&mut t, 2, slot::MAIN, PI / 2.0, 0.0);
+        let m = wind_moments(&t, &leaf_areas(&t, &p), &p.r3);
+        assert!(close(m[2], 0.03, 1e-12) && close(m[1], 0.06, 1e-12) && close(m[0], 0.09, 1e-12));
+        // Leaves on the lowest metamer alone (k_s 0): the stem above it carries nothing.
+        let mut t = stem(3, 0.1);
+        bud(&mut t, 0, RIGHT, 0.0, 1.0);
+        let m = wind_moments(&t, &leaf_areas(&t, &p), &p.r3);
+        assert_eq!((m[2], m[1]), (0.0, 0.0));
+        assert!(close(m[0], 0.01, 1e-12)); // f = 0.01 at y = 1, lever 1
+    }
+
+    #[test]
+    fn wind_from_a_descendant_below_a_base_adds_nothing_to_it() {
+        let p = params(r#"{"windLoad":1,"windStem":0}"#, "{}");
+        let mut t = Tree::new(0, 10.0, 0.5);
+        let trunk = metamer(&mut t, -1, slot::MAIN, PI / 2.0, 5.0, 0.1, 0.0);
+        let top = metamer(&mut t, trunk as i32, slot::MAIN, PI / 2.0, 1.0, 0.1, 0.0);
+        // A limb hanging from the top's tip (y 6) down to y 3.
+        let hang = metamer(&mut t, top as i32, RIGHT, -PI / 2.0, 3.0, 0.1, 0.0);
+        bud(&mut t, hang, slot::MAIN, -PI / 2.0, 1.0);
+        let m = wind_moments(&t, &leaf_areas(&t, &p), &p.r3);
+        assert_eq!(m[hang], 0.0); // its leaves are 3 below its own base
+        assert_eq!(m[top], 0.0); // and 2 below the top's base at y 5
+        assert!(close(m[trunk], 0.03 * 3.0, 1e-12)); // but 3 above the ground
+    }
+
+    #[test]
+    fn a_parents_wind_moment_is_at_least_its_childrens_on_an_upward_crown() {
+        let p = params(r#"{"windLoad":0.5,"windStem":1}"#, "{}");
+        let mut t = Tree::new(0, 10.0, 0.5);
+        let trunk = metamer(&mut t, -1, slot::MAIN, PI / 2.0, 2.0, 0.2, 0.0);
+        let a = metamer(&mut t, trunk as i32, slot::MAIN, PI / 3.0, 1.5, 0.1, 0.0);
+        let b = metamer(&mut t, trunk as i32, RIGHT, 2.0 * PI / 3.0, 1.0, 0.08, 0.0);
+        let c = metamer(&mut t, a as i32, slot::MAIN, PI / 2.0, 1.0, 0.05, 0.0);
+        bud(&mut t, c, slot::MAIN, PI / 2.0, 0.0);
+        bud(&mut t, b, slot::MAIN, 2.0 * PI / 3.0, 1.0);
+        let m = wind_moments(&t, &leaf_areas(&t, &p), &p.r3);
+        assert!(m[c] > 0.0 && m[b] > 0.0);
+        assert!(m[a] >= m[c]);
+        assert!(m[trunk] >= m[a] + m[b]);
+    }
+
+    #[test]
+    fn no_wind_load_is_a_no_op() {
+        let run = |r3: &str| {
+            let p = params(r3, "{}");
+            let mut t = stem(3, 0.05);
+            let lean = metamer(&mut t, 1, RIGHT, PI / 4.0, 2.0, 0.03, 0.0);
+            bud(&mut t, 2, slot::MAIN, PI / 2.0, 0.0);
+            bud(&mut t, lean, slot::MAIN, PI / 4.0, 1.0);
+            t.ensure_scratch();
+            t.prev_radius[lean] = 0.03;
+            update_mechanics(&mut t, &p, false, 0.0);
+            (
+                t.m.radius.clone(),
+                t.stress.clone(),
+                t.m.hx.clone(),
+                t.m.mz.clone(),
+            )
+        };
+        let base = r#"{"E":1e5,"sigmaTarget":50,"girthGain":1,"leafMass":0.05}"#;
+        let off =
+            r#"{"E":1e5,"sigmaTarget":50,"girthGain":1,"leafMass":0.05,"windLoad":0,"windStem":9}"#;
+        assert_eq!(run(base), run(off));
+    }
+
+    #[test]
+    fn wind_raises_the_stress_that_grows_wood_but_not_the_sag() {
+        // A vertical stem with its leaves straight above: gravity bends it not at all.
+        let grow = |r3: &str| {
+            let p = params(r3, "{}");
+            let mut t = stem(3, 0.05);
+            bud(&mut t, 2, slot::MAIN, PI / 2.0, 0.0);
+            update_mechanics(&mut t, &p, false, 0.0);
+            t.m.stress_wood[0]
+        };
+        let calm = r#"{"E":1e12,"sigmaTarget":10,"girthGain":1,"leafMass":1}"#;
+        let windy = r#"{"E":1e12,"sigmaTarget":10,"girthGain":1,"leafMass":1,"windLoad":1}"#;
+        assert_eq!(grow(calm), 0.0);
+        assert!(grow(windy) > 0.0);
+        // A leaning stem without stress wood (its radius fixed): the stress rises with the wind,
+        // the moment it sags by and its heading do not change.
+        let lean = |r3: &str| {
+            let p = params(r3, "{}");
+            let mut t = Tree::new(0, 10.0, 0.5);
+            let a = metamer(&mut t, -1, slot::MAIN, PI / 3.0, 2.0, 0.05, 0.0);
+            let b = metamer(&mut t, a as i32, slot::MAIN, PI / 3.0, 2.0, 0.05, 0.0);
+            bud(&mut t, b, slot::MAIN, PI / 3.0, 0.0);
+            t.ensure_scratch();
+            t.prev_radius[..2].copy_from_slice(&[0.05, 0.05]);
+            update_mechanics(&mut t, &p, false, 0.0);
+            (t.stress[0], (t.m.mx[0], t.m.my[0], t.m.mz[0]), t.heading(1))
+        };
+        let calm = r#"{"E":1e4,"leafMass":0.05}"#;
+        let windy = r#"{"E":1e4,"leafMass":0.05,"windLoad":1}"#;
+        let (s0, m0, h0) = lean(calm);
+        let (s1, m1, h1) = lean(windy);
+        assert!(s1 > s0);
+        assert_eq!(m0, m1);
+        assert_eq!(h0, h1);
     }
 }

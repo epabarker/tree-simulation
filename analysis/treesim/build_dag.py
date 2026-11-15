@@ -335,6 +335,7 @@ PARAMS = [
     ("r3.sigmaTarget / girthGain", "r3", [("R3_MECH", on("r3.enabled"))]),
     ("r3.sigmaBreak", "r3", [("R3_MECH", on("r3.enabled"))]),
     ("r3.ground", "r3", [("R3_MECH", on("r3.enabled"))]),
+    ("r3.windLoad / windStem", "r3", [("R3_MECH", on("r3.enabled"))]),
     # R4
     ("r4.vBreak", "r4", [("R4_FATE", on("r4.enabled"))]),
     ("r4.vCont", "r4", [("R4_FATE", on("r4.enabled"))]),

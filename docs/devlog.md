@@ -2,6 +2,27 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-15: #133's wind load in R3: built off by default; its probe rejects every arm
+
+- **The rule** (0e2a1ea, ADR 0067 decision 5):
+  - `principles/r3.rs::wind_moments`, M_w,i = Σ_j f_j·max(0, y_j − y_base,i) over i's subtree (j = i included), with f_j = k_w·(a_leaf,j + k_s·2·r_j·l_j)·(y_j/100).
+  - M_w enters σ for stress wood and the break check only.
+  - `r3.windLoad` (absent = 0, off and bit-identical) and `r3.windStem` (absent = 1).
+  - Goldens, regressions and lone hashes are unchanged; `spec-reviewer` found no divergences.
+- **The probe:** [docs/experiments/2026-11-15-wind-load-probe.md](experiments/2026-11-15-wind-load-probe.md). The bars were committed before the runs (50e0220).
+  - The dose was calibrated by `cli/wind-calibrate.ts`: M_w/|M_g| at the lone hornbeam's base, 365 per unit k_w, linear.
+  - The ladder: k_w 0.0014, 0.0028 and 0.0056.
+- **Result: no arm passes.** On `H4k8`'s crowns the throws fall with the dose (26 → 9; HEAD 8). But even 0.5× over-thickens the stand hornbeam (H/D 51 against a band of 74–98), and beech's inverted fork survives every dose.
+  - The σ ÷ 2 bracket matches the 1× wind on throws (16 against 15), so the height dependence bought nothing over more wood.
+  - Lone D on narrow crowns does not approach D on wide ones.
+- **Surprise: species override a world-level `r3` patch.** Every species sets `sigmaTarget` and `sigmaBreak`, so the bracket's first runs were void. They were re-run with σ set per species. `windLoad` is set by no species, so the wind arms were unaffected (all 120 wind runs differ from their no-wind runs).
+- **Surprise: a moved checkout strands cargo's test binaries.** After the repo moved to `~/Projects`, `tests/golden.rs`'s `env!("CARGO_MANIFEST_DIR")` still pointed at the old path, and the goldens failed with "No such file". `cargo clean -p tree-core -p tree-wasm -p treesim` fixed it.
+- No default, golden, preset or regression changed.
+- **Who is thrown (a re-read, `code/2026-11-15-wind-load/thrown.py`):** slender canopy trees in storms, far past the stand band (`H4k8`: median H/D 175, 0 of 26 inside 74–98). Narrow crowns grow a big tail over H/D 110 (257 tree-storms against HEAD's 104). The load shrinks the tail only by thickening every stem.
+  - So bars 7 and 9 don't conflict by construction.
+  - A light-scaled load would spare the wrong trees, since the thrown ones are lit.
+  - Recommended: close #133 and carry the slender tail to #134. The fork's reserve cure (ADR 0011 §3) is deferred until after #134's refit.
+- `wind.py` had read `broken` (a per-season count) as cumulative. The limb-break totals are corrected by 2–4%.
 ## 2026-11-15: #138 traced: the saplings are frozen by the one-metamer threshold, and the unspent resource is lost
 
 - **Note:** [docs/experiments/2026-11-15-sapling-growth.md](experiments/2026-11-15-sapling-growth.md). Read-only: `rust/core/examples/sapling_probe.rs`, seeds 1–3, HEAD's garden at 160 cells. Exploratory.

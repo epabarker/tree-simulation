@@ -2,6 +2,12 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-15: #138 traced: the saplings are frozen by the one-metamer threshold, and the unspent resource is lost
+
+- **Note:** [docs/experiments/2026-11-15-sapling-growth.md](experiments/2026-11-15-sapling-growth.md). Read-only: `rust/core/examples/sapling_probe.rs`, seeds 1–3, HEAD's garden at 160 cells. Exploratory.
+- **Result:** a 1–5 m hornbeam's surplus (median 4.9 units, P/M 5.8) is split among 15 buds, the largest share 0.70 against a threshold of 1; 61% of sapling-seasons add no metamer, and 64% of the saplings' summed surplus is left at buds below the threshold and discarded (79% for 5–10 m trees).
+- **As specified, not a coding defect:** spec §C3.4 and ADR 0004, whose revisit clause (R1 making the discarded resource matter) is now met. Whether to change the rule is the user's decision; three options in the note.
+- No default, golden, preset or regression changed.
 ## 2026-11-15: ADR 0069: an outside bird's-eye report reviewed against the repository
 
 - **What:** a deep-research report proposed a new axis-class state in R2, compiled multiscale structure for speed, and a basin gate. Reviewed against the notes; no simulation, no code.

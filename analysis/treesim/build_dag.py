@@ -28,7 +28,7 @@ PRINCIPLES = {
     "O2_TAG": ("Light", 3, "O2 owner grid (whose foliage is where)", "season.rs tag_foliage"),
     "C2_SAMPLE": ("Sample", 0, "C2 sample Q, V at every live bud", "season.rs sample_buds"),
     "R5_SHADE": ("Sample", 1, "R5 shade s = 1 - Q/C (x neighbours' share)", "r5.rs, season.rs sample_nodes"),
-    "R2_CROWD": ("Sample", 2, "R2 relay gate signal s-bar (mean neighbour shade)", "season.rs phase_sample"),
+    "R2_CROWD": ("Sample", 2, "R2 neighbour gates' signal s-bar (mean neighbour shade)", "season.rs phase_sample"),
     "C5_QTOP": ("Sample", 3, "C5 crown-top light Q_top (quantile of bud Q)", "c5.rs crown_top_light"),
     "C3_BASI": ("Allocate", 0, "C3 basipetal light sum Q_sum, n_b, Q_base", "c3.rs gather_light"),
     "R1_CARBON": ("Allocate", 1, "R1 carbon balance P - M -> reserve, seeds, v_base", "r1.rs carbon_balance"),
@@ -59,7 +59,7 @@ STATES = {
     "S_storm": "storm flag",
     "S_budq": "bud Q, V",
     "S_shade": "node shade s (R5)",
-    "S_crowd": "relay crowd s-bar",
+    "S_crowd": "neighbour crowd s-bar",
     "S_qtop": "Q_top",
     "S_qsum": "Q_sum, n_b per node; Q_base",
     "S_PM": "production P, maintenance M (tree and per branch)",
@@ -116,7 +116,7 @@ RW = {
     "C3_BASI": (["S_budq", "S_budstate", "S_geom"], ["S_qsum"]),
     "R1_CARBON": (["S_budq", "S_budstate", "S_geom", "S_reserve", "S_age"],
                   ["S_PM", "S_reserve", "S_seedpool", "S_vbase", "S_starved"]),
-    "C3_ACRO": (["S_vbase", "S_qsum", "S_shade", "S_geom", "S_age"], ["S_vin"]),
+    "C3_ACRO": (["S_vbase", "S_qsum", "S_shade", "S_geom", "S_age", "S_crowd"], ["S_vin"]),
     "R4_FATE": (["S_vin", "S_budstate", "S_budage", "S_shade", "S_budq", "S_reserve", "S_geom"],
                 ["S_budstate", "S_reserve"]),
     "R2_FORM": (["S_geom", "S_budq", "S_vbase", "S_age", "S_crowd", "S_budstate", "S_vin", "S_radius"],
@@ -207,7 +207,7 @@ for grp in ["c2", "c4", "c5", "c6", "r1", "r3", "r4", "r5", "r6"]:
     GATE_TEXT[on(f"{grp}.enabled")] = f"{grp}.enabled"
 PRINCIPLE_GATE = {
     "OBST": obstacles, "STORM": storms, "C2_LIGHT": always, "O2_TAG": OR(o2on, on("r5.enabled")),
-    "C2_SAMPLE": always, "R5_SHADE": shade_live, "R2_CROWD": AND(shade_live, lambda p, c: p["r2"].get("relayCrowd") is not None),
+    "C2_SAMPLE": always, "R5_SHADE": shade_live, "R2_CROWD": AND(shade_live, lambda p, c: p["r2"].get("relayCrowd") is not None or p["r2"].get("dLambdaCrowd") is not None),
     "C5_QTOP": lambda p, c: (p["c5"]["enabled"] or carbon(p, c)) and p["c5"]["Trel"] > 0,
     "C3_BASI": always, "R1_CARBON": on("r1.enabled"), "C3_ACRO": always, "R4_FATE": always,
     "R2_FORM": r2on, "C4_DIR": on("c4.enabled"), "C1_SHOOT": always, "R6_REST": always,
@@ -215,7 +215,7 @@ PRINCIPLE_GATE = {
     "R3_MECH": on("r3.enabled"), "COMMIT": always, "O2_ABRADE": o2on, "R1_STARVE": on("r1.enabled"),
     "O4_STAND": o4on,
 }
-GATE_TEXT[PRINCIPLE_GATE["R2_CROWD"]] = "R5 shade varies and r2.relayCrowd set"
+GATE_TEXT[PRINCIPLE_GATE["R2_CROWD"]] = "R5 shade varies and r2.relayCrowd or r2.dLambdaCrowd set"
 GATE_TEXT[PRINCIPLE_GATE["C5_QTOP"]] = "(c5.enabled or carbon) and c5.Trel > 0"
 GATE_TEXT[PRINCIPLE_GATE["C5_SHED"]] = "c5.enabled or r1.shed = carbon"
 
@@ -296,6 +296,7 @@ PARAMS = [
     # R2 tree-level
     ("r2.aC", "r2", [("C3_ACRO", r2on)]),
     ("r2.dLambda", "r2", [("C3_ACRO", r2on)]),
+    ("r2.dLambdaCrowd", "r2", [("C3_ACRO", AND(r2on, shade_live))]),
     ("r2.ramp", "r2", [("C3_ACRO", r2on)]),
     ("r2.kappa", "r2", [("C3_ACRO", r2on)]),
     ("r2.hJ", "r2", [("C1_SHOOT", r2on), ("R2_FORM", AND(relay_on, lambda p, c: (p["r2"].get("forkAt") or 0) > 0))]),

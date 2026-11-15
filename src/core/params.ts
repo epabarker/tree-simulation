@@ -440,6 +440,13 @@ export interface Params {
      */
     relayCrowd?: number;
     /**
+     * A neighbour gate k on the ontogenetic fall of λ (ADR 0069, probe only): the fall Δλ·t acts by
+     * max(0, 1 − k·s̄), s̄ the tree's mean R5 neighbour shade, so a tree among neighbours keeps its
+     * apical control through the race for height and a free-standing one loses it by age (aC, ramp).
+     * Needs R5's neighbour signal. Absent: off (age alone, bit-identical).
+     */
+    dLambdaCrowd?: number;
+    /**
      * The vigour fork (fresh-look beech): a pa-0 shoot grown from a bud given v ≥ forkAt times
      * c1.maxMetamersPerShoot ends its apex, and the relay makes its top laterals co-dominant arms;
      * every arm (a pa-0 axis not the trunk's) holds the inclination it was born at (Troll: all axes

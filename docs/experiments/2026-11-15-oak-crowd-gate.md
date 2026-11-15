@@ -66,6 +66,28 @@ Bare bole at 66 cells (pooled medians; trees ≥ 10 m):
 | hornbeam at 150 | 57, 0.399, 0.65 | 32, 0.152, 0.64 | fail |
 | hornbeam at 300 | 76, 0.461, 0.47 | 50, 0.309, 0.42 | fail |
 
+## The bare-bole fail, traced (read-only, the guard's runs)
+
+`code/2026-11-15-oak-crowd-gate/bole_trace.py <runs> <width>`, on the 40 gardens per width. `liveCrownBase` (lcb) is where the lowest living first-order limb leaves the trunk, over the height; it is 1 for a tree with no living limb.
+
+- **It is a real change in the same trees, and only on the narrow plot.** The same planted tree, ≥ 10 m in both arms:
+
+  | 66 cells | n | lcb HEAD → gated | median paired change | lower / higher |
+  |---|---|---|---|---|
+  | hornbeam at 100 | 18 | 0.135 → 0.064 | −0.027 | 11 / 7 |
+  | hornbeam at 150 | 17 | 0.168 → 0.060 | −0.064 | 13 / 4 |
+  | hornbeam at 300 | 12 | 0.253 → 0.149 | −0.063 | 9 / 3 |
+  | beech at 300 | 8 | 0.279 → 0.080 | −0.206 | 6 / 2 |
+
+  At 160 cells the paired change is −0.000 to −0.012 in every cell (n 10–45).
+- **It follows the oak.** At 66 cells and season 150, the 10 gardens where the gate adds a tall oak (≥ 10 m) change by a median −0.201; the other 10 by −0.008. At 300 the split is weaker (−0.080 against −0.035), with a tall oak left in only 7 gardens.
+- **The direction is more clothed, not lidded:** under the gate the beech and hornbeam keep living limbs lower on the stem. Against the bare-bole page's band (0.3–0.45), the phone's hornbeam goes from 0.40 to 0.15 at 150 and from 0.46 to 0.31 at 300.
+- **The pooled cells also move by who is counted.** HEAD's hornbeam cell at 150 is 57 trees, 40 of them recruits under 100 seasons old (24 and 14 of them in two gardens); the gated arm's is 32 trees, 15 recruits.
+- **Part of HEAD's bare bole on the phone is limbless poles.** lcb = 1 in 8 of 57 hornbeam at 150 and 25 of 76 at 300 under HEAD, against 0 of 32 and 9 of 50 under the gate. Without them the hornbeam cells read 0.358 → 0.152 at 150 and 0.299 → 0.238 at 300: the 150 cell still fails by a wide margin, the 300 cell by 0.01.
+- **The stand around them:** the top height rises from 29 to 33 m (the oak), trees ≥ 10 m from a median 2 to 3–4 a garden, and the judged trees' mean bud light falls from 0.23 to 0.20–0.21.
+- **Why a surviving oak keeps its neighbours clothed is not traced** (it needs the light at the limbs, which these runs do not keep). Two readings fit: with the oak alive there is no gap for a thicket of recruits to grow up and shade the planted trees' lower limbs (fewer recruits reach 10 m); or a top darkened by the oak lowers the crown-relative threshold the lower limbs are shed against. Both are inferences.
+- **So the bar is not misfiring.** It is symmetric and was written with a harmful oak in mind, but what it caught is a real change of form in other species on the phone's plot, partly below the bare-bole band. It also shows that HEAD's phone value leans on recruit turnover and limbless poles.
+
 ## The basin report (ADR 0069 decision 4)
 
 Not run. The ADR asked for k 5 and 20 on the pilot's seeds; with s̄ ≥ 0.1 in 92–100% of tree-seasons from age 14, k 10 and k 20 give the same g = 0 there, and k 5 is fully off only from s̄ ≥ 0.2, about the median. So the arm sits on a plateau above k 10 and on a slope below it. This is read from step 0's shade values, not from runs.
@@ -75,7 +97,7 @@ Not run. The ADR asked for k 5 and 20 on the pilot's seeds; with s̄ ≥ 0.1 in 
 - **Settled:** `d16a13`'s garden failure is the age-triggered fall acting on a crowded tree. A signal the tree already holds separates the lone oak from the stand oak completely, with no new state and no change to the lone tree.
 - **Not settled:** whether the oak can take this without disturbing the phone garden's beech and hornbeam. The failing criterion is about other species in a different stand, not about the oak.
 - **Three seeds and one k** for the pilot; the guard's 20 seeds are one build and one garden (the 0062/0063 garden at r6), which #133 and #134 may change.
-- **The cause of the bare-bole change is not traced.** More oak in a 66-cell plot is the obvious candidate; an oak that never loses apical control in the stand is also not the oak HEAD has.
+- **The bare-bole change is traced to the surviving oak on the 66-cell plot** (above); the light mechanism behind it is not.
 - **For the user:** (a) hold #124 as it is; (b) ask whether the guard's bare-bole bar, written to catch the patched oak harming the stand, should bind when the oak does better than HEAD's (a bar change needs a new decision, not this note); (c) a different design, such as gating only the excess over HEAD's 0.04, which is a new experiment with its own bars.
 
 ## Reproduce

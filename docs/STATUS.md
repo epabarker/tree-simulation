@@ -16,7 +16,7 @@ _Last updated: 2026-11-13; #132's probe: no arm passes; the ramp stays built and
   drag on leaf + stem area × height, a moment that cannot cancel (stress wood and storms only).
 - ADR 0068 (user): #132's signal is `topLight`, a ramp from θ_hi down to each species' survival
   light; the band counts stems ≥ 7 cm DBH; no cap bar (mortality can't clear it: #137, the bank).
-  #138: saplings at P/M 4–5 barely grow (untraced).
+  #138 traced: saplings frozen below the one-metamer threshold, surplus lost (ADR 0004; a decision).
 ## Feature playbook (spec #111, merged to 3d-port as #128)
 - Garden: round 6 (r6), periodic depth, two-part demography; ADR 0065 targets reported, not gated.
 - #124 oak d16a13 not adopted; #126 bare-bole probe failed (repeat if the stand changes).

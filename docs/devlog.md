@@ -2,6 +2,14 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-16: O4's light memory (`o4.lightMemory`, ADR 0073): built off by default; probed against s3d
+
+- **The user's decision** (2026-11-16, in chat: "Yes, add light memory"), after the churn note found the floor's light under the canopy memoryless from one season to the next (ρ 0.02).
+- **The rule** (`principles/memory.rs`, [ADR 0073](decisions/0073-light-memory.md)): with τ > 0, stand dynamics first folds the season's light into exponential running means (weight 1 − e^(−1/τ)): per ground cell of Q/C (`World::ground_light`), per tree of Q_top/C (`Tree::light_mean`, starting from its cell's). Establishment (q_est, stubLight), stub promotion, stub demotion and the `topLight` signal read them. No randomness, plain `Vec`s.
+  - Checkpoint version 6 (the header's `lightMemory`) only when a mean is kept; versions 1–5 load with none. The hash folds the means in only when kept. A width or depth patch restarts the cells.
+  - Eleven unit tests in `memory.rs`, three checkpoint tests. Goldens, regressions and presets unchanged. `spec-reviewer`: no divergences; its questions led to the layout restart and a fractional width's last column, and to two ADR clarifications.
+- **The probe:** [docs/experiments/2026-11-16-light-memory-probe.md](experiments/2026-11-16-light-memory-probe.md), arms and bars committed before the runs.
+
 ## 2026-11-16: #137's seedling stubs (§O4.11): built off by default; read both ways, s3d passes
 
 - **The rule** (38a3496, 66e0f3c; draft [ADR 0072](decisions/0072-seedling-stubs.md), proposed): `principles/stubs.rs`. With the world's `o4.stubs` on, a viable seed that cannot stand (cap full, ground below max(qEst, `stubLight`), a trunk within a cell) joins a per-cell, per-species count outside `maxTrees`.

@@ -190,7 +190,8 @@ pub fn promote(world: &mut World, live: &mut f64) -> f64 {
             .any(|(_, v)| v.get(k).is_some_and(|&n| n > 0));
         if held && !taken.get(k).copied().unwrap_or(true) {
             let (x, z) = centre(k as u32, width);
-            qs.push(world.light.sample(x, params.o4.stub_light_y, z).0 / c);
+            // ADR 0073: the cell's running mean with the light memory on.
+            qs.push(super::memory::ground(world, x, params.o4.stub_light_y, z));
             ks.push(k as u32);
         }
     }
@@ -271,7 +272,8 @@ pub fn demote(world: &mut World) -> f64 {
         let t = &world.trees[i];
         let own = &world.rules.of(&t.species).o4;
         let (at, from) = (own.stub_demote, math::max(1.0, own.stub_demote_age));
-        if !(t.alive && t.age >= from && at > 0.0) || t.q_top / c >= at {
+        let q = super::memory::top(&world.rules.params, t); // ADR 0073: the mean, if kept
+        if !(t.alive && t.age >= from && at > 0.0) || q >= at {
             continue;
         }
         if crate::stand::is_drawn(crate::stand::stem_height(t)) {

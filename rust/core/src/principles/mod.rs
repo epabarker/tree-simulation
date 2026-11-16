@@ -6,6 +6,7 @@ pub mod c3;
 pub mod c4;
 pub mod c5;
 pub mod c6;
+pub mod memory;
 pub mod o2;
 pub mod o4;
 pub mod obstacles;

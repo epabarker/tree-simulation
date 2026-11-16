@@ -461,6 +461,11 @@ pub struct O4 {
     /// The height (cells) at which a stub's cell, or a seed's landing point, is sampled for
     /// stubLight (#137's churn probe; the world's; absent: 0.5, the ground cell's centre).
     pub stub_light_y: f64,
+    /// τ_L: the light memory's time constant, seasons (ADR 0073; `principles::memory`), the
+    /// world's: establishment and stub promotion read each ground cell's running mean of light,
+    /// stub demotion and the `topLight` signal each tree's of Q_top/C. Absent or 0: off,
+    /// bit-identical.
+    pub light_memory: f64,
     /// Planting at a density (ADR 0063, decision 5; `principles::planting`); None: `trees`.
     pub planting: Option<Planting>,
 }
@@ -817,6 +822,7 @@ impl Params {
                 stub_demote: opt(o4, "stubDemote").unwrap_or(0.0),
                 stub_demote_age: opt(o4, "stubDemoteAge").unwrap_or(1.0),
                 stub_light_y: opt(o4, "stubLightY").unwrap_or(0.5),
+                light_memory: opt(o4, "lightMemory").unwrap_or(0.0),
                 planting: o4.get("planting").map(|g| Planting {
                     density: num(g, "density"),
                     spacing: num(g, "spacing"),

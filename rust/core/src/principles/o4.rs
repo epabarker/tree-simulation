@@ -145,11 +145,13 @@ pub fn growth_deficit(t: &Tree, season: f64, k: f64, floor: f64) -> f64 {
 /// Whether the ground at (x, z) is lit to `at` of open sky C (c > 0).
 fn lit(world: &World, x: f64, z: f64, c: f64, at: f64) -> bool {
     let y = world.rules.params.o4.stub_light_y;
-    c > 0.0 && world.light.sample(x, y, z).0 / c >= at
+    c > 0.0 && super::memory::ground(world, x, y, z) >= at
 }
 
 /// Background deaths, seeds, dispersal and establishment. Returns the season's recruits.
 pub fn stand_dynamics(world: &mut World) -> f64 {
+    // ADR 0073: this season's light folded into the running means every rule below reads.
+    super::memory::update(world);
     let season = world.season;
     let params = &world.rules.params;
     let (seed, w, periodic, c) = (
@@ -184,7 +186,8 @@ pub fn stand_dynamics(world: &mut World) -> f64 {
                     let deficit = match signal {
                         // ADR 0068: θ_hi and θ_sp are the species' (merged over the world's).
                         SuppressionSignal::TopLight => {
-                            top_light_ramp(t.q_top / c, own.top_light_threshold, own.survival_light)
+                            let q = super::memory::top(params, t);
+                            top_light_ramp(q, own.top_light_threshold, own.survival_light)
                         }
                         _ => growth_deficit(
                             t,
@@ -286,8 +289,7 @@ pub fn stand_dynamics(world: &mut World) -> f64 {
                 if live >= max_trees {
                     return recruits;
                 }
-                let (q, _) = world.light.sample(x, 0.5, z);
-                if c <= 0.0 || q / c < q_est {
+                if c <= 0.0 || super::memory::ground(world, x, 0.5, z) < q_est {
                     continue;
                 }
                 if uniform(seed, purpose::ESTABLISHMENT, pid, kk, season, 0.0) >= p_est {
@@ -349,8 +351,7 @@ pub fn stand_dynamics(world: &mut World) -> f64 {
                     continue;
                 }
             } else {
-                let (q, _) = world.light.sample(x, 0.5, z);
-                if c <= 0.0 || q / c < q_est {
+                if c <= 0.0 || super::memory::ground(world, x, 0.5, z) < q_est {
                     continue;
                 }
                 if uniform(seed, purpose::SEED_RAIN, key, 2.0, season, kk) >= p_est {

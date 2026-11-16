@@ -8,7 +8,9 @@
  * a pilot-only light bracket); s1d, s3d (s1 and s3 with stubDemote 0.075: the addendum); and
  * #137's churn arms, s3dY15 (stubLightY 1.5), s3dk3 and s3dk5 (stubDemoteAge 3, 5), run with
  * `--out runs/stub-churn-probe` and judged against s3d by
- * docs/experiments/2026-11-16-stub-churn-and-hornbeam-ceiling.md's bars.
+ * docs/experiments/2026-11-16-stub-churn-and-hornbeam-ceiling.md's bars; and the light-memory
+ * arms (ADR 0073), s3dT25, s3dT5 and s3dT10 (s3d with o4.lightMemory τ 2.5, 5, 10), run with
+ * `--out runs/light-memory-probe` and judged by docs/experiments/2026-11-16-light-memory-probe.md.
  *
  * Gates (#122; ≥ 18 of 20 seeds at both widths): a canopy tree in every season after 50; at 66
  * cells, one in every season from 100; checkpoints (frozen fixtures load with no stubs and grow on
@@ -69,7 +71,19 @@ export const ARMS: Record<string, Patch> = {
   s3dY15: { params: { o4: { ...ARM_O4(0.15, 3, 0.075), stubLightY: 1.5 } } as Patch["params"] },
   s3dk3: { params: { o4: { ...ARM_O4(0.15, 3, 0.075), stubDemoteAge: 3 } } as Patch["params"] },
   s3dk5: { params: { o4: { ...ARM_O4(0.15, 3, 0.075), stubDemoteAge: 5 } } as Patch["params"] },
+  // ADR 0073's light memory (docs/experiments/2026-11-16-light-memory-probe.md): s3d with O4's
+  // establishment, promotion, demotion and topLight reading running means of time constant τ.
+  s3dT25: { params: { o4: { ...ARM_O4(0.15, 3, 0.075), lightMemory: 2.5 } } as Patch["params"] },
+  s3dT5: { params: { o4: { ...ARM_O4(0.15, 3, 0.075), lightMemory: 5 } } as Patch["params"] },
+  s3dT10: { params: { o4: { ...ARM_O4(0.15, 3, 0.075), lightMemory: 10 } } as Patch["params"] },
 };
+/** The checkpoint version an arm's garden saves: 6 with the light memory, 5 with stubs, else 4. */
+const versionOf = (cond: string) =>
+  (ARMS[cond]?.params as { o4?: { lightMemory?: number } } | undefined)?.o4?.lightMemory
+    ? 6
+    : cond === "head"
+      ? 4
+      : 5;
 export const WIDTHS = [160, 66];
 export const SEASONS = 300;
 export const FRAMES = [100, 200, 300];
@@ -201,6 +215,10 @@ function summarise(j: Job) {
   const reached = new Set<string>();
   const recruits: Record<string, number> = {};
   const recruitsDrawn: Record<string, number> = {};
+  // Churn (ADR 0073's probe): each recruit's last season alive and its tallest height.
+  const last = new Map<string, number>();
+  const tallest = new Map<string, number>();
+  let lastSeason = 0;
   const seedsMade: Record<string, number> = {};
   let firstSeason = Number.POSITIVE_INFINITY;
   for (const r of rows(join(dir, "metrics.csv"))) {
@@ -210,6 +228,9 @@ function summarise(j: Job) {
     const sp = r.species as string;
     const h = Number(r.height);
     firstSeason = Math.min(firstSeason, season);
+    lastSeason = Math.max(lastSeason, season);
+    last.set(id, season);
+    tallest.set(id, Math.max(tallest.get(id) ?? 0, h));
     if (!first.has(id)) {
       first.set(id, season);
       if (season > firstSeason) bump(recruits, sp);
@@ -223,6 +244,16 @@ function summarise(j: Job) {
     atFrame.get(season)?.push({ id, sp, h });
   }
 
+  // A recruit "left within 2" stood at most 2 seasons, never reached 1.3 m, and was gone before
+  // the run's end: demoted (or, rarely, a suppression death) as churn.ts counts it.
+  let leftWithin2 = 0;
+  let recruitN = 0;
+  for (const [id, s0] of first) {
+    if (s0 <= firstSeason) continue;
+    recruitN++;
+    const s1 = last.get(id) ?? s0;
+    if (s1 < lastSeason && s1 - s0 + 1 <= 2 && (tallest.get(id) ?? 0) < DRAWN) leftWithin2++;
+  }
   const frames = FRAMES.map((s) => {
     const row = stand.find((r) => Number(r.season) === s);
     const drawn = Number(row?.drawn ?? 0);
@@ -267,6 +298,8 @@ function summarise(j: Job) {
     capSeasons: Number(meta.capSeasons),
     recruits,
     recruitsDrawn,
+    leftWithin2,
+    recruitN,
     seedsMade,
     frames,
     wall: Number(readFileSync(join(dir, "wall.txt"), "utf8")),
@@ -333,6 +366,12 @@ const counts = (rs: Summary[], base?: Summary[]) => {
     canopyShare7Median: median(fr.map((f) => f.canopyShare7)),
     drawnPerHaMedian: median(fr.map((f) => f.drawnPerHa)),
     recruitsPerRun: Object.values(recruits).reduce((a, x) => a + x, 0) / rs.length,
+    leftWithin2Share:
+      rs.reduce((a, r) => a + r.leftWithin2, 0) /
+      Math.max(
+        1,
+        rs.reduce((a, r) => a + r.recruitN, 0),
+      ),
     focusRecruitShare: shareOf(recruits, FOCUS),
     recruitsDrawnPerRun: Object.values(recruitsDrawn).reduce((a, x) => a + x, 0) / rs.length,
     focusRecruitDrawnShare: shareOf(recruitsDrawn, FOCUS),
@@ -422,9 +461,8 @@ if (withTests) {
     const same = loaded.hash() === unbroken.hash();
     unbroken.run(10);
     loaded.run(10);
-    const on = cond !== "head";
     t[`garden checkpoint (66, seed 1, season 30) v${version} round-trips and grows on alike`] =
-      same && loaded.hash() === unbroken.hash() && version === (on ? 5 : 4);
+      same && loaded.hash() === unbroken.hash() && version === versionOf(cond);
     unbroken.dispose();
     loaded.dispose();
     // (a)

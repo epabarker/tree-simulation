@@ -11,7 +11,10 @@
 //! count (`dark`, c5.kRel); versions 1–3 start it at zero. Version 5 (ADR 0072) adds the
 //! header's `stubs` table, §O4.11's seedling stubs as {species: [cell, count, …]}; it is written
 //! only when the pool is not empty, so a world without stubs keeps version 4's bytes, and versions
-//! 1–4 load with no stubs.
+//! 1–4 load with no stubs. Version 6 (ADR 0073) adds the header's `lightMemory`, O4's running
+//! means of light: {cells: [mean per ground cell], trees: [mean or null, one per tree in order]};
+//! it is written only when a mean is kept, so a world without the memory keeps version 4's or 5's
+//! bytes, and versions 1–5 load with none.
 //!
 //! **Version 2** (I2, ADR 0025) is the 3D schema. **Version 1**, the 2D core's (the TypeScript
 //! core's, and garden 0.14.0's opening forests), still loads: each angle becomes a heading in the
@@ -26,6 +29,14 @@ use crate::world::World;
 const VERSION: f64 = 4.0;
 /// The version a world with seedling stubs writes (ADR 0072): version 4 plus the header's table.
 const VERSION_STUBS: f64 = 5.0;
+/// The version a world with O4's light memory writes (ADR 0073): version 5 plus the header's
+/// `lightMemory`.
+const VERSION_MEMORY: f64 = 6.0;
+
+/// Whether the world keeps any light-memory state (ADR 0073).
+fn has_memory(world: &World) -> bool {
+    !world.ground_light.is_empty() || world.trees.iter().any(|t| t.light_mean.is_some())
+}
 
 /// The 2D schema (version 1): (name, size in bytes) of each column, in its order.
 const METAMERS_V1: [(&str, usize); 19] = [
@@ -102,7 +113,9 @@ pub fn save_world(world: &World) -> Vec<u8> {
             ])
         })
         .collect();
-    let version = if world.stubs.is_empty() {
+    let version = if has_memory(world) {
+        VERSION_MEMORY
+    } else if world.stubs.is_empty() {
         VERSION
     } else {
         VERSION_STUBS
@@ -134,6 +147,21 @@ pub fn save_world(world: &World) -> Vec<u8> {
             })
             .collect();
         fields.push(("stubs".into(), Value::Obj(table)));
+    }
+    if has_memory(world) {
+        let cells = world.ground_light.iter().map(|&m| Value::Num(m)).collect();
+        let trees = world
+            .trees
+            .iter()
+            .map(|t| t.light_mean.map_or(Value::Null, Value::Num))
+            .collect();
+        fields.push((
+            "lightMemory".into(),
+            Value::Obj(vec![
+                ("cells".into(), Value::Arr(cells)),
+                ("trees".into(), Value::Arr(trees)),
+            ]),
+        ));
     }
     let header = Value::Obj(fields);
     let text = json::stringify(&header, true);
@@ -218,7 +246,7 @@ pub fn load_world(bytes: &[u8]) -> Result<World, CheckpointError> {
     let header = json::parse(text).map_err(|e| CheckpointError(e.to_string()))?;
     let num = |v: &Value, k: &str| v.get(k).and_then(Value::as_f64).unwrap_or(0.0);
     let version = num(&header, "version");
-    if ![VERSION_STUBS, VERSION, 3.0, 2.0, 1.0].contains(&version) {
+    if ![VERSION_MEMORY, VERSION_STUBS, VERSION, 3.0, 2.0, 1.0].contains(&version) {
         return Err(CheckpointError(format!("unknown version {version}")));
     }
     let mut at = pad8(4 + len);
@@ -299,6 +327,13 @@ pub fn load_world(bytes: &[u8]) -> Result<World, CheckpointError> {
                     crate::principles::stubs::set(&mut world.stubs, sp, k as u32, n as u32);
                 }
             }
+        }
+    }
+    if let Some(memory) = header.get("lightMemory") {
+        let list = |k: &str| memory.get(k).and_then(Value::as_array).unwrap_or(&[]);
+        world.ground_light = list("cells").iter().filter_map(Value::as_f64).collect();
+        for (t, m) in world.trees.iter_mut().zip(list("trees")) {
+            t.light_mean = m.as_f64();
         }
     }
     Ok(world)
@@ -660,6 +695,82 @@ mod tests {
         assert!(v2.stubs.is_empty() && v3.stubs.is_empty());
         let v4 = load_world(&save_world(&carbon_world())).unwrap();
         assert!(v4.stubs.is_empty());
+    }
+
+    /// `stub_world` with O4's light memory on (τ 4) for its two seasons.
+    fn memory_world() -> World {
+        let params = preset(
+            "default",
+            r#"{"o4":{"enabled":true,"stubs":true,"stubDeath":0.1,"stubDemote":0.05,"cSeed":2,
+                "d":10,"qEst":0.1,"pEst":1,"m0":0,"maxTrees":100,"lightMemory":4}}"#,
+        );
+        let mut w = World::new(params);
+        w.run(2, &[]);
+        crate::principles::stubs::set(&mut w.stubs, "", 5, 40);
+        w
+    }
+
+    #[test]
+    fn the_light_memory_round_trips_as_version_6_and_grows_on_alike() {
+        let mut straight = memory_world();
+        assert!(!straight.ground_light.is_empty());
+        assert!(straight.trees.iter().any(|t| t.light_mean.is_some()));
+        let bytes = save_world(&straight);
+        assert_eq!(
+            header_of(&bytes).get("version").and_then(Value::as_f64),
+            Some(6.0)
+        );
+        let mut loaded = load_world(&bytes).unwrap();
+        assert_eq!(loaded.ground_light, straight.ground_light);
+        let means = |w: &World| w.trees.iter().map(|t| t.light_mean).collect::<Vec<_>>();
+        assert_eq!(means(&loaded), means(&straight));
+        assert_eq!(loaded.stubs, straight.stubs);
+        assert_eq!(hash_world(&loaded), hash_world(&straight));
+        assert_eq!(save_world(&loaded), bytes);
+        straight.run(3, &[]);
+        loaded.run(3, &[]);
+        assert_eq!(hash_world(&loaded), hash_world(&straight));
+        assert_eq!(means(&loaded), means(&straight));
+    }
+
+    #[test]
+    fn the_hash_sees_the_light_memory_only_when_it_keeps_a_mean() {
+        let mut w = memory_world();
+        let with = hash_world(&w);
+        w.ground_light[3] += 0.25;
+        assert_ne!(hash_world(&w), with);
+        // Cleared, the world hashes and saves as it would without the memory (version 5 here).
+        w.ground_light.clear();
+        for t in w.trees.iter_mut() {
+            t.light_mean = None;
+        }
+        let bytes = save_world(&w);
+        assert_eq!(
+            header_of(&bytes).get("version").and_then(Value::as_f64),
+            Some(5.0)
+        );
+        assert!(header_of(&bytes).get("lightMemory").is_none());
+    }
+
+    #[test]
+    fn pre_change_checkpoints_load_with_no_light_memory_and_grow_on_with_it() {
+        let v2 = load_world(include_bytes!("../../../tests/fixtures/checkpoint-v2.bin")).unwrap();
+        let v3 = load_world(include_bytes!("../../../tests/fixtures/checkpoint-v3.bin")).unwrap();
+        let v5 = load_world(&save_world(&stub_world())).unwrap();
+        for w in [&v2, &v3, &v5] {
+            assert!(w.ground_light.is_empty());
+            assert!(w.trees.iter().all(|t| t.light_mean.is_none()));
+        }
+        // A v5 world turned to the memory by a params patch starts its means on the next season.
+        let mut on = v5;
+        on.run(
+            1,
+            &[
+                json::parse(r#"{"season":2,"type":"params","patch":{"o4":{"lightMemory":4}}}"#)
+                    .unwrap(),
+            ],
+        );
+        assert!(!on.ground_light.is_empty());
     }
 
     #[test]

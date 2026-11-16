@@ -63,6 +63,10 @@ pub struct World {
     /// §O4.11's seedling stubs (ADR 0072): per species name, the stubs in each ground cell
     /// (`principles::stubs::cell`). Empty unless `o4.stubs` is on; saved in checkpoints.
     pub stubs: Stubs,
+    /// O4's light memory (ADR 0073; `principles::memory`): each ground cell's running mean of
+    /// Q/C, indexed as `stubs::cell`. Empty until `o4.lightMemory` first folds it; saved in
+    /// checkpoints (version 6) and hashed only when not empty.
+    pub ground_light: Vec<f64>,
 }
 
 /// The stub pool's shape: (species, count per cell index), species in name order and each list
@@ -133,6 +137,7 @@ impl World {
             pending: Vec::new(),
             notices: Vec::new(),
             stubs: Stubs::new(),
+            ground_light: Vec::new(),
         };
         world.plant_due();
         world
@@ -239,7 +244,7 @@ impl World {
         self.owner = grid(&self.rules.params);
     }
 
-    fn apply(&mut self, e: Value) {
+    pub(crate) fn apply(&mut self, e: Value) {
         let kind = e
             .get("type")
             .and_then(Value::as_str)
@@ -249,9 +254,16 @@ impl World {
         match kind.as_str() {
             "params" => {
                 let patch = e.get("patch").cloned().unwrap_or(Value::obj());
+                let before = self.rules.params.world.width;
+                let depth = crate::light::depth_of(&self.rules.params);
                 self.params_json = json::merge(&self.params_json, &patch);
                 self.rules = Rules::new(&self.params_json);
                 self.light = make_light(&self.rules.params);
+                // ADR 0073: a new ground layout restarts O4's cell means (the trees' keep theirs).
+                let p = &self.rules.params;
+                if p.world.width != before || crate::light::depth_of(p) != depth {
+                    self.ground_light.clear();
+                }
             }
             "plantTree" => {
                 let p = &self.rules.params;

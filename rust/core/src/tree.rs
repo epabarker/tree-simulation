@@ -318,6 +318,9 @@ pub struct Tree {
     pub shed_count: f64,
     pub mean_bud_q: f64,
     pub q_top: f64,
+    /// O4's light memory (ADR 0073): the running mean of Q_top/C, None until the memory first
+    /// folds it. Not a scalar: saved in checkpoint version 6's header, hashed only when set.
+    pub light_mean: Option<f64>,
     pub production: f64,
     pub maintenance: f64,
     pub reserve: f64,

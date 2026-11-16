@@ -2,6 +2,15 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-16: #137's seed-supply probe: only hornbeam's supply × 1/60 moves the cap; nothing ends it
+
+- **The probe:** [docs/experiments/2026-11-16-seed-supply-probe.md](experiments/2026-11-16-seed-supply-probe.md), `cli/seed-supply-probe.ts`; bars committed before the runs (7f21a7c). Hornbeam's supply ½, ¼, 1/10 and 1/60 (`cSeed` 10, 20, 50, 300), all species ¼ as a contrast; widths 160 and 66, seeds 1–20, 300 seasons, 6 simulators.
+- **Surprise: `o4.cSeed` is a cost per seed** (⌊pool / cSeed⌋ seeds), so a supply cut raises it. The brief's "cSeed × 0.5" would have doubled the supply; the arms were set as supply cuts.
+- **Result:** every arm run to 20 seeds passes the bars (h2 failed the pilot). Only h60 moves the cap by much: a median 31 seasons a run fewer on the desktop (235 → 206), 96 on the phone (186.5 → 78.5). The milder cuts move it by 2–20. No run of any arm is cap-free: the other species' seeds refill every slot.
+- Hornbeam keeps every desktop canopy frame; recruitment shifts towards beech, maple and birch (hornbeam's share of recruits reaching 1.3 m 0.69 → 0.58). The flood of drawn stems is unchanged.
+- A draft [ADR 0070](decisions/0070-hornbeam-seed-supply.md) (proposed, not accepted) for hornbeam `cSeed` 300. No default, golden, preset or regression changed. The stubs (§O4.11) remain #137's answer for ending the cap.
+||||||| a1ac407
+
 ## 2026-11-16: #138's sapling release: R5's δλ or a reserve bank; no arm passes, `dl25` nearest
 
 - **The rule** (0d31afe, 6af72f5; ADR 0004's revisit): `r1.unspent: "banked"` (absent "lost", off and bit-identical) with `r1.keep` (absent 1).

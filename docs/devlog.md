@@ -2,6 +2,14 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-16: #138's confirmation on 20 seeds: `r5.dLambda` 0.40 passes; recommended, not adopted
+
+- **The probe:** the `dl*` arms of [the sapling-release probe](experiments/2026-11-16-sapling-release-probe.md) on seeds 1–20 at widths 160 and 66 to season 300, bars committed before the runs (c2b72fe). `dl40` (0.40) added as the bracket above. 213 runs plus the pilot's 27, 117 min on 6 simulators. `cli/sapling-release-probe.ts` gains `--no-lone` and `--confirm`.
+- **Result:** `dl40` passes all five bars: no-growth falls in 18 / 20 seeds paired against HEAD, the median gain rises in 20 / 20, pooled no-growth 0.75 → 0.60 (bar 0.61), gates 20 / 20 at both widths, canopy/ha 109 → 188 and 76 → 133. `dl25` misses the pooled bar by 0.01 again (0.62), `dl10` by 0.09.
+- **Costs, reported:** ≥ 7 cm stems 852/ha at 160 cells (HEAD 266, band 200–400); maple, holly and rowan freeze harder (maple 0.78 → 0.97); the phone's seedling bank 55 → 33.5 a frame.
+- **Surprise:** HEAD's pooled no-growth is 0.75 on 20 seeds, not the pilot's 0.71, so the fixed 0.61 bar is HEAD − 0.14.
+- [ADR 0071](decisions/0071-shade-apical-control.md) drafted as proposed (world vs per-species scope, and what adoption touches). Lone beech hash-identical at 0.25 and 0.40. No default, golden, preset or regression changed.
+
 ## 2026-11-16: #137's seed-supply probe: only hornbeam's supply × 1/60 moves the cap; nothing ends it
 
 - **The probe:** [docs/experiments/2026-11-16-seed-supply-probe.md](experiments/2026-11-16-seed-supply-probe.md), `cli/seed-supply-probe.ts`; bars committed before the runs (7f21a7c). Hornbeam's supply ½, ¼, 1/10 and 1/60 (`cSeed` 10, 20, 50, 300), all species ¼ as a contrast; widths 160 and 66, seeds 1–20, 300 seasons, 6 simulators.

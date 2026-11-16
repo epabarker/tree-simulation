@@ -1,6 +1,6 @@
-# 0071: R5's shade term on λ raised to δλ 0.40, so shaded saplings grow (proposed)
+# 0071: R5's shade term on λ raised to δλ 0.40, so shaded saplings grow (deferred)
 
-- **Status:** proposed (drafted by the session that ran #138's confirmation, 2026-11-16). **Not adopted:** nothing in `params.ts`, `flora.ts`, the presets or the goldens changes until the user accepts it.
+- **Status:** deferred (the main session, under the user's delegation, 2026-11-16). **Not adopted:** nothing in `params.ts`, `flora.ts`, the presets or the goldens changes. dl40 clears the pooled bar by 0.01 (0.60 against ≤ 0.61), and it costs more than it gains: stems ≥ 7 cm reach 852/ha at 160 cells, more than twice the top of ADR 0068's band (200–400; HEAD 266), canopy trees/ha go from 109 to 188, and maple's no-growth share rises from 0.78 to 0.97. #134 is about to change the stand, so this is re-probed there, beside #132's ramp, which has to absorb the stems ≥ 7 cm. A per-species patch (beech and hornbeam) is the variant to try first.
 - **Spec:** §R5 (δλ: λ + δλ·s at a shaded node), §C3.4 (v < 1 grows nothing), §R1.4. ADRs 0004, 0012, 0068.
 - **Ticket:** [#138](https://github.com/epabarker/tree-simulation/issues/138).
 - **Evidence:** [the sapling-release probe](../experiments/2026-11-16-sapling-release-probe.md): the pilot (seeds 1–3) and its "Confirmation" (seeds 1–20 at widths 160 and 66, bars committed before the runs).

@@ -1,0 +1,81 @@
+
+head at ea5a247 ({})
+  160: gate1 3/3 | cap seasons med 230 (below head NaN/3, free 0) | canopy/ha med 156.25 | hornbeam in canopy 9/9, share med 0.40 | other > ½ canopy 0/9
+       stubs/ha med 0 [0–0] () | cap per run 184 230 252 | paired change med NaN
+       bank med 72 (hornbeam 72, beech 10, holly 2, maple 0, birch 0) | ≥7cm med 250/ha, share med 0.55 | drawn med 1375/ha | wall med 362 s
+       seeds/run 429531 (hornbeam 412633) | recruits/run 1016 (hornbeam 0.66) | reaching 1.3 m/run 122.3 (hornbeam 0.78; hornbeam 285, maple 53, holly 13, willow 9, beech 4, birch 3)
+       canopy tree-frames by species: hornbeam 34, rowan 12, birch 12, oak 8, beech 6, holly 4, maple 3, willow 2
+  66: gate1 3/3, gate2 3/3 | cap seasons med 174 (below head NaN/3, free 0) | canopy/ha med 75.76 | hornbeam in canopy 9/9, share med 0.50 | other > ½ canopy 0/9
+       stubs/ha med 0 [0–0] () | cap per run 174 231 172 | paired change med NaN
+       bank med 57 (hornbeam 44, beech 5, holly 1, oak 0) | ≥7cm med 114/ha, share med 0.67 | drawn med 341/ha | wall med 106 s
+       seeds/run 284337 (hornbeam 278444) | recruits/run 769 (hornbeam 0.75) | reaching 1.3 m/run 53.3 (hornbeam 0.86; hornbeam 138, maple 11, willow 6, holly 2, oak 2, birch 1)
+       canopy tree-frames by species: hornbeam 13, holly 3, oak 3, beech 2, rowan 1
+  test: lone hornbeam s1 859812b6: true
+  test: lone hornbeam s2 66b88c89: true
+  test: lone hornbeam s3 f4a96f3e: true
+  test: garden checkpoint (66, seed 1, season 30) v4 round-trips and grows on alike: true
+  test: checkpoint-v2 loads with no stubs and grows on alike: true
+  test: checkpoint-v3 loads with no stubs and grows on alike: true
+  test: garden-0.14.0 loads with no stubs and grows on alike: true
+
+s1 at ea5a247 ({"params":{"o4":{"stubs":true,"stubLight":0.15,"stubDeath":1}}})
+  160: gate1 3/3 | cap seasons med 208 (below head 2/3, free 0) | canopy/ha med 140.63 | hornbeam in canopy 9/9, share med 0.40 | other > ½ canopy 0/9
+       stubs/ha med 149922 [14969–207078] (hornbeam 126470, beech 1641, oak 587, birch 299, maple 127, rowan 47, willow 24) | cap per run 207 227 208 | paired change med -3
+       bank med 64 (hornbeam 72, beech 6, maple 0, rowan 0) | ≥7cm med 234/ha, share med 0.67 | drawn med 1078/ha | wall med 341 s
+       seeds/run 538164 (hornbeam 512108) | recruits/run 833 (hornbeam 0.75) | reaching 1.3 m/run 140.0 (hornbeam 0.87; hornbeam 366, maple 42, willow 9, birch 3)
+       canopy tree-frames by species: hornbeam 39, rowan 10, beech 10, birch 9, oak 4, holly 4, willow 3, maple 3
+  66: gate1 3/3, gate2 3/3 | cap seasons med 204 (below head 1/3, free 0) | canopy/ha med 37.88 | hornbeam in canopy 8/9, share med 1.00 | other > ½ canopy 1/9
+       stubs/ha med 170038 [27917–210492] (hornbeam 151263, beech 2715, oak 362, willow 17, birch 13) | cap per run 204 210 178 | paired change med 6
+       bank med 58 (hornbeam 53, beech 3, oak 0) | ≥7cm med 76/ha, share med 0.50 | drawn med 227/ha | wall med 123 s
+       seeds/run 253650 (hornbeam 248100) | recruits/run 690 (hornbeam 0.86) | reaching 1.3 m/run 36.3 (hornbeam 0.86; hornbeam 94, maple 8, willow 6, birch 1)
+       canopy tree-frames by species: hornbeam 8, oak 3, beech 2, holly 1, rowan 1
+  test: lone hornbeam s1 859812b6: true
+  test: lone hornbeam s2 66b88c89: true
+  test: lone hornbeam s3 f4a96f3e: true
+  test: garden checkpoint (66, seed 1, season 30) v5 round-trips and grows on alike: true
+  test: checkpoint-v2 loads with no stubs and grows on alike: true
+  test: checkpoint-v3 loads with no stubs and grows on alike: true
+  test: garden-0.14.0 loads with no stubs and grows on alike: true
+
+s3 at ea5a247 ({"params":{"o4":{"stubs":true,"stubLight":0.15,"stubDeath":3}}})
+  160: gate1 3/3 | cap seasons med 199 (below head 2/3, free 0) | canopy/ha med 156.25 | hornbeam in canopy 9/9, share med 0.50 | other > ½ canopy 0/9
+       stubs/ha med 42156 [31250–87563] (hornbeam 47036, beech 549, oak 127, birch 120, maple 21, willow 7) | cap per run 199 223 180 | paired change med -7
+       bank med 70 (hornbeam 79, beech 2) | ≥7cm med 234/ha, share med 0.57 | drawn med 1156/ha | wall med 312 s
+       seeds/run 527633 (hornbeam 501407) | recruits/run 781 (hornbeam 0.83) | reaching 1.3 m/run 131.3 (hornbeam 0.88; hornbeam 347, maple 34, willow 9, birch 3, beech 1)
+       canopy tree-frames by species: hornbeam 44, rowan 10, beech 9, birch 9, oak 4, holly 4, willow 2, maple 1
+  66: gate1 3/3, gate2 3/3 | cap seasons med 199 (below head 2/3, free 0) | canopy/ha med 37.88 | hornbeam in canopy 9/9, share med 1.00 | other > ½ canopy 0/9
+       stubs/ha med 40947 [5720–89811] (hornbeam 46561, beech 535, oak 143, birch 8, willow 4) | cap per run 199 205 166 | paired change med -6
+       bank med 53 (hornbeam 47, beech 0) | ≥7cm med 76/ha, share med 0.50 | drawn med 227/ha | wall med 110 s
+       seeds/run 252006 (hornbeam 247243) | recruits/run 575 (hornbeam 0.92) | reaching 1.3 m/run 48.0 (hornbeam 0.90; hornbeam 129, maple 8, willow 6, birch 1)
+       canopy tree-frames by species: hornbeam 10, oak 3, beech 2, holly 1, rowan 1
+  test: lone hornbeam s1 859812b6: true
+  test: lone hornbeam s2 66b88c89: true
+  test: lone hornbeam s3 f4a96f3e: true
+  test: garden checkpoint (66, seed 1, season 30) v5 round-trips and grows on alike: true
+  test: checkpoint-v2 loads with no stubs and grows on alike: true
+  test: checkpoint-v3 loads with no stubs and grows on alike: true
+  test: garden-0.14.0 loads with no stubs and grows on alike: true
+
+s1q10 at ea5a247 ({"params":{"o4":{"stubs":true,"stubLight":0.1,"stubDeath":1}}})
+  160: gate1 3/3 | cap seasons med 230 (below head 0/3, free 0) | canopy/ha med 125.00 | hornbeam in canopy 9/9, share med 0.29 | other > ½ canopy 0/9
+       stubs/ha med 137688 [66094–206281] (hornbeam 131766, oak 668, beech 573, birch 323, maple 149, willow 24, holly 14, rowan 2) | cap per run 207 230 254 | paired change med 2
+       bank med 58 (hornbeam 76, beech 3, holly 1, rowan 0, maple 0, oak 0) | ≥7cm med 234/ha, share med 0.67 | drawn med 1594/ha | wall med 329 s
+       seeds/run 539469 (hornbeam 511749) | recruits/run 1061 (hornbeam 0.63) | reaching 1.3 m/run 127.3 (hornbeam 0.80; hornbeam 304, maple 50, willow 9, beech 8, holly 5, birch 3, rowan 3)
+       canopy tree-frames by species: hornbeam 22, rowan 12, birch 11, oak 9, beech 7, willow 4, holly 3, maple 3
+  66: gate1 3/3, gate2 3/3 | cap seasons med 225 (below head 1/3, free 0) | canopy/ha med 37.88 | hornbeam in canopy 9/9, share med 1.00 | other > ½ canopy 0/9
+       stubs/ha med 181212 [28409–237083] (hornbeam 174794, beech 3060, willow 17, birch 13) | cap per run 212 225 227 | paired change med 38
+       bank med 59 (hornbeam 52, beech 5) | ≥7cm med 76/ha, share med 0.50 | drawn med 265/ha | wall med 101 s
+       seeds/run 267939 (hornbeam 263352) | recruits/run 707 (hornbeam 0.76) | reaching 1.3 m/run 40.0 (hornbeam 0.87; hornbeam 104, maple 9, willow 6, birch 1)
+       canopy tree-frames by species: hornbeam 10, beech 3, rowan 1, oak 1
+  test: lone hornbeam s1 859812b6: true
+  test: lone hornbeam s2 66b88c89: true
+  test: lone hornbeam s3 f4a96f3e: true
+  test: garden checkpoint (66, seed 1, season 30) v5 round-trips and grows on alike: true
+  test: checkpoint-v2 loads with no stubs and grows on alike: true
+  test: checkpoint-v3 loads with no stubs and grows on alike: true
+  test: garden-0.14.0 loads with no stubs and grows on alike: true
+
+runs wall 15.6 min on 6 simulators
+s1: gates pass, capWellBelowHead FAIL, canopyPerHa FAIL, hornbeamInCanopy pass, noTakeover pass, cheapOnPhone pass → fails
+s3: gates pass, capWellBelowHead FAIL, canopyPerHa pass, hornbeamInCanopy pass, noTakeover pass, cheapOnPhone pass → fails
+s1q10: gates pass, capWellBelowHead FAIL, canopyPerHa FAIL, hornbeamInCanopy pass, noTakeover pass, cheapOnPhone pass → fails

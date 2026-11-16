@@ -369,7 +369,7 @@ PARAMS = [
     ("o4.cSeed / d", "o4", [("O4_STAND", o4on)]),
     ("o4.qEst / pEst", "o4", [("O4_STAND", o4on)]),
     ("o4.maxTrees / rain / band", "o4", [("O4_STAND", o4on)]),
-    ("o4.stubs / stubLight / stubDeath", "o4", [("O4_STAND", o4on)]),
+    ("o4.stubs / stubLight / stubDeath / stubDemote", "o4", [("O4_STAND", o4on)]),
     ("seed", "world", [("C4_DIR", always), ("R4_FATE", stochastic), ("C1_SHOOT", always), ("STORM", storms), ("O4_STAND", o4on), ("O2_ABRADE", o2on)]),
 ]
 

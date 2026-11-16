@@ -628,7 +628,10 @@ mod tests {
     fn the_stub_pool_round_trips_as_version_5_and_grows_on_alike() {
         let mut straight = stub_world();
         let bytes = save_world(&straight);
-        assert_eq!(header_of(&bytes).get("version").and_then(Value::as_f64), Some(5.0));
+        assert_eq!(
+            header_of(&bytes).get("version").and_then(Value::as_f64),
+            Some(5.0)
+        );
         let mut loaded = load_world(&bytes).unwrap();
         assert_eq!(loaded.stubs, straight.stubs);
         assert_eq!(hash_world(&loaded), hash_world(&straight));

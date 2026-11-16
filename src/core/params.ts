@@ -671,6 +671,12 @@ export interface Params {
      */
     stubDeath?: number;
     /**
+     * θ_demote: with stubs on, a live tree of age ≥ 1 below the display threshold whose crown-top
+     * light Q_top/C is below this returns to its cell's stubs (ADR 0071); species-merged. Absent:
+     * 0 (no demotion).
+     */
+    stubDemote?: number;
+    /**
      * Seed rain (ADR 0018): seeds a season, per 100 cells of ground, that blow or are carried in
      * from beyond the world and land anywhere, then establish by the same rule as local seeds.
      * Per species, so a light-seeded pioneer can return to a clearing after it has died out

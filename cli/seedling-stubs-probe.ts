@@ -5,7 +5,7 @@
  * hand. The bars were fixed before the runs: docs/experiments/2026-11-16-seedling-stubs-probe.md.
  *
  * Arms: head; s1 (stubs on, stubLight 0.15, stubDeath 1); s3 (stubDeath 3); s1q10 (stubLight 0.10,
- * a pilot-only light bracket).
+ * a pilot-only light bracket); s1d, s3d (s1 and s3 with stubDemote 0.075: the addendum).
  *
  * Gates (#122; ≥ 18 of 20 seeds at both widths): a canopy tree in every season after 50; at 66
  * cells, one in every season from 100; checkpoints (frozen fixtures load with no stubs and grow on
@@ -40,11 +40,18 @@ const stubs = (stubLight: number, stubDeath: number): Patch => ({
   params: { o4: { stubs: true, stubLight, stubDeath } } as Patch["params"],
 });
 
+/** As `stubs`, with bank trees darker than `stubDemote` at the top returned to stubs (the addendum). */
+const demoting = (stubLight: number, stubDeath: number, stubDemote: number): Patch => ({
+  params: { o4: { stubs: true, stubLight, stubDeath, stubDemote } } as Patch["params"],
+});
+
 export const ARMS: Record<string, Patch> = {
   head: {},
   s1: stubs(0.15, 1),
   s3: stubs(0.15, 3),
   s1q10: stubs(0.1, 1),
+  s1d: demoting(0.15, 1, 0.075),
+  s3d: demoting(0.15, 3, 0.075),
 };
 export const WIDTHS = [160, 66];
 export const SEASONS = 300;

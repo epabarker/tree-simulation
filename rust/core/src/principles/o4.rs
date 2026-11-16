@@ -14,13 +14,15 @@
 //! is at least Q_est with probability p_est [RNG: establishment], with no live trunk within a
 //! cell; seed rain from beyond the world lands per species anywhere on the ground [RNG: seedRain].
 //! Local seeds and rain establish anywhere in the depth (ADR 0063, decision 4). Seedlings start
-//! next season; live trees, the seedling bank included, are capped at maxTrees.
+//! next season; live trees, the seedling bank included, are capped at maxTrees. With o4.stubs on
+//! (§O4.11, ADR 0071; `stubs.rs`), seeds that cannot stand become per-cell stubs outside the cap,
+//! promoted to trees where lit and returned to stubs when dark.
 //!
 //! Params: o4.mortality; sizeBlind reads o4.m0, twoPart reads o4.mCanopy, o4.hCanopy,
 //! o4.gammaCanopy, o4.mSuppression, o4.suppressionSlope and o4.shadeTolerance (per species, as m₀
 //! is), o4.topLightThreshold and o4.survivalLight (per species, ADR 0068), o4.suppressionSignal,
 //! o4.growthSeasons and o4.growthFloor (the world's) and r1.enabled; then o4.cSeed, d, qEst,
-//! pEst, maxTrees, rain, r1.fRep and r1.maturity (the seed supply), c2.C.
+//! pEst, maxTrees, rain, r1.fRep and r1.maturity (the seed supply), c2.C; o4.stubs and `stubs.rs`'s.
 
 use super::c1::{plant_seedling, seedling_azimuth};
 use crate::math;
@@ -232,6 +234,7 @@ pub fn stand_dynamics(world: &mut World) -> f64 {
     if stubs {
         super::stubs::deaths(world);
         recruits += super::stubs::promote(world, &mut live);
+        live -= super::stubs::demote(world);
     }
     // No live trunk within a cell, on the ground plane.
     let spaced = |trees: &[Tree], x: f64, z: f64| {

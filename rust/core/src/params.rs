@@ -451,6 +451,10 @@ pub struct O4 {
     /// m_stub: a stub's death rate per season at shade tolerance 1, scaled as the suppression rate
     /// is, e^(−β_s(T − 1)) (species-merged; absent: 0, no stub dies).
     pub stub_death: f64,
+    /// θ_demote: a live tree of age ≥ 1 below the display threshold whose crown-top light
+    /// Q_top/C is below this returns to its cell's stubs (ADR 0071's addendum; species-merged;
+    /// absent: 0, no demotion).
+    pub stub_demote: f64,
     /// Planting at a density (ADR 0063, decision 5; `principles::planting`); None: `trees`.
     pub planting: Option<Planting>,
 }
@@ -804,6 +808,7 @@ impl Params {
                 stubs: flag(o4, "stubs"),
                 stub_light: opt(o4, "stubLight").unwrap_or(0.0),
                 stub_death: opt(o4, "stubDeath").unwrap_or(0.0),
+                stub_demote: opt(o4, "stubDemote").unwrap_or(0.0),
                 planting: o4.get("planting").map(|g| Planting {
                     density: num(g, "density"),
                     spacing: num(g, "spacing"),

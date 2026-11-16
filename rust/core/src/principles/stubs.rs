@@ -9,9 +9,13 @@
 //! cells holding stubs, with no live trunk within a cell of their centre, are visited brightest
 //! first, and while the cap has room a cell lit to a stub species' threshold promotes one stub of
 //! the species so lit, drawn by count [RNG: stubPromotion], to a seedling at the cell's centre,
-//! next season, as an established seed is. At most one a cell a season.
+//! next season, as an established seed is. At most one a cell a season. Then, "until lit" read
+//! both ways (ADR 0071's addendum), each live tree of age ≥ 1 below the display threshold whose
+//! crown-top light Q_top/C (C5's, phase 2) is below `o4.stubDemote` leaves the stand and joins its
+//! root cell's stubs; it draws no stub death this season.
 //!
-//! Params: o4.stubs (the world's), o4.stubLight and o4.stubDeath (species-merged), with o4.qEst,
+//! Params: o4.stubs (the world's), o4.stubLight, o4.stubDeath and o4.stubDemote (species-merged),
+//! with o4.qEst,
 //! o4.suppressionSlope, o4.shadeTolerance and o4.maxTrees; c2.C.
 
 use super::c1::{plant_seedling, seedling_azimuth};
@@ -129,8 +133,11 @@ pub fn promote(world: &mut World, live: &mut f64) -> f64 {
     }
     let depth = crate::light::depth_of(params);
     let taken = blocked(world, width, depth);
-    let cells: std::collections::BTreeSet<u32> =
-        world.stubs.values().flat_map(|m| m.keys().copied()).collect();
+    let cells: std::collections::BTreeSet<u32> = world
+        .stubs
+        .values()
+        .flat_map(|m| m.keys().copied())
+        .collect();
     let mut lit: Vec<(f64, u32)> = cells
         .into_iter()
         .filter(|&k| !taken.get(k as usize).copied().unwrap_or(true))
@@ -193,6 +200,31 @@ pub fn promote(world: &mut World, live: &mut f64) -> f64 {
         planted += 1.0;
     }
     planted
+}
+
+/// Returns to the pool every bank tree (age ≥ 1, not drawn) whose top light Q_top/C is below its
+/// species' `stubDemote`. Returns how many left the stand.
+pub fn demote(world: &mut World) -> f64 {
+    let (width, c) = (world.rules.params.world.width, world.rules.params.c2.c);
+    if c <= 0.0 {
+        return 0.0;
+    }
+    let mut gone = 0.0;
+    for i in 0..world.trees.len() {
+        let t = &world.trees[i];
+        let at = world.rules.of(&t.species).o4.stub_demote;
+        if !(t.alive && t.age >= 1.0 && at > 0.0) || t.q_top / c >= at {
+            continue;
+        }
+        if crate::stand::is_drawn(crate::stand::stem_height(t)) {
+            continue;
+        }
+        let (x, z, species) = (t.root_x, t.root_z, t.species.clone());
+        world.trees[i].alive = false;
+        add(&mut world.stubs, &species, x, z, width);
+        gone += 1.0;
+    }
+    gone
 }
 
 #[cfg(test)]
@@ -287,11 +319,21 @@ mod tests {
         stand_dynamics(&mut keep);
         // The cell is lit and free and the cap has room, so one of them was promoted.
         assert_eq!(total(&keep.stubs), 999.0);
-        let mut half = pooled(r#"{"o4":{"stubDeath":0.5,"shadeTolerance":1}}"#, 1000, 10.0, 10.0);
+        let mut half = pooled(
+            r#"{"o4":{"stubDeath":0.5,"shadeTolerance":1}}"#,
+            1000,
+            10.0,
+            10.0,
+        );
         stand_dynamics(&mut half);
         let n = total(&half.stubs);
         assert!((440.0..560.0).contains(&n), "{n}");
-        let mut all = pooled(r#"{"o4":{"stubDeath":1,"shadeTolerance":1}}"#, 1000, 10.0, 10.0);
+        let mut all = pooled(
+            r#"{"o4":{"stubDeath":1,"shadeTolerance":1}}"#,
+            1000,
+            10.0,
+            10.0,
+        );
         stand_dynamics(&mut all);
         assert!(all.stubs.is_empty());
         assert_eq!(all.trees.len(), 1); // none was left to promote
@@ -322,6 +364,48 @@ mod tests {
             assert_eq!(stand_dynamics(&mut w), 0.0, "{patch} {x}");
             assert_eq!(total(&w.stubs), 3.0, "{patch} {x}");
         }
+    }
+
+    /// The test world's parent as a bank tree of age 1 whose top sees `q` of open sky.
+    fn shaded(patch: &str, q: f64) -> World {
+        let mut w = on(patch);
+        let c = w.params().c2.c;
+        (w.trees[0].age, w.trees[0].q_top) = (1.0, q * c);
+        w
+    }
+
+    #[test]
+    fn a_bank_tree_whose_top_is_darker_than_stub_demote_returns_to_its_cells_stubs() {
+        let mut w = shaded(r#"{"o4":{"stubDemote":0.075}}"#, 0.05);
+        assert!(!crate::stand::is_drawn(crate::stand::stem_height(
+            &w.trees[0]
+        )));
+        let (x, z) = (w.trees[0].root_x, w.trees[0].root_z);
+        stand_dynamics(&mut w);
+        assert!(!w.trees[0].alive);
+        assert_eq!(w.stubs[""][&cell(x, z, 100.0)], 1);
+        // At or above stubDemote, or with none set, it stays a tree.
+        for (patch, q) in [(r#"{"o4":{"stubDemote":0.075}}"#, 0.075), ("{}", 0.0)] {
+            let mut w = shaded(patch, q);
+            stand_dynamics(&mut w);
+            assert!(w.trees[0].alive && w.stubs.is_empty(), "{patch} {q}");
+        }
+    }
+
+    #[test]
+    fn a_drawn_tree_or_a_seedling_of_this_season_is_never_demoted() {
+        let mut young = shaded(r#"{"o4":{"stubDemote":0.075}}"#, 0.0);
+        young.trees[0].age = 0.0;
+        stand_dynamics(&mut young);
+        assert!(young.trees[0].alive);
+        let mut tall = shaded(r#"{"o4":{"stubDemote":0.075}}"#, 0.0);
+        let t = &mut tall.trees[0];
+        for i in 0..t.m.len() {
+            t.m.length[i] = 10.0; // well over 1.3 m (5.2 cells)
+        }
+        assert!(crate::stand::is_drawn(crate::stand::stem_height(t)));
+        stand_dynamics(&mut tall);
+        assert!(tall.trees[0].alive);
     }
 
     #[test]

@@ -144,7 +144,8 @@ pub fn growth_deficit(t: &Tree, season: f64, k: f64, floor: f64) -> f64 {
 
 /// Whether the ground at (x, z) is lit to `at` of open sky C (c > 0).
 fn lit(world: &World, x: f64, z: f64, c: f64, at: f64) -> bool {
-    c > 0.0 && world.light.sample(x, 0.5, z).0 / c >= at
+    let y = world.rules.params.o4.stub_light_y;
+    c > 0.0 && world.light.sample(x, y, z).0 / c >= at
 }
 
 /// Background deaths, seeds, dispersal and establishment. Returns the season's recruits.

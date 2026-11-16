@@ -28,7 +28,7 @@ So the 29 m stop is R1's maturity switch, not light, hydraulics or form: a step 
 
 ### B.1 The trace (s3d, 160 cells, seed 1, 150 seasons, WASM)
 
-`churn.ts` follows every tree recruited in the run: a promoted stub (it stands on a cell's centre exactly) or a seed that became a tree at once (its landing point lit to `stubLight`). It records the light that recruited it (that season's field, at the root, y 0.5) and, every later season, its age, height and Q_top/C, until it leaves the stand or reaches 1.3 m. Output: `runs/137-churn/s3d-w160-s1.txt` (generated).
+`churn.ts` follows every tree recruited in the run: a promoted stub (it stands on a cell's centre exactly) or a seed that became a tree at once (its landing point lit to `stubLight`). It records the light that recruited it (that season's field, at the root, y 0.5) and, every later season, its age, height and Q_top/C, until it leaves the stand or reaches 1.3 m. Output: [`churn-trace.txt`](code/2026-11-16-stub-churn-and-hornbeam-ceiling/churn-trace.txt); the floor's, [`floor.txt`](code/2026-11-16-stub-churn-and-hornbeam-ceiling/floor.txt) and [`floor-norotate.txt`](code/2026-11-16-stub-churn-and-hornbeam-ceiling/floor-norotate.txt).
 
 | recruits (150 seasons) | n | demoted | reached 1.3 m | still bank trees | demoted after 1 / 2 / 3 / ≥ 4 seasons |
 |---|---|---|---|---|---|
@@ -70,4 +70,33 @@ Written and committed before any run of B.3. Nothing below this heading changes 
 - **Reported, not gated:** cap seasons per run, recruits reaching 1.3 m, the bank, the stub pool, drawn stems/ha, wall at 160 (head's and s3d's from the reused runs, made under another load: not comparable).
 - **Expected (B.1):** s3dY15 fails C1. s3dk3 and s3dk5 cut recruits by up to k-fold, but each holds bank trees k seasons, so the cap seasons may climb back toward s3 (no demotion), against C2's bar 1.
 
-_Results: below, after the runs._
+### B.4 Results (seeds 1–20)
+
+160 new runs (120 of the three arms; head and s3d at 66 cells) in about 2½ hours on 6 simulators beside another agent's 6 (load 18–30 on 16 cores, so every wall time here is slower than the stubs probe's; the ratios at 66 cells are within this run). **The reuse holds:** all 40 re-runs at 66 cells have the stubs probe's hashes. Gates 1–4 pass in every arm (the lone hornbeam's hashes are head's; the fixtures and the stubs-on checkpoint load and grow on alike). Output: [`bars.txt`](code/2026-11-16-stub-churn-and-hornbeam-ceiling/bars.txt), [`bars.json`](code/2026-11-16-stub-churn-and-hornbeam-ceiling/bars.json); the full summaries in `runs/stub-churn-probe/` (generated).
+
+| arm | gates | stubs bars 1–5 | C1 recruits/run, 160 / 66 (÷ s3d) | C3 wall/run, 66 (÷ s3d) | cap median, 160 / 66 | runs below head | reaching 1.3 m/run, 160 | bank, 160 / 66 | drawn/ha, 160 / 66 | verdict |
+|---|---|---|---|---|---|---|---|---|---|---|
+| head | – | – | 1,016 / 737 | 74 s | 235 / 186.5 | – | 162 | 68 / 55 | 1,297 / 322 | – |
+| s3d | ✓ | ✓✓✓✓✓ | 7,756 / 3,511 | 88 s (1.19 × head) | 79.5 / 11 | 20 / 20 | 140 | 50 / 20.5 | 657 / 152 | reference |
+| s3dY15 | ✓ | ✓✓✓✓✓ | 8,052 / 3,936 (1.04, 1.12) ✗ | 92 s (1.04) ✗ | 68.5 / 30 | 20 / 20 | 142 | 44 / 21.5 | 743 / 133 | fail |
+| s3dk3 | ✓ | ✗✓✓✓✓ | 4,912 / 2,426 (0.63, 0.69) ✗ | 86 s (0.97) ✓ | 141.5 / 45.5 | 20 / 19 | 149 | 69.5 / 44 | 1,172 / 189 | fail |
+| s3dk5 | ✓ | ✗✓✓✓✓ | 3,423 / 1,815 (0.44, 0.52) ✗ | 87 s (0.99) ✓ | 164.5 / 75 | 20 / 19 | 141 | 99.5 / 52.5 | 805 / 171 | fail |
+
+**No arm passes.** As B.1 predicted:
+- **Reading higher (s3dY15) changes nothing.** Recruits rise 4–12%; the cap, the bank and the pool are s3d's within noise. One season's light at any height says nothing about the next.
+- **The age gate trades churn for the cap, about one for one.** k 3 cuts recruits by a third and k 5 by about half (0.44 on the desktop, 0.52 on the phone: just short of C1 there), but every gated tree holds a slot k seasons whatever its light, so the bank of full trees re-forms (desktop 50 → 69.5 → 99.5 a frame) and the cap's median seasons climb back toward head's (79.5 → 141.5 → 164.5 on the desktop; bar 1 needs ≤ 117.5). Recruits reaching 1.3 m do not change (140–149 a run): the extra seasons give a shaded seedling nothing. The phone's season is no cheaper (0.97–0.99 × s3d).
+- Every arm keeps canopy trees/ha, hornbeam in the canopy (59–60 of 60 frames) and the gates.
+
+## Conclusions
+
+**A.** Confirmed: the lone hornbeam's 29.1–29.4 m stop is R1's maturity switch (`maturity` 115 cells, `fRep` 0.8): from the first season R1 finds it at 115 cells, growth drops to an eighth and the height stops; at maturity 140 it stops at 35.2–35.5 m, and with none it is at 44–51 m by 150. Report only: 29 m is a plausible hornbeam height, but the stop is a step, and any #134 arm that keeps λ will meet it.
+
+**B.** The churn s3d brings (7,756 recruits a run against head's 1,016) is not a mismatch between promotion's and demotion's measures: it is the floor's light under the garden's rotating 16-direction sky, which has no memory from one season to the next under a canopy (rank correlation 0.02 between seasons; 0.83 with `rotate` off). Promotion (brightest first) picks the season's luckiest cells, demotion reads the next season's draw; 98% of promotions are demoted, three quarters at age 1, and none reached 1.3 m in the traced run. Neither stateless fix passes: a different sampling height does nothing, and an age gate buys fewer recruits only with more seasons at the cap.
+
+**Recommendation.**
+1. **Adopt s3d as it is, accepting the churn, if it is adopted at all.** The churn is invisible (churned seedlings never reach 1.3 m) and costs the phone about 1.2 × head's season; neither tested fix reduces it without giving back the cap. Do not adopt `stubLightY` or `stubDemoteAge`: both stay as off probe params (or are removed with the PR, if preferred).
+2. **A per-tree counter would not help either** and is not worth building as the issue framed it: under a memoryless floor a "k dark seasons in a row" counter behaves as the age gate does (in B.1 a recruit's top read ≥ 0.075 in a quarter of first seasons, which would only reset it). What would help is a measure with memory, for both sides: a running mean of each bank tree's Q_top (state per tree, a checkpoint change) and of each stub cell's light (state per cell), or reading O4's establishment and demotion off a sky that does not rotate. Either is a design decision (ADR 0072 and §C2.8's rotation) for the user, not a probe param.
+3. **The flicker is wider than stubs.** Every O4 rule that reads one season's floor or bank light (HEAD's establishment at q_est, ADR 0068's top-light ramp) reads the same lottery. Worth a look before #132's ramp is re-probed.
+
+### What this PR changes
+Two params, absent from every preset (`o4.stubLightY`, absent 0.5; `o4.stubDemoteAge`, absent 1), with a unit test each; the probe script's three arms. `npm run check` green with the goldens unchanged; the garden's WASM 188.9 kB gzip (budget 200).

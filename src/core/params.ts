@@ -677,6 +677,15 @@ export interface Params {
      */
     stubDemote?: number;
     /**
+     * τ_L: O4's light memory (ADR 0073), seasons, the world's. Establishment (qEst, stubLight)
+     * and stub promotion read each ground cell's exponential running mean of Q/C, stub demotion
+     * and the "topLight" signal each tree's of Q_top/C, each folding a season's reading with
+     * weight 1 − e^(−1/τ). Seedling survival integrates light over years (ADR 0073's sources);
+     * under the garden's rotating sky one season's floor light is noise. Absent or 0: off,
+     * bit-identical.
+     */
+    lightMemory?: number;
+    /**
      * Seed rain (ADR 0018): seeds a season, per 100 cells of ground, that blow or are carried in
      * from beyond the world and land anywhere, then establish by the same rule as local seeds.
      * Per species, so a light-seeded pioneer can return to a clearing after it has died out

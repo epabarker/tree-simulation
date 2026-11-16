@@ -48,5 +48,18 @@ pub fn hash_world(world: &World) -> String {
             }
         }
     }
+    // O4's light memory (ADR 0073), only when it keeps a mean, so a world without it hashes as
+    // before.
+    if !world.ground_light.is_empty() || world.trees.iter().any(|t| t.light_mean.is_some()) {
+        h = fnv_int(h, world.ground_light.len() as u32);
+        for &m in &world.ground_light {
+            h = fnv_bytes(h, &m.to_le_bytes());
+        }
+        for tree in &world.trees {
+            if let Some(m) = tree.light_mean {
+                h = fnv_bytes(fnv_int(h, tree.id as u32), &m.to_le_bytes());
+            }
+        }
+    }
     format!("{h:08x}")
 }

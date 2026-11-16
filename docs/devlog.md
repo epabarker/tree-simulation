@@ -2,6 +2,19 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-16: O4's light memory (`o4.lightMemory`, ADR 0073): built off by default; probed against s3d
+
+- **The user's decision** (2026-11-16, in chat: "Yes, add light memory"), after the churn note found the floor's light under the canopy memoryless from one season to the next (ρ 0.02).
+- **The rule** (`principles/memory.rs`, [ADR 0073](decisions/0073-light-memory.md)): with τ > 0, stand dynamics first folds the season's light into exponential running means (weight 1 − e^(−1/τ)): per ground cell of Q/C (`World::ground_light`), per tree of Q_top/C (`Tree::light_mean`, starting from its cell's). Establishment (q_est, stubLight), stub promotion, stub demotion and the `topLight` signal read them. No randomness, plain `Vec`s.
+  - Checkpoint version 6 (the header's `lightMemory`) only when a mean is kept; versions 1–5 load with none. The hash folds the means in only when kept. A width or depth patch restarts the cells.
+  - Eleven unit tests in `memory.rs`, three checkpoint tests. Goldens, regressions and presets unchanged. `spec-reviewer`: no divergences; its questions led to the layout restart and a fractional width's last column, and to two ADR clarifications.
+- **The probe:** [docs/experiments/2026-11-16-light-memory-probe.md](experiments/2026-11-16-light-memory-probe.md), arms and bars committed before the runs (6a1bd67). s3d plus τ 2.5, 5, 10; seeds 1–20 at widths 160 and 66. Head's and s3d's 160-cell runs reused; all 40 re-runs at 66 matched their hashes.
+- **Result: no arm passes; the only miss is M2 on the phone.** Recruits fall to 5–10% of s3d's (7,756 → 441–777 a desktop run), and the share leaving within 2 seasons falls from 84% to 3–9%.
+  - The desktop cap goes 79.5 → 61–65 seasons, but the phone's goes 11 → 14.5–17.5, against "no worse".
+  - The full-tree bank all but vanishes; recruits reaching 1.3 m return to head's level.
+  - The phone's season costs 0.90–0.95 × head's (s3dT5's 1.40 is a load artefact: it ran beside another agent's 10 simulators).
+- **Surprise: the mean does not make the floor predictable.** The mean at N against the next five seasons' raw light gives ρ ≈ −0.03. Under the canopy every cell's mean regresses to the same sub-threshold value, so promotion happens only where light lasts: in real gaps.
+
 ## 2026-11-16: #137's seedling stubs (§O4.11): built off by default; read both ways, s3d passes
 
 - **The rule** (38a3496, 66e0f3c; draft [ADR 0072](decisions/0072-seedling-stubs.md), proposed): `principles/stubs.rs`. With the world's `o4.stubs` on, a viable seed that cannot stand (cap full, ground below max(qEst, `stubLight`), a trunk within a cell) joins a per-cell, per-species count outside `maxTrees`.

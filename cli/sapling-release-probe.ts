@@ -253,7 +253,8 @@ function saplings(cond: string) {
       const x = Object.fromEntries(
         Object.entries(r).map(([k, v]) => [k, k === "species" ? v : Number(v)]),
       ) as Row;
-      rs.push({ ...x, seed });
+      x.seed = seed;
+      rs.push(x as Row & { seed: number });
     }
   }
   const at = new Map(rs.map((r) => [`${r.seed}:${r.tree}:${r.season}`, r]));

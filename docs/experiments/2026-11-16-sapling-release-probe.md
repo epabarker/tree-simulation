@@ -85,4 +85,71 @@ node cli/sapling-release-probe.ts            # seeds 1–3, 6 simulators; runs/s
 
 ## Result
 
-_(after the runs)_
+**No arm passes all five bars. `dl25` passes four and misses S1 by 0.01; the bank fails the lone trees at both caps. Nothing is adopted; the bank stays built and off.**
+
+108 runs at 6af72f5 in 93.5 min on 6 simulators (`runs/sapling-release-probe/`, `summary.json`, `bars.json`; generated). The lone open-grown trees took about 6 min each, the 160-cell gardens about 5.
+
+### The bars
+
+| arm | S1: no growth (HEAD − 0.10 = 0.61) | S2: gain/decade, m (median; P90; share none) | lone form | #122 gates | canopy/ha, 160 / 66 (HEAD 156 / 76) | passes |
+|---|---|---|---|---|---|---|
+| `head` | 0.71 | 0.02; 0.85; 0.36 | – | 3/3, 3/3, 3/3 | 156 / 76 | – |
+| `dl0` | 0.80 ✗ | 0.01; 0.50; 0.37 ✗ | ✓ (hash-identical) | ✓ | 94 ✗ / 76 | ✗ |
+| `dl10` | 0.67 ✗ | 0.11; 1.94; 0.26 ✓ | ✓ (hash-identical) | ✓ | 172 / 76 ✓ | ✗ |
+| `dl25` | **0.62** ✗ | **0.33**; 2.67; 0.17 ✓ | ✓ (hash-identical) | ✓ | 188 / 114 ✓ | ✗ (S1 by 0.01) |
+| `bank` | 0.72 ✗ | 0.05; 0.81; 0.29 ✓ | ✗ | ✓ | 94 ✗ / 76 | ✗ |
+| `bank4` | **0.59** ✓ | 0.12; 1.56; 0.27 ✓ | ✗ | ✓ | 94 ✗ / 76 | ✗ |
+
+Sapling-seasons per arm 24,600–42,400 (356–561 trees). S2's ceiling (3 m a decade) holds everywhere.
+
+**Lone trees at season 100** (H in cells; HEAD's seeds 1–3):
+
+| arm | beech H | hornbeam H | oak H | W/H, beech / hornbeam / oak (median) |
+|---|---|---|---|---|
+| HEAD, `dl0`, `dl10`, `dl25` | 134–144 | 117 | 132–136 | 1.49 / 1.18 / 1.39 |
+| `bank` | 166–179 ✗ | 137–152 ✗ | 126–133 | 1.43 / 1.32 / 1.53 |
+| `bank4` | 194–200 ✗ | 167–182 ✗ | 132–137 | 1.30 / 1.29 / 1.70 ✗ |
+
+- **The `dl*` arms leave the lone trees hash-identical** to HEAD's (all nine): R5's signal is neighbour shade, zero for a tree alone.
+- **The bank grows the lone beech and hornbeam taller:** 15–30% at 2·M, 40–55% at 4·M, with 1.5–3× the metamers. Oak barely moves in height but widens at 4·M. Open-grown trees lose most of their surplus at buds below threshold too (the trace's 79% at 5–10 m), so banking it is a recalibration of every species' lone tree, not a sapling fix.
+- **The bank's off state is the build:** HEAD's lone hashes at this branch are reported under "Off-state identity" below.
+
+### Does the 2·M cap bind? Yes.
+
+| arm | sapling-seasons with the reserve at its cap | v_base per metamer grown | median v_base |
+|---|---|---|---|
+| `head` | 0.46 | 6.1 | 2.2 |
+| `bank` (2·M) | **0.92** | 6.7 | 3.0 |
+| `bank4` (4·M) | 0.76 | 4.4 | 3.7 |
+
+At HEAD's cap the bank fills the reserve in 92% of sapling-seasons and carries at most 1·M a season into growth (2·M less the 1·M kept): v_base rises from 2.2 to 3.0, still split over the same buds, and the no-growth share does not move (0.71 → 0.72). Doubling the cap (the spec's "a few seasons") is what makes the bank work on saplings (0.59), and it is also what makes the lone trees outgrow their calibration.
+
+### Reported
+
+| arm | ≥ 7 cm stems/ha, 160 (median frame; HEAD's band 200–400) | ≥ 7 cm canopy share, 160 / 66 | seedling bank (< 1.3 m) per frame, 160 / 66 | seasons at the stand's cap, 160 |
+|---|---|---|---|---|
+| `head` | 250 | 0.55 / 0.67 | 72 / 57 | 184, 230, 252 |
+| `dl0` | 125 | 0.63 / 0.67 | 123 / 60 | 179, 241, 227 |
+| `dl10` | 891 | 0.34 / 0.67 | 56 / 59 | 215, 239, 261 |
+| `dl25` | 766 | 0.62 / 0.50 | 31 / 32 | 177, 249, 247 |
+| `bank` | 234 | 0.47 / 0.50 | 84 / 49 | 235, 260, 188 |
+| `bank4` | 734 | 0.26 / 0.50 | 39 / 32 | 252, 269, 207 |
+
+No-growth share by species, ≥ 30 sapling-seasons: HEAD hornbeam 0.72, beech 0.75, maple 0.64, holly 0.75; `dl25` hornbeam 0.65, beech 0.61, maple 0.94; `bank4` hornbeam 0.58, beech 0.77, maple 0.86, holly 0.88.
+
+### Off-state identity
+
+HEAD's records replayed by `origin/3d-port`'s treesim (a1ac407, built from `git archive`) give the same state hashes as this branch's build at the defaults, in all nine lone runs (beech c9f55e42, 300c8d73, ee7b6037; hornbeam 859812b6, 66b88c89, f4a96f3e; oak 9d18cdbd, 175ce3f9, 66d455d6). The goldens pass (`npm run check:stamp` green) and `npm run regressions` reads `phoneSeed3` and `forestRegeneration` unchanged.
+
+### Noise: three seeds do not settle these bars
+
+- **Per seed, HEAD's no-growth share is 0.95, 0.62 and 0.73** (2,466, 9,340 and 18,727 sapling-seasons). Seed 3 carries most of the class in every arm, so S1 is close to one seed's reading. `dl25`'s 0.59 / 0.62 / 0.64 is tighter than HEAD's spread, and `dl0`, a near-null change, reads 0.80.
+- **Canopy trees/ha per run at 160 cells:** HEAD 78, 156, 172; `dl0` 63, 94, 172; `bank` 63, 94, 109. A median of three reads one run. `dl0` failing bar 5 is noise as much as effect.
+- **`dl25`'s seed 2 reads 781 canopy trees/ha** at 160 cells: the stand's top height fell, so "over half the top height" took in the subcanopy. Its median (188) does not rest on it.
+
+## Conclusion
+
+- **The cheapest remedy works best.** Concentrating v at shaded nodes (`dl25`, λ up to 0.75) multiplies the sapling's median height gain by about 16 (0.02 → 0.33 m a decade; decades with none 0.36 → 0.17), cuts the no-growth share 0.71 → 0.62, keeps the lone trees bit-identical, and keeps the gates and the canopy. It misses S1's margin by 0.01 on three seeds whose own spread is ±0.15.
+- **Its cost is the ≥ 7 cm flood.** Released saplings reach 7 cm: 766/ha at 160 cells against HEAD's 250 and ADR 0068's band of 200–400. That moves #132's problem rather than solving it.
+- **The bank does not fit as built.** At HEAD's cap it is capped out (92%); at 4·M it frees the saplings but outgrows the lone beech and hornbeam by 40–55%. It needs either a sapling-only scope (a size or light condition: a new design choice) or a lone refit.
+- **What adoption of `dl25` would need:** seeds 1–20 on the same bars with stated pass rates (S1 judged on ≥ 15 of 20 seeds' own no-growth share against HEAD's same seed, rather than a pooled share dominated by one seed); `phoneSeed3` re-recorded with a devlog reason; an ADR on R5's δλ (0.02 → 0.25 is a calibration, not a spec change); and #132's rates re-tuned on the new stand, with the ≥ 7 cm flood read against ADR 0068's band.

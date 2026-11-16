@@ -442,6 +442,19 @@ pub struct O4 {
     pub m0: f64,
     pub max_trees: f64,
     pub rain: Option<f64>,
+    /// §O4.11's seedling stubs outside the cap (ADR 0072; `principles::stubs`), the world's.
+    /// Absent or false: off, bit-identical.
+    pub stubs: bool,
+    /// The ground light, as Q/C, a stub or a seed needs to become a tree with stubs on, raised to
+    /// q_est where lower (species-merged; absent: 0, so q_est alone).
+    pub stub_light: f64,
+    /// m_stub: a stub's death rate per season at shade tolerance 1, scaled as the suppression rate
+    /// is, e^(−β_s(T − 1)) (species-merged; absent: 0, no stub dies).
+    pub stub_death: f64,
+    /// θ_demote: a live tree of age ≥ 1 below the display threshold whose crown-top light
+    /// Q_top/C is below this returns to its cell's stubs (ADR 0072's addendum; species-merged;
+    /// absent: 0, no demotion).
+    pub stub_demote: f64,
     /// Planting at a density (ADR 0063, decision 5; `principles::planting`); None: `trees`.
     pub planting: Option<Planting>,
 }
@@ -792,6 +805,10 @@ impl Params {
                 m0: num(o4, "m0"),
                 max_trees: num(o4, "maxTrees"),
                 rain: opt(o4, "rain"),
+                stubs: flag(o4, "stubs"),
+                stub_light: opt(o4, "stubLight").unwrap_or(0.0),
+                stub_death: opt(o4, "stubDeath").unwrap_or(0.0),
+                stub_demote: opt(o4, "stubDemote").unwrap_or(0.0),
                 planting: o4.get("planting").map(|g| Planting {
                     density: num(g, "density"),
                     spacing: num(g, "spacing"),

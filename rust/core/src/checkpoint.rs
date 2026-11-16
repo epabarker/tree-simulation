@@ -8,7 +8,10 @@
 //! deficit counter per metamer after each tree's bud columns. These counters persist across
 //! seasons (R1/C5's kShed); absent counters in versions 1 and 2 start at zero. Version 4 (#125)
 //! appends, after the deficits and padded the same way, one f64 per metamer of C5's relative-test
-//! count (`dark`, c5.kRel); versions 1–3 start it at zero.
+//! count (`dark`, c5.kRel); versions 1–3 start it at zero. Version 5 (ADR 0072) adds the
+//! header's `stubs` table, §O4.11's seedling stubs as {species: [cell, count, …]}; it is written
+//! only when the pool is not empty, so a world without stubs keeps version 4's bytes, and versions
+//! 1–4 load with no stubs.
 //!
 //! **Version 2** (I2, ADR 0025) is the 3D schema. **Version 1**, the 2D core's (the TypeScript
 //! core's, and garden 0.14.0's opening forests), still loads: each angle becomes a heading in the
@@ -21,6 +24,8 @@ use crate::tree::{ColMut, NUMBERS, SCALARS, Tree};
 use crate::world::World;
 
 const VERSION: f64 = 4.0;
+/// The version a world with seedling stubs writes (ADR 0072): version 4 plus the header's table.
+const VERSION_STUBS: f64 = 5.0;
 
 /// The 2D schema (version 1): (name, size in bytes) of each column, in its order.
 const METAMERS_V1: [(&str, usize); 19] = [
@@ -97,8 +102,13 @@ pub fn save_world(world: &World) -> Vec<u8> {
             ])
         })
         .collect();
-    let header = Value::Obj(vec![
-        ("version".into(), Value::Num(VERSION)),
+    let version = if world.stubs.is_empty() {
+        VERSION
+    } else {
+        VERSION_STUBS
+    };
+    let mut fields = vec![
+        ("version".into(), Value::Num(version)),
         ("initialParams".into(), world.initial_params.clone()),
         ("params".into(), world.params_json.clone()),
         ("season".into(), Value::Num(world.season)),
@@ -107,7 +117,25 @@ pub fn save_world(world: &World) -> Vec<u8> {
         ("log".into(), Value::Arr(world.log.clone())),
         ("pending".into(), Value::Arr(world.pending.clone())),
         ("trees".into(), Value::Arr(trees)),
-    ]);
+    ];
+    if !world.stubs.is_empty() {
+        let table = world
+            .stubs
+            .iter()
+            .map(|(sp, v)| {
+                let mut flat = Vec::new();
+                for (k, &n) in v.iter().enumerate() {
+                    if n > 0 {
+                        flat.push(Value::Num(k as f64));
+                        flat.push(Value::Num(n as f64));
+                    }
+                }
+                (sp.clone(), Value::Arr(flat))
+            })
+            .collect();
+        fields.push(("stubs".into(), Value::Obj(table)));
+    }
+    let header = Value::Obj(fields);
     let text = json::stringify(&header, true);
     let mut out = Vec::new();
     out.extend_from_slice(&(text.len() as u32).to_le_bytes());
@@ -190,7 +218,7 @@ pub fn load_world(bytes: &[u8]) -> Result<World, CheckpointError> {
     let header = json::parse(text).map_err(|e| CheckpointError(e.to_string()))?;
     let num = |v: &Value, k: &str| v.get(k).and_then(Value::as_f64).unwrap_or(0.0);
     let version = num(&header, "version");
-    if version != VERSION && version != 3.0 && version != 2.0 && version != 1.0 {
+    if ![VERSION_STUBS, VERSION, 3.0, 2.0, 1.0].contains(&version) {
         return Err(CheckpointError(format!("unknown version {version}")));
     }
     let mut at = pad8(4 + len);
@@ -262,6 +290,17 @@ pub fn load_world(bytes: &[u8]) -> Result<World, CheckpointError> {
         .unwrap_or(&[])
         .to_vec();
     world.trees = trees;
+    if let Some(Value::Obj(table)) = header.get("stubs") {
+        for (sp, flat) in table {
+            for pair in flat.as_array().unwrap_or(&[]).chunks_exact(2) {
+                if let (Some(k), Some(n)) = (pair[0].as_f64(), pair[1].as_f64())
+                    && n > 0.0
+                {
+                    crate::principles::stubs::set(&mut world.stubs, sp, k as u32, n as u32);
+                }
+            }
+        }
+    }
     Ok(world)
 }
 
@@ -554,6 +593,73 @@ mod tests {
         // It sheds on the season the v3 world would have: the third deficit in a row.
         let mut on = loaded;
         assert_eq!(carbon_season(&mut on, true), 2.0);
+    }
+
+    /// A world with stubs on after two seasons, with a pool in two species.
+    fn stub_world() -> World {
+        let params = preset(
+            "default",
+            r#"{"o4":{"enabled":true,"stubs":true,"stubDeath":0.1,"cSeed":2,"d":10,"qEst":0.1,
+                "pEst":1,"m0":0,"maxTrees":100}}"#,
+        );
+        let mut w = World::new(params);
+        w.run(2, &[]);
+        use crate::principles::stubs::set;
+        set(&mut w.stubs, "", 5, 40);
+        set(&mut w.stubs, "", 900, 3);
+        set(&mut w.stubs, "oak", 17, 2);
+        w
+    }
+
+    /// The checkpoint's header, as JSON.
+    fn header_of(bytes: &[u8]) -> Value {
+        let len = u32::from_le_bytes(bytes[0..4].try_into().unwrap()) as usize;
+        json::parse(std::str::from_utf8(&bytes[4..4 + len]).unwrap()).unwrap()
+    }
+
+    #[test]
+    fn a_world_without_stubs_keeps_version_4s_bytes() {
+        let header = header_of(&save_world(&carbon_world()));
+        assert_eq!(header.get("version").and_then(Value::as_f64), Some(4.0));
+        assert!(header.get("stubs").is_none());
+    }
+
+    #[test]
+    fn the_stub_pool_round_trips_as_version_5_and_grows_on_alike() {
+        let mut straight = stub_world();
+        let bytes = save_world(&straight);
+        assert_eq!(
+            header_of(&bytes).get("version").and_then(Value::as_f64),
+            Some(5.0)
+        );
+        let mut loaded = load_world(&bytes).unwrap();
+        assert_eq!(loaded.stubs, straight.stubs);
+        assert_eq!(hash_world(&loaded), hash_world(&straight));
+        assert_eq!(save_world(&loaded), bytes);
+        straight.run(3, &[]);
+        loaded.run(3, &[]);
+        assert_eq!(hash_world(&loaded), hash_world(&straight));
+        assert_eq!(loaded.stubs, straight.stubs);
+    }
+
+    #[test]
+    fn the_hash_sees_the_stub_pool_only_when_there_is_one() {
+        let mut w = stub_world();
+        let with = hash_world(&w);
+        crate::principles::stubs::set(&mut w.stubs, "", 5, 41);
+        assert_ne!(hash_world(&w), with);
+        // The v2 fixture's hash, pinned before stubs existed, is unchanged (an empty pool).
+        let v2 = load_world(include_bytes!("../../../tests/fixtures/checkpoint-v2.bin")).unwrap();
+        assert_eq!(hash_world(&v2), "f46fef77");
+    }
+
+    #[test]
+    fn pre_change_checkpoints_load_with_no_stubs() {
+        let v2 = load_world(include_bytes!("../../../tests/fixtures/checkpoint-v2.bin")).unwrap();
+        let v3 = load_world(include_bytes!("../../../tests/fixtures/checkpoint-v3.bin")).unwrap();
+        assert!(v2.stubs.is_empty() && v3.stubs.is_empty());
+        let v4 = load_world(&save_world(&carbon_world())).unwrap();
+        assert!(v4.stubs.is_empty());
     }
 
     #[test]

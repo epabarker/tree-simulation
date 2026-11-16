@@ -60,7 +60,15 @@ pub struct World {
     /// the cap holds (stand.rs; the season as stand.csv numbers it, after the season ran). Kept
     /// apart from `log`, which is the replay's input, and out of the checkpoint's bytes.
     pub notices: Vec<Value>,
+    /// §O4.11's seedling stubs (ADR 0072): per species name, the stubs in each ground cell
+    /// (`principles::stubs::cell`). Empty unless `o4.stubs` is on; saved in checkpoints.
+    pub stubs: Stubs,
 }
+
+/// The stub pool's shape: (species, count per cell index), species in name order and each list
+/// dense (grown on demand), so every pass is deterministic; a species with no stub is left out.
+/// Plain vectors keep the garden's WASM within its budget (ADR 0014).
+pub type Stubs = Vec<(String, Vec<u32>)>;
 
 /// The owner grid (O2, R5): one cell per light cell, W × H × D.
 fn grid(params: &Params) -> Vec<i32> {
@@ -124,6 +132,7 @@ impl World {
             log: Vec::new(),
             pending: Vec::new(),
             notices: Vec::new(),
+            stubs: Stubs::new(),
         };
         world.plant_due();
         world

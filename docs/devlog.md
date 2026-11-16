@@ -2,6 +2,21 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-16: #137's seedling stubs (§O4.11): built off by default; read both ways, s3d passes
+
+- **The rule** (38a3496, 66e0f3c; draft [ADR 0072](decisions/0072-seedling-stubs.md), proposed): `principles/stubs.rs`. With the world's `o4.stubs` on, a viable seed that cannot stand (cap full, ground below max(qEst, `stubLight`), a trunk within a cell) joins a per-cell, per-species count outside `maxTrees`.
+  - Stubs die at `stubDeath`·e^(−β_s(T − 1)) [RNG purpose 22].
+  - Lit, free cells promote one stub each, brightest first, while the cap has room [purpose 23].
+  - A bank tree (age ≥ 1, under 1.3 m) whose Q_top/C falls below `stubDemote` returns to its cell's count.
+  - Checkpoint version 5 (a header `stubs` table) only when the pool is not empty; versions 1–4 load with no stubs. The hash folds the pool in only when non-empty. stubs.csv from the CLI.
+  - Fourteen unit tests at the rule's edges; goldens, regressions and lone hashes unchanged; `spec-reviewer` found no divergences (its questions: the pilot is judged by hand, the hash got separators, O4's header names the rule, stubs-off-by-patch is ADR 0072 decision 8).
+- **The probe:** [docs/experiments/2026-11-16-seedling-stubs-probe.md](experiments/2026-11-16-seedling-stubs-probe.md), `cli/seedling-stubs-probe.ts`, bars committed before the runs (0630ce6).
+- **Surprise: stubs one way do not end the cap.** s1, s3 and s1q10 (no demotion) hold the cap as long as head: a pool of 10⁴–10⁵/ha refills each freed slot and shaded promoted trees stay trees. Demotion was added as a pre-registered addendum (b419a73) before its runs.
+- **Result (seeds 1–20):** s3d (`stubLight` 0.15, `stubDeath` 3, `stubDemote` 0.075) passes every gate and bar: cap seasons 235 → 79.5 (desktop), 186.5 → 11 (phone); canopy trees/ha unchanged (109); hornbeam in 60/60 canopy frames; the pool 4.8·10⁴/ha, a real bank's order. s1d fails the phone's cost bar (1.30×), s3 the cap bar.
+- **Cost:** churn. Recruits 1,016 → 7,756 a run; the season costs 1.24× (desktop) and 1.16× (phone). Drawn stems halve (1,297 → 657/ha).
+- **The garden's WASM budget** (ADR 0014): the first build was 205.4 kB gzip on CI, against a 200 kB budget and 3d-port's 184.3. The cause was a nested `BTreeMap` pool and a `sort_by` on (f64, u32) pairs, each a new monomorphisation. Now the pool is dense `Vec` columns, (species, count per cell) in name order, and promotion picks the brightest cell by selection. Locally that is 183.5 → 188.8 kB (+5.3: the rule's code 3.8 kB, the rest the checkpoint table, hash and params). Re-running s3d (66, seed 1) and s1 (66, seed 2) gives byte-identical stand.csv, stubs.csv and metrics.csv, and s3d gives the same hash (s1's hash differs only by the separators added before the demotion runs).
+- No default, golden, preset or regression changed. Adopting s3d is the user's call.
+
 ## 2026-11-16: #138's confirmation on 20 seeds: `r5.dLambda` 0.40 passes; recommended, not adopted
 
 - **The probe:** the `dl*` arms of [the sapling-release probe](experiments/2026-11-16-sapling-release-probe.md) on seeds 1–20 at widths 160 and 66 to season 300, bars committed before the runs (c2b72fe). `dl40` (0.40) added as the bracket above. 213 runs plus the pilot's 27, 117 min on 6 simulators. `cli/sapling-release-probe.ts` gains `--no-lone` and `--confirm`.
@@ -17,7 +32,6 @@ Newest first. One entry per session or milestone: what changed, why, surprises, 
 - **Result:** every arm run to 20 seeds passes the bars (h2 failed the pilot). Only h60 moves the cap by much: a median 31 seasons a run fewer on the desktop (235 → 206), 96 on the phone (186.5 → 78.5). The milder cuts move it by 2–20. No run of any arm is cap-free: the other species' seeds refill every slot.
 - Hornbeam keeps every desktop canopy frame; recruitment shifts towards beech, maple and birch (hornbeam's share of recruits reaching 1.3 m 0.69 → 0.58). The flood of drawn stems is unchanged.
 - A draft [ADR 0070](decisions/0070-hornbeam-seed-supply.md) (proposed, not accepted) for hornbeam `cSeed` 300. No default, golden, preset or regression changed. The stubs (§O4.11) remain #137's answer for ending the cap.
-||||||| a1ac407
 
 ## 2026-11-16: #138's sapling release: R5's δλ or a reserve bank; no arm passes, `dl25` nearest
 

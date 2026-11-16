@@ -654,6 +654,29 @@ export interface Params {
     /** Cap on live trees, so a page cannot run away. */
     maxTrees: number;
     /**
+     * §O4.11's seedling stubs (ADR 0072), the world's: a seed that passes p_est but cannot become
+     * a tree (the cap full, too dark, a trunk within a cell) joins a per-cell count of stubs of
+     * its species outside `maxTrees`; a lit, free cell promotes one to a tree while the cap has
+     * room, brightest first. Absent or false: off, bit-identical.
+     */
+    stubs?: boolean;
+    /**
+     * With stubs on, the ground light (Q/C) a seed or stub needs to become a tree, raised to
+     * `qEst` where lower; species-merged. Absent: 0 (`qEst` alone).
+     */
+    stubLight?: number;
+    /**
+     * m_stub: a stub's death rate per season at shade tolerance 1, scaled by
+     * e^(−β_s(T − 1)) as the suppression rate is; species-merged. Absent: 0 (stubs never die).
+     */
+    stubDeath?: number;
+    /**
+     * θ_demote: with stubs on, a live tree of age ≥ 1 below the display threshold whose crown-top
+     * light Q_top/C is below this returns to its cell's stubs (ADR 0072); species-merged. Absent:
+     * 0 (no demotion).
+     */
+    stubDemote?: number;
+    /**
      * Seed rain (ADR 0018): seeds a season, per 100 cells of ground, that blow or are carried in
      * from beyond the world and land anywhere, then establish by the same rule as local seeds.
      * Per species, so a light-seeded pioneer can return to a clearing after it has died out

@@ -1,6 +1,6 @@
 # 0073: O4 reads a running mean of light (`o4.lightMemory`); built off by default
 
-- **Status:** accepted as a build (the user, 2026-11-16, in chat: "Yes, add light memory"); off by default. Adopting a τ for the garden is the user's call, on [the light-memory probe](../experiments/2026-11-16-light-memory-probe.md).
+- **Status:** accepted as a build (the user, 2026-11-16, in chat: "Yes, add light memory"); off by default. Adopting a τ for the garden is the user's call, on [the light-memory probe](../experiments/2026-11-16-light-memory-probe.md). No τ passed its pre-registered bars: every arm missed M2, the phone's cap no worse than s3d's (11 → 14.5–17.5 seasons). Each cut churn to 5–10% of s3d's and ran the phone's season cheaper than head's. τ 2.5 is the probe's pick if M2's miss is accepted.
 - **Spec:** §O4.4 (establishment "if ground Q > Q_est"), §O4.11 (stubs), §C2 item 8 (the garden's rotating sky), §6 (staging). ADRs 0065, 0068, 0072.
 - **Tickets:** [#137](https://github.com/epabarker/tree-simulation/issues/137), [#132](https://github.com/epabarker/tree-simulation/issues/132).
 - **Evidence:** [the churn note](../experiments/2026-11-16-stub-churn-and-hornbeam-ceiling.md), B.1 and its recommendation 2.

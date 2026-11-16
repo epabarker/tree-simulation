@@ -1,0 +1,35 @@
+{
+ "s3dT25": {
+  "gates": true,
+  "b1": true,
+  "b2": true,
+  "b3": true,
+  "b4": true,
+  "b5": true,
+  "m1": true,
+  "m2": false,
+  "pass": false
+ },
+ "s3dT5": {
+  "gates": true,
+  "b1": true,
+  "b2": true,
+  "b3": true,
+  "b4": true,
+  "b5": false,
+  "m1": true,
+  "m2": false,
+  "pass": false
+ },
+ "s3dT10": {
+  "gates": true,
+  "b1": true,
+  "b2": true,
+  "b3": true,
+  "b4": true,
+  "b5": true,
+  "m1": true,
+  "m2": false,
+  "pass": false
+ }
+}

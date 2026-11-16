@@ -1,6 +1,6 @@
 # Status
 
-_Last updated: 2026-11-15; #133's wind-load probe: no arm passes; the load stays built and off._
+_Last updated: 2026-11-16; overnight: #133 closed, #138/#137 probed, stubs built off, #134 screened._
 
 **Live:** garden0.16.0. RC prepared/merged#71; phone soak deferred, no release-readiness waiver.
 
@@ -16,7 +16,7 @@ _Last updated: 2026-11-15; #133's wind-load probe: no arm passes; the load stays
   drag on leaf + stem area × height, a moment that cannot cancel (stress wood and storms only).
 - ADR 0068 (user): #132's signal is `topLight`, a ramp from θ_hi down to each species' survival
   light; the band counts stems ≥ 7 cm DBH; no cap bar (mortality can't clear it: #137, the bank).
-  #138 traced: saplings frozen below the one-metamer threshold, surplus lost (ADR 0004; a decision).
+  #138: δλ 0.40 passes on 20 seeds but floods stems ≥ 7 cm (852/ha): ADR 0071 deferred (PR #147).
 ## Feature playbook (spec #111, merged to 3d-port as #128)
 - Garden: round 6 (r6), periodic depth, two-part demography; ADR 0065 targets reported, not gated.
 - #124 held: d16a13 + crowd gate (`r2.dLambdaCrowd`, built, off; ADR 0069) cures the garden oak
@@ -26,12 +26,11 @@ _Last updated: 2026-11-15; #133's wind-load probe: no arm passes; the load stays
 - Branch codex/day3-species-programme; beech retained, no sycamore/ash candidate qualified.
 - Confirmation seeds 22021–22040/23021–23040 untouched. docs/experiments/2026-11-08-day3-step8.md.
 ## Next
-1. #133 probed (docs/experiments/2026-11-15-wind-load-probe.md, PR #141): no arm passes.
-   Throws fall with dose (H4k8 26 → 9; HEAD 8) but every dose over-thickens the stand;
-   beech's fork stays; σ÷2 does as well. Thrown = lit canopy trees at H/D>110 (re-read):
-   light-scaling won't help; recommend close #133, report the slender tail in #134.
-2. #134 carries ADR 0067's fit change (breast-height slenderness, pooled forks).
-3. #132's ramp re-probed on #134's stand (rates only). Phone soak deferred; no deploy.
+1. #137 stubs built, off (`o4.stubs`, ADR 0072 proposed, PR #148): s3d cuts cap seasons 235 → 79.5
+   (phone 186.5 → 11), 1.24× season cost. User: adopt s3d, or first a k-dark-seasons demotion.
+2. #134 screen (PR #149, 5 seeds): only the leader's λ₀ moves W/H. Beech lam0+14 → 20-seed
+   confirm + stand check; taller (≈39 m). Hornbeam: no knob fits W/H and H/D (user's call).
+3. #138 re-probed with #132's ramp on #134's stand (per-species δλ first). Phone soak deferred.
 ## Gotchas
 - m27_adopt resets mw=64; any adopter extension must preserve selected coupled mw/r0.
 - Same-skeleton mw*r0² normalisation is NOT behaviour/bit invariance; R3/topology change.

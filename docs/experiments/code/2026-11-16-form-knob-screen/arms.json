@@ -1,0 +1,24 @@
+{
+  "beech": {
+    "head": {},
+    "sp-12": { "r2.levels.1.setPoint": 22.32 },
+    "sp-20": { "r2.levels.1.setPoint": 14.32 },
+    "lam0+": { "r2.levels.0.lambda": 0.6108 },
+    "lam1-": { "r2.levels.1.lambda": 0.4524 },
+    "kap1=0": { "r2.levels.1.kappa": 0 },
+    "le1=2": { "r2.levels.1.lateralEvery": 2 },
+    "curve1-15": { "r2.levels.1.curve": -15, "r2.levels.1.curveLength": 20 },
+    "sp-12+lam0+": { "r2.levels.1.setPoint": 22.32, "r2.levels.0.lambda": 0.6108 }
+  },
+  "hornbeam": {
+    "head": {},
+    "sp-12": { "r2.levels.1.setPoint": 26.73 },
+    "sp-20": { "r2.levels.1.setPoint": 18.73 },
+    "lam0+": { "r2.levels.0.lambda": 0.6601 },
+    "lam1-": { "r2.levels.1.lambda": 0.4407 },
+    "kap1=0": { "r2.levels.1.kappa": 0 },
+    "le1=2": { "r2.levels.1.lateralEvery": 2 },
+    "curve1-15": { "r2.levels.1.curve": -15, "r2.levels.1.curveLength": 20 },
+    "sp-12+lam0+": { "r2.levels.1.setPoint": 26.73, "r2.levels.0.lambda": 0.6601 }
+  }
+}

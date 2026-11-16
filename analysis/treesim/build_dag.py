@@ -288,6 +288,7 @@ PARAMS = [
     ("r1.sr", "r1", [("R1_CARBON", always)]),
     ("r1.store", "r1", [("R1_CARBON", always)]),
     ("r1.reserve0", "r1", [("R1_CARBON", always)]),
+    ("r1.unspent / keep", "r1", [("R1_CARBON", on("r1.enabled"))]),
     ("r1.fRep", "r1", [("R1_CARBON", always)]),
     ("r1.maturity", "r1", [("R1_CARBON", lambda p, c: (p["r1"].get("fRep") or 0) > 0), ("O4_STAND", o4on)]),
     ("r1.kStarve", "r1", [("R1_STARVE", always)]),

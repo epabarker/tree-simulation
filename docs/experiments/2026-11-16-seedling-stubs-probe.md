@@ -59,5 +59,13 @@ At both widths: median and per-run cap seasons, cap-free runs; the stub pool per
 ### Regressions
 `npm run regressions` must not move (no default changes); goldens unchanged (`npm run check`).
 
+### Addendum: the demotion arms (fixed before their runs, after the first pilot's desktop runs)
+
+Written after the first pilot's desktop runs (seeds 1–2) showed s1, s3 and s1q10 at the cap as long as head (199–230 seasons against 184–230), and before any run of the arms below. The reason read from those runs: promotion fills every freed slot at once from a pool of ~10⁴ stubs, and a promoted tree that is later shaded stays a full tree (bank trees die at ≤ 0.065 a season), so the bank of full trees re-forms. "Until lit" read both ways: a bank tree that is no longer lit returns to its cell's stub count.
+
+- **The rule (`o4.stubDemote`, species-merged, absent 0: no demotion).** In O4's phase, after the stubs' deaths and promotions and before the season's seeds, each live tree of age ≥ 1 below the display threshold (1.3 m, not drawn) whose crown-top light Q_top/C (C5's, phase 2) is below `stubDemote` leaves the stand (not alive) and joins its root cell's stub count. It draws no death this season as a stub. Q_top is computed for every garden species (each has C5's `Trel` > 0).
+- **Arms:** **s1d**, s1 with `stubDemote: 0.075` (half of `stubLight`, so a tree promoted at 0.15 is not demoted at once); **s3d**, s3 with `stubDemote: 0.075`.
+- **Pilot and bars:** as above, unchanged. The first three arms are judged by the same pilot rule.
+
 ### Expected
 At the cap about 1,200 seeds a season are dispersed on the desktop; with p_est 0.3 about 400 join the pool. At hornbeam's 0.065 the pool settles near 400/0.065 ≈ 6·10³ stubs (≈ 10⁵/ha); at s3 about a third of that. The full-tree bank should shrink to what the lit cells hold, so the cap should fall sharply; the risk is the gates, if 0.15 is rarely reached on the floor (3–13% of open sky at HEAD) and gaps refill too slowly.

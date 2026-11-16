@@ -52,41 +52,84 @@ pub fn death_rate(own: &Params) -> f64 {
     )
 }
 
+/// The counts of `species`, added in name order if it has none yet.
+fn counts<'a>(stubs: &'a mut Stubs, species: &str) -> &'a mut Vec<u32> {
+    let at = match stubs.binary_search_by(|(sp, _)| sp.as_str().cmp(species)) {
+        Ok(at) => at,
+        Err(at) => {
+            stubs.insert(at, (species.to_string(), Vec::new()));
+            at
+        }
+    };
+    &mut stubs[at].1
+}
+
+/// Sets the count of `species` in cell `k` (the checkpoint's reader and the tests).
+pub fn set(stubs: &mut Stubs, species: &str, k: u32, n: u32) {
+    let v = counts(stubs, species);
+    if v.len() <= k as usize {
+        v.resize(k as usize + 1, 0);
+    }
+    v[k as usize] = n;
+    prune(stubs);
+}
+
+/// The count of `species` in cell `k`.
+pub fn count(stubs: &Stubs, species: &str, k: u32) -> u32 {
+    stubs
+        .iter()
+        .find(|(sp, _)| sp == species)
+        .and_then(|(_, v)| v.get(k as usize).copied())
+        .unwrap_or(0)
+}
+
+/// The cells holding stubs of `species`, ascending.
+pub fn cells_of(stubs: &Stubs, species: &str) -> Vec<u32> {
+    stubs
+        .iter()
+        .filter(|(sp, _)| sp == species)
+        .flat_map(|(_, v)| (0..v.len() as u32).filter(|&k| v[k as usize] > 0))
+        .collect()
+}
+
+/// Leaves out every species with no stub left, so an empty pool is an empty list.
+fn prune(stubs: &mut Stubs) {
+    stubs.retain(|(_, v)| v.iter().any(|&n| n > 0));
+}
+
 /// One more stub of `species` in the cell at (x, z).
 pub fn add(stubs: &mut Stubs, species: &str, x: f64, z: f64, width: f64) {
-    let n = stubs
-        .entry(species.to_string())
-        .or_default()
-        .entry(cell(x, z, width))
-        .or_insert(0);
-    *n += 1;
+    let k = cell(x, z, width) as usize;
+    let v = counts(stubs, species);
+    if v.len() <= k {
+        v.resize(k + 1, 0);
+    }
+    v[k] += 1;
 }
 
 /// The stubs in the pool, every species.
 pub fn total(stubs: &Stubs) -> f64 {
-    stubs
-        .values()
-        .map(|cells| cells.values().map(|&n| n as f64).sum::<f64>())
-        .sum()
+    let mut n = 0.0;
+    for (_, v) in stubs {
+        for &c in v {
+            n += c as f64;
+        }
+    }
+    n
 }
 
 /// This season's stub deaths: each stub that began the season draws once against its species'
 /// rate. Stubs are exchangeable, so the k-th stub of a cell's count is keyed by k.
 pub fn deaths(world: &mut World) {
     let (seed, season) = (world.rules.params.seed, world.season);
-    let rates: Vec<(String, f64, f64)> = world
-        .stubs
-        .keys()
-        .map(|sp| (sp.clone(), death_rate(world.rules.of(sp)), species_key(sp)))
-        .collect();
-    for (sp, rate, key) in rates {
+    for i in 0..world.stubs.len() {
+        let sp = &world.stubs[i].0;
+        let (rate, key) = (death_rate(world.rules.of(sp)), species_key(sp));
         if !(rate > 0.0) {
             continue;
         }
-        let Some(cells) = world.stubs.get_mut(&sp) else {
-            continue;
-        };
-        for (&c, n) in cells.iter_mut() {
+        let v = &mut world.stubs[i].1;
+        for (c, n) in v.iter_mut().enumerate() {
             let mut alive = 0;
             for k in 0..*n {
                 if uniform(seed, purpose::STUB_DEATH, c as f64, key, season, k as f64) >= rate {
@@ -95,9 +138,8 @@ pub fn deaths(world: &mut World) {
             }
             *n = alive;
         }
-        cells.retain(|_, n| *n > 0);
     }
-    world.stubs.retain(|_, cells| !cells.is_empty());
+    prune(&mut world.stubs);
 }
 
 /// Which cells have a live trunk within a cell of their centre (O4's spacing test, per cell).
@@ -133,37 +175,42 @@ pub fn promote(world: &mut World, live: &mut f64) -> f64 {
     }
     let depth = crate::light::depth_of(params);
     let taken = blocked(world, width, depth);
-    let cells: std::collections::BTreeSet<u32> = world
+    let cells = world.stubs.iter().map(|(_, v)| v.len()).max().unwrap_or(0);
+    // The free cells holding stubs and their ground light, as two columns.
+    let (mut qs, mut ks) = (Vec::new(), Vec::new());
+    for k in 0..cells {
+        let held = world
+            .stubs
+            .iter()
+            .any(|(_, v)| v.get(k).is_some_and(|&n| n > 0));
+        if held && !taken.get(k).copied().unwrap_or(true) {
+            let (x, z) = centre(k as u32, width);
+            qs.push(world.light.sample(x, 0.5, z).0 / c);
+            ks.push(k as u32);
+        }
+    }
+    let thresholds: Vec<f64> = world
         .stubs
-        .values()
-        .flat_map(|m| m.keys().copied())
-        .collect();
-    let mut lit: Vec<(f64, u32)> = cells
-        .into_iter()
-        .filter(|&k| !taken.get(k as usize).copied().unwrap_or(true))
-        .map(|k| {
-            let (x, z) = centre(k, width);
-            (world.light.sample(x, 0.5, z).0 / c, k)
-        })
-        .collect();
-    lit.sort_by(|a, b| b.0.total_cmp(&a.0).then(a.1.cmp(&b.1)));
-    let thresholds: Vec<(String, f64)> = world
-        .stubs
-        .keys()
-        .map(|sp| (sp.clone(), threshold(world.rules.of(sp))))
+        .iter()
+        .map(|(sp, _)| threshold(world.rules.of(sp)))
         .collect();
     let mut planted = 0.0;
-    for (q, k) in lit {
-        if *live >= max_trees {
-            break;
+    // Brightest first, ties to the lower cell: a selection rather than a sort, since only as many
+    // cells as the cap has room for are taken, and a sort's code would cost the garden's WASM.
+    while *live < max_trees && !qs.is_empty() {
+        let mut best = 0;
+        for j in 1..qs.len() {
+            let order = qs[j].total_cmp(&qs[best]);
+            if order.is_gt() || (order.is_eq() && ks[j] < ks[best]) {
+                best = j;
+            }
         }
-        let eligible: Vec<(&str, u32)> = thresholds
-            .iter()
-            .filter(|(_, at)| q >= *at)
-            .filter_map(|(sp, _)| {
-                let n = world.stubs.get(sp)?.get(&k).copied()?;
-                Some((sp.as_str(), n))
-            })
+        let (q, k) = (qs.swap_remove(best), ks.swap_remove(best));
+        // The species lit here, in name order, with their counts in this cell.
+        let eligible: Vec<(usize, u32)> = (0..world.stubs.len())
+            .filter(|&i| q >= thresholds[i])
+            .map(|i| (i, world.stubs[i].1.get(k as usize).copied().unwrap_or(0)))
+            .filter(|&(_, n)| n > 0)
             .collect();
         let sum: u32 = eligible.iter().map(|e| e.1).sum();
         if sum == 0 {
@@ -172,23 +219,16 @@ pub fn promote(world: &mut World, live: &mut f64) -> f64 {
         let mut pick = (uniform(seed, purpose::STUB_PROMOTION, k as f64, 0.0, season, 0.0)
             * sum as f64)
             .floor() as u32;
-        let mut species = eligible[eligible.len() - 1].0.to_string();
-        for (sp, n) in &eligible {
-            if pick < *n {
-                species = sp.to_string();
+        let mut chosen = eligible[eligible.len() - 1].0;
+        for &(i, n) in &eligible {
+            if pick < n {
+                chosen = i;
                 break;
             }
             pick -= n;
         }
-        let cells = world.stubs.get_mut(&species).unwrap();
-        let n = cells.get_mut(&k).unwrap();
-        *n -= 1;
-        if *n == 0 {
-            cells.remove(&k);
-            if cells.is_empty() {
-                world.stubs.remove(&species);
-            }
-        }
+        world.stubs[chosen].1[k as usize] -= 1;
+        let species = world.stubs[chosen].0.clone();
         let (x, z) = centre(k, width);
         let own = world.rules.of(&species).clone();
         let mut seedling = crate::tree::Tree::new(world.trees.len(), x, z);
@@ -199,6 +239,7 @@ pub fn promote(world: &mut World, live: &mut f64) -> f64 {
         *live += 1.0;
         planted += 1.0;
     }
+    prune(&mut world.stubs);
     planted
 }
 
@@ -286,7 +327,7 @@ mod tests {
         assert_eq!(total(&w.stubs), 10.0);
         let (x, z) = (w.trees[0].root_x, w.trees[0].root_z);
         // The parent stands on a cell corner, so the seeds fall in the four cells around it.
-        for &k in w.stubs[""].keys() {
+        for k in cells_of(&w.stubs, "") {
             let (cx, cz) = centre(k, 100.0);
             assert!((cx - x).abs() < 1.0 && (cz - z).abs() < 1.0, "{k}");
         }
@@ -306,10 +347,7 @@ mod tests {
     /// A world with stubs on, no parent seed and `n` stubs of no species in the cell at (x, z).
     fn pooled(patch: &str, n: u32, x: f64, z: f64) -> World {
         let mut w = on(patch);
-        w.stubs
-            .entry(String::new())
-            .or_default()
-            .insert(cell(x, z, 100.0), n);
+        set(&mut w.stubs, "", cell(x, z, 100.0), n);
         w
     }
 
@@ -383,7 +421,7 @@ mod tests {
         let (x, z) = (w.trees[0].root_x, w.trees[0].root_z);
         stand_dynamics(&mut w);
         assert!(!w.trees[0].alive);
-        assert_eq!(w.stubs[""][&cell(x, z, 100.0)], 1);
+        assert_eq!(count(&w.stubs, "", cell(x, z, 100.0)), 1);
         // At or above stubDemote, or with none set, it stays a tree.
         for (patch, q) in [(r#"{"o4":{"stubDemote":0.075}}"#, 0.075), ("{}", 0.0)] {
             let mut w = shaded(patch, q);
@@ -412,12 +450,9 @@ mod tests {
     fn with_room_for_one_the_brightest_cell_wins_and_ties_go_to_the_lower_cell() {
         // Every cell is equally lit here, so the tie-break decides: cell (10, 3) before (80, 40).
         let mut w = pooled(r#"{"o4":{"maxTrees":2}}"#, 1, 80.0, 40.0);
-        w.stubs
-            .get_mut("")
-            .unwrap()
-            .insert(cell(10.0, 3.0, 100.0), 1);
+        set(&mut w.stubs, "", cell(10.0, 3.0, 100.0), 1);
         assert_eq!(stand_dynamics(&mut w), 1.0);
         assert_eq!((w.trees[1].root_x, w.trees[1].root_z), (10.5, 3.5));
-        assert!(w.stubs[""].contains_key(&cell(80.0, 40.0, 100.0)));
+        assert_eq!(count(&w.stubs, "", cell(80.0, 40.0, 100.0)), 1);
     }
 }

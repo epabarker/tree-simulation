@@ -331,7 +331,7 @@ fn main() {
             ));
         }
         for (sp, cells) in &world.stubs {
-            let n: u64 = cells.values().map(|&n| n as u64).sum();
+            let n: u64 = cells.iter().map(|&n| n as u64).sum();
             stub_lines.push(format!("{},{sp},{n}", num(season)));
         }
         if checkpoint_at == Some(season) {

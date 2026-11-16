@@ -122,11 +122,14 @@ pub fn save_world(world: &World) -> Vec<u8> {
         let table = world
             .stubs
             .iter()
-            .map(|(sp, cells)| {
-                let flat = cells
-                    .iter()
-                    .flat_map(|(&k, &n)| [Value::Num(k as f64), Value::Num(n as f64)])
-                    .collect();
+            .map(|(sp, v)| {
+                let mut flat = Vec::new();
+                for (k, &n) in v.iter().enumerate() {
+                    if n > 0 {
+                        flat.push(Value::Num(k as f64));
+                        flat.push(Value::Num(n as f64));
+                    }
+                }
                 (sp.clone(), Value::Arr(flat))
             })
             .collect();
@@ -289,17 +292,14 @@ pub fn load_world(bytes: &[u8]) -> Result<World, CheckpointError> {
     world.trees = trees;
     if let Some(Value::Obj(table)) = header.get("stubs") {
         for (sp, flat) in table {
-            let flat = flat.as_array().unwrap_or(&[]);
-            let cells = world.stubs.entry(sp.clone()).or_default();
-            for pair in flat.chunks_exact(2) {
+            for pair in flat.as_array().unwrap_or(&[]).chunks_exact(2) {
                 if let (Some(k), Some(n)) = (pair[0].as_f64(), pair[1].as_f64())
                     && n > 0.0
                 {
-                    cells.insert(k as u32, n as u32);
+                    crate::principles::stubs::set(&mut world.stubs, sp, k as u32, n as u32);
                 }
             }
         }
-        world.stubs.retain(|_, cells| !cells.is_empty());
     }
     Ok(world)
 }
@@ -604,10 +604,10 @@ mod tests {
         );
         let mut w = World::new(params);
         w.run(2, &[]);
-        let stubs = w.stubs.entry("".into()).or_default();
-        stubs.insert(5, 40);
-        stubs.insert(900, 3);
-        w.stubs.entry("oak".into()).or_default().insert(17, 2);
+        use crate::principles::stubs::set;
+        set(&mut w.stubs, "", 5, 40);
+        set(&mut w.stubs, "", 900, 3);
+        set(&mut w.stubs, "oak", 17, 2);
         w
     }
 
@@ -646,7 +646,7 @@ mod tests {
     fn the_hash_sees_the_stub_pool_only_when_there_is_one() {
         let mut w = stub_world();
         let with = hash_world(&w);
-        w.stubs.get_mut("").unwrap().insert(5, 41);
+        crate::principles::stubs::set(&mut w.stubs, "", 5, 41);
         assert_ne!(hash_world(&w), with);
         // The v2 fixture's hash, pinned before stubs existed, is unchanged (an empty pool).
         let v2 = load_world(include_bytes!("../../../tests/fixtures/checkpoint-v2.bin")).unwrap();

@@ -65,8 +65,10 @@ pub struct World {
     pub stubs: Stubs,
 }
 
-/// The stub pool's shape: species → (cell → count), both ordered, so every pass is deterministic.
-pub type Stubs = std::collections::BTreeMap<String, std::collections::BTreeMap<u32, u32>>;
+/// The stub pool's shape: (species, count per cell index), species in name order and each list
+/// dense (grown on demand), so every pass is deterministic; a species with no stub is left out.
+/// Plain vectors keep the garden's WASM within its budget (ADR 0014).
+pub type Stubs = Vec<(String, Vec<u32>)>;
 
 /// The owner grid (O2, R5): one cell per light cell, W × H × D.
 fn grid(params: &Params) -> Vec<i32> {

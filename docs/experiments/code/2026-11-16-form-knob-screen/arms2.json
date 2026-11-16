@@ -1,0 +1,12 @@
+{
+  "beech": {
+    "lam0+14": { "r2.levels.0.lambda": 0.6708 },
+    "lam0+20": { "r2.levels.0.lambda": 0.7308 },
+    "lam0+&dL0": { "r2.levels.0.lambda": 0.6108, "r2.dLambda": 0 }
+  },
+  "hornbeam": {
+    "lam0+14": { "r2.levels.0.lambda": 0.7201 },
+    "lam0+20": { "r2.levels.0.lambda": 0.7801 },
+    "lam0+&dL0": { "r2.levels.0.lambda": 0.6601, "r2.dLambda": 0 }
+  }
+}

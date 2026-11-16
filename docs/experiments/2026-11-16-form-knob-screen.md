@@ -30,6 +30,18 @@ Each arm changes one or two knobs on the species' own patch (`cli/trials.ts` `wi
 - D at 1.3 m, pooled over a codominant fork below it (`cli/allometry.ts` `pooledDbh`, ADR 0067);
 - H/D on that D.
 
+### 2.1 Wave 2 (added after wave 1's beech, before any wave-2 run)
+
+Wave 1's beech moved on one knob only: the leader's λ (`lam0+`: W/H at 100 in band in 3 of 5 seeds; every other single knob left it at HEAD's 1.3–1.7). Wave 2 doses that knob, and tries holding λ against its ontogenetic fall (`r2.dLambda`: beech 0.014 from season 14, hornbeam 0.073 from season 2 over 20 seasons):
+
+| arm | change | beech | hornbeam |
+|---|---|---|---|
+| `lam0+14` | `levels.0.lambda` +0.14 | 0.671 | 0.720 |
+| `lam0+20` | `levels.0.lambda` +0.20 | 0.731 | 0.780 |
+| `lam0+&dL0` | `lam0+` and `r2.dLambda` 0 | 0.611, 0 | 0.660, 0 |
+
+30 more runs (`code/2026-11-16-form-knob-screen/arms2.json`, `run2.sh`), read and judged by the same §3 rule.
+
 ## 3. What counts as promising (fixed before any run)
 
 The triad note's §5 bars, as amended by ADR 0067, read on 5 seeds:

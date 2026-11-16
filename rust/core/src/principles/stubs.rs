@@ -207,22 +207,33 @@ pub fn promote(world: &mut World, live: &mut f64) -> f64 {
         }
         let (q, k) = (qs.swap_remove(best), ks.swap_remove(best));
         // The species lit here, in name order, with their counts in this cell.
-        let eligible: Vec<(usize, u32)> = (0..world.stubs.len())
-            .filter(|&i| q >= thresholds[i])
-            .map(|i| (i, world.stubs[i].1.get(k as usize).copied().unwrap_or(0)))
-            .filter(|&(_, n)| n > 0)
-            .collect();
-        let sum: u32 = eligible.iter().map(|e| e.1).sum();
+        let stubs = &world.stubs;
+        let eligible = |i: usize| {
+            if q >= thresholds[i] {
+                stubs[i].1.get(k as usize).copied().unwrap_or(0)
+            } else {
+                0
+            }
+        };
+        let mut sum = 0;
+        for i in 0..stubs.len() {
+            sum += eligible(i);
+        }
         if sum == 0 {
             continue;
         }
+        // floor(u·sum) < sum, so the walk always ends on an eligible species.
         let mut pick = (uniform(seed, purpose::STUB_PROMOTION, k as f64, 0.0, season, 0.0)
             * sum as f64)
             .floor() as u32;
-        let mut chosen = eligible[eligible.len() - 1].0;
-        for &(i, n) in &eligible {
+        let mut chosen = 0;
+        for i in 0..stubs.len() {
+            let n = eligible(i);
+            if n == 0 {
+                continue;
+            }
+            chosen = i;
             if pick < n {
-                chosen = i;
                 break;
             }
             pick -= n;
@@ -230,11 +241,11 @@ pub fn promote(world: &mut World, live: &mut f64) -> f64 {
         world.stubs[chosen].1[k as usize] -= 1;
         let species = world.stubs[chosen].0.clone();
         let (x, z) = centre(k, width);
-        let own = world.rules.of(&species).clone();
+        let own = world.rules.of(&species);
         let mut seedling = crate::tree::Tree::new(world.trees.len(), x, z);
+        let azimuth = seedling_azimuth(own, seedling.id);
+        plant_seedling(&mut seedling, own, season + 1.0, 0.0, azimuth);
         seedling.species = species;
-        let azimuth = seedling_azimuth(&own, seedling.id);
-        plant_seedling(&mut seedling, &own, season + 1.0, 0.0, azimuth);
         world.trees.push(seedling);
         *live += 1.0;
         planted += 1.0;

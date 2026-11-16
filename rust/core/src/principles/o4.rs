@@ -331,41 +331,33 @@ pub fn stand_dynamics(world: &mut World) -> f64 {
         while k < n {
             let kk = k;
             k += 1.0;
-            if stubs {
-                let x = uniform(seed, purpose::SEED_RAIN, key, 1.0, season, kk) * w;
-                let z = uniform(seed, purpose::SEED_RAIN, key, 3.0, season, kk) * depth;
-                if uniform(seed, purpose::SEED_RAIN, key, 2.0, season, kk) >= p_est {
-                    continue;
-                }
-                let at = super::stubs::threshold(&own);
-                let name = species.as_deref().unwrap_or("");
-                if !(live < max_trees && lit(world, x, z, c, at) && !spaced(&world.trees, x, z)) {
-                    super::stubs::add(&mut world.stubs, name, x, z, w);
-                    continue;
-                }
-                let mut seedling = Tree::new(world.trees.len(), x, z);
-                seedling.species = name.to_string();
-                let azimuth = seedling_azimuth(&own, seedling.id);
-                plant_seedling(&mut seedling, &own, season + 1.0, 0.0, azimuth);
-                world.trees.push(seedling);
-                live += 1.0;
-                recruits += 1.0;
-                continue;
-            }
-            if live >= max_trees {
+            if !stubs && live >= max_trees {
                 return recruits;
             }
             let x = uniform(seed, purpose::SEED_RAIN, key, 1.0, season, kk) * w;
             let z = uniform(seed, purpose::SEED_RAIN, key, 3.0, season, kk) * depth;
-            let (q, _) = world.light.sample(x, 0.5, z);
-            if c <= 0.0 || q / c < q_est {
-                continue;
-            }
-            if uniform(seed, purpose::SEED_RAIN, key, 2.0, season, kk) >= p_est {
-                continue;
-            }
-            if spaced(&world.trees, x, z) {
-                continue;
+            if stubs {
+                // ADR 0072: as a local seed, a tree where it can stand and is lit, else a stub.
+                if uniform(seed, purpose::SEED_RAIN, key, 2.0, season, kk) >= p_est {
+                    continue;
+                }
+                let at = super::stubs::threshold(&own);
+                if !(live < max_trees && lit(world, x, z, c, at) && !spaced(&world.trees, x, z)) {
+                    let name = species.as_deref().unwrap_or("");
+                    super::stubs::add(&mut world.stubs, name, x, z, w);
+                    continue;
+                }
+            } else {
+                let (q, _) = world.light.sample(x, 0.5, z);
+                if c <= 0.0 || q / c < q_est {
+                    continue;
+                }
+                if uniform(seed, purpose::SEED_RAIN, key, 2.0, season, kk) >= p_est {
+                    continue;
+                }
+                if spaced(&world.trees, x, z) {
+                    continue;
+                }
             }
             let mut seedling = Tree::new(world.trees.len(), x, z);
             if let Some(s) = species.as_ref().filter(|s| !s.is_empty()) {

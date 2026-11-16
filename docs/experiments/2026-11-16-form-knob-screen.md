@@ -36,9 +36,14 @@ Wave 1's beech moved on one knob only: the leader's λ (`lam0+`: W/H at 100 in b
 
 | arm | change | beech | hornbeam |
 |---|---|---|---|
-| `lam0+14` | `levels.0.lambda` +0.14 | 0.671 | 0.720 |
-| `lam0+20` | `levels.0.lambda` +0.20 | 0.731 | 0.780 |
-| `lam0+&dL0` | `lam0+` and `r2.dLambda` 0 | 0.611, 0 | 0.660, 0 |
+| `lam0+14` | `levels.0.lambda` +0.14 | 0.671 | – |
+| `lam0+20` | `levels.0.lambda` +0.20 | 0.731 | – |
+| `lam0+&dL0` | `lam0+` and `r2.dLambda` 0 | 0.611, 0 | – |
+| `lam0+03` | `levels.0.lambda` +0.03 | – | 0.610 |
+| `lam0+05` | `levels.0.lambda` +0.05 | – | 0.630 |
+| `dL/2` | `r2.dLambda` halved | – | 0.036 |
+
+**Hornbeam's wave 2 was changed before it ran.** Wave 1's hornbeam `lam0+` read after the beech arms above were committed: a 50–52 m pole at the box's top on a 13–16 cm stem (H/D 323–380). Larger doses could only be poles too, so hornbeam's wave 2 brackets HEAD and `lam0+` instead: two smaller doses, and HEAD's λ with half its fall.
 
 30 more runs (`code/2026-11-16-form-knob-screen/arms2.json`, `run2.sh`), read and judged by the same §3 rule.
 

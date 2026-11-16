@@ -14,7 +14,8 @@
 //! top height `topHeight100`, the mean of the 100 tallest drawn stems a hectare, per season) and stand-species.csv; with --light,
 //! light.csv (with lad, the leaf area density over depth), buds.csv (every live bud, with its
 //! birthId) and ground.csv (the ground's light and the leaf area above it, per x and z); with
-//! --checkpoint-at N, checkpoint-N.bin.gz. Presets come from rust/presets.json
+//! --checkpoint-at N, checkpoint-N.bin.gz; with `o4.stubs` on, stubs.csv (§O4.11's seedling stubs
+//! by species, per season, ADR 0071). Presets come from rust/presets.json
 //! (exported from the TypeScript presets). `npm run sim` (cli/run.ts) builds and runs it.
 
 use std::collections::HashSet;
@@ -269,6 +270,7 @@ fn main() {
     // Seasons the live trees filled the cap: a reported count, not a failure (ADR 0065).
     let mut cap_seasons = 0.0;
     let mut stand_species_lines = vec!["season,species,live,drawn,share".to_string()];
+    let mut stub_lines = vec!["season,species,stubs".to_string()];
 
     let mut world = World::new(params);
     if a.bench {
@@ -327,6 +329,10 @@ fn main() {
                 num(sp.drawn),
                 num(sp.share)
             ));
+        }
+        for (sp, cells) in &world.stubs {
+            let n: u64 = cells.values().map(|&n| n as u64).sum();
+            stub_lines.push(format!("{},{sp},{n}", num(season)));
         }
         if checkpoint_at == Some(season) {
             let bytes = save_world(&world);
@@ -519,6 +525,9 @@ fn main() {
         "stand-species.csv",
         format!("{}\n", stand_species_lines.join("\n")),
     );
+    if world.params().o4.stubs {
+        write("stubs.csv", format!("{}\n", stub_lines.join("\n")));
+    }
     if a.light {
         write("light.csv", format!("{}\n", light_lines.join("\n")));
         write("ground.csv", format!("{}\n", ground_lines.join("\n")));

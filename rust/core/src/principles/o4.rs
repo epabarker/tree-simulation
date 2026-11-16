@@ -140,6 +140,11 @@ pub fn growth_deficit(t: &Tree, season: f64, k: f64, floor: f64) -> f64 {
     math::max(1.0 - gained / (k * floor), 0.0)
 }
 
+/// Whether the ground at (x, z) is lit to `at` of open sky C (c > 0).
+fn lit(world: &World, x: f64, z: f64, c: f64, at: f64) -> bool {
+    c > 0.0 && world.light.sample(x, 0.5, z).0 / c >= at
+}
+
 /// Background deaths, seeds, dispersal and establishment. Returns the season's recruits.
 pub fn stand_dynamics(world: &mut World) -> f64 {
     let season = world.season;
@@ -155,6 +160,7 @@ pub fn stand_dynamics(world: &mut World) -> f64 {
     let max_trees = params.o4.max_trees;
     let mortality = params.o4.mortality;
     let signal = params.o4.suppression_signal;
+    let stubs = params.o4.stubs;
     for i in 0..world.trees.len() {
         let t = &world.trees[i];
         if !(t.alive && t.age > 0.0) {
@@ -221,6 +227,12 @@ pub fn stand_dynamics(world: &mut World) -> f64 {
         .collect();
     let mut live = parents.len() as f64;
     let mut recruits = 0.0;
+    // §O4.11's stubs (ADR 0071): the pool's deaths, then its lit cells' promotions, before this
+    // season's seeds land (staging).
+    if stubs {
+        super::stubs::deaths(world);
+        recruits += super::stubs::promote(world, &mut live);
+    }
     // No live trunk within a cell, on the ground plane.
     let spaced = |trees: &[Tree], x: f64, z: f64| {
         trees
@@ -256,15 +268,27 @@ pub fn stand_dynamics(world: &mut World) -> f64 {
             } else if z < 0.0 || z >= depth {
                 continue; // beyond an open face
             }
-            if live >= max_trees {
-                return recruits;
-            }
-            let (q, _) = world.light.sample(x, 0.5, z);
-            if c <= 0.0 || q / c < q_est {
-                continue;
-            }
-            if uniform(seed, purpose::ESTABLISHMENT, pid, kk, season, 0.0) >= p_est {
-                continue;
+            if stubs {
+                // ADR 0071: a viable seed is a tree where it can stand and is lit, else a stub.
+                if uniform(seed, purpose::ESTABLISHMENT, pid, kk, season, 0.0) >= p_est {
+                    continue;
+                }
+                let at = super::stubs::threshold(&own);
+                if !(live < max_trees && lit(world, x, z, c, at) && !spaced(&world.trees, x, z)) {
+                    super::stubs::add(&mut world.stubs, &species, x, z, w);
+                    continue;
+                }
+            } else {
+                if live >= max_trees {
+                    return recruits;
+                }
+                let (q, _) = world.light.sample(x, 0.5, z);
+                if c <= 0.0 || q / c < q_est {
+                    continue;
+                }
+                if uniform(seed, purpose::ESTABLISHMENT, pid, kk, season, 0.0) >= p_est {
+                    continue;
+                }
             }
             if spaced(&world.trees, x, z) {
                 continue;
@@ -304,6 +328,27 @@ pub fn stand_dynamics(world: &mut World) -> f64 {
         while k < n {
             let kk = k;
             k += 1.0;
+            if stubs {
+                let x = uniform(seed, purpose::SEED_RAIN, key, 1.0, season, kk) * w;
+                let z = uniform(seed, purpose::SEED_RAIN, key, 3.0, season, kk) * depth;
+                if uniform(seed, purpose::SEED_RAIN, key, 2.0, season, kk) >= p_est {
+                    continue;
+                }
+                let at = super::stubs::threshold(&own);
+                let name = species.as_deref().unwrap_or("");
+                if !(live < max_trees && lit(world, x, z, c, at) && !spaced(&world.trees, x, z)) {
+                    super::stubs::add(&mut world.stubs, name, x, z, w);
+                    continue;
+                }
+                let mut seedling = Tree::new(world.trees.len(), x, z);
+                seedling.species = name.to_string();
+                let azimuth = seedling_azimuth(&own, seedling.id);
+                plant_seedling(&mut seedling, &own, season + 1.0, 0.0, azimuth);
+                world.trees.push(seedling);
+                live += 1.0;
+                recruits += 1.0;
+                continue;
+            }
             if live >= max_trees {
                 return recruits;
             }

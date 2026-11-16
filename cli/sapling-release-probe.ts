@@ -8,6 +8,8 @@
  *
  *   node cli/sapling-release-probe.ts                    seeds 1–3, every arm, 6 simulators
  *   node cli/sapling-release-probe.ts -j 6 --arms head,bank --seeds 1-20
+ *   node cli/sapling-release-probe.ts --arms head,dl10,dl25,dl40 --seeds 1-20 --no-lone --confirm \
+ *     --out runs/sapling-release-confirm     the 20-seed confirmation (the note's "Confirmation")
  *
  * Per arm and seed: the garden at 160 and 66 cells (treesim, snapshots 100 and 200 for DBH), the
  * sapling probe (`rust/core/examples/sapling_probe.rs`) on the same 160-cell params (it replays
@@ -59,6 +61,7 @@ export const ARMS: Record<string, Patch> = {
   dl0: r5Arm(0),
   dl10: r5Arm(0.1),
   dl25: r5Arm(0.25),
+  dl40: r5Arm(0.4),
   bank: r1Arm({ unspent: "banked", keep: 1 }),
   bank4: r1Arm({ unspent: "banked", keep: 1, store: 4 }),
 };
@@ -78,6 +81,10 @@ const [s0, s1] = arg("--seeds", "1-3").split("-").map(Number) as [number, number
 const seeds = Array.from({ length: (s1 ?? s0) - s0 + 1 }, (_, k) => s0 + k);
 const out = join(ROOT, arg("--out", "runs/sapling-release-probe"));
 const snapshots = FRAMES.slice(0, -1).join(",");
+/** The `dl*` arms leave a lone tree hash-identical (R5's signal is neighbour shade): skip them. */
+const noLone = process.argv.includes("--no-lone");
+/** The 20-seed confirmation's bars (per seed, paired against HEAD's same seed) instead of S1–5. */
+const confirm = process.argv.includes("--confirm");
 
 // Build treesim and the sapling probe once, before the pool.
 await sim(loneTreeParams("oak", 1), 1, join(out, "build"));
@@ -129,7 +136,7 @@ const all: Job[] = [
       { kind: "garden" as const, cond, seed, key: "w66" },
     ]),
   ),
-  ...names.flatMap((cond) =>
+  ...(noLone ? [] : names).flatMap((cond) =>
     LONE.species.flatMap((sp) =>
       seeds.map((seed) => ({ kind: "lone" as const, cond, seed, key: `lone-${sp}` })),
     ),
@@ -246,9 +253,12 @@ function garden(dir: string, width: number) {
 
 type Row = Record<string, number> & { species: string };
 /** The sapling class's measures over one arm's seeds (rows from season 50, so a decade fits). */
-function saplings(cond: string) {
-  const rs: (Row & { seed: number })[] = [];
-  for (const seed of seeds) {
+const sapRows = new Map<string, (Row & { seed: number })[]>();
+function sapSeed(cond: string, seed: number): (Row & { seed: number })[] {
+  const key = `${cond}:${seed}`;
+  let rs = sapRows.get(key);
+  if (!rs) {
+    rs = [];
     for (const r of rows(join(out, cond, `saplings160-s${seed}`, "saplings.csv"))) {
       const x = Object.fromEntries(
         Object.entries(r).map(([k, v]) => [k, k === "species" ? v : Number(v)]),
@@ -256,7 +266,12 @@ function saplings(cond: string) {
       x.seed = seed;
       rs.push(x as Row & { seed: number });
     }
+    sapRows.set(key, rs);
   }
+  return rs;
+}
+function saplings(cond: string, ss: number[] = seeds) {
+  const rs = ss.flatMap((seed) => sapSeed(cond, seed));
   const at = new Map(rs.map((r) => [`${r.seed}:${r.tree}:${r.season}`, r]));
   const sap = rs.filter(
     (r) => r.height >= SAPLING.lo && r.height <= SAPLING.hi && r.season >= 50 && r.season <= 290,
@@ -332,9 +347,11 @@ for (const cond of names) {
         ];
       }),
     ),
-    lone: Object.fromEntries(
-      LONE.species.map((sp) => [sp, seeds.map((seed) => lone(cond, sp, seed))]),
-    ),
+    lone: noLone
+      ? {}
+      : Object.fromEntries(
+          LONE.species.map((sp) => [sp, seeds.map((seed) => lone(cond, sp, seed))]),
+        ),
   };
 }
 writeFileSync(join(out, "summary.json"), JSON.stringify({ seeds, arms: ARMS, result }, null, 1));
@@ -366,13 +383,23 @@ for (const cond of names) {
       `  ${w}: gate1 ${x.gate1}/${seeds.length}${w === 66 ? `, gate2 ${x.gate2}/${seeds.length}` : ""} | canopy/ha med ${f2(x.canopyPerHa100 as number)} | cap seasons ${(x.capSeasons as number[]).join(",")} | bank med ${x.bankMedian} | ≥7cm ${x.stems7PerHaMedian}/ha, canopy share ${f2(x.canopyShare7Median as number)}`,
     );
   }
-  for (const sp of LONE.species) {
+  for (const sp of noLone ? [] : LONE.species) {
     const l = a.lone[sp] ?? [];
     console.log(
       `  lone ${sp}: H ${l.map((x) => x.height.toFixed(1)).join(",")} W/H ${l.map((x) => f2(x.wh)).join(",")} metamers ${l.map((x) => x.metamers).join(",")} hashes ${l.map((x) => x.hash).join(",")}`,
     );
   }
   if (!head || cond === "head") continue;
+  if (confirm) {
+    const b = confirmBars(cond, a, head);
+    bars[cond] = { ...b, passes: Object.values(b).every(Boolean) };
+    console.log(
+      `  bars: ${Object.entries(b)
+        .map(([k, v]) => `${k} ${v ? "pass" : "FAIL"}`)
+        .join(", ")} → ${bars[cond]?.passes ? "PASSES" : "fails"}`,
+    );
+    continue;
+  }
   const h = head.saplings;
   const n = seeds.length;
   const inNoise = (sp: string, key: "height" | "wh") => {
@@ -398,6 +425,46 @@ for (const cond of names) {
       .map(([k, v]) => `${k} ${v ? "pass" : "FAIL"}`)
       .join(", ")} → ${bars[cond]?.passes ? "PASSES" : "fails"}`,
   );
+}
+/**
+ * The confirmation's bars (the note's "Confirmation", fixed before its runs): per seed, paired
+ * against HEAD's same seed, the no-growth share falls and the median gain per decade rises in
+ * ≥ 15 of 20 (a seed where either side has under 30 sapling-seasons counts as a miss); pooled, the
+ * no-growth share ≤ 0.61; #122's gates in ≥ 18 of 20 runs at each width; canopy trees/ha (median
+ * over runs) not below HEAD's at either width.
+ */
+function confirmBars(cond: string, a: R, head: R): Record<string, boolean> {
+  type G = { runs: { gate1: boolean; gate2: boolean }[]; canopyPerHa100: number };
+  const g = (x: R, w: number) => (x.garden as unknown as Record<number, G>)[w] as G;
+  const n = seeds.length;
+  const need = Math.ceil(0.75 * n);
+  const paired = seeds.map((seed) => ({
+    seed,
+    arm: saplings(cond, [seed]),
+    head: saplings("head", [seed]),
+  }));
+  const ok = (p: (typeof paired)[number]) => p.arm.treeSeasons >= 30 && p.head.treeSeasons >= 30;
+  const falls = paired.filter((p) => ok(p) && p.arm.noGrowth < p.head.noGrowth).length;
+  const rises = paired.filter((p) => ok(p) && p.arm.gainPerDecade > p.head.gainPerDecade).length;
+  const gates160 = g(a, 160).runs.filter((r) => r.gate1).length;
+  const gates66 = g(a, 66).runs.filter((r) => r.gate1 && r.gate2).length;
+  console.log(
+    `  per seed (arm/head no growth; gain/decade m; sapling-seasons):\n${paired
+      .map(
+        (p) =>
+          `    s${p.seed}: ${f2(p.arm.noGrowth)}/${f2(p.head.noGrowth)}; ${f2(p.arm.gainPerDecade)}/${f2(p.head.gainPerDecade)}; ${p.arm.treeSeasons}/${p.head.treeSeasons}`,
+      )
+      .join(
+        "\n",
+      )}\n  falls ${falls}/${n}, rises ${rises}/${n}, gates ${gates160}/${n} (160), ${gates66}/${n} (66)`,
+  );
+  return {
+    perSeedNoGrowth: falls >= need,
+    perSeedGain: rises >= need,
+    pooledNoGrowth: a.saplings.noGrowth <= 0.61,
+    gates: gates160 >= n - 2 && gates66 >= n - 2,
+    canopy: WIDTHS.every((w) => g(a, w).canopyPerHa100 >= g(head, w).canopyPerHa100),
+  };
 }
 writeFileSync(join(out, "bars.json"), JSON.stringify({ seeds, bars }, null, 1));
 console.log(`\nruns wall ${(runsWall / 60).toFixed(1)} min on ${jobs} simulators`);

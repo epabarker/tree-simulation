@@ -1,6 +1,6 @@
 # #138's sapling-release probe: concentrate the unspent v, or bank it (2026-11-16)
 
-_EXPLORATORY: seeds 1–3, nothing adopted on these runs. Issue [#138](https://github.com/epabarker/tree-simulation/issues/138); the trace is [2026-11-15-sapling-growth.md](2026-11-15-sapling-growth.md). Spec §C3.4, §R1.4, §R5; ADR 0004 (its revisit clause), ADR 0068. Everything down to "Cost" was committed before any arm ran. The results are under "Result" below._
+_EXPLORATORY: seeds 1–3, nothing adopted on these runs; the `dl*` arms confirmed on seeds 1–20 under "Confirmation" (`dl40` passes, recommended, not adopted). Issue [#138](https://github.com/epabarker/tree-simulation/issues/138); the trace is [2026-11-15-sapling-growth.md](2026-11-15-sapling-growth.md). Spec §C3.4, §R1.4, §R5; ADR 0004 (its revisit clause), ADR 0068. Everything down to "Cost" was committed before any arm ran. The results are under "Result" below._
 
 ## Question
 
@@ -153,3 +153,73 @@ HEAD's records replayed by `origin/3d-port`'s treesim (a1ac407, built from `git 
 - **Its cost is the ≥ 7 cm flood.** Released saplings reach 7 cm: 766/ha at 160 cells against HEAD's 250 and ADR 0068's band of 200–400. That moves #132's problem rather than solving it.
 - **The bank does not fit as built.** At HEAD's cap it is capped out (92%); at 4·M it frees the saplings but outgrows the lone beech and hornbeam by 40–55%. It needs either a sapling-only scope (a size or light condition: a new design choice) or a lone refit.
 - **What adoption of `dl25` would need:** seeds 1–20 on the same bars with stated pass rates (S1 judged on ≥ 15 of 20 seeds' own no-growth share against HEAD's same seed, rather than a pooled share dominated by one seed); `phoneSeed3` re-recorded with a devlog reason; an ADR on R5's δλ (0.02 → 0.25 is a calibration, not a spec change); and #132's rates re-tuned on the new stand, with the ≥ 7 cm flood read against ADR 0068's band.
+
+## Confirmation: the `dl*` arms on seeds 1–20 (bars fixed before its runs)
+
+_Issue #138's follow-up. This section down to "Reproduce (confirmation)" was committed before any of its runs; the results are appended under "Confirmation result"._
+
+**Why:** `dl25` missed the pilot's S1 by 0.01 on three seeds whose own spread was ±0.15 (HEAD 0.95 / 0.62 / 0.73). A claim about the seeds needs N ≥ 20 and a stated pass rate (AGENTS.md).
+
+**Arms:** `head`, `dl10` (`r5.dLambda` 0.10), `dl25` (0.25), and `dl40` (0.40, the bracket above; λ = 0.5 + δλ·shade reaches 0.9 in deep shade). Gardens at 160 and 66 cells to season 300 and the sapling probe on the 160-cell params, seeds 1–20. Seeds 1–3 of `head`, `dl10` and `dl25` are the pilot's runs, reused (built at 6af72f5; nothing under `rust/` has changed since).
+
+**Lone trees are not re-run:** R5's signal is neighbour shade, zero for a tree alone, and the pilot found all nine `dl*` lone runs hash-identical to HEAD's. One is checked again: `dl25`'s lone beech, seed 1, to season 100, against HEAD's c9f55e42.
+
+**Bars** (the sapling class as the pilot's: live trees 1–5 m at seasons 50–290 of the 160-cell gardens, all species):
+
+1. **Per seed, no growth:** the arm's no-growth share below HEAD's on the same seed in ≥ 15 of 20 seeds.
+2. **Per seed, gain:** the arm's median height gain per decade above HEAD's on the same seed in ≥ 15 of 20. In both per-seed bars, a seed where the arm or HEAD has fewer than 30 sapling-seasons counts as a miss.
+3. **Pooled no growth:** seeds 1–20 pooled, the no-growth share ≤ 0.61 (the pilot's HEAD − 0.10).
+4. **#122's gates:** a canopy tree every season after 50 at 160 cells, and at 66 cells that plus one every season from 100, in ≥ 18 of 20 runs at each width.
+5. **Canopy trees/ha:** at each width, the median over the 20 runs of each run's median canopy trees/ha over seasons 100–300 at least HEAD's.
+
+An arm passes if it passes all five. **Rule:** a passing arm is recommended for adoption as the garden's default; adoption is the user's call, with an ADR (drafted here only if an arm passes). No default changes in this PR.
+
+**Reported, not gated:** stems ≥ 7 cm DBH per ha (ADR 0068's band 200–400; the band is #132's, now blocked behind #134), their canopy share, seasons at the stand's cap, and the phone width's (66 cells) numbers in place of `phoneSeed3` / `forestRegeneration` (`npm run regressions` runs the defaults, so it cannot read an arm).
+
+**Cost:** 4 arms × 20 seeds × 3 runs = 240, less the 27 reused: 213 runs (≈ 12 simulator-minutes per arm and seed), at most 6 simulators (another probe holds 6), so about 2.5 h.
+
+### Reproduce (confirmation)
+
+```
+node cli/sapling-release-probe.ts --arms head,dl10,dl25,dl40 --seeds 1-20 --no-lone --confirm \
+  --out runs/sapling-release-confirm -j 6
+```
+
+## Confirmation result
+
+**`dl40` (`r5.dLambda` 0.40) passes all five bars. `dl25` fails the pooled no-growth bar by 0.01 again; `dl10` fails it by 0.09. Nothing is adopted: `dl40` is recommended to the user, with [ADR 0071](../decisions/0071-shade-apical-control.md) drafted as proposed.**
+
+213 new runs plus the pilot's 27, 117 min on 6 simulators (`runs/sapling-release-confirm/`, `summary.json`, `bars.json`, `log.txt`; generated). Nothing under `rust/` or `src/core/` changed between the runs and this commit's base.
+
+### The bars
+
+| arm | 1: no growth falls, per seed (≥ 15) | 2: gain rises, per seed (≥ 15) | 3: pooled no growth (≤ 0.61) | 4: gates, 160 / 66 (≥ 18) | 5: canopy/ha, 160 / 66 (HEAD 109 / 76) | passes |
+|---|---|---|---|---|---|---|
+| `head` | – | – | 0.75 | 20 / 20 | 109 / 76 | – |
+| `dl10` | 15 ✓ | 19 ✓ | 0.70 ✗ | 20 / 20 ✓ | 141 / 76 ✓ | ✗ |
+| `dl25` | 17 ✓ | 20 ✓ | 0.62 ✗ | 20 / 20 ✓ | 188 / 76 ✓ | ✗ |
+| `dl40` | 18 ✓ | 20 ✓ | **0.60** ✓ | 20 / 20 ✓ | 188 / 133 ✓ | **✓** |
+
+- **HEAD's pooled share is 0.75 on 20 seeds**, not the pilot's 0.71. Bar 3 was fixed at the pilot's HEAD − 0.10 (0.61) and is kept as written; against the 20-seed HEAD − 0.10 (0.65), `dl25` would pass. Read that as a statement about the bar, not a pass.
+- **Per seed** (arm / HEAD no-growth): every arm's misses include seed 7 (`dl40` 0.85 / 0.81) and seed 18 (0.81 / 0.73); the per-seed tables are in `log.txt`. Every seed had ≥ 30 sapling-seasons in every arm (the fewest: `dl40` seed 19, 2,820).
+- **The lone trees:** `dl25`'s and `dl40`'s lone beech, seed 1, to season 100, give HEAD's state hash c9f55e42, as the pilot's nine `dl*` lone runs did.
+
+### Reported, not gated
+
+| arm | gain/decade, m (median; P90; share none) | ≥ 7 cm stems/ha, 160 / 66 (band 200–400) | ≥ 7 cm canopy share, 160 / 66 | seedling bank per frame, 160 / 66 | cap seasons (median), 160 / 66 | top height (cells, median run), 160 / 66 |
+|---|---|---|---|---|---|---|
+| `head` | 0.02; 0.83; 0.34 | 266 / 114 | 0.50 / 0.67 | 68 / 55 | 235 / 186.5 | 97 / 84 |
+| `dl10` | 0.10; 1.34; 0.27 | 328 / 114 | 0.54 / 0.75 | 76 / 57.5 | 239.5 / 196.5 | 108 / 82 |
+| `dl25` | 0.26; 2.89; 0.23 | 758 / 152 | 0.65 / 0.75 | 70.5 / 45.5 | 248 / 208.5 | 112 / 101 |
+| `dl40` | 0.34; 2.97; 0.20 | 852 / 152 | 0.71 / 0.84 | 60.5 / 33.5 | 245.5 / 217 | 117 / 112 |
+
+- **The ≥ 7 cm flood stays and grows with δλ:** at 160 cells every `dl40` run's peak frame is above 400/ha (HEAD 15 of 20). It is #132's problem moved, as the pilot said; the band is #132's, blocked behind #134.
+- **The phone (66 cells, in place of `phoneSeed3` / `forestRegeneration`):** gates 20/20; the seedling bank falls from 55 to 33.5 stems a frame and one run has an empty frame (HEAD two); the stand sits at its cap 30 seasons longer. Canopy/ha 133 against 76 is real height growth (top height 84 → 112 cells), not the pilot's top-height artefact; its spread is wide (38–1,174/ha by run).
+- **Per species:** beech (0.69 → 0.57) and hornbeam (0.76 → 0.65) are released; **maple is frozen harder** (0.78 → 0.97) and holly (0.65 → 0.82) and rowan (0.83 → 0.87) too. δλ concentrates v at the leader, which helps species with a strong leader and starves the bushier ones.
+- **Sapling-seasons fall** from 270,670 to 157,940: released saplings leave the 1–5 m class sooner, and fewer enter it.
+
+### Conclusion
+
+- **`dl40` meets the release bars on 20 seeds** (18 / 20 and 20 / 20 paired; pooled 0.60), keeps the gates, the canopy and the lone trees. **Recommended for adoption** as the garden's default, as ADR 0071 (proposed) sets out; adoption is the user's call.
+- **Its costs are reported, not gated, and two need the user:** the ≥ 7 cm flood (852/ha at 160 against the 200–400 band), which #132's re-tune must now absorb, and maple, holly and rowan freezing harder.
+- **Where it lives:** `r5.dLambda` is the world's (`DEFAULT_PARAMS.r5` in `src/core/params.ts`, 0.02; no species patch carries an `r5`, though `SpeciesPatch` allows one). Adopting it at the world level touches every preset with R5 on; a per-species patch on beech and hornbeam alone would spare maple. ADR 0071 lists what either touches.

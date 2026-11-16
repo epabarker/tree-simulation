@@ -442,7 +442,7 @@ pub struct O4 {
     pub m0: f64,
     pub max_trees: f64,
     pub rain: Option<f64>,
-    /// §O4.11's seedling stubs outside the cap (ADR 0071; `principles::stubs`), the world's.
+    /// §O4.11's seedling stubs outside the cap (ADR 0072; `principles::stubs`), the world's.
     /// Absent or false: off, bit-identical.
     pub stubs: bool,
     /// The ground light, as Q/C, a stub or a seed needs to become a tree with stubs on, raised to
@@ -452,7 +452,7 @@ pub struct O4 {
     /// is, e^(−β_s(T − 1)) (species-merged; absent: 0, no stub dies).
     pub stub_death: f64,
     /// θ_demote: a live tree of age ≥ 1 below the display threshold whose crown-top light
-    /// Q_top/C is below this returns to its cell's stubs (ADR 0071's addendum; species-merged;
+    /// Q_top/C is below this returns to its cell's stubs (ADR 0072's addendum; species-merged;
     /// absent: 0, no demotion).
     pub stub_demote: f64,
     /// Planting at a density (ADR 0063, decision 5; `principles::planting`); None: `trees`.

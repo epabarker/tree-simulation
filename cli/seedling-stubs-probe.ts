@@ -1,5 +1,5 @@
 /**
- * #137's seedling-stubs probe: spec §O4.11's "keep seedlings as stubs until lit" (ADR 0071, off by
+ * #137's seedling-stubs probe: spec §O4.11's "keep seedlings as stubs until lit" (ADR 0072, off by
  * default: `o4.stubs`, `o4.stubLight`, `o4.stubDeath`) against HEAD's garden, at widths 160 and 66,
  * to season 300, natively (`cli/run.ts` builds it when stale). Too slow for `npm run check`: run by
  * hand. The bars were fixed before the runs: docs/experiments/2026-11-16-seedling-stubs-probe.md.

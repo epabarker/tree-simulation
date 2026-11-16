@@ -654,7 +654,7 @@ export interface Params {
     /** Cap on live trees, so a page cannot run away. */
     maxTrees: number;
     /**
-     * §O4.11's seedling stubs (ADR 0071), the world's: a seed that passes p_est but cannot become
+     * §O4.11's seedling stubs (ADR 0072), the world's: a seed that passes p_est but cannot become
      * a tree (the cap full, too dark, a trunk within a cell) joins a per-cell count of stubs of
      * its species outside `maxTrees`; a lit, free cell promotes one to a tree while the cap has
      * room, brightest first. Absent or false: off, bit-identical.
@@ -672,7 +672,7 @@ export interface Params {
     stubDeath?: number;
     /**
      * θ_demote: with stubs on, a live tree of age ≥ 1 below the display threshold whose crown-top
-     * light Q_top/C is below this returns to its cell's stubs (ADR 0071); species-merged. Absent:
+     * light Q_top/C is below this returns to its cell's stubs (ADR 0072); species-merged. Absent:
      * 0 (no demotion).
      */
     stubDemote?: number;

@@ -60,7 +60,7 @@ pub struct World {
     /// the cap holds (stand.rs; the season as stand.csv numbers it, after the season ran). Kept
     /// apart from `log`, which is the replay's input, and out of the checkpoint's bytes.
     pub notices: Vec<Value>,
-    /// §O4.11's seedling stubs (ADR 0071): per species name, the stubs in each ground cell
+    /// §O4.11's seedling stubs (ADR 0072): per species name, the stubs in each ground cell
     /// (`principles::stubs::cell`). Empty unless `o4.stubs` is on; saved in checkpoints.
     pub stubs: Stubs,
 }

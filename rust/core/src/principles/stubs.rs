@@ -1,4 +1,4 @@
-//! O4's seedling stubs (spec §O4.11 "keep seedlings as stubs until lit", ADR 0071).
+//! O4's seedling stubs (spec §O4.11 "keep seedlings as stubs until lit", ADR 0072).
 //!
 //! Rule: with the world's `o4.stubs` on, a seed that passes p_est but cannot become a tree (the
 //! cap full, its ground light below max(q_est, stubLight), or a live trunk within a cell) joins a
@@ -10,7 +10,7 @@
 //! first, and while the cap has room a cell lit to a stub species' threshold promotes one stub of
 //! the species so lit, drawn by count [RNG: stubPromotion], to a seedling at the cell's centre,
 //! next season, as an established seed is. At most one a cell a season. Then, "until lit" read
-//! both ways (ADR 0071's addendum), each live tree of age ≥ 1 below the display threshold whose
+//! both ways (ADR 0072's addendum), each live tree of age ≥ 1 below the display threshold whose
 //! crown-top light Q_top/C (C5's, phase 2) is below `o4.stubDemote` leaves the stand and joins its
 //! root cell's stubs; it draws no stub death this season.
 //!

@@ -8,7 +8,7 @@
 //! deficit counter per metamer after each tree's bud columns. These counters persist across
 //! seasons (R1/C5's kShed); absent counters in versions 1 and 2 start at zero. Version 4 (#125)
 //! appends, after the deficits and padded the same way, one f64 per metamer of C5's relative-test
-//! count (`dark`, c5.kRel); versions 1–3 start it at zero. Version 5 (ADR 0071) adds the
+//! count (`dark`, c5.kRel); versions 1–3 start it at zero. Version 5 (ADR 0072) adds the
 //! header's `stubs` table, §O4.11's seedling stubs as {species: [cell, count, …]}; it is written
 //! only when the pool is not empty, so a world without stubs keeps version 4's bytes, and versions
 //! 1–4 load with no stubs.
@@ -24,7 +24,7 @@ use crate::tree::{ColMut, NUMBERS, SCALARS, Tree};
 use crate::world::World;
 
 const VERSION: f64 = 4.0;
-/// The version a world with seedling stubs writes (ADR 0071): version 4 plus the header's table.
+/// The version a world with seedling stubs writes (ADR 0072): version 4 plus the header's table.
 const VERSION_STUBS: f64 = 5.0;
 
 /// The 2D schema (version 1): (name, size in bytes) of each column, in its order.

@@ -38,10 +38,10 @@ pub mod purpose {
     /// by the bud and the season. The number probe/121-pathlength's `PATH_LIMIT` had, so the
     /// reach yardstick draws as that probe drew.
     pub const EXTENT_LIMIT: u32 = 21;
-    /// A seedling stub's death (§O4.11, ADR 0071), keyed by its cell, its species' key and its
+    /// A seedling stub's death (§O4.11, ADR 0072), keyed by its cell, its species' key and its
     /// index in the cell's count, and the season.
     pub const STUB_DEATH: u32 = 22;
-    /// Which species a lit cell's stubs promote to a tree (ADR 0071), keyed by the cell and season.
+    /// Which species a lit cell's stubs promote to a tree (ADR 0072), keyed by the cell and season.
     pub const STUB_PROMOTION: u32 = 23;
 }
 

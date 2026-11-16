@@ -15,7 +15,7 @@
 //! cell; seed rain from beyond the world lands per species anywhere on the ground [RNG: seedRain].
 //! Local seeds and rain establish anywhere in the depth (ADR 0063, decision 4). Seedlings start
 //! next season; live trees, the seedling bank included, are capped at maxTrees. With o4.stubs on
-//! (§O4.11, ADR 0071; `stubs.rs`), seeds that cannot stand become per-cell stubs outside the cap,
+//! (§O4.11, ADR 0072; `stubs.rs`), seeds that cannot stand become per-cell stubs outside the cap,
 //! promoted to trees where lit and returned to stubs when dark.
 //!
 //! Params: o4.mortality; sizeBlind reads o4.m0, twoPart reads o4.mCanopy, o4.hCanopy,
@@ -229,7 +229,7 @@ pub fn stand_dynamics(world: &mut World) -> f64 {
         .collect();
     let mut live = parents.len() as f64;
     let mut recruits = 0.0;
-    // §O4.11's stubs (ADR 0071): the pool's deaths, then its lit cells' promotions, before this
+    // §O4.11's stubs (ADR 0072): the pool's deaths, then its lit cells' promotions, before this
     // season's seeds land (staging).
     if stubs {
         super::stubs::deaths(world);
@@ -272,7 +272,7 @@ pub fn stand_dynamics(world: &mut World) -> f64 {
                 continue; // beyond an open face
             }
             if stubs {
-                // ADR 0071: a viable seed is a tree where it can stand and is lit, else a stub.
+                // ADR 0072: a viable seed is a tree where it can stand and is lit, else a stub.
                 if uniform(seed, purpose::ESTABLISHMENT, pid, kk, season, 0.0) >= p_est {
                     continue;
                 }

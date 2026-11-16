@@ -36,7 +36,7 @@ pub fn hash_world(world: &World) -> String {
         h = hash_table(h, tree.m.len(), tree.m.columns());
         h = hash_table(h, tree.b.len(), tree.b.columns());
     }
-    // §O4.11's stubs (ADR 0071), only when there are any, so a world without them hashes as before.
+    // §O4.11's stubs (ADR 0072), only when there are any, so a world without them hashes as before.
     for (species, cells) in &world.stubs {
         h = fnv_int(h, species.len() as u32);
         h = fnv_bytes(h, species.as_bytes());

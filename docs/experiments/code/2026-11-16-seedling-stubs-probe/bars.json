@@ -1,0 +1,53 @@
+{
+ "seeds": [
+  1,
+  2,
+  3,
+  4,
+  5,
+  6,
+  7,
+  8,
+  9,
+  10,
+  11,
+  12,
+  13,
+  14,
+  15,
+  16,
+  17,
+  18,
+  19,
+  20
+ ],
+ "bars": {
+  "s3": {
+   "gates": true,
+   "capWellBelowHead": false,
+   "canopyPerHa": true,
+   "hornbeamInCanopy": true,
+   "noTakeover": true,
+   "cheapOnPhone": true,
+   "passes": false
+  },
+  "s1d": {
+   "gates": true,
+   "capWellBelowHead": true,
+   "canopyPerHa": true,
+   "hornbeamInCanopy": true,
+   "noTakeover": true,
+   "cheapOnPhone": false,
+   "passes": false
+  },
+  "s3d": {
+   "gates": true,
+   "capWellBelowHead": true,
+   "canopyPerHa": true,
+   "hornbeamInCanopy": true,
+   "noTakeover": true,
+   "cheapOnPhone": true,
+   "passes": true
+  }
+ }
+}

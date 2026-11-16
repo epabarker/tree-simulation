@@ -15,7 +15,7 @@
 //! light.csv (with lad, the leaf area density over depth), buds.csv (every live bud, with its
 //! birthId) and ground.csv (the ground's light and the leaf area above it, per x and z); with
 //! --checkpoint-at N, checkpoint-N.bin.gz; with `o4.stubs` on, stubs.csv (§O4.11's seedling stubs
-//! by species, per season, ADR 0071). Presets come from rust/presets.json
+//! by species, per season, ADR 0072). Presets come from rust/presets.json
 //! (exported from the TypeScript presets). `npm run sim` (cli/run.ts) builds and runs it.
 
 use std::collections::HashSet;

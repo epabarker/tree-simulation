@@ -90,6 +90,47 @@ function subtreeVolume(m: Columns): Float64Array {
   return vol;
 }
 
+/**
+ * D at 1.3 m pooled over codominant stems (ADR 0067 decision 2; Tallo's √Σd² for a multi-stem tree), in
+ * metres, and the number of stems pooled. Each stem is followed as `dbh`'s trunk is (the continuing child by
+ * subtree volume, `continuation`) and read at the metamer whose span holds 1.3 m of stem length from the root,
+ * or at its tip if it ends sooner. Below that metamer, a side child holding at least CODOMINANT of the
+ * continuing child's subtree volume starts a stem of its own, read the same way; a fork at or above it is
+ * the crown's, not pooled. The trunk's stem is `dbh`'s, so a tree with no codominant fork reads `dbh`.
+ * (The #133 probe's `breast()`, docs/experiments/code/2026-11-15-wind-load/wind.py, on branch
+ * probe/133-wind-load, is the same rule.)
+ */
+export function pooledDbh(m: Columns): { dbh: number; stems: number } {
+  const n = m.length.length;
+  if (n === 0) return { dbh: 0, stems: 0 };
+  const nxt = continuation(m);
+  const vol = subtreeVolume(m);
+  const sides: number[][] = Array.from({ length: n }, () => []);
+  for (let i = 1; i < n; i++) {
+    const p = at(m.parent, i);
+    if (nxt[p] !== i) sides[p]?.push(i);
+  }
+  let sum = 0;
+  let stems = 0;
+  const open: [number, number][] = [[0, 0]]; // (first metamer, stem length below it, m)
+  while (open.length > 0) {
+    let [i, along] = open.pop() as [number, number];
+    for (;;) {
+      along += at(m.length, i) * CELL;
+      const next = nxt[i] as number;
+      if (along >= BREAST_HEIGHT || next < 0) break;
+      for (const k of sides[i] as number[]) {
+        if ((vol[k] as number) >= CODOMINANT * (vol[next] as number)) open.push([k, along]);
+      }
+      i = next;
+    }
+    const d = 2 * at(m.radius, i) * CELL;
+    sum += d * d;
+    stems++;
+  }
+  return { dbh: Math.sqrt(sum), stems };
+}
+
 export function allometry(m: Columns, b: Buds): Allometry {
   const n = m.length.length;
   if (n === 0) return { dbh: 0, height: 0, crownRadius: 0, maxOffset: 0, codominant: false };

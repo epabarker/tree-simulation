@@ -44,7 +44,7 @@ import {
   TOP,
 } from "../src/core/presets.ts";
 import { coreWasm, loadWorldsSync, RustWorld, type TreeView as Tree } from "../src/wasm/world.ts";
-import { type Allometry, allometry } from "./allometry.ts";
+import { type Allometry, allometry, CELL, pooledDbh } from "./allometry.ts";
 
 loadWorldsSync(readFileSync(coreWasm));
 /** A trial's world: the Rust core. */
@@ -185,7 +185,13 @@ export function withAssign(
 /** The lone tree's shape, read at one season (reported beside a fit, never scored: ADR 0029). */
 export interface LoneShape {
   spread: number;
+  /**
+   * H/D with D at 1.3 m, pooled over a codominant fork below it (allometry.ts `pooledDbh`; ADR
+   * 0067 decision 2): where the targets' anchors read D. Height and D both in cells.
+   */
   slenderness: number;
+  /** H/D over the root metamer's diameter (metrics' slenderness, the fit's measure before #134). */
+  slendernessRoot: number;
   branchAngle: number;
   widestAt: number;
   profileCentre: number;
@@ -221,11 +227,14 @@ export interface LoneTraits extends LoneShape, Partial<LoneShape100> {
 function loneShape(world: RustWorld, tree: Tree): LoneShape {
   const m = world.metricsOf(tree);
   const f = world.formOf(tree);
+  // Metrics' height is allometry's highest point (fit.py, 2026-11-03), so only D changes.
+  const breast = pooledDbh(tree.m.cols).dbh / CELL;
   return {
     // The crown read in x and z (form.rs's profile reads both the same way): the larger extent,
     // which the slab's depth does not cap.
     spread: m.height > 0 ? Math.max(m.crownWidth, m.crownDepth) / m.height : 0,
-    slenderness: m.slenderness,
+    slenderness: breast > 0 ? m.height / breast : 0,
+    slendernessRoot: m.slenderness,
     branchAngle: m.branchAngle,
     widestAt: f.widestAt,
     profileCentre: f.profileCentre,

@@ -22,7 +22,7 @@ use crate::principles::c6::update_girth;
 use crate::principles::o2::{EMPTY, Grid, abrade, tag_owner};
 use crate::principles::o4::stand_dynamics;
 use crate::principles::obstacles::clear_obstacles;
-use crate::principles::r1::{carbon_balance, starved_to_death};
+use crate::principles::r1::{bank_unspent, carbon_balance, starved_to_death};
 use crate::principles::r2::{
     aged_offset, arm_set_point, curve_offset, curved, direction_params, light_set_point,
     pendulous_set_point, relay_depth, relay_nodes, relay_on, relay_shift, vigour_forks,
@@ -456,6 +456,8 @@ pub fn grow_buds(tree: &mut Tree, params: &Params, season: f64) {
         Vec::new()
     };
     let mut shoot_length = 0.0;
+    // #138's bank: the v of buds that grew no shoot from it (R1, `r1.unspent`).
+    let mut unspent = 0.0;
     for i in 0..count {
         if !is_live_bud(tree.b.state[i]) {
             continue;
@@ -492,11 +494,16 @@ pub fn grow_buds(tree: &mut Tree, params: &Params, season: f64) {
                     season,
                     params,
                 );
-        let mut n = if v >= threshold && !refused {
+        let spends = v >= threshold && !refused;
+        let mut n = if spends {
             shoot_size(v, params, &mut shoot_length, cap)
         } else {
             0.0
         };
+        // Below its threshold, refused, or too little for one metamer (vCont < 1).
+        if n == 0.0 {
+            unspent += v;
+        }
         if n == 0.0 && !refused && state == bud::DORMANT && light_releases(tree.b.q[i], age, params)
         {
             // R4's light trigger: the first metamer is paid from the reserve (free without R1).
@@ -683,4 +690,5 @@ pub fn grow_buds(tree: &mut Tree, params: &Params, season: f64) {
             }
         }
     }
+    bank_unspent(tree, unspent, &params.r1);
 }

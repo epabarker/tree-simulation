@@ -1,8 +1,10 @@
 import { describe, expect, it } from "vitest";
+import { CELL, pooledDbh } from "../cli/allometry.ts";
 import {
   amendSpecies,
   getPath,
   loneParams,
+  newWorld,
   ROOFS,
   runLone,
   runShade,
@@ -14,6 +16,7 @@ import {
 } from "../cli/trials.ts";
 import { FLORA } from "../src/core/flora.ts";
 import { speciesParams } from "../src/core/params.ts";
+import type { TreeView as Tree } from "../src/wasm/world.ts";
 import { hashWorld, World } from "./world.ts";
 
 describe("species trials and amended patches (M27)", () => {
@@ -70,6 +73,22 @@ describe("species trials and amended patches (M27)", () => {
     expect(t.heightStage2).toBeGreaterThan(t.heightStage1);
     expect(t.spread).toBeGreaterThan(0);
     expect(t.forkHeight).toBeGreaterThan(0);
+  });
+
+  // ADR 0067 decision 2: the fit's lone H/D reads D at 1.3 m, pooled over a codominant fork below
+  // it; the root metamer's H/D is reported beside it.
+  it("scores the lone tree's slenderness at breast height, the root's beside it", () => {
+    const t = runLone("birch", 1, {}, 60, [10, 20]);
+    const world = newWorld(loneParams("birch", 1));
+    world.run(20);
+    const tree = world.trees[0] as Tree;
+    const m = world.metricsOf(tree);
+    const breast = pooledDbh(tree.m.cols).dbh / CELL;
+    world.dispose();
+    expect(t.slenderness).toBeCloseTo(m.height / breast, 9);
+    expect(t.slendernessRoot).toBeCloseTo(m.slenderness, 9);
+    // The two diameters differ on this tree, so the test tells them apart.
+    expect(Math.abs(t.slenderness - t.slendernessRoot)).toBeGreaterThan(0.5);
   });
 
   it("grows the lone tree and the stand under the woods' top, and the wood per area at τ 0", () => {

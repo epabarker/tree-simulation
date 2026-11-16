@@ -9,6 +9,21 @@ Newest first. One entry per session or milestone: what changed, why, surprises, 
 - **Result:** every arm run to 20 seeds passes the bars (h2 failed the pilot). Only h60 moves the cap by much: a median 31 seasons a run fewer on the desktop (235 → 206), 96 on the phone (186.5 → 78.5). The milder cuts move it by 2–20. No run of any arm is cap-free: the other species' seeds refill every slot.
 - Hornbeam keeps every desktop canopy frame; recruitment shifts towards beech, maple and birch (hornbeam's share of recruits reaching 1.3 m 0.69 → 0.58). The flood of drawn stems is unchanged.
 - A draft [ADR 0070](decisions/0070-hornbeam-seed-supply.md) (proposed, not accepted) for hornbeam `cSeed` 300. No default, golden, preset or regression changed. The stubs (§O4.11) remain #137's answer for ending the cap.
+||||||| a1ac407
+
+## 2026-11-16: #138's sapling release: R5's δλ or a reserve bank; no arm passes, `dl25` nearest
+
+- **The rule** (0d31afe, 6af72f5; ADR 0004's revisit): `r1.unspent: "banked"` (absent "lost", off and bit-identical) with `r1.keep` (absent 1).
+  - At GROW, the v of live buds that grew no metamer from it returns to the reserve, capped at `store`·M.
+  - At CARBON, in a surplus season after the seed's first, the reserve above `keep`·M joins v_base.
+  - `r1.rs::reserve_cap` (the old expression) and `bank_unspent`; five unit tests. No checkpoint state, no RNG purpose.
+  - `spec-reviewer` (on opus: its Fable pin was rate-limited) found no divergences; its two questions became the age-0 and vCont < 1 clauses before any run.
+- **The probe:** [docs/experiments/2026-11-16-sapling-release-probe.md](experiments/2026-11-16-sapling-release-probe.md), `cli/sapling-release-probe.ts`, bars committed before the runs (0d31afe). Seeds 1–3, 108 runs, 93.5 min on 6 simulators.
+- **Result: no arm passes.**
+  - `dl25` (`r5.dLambda` 0.25): sapling height gain 0.02 → 0.33 m a decade, no-growth share 0.71 → 0.62 (bar 0.61), lone trees hash-identical, gates and canopy held. But ≥ 7 cm stems 766/ha against HEAD's 250 and ADR 0068's 200–400.
+  - The bank at 2·M is capped out (reserve at its cap in 92% of sapling-seasons, no-growth unchanged); at 4·M it frees the saplings (0.59) but grows the lone beech and hornbeam 40–55% taller.
+- **Surprise: three seeds do not settle a pooled sapling share.** HEAD's per-seed no-growth is 0.95, 0.62, 0.73, and seed 3 holds most sapling-seasons in every arm; canopy trees/ha per run spans 2×.
+- No default, golden, preset or regression changed.
 
 ## 2026-11-15: #133's wind load in R3: built off by default; its probe rejects every arm
 

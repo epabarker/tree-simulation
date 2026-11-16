@@ -2,6 +2,18 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-16: #132's ramp re-probed with O4's light memory on; no arm passes; B2 not rescued
+
+- **The probe:** [docs/experiments/2026-11-16-understorey-ramp-memory-probe.md](experiments/2026-11-16-understorey-ramp-memory-probe.md). The arms and bars were committed before the runs (b223db6), as the user approved them on 2026-11-16.
+  - Arms: M (s3d + τ 2.5) with ADR 0068's ramp at θ_hi 0.10 / 0.15 / 0.25; the control (s3d + the ramp at 0.15, no memory); M + B2; M + the ramp + B2.
+  - Runs: seeds 1–20 at widths 160 and 66, 300 new runs on 10 simulators. Head, s3d and M at 160 cells were linked from the light-memory probe; all 60 re-runs at 66 matched its hashes.
+- **Result: no ramp arm passes.** Bar 1 (≥ 7 cm stems in 200–400/ha) fails everywhere, and the ramp costs band frames against M. The phone empties again (1–2 stems ≥ 7 cm from season 200).
+  - The memory lowers the cohort's deaths only a little: 67% against the control's 73% at θ_hi 0.15, against head's 22%.
+  - M alone keeps head's 22%, with +22% canopy trees, and its phone season costs 0.96× head's.
+- **B2 fails under the memory too.** Beech holds 0.89 of the canopy at 300, hornbeam 0.08 (unreadable), and the phone's cap rises.
+- **M2 read per seed:** τ 2.5's 3.5-season miss is noise (worse in 10 seeds and better in 9; median paired difference +0.5 season). τ 10's is systematic (15 of 20 worse, p 0.04).
+- No code, golden, regression or default changes.
+
 ## 2026-11-16: O4's light memory (`o4.lightMemory`, ADR 0073): built off by default; probed against s3d
 
 - **The user's decision** (2026-11-16, in chat: "Yes, add light memory"), after the churn note found the floor's light under the canopy memoryless from one season to the next (ρ 0.02).

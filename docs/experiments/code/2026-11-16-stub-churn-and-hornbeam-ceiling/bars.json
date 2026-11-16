@@ -1,0 +1,50 @@
+{
+ "s3d": {
+  "gates": true,
+  "g34": true,
+  "b1": true,
+  "b2": true,
+  "b3": true,
+  "b4": true,
+  "b5": true,
+  "c1": false,
+  "c3": true,
+  "pass": false
+ },
+ "s3dY15": {
+  "gates": true,
+  "g34": true,
+  "b1": true,
+  "b2": true,
+  "b3": true,
+  "b4": true,
+  "b5": true,
+  "c1": false,
+  "c3": false,
+  "pass": false
+ },
+ "s3dk3": {
+  "gates": true,
+  "g34": true,
+  "b1": false,
+  "b2": true,
+  "b3": true,
+  "b4": true,
+  "b5": true,
+  "c1": false,
+  "c3": true,
+  "pass": false
+ },
+ "s3dk5": {
+  "gates": true,
+  "g34": true,
+  "b1": false,
+  "b2": true,
+  "b3": true,
+  "b4": true,
+  "b5": true,
+  "c1": false,
+  "c3": true,
+  "pass": false
+ }
+}

@@ -1,0 +1,130 @@
+runs/137-churn/s3d-w160-s1.json, promoted stubs: 2912 trees, 150 seasons
+  demoted: 2859 (98.2%)
+  died: 0 (0.0%)
+  drawn: 0 (0.0%)
+  alive: 53 (1.8%)
+  demoted, seasons from promotion to demotion: 1:2144 2:562 3:115 4:32 5:4 6:1 7:1
+  demoted, age at demotion: median 1.000 [p10 1.000, p90 2.000]
+  demoted (2859):
+    promotion's ground Q/C at y 0.5: median 0.189 [p10 0.161, p90 0.236]
+    promotion's ground Q/C at y 1.5: median 0.126 [p10 0.041, p90 0.209]
+    promotion's ground Q/C at y 2.5: median 0.102 [p10 0.018, p90 0.189]
+    promotion's ground Q/C at y 4.5: median 0.075 [p10 0.013, p90 0.168]
+    next season: the centre's y 0.5 Q/C median 0.015 [p10 0.003, p90 0.059]
+    next season: Q_top/C median 0.030 [p10 0.005, p90 0.114], age median 1.000 [p10 1.000, p90 1.000], h median 1.000 [p10 1.000, p90 1.000]
+    last read: Q_top/C median 0.020 [p10 0.004, p90 0.055]
+  alive (53):
+    promotion's ground Q/C at y 0.5: median 0.181 [p10 0.157, p90 0.213]
+    promotion's ground Q/C at y 1.5: median 0.118 [p10 0.027, p90 0.184]
+    promotion's ground Q/C at y 2.5: median 0.053 [p10 0.011, p90 0.142]
+    promotion's ground Q/C at y 4.5: median 0.054 [p10 0.006, p90 0.126]
+    next season: the centre's y 0.5 Q/C median 0.046 [p10 0.025, p90 0.085]
+    next season: Q_top/C median 0.116 [p10 0.077, p90 0.173], age median 1.000 [p10 1.000, p90 1.000], h median 1.000 [p10 1.000, p90 1.000]
+    last read: Q_top/C median 0.116 [p10 0.080, p90 0.173]
+  all (2912):
+    promotion's ground Q/C at y 0.5: median 0.189 [p10 0.160, p90 0.236]
+    promotion's ground Q/C at y 1.5: median 0.126 [p10 0.041, p90 0.209]
+    promotion's ground Q/C at y 2.5: median 0.102 [p10 0.018, p90 0.189]
+    promotion's ground Q/C at y 4.5: median 0.074 [p10 0.013, p90 0.167]
+    next season: the centre's y 0.5 Q/C median 0.015 [p10 0.003, p90 0.059]
+    next season: Q_top/C median 0.031 [p10 0.005, p90 0.115], age median 1.000 [p10 1.000, p90 1.000], h median 1.000 [p10 1.000, p90 1.000]
+    last read: Q_top/C median 0.020 [p10 0.004, p90 0.055]
+  first season Q_top/C < 0.075: 2144 of 2873
+  ρ(promotion ground y 0.5, first Q_top/C): 0.07
+  ρ(promotion ground y 1.5, first Q_top/C): 0.06
+  ρ(promotion ground y 2.5, first Q_top/C): 0.05
+  ρ(promotion ground y 4.5, first Q_top/C): 0.06
+  ρ(next season's centre y 0.5, first Q_top/C): 0.48
+  ρ(promotion y 0.5, next season's y 0.5): 0.06
+runs/137-churn/s3d-w160-s1.json, seeds that became trees at once: 1008 trees, 150 seasons
+  demoted: 963 (95.5%)
+  died: 0 (0.0%)
+  drawn: 31 (3.1%)
+  alive: 14 (1.4%)
+  demoted, seasons from promotion to demotion: 1:745 2:151 3:51 4:12 5:2 6:1 9:1
+  demoted, age at demotion: median 1.000 [p10 1.000, p90 2.000]
+  demoted (963):
+    promotion's ground Q/C at y 0.5: median 0.172 [p10 0.154, p90 0.214]
+    promotion's ground Q/C at y 1.5: median 0.114 [p10 0.037, p90 0.199]
+    promotion's ground Q/C at y 2.5: median 0.094 [p10 0.015, p90 0.180]
+    promotion's ground Q/C at y 4.5: median 0.068 [p10 0.011, p90 0.151]
+    next season: the centre's y 0.5 Q/C median 0.014 [p10 0.002, p90 0.060]
+    next season: Q_top/C median 0.029 [p10 0.004, p90 0.112], age median 1.000 [p10 1.000, p90 1.000], h median 1.000 [p10 1.000, p90 1.000]
+    last read: Q_top/C median 0.021 [p10 0.004, p90 0.059]
+  drawn (31):
+    promotion's ground Q/C at y 0.5: median 0.577 [p10 0.577, p90 0.815]
+    promotion's ground Q/C at y 1.5: median 1.000 [p10 0.971, p90 1.000]
+    promotion's ground Q/C at y 2.5: median 1.000 [p10 1.000, p90 1.000]
+    promotion's ground Q/C at y 4.5: median 1.000 [p10 1.000, p90 1.000]
+    next season: the centre's y 0.5 Q/C median 0.582 [p10 0.388, p90 0.940]
+    next season: Q_top/C median 1.000 [p10 0.981, p90 1.000], age median 2.000 [p10 1.000, p90 2.000], h median 3.106 [p10 2.373, p90 4.411]
+    last read: Q_top/C median 1.000 [p10 0.701, p90 1.000]
+  alive (14):
+    promotion's ground Q/C at y 0.5: median 0.181 [p10 0.169, p90 0.239]
+    promotion's ground Q/C at y 1.5: median 0.168 [p10 0.068, p90 0.196]
+    promotion's ground Q/C at y 2.5: median 0.103 [p10 0.033, p90 0.177]
+    promotion's ground Q/C at y 4.5: median 0.100 [p10 0.014, p90 0.127]
+    next season: the centre's y 0.5 Q/C median 0.061 [p10 0.026, p90 0.111]
+    next season: Q_top/C median 0.093 [p10 0.086, p90 0.176], age median 1.000 [p10 1.000, p90 1.000], h median 1.000 [p10 1.000, p90 1.000]
+    last read: Q_top/C median 0.093 [p10 0.086, p90 0.176]
+  all (1008):
+    promotion's ground Q/C at y 0.5: median 0.174 [p10 0.154, p90 0.225]
+    promotion's ground Q/C at y 1.5: median 0.116 [p10 0.038, p90 0.210]
+    promotion's ground Q/C at y 2.5: median 0.097 [p10 0.016, p90 0.193]
+    promotion's ground Q/C at y 4.5: median 0.072 [p10 0.011, p90 0.174]
+    next season: the centre's y 0.5 Q/C median 0.015 [p10 0.002, p90 0.069]
+    next season: Q_top/C median 0.030 [p10 0.004, p90 0.124], age median 1.000 [p10 1.000, p90 1.000], h median 1.000 [p10 1.000, p90 1.000]
+    last read: Q_top/C median 0.021 [p10 0.004, p90 0.063]
+  first season Q_top/C < 0.075: 745 of 999
+  ρ(promotion ground y 0.5, first Q_top/C): 0.15
+  ρ(promotion ground y 1.5, first Q_top/C): 0.13
+  ρ(promotion ground y 2.5, first Q_top/C): 0.12
+  ρ(promotion ground y 4.5, first Q_top/C): 0.12
+  ρ(next season's centre y 0.5, first Q_top/C): 0.50
+  ρ(promotion y 0.5, next season's y 0.5): 0.17
+runs/137-churn/s3d-w160-s1.json, every recruit: 3920 trees, 150 seasons
+  demoted: 3822 (97.5%)
+  died: 0 (0.0%)
+  drawn: 31 (0.8%)
+  alive: 67 (1.7%)
+  demoted, seasons from promotion to demotion: 1:2889 2:713 3:166 4:44 5:6 6:2 7:1 9:1
+  demoted, age at demotion: median 1.000 [p10 1.000, p90 2.000]
+  demoted (3822):
+    promotion's ground Q/C at y 0.5: median 0.186 [p10 0.157, p90 0.231]
+    promotion's ground Q/C at y 1.5: median 0.122 [p10 0.040, p90 0.207]
+    promotion's ground Q/C at y 2.5: median 0.100 [p10 0.017, p90 0.187]
+    promotion's ground Q/C at y 4.5: median 0.073 [p10 0.012, p90 0.164]
+    next season: the centre's y 0.5 Q/C median 0.015 [p10 0.003, p90 0.059]
+    next season: Q_top/C median 0.030 [p10 0.005, p90 0.113], age median 1.000 [p10 1.000, p90 1.000], h median 1.000 [p10 1.000, p90 1.000]
+    last read: Q_top/C median 0.020 [p10 0.004, p90 0.055]
+  drawn (31):
+    promotion's ground Q/C at y 0.5: median 0.577 [p10 0.577, p90 0.815]
+    promotion's ground Q/C at y 1.5: median 1.000 [p10 0.971, p90 1.000]
+    promotion's ground Q/C at y 2.5: median 1.000 [p10 1.000, p90 1.000]
+    promotion's ground Q/C at y 4.5: median 1.000 [p10 1.000, p90 1.000]
+    next season: the centre's y 0.5 Q/C median 0.582 [p10 0.388, p90 0.940]
+    next season: Q_top/C median 1.000 [p10 0.981, p90 1.000], age median 2.000 [p10 1.000, p90 2.000], h median 3.106 [p10 2.373, p90 4.411]
+    last read: Q_top/C median 1.000 [p10 0.701, p90 1.000]
+  alive (67):
+    promotion's ground Q/C at y 0.5: median 0.181 [p10 0.158, p90 0.221]
+    promotion's ground Q/C at y 1.5: median 0.130 [p10 0.032, p90 0.189]
+    promotion's ground Q/C at y 2.5: median 0.063 [p10 0.012, p90 0.168]
+    promotion's ground Q/C at y 4.5: median 0.056 [p10 0.007, p90 0.127]
+    next season: the centre's y 0.5 Q/C median 0.046 [p10 0.025, p90 0.093]
+    next season: Q_top/C median 0.105 [p10 0.077, p90 0.176], age median 1.000 [p10 1.000, p90 1.000], h median 1.000 [p10 1.000, p90 1.000]
+    last read: Q_top/C median 0.098 [p10 0.080, p90 0.176]
+  all (3920):
+    promotion's ground Q/C at y 0.5: median 0.186 [p10 0.157, p90 0.234]
+    promotion's ground Q/C at y 1.5: median 0.123 [p10 0.040, p90 0.209]
+    promotion's ground Q/C at y 2.5: median 0.100 [p10 0.017, p90 0.189]
+    promotion's ground Q/C at y 4.5: median 0.074 [p10 0.012, p90 0.168]
+    next season: the centre's y 0.5 Q/C median 0.015 [p10 0.003, p90 0.061]
+    next season: Q_top/C median 0.030 [p10 0.005, p90 0.117], age median 1.000 [p10 1.000, p90 1.000], h median 1.000 [p10 1.000, p90 1.000]
+    last read: Q_top/C median 0.020 [p10 0.004, p90 0.057]
+  first season Q_top/C < 0.075: 2889 of 3872
+  ρ(promotion ground y 0.5, first Q_top/C): 0.09
+  ρ(promotion ground y 1.5, first Q_top/C): 0.08
+  ρ(promotion ground y 2.5, first Q_top/C): 0.07
+  ρ(promotion ground y 4.5, first Q_top/C): 0.08
+  ρ(next season's centre y 0.5, first Q_top/C): 0.49
+  ρ(promotion y 0.5, next season's y 0.5): 0.09

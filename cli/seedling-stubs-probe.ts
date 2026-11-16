@@ -5,7 +5,10 @@
  * hand. The bars were fixed before the runs: docs/experiments/2026-11-16-seedling-stubs-probe.md.
  *
  * Arms: head; s1 (stubs on, stubLight 0.15, stubDeath 1); s3 (stubDeath 3); s1q10 (stubLight 0.10,
- * a pilot-only light bracket); s1d, s3d (s1 and s3 with stubDemote 0.075: the addendum).
+ * a pilot-only light bracket); s1d, s3d (s1 and s3 with stubDemote 0.075: the addendum); and
+ * #137's churn arms, s3dY15 (stubLightY 1.5), s3dk3 and s3dk5 (stubDemoteAge 3, 5), run with
+ * `--out runs/stub-churn-probe` and judged against s3d by
+ * docs/experiments/2026-11-16-stub-churn-and-hornbeam-ceiling.md's bars.
  *
  * Gates (#122; ≥ 18 of 20 seeds at both widths): a canopy tree in every season after 50; at 66
  * cells, one in every season from 100; checkpoints (frozen fixtures load with no stubs and grow on
@@ -45,6 +48,14 @@ const demoting = (stubLight: number, stubDeath: number, stubDemote: number): Pat
   params: { o4: { stubs: true, stubLight, stubDeath, stubDemote } } as Patch["params"],
 });
 
+/** s3d's o4 fields, for the churn arms to extend. */
+const ARM_O4 = (stubLight: number, stubDeath: number, stubDemote: number) => ({
+  stubs: true,
+  stubLight,
+  stubDeath,
+  stubDemote,
+});
+
 export const ARMS: Record<string, Patch> = {
   head: {},
   s1: stubs(0.15, 1),
@@ -52,6 +63,12 @@ export const ARMS: Record<string, Patch> = {
   s1q10: stubs(0.1, 1),
   s1d: demoting(0.15, 1, 0.075),
   s3d: demoting(0.15, 3, 0.075),
+  // #137's churn probe (docs/experiments/2026-11-16-stub-churn-and-hornbeam-ceiling.md): s3d
+  // with promotion and a seed's test read at a seedling's top (y 1.5) instead of the ground's
+  // centre (y 0.5); and with demotion from age 3 or 5 instead of 1.
+  s3dY15: { params: { o4: { ...ARM_O4(0.15, 3, 0.075), stubLightY: 1.5 } } as Patch["params"] },
+  s3dk3: { params: { o4: { ...ARM_O4(0.15, 3, 0.075), stubDemoteAge: 3 } } as Patch["params"] },
+  s3dk5: { params: { o4: { ...ARM_O4(0.15, 3, 0.075), stubDemoteAge: 5 } } as Patch["params"] },
 };
 export const WIDTHS = [160, 66];
 export const SEASONS = 300;

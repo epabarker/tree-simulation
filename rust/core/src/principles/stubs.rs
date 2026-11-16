@@ -14,8 +14,13 @@
 //! crown-top light Q_top/C (C5's, phase 2) is below `o4.stubDemote` leaves the stand and joins its
 //! root cell's stubs; it draws no stub death this season.
 //!
+//! Two probe params (#137's churn note, docs/experiments/2026-11-16-stub-churn-and-hornbeam-
+//! ceiling.md), whose absence is the rule above: `o4.stubLightY` (the world's; absent 0.5) is the
+//! height at which a stub's cell and a seed's landing point are sampled for stubLight, and
+//! `o4.stubDemoteAge` (species-merged; absent 1) the age from which a bank tree can be demoted.
+//!
 //! Params: o4.stubs (the world's), o4.stubLight, o4.stubDeath and o4.stubDemote (species-merged),
-//! with o4.qEst,
+//! o4.stubLightY and o4.stubDemoteAge, with o4.qEst,
 //! o4.suppressionSlope, o4.shadeTolerance and o4.maxTrees; c2.C.
 
 use super::c1::{plant_seedling, seedling_azimuth};
@@ -185,7 +190,7 @@ pub fn promote(world: &mut World, live: &mut f64) -> f64 {
             .any(|(_, v)| v.get(k).is_some_and(|&n| n > 0));
         if held && !taken.get(k).copied().unwrap_or(true) {
             let (x, z) = centre(k as u32, width);
-            qs.push(world.light.sample(x, 0.5, z).0 / c);
+            qs.push(world.light.sample(x, params.o4.stub_light_y, z).0 / c);
             ks.push(k as u32);
         }
     }
@@ -254,7 +259,7 @@ pub fn promote(world: &mut World, live: &mut f64) -> f64 {
     planted
 }
 
-/// Returns to the pool every bank tree (age ≥ 1, not drawn) whose top light Q_top/C is below its
+/// Returns to the pool every bank tree (age ≥ max(1, stubDemoteAge), not drawn) whose top light Q_top/C is below its
 /// species' `stubDemote`. Returns how many left the stand.
 pub fn demote(world: &mut World) -> f64 {
     let (width, c) = (world.rules.params.world.width, world.rules.params.c2.c);
@@ -264,8 +269,9 @@ pub fn demote(world: &mut World) -> f64 {
     let mut gone = 0.0;
     for i in 0..world.trees.len() {
         let t = &world.trees[i];
-        let at = world.rules.of(&t.species).o4.stub_demote;
-        if !(t.alive && t.age >= 1.0 && at > 0.0) || t.q_top / c >= at {
+        let own = &world.rules.of(&t.species).o4;
+        let (at, from) = (own.stub_demote, math::max(1.0, own.stub_demote_age));
+        if !(t.alive && t.age >= from && at > 0.0) || t.q_top / c >= at {
             continue;
         }
         if crate::stand::is_drawn(crate::stand::stem_height(t)) {
@@ -439,6 +445,37 @@ mod tests {
             stand_dynamics(&mut w);
             assert!(w.trees[0].alive && w.stubs.is_empty(), "{patch} {q}");
         }
+    }
+
+    #[test]
+    fn with_stub_demote_age_k_a_bank_tree_younger_than_k_stays_a_tree() {
+        let gated = r#"{"o4":{"stubDemote":0.075,"stubDemoteAge":3}}"#;
+        let mut young = shaded(gated, 0.0);
+        young.trees[0].age = 2.0;
+        stand_dynamics(&mut young);
+        assert!(young.trees[0].alive && young.stubs.is_empty());
+        let mut old = shaded(gated, 0.0);
+        old.trees[0].age = 3.0;
+        stand_dynamics(&mut old);
+        assert!(!old.trees[0].alive);
+        assert_eq!(total(&old.stubs), 1.0);
+    }
+
+    #[test]
+    fn stub_light_y_moves_where_a_seed_and_a_stubs_cell_are_sampled() {
+        // The test world is lit inside the slab and dark above it: sampled above the slab's top,
+        // no seed is lit (every seed is a stub) and no stub is promoted.
+        let high = r#"{"o4":{"stubLightY":1e6}}"#;
+        let mut w = on(high);
+        w.trees[0].seed_pool = 20.0;
+        assert_eq!(stand_dynamics(&mut w), 0.0);
+        assert!(total(&w.stubs) > 5.0);
+        let mut p = pooled(high, 3, 10.0, 10.0);
+        assert_eq!(stand_dynamics(&mut p), 0.0);
+        assert_eq!(total(&p.stubs), 3.0);
+        // Within the slab it is lit at any height: as the default.
+        let mut low = pooled(r#"{"o4":{"stubLightY":2.5}}"#, 3, 10.0, 10.0);
+        assert_eq!(stand_dynamics(&mut low), 1.0);
     }
 
     #[test]

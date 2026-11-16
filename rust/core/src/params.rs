@@ -455,6 +455,12 @@ pub struct O4 {
     /// Q_top/C is below this returns to its cell's stubs (ADR 0072's addendum; species-merged;
     /// absent: 0, no demotion).
     pub stub_demote: f64,
+    /// k_demote: the age (seasons) from which a bank tree can be demoted (#137's churn probe;
+    /// species-merged; absent: 1, ADR 0072's addendum).
+    pub stub_demote_age: f64,
+    /// The height (cells) at which a stub's cell, or a seed's landing point, is sampled for
+    /// stubLight (#137's churn probe; the world's; absent: 0.5, the ground cell's centre).
+    pub stub_light_y: f64,
     /// Planting at a density (ADR 0063, decision 5; `principles::planting`); None: `trees`.
     pub planting: Option<Planting>,
 }
@@ -809,6 +815,8 @@ impl Params {
                 stub_light: opt(o4, "stubLight").unwrap_or(0.0),
                 stub_death: opt(o4, "stubDeath").unwrap_or(0.0),
                 stub_demote: opt(o4, "stubDemote").unwrap_or(0.0),
+                stub_demote_age: opt(o4, "stubDemoteAge").unwrap_or(1.0),
+                stub_light_y: opt(o4, "stubLightY").unwrap_or(0.5),
                 planting: o4.get("planting").map(|g| Planting {
                     density: num(g, "density"),
                     spacing: num(g, "spacing"),

@@ -1,0 +1,8 @@
+garden 160 seed 1, seasons 100–102, 10240 ground cells
+  median ground Q/C at y 0.5: 0.011 (N), 0.011 (N+1)
+  cells ≥ 0.15 at N: 0.3%; at N+1: 0.2%
+  of the cells ≥ 0.15 at N (26): ≥ 0.15 at N+1 46.2%, < 0.075 at N+1 30.8%, ≥ 0.15 at both N+1 and N+2 34.6%
+  ρ(centre y 0.5 at N, at N+1): 0.83; (N, N+2): 0.75; (N+1, N+2): 0.82
+  ρ(3×3 mean at N, centre at N+1): 0.47
+  ρ(centre y 4.5 at N, centre y 0.5 at N+1): 0.13
+  ρ(mean of N and N+1, N+2): 0.81

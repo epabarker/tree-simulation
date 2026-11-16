@@ -1,0 +1,98 @@
+{
+ "s3d": {
+  "gates": true,
+  "b1": false,
+  "b2": false,
+  "b3": true,
+  "b4": true,
+  "b5": false,
+  "wall": true
+ },
+ "M": {
+  "gates": true,
+  "b1": false,
+  "b2": false,
+  "b3": true,
+  "b4": true,
+  "b5": false,
+  "wall": true
+ },
+ "Mr10": {
+  "gates": true,
+  "b1": false,
+  "b2": false,
+  "b3": true,
+  "b4": true,
+  "b5": false,
+  "n1": false,
+  "wall": true,
+  "pass": false
+ },
+ "Mr15": {
+  "gates": true,
+  "b1": false,
+  "b2": true,
+  "b3": true,
+  "b4": false,
+  "b5": false,
+  "n1": false,
+  "wall": true,
+  "pass": false
+ },
+ "Mr25": {
+  "gates": false,
+  "b1": false,
+  "b2": true,
+  "b3": false,
+  "b4": false,
+  "b5": false,
+  "n1": false,
+  "wall": true,
+  "pass": false
+ },
+ "s3dr15": {
+  "gates": false,
+  "b1": false,
+  "b2": true,
+  "b3": true,
+  "b4": false,
+  "b5": false,
+  "n1": false,
+  "wall": true,
+  "pass": false
+ },
+ "MB2": {
+  "gates": true,
+  "b1": false,
+  "b2": false,
+  "b3": true,
+  "b4": true,
+  "b5": false,
+  "wall": true,
+  "pass": false,
+  "B2a": false,
+  "B2b": false,
+  "B2c": false,
+  "B2d": true,
+  "B2e": false,
+  "B2f": true,
+  "B2g": false
+ },
+ "Mr15B2": {
+  "gates": false,
+  "b1": false,
+  "b2": false,
+  "b3": true,
+  "b4": false,
+  "b5": false,
+  "wall": true,
+  "pass": false,
+  "B2a": true,
+  "B2b": false,
+  "B2c": false,
+  "B2d": true,
+  "B2e": true,
+  "B2f": false,
+  "B2g": false
+ }
+}

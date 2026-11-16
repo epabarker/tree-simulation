@@ -1,0 +1,29 @@
+params equal for every linked run; hashes at 66 equal: 60 of 60
+runs wall 81.1 min on 10 simulators
+head 160: runs 20 gate1 20 gate2 20 | ≥7 band 19/60 (med 266) share≥0.6 21 | canopy/ha 109.38 deaths 10.30 | LD 53 | cap 235 | cohort dead 0.22 | wall 220 s
+head 66: runs 20 gate1 20 gate2 20 | ≥7 band 6/60 (med 114) share≥0.6 41 | canopy/ha 75.76 deaths 6.45 | LD 23 | cap 186.5 | cohort dead 0.58 | wall 111 s
+s3d 160: runs 20 gate1 20 gate2 20 | ≥7 band 14/60 (med 258) share≥0.6 22 | canopy/ha 109.38 deaths 10.75 | LD 47 | cap 79.5 | cohort dead 0.29 | wall 273 s
+s3d 66: runs 20 gate1 19 gate2 19 | ≥7 band 9/60 (med 114) share≥0.6 40 | canopy/ha 75.76 deaths 8.30 | LD 16 | cap 11 | cohort dead 0.73 | wall 129 s
+M 160: runs 20 gate1 20 gate2 20 | ≥7 band 16/60 (med 297) share≥0.6 18 | canopy/ha 132.81 deaths 10.05 | LD 49 | cap 62.5 | cohort dead 0.22 | wall 150 s
+M 66: runs 20 gate1 19 gate2 19 | ≥7 band 5/60 (med 114) share≥0.6 40 | canopy/ha 75.76 deaths 6.65 | LD 19 | cap 14.5 | cohort dead 0.47 | wall 107 s
+Mr10 160: runs 20 gate1 20 gate2 20 | ≥7 band 15/60 (med 250) share≥0.6 29 | canopy/ha 125.00 deaths 14.55 | LD 46 | cap 57.5 | cohort dead 0.42 | wall 274 s
+Mr10 66: runs 20 gate1 18 gate2 18 | ≥7 band 6/60 (med 76) share≥0.6 54 | canopy/ha 37.88 deaths 8.80 | LD 20 | cap 19.5 | cohort dead 0.79 | wall 102 s
+Mr15 160: runs 20 gate1 20 gate2 20 | ≥7 band 9/60 (med 195.5) share≥0.6 37 | canopy/ha 117.19 deaths 15.70 | LD 49 | cap 47 | cohort dead 0.67 | wall 272 s
+Mr15 66: runs 20 gate1 18 gate2 18 | ≥7 band 6/60 (med 38) share≥0.6 59 | canopy/ha 37.88 deaths 10.35 | LD 19 | cap 17 | cohort dead 0.91 | wall 104 s
+Mr25 160: runs 20 gate1 20 gate2 20 | ≥7 band 9/60 (med 109) share≥0.6 42 | canopy/ha 101.56 deaths 22.95 | LD 44 | cap 64 | cohort dead 0.91 | wall 286 s
+Mr25 66: runs 20 gate1 17 gate2 17 | ≥7 band 2/60 (med 38) share≥0.6 58 | canopy/ha 37.88 deaths 13.25 | LD 15 | cap 14 | cohort dead 0.96 | wall 102 s
+s3dr15 160: runs 20 gate1 20 gate2 20 | ≥7 band 7/60 (med 156) share≥0.6 41 | canopy/ha 109.38 deaths 20.70 | LD 49 | cap 58 | cohort dead 0.73 | wall 365 s
+s3dr15 66: runs 20 gate1 17 gate2 17 | ≥7 band 4/60 (med 38) share≥0.6 59 | canopy/ha 37.88 deaths 11.60 | LD 20 | cap 19 | cohort dead 0.93 | wall 132 s
+MB2 160: runs 20 gate1 20 gate2 20 | ≥7 band 12/60 (med 367.5) share≥0.6 25 | canopy/ha 140.63 deaths 14.95 | LD 34 | cap 69 | cohort dead 0.17 | wall 306 s
+MB2 66: runs 20 gate1 19 gate2 19 | ≥7 band 0/60 (med 152) share≥0.6 38 | canopy/ha 94.70 deaths 7.25 | LD 12 | cap 40.5 | cohort dead 0.35 | wall 113 s
+Mr15B2 160: runs 20 gate1 20 gate2 20 | ≥7 band 14/60 (med 289) share≥0.6 29 | canopy/ha 117.19 deaths 23.30 | LD 33 | cap 57 | cohort dead 0.82 | wall 311 s
+Mr15B2 66: runs 20 gate1 16 gate2 16 | ≥7 band 5/60 (med 76) share≥0.6 53 | canopy/ha 75.76 deaths 12.30 | LD 16 | cap 20.5 | cohort dead 0.82 | wall 108 s
+head tests: 10/10
+s3d tests: 10/10
+M tests: 10/10
+Mr10 tests: 10/10
+Mr15 tests: 10/10
+Mr25 tests: 10/10
+s3dr15 tests: 10/10
+MB2 tests: 10/10
+Mr15B2 tests: 10/10

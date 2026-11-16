@@ -6,8 +6,12 @@
 //! to keep, an ablation). A surplus N = P − M feeds the reserve (s_r), reproduction above the maturity height
 //! (f_rep) and v_base; a deficit draws the reserve, and k_starve seasons empty kill the tree.
 //! P_b and M_b per branch feed C5's `carbon` shedding, after `r1.kShed` deficit seasons in a row.
+//! With `r1.unspent` "banked" (#138, a probe, off by default), the v a bud could not spend returns
+//! to the reserve (capped) at GROW, and a surplus season moves the reserve above `r1.keep`·M into
+//! v_base (ADR 0004's revisit: "storing it as reserve").
 //!
-//! Params: r1.* (r1.response, r1.qHalf, r1.kShed, r1.leafCost, r1.leafCostShade), c3.alpha (α), c6.n, c6.r0, r6 leaf areas.
+//! Params: r1.* (r1.response, r1.qHalf, r1.kShed, r1.leafCost, r1.leafCostShade, r1.unspent,
+//! r1.keep), c3.alpha (α), c6.n, c6.r0, r6 leaf areas.
 
 use super::c3::is_live_bud;
 use super::r6::deposit_area;
@@ -92,11 +96,7 @@ pub fn carbon_balance(tree: &mut Tree, params: &Params) {
     let total_m = if nm > 0 { m_sum[0] } else { 0.0 };
     tree.production = total_p;
     tree.maintenance = total_m;
-    let cap = if tree.age == 0.0 {
-        math::max(r1.reserve0, r1.store * total_m)
-    } else {
-        r1.store * total_m
-    };
+    let cap = reserve_cap(tree.age, total_m, r1);
     if tree.age == 0.0 {
         tree.reserve = r1.reserve0;
     } else {
@@ -114,6 +114,14 @@ pub fn carbon_balance(tree: &mut Tree, params: &Params) {
         tree.reproduction += to_seeds;
         tree.seed_pool += to_seeds;
         tree.v_base = net - to_reserve - to_seeds;
+        if r1.bank_unspent && tree.age > 0.0 {
+            // #138's bank: what the buds could not spend comes back as growth in a surplus
+            // season, above a buffer of `keep` seasons of maintenance held for deficits. Not in
+            // the seed's first season: reserve0 is the seedling's store (ADR 0028), not a bank.
+            let draw = math::max(0.0, tree.reserve - r1.keep * total_m);
+            tree.reserve -= draw;
+            tree.v_base += draw;
+        }
         tree.starved = 0.0;
     } else {
         tree.v_base = 0.0;
@@ -124,6 +132,28 @@ pub fn carbon_balance(tree: &mut Tree, params: &Params) {
         } else {
             tree.starved = 0.0;
         }
+    }
+}
+
+/// The reserve's cap: `store` seasons of maintenance M; in the seed's first season, at least the
+/// seed's own store.
+pub fn reserve_cap(age: f64, maintenance: f64, r1: &R1) -> f64 {
+    if age == 0.0 {
+        math::max(r1.reserve0, r1.store * maintenance)
+    } else {
+        r1.store * maintenance
+    }
+}
+
+/// #138's bank (`r1.unspent` "banked"; ADR 0004's revisit): the v left at buds that grew no shoot
+/// from it this season returns to the reserve, up to its cap on this season's M. Lost otherwise.
+pub fn bank_unspent(tree: &mut Tree, unspent: f64, r1: &R1) {
+    if !(r1.enabled && r1.bank_unspent) || unspent <= 0.0 {
+        return;
+    }
+    let cap = reserve_cap(tree.age, tree.maintenance, r1);
+    if tree.reserve < cap {
+        tree.reserve = math::min(tree.reserve + unspent, cap);
     }
 }
 
@@ -345,6 +375,104 @@ mod tests {
             carbon_balance(&mut t, &p);
         }
         assert!(close(t.reserve, 2.0 * t.maintenance));
+    }
+
+    #[test]
+    fn unspent_v_is_lost_by_default() {
+        let p = params(r#"{"mw":0,"mf":0.1,"sr":0,"store":100}"#, "{}");
+        assert!(!p.r1.bank_unspent);
+        let mut t = seedling(&p, 1.0);
+        t.age = 1.0;
+        t.reserve = 5.0;
+        carbon_balance(&mut t, &p);
+        // No draw: v_base is the surplus alone, the reserve is kept.
+        assert!(close(t.v_base, t.production - t.maintenance));
+        assert_eq!(t.reserve, 5.0);
+    }
+
+    #[test]
+    fn a_banked_reserve_above_keep_seasons_of_m_funds_a_surplus_season_s_growth() {
+        // Cap 100·M, far above the reserve; keep 1·M.
+        let p = params(
+            r#"{"mw":0,"mf":0.1,"Lh":0,"sr":0,"store":100,"unspent":"banked","keep":1}"#,
+            "{}",
+        );
+        let mut t = seedling(&p, 1.0);
+        t.age = 1.0;
+        t.reserve = 5.0;
+        carbon_balance(&mut t, &p);
+        let (n, m) = (t.production - t.maintenance, t.maintenance);
+        assert!(n > 0.0 && 100.0 * m > 5.0);
+        assert!(close(t.reserve, m));
+        assert!(close(t.v_base, n + 5.0 - m));
+    }
+
+    #[test]
+    fn the_seed_s_store_is_not_drawn_into_growth_in_its_first_season() {
+        let p = params(
+            r#"{"mw":0,"mf":0.1,"sr":0,"store":100,"reserve0":5,"unspent":"banked","keep":1}"#,
+            "{}",
+        );
+        let mut t = seedling(&p, 1.0);
+        carbon_balance(&mut t, &p); // age 0
+        assert!(close(t.v_base, t.production - t.maintenance));
+        assert_eq!(t.reserve, 5.0);
+    }
+
+    #[test]
+    fn a_deficit_season_draws_nothing_into_growth_when_banked() {
+        let p = params(
+            r#"{"mw":0,"mf":1,"sr":0,"store":100,"unspent":"banked","keep":1}"#,
+            "{}",
+        );
+        let mut t = seedling(&p, 0.0);
+        t.age = 1.0;
+        t.reserve = 10.0;
+        carbon_balance(&mut t, &p);
+        assert_eq!(t.v_base, 0.0);
+        assert!(close(t.reserve, 10.0 - 2.0));
+    }
+
+    #[test]
+    fn banking_returns_a_bud_s_unspent_v_to_the_reserve_up_to_its_cap() {
+        let p = params(r#"{"store":2,"unspent":"banked"}"#, "{}");
+        let mut t = seedling(&p, 1.0);
+        t.age = 1.0;
+        t.maintenance = 1.0;
+        t.reserve = 0.5;
+        bank_unspent(&mut t, 1.0, &p.r1);
+        assert!(close(t.reserve, 1.5));
+        bank_unspent(&mut t, 1.0, &p.r1);
+        assert!(close(t.reserve, 2.0)); // the cap, store·M
+        let off = params(r#"{"store":2}"#, "{}");
+        let mut u = seedling(&off, 1.0);
+        u.age = 1.0;
+        u.maintenance = 1.0;
+        u.reserve = 0.5;
+        bank_unspent(&mut u, 1.0, &off.r1);
+        assert_eq!(u.reserve, 0.5);
+    }
+
+    #[test]
+    fn a_bud_below_its_threshold_banks_its_v_and_one_that_grows_spends_it() {
+        let p = params(
+            r#"{"store":100,"unspent":"banked"}"#,
+            r#"{"r4":{"enabled":true,"vCont":1,"vBreak":2,"qRel":0.1,"delta":0,"lDorm":40}}"#,
+        );
+        let mut t = seedling(&p, 1.0);
+        t.age = 1.0;
+        t.maintenance = 1.0;
+        t.reserve = 0.0;
+        let main = (0..t.b.len())
+            .find(|&j| t.b.slot[j] == crate::tree::slot::MAIN)
+            .unwrap();
+        let lateral = (0..t.b.len()).find(|&j| j != main).unwrap();
+        t.b.v[main] = 1.5; // grows one metamer
+        t.b.v[lateral] = 0.4; // below its threshold: banked
+        let before = t.m.len();
+        crate::season::grow_buds(&mut t, &p, 1.0);
+        assert!(t.m.len() > before);
+        assert!(close(t.reserve, 0.4));
     }
 
     #[test]

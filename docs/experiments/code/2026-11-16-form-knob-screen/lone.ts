@@ -26,6 +26,9 @@ for (const s of [25, 60, 100]) {
   out[`H${s}`] = m.height * CELL; // m
   out[`W${s}`] = w * CELL; // m
   out[`WH${s}`] = m.height > 0 ? w / m.height : 0;
+  // The mean crown radius over ±x and ±z (dbh.py's cr_m: the four extents sum to width + depth),
+  // for the late edge rate (#134; the crown-extent note's §3). Added for the beech λ₀ confirmation.
+  out[`cr${s}`] = ((m.crownWidth + m.crownDepth) / 4) * CELL; // m
   out[`D${s}`] = d * CELL * 100; // cm at 1.3 m, forks pooled
   out[`HD${s}`] = d > 0 ? m.height / d : 0;
   out[`n${s}`] = t.m.cols.length.length;

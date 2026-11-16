@@ -49,7 +49,19 @@ Not read: bar 4 (W ÷ Pretzsch at DBH 40), the namer panel, the stand gate (bars
 
 ### 4.1 The L_h pilot (seeds 101–103)
 
-_To be filled before the confirmation runs._
+Written before the confirmation ran. Per seed 101, 102, 103 (the median is the middle one):
+
+| arm | H at 100 (m) | median H | W/H at 100 | H/D at 100 | W/H at 60 |
+|---|---|---|---|---|---|
+| `head` | 35.4, 37.4, 35.2 | 35.4 | 1.44, 1.39, 1.46 | 84, 91, 89 | 1.52, 1.54, 1.56 |
+| `lam0+14` | 38.3, 37.7, 36.1 | 37.7 | 1.32, 1.18, 1.31 | 52, 56, 53 | 1.37, 1.25, 1.26 |
+| `lam0+14`, L_h 90 | 43.6, 37.8, 37.4 | 37.8 | 0.97, 1.04, 1.15 | 183, 67, 56 | 0.88, 1.07, 1.25 |
+| `lam0+14`, L_h 75 | 43.7, 35.4, 36.8 | 36.8 | 1.03, 1.42, 1.07 | 108, 71, 83 | 1.21, 1.24, 1.13 |
+| `lam0+14`, L_h 60 | 38.5, 32.3, 32.3 | 32.3 | 1.02, 1.18, 1.27 | 83, 69, 52 | 0.88, 1.27, 1.10 |
+
+**The dose is L_h 75** (§2.1's rule): its median is 1.4 m from HEAD's, the only one within 1.5 m (L_h 90: 2.4 m; 60: 3.1 m). The arm is `lam0+14&Lh75` (`confirm.json`).
+
+**Seen on three seeds, not judged:** L_h does not lower height monotonically. Seed 101 is 43.6–43.7 m at L_h 90 and 75, taller than at HEAD's L_h. The lower L_h also narrowed the crown rather than widening it (W/H at 100 about 1.0–1.1 in two of three seeds), and the stems scatter more (H/D 52–183).
 
 ### 4.2 The confirmation (seeds 1–20)
 

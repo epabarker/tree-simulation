@@ -1,0 +1,8 @@
+{
+  "beech": {
+    "head": {},
+    "lam0+14": { "r2.levels.0.lambda": 0.6708 },
+    "lam0+20": { "r2.levels.0.lambda": 0.7308 },
+    "lam0+14&Lh75": { "r2.levels.0.lambda": 0.6708, "r1.Lh": 75 }
+  }
+}

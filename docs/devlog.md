@@ -2,6 +2,14 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-19: #132's probe phase closed; M2 read paired, so τ 2.5 passes
+
+- **The user's decisions** (in chat, accepting both of the ramp re-probe's recommendations):
+  - #132's probe phase is closed, with the `topLight` ramp built and off;
+  - the light-memory probe's M2 is read paired by seed, so s3dT25 passes and s3dT10 still fails.
+- M (s3d + τ 2.5, no ramp) is the candidate for the one garden adoption, after #135 and #138. Recorded in ADR 0073's status and in addenda to both probe notes.
+- No code, golden, regression or default changes.
+
 ## 2026-11-16: #132's ramp re-probed with O4's light memory on; no arm passes; B2 not rescued
 
 - **The probe:** [docs/experiments/2026-11-16-understorey-ramp-memory-probe.md](experiments/2026-11-16-understorey-ramp-memory-probe.md). The arms and bars were committed before the runs (b223db6), as the user approved them on 2026-11-16.

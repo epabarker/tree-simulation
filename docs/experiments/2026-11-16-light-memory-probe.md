@@ -66,3 +66,7 @@ Written and committed before any run of this probe. Nothing below this heading c
 - **If a τ is adopted despite M2, take τ 2.5.** It is the shortest memory and the nearest to SORTIE's five-year window. It has the smallest phone cap regression (14.5) and keeps the phone's canopy and gates at s3d's. τ 10 begins to cost the phone canopy.
 - Whether M2's 3.5 seasons matter is the user's call. The bar was set as "no worse" before the runs and stands as written. Re-running s3dT25 against a looser bar would be a new probe.
 - **#132** should be re-probed with `lightMemory` on. The `topLight` ramp then reads each tree's running mean through `memory::top`, and on the floor's evidence one season's top light is as much noise as one season's ground light.
+
+## Addendum (2026-11-19): M2 read paired
+
+The user accepted reading M2 seed for seed against s3d (in chat: "I'll accept your recommendations"), on [the ramp re-probe's per-seed reading](2026-11-16-understorey-ramp-memory-probe.md) of this probe's own runs. On that reading s3dT25 passes M2, and with it every bar. s3dT10's miss is systematic (worse in 15 of 20 seeds, p 0.04) and still fails. No run was repeated and no other bar changed. The reading is recorded in [ADR 0073](../decisions/0073-light-memory.md).

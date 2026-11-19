@@ -186,3 +186,9 @@ This section reads the light-memory probe's runs only: s3d against each memory a
   - B2's bar set fails on hornbeam, beech's share and the phone's cap in both arms.
   - #135 (the lone λ₀ arm) should go ahead with today's beech in the stand. A beech-side competitive cost, or accepting a beech wood, is still the user's call (#134).
 - **For the user:** whether to close #132's probe phase on this (the ramp stays built and off). Separately, whether the M2 bar should be read paired, which would make τ 2.5 pass the light-memory probe.
+
+## Decisions (the user, 2026-11-19)
+
+The user accepted both recommendations (in chat: "I'll accept your recommendations"):
+1. #132's probe phase is closed on this result. The `topLight` ramp (ADR 0068) stays built and off. The understorey band stays open.
+2. M2 is read paired by seed, so τ 2.5 passes the light-memory probe (ADR 0073's status). M (s3d + τ 2.5, no ramp) is the candidate for the one garden adoption.

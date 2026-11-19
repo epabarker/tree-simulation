@@ -1,0 +1,31 @@
+{
+  "note": "#135's lone arms, fixed before any rule run. `rule` is H40k2f's form (the crown-extent note's patches/H40k2f.json) under the built rule's param names; B2 is beech's leader λ₀ 0.6708 (the beech λ₀ confirmation's lam0+14), on the lone tree only. `head` ran first, alone, as the condition check.",
+  "arms": {
+    "head": { "species": ["oak", "maple", "birch", "beech", "hornbeam", "holly"] },
+    "rule": {
+      "species": ["oak", "maple", "birch", "beech", "hornbeam", "holly"],
+      "params": {
+        "c1": {
+          "extentLimit": "height",
+          "extentSpare": true,
+          "extentScale": 40,
+          "extentSteepness": 2,
+          "extentFloor": 0.1
+        }
+      }
+    },
+    "rule+B2": {
+      "species": ["beech"],
+      "params": {
+        "c1": {
+          "extentLimit": "height",
+          "extentSpare": true,
+          "extentScale": 40,
+          "extentSteepness": 2,
+          "extentFloor": 0.1
+        }
+      },
+      "assign": { "beech": { "r2.levels.0.lambda": 0.6708 } }
+    }
+  }
+}

@@ -2,6 +2,19 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-19: #135's floored height rule built (ADR 0074 proposed, off); fails the lone bars, passes the stand check
+
+- **The condition held** (HEAD, lone trees, seeds 1–20): the late edge rate (seasons 60–100) is above Choi's 2–3 cm a season for beech (median 16.1), birch (12.5) and maple (4.7); oak, hornbeam and holly are at or under it. Beech reproduces the λ₀ confirmation's HEAD row exactly.
+- **The rule** (`principles/extent.rs`, moved out of `c1.rs` with its own header; [ADR 0074](decisions/0074-height-floored-extent-rule.md), proposed, owning §C1 item 1's whole-tree exception):
+  - **defects 1 and 2 fixed:** an active bud the limit bars when it would have extended is held active (no dormancy, R4 age or hysteresis, no R6 short shoot with its larger leaf); a unit test, red before green;
+  - **defect 3 accepted:** sparing reads the bud's stored heading (§6's staging);
+  - no new param or RNG purpose (21 as before); off by default. Goldens, the regression vectors (phoneSeed3, forestRegeneration) and presets unchanged; M's 20 garden re-runs at 66 cells hash as the ramp re-probe's; the garden's WASM 190.8 kB gzip.
+  - `spec-reviewer`: no divergences. Its questions are recorded in ADR 0074 decision 3 (short shoots, `vCont` < 1, the unspent bank, one draw per live bud); one older test tightened to the held state.
+- **The probe** ([note](experiments/2026-11-19-floored-height-rule.md); arms and bars committed in fae8291 before any rule run): `H40k2f` on six lone exemplars, B2 beech beside it, and the candidate garden M with and without the rule (widths 160 and 66, seeds 1–20, to 300).
+  - **Lone: fails.** The edge falls by about a third (beech 10.7, birch 5.8, maple 3.8) with no beech or birch seed at 3; W/H at 100 in band for hornbeam 19 of 20, beech 11 (17 with B2, at 45 m tall); H/D at 1.3 m worse in every species with a band.
+  - **Garden: passes S1–S5.** Canopy trees 133 → 164/ha from 100, ADR 0068's band frames 16 → 24, canopy deaths 10.1 → 8.2 a run, hornbeam still passing bar 6; thrown 4.3 → 6.4.
+- **Not adopted;** the decisions are the user's (the note's §5).
+
 ## 2026-11-19: #132's probe phase closed; M2 read paired, so τ 2.5 passes
 
 - **The user's decisions** (in chat, accepting both of the ramp re-probe's recommendations):

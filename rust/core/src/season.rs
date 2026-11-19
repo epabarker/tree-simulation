@@ -12,13 +12,14 @@ use crate::math;
 use crate::metrics::lowest_living_limb;
 use crate::params::{DEG, ExtentLimit, Params};
 use crate::principles::c1::{
-    beta_offset, extends, extent_chance, extent_g, extent_sizes, grow_shoot, juvenile_cap,
-    lateral_frame, offset_frame, shoot_length_factor, shoot_size,
+    beta_offset, grow_shoot, juvenile_cap, lateral_frame, offset_frame, shoot_length_factor,
+    shoot_size,
 };
 use crate::principles::c3::{allocate, gather_light, is_live_bud};
 use crate::principles::c4::{axis_offset, shoot_direction};
 use crate::principles::c5::{crown_top_light, shed_branches};
 use crate::principles::c6::update_girth;
+use crate::principles::extent::{extends, extent_chance, extent_g, extent_sizes};
 use crate::principles::o2::{EMPTY, Grid, abrade, tag_owner};
 use crate::principles::o4::stand_dynamics;
 use crate::principles::obstacles::clear_obstacles;
@@ -449,7 +450,7 @@ pub fn grow_buds(tree: &mut Tree, params: &Params, season: f64) {
     } else {
         0.0
     };
-    // The crown-extent limit (probe, #129): each node's L as the season began.
+    // The crown-extent limit (extent.rs, ADR 0074): each node's L as the season began.
     let sizes = if params.c1.extent_limit != ExtentLimit::Off {
         extent_sizes(tree, params.c1.extent_limit)
     } else {
@@ -473,27 +474,30 @@ pub fn grow_buds(tree: &mut Tree, params: &Params, season: f64) {
         let age = tree.b.age[i] as f64;
         let threshold = growth_threshold(state, age, shade, params);
         let v = tree.b.v[i];
-        // The crown-extent limit (probe, #129): a draw at the chance g of the bud's node, with
-        // upright shoots spared by the bud's own heading (c1.extentSpare), bars the bud from
-        // extending this season, by resource or by R4's light release. It rests below.
+        // The crown-extent limit (extent.rs, ADR 0074): a draw at the chance g of the bud's
+        // node, with upright shoots spared by the bud's own heading (c1.extentSpare), bars the
+        // bud from extending this season, by resource or by R4's light release.
         let barred = !sizes.is_empty() && {
             let g = extent_g(sizes[tree.b.metamer[i] as usize], &params.c1);
             let p = extent_chance(g, tree.b.hy[i], params.c1.extent_spare);
             !extends(p, params, tree.id as f64, tree.b.birth_id[i] as f64, season)
         };
-        // A stochastic break (c1.budBreak) may refuse a lateral that passed: it rests below, and
-        // is not released by light either this season.
-        let refused = barred
-            || v >= threshold
-                && !breaks(
-                    v,
-                    threshold,
-                    tree.b.slot[i],
-                    tree.id as f64,
-                    tree.b.birth_id[i] as f64,
-                    season,
-                    params,
-                );
+        // Whether the bud passes its threshold and a stochastic break (c1.budBreak), which may
+        // refuse a lateral that passed: it rests below, and is not released by light either.
+        let passes = v >= threshold
+            && breaks(
+                v,
+                threshold,
+                tree.b.slot[i],
+                tree.id as f64,
+                tree.b.birth_id[i] as f64,
+                season,
+                params,
+            );
+        let refused = barred || v >= threshold && !passes;
+        // ADR 0074 decision 3: an active bud the limit bars when it would have extended is held
+        // as it is, not rested: no dormancy, R4 age or hysteresis, nor an R6 short shoot.
+        let held = barred && passes && state == bud::ACTIVE;
         let spends = v >= threshold && !refused;
         let mut n = if spends {
             shoot_size(v, params, &mut shoot_length, cap)
@@ -672,7 +676,7 @@ pub fn grow_buds(tree: &mut Tree, params: &Params, season: f64) {
                     }
                 }
             }
-        } else {
+        } else if !held {
             tree.b.state[i] = resting_state(tree.b.q[i], &params.r6);
             // ADR 0044: a short shoot on wood past its lifespan rests leafless, and R4 ages it.
             let wood = season - tree.m.birth_season[tree.b.metamer[i] as usize] as f64;

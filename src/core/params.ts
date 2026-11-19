@@ -137,12 +137,15 @@ export interface Params {
      */
     betaSD?: number;
     /**
-     * Crown-extent limit (probe only, #129; not an ADR). A shoot extends this season with a chance
-     * g(L) = max(g_min, 1 / (1 + (L / L_x)^k)) [RNG: extentLimit, keyed by the bud and season], L
-     * read at the bud's node as the season began; a barred bud rests. 'reach': the node's
-     * horizontal distance from the stem base (an imposed crown radius, #121's yardstick);
-     * 'height': the tree's height (a whole-tree size signal); 'path': the node's path length from
-     * the stem base (local). 'off' or absent: no limit, bit-identical.
+     * Crown-extent limit (rust/core/src/principles/extent.rs; ADR 0074, proposed). A shoot extends
+     * this season with a chance g(L) = max(g_min, 1 / (1 + (L / L_x)^k)) [RNG: extentLimit, keyed
+     * by the bud and season], L read at the bud's node as the season began; an active bud barred
+     * when it would have extended is held active (no dormancy, R4 age or R6 short shoot).
+     * 'height': the tree's height (a whole-tree size signal, ADR 0074's §C1 exception; its
+     * calibration H40k2f: L_x 40, k 2, g_min 0.1, spared). Comparisons outside the ADR: 'reach',
+     * the node's horizontal distance from the stem base (an imposed crown radius, #121's
+     * yardstick); 'path', the node's path length from the stem base (local). 'off' or absent: no
+     * limit, bit-identical.
      */
     extentLimit?: "off" | "reach" | "height" | "path";
     /**

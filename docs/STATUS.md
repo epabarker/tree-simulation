@@ -1,6 +1,6 @@
 # Status
 
-_Last updated: 2026-11-19; #132's probe phase closed; M (stubs s3d + light memory τ 2.5) is the candidate._
+_Last updated: 2026-11-19; #132 and #135 closed as built, off; M (stubs s3d + memory τ 2.5) the candidate._
 
 **Live:** garden0.16.0. RC prepared/merged#71; phone soak deferred, no release-readiness waiver.
 
@@ -12,6 +12,9 @@ _Last updated: 2026-11-19; #132's probe phase closed; M (stubs s3d + light memor
   floods stems ≥ 7 cm (852/ha).
 - #134: only the leader's λ₀ moves W/H. Beech stays as it is; B2 (beech λ₀ 0.6708) makes beech
   take ~0.89 of the canopy (recruits, seasons 100–200). A beech-side cost is the user's call.
+- #135 closed (user, 2026-11-19; PR #157, ADR 0074 accepted as a build, off): the floored
+  height rule fails lone E and H/D (narrower crowns, thinner trunks), passes every stand bar.
+  Lone H/D blocks every crown-narrowing arm: #134's slenderness or R3, not a crown rule.
 ## Understorey and the cap (#137, #132)
 - ADR 0072 seedling stubs (`o4.stubs`, proposed, off): s3d cuts cap seasons 235 → 79.5
   (phone 186.5 → 11).
@@ -25,9 +28,8 @@ _Last updated: 2026-11-19; #132's probe phase closed; M (stubs s3d + light memor
 - #124 held: d16a13 + crowd gate (`r2.dLambdaCrowd`, built, off; ADR 0069) fails bare bole at 66.
 - No 3D shipped forests (ADR 0046). Still fog: maple's length cap, C5/R1 shedding, d(L).
 ## Next
-1. #135: the floored height rule at Choi's rates, with a lone λ₀ arm beside today's beech.
-2. #138: per-species δλ on the new stand (M).
-3. One adoption (M, plus any of #135/#138 that pass): goldens re-baselined, phone look (user).
+1. #138: per-species δλ on the new stand (M).
+2. One adoption (M, plus #138 if it passes): goldens re-baselined, phone look (user).
 ## Gotchas
 - PRs go to 3d-port, not main (main is the live site, far behind).
 - Stamp foreground before commits; ≥20seeds for adoption; cap12simulators.

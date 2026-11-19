@@ -2,6 +2,14 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-19: #135 closed as built, not adopted; ADR 0074 accepted as a build
+
+- **The user's decisions** (in chat, accepting the probe's recommendations):
+  - #135 is closed with the rule built and off: no garden-only use, and no stronger dose;
+  - ADR 0074 is accepted as a build.
+- Lone H/D, which blocks every crown-narrowing arm, goes to #134's slenderness work or R3. Next is #138's per-species δλ on M's stand.
+- No code, golden or default changes.
+
 ## 2026-11-19: #135's floored height rule built (ADR 0074 proposed, off); fails the lone bars, passes the stand check
 
 - **The condition held** (HEAD, lone trees, seeds 1–20): the late edge rate (seasons 60–100) is above Choi's 2–3 cm a season for beech (median 16.1), birch (12.5) and maple (4.7); oak, hornbeam and holly are at or under it. Beech reproduces the λ₀ confirmation's HEAD row exactly.

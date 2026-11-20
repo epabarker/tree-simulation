@@ -2,6 +2,15 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-20: #138's low-dose ladder on M: δλ 0.10–0.25 releases in proportion and floods at every dose
+
+- **The probe** ([note](experiments/2026-11-20-sapling-release-low-dose.md); arms and bars committed in ced255b before any run; the ladder approved by the user, 2026-11-20): `r5.dLambda` 0.10, 0.15 and 0.25 on every species, on M; widths 160 and 66, seeds 1–20, to 300, with the sapling probe and lone hash gates. Bars 1–11 the previous probe's, plus a realism bar (shaded beech and hornbeam gain 0.1–0.5 m a decade) and a late-frame bar (stems ≥ 7 cm/ha at 200 and 300 no farther from the band than M's). Params only; no code, golden or default changes.
+- **Released, graded:** shaded beech and hornbeam gain 0.04 → 0.18 / 0.28 / 0.54 m a decade; 0.10 and 0.15 inside the realism band.
+- **Flooded at every dose:** stems ≥ 7 cm/ha at frame 200 484 / 594 / 1,375 against M's 204 (in the band), at 300 1,172 / 1,266 / 1,516 against M's 1,055. Maple freezes (0.83 → 0.90–0.94) and band frames fall (16 → 9 / 10 / 7). No dose passes.
+- **Surprises:** HEAD's in-band 0.10 (328/ha) does not transfer to M. Canopy deaths per canopy tree a season barely move (0.28% → 0.29–0.33%); the higher deaths per run come from a larger canopy. Beech's canopy share at 300 rises 0.13 → 0.33–0.51. The pilot's median at frame 200 for 0.25 (234) was one seed's.
+- **Reuse:** M's linked runs re-run equal, 38 of 38. Lone trees hash as M's at every dose.
+- Not adopted; `r5.dLambda` stays 0.02 and ADR 0071 (rejected as written) is untouched. The decisions are the user's (the note's "Decisions").
+
 ## 2026-11-20: ADR 0071 rejected as written; #138 stays open with a growth target; a low-dose ladder next
 
 - **The user's decisions** (in chat, after an independent review of the re-probe on M):

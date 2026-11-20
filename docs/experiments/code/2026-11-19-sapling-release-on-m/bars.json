@@ -1,0 +1,84 @@
+{
+ "Mbh40": {
+  "b1PerSeedNoGrowth": true,
+  "b2PerSeedGain": true,
+  "b3Pooled": true,
+  "b4Gates": true,
+  "b5Canopy": true,
+  "b6Band": false,
+  "b7Maple": true,
+  "b8Bar6": false,
+  "b9Deaths": false,
+  "b10Wall": true,
+  "b11Lone": true,
+  "pass": false,
+  "falls": 19,
+  "rises": 18,
+  "lost": [
+   "hornbeam@300"
+  ],
+  "loneRead": [
+   {
+    "sp": "beech",
+    "same": true,
+    "pass": true
+   },
+   {
+    "sp": "hornbeam",
+    "same": true,
+    "pass": true
+   },
+   {
+    "sp": "oak",
+    "same": true,
+    "pass": true
+   },
+   {
+    "sp": "maple",
+    "same": true,
+    "pass": true
+   }
+  ],
+  "mapleReadable": true
+ },
+ "Mdl40": {
+  "b1PerSeedNoGrowth": true,
+  "b2PerSeedGain": true,
+  "b3Pooled": true,
+  "b4Gates": true,
+  "b5Canopy": true,
+  "b6Band": false,
+  "b7Maple": false,
+  "b8Bar6": true,
+  "b9Deaths": false,
+  "b10Wall": true,
+  "b11Lone": true,
+  "pass": false,
+  "falls": 18,
+  "rises": 18,
+  "lost": [],
+  "loneRead": [
+   {
+    "sp": "beech",
+    "same": true,
+    "pass": true
+   },
+   {
+    "sp": "hornbeam",
+    "same": true,
+    "pass": true
+   },
+   {
+    "sp": "oak",
+    "same": true,
+    "pass": true
+   },
+   {
+    "sp": "maple",
+    "same": true,
+    "pass": true
+   }
+  ],
+  "mapleReadable": true
+ }
+}

@@ -2,6 +2,15 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-20: #138 re-probed on M: δλ 0.40 releases the saplings and floods the band; neither scope passes
+
+- **The probe** ([note](experiments/2026-11-19-sapling-release-on-m.md); arms and bars committed in 7d54173 before any run): R5's `r5.dLambda` 0.40 on the candidate garden M (s3d + τ 2.5), on beech and hornbeam only (`Mbh40`, ADR 0071's scope 2) and on every species (`Mdl40`, scope 1); widths 160 and 66, seeds 1–20, to 300, with the sapling probe and lone hash gates. Params only; no code, golden, regression or default changes.
+- **Released:** pooled no-growth 0.68 → 0.39 / 0.45, per seed 19 and 18 of 20; median gain 0.04 → 1.24 / 0.75 m a decade. Lone beech, hornbeam, oak and maple hash as M's (24 of 24).
+- **Failed:** the band (frames 16 → 6 / 9; stems ≥ 7 cm 1,141 / 1,407/ha at 200 against 200–400), canopy deaths 10.1 → 24.9 / 25.6 a run, and the seedling bank empties at 160 cells. `Mbh40` makes a beech wood (0.84 of the canopy at 300) and hornbeam fails bar 6 at 300; `Mdl40` freezes maple (0.83 → 0.97).
+- **`Mbh25` not run:** its pre-registered pilot condition (the flood under `Mbh40`) did not hold on seeds 1–3.
+- **Reuse:** M's 20 re-runs at 66 cells hash as the ramp re-probe's.
+- Not adopted; ADR 0071 untouched. The decisions are the user's (the note's "Decisions").
+
 ## 2026-11-19: #135's floored height rule built (ADR 0074 proposed, off); fails the lone bars, passes the stand check
 
 - **The condition held** (HEAD, lone trees, seeds 1–20): the late edge rate (seasons 60–100) is above Choi's 2–3 cm a season for beech (median 16.1), birch (12.5) and maple (4.7); oak, hornbeam and holly are at or under it. Beech reproduces the λ₀ confirmation's HEAD row exactly.

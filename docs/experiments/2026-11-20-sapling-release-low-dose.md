@@ -133,6 +133,13 @@ No crashes; the phone's wall 75–104 s a run. Read per frame, the pilot already
 2. **Whether `Mdl10` is acceptable if the late band is not held as a gate.** It gives a realistic release (0.18 m a decade), keeps the gates, canopy, hornbeam's and beech's bar 6, the death rate per canopy tree, and the phone (66 cells, frames at `M`'s), at the cost of frame 200 (484/ha), frame 300 (+117/ha over `M`) and maple (0.92).
 3. **#138's next step:** #138 stays open with its 0.1–0.5 m target, which 0.10 and 0.15 meet. What is missing is #132's sink for stems ≥ 7 cm: a thinning or mortality term on released stems in shade, or the review's untried pairing of the ramp at θ_hi 0.10 with δλ 0.10–0.15. Which to probe next is the user's call.
 
+## Decisions (the user, 2026-11-20)
+
+The user accepted the recommendations (in chat: "I accept your recommendations"):
+1. ADR 0071 records that no dose of δλ alone passes on M; `r5.dLambda` stays 0.02.
+2. Mdl10 is not accepted with the late band waived: it fails bars 1, 3, 6, 7 and 13.
+3. One last params-only probe before the adoption: the ramp at θ_hi 0.10 with δλ 0.10 and 0.15. If it fails, M is adopted as it stands and #138 waits for a thinning rule.
+
 ## Limits
 
 - One species scope (every species); the per-species scope was rejected at 0.40 for turning the garden into a beech wood, and was not re-run.

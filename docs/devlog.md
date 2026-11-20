@@ -2,6 +2,14 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-20: no dose of δλ alone passes on M (ADR 0071); the ramp × δλ pairing probed before the adoption
+
+- **The user's decisions** (in chat, on the low-dose ladder):
+  - ADR 0071 records that no dose alone passes; `r5.dLambda` stays 0.02;
+  - δλ 0.10 is not accepted with the late band waived;
+  - the ramp at θ_hi 0.10 with δλ 0.10 and 0.15 is probed next; if it fails, M is adopted as it stands.
+- No code, golden or default changes.
+
 ## 2026-11-20: #138's low-dose ladder on M: δλ 0.10–0.25 releases in proportion and floods at every dose
 
 - **The probe** ([note](experiments/2026-11-20-sapling-release-low-dose.md); arms and bars committed in ced255b before any run; the ladder approved by the user, 2026-11-20): `r5.dLambda` 0.10, 0.15 and 0.25 on every species, on M; widths 160 and 66, seeds 1–20, to 300, with the sapling probe and lone hash gates. Bars 1–11 the previous probe's, plus a realism bar (shaded beech and hornbeam gain 0.1–0.5 m a decade) and a late-frame bar (stems ≥ 7 cm/ha at 200 and 300 no farther from the band than M's). Params only; no code, golden or default changes.

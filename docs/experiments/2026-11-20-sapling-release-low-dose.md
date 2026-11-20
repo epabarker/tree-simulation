@@ -66,6 +66,87 @@ An arm **passes** if it passes all thirteen. **A pass is not adoption:** it is r
 - **Maple:** 0.40 froze it (0.83 → 0.97); a lower dose shades it less, so bar 7 likely passes at 0.10 and 0.15.
 - **The lone trees** hash as `M`'s: R5's signal is neighbour shade, zero for a tree alone.
 
-## Results
+## Results (seeds 1–20, ced255b)
 
-Pending.
+**No dose passes. δλ 0.10 and 0.15 reach the realism band (shaded beech and hornbeam gain 0.18 and 0.28 m a decade; 0.25 overshoots it at 0.54), but every dose makes the late frames worse than `M`: stems ≥ 7 cm/ha at frame 200 are 484, 594 and 1,375 against `M`'s 204 (in the band), and at 300 1,172, 1,266 and 1,516 against `M`'s 1,055. Every dose also freezes maple harder (bar 7) and loses band frames (bar 6). No dose grows the saplings realistically without worsening the late frames. Nothing is adopted; ADR 0071 stays deferred.**
+
+**Runs:** 254 new runs at ced255b (the pilot, seeds 1–3, 33.7 min; the rest 52.9 min, 10 simulators), and `M`'s 20 gardens at 160 cells and 20 sapling probes linked from the previous probe. **The reuse holds:** every linked run's params equal this script's; the 6 re-runs on seeds 1–3 (garden hash and `saplings.csv` bytes), `M`'s 20 gardens at 66 cells and its 12 lone trees all equal the previous probe's: 38 of 38 ([`reuse-check.txt`](code/2026-11-20-sapling-release-low-dose/reuse-check.txt)). The output is in [`bars.txt`](code/2026-11-20-sapling-release-low-dose/bars.txt), [`output.txt`](code/2026-11-20-sapling-release-low-dose/output.txt), [`pilot.txt`](code/2026-11-20-sapling-release-low-dose/pilot.txt) and [`tables.md`](code/2026-11-20-sapling-release-low-dose/tables.md) (`stand.py`).
+
+### The pilot (seeds 1–3, frames 200 and 300 at 160 cells)
+
+| arm | s1 | s2 | s3 | median, 200 / 300 |
+|---|---|---|---|---|
+| `M` | 109 / 78 | 188 / 1,156 | 797 / 672 | 188 / 672 |
+| `Mdl10` | 141 / 859 | 1,656 / 1,406 | 797 / 719 | 797 / 859 |
+| `Mdl15` | 63 / 1,297 | 1,453 / 1,281 | 1,016 / 1,406 | 1,016 / 1,297 |
+| `Mdl25` | 94 / 1,313 | 2,031 / 1,625 | 234 / 1,578 | 234 / 1,578 |
+
+No crashes; the phone's wall 75–104 s a run. Read per frame, the pilot already showed every dose over `M` at 300 on all three seeds, and over it at 200 on 2, 2 and 1 of the three (0.10, 0.15, 0.25). `Mdl25`'s median at 200 (234, in the band) was seed 3's; on 20 seeds it is 1,375. All three doses ran on 20 seeds as pre-registered.
+
+### The bars
+
+`M`: pooled no growth 0.68; shaded beech and hornbeam gain 0.04 m; canopy/ha 133 / 76; band frames 16 of 60; maple 0.83; hornbeam bar 6 z −0.74 / −0.08; canopy deaths 10.1 a run; the phone's wall 85 s; gates 20 / 19.
+
+| arm | 1: no growth falls per seed (≥ 15 of 20) | 2: gain rises per seed (≥ 15 of 20) | 3: pooled no growth (≤ 0.61) | 4: gates 160 / 66 (≥ 18 of 20) | 5: canopy/ha 160 / 66 (≥ M's) | 6: band frames, 160 (≥ 16 of 60) | 7: maple no growth (≤ 0.88) | 8: hornbeam z 100 / 300; M's cells kept | 9: canopy deaths/run (≤ 15.1) | 10: phone wall (≤ 1.25×) | 11: lone hashes (12) | 12: shaded gain (0.1–0.5 m) | 13: late frames no worse than M | verdict |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| `Mdl10` | 14 ✗ | 16 ✓ | 0.64 ✗ | 20 / 19 ✓ | 148 / 76 ✓ | 9 ✗ | **0.92** ✗ | −0.02 / −0.85 ✓ | 14.5 ✓ | 95 s (1.13) ✓ | 12 equal ✓ | **0.18** ✓ (11 of 20 seeds in band) | 484 / 1,172 ✗ (seeds no worse: 8 / 5 of 20) | **fail** (1, 3, 6, 7, 13) |
+| `Mdl15` | 13 ✗ | 18 ✓ | 0.60 ✓ | 20 / 20 ✓ | 148 / 114 ✓ | 10 ✗ | **0.94** ✗ | −0.29 / −0.96 ✓ | 17.0 ✗ | 96 s (1.13) ✓ | 12 equal ✓ | **0.28** ✓ (10 of 20) | 594 / 1,266 ✗ (6 / 6 of 20) | **fail** (1, 6, 7, 9, 13) |
+| `Mdl25` | 17 ✓ | 20 ✓ | 0.51 ✓ | 20 / 20 ✓ | 172 / 95 ✓ | 7 ✗ | **0.90** ✗ | −0.28 / −0.46 ✓ | 19.8 ✗ | 90 s (1.06) ✓ | 12 equal ✓ | 0.54 ✗ (8 of 20) | 1,375 / 1,516 ✗ (5 / 1 of 20) | **fail** (6, 7, 9, 12, 13) |
+
+### The flood, frame by frame (bar 13 and reported)
+
+| arm | ≥ 7 cm/ha at 160: 100 / 200 / 300 | frame 200 vs band; vs M (204) | frame 300 vs band; vs M (1,055) | seeds in the band at 200 / 300 (of 20) | at 66: 100 / 200 / 300 (M 114 / 114 / 76) |
+|---|---|---|---|---|---|
+| `M` | 203 / 204 / 1,055 | in | over (+655) | – | 114 / 114 / 76 |
+| `Mdl10` | 188 / 484 / 1,172 | over; **worse** (+281) | over; **worse** (+117) | 2 / 0 | 171 / 114 / 76 |
+| `Mdl15` | 196 / 594 / 1,266 | over; **worse** (+390) | over; **worse** (+211) | 0 / 0 | 133 / 114 / 190 |
+| `Mdl25` | 172 / 1,375 / 1,516 | over; **worse** (+1,171) | over; **worse** (+461) | 2 / 0 | 152 / 133 / 493 |
+
+- **The flood is graded, not a threshold, and it starts at the lowest dose.** Frame 100 is unchanged (172–203/ha at every dose); by 200 each dose moves the stand's stems ≥ 7 cm out of the band, in order of dose, and at 300 each adds to `M`'s own overshoot. Per seed, at 300 only 5, 6 and 1 of 20 seeds are no worse than `M`'s same seed.
+- **At 66 cells (the phone)** 0.10 matches `M` at 200 and 300; 0.15 and 0.25 overshoot at 300 (190 and 493 against 76). Reported only.
+
+### Reported
+
+| arm | gain/decade, whole class (median; P90; share none) | maple no growth | seedling bank per frame 160 / 66 | cap seasons 160 / 66 | thrown/run 160 / 66 | canopy deaths/run 160 / 66 | canopy deaths, % of canopy trees a season, 160 / 66 | beech canopy share at 300, 160 / 66 | canopy at 300, 160 |
+|---|---|---|---|---|---|---|---|---|---|
+| `M` | 0.04; 1.28; 0.29 | 0.83 | 7.5 / 0 | 62.5 / 14.5 | 4.3 / 1.6 | 10.1 / 6.7 | 0.28 / 0.48 | 0.13 / 0.12 | hornbeam 0.74, beech 0.13 |
+| `Mdl10` | 0.18; 1.85; 0.23 | 0.92 | 3.5 / 0 | 61 / 19.5 | 5.6 / 2.5 | 14.5 / 7.6 | 0.31 / 0.44 | 0.33 / 0.28 | hornbeam 0.61, beech 0.33 |
+| `Mdl15` | 0.29; 1.85; 0.18 | 0.94 | 2 / 0 | 72 / 29 | 6.8 / 2.5 | 17.0 / 9.4 | 0.33 / 0.45 | 0.51 / 0.37 | beech 0.51, hornbeam 0.45 |
+| `Mdl25` | 0.55; 3.05; 0.14 | 0.90 | 1 / 0 | 74 / 30 | 13.7 / 3.7 | 19.8 / 12.3 | 0.29 / 0.46 | 0.46 / 0.64 | hornbeam 0.50, beech 0.46 |
+
+- **The release is graded and linear in dose:** shaded beech and hornbeam gain 0.04 → 0.18 → 0.28 → 0.54 m a decade (the whole class 0.04 → 0.18 → 0.29 → 0.55). Bar 12's band is crossed between 0.15 and 0.25. Per seed the gain is spread: only 8–11 seeds of 20 have their own median in the band at any dose.
+- **Canopy deaths per run rise with the canopy, not the rate:** canopy deaths as a share of canopy trees a season are 0.29–0.33% at 160 cells against `M`'s 0.28% (and 0.44–0.46% against 0.48% at 66). Bar 9's fail at 0.15 and 0.25 is more canopy trees dying at the same rate.
+- **Beech takes the canopy with dose:** its share at 300 rises 0.13 → 0.33 → 0.51 → 0.46 at 160 cells (0.64 at 66 under 0.25). Hornbeam keeps bar 6 at every dose, beech passes it at 300 at every dose (z 0.86, 0.64, 0.83; it fails under `M`), and oak passes at 300 under 0.25 (z 0.75). No species–season cell that passes under `M` fails.
+- **Maple freezes at every dose** (0.83 → 0.90–0.94), as under 0.40 (0.97): the released beech and hornbeam shade it.
+- **The seedling bank at 160 cells** falls 7.5 → 3.5 → 2 → 1 a frame; at 66 it is empty in every arm.
+- **The lone trees** hash as `M`'s at every dose (36 of 36).
+
+## Conclusions
+
+- **The previous probe's question is answered: there is no low dose that releases without flooding.** Every rung of the ladder that moves the saplings at all (0.10 and up) puts the frame-200 stand out of ADR 0068's band and adds to frame 300's overshoot. The doses that reach the realism band (0.10, 0.15) are exactly the doses that flood less, not the doses that do not flood.
+- **HEAD's 0.10 does not transfer to M.** On HEAD 0.10 kept stems ≥ 7 cm at 328/ha; on M, whose stubs and memory keep more stems alive under the canopy, the same dose reaches 484/ha at 200. This repeats the previous probe's conclusion: on M the band holds at 200 only because the saplings are frozen.
+- **A dose of δλ is not the lever for #138 on this stand.** Any release needs a sink for the stems it sends past 7 cm (thinning or mortality of released stems), or a stand at lower carrying density. Both are design choices.
+
+## Decisions for the user
+
+1. **Reject ADR 0071 for the garden as it stands?** Five arms on M (δλ 0.10, 0.15 and 0.25 here, 0.40 in two scopes before) fail the band; the recommendation is to mark it rejected for M and keep `r5.dLambda` at 0.02, or keep it deferred behind a sink for stems ≥ 7 cm.
+2. **Whether `Mdl10` is acceptable if the late band is not held as a gate.** It gives a realistic release (0.18 m a decade), keeps the gates, canopy, hornbeam's and beech's bar 6, the death rate per canopy tree, and the phone (66 cells, frames at `M`'s), at the cost of frame 200 (484/ha), frame 300 (+117/ha over `M`) and maple (0.92).
+3. **#138's next step:** close it as "the freeze holds the band on M", or open a sink for released stems (a thinning or mortality term on stems ≥ 7 cm in shade) as a new ticket.
+
+## Limits
+
+- One species scope (every species); the per-species scope was rejected at 0.40 for turning the garden into a beech wood, and was not re-run.
+- Bar 12's "shaded" is the top bud's light under 0.5 of open sky; under `M` that is 99% of beech's and hornbeam's sapling-seasons, so the bar is close to the whole beech and hornbeam class.
+- Bar 13 is judged on the median over runs per frame; the per-seed counts are reported beside it and agree.
+- `M`'s 160-cell gardens were made on 6a1bd67 and its sapling probes on 7d54173; the re-runs above show both unchanged at ced255b.
+
+## Reproduce
+
+```
+node docs/experiments/code/2026-11-20-sapling-release-low-dose/run.ts -j 10 --seeds 1-3 --reuse <the previous probe's runs/138-dl-on-m>
+node docs/experiments/code/2026-11-20-sapling-release-low-dose/run.ts -j 10 --reuse <the same>
+uv run --project analysis python -I docs/experiments/code/2026-11-20-sapling-release-low-dose/stand.py -j 10
+node docs/experiments/code/2026-11-20-sapling-release-low-dose/bars.ts runs/138-dl-ladder
+```
+
+Runs (not committed): `runs/138-dl-ladder/`.

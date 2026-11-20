@@ -2,6 +2,16 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-20: ADR 0071 rejected as written; #138 stays open with a growth target; a low-dose ladder next
+
+- **The user's decisions** (in chat, after an independent review of the re-probe on M):
+  - ADR 0071 (δλ 0.40) is rejected as written, with lower doses open under #138;
+  - #138 stays its own ticket, linked to #132, with a target of 0.1–0.5 m a decade;
+  - the flood is not accepted;
+  - δλ 0.10, 0.15 and 0.25 are probed on M before the adoption.
+- **The review's corrections** are in the note's "Decisions": the band fails with the saplings frozen too, so the freeze only delays the flood; and the skipped lower dose's pilot test hid the late frames.
+- No code, golden or default changes.
+
 ## 2026-11-20: #138 re-probed on M: δλ 0.40 releases the saplings and floods the band; neither scope passes
 
 - **The probe** ([note](experiments/2026-11-19-sapling-release-on-m.md); arms and bars committed in 7d54173 before any run): R5's `r5.dLambda` 0.40 on the candidate garden M (s3d + τ 2.5), on beech and hornbeam only (`Mbh40`, ADR 0071's scope 2) and on every species (`Mdl40`, scope 1); widths 160 and 66, seeds 1–20, to 300, with the sapling probe and lone hash gates. Params only; no code, golden, regression or default changes.

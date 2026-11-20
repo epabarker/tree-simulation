@@ -169,6 +169,15 @@ Heights at 100 hold (medians 0.93–1.07 of HEAD's, birch lowest; beech with B2 
 3. **The lone H/D** stays the blocker for every crown-narrowing arm so far. It needs #134's slenderness work (or a girth change in §R3), not another crown rule.
 4. **ADR 0074** stays proposed. Accept it as the record of the built rule (and its §C1 item 1 exception), or leave it proposed until a species adopts the rule.
 
+## 5a. Decisions (the user, 2026-11-19)
+
+The user accepted the recommendations (in chat: "I accept your recommendations"):
+1. #135 is closed as built and not adopted; no garden-only use (the lone triad is ADR 0067's guard).
+2. No stronger-dose probe: it would be `H4k8`'s handicap, not a size signal.
+3. ADR 0074 is accepted as a build, off by default.
+
+Lone H/D, which blocks every crown-narrowing arm so far, goes to #134's slenderness work or R3.
+
 ## Limits
 
 - The lone trees run to season 100 only; Choi's floor is read at 60–100.

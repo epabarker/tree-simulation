@@ -10,6 +10,15 @@ Newest first. One entry per session or milestone: what changed, why, surprises, 
 - **`Mbh25` not run:** its pre-registered pilot condition (the flood under `Mbh40`) did not hold on seeds 1–3.
 - **Reuse:** M's 20 re-runs at 66 cells hash as the ramp re-probe's.
 - Not adopted; ADR 0071 untouched. The decisions are the user's (the note's "Decisions").
+||||||| 29e9218
+
+## 2026-11-19: #135 closed as built, not adopted; ADR 0074 accepted as a build
+
+- **The user's decisions** (in chat, accepting the probe's recommendations):
+  - #135 is closed with the rule built and off: no garden-only use, and no stronger dose;
+  - ADR 0074 is accepted as a build.
+- Lone H/D, which blocks every crown-narrowing arm, goes to #134's slenderness work or R3. Next is #138's per-species δλ on M's stand.
+- No code, golden or default changes.
 
 ## 2026-11-19: #135's floored height rule built (ADR 0074 proposed, off); fails the lone bars, passes the stand check
 

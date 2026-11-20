@@ -10,7 +10,6 @@ Newest first. One entry per session or milestone: what changed, why, surprises, 
 - **`Mbh25` not run:** its pre-registered pilot condition (the flood under `Mbh40`) did not hold on seeds 1–3.
 - **Reuse:** M's 20 re-runs at 66 cells hash as the ramp re-probe's.
 - Not adopted; ADR 0071 untouched. The decisions are the user's (the note's "Decisions").
-||||||| 29e9218
 
 ## 2026-11-19: #135 closed as built, not adopted; ADR 0074 accepted as a build
 

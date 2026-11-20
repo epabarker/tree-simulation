@@ -102,6 +102,20 @@ An arm **passes** if it passes all eleven. **A pass is not adoption:** it is rec
 2. **Close #138 as "frozen saplings are what keeps the band"?** Or keep it open behind a new sink for stems ≥ 7 cm (the ramp is closed). The freeze is a property of M's band, not only of C3's split.
 3. **Whether the flood is acceptable** if the user prefers released saplings to the band: `Mdl40` passes every bar but the band (6), maple (7) and canopy deaths (9), gains canopy trees (133 → 172/ha) and moves the stand H/D toward its bands.
 
+## Decisions (the user, 2026-11-20) and a review's corrections
+
+The user accepted four recommendations (in chat: "Go ahead with all four"), after an independent read-only review of this note:
+1. ADR 0071 is rejected as written (δλ 0.40, both scopes). Lower doses stay open under #138.
+2. #138 stays open as its own ticket, linked to #132, with a growth target of 0.1–0.5 m a decade for shaded beech and hornbeam saplings (the review's judgement from general knowledge, no source cited).
+3. The flood is not accepted.
+4. A low-dose ladder on M (δλ 0.10, 0.15, 0.25) is run before the adoption, with the flood read from frames 200 and 300.
+
+The review's corrections to this note:
+- **"Releasing the saplings and holding the band are one problem" is overstated.** M overshoots the band with its saplings frozen (1,055/ha at 300), and HEAD does too (703/ha). The freeze delays the flood; it does not hold the band. The shared cause is #132's: no sink for stems ≥ 7 cm.
+- **`Mbh25`'s pilot condition was badly posed.** Its nine-frame median (141 against 203) hid the pilot's own frames at 200 and 300 (359 and 375/ha at 160 cells). So "no dose that releases can keep the band" rests on one dose.
+- **Canopy deaths are the weakest objection:** about 0.8% of canopy trees a season against M's 0.4% (the review's arithmetic, on the 640 m² plot).
+- **Untried:** the ramp at θ_hi 0.10 together with a raised δλ.
+
 ## Limits
 
 - One dose per scope: `Mbh25` was not run (its pre-registered condition failed on the pilot); a lower dose would release less and flood less, but the band frames already fall at the dose that releases.

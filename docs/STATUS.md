@@ -1,6 +1,6 @@
 # Status
 
-_Last updated: 2026-11-19; #132 and #135 closed as built, off; M (stubs s3d + memory τ 2.5) the candidate._
+_Last updated: 2026-11-20; ADR 0071 rejected as written; a low-dose δλ ladder on M runs before the adoption._
 
 **Live:** garden0.16.0. RC prepared/merged#71; phone soak deferred, no release-readiness waiver.
 
@@ -8,8 +8,9 @@ _Last updated: 2026-11-19; #132 and #135 closed as built, off; M (stubs s3d + me
 - Order: #132 → #135 → #138 → one adoption → hornbeam girth (ADR 0011 §3) → #124.
 - ADR 0067: the lone triad (W at DBH, W/H, H/D) a guard; the stand against Tallo the gate.
 - ADR 0068: #132's `topLight` ramp; the band counts stems ≥ 7 cm DBH in 200–400/ha.
-- #133 closed (wind load built, off). ADR 0071 (shade apical control, #138) deferred: δλ 0.40
-  floods stems ≥ 7 cm (852/ha).
+- #133 closed (wind load built, off). ADR 0071 (δλ 0.40, #138) rejected as written
+  (user, 2026-11-20; PR #159): floods the band on M; beech + hornbeam only makes a beech wood.
+- #138 open, its own ticket: shaded saplings gain 0.04 m a decade under M; target 0.1–0.5.
 - #134: only the leader's λ₀ moves W/H. Beech stays as it is; B2 (beech λ₀ 0.6708) makes beech
   take ~0.89 of the canopy (recruits, seasons 100–200). A beech-side cost is the user's call.
 - #135 closed (user, 2026-11-19; PR #157, ADR 0074 accepted as a build, off): the floored
@@ -28,8 +29,8 @@ _Last updated: 2026-11-19; #132 and #135 closed as built, off; M (stubs s3d + me
 - #124 held: d16a13 + crowd gate (`r2.dLambdaCrowd`, built, off; ADR 0069) fails bare bole at 66.
 - No 3D shipped forests (ADR 0046). Still fog: maple's length cap, C5/R1 shedding, d(L).
 ## Next
-1. #138: per-species δλ on the new stand (M).
-2. One adoption (M, plus #138 if it passes): goldens re-baselined, phone look (user).
+1. #138: δλ 0.10 / 0.15 / 0.25 on M, the flood read at frames 200 and 300 (running).
+2. One adoption (M, plus a δλ dose if one passes): goldens re-baselined, phone look (user).
 ## Gotchas
 - PRs go to 3d-port, not main (main is the live site, far behind).
 - Stamp foreground before commits; ≥20seeds for adoption; cap12simulators.

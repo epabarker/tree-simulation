@@ -9,7 +9,17 @@ Newest first. One entry per session or milestone: what changed, why, surprises, 
 - **Flooded at every dose:** stems ≥ 7 cm/ha at frame 200 484 / 594 / 1,375 against M's 204 (in the band), at 300 1,172 / 1,266 / 1,516 against M's 1,055. Maple freezes (0.83 → 0.90–0.94) and band frames fall (16 → 9 / 10 / 7). No dose passes.
 - **Surprises:** HEAD's in-band 0.10 (328/ha) does not transfer to M. Canopy deaths per canopy tree a season barely move (0.28% → 0.29–0.33%); the higher deaths per run come from a larger canopy. Beech's canopy share at 300 rises 0.13 → 0.33–0.51. The pilot's median at frame 200 for 0.25 (234) was one seed's.
 - **Reuse:** M's linked runs re-run equal, 38 of 38. Lone trees hash as M's at every dose.
-- Not adopted; ADR 0071 untouched. The decisions are the user's (the note's "Decisions").
+- Not adopted; `r5.dLambda` stays 0.02 and ADR 0071 (rejected as written) is untouched. The decisions are the user's (the note's "Decisions").
+
+## 2026-11-20: ADR 0071 rejected as written; #138 stays open with a growth target; a low-dose ladder next
+
+- **The user's decisions** (in chat, after an independent review of the re-probe on M):
+  - ADR 0071 (δλ 0.40) is rejected as written, with lower doses open under #138;
+  - #138 stays its own ticket, linked to #132, with a target of 0.1–0.5 m a decade;
+  - the flood is not accepted;
+  - δλ 0.10, 0.15 and 0.25 are probed on M before the adoption.
+- **The review's corrections** are in the note's "Decisions": the band fails with the saplings frozen too, so the freeze only delays the flood; and the skipped lower dose's pilot test hid the late frames.
+- No code, golden or default changes.
 
 ## 2026-11-20: #138 re-probed on M: δλ 0.40 releases the saplings and floods the band; neither scope passes
 

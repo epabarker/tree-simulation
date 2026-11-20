@@ -68,7 +68,7 @@ An arm **passes** if it passes all thirteen. **A pass is not adoption:** it is r
 
 ## Results (seeds 1–20, ced255b)
 
-**No dose passes. δλ 0.10 and 0.15 reach the realism band (shaded beech and hornbeam gain 0.18 and 0.28 m a decade; 0.25 overshoots it at 0.54), but every dose makes the late frames worse than `M`: stems ≥ 7 cm/ha at frame 200 are 484, 594 and 1,375 against `M`'s 204 (in the band), and at 300 1,172, 1,266 and 1,516 against `M`'s 1,055. Every dose also freezes maple harder (bar 7) and loses band frames (bar 6). No dose grows the saplings realistically without worsening the late frames. Nothing is adopted; ADR 0071 stays deferred.**
+**No dose passes. δλ 0.10 and 0.15 reach the realism band (shaded beech and hornbeam gain 0.18 and 0.28 m a decade; 0.25 overshoots it at 0.54), but every dose makes the late frames worse than `M`: stems ≥ 7 cm/ha at frame 200 are 484, 594 and 1,375 against `M`'s 204 (in the band), and at 300 1,172, 1,266 and 1,516 against `M`'s 1,055. Every dose also freezes maple harder (bar 7) and loses band frames (bar 6). No dose grows the saplings realistically without worsening the late frames. Nothing is adopted; `r5.dLambda` stays 0.02 (ADR 0071 was rejected as written on 2026-11-20, with lower doses left open: this probe is those doses).**
 
 **Runs:** 254 new runs at ced255b (the pilot, seeds 1–3, 33.7 min; the rest 52.9 min, 10 simulators), and `M`'s 20 gardens at 160 cells and 20 sapling probes linked from the previous probe. **The reuse holds:** every linked run's params equal this script's; the 6 re-runs on seeds 1–3 (garden hash and `saplings.csv` bytes), `M`'s 20 gardens at 66 cells and its 12 lone trees all equal the previous probe's: 38 of 38 ([`reuse-check.txt`](code/2026-11-20-sapling-release-low-dose/reuse-check.txt)). The output is in [`bars.txt`](code/2026-11-20-sapling-release-low-dose/bars.txt), [`output.txt`](code/2026-11-20-sapling-release-low-dose/output.txt), [`pilot.txt`](code/2026-11-20-sapling-release-low-dose/pilot.txt) and [`tables.md`](code/2026-11-20-sapling-release-low-dose/tables.md) (`stand.py`).
 
@@ -124,14 +124,14 @@ No crashes; the phone's wall 75–104 s a run. Read per frame, the pilot already
 ## Conclusions
 
 - **The previous probe's question is answered: there is no low dose that releases without flooding.** Every rung of the ladder that moves the saplings at all (0.10 and up) puts the frame-200 stand out of ADR 0068's band and adds to frame 300's overshoot. The doses that reach the realism band (0.10, 0.15) are exactly the doses that flood less, not the doses that do not flood.
-- **HEAD's 0.10 does not transfer to M.** On HEAD 0.10 kept stems ≥ 7 cm at 328/ha; on M, whose stubs and memory keep more stems alive under the canopy, the same dose reaches 484/ha at 200. This repeats the previous probe's conclusion: on M the band holds at 200 only because the saplings are frozen.
+- **HEAD's 0.10 does not transfer to M.** On HEAD 0.10 kept stems ≥ 7 cm at 328/ha; on M, whose stubs and memory keep more stems alive under the canopy, the same dose reaches 484/ha at 200. As the review of the previous probe put it, the freeze delays M's flood (in the band at 200, over it at 300) but does not prevent it; every dose here brings the flood forward, in proportion to the release.
 - **A dose of δλ is not the lever for #138 on this stand.** Any release needs a sink for the stems it sends past 7 cm (thinning or mortality of released stems), or a stand at lower carrying density. Both are design choices.
 
 ## Decisions for the user
 
-1. **Reject ADR 0071 for the garden as it stands?** Five arms on M (δλ 0.10, 0.15 and 0.25 here, 0.40 in two scopes before) fail the band; the recommendation is to mark it rejected for M and keep `r5.dLambda` at 0.02, or keep it deferred behind a sink for stems ≥ 7 cm.
+1. **Close the lower doses too?** ADR 0071 is already rejected as written (0.40), with lower doses left open under #138. Five arms on M (δλ 0.10, 0.15 and 0.25 here, 0.40 in two scopes before) fail the band. The recommendation is to record in ADR 0071 that no dose of δλ alone passes on M, and keep `r5.dLambda` at 0.02 until a sink for stems ≥ 7 cm exists.
 2. **Whether `Mdl10` is acceptable if the late band is not held as a gate.** It gives a realistic release (0.18 m a decade), keeps the gates, canopy, hornbeam's and beech's bar 6, the death rate per canopy tree, and the phone (66 cells, frames at `M`'s), at the cost of frame 200 (484/ha), frame 300 (+117/ha over `M`) and maple (0.92).
-3. **#138's next step:** close it as "the freeze holds the band on M", or open a sink for released stems (a thinning or mortality term on stems ≥ 7 cm in shade) as a new ticket.
+3. **#138's next step:** #138 stays open with its 0.1–0.5 m target, which 0.10 and 0.15 meet. What is missing is #132's sink for stems ≥ 7 cm: a thinning or mortality term on released stems in shade, or the review's untried pairing of the ramp at θ_hi 0.10 with δλ 0.10–0.15. Which to probe next is the user's call.
 
 ## Limits
 

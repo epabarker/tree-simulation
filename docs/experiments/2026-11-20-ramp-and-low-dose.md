@@ -188,7 +188,7 @@ No run crashed, and the phone's wall was 87–104 s a run. Read per frame, both 
    - the phone: 2 / 1 stems against 3 / 2.
 
    If the user takes the late medians (bar 13) as the band's test, and accepts one or two stems ≥ 7 cm on the phone, it is the candidate that answers #138. Otherwise #138 has no params-only answer on M: `r5.dLambda` stays 0.02 and the ramp stays off.
-2. **The garden adoption.** This was the last probe before it. On these bars M, with neither rule, stays the adoption candidate. Adopting `Mr10dl10` would be a separate decision, recorded in ADRs 0068 and 0071 if taken.
+2. **The garden adoption.** The user's rule, set while this probe ran (devlog, 2026-11-20), was that if the pairing fails, M is adopted as it stands. On the pre-registered bars both pairs fail, so the recommendation is to adopt M with neither rule. Taking `Mr10dl10` instead would mean waiving bars 6, 9, 15 and 16. That is the user's call, and would be recorded in ADRs 0068 and 0071.
 3. **If more is wanted:** the phone is where the ramp fails in every probe. Two candidates need a code change, outside this probe: a ramp that waits until a stem has had a chance at a gap (the ramp re-probe's "release term"), or a ceiling for the phone alone.
 
 ## Limits

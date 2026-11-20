@@ -1,6 +1,6 @@
 # Status
 
-_Last updated: 2026-11-20; ADR 0071 rejected as written; a low-dose δλ ladder on M runs before the adoption._
+_Last updated: 2026-11-20; no δλ dose alone passes on M (PR #161); the ramp × δλ pairing runs before the adoption._
 
 **Live:** garden0.16.0. RC prepared/merged#71; phone soak deferred, no release-readiness waiver.
 
@@ -11,6 +11,7 @@ _Last updated: 2026-11-20; ADR 0071 rejected as written; a low-dose δλ ladder 
 - #133 closed (wind load built, off). ADR 0071 (δλ 0.40, #138) rejected as written
   (user, 2026-11-20; PR #159): floods the band on M; beech + hornbeam only makes a beech wood.
 - #138 open, its own ticket: shaded saplings gain 0.04 m a decade under M; target 0.1–0.5.
+  δλ 0.10/0.15 reach it, but every dose worsens the late stems ≥ 7 cm and freezes maple.
 - #134: only the leader's λ₀ moves W/H. Beech stays as it is; B2 (beech λ₀ 0.6708) makes beech
   take ~0.89 of the canopy (recruits, seasons 100–200). A beech-side cost is the user's call.
 - #135 closed (user, 2026-11-19; PR #157, ADR 0074 accepted as a build, off): the floored
@@ -29,8 +30,8 @@ _Last updated: 2026-11-20; ADR 0071 rejected as written; a low-dose δλ ladder 
 - #124 held: d16a13 + crowd gate (`r2.dLambdaCrowd`, built, off; ADR 0069) fails bare bole at 66.
 - No 3D shipped forests (ADR 0046). Still fog: maple's length cap, C5/R1 shedding, d(L).
 ## Next
-1. #138: δλ 0.10 / 0.15 / 0.25 on M, the flood read at frames 200 and 300 (running).
-2. One adoption (M, plus a δλ dose if one passes): goldens re-baselined, phone look (user).
+1. #138: the ramp at θ_hi 0.10 with δλ 0.10 / 0.15 on M (running); the last probe before adopting.
+2. One adoption (M, plus the pairing if it passes): goldens re-baselined, phone look (user).
 ## Gotchas
 - PRs go to 3d-port, not main (main is the live site, far behind).
 - Stamp foreground before commits; ≥20seeds for adoption; cap12simulators.

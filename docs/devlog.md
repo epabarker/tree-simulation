@@ -2,6 +2,20 @@
 
 Newest first. One entry per session or milestone: what changed, why, surprises, and any golden-hash updates with their reason.
 
+## 2026-11-20: #138's ramp at θ_hi 0.10 with δλ 0.10 / 0.15 on M: the ramp is a sink, but neither pair passes
+
+- **The probe** ([note](experiments/2026-11-20-ramp-and-low-dose.md); arms and bars committed in 1346f7e before any run; approved by the user, 2026-11-20). ADR 0068's `topLight` ramp at θ_hi 0.10 with `r5.dLambda` 0.10 and 0.15 on every species, on M. The runs: widths 160 and 66, seeds 1–20, to 300, with the sapling probe and the lone hash gates. The bars: the ladder's 1–13 against M, plus 14 (the ramp lowers the late stems against the same dose alone), 15 (the cohort against `Mr10`) and 16 (the phone's stems against M).
+- **The ramp works as a sink:** stems ≥ 7 cm/ha at 160 cells fall from `Mdl10`'s 484 / 1,172 to 297 / 766 at frames 200 / 300. That puts frame 200 in the band and frame 300 under M's 1,055. The shaded gain is 0.25 m a decade.
+- **`Mr10dl10` still fails 4 of 16:**
+  - band frames: 11 of 60 against M's 16;
+  - canopy deaths: 18.0 a run, the ramp's rate of 0.43% a season;
+  - the cohort: 58% / 88% dead against `Mr10`'s 42% / 79%;
+  - the phone: 2 / 1 stems ≥ 7 cm against 3 / 2.
+- **`Mr10dl15` fails 7 bars:** frame 200 floods (555/ha), beech takes the canopy (0.68), and the phone's gates fall to 17 of 20.
+- **Surprise:** δλ makes the ramp kill more of the cohort, not less. This is against the probe's idea.
+- **Reuse:** 79 of 79 re-runs and checks equal their sources, and `Mr10` re-reads as the ramp re-probe's. The lone trees hash as M's in every arm.
+- Nothing is adopted. Whether `Mr10dl10` is acceptable on the bars it fails is the user's call (the note's "Decisions").
+
 ## 2026-11-20: no dose of δλ alone passes on M (ADR 0071); the ramp × δλ pairing probed before the adoption
 
 - **The user's decisions** (in chat, on the low-dose ladder):

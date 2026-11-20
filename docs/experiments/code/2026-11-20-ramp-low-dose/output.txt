@@ -1,0 +1,50 @@
+M: stubs true τ 2.5; birch δλ 0.02 (r5 true) carbon θ0 m1 sp- c5 true, beech δλ 0.02 (r5 true) carbon θ0 m1 sp- c5 true, oak δλ 0.02 (r5 true) carbon θ0 m1 sp- c5 true, fir δλ 0.02 (r5 true) carbon θ0 m1 sp- c5 true, hornbeam δλ 0.02 (r5 true) carbon θ0 m1 sp- c5 true, maple δλ 0.02 (r5 true) carbon θ0 m1 sp- c5 true, holly δλ 0.02 (r5 true) carbon θ0 m1 sp- c5 true, rowan δλ 0.02 (r5 true) carbon θ0 m1 sp- c5 true, willow δλ 0.02 (r5 true) carbon θ0 m1 sp- c5 true, pine δλ 0.02 (r5 true) carbon θ0 m1 sp- c5 true
+Mr10: stubs true τ 2.5; birch δλ 0.02 (r5 true) topLight θ0.1 m1 sp0.21 c5 true, beech δλ 0.02 (r5 true) topLight θ0.1 m1 sp0.034 c5 true, oak δλ 0.02 (r5 true) topLight θ0.1 m1 sp0.114 c5 true, fir δλ 0.02 (r5 true) topLight θ0.1 m1 sp0.0275 c5 true, hornbeam δλ 0.02 (r5 true) topLight θ0.1 m1 sp0.033 c5 true, maple δλ 0.02 (r5 true) topLight θ0.1 m1 sp0.075 c5 true, holly δλ 0.02 (r5 true) topLight θ0.1 m1 sp0.035 c5 true, rowan δλ 0.02 (r5 true) topLight θ0.1 m1 sp0.11 c5 true, willow δλ 0.02 (r5 true) topLight θ0.1 m1 sp0.16 c5 true, pine δλ 0.02 (r5 true) topLight θ0.1 m1 sp0.25 c5 true
+Mdl10: stubs true τ 2.5; birch δλ 0.1 (r5 true) carbon θ0 m1 sp- c5 true, beech δλ 0.1 (r5 true) carbon θ0 m1 sp- c5 true, oak δλ 0.1 (r5 true) carbon θ0 m1 sp- c5 true, fir δλ 0.1 (r5 true) carbon θ0 m1 sp- c5 true, hornbeam δλ 0.1 (r5 true) carbon θ0 m1 sp- c5 true, maple δλ 0.1 (r5 true) carbon θ0 m1 sp- c5 true, holly δλ 0.1 (r5 true) carbon θ0 m1 sp- c5 true, rowan δλ 0.1 (r5 true) carbon θ0 m1 sp- c5 true, willow δλ 0.1 (r5 true) carbon θ0 m1 sp- c5 true, pine δλ 0.1 (r5 true) carbon θ0 m1 sp- c5 true
+Mdl15: stubs true τ 2.5; birch δλ 0.15 (r5 true) carbon θ0 m1 sp- c5 true, beech δλ 0.15 (r5 true) carbon θ0 m1 sp- c5 true, oak δλ 0.15 (r5 true) carbon θ0 m1 sp- c5 true, fir δλ 0.15 (r5 true) carbon θ0 m1 sp- c5 true, hornbeam δλ 0.15 (r5 true) carbon θ0 m1 sp- c5 true, maple δλ 0.15 (r5 true) carbon θ0 m1 sp- c5 true, holly δλ 0.15 (r5 true) carbon θ0 m1 sp- c5 true, rowan δλ 0.15 (r5 true) carbon θ0 m1 sp- c5 true, willow δλ 0.15 (r5 true) carbon θ0 m1 sp- c5 true, pine δλ 0.15 (r5 true) carbon θ0 m1 sp- c5 true
+Mr10dl10: stubs true τ 2.5; birch δλ 0.1 (r5 true) topLight θ0.1 m1 sp0.21 c5 true, beech δλ 0.1 (r5 true) topLight θ0.1 m1 sp0.034 c5 true, oak δλ 0.1 (r5 true) topLight θ0.1 m1 sp0.114 c5 true, fir δλ 0.1 (r5 true) topLight θ0.1 m1 sp0.0275 c5 true, hornbeam δλ 0.1 (r5 true) topLight θ0.1 m1 sp0.033 c5 true, maple δλ 0.1 (r5 true) topLight θ0.1 m1 sp0.075 c5 true, holly δλ 0.1 (r5 true) topLight θ0.1 m1 sp0.035 c5 true, rowan δλ 0.1 (r5 true) topLight θ0.1 m1 sp0.11 c5 true, willow δλ 0.1 (r5 true) topLight θ0.1 m1 sp0.16 c5 true, pine δλ 0.1 (r5 true) topLight θ0.1 m1 sp0.25 c5 true
+Mr10dl15: stubs true τ 2.5; birch δλ 0.15 (r5 true) topLight θ0.1 m1 sp0.21 c5 true, beech δλ 0.15 (r5 true) topLight θ0.1 m1 sp0.034 c5 true, oak δλ 0.15 (r5 true) topLight θ0.1 m1 sp0.114 c5 true, fir δλ 0.15 (r5 true) topLight θ0.1 m1 sp0.0275 c5 true, hornbeam δλ 0.15 (r5 true) topLight θ0.1 m1 sp0.033 c5 true, maple δλ 0.15 (r5 true) topLight θ0.1 m1 sp0.075 c5 true, holly δλ 0.15 (r5 true) topLight θ0.1 m1 sp0.035 c5 true, rowan δλ 0.15 (r5 true) topLight θ0.1 m1 sp0.11 c5 true, willow δλ 0.15 (r5 true) topLight θ0.1 m1 sp0.16 c5 true, pine δλ 0.15 (r5 true) topLight θ0.1 m1 sp0.25 c5 true
+params equal for every linked run; re-runs equal to their sources': 79 of 79
+runs wall 44.4 min on 10 simulators
+M: saplings 199764 (3225 trees) no growth 0.68 gain 0.04 m (P90 1.28, none 0.29); shaded beech+hornbeam 0.04 m (n 183490) | beech 0.63, maple 0.83, hornbeam 0.68, holly 0.61, rowan 0.80, willow 1.00, birch 0.79
+  160: runs 20 gate1 20 gate1+2 20 | canopy/ha 132.81 | ≥7 band 16/60 (med 297; 203/203.5/1054.5) share≥0.6 18 | deaths 10.05 (0.28%/canopy-season) thrown 4.30 | cap 62.5 | wall 150.41 s | cohort 56.85/run dead 0.22 crossed 0.37 | ≥7 in plot 13/13/67.5 (empty at 200|300: 0)
+  66: runs 20 gate1 19 gate1+2 19 | canopy/ha 75.76 | ≥7 band 5/60 (med 114; 114/114/76) share≥0.6 40 | deaths 6.65 (0.48%/canopy-season) thrown 1.60 | cap 14.5 | wall 88.89 s | cohort 5.10/run dead 0.47 crossed 0.41 | ≥7 in plot 3/3/2 (empty at 200|300: 0)
+  lone beech: c9f55e42 H134.4 W/H 1.49; 300c8d73 H144.4 W/H 1.37; ee7b6037 H135.9 W/H 1.59
+  lone hornbeam: 859812b6 H117.4 W/H 1.31; 66b88c89 H116.7 W/H 1.18; f4a96f3e H116.7 W/H 1.00
+  lone oak: 9d18cdbd H135.8 W/H 1.39; 175ce3f9 H132.1 W/H 1.56; 66d455d6 H132.0 W/H 1.30
+  lone maple: ee97a454 H105.1 W/H 1.24; 4ba74db9 H101.6 W/H 1.15; 5084cd52 H107.3 W/H 1.06
+Mr10: saplings 183456 (3349 trees) no growth 0.66 gain 0.08 m (P90 1.35, none 0.26); shaded beech+hornbeam 0.09 m (n 158701) | beech 0.62, maple 0.82, hornbeam 0.65, rowan 0.82, holly 0.43, oak 0.72
+  160: runs 20 gate1 20 gate1+2 20 | canopy/ha 125.00 | ≥7 band 15/60 (med 250; 195.5/219/664) share≥0.6 29 | deaths 14.55 (0.42%/canopy-season) thrown 3.60 | cap 57.5 | wall 274.02 s | cohort 51.40/run dead 0.42 crossed 0.48 | ≥7 in plot 12.5/14/42.5 (empty at 200|300: 0)
+  66: runs 20 gate1 18 gate1+2 18 | canopy/ha 37.88 | ≥7 band 6/60 (med 76; 133/38/38) share≥0.6 54 | deaths 8.80 (0.64%/canopy-season) thrown 1.60 | cap 19.5 | wall 91.86 s | cohort 6.90/run dead 0.79 crossed 0.48 | ≥7 in plot 3.5/1/1 (empty at 200|300: 0)
+  lone beech: c9f55e42 H134.4 W/H 1.49; 300c8d73 H144.4 W/H 1.37; ee7b6037 H135.9 W/H 1.59
+  lone hornbeam: 859812b6 H117.4 W/H 1.31; 66b88c89 H116.7 W/H 1.18; f4a96f3e H116.7 W/H 1.00
+  lone oak: 9d18cdbd H135.8 W/H 1.39; 175ce3f9 H132.1 W/H 1.56; 66d455d6 H132.0 W/H 1.30
+  lone maple: ee97a454 H105.1 W/H 1.24; 4ba74db9 H101.6 W/H 1.15; 5084cd52 H107.3 W/H 1.06
+Mdl10: saplings 169981 (3305 trees) no growth 0.64 gain 0.18 m (P90 1.85, none 0.23); shaded beech+hornbeam 0.18 m (n 156799) | beech 0.58, maple 0.92, hornbeam 0.64, rowan 0.77, holly 0.86, willow 0.98, oak 0.85
+  160: runs 20 gate1 20 gate1+2 20 | canopy/ha 148.44 | ≥7 band 9/60 (med 297; 188/484.5/1172) share≥0.6 31 | deaths 14.45 (0.31%/canopy-season) thrown 5.60 | cap 61 | wall 258.67 s | cohort 62.65/run dead 0.23 crossed 0.40 | ≥7 in plot 12/31/75 (empty at 200|300: 0)
+  66: runs 20 gate1 19 gate1+2 19 | canopy/ha 75.76 | ≥7 band 8/60 (med 114; 170.5/114/76) share≥0.6 37 | deaths 7.55 (0.44%/canopy-season) thrown 2.50 | cap 19.5 | wall 95.18 s | cohort 6.35/run dead 0.75 crossed 0.31 | ≥7 in plot 4.5/3/2 (empty at 200|300: 0)
+  lone beech: c9f55e42 H134.4 W/H 1.49; 300c8d73 H144.4 W/H 1.37; ee7b6037 H135.9 W/H 1.59
+  lone hornbeam: 859812b6 H117.4 W/H 1.31; 66b88c89 H116.7 W/H 1.18; f4a96f3e H116.7 W/H 1.00
+  lone oak: 9d18cdbd H135.8 W/H 1.39; 175ce3f9 H132.1 W/H 1.56; 66d455d6 H132.0 W/H 1.30
+  lone maple: ee97a454 H105.1 W/H 1.24; 4ba74db9 H101.6 W/H 1.15; 5084cd52 H107.3 W/H 1.06
+Mdl15: saplings 164521 (3290 trees) no growth 0.60 gain 0.29 m (P90 1.85, none 0.18); shaded beech+hornbeam 0.28 m (n 151966) | maple 0.94, beech 0.48, hornbeam 0.65, holly 0.89, rowan 0.81, oak 0.84
+  160: runs 20 gate1 20 gate1+2 20 | canopy/ha 148.44 | ≥7 band 10/60 (med 390.5; 195.5/594/1265.5) share≥0.6 28 | deaths 17.00 (0.33%/canopy-season) thrown 6.80 | cap 72 | wall 249.68 s | cohort 61.50/run dead 0.20 crossed 0.48 | ≥7 in plot 12.5/38/81 (empty at 200|300: 0)
+  66: runs 20 gate1 20 gate1+2 20 | canopy/ha 113.64 | ≥7 band 9/60 (med 114; 133/114/189.5) share≥0.6 46 | deaths 9.35 (0.45%/canopy-season) thrown 2.50 | cap 29 | wall 95.73 s | cohort 3.90/run dead 0.55 crossed 0.54 | ≥7 in plot 3.5/3/5 (empty at 200|300: 0)
+  lone beech: c9f55e42 H134.4 W/H 1.49; 300c8d73 H144.4 W/H 1.37; ee7b6037 H135.9 W/H 1.59
+  lone hornbeam: 859812b6 H117.4 W/H 1.31; 66b88c89 H116.7 W/H 1.18; f4a96f3e H116.7 W/H 1.00
+  lone oak: 9d18cdbd H135.8 W/H 1.39; 175ce3f9 H132.1 W/H 1.56; 66d455d6 H132.0 W/H 1.30
+  lone maple: ee97a454 H105.1 W/H 1.24; 4ba74db9 H101.6 W/H 1.15; 5084cd52 H107.3 W/H 1.06
+Mr10dl10: saplings 140580 (3407 trees) no growth 0.60 gain 0.24 m (P90 2.14, none 0.20); shaded beech+hornbeam 0.25 m (n 120463) | maple 0.85, beech 0.56, hornbeam 0.60, holly 0.90, rowan 0.81, oak 0.90
+  160: runs 20 gate1 20 gate1+2 20 | canopy/ha 148.44 | ≥7 band 11/60 (med 226.5; 180/297/766) share≥0.6 33 | deaths 18.00 (0.43%/canopy-season) thrown 5.40 | cap 41 | wall 248.28 s | cohort 47.50/run dead 0.58 crossed 0.60 | ≥7 in plot 11.5/19/49 (empty at 200|300: 0)
+  66: runs 20 gate1 19 gate1+2 19 | canopy/ha 75.76 | ≥7 band 6/60 (med 76; 133/76/38) share≥0.6 49 | deaths 9.35 (0.60%/canopy-season) thrown 2.25 | cap 19.5 | wall 93.55 s | cohort 5.15/run dead 0.88 crossed 0.25 | ≥7 in plot 3.5/2/1 (empty at 200|300: 0)
+  lone beech: c9f55e42 H134.4 W/H 1.49; 300c8d73 H144.4 W/H 1.37; ee7b6037 H135.9 W/H 1.59
+  lone hornbeam: 859812b6 H117.4 W/H 1.31; 66b88c89 H116.7 W/H 1.18; f4a96f3e H116.7 W/H 1.00
+  lone oak: 9d18cdbd H135.8 W/H 1.39; 175ce3f9 H132.1 W/H 1.56; 66d455d6 H132.0 W/H 1.30
+  lone maple: ee97a454 H105.1 W/H 1.24; 4ba74db9 H101.6 W/H 1.15; 5084cd52 H107.3 W/H 1.06
+Mr10dl15: saplings 145034 (3873 trees) no growth 0.52 gain 0.46 m (P90 2.66, none 0.15); shaded beech+hornbeam 0.44 m (n 123419) | beech 0.45, hornbeam 0.56, maple 0.89, holly 0.88, oak 0.82, rowan 0.88
+  160: runs 20 gate1 19 gate1+2 19 | canopy/ha 164.06 | ≥7 band 5/60 (med 391; 141/555/906.5) share≥0.6 33 | deaths 23.60 (0.44%/canopy-season) thrown 7.65 | cap 57.5 | wall 263.91 s | cohort 42.15/run dead 0.42 crossed 0.63 | ≥7 in plot 9/35.5/58 (empty at 200|300: 0)
+  66: runs 20 gate1 17 gate1+2 17 | canopy/ha 56.82 | ≥7 band 6/60 (med 114; 114/76/114) share≥0.6 50 | deaths 9.90 (0.50%/canopy-season) thrown 2.30 | cap 17 | wall 91.27 s | cohort 3.25/run dead 0.65 crossed 0.78 | ≥7 in plot 3/2/3 (empty at 200|300: 0)
+  lone beech: c9f55e42 H134.4 W/H 1.49; 300c8d73 H144.4 W/H 1.37; ee7b6037 H135.9 W/H 1.59
+  lone hornbeam: 859812b6 H117.4 W/H 1.31; 66b88c89 H116.7 W/H 1.18; f4a96f3e H116.7 W/H 1.00
+  lone oak: 9d18cdbd H135.8 W/H 1.39; 175ce3f9 H132.1 W/H 1.56; 66d455d6 H132.0 W/H 1.30
+  lone maple: ee97a454 H105.1 W/H 1.24; 4ba74db9 H101.6 W/H 1.15; 5084cd52 H107.3 W/H 1.06
